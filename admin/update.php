@@ -1,6 +1,6 @@
 <?
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
 // Define a function for updating user save files
 function mmrpg_admin_update_save_file($key, $data){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_admin_update_save_file({$key}, \$data)");  }
@@ -10,62 +10,81 @@ function mmrpg_admin_update_save_file($key, $data){
   // Expand this save files data into full arrays and update the session
   $_SESSION['GAME']['CACHE_DATE'] = $data['save_cache_date'];
   $cache_date_backup = $data['save_cache_date'];
-  
+
   // If the CACHE DATE was BEFORE the serialization purge, collect with special care
   if ($_SESSION['GAME']['CACHE_DATE'] < '20140501-01'){
-    
+
     //$_SESSION['GAME']['USER']['userid'] = $data['user_id'];
     $_SESSION['GAME']['flags'] = !empty($data['save_flags']) ? unserialize($data['save_flags']) : array();
     $_SESSION['GAME']['values'] = !empty($data['save_values']) ? unserialize($data['save_values']) : array();
+
     if (!empty($data['save_values_battle_index'])){ $_SESSION['GAME']['values']['battle_index'] = array(); /*unserialize($data['save_values_battle_index']);*/ }
     elseif (!isset($_SESSION['GAME']['values']['battle_index'])){ $_SESSION['GAME']['values']['battle_index'] = array(); }
+
     if (!empty($data['save_values_battle_complete'])){ $_SESSION['GAME']['values']['battle_complete'] = unserialize($data['save_values_battle_complete']); }
     elseif (!isset($_SESSION['GAME']['values']['battle_complete'])){ $_SESSION['GAME']['values']['battle_complete'] = array(); }
+
     if (!empty($data['save_values_battle_failure'])){ $_SESSION['GAME']['values']['battle_failure'] = unserialize($data['save_values_battle_failure']); }
     elseif (!isset($_SESSION['GAME']['values']['battle_failure'])){ $_SESSION['GAME']['values']['battle_failure'] = array(); }
-    if (!empty($data['save_values_battle_settings'])){ $_SESSION['GAME']['values']['battle_rewards'] = unserialize($data['save_values_battle_settings']); }
+
+    if (!empty($data['save_values_battle_settings'])){ $_SESSION['GAME']['values']['battle_settings'] = unserialize($data['save_values_battle_settings']); }
     elseif (!isset($_SESSION['GAME']['values']['battle_settings'])){ $_SESSION['GAME']['values']['battle_settings'] = array(); }
-    if (!empty($data['save_values_battle_rewards'])){ $_SESSION['GAME']['values']['battle_settings'] = unserialize($data['save_values_battle_rewards']); }
+
+    if (!empty($data['save_values_battle_rewards'])){ $_SESSION['GAME']['values']['battle_rewards'] = unserialize($data['save_values_battle_rewards']); }
     elseif (!isset($_SESSION['GAME']['values']['battle_rewards'])){ $_SESSION['GAME']['values']['battle_rewards'] = array(); }
+
     if (!empty($data['save_values_battle_items'])){ $_SESSION['GAME']['values']['battle_items'] = unserialize($data['save_values_battle_items']); }
     elseif (!isset($_SESSION['GAME']['values']['battle_items'])){ $_SESSION['GAME']['values']['battle_items'] = array(); }
+
     if (!empty($data['save_values_battle_stars'])){ $_SESSION['GAME']['values']['battle_stars'] = unserialize($data['save_values_battle_stars']); }
     elseif (!isset($_SESSION['GAME']['values']['battle_stars'])){ $_SESSION['GAME']['values']['battle_stars'] = array(); }
+
     if (!empty($data['save_values_robot_database'])){ $_SESSION['GAME']['values']['robot_database'] = unserialize($data['save_values_robot_database']); }
     elseif (!isset($_SESSION['GAME']['values']['robot_database'])){ $_SESSION['GAME']['values']['robot_database'] = array(); }
+
     $_SESSION['GAME']['counters'] = !empty($data['save_counters']) ? unserialize($data['save_counters']) : array();
-    
+
   }
   // Otherwise, if this save is AFTER the serialization purge, collect normally
   else {
-    
+
     //$_SESSION['GAME']['USER']['userid'] = $data['user_id'];
     $_SESSION['GAME']['flags'] = !empty($data['save_flags']) ? json_decode($data['save_flags'], true) : array();
     $_SESSION['GAME']['values'] = !empty($data['save_values']) ? json_decode($data['save_values'], true) : array();
+
     if (!empty($data['save_values_battle_index'])){ $_SESSION['GAME']['values']['battle_index'] = array(); }
     elseif (!isset($_SESSION['GAME']['values']['battle_index'])){ $_SESSION['GAME']['values']['battle_index'] = array(); }
+
     if (!empty($data['save_values_battle_complete'])){ $_SESSION['GAME']['values']['battle_complete'] = json_decode($data['save_values_battle_complete'], true); }
     elseif (!isset($_SESSION['GAME']['values']['battle_complete'])){ $_SESSION['GAME']['values']['battle_complete'] = array(); }
+
     if (!empty($data['save_values_battle_failure'])){ $_SESSION['GAME']['values']['battle_failure'] = json_decode($data['save_values_battle_failure'], true); }
     elseif (!isset($_SESSION['GAME']['values']['battle_failure'])){ $_SESSION['GAME']['values']['battle_failure'] = array(); }
-    if (!empty($data['save_values_battle_settings'])){ $_SESSION['GAME']['values']['battle_rewards'] = json_decode($data['save_values_battle_settings'], true); }
+
+    if (!empty($data['save_values_battle_settings'])){ $_SESSION['GAME']['values']['battle_settings'] = json_decode($data['save_values_battle_settings'], true); }
     elseif (!isset($_SESSION['GAME']['values']['battle_settings'])){ $_SESSION['GAME']['values']['battle_settings'] = array(); }
-    if (!empty($data['save_values_battle_rewards'])){ $_SESSION['GAME']['values']['battle_settings'] = json_decode($data['save_values_battle_rewards'], true); }
+
+    if (!empty($data['save_values_battle_rewards'])){ $_SESSION['GAME']['values']['battle_rewards'] = json_decode($data['save_values_battle_rewards'], true); }
     elseif (!isset($_SESSION['GAME']['values']['battle_rewards'])){ $_SESSION['GAME']['values']['battle_rewards'] = array(); }
+
     if (!empty($data['save_values_battle_items'])){ $_SESSION['GAME']['values']['battle_items'] = json_decode($data['save_values_battle_items'], true); }
     elseif (!isset($_SESSION['GAME']['values']['battle_items'])){ $_SESSION['GAME']['values']['battle_items'] = array(); }
+
     if (!empty($data['save_values_battle_stars'])){ $_SESSION['GAME']['values']['battle_stars'] = json_decode($data['save_values_battle_stars'], true); }
     elseif (!isset($_SESSION['GAME']['values']['battle_stars'])){ $_SESSION['GAME']['values']['battle_stars'] = array(); }
+
     if (!empty($data['save_values_robot_database'])){ $_SESSION['GAME']['values']['robot_database'] = json_decode($data['save_values_robot_database'], true); }
     elseif (!isset($_SESSION['GAME']['values']['robot_database'])){ $_SESSION['GAME']['values']['robot_database'] = array(); }
+
     $_SESSION['GAME']['counters'] = !empty($data['save_counters']) ? json_decode($data['save_counters'], true) : array();
-    
+
   }
-  
+
   // Include the file updates list
   $_SESSION['TEMP']['temp_update_user_id'] = $data['user_id'];
+  $_SESSION['TEMP']['temp_update_user_name_clean'] = $data['user_name_clean'];
   require('file_updates.php');
-  
+
   // Recompress and prepare the save data for the database
   $temp_values = $_SESSION['GAME']['values'];
   unset($temp_values['battle_index'], $temp_values['battle_complete'], $temp_values['battle_failure'],
@@ -85,22 +104,22 @@ function mmrpg_admin_update_save_file($key, $data){
     'save_values_robot_database' => mmrpg_admin_encode_save_data($_SESSION['GAME']['values']['robot_database'], $cache_date_backup),
     'save_counters' => mmrpg_admin_encode_save_data($_SESSION['GAME']['counters'], $cache_date_backup)
     );
-    
+
   //die('$_SESSION[\'GAME\'][\'values\']('.$data['user_id'].':'.$data['user_name_clean'].') => <pre>'.print_r($_SESSION['GAME']['values'], true).'</pre>');
   //die('$update_array('.$data['user_id'].':'.$data['user_name_clean'].') => <pre>'.print_r($update_array, true).'</pre>');
   //die('$update_array[\'save_values\'] : '.$update_array['save_values']);
-    
+
   // Update the database with the recent changes
   $temp_success = $DB->update('mmrpg_saves', $update_array, "save_id = {$data['save_id']}");
   // If there was an error, print it, else continue
-  
+
   // DEBUG
   $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
-    
+
     // Print the debug headers
     $this_page_markup .= '<strong>$this_update_list['.$key.']['.$data['user_name_clean'].']</strong><br />';
     $this_page_markup .= 'Save ID:'.$data['save_id'].'<br />';
-                
+
     // Check to see which fields have been updated
     if ($update_array['save_cache_date'] != $data['save_cache_date']){ $this_page_markup .= 'Save cache date has been changed...<br />'; }
     if ($update_array['save_flags'] != $data['save_flags']){ $this_page_markup .= 'Save flags have been changed...<br />'; }
@@ -118,12 +137,12 @@ function mmrpg_admin_update_save_file($key, $data){
     if ($temp_success === false){ $this_page_markup .= '...Failure!'; }
     else { $this_page_markup .= '...'.(!empty($temp_success) ? 'Success!' : 'Skipped!'); }
     unset($update_array);
-    
+
   $this_page_markup .= '</p><hr />';
-  
+
   // Reset everything back to default
   mmrpg_reset_game_session($this_save_filepath);
-  
+
   // Return generated page markup
   return $this_page_markup;
 }
@@ -134,7 +153,7 @@ function mmrpg_admin_encode_save_data($data, $cache){
   static $typo_find_replace;
   if (empty($typo_find_replace)){
     $typo_find_replace = array();
-    
+
     // If this was before the May 2014 serialization and typo purge
     if ($cache < '20140501-01'){
       $typo_find_replace = array(
@@ -143,10 +162,18 @@ function mmrpg_admin_encode_save_data($data, $cache){
         'Crystal ' => 'Photon ',
         'crystal-' => 'photon-',
         ' Cave' => ' Collider',
-        '-cave' => '-collider',
+        '-cave' => '-collider'
         );
     }
-    
+
+    // If this was before the April 2015 serialization and typo purge
+    if ($cache < '20150405-05'){
+      $typo_find_replace = array(
+        'dive-torpedo' => 'dive-missile',
+        'pharaoh-shot' => 'pharaoh-soul'
+        );
+    }
+
   }
   $typo_find = array_keys($typo_find_replace);
   $typo_replace = array_values($typo_find_replace);
@@ -172,6 +199,8 @@ $this_update_query = "SELECT mmrpg_saves.*, mmrpg_leaderboard.board_points, mmrp
 	LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_saves.user_id
 	LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_saves.user_id
 	WHERE save_cache_date < '{$this_cache_date}' AND board_points > 0
+	AND mmrpg_users.user_id <> ".MMRPG_SETTINGS_GUEST_ID."
+	".(!empty($_REQUEST['user_id']) ? "AND mmrpg_users.user_id = {$_REQUEST['user_id']} " : '')."
 	ORDER BY board_points DESC
 	LIMIT {$this_update_limit}";
 //die($this_update_query);
@@ -179,6 +208,8 @@ $this_total_query = "SELECT mmrpg_saves.user_id, mmrpg_saves.save_cache_date, mm
 	LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_saves.user_id
 	LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_saves.user_id
 	WHERE save_cache_date < '{$this_cache_date}' AND board_points > 0
+	AND mmrpg_users.user_id <> ".MMRPG_SETTINGS_GUEST_ID."
+	".(!empty($_REQUEST['user_id']) ? "AND mmrpg_users.user_id = {$_REQUEST['user_id']} " : '')."
 	ORDER BY board_points DESC";
 //die($this_update_query);
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -204,7 +235,8 @@ if ($this_request_type != 'ajax'){
     <a href="admin.php">Admin Panel</a> &raquo;
     <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=<?=$this_update_limit?>">Update Save Files</a> &raquo;
     <br />
-    <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=10" data-limit="10">x10</a>
+    <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=1" data-limit="1">x1</a>
+    | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=10" data-limit="10">x10</a>
     | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=50" data-limit="50">x50</a>
     | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=100" data-limit="100">x100</a>
     | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=200" data-limit="200">x200</a>
@@ -237,6 +269,8 @@ if (!empty($this_update_list) && $this_request_type == 'ajax'){
     //if ($this_request_type == 'index'){ $this_page_markup .= mmrpg_admin_update_save_file($key, $data); }
     //if ($this_request_type == 'ajax') { $this_return_markup .= preg_replace('/\s+/', ' ', mmrpg_admin_update_save_file($key, $data))."\n"; }
     //elseif ($this_request_type == 'ajax') { $this_return_markup .= mmrpg_admin_update_save_file($key, $data) ? "update/success/{$key}\n" : "update/failure/{$key}\n"; }
+    if ($data['user_id'] == MMRPG_SETTINGS_GUEST_ID){ continue; }
+    //die($this_return_markup."\n".print_r($data, true));
     $this_return_markup .= preg_replace('/\s+/', ' ', mmrpg_admin_update_save_file($key, $data))."\n";
   }
   $key = $data = false;
@@ -282,7 +316,7 @@ $(document).ready(function(){
   thisResults = $('#results', thisContent);
   thisPendingCounter = $('#count_pending', thisContent);
   thisCompletedCounter = $('#count_completed', thisContent);
-  
+
   $('a[data-limit]', thisMenu).click(function(e){
     e.preventDefault();
     if (pendingUpdates > 0){ return false; }
@@ -296,7 +330,7 @@ $(document).ready(function(){
 
 function admin_trigger_update(){
   if (pendingUpdates > 0){
-    
+
       // Define the post data array
       var postData = {date:thisCacheDate,limit:1};
 
@@ -306,28 +340,28 @@ function admin_trigger_update(){
         url: 'admin.php?action=update&type=ajax',
         data: postData,
         success: function(data, status){
-          
+
           // Break apart the response into parts
           var data = data.split('\n');
           var dataQuery = data[0] != undefined ? data[0] : false;
           var dataCount = data[1] != undefined ? data[1] : false;
           var dataContent = data[2] != undefined ? data[2] : false;
-          
+
           // DEBUG
           //console.log('dataQuery = '+dataQuery+', dataCount = '+dataCount+', dataContent = '+dataContent+'; ');
-          
+
           // If the ability change was a success, flash the box green
           if (dataContent != false){
-            
+
             dataContent = $(dataContent);
             dataContent.css({height:'1px',overflow:'hidden',opacity:0});
             dataContent.prependTo(thisResults).animate({height:'100%',opacity:1},200,'swing');
-            
+
             pendingUpdates--;
             completedUpdates++;
             thisPendingCounter.html(pendingUpdates);
             thisCompletedCounter.html(completedUpdates);
-            
+
             if (pendingUpdates > 0){
               var thisTimeout = setTimeout(function(){ return admin_trigger_update(); }, 500);
               return true;
@@ -335,9 +369,9 @@ function admin_trigger_update(){
               thisCompletedCounter.css({color:'rgb(0, 139, 0)',opacity:0.5}).animate({opacity:1.0},1000,'swing',function(){ thisCompletedCounter.css({color:'rgb(0, 0, 0)'}); });
               return true;
               }
-            
+
             }
-          
+
         }});
   }
 }
