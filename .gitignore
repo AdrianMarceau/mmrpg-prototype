@@ -5,6 +5,7 @@
 /_preview/
 /_share/
 /_tmp/
+/_sql/
 /admin/*
 /chat/*
 /data/config.php
@@ -29,7 +30,6 @@
 /images/database/
 /images/misc/
 /images/previews/
-/sounds/misc/
 /admin.php
 /ability-generator.php
 /debug.php
