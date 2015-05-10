@@ -6,7 +6,7 @@
 /_share/
 /_tmp/
 /_sql/
-/admin/*
+/admin/_phpinfo.php
 /chat/*
 /data/config.php
 /data/analytics.php
