@@ -1,0 +1,3 @@
+This is my first commit for the Mega Man RPG Prototype! :D
+
+Just testing to make sure everything works and is setup correctly...  wish me luck.
