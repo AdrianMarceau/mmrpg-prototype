@@ -1,7 +1,7 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               5.5.31-0ubuntu0.12.04.2 - (Ubuntu)
--- Server OS:                    debian-linux-gnu
+-- Server version:               5.6.17 - MySQL Community Server (GPL)
+-- Server OS:                    Win64
 -- HeidiSQL Version:             9.1.0.4867
 -- --------------------------------------------------------
 
@@ -10,7 +10,7 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table mmrpg2k11.mmrpg_index_fields
+-- Dumping structure for table pluto1_mmrpg2k11.mmrpg_index_fields
 CREATE TABLE IF NOT EXISTS `mmrpg_index_fields` (
   `field_id` mediumint(8) NOT NULL AUTO_INCREMENT COMMENT 'Field ID',
   `field_token` varchar(100) NOT NULL COMMENT 'Field Token',
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `mmrpg_index_fields` (
   `field_flag_hidden` smallint(1) NOT NULL DEFAULT '0' COMMENT 'Field Flag Hidden',
   `field_flag_complete` smallint(1) NOT NULL DEFAULT '0' COMMENT 'Field Flag Complete',
   `field_flag_published` smallint(1) NOT NULL DEFAULT '1' COMMENT 'Field Flag Published',
-  `fields_order` smallint(8) NOT NULL DEFAULT '0' COMMENT 'Field Order',
+  `field_order` smallint(8) NOT NULL DEFAULT '0' COMMENT 'Field Order',
   PRIMARY KEY (`field_id`),
   KEY `robot_token` (`field_token`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

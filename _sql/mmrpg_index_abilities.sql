@@ -1,7 +1,7 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               5.5.31-0ubuntu0.12.04.2 - (Ubuntu)
--- Server OS:                    debian-linux-gnu
+-- Server version:               5.6.17 - MySQL Community Server (GPL)
+-- Server OS:                    Win64
 -- HeidiSQL Version:             9.1.0.4867
 -- --------------------------------------------------------
 
@@ -10,12 +10,13 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table mmrpg2k11.mmrpg_index_abilities
+-- Dumping structure for table pluto1_mmrpg2k11.mmrpg_index_abilities
 CREATE TABLE IF NOT EXISTS `mmrpg_index_abilities` (
   `ability_id` mediumint(8) NOT NULL AUTO_INCREMENT COMMENT 'Ability ID',
   `ability_token` varchar(100) NOT NULL COMMENT 'Ability Token',
   `ability_name` varchar(100) NOT NULL COMMENT 'Ability Name',
   `ability_game` varchar(10) NOT NULL COMMENT 'Ability Game',
+  `ability_group` varchar(100) NOT NULL COMMENT 'Ability Group',
   `ability_class` varchar(32) NOT NULL COMMENT 'Ability Class',
   `ability_master` varchar(100) NOT NULL COMMENT 'Ability Master',
   `ability_number` varchar(10) NOT NULL COMMENT 'Ability Number',

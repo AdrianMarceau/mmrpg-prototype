@@ -1,7 +1,7 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               5.5.31-0ubuntu0.12.04.2 - (Ubuntu)
--- Server OS:                    debian-linux-gnu
+-- Server version:               5.6.17 - MySQL Community Server (GPL)
+-- Server OS:                    Win64
 -- HeidiSQL Version:             9.1.0.4867
 -- --------------------------------------------------------
 
@@ -10,7 +10,7 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table mmrpg2k11.mmrpg_index_robots
+-- Dumping structure for table pluto1_mmrpg2k11.mmrpg_index_robots
 CREATE TABLE IF NOT EXISTS `mmrpg_index_robots` (
   `robot_id` mediumint(8) NOT NULL AUTO_INCREMENT COMMENT 'Robot ID',
   `robot_token` varchar(100) NOT NULL COMMENT 'Robot Token',
@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `mmrpg_index_robots` (
   `robot_field` varchar(100) NOT NULL COMMENT 'Robot Field',
   `robot_field2` varchar(100) NOT NULL COMMENT 'Robot Field 2',
   `robot_class` varchar(32) NOT NULL COMMENT 'Robot Class',
+  `robot_gender` varchar(10) CHARACTER SET utf16 NOT NULL DEFAULT 'none' COMMENT 'Robot Gender',
   `robot_image` varchar(64) NOT NULL COMMENT 'Robot Image',
   `robot_image_size` smallint(3) NOT NULL DEFAULT '40' COMMENT 'Robot Image Size',
   `robot_image_editor` mediumint(8) NOT NULL DEFAULT '0' COMMENT 'Robot Image Editor',

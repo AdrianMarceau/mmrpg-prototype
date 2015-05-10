@@ -10,16 +10,16 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table pluto1_mmrpg2k11.mmrpg_categories
-CREATE TABLE IF NOT EXISTS `mmrpg_categories` (
-  `category_id` mediumint(8) NOT NULL AUTO_INCREMENT COMMENT 'Category ID',
-  `category_level` mediumint(8) NOT NULL DEFAULT '5' COMMENT 'Category Level',
-  `category_name` varchar(255) NOT NULL COMMENT 'Category Name',
-  `category_token` varchar(255) NOT NULL COMMENT 'Category Token',
-  `category_description` text CHARACTER SET latin1 NOT NULL COMMENT 'Category Description',
-  `category_published` smallint(1) NOT NULL DEFAULT '1' COMMENT 'Category Published',
-  `category_order` mediumint(8) NOT NULL DEFAULT '0' COMMENT 'Category Order',
-  PRIMARY KEY (`category_id`)
+-- Dumping structure for table pluto1_mmrpg2k11.mmrpg_sessions
+CREATE TABLE IF NOT EXISTS `mmrpg_sessions` (
+  `session_id` mediumint(8) NOT NULL AUTO_INCREMENT COMMENT 'Session ID',
+  `user_id` mediumint(8) NOT NULL DEFAULT '0' COMMENT 'User ID',
+  `session_key` varchar(255) NOT NULL COMMENT 'Session Key',
+  `session_href` varchar(255) NOT NULL COMMENT 'Session Href',
+  `session_start` int(8) NOT NULL COMMENT 'Session Start',
+  `session_access` int(8) NOT NULL DEFAULT '0' COMMENT 'Session Access',
+  `session_ip` varchar(100) NOT NULL DEFAULT '0.0.0.0' COMMENT 'Session IP',
+  PRIMARY KEY (`session_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
