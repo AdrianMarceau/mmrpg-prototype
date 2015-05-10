@@ -67,8 +67,9 @@ ob_start();
         $temp_robot_title .= ' <br />'.(!empty($temp_robot->robot_core) ? ucfirst($temp_robot->robot_core).' Core' : 'Neutral Core').' | '.ucfirst($temp_robot->robot_position).' Position';
         $temp_robot_title .= ' <br />'.$temp_robot->robot_energy.' / '.$temp_robot->robot_base_energy.' LE';
         $temp_robot_title .= ' | '.$temp_robot->robot_weapons.' / '.$temp_robot->robot_base_weapons.' WE';
+        $temp_required_experience = mmrpg_prototype_calculate_experience_required($temp_robot->robot_level);
         if ($robot_direction == 'right' && $temp_robot->robot_class != 'mecha'){
-          $temp_robot_title .= ' | '.$temp_robot->robot_experience.' / 1000 EXP';
+          $temp_robot_title .= ' | '.$temp_robot->robot_experience.' / '.$temp_required_experience.' EXP';
         } elseif ($temp_robot->robot_class == 'mecha'){
           $temp_generation = '1st';
           if (preg_match('/-2$/', $temp_robot->robot_token)){ $temp_generation = '2nd'; }
@@ -85,12 +86,12 @@ ob_start();
           if ($key > 0 && $key % 4 == 0){ $temp_robot_title .= '<br /> '; }
           $info = mmrpg_ability::parse_index_info($temp_abilities_index[$token]);
           $temp_robot_title .= $info['ability_name'];
-          
+
         }
         // Encode the tooltip for markup insertion and create a plain one too
         $temp_robot_title_plain = strip_tags(str_replace('<br />', '//', $temp_robot_title));
         $temp_robot_title_tooltip = htmlentities($temp_robot_title, ENT_QUOTES, 'UTF-8');
-        
+
         // Define the robot button text variables
         $temp_robot_label = '<span class="multi">';
         $temp_robot_label .= '<span class="maintext">'.$temp_robot->robot_name.'</span>';
@@ -105,7 +106,7 @@ ob_start();
           $temp_robot_label .= 'S:'.$temp_robot->robot_speed;
         $temp_robot_label .= '</span>';
         $temp_robot_label .= '</span>';
-                  
+
         // Define the robot sprite variables
         $temp_robot_sprite = array();
         $temp_robot_sprite['name'] = $temp_robot->robot_name;

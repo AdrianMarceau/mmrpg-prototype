@@ -81,18 +81,18 @@ ob_start();
         elseif (!empty($this_battle->battle_field->field_multipliers['none'])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers['none']; }
         if (!empty($temp_type2) && !empty($this_battle->battle_field->field_multipliers[$temp_type2])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$temp_type2]; }
         //elseif (!empty($this_battle->battle_field->field_multipliers['none'])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers['none']; }
-        if (!empty($temp_type) && !empty($_SESSION['GAME']['values']['star_force'][$temp_type])){ $temp_multiplier += $temp_multiplier * ($_SESSION['GAME']['values']['star_force'][$temp_type] / 10); }
-        elseif (!empty($_SESSION['GAME']['values']['star_force']['none'])){ $temp_multiplier += $temp_multiplier * ($_SESSION['GAME']['values']['star_force']['none'] / 10); }
-        if (!empty($temp_type2) && !empty($_SESSION['GAME']['values']['star_force'][$temp_type2])){ $temp_multiplier += $temp_multiplier * ($_SESSION['GAME']['values']['star_force'][$temp_type2] / 10); }
+        //if (!empty($temp_type) && !empty($_SESSION['GAME']['values']ar_force'][$temp_type])){ $temp_multiplier += $temp_multiplier * ($_SESSION['GAME']['values']['star_force'][$temp_type] / 10); }
         //elseif (!empty($_SESSION['GAME']['values']['star_force']['none'])){ $temp_multiplier += $temp_multiplier * ($_SESSION['GAME']['values']['star_force']['none'] / 10); }
-        
+        //if (!empty($temp_type2) && !empty($_SESSION['GAME']['values']['star_force'][$temp_type2])){ $temp_multiplier += $temp_multiplier * ($_SESSION['GAME']['values']['star_force'][$temp_type2] / 10); }
+        //elseif (!empty($_SESSION['GAME']['values']['star_force']['none'])){ $temp_multiplier += $temp_multiplier * ($_SESSION['GAME']['values']['star_force']['none'] / 10); }
+
         $temp_damage = ceil($temp_damage * $temp_multiplier);
         if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage = ceil($temp_damage * $this_battle->battle_field->field_multipliers['damage']); }
         if ($temp_damage_unit == '%' && $temp_damage > 100){ $temp_damage = 100; }
         $temp_damage2 = ceil($temp_damage2 * $temp_multiplier);
         if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage2 = ceil($temp_damage2 * $this_battle->battle_field->field_multipliers['damage']); }
         if ($temp_damage2_unit == '%' && $temp_damage2 > 100){ $temp_damage2 = 100; }
-        
+
         $temp_recovery = ceil($temp_recovery * $temp_multiplier);
         if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['recovery'])){ $temp_recovery = ceil($temp_recovery * $this_battle->battle_field->field_multipliers['recovery']); }
         if ($temp_recovery_unit == '%' && $temp_recovery > 100){ $temp_recovery = 100; }
@@ -110,11 +110,15 @@ ob_start();
         if (!empty($temp_ability->ability_type2)){ $temp_ability_details .= ' / '.$mmrpg_index['types'][$temp_ability->ability_type2]['type_name']; }
         else { $temp_ability_details .= ' Type'; }
         $temp_ability_details .= ') <br />';
+        //if ($temp_kind == 'damage'){ $temp_ability_details .= ($temp_multiplier != 1 ? '<del>'.$temp_ability->ability_damage.'</del> ' : '').$temp_damage.$temp_damage_unit.' Damage'; }
+        //elseif ($temp_kind == 'recovery'){ $temp_ability_details .= ($temp_multiplier != 1 ? '<del>'.$temp_ability->ability_recovery.'</del> ' : '').$temp_recovery.$temp_recovery_unit.' Recovery'; }
+        //elseif ($temp_kind == 'multi'){ $temp_ability_details .= ($temp_multiplier != 1 ? '<del>'.$temp_ability->ability_damage.'</del> ' : '').$temp_damage.$temp_damage_unit.' Damage / '.($temp_multiplier != 1 ? '<del>'.$temp_ability->ability_recovery.'</del> ' : '').$temp_recovery.$temp_recovery_unit.' Recovery'; }
         if ($temp_kind == 'damage'){ $temp_ability_details .= $temp_damage.$temp_damage_unit.' Damage'; }
         elseif ($temp_kind == 'recovery'){ $temp_ability_details .= $temp_recovery.$temp_recovery_unit.' Recovery'; }
-        elseif ($temp_kind == 'multi'){ $temp_ability_details .= $temp_damage.$temp_damage_unit.' Damage / '.$temp_recovery.$temp_recovery_unit.' Recovery'; }
+        elseif ($temp_kind == 'multi'){ $temp_ability_details .= $temp_damage.$temp_damage_unit.' Damage / '.($temp_multiplier != 1 ? '<del>'.$temp_ability->ability_recovery.'</del> ' : '').$temp_recovery.$temp_recovery_unit.' Recovery'; }
         else { $temp_ability_details .= 'Support'; }
         $temp_ability_details .= ' | '.$temp_ability->ability_accuracy.'% Accuracy';
+        //if (!empty($temp_ability_energy)){ $temp_ability_details .= ' | '.(!empty($temp_ability_energy_mods) ? '<del>'.$temp_ability_energy_base.'</del> ' : '').$temp_ability_energy.' Energy'; }
         if (!empty($temp_ability_energy)){ $temp_ability_details .= ' | '.$temp_ability_energy.' Energy'; }
         if (!empty($temp_target_text)){ $temp_ability_details .= ' | '.$temp_target_text; }
         $temp_ability_description = $temp_ability->ability_description;
@@ -142,24 +146,24 @@ ob_start();
           $temp_ability_label .= 'A:'.$temp_accuracy.'%';
         $temp_ability_label .= '</span>';
         $temp_ability_label .= '</span>';
-        
+
         // Define whether or not this ability button should be enabled
         $temp_button_enabled = $temp_robot_weapons >= $temp_ability_energy ? true : false;
-        
+
         // If the ability is not actually compatible with this robot, disable it
         //$temp_robot_array = $this_robot->export_array();
         $temp_ability_array = $temp_ability->export_array();
         $temp_button_compatible = mmrpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo);
         if (!$temp_button_compatible){ $temp_button_enabled = false; }
-        
+
         // If this button is enabled, add it to the global ability options array
         if ($temp_button_enabled){ $temp_player_ability_actions[] = $temp_ability->ability_token; }
-        
+
         // Define the ability sprite variables
         $temp_ability_sprite = array();
         $temp_ability_sprite['name'] = $temp_ability->ability_name;
         if ($this_robot->robot_class == 'master'){
-          
+
           $temp_ability_sprite['image'] = $temp_ability->ability_image;
           $temp_ability_sprite['image_size'] = $temp_ability->ability_image_size;
           $temp_ability_sprite['image_size_text'] = $temp_ability_sprite['image_size'].'x'.$temp_ability_sprite['image_size'];
@@ -170,9 +174,9 @@ ob_start();
           $temp_ability_sprite['style'] = 'background-image: url('.$temp_ability_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); top: 5px; left: 5px; ';
           $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_ability" style="'.$temp_ability_sprite['style'].'">'.$temp_ability_sprite['name'].'</span>';
           $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_weapons" style="top: 35px; left: 5px; '.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
-          
+
         } elseif ($this_robot->robot_class == 'mecha'){
-          
+
           $temp_ability_sprite['image'] = $this_robot->robot_image;
           $temp_ability_sprite['image_size'] = $this_robot->robot_image_size;
           $temp_ability_sprite['image_size_text'] = $temp_ability_sprite['image_size'].'x'.$temp_ability_sprite['image_size'];
@@ -183,11 +187,11 @@ ob_start();
           $temp_ability_sprite['style'] = 'background-image: url('.$temp_ability_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); top: 7px; left: 5px; height: 43px; background-position: center center !important; background-size: 50% 50% !important; ';
           $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_ability" style="'.$temp_ability_sprite['style'].'">'.$temp_ability_sprite['name'].'</span>';
           //$temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_weapons" style="top: 35px; left: 5px; '.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
-          
+
         }
-        
+
         $temp_ability_sprite['preload'] = 'images/abilities/'.$temp_ability_sprite['image'].'/sprite_'.$robot_direction.'_'.$temp_ability_sprite['image_size_zoom_text'].'.png';
-        
+
         // Now use the new object to generate a snapshot of this ability button
         if ($temp_button_enabled){ ?><a data-order="<?=$temp_order_counter?>" class="button action_ability ability_<?= $temp_ability->ability_token ?> ability_type ability_type_<?= (!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '') ?> block_<?= $unlocked_abilities_count ?>" type="button" data-action="ability_<?= $temp_ability->ability_id.'_'.$temp_ability->ability_token ?>" data-tooltip="<?= $temp_ability_details_tooltip ?>" data-target="<?= $temp_target ?>"><label class=""><?= $temp_ability_sprite['markup'] ?><?= $temp_ability_label ?></label></a><? }
         else { ?><a data-order="<?=$temp_order_counter?>" class="button button_disabled action_ability ability_<?= $temp_ability->ability_token ?> ability_type ability_type_<?= (!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '') ?> block_<?= $unlocked_abilities_count ?>" type="button"><label class=""><?= $temp_ability_sprite['markup'] ?><?= $temp_ability_label ?></label></a><? }
