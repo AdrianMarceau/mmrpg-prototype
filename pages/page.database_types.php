@@ -38,7 +38,7 @@ $this_markup_header = 'Mega Man RPG Prototype Type Database <span class="count">
     <p class="text">Given the importance of these types classifications, knowing the distribution of them in the game might be useful in a few ways.  As an example, knowing there are many robots with a weakness to <span class="type_span ability_type ability_type_cutter">Cutter</span> attacks might prompt one to equip more of those types of abilities.  Additionally, knowing the type distribution will also make it easier to balance the game from the development side and may help prevent certain types from getting ignored or abused.  As such, a series of bar-graphs have been created to show how and where these types are being used in the RPG so far.  These bar-graphs are linked directly to the game's logic, so they will always be in sync with recent additions and updates to the project.  Please feel free to use these as reference when preparing for battle, and let me know if you have any questions.</p>
     <p class="text" style="">Please note that robots / abilities without a type are not included in the bar-graphs below, and for the weakness / resistance / affinity / immunity graphs the types which have no entries are skipped entirely.  Lastly, these stats are based on all current <em>and future</em> content and may not represent the current conditions perfectly.</p>
     <div style="overflow: hidden; padding-top: 10px;">
-    
+
       <? foreach($mmrpg_database_robots_types AS $type_mechanic => $type_array): ?>
         <? $this_overall_count = $type_mechanic == 'cores' ? $mmrpg_database_types_count : $mmrpg_database_types_count - 1;  ?>
         <div class="type_chart type_chart_cores">
@@ -114,7 +114,7 @@ $this_markup_header = 'Mega Man RPG Prototype Type Database <span class="count">
           ?>
         </div>
       <? endforeach; ?>
-      
+
       <div class="type_chart type_chart_cores">
         <strong class="category">Ability Types</strong>
         <div class="wrapper">
@@ -148,7 +148,7 @@ $this_markup_header = 'Mega Man RPG Prototype Type Database <span class="count">
           </table>
         </div>
       </div>
-  
+
     </div>
   </div>
 </div>

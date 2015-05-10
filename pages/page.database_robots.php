@@ -1,8 +1,73 @@
 <?
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+/*
+ * ROBOTS DATABASE AJAX
+ */
+
+// If an explicit return request for the index was provided
+if (!empty($_REQUEST['return']) && $_REQUEST['return'] == 'index'){
+  // Exit with only the database link markup
+  exit($mmrpg_database_robots_links);
+}
+
+
+
 /*
  * ROBOT DATABASE PAGE
  */
+
+// DEBUG DEBUG DEBUG
+if (!empty($_GET['debug'])){
+
+  $temp_robots = array_slice(array_keys($mmrpg_database_robots), 0, 10);
+  $temp_levels = array(1, 2, 5, 10, 25, 50, 100);
+
+  $stat_tester_index = array();
+  foreach ($temp_robots AS $token){
+    // Collect reference to robot
+    $stat_reference = $mmrpg_database_robots[$token];
+    // Collect only relevant base stats
+    $robot_token = $stat_reference['robot_token'];
+    $robot_stats = array('energy' => $stat_reference['robot_energy'], 'attack' => $stat_reference['robot_attack'], 'defense' => $stat_reference['robot_defense'], 'speed' => $stat_reference['robot_speed']);
+    $stat_tester = array('name' => $robot_token, 'stats_base' => $robot_stats);
+
+    // Apply stat boosts at key levels and record
+    foreach ($temp_levels AS $level){
+      $stat_tester['stats_level_'.$level] = array(
+        'energy' => $robot_stats['energy'].' base '.
+          ' =>  '.($robot_stats['energy'] + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($robot_stats['energy'], $level)).' min '.
+        	' =>  '.MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['energy'], $level).' max '.
+        	' +=  '.MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['energy'], $level).' player '.
+          ' ==  '.(MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['energy'], $level) + MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['energy'], $level)).' total',
+        'attack' => $robot_stats['attack'].' base '.
+          ' =>  '.($robot_stats['attack'] + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($robot_stats['attack'], $level)).' min '.
+          ' =>  '.MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['attack'], $level).' max '.
+          ' +=  '.MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['attack'], $level).' player'.
+          ' ==  '.(MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['attack'], $level) + MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['attack'], $level)).' total',
+        'defense' => $robot_stats['defense'].' base '.
+          ' =>  '.($robot_stats['defense'] + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($robot_stats['defense'], $level)).' min '.
+          ' =>  '.MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['defense'], $level).' max '.
+          ' +=  '.MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['defense'], $level).' player '.
+          ' ==  '.(MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['defense'], $level) + MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['defense'], $level)).' total',
+        'speed' => $robot_stats['speed'].' base '.
+          ' =>  '.($robot_stats['speed'] + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($robot_stats['speed'], $level)).' min '.
+          ' =>  '.MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['speed'], $level).' max '.
+          ' +=  '.MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['speed'], $level).' player '.
+          ' ==  '.(MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['speed'], $level) + MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['speed'], $level)).' total',
+        );
+    }
+
+    $stat_tester_index[] = $stat_tester;
+  }
+
+
+  die('<pre>$stat_tester_index = '.print_r($stat_tester_index, true).'</pre>');
+
+
+
+}
+
 
 // Define the SEO variables for this page
 $this_seo_title = 'Robots '.(!empty($this_current_filter) ? '('.$this_current_filter_name.' Core) ' : '').'| Database | '.$this_seo_title;
@@ -68,14 +133,14 @@ if (!empty($this_current_token)){
   // Loop through the robot database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_robots AS $robot_key => $robot_info){
-    
+
     // If a specific robot has been requested and it's not this one
     if (!empty($this_current_token) && $this_current_token != $robot_info['robot_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
-    
+
     // If this is THE specific robot requested (and one was specified)
     if (!empty($this_current_token) && $this_current_token == $robot_info['robot_token']){
-      
+
       $this_robot_image = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
       $this_robot_image_size = (!empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40) * 2;
       $this_robot_image_size_text = $this_robot_image_size.'x'.$this_robot_image_size;
@@ -97,23 +162,27 @@ if (!empty($this_current_token)){
       $this_graph_data['title'] .= ' | '.$robot_info['robot_name'];
       $this_graph_data['description'] = $robot_info['robot_number'].' '.$robot_info['robot_name'].', a '.(!empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')).' core' : 'special').' robot master in the Mega Man RPG Prototype. '.$this_graph_data['description'];
       $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$robot_info['robot_token'].'/mug_right_'.$this_robot_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
-      
+
     }
-    
+
     // Collect the markup for this robot and print it to the browser
     $temp_robot_markup = mmrpg_robot::print_database_markup($robot_info, array('show_key' => $key_counter));
     echo $temp_robot_markup;
     $key_counter++;
     break;
-    
+
   }
-  
+
 }
+
 
 // Only show the header if a specific robot has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Robot Index <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Core )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Robot Index
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Core )</span>' : '' ?>
+  </h2>
   <?
 }
 
@@ -143,7 +212,10 @@ if (empty($this_current_token)){
 // Only show the header if a specific robot has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Robot Listing <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Core )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Robot Listing
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Core )</span>' : '' ?>
+  </h2>
   <?
 }
 

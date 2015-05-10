@@ -1,5 +1,18 @@
 <?
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+/*
+ * ITEMS DATABASE AJAX
+ */
+
+// If an explicit return request for the index was provided
+if (!empty($_REQUEST['return']) && $_REQUEST['return'] == 'index'){
+  // Exit with only the database link markup
+  exit($mmrpg_database_items_links);
+}
+
+
+
 /*
  * ITEM DATABASE PAGE
  */
@@ -32,14 +45,14 @@ if (!empty($this_current_token)){
   // Loop through the item database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_items AS $ability_key => $ability_info){
-    
+
     // If a specific ability has been requested and it's not this one
     if (!empty($this_current_token) && $this_current_token != $ability_info['ability_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
-    
+
     // If this is THE specific ability requested (and one was specified)
     if (!empty($this_current_token) && $this_current_token == $ability_info['ability_token']){
-      
+
       $this_ability_image = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
       if ($this_ability_image == 'ability'){ $this_seo_robots = 'noindex'; }
       $this_temp_description = 'The '.$ability_info['ability_name'].' is ';
@@ -60,23 +73,26 @@ if (!empty($this_current_token)){
       $this_graph_data['title'] .= ' | '.$ability_info['ability_name'];
       $this_graph_data['description'] = $this_temp_description.'  '.$ability_info['ability_description'].'  '.$this_graph_data['description'];
       $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/abilities/'.$ability_info['ability_token'].'/icon_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
-      
+
     }
-    
+
     // Collect the markup for this ability and print it to the browser
     $temp_ability_markup = mmrpg_ability::print_database_markup($ability_info, array('show_key' => $key_counter));
     echo $temp_ability_markup;
     $key_counter++;
     break;
-    
+
   }
-  
+
 }
 
 // Only show the header if a specific item has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Item Index <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Item Index
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  </h2>
   <?
 }
 
@@ -86,7 +102,7 @@ if (empty($this_current_token)){
   <div class="<?= !empty($this_current_token) ? 'toggle_body' : '' ?>" style="<?= !empty($this_current_token) ? 'display: none;' : '' ?>">
     <? if(empty($this_current_token)): ?>
       <p class="text" style="clear: both;">
-        The item database contains detailed information on <?= $mmrpg_database_items_links_counter == 1 ? 'the' : 'all' ?> <?= isset($this_current_filter) ? $mmrpg_database_items_links_counter.' <span class="type_span robot_type robot_type_'.$this_current_filter.'">'.$this_current_filter_name.' Type</span> ' : $mmrpg_database_items_links_counter.' ' ?><?= $mmrpg_database_items_links_counter == 1 ? 'collectable item that appears ' : 'collectable items that appear ' ?> or will appear in the prototype, including <?= $mmrpg_database_items_links_counter == 1 ? 'its' : 'each item\'s' ?> stats, description, and sprite sheets.
+        The item database contains detailed information on <?= $mmrpg_database_items_links_counter == 1 ? 'the' : 'all' ?> <?= isset($this_current_filter) ? $mmrpg_database_items_links_counter.' <span class="type_span robot_type robot_type_'.($this_current_filter == 'multi' ? 'shield' : ($this_current_filter == 'bonus' ? 'laser' : $this_current_filter)).'">'.$this_current_filter_name.' Type</span> ' : $mmrpg_database_items_links_counter.' ' ?><?= $mmrpg_database_items_links_counter == 1 ? 'collectable item that appears ' : 'collectable items that appear ' ?> or will appear in the prototype, including <?= $mmrpg_database_items_links_counter == 1 ? 'its' : 'each item\'s' ?> stats, description, and sprite sheets.
         Click <?= $mmrpg_database_items_links_counter == 1 ? 'the icon below to scroll to the' : 'any of the icons below to scroll to an' ?> item's summarized database entry and click the more link to see its full page with sprites and extended info. <?= isset($this_current_filter) ? 'If you wish to reset the item type filter, <a href="database/items/">please click here</a>.' : '' ?>
       </p>
       <?= preg_replace('/data-token="([-_a-z0-9]+)"/', 'data-anchor="$1"', $mmrpg_database_items_links) ?>
@@ -106,7 +122,10 @@ if (empty($this_current_token)){
 // Only show the header if a specific item has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Item Listing <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Item Listing
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  </h2>
   <?
 }
 
@@ -119,6 +138,8 @@ if (empty($this_current_token)){
     $temp_item_types = array();
     if (!empty($item_info['ability_type'])){ $temp_item_types[] = $item_info['ability_type']; }
     if (!empty($item_info['ability_type2'])){ $temp_item_types[] = $item_info['ability_type2']; }
+	  if (preg_match('/^item-score-ball-(red|blue|green|purple)$/i', $item_info['ability_token'])){ $temp_item_types[] = 'bonus'; }
+	  elseif (preg_match('/^item-super-(pellet|capsule)$/i', $item_info['ability_token'])){ $temp_item_types[] = 'multi'; }
     if (empty($temp_item_types)){ $temp_item_types[] = 'none'; }
     if (isset($this_current_filter) && !in_array($this_current_filter, $temp_item_types)){ $key_counter++; continue; }
     // Collect information about this ability

@@ -1,5 +1,18 @@
 <?
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+/*
+ * FIELDS DATABASE AJAX
+ */
+
+// If an explicit return request for the index was provided
+if (!empty($_REQUEST['return']) && $_REQUEST['return'] == 'index'){
+  // Exit with only the database link markup
+  exit($mmrpg_database_fields_links);
+}
+
+
+
 /*
  * FIELDS DATABASE PAGE
  */
@@ -29,14 +42,14 @@ if (!empty($this_current_token)){
   // Loop through the field database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_fields AS $field_key => $field_info){
-    
+
     // If a specific field has been requested and it's not this one
     if (!empty($this_current_token) && $this_current_token != $field_info['field_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
-    
+
     // If this is THE specific field requested (and one was specified)
     if (!empty($this_current_token) && $this_current_token == $field_info['field_token']){
-      
+
       $this_field_image = !empty($field_info['field_image']) ? $field_info['field_image'] : $field_info['field_token'];
       if ($this_field_image == 'field'){ $this_seo_robots = 'noindex'; }
       // Define the SEO variables for this page
@@ -49,23 +62,26 @@ if (!empty($this_current_token)){
       $this_graph_data['title'] .= ' | '.$field_info['field_name'];
       $this_graph_data['description'] = $field_info['field_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_graph_data['description'];
       $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/fields/'.$field_info['field_token'].'/mug_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
-      
+
     }
-    
+
     // Collect the markup for this field and print it to the browser
     $temp_field_markup = mmrpg_field::print_database_markup($field_info, array('show_key' => $key_counter));
     echo $temp_field_markup;
     $key_counter++;
     break;
-    
+
   }
-  
+
 }
 
 // Only show the header if a specific field has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Field Index <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Field Index
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  </h2>
   <?
 }
 
@@ -95,7 +111,10 @@ if (empty($this_current_token)){
 // Only show the header if a specific field has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Field Listing <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Field Listing
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  </h2>
   <?
 }
 

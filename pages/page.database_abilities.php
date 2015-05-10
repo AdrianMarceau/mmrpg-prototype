@@ -1,5 +1,17 @@
 <?
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+/*
+ * ABILITY DATABASE AJAX
+ */
+
+// If an explicit return request for the index was provided
+if (!empty($_REQUEST['return']) && $_REQUEST['return'] == 'index'){
+  // Exit with only the database link markup
+  exit($mmrpg_database_abilities_links);
+}
+
+
 /*
  * ABILITY DATABASE PAGE
  */
@@ -29,14 +41,14 @@ if (!empty($this_current_token)){
   // Loop through the ability database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_abilities AS $ability_key => $ability_info){
-    
+
     // If a specific ability has been requested and it's not this one
     if (!empty($this_current_token) && $this_current_token != $ability_info['ability_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
-    
+
     // If this is THE specific ability requested (and one was specified)
     if (!empty($this_current_token) && $this_current_token == $ability_info['ability_token']){
-      
+
       $this_ability_image = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
       if ($this_ability_image == 'ability'){ $this_seo_robots = 'noindex'; }
       $this_temp_description = 'The '.$ability_info['ability_name'].' is ';
@@ -57,23 +69,26 @@ if (!empty($this_current_token)){
       $this_graph_data['title'] .= ' | '.$ability_info['ability_name'];
       $this_graph_data['description'] = $this_temp_description.'  '.$ability_info['ability_description'].'  '.$this_graph_data['description'];
       $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/abilities/'.$ability_info['ability_token'].'/icon_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
-      
+
     }
-    
+
     // Collect the markup for this ability and print it to the browser
     $temp_ability_markup = mmrpg_ability::print_database_markup($ability_info, array('show_key' => $key_counter));
     echo $temp_ability_markup;
     $key_counter++;
     break;
-    
+
   }
-  
+
 }
 
 // Only show the header if a specific ability has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Ability Index <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Ability Index
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  </h2>
   <?
 }
 
@@ -103,7 +118,10 @@ if (empty($this_current_token)){
 // Only show the header if a specific ability has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Ability Listing <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Ability Listing
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  </h2>
   <?
 }
 

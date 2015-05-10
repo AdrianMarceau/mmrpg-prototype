@@ -1,5 +1,18 @@
 <?
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+/*
+ * PLAYERS DATABASE AJAX
+ */
+
+// If an explicit return request for the index was provided
+if (!empty($_REQUEST['return']) && $_REQUEST['return'] == 'index'){
+  // Exit with only the database link markup
+  exit($mmrpg_database_players_links);
+}
+
+
+
 /*
  * PLAYERS DATABASE PAGE
  */
@@ -29,14 +42,14 @@ if (!empty($this_current_token)){
   // Loop through the player database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_players AS $player_key => $player_info){
-    
+
     // If a specific player has been requested and it's not this one
     if (!empty($this_current_token) && $this_current_token != $player_info['player_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
-    
+
     // If this is THE specific player requested (and one was specified)
     if (!empty($this_current_token) && $this_current_token == $player_info['player_token']){
-      
+
       $this_player_image = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
       if ($this_player_image == 'player'){ $this_seo_robots = 'noindex'; }
       // Define the SEO variables for this page
@@ -49,23 +62,26 @@ if (!empty($this_current_token)){
       $this_graph_data['title'] .= ' | '.$player_info['player_name'];
       $this_graph_data['description'] = $player_info['player_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_graph_data['description'];
       $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/players/'.$player_info['player_token'].'/mug_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
-      
+
     }
-    
+
     // Collect the markup for this player and print it to the browser
     $temp_player_markup = mmrpg_player::print_database_markup($player_info, array('show_key' => $key_counter));
     echo $temp_player_markup;
     $key_counter++;
     break;
-    
+
   }
-  
+
 }
 
 // Only show the header if a specific player has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Player Index <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Player Index
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  </h2>
   <?
 }
 
@@ -95,7 +111,10 @@ if (empty($this_current_token)){
 // Only show the header if a specific player has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">Mega Man RPG Prototype Player Listing <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?></h2>
+  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    Player Listing
+    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  </h2>
   <?
 }
 
