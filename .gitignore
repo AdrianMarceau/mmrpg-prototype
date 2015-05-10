@@ -19,8 +19,8 @@
 /images/gallery/screenshots/*
 /images/gallery/starforce/
 /images/gallery/updates/
-/images/robots/*
-/images/robots_shadows/*
+/images/robots/_*
+/images/robots_shadows/_*
 /images/abilities/*
 /images/fields/*
 /images/objects/*
