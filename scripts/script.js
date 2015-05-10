@@ -29,7 +29,20 @@ gameSettings.autoResizeWidth = true; // allow auto reszing of the game window wi
 gameSettings.autoResizeHeight = true; // allow auto reszing of the game window height
 gameSettings.currentBodyWidth = 0; // collect the current window width and update when necessary
 gameSettings.currentBodyHeight = 0; // collect the current window width and update when necessary
+gameSettings.userNumber = 0; // default to zero so we pull demo info unless otherwise stated
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
+gameSettings.autoKeepAlive = false; // default to false unless necessary, keeps session alive
+gameSettings.baseHref = ''; // default to empty as not to throw undefined errors
+
+// Define the WEBSITE global settings variables
+var websiteSettings = {};
+websiteSettings.currentHref = ''; // default to empty
+websiteSettings.currentPage = ''; // default to empty
+websiteSettings.currentSub = ''; // default to empty
+websiteSettings.currentCat = ''; // default to empty
+websiteSettings.currentToken = ''; // default to empty
+websiteSettings.currentNum = 0; // default to zero
+websiteSettings.currentId = 0; // default to zero
     
 // Create the game engine submit timer
 var gameEngineSubmitTimeout = false;
@@ -116,46 +129,54 @@ $(document).ready(function(){
     // Only attach hover tooltips if NOT in mobile mode
     if (!gameSettings.wapFlag && !gameSettings.wapFlagIphone && !gameSettings.wapFlagIpad){
     
-      // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
-      var tooltipSelector = '*[title],*[data-backup-title],*[data-tooltip]';
-      $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
-        e.preventDefault();      
-        $('.tooltip', mmrpgBody).remove();
+      // Define the function for showing the tooltip
+      var showTooltipFunction = function(e){        
         var thisElement = $(this);
+        $('.tooltip', mmrpgBody).empty();
+        var thisDate = new Date();        
+        var thisTime = thisDate.getTime();
+        //console.log('starting the tooltip at '+thisTime);         
         var thisClassList = thisElement.attr('class') != undefined ? thisElement.attr('class').split(/\s+/) : '';        
-        var thisTitle = thisElement.attr('title') != undefined ? thisElement.attr('title') : '';
+        var thisTitle = thisElement.attr('data-backup-title') != undefined ? thisElement.attr('data-backup-title') : (thisElement.attr('title') != undefined ? thisElement.attr('title') : '');
         var thisTooltip = thisElement.attr('data-tooltip') != undefined ? thisElement.attr('data-tooltip') : '';  
         if (!thisTitle.length && !thisTooltip.length){ return false; }
         else if (thisTitle.length && !thisTooltip.length){ thisTooltip = thisTitle; }
-        thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|/g, '<span class="pipe">|</span>').replace(/\s?\/\/\s?/g, '<br />');   
+        thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\|/g, '<span class="pipe">|</span>').replace(/\s?\/\/\s?/g, '<br />').replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');   
         var thisTooltipAlign = thisElement.attr('data-tooltip-align') != undefined ? thisElement.attr('data-tooltip-align') : 'left';
         var thisTooltipType = thisElement.attr('data-tooltip-type') != undefined ? thisElement.attr('data-tooltip-type') : '';
         if (!thisTooltipType.length){        
           for (i in thisClassList){
             var tempClass = thisClassList[i] != undefined ? thisClassList[i].toString() : '';
-            if (tempClass.match(/^(field|player|robot|ability)_type$/) || tempClass.match(/^(field|player|robot|ability)_type_/)){ 
+            //console.log('tempClass = '+tempClass);
+            if (tempClass.match(/^(field_|player_|robot_|ability_)?type$/) || tempClass.match(/^(field_|player_|robot_|ability_)?type_/) || tempClass.match(/^(energy|weapons|attack|defense|speed|light|cossack|wily|experience|level|damage|recovery|none|cutter|impact|freeze|explode|flame|electric|time|earth|wind|water|swift|nature|missile|crystal|shadow|space|shield|laser|copy)(_|$)/)){ 
+              //console.log('tempClass match!');
               thisTooltipType += tempClass+' '; 
               }
+            //console.log('thisTooltipType = '+thisTooltipType);
             }
           }
         if (!thisTooltipType.length){ 
-          thisTooltipType = 'ability_type ability_type_none'; 
-          }
+          thisTooltipType = 'type none'; 
+          }        
         //console.log('thisTitle : '+thisTitle);
-        thisElement.attr('data-backup-title', thisTitle).removeAttr('title');                   
-        $('<p class="tooltip '+thisTooltipType+'"></p>').html('<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>').appendTo(mmrpgBody).fadeIn('fast');
-        var toolwidth = $('.tooltip', mmrpgBody).outerWidth();
-        $('.tooltip', mmrpgBody).css({width:toolwidth+'px'});
-        });
-      // Define the live MOUSELEAVE events for any elements with a title tag (which should be many)
-      $(tooltipSelector, mmrpgBody).live('mouseleave', function(e){
-        e.preventDefault();
-        var thisElement = $(this);
-        $('.tooltip', mmrpgBody).remove();
-        thisElement.attr('title', thisElement.attr('data-backup-title'));      
-        });
-      // Define the live MOUSEMOVE events for any elements with a title tag (which should be many)
-      $(tooltipSelector, mmrpgBody).live('mousemove', function(e){
+        //console.log('append and trigger animation at '+thisTime);        
+        thisElement.attr('data-backup-title', thisTitle).removeAttr('title');  
+        if (!$('.tooltip', mmrpgBody).length){ $('<p class="tooltip '+thisTooltipType+'"></p>').html('<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>').appendTo(mmrpgBody).fadeIn('fast'); }
+        else { $('.tooltip', mmrpgBody).removeClass().addClass('tooltip').addClass(thisTooltipType).html('<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>').fadeIn('fast'); }
+        //$('.tooltip', mmrpgBody).css({width:''});
+        //var toolwidth = $('.tooltip', mmrpgBody).outerWidth();
+        //$('.tooltip', mmrpgBody).css({width:toolwidth+'px'});
+        var thisDate = new Date();        
+        var thisTime = thisDate.getTime();
+        //console.log('animation should be done at '+thisTime);
+        alignTooltipFunction.call(this, e);        
+        };
+        
+      // Define the function for positioning the tooltip
+      var alignTooltipFunction = function(e){
+        var thisDate = new Date();        
+        var thisTime = thisDate.getTime();
+        //console.log('trigger the align function at '+thisTime);
         var mousex = e.pageX + 10;
         var mousey = e.pageY + 5;
         var toolwidth = $('.tooltip', mmrpgBody).outerWidth() + 20;
@@ -171,7 +192,54 @@ $(document).ready(function(){
         //  'gameSettings.currentBodyHeight = '+gameSettings.currentBodyHeight+'; mousey = '+mousex+'; toolheight = '+toolheight+'; \n'
         //  );
         $('.tooltip', mmrpgBody).css({ top: mousey, left: mousex });      
+        };
+      
+      // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
+      var tooltipDelay = 1200; //600;
+      var tooltipTimeout = false;
+      var tooltipShowing = false;
+      var tooltipSelector = '*[title],*[data-backup-title],*[data-tooltip]';
+      $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
+        e.preventDefault();
+        if (tooltipTimeout == false){
+          var thisDate = new Date();        
+          var thisTime = thisDate.getTime();
+          var thisObject = this;
+          //console.log('set tooltip timeout for '+tooltipDelay+' at '+thisTime);
+          tooltipTimeout = setTimeout(function(){
+            tooltipShowing = true;
+            showTooltipFunction.call(thisObject, e);
+            }, tooltipDelay); 
+          var thisElement = $(this);
+          if (thisElement.attr('title')){ 
+            thisElement.attr('data-backup-title', thisElement.attr('title')); 
+            thisElement.removeAttr('title');
+            }
+          }
         });
+      
+      // Define the live MOUSEMOVE events for any elements with a title tag (which should be many)
+      $(tooltipSelector, mmrpgBody).live('mousemove', function(e){
+        if (!tooltipShowing){ return false; }        
+        alignTooltipFunction.call(this, e);
+        });
+      
+      // Define the live MOUSELEAVE events for any elements with a title tag (which should be many)
+      $(tooltipSelector, mmrpgBody).live('mouseleave', function(e){
+        e.preventDefault();
+        var thisElement = $(this);
+        $('.tooltip', mmrpgBody).empty();
+        //thisElement.attr('title', thisElement.attr('data-backup-title'));
+        var thisDate = new Date();        
+        var thisTime = thisDate.getTime();
+        //console.log('clear tooltip timeout at '+thisTime);
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = false;
+        tooltipShowing = false;
+        });
+      
+        //$('*', mmrpgBody).click(function(e){ $('.tooltip', mmrpgBody).remove(); });
+        $('*', mmrpgBody).click(function(e){ $('.tooltip', mmrpgBody).empty(); });
       
       }
     
@@ -449,8 +517,44 @@ $(document).ready(function(){
       });
   }
         
+  // If the auto keep alive has been set, trigger it
+  if (gameSettings.autoKeepAlive){ pingWebsite(); }  
   
 });
+
+// Define a function for sending a pink to the website and keeping the session alive
+var pingDuration = 1000 * 60 * 3; // 3 minutes
+var pingTimeout = false;
+var pingCounter = 0;
+function pingWebsite(){
+  // Increment the ping counter, just so we know where we are
+  pingCounter++;
+  console.log('post to website '+pingCounter+' ('+(pingDuration * (pingCounter - 1))+'ms)');
+  // Do not actually ping the server on the first run, we just loaded the page
+  if (pingCounter > 0){
+    // Generate the post fields for the upcoming ping request
+    var pingField = pingCounter % 2 == 0 ? 'ping' : 'pong';
+    var pingPage = websiteSettings.currentHref;
+    $.ajax({
+      type: 'POST',
+      url: gameSettings.baseHref,
+      data: {'ping':pingField,'page':pingPage},
+      success: function(markup, status){
+        console.log(status+' : '+markup);
+        return true;
+      },
+      error: function(markup, status){
+        console.log(status+' : '+markup);
+        return false;
+        }
+      });
+    }
+  // Clear the existing timeout if it exists, and set a new one
+  clearTimeout(pingTimeout);
+  pingTimeout = setTimeout(function(){
+    return pingWebsite();
+    }, pingDuration);
+}
 
 // Define a function for updating the window sizes
 function windowResizeUpdate(updateType){
@@ -1280,7 +1384,8 @@ var actionPanelCache = [];
 function mmrpg_action_panel_update(thisPanel, thisMarkup){
   // Update the requested panel with the supplied markup
   var thisActionPanel = $('#actions_'+thisPanel, gameActions);
-  thisActionPanel.empty().html(decompress_action_markup(thisMarkup));
+  //thisActionPanel.empty().html(decompress_action_markup(thisMarkup));
+  thisActionPanel.empty().html(thisMarkup);
   // Search for any sprites in this panel's markup
   $('.sprite', thisActionPanel).each(function(){
     var thisBackground = $(this).css('background-image').replace(/^url\((.*?)\)$/i, '$1');
@@ -1316,10 +1421,12 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
         */
         }
       if (canvasMarkup.length){ 
-        mmrpg_canvas_event(decompress_action_markup(canvasMarkup)); //, flagsMarkup 
+        //mmrpg_canvas_event(decompress_action_markup(canvasMarkup)); //, flagsMarkup 
+        mmrpg_canvas_event(canvasMarkup);
         }
       if (consoleMarkup.length){ 
-        mmrpg_console_event(decompress_action_markup(consoleMarkup));  //, flagsMarkup 
+        //mmrpg_console_event(decompress_action_markup(consoleMarkup));  //, flagsMarkup 
+        mmrpg_console_event(consoleMarkup);
         }
       }, 
     'event_flags' : flagsMarkup //$.parseJSON(flagsMarkup)

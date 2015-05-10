@@ -2,7 +2,6 @@
 var thisBody = false;
 var thisPrototype = false;
 var thisWindow = false;
-var websiteSettings = {};
 $(document).ready(function(){
   
   // Update global reference variables
@@ -39,6 +38,15 @@ $(document).ready(function(){
     return false;    
     });
   
+  // Capture any click-copy fields and attach click events
+  $('*[data-clickcopy]', thisIndex).live('click', function(e){
+    e.preventDefault();
+    var thisLink = $(this);
+    var thisText = thisLink.attr('data-clickcopy');
+    return window.prompt("Copy to clipboard: Ctrl+C or Cmd-C, Enter", thisText);
+    //alert('data-clickcopy = '+thisText);
+    });
+  
   /*
    * GALLERY LINK EVENTS
    */
@@ -61,12 +69,15 @@ $(document).ready(function(){
   // Capture any header objects and move them around the document for better visual understanding
   if ($('.page', thisIndex).length){
     
+    /*
     // Find any counter and move them to the header area visually
     if ($('.count_header', thisIndex).length){
       var tempHeader = $('h1.header', thisIndex);
       var tempCounter = $('span.count_header', thisIndex);
       $('.header_wrapper', tempHeader).append(tempCounter);      
-      }  
+      } 
+    */
+    
     // Find any hideme classes in the headers and... hide them
     $('.header', thisIndex).find('.hideme').css({display:'none'});
     
@@ -97,8 +108,16 @@ $(document).ready(function(){
   // Ensure there is actually a community page wrapper to work with
   if (thisDatabase.length){
     
+    // -- DATABASE SPRITE LINKS -- //
+    
+    // Create a function that generates database link events
+    refreshDatabaseEvents(thisDatabase);     
+    
     // Loop through all the database link clusters
-    thisDatabaseLinks.each(function(){
+    thisDatabaseLinks.each(function(){    
+      
+      
+      // -- DATABASE INDEX LINKS -- //
       
       // Collect the class for this cluster and a reference to it
       var thisCluster = $(this);
@@ -127,6 +146,7 @@ $(document).ready(function(){
           }        
         });
       
+      /*
       // Loop through this cluster's float links and attach events
       $('.float_link[data-token]', thisCluster).each(function(){
         
@@ -167,6 +187,7 @@ $(document).ready(function(){
                   $('.float_link[data-token]', thisCluster).removeClass('float_link_active').addClass('float_link_inactive');
                   thisLink.removeClass('float_link_inactive').addClass('float_link_active');
                   $('.database_'+thisClassSingle+'_container[data-token!='+thisToken+']', thisDatabase).remove();
+                  refreshDatabaseEvents(thisDatabase);
                   });                
                 }
               if (currentBody.length){ currentBody.animate({opacity:0},200,'swing',function(){ newRobotFunction(); }); }
@@ -202,7 +223,9 @@ $(document).ready(function(){
           var firstLink = $('.float_link[data-token]', thisCluster).first();          
           }
         firstLink.trigger('click');          
-        }   
+        } 
+         
+        */ 
       
       
       });
@@ -235,7 +258,7 @@ $(document).ready(function(){
     var formattingToggleFunction = function(e){
       e.preventDefault();
       
-      console.log('formattingToggleFunction');
+      //console.log('formattingToggleFunction');
       
       // Collect a reference to this link and the parent and wrapper
       var thisLink = $(this);
@@ -244,7 +267,7 @@ $(document).ready(function(){
       
       // If this is the first time the element was clicked
       if (formattingToggleFirstClick){
-        console.log('formattingToggleFunction first click, let\'s hide');
+        //console.log('formattingToggleFunction first click, let\'s hide');
         thisParent.removeClass('formatting_expanded');          
         thisWrapper.css({display:'none',height:'',opacity:1});
         thisLink.html('+ Show Formatting Options');        
@@ -254,7 +277,7 @@ $(document).ready(function(){
       
       // If the wrapper is already expanded, let's collapse it
       if (thisParent.hasClass('formatting_expanded')){
-        console.log('formattingToggleFunction is expanded, closing now... to 0 height');
+        //console.log('formattingToggleFunction is expanded, closing now... to 0 height');
         thisWrapper.stop().animate({height:0,opacity:0},600,'swing',function(){  
           thisParent.removeClass('formatting_expanded');      
           thisLink.html('+ Show Formatting Options');          
@@ -265,7 +288,7 @@ $(document).ready(function(){
       // Otherwise if the wrapper is not yet expanded, let's do so now
       else {   
         var maxHeight = thisWrapper.attr('data-maxheight');
-        console.log('formattingToggleFunction is collapsed, opening now... to '+maxHeight+' height');       
+        //console.log('formattingToggleFunction is collapsed, opening now... to '+maxHeight+' height');       
         thisWrapper.css({display:'',height:0,opacity:0});
         thisWrapper.stop().animate({height:maxHeight+'px',opacity:1},600,'swing',function(){  
           thisParent.addClass('formatting_expanded');
@@ -295,6 +318,7 @@ $(document).ready(function(){
   // Ensure there is actually a community page wrapper to work with
   if (thisCommunity.length){
     
+    /*
     // Add in code to create the comment-listing page buttons and events
     var thisCommentHeader = $('#comment-listing', thisCommunity);
     var thisCommentPosts = $('.post_subbody[data-key]', thisCommunity);
@@ -325,6 +349,7 @@ $(document).ready(function(){
       $('a[data-page]:last-child', thisCommentHeader).trigger('click');
       
     }
+    */
     
     
     // Append a button to the form for submitting
@@ -624,3 +649,64 @@ function windowResizePage(){
   gameSettings.currentBodyHeight = indexHeight; //$(document).height(); //mmrpgBody.outerHeight();
   
 }
+
+// Create a function that generates database link events
+function refreshDatabaseEvents(thisDatabase){
+  //console.log('refreshDatabaseEvents(thisDatabase)');
+  
+  // Collect a reference to the tabs container and make sure it exists
+  var thisSpritesHeader = $('#tabs', thisDatabase);
+  
+  // Collect a reference to the link container and make sure it exists
+  var thisSpritesHeader = $('#sprites', thisDatabase);
+  var thisSpritesBody = $('#sprites_body', thisDatabase);
+  if (thisSpritesHeader.length && thisSpritesBody.length){
+    //console.log('database sprite links');
+    
+    // Collect a reference to the link container if it exists
+    var thisLinkContainer = $('.image_link_container', thisSpritesHeader);
+    if (thisLinkContainer.length){
+    //console.log('database sprite links > image link container');
+      
+      // Define the click events for the direction links
+      var directionLinks = $('.directions', thisLinkContainer);
+      $('.link_direction', directionLinks).click(function(e){           
+        e.preventDefault();
+        var thisLink = $(this);
+        var thisDirection = thisLink.attr('data-direction');
+        var thisImage = $('.images .link_active', thisLinkContainer).attr('data-image');
+        //console.log('database sprite links > image link container > click direction '+thisDirection); 
+        $('.link', directionLinks).removeClass('link_active');
+        thisLink.addClass('link_active');            
+        $('.frame_container', thisSpritesBody).css({display:'none'});
+        $('.frame_container[data-image='+thisImage+'][data-direction='+thisDirection+']', thisSpritesBody).css({display:''});                        
+        });
+      // Auto-click the first link or whichever one has the active class
+      var firstLink = $('.link_active', directionLinks).length ? $('.link_active', directionLinks) : $('.link_direction:first-child', directionLinks);
+      firstLink.trigger('click');
+      
+      // Define the click events for the image links
+      var imageLinks = $('.images', thisLinkContainer);
+      $('.link_image', imageLinks).click(function(e){           
+        e.preventDefault();
+        var thisLink = $(this);
+        var thisImage = thisLink.attr('data-image');
+        var thisDirection = $('.directions .link_active', thisLinkContainer).attr('data-direction');
+        //console.log('database sprite links > image link container > click image '+thisImage); 
+        $('.link', imageLinks).removeClass('link_active');
+        thisLink.addClass('link_active');            
+        $('.frame_container', thisSpritesBody).css({display:'none'});
+        $('.frame_container[data-image='+thisImage+'][data-direction='+thisDirection+']', thisSpritesBody).css({display:''});                   
+        });
+      // Auto-click the first link or whichever one has the active class
+      var firstLink = $('.link_active', imageLinks).length ? $('.link_active', imageLinks) : $('.link_image:first-child', imageLinks);
+      firstLink.trigger('click');
+      
+      }          
+    
+    }    
+  
+  // Return true on success
+  return true;
+  
+}   

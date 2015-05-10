@@ -12,6 +12,8 @@ gameSettings.nextStepName = 'home';
 gameSettings.nextSlideDirection = 'left';
 gameSettings.startLink = 'home';
 gameSettings.skipPlayerSelect = false;
+gameSettings.passwordUnlocked = 0;
+gameSettings.pointsUnlocked = 0;
 var battleOptions = {};
 // When the document is ready, assign events
 $(document).ready(function(){
@@ -239,15 +241,14 @@ $(document).ready(function(){
         }        
       };
     
-
-
   // Define the event for the password prompt's click unlock sequence
   $('.banner .sprite_player', thisPrototype).live('click', function(){
     gameSettings.passwordUnlocked++;
-    //console.log('counter = '+gameSettings.passwordUnlocked);
-    if (gameSettings.passwordUnlocked >= 5){
+    //console.log('gameSettings.passwordUnlocked = '+gameSettings.passwordUnlocked+'; gameSettings.pointsUnlocked = '+gameSettings.pointsUnlocked);
+    if (gameSettings.passwordUnlocked >= 5 && gameSettings.pointsUnlocked > 0){
       //console.log('omg you unlocked me!');
       var thisToken = $(this).html().toLowerCase();
+      var thisPlayer = thisToken.replace('. ', '-');
       //thisToken = thisToken.replace('.', '-');
       thisToken = thisToken.replace(/[^-_a-z0-9]+/ig, '');
       if (thisToken == 'drlight'){ var thisPromptText = 'Oh, hello there! What can I help you with today?'; }
@@ -259,7 +260,7 @@ $(document).ready(function(){
         //alert(thisToken+':'+thisPassword);
         // Update the session with this password string
         var thisRequestType = 'session';
-        var thisRequestData = 'flags,'+thisToken+'_password_'+thisPassword+',true';
+        var thisRequestData = 'values,battle_passwords,'+thisPlayer+','+thisPassword+',true';
         $.post('scripts/script.php',{requestType:'session',requestData:thisRequestData},function(){
           window.location.href = 'prototype.php?wap='+(gameSettings.wapFlag ? 'true' : 'false');
           });
@@ -643,7 +644,7 @@ function prototype_menu_click_option(thisContext, thisOption){
     if (tempSize == 80){ tempSpriteShift -= 20; }
     //console.log('tempSize = '+tempSize+'; tempSpriteKey = '+tempSpriteKey+'; tempSpriteShift = '+tempSpriteShift+'; ');
     var cloneShift = tempSpriteShift+'px'; //someValue+'px';
-    var cloneSprite = tempSprite.clone().addClass('sprite_clone').css({right:cloneShift,left:'auto',bottom:'6px'});
+    var cloneSprite = tempSprite.clone().addClass('sprite_clone').css({opacity:1,right:cloneShift,left:'auto',bottom:'6px'});
     
     // Prepend the sprite to the parent's label value
     $('label', tokenParent).append(cloneSprite);
@@ -652,7 +653,9 @@ function prototype_menu_click_option(thisContext, thisOption){
     $('.sprite_40x40_placeholder:eq('+(gameSettings.nextRobotLimit - tokenParentCount)+')', tokenParent).css({display:'none'});
     
     // Brighten the opacity of the parent element proportionately
-    var newOpacity = 1.0; //0.2 + (0.8 * (tokenParentCount/tokenParentLimit));
+    //var newOpacity = 1.0; //0.2 + (0.8 * (tokenParentCount/tokenParentLimit));
+    var newOpacity = 0.8 + (0.2 * (tokenParentCount/tokenParentLimit));
+    if (newOpacity > 1){ newOpacity = 1; }
     tokenParent.css({opacity:newOpacity});
     //tokenParent.find('.count').html((tokenParentCount >= tokenParentLimit) ? 'Start!' : (tokenParentCount+'/'+tokenParentLimit));
     tokenParent.find('.count').html((tokenParentCount >= 1) ? (tokenParentCount+'/'+gameSettings.nextRobotLimit)+' Start!' : (tokenParentCount+'/'+gameSettings.nextRobotLimit));
@@ -1246,7 +1249,7 @@ function prototype_menu_switch(switchOptions){
                   // If the markup is not empty, replace this menu's options
                   if (markup.length){
                     var tempMarkup = $(markup); 
-                    tempMenuWrapper.find('.option').not('.option_sticky').remove();
+                    tempMenuWrapper.find('.option,.chapter_select').not('.option_sticky').remove();
                     tempMenuWrapper.append(tempMarkup.html());
                     $('.option_message:gt(0)', tempMenuWrapper).trigger('click');
                     }

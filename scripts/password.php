@@ -15,7 +15,7 @@ if (!empty($password_string) && preg_match($valid_passwords, $password_string)){
   if (!empty($_SESSION['GAME']['USER']) && !empty($_SESSION['GAME']['FILE'])){
     
     // Process the password based on a predefined list
-    if (preg_match('#^(dr-light|dr-wily)_#i', $password_string)){ //($password_string == 'dr-light_proto-man'){
+    if (preg_match('#^(dr-light|dr-wily|dr-cossack)_#i', $password_string)){ //($password_string == 'dr-light_proto-man'){
       
       // UNLOCK ROBOTS
       list($player_token, $robot_token) = explode('_', $password_string);

@@ -83,6 +83,7 @@ $(document).ready(function(){
     if (!thisShopData.allowEdit){ return false; }
     var thisButton = $(this); 
     var thisCell = thisButton.parent(); 
+    var thisSeller = thisButton.parents('.event[data-token]').attr('data-token');
     var thisTab = thisCell.parents('.tab_container[data-tab]');
     var thisKind = thisCell.attr('data-kind');
     var thisAction = thisCell.attr('data-action'); 
@@ -96,18 +97,18 @@ $(document).ready(function(){
     var thisDisabled = thisCell.hasClass('item_cell_disabled') ? true : false;
     if (thisDisabled){ return false; }
     var thisItemName = thisCell.find('.item_name').clone();    
-    //console.log(thisKind+' / '+thisAction+' / '+thisToken+' / x'+thisQuantity+' / '+thisPrice+'z');    
+    //console.log(thisSeller+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+thisQuantity+' / '+thisPrice+'z');    
     var itemCellConfirm = $('.item_cell_confirm', thisTab);    
     if (itemCellConfirm.attr('data-token') == thisToken){      
       var sellQuantity = parseInt(itemCellConfirm.attr('data-quantity')) + 1;
       if (sellQuantity > thisQuantity){ sellQuantity = thisQuantity; }
       var sellPrice = sellQuantity * parseInt(thisPrice);
-      itemCellConfirm.attr('data-quantity', sellQuantity).attr('data-price', sellPrice);
+      itemCellConfirm.attr('data-quantity', sellQuantity).attr('data-price', sellPrice).attr('data-shop', thisSeller);
       itemCellConfirm.find('.item_quantity').attr('data-quantity', sellQuantity).html('x '+sellQuantity);
       itemCellConfirm.find('.item_price').attr('data-price', sellPrice).html('&hellip; '+printNumberWithCommas(sellPrice)+'z');      
       } else {      
       itemCellConfirm.empty();
-      itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', sellQuantity);
+      itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', sellQuantity).attr('data-shop', thisSeller);
       itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
       itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
       itemCellConfirm.append('<label class="item_price" data-price="'+sellPrice+'">&hellip; '+printNumberWithCommas(sellPrice)+'z</label>');
@@ -117,6 +118,7 @@ $(document).ready(function(){
     return true;
     });
   
+  /*
   // Functionality to the player toggles on hover
   $('.item_cell_confirm .player_button', gameConsole).live('mouseenter', function(e){
     
@@ -166,12 +168,15 @@ $(document).ready(function(){
     
     });
   
+  */
+  
   // Functionality to the buy links for all shops
   $('.item_cell[data-token][data-action=buy] .buy_button', gameConsole).live('click', function(e){
     e.preventDefault();
     if (!thisShopData.allowEdit){ return false; }
     var thisButton = $(this); 
     var thisCell = thisButton.parent(); 
+    var thisBuyer = thisButton.parents('.event[data-token]').attr('data-token');
     var thisTab = thisCell.parents('.tab_container[data-tab]');
     var thisKind = thisCell.attr('data-kind');
     var thisAction = thisCell.attr('data-action'); 
@@ -185,10 +190,11 @@ $(document).ready(function(){
     var thisDisabled = thisCell.hasClass('item_cell_disabled') ? true : false;
     if (thisDisabled){ return false; }
     var thisItemName = thisCell.find('.item_name').clone();    
-    //console.log(thisKind+' / '+thisAction+' / '+thisToken+' / x'+thisQuantity+' / '+thisPrice+'z');    
+    //console.log(thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / '+thisPrice+'z');    
     var itemCellConfirm = $('.item_cell_confirm', thisTab);    
     if (thisKind == 'item' && itemCellConfirm.attr('data-token') == thisToken){      
       buyQuantity = parseInt(itemCellConfirm.attr('data-quantity')) + 1;
+      //console.log('A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
       buyPrice = buyQuantity * parseInt(thisPrice);
       if (buyQuantity + thisQuantity > 99){ 
         //console.log('buyQuantity + thisQuantity > 99 | '+buyQuantity+' + '+thisQuantity+' > 99');
@@ -199,7 +205,7 @@ $(document).ready(function(){
         buyQuantity = buyQuantity - 1; 
         buyPrice = buyQuantity * parseInt(thisPrice); 
         }      
-      itemCellConfirm.attr('data-quantity', buyQuantity).attr('data-price', buyPrice);
+      itemCellConfirm.attr('data-quantity', buyQuantity).attr('data-price', buyPrice).attr('data-shop', thisBuyer);
       itemCellConfirm.find('.item_quantity').attr('data-quantity', buyQuantity).html('x '+buyQuantity);
       itemCellConfirm.find('.item_price').attr('data-price', buyPrice).html('&hellip; '+printNumberWithCommas(buyPrice)+'z');  
       } else if (thisKind == 'ability') {            
@@ -207,14 +213,17 @@ $(document).ready(function(){
       var actualPrice = buyPrice * actualQuantity;
       var thisUnlocked = thisCell.attr('data-unlocked').split(',');
       //console.log('thisUnlocked', thisUnlocked);
+      //console.log('B) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+actualQuantity+' / '+thisPrice+'z');
       itemCellConfirm.empty();
-      itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity);
+      itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer).attr('data-player', 'all');
       itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
-      itemCellConfirm.append('<a class="confirm_button confirm_button_disabled ability_type ability_type_energy" href="#">Confirm</a>');      
+      //itemCellConfirm.append('<a class="confirm_button confirm_button_disabled ability_type ability_type_energy" href="#">Confirm</a>');      
+      itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
       
       var buttonCounter = 0;
       var buttonMarkup = [];
       
+      /*
       if (jQuery.inArray('dr-light', thisShopData.unlockedPlayers) != -1){      
         if (jQuery.inArray('dr-light', thisUnlocked) != -1){  
           buttonCounter++;
@@ -250,6 +259,7 @@ $(document).ready(function(){
           buttonMarkup.push('<a class="player_button player_button_3 ability_type" data-stat="speed" data-player="dr-cossack" href="#"  data-tooltip="Dr. Cossack" data-tooltip-type="ability_type_speed">C</a>'); 
           }        
         }
+      */
       
       buttonMarkup.reverse();
       for (i in buttonMarkup){ 
@@ -263,14 +273,15 @@ $(document).ready(function(){
       itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
       itemCellConfirm.append(thisItemName);    
       
-      } else {            
+      } else {
+      //console.log('C) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');            
       itemCellConfirm.empty();
-      itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity);
+      itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer);
       itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
       itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
       itemCellConfirm.append('<label class="item_price" data-price="'+buyPrice+'">&hellip; '+printNumberWithCommas(buyPrice)+'z</label>');
       itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
-      itemCellConfirm.append(thisItemName);              
+      itemCellConfirm.append(thisItemName);                 
       }         
     return true;
     });
@@ -293,6 +304,7 @@ $(document).ready(function(){
     if (!thisShopData.allowEdit){ return false; }
     var thisButton = $(this);
     var thisConfirmCell = thisButton.parent();
+    var thisKeeper = thisConfirmCell.attr('data-shop');
     var thisKind = thisConfirmCell.attr('data-kind');
     var thisAction = thisConfirmCell.attr('data-action'); 
     var thisToken = thisConfirmCell.attr('data-token'); 
@@ -302,10 +314,10 @@ $(document).ready(function(){
     if (thisButton.hasClass('confirm_button_disabled')){ return false; }
     var thisTab = thisButton.parents('.tab_container');
     var thisItemCell = $('.item_cell[data-token='+thisToken+']', thisTab);
-    //console.log('confirm_button:click / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+thisQuantity+' / '+thisPrice+'z / '+thisPlayer+'');    
+    //console.log('confirm_button: click / '+thisKeeper+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+thisQuantity+' / '+thisPrice+'z / '+thisPlayer+'');    
     
     // Define the post options for the ajax call
-    var postData = {kind:thisKind,action:thisAction,token:thisToken,quantity:thisQuantity,price:thisPrice,player:thisPlayer};
+    var postData = {shop:thisKeeper,kind:thisKind,action:thisAction,token:thisToken,quantity:thisQuantity,price:thisPrice,player:thisPlayer};
     thisConfirmCell.css({opacity:0.3});
     thisShopData.allowEdit = false;
     
@@ -349,15 +361,17 @@ $(document).ready(function(){
           thisShopData.itemQuantities[thisToken] = newItemCount;
           thisShopData.zennyCounter = newZennyTotal;
           
+          /*
           if (thisKind == 'ability' && thisAction == 'buy'){ 
             //thisShopData.itemQuantities[thisAction][thisToken] += 1; 
             var unlockedPlayers = thisItemCell.attr('data-unlocked');
-            //console.log('successful buy of ability data unlocked for '+thisToken+' / '+unlockedPlayers);
+            //console.log('successful buy of ability data unlocked for '+thisToken); //+' / '+unlockedPlayers);
             unlockedPlayers = unlockedPlayers.split(',');
             unlockedPlayers.push(thisPlayer);
             unlockedPlayers = unlockedPlayers.join(',');
             thisItemCell.attr('data-unlocked', unlockedPlayers);
             }
+            */
           
           $('#zenny_counter', thisBody).css({color:'#8CEB80'}).html(printNumberWithCommas(newZennyTotal));
           
@@ -374,6 +388,7 @@ $(document).ready(function(){
           return true;
           
           } else {
+            
           //console.log('ummmm');
           //console.log(data);
           
@@ -459,8 +474,8 @@ function updateItemQuantity(itemToken, itemQuantity){
       if (thisAction == 'buy' && itemQuantity >= 99){ thisCell.addClass('item_cell_disabled');  }
       else if (thisAction == 'sell' && itemQuantity <= 0){ thisCell.addClass('item_cell_disabled');  }  
       } else if (thisKind == 'ability'){         
-      thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html(itemQuantity+' / 3');     
-      if (itemQuantity >= 3){ thisCell.addClass('item_cell_disabled');  }    
+      thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html(''); //.html(itemQuantity+' / 3');     
+      if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }    
       } else if (thisKind == 'field'){                     
       if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }
       } else if (thisKind == 'star'){
