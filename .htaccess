@@ -62,22 +62,62 @@ RewriteRule ^images/robots/([a-z]+)man/(.*)?$ /images/robots/$1-man/$2 [R,L]
 # Define the rewrite conditions
 RewriteCond %{REQUEST_FILENAME} -d [OR]
 RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule (.*) - [S=14]
+#RewriteRule (.*) - [S=15]
+RewriteRule (.*) - [S=100]
+
+# Define the redirect rules for the player image asset quick-paths
+RewriteRule ^i/a/([-_a-z0-9]+)/il([0-9]+).png(.*)?$ images/abilities/$1/icon_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/a/([-_a-z0-9]+)/ir([0-9]+).png(.*)?$ images/abilities/$1/icon_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/as/([-_a-z0-9]+)/il([0-9]+).png(.*)?$ images/abilities_shadows/$1/icon_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/as/([-_a-z0-9]+)/ir([0-9]+).png(.*)?$ images/abilities_shadows/$1/icon_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/a/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/abilities/$1/sprite_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/a/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/abilities/$1/sprite_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/as/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/abilities_shadows/$1/sprite_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/as/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/abilities_shadows/$1/sprite_right_$2x$2.png?$3 [QSA,L]
+
+# Define the redirect rules for the player image asset quick-paths
+RewriteRule ^i/p/([-_a-z0-9]+)/ml([0-9]+).png(.*)?$ images/players/$1/mug_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/p/([-_a-z0-9]+)/mr([0-9]+).png(.*)?$ images/players/$1/mug_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/ps/([-_a-z0-9]+)/ml([0-9]+).png(.*)?$ images/players_shadows/$1/mug_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/ps/([-_a-z0-9]+)/mr([0-9]+).png(.*)?$ images/players_shadows/$1/mug_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/p/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/players/$1/sprite_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/p/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/players/$1/sprite_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/ps/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/players_shadows/$1/sprite_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/ps/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/players_shadows/$1/sprite_right_$2x$2.png?$3 [QSA,L]
+
+# Define the redirect rules for the robot image asset quick-paths
+RewriteRule ^i/r/([-_a-z0-9]+)/ml([0-9]+).png(.*)?$ images/robots/$1/mug_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/r/([-_a-z0-9]+)/mr([0-9]+).png(.*)?$ images/robots/$1/mug_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/rs/([-_a-z0-9]+)/ml([0-9]+).png(.*)?$ images/robots_shadows/$1/mug_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/rs/([-_a-z0-9]+)/mr([0-9]+).png(.*)?$ images/robots_shadows/$1/mug_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/r/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/robots/$1/sprite_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/r/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/robots/$1/sprite_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/rs/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/robots_shadows/$1/sprite_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/rs/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/robots_shadows/$1/sprite_right_$2x$2.png?$3 [QSA,L]
+
+# Define the redirect rules for the field image asset quick-paths
+RewriteRule ^i/f/([-_a-z0-9]+)/bfa.png(.*)?$ images/fields/$1/battle-field_avatar.png?$3 [QSA,L]
+RewriteRule ^i/f/([-_a-z0-9]+)/bfbb.gif(.*)?$ images/fields/$1/battle-field_background_base.gif?$3 [QSA,L]
+RewriteRule ^i/f/([-_a-z0-9]+)/bfbb.png(.*)?$ images/fields/$1/battle-field_background_base.png?$3 [QSA,L]
+RewriteRule ^i/f/([-_a-z0-9]+)/bffb.png(.*)?$ images/fields/$1/battle-field_foreground_base.png?$3 [QSA,L]
+RewriteRule ^i/f/([-_a-z0-9]+)/bfp.png(.*)?$ images/fields/$1/battle-field_preview.png?$3 [QSA,L]
 
 # Define the redirect rules for specific pages
-RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&target=$4&$5 [L]
-RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&$4 [L]
-RewriteRule ^community/([-_a-z0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=community&cat=$1&sub=$2&$3 [L]
-RewriteRule ^community/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&$2 [L]
+RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/?([0-9]+)/?$ index.php?page=community&cat=$1&id=$2&token=$3&num=$4 [QSA,L]
+RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/?([0-9]+)/(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&num=$4&$5 [QSA,L]
+RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&target=$4&$5 [QSA,L]
+RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&$4 [QSA,L]
+RewriteRule ^community/([-_a-z0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=community&cat=$1&sub=$2&$3 [QSA,L]
+RewriteRule ^community/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&$2 [QSA,L]
 
-RewriteRule ^file/game/([-_a-z0-9]+)/?\??(.*)$ index.php?page=file&sub=game&token=$1 [L]
+RewriteRule ^file/game/([-_a-z0-9]+)/?\??(.*)$ index.php?page=file&sub=game&token=$1 [QSA,L]
 
-RewriteRule ^leaderboard/([0-9]+)/\??(.*)$ index.php?page=leaderboard&num=$1&$2 [L]
-RewriteRule ^leaderboard/([-_a-z0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=leaderboard&sub=$1&token=$2 [L]
-RewriteRule ^leaderboard/([-_a-z0-9]+)/\??(.*)$ index.php?page=leaderboard&sub=$1&$2 [L]
+RewriteRule ^leaderboard/([0-9]+)/\??(.*)$ index.php?page=leaderboard&num=$1&$2 [QSA,L]
+RewriteRule ^leaderboard/([-_a-z0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=leaderboard&sub=$1&token=$2 [QSA,L]
+RewriteRule ^leaderboard/([-_a-z0-9]+)/\??(.*)$ index.php?page=leaderboard&sub=$1&$2 [QSA,L]
 
-RewriteRule ^database/(players|abilities|robots|mechas|types|fields|items)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=database&sub=$1&token=$2 [L]
-RewriteRule ^database/(players|abilities|robots|mechas|types|fields|items)/\??(.*)$ index.php?page=database&sub=$1&$2 [L]
+RewriteRule ^database/(players|abilities|robots|mechas|bosses|types|fields|items)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=database&sub=$1&token=$2 [QSA,L]
+RewriteRule ^database/(players|abilities|robots|mechas|bosses|types|fields|items)/\??(.*)$ index.php?page=database&sub=$1&$2 [QSA,L]
 
 RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file)/([0-9]+)/?\??(.*)$ index.php?page=$1&num=$2&$3 [L]
 RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file)/([-_a-z0-9]+)/([0-9]+)/?\??(.*)$ index.php?page=$1&sub=$2&num=$3&$4 [L]
