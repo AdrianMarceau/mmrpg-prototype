@@ -1,7 +1,7 @@
 <?php
 // Define the plutocms_database() class
 class plutocms_database {
-  
+
   // Define the private variables
   private $LINK = false;
   private $CACHE = array();
@@ -15,12 +15,12 @@ class plutocms_database {
   public $MYSQL_RESULT;
   public $INDEX;
   public $DEBUG;
-  
-  
+
+
   /*
    * CONSTRUCTOR
    */
-  
+
   // Define the constructor for the class
   public function __construct(){
     // Collect the initializer arguments
@@ -32,11 +32,11 @@ class plutocms_database {
     // DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){
       mmrpg_debug_checkpoint(__FILE__, __LINE__);
-      
+
       $this->DEBUG['script_details']['initiation_script'] = $_SERVER['SCRIPT_NAME'].'?'.$_SERVER['QUERY_STRING']."\r\n";
-      
+
       $this->DEBUG['script_details']['memory_limit'] = ini_get('memory_limit')."\r\n";
-      
+
       $mem_usage = strlen(json_encode($_SESSION)); //strlen(session_encode());
       if ($mem_usage < 1024){ $mem_usage = $mem_usage.' B'; }
       elseif ($mem_usage < 1048576){ $mem_usage = round($mem_usage/1024,2).' KB'; }
@@ -46,27 +46,27 @@ class plutocms_database {
       $this->DEBUG['script_details']['memory_start_time'] = microtime(true);
       $this->DEBUG['script_details']['memory_final_time'] = 0;
       $this->DEBUG['script_details']['memory_time_diff'] = 0;
-      
+
       $this->DEBUG['script_details']['memory_start_usage'] = round(((memory_get_usage() / 1024) / 1024), 2).'M';
       $this->DEBUG['script_details']['memory_final_usage'] = 0;
       $this->DEBUG['script_details']['memory_usage_diff'] = 0;
-      
+
       $this->DEBUG['script_details']['memory_start_peak_usage'] = round((memory_get_peak_usage() / 1024) / 1024, 2).'M';
       $this->DEBUG['script_details']['memory_final_peak_usage'] = 0;
       $this->DEBUG['script_details']['memory_peak_usage_diff'] = 0;
-            
+
       $this->DEBUG['script_details']['post_vars'] = (!empty($_POST) ? print_r($_POST, true) : '')."\r\n";
-      
+
       $this->DEBUG['script_details']['query_count'] = 0;
-      
+
       $this->DEBUG['script_queries'][] = '<span style="color: blue;">EVENT DB::__construct()</span>'."\r\n";
     }
   	// First initialize the database connection
     $this->CONNECT = $this->db_connect();
     if ($this->CONNECT === false){ $this->CONNECT = false; return $this->CONNECT; }
     // Now select the currently active database
-    $this->CONNECT = $this->db_select();
-    if ($this->CONNECT === false){ $this->CONNECT = false; return $this->CONNECT; }
+    //$this->CONNECT = $this->db_select();
+    //if ($this->CONNECT === false){ $this->CONNECT = false; return $this->CONNECT; }
     // Set the names and character set
     $this->CONNECT = $this->query("SET NAMES {$this->CHARSET};");
     if ($this->CONNECT === false){ $this->CONNECT = false; return $this->CONNECT; }
@@ -74,7 +74,7 @@ class plutocms_database {
     $this->CONNECT = $this->clear();
     if ($this->CONNECT === false){ $this->CONNECT = false; return $this->CONNECT; }
   }
-  
+
   // Define the constructor for the class
   public function __destruct(){
     // DEBUG
@@ -120,11 +120,11 @@ class plutocms_database {
     // Close the database connection
     $this->db_close();
   }
-  
+
   /*
    * CONNECT / DISCONNECT FUNCTIONS
    */
-  
+
   // Define the error handler for when the database goes bye bye
   private function critical_error($message){
     if (MMRPG_CONFIG_IS_LIVE){
@@ -132,100 +132,99 @@ class plutocms_database {
       fwrite($file, date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') : '.$message."\r\n\r\n");
       fclose($file);
     } else {
-      echo('<pre style="display: block; clear: both; float: none; background-color: #f2f2f2; padding: 10px; text-align: left;">'.$message.'</pre>');
+      echo('<pre style="display: block; clear: both; float: none; background-color: #f2f2f2; color: #292929; text-shadow: 0 0 0 transparent; white-space: normal; padding: 10px; text-align: left;">'.$message.'</pre>');
     }
     return false;
   }
-  
+
   // Define the private function for initializing the database connection
   private function db_connect(){
   	// Clear any leftover data
     $this->clear();
     // Attempt to open the connection to the MySQL database
-    if ($this->LINK !== false){ $connect = mysql_connect($this->HOST, $this->USERNAME, $this->PASSWORD, $this->LINK); }
-    else { $connect = mysql_connect($this->HOST, $this->USERNAME, $this->PASSWORD); }
+	if (!isset($this->LINK) || $this->LINK === false){ $this->LINK = new mysqli($this->HOST, $this->USERNAME, $this->PASSWORD, $this->NAME);	}
     // If the connection was not successful, return false
-    if ($connect === false){
-      if (MMRPG_CONFIG_IS_LIVE && !MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("<strong>plutocms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysql_errno()."] : &quot;".htmlentities(mysql_error(), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
-      else { $this->critical_error("<strong>plutocms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:{$this->PASSWORD}@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysql_errno()."] : &quot;".htmlentities(mysql_error(), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
+    if ($this->LINK === false){
+      if (MMRPG_CONFIG_IS_LIVE && !MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("<strong>plutocms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".htmlentities(mysqli_error($this->LINK), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
+      else { $this->critical_error("<strong>plutocms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:{$this->PASSWORD}@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno()."] : &quot;".htmlentities(mysqli_errno($this->LINK), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
       return false;
     }
     // Set the character set, if possible
-    //if (function_exists('mysql_set_charset')) { mysql_set_charset($this->CHARSET); }
-    //else { mysql_query("SET NAMES 'utf8'");  }
+    //if (function_exists('mysqli_set_charset')) { mysqli_set_charset($this->LINK, $this->CHARSET); }
+    //else { mysqli_query($this->LINK, "SET NAMES 'utf8'");  }
     // Return true
     return true;
   }
-  
+
   // Define the private function for closing the database connection
   private function db_close(){
   	// Close the open connection to the database
-    if ($this->LINK !== false){ $close = mysql_close($this->LINK); }
+    if (isset($this->LINK) && $this->LINK != false){ $close = mysqli_close($this->LINK); }
   	else { $close = true; }
     // If the closing was not successful, return false
     if ($close === false){
-      $this->critical_error("<strong>plutocms_database::db_close</strong> : Critical error! Unable to close the database connection for host &lt;{$this->HOST}&gt;!<br />[MySQL Error ".mysql_errno()."] : &quot;".mysql_error()."&quot;");
+      $this->critical_error("<strong>plutocms_database::db_close</strong> : Critical error! Unable to close the database connection for host &lt;{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".mysqli_errno($this->LINK)."&quot;");
       return false;
     }
     // Return true
     return true;
   }
-  
+
   // Define the private function for selecting the database
   private function db_select(){
   	// Attempt to select the database by name
-    $select = mysql_select_db($this->NAME);
+    $select = mysqli_select_db($this->LINK, $this->NAME);
     // If the select was not successful, return false
     if ($select === false){
-      $this->critical_error("<strong>plutocms_database::db_select</strong> : Critical error! Unable to select the database &lt;{$this->NAME}&gt;!<br />[MySQL Error ".mysql_errno()."] : &quot;".mysql_error()."&quot;");
+      $this->critical_error("<strong>plutocms_database::db_select</strong> : Critical error! Unable to select the database &lt;{$this->NAME}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".mysqli_errno($this->LINK)."&quot;");
       return false;
     }
     // Return true
     return true;
   }
-  
+
   /*
    * DATABASE QUERY FUNCTIONS
    */
-  
+
   // Define the function for querying the database
   public function query($query_string, &$affected_rows = 0){
-    
+
     // Execute the query against the database
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (MMRPG_CONFIG_DEBUG_MODE){ $this->DEBUG['script_details']['query_count'] += 1; }
     if (MMRPG_CONFIG_DEBUG_MODE){ $this->DEBUG['script_queries'][] = '<span style="color: green;">DATABASE query #'.$this->DEBUG['script_details']['query_count'].' of '.preg_replace('/\s+/', ' ', substr($query_string, 0, 5000)).'</span>'."\r\n"; }
-    $this->MYSQL_RESULT = mysql_query($query_string);
+    $this->MYSQL_RESULT = mysqli_query($this->LINK, $query_string);
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // If a result was not found, produce an error message and return false
     if ($this->MYSQL_RESULT === false){
-      if (MMRPG_CONFIG_DEBUG_MODE || MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("[[plutocms_database::query]] : Unable to run the requested query. ".mysql_error().". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;."); }
-      else { $this->critical_error("[[plutocms_database::query]] : Unable to run the requested query. ".mysql_error()."."); }
+      if (MMRPG_CONFIG_DEBUG_MODE || MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("[[plutocms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;."); }
+      else { $this->critical_error("[[plutocms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK)."."); }
       return false;
     }
-    
+
     // Populate the affected rows, if any
-    $affected_rows = mysql_affected_rows();
+    $affected_rows = mysqli_affected_rows($this->LINK);
 
     // Return the results if there are any
-    if (is_resource($this->MYSQL_RESULT) && mysql_num_rows($this->MYSQL_RESULT) > 0){
+    if (is_resource($this->MYSQL_RESULT) && mysqli_num_rows($this->LINK, $this->MYSQL_RESULT) > 0){
       return $this->MYSQL_RESULT;
     } else {
       return true;
     }
-    
+
   }
-  
+
   // Define the function for clearing the results
   public function clear(){
   	// Attempt to release the MySQL result
   	if (is_resource($this->MYSQL_RESULT)){
-  	  mysql_free_result($this->MYSQL_RESULT);
+  	  mysqli_free_result($this->LINK, $this->MYSQL_RESULT);
   	}
     // Return true
     return true;
   }
-  
+
   // Define a function for selecting a single row as an array
   public function get_array($query_string){
   	// Ensure this is a string
@@ -243,9 +242,9 @@ class plutocms_database {
     // Run the query against the database
     $this->query($query_string);
     // If the result is empty NULL or empty, return false
-    if (!$this->MYSQL_RESULT || mysql_num_rows($this->MYSQL_RESULT) < 1) { return false; }
+    if (!$this->MYSQL_RESULT || mysqli_num_rows($this->MYSQL_RESULT) < 1) { return false; }
     // Otherwise, pull an array from the result
-    $result_array = mysql_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC);
+    $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC);
     // Free the results of the query
     $this->clear();
     // Check to see if this is a cacheable result, and encode if so
@@ -263,7 +262,7 @@ class plutocms_database {
     // Now return the resulting array, casted as an object
     return (object)($this->get_array($query_string));
   }
-  
+
   // Define a function for selecting a list of rows as arrays
   public function get_array_list($query_string, $index = false, &$record_count = 0){
     // Ensure this is a string
@@ -283,11 +282,11 @@ class plutocms_database {
     // Run the query against the database
     $this->query($query_string);
     // If the result is empty NULL or empty, return false
-    if (!$this->MYSQL_RESULT || mysql_num_rows($this->MYSQL_RESULT) < 1) { return false; }
+    if (!$this->MYSQL_RESULT || mysqli_num_rows($this->MYSQL_RESULT) < 1) { return false; }
     // Create the list array to hold all the rows
     $array_list = array();
     // Now loop through the result rows, pulling associative arrays
-    while ($result_array = mysql_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC)){
+    while ($result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC)){
       // If there was an index defined, assign the array to a specific key in the list
       if ($index) { $array_list[$result_array[$index]] = $result_array; }
       // Otherwise, append the array to the end of the list
@@ -340,9 +339,9 @@ class plutocms_database {
     // Run the query against the database
     $this->query($query_string);
     // If the result is empty NULL or empty, return false
-    if (!$this->MYSQL_RESULT || mysql_num_rows($this->MYSQL_RESULT) < 1) { return false; }
+    if (!$this->MYSQL_RESULT || mysqli_num_rows($this->MYSQL_RESULT) < 1) { return false; }
     // Otherwise, pull an array from the result
-    $result_array = mysql_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC);
+    $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC);
     // Free the results of the query
     $this->clear();
     // Check to see if this is a cacheable result, and encode if so
@@ -353,7 +352,7 @@ class plutocms_database {
     // Now return the resulting array
     return isset($result_array[$field_name]) ? $result_array[$field_name] : false;
   }
-  
+
   // Define a function for inserting a record into the database
   public function insert($table_name, $insert_data){
     // Ensure proper data types have been received
@@ -392,7 +391,7 @@ class plutocms_database {
     if ($this->MYSQL_RESULT !== false){ $this->clear(); return $affected_rows; }
     else { $this->clear(); return false; }
   }
-  
+
   // Define a function for updating a record in the database
   public function update($table_name, $update_data, $condition_data){
     // Ensure proper data types have been received
@@ -485,7 +484,7 @@ class plutocms_database {
     if ($this->MYSQL_RESULT !== false){ $this->clear(); return $affected_rows; }
     else { $this->clear(); return false; }
   }
-  
+
   // Define a function for deleting a record (or records) from the database
   public function delete($table_name, $condition_data){
     // Ensure proper data types have been received
@@ -520,17 +519,17 @@ class plutocms_database {
     if ($this->MYSQL_RESULT !== false){ $this->clear(); return $affected_rows; }
     else { $this->clear(); return false; }
   }
-  
+
   // Define a function for pulling the list of database tables
   public function table_list(){
     // Run the SHOW TABLES query against the database
     $this->query("SHOW TABLES");
     // If the result is empty NULL or empty, return false
-    if (!$this->MYSQL_RESULT || mysql_num_rows($this->MYSQL_RESULT) < 1) { return false; }
+    if (!$this->MYSQL_RESULT || mysqli_num_rows($this->LINK, $this->MYSQL_RESULT) < 1) { return false; }
     // Create the array to hold all table names
     $all_tables = array();
     // Loop through the result and add the names to the array
-    while ($row = mysql_fetch_row($this->MYSQL_RESULT)){
+    while ($row = mysqli_fetch_row($this->LINK, $this->MYSQL_RESULT)){
       if (!isset($row[0]) || empty($row[0])){ continue; }
       $all_tables[] = $row[0];
     }
@@ -538,9 +537,9 @@ class plutocms_database {
     $this->clear();
     // Now return the resulting array of table names
     return $all_tables;
-    
+
   }
-  
+
   // Define a function for checking if a database table exists
   public function table_exists($table_name){
     // First collect all tables from the database into an array
@@ -548,7 +547,7 @@ class plutocms_database {
     // Return true
     return in_array($table_name, $all_tables);
   }
-  
+
   // Define a function for collection the maximum field value of a given table
   public function max_value($table_name, $field_name, $condition_data = false){
     // Ensure proper data types have been received
@@ -580,7 +579,7 @@ class plutocms_database {
     // Return the value for the $max_array
     return !empty($max_array['max_value']) ? $max_array['max_value'] : 0;
   }
-  
+
   // Define a function for collection the minimum field value of a given table
   public function min_value($table_name, $field_name, $condition_data = false){
     // Ensure proper data types have been received
@@ -612,7 +611,7 @@ class plutocms_database {
     // Return the value for the $min_array
     return $min_array['min_value'];
   }
-  
+
   // Define a public function for resetting the auto increment of a table
   public function reset_table($table_name, $auto_increment = false, $order_by = false){
     // Ensure proper data types have been received
@@ -631,7 +630,7 @@ class plutocms_database {
     }
     return ($success1 + $success2);
   }
-  
+
 }
 
 ?>

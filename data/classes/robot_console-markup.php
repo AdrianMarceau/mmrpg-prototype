@@ -58,8 +58,9 @@ if (true){
 if ($this_data['robot_float'] == 'left'){
   // Define the fraction and percent text for the experience
   if ($this->robot_level < 100){
-    $this_data['experience_fraction'] = $this->robot_experience.' / 1000';
-    $this_data['experience_percent'] = floor(($this->robot_experience / 1000) * 100);
+    $required_experience = mmrpg_prototype_calculate_experience_required($this->robot_level);
+    $this_data['experience_fraction'] = $this->robot_experience.' / '.$required_experience;
+    $this_data['experience_percent'] = floor(($this->robot_experience / $required_experience) * 100);
   } else {
     $this_data['experience_fraction'] = '&#8734;';
     $this_data['experience_percent'] = 100;

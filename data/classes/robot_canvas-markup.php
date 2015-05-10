@@ -42,6 +42,10 @@ $this_data['robot_size_path'] = ($this->robot_image_size * 2).'x'.($this->robot_
 $this_data['robot_title'] = $this->robot_name.' (Lv. '.$this->robot_level.')';
 $this_data['robot_title'] .= ' <br />'.(!empty($this_data['robot_core']) && $this_data['robot_core'] != 'none' ? ucfirst($this_data['robot_core']).' Core' : 'Neutral Core');
 $this_data['robot_title'] .= ' | '.ucfirst($this_data['robot_position']).' Position';
+$temp_energy_max = !empty($this->flags['robot_stat_max_energy']) ? ' &#9733;' : '';
+$temp_attack_max = !empty($this->flags['robot_stat_max_attack']) ? ' &#9733;' : '';
+$temp_defense_max = !empty($this->flags['robot_stat_max_defense']) ? ' &#9733;' : '';
+$temp_speed_max = !empty($this->flags['robot_stat_max_speed']) ? ' &#9733;' : '';
 
 // Calculate the canvas offset variables for this robot
 $temp_data = $this->battle->canvas_markup_offset($this_data['robot_key'], $this_data['robot_position'], $this_data['robot_size']);
@@ -182,7 +186,7 @@ if (true){
     //if ($this_data['weapons_percent'] > 0 && $this_data['weapons_percent'] < 100 && $this_data['weapons_x_position'] % 2 != 0){ $this_data['weapons_x_position']++; }
     $this_data['weapons_y_position'] = -6;
   }
-  
+
 }
 
 
@@ -190,8 +194,9 @@ if (true){
 if ($this_data['robot_float'] == 'left'){
   // Define the fraction and percent text for the experience
   if ($this->robot_level < 100){
-    $this_data['experience_fraction'] = $this->robot_experience.' / 1000';
-    $this_data['experience_percent'] = floor(($this->robot_experience / 1000) * 100);
+    $required_experience = mmrpg_prototype_calculate_experience_required($this->robot_level);
+    $this_data['experience_fraction'] = $this->robot_experience.' / '.$required_experience;
+    $this_data['experience_percent'] = floor(($this->robot_experience / $required_experience) * 100);
     $this_data['experience_percent_remaining'] = 100 - $this_data['experience_percent'];
   } else {
     $this_data['experience_fraction'] = '&#8734;';
@@ -237,18 +242,18 @@ ob_start();
   $this_data['energy_style'] = 'background-position: '.$this_data['energy_x_position'].'px '.$this_data['energy_y_position'].'px;';
   $this_data['weapons_class'] = 'weapons';
   $this_data['weapons_style'] = 'background-position: '.$this_data['weapons_x_position'].'px '.$this_data['weapons_y_position'].'px;';
-  
+
   if ($this_data['robot_float'] == 'left'){
-    
+
     $this_data['experience_class'] = 'experience';
     $this_data['experience_style'] = 'background-position: '.$this_data['experience_x_position'].'px '.$this_data['experience_y_position'].'px;';
-    
-    $this_data['energy_title'] = $this_data['energy_fraction'].' LE | '.$this_data['energy_percent'].'%';
-    $this_data['robot_title'] .= ' <br />'.$this_data['energy_fraction'].' LE';
-    
+
+    $this_data['energy_title'] = $this_data['energy_fraction'].' LE'.$temp_energy_max.' | '.$this_data['energy_percent'].'%';
+    $this_data['robot_title'] .= ' <br />'.$this_data['energy_fraction'].' LE'.$temp_energy_max.'';
+
     $this_data['weapons_title'] = $this_data['weapons_fraction'].' WE | '.$this_data['weapons_percent'].'%';
     $this_data['robot_title'] .= ' | '.$this_data['weapons_fraction'].' WE';
-    
+
     if ($this_data['robot_class'] == 'master'){
       $this_data['experience_title'] = $this_data['experience_fraction'].' EXP | '.$this_data['experience_percent'].'%';
       $this_data['robot_title'] .= ' | '.$this_data['experience_fraction'].' EXP';
@@ -259,20 +264,20 @@ ob_start();
       $this_data['experience_title'] = $temp_generation.' Gen';
       $this_data['robot_title'] .= ' | '.$temp_generation.' Gen';
     }
-    
+
     $this_data['robot_title'] .= ' <br />'.$this->robot_attack.' / '.$this->robot_base_attack.' AT';
     $this_data['robot_title'] .= ' | '.$this->robot_defense.' / '.$this->robot_base_defense.' DF';
     $this_data['robot_title'] .= ' | '.$this->robot_speed.' / '.$this->robot_base_speed.' SP';
-    
+
   }
   elseif ($this_data['robot_float'] == 'right'){
 
     $this_data['energy_title'] = $this_data['energy_percent'].'% | '.$this_data['energy_fraction'].' LE';
     $this_data['robot_title'] .= ' <br />'.$this_data['energy_fraction'].' LE';
-    
+
     $this_data['weapons_title'] = $this_data['weapons_percent'].'% | '.$this_data['weapons_fraction'].' WE';
     $this_data['robot_title'] .= ' | '.$this_data['weapons_fraction'].' WE';
-    
+
     if ($this_data['robot_class'] == 'mecha'){
       $temp_generation = '1st';
       if (preg_match('/-2$/', $this_data['robot_token'])){ $temp_generation = '2nd'; }
@@ -280,16 +285,16 @@ ob_start();
       $this_data['experience_title'] = $temp_generation.' Gen';
       $this_data['robot_title'] .= ' | '.$temp_generation.' Gen';
     }
-    
+
     $this_data['robot_title'] .= ' <br />'.$this->robot_attack.' / '.$this->robot_base_attack.' AT';
     $this_data['robot_title'] .= ' | '.$this->robot_defense.' / '.$this->robot_base_defense.' DF';
     $this_data['robot_title'] .= ' | '.$this->robot_speed.' / '.$this->robot_base_speed.' SP';
-    
+
   }
-  
+
   $this_data['robot_title_plain'] = strip_tags(str_replace('<br />', '&#10;', $this_data['robot_title']));
   $this_data['robot_title_tooltip'] = htmlentities($this_data['robot_title'], ENT_QUOTES, 'UTF-8');
-  
+
   // Display the robot's shadow sprite if allowed sprite
   global $flag_wap, $flag_ipad, $flag_iphone;
   if (!$flag_wap && !$flag_ipad && !$flag_iphone){
@@ -345,16 +350,16 @@ ob_start();
       	'"></div>';
     }
   }
-  
+
   // Check if his player has any other active robots
   $temp_player_active_robots = false;
   foreach ($this->player->values['robots_active'] AS $info){
     if ($info['robot_position'] == 'active'){ $temp_player_active_robots = true; }
   }
-  
+
   // Check if this is an active position robot
   if ($this_data['robot_position'] != 'bench' || ($temp_player_active_robots == false && $this_data['robot_frame'] == 'damage')){
-    
+
     // Define the mugshot and detail variables for the GUI
     $details_data = $this_data;
     $details_data['robot_file'] = 'images/robots/'.$details_data['robot_image'].'/sprite_'.$details_data['robot_direction'].'_'.$details_data['robot_size'].'x'.$details_data['robot_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
@@ -363,35 +368,44 @@ ob_start();
     $details_data['robot_details'] .= '<div class="'.$details_data['energy_class'].'" style="'.$details_data['energy_style'].'" title="'.$details_data['energy_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_'.$this_data['energy_tooltip_type'].'">'.$details_data['energy_title'].'</div>';
     $details_data['robot_details'] .= '<div class="'.$details_data['weapons_class'].'" style="'.$details_data['weapons_style'].'" title="'.$details_data['weapons_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_weapons">'.$details_data['weapons_title'].'</div>';
     if ($this_data['robot_float'] == 'left'){ $details_data['robot_details'] .= '<div class="'.$details_data['experience_class'].'" style="'.$details_data['experience_style'].'" title="'.$details_data['experience_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_experience">'.$details_data['experience_title'].'</div>'; }
+    $details_data['robot_details_extended'] = '';
+
     /*
     $robot_attack_markup = '<div class="robot_attack'.($this->robot_attack < 1 ? ' robot_attack_break' : ($this->robot_attack < ($this->robot_base_attack / 2) ? ' robot_attack_break_chance' : '')).'">'.str_pad($this->robot_attack, 3, '0', STR_PAD_LEFT).'</div>';
     $robot_defense_markup = '<div class="robot_defense'.($this->robot_defense < 1 ? ' robot_defense_break' : ($this->robot_defense < ($this->robot_base_defense / 2) ? ' robot_defense_break_chance' : '')).'">'.str_pad($this->robot_defense, 3, '0', STR_PAD_LEFT).'</div>';
     $robot_speed_markup = '<div class="robot_speed'.($this->robot_speed < 1 ? ' robot_speed_break' : ($this->robot_speed < ($this->robot_base_speed / 2) ? ' robot_speed_break_chance' : '')).'">'.str_pad($this->robot_speed, 3, '0', STR_PAD_LEFT).'</div>';
     */
+
+    // Define whether or not this robot should display smalltext
+    $temp_display_smalltext = false;
+    if (strlen($this->robot_attack) > 4){ $temp_display_smalltext = true;  }
+    elseif (strlen($this->robot_defense) > 4){ $temp_display_smalltext = true;  }
+    elseif (strlen($this->robot_speed) > 4){ $temp_display_smalltext = true;  }
+
     // Define attack variables and markup
     $temp_attack_break = $this->robot_attack < 1 ? true : false;
     $temp_attack_break_chance = $this->robot_attack < ($this->robot_base_attack / 2) ? true : false;
     $temp_attack_percent = round(($this->robot_attack / $this->robot_base_attack) * 100);
-    if ($this_data['robot_float'] == 'left'){ $temp_attack_title = $this->robot_attack.' / '.$this->robot_base_attack.' AT | '.$temp_attack_percent.'%'.($temp_attack_break ? ' | BREAK!' : ''); }
-    elseif ($this_data['robot_float'] == 'right'){ $temp_attack_title = ($temp_attack_break ? 'BREAK! | ' : '').$temp_attack_percent.'% | '.$this->robot_attack.' / '.$this->robot_base_attack.' AT'; }
-    $robot_attack_markup = '<div class="robot_attack'.($temp_attack_break ? ' robot_attack_break' : ($temp_attack_break_chance ? ' robot_attack_break_chance' : '')).'" title="'.$temp_attack_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_attack">'.$this->robot_attack.'</div>';
-    
+    if ($this_data['robot_float'] == 'left'){ $temp_attack_title = $this->robot_attack.' / '.$this->robot_base_attack.' AT'.$temp_attack_max.' | '.$temp_attack_percent.'%'.($temp_attack_break ? ' | BREAK!' : ''); }
+    elseif ($this_data['robot_float'] == 'right'){ $temp_attack_title = ($temp_attack_break ? 'BREAK! | ' : '').$temp_attack_percent.'% | '.$this->robot_attack.' / '.$this->robot_base_attack.' AT'.$temp_attack_max.''; }
+    $robot_attack_markup = '<div class="robot_attack'.($temp_attack_break ? ' robot_attack_break' : ($temp_attack_break_chance ? ' robot_attack_break_chance' : '')).($temp_display_smalltext ? ' robot_attack_smalltext' : '').'" title="'.$temp_attack_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_attack">'.$this->robot_attack.'</div>';
+
     // Define attack variables and markup
     $temp_defense_break = $this->robot_defense < 1 ? true : false;
     $temp_defense_break_chance = $this->robot_defense < ($this->robot_base_defense / 2) ? true : false;
     $temp_defense_percent = round(($this->robot_defense / $this->robot_base_defense) * 100);
-    if ($this_data['robot_float'] == 'left'){ $temp_defense_title = $this->robot_defense.' / '.$this->robot_base_defense.' DF | '.$temp_defense_percent.'%'.($temp_defense_break ? ' | BREAK!' : ''); }
-    elseif ($this_data['robot_float'] == 'right'){ $temp_defense_title = ($temp_defense_break ? 'BREAK! | ' : '').$temp_defense_percent.'% | '.$this->robot_defense.' / '.$this->robot_base_defense.' DF'; }
-    $robot_defense_markup = '<div class="robot_defense'.($temp_defense_break ? ' robot_defense_break' : ($temp_defense_break_chance ? ' robot_defense_break_chance' : '')).'" title="'.$temp_defense_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_defense">'.$this->robot_defense.'</div>';
-    
+    if ($this_data['robot_float'] == 'left'){ $temp_defense_title = $this->robot_defense.' / '.$this->robot_base_defense.' DF'.$temp_defense_max.' | '.$temp_defense_percent.'%'.($temp_defense_break ? ' | BREAK!' : ''); }
+    elseif ($this_data['robot_float'] == 'right'){ $temp_defense_title = ($temp_defense_break ? 'BREAK! | ' : '').$temp_defense_percent.'% | '.$this->robot_defense.' / '.$this->robot_base_defense.' DF'.$temp_defense_max.''; }
+    $robot_defense_markup = '<div class="robot_defense'.($temp_defense_break ? ' robot_defense_break' : ($temp_defense_break_chance ? ' robot_defense_break_chance' : '')).($temp_display_smalltext ? ' robot_defense_smalltext' : '').'" title="'.$temp_defense_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_defense">'.$this->robot_defense.'</div>';
+
     // Define attack variables and markup
     $temp_speed_break = $this->robot_speed < 1 ? true : false;
     $temp_speed_break_chance = $this->robot_speed < ($this->robot_base_speed / 2) ? true : false;
     $temp_speed_percent = round(($this->robot_speed / $this->robot_base_speed) * 100);
-    if ($this_data['robot_float'] == 'left'){ $temp_speed_title = $this->robot_speed.' / '.$this->robot_base_speed.' SP | '.$temp_speed_percent.'%'.($temp_speed_break ? ' | BREAK!' : ''); }
-    elseif ($this_data['robot_float'] == 'right'){ $temp_speed_title = ($temp_speed_break ? 'BREAK! | ' : '').$temp_speed_percent.'% | '.$this->robot_speed.' / '.$this->robot_base_speed.' SP'; }
-    $robot_speed_markup = '<div class="robot_speed'.($temp_speed_break ? ' robot_speed_break' : ($temp_speed_break_chance ? ' robot_speed_break_chance' : '')).'" title="'.$temp_speed_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_speed">'.$this->robot_speed.'</div>';
-    
+    if ($this_data['robot_float'] == 'left'){ $temp_speed_title = $this->robot_speed.' / '.$this->robot_base_speed.' SP'.$temp_speed_max.' | '.$temp_speed_percent.'%'.($temp_speed_break ? ' | BREAK!' : ''); }
+    elseif ($this_data['robot_float'] == 'right'){ $temp_speed_title = ($temp_speed_break ? 'BREAK! | ' : '').$temp_speed_percent.'% | '.$this->robot_speed.' / '.$this->robot_base_speed.' SP'.$temp_speed_max.''; }
+    $robot_speed_markup = '<div class="robot_speed'.($temp_speed_break ? ' robot_speed_break' : ($temp_speed_break_chance ? ' robot_speed_break_chance' : '')).($temp_display_smalltext ? ' robot_speed_smalltext' : '').'" title="'.$temp_speed_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_speed">'.$this->robot_speed.'</div>';
+
     // Add these markup variables to the details string
     if ($details_data['robot_float'] == 'left'){
       $details_data['robot_details'] .= $robot_attack_markup;
@@ -402,20 +416,21 @@ ob_start();
       $details_data['robot_details'] .= $robot_defense_markup;
       $details_data['robot_details'] .= $robot_attack_markup;
     }
-    
+
     $details_data['mugshot_file'] = 'images/robots/'.$details_data['robot_image'].'/mug_'.$details_data['robot_direction'].'_'.$details_data['robot_size_base'].'x'.$details_data['robot_size_base'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
     $details_data['mugshot_class'] = 'sprite details robot_mugshot ';
     $details_data['mugshot_class'] .= 'sprite_'.$details_data['robot_size_base'].'x'.$details_data['robot_size_base'].' sprite_'.$details_data['robot_size_base'].'x'.$details_data['robot_size_base'].'_mugshot sprite_mugshot_'.$details_data['robot_float'].' sprite_'.$details_data['robot_size_base'].'x'.$details_data['robot_size_base'].'_mugshot_'.$details_data['robot_float'].' ';
     $details_data['mugshot_class'] .= 'robot_status_'.$details_data['robot_status'].' robot_position_'.$details_data['robot_position'].' ';
     $details_data['mugshot_style'] = 'z-index: 9100; ';
     $details_data['mugshot_style'] .= 'background-image: url('.$details_data['mugshot_file'].'); ';
-    
+
     // Display the robot's mugshot sprite and detail fields
     echo '<div data-detailsid="'.$this_data['robot_id'].'" class="sprite details robot_details robot_details_'.$details_data['robot_float'].'"'.(!empty($this_data['robot_detail_styles']) ? ' style="'.$this_data['robot_detail_styles'].'"' : '').'><div class="container">'.$details_data['robot_details'].'</div></div>';
+    if (!empty($details_data['robot_details_extended'])){ echo '<div data-detailsid="'.$this_data['robot_id'].'" class="sprite details robot_details_extended robot_details_extended_'.$details_data['robot_float'].' '.$extended_class.'"'.(!empty($this_data['robot_detail_styles']) ? ' style="'.$this_data['robot_detail_styles'].'"' : '').'><div class="container">'.$details_data['robot_details_extended'].'</div></div>'; }
     echo '<div data-mugshotid="'.$this_data['robot_id'].'" class="'.str_replace('80x80', '40x40', $details_data['mugshot_class']).' robot_mugshot_type robot_type robot_type_'.$this_data['robot_core'].'"'.(!empty($this_data['robot_detail_styles']) ? ' style="'.$this_data['robot_detail_styles'].'"' : '').' data-tooltip="'.$details_data['robot_title_tooltip'].'"><div class="sprite">&nbsp;</div></div>';
     //echo '<div data-mugshotid="'.$this_data['robot_id'].'" class="'.$details_data['mugshot_class'].'" style="'.$details_data['mugshot_style'].$this_data['robot_detail_styles'].'" title="'.$details_data['robot_title_plain'].'" data-tooltip="'.$details_data['robot_title_tooltip'].'">'.$details_data['robot_token'].'</div>';
     echo '<div data-mugshotid="'.$this_data['robot_id'].'" class="'.$details_data['mugshot_class'].'" style="'.$details_data['mugshot_style'].$this_data['robot_detail_styles'].'">'.$details_data['robot_token'].'</div>';
-    
+
     // Update the main data array with this markup
     $this_data['details'] = $details_data;
   }

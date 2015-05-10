@@ -10,6 +10,7 @@ class mmrpg_robot {
 
   // Define the constructor class
   public function mmrpg_robot(){
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_robot()');  }
 
     // Collect any provided arguments
     $args = func_get_args();
@@ -38,6 +39,7 @@ class mmrpg_robot {
     // Now load the robot data from the session or index
     if (!$this->robot_load($this_robotinfo)){
       // Robot data could not be loaded
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '!$this->robot_load($this_robotinfo)');  }
       die('Robot data could not be loaded :<br />$this_robotinfo = <pre>'.print_r($this_robotinfo, true).'</pre>');
     }
 
@@ -45,16 +47,18 @@ class mmrpg_robot {
     return true;
 
   }
-  
+
   // Define a function for getting the session info
   public static function get_session_field($robot_id, $field_token){
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'get_session_field('.$robot_id.', '.$field_token.')');  }
     if (empty($robot_id) || empty($field_token)){ return false; }
     elseif (!empty($_SESSION['ROBOTS'][$robot_id][$field_token])){ return $_SESSION['ROBOTS'][$robot_id][$field_token]; }
     else { return false; }
   }
-  
+
   // Define a function for setting the session info
   public static function set_session_field($robot_id, $field_token, $field_value){
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'set_session_field('.$robot_id.', '.$field_token.', '.$field_value.')');  }
     if (empty($robot_id) || empty($field_token)){ return false; }
     else { $_SESSION['ROBOTS'][$robot_id][$field_token] = $field_value; }
     return true;
@@ -62,13 +66,26 @@ class mmrpg_robot {
 
   // Define a public function for manually loading data
   public function robot_load($this_robotinfo){
-    
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'robot_load('.print_r($this_robotinfo, true).')');  }
+
     // If the robot info was not an array, return false
-    if (!is_array($this_robotinfo)){ die("robot info must be an array!\n\$this_robotinfo\n".print_r($this_robotinfo, true)); return false; }
+    if (!is_array($this_robotinfo)){
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "robot info must be an array!\n\$this_robotinfo\n".print_r($this_robotinfo, true));  }
+      die("robot info must be an array!\n\$this_robotinfo\n".print_r($this_robotinfo, true));
+      return false;
+    }
     // If the robot ID was not provided, return false
-    if (!isset($this_robotinfo['robot_id'])){ die("robot id must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true)); return false; }
+    if (!isset($this_robotinfo['robot_id'])){
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "robot id must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true));  }
+      die("robot id must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true));
+      return false;
+    }
     // If the robot token was not provided, return false
-    if (!isset($this_robotinfo['robot_token'])){ die("robot token must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true)); return false; }
+    if (!isset($this_robotinfo['robot_token'])){
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "robot token must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true));  }
+      die("robot token must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true));
+      return false;
+    }
 
     // Collect current robot data from the session if available
     $this_robotinfo_backup = $this_robotinfo;
@@ -83,7 +100,7 @@ class mmrpg_robot {
         $this_robotinfo = array_replace($this_robotinfo, $this_robotinfo_backup);
       }
     }
-    
+
     // DEBUG
     /*
     if (false && $this_robotinfo['robot_token'] == 'mega-man'){
@@ -106,9 +123,11 @@ class mmrpg_robot {
     $this->robot_token = isset($this_robotinfo['robot_token']) ? $this_robotinfo['robot_token'] : 'robot';
     $this->robot_field = isset($this_robotinfo['robot_field']) ? $this_robotinfo['robot_field'] : 'field';
     $this->robot_class = isset($this_robotinfo['robot_class']) ? $this_robotinfo['robot_class'] : 'master';
+    $this->robot_gender = isset($this_robotinfo['robot_gender']) ? $this_robotinfo['robot_gender'] : 'none';
     $this->robot_image = isset($this_robotinfo['robot_image']) ? $this_robotinfo['robot_image'] : $this->robot_token;
     $this->robot_image_size = isset($this_robotinfo['robot_image_size']) ? $this_robotinfo['robot_image_size'] : 40;
     $this->robot_image_overlay = isset($this_robotinfo['robot_image_overlay']) ? $this_robotinfo['robot_image_overlay'] : array();
+    $this->robot_image_alts = isset($this_robotinfo['robot_image_alts']) ? $this_robotinfo['robot_image_alts'] : array();
     $this->robot_core = isset($this_robotinfo['robot_core']) ? $this_robotinfo['robot_core'] : false;
     $this->robot_core2 = isset($this_robotinfo['robot_core2']) ? $this_robotinfo['robot_core2'] : false;
     $this->robot_description = isset($this_robotinfo['robot_description']) ? $this_robotinfo['robot_description'] : '';
@@ -119,6 +138,7 @@ class mmrpg_robot {
     $this->robot_attack = isset($this_robotinfo['robot_attack']) ? $this_robotinfo['robot_attack'] : 1;
     $this->robot_defense = isset($this_robotinfo['robot_defense']) ? $this_robotinfo['robot_defense'] : 1;
     $this->robot_speed = isset($this_robotinfo['robot_speed']) ? $this_robotinfo['robot_speed'] : 1;
+    $this->robot_total = isset($this_robotinfo['robot_total']) ? $this_robotinfo['robot_total'] : ($this->robot_energy + $this->robot_attack + $this->robot_defense + $this->robot_speed);
     $this->robot_weaknesses = isset($this_robotinfo['robot_weaknesses']) ? $this_robotinfo['robot_weaknesses'] : array();
     $this->robot_resistances = isset($this_robotinfo['robot_resistances']) ? $this_robotinfo['robot_resistances'] : array();
     $this->robot_affinities = isset($this_robotinfo['robot_affinities']) ? $this_robotinfo['robot_affinities'] : array();
@@ -139,13 +159,14 @@ class mmrpg_robot {
     $this->robot_detail_styles = isset($this_robotinfo['robot_detail_styles']) ? $this_robotinfo['robot_detail_styles'] : '';
     $this->robot_original_player = isset($this_robotinfo['robot_original_player']) ? $this_robotinfo['robot_original_player'] : $this->player_token;
     $this->robot_string = isset($this_robotinfo['robot_string']) ? $this_robotinfo['robot_string'] : $this->robot_id.'_'.$this->robot_token;
-     
+
     // Collect any functions associated with this ability
-    $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->robot_functions) ? $this->robot_functions : 'robots/functions.php';
+    $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->robot_functions) ? $this->robot_functions : 'robots/robot.php';
     require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
-    $this->robot_function = isset($ability['robot_function']) ? $ability['robot_function'] : function(){};
-    $this->robot_function_onload = isset($ability['robot_function_onload']) ? $ability['robot_function_onload'] : function(){};
-    unset($ability);
+    $this->robot_function = isset($robot['robot_function']) ? $robot['robot_function'] : function(){};
+    $this->robot_function_onload = isset($robot['robot_function_onload']) ? $robot['robot_function_onload'] : function(){};
+    $this->robot_function_choices_abilities = isset($robot['robot_function_choices_abilities']) ? $robot['robot_function_choices_abilities'] : function(){};
+    unset($robot);
 
     // Define the internal robot base values using the robots index array
     $this->robot_base_name = isset($this_robotinfo['robot_base_name']) ? $this_robotinfo['robot_base_name'] : $this->robot_name;
@@ -163,6 +184,7 @@ class mmrpg_robot {
     $this->robot_base_attack = isset($this_robotinfo['robot_base_attack']) ? $this_robotinfo['robot_base_attack'] : $this->robot_attack;
     $this->robot_base_defense = isset($this_robotinfo['robot_base_defense']) ? $this_robotinfo['robot_base_defense'] : $this->robot_defense;
     $this->robot_base_speed = isset($this_robotinfo['robot_base_speed']) ? $this_robotinfo['robot_base_speed'] : $this->robot_speed;
+    $this->robot_base_total = isset($this_robotinfo['robot_base_total']) ? $this_robotinfo['robot_base_total'] : ($this->robot_base_energy + $this->robot_base_attack + $this->robot_base_defense + $this->robot_base_speed);
     $this->robot_base_weaknesses = isset($this_robotinfo['robot_base_weaknesses']) ? $this_robotinfo['robot_base_weaknesses'] : $this->robot_weaknesses;
     $this->robot_base_resistances = isset($this_robotinfo['robot_base_resistances']) ? $this_robotinfo['robot_base_resistances'] : $this->robot_resistances;
     $this->robot_base_affinities = isset($this_robotinfo['robot_base_affinities']) ? $this_robotinfo['robot_base_affinities'] : $this->robot_affinities;
@@ -172,7 +194,7 @@ class mmrpg_robot {
     $this->robot_base_quotes = isset($this_robotinfo['robot_base_quotes']) ? $this_robotinfo['robot_base_quotes'] : $this->robot_quotes;
     //$this->robot_base_rewards = isset($this_robotinfo['robot_base_rewards']) ? $this_robotinfo['robot_base_rewards'] : $this->robot_rewards;
 
-    // Limit all stats to 9999 for display purposes (and balance I guess)
+    // Limit all stats to 999999 for display purposes (and balance I guess)
     if ($this->robot_energy > MMRPG_SETTINGS_STATS_MAX){ $this->robot_energy = MMRPG_SETTINGS_STATS_MAX; }
     if ($this->robot_base_energy > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_energy = MMRPG_SETTINGS_STATS_MAX; }
     if ($this->robot_weapons > MMRPG_SETTINGS_STATS_MAX){ $this->robot_weapons = MMRPG_SETTINGS_STATS_MAX; }
@@ -183,8 +205,8 @@ class mmrpg_robot {
     if ($this->robot_base_defense > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_defense = MMRPG_SETTINGS_STATS_MAX; }
     if ($this->robot_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_speed = MMRPG_SETTINGS_STATS_MAX; }
     if ($this->robot_base_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_speed = MMRPG_SETTINGS_STATS_MAX; }
-    
-    // If this is a player-controlled robot, load abilities from session
+
+    // If this is a player-controlled robot, load abilities and image from session
     if ($this->player->player_side == 'left' && empty($this->flags['apply_session_abilities'])){
       // Collect the abilities for this robot from the session
       $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
@@ -192,6 +214,11 @@ class mmrpg_robot {
         $temp_robot_abilities = $temp_robot_settings['robot_abilities'];
         $this->robot_abilities = array();
         foreach ($temp_robot_abilities AS $token => $info){ $this->robot_abilities[] = $token; }
+      }
+      // If there is an alternate image set, apply it
+      if (!empty($temp_robot_settings['robot_image'])){
+        $this->robot_image = $temp_robot_settings['robot_image'];
+        $this->robot_base_image = $this->robot_image;
       }
       // Set the session ability flag to true
       $this->flags['apply_session_abilities'] = true;
@@ -211,12 +238,12 @@ class mmrpg_robot {
       $this->robot_status = 'disabled';
       $this->robot_energy = 0;
     }
-    
-    
-    
+
+
+
     // Update the session variable
     $this->update_session();
-    
+
     // DEBUG
     /*
     if ($this_robotinfo['robot_token'] == 'mega-man'){
@@ -259,32 +286,52 @@ class mmrpg_robot {
   public function print_robot_base_speed(){ return '<span class="robot_stat robot_stat_base_speed">'.$this->robot_base_speed.'</span>'; }
   public function print_robot_weaknesses(){
     $this_markup = array();
-    foreach ($this->robot_weaknesses AS $this_type){
-      $this_markup[] = '<span class="robot_weakness robot_type robot_type_'.$this_type.'">'.ucfirst($this_type).'</span>';
+    $short_names = count($this->robot_weaknesses) > 4 ? true : false;
+    if (count($this->robot_weaknesses) >= 19){
+      $this_markup[] = '<span class="robot_weakness robot_type robot_type_none">All Types</span>';
+    } else {
+      foreach ($this->robot_weaknesses AS $key => $this_type){
+        $this_markup[] = '<span class="robot_weakness robot_type robot_type_'.$this_type.'"'.($short_names ? ' title="'.ucfirst($this_type).'"' : '').'>'.ucfirst($short_names ? substr($this_type, 0, 2) : $this_type).'</span>';
+      }
     }
     $this_markup = implode(', ', $this_markup);
     return $this_markup;
   }
   public function print_robot_resistances(){
     $this_markup = array();
-    foreach ($this->robot_resistances AS $this_type){
-      $this_markup[] = '<span class="robot_resistance robot_type robot_type_'.$this_type.'">'.ucfirst($this_type).'</span>';
+    $short_names = count($this->robot_resistances) > 4 ? true : false;
+    if (count($this->robot_resistances) >= 19){
+      $this_markup[] = '<span class="robot_resistance robot_type robot_type_none">All Types</span>';
+    } else {
+      foreach ($this->robot_resistances AS $key => $this_type){
+        $this_markup[] = '<span class="robot_resistance robot_type robot_type_'.$this_type.'"'.($short_names ? ' title="'.ucfirst($this_type).'"' : '').'>'.ucfirst($short_names ? substr($this_type, 0, 2) : $this_type).'</span>';
+      }
     }
     $this_markup = implode(', ', $this_markup);
     return $this_markup;
   }
   public function print_robot_affinities(){
     $this_markup = array();
-    foreach ($this->robot_affinities AS $this_type){
-      $this_markup[] = '<span class="robot_affinity robot_type robot_type_'.$this_type.'">'.ucfirst($this_type).'</span>';
+    $short_names = count($this->robot_affinities) > 4 ? true : false;
+    if (count($this->robot_affinities) >= 19){
+      $this_markup[] = '<span class="robot_affinity robot_type robot_type_none">All Types</span>';
+    } else {
+      foreach ($this->robot_affinities AS $key => $this_type){
+        $this_markup[] = '<span class="robot_affinity robot_type robot_type_'.$this_type.'"'.($short_names ? ' title="'.ucfirst($this_type).'"' : '').'>'.ucfirst($short_names ? substr($this_type, 0, 2) : $this_type).'</span>';
+      }
     }
     $this_markup = implode(', ', $this_markup);
     return $this_markup;
   }
   public function print_robot_immunities(){
     $this_markup = array();
-    foreach ($this->robot_immunities AS $this_type){
-      $this_markup[] = '<span class="robot_immunity robot_type robot_type_'.$this_type.'">'.ucfirst($this_type).'</span>';
+    $short_names = count($this->robot_immunities) > 4 ? true : false;
+    if (count($this->robot_immunities) >= 19){
+      $this_markup[] = '<span class="robot_immunity robot_type robot_type_none">All Types</span>';
+    } else {
+      foreach ($this->robot_immunities AS $key => $this_type){
+        $this_markup[] = '<span class="robot_immunity robot_type robot_type_'.$this_type.'"'.($short_names ? ' title="'.ucfirst($this_type).'"' : '').'>'.ucfirst($short_names ? substr($this_type, 0, 2) : $this_type).'</span>';
+      }
     }
     $this_markup = implode(', ', $this_markup);
     return $this_markup;
@@ -315,8 +362,8 @@ class mmrpg_robot {
     }
     return $quote_text;
   }
-  
-  
+
+
 
 
   // Define public print functions for markup generation
@@ -391,7 +438,7 @@ class mmrpg_robot {
     }
     return $quote_text;
   }
-  
+
 
   // Define a function for checking if this robot has a specific ability
   public function has_ability($ability_token){
@@ -537,9 +584,19 @@ class mmrpg_robot {
 
   // Define a function for checking if this robot is in speed break status
   public static function robot_choices_abilities($objects){
+
     // Extract all objects into the current scope
     extract($objects);
     global $DB;
+
+    // If the given robot has their own choices function
+    if (isset($this_robot->robot_function_choices_abilities)){
+      // Simply return the result of the robot's personal choices function
+      $temp_function = $this_robot->robot_function_choices_abilities;
+      $return_token = $temp_function($objects);
+      if (!empty($return_token)){ return $return_token; }
+    }
+
     // Create the ability options and weights variables
     $options = array();
     $weights = array();
@@ -603,12 +660,13 @@ class mmrpg_robot {
     // Return an ability based on a weighted chance
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'robot_choices_abilities('.$this_robot->robot_token.')<br /> $options = '.implode(',', $options).'<br /> $weights = '.implode(',', $weights).'<br /> $this_robot->robot_abilities = '.implode(',', $this_robot->robot_abilities));  }
     return $this_battle->weighted_chance($options, $weights);
+
   }
 
   // Define a trigger for using one of this robot's abilities
   public function trigger_ability($target_robot, $this_ability){
     global $DB;
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'trigger_ability(\$target_robot, \$this_ability)');  }
 
     // Update this robot's history with the triggered ability
     $this->history['triggered_abilities'][] = $this_ability->ability_token;
@@ -646,13 +704,13 @@ class mmrpg_robot {
     // Determine how much weapon energy this should take
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_ability_energy = $this->calculate_weapon_energy($this_ability);
-    
+
     // Decrease this robot's weapon energy
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this->robot_weapons = $this->robot_weapons - $temp_ability_energy;
     if ($this->robot_weapons < 0){ $this->robot_weapons = 0; }
     $this->update_session();
-    
+
     // Default this and the target robot's frames to their base
     $this->robot_frame = 'base';
     $target_robot->robot_frame = 'base';
@@ -660,7 +718,7 @@ class mmrpg_robot {
     // Default the robot's stances to attack/defend
     $this->robot_stance = 'attack';
     $target_robot->robot_stance = 'defend';
-    
+
     // If this is a copy core robot and the ability type does not match its core
     $temp_image_changed = false;
     $temp_ability_type = !empty($this_ability->ability_type) ? $this_ability->ability_type : '';
@@ -685,14 +743,14 @@ class mmrpg_robot {
       'this_ability' => $this_ability
       ));
 
-  
+
     // If this robot's image has been changed, reveert it back to what it was
     if ($temp_image_changed){
       unset($this->robot_image_overlay['copy_type1']);
       unset($this->robot_image_overlay['copy_type2']);
       $this->update_session();
     }
-      
+
     // DEBUG DEBUG DEBUG
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update this ability's history with the triggered ability data and results
@@ -703,13 +761,13 @@ class mmrpg_robot {
     // Reset the robot's stances to the base
     $this->robot_stance = 'base';
     $target_robot->robot_stance = 'base';
-    
+
     // Update internal variables
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $target_robot->update_session();
     $this_ability->update_session();
 
-    
+
     // -- CHECK ATTACHMENTS -- //
 
     // If this robot has any attachments, loop through them
@@ -719,11 +777,11 @@ class mmrpg_robot {
       $temp_attachments_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
         // Ensure this ability has a type before checking weaknesses, resistances, etc.
         if (!empty($this_ability->ability_type)){
           //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-          
+
           // If this attachment has weaknesses defined and this ability is a match
           if (!empty($attachment_info['attachment_weaknesses'])
             && (in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses']) || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))){
@@ -781,12 +839,12 @@ class mmrpg_robot {
               break;
             }
           }
-          
+
         }
-        
+
       }
     }
-    
+
     // Update internal variables
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $target_robot->update_session();
@@ -894,6 +952,9 @@ class mmrpg_robot {
     $event_options['this_ability_target_position'] = $target_robot->robot_position;
     $event_options['this_ability_results'] = array();
     $event_options['console_show_target'] = false;
+    if (!empty($trigger_options['prevent_stats_text'])){
+      $event_options['canvas_show_ability_stats'] = false;
+    }
 
     // Empty any text from the previous ability result
     $this_ability->ability_results['this_text'] = '';
@@ -916,7 +977,7 @@ class mmrpg_robot {
     $this_ability->ability_frame = $this_ability->target_options['ability_success_frame'];
     $this_ability->ability_frame_span = $this_ability->target_options['ability_success_frame_span'];
     $this_ability->ability_frame_offset = $this_ability->target_options['ability_success_frame_offset'];
-    
+
     // If the target player is on the bench, alter the ability scale
     $temp_ability_styles_backup = $this_ability->ability_frame_styles;
     if ($target_robot->robot_position == 'bench' && $event_options['this_ability_target'] != $this->robot_id.'_'.$this->robot_token){
@@ -940,6 +1001,8 @@ class mmrpg_robot {
 
     // Update the ability results with the the trigger kind
     $this_ability->ability_results['trigger_kind'] = 'target';
+    $this_ability->ability_results['trigger_target_id'] = $target_robot->robot_id;
+    $this_ability->ability_results['trigger_target_key'] = $target_robot->robot_key;
     $this_ability->ability_results['this_result'] = 'success';
 
     // Update the event options with the ability results
@@ -957,7 +1020,7 @@ class mmrpg_robot {
       $temp_image_changed = true;
     }
     */
-        
+
     // Create a new entry in the event log for the targeting event
     $this->battle->events_create($this, $target_robot, $this_ability->target_options['target_header'], $this_ability->ability_results['this_text'], $event_options);
 
@@ -968,10 +1031,10 @@ class mmrpg_robot {
       $this->update_session();
     }
     */
-    
+
     // Update this ability's history with the triggered ability data and results
     $this_ability->history['ability_results'][] = $this_ability->ability_results;
-    
+
     // Refresh the ability styles from any changes
     $this_ability->ability_frame_styles = ''; //$temp_ability_styles_backup;
 
@@ -998,7 +1061,7 @@ class mmrpg_robot {
   public function trigger_damage($target_robot, $this_ability, $damage_amount, $trigger_disabled = true, $trigger_options = array()){
     global $DB;
     // Generate default trigger options if not set
-    if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = true; }
+    if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = $this_ability->damage_options['damage_modifiers'] == false ? false : true; }
     if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_core_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_core_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
@@ -1016,7 +1079,7 @@ class mmrpg_robot {
   public function trigger_recovery($target_robot, $this_ability, $recovery_amount, $trigger_disabled = true, $trigger_options = array()){
     global $DB;
     // Generate default trigger options if not set
-    if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = true; }
+    if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = $this_ability->recovery_options['recovery_modifiers'] == false ? false : true; }
     if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_core_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_core_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
@@ -1040,19 +1103,28 @@ class mmrpg_robot {
     // Return true on success
     return true;
   }
-  
+
   // Define a function for calculating required weapon energy
   public function calculate_weapon_energy($this_ability, &$energy_base = 0, &$energy_mods = 0){
     // Determine how much weapon energy this should take
     $energy_new = $this_ability->ability_energy;
     $energy_base = $energy_new;
     $energy_mods = 0;
+    // Only calculate energy if this is not the struggle action
     if ($this_ability->ability_token != 'action-noweapons'){
+      // If this robot's core is Elemental, apply a 50% WE reduction to abilities with matching type1 or type2
       if (!empty($this->robot_core) && ($this->robot_core == $this_ability->ability_type || $this->robot_core == $this_ability->ability_type2)){
         $energy_mods++;
         $energy_new = ceil($energy_new * 0.5);
       }
+      // Otherwise, if this robot's core is Neutral, apply a 50% WE reduction to abilities with matching type1 only
+      elseif (empty($this->robot_core) && (empty($this_ability->ability_type) && empty($this_ability->ability_type2))){
+        $energy_mods++;
+        $energy_new = ceil($energy_new * 0.5);
+      }
+      // Check to make sure this robot has level-up abilities before looping
       if (!empty($this->robot_rewards['abilities'])){
+        // Loop through level up abilities and apply a 50% WE reduction to a matching ability
         foreach ($this->robot_rewards['abilities'] AS $key => $info){
           if ($info['token'] == $this_ability->ability_token){
             $energy_mods++;
@@ -1061,28 +1133,40 @@ class mmrpg_robot {
           }
         }
       }
-    } else {
+    }
+    // Otherwise, if this is the struggle action, energy is zero
+    else {
       $this_ability->ability_energy = 0;
     }
     // Return the resulting weapon energy
     return $energy_new;
   }
-  
+
   // Define a function for calculating required weapon energy without using objects
   static function calculate_weapon_energy_static($this_robot, $this_ability, &$energy_base = 0, &$energy_mods = 0){
     // Determine how much weapon energy this should take
     $energy_new = isset($this_ability['ability_energy']) ? $this_ability['ability_energy'] : 0;
     $energy_base = $energy_new;
     $energy_mods = 0;
+    // Generate required variables if not already provided
     if (!isset($this_robot['robot_core'])){ $this_robot['robot_core'] = ''; }
     if (!isset($this_ability['ability_type'])){ $this_ability['ability_type'] = ''; }
     if (!isset($this_ability['ability_type2'])){ $this_ability['ability_type2'] = ''; }
+    // Only calculate energy if this is not the struggle action
     if ($this_ability['ability_token'] != 'action-noweapons'){
+      // If this robot's core is Elemental, apply a 50% WE reduction to abilities with matching type1 or type2
       if (!empty($this_robot['robot_core']) && ($this_robot['robot_core'] == $this_ability['ability_type'] || $this_robot['robot_core'] == $this_ability['ability_type2'])){
         $energy_mods++;
         $energy_new = ceil($energy_new * 0.5);
       }
+      // Otherwise, if this robot's core is Neutral, apply a 50% WE reduction to abilities with matching type1 only
+      elseif (empty($this_robot['robot_core']) && (empty($this_ability['ability_type']) && empty($this_ability['ability_type2']))){
+        $energy_mods++;
+        $energy_new = ceil($energy_new * 0.5);
+      }
+      // Check to make sure this robot has level-up abilities before looping
       if (!empty($this_robot['robot_rewards']['abilities'])){
+        // Loop through level up abilities and apply a 50% WE reduction to a matching ability
         foreach ($this_robot['robot_rewards']['abilities'] AS $key => $info){
           if ($info['token'] == $this_ability['ability_token']){
             $energy_mods++;
@@ -1091,7 +1175,9 @@ class mmrpg_robot {
           }
         }
       }
-    } else {
+    }
+    // Otherwise, if this is the struggle action, energy is zero
+    else {
       $this_ability['ability_energy'] = 0;
     }
     // Return the resulting weapon energy
@@ -1113,12 +1199,12 @@ class mmrpg_robot {
     // Return the robot console data
     return $this_data;
   }
-  
+
   // Define a function for pulling the full robot index
   public static function get_index(){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index()");  }
     global $DB;
-    $robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 OR robot_token = 'robot';", 'robot_token');
     if (!empty($robot_index)){ return $robot_index; }
     else { return array(); }
   }
@@ -1134,36 +1220,36 @@ class mmrpg_robot {
   // Define a public function for reformatting database data into proper arrays
   public static function parse_index_info($robot_info){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "parse_index_info(\$robot_info:{$robot_info['robot_token']})");  }
-    
+
     // Return false if empty
     if (empty($robot_info)){ return false; }
-    
+
     // If the information has already been parsed, return as-is
     if (!empty($robot_info['_parsed'])){ return $robot_info; }
     else { $robot_info['_parsed'] = true; }
-    
+
     // Explode the weaknesses, resistances, affinities, and immunities into an array
-    $temp_field_names = array('robot_field2', 'robot_weaknesses', 'robot_resistances', 'robot_affinities', 'robot_immunities');
+    $temp_field_names = array('robot_field2', 'robot_weaknesses', 'robot_resistances', 'robot_affinities', 'robot_immunities', 'robot_image_alts');
     foreach ($temp_field_names AS $field_name){
       if (!empty($robot_info[$field_name])){ $robot_info[$field_name] = json_decode($robot_info[$field_name], true); }
       else { $robot_info[$field_name] = array(); }
     }
-    
+
     // Explode the abilities into the appropriate array
     $robot_info['robot_abilities'] = !empty($robot_info['robot_abilities_compatible']) ? json_decode($robot_info['robot_abilities_compatible'], true) : array();
     unset($robot_info['robot_abilities_compatible']);
-            
+
     // Explode the abilities into the appropriate array
     $robot_info['robot_rewards']['abilities'] = !empty($robot_info['robot_abilities_rewards']) ? json_decode($robot_info['robot_abilities_rewards'], true) : array();
     unset($robot_info['robot_abilities_rewards']);
-    
+
     // Collect the quotes into the proper arrays
     $robot_info['robot_quotes']['battle_start'] = !empty($robot_info['robot_quotes_start']) ? $robot_info['robot_quotes_start']: '';
     $robot_info['robot_quotes']['battle_taunt'] = !empty($robot_info['robot_quotes_taunt']) ? $robot_info['robot_quotes_taunt']: '';
     $robot_info['robot_quotes']['battle_victory'] = !empty($robot_info['robot_quotes_victory']) ? $robot_info['robot_quotes_victory']: '';
     $robot_info['robot_quotes']['battle_defeat'] = !empty($robot_info['robot_quotes_defeat']) ? $robot_info['robot_quotes_defeat']: '';
     unset($robot_info['robot_quotes_start'], $robot_info['robot_quotes_taunt'], $robot_info['robot_quotes_victory'], $robot_info['robot_quotes_defeat']);
-        
+
     // Return the parsed robot info
     return $robot_info;
   }
@@ -1190,6 +1276,10 @@ class mmrpg_robot {
         break;
       }
     }
+
+    // Calculate this robot's stat totals
+    $this->robot_total = ($this->robot_energy + $this->robot_attack + $this->robot_defense + $this->robot_speed);
+    $this->robot_base_total = ($this->robot_base_energy + $this->robot_base_attack + $this->robot_base_defense + $this->robot_base_speed);
 
     // Return true on success
     return true;
@@ -1258,9 +1348,11 @@ class mmrpg_robot {
       'robot_token' => $this->robot_token,
       'robot_field' => $this->robot_field,
       'robot_class' => $this->robot_class,
+      'robot_gender' => $this->robot_gender,
       'robot_image' => $this->robot_image,
       'robot_image_size' => $this->robot_image_size,
       'robot_image_overlay' => $this->robot_image_overlay,
+      'robot_image_alts' => $this->robot_image_alts,
       'robot_core' => $this->robot_core,
       'robot_description' => $this->robot_description,
       'robot_experience' => $this->robot_experience,
@@ -1322,15 +1414,48 @@ class mmrpg_robot {
   }
 
   // Define a static function for printing out the robot's database markup
-  public static function print_database_markup($robot_info, $print_options = array()){
+  public static function print_database_markup($robot_info, $print_options = array(), $cache_markup = false){
+
+    //die('$temp_path_file = '.$temp_path_file.'<br /> markup was not found...');
     // Define the markup variable
     $this_markup = '';
     // Require the external function for generating database markup
     require('robot_database-markup.php');
     // Return the generated markup
     return $this_markup;
+
+    /*
+    // Define the cache and index paths for robots
+    $temp_hash_token = $robot_info['robot_token'].'_'.preg_replace('/[^a-z0-9]/i', '', json_encode($print_options)); //md5();
+    $temp_path_file = 'database/robot_'.$temp_hash_token.'_'.MMRPG_CONFIG_CACHE_DATE.'.htm';
+    //die('$temp_path_file = '.$temp_path_file);
+    // If the appropriate cache file exists, use that
+    $this_markup = $cache_markup ? mmrpg_get_cached_markup($temp_path_file) : '';
+    //die('$this_markup = '.$this_markup);
+    // If markup was found, return it directly
+    if (!empty($this_markup)){
+      //die('$temp_path_file = '.$temp_path_file.'<br /> markup was found!');
+      // Return the database markup
+      return $this_markup;
+    }
+    // Otherwise, generate fresh content
+    else {
+      //die('$temp_path_file = '.$temp_path_file.'<br /> markup was not found...');
+      // Define the markup variable
+      $this_markup = '';
+      // Require the external function for generating database markup
+      require('robot_database-markup.php');
+      // Update the cached markup file
+      if (!empty($cache_markup) && !empty($this_markup)){
+        mmrpg_save_cached_markup($temp_path_file, $this_markup);
+      }
+      // Return the generated markup
+      return $this_markup;
+    }
+    */
+
   }
-  
+
   // Define a static function for printing out the robot's editor markup
   public static function print_editor_markup($player_info, $robot_info, $mmrpg_database_abilities = array()){
     // Require the external function for generating editor markup

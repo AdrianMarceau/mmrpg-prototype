@@ -1,7 +1,9 @@
 <?
 // Pull in global variables
 global $mmrpg_index;
-$session_token = mmrpg_game_token();
+global $session_token;
+// Collect values for potentially missing global variables
+if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
 
 // Generate the ability option markup
 if (empty($robot_info)){ return false; }

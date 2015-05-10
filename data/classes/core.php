@@ -1,12 +1,12 @@
 <?php
 // Define the plutocms_core class
 class plutocms_core {
-	
+
   // Define the public variables
   public $DOMAIN;
   public $ROOTDIR;
   public $ROOTURL;
-  
+
   // Define the class constructor
   public function plutocms_core(){
     // Collect filesystem constants from the global scope
@@ -14,7 +14,7 @@ class plutocms_core {
     $this->ROOTDIR = MMRPG_CONFIG_ROOTDIR;
     $this->ROOTURL = MMRPG_CONFIG_ROOTURL;
   }
-  
+
   // Define the shortcut function for encoding html entities
   public function htmlentity_encode($string, $encoding = ENT_QUOTES, $charset = 'UTF-8'){
     // Encode using UTF-8 and the ENT_QUOTES setting
@@ -30,7 +30,7 @@ class plutocms_core {
     // Padd the number a default of three zeros to the left
     return str_pad($number, $pad_length, $pad_char, $pad_direction);
   }
-  
+
   // Define a function for adding the ordinal suffix to any integer
   public function number_suffix($value, $concatenate = true, $superscript = false){
     if (!is_numeric($value) || !is_int($value)){ return false; }
@@ -43,7 +43,7 @@ class plutocms_core {
     if ($concatenate){ return $value.$suffix; }
     else { return $suffix; }
   }
-  
+
   // Define a function for easily switching the content-type to that of an HTML document
   public function header_html($cache_time = 0, $attachment = false){
     // Update the page headers for text/html
@@ -59,7 +59,7 @@ class plutocms_core {
     // Return true
     return true;
   }
-  
+
   // Define a function for easily switching the content-type to that of a JS document
   public function header_js($cache_time = 0, $attachment = false){
     // Update the page headers for text/js
@@ -91,7 +91,7 @@ class plutocms_core {
     // Return true
     return true;
   }
-  
+
   // Define a function for easily switching the content-type to that of an XML document
   public function header_xml($cache_time = 0, $attachment = false){
     // Update the page headers for text/xml
@@ -123,7 +123,7 @@ class plutocms_core {
     // Return true
     return true;
   }
-  
+
   // Define a function for easily switching the content-type to that of a CSV document
   public function header_csv($cache_time = 0, $attachment = false){
     // Update the page headers for text/html
@@ -139,7 +139,7 @@ class plutocms_core {
     // Return true
     return true;
   }
-  
+
   // Define a function for checking if an email address is valid format
   public function valid_email($email){
     $qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
@@ -156,6 +156,58 @@ class plutocms_core {
     $addr_spec = "$local_part\\x40$domain";
     return preg_match("!^$addr_spec$!", $email) ? true : false;
   }
-  
+
+  // Define a public function for sending email messages
+  public function email($to_email, $from_email, $message_subject, $message_body, $reply_to_email = false, $email_type = 'text/html'){
+    // Parse the email type
+    $email_type = strtolower($email_type);
+    if (!in_array($email_type, array('text/html', 'text/plain'))){
+      $email_type = 'text/html';
+    }
+    // Parse the TO email
+    if (preg_match('/([^<>]*)<(.*)>/i', $to_email, $to_matches)){
+      $to_name = $to_matches[1];
+      $to_email = $to_matches[2];
+    }elseif(preg_match('/([-_a-z0-9\.]*)@([^<>]*)/i', $to_email, $to_matches)){
+      $to_name = $to_matches[1];
+      $to_email = $to_matches[0];
+    }else{
+      echo ("[[plutocms_core::email]] : A valid recipient email was not provided.");
+      return false;
+    }
+    // Parse the FROM email
+    if (preg_match('/([^<>]*)<(.*)>/i', $from_email, $from_matches)){
+      $from_name = $from_matches[1];
+      $from_email = $from_matches[2];
+    }elseif(preg_match('/([-_a-z0-9\.]*)@([^<>]*)/i', $from_email, $from_matches)){
+      $from_name = $from_matches[1];
+      $from_email = $from_matches[0];
+    }else{
+      echo ("[[plutocms_core::email]] : A valid sender email was not provided.");
+      return false;
+    }
+    // Parse the REPLY-TO email
+    if (preg_match('/([^<>]*)<(.*)>/i', $reply_to_email, $reply_to_matches)){
+      $reply_to_name = $reply_to_matches[1];
+      $reply_to_email = $reply_to_matches[2];
+    }elseif(preg_match('/([-_a-z0-9\.]*)@([^<>]*)/i', $reply_to_email, $reply_to_matches)){
+      $reply_to_name = $reply_to_matches[1];
+      $reply_to_email = $reply_to_matches[0];
+    }else{
+      $reply_to_name = false;
+      $reply_to_email = false;
+    }
+    // Define/set the email headers
+    ini_set('sendmail_from', $from_email);
+    $message_header .= "Return-Path: {$from_name} <{$from_email}>\r\n";
+    $message_header .= "From: {$from_name} <{$from_email}>\r\n";
+    $message_header .= "Content-Type: {$email_type};\r\n";
+    if ($reply_to_name && $reply_to_email) { $message_header = "Reply-To: {$reply_to_name} <{$reply_to_email}>\r\n"; }
+    else { $message_header = "Reply-To: {$from_name} <{$from_email}>\r\n"; }
+    // Attempt to send the email message
+    if (mail($to_email, $message_subject, ($email_type == 'text/html' ? "<html>\r\n<body>\r\n" : '').$message_body.($email_type == 'text/html' ? "</body>\r\n</html>\r\n" : ''), $message_header)){ return true; }
+    else { echo("[[plutocms_core::email]] : An unknown error occured.  Mail was not sent."); return false; }
+  }
+
 }
 ?>

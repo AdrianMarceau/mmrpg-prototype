@@ -12,6 +12,10 @@ $target_robot_backup_frame = $target_robot->robot_frame;
 $target_player_backup_frame = $target_robot->player->player_frame;
 $this_ability_backup_frame = $this_ability->ability_frame;
 
+// Check if this robot is at full health before triggering
+$this_robot_energy_start = $this->robot_energy;
+$this_robot_energy_start_max = $this_robot_energy_start >= $this->robot_base_energy ? true : false;
+
 // Define the event console options
 $event_options = array();
 $event_options['console_container_height'] = 1;
@@ -24,17 +28,18 @@ $this_ability->ability_results['this_text'] = '';
 // Update the recovery to whatever was supplied in the argument
 //if ($this_ability->recovery_options['recovery_percent'] && $recovery_amount > 100){ $recovery_amount = 100; }
 $this_ability->recovery_options['recovery_amount'] = $recovery_amount;
-  
+
 // Collect the recovery amount argument from the function
 $this_ability->ability_results['this_amount'] = $recovery_amount;
 // DEBUG
-//$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | recovery_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->recovery_options['recovery_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->recovery_options['recovery_kind'].'');
+//$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | recovery_start_amount<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->recovery_options['recovery_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->recovery_options['recovery_kind'].'');
 
 
 // DEBUG
-$debug = '';
-foreach ($trigger_options AS $key => $value){ $debug .= $key.'='.($value === true ? 'true' : ($value === false ? 'false' : $value)).'; '; }
-//$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' : recovery_trigger_options : '.$debug);
+$debug = array();
+//foreach ($trigger_options AS $key => $value){ $debug .= $key.'='.($value === true ? 'true' : ($value === false ? 'false' : $value)).'; '; }
+foreach ($trigger_options AS $key => $value){ $debug[] = (!$value ? '<del>' : '<span>').preg_replace('/^apply_(.*)_modifiers$/i', '$1_modifiers', $key).(!$value ? '</del>' : '</span>'); }
+//$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' : damage_trigger_options <br /> '.implode(', ', $debug));
 
 /*
 // Only apply weakness, resistance, etc. if not percent
@@ -54,14 +59,14 @@ if ($trigger_options['apply_modifiers'] != false){
     } else {
       $this_ability->ability_results['flag_weakness'] = false;
     }
-    
+
     // If this robot has weakness to the ability (based on type2)
     if ($this->has_weakness($this_ability->recovery_options['recovery_type2']) && !$this->has_affinity($this_ability->recovery_options['recovery_type'])){
       $this_ability->ability_results['counter_weaknesses'] += 1;
       $this_ability->ability_results['flag_weakness'] = true;
       return $this->trigger_damage($target_robot, $this_ability, $recovery_amount);
     }
-    
+
     // If target robot has affinity to the ability (based on type)
     if ($this->has_affinity($this_ability->recovery_options['recovery_type']) && !$this->has_weakness($this_ability->recovery_options['recovery_type2'])){
       $this_ability->ability_results['counter_affinities'] += 1;
@@ -69,13 +74,13 @@ if ($trigger_options['apply_modifiers'] != false){
     } else {
       $this_ability->ability_results['flag_affinity'] = false;
     }
-    
+
     // If target robot has affinity to the ability (based on type2)
     if ($this->has_affinity($this_ability->recovery_options['recovery_type2']) && !$this->has_weakness($this_ability->recovery_options['recovery_type'])){
       $this_ability->ability_results['counter_affinities'] += 1;
       $this_ability->ability_results['flag_affinity'] = true;
     }
-    
+
     // If target robot has resistance tp the ability (based on type)
     if ($this->has_resistance($this_ability->recovery_options['recovery_type'])){
       $this_ability->ability_results['counter_resistances'] += 1;
@@ -83,13 +88,13 @@ if ($trigger_options['apply_modifiers'] != false){
     } else {
       $this_ability->ability_results['flag_resistance'] = false;
     }
-    
+
     // If target robot has resistance tp the ability (based on type2)
     if ($this->has_resistance($this_ability->recovery_options['recovery_type2'])){
       $this_ability->ability_results['counter_resistances'] += 1;
       $this_ability->ability_results['flag_resistance'] = true;
     }
-    
+
     // If target robot has immunity to the ability (based on type)
     if ($this->has_immunity($this_ability->recovery_options['recovery_type'])){
       $this_ability->ability_results['counter_immunities'] += 1;
@@ -97,37 +102,18 @@ if ($trigger_options['apply_modifiers'] != false){
     } else {
       $this_ability->ability_results['flag_immunity'] = false;
     }
-    
+
     // If target robot has immunity to the ability (based on type2)
     if ($this->has_immunity($this_ability->recovery_options['recovery_type2'])){
       $this_ability->ability_results['counter_immunities'] += 1;
       $this_ability->ability_results['flag_immunity'] = true;
     }
-    
+
   }
-  
-  // Apply core boosts if allowed to
-  if ($trigger_options['apply_core_modifiers'] != false){
-  
-    // If the target robot is using an ability that it is the same type as its core
-    if (!empty($target_robot->robot_core) && $target_robot->robot_core == $this_ability->recovery_options['recovery_type']){
-      $this_ability->ability_results['counter_coreboosts'] += 1;
-      $this_ability->ability_results['flag_coreboost'] = true;
-    } else {
-      $this_ability->ability_results['flag_coreboost'] = false;
-    }
-    
-    // If the target robot is using an ability that it is the same type as its core
-    if (!empty($target_robot->robot_core) && $target_robot->robot_core == $this_ability->recovery_options['recovery_type2']){
-      $this_ability->ability_results['counter_coreboosts'] += 1;
-      $this_ability->ability_results['flag_coreboost'] = true;
-    }
-    
-  }
-  
+
   // Apply position boosts if allowed to
   if ($trigger_options['apply_position_modifiers'] != false){
-  
+
     // If this robot is not in the active position
     if ($this->robot_position != 'active'){
       // Collect the current key of the robot and apply recovery mods
@@ -138,9 +124,9 @@ if ($trigger_options['apply_modifiers'] != false){
       //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | position_modifier_recovery | '.$recovery_amount.' = round('.$recovery_amount.' * '.$temp_recovery_resistor.') = '.$new_recovery_amount.'');
       $recovery_amount = $new_recovery_amount;
     }
-    
+
   }
-  
+
 }
 
 // Apply field multipliers preemtively if there are any
@@ -171,15 +157,6 @@ if ($trigger_options['apply_field_modifiers'] != false && $this_ability->recover
         $recovery_amount = $new_recovery_amount;
       }
     }
-    // Apply any starforce bonuses while we're here
-    //if ($target_robot->player->player_side == 'left' && !empty($_SESSION['GAME']['values']['star_force'][$temp_ability_recovery_type])){
-    if (!empty($target_robot->player->player_starforce[$temp_ability_recovery_type])){
-      $temp_multiplier = 1 + ($target_robot->player->player_starforce[$temp_ability_recovery_type] / 10);
-      $new_recovery_amount = round($recovery_amount * $temp_multiplier);
-      // DEBUG
-      //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | starforce_multiplier_'.$temp_ability_recovery_type.' | '.$recovery_amount.' = round('.$recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
-      $recovery_amount = $new_recovery_amount;
-    }
   }
   if (!empty($this_ability->recovery_options['recovery_type2'])){
     foreach ($field_multipliers AS $temp_type => $temp_multiplier){
@@ -193,14 +170,6 @@ if ($trigger_options['apply_field_modifiers'] != false && $this_ability->recover
         $recovery_amount = $new_recovery_amount;
       }
     }
-    // Apply any starforce bonuses while we're here
-    if ($target_robot->player->player_side == 'left' && !empty($_SESSION['GAME']['values']['star_force'][$this_ability->recovery_options['recovery_type2']])){
-      $temp_multiplier = 1 + ($_SESSION['GAME']['values']['star_force'][$this_ability->recovery_options['recovery_type2']] / 10);
-      $new_recovery_amount = round($recovery_amount * $temp_multiplier);
-      // DEBUG
-      //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | starforce_multiplier_'.$this_ability->recovery_options['recovery_type2'].' | '.$recovery_amount.' = round('.$recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
-      $recovery_amount = $new_recovery_amount;
-    }
   }
 }
 
@@ -208,6 +177,7 @@ if ($trigger_options['apply_field_modifiers'] != false && $this_ability->recover
 $this_ability->ability_results['trigger_kind'] = 'recovery';
 $this_ability->ability_results['recovery_kind'] = $this_ability->recovery_options['recovery_kind'];
 $this_ability->ability_results['recovery_type'] = $this_ability->recovery_options['recovery_type'];
+$this_ability->ability_results['recovery_type2'] = $this_ability->recovery_options['recovery_type2'];
 
 // If the success rate was not provided, auto-calculate
 if ($this_ability->recovery_options['success_rate'] == 'auto'){
@@ -325,12 +295,12 @@ if ($this_ability->ability_results['flag_immunity']){
 
 // If the attack was a success, proceed normally
 if ($this_ability->ability_results['this_result'] == 'success'){
-  
+
   // Create the experience multiplier if not already set
   if (!isset($this->field->field_multipliers['experience'])){ $this->field->field_multipliers['experience'] = 1; }
   elseif ($this->field->field_multipliers['experience'] < 0.1){ $this->field->field_multipliers['experience'] = 0.1; }
   elseif ($this->field->field_multipliers['experience'] > 9.9){ $this->field->field_multipliers['experience'] = 9.9; }
-  
+
   // If modifiers are not turned off
   if ($trigger_options['apply_modifiers'] != false){
 
@@ -339,7 +309,10 @@ if ($this_ability->ability_results['this_result'] == 'success'){
       $this->flags['triggered_weakness'] = true;
       if (isset($this->counters['triggered_weakness'])){ $this->counters['triggered_weakness'] += 1; }
       else { $this->counters['triggered_weakness'] = 1; }
-      if ($this_ability->recovery_options['recovery_kind'] == 'energy' && $this->player->player_side == 'right'){ $this->field->field_multipliers['experience'] += 0.1; }
+      if ($this_ability->recovery_options['recovery_kind'] == 'energy' && $this->player->player_side == 'right'){
+        $this->field->field_multipliers['experience'] += 0.1;
+        $this_ability->recovery_options['recovery_kickback']['x'] = ceil($this_ability->recovery_options['recovery_kickback']['x'] * 2);
+      }
       //elseif ($this->player->player_side == 'left'){ $this->field->field_multipliers['experience'] -= 0.1; }
     }
     if (!empty($this_ability->ability_results['flag_affinity'])){
@@ -360,51 +333,41 @@ if ($this_ability->ability_results['this_result'] == 'success'){
       $this->flags['triggered_critical'] = true;
       if (isset($this->counters['triggered_critical'])){ $this->counters['triggered_critical'] += 1; }
       else { $this->counters['triggered_critical'] = 1; }
-      if ($this_ability->recovery_options['recovery_kind'] == 'energy' && $this->player->player_side == 'right'){ $this->field->field_multipliers['experience'] += 0.1; }
+      if ($this_ability->recovery_options['recovery_kind'] == 'energy' && $this->player->player_side == 'right'){
+        $this->field->field_multipliers['experience'] += 0.1;
+        $this_ability->recovery_options['recovery_kickback']['x'] = ceil($this_ability->recovery_options['recovery_kickback']['x'] * 2);
+      }
       //elseif ($this->player->player_side == 'left'){ $this->field->field_multipliers['experience'] -= 0.1; }
     }
-    
+
   }
-  
+
   // Update the field session with any changes
   $this->field->update_session();
-  
+
   // Update this robot's frame based on recovery type
   $this->robot_frame = $this_ability->recovery_options['recovery_frame'];
   $this->player->player_frame = ($this->robot_id != $target_robot->robot_id || $trigger_options['referred_recovery']) ? 'taunt' : 'base';
   $this_ability->ability_frame = $this_ability->recovery_options['ability_success_frame'];
   $this_ability->ability_frame_offset = $this_ability->recovery_options['ability_success_frame_offset'];
-  
+
   // Display the success text, if text has been provided
   if (!empty($this_ability->recovery_options['success_text'])){
     $this_ability->ability_results['this_text'] .= $this_ability->recovery_options['success_text'];
   }
-  
+
   // Collect the recovery amount argument from the function
   $this_ability->ability_results['this_amount'] = $recovery_amount;
-  
-  // Only apply core modifiers if allowed to
-  if ($trigger_options['apply_core_modifiers'] != false){
-    
-    // If target robot has core boost for the ability (based on type)
-    if ($this_ability->ability_results['flag_coreboost']){
-      $temp_multiplier = MMRPG_SETTINGS_COREBOOST_MULTIPLIER;
-      $this_ability->ability_results['this_amount'] = ceil($this_ability->ability_results['this_amount'] * $temp_multiplier);
-      // DEBUG
-      //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | apply_core_modifiers | x '.$temp_multiplier.' = '.$this_ability->ability_results['this_amount'].'');
-    }
-    
-  }
-  
+
   // If we're not dealing with a percentage-based amount, apply stat mods
   if ($trigger_options['apply_stat_modifiers'] != false && !$this_ability->recovery_options['recovery_percent']){
 
     // Only apply ATTACK/DEFENSE mods if this robot is not targetting itself and it's ENERGY based recovery
     if ($this_ability->recovery_options['recovery_kind'] == 'energy' && ($this->robot_id != $target_robot->robot_id || $trigger_options['referred_recovery'])){
-    
+
       // Backup the current ammount before stat multipliers
       $temp_amount_backup = $this_ability->ability_results['this_amount'];
-      
+
       // If this robot's defense is at absolute zero, and the target's attack isnt, OHKO
       if ($this->robot_defense <= 0 && $target_robot->robot_attack >= 1){
         // Set the new recovery amount to OHKO this robot
@@ -434,19 +397,58 @@ if ($this_ability->ability_results['this_result'] == 'success'){
       }
       // Otherwise if both robots have normal stats, calculate the new amount normally
       else {
+
+        // Collect the target's attack stat and this robot's defense values
+        $target_robot_attack = $target_robot->robot_attack;
+        $this_robot_defense = $this->robot_defense;
+        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | attack_vs_defense | A:'.$target_robot_attack.' vs. D:'.$this_robot_defense.' ');
+
+        // If the target player has any starforce for type1, apply it to the attack
+        if (!empty($target_robot->player->player_starforce[$temp_ability_recovery_type])){
+          $temp_attack_boost = $target_robot->player->player_starforce[$temp_ability_recovery_type] * MMRPG_SETTINGS_STARS_ATTACKBOOST;
+          $temp_new_attack = $target_robot_attack + $temp_attack_boost;
+          //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | target_starforce | '.$temp_ability_recovery_type.'_boost = '.$temp_attack_boost.' | robot_attack = round('.$target_robot_attack.' + '.$temp_attack_boost.') = '.$temp_new_attack.'');
+          $target_robot_attack = $temp_new_attack;
+          // If the target player has any starforce for type2, apply it to the attack
+          if (!empty($target_robot->player->player_starforce[$temp_ability_recovery_type2])){
+            $temp_attack_boost = $target_robot->player->player_starforce[$temp_ability_recovery_type2] * MMRPG_SETTINGS_STARS_ATTACKBOOST;
+            $temp_new_attack = $target_robot_attack + $temp_attack_boost;
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | target_starforce | '.$temp_ability_recovery_type2.'_boost = '.$temp_attack_boost.' | robot_attack = round('.$target_robot_attack.' + '.$temp_attack_boost.') = '.$temp_new_attack.'');
+            $target_robot_attack = $temp_new_attack;
+          }
+        }
+
+        // If this player has any starforce for type1, apply it to the defense
+        if (!empty($this->player->player_starforce[$temp_ability_recovery_type])){
+          $temp_defense_boost = $this->player->player_starforce[$temp_ability_recovery_type] * MMRPG_SETTINGS_STARS_DEFENSEBOOST;
+          $temp_new_defense = $this_robot_defense + $temp_defense_boost;
+          //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | this_starforce | '.$temp_ability_recovery_type.'_boost = '.$temp_defense_boost.' | robot_defense = round('.$this_robot_defense.' + '.$temp_defense_boost.') = '.$temp_new_defense.'');
+          $this_robot_defense = $temp_new_defense;
+          // If the target player has any starforce for type2, apply it to the defense
+          if (!empty($this->player->player_starforce[$temp_ability_recovery_type2])){
+            $temp_defense_boost = $this->player->player_starforce[$temp_ability_recovery_type2] * MMRPG_SETTINGS_STARS_DEFENSEBOOST;
+            $temp_new_defense = $this_robot_defense + $temp_defense_boost;
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | this_starforce | '.$temp_ability_recovery_type2.'_boost = '.$temp_defense_boost.' | robot_defense = round('.$this_robot_defense.' + '.$temp_defense_boost.') = '.$temp_new_defense.'');
+            $this_robot_defense = $temp_new_defense;
+          }
+        }
+
         // Set the new recovery amount relative to this robot's defense and the target robot's attack
-        $temp_new_amount = round($this_ability->ability_results['this_amount'] * ($target_robot->robot_attack / $this->robot_defense));
+        $temp_new_amount = round($this_ability->ability_results['this_amount'] * ($target_robot_attack / $this_robot_defense));
+
         // DEBUG
-        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | normal_recovery | A:'.$target_robot->robot_attack.' D:'.$this->robot_defense.' | '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * ('.$target_robot->robot_attack.' / '.$this->robot_defense.')) = '.$temp_new_amount.'');
+        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | normal_recovery | A:'.$target_robot_attack.' D:'.$this_robot_defense.' | '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * ('.$target_robot_attack.' / '.$this_robot_defense.')) = '.$temp_new_amount.'');
+
         // Update the amount with the new calculation
         $this_ability->ability_results['this_amount'] = $temp_new_amount;
+
       }
-      
+
       // If this robot started out above zero but is now absolute zero, round up
       if ($temp_amount_backup > 0 && $this_ability->ability_results['this_amount'] == 0){ $this_ability->ability_results['this_amount'] = 1; }
-      
+
     }
-    
+
     // If this is a critical hit (random chance)
     if ($this->battle->critical_chance($this_ability->recovery_options['critical_rate'])){
       $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] * $this_ability->recovery_options['critical_multiplier'];
@@ -456,9 +458,9 @@ if ($this_ability->ability_results['this_result'] == 'success'){
     } else {
       $this_ability->ability_results['flag_critical'] = false;
     }
-    
+
   }
-  
+
   // Only apply weakness, resistance, etc. if allowed to
   if ($trigger_options['apply_type_modifiers'] != false){
 
@@ -472,7 +474,7 @@ if ($this_ability->ability_results['this_result'] == 'success'){
         $this_ability->ability_results['this_amount'] = $temp_new_amount;
       }
     }
-    
+
     // If target robot resists the ability (based on type)
     if ($this_ability->ability_results['flag_resistance']){
       $loop_count = $this_ability->ability_results['counter_resistances'] / ($this_ability->ability_results['total_strikes'] + 1);
@@ -483,7 +485,7 @@ if ($this_ability->ability_results['this_result'] == 'success'){
         $this_ability->ability_results['this_amount'] = $temp_new_amount;
       }
     }
-    
+
     // If target robot is immune to the ability (based on type)
     if ($this_ability->ability_results['flag_immunity']){
       $loop_count = $this_ability->ability_results['counter_immunities'] / ($this_ability->ability_results['total_strikes'] + 1);
@@ -494,16 +496,16 @@ if ($this_ability->ability_results['this_result'] == 'success'){
         $this_ability->ability_results['this_amount'] = $temp_new_amount;
       }
     }
-    
+
   }
-  
+
   // Only apply other modifiers if allowed to
   if ($trigger_options['apply_modifiers'] != false){
-    
+
     // If this robot has an attachment with a recovery multiplier
     if (!empty($this->robot_attachments)){
       foreach ($this->robot_attachments AS $temp_token => $temp_info){
-        
+
         // First check to see if any basic boosters or breakers have been created for this robot
         if (true){
           // If this robot's attachment has a recovery breaker value set
@@ -520,6 +522,22 @@ if ($this_ability->ability_results['this_result'] == 'success'){
             $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_booster']);
             // DEBUG
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_booster<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster'].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a recovery input breaker value set
+          if (isset($temp_info['attachment_recovery_input_breaker'])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_breaker']);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_input_breaker<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_breaker'].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a recovery input booster value set
+          if (isset($temp_info['attachment_recovery_input_booster'])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_booster']);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_input_booster<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_booster'].') = '.$temp_new_amount.'');
             $this_ability->ability_results['this_amount'] = $temp_new_amount;
           }
         }
@@ -541,14 +559,108 @@ if ($this_ability->ability_results['this_result'] == 'success'){
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_booster_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
             $this_ability->ability_results['this_amount'] = $temp_new_amount;
           }
+          // If this robot's attachment has a recovery breaker value set
+          if (isset($temp_info['attachment_recovery_input_breaker_'.$this_ability->ability_type])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_breaker_'.$this_ability->ability_type]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_input_breaker_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_breaker_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a recovery booster value set
+          if (isset($temp_info['attachment_recovery_input_booster_'.$this_ability->ability_type])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_booster_'.$this_ability->ability_type]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_input_booster_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
         }
-        
+
       }
     }
-    
-    
+
+    // If this robot has an attachment with a recovery multiplier
+    if (!empty($target_robot->robot_attachments)){
+      foreach ($target_robot->robot_attachments AS $temp_token => $temp_info){
+
+        // First check to see if any basic boosters or breakers have been created for this robot
+        if (true){
+          // If this robot's attachment has a recovery breaker value set
+          if (isset($temp_info['attachment_recovery_breaker'])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_breaker']);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_breaker<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker'].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a recovery booster value set
+          if (isset($temp_info['attachment_recovery_booster'])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_booster']);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_booster<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster'].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a recovery output breaker value set
+          if (isset($temp_info['attachment_recovery_output_breaker'])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_breaker']);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_output_breaker<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_breaker'].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a recovery output booster value set
+          if (isset($temp_info['attachment_recovery_output_booster'])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_booster']);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_output_booster<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_booster'].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+        }
+        // Next check to see if any boosters or breakers for either of this ability's types
+        if (!empty($this_ability->ability_type)){
+          // If this robot's attachment has a recovery breaker value set
+          if (isset($temp_info['attachment_recovery_breaker_'.$this_ability->ability_type])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_breaker_'.$this_ability->ability_type]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_breaker_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a recovery booster value set
+          if (isset($temp_info['attachment_recovery_booster_'.$this_ability->ability_type])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_booster_'.$this_ability->ability_type]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_booster_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a recovery breaker value set
+          if (isset($temp_info['attachment_recovery_output_breaker_'.$this_ability->ability_type])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_breaker_'.$this_ability->ability_type]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_output_breaker_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_breaker_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a recovery booster value set
+          if (isset($temp_info['attachment_recovery_output_booster_'.$this_ability->ability_type])){
+            // Apply the recovery breaker multiplier to the current recovery amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_booster_'.$this_ability->ability_type]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_output_booster_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+        }
+
+      }
+    }
+
+
   }
-  
+
   // Generate the flag string for easier parsing
   $this_flag_string = array();
   if ($this_ability->ability_results['flag_immunity']){ $this_flag_string[] = 'immunity'; }
@@ -561,29 +673,29 @@ if ($this_ability->ability_results['this_result'] == 'success'){
     }
   }
   $this_flag_name = (!empty($this_flag_string) ? implode('_', $this_flag_string).'_' : '').'text';
-  
+
   // Generate the status text based on flags
   if (isset($this_ability->recovery_options[$this_flag_name])){
     //$event_options['console_container_height'] = 2;
     //$this_ability->ability_results['this_text'] .= '<br />';
     $this_ability->ability_results['this_text'] .= ' '.$this_ability->recovery_options[$this_flag_name];
   }
-  
+
   // Display a break before the recovery amount if other text was generated
   if (!empty($this_ability->ability_results['this_text'])){
     $this_ability->ability_results['this_text'] .= '<br />';
   }
-  
+
   // Ensure the recovery amount is always at least one, unless absolute zero
   if ($this_ability->ability_results['this_amount'] < 1 && $this_ability->ability_results['this_amount'] > 0){ $this_ability->ability_results['this_amount'] = 1; }
-  
+
   // Reference the requested recovery kind with a shorter variable
   $this_ability->recovery_options['recovery_kind'] = strtolower($this_ability->recovery_options['recovery_kind']);
   $recovery_stat_name = 'robot_'.$this_ability->recovery_options['recovery_kind'];
-  
+
   // Inflict the approiate recovery type based on the recovery options
   switch ($recovery_stat_name){
-    
+
     // If this is an ATTACK type recovery trigger
     case 'robot_attack': {
       // Inflict attack recovery on the target's internal stat
@@ -655,7 +767,8 @@ if ($this_ability->ability_results['this_result'] == 'success'){
       // If the recovery put the robot into overboost, recalculate the recovery
       if ($this->robot_energy > $this->robot_base_energy){
         // Calculate the overcure amount
-        $this_ability->ability_results['this_overkill'] = ($this->robot_base_energy - $this->robot_energy) * -1;
+        $this_ability->ability_results['this_overboost'] = ($this->robot_base_energy - $this->robot_energy) * -1;
+        if ($this_ability->ability_results['this_overboost'] > $this->robot_base_energy){ $this_ability->ability_results['this_overboost'] = $this->robot_base_energy; }
         // Calculate the actual recovery amount
         $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overkill'];
         // Max out the robots energy
@@ -675,16 +788,16 @@ if ($this_ability->ability_results['this_result'] == 'success'){
       // Break from the ENERGY case
       break;
     }
-    
+
   }
-  
+
   // Define the print variables to return
   $this_ability->ability_results['print_strikes'] = '<span class="recovery_strikes">'.(!empty($this_ability->ability_results['total_strikes']) ? $this_ability->ability_results['total_strikes'] : 0).'</span>';
   $this_ability->ability_results['print_misses'] = '<span class="recovery_misses">'.(!empty($this_ability->ability_results['total_misses']) ? $this_ability->ability_results['total_misses'] : 0).'</span>';
   $this_ability->ability_results['print_result'] = '<span class="recovery_result">'.(!empty($this_ability->ability_results['total_result']) ? $this_ability->ability_results['total_result'] : 0).'</span>';
   $this_ability->ability_results['print_amount'] = '<span class="recovery_amount">'.(!empty($this_ability->ability_results['this_amount']) ? $this_ability->ability_results['this_amount'] : 0).'</span>';
   $this_ability->ability_results['print_overkill'] = '<span class="recovery_overkill">'.(!empty($this_ability->ability_results['this_overkill']) ? $this_ability->ability_results['this_overkill'] : 0).'</span>';
-  
+
   // Add the final recovery text showing the amount based on life energy recovery
   if ($this_ability->recovery_options['recovery_kind'] == 'energy'){
     $this_ability->ability_results['this_text'] .= "{$this->print_robot_name()} recovers {$this_ability->ability_results['print_amount']} life energy";
@@ -707,37 +820,37 @@ if ($this_ability->ability_results['this_result'] == 'success'){
     }
     // Otherwise if the stat wouldn't go any lower
     else {
-      
+
       // Update this robot's frame based on recovery type
       $this_ability->ability_frame = $this_ability->recovery_options['ability_failure_frame'];
       $this_ability->ability_frame_span = $this_ability->recovery_options['ability_failure_frame_span'];
       $this_ability->ability_frame_offset = $this_ability->recovery_options['ability_failure_frame_offset'];
-      
+
       // Display the failure text, if text has been provided
       if (!empty($this_ability->recovery_options['failure_text'])){
         $this_ability->ability_results['this_text'] .= $this_ability->recovery_options['failure_text'].' ';
       }
     }
   }
-    
+
 }
 // Otherwise, if the attack was a failure
 else {
-  
+
   // Update this robot's frame based on recovery type
   $this_ability->ability_frame = $this_ability->recovery_options['ability_failure_frame'];
   $this_ability->ability_frame_span = $this_ability->recovery_options['ability_failure_frame_span'];
   $this_ability->ability_frame_offset = $this_ability->recovery_options['ability_failure_frame_offset'];
-  
+
   // Update the recovery and overkilll amounts to reflect zero recovery
   $this_ability->ability_results['this_amount'] = 0;
   $this_ability->ability_results['this_overkill'] = 0;
-  
+
   // Display the failure text, if text has been provided
   if (!$this_ability->ability_results['flag_immunity'] && !empty($this_ability->recovery_options['failure_text'])){
     $this_ability->ability_results['this_text'] .= $this_ability->recovery_options['failure_text'].' ';
   }
-  
+
 }
 
 // Update this robot's history with the triggered recovery amount
@@ -750,6 +863,10 @@ if (!empty($this_ability->ability_results['recovery_type'])){
   $this->history['triggered_recovery_types'][] = $temp_types;
 } else {
   $this->history['triggered_recovery_types'][] = array();
+}
+// Update this robot's history with the overboost if applicable
+if (!empty($this_ability->ability_results['this_overboost'])){
+  $this->counters['assist_overboost'] = isset($this->counters['assist_overboost']) ? $this->counters['assist_overboost'] + $this_ability->ability_results['this_overboost'] : $this_ability->ability_results['this_overboost'];
 }
 
 // Update the recovery result total variables
@@ -766,6 +883,21 @@ $target_robot->update_session();
 $target_robot->player->update_session();
 $this->update_session();
 $this->player->update_session();
+
+// If this robot was at full energy but is now at zero, it's a OHKO
+$this_robot_energy_ohko = false;
+if ($this->robot_energy <= 0 && $this_robot_energy_start_max){
+  // DEBUG
+  //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | damage_result_OHKO! | Start:'.$this_robot_energy_start.' '.($this_robot_energy_start_max ? '(MAX!)' : '-').' | Finish:'.$this->robot_energy);
+  // Ensure the attacking player was a human
+  if ($this->player->player_side == 'right'){
+    $this_robot_energy_ohko = true;
+    // Increment the field multipliers for items
+    //if (!isset($this->field->field_multipliers['items'])){ $this->field->field_multipliers['items'] = 1; }
+    //$this->field->field_multipliers['items'] += 0.1;
+    //$this->field->update_session();
+  }
+}
 
 // Generate an event with the collected recovery results based on recovery type
 if ($this->robot_id == $target_robot->robot_id){ //$this_ability->recovery_options['recovery_kind'] == 'energy'
@@ -786,6 +918,7 @@ $target_robot->player->player_frame = $target_player_backup_frame;
 $this_ability->ability_frame = $this_ability_backup_frame;
 
 // Update internal variables
+//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $target_robot->update_session();
 $target_robot->player->update_session();
 $this->update_session();
@@ -794,8 +927,10 @@ $this_ability->update_session();
 
 // If this robot has been disabled, add a defeat attachment
 if ($this->robot_status == 'disabled'){
-  
+  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
   // Define this ability's attachment token
+  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_frames = array(0,4,1,5,2,6,3,7,4,8,5,9,0,1,2,3,4,5,6,7,8,9);
   shuffle($temp_frames);
   $this_attachment_token = 'ability_attachment-defeat';
@@ -807,34 +942,39 @@ if ($this->robot_status == 'disabled'){
     'ability_frame_animate' => $temp_frames,
     'ability_frame_offset' => array('x' => 0, 'y' => -10, 'z' => -10)
     );
-    
+
   // If the attachment doesn't already exists, add it to the robot
   if (!isset($this->robot_attachments[$this_attachment_token])){
+    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this->robot_attachments[$this_attachment_token] =  $this_attachment_info;
     $this->update_session();
   }
-  
+
 }
 
 // If this robot was disabled, process experience for the target
 if ($this->robot_status == 'disabled' && $trigger_disabled){
-  $this->trigger_disabled($target_robot, $this_ability);
+  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+  $trigger_options = array();
+  if ($this_robot_energy_ohko){ $trigger_options['item_multiplier'] = 2.0; }
+  $this->trigger_disabled($target_robot, $this_ability, $trigger_options);
 }
 // Otherwise, if the target robot was not disabled
 elseif ($this->robot_status != 'disabled'){
-    
+  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
   // -- CHECK ATTACHMENTS -- //
-  
+
   // Ensure the ability was a success before checking attachments
   if ($this_ability->ability_results['this_result'] == 'success'){
     // If this robot has any attachments, loop through them
     if (!empty($this->robot_attachments)){
       //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
       foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
-        
+
         // Ensure this ability has a type before checking weaknesses, resistances, etc.
         if (!empty($this_ability->ability_type)){
-          
+
           // If this attachment has weaknesses defined and this ability is a match
           if (!empty($attachment_info['attachment_weaknesses'])
             && (in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses']) || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))){
@@ -879,12 +1019,12 @@ elseif ($this->robot_status != 'disabled'){
             // If this robot was disabled, process experience for the target
             if ($this->robot_status == 'disabled'){ break; }
           }
-          
+
         }
-        
+
       }
     }
-    
+
   }
 
 }

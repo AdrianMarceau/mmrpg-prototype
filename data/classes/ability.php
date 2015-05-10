@@ -38,7 +38,7 @@ class mmrpg_ability {
 
     // Now load the ability data from the session or index
     $this->ability_load($this_abilityinfo);
-    
+
     // Update the session by default
     $this->update_session();
 
@@ -50,7 +50,7 @@ class mmrpg_ability {
   // Define a public function for manually loading data
   public function ability_load($this_abilityinfo){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'ability_load($this_abilityinfo:'.substr(json_encode($this_abilityinfo), 0, 100).')');  }
-    
+
     // If the ability info was not an array, return false
     if (!is_array($this_abilityinfo)){ return false; }
     // If the ability ID was not provided, return false
@@ -58,7 +58,7 @@ class mmrpg_ability {
     if (!isset($this_abilityinfo['ability_id'])){ $this_abilityinfo['ability_id'] = 0; }
     // If the ability token was not provided, return false
     if (!isset($this_abilityinfo['ability_token'])){ return false; }
-    
+
     // If this is a special system ability, hard-code its ID, otherwise base off robot
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_system_abilities = array('attachment-defeat');
@@ -77,7 +77,7 @@ class mmrpg_ability {
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_abilityinfo['ability_id'] = $this->robot_id.str_pad($this_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
     }
-        
+
     // Collect current ability data from the session if available
     $this_abilityinfo_backup = $this_abilityinfo;
     if (isset($_SESSION['ABILITIES'][$this_abilityinfo['ability_id']])){
@@ -110,6 +110,8 @@ class mmrpg_ability {
     $this->ability_name = isset($this_abilityinfo['ability_name']) ? $this_abilityinfo['ability_name'] : 'Ability';
     $this->ability_token = isset($this_abilityinfo['ability_token']) ? $this_abilityinfo['ability_token'] : 'ability';
     $this->ability_class = isset($this_abilityinfo['ability_class']) ? $this_abilityinfo['ability_class'] : 'master';
+    $this->ability_master = isset($this_abilityinfo['ability_master']) ? $this_abilityinfo['ability_master'] : '';
+    $this->ability_number = isset($this_abilityinfo['ability_number']) ? $this_abilityinfo['ability_number'] : '';
     $this->ability_image = isset($this_abilityinfo['ability_image']) ? $this_abilityinfo['ability_image'] : $this->ability_token;
     $this->ability_image_size = isset($this_abilityinfo['ability_image_size']) ? $this_abilityinfo['ability_image_size'] : 40;
     $this->ability_description = isset($this_abilityinfo['ability_description']) ? $this_abilityinfo['ability_description'] : '';
@@ -117,6 +119,7 @@ class mmrpg_ability {
     $this->ability_type2 = isset($this_abilityinfo['ability_type2']) ? $this_abilityinfo['ability_type2'] : '';
     $this->ability_speed = isset($this_abilityinfo['ability_speed']) ? $this_abilityinfo['ability_speed'] : 1;
     $this->ability_energy = isset($this_abilityinfo['ability_energy']) ? $this_abilityinfo['ability_energy'] : 4;
+    $this->ability_energy_percent = isset($this_abilityinfo['ability_energy_percent']) ? $this_abilityinfo['ability_energy_percent'] : true;
     $this->ability_damage = isset($this_abilityinfo['ability_damage']) ? $this_abilityinfo['ability_damage'] : 0;
     $this->ability_damage2 = isset($this_abilityinfo['ability_damage2']) ? $this_abilityinfo['ability_damage2'] : 0;
     $this->ability_damage_percent = isset($this_abilityinfo['ability_damage_percent']) ? $this_abilityinfo['ability_damage_percent'] : false;
@@ -156,7 +159,7 @@ class mmrpg_ability {
     $this->ability_function_onload = isset($ability['ability_function_onload']) ? $ability['ability_function_onload'] : function(){};
     $this->ability_function_attachment = isset($ability['ability_function_attachment']) ? $ability['ability_function_attachment'] : function(){};
     unset($ability);
-    
+
     // Define the internal robot base values using the robots index array
     $this->ability_base_name = isset($this_abilityinfo['ability_base_name']) ? $this_abilityinfo['ability_base_name'] : $this->ability_name;
     $this->ability_base_token = isset($this_abilityinfo['ability_base_token']) ? $this_abilityinfo['ability_base_token'] : $this->ability_token;
@@ -181,7 +184,7 @@ class mmrpg_ability {
     $this->target_options_reset();
     $this->damage_options_reset();
     $this->recovery_options_reset();
-    
+
     // Trigger the onload function if it exists
     $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
     $temp_target_robot = $this->battle->find_target_robot($this->player->player_side != 'right' ? 'right' : 'left');
@@ -206,7 +209,10 @@ class mmrpg_ability {
 
   // Define public print functions for markup generation
   public function print_ability_name(){
-    return '<span class="ability_name ability_type ability_type_'.(!empty($this->ability_type) ? $this->ability_type : 'none').(!empty($this->ability_type2) ? '_'.$this->ability_type2 : '').'">'.$this->ability_name.'</span>';
+    $type_class = !empty($this->ability_type) ? $this->ability_type : 'none';
+    if ($type_class != 'none' && !empty($this->ability_type2)){ $type_class .= '_'.$this->ability_type2; }
+    elseif ($type_class == 'none' && !empty($this->ability_type2)){ $type_class = $this->ability_type2; }
+  	return '<span class="ability_name ability_type ability_type_'.$type_class.'">'.$this->ability_name.'</span>';
   }
   //public function print_ability_name(){ return '<span class="ability_name">'.$this->ability_name.'</span>'; }
   public function print_ability_token(){ return '<span class="ability_token">'.$this->ability_token.'</span>'; }
@@ -580,10 +586,10 @@ class mmrpg_ability {
     $this_data['ability_frame_classes'] = isset($options['ability_frame_classes']) ? $options['ability_frame_classes'] : $this->ability_frame_classes;
 
     $this_data['ability_scale'] = isset($robot_data['robot_scale']) ? $robot_data['robot_scale'] : ($robot_data['robot_position'] == 'active' ? 1 : 0.5 + (((8 - $robot_data['robot_key']) / 8) * 0.5));
-    
+
     // DEBUG
     //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, '$this_data[\'robot_id_token\'] = '.$this_data['robot_id_token'].' | $options[\'this_ability_target\'] = '.$options['this_ability_target']);
-    
+
     // Calculate the rest of the sprite size variables
     $zoom_size = ($this->ability_image_size * 2);
     $this_data['ability_sprite_size'] = ceil($this_data['ability_scale'] * $zoom_size);
@@ -597,7 +603,7 @@ class mmrpg_ability {
     //$this_data['canvas_offset_x'] = $temp_data['canvas_offset_x'];
     //$this_data['canvas_offset_y'] = $temp_data['canvas_offset_y'];
     //$this_data['canvas_offset_z'] = $temp_data['canvas_offset_z'];
-    
+
     // Define the ability's canvas offset variables
     //$temp_size_diff = $robot_data['robot_sprite_size'] != $ability_data['ability_sprite_size'] ? ceil(($robot_data['robot_sprite_size'] - $ability_data['ability_sprite_size']) * 0.5) : ceil($ability_data['ability_sprite_size'] * 0.25);
     //$temp_size_diff = $robot_data['robot_sprite_size'] > 80 ? ceil(($robot_data['robot_sprite_size'] - 80) / 2) : 0;
@@ -610,7 +616,7 @@ class mmrpg_ability {
     if ($this_data['data_sticky'] != false){
 
       //$this_data['data_sticky'] = 'true';
-      
+
       // Calculate the canvas X offsets using the robot's position as base
       if ($this_data['ability_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($canvas_offset_data['canvas_offset_x'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['x']/100))) + $temp_size_diff; }
       elseif ($this_data['ability_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($canvas_offset_data['canvas_offset_x'] - ($this_data['ability_sprite_size'] * (($this_data['ability_frame_offset']['x'] * -1)/100))) + $temp_size_diff; }
@@ -629,7 +635,7 @@ class mmrpg_ability {
       $this_damage_options = !empty($options['this_ability']->damage_options) ? $options['this_ability']->damage_options : array();
       $this_recovery_options = !empty($options['this_ability']->recovery_options) ? $options['this_ability']->recovery_options : array();
       $this_results = !empty($options['this_ability']->ability_results) ? $options['this_ability']->ability_results : array();
-      
+
       // Either way, apply target offsets if they exist and it's this robot using the ability
       if (isset($options['this_ability_target']) && $options['this_ability_target'] == $this_data['robot_id_token']){
         // If any of the co-ordinates are provided, update all
@@ -645,7 +651,7 @@ class mmrpg_ability {
     }
     // Else if this is a normal attachment, it moves with the robot
     else {
-      
+
       // Calculate the canvas X offsets using the robot's offset as base
       if ($this_data['ability_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_offset_x'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['x']/100))) + $temp_size_diff; }
       elseif ($this_data['ability_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_offset_x'] - ($this_data['ability_sprite_size'] * (($this_data['ability_frame_offset']['x'] * -1)/100))) + $temp_size_diff; }
@@ -658,7 +664,7 @@ class mmrpg_ability {
       if ($this_data['ability_frame_offset']['z'] > 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_offset_z'] + $this_data['ability_frame_offset']['z']); }
       elseif ($this_data['ability_frame_offset']['z'] < 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_offset_z'] - ($this_data['ability_frame_offset']['z'] * -1)); }
       else { $this_data['canvas_offset_z'] = $robot_data['canvas_offset_z'];  }
-      
+
     }
 
 
@@ -731,7 +737,7 @@ class mmrpg_ability {
     return $this_data;
 
   }
-  
+
   // Define a public function for collecting index data from the database
   public static function get_index_info($ability_token){
     global $DB;
@@ -745,14 +751,14 @@ class mmrpg_ability {
   // Define a public function for reformatting database data into proper arrays
   public static function parse_index_info($ability_info){
     global $DB;
-    
+
     // Return false if empty
     if (empty($ability_info)){ return false; }
-    
+
     // If the information has already been parsed, return as-is
     if (!empty($ability_info['_parsed'])){ return $ability_info; }
     else { $ability_info['_parsed'] = true; }
-    
+
     // Explode the base and animation indexes into an array
     $temp_field_names = array('ability_frame_animate', 'attachment_frame_animate', 'ability_frame_index', 'attachment_frame_index', 'ability_frame_offset', 'attachment_frame_offset');
     foreach ($temp_field_names AS $field_name){
@@ -767,7 +773,7 @@ class mmrpg_ability {
       }
       */
     }
-    
+
     // Explode the base and animation frame offsets into an array
     /*
     $temp_field_names = array('ability_frame_offset', 'attachment_frame_offset');
@@ -785,17 +791,17 @@ class mmrpg_ability {
       }
     }
     */
-    
+
     // Update the static index with this ability's index info
     //$DB->INDEX['ABILITIES'][$ability_info['ability_token']] = $ability_info;
-    
+
     // Return the parsed ability info
     return $ability_info;
   }
-  
-  
 
-  
+
+
+
   // Define a static function for printing out the ability's title markup
   public static function print_editor_title_markup($robot_info, $ability_info, $print_options = array()){
     // Require the function file
@@ -805,7 +811,7 @@ class mmrpg_ability {
     return $temp_ability_title;
   }
 
-  
+
   // Define a static function for printing out the ability's title markup
   public static function print_editor_option_markup($robot_info, $ability_info){
     // Require the function file
@@ -813,6 +819,26 @@ class mmrpg_ability {
     require(MMRPG_CONFIG_ROOTDIR.'data/classes/ability_editor-option-markup.php');
     // Return the generated option markup
     return $this_option_markup;
+  }
+
+
+  // Define a static function for printing out the ability's select options markup
+  public static function print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info){
+    // Require the function file
+    $this_options_markup = '';
+    require(MMRPG_CONFIG_ROOTDIR.'data/classes/ability_editor-options-list-markup.php');
+    // Return the generated select markup
+    return $this_options_markup;
+  }
+
+
+  // Define a static function for printing out the ability's select markup
+  public static function print_editor_select_markup($ability_rewards_options, $player_info, $robot_info, $ability_info, $ability_key = 0){
+    // Require the function file
+    $this_select_markup = '';
+    require(MMRPG_CONFIG_ROOTDIR.'data/classes/ability_editor-select-markup.php');
+    // Return the generated select markup
+    return $this_select_markup;
   }
 
 
@@ -868,12 +894,15 @@ class mmrpg_ability {
       'ability_name' => $this->ability_name,
       'ability_token' => $this->ability_token,
       'ability_class' => $this->ability_class,
+      'ability_master' => $this->ability_master,
+      'ability_number' => $this->ability_number,
       'ability_image' => $this->ability_image,
       'ability_image_size' => $this->ability_image_size,
       'ability_description' => $this->ability_description,
       'ability_type' => $this->ability_type,
       'ability_type2' => $this->ability_type2,
       'ability_energy' => $this->ability_energy,
+      'ability_energy_percent' => $this->ability_energy_percent,
       'ability_speed' => $this->ability_speed,
       'ability_damage' => $this->ability_damage,
       'ability_damage2' => $this->ability_damage2,
@@ -927,19 +956,54 @@ class mmrpg_ability {
   }
 
   // Define a static function for printing out the ability's database markup
-  public static function print_database_markup($ability_info, $print_options = array()){
+  public static function print_database_markup($ability_info, $print_options = array(), $cache_markup = false){
+
+    //die('$temp_path_file = '.$temp_path_file.'<br /> markup was not found...');
+    // Define the markup variable
+    $this_markup = '';
     // Require the external function for generating database markup
     require('ability_database-markup.php');
     // Return the generated markup
     return $this_markup;
+
+    /*
+    // Define the cache and index paths for abilities
+    $temp_hash_token = $ability_info['ability_token'].'_'.preg_replace('/[^a-z0-9]/i', '', json_encode($print_options)); //md5();
+    $temp_path_file = 'database/ability_'.$temp_hash_token.'_'.MMRPG_CONFIG_CACHE_DATE.'.htm';
+    //die('$temp_path_file = '.$temp_path_file);
+    // If the appropriate cache file exists, use that
+    $this_markup = $cache_markup ? mmrpg_get_cached_markup($temp_path_file) : '';
+    //die('$this_markup = '.$this_markup);
+    // If markup was found, return it directly
+    if (!empty($this_markup)){
+      //die('$temp_path_file = '.$temp_path_file.'<br /> markup was found!');
+      // Return the database markup
+      return $this_markup;
+    }
+    // Otherwise, generate fresh content
+    else {
+      //die('$temp_path_file = '.$temp_path_file.'<br /> markup was not found...');
+      // Define the markup variable
+      $this_markup = '';
+      // Require the external function for generating database markup
+      require('ability_database-markup.php');
+      // Update the cached markup file
+      if (!empty($cache_markup) && !empty($this_markup)){
+        mmrpg_save_cached_markup($temp_path_file, $this_markup);
+      }
+      // Return the generated markup
+      return $this_markup;
+    }
+    */
+
   }
-  
-  // Define a static function to use as the common action for all item-core-___ abilities
-  public static function item_function_core($objects){
-    
+
+  // Define a static function to use as the common action for all item-shard-___ abilities
+  public static function item_function_shard($objects){
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
@@ -949,10 +1013,10 @@ class mmrpg_ability {
         )
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
-    
+
     // If the multiplier is already at the limit of 3x, this ability fails
     if (isset($this_field->field_multipliers[$this_ability->ability_type]) && $this_field->field_multipliers[$this_ability->ability_type] >= MMRPG_SETTINGS_MULTIPLIER_MAX){
-           
+
       // Target this robot's self and show the ability failing
       $this_ability->target_options_update(array(
         'frame' => 'summon',
@@ -961,15 +1025,15 @@ class mmrpg_ability {
           )
         ));
       $this_robot->trigger_target($this_robot, $this_ability);
-      
+
       // Return true on success (well, failure, but whatever)
       return true;
-      
+
     }
-    
+
     // CREATE ANIMATION ATTACHMENTS
     if (true){
-          
+
       // Define this ability's attachment token
       $this_star_index = mmrpg_prototype_star_image(!empty($this_ability->ability_type) ? $this_ability->ability_type : 'none');
       $this_sprite_sheet = 'field-support';
@@ -982,12 +1046,12 @@ class mmrpg_ability {
         'ability_frame_animate' => array($this_star_index['frame']),
         'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
         );
-      
+
       // Attach this ability attachment to this robot temporarily
       $this_robot->robot_frame = 'taunt';
       $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
       $this_robot->update_session();
-      
+
       // Attach this ability to all robots on this player's side of the field
       $backup_robots_active = $this_player->values['robots_active'];
       $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
@@ -1003,7 +1067,7 @@ class mmrpg_ability {
           $this_key++;
         }
       }
-      
+
       // Attach this ability to all robots on the target's side of the field
       $backup_robots_active = $target_player->values['robots_active'];
       $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
@@ -1018,9 +1082,9 @@ class mmrpg_ability {
           $target_key++;
         }
       }
-      
+
     }
-    
+
     // Create or increase the elemental booster for this field
     $temp_change_percent = round($this_ability->ability_recovery / 100, 1);
     if (!isset($this_field->field_multipliers[$this_ability->ability_type])){ $this_field->field_multipliers[$this_ability->ability_type] = 1.0 + $temp_change_percent; }
@@ -1030,18 +1094,18 @@ class mmrpg_ability {
       $this_field->field_multipliers[$this_ability->ability_type] = MMRPG_SETTINGS_MULTIPLIER_MAX;
     }
     $this_field->update_session();
-    
+
     // Create the event to show this element boost
     $this_battle->events_create($this_robot, false, $this_field->field_name.' Multipliers',
     	mmrpg_battle::random_positive_word().' <span class="ability_name ability_type ability_type_'.$this_ability->ability_type.'">'.ucfirst($this_ability->ability_type).' Effects</span> were boosted by '.ceil($temp_change_percent * 100).'%!<br />'.
       'The multiplier is now at <span class="ability_name ability_type ability_type_'.$this_ability->ability_type.'">'.ucfirst($this_ability->ability_type).' x '.number_format($this_field->field_multipliers[$this_ability->ability_type], 1).'</span>!',
       array('canvas_show_this_ability_overlay' => true)
       );
-    
-    
+
+
     // DESTROY ANIMATION ATTACHMENTS
     if (true){
-      
+
       // Remove this ability from all robots on this player's side of the field
       $backup_robots_active = $this_player->values['robots_active'];
       $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
@@ -1056,7 +1120,7 @@ class mmrpg_ability {
           $this_key++;
         }
       }
-      
+
       // Remove this ability from all robots on the target's side of the field
       $backup_robots_active = $target_player->values['robots_active'];
       $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
@@ -1071,18 +1135,18 @@ class mmrpg_ability {
           $target_key++;
         }
       }
-      
+
       // Remove this ability attachment from the target robot
       unset($target_robot->robot_attachments[$this_attachment_token]);
       $target_robot->update_session();
-      
+
       // Remove this ability attachment from this robot
       unset($this_robot->robot_attachments[$this_attachment_token]);
       $this_robot->update_session();
-    
+
       // UPDATE COPY CORE ROBOTS
-      if ($this_robot->robot_base_core == 'copy' && $this_robot->robot_core != $this_ability->ability_type){
-      
+      if ($this_robot->robot_base_shard == 'copy' && $this_robot->robot_shard != $this_ability->ability_type){
+
         // Define this ability's second attachment token
         $this_attachment_token_two = 'ability_'.$this_ability->ability_token.'_two';
         $this_attachment_info_two = array(
@@ -1093,32 +1157,32 @@ class mmrpg_ability {
           'ability_frame_animate' => array(0),
           'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
           );
-          
-        // Attach this item core to the robot temporarily
+
+        // Attach this item shard to the robot temporarily
         $this_robot->robot_attachments[$this_attachment_token_two] = $this_attachment_info_two;
         $this_robot->update_session();
 
-        // Remove the immunities added by any previous core
-        //$robot_backup_core = $this_robot->robot_core;
-        
-        // If this is a copy core item, reset the robot's immunities to nothing
+        // Remove the immunities added by any previous shard
+        //$robot_backup_shard = $this_robot->robot_shard;
+
+        // If this is a copy shard item, reset the robot's immunities to nothing
         if ($this_ability->ability_type == 'copy'){ $this_robot->robot_immunities = array(); }
-        // Otherwise, add this core's type as an immunity for this robot
+        // Otherwise, add this shard's type as an immunity for this robot
         else { $this_robot->robot_immunities = array($this_ability->ability_type); }
-        
-        // Update this robot's core and image
-        $this_robot->robot_core = $this_ability->ability_type;
+
+        // Update this robot's shard and image
+        $this_robot->robot_shard = $this_ability->ability_type;
         $this_robot->robot_image = $this_ability->ability_type != 'copy' ? $this_robot->robot_base_image.'_'.$this_ability->ability_type : $this_robot->robot_base_image;
-               
-        // Define and print the event message about the core change
+
+        // Define and print the event message about the shard change
         $this_robot->robot_frame = 'defend';
         $this_robot->update_session();
         $this_event_body = '';
         if ($this_ability->ability_type == 'copy'){
-          $this_event_body .= $this_robot->print_robot_name().'&#39;s robot core returned to normal!<br /> ';
+          $this_event_body .= $this_robot->print_robot_name().'&#39;s robot shard returned to normal!<br /> ';
           $this_event_body .= $this_robot->print_robot_name().' turned back into a '.$this_ability->print_ability_name().' robot!';
         } else {
-          $this_event_body .= $this_robot->print_robot_name().'&#39;s robot core reacted to the elemental energy!<br /> ';
+          $this_event_body .= $this_robot->print_robot_name().'&#39;s robot shard reacted to the elemental energy!<br /> ';
           $this_event_body .= $this_robot->print_robot_name().' turned into '.(preg_match('/^(a|e|i|o|u|y)/i', $this_ability->ability_type) ? 'an' : 'a').' '.$this_ability->print_ability_name().' robot!';
         }
         $this_battle->events_create($this_robot, $target_robot,
@@ -1126,19 +1190,535 @@ class mmrpg_ability {
           $this_event_body,
           array('canvas_show_this_ability_overlay' => true)
           );
-        
-        // Remove this core attachment from this robot
+
+        // Remove this shard attachment from this robot
         $this_robot->robot_frame = 'base';
         unset($this_robot->robot_attachments[$this_attachment_token_two]);
         $this_robot->update_session();
-        
+
       }
-      
+
     }
-      
+
     // Return true on success
     return true;
-      
+
+  }
+
+  // Define a static function to use as the common action for all ____-shot abilities
+  public static function ability_function_shot($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // Update the ability's target options and trigger
+    $this_ability->target_options_update(array(
+      'frame' => 'shoot',
+      'success' => array(0, 105, 0, 10, $this_robot->print_robot_name().' fires '.(preg_match('/^(a|e|i|o|u)/i', $this_ability->ability_token) ? 'an' : 'a').'  '.$this_ability->print_ability_name().'!')
+      ));
+    $this_robot->trigger_target($target_robot, $this_ability);
+
+    // Inflict damage on the opposing robot
+    $this_ability->damage_options_update(array(
+      'kind' => 'energy',
+      'kickback' => array(10, 0, 0),
+      'success' => array(0, -60, 0, 10, 'The '.$shot_text.' shot '.$damage_text.' the target!'),
+      'failure' => array(0, -60, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      ));
+    $this_ability->recovery_options_update(array(
+      'kind' => 'energy',
+      'kickback' => array(10, 0, 0),
+      'success' => array(0, -60, 0, 10, 'The '.$shot_text.' shot '.$recovery_text.' the target!'),
+      'failure' => array(0, -60, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      ));
+    $energy_damage_amount = $this_ability->ability_damage;
+    $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+    // Return true on success
+    return true;
+
+  }
+
+  // Define a static onload function to use as the common action for all ____-shot abilities
+  public static function ability_function_onload_shot($objects){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // Loop through any attachments and boost power by 10% for each buster charge
+    $temp_new_damage = $this_ability->ability_base_damage;
+    $temp_new_damage_booster = 0;
+    foreach ($this_robot->robot_attachments AS $this_attachment_token => $this_attachment_info){
+      if ($this_attachment_token == 'ability_'.$this_ability->ability_type.'-buster'){ $temp_new_damage_booster += 2; }
+    }
+    $temp_new_damage += $temp_new_damage_booster;
+    // Update the ability's damage with the new amount
+    $this_ability->ability_damage = $temp_new_damage;
+    // Update the ability session
+    $this_ability->update_session();
+
+    // Return true on success
+    return true;
+
+  }
+
+  // Define a static function to use as the common action for all ____-buster abilities
+  public static function ability_function_buster($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // Define this ability's attachment token
+    $this_attachment_offset = array('x' => -10, 'y' => -10, 'z' => -20);
+    $this_attachment_modifier = 1 + ($this_ability->ability_recovery2 / 100);
+    $this_attachment_token = 'ability_'.$this_ability->ability_token;
+    $this_attachment_info = array(
+    	'class' => 'ability',
+    	'ability_token' => $this_ability->ability_token,
+      'ability_frame' => 0,
+      'ability_frame_animate' => array(1, 2, 1, 0),
+      'ability_frame_offset' => $this_attachment_offset,
+      'attachment_damage_output_booster_'.$this_ability->ability_type => $this_attachment_modifier,
+      'attachment_damage_input_breaker_'.$this_ability->ability_type => $this_attachment_modifier,
+      'attachment_recovery_output_booster_'.$this_ability->ability_type => $this_attachment_modifier,
+      'attachment_recovery_input_breaker_'.$this_ability->ability_type => $this_attachment_modifier
+      );
+
+    // Loop through each existing attachment and alter the start frame by one
+    foreach ($this_robot->robot_attachments AS $key => $info){
+      // Move the start frame to the end of the queue so it doesn't overlay with others
+      $temp_first = array_shift($this_attachment_info['ability_frame_animate']);
+      array_push($this_attachment_info['ability_frame_animate'], $temp_first);
+      // Move this attachment's x, y, and z positionslightly left and up for the same reason
+      $this_attachment_offset['x'] -= 2;
+      $this_attachment_offset['y'] -= 2;
+      $this_attachment_offset['z'] -= 1;
+      $this_attachment_info['ability_frame_offset'] = $this_attachment_offset;
+    }
+
+    // If the ability flag was not set, this ability begins charging
+    if (!isset($this_robot->robot_attachments[$this_attachment_token])){
+
+      // Target this robot's self
+      $this_ability->target_options_update(array(
+        'frame' => 'defend',
+        'success' => array(1, -10, 0, -10, $this_robot->print_robot_name().' charges the '.$this_ability->print_ability_name().'&hellip;')
+        ));
+      $this_robot->trigger_target($this_robot, $this_ability);
+
+      /*
+      // Increase this robot's defense stat slightly
+      $this_ability->target_options_update(array(
+        'kind' => 'special',
+        'percent' => true,
+        'rates' => array(100, 0, 0),
+        'success' => array(2, -10, 0, -10, ''),
+        'failure' => array(2, -10, 0, -10, '')
+        //'success' => array(2, -10, 0, -10, $this_robot->print_robot_name().'&#39;s elemental abilities were boosted!'),
+        //'failure' => array(2, -10, 0, -10, $this_robot->print_robot_name().'&#39;s elemental abilities were boosted!')
+        ));
+      $this_robot->trigger_target($this_robot, $this_ability);
+      */
+
+      // Attach this ability attachment to the robot using it
+      $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
+      $this_robot->update_session();
+
+    }
+    // Else if the ability flag was set, the ability is released at the target
+    else {
+
+      // Remove this ability attachment to the robot using it
+      unset($this_robot->robot_attachments[$this_attachment_token]);
+      $this_robot->update_session();
+
+      // Update this ability's target options and trigger
+      $this_ability->target_options_update(array(
+        'frame' => 'shoot',
+        'kickback' => array(-5, 0, 0),
+        'success' => array(3, 100, -15, 10, $this_robot->print_robot_name().' fires the '.$this_ability->print_ability_name().'!'),
+        ));
+      $this_robot->trigger_target($target_robot, $this_ability);
+
+      // Inflict damage on the opposing robot
+      $this_ability->damage_options_update(array(
+        'kind' => 'energy',
+        'kickback' => array(20, 0, 0),
+        'success' => array(3, -110, -15, 10, 'A powerful '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$damage_text.' the target!'),
+        'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_ability_name().' shot missed&hellip;')
+        ));
+      $this_ability->recovery_options_update(array(
+        'kind' => 'energy',
+        'kickback' => array(20, 0, 0),
+        'success' => array(3, -110, -15, 10, 'The '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$recovery_text.' the target!'),
+        'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_ability_name().' shot missed&hellip;')
+        ));
+      $energy_damage_amount = $this_ability->ability_damage;
+      $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+    }
+
+    // Return true on success
+    return true;
+
+  }
+
+  // Define a static onload function to use as the common action for all ____-buster abilities
+  public static function ability_function_onload_buster($objects){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // Define this ability's attachment token
+    $this_attachment_token = 'ability_'.$this_ability->ability_token;
+
+    // If the ability flag had already been set, reduce the weapon energy to zero
+    if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->ability_energy = 0; }
+    // Otherwise, return the weapon energy back to default
+    else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
+    // Update the ability session
+    $this_ability->update_session();
+
+    // Return true on success
+    return true;
+
+  }
+
+  // Define a static function to use as the common action for all ____-overdrive abilities
+  public static function ability_function_overdrive($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // Decrease this robot's weapon energy to zero
+    $this_robot->robot_weapons = 0;
+    $this_robot->update_session();
+
+    // Target the opposing robot
+    $this_ability->target_options_update(array(
+      'kickback' => array(-5, 0, 0),
+      'frame' => 'defend',
+      'success' => array(0, 15, 45, 10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
+      ));
+    $this_robot->trigger_target($target_robot, $this_ability);
+
+    // Define this ability's attachment token
+    $crest_attachment_token = 'ability_'.$this_ability->ability_token;
+    $crest_attachment_info = array(
+      'class' => 'ability',
+      'sticky' => true,
+      'ability_token' => $this_ability->ability_token,
+      'ability_image' => $this_ability->ability_token,
+      'ability_frame' => 0,
+      'ability_frame_animate' => array(1,2),
+      'ability_frame_offset' => array('x' => 20, 'y' => 50, 'z' => 10),
+      'ability_frame_classes' => ' ',
+      'ability_frame_styles' => ' '
+      );
+
+    // Add the ability crest attachment
+    $this_robot->robot_frame = 'summon';
+    $this_robot->robot_attachments[$crest_attachment_token] = $crest_attachment_info;
+    $this_robot->update_session();
+
+
+    // Define this ability's attachment token
+    $overlay_attachment_token = 'system_fullscreen-black';
+    $overlay_attachment_info = array(
+    	'class' => 'ability',
+      'sticky' => true,
+    	'ability_token' => $this_ability->ability_token,
+      'ability_image' => 'fullscreen-black',
+      'ability_frame' => 0,
+      'ability_frame_animate' => array(0, 1),
+      'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -12),
+      'ability_frame_classes' => 'sprite_fullscreen '
+      );
+
+    // Add the black overlay attachment
+    $target_robot->robot_attachments[$overlay_attachment_token] = $overlay_attachment_info;
+    $target_robot->update_session();
+    // prepare the ability options
+    $this_ability->damage_options_update(array(
+      'kind' => 'energy',
+      'kickback' => array(20, 0, 0),
+      'success' => array(3, -60, -15, 10, 'A powerful '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$damage_text.' '.$target_robot->print_robot_name().'!'),
+      'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_ability_name().' shot missed '.$target_robot->print_robot_name().'&hellip;')
+      ));
+    $this_ability->recovery_options_update(array(
+      'kind' => 'energy',
+      'frame' => 'taunt',
+      'kickback' => array(20, 0, 0),
+      'success' => array(3, -60, -15, 10, 'The '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$recovery_text.' '.$target_robot->print_robot_name().'!'),
+      'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_ability_name().' shot missed '.$target_robot->print_robot_name().'&hellip;')
+      ));
+    // Inflict damage on the opposing robot
+    $energy_damage_amount = $this_ability->ability_damage;
+    $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+    // Remove the black overlay attachment
+    unset($target_robot->robot_attachments[$overlay_attachment_token]);
+    $target_robot->update_session();
+
+    // Loop through the target's benched robots, inflicting half base damage to each
+    $backup_robots_active = $target_player->values['robots_active'];
+    foreach ($backup_robots_active AS $key => $info){
+      if ($info['robot_id'] == $target_robot->robot_id){ continue; }
+      $this_ability->ability_results_reset();
+      $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+      // Add the black overlay attachment
+      $overlay_attachment_info['ability_frame_offset']['z'] -= 2;
+      $temp_target_robot->robot_attachments[$overlay_attachment_token] = $overlay_attachment_info;
+      $temp_target_robot->update_session();
+      // Update the ability options
+      $this_ability->damage_options_update(array(
+        'kind' => 'energy',
+        'kickback' => array(20, 0, 0),
+        'success' => array(3, -60, -15, 10, 'A powerful '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$damage_text.' '.$temp_target_robot->print_robot_name().'!'),
+        'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_ability_name().' shot missed '.$temp_target_robot->print_robot_name().'&hellip;')
+        ));
+      $this_ability->recovery_options_update(array(
+        'kind' => 'energy',
+        'frame' => 'taunt',
+        'kickback' => array(20, 0, 0),
+        'success' => array(3, -60, -15, 10, 'The '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$recovery_text.' '.$temp_target_robot->print_robot_name().'!'),
+        'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_ability_name().' shot missed '.$temp_target_robot->print_robot_name().'&hellip;')
+        ));
+      //$energy_damage_amount = ceil($this_ability->ability_damage / $target_robots_active);
+      $energy_damage_amount = $this_ability->ability_damage;
+      $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+      unset($temp_target_robot->robot_attachments[$overlay_attachment_token]);
+      $temp_target_robot->update_session();
+    }
+
+    // Add the black background attachment
+    $this_robot->robot_frame = '';
+    unset($this_robot->robot_attachments[$crest_attachment_token]);
+    $this_robot->update_session();
+
+    // Trigger the disabled event on the targets now if necessary
+    if ($target_robot->robot_energy <= 0 || $target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot, $this_ability); }
+    foreach ($backup_robots_active AS $key => $info){
+      if ($info['robot_id'] == $target_robot->robot_id){ continue; }
+      $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+      if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){ $temp_target_robot->trigger_disabled($this_robot, $this_ability); }
+    }
+
+    // Return true on success
+    return true;
+
+  }
+
+  // Define a static onload function to use as the common action for all ____-overdrive abilities
+  public static function ability_function_onload_overdrive($objects){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // Collect the user's weapon energy base and adjust accordingly
+    $robot_energy_damage = $this_robot->robot_base_energy - $this_robot->robot_energy;
+    $robot_energy_damage_percent = !empty($robot_energy_damage) ? ceil(($robot_energy_damage / $this_robot->robot_base_energy) * 100) : 0;
+    $this_ability->ability_damage = 1 + $robot_energy_damage_percent;
+    $this_ability->ability_energy = $this_robot->robot_base_weapons;
+    if ($this_ability->ability_type == $this_robot->robot_core){
+      $this_ability->ability_energy = $this_ability->ability_energy * 2;
+      $this_ability->ability_base_energy = $this_ability->ability_base_energy * 2;
+    }
+    $this_ability->update_session();
+
+    // Return true on success
+    return true;
+
+  }
+
+
+
+  // Define a static function to use as the common action for all elemental stat boost abilities
+  public static function ability_function_elemental_stat_boost($objects, $stat_type, $stat_noun, $recovery_text, $damage_text){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // Target this robot's self
+    $this_ability->target_options_update(array(
+      'frame' => 'summon',
+      'success' => array(2, 0, -20, -10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
+      ));
+    $this_robot->trigger_target($this_robot, $this_ability);
+
+    // Decrease the target robot's attack stat
+    $this_ability->recovery_options_update(array(
+      'kind' => $stat_type,
+      'frame' => 'taunt',
+      'percent' => true,
+      'kickback' => array(10, 0, 0),
+      'success' => array(3, 0, 5, -10, $this_robot->print_robot_name().'&#39;s '.$stat_noun.' were '.$recovery_text.'!'),
+      'failure' => array(0, 0, -9999, -9999, 'It had no effect on '.$this_robot->print_robot_name().'&hellip;')
+      ), true);
+    $this_ability->damage_options_update(array(
+      'kind' => $stat_type,
+      'frame' => 'damage',
+      'percent' => true,
+      'kickback' => array(0, 0, 0),
+      'success' => array(3, 0, 5, -10, $this_robot->print_robot_name().'&#39;s '.$stat_noun.' were '.$damage_text.'!'),
+      'failure' => array(0, 0, -9999, -9999, 'It had no effect on '.$this_robot->print_robot_name().'&hellip;')
+      ), true);
+
+    $recovery_base_amount = $this_ability->ability_recovery;
+    if ($stat_type == 'attack'){ $stat_base_amount = $this_robot->robot_attack; }
+    elseif ($stat_type == 'defense'){ $stat_base_amount = $this_robot->robot_defense; }
+    elseif ($stat_type == 'speed'){ $stat_base_amount = $this_robot->robot_speed; }
+    $stat_recovery_amount = ceil($stat_base_amount * ($recovery_base_amount / 100));
+
+    $trigger_options = array('apply_stat_modifiers' => false);
+    $this_robot->trigger_recovery($this_robot, $this_ability, $stat_recovery_amount, $trigger_options);
+
+    // Return true on success
+    return true;
+
+  }
+  // Define alias functions for each stat in attack/defense/speed stats for cleaner function calls
+  public static function ability_function_elemental_attack_boost($objects, $recovery_text = 'recovered', $damage_text = 'damaged'){
+    return mmrpg_ability::ability_function_elemental_stat_boost($objects, 'attack', 'weapon systems', $shot_text, $recovery_text, $damage_text);
+  }
+  public static function ability_function_elemental_defense_boost($objects, $recovery_text = 'recovered', $damage_text = 'damaged'){
+    return mmrpg_ability::ability_function_elemental_stat_boost($objects, 'defense', 'shield systems', $shot_text, $recovery_text, $damage_text);
+  }
+  public static function ability_function_elemental_speed_boost($objects, $recovery_text = 'recovered', $damage_text = 'damaged'){
+    return mmrpg_ability::ability_function_elemental_stat_boost($objects, 'speed', 'mobility systems', $shot_text, $recovery_text, $damage_text);
+  }
+
+  // Define a static onload function to use as the common action for all elemental stat boost abilities
+  public static function ability_function_onload_elemental_stat_boost($objects){
+
+    // Return true on success
+    return true;
+
+  }
+  // Define alias functions for each stat in attack/defense/speed stats for cleaner function calls
+  public static function ability_function_onload_elemental_attack_boost($objects){
+    return mmrpg_ability::ability_function_onload_elemental_stat_boost($objects);
+  }
+  public static function ability_function_onload_elemental_defense_boost($objects){
+    return mmrpg_ability::ability_function_onload_elemental_stat_boost($objects);
+  }
+  public static function ability_function_onload_elemental_speed_boost($objects){
+    return mmrpg_ability::ability_function_onload_elemental_stat_boost($objects);
+  }
+
+
+  // Define a static function to use as the common action for all elemental stat break abilities
+  public static function ability_function_elemental_stat_break($objects, $stat_type, $stat_noun, $damage_text = 'damaged', $recovery_text = 'recovered'){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // Target the opposing robot
+    $this_ability->target_options_update(array(
+      'frame' => 'shoot',
+      'success' => array(0, 85, 0, 10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
+      ));
+    $this_robot->trigger_target($target_robot, $this_ability);
+
+    // Decrease the target robot's attack stat
+    $this_ability->damage_options_update(array(
+      'kind' => $stat_type,
+      'frame' => 'damage',
+      'percent' => true,
+      'kickback' => array(10, 0, 0),
+      'success' => array(1, -50, 0, 10, $target_robot->print_robot_name().'&#39;s '.$stat_noun.' were '.$damage_text.'!'),
+      'failure' => array(0, -75, 0, -10, 'It had no effect on '.$target_robot->print_robot_name().'&hellip;')
+      ));
+    $this_ability->recovery_options_update(array(
+      'kind' => $stat_type,
+      'frame' => 'taunt',
+      'percent' => true,
+      'kickback' => array(0, 0, 0),
+      'success' => array(1, -50, 0, 10, $target_robot->print_robot_name().'&#39;s '.$stat_noun.' were '.$recovery_text.'!'),
+      'failure' => array(0, -75, 0, -10, 'It had no effect on '.$target_robot->print_robot_name().'&hellip;')
+      ));
+
+    $damage_base_amount = $this_ability->ability_damage;
+    if ($stat_type == 'attack'){ $stat_base_amount = $this_robot->robot_attack; }
+    elseif ($stat_type == 'defense'){ $stat_base_amount = $this_robot->robot_defense; }
+    elseif ($stat_type == 'speed'){ $stat_base_amount = $this_robot->robot_speed; }
+    $stat_damage_amount = ceil($stat_base_amount * ($damage_base_amount / 100));
+
+    $trigger_options = array('apply_stat_modifiers' => false);
+    $target_robot->trigger_damage($this_robot, $this_ability, $stat_damage_amount, $trigger_options);
+
+    // Return true on success
+    return true;
+
+  }
+  // Define alias functions for each stat in attack/defense/speed stats for cleaner function calls
+  public static function ability_function_elemental_attack_break($objects, $damage_text = 'damaged', $recovery_text = 'recovered'){
+    return mmrpg_ability::ability_function_elemental_stat_break($objects, 'attack', 'weapon systems', $shot_text, $damage_text, $recovery_text);
+  }
+  public static function ability_function_elemental_defense_break($objects, $damage_text = 'damaged', $recovery_text = 'recovered'){
+    return mmrpg_ability::ability_function_elemental_stat_break($objects, 'defense', 'shield systems', $shot_text, $damage_text, $recovery_text);
+  }
+  public static function ability_function_elemental_speed_break($objects, $damage_text = 'damaged', $recovery_text = 'recovered'){
+    return mmrpg_ability::ability_function_elemental_stat_break($objects, 'speed', 'mobility systems', $shot_text, $damage_text, $recovery_text);
+  }
+
+  // Define a static onload function to use as the common action for all elemental stat break abilities
+  public static function ability_function_onload_elemental_stat_break($objects){
+
+    // Return true on success
+    return true;
+
+  }
+  // Define alias functions for each stat in attack/defense/speed stats for cleaner function calls
+  public static function ability_function_onload_elemental_attack_break($objects){
+    return mmrpg_ability::ability_function_onload_elemental_stat_break($objects);
+  }
+  public static function ability_function_onload_elemental_defense_break($objects){
+    return mmrpg_ability::ability_function_onload_elemental_stat_break($objects);
+  }
+  public static function ability_function_onload_elemental_speed_break($objects){
+    return mmrpg_ability::ability_function_onload_elemental_stat_break($objects);
+  }
+
+  // Define a static function to use as the common action for all item-core-___ abilities
+  public static function item_function_core($objects){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // Target this robot's self
+    $this_ability->target_options_update(array(
+      'frame' => 'throw',
+      'success' => array(0, 60, 40, 99,
+        $this_player->print_player_name().' hands over an item from the inventory&hellip; <br />'.
+        $this_robot->print_robot_name().' throws a '.$this_ability->print_ability_name().' at the target!'
+        )
+      ));
+    $this_robot->trigger_target($this_robot, $this_ability);
+
+    // Inflict damage on the opposing robot
+    $this_ability->damage_options_update(array(
+      'kind' => 'energy',
+      'percent' => true,
+      'multipliers' => false,
+      'kickback' => array(10, 0, 0),
+      'success' => array(0, -90, 0, 10, $target_robot->print_robot_name().' was hit by the '.$this_ability->print_ability_name().'!'),
+      'failure' => array(0, -120, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      ));
+    $this_ability->recovery_options_update(array(
+      'kind' => 'energy',
+      'frame' => 'taunt',
+      'percent' => true,
+      'multipliers' => false,
+      'kickback' => array(0, 0, 0),
+      'success' => array(0, -60, 0, 10, $target_robot->print_robot_name().' absorbed the '.$this_ability->print_ability_name().'!'),
+      'failure' => array(0, -90, 0, -10, 'The '.$this_ability->print_ability_name().' had no effect&hellip;')
+      ));
+    $energy_damage_amount = ceil($target_robot->robot_energy * 0.10);
+    $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+    // Return true on success
+    return true;
+
   }
 
 }

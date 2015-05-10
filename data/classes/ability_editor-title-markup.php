@@ -1,7 +1,9 @@
 <?
 // Pull in global variables
 global $mmrpg_index;
-$session_token = mmrpg_game_token();
+global $session_token;
+// Collect values for potentially missing global variables
+if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
 
 if (empty($robot_info)){ return false; }
 if (empty($ability_info)){ return false; }
@@ -39,8 +41,11 @@ if (!empty($temp_ability_type2)){ $temp_ability_title = str_replace('Type', '/ '
 
 if ($ability_info['ability_class'] != 'item'){
   if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
-  if (!empty($ability_info['ability_damage'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage'; }
-  if (!empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_recovery'].' Recovery'; }
+  elseif (empty($ability_info['ability_damage']) && empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
+  if (!empty($ability_info['ability_damage']) && !empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage | '.$ability_info['ability_recovery'].' Recovery'; }
+  elseif (!empty($ability_info['ability_damage'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage'; }
+  elseif (!empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_recovery'].' Recovery '; }
+  if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  | '; }
 }
 
 //if (empty($ability_info['ability_damage']) && empty($ability_info['ability_recovery'])){ $temp_ability_title .= 'Special'; }
@@ -48,10 +53,11 @@ if ($ability_info['ability_class'] != 'item'){
 // If show accuracy or quantity
 if (($ability_info['ability_class'] != 'item' && $print_options['show_accuracy'])
   || ($ability_info['ability_class'] == 'item' && $print_options['show_quantity'])){
-    
-  if ($ability_info['ability_class'] != 'item' && !empty($ability_info['ability_accuracy'])){ $temp_ability_title .= ' | '.$ability_info['ability_accuracy'].'% Accuracy'; }
-  elseif ($ability_info['ability_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token])){ $temp_ability_title .= ' | '.($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token] == 1 ? '1 Unit' : $_SESSION[$session_token]['values']['battle_items'][$temp_ability_token].' Units'); }
-  elseif ($ability_info['ability_class'] == 'item' ){ $temp_ability_title .= ' | 0 Units'; }
+
+  $temp_ability_title .= '  | ';
+  if ($ability_info['ability_class'] != 'item' && !empty($ability_info['ability_accuracy'])){ $temp_ability_title .= ' '.$ability_info['ability_accuracy'].'% Accuracy'; }
+  elseif ($ability_info['ability_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token])){ $temp_ability_title .= ' '.($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token] == 1 ? '1 Unit' : $_SESSION[$session_token]['values']['battle_items'][$temp_ability_token].' Units'); }
+  elseif ($ability_info['ability_class'] == 'item' ){ $temp_ability_title .= ' 0 Units'; }
 
 }
 

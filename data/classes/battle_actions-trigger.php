@@ -22,13 +22,13 @@ $this_player->update_session();
 
 // If the target player does not have any robots left
 if ($target_player->counters['robots_active'] == 0){
-  
+
   // Trigger the battle complete action to update status and result
   //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this->battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_token);
 
 }
-    
+
 
 // Start the battle loop to allow breaking
 $battle_loop = true;
@@ -37,10 +37,10 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
   // If the battle is just starting
   if ($this_action == 'start'){
 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Ensure this is an actual player
     if ($this_player->player_token != 'player'){
-      
+
       /*
       // Create the enter event for this robot
       $event_header = $this_player->player_name.'&#39;s '.$this_robot->robot_name;
@@ -144,12 +144,12 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
   // Else if the player has chosen to use an ability
   elseif ($this_action == 'ability'){
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Combine into the actions index
     $temp_actions_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-    
+
     // DEFINE ABILITY TOKEN
-    
+
     // If an ability token was not collected
     if (empty($this_token)){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -162,7 +162,8 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
         'target_player' => &$target_player,
         'target_robot' => &$target_robot
         ));
-      $temp_id = $this->index['abilities'][$temp_token]['ability_id'];//array_search($temp_token, $this_robot->robot_abilities);
+      $temp_id = array_search($temp_token, $this_robot->robot_abilities);
+      if (empty($temp_id)){ $temp_id = $this->index['abilities'][$temp_token]['ability_id']; }
       $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
       //$this_token = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
       $this_token = mmrpg_ability::parse_index_info($temp_actions_index[$temp_token]);
@@ -191,7 +192,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     // Trigger this robot's ability
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_ability->ability_results = $this_robot->trigger_ability($target_robot, $this_ability);
-        
+
     // Ensure the battle has not completed before triggering the taunt event
     if ($this->battle_status != 'complete'){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -233,7 +234,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
   // Else if the player has chosen to switch
   elseif ($this_action == 'switch'){
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Collect this player's last action if it exists
     if (!empty($this_player->history['actions'])){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -261,7 +262,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       // Return from the battle function
       $this_return = true;
       break;
-      
+
     }
     // Else If a robot token was not collected and this player IS on autopilot
     elseif (empty($this_token) && $this_player->player_side == 'right'){
@@ -298,7 +299,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       list($temp_id, $temp_token) = explode('_', $this_token);
       $this_robotinfo = array('robot_id' => $temp_id, 'robot_token' => $temp_token);
     }
-    
+
     //$this->events_create(false, false, 'DEBUG', 'switch picked ['.print_r($this_robotinfo['robot_token'], true).'] | other : []');
 
     // Update this player and robot's session data before switching
@@ -309,7 +310,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     // Define the switch reason based on if this robot is disabled
     $this_switch_reason = $this_robot->robot_status != 'disabled' ? 'withdrawn' : 'removed';
     //if ($this_robot->robot_position == 'bench'){ $this_switch_reason = 'auto'; }
-    
+
     /*
     $this->events_create(false, false, 'DEBUG',
     	'$this_switch_reason = '.$this_switch_reason.'<br />'.
@@ -317,21 +318,21 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       '$this_player->values[\'current_robot_enter\'] = '.$this_player->values['current_robot_enter'].'<br />'.
       '');
     */
-    
+
     // If this robot is being withdrawn on the same turn it entered, return false
     if ($this_player->player_side == 'right' && $this_switch_reason == 'withdrawn' && $this_player->values['current_robot_enter'] == $this->counters['battle_turn']){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       // Return false to cancel the switch action
       return false;
     }
-    
+
     // If the switch reason was removal, make sure this robot stays hidden
     if ($this_switch_reason == 'removed' && $this_player->player_side == 'right'){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_robot->flags['hidden'] = true;
       $this_robot->update_session();
     }
-    
+
     // Withdraw the player's robot and display an event for it
     if ($this_robot->robot_position != 'bench'){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -359,14 +360,14 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_robot->update_session();
     }
-    
+
     // If the switch reason was removal, hide the robot from view
     if ($this_switch_reason == 'removed'){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_robot->flags['hidden'] = true;
       $this_robot->update_session();
     }
-    
+
     // Ensure all robots have been withdrawn to the bench at this point
     if (!empty($this_player->player_robots)){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -377,7 +378,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
         $temp_robot->update_session();
       }
     }
-    
+
     // Switch in the player's new robot and display an event for it
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_robot->robot_load($this_robotinfo);
@@ -429,12 +430,12 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     // Now we can update the current robot's frame regardless of what happened
     $this_robot->robot_frame = $this_robot->robot_status != 'disabled' ? 'base' : 'defeat';
     $this_robot->update_session();
-    
+
     // Set this token to the ID and token of the switched robot
     $this_token = $this_robotinfo['robot_id'].'_'.$this_robotinfo['robot_token'];
-    
+
     //$this->events_create(false, false, 'DEBUG', 'checkpoint ['.$this_token.'] | other : []');
-    
+
     // Return from the battle function
     $this_return = true;
     break;
@@ -482,33 +483,33 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
 
     // Now change the target robot's frame is set to its mugshot
     $temp_target_robot->robot_frame = 'taunt'; //taunt';
-    
+
     $temp_stat_padding_total = 300;
     $temp_stat_counter_total = $temp_target_robot->robot_energy + $temp_target_robot->robot_attack + $temp_target_robot->robot_defense + $temp_target_robot->robot_speed;
     $temp_stat_counter_base_total = $temp_target_robot->robot_base_energy + $temp_target_robot->robot_base_attack + $temp_target_robot->robot_base_defense + $temp_target_robot->robot_base_speed;
-    
+
     $temp_energy_padding = ceil(($temp_target_robot->robot_energy / $temp_stat_counter_base_total) * $temp_stat_padding_total);
     $temp_energy_base_padding = ceil(($temp_target_robot->robot_base_energy / $temp_stat_counter_base_total) * $temp_stat_padding_total);
     $temp_energy_base_padding = $temp_energy_base_padding - $temp_energy_padding;
-    
+
     $temp_attack_padding = ceil(($temp_target_robot->robot_attack / $temp_stat_counter_base_total) * $temp_stat_padding_total);
     $temp_attack_base_padding = ceil(($temp_target_robot->robot_base_attack / $temp_stat_counter_base_total) * $temp_stat_padding_total);
     $temp_attack_base_padding = $temp_attack_base_padding - $temp_attack_padding;
     if ($temp_attack_padding < 1){ $temp_attack_padding = 0; }
     if ($temp_attack_base_padding < 1){ $temp_attack_base_padding = 0; }
-    
+
     $temp_defense_padding = ceil(($temp_target_robot->robot_defense / $temp_stat_counter_base_total) * $temp_stat_padding_total);
     $temp_defense_base_padding = ceil(($temp_target_robot->robot_base_defense / $temp_stat_counter_base_total) * $temp_stat_padding_total);
     $temp_defense_base_padding = $temp_defense_base_padding - $temp_defense_padding;
     if ($temp_defense_padding < 1){ $temp_defense_padding = 0; }
     if ($temp_defense_base_padding < 1){ $temp_defense_base_padding = 0; }
-    
+
     $temp_speed_padding = ceil(($temp_target_robot->robot_speed / $temp_stat_counter_base_total) * $temp_stat_padding_total);
     $temp_speed_base_padding = ceil(($temp_target_robot->robot_base_speed / $temp_stat_counter_base_total) * $temp_stat_padding_total);
     $temp_speed_base_padding = $temp_speed_base_padding - $temp_speed_padding;
     if ($temp_speed_padding < 1){ $temp_speed_padding = 0; }
     if ($temp_speed_base_padding < 1){ $temp_speed_base_padding = 0; }
-    
+
     // Create an event showing the scanned robot's data
     $event_header = ($temp_target_player->player_token != 'player' ? $temp_target_player->player_name.'&#39;s ' : '').$temp_target_robot->robot_name;
     if (empty($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $event_header .= ' (New!)'; }
@@ -526,7 +527,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
           <tbody>
             <tr>
               <td class="left">Name  : </td>
-              <td  class="right"><?= $temp_target_robot->print_robot_number() ?> <?= $temp_target_robot->print_robot_name() ?></td>
+              <td  class="right"><?= !preg_match('/^dark-(frag|spire|tower)$/i', $temp_target_robot->robot_token) ? $temp_target_robot->print_robot_number() : '' ?> <?= $temp_target_robot->print_robot_name() ?></td>
               <td class="center">&nbsp;</td>
               <td class="left">Core : </td>
               <td  class="right"><?= $temp_target_robot->print_robot_core() ?></td>
@@ -582,7 +583,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     break;
 
   }
-  
+
   // Break out of the battle loop by default
   break;
 }
@@ -605,7 +606,7 @@ if ($target_robot->robot_position == 'bench' && ($target_robot->robot_status == 
 
 // If the target player does not have any robots left
 if ($target_player->counters['robots_active'] == 0){
-             
+
   // Trigger the battle complete action to update status and result
   //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this->battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_token);

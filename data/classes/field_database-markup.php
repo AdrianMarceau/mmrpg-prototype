@@ -76,22 +76,22 @@ ob_start();
 ?>
 <div class="database_container database_field_container" data-token="<?=$field_info['field_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
   <a class="anchor" id="<?=$field_info['field_token']?>">&nbsp;</a>
-  
+
   <div class="subbody event event_triple event_visible" data-token="<?=$field_info['field_token']?>" style="min-height: 90px; <?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
-    
+
     <? if($print_options['show_icon']): ?>
       <div class="this_sprite sprite_left" style="height: 40px;">
         <? if($print_options['show_key'] !== false): ?>
           <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.($print_options['show_key'] + 1) ?></div>
         <? endif; ?>
         <? if ($field_image_token != 'field'){ ?>
-          <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><div style="background-image: url(images/fields/<?= $field_image_token ?>/battle-field_avatar.png?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 50px 50px; background-position: -5px -5px;" class="sprite sprite_field sprite_40x40 sprite_40x40_mug sprite_size_<?= $field_image_size_text ?> sprite_size_<?= $field_image_size_text ?>_mug field_status_active field_position_active"><?=$field_info['field_name']?>'s Avatar</div></div>
+          <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><div style="background-image: url(i/f/<?= $field_image_token ?>/bfa.png?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 50px 50px; background-position: -5px -5px;" class="sprite sprite_field sprite_40x40 sprite_40x40_mug sprite_size_<?= $field_image_size_text ?> sprite_size_<?= $field_image_size_text ?>_mug field_status_active field_position_active"><?=$field_info['field_name']?>'s Avatar</div></div>
         <? } else { ?>
           <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><div style="background-image: none; background-color: #000000; background-color: rgba(0, 0, 0, 0.6); " class="sprite sprite_field sprite_40x40 sprite_40x40_mug sprite_size_<?= $field_image_size_text ?> sprite_size_<?= $field_image_size_text ?>_mug field_status_active field_position_active">No Image</div></div>
         <? }?>
       </div>
     <? endif; ?>
-    
+
     <? if($print_options['show_basics']): ?>
       <h2 class="header header_left field_type_<?= $field_type_token ?>" style="margin-right: 0;">
         <? if($print_options['layout_style'] == 'website_compact'): ?>
@@ -236,11 +236,11 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
 
     <? if($print_options['show_description'] && !empty($field_info['field_description2'])): ?>
-      
+
       <h2 class="header header_left field_type_<?= $field_type_token ?>" style="margin-right: 0;">
         <?= $field_info['field_name'] ?>&#39;s Description
       </h2>
@@ -258,19 +258,19 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
-    
+
 
     <? if($print_options['show_sprites'] && $field_image_token != 'field'): ?>
-    
+
       <h2 class="header header_full field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
         <?= $field_info['field_name'].(!preg_match('/s$/i', $field_info['field_name']) ? '&#39;s' : '&#39;') ?> Sprites
       </h2>
       <div class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
         <div id="sprite_container" style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #191919 none scroll repeat -10px -30px; overflow: hidden; padding: 0; margin-bottom: 10px;">
-          <div class="sprite_background" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: transparent url(images/fields/<?= $field_info['field_background'] ?>/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
-            <div class="sprite_foreground" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: transparent url(images/fields/<?= $field_info['field_background'] ?>/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
+          <div class="sprite_background" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: transparent url(i/f/<?= $field_info['field_background'] ?>/bfbb.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
+            <div class="sprite_foreground" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: transparent url(i/f/<?= $field_info['field_background'] ?>/bffb.png?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
               &nbsp;
             </div>
           </div>
@@ -298,19 +298,19 @@ ob_start();
         }
         ?>
       </div>
-            
+
     <? endif; ?>
 
     <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
       <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
       <a class="link link_permalink permalink" href="database/fields/<?= $field_info['field_token'] ?>/" rel="permalink">+ Permalink</a>
-    
+
     <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
       <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
       <a class="link link_permalink permalink" href="database/fields/<?= $field_info['field_token'] ?>/" rel="permalink">+ View More</a>
-      
+
     <? endif; ?>
 
   </div>
