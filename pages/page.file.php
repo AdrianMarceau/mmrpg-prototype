@@ -21,6 +21,12 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('999.999.999.999'))){
 // Define the MARKUP variables for this page
 //$this_markup_header = 'Mega Man RPG Prototype File';
 
+
+
+// Include the database index array files
+require('data/database_types.php');
+require('data/database_robots.php');
+
 // Collect an index of user roles for display
 $this_roles_index = $DB->get_array_list("SELECT * FROM mmrpg_roles ORDER BY role_id ASC", 'role_id');
 $this_fields_index = mmrpg_field::get_index();
@@ -87,7 +93,7 @@ while ($this_action == 'profile'){
       $user_profiletext = !empty($_POST['profiletext']) ? strip_tags(trim($_POST['profiletext'])) : '';
       $user_creditstext = !empty($_POST['creditstext']) ? strip_tags(trim($_POST['creditstext'])) : '';
       $user_creditsline = !empty($_POST['creditsline']) ? strip_tags(trim($_POST['creditsline'])) : '';
-      
+
       // Check if the password has changed at all
       if (true){
 
@@ -121,7 +127,7 @@ while ($this_action == 'profile'){
     mmrpg_save_game_session($this_save_filepath);
     $this_userinfo = $DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
     $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
-    
+
     //die($this_save_filepath);
     // If a game session's info was backup up for deletion
     if (!empty($backup_save_filepath) && $backup_save_filepath != $this_save_filepath){
@@ -135,7 +141,8 @@ while ($this_action == 'profile'){
     break;
 
   }
-  
+
+  /*
   // Sort the robot index based on robot number
   function mmrpg_index_sort_robots($robot_one, $robot_two){
     global $temp_serial_ordering;
@@ -155,12 +162,17 @@ while ($this_action == 'profile'){
   $mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
   uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
   //die('<pre>$mmrpg_database_robots = '.print_r($mmrpg_database_robots, true).'</pre>');
-  
+  */
+
   // Update the header markup title
   $html_header_title .= 'Edit Profile';
-  
+
   // Update the header markup text
   $html_header_text .= 'Use the fields below to update your player profile for the Mega Man RPG Prototype game and community pages.<br /> Usernames and passwords cannot be changed, so please remember them.';
+
+  // Display s section separator for the form
+  $html_form_fields .= '<div class="field field_header" style="padding-top: 0;">Basic Profile Details</div>';
+
   // Update the form markup fields
   $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
     $html_form_fields .= '<label class="label label_username" style="width: 230px; ">Username :</label>';
@@ -180,11 +192,18 @@ while ($this_action == 'profile'){
     $html_form_fields .= '<label class="label label_emailaddress" style="width: 230px; ">Email Address :</label>';
     $html_form_fields .= '<input class="text text_emailaddress" style="width: 100%; " type="text" name="emailaddress" maxlength="128" value="'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['emailaddress']) ? $_SESSION['GAME']['USER']['emailaddress'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
   $html_form_fields .= '</div>';
+
+
+
+  // Display s section separator for the form
+  $html_form_fields .= '<div class="field field_header">Optional Profile Details</div>';
+
+  // Update the form markup fields
   $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
     $html_form_fields .= '<label class="label label_websiteaddress" style="width: 230px; ">Website Address :</label>';
     $html_form_fields .= '<input class="text text_websiteaddress" style="width: 100%; " type="text" name="websiteaddress" maxlength="128" value="'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
   $html_form_fields .= '</div>';
-  
+
   // Player Gender
   $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">';
     $html_form_fields .= '<label class="label label_gender" style="width: 230px; ">Player Gender :</label>';
@@ -195,23 +214,113 @@ while ($this_action == 'profile'){
     $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['gender'].'"', 'value="'.$_SESSION['GAME']['USER']['gender'].'" selected="selected"', implode('', $html_gender_options));
     $html_form_fields .= '<select class="select select_gender" style="width: 100%; " name="gender">'.$temp_select_options.'</select>';
   $html_form_fields .= '</div>';
-  
+
+  /*
+
+  // Display s section separator for the form
+  $html_form_fields .= '<div class="field field_header">Player Battle Links</div>';
+
+  // Collect the leaderboard index and our current place in it
+  //$this_leaderboard_index = mmrpg_prototype_leaderboard_index();
+  //$this_leaderboard_targets = mmrpg_prototype_leaderboard_targets($this_userid, );
+
+  /*
+  $this_leaderboard_rank = mmrpg_prototype_leaderboard_rank($this_userid);
+  // Collect the position of the current player in the leaderboard list
+  $this_leaderboard_index_position = 0;
+  foreach ($this_leaderboard_index AS $key => $array){
+    if ($array['user_id'] == $this_userid){
+      $this_leaderboard_index_position = $key;
+      break;
+    }
+  }
+
+  // Collect the players before and after the current user
+  $max_player_key = $this_leaderboard_index_position - 10;
+  $min_player_key = $this_leaderboard_index_position + 10;
+  if ($max_player_key < 0){ $min_player_key -= $max_player_key; $max_player_key = 0; }
+  if ($min_player_key > count($this_leaderboard_index)){ $max_player_key -= $min_player_key - count($this_leaderboard_index); }
+
+  $temp_target_players = $this_leaderboard_index;
+  unset($temp_target_players[$this_leaderboard_index_position]);
+  $temp_target_players = array_slice($temp_target_players, $max_player_key, $min_player_key);
+
+  //$temp_players_before = array_slice($this_leaderboard_index, ($this_leaderboard_index_position - 10), 10);
+   */
+
+  /*
+  echo '<div style="background-color: white; margin: 20px auto; padding: 20px; max-width: 600px; text-align: left; color: #000000;">';
+  echo '$this_leaderboard_targets = <pre>'.print_r($this_leaderboard_targets, true).'</pre>';
+  echo '</div>';
+
+  echo '<div style="background-color: white; margin: 20px auto; padding: 20px; max-width: 600px; text-align: left; color: #000000;">';
+  echo '$max_player_key = '.$max_player_key.'; $min_player_key = '.$min_player_key.';<br /> ';
+  echo '$this_leaderboard_index = <pre>'.print_r($this_leaderboard_index, true).'</pre>';
+  echo '</div>';
+  */
+
+  // Remove this robot from the leaderboard so we don't fight outselves
+  //$this_leaderboard_targets = array_slice($this_leaderboard_index, );
+
+  //$this_leaderboard_options = array_slice($this_leaderboard_index, $this_leaderboard_rank);
+
+  //echo '$this_leaderboard_rank = '.$this_leaderboard_rank.'; $this_leaderboard_index_position = '.$this_leaderboard_index_position.'<br /> ';
+  //echo '$this_leaderboard_index = <pre>'.print_r($this_leaderboard_index, true).'</pre>';
+  /*
+
+  // We can have up to six player links (for now) so loop through and display
+  for ($i = 0; $i < 6; $i++){
+
+    // Update the form markup fields
+    $temp_value = !empty($_SESSION['GAME']['USER']['playerlinks'][0]) ? trim($_SESSION['GAME']['USER']['playerlinks'][0]) : '';
+    $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: '.($i == 0 || $i % 2 == 0 ? '35px' : '0').'; ">';
+      $html_form_fields .= '<label class="label label_playerlink" style="width: 230px; ">Player Link #'.($i + 1).' :</label>';
+      $html_form_fields .= '<input class="text text_playerlink" style="width: 100%; " type="text" name="playerlinks['.$i.']" maxlength="128" value="'.htmlentities($temp_value, ENT_QUOTES, 'UTF-8', true).'" />';
+    $html_form_fields .= '</div>';
+
+  }
+  */
+
+  // IF CONTRIBUTOR OR ADMIN
+  if (in_array($this_userinfo['role_id'], array(1, 6, 2, 7))){
+
+    // Display s section separator for the form
+    $member_role_name = trim(!empty($_SESSION['GAME']['USER']['roleid']) ? $this_roles_index[$_SESSION['GAME']['USER']['roleid']]['role_name'] : 'Unknown');
+    $html_form_fields .= '<div class="field field_header">Credits &amp; Contributions</div>';
+
+    $html_form_fields .= '<div class="field" style="margin-top: 20px;">';
+      $html_form_fields .= '<label class="label label_profiletext" style="width: 230px; ">'.$member_role_name.' Credits :</label>';
+      $html_form_fields .= '<input class="text text_profiletext" style="width: 98%; " name="creditsline" value="'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditsline']) ? $_SESSION['GAME']['USER']['creditsline'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
+    $html_form_fields .= '</div>';
+
+    $html_form_fields .= '<div class="field" style="margin-bottom: 20px;">';
+      $html_form_fields .= '<label class="label label_profiletext" style="width: 230px; ">'.$member_role_name.' Description :</label>';
+      $html_form_fields .= '<textarea class="textarea textarea_profiletext" style="width: 98%; height: 150px; " name="creditstext">'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditstext']) ? $_SESSION['GAME']['USER']['creditstext'] : ''), ENT_QUOTES, 'UTF-8', true).'</textarea>';
+    $html_form_fields .= '</div>';
+
+  }
+
+
+  // Display s section separator for the form
+  $html_form_fields .= '<div class="field field_header">Community &amp; Leaderboard Customization</div>';
+
   // Member Type
+  $member_role_name = trim(!empty($_SESSION['GAME']['USER']['roleid']) ? $this_roles_index[$_SESSION['GAME']['USER']['roleid']]['role_name'] : 'Unknown');
   $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
     $html_form_fields .= '<label class="label label_roleid" style="width: 230px; ">Member Type :</label>';
-    $html_form_fields .= '<input class="text text_roleid" style="width: 100%; opacity: 0.50; filter: alpha(opacity = 50); " type="text" name="role_id" disabled="disabled" value="'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['roleid']) ? $this_roles_index[$_SESSION['GAME']['USER']['roleid']]['role_name'] : 'Unknown'), ENT_QUOTES, 'UTF-8', true).'" />';
+    $html_form_fields .= '<input class="text text_roleid" style="width: 100%; opacity: 0.50; filter: alpha(opacity = 50); " type="text" name="role_id" disabled="disabled" value="'.htmlentities($member_role_name, ENT_QUOTES, 'UTF-8', true).'" />';
   $html_form_fields .= '</div>';
-  
+
   // Player Colour
-  $mmrpg_database_type = $mmrpg_index['types'];
-  sort($mmrpg_database_type);
+  //$mmrpg_database_types = $mmrpg_index['types'];
+  sort($mmrpg_database_types);
   $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">';
     $html_form_fields .= '<label class="label label_colourtoken" style="width: 230px; ">Player Colour :</label>';
     $html_colour_options = array();
     $html_colour_options[] = '<option value="">- Select Type -</option>';
     $html_colour_options[] = '<option value="none">Neutral Type</option>';
     // Add all the robot avatars to the list
-    foreach ($mmrpg_database_type AS $token => $info){
+    foreach ($mmrpg_database_types AS $token => $info){
       if ($token == 'none'){ continue; }
       $html_colour_options[] = '<option value="'.$info['type_token'].'">'.$info['type_name'].' Type</option>';
     }
@@ -235,6 +344,7 @@ while ($this_action == 'profile'){
     $temp_optgroup_token = 'MM00';
     $html_avatar_options[] = '<optgroup label="Mega Man Robots">';
     // Add all the robot avatars to the list
+    //die('<pre>$mmrpg_database_robots = '.print_r($mmrpg_database_robots, true).'</pre>');
     foreach ($mmrpg_database_robots AS $token => $info){
       if ($token == 'robot' || strstr($token, 'copy')){ continue; }
       elseif (isset($info['robot_image']) && $info['robot_image'] == 'robot'){ continue; }
@@ -242,7 +352,8 @@ while ($this_action == 'profile'){
       elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
       elseif (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
       if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
-      
+      //$info = mmrpg_robot::parse_index_info($info);
+
       // If the game has changed print the new optgroup
       if ($info['robot_game'] != $temp_optgroup_token){
         $temp_optgroup_token = $info['robot_game'];
@@ -252,9 +363,14 @@ while ($this_action == 'profile'){
         $html_avatar_options[] = '</optgroup>';
         $html_avatar_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
       }
-      
+
       $size = isset($info['robot_image_size']) ? $info['robot_image_size'] : 40;
       $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
+
+      // Collect the summon count for this robot
+      $temp_summon_count = mmrpg_prototype_database_summoned($token);
+
+      // If this is a copy core, add it's type alts
       if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
         foreach ($mmrpg_index['types'] AS $type_token => $type_info){
           if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
@@ -262,9 +378,21 @@ while ($this_action == 'profile'){
           $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)'.'</option>';
         }
       }
+      // Otherwise, if this ROBOT MASTER alt skin has been inlocked
+      elseif (!empty($info['robot_image_alts'])){
+        //die('<pre>$info = '.print_r($info, true).'</pre>');
+        // Loop through each of the available alts and print if unlocked
+        foreach ($info['robot_image_alts'] AS $key => $this_altinfo){
+          // Only print if unlocked or admin
+          if ($temp_summon_count >= $this_altinfo['summons']){
+            $html_avatar_options[] = '<option value="robots/'.$token.'_'.$this_altinfo['token'].'/'.$size.'">'.$info['robot_number'].' : '.$this_altinfo['name'].'</option>';
+          }
+        }
+      }
+
     }
     // Add player avatars if this is the developer
-    if ($this_userinfo['role_id'] == 1 || $this_userinfo['role_id'] == 6){
+    if ($this_userinfo['role_id'] == 1){
       $html_avatar_options[] = '</optgroup>';
       $html_avatar_options[] = '<optgroup label="Mega Man Players">';
       $html_avatar_options[] = '<option value="players/dr-light/40">PLAYER : Dr. Light</option>';
@@ -276,7 +404,7 @@ while ($this_action == 'profile'){
     $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['imagepath'].'"', 'value="'.$_SESSION['GAME']['USER']['imagepath'].'" selected="selected"', implode('', $html_avatar_options));
     $html_form_fields .= '<select class="select select_imagepath" style="width: 100%; " name="imagepath">'.$temp_select_options.'</select>';
   $html_form_fields .= '</div>';
-    
+
   // Player Background
   require('data/prototype_omega.php');
   $temp_omega_factor_options = array();
@@ -291,7 +419,7 @@ while ($this_action == 'profile'){
     }
   }
   ksort($temp_omega_factor_options);
-  
+
   $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">';
     $html_form_fields .= '<label class="label label_backgroundpath" style="width: 230px; ">Player Background :</label>';
     $temp_optgroup_token = 'MM00';
@@ -326,33 +454,14 @@ while ($this_action == 'profile'){
     $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['backgroundpath'].'"', 'value="'.$_SESSION['GAME']['USER']['backgroundpath'].'" selected="selected"', implode('', $html_background_options));
     $html_form_fields .= '<select class="select select_backgroundpath" style="width: 100%; " name="backgroundpath">'.$temp_select_options.'</select>';
   $html_form_fields .= '</div>';
-  
-  
-  // IF CONTRIBUTOR OR ADMIN
-  if (in_array($_SESSION['GAME']['USER']['roleid'], array(1, 6, 2, 7))){
-    
-    $member_role_name = trim(!empty($_SESSION['GAME']['USER']['roleid']) ? $this_roles_index[$_SESSION['GAME']['USER']['roleid']]['role_name'] : 'Unknown');
-    
-    $html_form_fields .= '<div class="field" style="margin-top: 20px;">';
-      $html_form_fields .= '<label class="label label_profiletext" style="width: 230px; ">'.$member_role_name.' Credits :</label>';
-      $html_form_fields .= '<input class="text text_profiletext" style="width: 98%; " name="creditsline" value="'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditsline']) ? $_SESSION['GAME']['USER']['creditsline'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
-    $html_form_fields .= '</div>';
-        
-    $html_form_fields .= '<div class="field" style="margin-bottom: 20px;">';
-      $html_form_fields .= '<label class="label label_profiletext" style="width: 230px; ">'.$member_role_name.' Description :</label>';
-      $html_form_fields .= '<textarea class="textarea textarea_profiletext" style="width: 98%; height: 150px; " name="creditstext">'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditstext']) ? $_SESSION['GAME']['USER']['creditstext'] : ''), ENT_QUOTES, 'UTF-8', true).'</textarea>';
-    $html_form_fields .= '</div>';
-    
-  }
-  
-  
+
   $html_form_fields .= '<div class="field">';
-    $html_form_fields .= '<label class="label label_profiletext" style="width: 230px; ">Profile Description :</label>';
+    $html_form_fields .= '<label class="label label_profiletext" style="width: 230px; ">Leaderboard Profile :</label>';
     $html_form_fields .= '<textarea class="textarea textarea_profiletext" style="width: 98%; height: 250px; " name="profiletext">'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['profiletext']) ? $_SESSION['GAME']['USER']['profiletext'] : ''), ENT_QUOTES, 'UTF-8', true).'</textarea>';
     $html_form_fields .= mmrpg_formatting_help();
   $html_form_fields .= '</div>';
-  
-  
+
+
   // Update the form markup buttons
   $html_form_buttons .= '<input class="button button_submit" type="submit" value="Save Changes" />';
   //$html_form_buttons .= '<input class="button button_reset" type="button" value="Reset Game" onclick="javascript:parent.window.mmrpg_trigger_reset();" />';
@@ -372,7 +481,7 @@ while ($this_action == 'profile'){
     $_SESSION['mmrpg_form_messages'] = $html_form_messages;
     header('Location: '.MMRPG_CONFIG_ROOTURL.'file/profile/');
     exit();
-    
+
   }
 
   // Break from the PROFILE loop
@@ -396,7 +505,7 @@ while ($this_action == 'new'){
       $temp_username_clean = preg_replace('/[^-a-z0-9]+/i', '', strtolower($_REQUEST['username']));
       $temp_file_path = $this_save_dir.$temp_username_clean.'/';
       $_REQUEST['password'] = trim($_REQUEST['password']);
-      
+
       // Define the is verfied and default to true
       $html_form_verified = true;
       // Ensure the username is valid
@@ -424,11 +533,11 @@ while ($this_action == 'new'){
         $html_form_messages .= '<span class="error">(!) The email address was either much too long, or much too short.</span>';
         $html_form_verified = false;
       }
-      
+
       // Define the data of birth checking variables
       $min_dateofbirth = date('Y/m/d', strtotime('13 years ago'));
       $bypass_dateofbirth = false;
-      
+
       // Allow the test user to bypass age concent, we got an email
       $bypass_dateofbirth_index = array();
       $temp_dateofbirth_index = explode(',', preg_replace('/\s+/', '', MMRPG_COPPA_COMPLIANCE_PERMISSIONS));
@@ -436,7 +545,7 @@ while ($this_action == 'new'){
       $temp_email_token = trim(strtolower($_REQUEST['emailaddress']));
       foreach ($temp_dateofbirth_index AS $string){ list($username, $email) = explode('/', $string); $bypass_dateofbirth_index[strtolower($username)] = strtolower($email); }
       if (!empty($bypass_dateofbirth_index[$temp_username_token]) && $bypass_dateofbirth_index[$temp_username_token] == $temp_email_token){ $bypass_dateofbirth = true; }
-      
+
       // Ensure the dateofbirth is valid
       //die('$min_dateofbirth = '.$min_dateofbirth);
       if (empty($_REQUEST['dateofbirth'])){
@@ -474,7 +583,7 @@ while ($this_action == 'new'){
       }
       // If not verified, break
       if (!$html_form_verified){ break; }
-      
+
     }
 
     // Collect the user details and generate the file ones as well
@@ -525,7 +634,7 @@ while ($this_action == 'new'){
   <p class="text">In order to register for this browser game, we require you to verify your age to comply with <a href="http://www.coppa.org/" target="_blank">COPPA</a>. If you are under the age of 13, parental permission must be obtained prior to registration. A parent or legal guardian will need to download, fill in and submit to us a completed copy of our <a href="images/misc/MMRPG-Prototype_COPPA-Compliance.pdf" target="_blank">COPPA Compliance &amp; Permission form</a>.</p>
   <?
   $html_header_text = ob_get_clean();
-  
+
   /*
   $html_header_text .= 'Please select a username and password combo for your new save file below. ';
   $html_header_text .= 'You will be required to enter this combo each time you load your save file. ';
@@ -564,7 +673,7 @@ while ($this_action == 'new'){
   </div>
   <?
   $html_form_fields = ob_get_clean();
-  
+
   // Update the form markup buttons
   $html_form_buttons .= '<input class="button button_submit" type="submit" value="New Game" />';
   //$html_form_buttons .= '<input class="button button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
@@ -586,7 +695,7 @@ while ($this_action == 'new'){
 }
 // Else, if the LOAD action was requested
 while ($this_action == 'load'){
-  
+
   // Define the coppa flag
   $html_form_show_coppa = false;
 
@@ -631,16 +740,12 @@ while ($this_action == 'load'){
     $this_file['path'] = $this_user['username_clean'].'/';
     $this_file['name'] = $this_user['password_encoded'].'.sav';
 
-    // The file exists, so let's collect this user's info from teh database
-    $temp_database_user = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
-
     // Check if the requested save file path exists
     $temp_save_filepath = $this_save_dir.$this_file['path'];
-    //if (file_exists($temp_save_filepath) && is_dir($temp_save_filepath)){
-    if (!empty($temp_database_user)){
+    if (file_exists($temp_save_filepath) && is_dir($temp_save_filepath)){
 
       // The file exists, so let's collect this user's info from teh database
-      //$temp_database_user = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
+      $temp_database_user = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
 
       // And now let's let's check the password
       $temp_save_filepath .= $this_file['name'];
@@ -648,7 +753,7 @@ while ($this_action == 'load'){
 
         // The password was correct, but let's also make sure the user is old enough
         if (!empty($temp_database_user['user_date_birth']) && !empty($temp_database_user['user_flag_approved'])){
-                
+
           // The password was correct! Update the session with these credentials
           $_SESSION['GAME']['DEMO'] = 0;
           $_SESSION['GAME']['USER'] = $this_user;
@@ -664,15 +769,15 @@ while ($this_action == 'load'){
           // Update the form markup, then break from the loop
           $file_has_updated = true;
           break;
-          
+
         }
         // The user has not confirmed their date of birth, produce an error
         else {
-      
+
           // Define the data of birth checking variables
           $min_dateofbirth = date('Y/m/d', strtotime('13 years ago'));
           $bypass_dateofbirth = false;
-          
+
           // Allow the test user to bypass age concent, we got an email
           $bypass_dateofbirth_index = array();
           $temp_dateofbirth_index = explode(',', preg_replace('/\s+/', '', MMRPG_COPPA_COMPLIANCE_PERMISSIONS));
@@ -681,7 +786,7 @@ while ($this_action == 'load'){
           foreach ($temp_dateofbirth_index AS $string){ list($username, $email) = explode('/', $string); $bypass_dateofbirth_index[strtolower($username)] = strtolower($email); }
           if (!empty($bypass_dateofbirth_index[$temp_username_token]) && $bypass_dateofbirth_index[$temp_username_token] == $temp_email_token){ $bypass_dateofbirth = true; }
           //die('<pre>$bypass_dateofbirth_index = '.print_r($bypass_dateofbirth_index, true).'</pre>');
-          
+
           // Ensure the dateofbirth is valid
           //die('$min_dateofbirth = '.$min_dateofbirth);
           if (empty($_REQUEST['dateofbirth'])){
@@ -704,7 +809,7 @@ while ($this_action == 'load'){
             $html_form_verified = false;
             $html_form_show_coppa = true;
           }
-                    
+
           // The password was correct! Update the session with these credentials
           $_SESSION['GAME']['DEMO'] = 0;
           $_SESSION['GAME']['USER'] = $this_user;
@@ -724,7 +829,7 @@ while ($this_action == 'load'){
           // Update the form markup, then break from the loop
           $file_has_updated = true;
           break;
-          
+
         }
 
       }
@@ -742,7 +847,7 @@ while ($this_action == 'load'){
     else {
 
       // Create an error message and break out of the form
-      $html_form_messages .= '<span class="error">(!) The requested username ('.$this_user['username_clean'].') does not exist.</span>';
+      $html_form_messages .= '<span class="error">(!) The requested username does not exist.</span>';
       break;
 
     }
@@ -798,6 +903,8 @@ while ($this_action == 'load'){
 // Else, if the EXIT action was requested
 while ($this_action == 'exit'){
 
+  // Back up the index settings array
+  $temp_index_settings = !empty($_SESSION['GAME']['index_settings']) ? $_SESSION['GAME']['index_settings'] : array();
   // Auto-generate the user and file info based on their IP
   $this_user = array();
   $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
@@ -817,6 +924,7 @@ while ($this_action == 'exit'){
   $_SESSION['GAME']['USER'] = $this_user;
   $_SESSION['GAME']['FILE'] = $this_file;
   $_SESSION['GAME']['counters']['battle_points'] = 0;
+  $_SESSION['GAME']['index_settings'] = $temp_index_settings;
   // Update the global save path variable
   $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
   // Reset the game session and reload the page
@@ -840,7 +948,7 @@ while ($this_action == 'exit'){
 // Ensure this is not a demo build before doing updates
 if ($_SESSION['GAME']['DEMO'] == 0){
   // Require the updates file
-  require_once('file_updates.php');
+  require_once(MMRPG_CONFIG_ROOTDIR.'admin/file_updates.php');
 }
 
 
@@ -880,9 +988,9 @@ ob_start();
   <? if(!empty($html_header_text)): ?>
     <?= !strstr($html_header_text, '</p>') ? '<p class="text">'.$html_header_text.'</p>' : $html_header_text ?>
   <? endif; ?>
-      
+
       <form class="form" action="file/<?= $this_action ? $this_action.'/' : '' ?>" method="post" autocomplete="on">
-  
+
         <div class="wrapper">
           <?
           // DEBUG
@@ -912,9 +1020,9 @@ ob_start();
             </div>
           <? endif; ?>
         </div>
-  
+
       </form>
-      
+
   </div>
 
 <? } elseif($this_action == 'game'){ ?>
@@ -926,7 +1034,7 @@ ob_start();
   $temp_show_starforce = mmrpg_prototype_complete() ? true : false;
   $temp_colour_token = !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none';
   ?>
-  
+
   <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">My Account &raquo; <?= $html_header_title ?></h2>
 
   <div class="subbody" style="padding-left: 15px; margin-bottom: 2px; ">
@@ -934,64 +1042,64 @@ ob_start();
   </div>
 
   <div class="subbody thread_subbody thread_subbody_full thread_subbody_full_right thread_right event event_triple event_visible" style="text-align: left; position: relative; padding: 10px 10px 6px 15px; margin-bottom: 4px;">
-    
+
     <div id="game_buttons" data-fieldtype="<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>" class="field" style="margin: 6px auto 20px;">
       <a class="link_button field_type <?= empty($this_current_token) || $this_current_token == 'robots' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/robots/' ?>">View Robots</a>
       <? if(!empty($temp_show_players)): ?><a class="link_button field_type <?= $this_current_token == 'players' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/players/' ?>">View Players</a><? endif; ?>
       <? if(!empty($temp_show_starforce)): ?><a class="link_button field_type <?= $this_current_token == 'starforce' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/starforce/' ?>">View Starforce</a><? endif; ?>
       <a class="link_button field_type <?= $this_current_token == 'database' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/database/' ?>">View Database</a>
     </div>
-    
+
     <?
-    
+
     // -- LEADERBOARD PAGES -- //
-    
+
     // Define the allowable pages
     $temp_allowed_pages = array('robots', 'players', 'starforce', 'database');
-    
+
     // If this is the View Robots page, show the appropriate content
     if (empty($this_current_token) || !in_array($this_current_token, $temp_allowed_pages) || $this_current_token == 'robots'){
       ?>
-      
+
       <div id="game_frames" class="field" style="height: 600px;">
         <iframe name="edit_robots" src="frames/edit_robots.php?action=robots&amp;1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
       </div>
-      
+
       <?
     }
     // Else if this is the View Players page, show the appropriate content
     elseif ($this_current_token == 'players'){
       ?>
-      
+
       <div id="game_frames" class="field" style="height: 600px;">
         <iframe name="edit_players" src="frames/edit_players.php?action=players&amp;1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
       </div>
-      
+
       <?
     }
     // Else if this is the View Starforce page, show the appropriate content
     elseif ($this_current_token == 'starforce'){
       ?>
-      
+
       <div id="game_frames" class="field" style="height: 600px;">
         <iframe name="edit_starforce" src="frames/starforce.php?1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
       </div>
-      
+
       <?
     }
     // Else if this is the View Database page, show the appropriate content
     elseif ($this_current_token == 'database'){
       ?>
-      
+
       <div id="game_frames" class="field" style="height: 600px;">
         <iframe name="database" src="frames/database.php?1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
       </div>
-      
+
       <?
     }
-    
+
     ?>
-    
+
   </div>
 <? } ?>
 
