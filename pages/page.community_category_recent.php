@@ -23,7 +23,7 @@ $this_graph_data['description'] = strip_tags($this_category_info['category_descr
 
 // Update the MARKUP variables for this page
 //$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
-  
+
 // Define the ORDER BY string based on category key
 if ($this_category_info['category_token'] != 'news'){ $temp_order_by = 'threads.thread_sticky DESC, threads.thread_mod_date DESC, threads.thread_date DESC'; }
 else { $temp_order_by = 'threads.thread_sticky DESC, threads.thread_date DESC'; }
@@ -152,7 +152,7 @@ $temp_threads_shown = 0;
 $temp_update_session_ids = array();
 if (!empty($this_threads_array)){
   foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
-    
+
     // Define this thread's session tracker token
     $temp_session_token = $this_thread_info['thread_id'].'_';
     $temp_session_token .= !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date'];
@@ -163,7 +163,7 @@ if (!empty($this_threads_array)){
     $temp_new_views = $temp_current_views + 1;
     //$temp_update_session = $DB->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
     $temp_update_session_ids[] = $this_thread_info['thread_id'];
-    
+
     // Update the temp date group if necessary
     $temp_thread_date = !empty($this_thread_info['thread_date']) ? $this_thread_info['thread_date'] : mktime(0, 0, 1, 1, 1, 2011);
     $temp_thread_mod_date = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $temp_thread_date;
@@ -173,7 +173,7 @@ if (!empty($this_threads_array)){
     if ($temp_date_group != $this_date_group){
       $this_date_group = $temp_date_group;
     }
-    
+
     // Define the temporary display variables
     $temp_category_id = $this_thread_info['category_id'];
     $temp_category_token = $this_thread_info['category_token'];
@@ -190,7 +190,7 @@ if (!empty($this_threads_array)){
     $temp_posts_count = !empty($this_thread_info['post_count']) ? $this_thread_info['post_count'] : 0;
     $temp_thread_timestamp = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date'];
     $temp_thread_link = 'community/'.$temp_category_token.'/'.$temp_thread_id.'/'.$temp_thread_token.'/';
-    
+
     // Define the avatar class and path variables
     $temp_avatar_frame = !empty($this_thread_info['thread_frame']) ? $this_thread_info['thread_frame'] : '00';
     $temp_avatar_path = !empty($this_thread_info['user_image_path']) ? $this_thread_info['user_image_path'] : 'robots/mega-man/40';
@@ -201,7 +201,17 @@ if (!empty($this_threads_array)){
     $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_'.$temp_avatar_frame;
     $temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_right_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
     $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_avatar.png?'.MMRPG_CONFIG_CACHE_DATE;
-    
+
+    $temp_is_contributor = in_array($this_thread_info['role_token'], array('developer', 'administrator', 'moderator', 'contributor')) ? true : false;
+    if ($temp_is_contributor){
+      $temp_item_class = 'sprite sprite_80x80 sprite_80x80_00';
+      $temp_item_path = 'images/abilities/item-'.(!empty($this_thread_info['role_icon']) ? $this_thread_info['role_icon'] : 'energy-pellet' ).'/icon_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+      $temp_item_title = !empty($this_thread_info['role_name']) ? $this_thread_info['role_name'] : 'Contributor';
+    }
+
+    $temp_is_online = false;
+    foreach ($temp_leaderboard_online AS $key => $info){ if ($info['id'] == $this_thread_info['user_id']){ $temp_is_online = true; break; } }
+
     // Define if this post is new to the logged in user or not
     $temp_is_new = false;
     // Supress the new flag if thread has already been viewed
@@ -224,8 +234,8 @@ if (!empty($this_threads_array)){
     }
     // If this is not new, continue
     if (!$temp_is_new){ continue; }
-    
-    
+
+
     ?>
     <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" class="subbody thread_subbody thread_subbody_small thread_subbody_small_nohover thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>" style="text-align: left; <?= $this_thread_key == 0 ? 'margin: 2px 0 4px; ' : 'margin: 30px 0 4px; ' ?>">
       <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 60px 60px;">
@@ -238,7 +248,7 @@ if (!empty($this_threads_array)){
       <div class="text thread_linkblock">
         <a class="link" href="<?= $temp_thread_link ?>"><span><?= $temp_thread_name ?></span></a>
         <div class="info">
-          <strong data-tooltip-type="player_type_<?= $temp_avatar_colour ?>" title="<?= $temp_thread_author.($temp_is_contributor ? ' | '.$temp_item_title : ' | Player').($temp_is_online ? ' | Online' : '') ?>" class="player_type player_type_<?= $temp_thread_author_colour ?>"><?= $temp_thread_author ?></strong>
+          <strong data-tooltip-type="player_type player_type_<?= $temp_thread_author_colour ?>" title="<?= $temp_thread_author.($temp_is_contributor ? ' | '.$temp_item_title : ' | Player').($temp_is_online ? ' | Online' : '') ?>" class="player_type player_type_<?= $temp_thread_author_colour ?>"><?= $temp_thread_author ?></strong>
           <?= $this_thread_info['thread_target'] != 0 ? 'to <strong class="player_type player_type_'.$temp_target_thread_author_colour.'">'.$temp_target_thread_author.'</strong>' : '' ?>
           on <strong><?= $temp_thread_date ?></strong>
         </div>
@@ -250,7 +260,7 @@ if (!empty($this_threads_array)){
       </div>
     </div>
     <?
-        
+
     /*
     // Collect any posts for this specific thread from the database
     $this_posts_query = "SELECT posts.*, users.*
@@ -262,10 +272,10 @@ if (!empty($this_threads_array)){
     //$this_posts_count = !empty($this_posts_array) ? count($this_posts_array) : 0;
     $this_posts_count = $DB->get_value("SELECT COUNT(1) AS post_count FROM mmrpg_posts AS posts WHERE posts.thread_id = '{$this_thread_info['thread_id']}' AND posts.post_deleted = 0", 'post_count');
     */
-    
+
     // Collect all the posts for this specific thread from the global array
     $this_thread_posts_array = !empty($this_posts_array[$this_thread_info['thread_id']]) ? $this_posts_array[$this_thread_info['thread_id']] : array();
-    
+
     // Loop through all the posts and display them in reverse order
     if (!empty($this_thread_posts_array)){
       ?>
@@ -284,7 +294,7 @@ if (!empty($this_threads_array)){
           $this_post_float = 'right';
           $this_post_direction = 'left';
         }
-  
+
         // Define the temporary display variables
         $temp_post_guest = $this_post_info['user_id'] == MMRPG_SETTINGS_GUEST_ID ? true : false;
         $temp_post_author = !empty($this_post_info['user_name_public']) ? $this_post_info['user_name_public'] : $this_post_info['user_name'];
@@ -297,7 +307,7 @@ if (!empty($this_threads_array)){
         $temp_post_body = $this_post_info['post_body'];
         $temp_post_title = '#'.$this_post_info['user_id'].' : '.$temp_post_author;
         $temp_post_timestamp = !empty($this_post_info['post_mod']) ? $this_post_info['post_mod'] : $this_post_info['post_date'];
-          
+
         // Define if this post is new to the logged in user or not
         $temp_is_new = false;
         // Supress the new flag if thread has already been viewed
@@ -317,7 +327,7 @@ if (!empty($this_threads_array)){
         }
         // If this is not new, continue
         if (!$temp_is_new){ continue; }
-        
+
         // Define the avatar class and path variables
         $temp_avatar_frame = !empty($this_post_info['post_frame']) ? $this_post_info['post_frame'] : '00';
         $temp_avatar_path = !empty($this_post_info['user_image_path']) ? $this_post_info['user_image_path'] : 'robots/mega-man/40';
@@ -329,17 +339,17 @@ if (!empty($this_threads_array)){
         $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_'.$temp_avatar_frame;
         $temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_right_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
         $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_avatar.png?'.MMRPG_CONFIG_CACHE_DATE;
-        
+
         $temp_is_contributor = in_array($this_post_info['role_token'], array('developer', 'administrator', 'moderator', 'contributor')) ? true : false;
         if ($temp_is_contributor){
           $temp_item_class = 'sprite sprite_40x40 sprite_40x40_00';
           $temp_item_path = 'images/abilities/item-'.(!empty($this_post_info['role_icon']) ? $this_post_info['role_icon'] : 'energy-pellet' ).'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
           $temp_item_title = !empty($this_post_info['role_name']) ? $this_post_info['role_name'] : 'Contributor';
         }
-        
+
         // Define the temporary online variables
         $temp_last_modified = !empty($this_post_info['user_date_modified']) ? $this_post_info['user_date_modified'] : 0;
-    
+
         // Check if the thread creator is currently online
         $temp_is_online = false;
         foreach ($temp_leaderboard_online AS $key => $info){ if ($info['id'] == $this_post_info['user_id']){ $temp_is_online = true; break; } }
@@ -350,10 +360,10 @@ if (!empty($this_threads_array)){
         // Collect the post count for this user
         if ($this_post_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_post_info['post_count'] = !empty($this_user_postcount[$this_post_info['user_id']]) ? $this_user_postcount[$this_post_info['user_id']]['post_count'] : 0; }
         else { $this_post_info['post_count'] = false; }
-  
+
         //die(print_r($this_user_postcount[$this_userinfo['user_id']], true));
         //echo print_r($this_user_postcount[$this_post_info['user_id']], true);
-  
+
         ?>
         <div id="post-<?= $this_post_info['post_id'] ?>" data-key="<?= $this_post_key ?>" title="<?= !empty($this_post_info['post_deleted']) ? ($temp_post_author.' on '.str_replace(' ', '&nbsp;', $temp_post_date)) : '' ?>" class="subbody post_subbody post_subbody_left <?= !empty($this_post_info['post_deleted']) ? 'post_subbody_deleted' : '' ?> post_left" style="<?= !empty($this_post_info['post_deleted']) ? 'margin-top: 0; padding: 0 10px; background-color: transparent; float: left; ' : 'clear: left; ' ?>">
           <? if(empty($this_post_info['post_deleted'])): ?>
@@ -371,7 +381,7 @@ if (!empty($this_threads_array)){
                 <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -10px; <?= $this_post_float ?>: -14px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
                 <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_thread_author ?></div>
               </div>
-            
+
               <? $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['board_points']) ? $this_user_countindex[$this_post_info['user_id']]['board_points'] : 0; ?>
               <div class="counter points_counter"><?= number_format($temp_stat, 0, '.', ',').' BP' ?></div>
               <div class="counter community_counters">
@@ -380,7 +390,7 @@ if (!empty($this_threads_array)){
                 <? $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['post_count']) ? $this_user_countindex[$this_post_info['user_id']]['post_count'] : 0; ?>
                 <span class="post_counter"><?= $temp_stat.' PP' ?></span>
               </div>
-              
+
             </div>
             <div class="postblock">
               <div class="published" title="<?= $temp_post_author.' on '.str_replace(' ', '&nbsp;', $temp_post_date) ?>">
@@ -406,24 +416,24 @@ if (!empty($this_threads_array)){
       ?>
       </div>
       <?
-      
+
       // Increment the posts show counter
       $temp_posts_shown++;
-      
+
     }
-    
+
     // Increment the threads show counter
     $temp_threads_shown++;
-    
+
   }
-  
+
   // Update all the threads that require it with a view count
   if (!MMRPG_CONFIG_DEBUG_MODE){
     $temp_update_session_ids = implode(', ', $temp_update_session_ids);
     $temp_update_session = $DB->query("UPDATE mmrpg_threads SET thread_views = (thread_views + 1) WHERE thread_id IN ({$temp_update_session_ids});");
   }
-  
-  
+
+
 }
 
 // Otherwise, if there's nothing to show
