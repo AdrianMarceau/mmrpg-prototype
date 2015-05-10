@@ -13,15 +13,77 @@ elseif ($this_robot_class == 'master'){
   $temp_battle_omega = mmrpg_battle::get_index_info('bonus-prototype-complete-2');
   $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field II';
 }
+// Populate the player's target robots with compatible class matches
+$temp_battle_omega['battle_target_player']['player_robots'] = array();
+$temp_counter = 0;
+foreach ($this_robot_index AS $token => $info){
+  if (empty($info['robot_flag_complete']) || $info['robot_class'] != $this_robot_class){ continue; }
+  $temp_counter++;
+  $temp_robot_info = array();
+  $temp_robot_info['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $temp_counter;
+  $temp_robot_info['robot_token'] = $info['robot_token'];
+  $temp_robot_info['robot_core'] = $info['robot_core'];
+  $temp_robot_info['robot_core2'] = $info['robot_core2'];
+  $temp_battle_omega['battle_target_player']['player_robots'][] = $temp_robot_info;
+}
+//die('<pre>player_robots '.print_r($temp_battle_omega['battle_target_player']['player_robots'], true).'</pre>');
+// Continue defining battle variables for this mission
 $temp_battle_omega['flags']['bonus_battle'] = true;
 $temp_battle_omega['battle_token'] = $temp_battle_token;
 $temp_battle_omega['battle_size'] = '1x4';
 $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
-if ($this_robot_class == 'mecha'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERROBOT * $this_robot_count; }
-elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERMECHA * $this_robot_count; }
+if ($this_robot_class == 'mecha'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERMECHA * $this_robot_count; }
+elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERROBOT * $this_robot_count; }
 //$temp_battle_omega['battle_points'] = ceil(($this_prototype_data['battles_complete'] > 1 ? 100 : 1000) * $temp_rand_num);
+//shuffle($temp_battle_omega['battle_target_player']['player_robots']);
+
+
+// Create the randomized field multupliers
+$temp_types = $mmrpg_index['types'];
+$temp_allow_special = array(); //, 'damage', 'recovery', 'experience'
+foreach ($temp_types AS $key => $temp_type){ if (!empty($temp_type['type_class']) && $temp_type['type_class'] == 'special' && !in_array($temp_type['type_token'], $temp_allow_special)){ unset($temp_types[$key]); } }
+//$temp_battle_omega['battle_field_base']['field_multipliers']['experience'] = round((mt_rand(200, 300) / 100), 1);
+//$temp_battle_omega['battle_field_base']['field_type'] = $temp_types[array_rand($temp_types)]['type_token'];
+//do { $temp_battle_omega['battle_field_base']['field_type2'] = $temp_types[array_rand($temp_types)]['type_token'];
+//} while($temp_battle_omega['battle_field_base']['field_type2'] == $temp_battle_omega['battle_field_base']['field_type']);
+$temp_battle_omega['battle_field_base']['field_multipliers'] = array();
+while (count($temp_battle_omega['battle_field_base']['field_multipliers']) < 6){
+  $temp_type = $temp_types[array_rand($temp_types)];
+  $temp_multiplier = 1;
+  while ($temp_multiplier == 1){ $temp_multiplier = round((mt_rand(10, 990) / 100), 1); }
+  $temp_battle_omega['battle_field_base']['field_multipliers'][$temp_type['type_token']] = $temp_multiplier;
+  //if (count($temp_battle_omega['battle_field_base']['field_multipliers']) >= 6){ break; }
+}
+
+
+// Update the field type based on multipliers
+$temp_multipliers = $temp_battle_omega['battle_field_base']['field_multipliers'];
+asort($temp_multipliers);
+$temp_multipliers = array_keys($temp_multipliers);
+$temp_battle_omega['battle_field_base']['field_type'] = array_pop($temp_multipliers);
+$temp_battle_omega['battle_field_base']['field_type2'] = array_pop($temp_multipliers);
+
+// Collect the field types into a simple array
+$temp_field_types = array($temp_battle_omega['battle_field_base']['field_type'], $temp_battle_omega['battle_field_base']['field_type2']);
+
+// Give the robots a quick shuffle before sorting by core
 shuffle($temp_battle_omega['battle_target_player']['player_robots']);
+//die('<pre>player_robots '.print_r($temp_battle_omega['battle_target_player']['player_robots'], true).'</pre>');
+
+// Sort the robots by their relevance to the field type
+usort($temp_battle_omega['battle_target_player']['player_robots'], function($r1, $r2) use ($temp_field_types, $this_robot_index){
+  //global $temp_field_types, $this_robot_index;
+  $r1_core = !empty($r1['robot_core']) ? $r1['robot_core'] : '';
+  $r2_core = !empty($r2['robot_core']) ? $r2['robot_core'] : '';
+  if (in_array($r1_core, $temp_field_types) && !in_array($r2_core, $temp_field_types)){ return -1; }
+  elseif (!in_array($r1_core, $temp_field_types) && in_array($r2_core, $temp_field_types)){ return 1; }
+  else { return 0; }
+});
+
+//die('<pre>field_types = '.implode(', ', $temp_field_types).' | player_robots '.print_r($temp_battle_omega['battle_target_player']['player_robots'], true).'</pre>');
+
 $temp_battle_omega['battle_target_player']['player_robots'] = array_slice($temp_battle_omega['battle_target_player']['player_robots'], 0, $this_robot_count);
+$temp_battle_omega['battle_robot_limit'] = MMRPG_SETTINGS_BATTLEROBOTS_SELECT_MAX;
 
 // Calculate what level these bonus robots should be in the range of
 $temp_player_rewards = mmrpg_prototype_player_rewards($this_prototype_data['this_player_token']);
@@ -57,30 +119,7 @@ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] /
 //elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10); }
 //elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10); }
 
-// Create the randomized field multupliers
-$temp_types = $mmrpg_index['types'];
-$temp_allow_special = array(); //, 'damage', 'recovery', 'experience'
-foreach ($temp_types AS $key => $temp_type){ if (!empty($temp_type['type_class']) && $temp_type['type_class'] == 'special' && !in_array($temp_type['type_token'], $temp_allow_special)){ unset($temp_types[$key]); } }
-//$temp_battle_omega['battle_field_base']['field_multipliers']['experience'] = round((mt_rand(200, 300) / 100), 1);
-//$temp_battle_omega['battle_field_base']['field_type'] = $temp_types[array_rand($temp_types)]['type_token'];
-//do { $temp_battle_omega['battle_field_base']['field_type2'] = $temp_types[array_rand($temp_types)]['type_token'];
-//} while($temp_battle_omega['battle_field_base']['field_type2'] == $temp_battle_omega['battle_field_base']['field_type']);
-
-$temp_battle_omega['battle_field_base']['field_multipliers'] = array();
-while (count($temp_battle_omega['battle_field_base']['field_multipliers']) < 6){
-  $temp_type = $temp_types[array_rand($temp_types)];
-  $temp_multiplier = 1;
-  while ($temp_multiplier == 1){ $temp_multiplier = round((mt_rand(10, 990) / 100), 1); }
-  $temp_battle_omega['battle_field_base']['field_multipliers'][$temp_type['type_token']] = $temp_multiplier;
-  //if (count($temp_battle_omega['battle_field_base']['field_multipliers']) >= 6){ break; }
-}
-
-// Update the field type based on multipliers
-$temp_multipliers = $temp_battle_omega['battle_field_base']['field_multipliers'];
-asort($temp_multipliers);
-$temp_multipliers = array_keys($temp_multipliers);
-$temp_battle_omega['battle_field_base']['field_type'] = array_pop($temp_multipliers);
-$temp_battle_omega['battle_field_base']['field_type2'] = array_pop($temp_multipliers);
+// types used to be here
 
 // Update the field music to a random boss theme from MM1-10 + MM&B
 $temp_music_number = mt_rand(1, 11);
@@ -89,10 +128,10 @@ $temp_battle_omega['battle_field_base']['field_music'] = $temp_music_name;
 
 // Add some random item drops to the starter battle
 $temp_battle_omega['battle_rewards']['items'] = array(
-  array('chance' => 20, 'token' => 'item-energy-tank'),
-  array('chance' => 20, 'token' => 'item-weapon-tank'),
-  array('chance' => 10, 'token' => 'item-yashichi'),
-  array('chance' => 20, 'token' => 'item-extra-life')
+  array('chance' => 2, 'token' => 'item-energy-tank'),
+  array('chance' => 2, 'token' => 'item-weapon-tank'),
+  array('chance' => 1, 'token' => 'item-yashichi'),
+  array('chance' => 1, 'token' => 'item-extra-life')
   );
 
 ?>

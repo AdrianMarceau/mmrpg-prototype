@@ -2,31 +2,31 @@
 // Define a function for saving the game session
 function mmrpg_save_game_session($this_save_filepath){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Reference global variables
   global $DB;
   $session_token = mmrpg_game_token();
   $mmrpg_index_players = &$GLOBALS['mmrpg_index']['players'];
-  
+
   // Do NOT load, save, or otherwise alter the game file while viewing remote
   if (defined('MMRPG_REMOTE_GAME')){ return true; }
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Update the last saved value
   $_SESSION[$session_token]['values']['last_save'] = time();
-  
+
   // DEBUG
   //echo 'I\'ve been asked to save ';
-  
+
   // If this is NOT demo mode, load from database
   if (empty($_SESSION[$session_token]['DEMO'])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // UPDATE DATABASE INFO
-    
+
     // DEBUG
     //echo 'and we\'re NOT in demo mode';
-    
+
     // Collect the save info
     $save = $_SESSION[$session_token];
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -41,7 +41,7 @@ function mmrpg_save_game_session($this_save_filepath){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     unset($save);
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Collect this user's ID from the database if not set
     if (!isset($this_user['userid'])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -51,15 +51,15 @@ function mmrpg_save_game_session($this_save_filepath){
       // If the user ID was found, collect it and proceed as normal
       if (!empty($temp_value)){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
         // Update the ID in the user array and continue
         $this_user['userid'] = $temp_value;
-        
+
       }
       // Otherwise, create database rows for this new file
       else {
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
         // Generate new user, save, and board IDs for this listing
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_user_id = $DB->get_value('SELECT MAX(user_id) AS user_id FROM mmrpg_users WHERE user_id < '.MMRPG_SETTINGS_GUEST_ID, 'user_id') + 1;
@@ -68,7 +68,7 @@ function mmrpg_save_game_session($this_save_filepath){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_board_id = $DB->get_value('SELECT MAX(board_id) AS board_id FROM mmrpg_leaderboard', 'board_id') + 1;
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
         // Generate the USER details for import
         $temp_user_array = array();
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -85,6 +85,7 @@ function mmrpg_save_game_session($this_save_filepath){
         $temp_user_array['user_image_path'] = !empty($this_user['imagepath']) ? $this_user['imagepath'] : '';
         $temp_user_array['user_background_path'] = !empty($this_user['backgroundpath']) ? $this_user['backgroundpath'] : '';
         $temp_user_array['user_colour_token'] = !empty($this_user['colourtoken']) ? $this_user['colourtoken'] : '';
+        $temp_user_array['user_game_difficulty'] = !empty($this_user['difficulty']) ? $this_user['difficulty'] : 'normal';
         $temp_user_array['user_gender'] = !empty($this_user['gender']) ? $this_user['gender'] : '';
         $temp_user_array['user_email_address'] = !empty($this_user['emailaddress']) ? $this_user['emailaddress'] : '';
         $temp_user_array['user_website_address'] = !empty($this_user['websiteaddress']) ? $this_user['websiteaddress'] : '';
@@ -93,7 +94,7 @@ function mmrpg_save_game_session($this_save_filepath){
         $temp_user_array['user_date_modified'] = time();
         $temp_user_array['user_date_birth'] = !empty($this_user['dateofbirth']) ? $this_user['dateofbirth'] : 0;
         $temp_user_array['user_flag_approved'] = !empty($this_user['approved']) ? 1 : 0;
-        
+
         // Generate the BOARD details for import
         $temp_board_array = array();
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -167,7 +168,7 @@ function mmrpg_save_game_session($this_save_filepath){
             $temp_board_array['board_battles_'.$player_database_token] = !empty($temp_board_array['board_battles_'.$player_database_token]) ? implode(',', $temp_board_array['board_battles_'.$player_database_token]) : '';
           }
         }
-        
+
         if (!empty($this_stars)){
           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           foreach ($this_stars AS $temp_star_token => $temp_star_info){
@@ -176,16 +177,16 @@ function mmrpg_save_game_session($this_save_filepath){
             $temp_board_array['board_stars_'.$temp_star_player] += 1;
           }
         }
-      
+
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_board_array['board_robots'] = !empty($temp_board_array['board_robots']) ? implode(',', $temp_board_array['board_robots']) : '';
         $temp_board_array['board_battles'] = !empty($temp_board_array['board_battles']) ? implode(',', $temp_board_array['board_battles']) : '';
         $temp_board_array['board_date_created'] = $temp_user_array['user_date_created'];
         $temp_board_array['board_date_modified'] = $temp_user_array['user_date_modified'];
-        
+
         // DEBUG DEBUG DEBUG
         //die('<pre>$temp_board_array : '.print_r($temp_board_array, true).'</pre>');
-                
+
         // Generate the SAVE details for import
         $temp_save_array = array();
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -276,7 +277,7 @@ function mmrpg_save_game_session($this_save_filepath){
         $temp_save_array['save_date_created'] = $temp_user_array['user_date_created'];
         $temp_save_array['save_date_accessed'] = $temp_user_array['user_date_accessed'];
         $temp_save_array['save_date_modified'] = $temp_user_array['user_date_modified'];
-        
+
         // Insert these users into the database
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_user_array_return = $DB->insert('mmrpg_users', $temp_user_array);
@@ -285,16 +286,16 @@ function mmrpg_save_game_session($this_save_filepath){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         unset($temp_user_array, $temp_save_array, $temp_board_array);
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                
+
         // Update the ID in the user array and continue
         $this_user['userid'] = $temp_user_id;
-        
+
       }
     }
-    
+
     // DEBUG
     $DEBUG = '';
-    
+
     // Define the user database update array and populate
     $temp_user_array = array();
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -322,12 +323,12 @@ function mmrpg_save_game_session($this_save_filepath){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     unset($temp_user_array);
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // DEBUG
     //$DEBUG .= '$DB->update(\'mmrpg_users\', $temp_user_array, \'user_id = \'.$this_user[\'userid\']);';
     //$DEBUG .= '<pre>$temp_user_array = '.print_r($temp_user_array, true).'</pre>';
     //$DEBUG .= '<pre>$this_user = '.print_r($this_user, true).'</pre>';
-    
+
     // Define the board database update array and populate
     $temp_board_array = array();
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -347,7 +348,7 @@ function mmrpg_save_game_session($this_save_filepath){
     $temp_board_array['board_missions_dr_wily'] = 0;
     $temp_board_array['board_missions_dr_cossack'] = 0;
     $temp_board_array['board_awards'] = !empty($this_values['prototype_awards']) ? array_keys($this_values['prototype_awards']) : '';
-    
+
     $temp_board_ability_tokens = array();
     if (!empty($this_values['battle_rewards'])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -401,7 +402,7 @@ function mmrpg_save_game_session($this_save_filepath){
         $temp_board_array['board_battles_'.$player_database_token] = !empty($temp_board_array['board_battles_'.$player_database_token]) ? implode(',', $temp_board_array['board_battles_'.$player_database_token]) : '';
       }
     }
-    
+
     if (!empty($this_stars)){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($this_stars AS $temp_star_token => $temp_star_info){
@@ -410,23 +411,23 @@ function mmrpg_save_game_session($this_save_filepath){
         $temp_board_array['board_stars_'.$temp_star_player] += 1;
       }
     }
-    
+
     //$temp_board_array['board_robots'] = json_encode($temp_board_array['board_robots']);
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_board_array['board_robots'] = !empty($temp_board_array['board_robots']) ? implode(',', $temp_board_array['board_robots']) : '';
     $temp_board_array['board_battles'] = !empty($temp_board_array['board_battles']) ? implode(',', $temp_board_array['board_battles']) : '';
     $temp_board_array['board_awards'] = !empty($temp_board_array['board_awards']) ? implode(',', $temp_board_array['board_awards']) : '';
     $temp_board_array['board_date_modified'] = time();
-    
+
     // DEBUG DEBUG DEBUG
     //die('<pre>$temp_board_array : '.print_r($temp_board_array, true).'</pre>');
-    
+
     // Update this board's info in the database
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $DB->update('mmrpg_leaderboard', $temp_board_array, 'user_id = '.$this_user['userid']);
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     unset($temp_board_array);
-    
+
     // Clear any leaderboard data that exists in the session, forcing it to recache
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (isset($_SESSION[$session_token]['BOARD']['boardrank'])){ unset($_SESSION[$session_token]['BOARD']['boardrank']); }
@@ -525,26 +526,26 @@ function mmrpg_save_game_session($this_save_filepath){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     unset($temp_save_array);
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // DEBUG
     //$DEBUG .= '$DB->update(\'mmrpg_saves\', $temp_save_array, \'user_id = \'.$this_user[\'userid\']);';
     //$DEBUG .= '<pre>$temp_save_array = '.print_r($temp_save_array, true).'</pre>';
     //$DEBUG .= '<pre>$this_user = '.print_r($this_user, true).'</pre>';
-    
+
     // DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     //$DEBUG .= '$DB->update(\'mmrpg_leaderboard\', $temp_board_array, \'user_id = \'.$this_user[\'userid\']);';
     //$DEBUG .= '<pre>$temp_board_array = '.print_r($temp_board_array, true).'</pre>';
     //$DEBUG .= '<pre>$this_user = '.print_r($this_user, true).'</pre>';
-    
+
   } else {
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // DEBUG
     //echo 'but we\'re in demo mode';
-    
+
   }
-  
+
   // UPDATE SAVE FILE
   // Always update the save file so we have a backup
   // in case of future bugs with the system
@@ -563,7 +564,7 @@ function mmrpg_save_game_session($this_save_filepath){
   $this_save_file = fopen($this_save_filepath, 'w');
   fwrite($this_save_file, $this_save_content);
   fclose($this_save_file);
-  
+
   // Return true on success
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   return true;
