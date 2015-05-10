@@ -4,6 +4,9 @@ $ability = array(
   'ability_name' => 'Fire Chaser',
   'ability_token' => 'fire-chaser',
   'ability_game' => 'MM01',
+  'ability_group' => 'MM01/Weapons/007',
+  'ability_master' => 'fire-man',
+  'ability_number' => 'DLN-007',
   'ability_description' => 'The user a unleashes a powerful wave of fire that chases the target, inflicting twice as much damage on slower targets but half as much on faster ones&hellip;',
   'ability_type' => 'flame',
   'ability_type2' => 'swift',
@@ -11,17 +14,17 @@ $ability = array(
   'ability_damage' => 24,
   'ability_accuracy' => 94,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
       'success' => array(0, 100, 0, 10, $this_robot->print_robot_name().' unleashes a '.$this_ability->print_ability_name().'!'),
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
@@ -43,7 +46,7 @@ $ability = array(
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
     // Return true on success
     return true;
-      
+
     }
   );
 ?>

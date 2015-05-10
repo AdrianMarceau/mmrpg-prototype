@@ -4,6 +4,9 @@ $ability = array(
   'ability_name' => 'Thunder Strike',
   'ability_token' => 'thunder-strike',
   'ability_game' => 'MM01',
+  'ability_group' => 'MM01/Weapons/008',
+  'ability_master' => 'elec-man',
+  'ability_number' => 'DLN-008',
   'ability_description' => 'The user summons a powerful bolt of electricity that crashes into the target to inflict massive damage!',
   'ability_type' => 'electric',
   'ability_energy' => 4,
@@ -13,7 +16,7 @@ $ability = array(
 
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
     $this_attachment_info = array(
@@ -37,7 +40,7 @@ $ability = array(
     // Attach this ability to the target
     $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
     $target_robot->update_session();
-    
+
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
@@ -56,11 +59,11 @@ $ability = array(
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
     $this_robot->robot_frame = 'base';
     $this_robot->update_session();
-    
+
     // Remove this ability from the target
     unset($target_robot->robot_attachments[$this_attachment_token]);
     $target_robot->update_session();
-    
+
 
     // Return true on success
     return true;

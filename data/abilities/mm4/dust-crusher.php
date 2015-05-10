@@ -4,17 +4,20 @@ $ability = array(
   'ability_name' => 'Dust Crusher',
   'ability_token' => 'dust-crusher',
   'ability_game' => 'MM04',
+  'ability_group' => 'MM04/Weapons/030',
+  'ability_master' => 'dust-man',
+  'ability_number' => 'DCN-030',
   'ability_description' => 'The user collects a piece of stage debris with its powerful vaccuum and then blasts it at the target for massive damage!',
   'ability_type' => 'wind',
   'ability_type2' => 'impact',
-  'ability_energy' => 4,
-  'ability_damage' => 18,
+  'ability_energy' => 8,
+  'ability_damage' => 28,
   'ability_accuracy' => 94,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'summon',
@@ -32,7 +35,7 @@ $ability = array(
       'success' => array(1, 140, 20, 10, $this_robot->print_robot_name().' blasts the '.$this_ability->print_ability_name().' debris at the target!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
@@ -49,10 +52,10 @@ $ability = array(
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-    
+
     // Return true on success
     return true;
-      
+
   }
   );
 ?>

@@ -3,14 +3,15 @@
 $ability = array(
   'ability_name' => 'Large Screw',
   'ability_token' => 'item-screw-large',
-  'ability_game' => 'MM00',
+  'ability_game' => 'MM07',
+  'ability_group' => 'MM00/Items/Screws',
   'ability_class' => 'item',
-  'ability_description' => 'A large metal screw dropped by a defeated master.  This item is loved by a certain robot and can be traded in for a generous amount of Zenny.',
+  'ability_description' => 'A large metal screw dropped by a defeated master.  This item is loved by a certain character and can be traded in for a generous amount of Zenny.',
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
@@ -20,7 +21,7 @@ $ability = array(
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Target this robot's self and show the ability failing
     $this_ability->target_options_update(array(
       'frame' => 'defend',
@@ -29,10 +30,10 @@ $ability = array(
         )
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
-    
+
     // Return true on success
     return true;
-      
+
   }
   );
 ?>

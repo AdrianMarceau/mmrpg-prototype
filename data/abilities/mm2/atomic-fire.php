@@ -4,6 +4,9 @@ $ability = array(
   'ability_name' => 'Atomic Fire',
   'ability_token' => 'atomic-fire',
   'ability_game' => 'MM02',
+  'ability_group' => 'MM02/Weapons/015',
+  'ability_master' => 'heat-man',
+  'ability_number' => 'DWN-015',
   'ability_description' => 'The user unleashes a barrage of fire at the target, dealing damage and raising the user\'s attack by {RECOVERY2}%! This ability has three levels of charge, with damage multiplying on each successive barrage until the limit is reached or another technique is used.',
   'ability_type' => 'flame',
   'ability_energy' => 4,
@@ -12,10 +15,10 @@ $ability = array(
   'ability_recovery2_percent' => true,
   'ability_accuracy' => 95,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     if (!isset($this_robot->robot_attachments[$this_attachment_token])){
@@ -55,7 +58,7 @@ $ability = array(
       $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
       $this_robot->update_session();
     }
-    
+
     /*
     // If this ability is attached, remove it
     $this_attachment_backup = false;
@@ -66,7 +69,7 @@ $ability = array(
       $this_attachment_info['attachment_attack'] = $this_attachment_backup['attachment_attack'];
     }
     */
-    
+
     // Collect the shot power counter if set, otherwise default to level one
     $shot_power = !empty($this_attachment_info['attachment_power']) ? $this_attachment_info['attachment_power'] : 0;
     // Reward successive uses of this ability with boosts in power
@@ -82,13 +85,13 @@ $ability = array(
     }
     // Update this ability's internal shot power counter
     $this_attachment_info['attachment_power'] = $shot_power;
-    
+
     // Update the text and animation frames
     $shot_power_text = 'A flare ';
     $shot_power_frame = 0;
     if ($shot_power == 2){ $shot_power_text = 'A powerful flare '; $shot_power_frame = 1; }
     elseif ($shot_power == 3){ $shot_power_text = 'A massive flare '; $shot_power_frame = 2; }
-    
+
     // If the shot power is charging, attach this ability to the robot
     if ($shot_power < 3){
       if ($shot_power == 1){ $this_attachment_info['ability_frame_animate'] = array(3, 4); }
@@ -103,14 +106,14 @@ $ability = array(
     }
     // Update the robot either way
     $this_robot->update_session();
-    
+
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'throw',
       'success' => array($shot_power_frame, 75 + (25 * $shot_power), 0, 10, $this_robot->print_robot_name().' throws an '.$this_ability->print_ability_name().'!') // [shot_power='.$shot_power.'|attachment_attack='.$this_attachment_info['attachment_attack'].']
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
@@ -127,11 +130,11 @@ $ability = array(
       ));
     $energy_damage_amount = ceil($this_ability->ability_damage * $shot_power);
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-    
+
     // Decrease the target robot's attack stat
     $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->recovery_options_update($this_attachment_info['attachment_create'], true);
-    
+
     // If the shot power has reached its limit, reset
     if ($shot_power >= 3){
       //unset($this_ability->counters['shot_power']);
@@ -159,15 +162,15 @@ $ability = array(
         $this_robot->update_session();
       }
     }
-    
+
     // Either way, update this ability's settings to prevent recovery
     $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->update_session();
-    
+
     // Return true on success
     return true;
-      
+
     }
   );
 ?>

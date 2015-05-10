@@ -3,7 +3,8 @@
 $ability = array(
   'ability_name' => 'Bass Baroque',
   'ability_token' => 'bass-baroque',
-  'ability_game' => 'MM00',
+  'ability_game' => 'MMRPG',
+  'ability_group' => 'MM00/Weapons/Bass',
   'ability_description' => 'The user swiftly summons a dark aura around the target that inflicts massive damage with a {RECOVERY2}% chance of critical hit!',
   'ability_type' => '',
   'ability_energy' => 6,

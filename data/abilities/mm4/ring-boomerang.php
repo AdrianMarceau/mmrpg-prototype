@@ -4,11 +4,14 @@ $ability = array(
   'ability_name' => 'Ring Boomerang',
   'ability_token' => 'ring-boomerang',
   'ability_game' => 'MM04',
+  'ability_group' => 'MM04/Weapons/029',
+  'ability_master' => 'ring-man',
+  'ability_number' => 'DCN-029',
   'ability_description' => 'The user throws a large, boomerang-like ring at the target, striking twice with perfect accuracy and inflicting damage each time!',
   'ability_type' => 'cutter',
   'ability_type2' => 'space',
-  'ability_energy' => 4,
-  'ability_damage' => 10,
+  'ability_energy' => 8,
+  'ability_damage' => 20,
   'ability_accuracy' => 100,
   'ability_function' => function($objects){
 

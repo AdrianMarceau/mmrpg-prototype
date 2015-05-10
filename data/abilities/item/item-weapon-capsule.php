@@ -4,6 +4,7 @@ $ability = array(
   'ability_name' => 'Weapon Capsule',
   'ability_token' => 'item-weapon-capsule',
   'ability_game' => 'MM00',
+  'ability_group' => 'MM00/Items/Weapons',
   'ability_class' => 'item',
   'ability_type' => 'weapons',
   'ability_description' => 'A large ammo capsule that restores 40% weapon energy to one robot on the user\'s side of the field.',
@@ -14,10 +15,10 @@ $ability = array(
   'ability_accuracy' => 100,
   'ability_target' => 'select_this',
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
@@ -27,7 +28,7 @@ $ability = array(
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Increase this robot's life energy stat
     $this_ability->recovery_options_update(array(
       'kind' => 'weapons',
@@ -39,10 +40,10 @@ $ability = array(
       ));
     $weapons_recovery_amount = ceil($target_robot->robot_base_weapons * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $weapons_recovery_amount);
-    
+
     // Return true on success
     return true;
-      
+
   }
   );
 ?>

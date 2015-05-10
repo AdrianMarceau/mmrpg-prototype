@@ -4,23 +4,27 @@ $ability = array(
   'ability_name' => 'Charge Kick',
   'ability_token' => 'charge-kick',
   'ability_game' => 'MM05',
+  'ability_group' => 'MM05/Weapons/038',
+  'ability_master' => 'charge-man',
+  'ability_number' => 'DWN-038',
   'ability_description' => '...',
   'ability_type' => 'swift',
   'ability_type2' => 'impact',
+  'ability_energy' => 8,
   'ability_damage' => 10,
   'ability_accuracy' => 90,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
       'success' => array(0, 75, 0, 10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
@@ -37,10 +41,10 @@ $ability = array(
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-    
+
     // Return true on success
     return true;
-      
+
   }
   );
 ?>

@@ -3,7 +3,8 @@
 $ability = array(
   'ability_name' => 'Proto Strike',
   'ability_token' => 'proto-strike',
-  'ability_game' => 'MM00',
+  'ability_game' => 'MM085',
+  'ability_group' => 'MM00/Weapons/Proto',
   'ability_description' => 'The user unleashes a giant, lightspeed energy blast at the target to inflict massive damage with a {RECOVERY2}% chance of critical hit!',
   'ability_type' => '',
   'ability_energy' => 6,

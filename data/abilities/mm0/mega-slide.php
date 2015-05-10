@@ -3,7 +3,8 @@
 $ability = array(
   'ability_name' => 'Mega Slide',
   'ability_token' => 'mega-slide',
-  'ability_game' => 'MM00',
+  'ability_game' => 'MM03',
+  'ability_group' => 'MM00/Weapons/Mega',
   'ability_description' => 'The user quickly slides toward the target at blinding speed, inflicting damage with a {RECOVERY2}% chance of critical hit!',
   'ability_type' => '',
   'ability_energy' => 6,
