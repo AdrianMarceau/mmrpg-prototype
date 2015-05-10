@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Oil Man',
   'robot_token' => 'oil-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Oil Man (Black Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Oil Man (White Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'earth',
   'robot_description' => 'Slick Sliding Robot',
   'robot_field' => 'oil-wells',
@@ -18,10 +22,10 @@ $robot = array(
   'robot_abilities' => array(
   	'oil-shooter', 'oil-slider',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),
@@ -29,7 +33,7 @@ $robot = array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
         array('level' => 0, 'token' => 'oil-shooter'),
-        array('level' => 6, 'token' => 'oil-slider')
+        array('level' => 10, 'token' => 'oil-slider')
       )
     ),
   'robot_quotes' => array(

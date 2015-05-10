@@ -7,6 +7,10 @@ $robot = array(
   'robot_token' => 'needle-man',
   'robot_image_editor' => 110,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Needle Man (Magenta Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Needle Man (Emerald Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'cutter',
   'robot_field' => 'construction-site',
   'robot_description' => 'Deadly Spikes Robot',
@@ -19,10 +23,10 @@ $robot = array(
   'robot_abilities' => array(
   	'needle-cannon',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

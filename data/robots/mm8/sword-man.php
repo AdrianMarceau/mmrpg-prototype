@@ -5,7 +5,7 @@ $robot = array(
   'robot_game' => 'MM08',
   'robot_name' => 'Sword Man',
   'robot_token' => 'sword-man',
-  'robot_core' => 'flame',
+  'robot_core' => 'cutter',
   'robot_description' => 'Noble Swordsman Robot',
   'robot_energy' => 100,
   'robot_attack' => 100,
@@ -16,10 +16,10 @@ $robot = array(
   'robot_abilities' => array(
   	'flame-sword',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

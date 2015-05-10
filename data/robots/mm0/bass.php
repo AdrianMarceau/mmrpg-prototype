@@ -36,10 +36,8 @@ $robot = array(
     'abilities' => array(
       array('level' => 0, 'token' => 'buster-shot'), // = 10
       array('level' => 12, 'token' => 'bass-buster'), // +2
-      array('level' => 16, 'token' => 'copy-shot'), // +4
-      array('level' => 22, 'token' => 'bass-crush'), // +6
-      array('level' => 30, 'token' => 'bass-baroque'), // +8
-      //array('level' => 40, 'token' => 'mirror-move') // +10
+      array('level' => 16, 'token' => 'bass-crush'), // +4
+      array('level' => 22, 'token' => 'bass-baroque') // +6
       )
     ),
   'robot_quotes' => array(

@@ -1,8 +1,9 @@
 <?
 // SHIELD MAN
 $robot = array(
-  'robot_number' => 'PCR-008',
+  'robot_number' => 'PCR-00S',
   'robot_game' => 'MM19',
+  'robot_group' => 'MMAZ/Masters/MM19B',
   'robot_name' => 'Shield Man',
   'robot_token' => 'shield-man',
   'robot_core' => 'shield',
@@ -26,8 +27,8 @@ $robot = array(
     ),
   'robot_rewards' => array(
     'abilities' => array(
-        array('level' => 0, 'token' => 'buster-shot'),
-        //array('level' => 0, 'token' => 'plant-barrier')
+        array('level' => 0, 'token' => 'clear-shield'),
+        array('level' => 10, 'token' => 'gradient-shield')
       )
     ),
   'robot_quotes' => array(

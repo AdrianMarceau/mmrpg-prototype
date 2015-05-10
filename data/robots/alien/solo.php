@@ -1,10 +1,11 @@
 <?
 // SOLO
 $robot = array(
-  'robot_number' => 'EXN-001',
+  'robot_number' => 'EXN-003',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Solo',
   'robot_token' => 'solo',
+  'robot_class' => 'boss',
   'robot_core' => 'space',
   'robot_description' => 'Intergalactic Chairman',
   'robot_energy' => 100,

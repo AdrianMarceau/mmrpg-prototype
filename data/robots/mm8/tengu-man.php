@@ -16,10 +16,10 @@ $robot = array(
   'robot_abilities' => array(
   	'tornado-hold', 'tengu-blade',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

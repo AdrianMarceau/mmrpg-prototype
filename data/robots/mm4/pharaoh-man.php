@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Pharaoh Man',
   'robot_token' => 'pharaoh-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Pharaoh Man (Cursed Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Pharaoh Man (Blessed Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'flame',
   'robot_field' => 'egyptian-excavation',
   'robot_description' => 'Ancient Investigator Robot',
@@ -17,19 +21,19 @@ $robot = array(
   'robot_weaknesses' => array('time', 'space'), //pharaoh-wave, gemini-laser
   'robot_resistances' => array('shadow', 'flame'),
   'robot_abilities' => array(
-  	'pharaoh-shot', //'pharaoh-wave', 'pharaoh-curse',
+  	'pharaoh-soul', //'pharaoh-wave', 'pharaoh-curse',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),
   'robot_rewards' => array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
-        array('level' => 0, 'token' => 'pharaoh-shot'),
+        array('level' => 0, 'token' => 'pharaoh-soul'),
         //array('level' => 6, 'token' => 'speed-blaze'),
         //array('level' => 10, 'token' => 'pharaoh-wave'),
         //array('level' => 10, 'token' => 'speed-burn'),

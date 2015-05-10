@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Guts Man',
   'robot_token' => 'guts-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Guts Man (Blue Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Guts Man (Green Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'impact',
   'robot_description' => 'Tough Construction Robot',
   'robot_field' => 'mountain-mines',
@@ -18,10 +22,10 @@ $robot = array(
   'robot_abilities' => array(
   	'super-throw', 'super-arm',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),
@@ -29,7 +33,7 @@ $robot = array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
         array('level' => 0, 'token' => 'super-throw'),
-        array('level' => 6, 'token' => 'super-arm')
+        array('level' => 10, 'token' => 'super-arm')
       )
     ),
   'robot_quotes' => array(

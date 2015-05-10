@@ -1,12 +1,13 @@
 <?
 // LASER MAN
 $robot = array(
-  'robot_number' => 'PCR-007',
+  'robot_number' => 'PCR-00L',
   'robot_game' => 'MM19',
+  'robot_group' => 'MMAZ/Masters/MM19B',
   'robot_name' => 'Laser Man',
   'robot_token' => 'laser-man',
   'robot_core' => 'laser',
-  'robot_description' => 'Light Beams Robot',
+  'robot_description' => 'Devastating Lightbeams Robot',
   'robot_energy' => 100,
   'robot_attack' => 100,
   'robot_defense' => 100,
@@ -26,8 +27,8 @@ $robot = array(
     ),
   'robot_rewards' => array(
     'abilities' => array(
-        array('level' => 0, 'token' => 'buster-shot'),
-        //array('level' => 0, 'token' => 'plant-barrier')
+        array('level' => 0, 'token' => 'laser-beam'),
+        array('level' => 10, 'token' => 'laser-bloom')
       )
     ),
   'robot_quotes' => array(

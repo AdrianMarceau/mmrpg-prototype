@@ -1,13 +1,16 @@
 <?
 // COSMO MAN
 $robot = array(
-  'robot_number' => 'EXN-00A',
+  'robot_number' => 'EXN-00∞',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Cosmo Man',
   'robot_token' => 'cosmo-man',
+  'robot_class' => 'boss',
   'robot_core' => 'space',
+  'robot_core2' => 'time',
   'robot_description' => 'Interstellar Command Solaroid',
   'robot_energy' => 100,
+  'robot_weapons' => 90,
   'robot_attack' => 100,
   'robot_defense' => 100,
   'robot_speed' => 100,
@@ -26,8 +29,9 @@ $robot = array(
     ),
   'robot_rewards' => array(
     'abilities' => array(
-        array('level' => 0, 'token' => 'buster-shot'),
-        //array('level' => 0, 'token' => 'plant-barrier')
+        array('level' => 0, 'token' => 'space-shot'),
+        array('level' => 0, 'token' => 'space-buster'),
+        array('level' => 0, 'token' => 'space-overdrive')
       )
     ),
   'robot_quotes' => array(

@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Bright Man',
   'robot_token' => 'bright-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Bright Man (Green Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Bright Man (Purple Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'time',
   'robot_field' => 'lighting-control',
   'robot_description' => 'Bright Thinking Robot',
@@ -19,10 +23,10 @@ $robot = array(
   'robot_abilities' => array(
   	'bright-burst',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

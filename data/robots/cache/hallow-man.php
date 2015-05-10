@@ -1,12 +1,13 @@
 <?
 // HALLOW MAN
 $robot = array(
-  'robot_number' => 'PCR-003',
+  'robot_number' => 'PCR-006',
   'robot_game' => 'MM19',
+  'robot_group' => 'MMAZ/Masters/MM19',
   'robot_name' => 'Hallow Man',
   'robot_token' => 'hallow-man',
   'robot_core' => 'shadow',
-  'robot_description' => 'Shadowy Necromancer Robot',
+  'robot_description' => 'Scary Pumpkin Robot',
   'robot_energy' => 100,
   'robot_attack' => 100,
   'robot_defense' => 100,
@@ -26,8 +27,8 @@ $robot = array(
     ),
   'robot_rewards' => array(
     'abilities' => array(
-        array('level' => 0, 'token' => 'buster-shot'),
-        //array('level' => 0, 'token' => 'plant-barrier')
+        array('level' => 0, 'token' => 'pumpkin-smash'),
+        array('level' => 10, 'token' => 'pumpkin-harvest')
       )
     ),
   'robot_quotes' => array(

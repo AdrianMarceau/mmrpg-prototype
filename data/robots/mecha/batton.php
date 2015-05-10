@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Batton',
   'robot_token' => 'batton',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Batton (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Batton (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'nature',
   'robot_field' => 'preserved-forest',
   'robot_description' => 'Forest Patrol Mecha',

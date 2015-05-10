@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Snake Man',
   'robot_token' => 'snake-man',
   'robot_image_editor' => 110,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Snake Man (Amber Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Snake Man (Crimson Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'nature',
   'robot_field' => 'serpent-column',
   'robot_description' => 'Stealthy Serpent Robot',
@@ -14,14 +18,14 @@ $robot = array(
   'robot_defense' => 100,
   'robot_speed' => 100,
   'robot_weaknesses' => array('cutter', 'electric'), //needle-cannon
-  'robot_resistances' => array('nature', 'missile'),
+  'robot_resistances' => array('nature', 'shadow'),
   'robot_abilities' => array(
   	'search-snake',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

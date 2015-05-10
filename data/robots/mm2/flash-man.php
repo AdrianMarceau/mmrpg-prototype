@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Flash Man',
   'robot_token' => 'flash-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Flash Man (Red Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Flash Man (Green Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'time',
   'robot_description' => 'Temporal Shift Robot',
   'robot_field' => 'photon-collider',
@@ -19,10 +23,10 @@ $robot = array(
   'robot_abilities' => array(
   	'flash-stopper',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

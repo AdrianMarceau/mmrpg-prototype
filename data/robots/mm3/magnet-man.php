@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Magnet Man',
   'robot_token' => 'magnet-man',
   'robot_image_editor' => 110,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Magnet Man (Blue Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Magnet Man (Black Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'missile',
   'robot_field' => 'magnetic-generator',
   'robot_description' => 'Electro Magnetism Robot',
@@ -18,10 +22,10 @@ $robot = array(
   'robot_abilities' => array(
   	'magnet-missile',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

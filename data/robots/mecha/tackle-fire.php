@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Tackle Fire',
   'robot_token' => 'tackle-fire',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Tackle Fire (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Tackle Fire (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'flame',
   'robot_field' => 'steel-mill',
   'robot_description' => 'Burning Spirit Mecha',

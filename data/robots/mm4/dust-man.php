@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Dust Man',
   'robot_token' => 'dust-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Dust Man (Purple Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Dust Man (Green Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'wind',
   'robot_field' => 'rusty-scrapheap',
   'robot_description' => 'Scrap Contracting Robot',
@@ -18,10 +22,10 @@ $robot = array(
   'robot_abilities' => array(
   	'dust-crusher',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

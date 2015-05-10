@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Ice Man',
   'robot_token' => 'ice-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Ice Man (Pink Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Ice Man (Mint Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'freeze',
   'robot_description' => 'Arctic Exploration Robot',
   'robot_field' => 'arctic-jungle',
@@ -19,10 +23,10 @@ $robot = array(
   'robot_abilities' => array(
   	'ice-breath', 'ice-slasher',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),
@@ -30,7 +34,7 @@ $robot = array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
         array('level' => 0, 'token' => 'ice-breath'),
-        array('level' => 6, 'token' => 'ice-slasher')
+        array('level' => 10, 'token' => 'ice-slasher')
       )
     ),
   'robot_quotes' => array(

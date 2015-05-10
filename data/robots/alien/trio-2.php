@@ -1,10 +1,11 @@
 <?
 // TRIO
 $robot = array(
-  'robot_number' => 'EXN-003Χ',
+  'robot_number' => 'EXN-001Χ',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Trio Χ',
   'robot_token' => 'trio-2',
+  'robot_class' => 'boss',
   'robot_core' => 'space',
   'robot_description' => 'Mental Embodiment Weapon',
   'robot_energy' => 100,

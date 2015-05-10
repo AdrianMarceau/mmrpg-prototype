@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Top Man',
   'robot_token' => 'top-man',
   'robot_image_editor' => 110,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Top Man (Purple Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Top Man (Green Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'swift',
   'robot_field' => 'spinning-greenhouse',
   'robot_description' => 'Dizzy Spinning Robot',
@@ -19,10 +23,10 @@ $robot = array(
   'robot_abilities' => array(
   	'top-spin',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

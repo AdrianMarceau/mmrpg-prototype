@@ -6,7 +6,10 @@ $robot = array(
   'robot_name' => 'Bomb Man',
   'robot_token' => 'bomb-man',
   'robot_image_editor' => 412,
-  'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Bomb Man (Green Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Bomb Man (Purple Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'explode',
   'robot_description' => 'Hyper Explosive Robot',
   'robot_field' => 'orb-city',
@@ -20,10 +23,10 @@ $robot = array(
   'robot_abilities' => array(
   	'hyper-bomb', 'danger-bomb',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),
@@ -40,7 +43,7 @@ $robot = array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
         array('level' => 0, 'token' => 'hyper-bomb'),
-        array('level' => 6, 'token' => 'danger-bomb'),
+        array('level' => 10, 'token' => 'danger-bomb'),
         //array('level' => 10, 'token' => 'hyper-bomb'),
       )
     ),

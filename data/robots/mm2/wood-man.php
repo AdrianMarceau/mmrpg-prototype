@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Wood Man',
   'robot_token' => 'wood-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Wood Man (Burnt Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Wood Man (Mossy Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'nature',
   'robot_description' => 'Forest Protector Robot',
   'robot_field' => 'preserved-forest',
@@ -18,10 +22,10 @@ $robot = array(
   'robot_abilities' => array(
   	'leaf-shield',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

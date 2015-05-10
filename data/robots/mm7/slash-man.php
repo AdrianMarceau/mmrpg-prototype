@@ -5,8 +5,8 @@ $robot = array(
   'robot_game' => 'MM07',
   'robot_name' => 'Slash Man',
   'robot_token' => 'slash-man',
-  'robot_core' => 'cutter',
-  'robot_description' => 'Razor Claws Robot',
+  'robot_core' => 'nature',
+  'robot_description' => 'Razor Clawed Robot',
   'robot_energy' => 100,
   'robot_attack' => 100,
   'robot_defense' => 100,
@@ -14,19 +14,19 @@ $robot = array(
   'robot_weaknesses' => array('freeze', 'flame'),
   'robot_immunities' => array('swift'),
   'robot_abilities' => array(
-  	'slash-claw',
+  	'trap-beast',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),
   'robot_rewards' => array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
-        array('level' => 0, 'token' => 'slash-claw')
+        array('level' => 0, 'token' => 'trap-beast')
       )
     ),
   'robot_quotes' => array(

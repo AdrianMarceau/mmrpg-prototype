@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Snapper',
   'robot_token' => 'snapper',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Snapper (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Snapper (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'water',
   'robot_field' => 'waterfall-institute',
   'robot_description' => 'Shifty Crab Mecha',

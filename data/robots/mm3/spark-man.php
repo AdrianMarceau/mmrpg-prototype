@@ -7,6 +7,10 @@ $robot = array(
   'robot_token' => 'spark-man',
   'robot_image_editor' => 110,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Spark Man (Blue Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Spark Man (Yellow Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'electric',
   'robot_field' => 'power-plant',
   'robot_description' => 'Double Spark-Plug Robot',
@@ -19,10 +23,10 @@ $robot = array(
   'robot_abilities' => array(
   	'spark-shock',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

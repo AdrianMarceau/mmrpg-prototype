@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Ribbitron',
   'robot_token' => 'ribbitron',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Ribbitron (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Ribbitron (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'impact',
   'robot_field' => 'septic-system',
   'robot_description' => 'Jumping Frog Mecha',

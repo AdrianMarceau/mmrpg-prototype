@@ -5,6 +5,7 @@ $robot = array(
   'robot_game' => 'MMEXE',
   'robot_name' => 'Duo ω',
   'robot_token' => 'duo-2',
+  'robot_class' => 'boss',
   'robot_core' => 'space',
   'robot_description' => 'Omega Energy Balancer',
   'robot_energy' => 100,

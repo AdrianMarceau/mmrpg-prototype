@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Lady Blader',
   'robot_token' => 'lady-blader',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Lady Blader (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Lady Blader (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'wind',
   'robot_field' => 'rusty-scrapheap',
   'robot_description' => 'Bamboo Copter Mecha',

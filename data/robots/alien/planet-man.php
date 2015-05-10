@@ -1,13 +1,15 @@
 <?
 // PLANET MAN
 $robot = array(
-  'robot_number' => 'EXN-00B',
+  'robot_number' => 'EXN-00Z',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Planet Man',
   'robot_token' => 'planet-man',
+  'robot_class' => 'boss',
   'robot_core' => 'space',
   'robot_description' => 'Interstellar Service Planetoid',
   'robot_energy' => 100,
+  'robot_weapons' => 60,
   'robot_attack' => 100,
   'robot_defense' => 100,
   'robot_speed' => 100,

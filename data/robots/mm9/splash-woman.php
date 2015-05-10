@@ -5,6 +5,7 @@ $robot = array(
   'robot_game' => 'MM09',
   'robot_name' => 'Splash Woman',
   'robot_token' => 'splash-woman',
+  'robot_gender' => 'female',
   'robot_core' => 'water',
   'robot_description' => 'Aquatic Rescue Robot',
   'robot_energy' => 100,
@@ -17,10 +18,10 @@ $robot = array(
   'robot_abilities' => array(
   	'laser-trident',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

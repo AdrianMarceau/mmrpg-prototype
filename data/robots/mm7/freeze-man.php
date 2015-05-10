@@ -5,6 +5,8 @@ $robot = array(
   'robot_game' => 'MM07',
   'robot_name' => 'Freeze Man',
   'robot_token' => 'freeze-man',
+  'robot_image_editor' => 3842,
+  'robot_image_size' => 80,
   'robot_core' => 'freeze',
   'robot_description' => 'Icy Blasts Robot',
   'robot_energy' => 100,
@@ -16,10 +18,10 @@ $robot = array(
   'robot_abilities' => array(
   	'freeze-cracker',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

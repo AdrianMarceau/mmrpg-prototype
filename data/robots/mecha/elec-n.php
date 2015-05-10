@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Elec\'n',
   'robot_token' => 'elec-n',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Elec\'n (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Elec\'n (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'electric',
   'robot_field' => 'power-plant',
   'robot_description' => 'Flying Plug Mecha',

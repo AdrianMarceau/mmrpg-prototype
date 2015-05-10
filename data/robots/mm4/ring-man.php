@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Ring Man',
   'robot_token' => 'ring-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Ring Man (Blue Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Ring Man (Green Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'cutter',
   'robot_field' => 'space-simulator',
   'robot_description' => 'Ring Juggling Robot',
@@ -13,15 +17,15 @@ $robot = array(
   'robot_attack' => 100,
   'robot_defense' => 100,
   'robot_speed' => 100,
-  'robot_weaknesses' => array('flame', 'swift'), //pharaoh-shot,solar-blaze,(leaf-shield)
+  'robot_weaknesses' => array('flame', 'swift'), //pharaoh-soul,solar-blaze,(leaf-shield)
   'robot_resistances' => array('wind'),
   'robot_abilities' => array(
   	'ring-boomerang',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

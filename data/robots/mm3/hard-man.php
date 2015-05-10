@@ -6,6 +6,10 @@ $robot = array(
   'robot_name' => 'Hard Man',
   'robot_token' => 'hard-man',
   'robot_image_editor' => 110,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Hard Man (Golden Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Hard Man (Diamond Alt)', 'summons' => 200)
+    ),
   'robot_image_size' => 80,
   'robot_core' => 'impact',
   'robot_field' => 'rocky-plateau',
@@ -20,10 +24,10 @@ $robot = array(
   'robot_abilities' => array(
   	'hard-knuckle',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

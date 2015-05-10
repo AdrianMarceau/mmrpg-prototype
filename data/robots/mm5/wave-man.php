@@ -14,16 +14,16 @@ $robot = array(
   'robot_attack' => 100,
   'robot_defense' => 100,
   'robot_speed' => 100,
-  'robot_weaknesses' => array('swift', 'missile'), //charge-kick,dive-torpedo
+  'robot_weaknesses' => array('swift', 'missile'), //charge-kick,dive-missile
   'robot_resistances' => array('flame'),
   'robot_immunities' => array('water'),
   'robot_abilities' => array(
   	'water-wave',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

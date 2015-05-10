@@ -5,6 +5,7 @@ $robot = array(
   'robot_game' => 'MMEXE',
   'robot_name' => 'Slur',
   'robot_token' => 'slur',
+  'robot_class' => 'boss',
   'robot_image_size' => 80,
   'robot_image_editor' => 412,
   'robot_core' => 'space',
@@ -13,6 +14,7 @@ $robot = array(
   'robot_attack' => 100,
   'robot_defense' => 100,
   'robot_speed' => 100,
+  'robot_weapons' => 30,
   'robot_weaknesses' => array(),
   'robot_resistances' => array('space', 'freeze', 'flame'),
   'robot_affinities' => array('water', 'electric'),
@@ -30,7 +32,12 @@ $robot = array(
   'robot_rewards' => array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
-        //array('level' => 0, 'token' => 'plant-barrier')
+        //array('level' => 0, 'token' => 'space-shot'),
+        //array('level' => 0, 'token' => 'space-buster'),
+        //array('level' => 0, 'token' => 'space-overdrive'),
+        array('level' => 30, 'token' => 'slur-aura'),
+        array('level' => 60, 'token' => 'slur-twister'),
+        array('level' => 90, 'token' => 'slur-supernova')
       )
     ),
   'robot_quotes' => array(

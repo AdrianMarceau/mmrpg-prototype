@@ -7,6 +7,10 @@ $robot = array(
   'robot_token' => 'toad-man',
   'robot_image_editor' => 18,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Toad Man (Watermelon Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Toad Man (Blueberry Alt)', 'summons' => 200)
+    ),
   'robot_core' => 'water',
   'robot_field' => 'rainy-sewers',
   'robot_description' => 'Hopping Farmer Robot',
@@ -20,10 +24,10 @@ $robot = array(
   'robot_abilities' => array(
   	'rain-flush',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),

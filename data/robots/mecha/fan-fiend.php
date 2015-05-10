@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Fan Fiend',
   'robot_token' => 'fan-fiend',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Fan Fiend (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Fan Fiend (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'wind',
   'robot_field' => 'sky-ridge',
   'robot_description' => 'Gyrating Blades Mecha',

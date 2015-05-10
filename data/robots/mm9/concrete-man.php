@@ -18,17 +18,17 @@ $robot = array(
   'robot_abilities' => array(
   	'concrete-shot',
   	'buster-shot',
-  	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
-  	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
-    'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',
-    'energy-boost', 'energy-break', 'energy-swap', 'repair-mode',
+  	'attack-boost', 'attack-break', 'attack-mode',
+  	'defense-boost', 'defense-break', 'defense-mode',
+    'speed-boost', 'speed-break', 'speed-mode',
+    'energy-boost', 'energy-break', 'repair-mode',
     'field-support', 'mecha-support',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),
   'robot_rewards' => array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
-        array('level' => 0, 'token' => 'concrete-shot')
+        array('level' => 0, 'token' => 'concrete-block')
       )
     ),
   'robot_quotes' => array(
