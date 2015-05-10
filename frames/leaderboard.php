@@ -13,7 +13,7 @@ $session_token = mmrpg_game_token();
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Leaderboard | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+<title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?>View Leaderboard | Mega Man RPG Prototype Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
@@ -86,7 +86,7 @@ function windowResizeLeaderboard(){
 
   var newBodyHeight = windowHeight;
   var newFrameHeight = newBodyHeight - headerHeight;
-  
+
   if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
   else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 
@@ -176,7 +176,7 @@ $(document).ready(function(){
 if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
 // If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_battle-leaderboard-intro';
+$temp_event_flag = 'unlocked-tooltip_battle-leaderboard-intro';
 if (empty($_SESSION[$session_token]['DEMO']) && empty($temp_game_flags[$temp_event_flag])){
   $temp_game_flags[$temp_event_flag] = true;
   ?>

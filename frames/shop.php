@@ -36,23 +36,17 @@ require(MMRPG_CONFIG_ROOTDIR.'data/shop.php');
 
 // Define which shops we're allowed to see
 $allowed_edit_data = $this_shop_index;
-$prototype_player_counter = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
-$prototype_complete_counter = mmrpg_prototype_complete();
-$prototype_battle_counter = mmrpg_prototype_battles_complete('dr-light');
-if ($prototype_complete_counter < 3){ unset($allowed_edit_data['kalinka']); }
-if ($prototype_player_counter < 3){ unset($allowed_edit_data['reggae']); }
-if ($prototype_battle_counter < 1){ unset($allowed_edit_data['auto']); }
+//$prototype_player_counter = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
+//$prototype_complete_counter = mmrpg_prototype_complete();
+//$prototype_battle_counter = mmrpg_prototype_battles_complete('dr-light');
+if (!mmrpg_prototype_event_complete('completed-chapter_dr-light_one')){ unset($allowed_edit_data['auto']); }
+if (!mmrpg_prototype_event_complete('completed-chapter_dr-wily_one')){ unset($allowed_edit_data['reggae']); }
+if (!mmrpg_prototype_event_complete('completed-chapter_dr-cossack_one')){ unset($allowed_edit_data['kalinka']); }
+//if ($prototype_complete_counter < 3){ unset($allowed_edit_data['kalinka']); }
+//if ($prototype_player_counter < 3){ unset($allowed_edit_data['reggae']); }
+//if ($prototype_battle_counter < 1){ unset($allowed_edit_data['auto']); }
 $allowed_edit_data_count = count($allowed_edit_data);
 //die('$prototype_player_counter = '.$prototype_player_counter.'; $allowed_edit_data = <pre>'.print_r($allowed_edit_data, true).'</pre>');
-  
-// DEBUG DEBUG DEBUG
-//$_SESSION[$session_token]['counters']['battle_zenny'] = 500000;
-
-// Define the array to hold all the item quantities
-$global_item_quantities = array();
-$global_item_prices = array();
-$global_zenny_counter = !empty($_SESSION[$session_token]['counters']['battle_zenny']) ? $_SESSION[$session_token]['counters']['battle_zenny'] : 0;
-
 
 // -- PROCESS SHOP SELL ACTION -- //
 
@@ -61,19 +55,21 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Collect the action variables from the request header, if they exist
+  $temp_shop = !empty($_REQUEST['shop']) ? $_REQUEST['shop'] : '';
   $temp_kind = !empty($_REQUEST['kind']) ? $_REQUEST['kind'] : '';
   $temp_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : '';
   $temp_token = !empty($_REQUEST['token']) ? $_REQUEST['token'] : '';
   $temp_quantity = !empty($_REQUEST['quantity']) ? $_REQUEST['quantity'] : 0;
   $temp_price = !empty($_REQUEST['price']) ? $_REQUEST['price'] : 0;
-  
+
   // If key variables are not provided, kill the script in error
+  if (empty($temp_shop)){ die('error|request-error|shop-missing'); }
   if (empty($temp_kind)){ die('error|request-error|kind-missing'); }
   elseif (empty($temp_action)){ die('error|request-error|action-missing'); }
   elseif (empty($temp_token)){ die('error|request-error|token-missing'); }
   elseif (empty($temp_quantity)){ die('error|request-error|quantity-missing'); }
   elseif (empty($temp_price)){ die('error|request-error|price-missing'); }
-  
+
   // Check if this is an ITEM based action
   if ($temp_kind == 'item'){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -81,46 +77,62 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
     // Ensure this item exists before continuing
     if (isset($_SESSION[$session_token]['values']['battle_items'][$temp_token])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // Collect a reference to the session variable amount
+      $temp_is_shard = preg_match('/^item-shard-/i', $temp_token) ? true : false;
+      $temp_is_core = preg_match('/^item-core-/i', $temp_token) ? true : false;
+      if ($temp_is_shard){ $temp_max_quantity = MMRPG_SETTINGS_SHARDS_MAXQUANTITY; }
+      elseif ($temp_is_core){ $temp_max_quantity = MMRPG_SETTINGS_CORES_MAXQUANTITY; }
+      else { $temp_max_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY;  }
       $temp_current_quantity = $_SESSION[$session_token]['values']['battle_items'][$temp_token];
-      
+
       // Now make sure we actually have enough of this item to sell
       if ($temp_quantity <= $temp_current_quantity){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
         // Remove this item's count from the global variable and recollect
         $_SESSION[$session_token]['values']['battle_items'][$temp_token] = $temp_current_quantity - $temp_quantity;
         $temp_current_quantity = $_SESSION[$session_token]['values']['battle_items'][$temp_token];
-        
+
         // Increment the player's zenny count based on the provided price
         $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter + $temp_price;
         $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
-        
+
+        // Update the shop history with the item bought by the shop keeper
+        if ($temp_is_core){
+          if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['cores_bought'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['cores_bought'][$temp_token] = 0; }
+          $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['cores_bought'][$temp_token] += $temp_quantity;
+        } else {
+          if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['items_bought'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['items_bought'][$temp_token] = 0; }
+          $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['items_bought'][$temp_token] += $temp_quantity;
+        }
+        $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_spent'] += $temp_price;
+        $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price + (($temp_quantity - 1) * ($temp_quantity - 1));
+
         // Save, produce the success message with the new field order
         mmrpg_save_game_session($this_save_filepath);
         exit('success|item-sold|'.$temp_current_quantity.'|'.$global_zenny_counter);
-        
+
       }
       // Otherwise if the user requested more than they have
       else {
-    
+
         // Print an error message and kill the script
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         exit('error|insufficient-quantity|'.$temp_quantity);
-        
+
       }
-      
+
     }
     // Otherwise if this item does not exist
     else {
-    
+
       // Print an error message and kill the script
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-item|'.$temp_token);
-      
+
     }
-    
+
   }
   // Check if this is an STAR based action
   elseif ($temp_kind == 'star'){
@@ -128,19 +140,26 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
 
     // Collect the actual star token from the provided one
     $temp_actual_token = preg_replace('/^star-/i', '', $temp_token);
-    
+
     // Ensure this star exists before continuing
     if (isset($_SESSION[$session_token]['values']['battle_stars'][$temp_actual_token])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
       // Remove this star's entry from the global arrayand define the new quantity
       unset($_SESSION[$session_token]['values']['battle_stars'][$temp_actual_token]);
       $temp_current_quantity = 0;
-      
+
       // Increment the player's zenny count based on the provided price
       $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter + $temp_price;
       $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
-      
+
+      // Update the shop history with the star bought by the shop keeper
+      if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['stars_bought'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['stars_bought'][$temp_token] = 0; }
+      $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['stars_bought'][$temp_token] += 1;
+      $temp_new_quantity = $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['stars_bought'][$temp_token];
+      $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_spent'] += $temp_price;
+      $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price - (($temp_new_quantity - 1) * ($temp_new_quantity - 1));
+
       // Save, produce the success message with the new field order
       mmrpg_save_game_session($this_save_filepath);
       exit('success|star-sold|'.$temp_current_quantity.'|'.$global_zenny_counter);
@@ -148,23 +167,23 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
     }
     // Otherwise if this star does not exist
     else {
-    
+
       // Print an error message and kill the script
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-star|'.$temp_actual_token);
-      
+
     }
-    
+
   }
   // Otherwise if undefined kind
   else {
-    
+
     // Print an error message and kill the script
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     exit('error|invalid-kind|'.$temp_kind);
-    
+
   }
-  
+
 }
 
 
@@ -175,21 +194,23 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Collect the action variables from the request header, if they exist
+  $temp_shop = !empty($_REQUEST['shop']) ? $_REQUEST['shop'] : '';
   $temp_kind = !empty($_REQUEST['kind']) ? $_REQUEST['kind'] : '';
   $temp_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : '';
   $temp_token = !empty($_REQUEST['token']) ? $_REQUEST['token'] : '';
   $temp_quantity = !empty($_REQUEST['quantity']) ? $_REQUEST['quantity'] : 0;
   $temp_price = !empty($_REQUEST['price']) ? $_REQUEST['price'] : 0;
   $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
-  
+
   // If key variables are not provided, kill the script in error
+  if (empty($temp_shop)){ die('error|request-error|shop-missing'); }
   if (empty($temp_kind)){ die('error|request-error|kind-missing'); }
   elseif (empty($temp_action)){ die('error|request-error|action-missing'); }
   elseif (empty($temp_token)){ die('error|request-error|token-missing'); }
   elseif (empty($temp_quantity)){ die('error|request-error|quantity-missing'); }
   elseif (empty($temp_price)){ die('error|request-error|price-missing'); }
   elseif ($temp_kind == 'ability' && empty($temp_player)){ die('error|request-error|player-missing'); }
-  
+
   // Check if this is an ITEM based action
   if ($temp_kind == 'item'){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -197,112 +218,123 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
     // Ensure this item exists before continuing
     if (isset($mmrpg_database_items[$temp_token])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // Collect a reference to the session variable amount
+      $temp_is_shard = preg_match('/^item-shard-/i', $temp_token) ? true : false;
+      $temp_is_core = preg_match('/^item-core-/i', $temp_token) ? true : false;
+      if ($temp_is_shard){ $temp_max_quantity = MMRPG_SETTINGS_SHARDS_MAXQUANTITY; }
+      elseif ($temp_is_core){ $temp_max_quantity = MMRPG_SETTINGS_CORES_MAXQUANTITY; }
+      else { $temp_max_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY;  }
       $temp_current_quantity = !empty($_SESSION[$session_token]['values']['battle_items'][$temp_token]) ? $_SESSION[$session_token]['values']['battle_items'][$temp_token] : 0;
-      
+
       // Now make sure we actually have enough of this item to buy
-      if (($temp_current_quantity + $temp_quantity) <= 99){
+      if (($temp_current_quantity + $temp_quantity) <= $temp_max_quantity){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
         // Remove this item's count from the global variable and recollect
         $_SESSION[$session_token]['values']['battle_items'][$temp_token] = $temp_current_quantity + $temp_quantity;
         $temp_current_quantity = $_SESSION[$session_token]['values']['battle_items'][$temp_token];
-        
+
         // Increment the player's zenny count based on the provided price
         $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
         $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
-        
+
+        // Update the shop history with this sold item under the given character
+        if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['items_sold'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['items_sold'][$temp_token] = 0; }
+        $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['items_sold'][$temp_token] += $temp_quantity;
+        $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
+        $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price + (($temp_quantity - 1) * ($temp_quantity - 1));
+
         // Save, produce the success message with the new field order
         mmrpg_save_game_session($this_save_filepath);
         exit('success|item-bought|'.$temp_current_quantity.'|'.$global_zenny_counter);
-        
+
       }
       // Otherwise if the user requested more than they have
       else {
-    
+
         // Print an error message and kill the script
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         exit('error|overkill-quantity|'.$temp_quantity);
-        
+
       }
-      
+
     }
     // Otherwise if this item does not exist
     else {
-    
+
       // Print an error message and kill the script
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-item|'.$temp_token);
-      
+
     }
-    
+
   }
   // Check if this is an ABILITY based action
   elseif ($temp_kind == 'ability'){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Ensure this ability exists before continuing
     if (isset($mmrpg_database_abilities[$temp_token])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
-      // Collect the current ability's info from the database
-      $ability_info = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$temp_token]);
-      
-      // Ensure the requested player token is valid
-      if (!empty($mmrpg_database_players[$temp_player])){
-      
-        // Unlock this ability for the requested playable characters
-        $player_token = $temp_player;
-        $player_info = $mmrpg_database_players[$player_token];
-        mmrpg_game_unlock_ability($player_info, false, $ability_info);
-        
-        // Count the number of players who have this ability now
-        $temp_current_quantity = 0;
-        foreach ($mmrpg_database_players AS $player_token => $player_info){
-          if (mmrpg_prototype_ability_unlocked($player_token, '', $temp_token)){
-            $temp_current_quantity++;
-          }
+
+      // Ensure the requested ability token was valid
+      if (!empty($mmrpg_database_abilities[$temp_token])){
+
+        // Collect the current ability's info from the database
+        $ability_info = array('ability_token' => $temp_token); //mmrpg_ability::parse_index_info($mmrpg_database_abilities[$temp_token]);
+
+        // Unlock this ability for all playable characters
+        mmrpg_game_unlock_ability(false, false, $ability_info);
+        $temp_current_quantity = 1;
+
+        // If the unlock was successful
+        if (mmrpg_prototype_ability_unlocked('', '', $temp_token)){
+
+          // Increment the player's zenny count based on the provided price
+          $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
+          $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
+
+          // Update the shop history with this sold item under the given character
+          if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['abilities_sold'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['abilities_sold'][$temp_token] = 0; }
+          $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['abilities_sold'][$temp_token] += 1;
+          $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
+          $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
+
+          // Save, produce the success message with the new ability order
+          mmrpg_save_game_session($this_save_filepath);
+          exit('success|ability-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
+
         }
-        
-        // Increment the player's zenny count based on the provided price
-        $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
-        $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
-        
-        // Save, produce the success message with the new ability order
-        mmrpg_save_game_session($this_save_filepath);
-        exit('success|ability-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
-        
-        
+        // Otherwise, if the ability was not unlocked for some reason
+        else {
+
+          // Print an error message and kill the script
+          if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+          exit('error|unlock-error|'.$temp_token);
+
+        }
+
       }
       // Otherwise, produce an error
       else {
-    
+
         // Print an error message and kill the script
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         exit('error|invalid-player|'.$temp_token);
-        
+
       }
-      
-      /*
-        // Unlock this ability for all three playable characters
-        $temp_current_quantity = 0;
-        foreach ($mmrpg_database_players AS $player_token => $player_info){
-          mmrpg_game_unlock_ability($player_info, false, $ability_info);
-          $temp_current_quantity++;
-        }
-       */
 
     }
     // Otherwise if this star does not exist
     else {
-    
+
       // Print an error message and kill the script
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-ability|'.$temp_token);
-      
+
     }
-    
+
   }
   // Check if this is an FIELD based action
   elseif ($temp_kind == 'field'){
@@ -310,46 +342,52 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
 
     // Collect the actual field token from the provided one
     $temp_actual_token = preg_replace('/^field-/i', '', $temp_token);
-    
+
     // Ensure this field exists before continuing
     if (isset($mmrpg_database_fields[$temp_actual_token])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
       // Remove this field's entry from the global arrayand define the new quantity
       $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
       $temp_unlocked_fields[] = $temp_actual_token;
       $temp_unlocked_fields = array_unique($temp_unlocked_fields);
       $_SESSION[$session_token]['values']['battle_fields'] = $temp_unlocked_fields;
       $temp_current_quantity = 1;
-      
+
       // Increment the player's zenny count based on the provided price
       $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
       $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
-      
-      // Save, produce the success message with the new field order
+
+      // Update the shop history with this sold item under the given character
+      if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['fields_sold'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['fields_sold'][$temp_token] = 0; }
+      $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['fields_sold'][$temp_token] += 1;
+      $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
+      $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
+
+    // Save, produce the success message with the new field order
       mmrpg_save_game_session($this_save_filepath);
       exit('success|field-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
 
     }
     // Otherwise if this star does not exist
     else {
-    
+
       // Print an error message and kill the script
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-star|'.$temp_actual_token);
-      
+
     }
-    
+
   }
   // Otherwise if undefined kind
   else {
-    
+
     // Print an error message and kill the script
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     exit('error|invalid-kind|'.$temp_kind);
-    
+
   }
-  
+
 }
 
 
@@ -361,7 +399,7 @@ if (true){
 
   // Start the output buffer
   ob_start();
-  
+
   // Loop through the allowed edit data for all shops
   $key_counter = 0;
   $shop_counter = 0;
@@ -382,7 +420,7 @@ if (true){
       echo '</div>'."\n";
     //echo '</td>'."\n";
   }
-  
+
   // Collect the contents of the buffer
   $shop_canvas_markup = ob_get_clean();
   $shop_canvas_markup = preg_replace('/\s+/', ' ', trim($shop_canvas_markup));
@@ -405,7 +443,7 @@ if (true){
     $shop_key = $key_counter;
     $shop_info['shop_image'] = $shop_info['shop_token'];
     $shop_info['shop_image_size'] = 40;
-    
+
     // Collect a temp robot object for printing items
     $player_info = $mmrpg_index['players'][$shop_info['shop_player']];
     if ($shop_info['shop_player'] == 'dr-light'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['mega-man']); }
@@ -424,19 +462,20 @@ if (true){
         <span class="player_type"><?= ucfirst(rtrim($shop_info['shop_seeking'], 's')) ?> Seeker</span>
       </div>
       <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
-        
+
         <div class="shop_tabs_links" style="margin: 0 auto; color: #FFFFFF; ">
           <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
           <a class="tab_link tab_link_selling" href="#" data-tab="selling"><span class="inset">Buy <?= ucfirst($shop_info['shop_kind_selling']) ?></span></a>
           <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
           <a class="tab_link tab_link_buying" href="#" data-tab="buying"><span class="inset">Sell <?= ucfirst($shop_info['shop_kind_buying']) ?></span></a>
           <span class="tab_line"><span class="inset">&nbsp;</span></span>
+          <span class="tab_level"><span class="wrap">Level <?= $shop_info['shop_level'] ?></span></span>
         </div>
-        
+
         <div class="shop_tabs_containers" style="margin: 0 auto 10px;">
-        
+
           <div class="tab_container tab_container_selling" data-tab="selling">
-            
+
             <div class="shop_quote shop_quote_selling">&quot;<?= $shop_info['shop_quote_selling'] ?>&quot;</div>
             <?
             // -- SHOP SELLING ITEMS -- //
@@ -465,6 +504,12 @@ if (true){
                   <?
                   // Collect the items for buying and slice/shuffle if nessary
                   $item_list_array = $shop_info['shop_items']['items_selling'];
+                  if ($global_points_counter >= 0 && $global_points_counter < 1000){ $item_list_array = array_slice($item_list_array, 0, 6, true); }
+                  elseif ($global_points_counter >= 1000 && $global_points_counter < 10000){ $item_list_array = array_slice($item_list_array, 0, 8, true); }
+                  elseif ($global_points_counter >= 10000 && $global_points_counter < 100000){ $item_list_array = array_slice($item_list_array, 0, 14, true); }
+                  elseif ($global_points_counter >= 100000 && $global_points_counter < 1000000){ $item_list_array = array_slice($item_list_array, 0, 16, true); }
+                  elseif ($global_points_counter >= 1000000 && $global_points_counter < 10000000){ $item_list_array = array_slice($item_list_array, 0, 18, true); }
+                  else { $item_list_array = array_slice($item_list_array, 0, 20, true); }
                   // Loop through the items and print them one by one
                   $item_counter = 0;
                   $item_counter_total = count($item_list_array);
@@ -476,14 +521,15 @@ if (true){
                     $item_info_price = $price;
                     $item_info_name = $item_info['ability_name'];
                     $item_info_type = !empty($item_info['ability_type']) ? $item_info['ability_type'] : 'none';
-                    if (!empty($item_info['ability_type2'])){ $item_info_type .= '_'.$item_info['ability_type2']; }
+                    if ($item_info_type != 'none' && !empty($item_info['ability_type2'])){ $item_info_type .= '_'.$item_info['ability_type2']; }
+                    elseif ($item_info_type == 'none' && !empty($item_info['ability_type2'])){ $item_info_type = $item_info['ability_type2']; }
                     $item_info_quantity = !empty($_SESSION[$session_token]['values']['battle_items'][$token]) ? $_SESSION[$session_token]['values']['battle_items'][$token] : 0;
                     $global_item_quantities[$item_info_token] = $item_info_quantity;
                     $global_item_prices['buy'][$item_info_token] = $item_info_price;
                     $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
                     $temp_info_tooltip = mmrpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
-                    
+
                     ?>
                     <td class="<?= $item_cell_float ?> item_cell" data-kind="item" data-action="buy" data-token="<?= $item_info_token ?>">
                       <span class="item_name ability_type ability_type_<?= $item_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $item_info_name ?></span>
@@ -508,7 +554,7 @@ if (true){
               <?
             }
             // -- SHOP SELLING ABILITIES -- //
-            
+
             // If this shop has abilities to selling, print them out
             if (!empty($shop_info['shop_abilities']['abilities_selling'])){
               ?>
@@ -521,12 +567,12 @@ if (true){
                   <tr>
                     <td class="left">
                       <span class="buy_button buy_button_header">&nbsp;</span>
-                      <label class="item_quantity item_quantity_header">Own</label>
+                      <label class="item_quantity item_quantity_header" style="display: none;">Own</label>
                       <label class="item_price item_price_header">Buy</label>
                     </td>
                     <td class="right">
                       <span class="buy_button buy_button_header">&nbsp;</span>
-                      <label class="item_quantity item_quantity_header">Own</label>
+                      <label class="item_quantity item_quantity_header" style="display: none;">Own</label>
                       <label class="item_price item_price_header">Buy</label>
                     </td>
                   </tr>
@@ -535,109 +581,135 @@ if (true){
                   // Collect the abilities for buying and slice/shuffle if nessary
                   $ability_list_array = $shop_info['shop_abilities']['abilities_selling'];
                   $ability_list_array_count = count($ability_list_array);
-                  
+                  $ability_list_max = 20;
+                  /*
+                  $ability_list_max = 2;
+                  if ($shop_info['shop_level'] >= 5){ $ability_list_max += 2; }
+                  if ($shop_info['shop_level'] >= 10){ $ability_list_max += 2; }
+                  if ($shop_info['shop_level'] >= 15){ $ability_list_max += 2; }
+                  if ($shop_info['shop_level'] >= 20){ $ability_list_max += 2; }
+                  if ($shop_info['shop_level'] >= 25){ $ability_list_max += 2; }
+                  if ($shop_info['shop_level'] >= 30){ $ability_list_max += 2; }
+                  if ($shop_info['shop_level'] >= 35){ $ability_list_max += 2; }
+                  if ($shop_info['shop_level'] >= 40){ $ability_list_max += 2; }
+                  if ($shop_info['shop_level'] >= 45){ $ability_list_max += 2; }
+                  */
+
+                  //echo '<td colspan="4">$ability_list_max = '.$ability_list_max.'</td></tr><tr>';
+                  //echo '<td colspan="4">$ability_list_array_count = '.$ability_list_array_count.'</td></tr><tr>';
+
                   // Collect the unlocked abilities for all three players
                   $ability_list_unlocked = array();
                   if (!empty($_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_abilities'])){ $ability_list_unlocked['dr-light'] = array_keys($_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_abilities']); }
                   if (!empty($_SESSION[$session_token]['values']['battle_rewards']['dr-wily']['player_abilities'])){ $ability_list_unlocked['dr-wily'] = array_keys($_SESSION[$session_token]['values']['battle_rewards']['dr-wily']['player_abilities']); }
                   if (!empty($_SESSION[$session_token]['values']['battle_rewards']['dr-cossack']['player_abilities'])){ $ability_list_unlocked['dr-cossack'] = array_keys($_SESSION[$session_token]['values']['battle_rewards']['dr-cossack']['player_abilities']); }
-                              
+
                   // Loop through all the abilities and temporarily remove any that have been unlocked
                   $backup_unlocked_abilities = array();
+
                   // Count how any of these abilities have been unlocked already
                   $ability_list_unlocked_completely = 0;
                   foreach ($ability_list_array AS $token => $price){
-                    if (in_array($token, $ability_list_unlocked['dr-light'])
-                    && in_array($token, $ability_list_unlocked['dr-wily'])
-                    && in_array($token, $ability_list_unlocked['dr-cossack'])){
+                    if (!isset($mmrpg_database_abilities[$token])){ unset($ability_list_array[$token]); continue; }
+                    if (mmrpg_prototype_ability_unlocked('', '', $token)){
                       $ability_list_unlocked_completely += 1;
                       $backup_unlocked_abilities[$token] = $price;
                       unset($ability_list_array[$token]);
                     }
                   }
-                  
-                  // Collect the stars for buying and slice/shuffle if nessary
-                  $temp_session_key = 'ability_list_array_raw';
-                  $new_ability_list_array = !empty($_SESSION[$session_token]['SHOP'][$temp_session_key]) ? $_SESSION[$session_token]['SHOP'][$temp_session_key] : array();
-                  if (empty($new_ability_list_array) || $new_ability_list_array['date'] != date('Y-m-d-H')){
-                    $new_ability_list_array = array();
-                    $new_ability_list_array['date'] = date('Y-m-d-H');
-                    $new_ability_list_array['shuffled'] = $ability_list_array;
-                    $new_ability_list_array['count'] = $ability_list_array_count;
-                  
-                    // Only show a limited amount of abilities at a time, but shuffle them hourly
-                    function shuffle_assoc($list) {
-                      if (!is_array($list)){ return $list; }
-                      $keys = array_keys($list);
-                      shuffle($keys);
-                      $random = array();
-                      foreach ($keys as $key){ $random[$key] = $list[$key]; }
-                      return $random;
-                    }
-                    $ability_list_max = 16;
-                    $backup_unlocked_abilities = shuffle_assoc($backup_unlocked_abilities);
-                    $new_ability_list_array['shuffled'] = shuffle_assoc($new_ability_list_array['shuffled']);
-                    $new_ability_list_array['shuffled'] = array_slice($new_ability_list_array['shuffled'], 0, $ability_list_max, true);
-                    
-                    // If there were less than the necessary abilities, pad with unlocked ones
-                    $new_ability_list_array['count'] = count($new_ability_list_array['shuffled']);
-                    if ($new_ability_list_array['count'] < $ability_list_max){
-                      $temp_diff = $ability_list_max - $new_ability_list_array['count'];
-                      $new_ability_list_array['shuffled'] += array_slice($backup_unlocked_abilities, 0, $temp_diff, true);
-                      $new_ability_list_array['count'] = $ability_list_max;
-                    }
-                    
-                    // Update the session with new array details
-                    $_SESSION[$session_token]['SHOP'][$temp_session_key] = $new_ability_list_array;
-                                        
+
+                  // Re-count the ability list after recent changes
+                  $ability_list_array_count = count($ability_list_array);
+
+                  // If we have too many abilities, we should slice them
+                  if ($ability_list_array_count > $ability_list_max){
+                    $ability_list_array = array_slice($ability_list_array, 0, $ability_list_max, true);
                   }
-                    
-                  // Update the main arrays with changes
-                  $ability_list_array = $new_ability_list_array['shuffled'];
-                  $ability_list_array_count = $new_ability_list_array['count'];
-                  
+
+                  // Reverse the order with newest on top
+                  $ability_list_array = array_reverse($ability_list_array, true);
+
+
+                  // If the ability count is less than the max, pad with backups
+                  if ($ability_list_array_count < $ability_list_max){
+                    while ($ability_list_array_count < $ability_list_max){
+                      if (empty($backup_unlocked_abilities)){ break; }
+                      $token_list = array_keys($backup_unlocked_abilities);
+                      $token = array_pop($token_list);
+                      $price = $backup_unlocked_abilities[$token];
+                      unset($backup_unlocked_abilities[$token]);
+                      $ability_list_array[$token] = $price;
+                      $ability_list_array_count = count($ability_list_array);
+                    }
+                  }
+                  // Otherwise, if there are too many abilities, crop 'em
+                  elseif ($ability_list_array_count > $ability_list_max){
+
+                  }
+
+                  // Re-count the ability list after recent changes
+                  $ability_list_array_count = count($ability_list_array);
+                  $ability_list_array = array_reverse($ability_list_array, true);
+
                   // Loop through the items and print them one by one
                   $ability_counter = 0;
-                  foreach ($ability_list_array AS $token => $price){
-                    if (isset($mmrpg_database_abilities[$token])){ $ability_info = $mmrpg_database_abilities[$token]; }
-                    else { continue; }
-                    $ability_info_token = $token;
-                    $ability_info_price = $price;
-                    $ability_info_name = $ability_info['ability_name'];
-                    $ability_info_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
-                    if (!empty($ability_info['ability_type2'])){ $ability_info_type .= '_'.$ability_info['ability_type2']; }
-                    $ability_info_quantity = 0;
-                    $ability_info_unlocked = array();
-                    if (in_array($ability_info_token, $ability_list_unlocked['dr-light'])){ $ability_info_quantity += 1; $ability_info_unlocked[] = 'dr-light'; }
-                    if (in_array($ability_info_token, $ability_list_unlocked['dr-wily'])){ $ability_info_quantity += 1; $ability_info_unlocked[] = 'dr-wily'; }
-                    if (in_array($ability_info_token, $ability_list_unlocked['dr-cossack'])){ $ability_info_quantity += 1; $ability_info_unlocked[] = 'dr-cossack'; }
-                    //if ($ability_info_quantity > 0){ $ability_info_price -= ceil(($ability_info_price / 3) * $ability_info_quantity); }
-                    $global_item_quantities[$ability_info_token] = $ability_info_quantity;
-                    $global_item_prices['buy'][$ability_info_token] = $ability_info_price;
-                    $temp_info_tooltip = mmrpg_ability::print_editor_title_markup($robot_info, $ability_info);
-                    $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
-                    //if ($ability_info_quantity >= 3){ continue; }
-                    if ($ability_counter >= 12){ break; }
-                    
-                    $ability_counter++;
-                    $ability_cell_float = $ability_counter % 2 == 0 ? 'right' : 'left';
+                  if (!empty($ability_list_array)){
+                    foreach ($ability_list_array AS $token => $price){
+
+                      $ability_info = $mmrpg_database_abilities[$token];
+                      $ability_info_token = $token;
+                      $ability_info_price = $price;
+                      $ability_info_name = $ability_info['ability_name'];
+                      $ability_info_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
+                      if ($ability_info_type != 'none' && !empty($ability_info['ability_type2'])){ $ability_info_type .= '_'.$ability_info['ability_type2']; }
+                      elseif ($ability_info_type == 'none' && !empty($ability_info['ability_type2'])){ $ability_info_type = $ability_info['ability_type2']; }
+                      $ability_info_quantity = 0;
+                      $ability_info_unlocked = array();
+                      if (mmrpg_prototype_ability_unlocked('', '', $token)){
+                        $ability_info_quantity = 3;
+                        $ability_info_unlocked = array('dr-light', 'dr-wily', 'dr-cossack');
+                        $ability_info_price = 0;
+                      }
+                      $global_item_quantities[$ability_info_token] = $ability_info_quantity;
+                      $global_item_prices['buy'][$ability_info_token] = $ability_info_price;
+                      $temp_info_tooltip = mmrpg_ability::print_editor_title_markup($robot_info, $ability_info);
+                      $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
+                      //if ($ability_info_quantity >= 3){ continue; }
+                      if ($ability_counter >= $ability_list_max){ break; }
+                      $ability_counter++;
+                      $ability_cell_float = $ability_counter % 2 == 0 ? 'right' : 'left';
+                      ?>
+                      <td class="<?= $item_cell_float ?> item_cell" data-kind="ability" data-action="buy" data-token="<?= $ability_info_token ?>" data-unlocked="<?= implode(',', $ability_info_unlocked) ?>">
+                        <span class="item_name ability_type ability_type_<?= $ability_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $ability_info_name ?></span>
+                        <a class="buy_button ability_type ability_type_none" href="#">Buy</a>
+                        <label class="item_quantity" data-quantity="0" style="display: none;"></label>
+                        <label class="item_price" data-price="<?= $ability_info_price ?>">&hellip; <?= $ability_info_price ?>z</label>
+                      </td>
+                      <?
+                      if ($ability_cell_float == 'right'){ echo '</tr><tr>'; }
+                    }
+                    if ($ability_counter % 2 != 0){
+                      ?>
+                      <td class="right item_cell item_cell_disabled">
+                        &nbsp;
+                      </td>
+                      <?
+                    }
+                  } else {
                     ?>
-                    <td class="<?= $item_cell_float ?> item_cell" data-kind="ability" data-action="buy" data-token="<?= $ability_info_token ?>" data-unlocked="<?= implode(',', $ability_info_unlocked) ?>">
-                      <span class="item_name ability_type ability_type_<?= $ability_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $ability_info_name ?></span>
-                      <a class="buy_button ability_type ability_type_none" href="#">Buy</a>
-                      <label class="item_quantity" data-quantity="0">0 / 3</label>
-                      <label class="item_price" data-price="<?= $ability_info_price ?>">&hellip; <?= $ability_info_price ?>z</label>
+                    <td class="right item_cell item_cell_disabled" colspan="2" style="text-align: center">
+                      <span class="item_name ability_type ability_type_empty" style="float: none; width: 100px; margin: 6px auto; text-align: center;">Sold Out!</span>
                     </td>
                     <?
-                    if ($ability_cell_float == 'right'){ echo '</tr><tr>'; }
                   }
-                  if ($ability_counter % 2 != 0){
-                    ?>
-                    <td class="right item_cell item_cell_disabled">
-                      &nbsp;
-                    </td>
-                    <?
-                  }
+
+                  /*
+                  die('<hr />'.
+                    '<pre>$backup_unlocked_abilities = '.print_r($backup_unlocked_abilities, true).'</pre><hr />'.
+                    '<pre>$ability_list_array = '.print_r($ability_list_array, true).'</pre><hr />'
+                    );
+                  */
+
                   ?>
                   </tr>
                 </tbody>
@@ -645,7 +717,7 @@ if (true){
               <?
             }
             // -- SHOP SELLING FIELDS -- //
-            
+
             // If this shop has fields to selling, print them out
             if (!empty($shop_info['shop_fields']['fields_selling'])){
               ?>
@@ -671,7 +743,7 @@ if (true){
                   $field_list_array = $shop_info['shop_fields']['fields_selling'];
                   // Collect the unlocked fields for this game file
                   $field_list_unlocked = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
-                  
+
                   // Loop through the items and print them one by one
                   $field_counter = 0;
                   foreach ($field_list_array AS $token => $price){
@@ -703,7 +775,7 @@ if (true){
                     if ($field_info_unlocked){ $field_info_price = 0; }
                     //if ($field_info_unlocked){ continue; }
                     if ($field_counter >= 24){ break; }
-                    
+
                     $field_counter++;
                     $field_cell_float = $field_counter % 2 == 0 ? 'right' : 'left';
                     ?>
@@ -742,15 +814,15 @@ if (true){
                 </tr>
               </tbody>
             </table>
-            
+
           </div>
-          
+
           <div class="tab_container tab_container_buying" data-tab="buying">
-            
+
             <div class="shop_quote shop_quote_buying">&quot;<?= $shop_info['shop_quote_buying'] ?>&quot;</div>
             <?
             // -- SHOP BUYING ITEMS -- //
-            
+
             // If this shop has items to buying, print them out
             if (!empty($shop_info['shop_items']['items_buying'])){
               ?>
@@ -762,12 +834,12 @@ if (true){
                 <tbody>
                   <tr>
                     <td class="left">
-                      <span class="buy_button buy_button_header">&nbsp;</span>
+                      <span class="sell_button sell_button_header">&nbsp;</span>
                       <label class="item_quantity item_quantity_header">Own</label>
                       <label class="item_price item_price_header">Sell</label>
                     </td>
                     <td class="right">
-                      <span class="buy_button buy_button_header">&nbsp;</span>
+                      <span class="sell_button sell_button_header">&nbsp;</span>
                       <label class="item_quantity item_quantity_header">Own</label>
                       <label class="item_price item_price_header">Sell</label>
                     </td>
@@ -776,6 +848,15 @@ if (true){
                   <?
                   // Collect the items for buying and slice/shuffle if nessary
                   $item_list_array = $shop_info['shop_items']['items_buying'];
+                  $item_list_array_screws = array_slice($item_list_array, -2, 2, true);
+                  if ($global_points_counter >= 0 && $global_points_counter < 1000){ $item_list_array = array_slice($item_list_array, 0, 6, true); }
+                  elseif ($global_points_counter >= 1000 && $global_points_counter < 10000){ $item_list_array = array_slice($item_list_array, 0, 8, true); }
+                  elseif ($global_points_counter >= 10000 && $global_points_counter < 100000){ $item_list_array = array_slice($item_list_array, 0, 14, true); }
+                  elseif ($global_points_counter >= 100000 && $global_points_counter < 1000000){ $item_list_array = array_slice($item_list_array, 0, 16, true); }
+                  elseif ($global_points_counter >= 1000000 && $global_points_counter < 10000000){ $item_list_array = array_slice($item_list_array, 0, 18, true); }
+                  elseif ($global_points_counter >= 10000000){ $item_list_array = array_slice($item_list_array, 0, -2, true); }
+                  //else { $item_list_array = array_slice($item_list_array, 0, 18); }
+                  $item_list_array = array_merge($item_list_array, $item_list_array_screws);
                   // Loop through the items and print them one by one
                   $item_counter = 0;
                   foreach ($item_list_array AS $token => $price){
@@ -787,23 +868,16 @@ if (true){
                     $item_info_name = $item_info['ability_name'];
                     $item_info_quantity = !empty($_SESSION[$session_token]['values']['battle_items'][$token]) ? $_SESSION[$session_token]['values']['battle_items'][$token] : 0;
                     $item_info_type = !empty($item_info['ability_type']) ? $item_info['ability_type'] : 'none';
-                    if (!empty($item_info['ability_type2'])){ $item_info_type .= '_'.$item_info['ability_type2']; }
-                    if (preg_match('/^item-core-/i', $item_info_token)){
-                      $temp_type_token = preg_replace('/^item-core-([a-z]+)$/i', '$1', $item_info_token);
-                      $temp_star_force = !empty($this_star_force[$temp_type_token]) ? $this_star_force[$temp_type_token] : 0;
-                      //$temp_star_percent = ($temp_star_force / $this_star_force_total) * 100;
-                      //$item_info_price = $item_info_price - ceil($item_info_price * ($temp_star_percent / 100));
-                      //$temp_price_diff = ($item_info_price * 1.15) * (ceil(($temp_star_force / $this_star_force_total) * 100) / 100);
-                      //$item_info_price -= ceil($temp_price_diff * 5);
-                      $temp_price_boost = !empty($temp_star_force) ? ($item_info_price * $temp_star_force * 0.10) : 0;
-                      $item_info_price += $temp_price_boost;
-                    }
+                    if ($item_info_type != 'none' && !empty($item_info['ability_type2'])){ $item_info_type .= '_'.$item_info['ability_type2']; }
+                    elseif ($item_info_type == 'none' && !empty($item_info['ability_type2'])){ $item_info_type = $item_info['ability_type2']; }
+
                     $global_item_quantities[$item_info_token] = $item_info_quantity;
                     $global_item_prices['sell'][$item_info_token] = $item_info_price;
+
                     $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
                     $temp_info_tooltip = mmrpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
-                    
+
                     ?>
                     <td class="<?= $item_cell_float ?> item_cell" data-kind="item" data-action="sell" data-token="<?= $item_info_token ?>">
                       <span class="item_name ability_type ability_type_<?= $item_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $item_info_name ?></span>
@@ -828,7 +902,7 @@ if (true){
               <?
             }
             // -- SHOP BUYING STARS -- //
-            
+
             // If this shop has items to buying, print them out
             if (!empty($shop_info['shop_stars']['stars_buying'])){
               ?>
@@ -853,45 +927,49 @@ if (true){
                   // Collect the stars for buying and slice/shuffle if nessary
                   //$star_list_array = $shop_info['shop_stars']['stars_buying'];
                   //$star_list_array = array_keys($_SESSION[$session_token]['values']['battle_stars']);
-                  
+                  $temp_star_counter = 4;
+                  if ($global_points_counter >= 10000){ $temp_star_counter = 6; }
+                  if ($global_points_counter >= 100000){ $temp_star_counter = 8; }
+                  if ($global_points_counter >= 1000000){ $temp_star_counter = 10; }
+
                   // Collect the stars for buying and slice/shuffle if nessary
                   $temp_session_key = 'star_list_array_raw';
                   $star_list_array_raw = !empty($_SESSION[$session_token]['SHOP'][$temp_session_key]) ? $_SESSION[$session_token]['SHOP'][$temp_session_key] : array();
-                  if (empty($star_list_array_raw) || $star_list_array_raw['date'] != date('Y-m-d')){
+                  if (true || empty($star_list_array_raw) || $star_list_array_raw['date'] != date('Y-m-d')){
                     $star_list_array_raw = array();
                     $star_list_array_raw['date'] = date('Y-m-d');
                     $star_list_array_raw['today'] = array();
-                    
+
                     // Collect all the star tokens sorted by their kind
                     $temp_star_tokens = array();
                     $temp_base_tokens = array();
-                    
+
                     // Collect all possible base field tokens for seeking
                     foreach ($this_omega_factors_one AS $info){ $temp_base_tokens[] = $info['field']; }
                     foreach ($this_omega_factors_two AS $info){ $temp_base_tokens[] = $info['field']; }
                     foreach ($this_omega_factors_three AS $info){ $temp_base_tokens[] = $info['field']; }
                     $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
                     foreach ($this_omega_factors_four AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_base_tokens[] = $factor['field']; } }
-                    // Shuffle the order of the field stars then crop to 8
+                    // Shuffle the order of the field stars
                     shuffle($temp_base_tokens);
-                    
+
                     // Define the first eight field star tokens
                     $temp_field_star_tokens = $temp_base_tokens;
-                    $temp_field_star_tokens = array_slice($temp_field_star_tokens, 0, 8);
-                    
+                    $temp_field_star_tokens = array_slice($temp_field_star_tokens, 0, $temp_star_counter);
+
                     // Loop through and index collected star info
                     foreach ($temp_field_star_tokens AS $key => $token){
-                      
+
                       // Collect the info for this base field and create the star
                       $field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
                       if (isset($_SESSION[$session_token]['values']['battle_stars'][$token])){ $star_info = $_SESSION[$session_token]['values']['battle_stars'][$token]; }
                       else { $star_info = array('star_token' => $token, 'star_name' => $field_info['field_name'], 'star_kind' => 'field', 'star_type' => $field_info['field_type'], 'star_type2' => '', 'star_player' => '', 'star_date' => ''); }
                       $star_list_array_raw['today'][$star_info['star_token']] = $star_info;
                       $temp_star_tokens[] = $star_info['star_token'];
-                      
+
                       // Collect the two fusion field token info and create stars
-                      $key2 = $key + 8;
-                      $key3 = $key2 + 8;
+                      $key2 = $key + $temp_star_counter;
+                      $key3 = $key2 + $temp_star_counter;
                       $token2 = $temp_base_tokens[$key2];
                       $token3 = $temp_base_tokens[$key3];
                       $field_info2 = mmrpg_field::parse_index_info($mmrpg_database_fields[$token2]);
@@ -904,11 +982,11 @@ if (true){
                       else { $star_info = array('star_token' => $fusion_token, 'star_name' => $fusion_name, 'star_kind' => 'fusion', 'star_type' => $fusion_type, 'star_type2' => $fusion_type2, 'star_player' => '', 'star_date' => ''); }
                       $star_list_array_raw['today'][$star_info['star_token']] = $star_info;
                       $temp_star_tokens[] = $star_info['star_token'];
-                      
+
                       //$temp_star_tokens[] = "\$key2 = {$key2}; \$key3 = {$key3};\n\$token2 = {$token2}; \$token3 = {$token3}; ";
-                      
+
                     }
-                    
+
                     /*
                     ob_end_clean();
                     die(
@@ -917,14 +995,14 @@ if (true){
                     '<pre>$star_list_array_raw = '.print_r($star_list_array_raw, true).'</pre>'
                     );
                     */
-                    
+
                     // Update the session with the new array in raw format
                     $_SESSION[$session_token]['SHOP'][$temp_session_key] = $star_list_array_raw;
                   }
-                  
+
                   // Reformat the list arrays to what we need them for
                   $star_list_array = array_keys($star_list_array_raw['today']);
-                  
+
                   /*
                   ob_end_clean();
                   die(
@@ -932,36 +1010,48 @@ if (true){
                   '<pre>$star_list_array_raw = '.print_r($star_list_array_raw, true).'</pre>'
                   );
                   */
-                  
+
                   // Loop through the items and print them one by one
                   $star_counter = 0;
                   foreach ($star_list_array AS $key => $token){
                     $star_counter++;
-                    
+
                     $star_cell_float = $star_counter % 2 == 0 ? 'right' : 'left';
-                    
+
                     $star_info_token = $token;
                     $star_info = $star_list_array_raw['today'][$token];
-                    
+
                     $star_info_price = $shop_info['shop_stars']['stars_buying'][$star_info['star_kind']];
                     $star_info_name = $star_info['star_name'].' Star';
-                    $star_info_type = !empty($star_info['star_type']) ? $star_info['star_type'] : 'none';
                     $star_info_date = !empty($star_info['star_date']) ? $star_info['star_date'] : 0;
-                    if (!empty($star_info['star_type2'])){ $star_info_type .= '_'.$star_info['star_type2']; }
-                    
+
+                    $star_info_type = !empty($star_info['star_type']) ? $star_info['star_type'] : '';
+                    $star_info_type2 = !empty($star_info['star_type2']) ? $star_info['star_type2'] : '';
+                    $star_info_class = !empty($star_info_type) ? $star_info_type : 'none';
+                    if (!empty($star_info_type2)){ $star_info_class .= '_'.$star_info_type2; }
+
+                    if (!empty($star_info_type) && !empty($this_star_force[$star_info_type])){
+                      $temp_force = $this_star_force[$star_info_type];
+                      $star_info_price += round($temp_force * 10);
+                    }
+                    if (!empty($star_info_type2) && !empty($this_star_force[$star_info_type2])){
+                      $temp_force2 = $this_star_force[$star_info_type2];
+                      $star_info_price += round($temp_force2 * 10);
+                    }
+
                     $global_item_quantities['star-'.$star_info_token] = !empty($_SESSION[$session_token]['values']['battle_stars'][$star_info_token]) ? 1 : 0;
                     $global_item_prices['sell']['star-'.$star_info_token] = $star_info_price;
-                    
+
                     $temp_info_tooltip = $star_info_name.'<br /> ';
                     $temp_info_tooltip .= '<span style="font-size:80%;">';
                     $temp_info_tooltip .= ucfirst($star_info['star_kind']).' Star | '.ucwords(str_replace('_', ' / ', $star_info_type)).' Type';
                     if (!empty($star_info_date)){ $temp_info_tooltip .= ' <br />Found '.date('Y/m/d', $star_info_date); }
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                     $temp_info_tooltip .= '</span>';
-                    
+
                     ?>
                     <td class="<?= $star_cell_float ?> item_cell" data-kind="star" data-action="sell" data-token="<?= 'star-'.$star_info_token ?>">
-                      <span class="item_name ability_type ability_type_<?= $star_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $star_info_name ?></span>
+                      <span class="item_name ability_type ability_type_<?= $star_info_class ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $star_info_name ?></span>
                       <a class="sell_button ability_type ability_type_none" href="#">Sell</a>
                       <label class="item_quantity" data-quantity="1" style="display: none;">x 1</label>
                       <label class="item_price" data-price="<?= $star_info_price ?>">&hellip; <?= $star_info_price ?>z</label>
@@ -995,12 +1085,12 @@ if (true){
                 </tr>
               </tbody>
             </table>
-          
+
           </div>
-          
+
         </div>
-        
-        
+
+
       </div>
     </div>
     <?
@@ -1028,7 +1118,7 @@ if (true){
   // Determine the token for the very first player in the edit
   $temp_shop_tokens = array_keys($allowed_edit_data);
   $first_shop_token = array_shift($temp_shop_tokens);
-  $first_shop_token = $first_shop_token['shop_token'];
+  //$first_shop_token = $first_shop_token['shop_token'];
   unset($temp_shop_tokens);
 
   // Start generating the edit markup
@@ -1078,7 +1168,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Data Library | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+<title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?>View Shops | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="shops" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
@@ -1122,7 +1212,7 @@ if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_tok
 $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
 $temp_event_shown = false;
 // If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_shop-auto-intro';
+$temp_event_flag = 'unlocked-tooltip_shop-auto-intro';
 if (!$temp_event_shown && !empty($allowed_edit_data['auto']) && empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
   $temp_game_flags[$temp_event_flag] = true;
   $temp_event_shown = true;
@@ -1136,7 +1226,7 @@ if (!$temp_event_shown && !empty($allowed_edit_data['auto']) && empty($temp_game
     ];
   // Generate a first-time event message that explains how the editor works
   gameSettings.windowEventsMessages = [
-    '<p>Congratulations! <strong>Auto\'s Shop</strong> has been unlocked! Items can be purchased and sold in Auto\'s Shop using a digital currency called Zenny, and the only way to earn Zenny is by selling the items you find in battle.</p>'+
+    '<p>Congratulations! <strong>Auto\'s Shop</strong> has been unlocked! Items can be purchased and sold in Auto\'s Shop using a digital currency called Zenny, and the only ways to earn Zenny are by selling items you find in battle or by scoring overkill bonuses at the end of a mission.</p>'+
     '<p>Use the Buy or Sell tabs to switch between modes, and then click any of the Buy or Sell buttons to make your selection.  A confirmation box will appear below to finalize your request.  Clicking a button multiple times will increase the quantity, helpful for bulk transactions.</p>'+
     '<p>Auto has made himself available to our players out of devotion to his creator Dr. Light, but he\'s also on a secret mission to find more of his favourite thing - screws.  Bring him any screws you find and he\'ll likely pay a premium price.</p>'+
     ''
@@ -1146,7 +1236,7 @@ if (!$temp_event_shown && !empty($allowed_edit_data['auto']) && empty($temp_game
   <?
 }
 // If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_reggae-auto-intro';
+$temp_event_flag = 'unlocked-tooltip_reggae-auto-intro';
 if (!$temp_event_shown && !empty($allowed_edit_data['reggae']) && empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
   $temp_game_flags[$temp_event_flag] = true;
   $temp_event_shown = true;
@@ -1169,7 +1259,7 @@ if (!$temp_event_shown && !empty($allowed_edit_data['reggae']) && empty($temp_ga
   <?
 }
 // If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_kalinka-auto-intro';
+$temp_event_flag = 'unlocked-tooltip_kalinka-shop-intro';
 if (!$temp_event_shown && !empty($allowed_edit_data['kalinka']) && empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
   $temp_game_flags[$temp_event_flag] = true;
   $temp_event_shown = true;

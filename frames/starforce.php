@@ -31,7 +31,7 @@ $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Rulebook | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+<title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?>View Starforce | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
@@ -62,13 +62,13 @@ gameSettings.autoScrollTop = false;
 
       <?
       $this_battle_stars_boost = 0;
-      foreach ($this_star_force AS $force_type => $force_count){ $this_battle_stars_boost += ($force_count * 10); }
+      foreach ($this_star_force AS $force_type => $force_count){ $this_battle_stars_boost += $force_count * MMRPG_SETTINGS_STARS_ATTACKBOOST; }
       $temp_field_stars_text = $this_battle_stars_field_count == 1 ? '1 Field Star' : $this_battle_stars_field_count.' Field Stars';
       $temp_fusion_stars_text = $this_battle_stars_fusion_count == 1 ? '1 Fusion Star' : $this_battle_stars_fusion_count.' Fusion Stars';
       $temp_total_stars_label = $this_battle_stars_count == 1 ? '1 Star' : $this_battle_stars_count.' Stars';
       $temp_total_stars_text = $temp_total_stars_label.' Total';
-      $temp_total_boost_label = '+'.$this_battle_stars_boost.'% Boost';
-      $temp_total_boost_text = '+'.$this_battle_stars_boost.'% Starforce Boost';
+      $temp_total_boost_label = '+'.$this_battle_stars_boost.' Boost';
+      $temp_total_boost_text = '+'.$this_battle_stars_boost.' Starforce Boost';
       ?>
       <span class="header block_1">Star Force <span style="opacity: 0.25;">(
         <span title="<?= $temp_field_stars_text ?>" data-tooltip-type="field_type field_type_none"><?= $this_battle_stars_field_count ?></span> /
@@ -104,7 +104,7 @@ gameSettings.autoScrollTop = false;
                 $temp_padding_amount = $force_count * 2;
                 $temp_padding_amount = ceil(($force_count / $temp_max_force) * $temp_max_padding);
                 $force_count_strict = $this_star_force_strict[$force_type];
-                echo '<div data-tooltip="'.ucfirst($force_type).' +'.($force_count * 10).'% | '.$force_count_strict.' / '.$this_battle_stars_count.' Stars" class="field_type field_type_'.$force_type.'" style="padding-right: '.$temp_padding_amount.'px;" data-padding="'.$temp_padding_amount.'">'.ucfirst($force_type).' +'.($force_count * 10).'%</div>';
+                echo '<div data-tooltip="'.ucfirst($force_type).' +'.($force_count * MMRPG_SETTINGS_STARS_ATTACKBOOST).'% | '.$force_count_strict.' / '.$this_battle_stars_count.' Stars" class="field_type field_type_'.$force_type.'" style="padding-right: '.$temp_padding_amount.'px;" data-padding="'.$temp_padding_amount.'">'.ucfirst($force_type).' +'.($force_count * MMRPG_SETTINGS_STARS_ATTACKBOOST).'</div>';
               }
 
 
@@ -136,7 +136,7 @@ gameSettings.autoScrollTop = false;
                   else { return 0; }
                 }
               }
-              
+
               //die(print_r($this_battle_stars, true));
               uasort($this_battle_stars, 'mmrpg_prototype_sort_stars');
               //die('<pre>'.print_r($this_battle_stars, true).'</pre>');
@@ -159,13 +159,13 @@ gameSettings.autoScrollTop = false;
                 $temp_star_title .= ' | '.ucfirst($temp_star_kind).' Star';
                 if ($temp_field_type_1 != 'none'){
                   if ($temp_star_kind == 'field'){
-                    $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +10%';
+                    $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARS_ATTACKBOOST);
                   } elseif ($temp_star_kind == 'fusion'){
                     if ($temp_field_type_1 != $temp_field_type_2){
-                      $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +10%';
-                      $temp_star_title .= ' | '.ucfirst($temp_field_type_2).' +10%';
+                      $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARS_ATTACKBOOST);
+                      $temp_star_title .= ' | '.ucfirst($temp_field_type_2).' +'.(MMRPG_SETTINGS_STARS_ATTACKBOOST);
                     } else {
-                      $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +20%';
+                      $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARS_ATTACKBOOST * 2);
                     }
                   }
                 }
@@ -199,8 +199,8 @@ $(document).ready(function(){
 if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
 // If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_starforce-viewer-intro';
-if (empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
+$temp_event_flag = 'unlocked-tooltip_starforce-viewer-intro';
+if (true || empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
   $temp_game_flags[$temp_event_flag] = true;
   ?>
   // Generate a first-time event canvas that explains how the editor works
@@ -213,9 +213,14 @@ if (empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
     ];
   // Generate a first-time event message that explains how the editor works
   gameSettings.windowEventsMessages = [
-    '<p>A strange new energy source called <strong>Star Force</strong> has appeared in the prototype in the form of <em>Field Stars</em> and <em>Fusion Stars</em>. The elemental energy that these stars radiate dramatically boosts robots of the same type, giving them more power and more experience points in battle.</p>'+
-    '<p>Recent studies estimate that the total number of stars in the prototype may be well over nine hundred, but we may never know the real number until you\'ve collected them all.  Searching for Star Force may seem daunting at first, but there are really only few things to keep in mind.</p>'+
-    '<p>Field Stars can be found in any of the chapter two base fields, and are relatively easy to find.  Fusion Stars, on the other hand, appear in chapter four fusion stages and are a bit more complicated to find.  Every unique combination of field factors has it\'s own fusion star, so heavy use of the Player Editor will be required to track them all down.</p>'+
+    '<p>A powerful new form of elemental energy has appeared in world of the prototype! <strong>Star Force</strong> appears in the form of <strong>Field Stars</strong> and <strong>Fusion Stars</strong> that boost Attack toward and Defense against all damage of the same type.</p>'+
+    '<p>Many of the new stars have formed in previously secured areas, reviving defeated robot masters with greater power and attracting the attention of other robot masters wandering the prototyp.  Only 24 Field Stars and 12 Fusion Stars have been identified so far, but rough estimates for the total number are well over one thousand.</p>'+
+    '<p>It is your mission to track down these new stars and liberate them from enemy forces, simultaneously crippling their elemental abilities while boosting ours.  Collecting stars might seem daunting at first, but it\'s actually pretty straight forward if you can remember a few things:</p>'+
+    '<p>&bull; Field Stars can be found in any of the <strong>Chapter Two</strong> robot master fields and grant +10 Attack toward and +10 Defense against one elemental type.</p>'+
+    '<p>&bull; Fusion Stars can be found in any of the <strong>Chapter Four</strong> fusion fields and grant +20 Attack toward and +20 Defense against up to two different types.</p>'+
+    '<p>&bull; Every star is unique and associated with a specific elemental field, with exactly one appearing on any given mission .</p>'+
+    '<p>&bull; Defeat all target robots in a given mission to collect the star and combine its power with your own.</p>'+
+    '<p>&bull; Collecting stars beyond the identified 36 will require heavy use of the Player Editor and may not be for the feint of heart.</p>'+
     ''
     ];
   // Push this event to the parent window and display to the user

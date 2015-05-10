@@ -35,6 +35,8 @@ if (mmrpg_prototype_complete('dr-light')){ $temp_omega_factor_options = array_me
 if (mmrpg_prototype_complete('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
 if (mmrpg_prototype_complete('dr-cossack')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); }
 $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
+// Loop through unlockable system fields with no type
+foreach ($this_omega_factors_system AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_omega_factor_options[] = $factor; } }
 // Loop through the unlockable MM3 fields (from omega factor four)
 foreach ($this_omega_factors_four AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_omega_factor_options[] = $factor; } }
 
@@ -100,7 +102,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
 
   // If requested new field was an empty string, remove the previous value
   if (empty($temp_field)){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // If this was the last field, do nothing with this request
     if (count($temp_fields) <= 1){ die('success|remove-last|'.implode(',', $temp_fields)); }
@@ -116,11 +118,11 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-removed|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
+
   }
   // Otherwise if this was a shuffle request
   elseif ($temp_field == 'shuffle'){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Shuffle fields, simple as that
     shuffle($temp_fields);
@@ -149,12 +151,12 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-shuffled|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
-    
+
+
   }
   // Otherwise if this was a randomize request
   elseif ($temp_field == 'randomize'){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Collect a copy of the available fields and then shuffle them
     $temp_available_fields = $temp_omega_factor_options;
@@ -192,12 +194,12 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-randomize|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
-    
+
+
   }
   // Otherwise, if there was a new field provided, update it in the array
   elseif (!in_array($temp_field, $temp_fields)){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update this position in the array with the new field
     $temp_fields[$temp_key] = $temp_field;
@@ -226,11 +228,11 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
+
   }
   // Otherwise, if this field already exists, swap position in array
   elseif (in_array($temp_field, $temp_fields)){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update this position in the array with the new field
     $this_slot_key = $temp_key;
@@ -266,15 +268,15 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
+
   } else {
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Collect the available star counts for this player
     $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
     // Produce an error show this field has already been selected
     exit('error|field-exists|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
+
   }
 
 }
@@ -307,7 +309,7 @@ if (true){
 
   // Start the output buffer
   ob_start();
-  
+
   // Loop through the allowed edit data for all players
   $key_counter = 0;
   $player_counter = 0;
@@ -321,13 +323,13 @@ if (true){
         $player_image_offset = $player_info['player_image_size'] > 80 ? ceil(($player_info['player_image_size'] - 80) * 0.5) : 0;
         $player_image_offset_x = -14 - $player_image_offset;
         $player_image_offset_y = -14 - $player_image_offset;
-        echo '<a data-number="'.$player_info['player_number'].'" data-token="'.$player_info['player_token'].'_'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" style="background-image: url(images/players/'.(!empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token']).'/mug_right_'.$player_info['player_image_size'].'x'.$player_info['player_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: '.$player_image_offset_x.'px '.$player_image_offset_y.'px;" class="sprite sprite_player sprite_player_'.$player_token.' sprite_player_sprite sprite_'.$player_info['player_image_size'].'x'.$player_info['player_image_size'].' sprite_'.$player_info['player_image_size'].'x'.$player_info['player_image_size'].'_mugshot player_status_active player_position_active '.($player_key == $first_player_token ? 'sprite_player_current sprite_player_'.$player_token.'_current ' : '').'">'.$player_info['player_name'].'</a>'."\n";
+        echo '<a data-number="'.$player_counter.'" data-token="'.$player_info['player_token'].'_'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" style="background-image: url(images/players/'.(!empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token']).'/mug_right_'.$player_info['player_image_size'].'x'.$player_info['player_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: '.$player_image_offset_x.'px '.$player_image_offset_y.'px;" class="sprite sprite_player sprite_player_'.$player_token.' sprite_player_sprite sprite_'.$player_info['player_image_size'].'x'.$player_info['player_image_size'].' sprite_'.$player_info['player_image_size'].'x'.$player_info['player_image_size'].'_mugshot player_status_active player_position_active '.($player_key == $first_player_token ? 'sprite_player_current sprite_player_'.$player_token.'_current ' : '').'">'.$player_info['player_name'].'</a>'."\n";
         $key_counter++;
       //echo '<a class="sort" data-player="'.$player_info['player_token'].'">sort</a>';
       echo '</div>'."\n";
     //echo '</td>'."\n";
   }
-  
+
   // Collect the contents of the buffer
   $edit_canvas_markup = ob_get_clean();
   $edit_canvas_markup = preg_replace('/\s+/', ' ', trim($edit_canvas_markup));
@@ -374,7 +376,7 @@ if (true){
   // Loop through the unlockable MM3 fields (from omega factor four)
   foreach ($this_omega_factors_four AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_omega_factor_options[] = $factor; } }
 */
-    
+
   // Loop through the players in the field edit data
   foreach($allowed_edit_data AS $player_token => $player_info){
 
@@ -520,7 +522,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Data Library | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+<title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?><?= $global_allow_editing ? 'Edit' : 'View' ?> Players | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="players" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
@@ -552,6 +554,7 @@ gameSettings.fadeIn = <?= isset($_GET['fadein']) ? $_GET['fadein'] : 'true' ?>;
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
 gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
 gameSettings.autoScrollTop = false;
+gameSettings.userNumber = <?= MMRPG_REMOTE_GAME_ID ?>;
 gameSettings.allowEditing = <?= isset($_GET['edit']) ? $_GET['edit'] : 'true' ?>;
 // Wait until the document is ready
 $(document).ready(function(){
@@ -568,7 +571,7 @@ $(document).ready(function(){
 if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
 // If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_player-editor-intro';
+$temp_event_flag = 'unlocked-tooltip_player-editor-intro';
 if (empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
   $temp_game_flags[$temp_event_flag] = true;
   ?>

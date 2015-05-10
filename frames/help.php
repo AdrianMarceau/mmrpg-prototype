@@ -63,7 +63,7 @@ $this_tooltip_count = !empty($prototype_tooltip_index) ? count($prototype_toolti
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Rulebook | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+<title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?>View Help | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
@@ -136,7 +136,7 @@ function windowResizeLeaderboard(){
 
   var newBodyHeight = windowHeight;
   var newFrameHeight = newBodyHeight - headerHeight;
-  
+
   if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
   else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 

@@ -2,6 +2,10 @@
 // Require the application top file
 require_once('../top.php');
 
+// Include the database index array files
+require('../data/database_types.php');
+require('../data/database_robots.php');
+
 // Collect the current request type if set
 $this_action = !empty($_REQUEST['action']) ? strtolower($_REQUEST['action']) : false;
 $allow_fadein = true;
@@ -61,6 +65,7 @@ while ($this_action == 'save'){
         $_SESSION[$session_token]['USER']['password_encoded'] = md5($_SESSION[$session_token]['USER']['password']);
         $_SESSION[$session_token]['USER']['imagepath'] = $_POST['imagepath'];
         $_SESSION[$session_token]['USER']['colourtoken'] = $_POST['colourtoken'];
+        $_SESSION[$session_token]['USER']['difficulty'] = $_POST['difficulty'];
         $_SESSION[$session_token]['FILE']['path'] = $_SESSION[$session_token]['USER']['username_clean'].'/';
         $_SESSION[$session_token]['FILE']['name'] = $_SESSION[$session_token]['USER']['password_encoded'].'.sav';
         $this_save_filepath = $this_save_dir.$_SESSION[$session_token]['FILE']['path'].$_SESSION[$session_token]['FILE']['name'];
@@ -85,25 +90,10 @@ while ($this_action == 'save'){
     break;
 
   }
-  
+
   // Sort the robot index based on robot number
-  function mmrpg_index_sort_robots($robot_one, $robot_two){
-    global $temp_serial_ordering;
-    $robot_one['robot_game'] = !empty($robot_one['robot_game']) ? $robot_one['robot_game'] : 'MM00';
-    $robot_two['robot_game'] = !empty($robot_two['robot_game']) ? $robot_two['robot_game'] : 'MM00';
-    //$robot_one['robot_number_position'] = array_search(substr($robot_one['robot_number'], 0, 3), $temp_serial_ordering);
-    //$robot_two['robot_number_position'] = array_search(substr($robot_two['robot_number'], 0, 3), $temp_serial_ordering);
-    if ($robot_one['robot_game'] > $robot_two['robot_game']){ return 1; }
-    elseif ($robot_one['robot_game'] < $robot_two['robot_game']){ return -1; }
-    //elseif ($robot_one['robot_number_position'] > $robot_two['robot_number_position']){ return 1; }
-    //elseif ($robot_one['robot_number_position'] < $robot_two['robot_number_position']){ return -1; }
-    elseif ($robot_one['robot_number'] > $robot_two['robot_number']){ return 1; }
-    elseif ($robot_one['robot_number'] < $robot_two['robot_number']){ return -1; }
-    else { return 0; }
-  }
-  // Sort the robot index based on robot number
-  $mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
-  uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
+  //$mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
+  //uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
   //die('<pre>$mmrpg_database_robots = '.print_r($mmrpg_database_robots, true).'</pre>');
 
   // Update the header markup title
@@ -134,7 +124,7 @@ while ($this_action == 'save'){
     // Display Name
     $html_form_fields .= '<label class="label label_displayname" style="width: 130px; ">Display Name :</label>';
     $html_form_fields .= '<input class="text text_displayname" style="width: 230px; " type="text" name="displayname" maxlength="18" value="'.htmlentities(trim(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
-      
+
     // Player Colour
     $mmrpg_database_type = $mmrpg_index['types'];
     sort($mmrpg_database_type);
@@ -158,9 +148,9 @@ while ($this_action == 'save'){
       $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['colourtoken'].'"', 'value="'.$_SESSION['GAME']['USER']['colourtoken'].'" selected="selected"', implode('', $html_colour_options));
       $html_form_fields .= '<select class="select select_colourtoken" style="width: 230px; " name="colourtoken">'.$temp_select_options.'</select>';
     //$html_form_fields .= '</div>';
-    
-    // Robot Avatar
-    //$html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
+
+      // Robot Avatar
+      //$html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
       $html_form_fields .= '<label class="label label_imagepath" style="width: 130px; ">Robot Avatar :</label>';
       $html_avatar_options = array();
       $html_avatar_options[] = '<option value="">- Select Robot -</option>';
@@ -169,31 +159,51 @@ while ($this_action == 'save'){
       $html_avatar_options[] = '<optgroup label="Mega Man Robots">';
       // Add all the robot avatars to the list
       foreach ($mmrpg_database_robots AS $token => $info){
-        if ($token == 'robot' || strstr($token, 'copy')){ continue; }
-        elseif (isset($info['robot_image']) && $info['robot_image'] == 'robot'){ continue; }
-        elseif (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){ continue; }
-        elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
-        elseif (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
-        if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
-        // If the game has changed print the new optgroup
-        if ($info['robot_game'] != $temp_optgroup_token){
-          $temp_optgroup_token = $info['robot_game'];
-          if ($temp_optgroup_token == 'MM20'){ $temp_optgroup_name = 'Mega Man Killers'; }
-          elseif (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '0').' Robots'; }
-          else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $temp_optgroup_token).' Robots'; }
-          $html_avatar_options[] = '</optgroup>';
-          $html_avatar_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
+      if ($token == 'robot' || strstr($token, 'copy')){ continue; }
+      elseif (isset($info['robot_image']) && $info['robot_image'] == 'robot'){ continue; }
+      elseif (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){ continue; }
+      elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
+      elseif (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
+      if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
+      //$info = mmrpg_robot::parse_index_info($info);
+
+      // If the game has changed print the new optgroup
+      if ($info['robot_game'] != $temp_optgroup_token){
+        $temp_optgroup_token = $info['robot_game'];
+        if ($temp_optgroup_token == 'MM20'){ $temp_optgroup_name = 'Mega Man Killers'; }
+        elseif (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '0').' Robots'; }
+        else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $temp_optgroup_token).' Robots'; }
+        $html_avatar_options[] = '</optgroup>';
+        $html_avatar_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
+      }
+
+      $size = isset($info['robot_image_size']) ? $info['robot_image_size'] : 40;
+      $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
+
+      // Collect the summon count for this robot
+      $temp_summon_count = mmrpg_prototype_database_summoned($token);
+
+      // If this is a copy core, add it's type alts
+      if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
+        foreach ($mmrpg_index['types'] AS $type_token => $type_info){
+          if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
+          if (!isset($_SESSION['GAME']['values']['battle_items']['item-core-'.$type_token]) && $this_userinfo['role_id'] != 1){ continue; }
+          $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)'.'</option>';
         }
-        $size = isset($info['robot_image_size']) ? $info['robot_image_size'] : 40;
-        $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
-        if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
-          foreach ($mmrpg_index['types'] AS $type_token => $type_info){
-            if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
-            if (!isset($_SESSION['GAME']['values']['battle_items']['item-core-'.$type_token]) && $this_userinfo['role_id'] != 1){ continue; }
-            $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)'.'</option>';
+      }
+      // Otherwise, if this ROBOT MASTER alt skin has been inlocked
+      elseif (!empty($info['robot_image_alts'])){
+        //die('<pre>$info = '.print_r($info, true).'</pre>');
+        // Loop through each of the available alts and print if unlocked
+        foreach ($info['robot_image_alts'] AS $key => $this_altinfo){
+          // Only print if unlocked or admin
+          if ($temp_summon_count >= $this_altinfo['summons']){
+            $html_avatar_options[] = '<option value="robots/'.$token.'_'.$this_altinfo['token'].'/'.$size.'">'.$info['robot_number'].' : '.$this_altinfo['name'].'</option>';
           }
         }
       }
+
+    }
       // Add player avatars if this is the developer
       if ($this_userinfo['role_id'] == 1 || $this_userinfo['role_id'] == 6){
         $html_avatar_options[] = '</optgroup>';
@@ -209,6 +219,17 @@ while ($this_action == 'save'){
     //$html_form_fields .= '</div>';
 
   $html_form_fields .= '</div>';
+
+  // Game Difficulty
+  //$html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">';
+    $html_form_fields .= '<label class="label label_difficulty" style="width: 100px; ">Mode :</label>';
+    $html_difficulty_options = array();
+    $html_difficulty_options[] = '<option value="easy">Easy Difficulty</option>';
+    $html_difficulty_options[] = '<option value="normal">Normal Difficulty</option>';
+    $html_difficulty_options[] = '<option value="hard">Hard Difficulty</option>';
+    $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['difficulty'].'"', 'value="'.$_SESSION['GAME']['USER']['difficulty'].'" selected="selected"', implode('', $html_difficulty_options));
+    $html_form_fields .= '<select class="select select_difficulty" style="width: 230px; " name="difficulty">'.$temp_select_options.'</select>';
+  //$html_form_fields .= '</div>';
 
   // Update the form markup buttons
   $html_form_buttons .= '<input class="button button_submit" type="submit" value="Save Game" />';
@@ -423,7 +444,7 @@ while ($this_action == 'new'){
 }
 // Else, if the LOAD action was requested
 while ($this_action == 'load'){
-  
+
   // Define the coppa flag
   $html_form_show_coppa = false;
 
@@ -481,7 +502,7 @@ while ($this_action == 'load'){
 
         // The password was correct, but let's also make sure the user is old enough
         if (!empty($temp_database_user['user_date_birth']) && !empty($temp_database_user['user_flag_approved'])){
-                
+
           // The password was correct! Update the session with these credentials
           $_SESSION['GAME']['DEMO'] = 0;
           $_SESSION['GAME']['USER'] = $this_user;
@@ -497,15 +518,15 @@ while ($this_action == 'load'){
           // Update the form markup, then break from the loop
           $file_has_updated = true;
           break;
-          
+
         }
         // The user has not confirmed their date of birth, produce an error
         else {
-      
+
           // Define the data of birth checking variables
           $min_dateofbirth = date('Y/m/d', strtotime('13 years ago'));
           $bypass_dateofbirth = false;
-          
+
           // Allow the test user to bypass age concent, we got an email
           $bypass_dateofbirth_index = array();
           $temp_dateofbirth_index = explode(',', preg_replace('/\s+/', '', MMRPG_COPPA_COMPLIANCE_PERMISSIONS));
@@ -514,7 +535,7 @@ while ($this_action == 'load'){
           foreach ($temp_dateofbirth_index AS $string){ list($username, $email) = explode('/', $string); $bypass_dateofbirth_index[strtolower($username)] = strtolower($email); }
           if (!empty($bypass_dateofbirth_index[$temp_username_token]) && $bypass_dateofbirth_index[$temp_username_token] == $temp_email_token){ $bypass_dateofbirth = true; }
           //die('<pre>$bypass_dateofbirth_index = '.print_r($bypass_dateofbirth_index, true).'</pre>');
-          
+
           // Ensure the dateofbirth is valid
           //die('$min_dateofbirth = '.$min_dateofbirth);
           if (empty($_REQUEST['dateofbirth'])){
@@ -537,7 +558,7 @@ while ($this_action == 'load'){
             $html_form_verified = false;
             $html_form_show_coppa = true;
           }
-                    
+
           // The password was correct! Update the session with these credentials
           $_SESSION['GAME']['DEMO'] = 0;
           $_SESSION['GAME']['USER'] = $this_user;
@@ -557,7 +578,7 @@ while ($this_action == 'load'){
           // Update the form markup, then break from the loop
           $file_has_updated = true;
           break;
-          
+
         }
 
       }
@@ -627,9 +648,9 @@ while ($this_action == 'load'){
 }
 
 // Ensure this is not a demo build before doing updates
-if ($_SESSION[$session_token]['DEMO'] == 0){
+if (empty($_SESSION[$session_token]['DEMO'])){
   // Require the updates file
-  require_once('../file_updates.php');
+  require_once('../admin/file_updates.php');
 }
 
 ?>
@@ -637,7 +658,7 @@ if ($_SESSION[$session_token]['DEMO'] == 0){
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Game File | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+<title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?><?= ucfirst($this_action) ?> Game | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
@@ -736,7 +757,7 @@ function windowResizeFrame(){
 
   var newBodyHeight = windowHeight;
   var newFrameHeight = newBodyHeight - headerHeight;
-  
+
   if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
   else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 
