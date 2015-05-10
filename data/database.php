@@ -14,6 +14,9 @@ require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
 // Require the mechas database
 require(MMRPG_CONFIG_ROOTDIR.'data/database_mechas.php');
 
+// Require the bosses database
+require(MMRPG_CONFIG_ROOTDIR.'data/database_bosses.php');
+
 // Require the abilities database
 require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
 

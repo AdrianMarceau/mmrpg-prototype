@@ -8,11 +8,15 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $mmrpg_database_types = $mmrpg_index['types'];
 $temp_remove_types = array('attack', 'defense', 'speed', 'energy', 'weapons', 'empty', 'light', 'wily', 'cossack', 'damage', 'recovery', 'experience', 'level');
 foreach ($temp_remove_types AS $token){ unset($mmrpg_database_types[$token]); }
-ksort($mmrpg_database_types);
-$mmrpg_database_types['none'] = array();
+uasort($mmrpg_database_types, function($t1, $t2){
+  if ($t1['type_order'] > $t2['type_order']){ return 1; }
+  elseif ($t1['type_order'] < $t2['type_order']){ return -1; }
+  else { return 0; }
+});
+//$mmrpg_database_types['none'] = array();
 $mmrpg_database_types_count = count($mmrpg_database_types);
 $mmrpg_database_types_count_added = 1;
 $mmrpg_database_types_count_actual = count($mmrpg_index['types']);
-//die('$mmrpg_database_abilities_types = <pre>'.print_r($mmrpg_database_abilities_types, true).'</pre>');
+//die('$mmrpg_database_abilities_types = <pre>'.print_r($mmrpg_database_types, true).'</pre>');
 
 ?>

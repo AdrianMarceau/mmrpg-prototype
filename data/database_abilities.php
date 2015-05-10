@@ -14,7 +14,9 @@ foreach ($mmrpg_database_types AS $token => $info){
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $hidden_database_abilities = array();
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('ability', 'attachment-defeat', 'action-noweapons'));
-$hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'sticky-shot', 'roll-swing'));
+$hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'sticky-shot'));
+$hidden_database_abilities = array_merge($hidden_database_abilities, array('crash-driller', 'dive-blitzkrieg', 'pharaoh-wave', 'sakugarne-bounce'));
+$hidden_database_abilities = array_merge($hidden_database_abilities, array('meteor-knuckle', 'comet-attack'));
 //$hidden_database_abilities = array_merge($hidden_database_abilities, array('air-man', 'bubble-man', 'crash-man', 'flash-man', 'heat-man', 'metal-man', 'quick-man', 'wood-man'));
 //$hidden_database_abilities = array_merge($hidden_database_abilities, array('needle-man', 'magnet-man', 'gemini-man', 'hard-man', 'top-man', 'snake-man', 'spark-man', 'shadow-man'));
 $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($hidden_database_abilities) : 0;
@@ -27,6 +29,9 @@ $temp_condition .= "AND ability_class <> 'item' ";
 if (!defined('DATA_DATABASE_SHOW_MECHAS')){
   $temp_condition .= "AND ability_class <> 'mecha' ";
 }
+if (!defined('DATA_DATABASE_SHOW_BOSSES')){
+  $temp_condition .= "AND ability_class <> 'boss' ";
+}
 if (!empty($hidden_database_abilities)){
   $temp_tokens = array();
   foreach ($hidden_database_abilities AS $token){ $temp_tokens[] = "'".$token."'"; }
@@ -35,16 +40,16 @@ if (!empty($hidden_database_abilities)){
 
 // Collect the database abilities
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-$mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition}", 'ability_token');
+$mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
 
 // Remove unallowed abilities from the database, and increment counters
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
   if (true){
-    
+
     // Send this data through the ability index parser
     $temp_info = mmrpg_ability::parse_index_info($temp_info);
-    
+
     // Ensure this ability's image exists, else default to the placeholder
     $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/abilities/'.$temp_image_token.'/')){ $temp_info['ability_image'] = $temp_image_token; }
@@ -55,118 +60,23 @@ foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
       unset($mmrpg_database_abilities[$temp_token]);
       continue;
     }
-    $temp_info['ability_speed'] = isset($temp_info['ability_speed']) ? $temp_info['ability_speed'] + 3 : 3;
+    //$temp_info['ability_speed'] = isset($temp_info['ability_speed']) ? $temp_info['ability_speed'] + 3 : 3;
+    $temp_info['ability_speed'] = isset($temp_info['ability_speed']) ? ($temp_info['ability_speed'] + 9) : 10;
     $temp_info['ability_energy'] = isset($temp_info['ability_energy']) ? $temp_info['ability_energy'] : 10;
     // Increment the corresponding type counter for this ability if not empty
-    if (!empty($temp_info['ability_type'])){ $mmrpg_database_abilities_types[$temp_info['ability_type']]++; }
+    if (!empty($temp_info['ability_type'])){
+      if (!isset($mmrpg_database_abilities_types[$temp_info['ability_type']])){ $mmrpg_database_abilities_types[$temp_info['ability_type']] = 0; }
+      $mmrpg_database_abilities_types[$temp_info['ability_type']]++;
+    }
     else { $mmrpg_database_abilities_types['none']++; }
     if (!empty($temp_info['ability_type2'])){ $mmrpg_database_abilities_types[$temp_info['ability_type2']]++; }
     //else { $mmrpg_database_abilities_types['none']++; }
-    
+
     // Update the main database array with the changes
     $mmrpg_database_abilities[$temp_token] = $temp_info;
-    
-  }
-}
 
-// Sort the ability index based on ability number
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-$temp_pattern_first = array();
-$temp_pattern_first[] = '/^(buster-shot)$/i';
-$temp_pattern_first[] = '/^mega-(buster|ball|slide)$/i';
-$temp_pattern_first[] = '/^bass-(buster|crush|baroque)$/i';
-$temp_pattern_first[] = '/^proto-(buster|shield|strike)$/i';
-$temp_pattern_first[] = '/^roll-(buster)$/i';
-$temp_pattern_first[] = '/^disco-(buster)$/i';
-$temp_pattern_first[] = '/^rhythm-(buster)$/i';
-$temp_pattern_first[] = '/^light-buster$/i';
-$temp_pattern_first[] = '/^wily-buster$/i';
-$temp_pattern_first[] = '/^cossack-buster$/i';
-//$temp_pattern_first = array_reverse($temp_pattern_first);
-$temp_pattern_last = array();
-$temp_pattern_last[] = '/^(energy|repair)-(boost|break|swap)$/i';
-$temp_pattern_last[] = '/^(energy|repair)-(support)$/i';
-$temp_pattern_last[] = '/^(energy|repair)-(assault|shuffle)$/i';
-$temp_pattern_last[] = '/^(energy|repair)-(mode)$/i';
-$temp_pattern_last[] = '/^(attack|weapon)-(boost|break|swap)$/i';
-$temp_pattern_last[] = '/^(attack|weapon)-(support)$/i';
-$temp_pattern_last[] = '/^(attack|weapon)-(assault|shuffle)$/i';
-$temp_pattern_last[] = '/^(attack|weapon)-(mode)$/i';
-$temp_pattern_last[] = '/^(defense|shield)-(boost|break|swap)$/i';
-$temp_pattern_last[] = '/^(defense|shield)-(support)$/i';
-$temp_pattern_last[] = '/^(defense|shield)-(assault|shuffle)$/i';
-$temp_pattern_last[] = '/^(defense|shield)-(mode)$/i';
-$temp_pattern_last[] = '/^(speed|mobility)-(boost|break|swap)$/i';
-$temp_pattern_last[] = '/^(speed|mobility)-(support)$/i';
-$temp_pattern_last[] = '/^(speed|mobility)-(assault|shuffle)$/i';
-$temp_pattern_last[] = '/^(speed|mobility)-(mode)$/i';
-$temp_pattern_last[] = '/^(energy|attack|defense|speed|repair|weapon|shield|mobility)-(booster|breaker)$/i';
-$temp_pattern_last[] = '/^(energy|attack|defense|speed|repair|weapon|shield|mobility)-(burn|blaze)$/i';
-$temp_pattern_last[] = '/^(damage|recovery|experience)-(boost|break|mode)$/i';
-$temp_pattern_last[] = '/^(damage|recovery|experience)-(support|assault)$/i';
-$temp_pattern_last[] = '/^(damage|recovery|experience)-(booster|breaker)$/i';
-$temp_pattern_last[] = '/^(mecha|field)-(support|assault)$/i';
-$temp_pattern_last = array_reverse($temp_pattern_last);
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-function mmrpg_index_sort_abilities($ability_one, $ability_two){
-  // Pull in global variables
-  global $temp_pattern_first, $temp_pattern_last;
-  // Loop through all the temp patterns and compare them one at a time
-  foreach ($temp_pattern_first AS $key => $pattern){
-    // Check if either of these two abilities matches the current pattern
-    if (preg_match($pattern, $ability_one['ability_token']) && !preg_match($pattern, $ability_two['ability_token'])){ return -1; }
-    elseif (!preg_match($pattern, $ability_one['ability_token']) && preg_match($pattern, $ability_two['ability_token'])){ return 1; }
-  }
-  foreach ($temp_pattern_last AS $key => $pattern){
-    // Check if either of these two abilities matches the current pattern
-    if (preg_match($pattern, $ability_one['ability_token']) && !preg_match($pattern, $ability_two['ability_token'])){ return 1; }
-    elseif (!preg_match($pattern, $ability_one['ability_token']) && preg_match($pattern, $ability_two['ability_token'])){ return -1; }
-  }
-  // If only one of the two abilities has a type, the one with goes first
-  if (!empty($ability_one['ability_type']) && empty($ability_two['ability_type'])){ return 1; }
-  elseif (empty($ability_one['ability_type']) && !empty($ability_two['ability_type'])){ return -1; }
-  // If neither ability has a type, order albabetically
-  elseif (empty($ability_one['ability_type']) && empty($ability_two['ability_type'])){
-    if ($ability_one['ability_energy'] > $ability_two['ability_energy']){ return 1; }
-    elseif ($ability_one['ability_energy'] < $ability_two['ability_energy']){ return -1; }
-    elseif ($ability_one['ability_token'] > $ability_two['ability_token']){ return 1; }
-    elseif ($ability_one['ability_token'] < $ability_two['ability_token']){ return -1; }
-    else { return 0; }
-  }
-  // If the abilities have types, order them by their types alphabetically
-  elseif ($ability_one['ability_type'] > $ability_two['ability_type']){ return 1; }
-  elseif ($ability_one['ability_type'] < $ability_two['ability_type']){ return -1; }
-  // If the abilities have the same first type, compare further
-  elseif ($ability_one['ability_type'] == $ability_two['ability_type']){
-    // If only one of the two abilities has a second type, that one goes last
-    if (!empty($ability_one['ability_type2']) && empty($ability_two['ability_type2'])){ return 1; }
-    elseif (empty($ability_one['ability_type2']) && !empty($ability_two['ability_type2'])){ return -1; }
-    // Else if neither ability has a type, order alphabetically
-    elseif (empty($ability_one['ability_type2']) && empty($ability_two['ability_type2'])){
-      if ($ability_one['ability_energy'] > $ability_two['ability_energy']){ return 1; }
-      elseif ($ability_one['ability_energy'] < $ability_two['ability_energy']){ return -1; }
-      elseif ($ability_one['ability_token'] > $ability_two['ability_token']){ return 1; }
-      elseif ($ability_one['ability_token'] < $ability_two['ability_token']){ return -1; }
-      else { return 0; }
-    }
-    // Else if the abilities have second types, order them by their second types alphabetically
-    elseif ($ability_one['ability_type2'] > $ability_two['ability_type2']){ return 1; }
-    elseif ($ability_one['ability_type2'] < $ability_two['ability_type2']){ return -1; }
-    // Else if the abilities have the same second type, order alphabetically
-    elseif ($ability_one['ability_type2'] == $ability_two['ability_type2']){
-      if ($ability_one['ability_energy'] > $ability_two['ability_energy']){ return 1; }
-      elseif ($ability_one['ability_energy'] < $ability_two['ability_energy']){ return -1; }
-      elseif ($ability_one['ability_token'] > $ability_two['ability_token']){ return 1; }
-      elseif ($ability_one['ability_token'] < $ability_two['ability_token']){ return -1; }
-      else { return 0; }
-    }
-  }
-  else {
-    // Return 0 by default
-    return 0;
   }
 }
-uasort($mmrpg_database_abilities, 'mmrpg_index_sort_abilities');
 
 // Determine the token for the very first ability in the database
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -179,36 +89,67 @@ unset($temp_ability_tokens);
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $mmrpg_database_abilities_count = count($mmrpg_database_abilities);
 
-// Loop through the database and generate the links for these abilities
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+// Define database variables we'll be using to generate links
 $key_counter = 0;
+$last_game_code = '';
 $mmrpg_database_abilities_links = '';
 $mmrpg_database_abilities_links_counter = 0;
+
+// Loop through the database and generate the links for these abilities
 foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
+
   // If a type filter has been applied to the ability page
   $temp_ability_types = array();
   if (!empty($ability_info['ability_type'])){ $temp_ability_types[] = $ability_info['ability_type']; }
   if (!empty($ability_info['ability_type2'])){ $temp_ability_types[] = $ability_info['ability_type2']; }
   if (empty($temp_ability_types)){ $temp_ability_types[] = 'none'; }
   if (isset($this_current_filter) && !in_array($this_current_filter, $temp_ability_types)){ $key_counter++; continue; }
+
+  // If this is the first in a new group
+  $game_code = !empty($ability_info['ability_group']) ? $ability_info['ability_group'] : (!empty($ability_info['ability_game']) ? $ability_info['ability_game'] : 'MMRPG');
+  if ($game_code != $last_game_code){
+    if ($key_counter != 0){ $mmrpg_database_abilities_links .= '</div>'; }
+    if ($game_code == 'MM01/Weapons/003'){ $mmrpg_database_abilities_links .= '<span class="break"></span>'; }
+    $mmrpg_database_abilities_links .= '<div class="float link group" data-game="'.$game_code.'">';
+    $last_game_code = $game_code;
+  }
+
   // Collect the ability sprite dimensions
   $ability_image_size = !empty($ability_info['ability_image_size']) ? $ability_info['ability_image_size'] : 40;
   $ability_image_size_text = $ability_image_size.'x'.$ability_image_size;
   $ability_image_token = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
   $ability_image_incomplete = $ability_image_token == 'ability' ? true : false;
   $ability_is_active = !empty($this_current_token) && $this_current_token == $ability_info['ability_token'] ? true : false;
-  $ability_title_text = $ability_info['ability_name'].(!empty($ability_info['ability_type']) ? ' | '.ucfirst($ability_info['ability_type']).' Type' : ' | Neutral Type');
+  $ability_title_text = $ability_info['ability_name'].(!empty($ability_info['ability_type']) ? ' | '.ucfirst($ability_info['ability_type']).' Type' : ' | Neutral Type'); //.' | '.$ability_info['ability_game'].' | '.$ability_info['ability_group'];
   if (!empty($ability_info['ability_type2'])){ $ability_title_text = str_replace('Type', '/ '.ucfirst($ability_info['ability_type2']).' Type', $ability_title_text); }
-  $ability_image_path = 'images/abilities/'.$ability_image_token.'/icon_right_'.$ability_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+  $ability_title_text .= '|| [[';
+  if (empty($ability_info['ability_damage']) && empty($ability_info['ability_recovery'])){ $ability_title_text .= 'Special Effects'; }
+  elseif (!empty($ability_info['ability_damage'])){ $ability_title_text .= $ability_info['ability_damage'].' Damage'; }
+  elseif (!empty($ability_info['ability_recovery'])){ $ability_title_text .= $ability_info['ability_recovery'].' Recovery'; }
+  if (!empty($ability_info['ability_accuracy'])){ $ability_title_text .= ' | '.$ability_info['ability_accuracy'].'% Accuracy'; }
+  if (isset($ability_info['ability_energy'])){ $ability_title_text .= ' | '.$ability_info['ability_energy'].' Energy'; }
+  $ability_title_text .= ']]';
+  if (false && !empty($ability_info['ability_description'])){
+    $temp_description = $ability_info['ability_description'];
+    $temp_description = str_replace('{DAMAGE}', $ability_info['ability_damage'], $temp_description);
+    $temp_description = str_replace('{DAMAGE2}', $ability_info['ability_damage2'], $temp_description);
+    $temp_description = str_replace('{RECOVERY}', $ability_info['ability_recovery'], $temp_description);
+    $temp_description = str_replace('{RECOVERY2}', $ability_info['ability_recovery2'], $temp_description);
+    $ability_title_text .= '|| [['.$temp_description.']]';
+  }
+  //$ability_image_path = 'images/abilities/'.$ability_image_token.'/icon_right_'.$ability_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+  $ability_image_path = 'i/a/'.$ability_image_token.'/ir'.$ability_image_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+
   // Start the output buffer and collect the generated markup
   ob_start();
   ?>
-  <div title="<?= $ability_title_text ?>" data-token="<?= $ability_info['ability_token'] ?>" class="float float_left float_link ability_type ability_type_<?= (!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '') ?>" style="<?= $ability_image_incomplete  ? 'opacity: 0.25; ' : '' ?>" rel="<?= $ability_image_incomplete ? 'nofollow' : 'follow' ?>">
-    <a class="sprite sprite_ability_link sprite_ability sprite_ability_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_<?= $ability_image_size_text ?>  ability_status_active ability_position_active <?= $ability_key == $first_ability_token ? 'sprite_ability_current ' : '' ?>" href="<?='database/abilities/'.$ability_info['ability_token']?>/" style="<?= $ability_image_incomplete  ? 'opacity: 0.50; ' : '' ?>">
+  <div title="<?= $ability_title_text ?>" data-token="<?= $ability_info['ability_token'] ?>" class="float left link type <?= ($ability_image_incomplete ? 'inactive ' : '').(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '') ?>">
+    <a class="sprite ability link mugshot size<?= $ability_image_size.($ability_key == $first_ability_token ? ' current' : '') ?>" href="<?='database/abilities/'.$ability_info['ability_token']?>/" rel="<?= $ability_image_incomplete ? 'nofollow' : 'follow' ?>">
       <? if($ability_image_token != 'ability'): ?>
         <img src="<?= $ability_image_path ?>" width="<?= $ability_image_size ?>" height="<?= $ability_image_size ?>" alt="<?= $ability_title_text ?>" />
       <? else: ?>
-        <span><?= preg_replace('/\s+([a-z0-9]+)$/i', '<br />$1', $ability_info['ability_name']) ?></span>
+        <span><?= $ability_info['ability_name'] ?></span>
       <? endif; ?>
     </a>
   </div>
@@ -216,7 +157,12 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
   $mmrpg_database_abilities_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
   $mmrpg_database_abilities_links_counter++;
   $key_counter++;
+
 }
+
+// End the groups, however many there were
+$mmrpg_database_abilities_links .= '</div>';
+
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 ?>

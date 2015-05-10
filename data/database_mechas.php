@@ -23,7 +23,6 @@ $hidden_database_mechas = array();
 //$hidden_database_mechas = array_merge($hidden_database_mechas, array('needle-man', 'magnet-man', 'gemini-man', 'hard-man', 'top-man', 'snake-man', 'spark-man', 'shadow-man'));
 $hidden_database_mechas_count = !empty($hidden_database_mechas) ? count($hidden_database_mechas) : 0;
 
-
 // Define the hidden mecha query condition
 $temp_condition = '';
 $temp_condition .= "AND robot_class = 'mecha' ";
@@ -36,21 +35,21 @@ if (!empty($hidden_database_mechas)){
 
 // Collect the database mechas and fields
 $mmrpg_database_fields = $DB->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
-$mmrpg_database_mechas = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition};", 'robot_token');
+$mmrpg_database_mechas = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition} ORDER BY robot_order ASC;", 'robot_token');
 
 // Remove unallowed mechas from the database, and increment type counters
 foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){
-  
+
   // Remove hidden mechas from the the array (assuming they're still here)
   if (true){
-    
+
     // Send this data through the mecha index parser
     $temp_info = mmrpg_robot::parse_index_info($temp_info);
-    
+
     // Ensure this mecha's image exists, else default to the placeholder
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$temp_token.'/')){ $temp_info['robot_image'] = $temp_token; }
     else { $temp_info['robot_image'] = 'mecha'; }
-    
+
     // Modify the name of this mecha if it is of the mecha class
     if ($temp_info['robot_class'] == 'mecha'){
       // Collect this mecha's field token, then mecha master token, then mecha master number
@@ -62,14 +61,19 @@ foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){
       $temp_master_number = !empty($mmrpg_database_robots[$temp_master_token]) ? $mmrpg_database_robots[$temp_master_token]['robot_number'] : $temp_info['robot_number'];
       $temp_info['robot_master_number'] = $temp_master_number;
     }
-    
-    
+
+
     // Increment the mecha core counter if not empty
-    if (!empty($temp_info['robot_core'])){ $mmrpg_database_mechas_types['cores'][$temp_info['robot_core']]++; }
-    else { $mmrpg_database_mechas_types['cores']['none']++; }
+    if (!empty($temp_info['robot_core'])){
+      if (!isset($mmrpg_database_mechas_types['cores'][$temp_info['robot_core']])){ $mmrpg_database_mechas_types['cores'][$temp_info['robot_core']] = 0; }
+      $mmrpg_database_mechas_types['cores'][$temp_info['robot_core']]++;
+    }
+    else {
+      $mmrpg_database_mechas_types['cores']['none']++;
+    }
     if (!empty($temp_info['robot_core2'])){ $mmrpg_database_mechas_types['cores'][$temp_info['robot_core2']]++; }
     //else { $mmrpg_database_mechas_types['cores']['none']++; }
-    
+
     // Loop through the mecha weaknesses if there are any to loop through
     if (!empty($temp_info['robot_weaknesses'])){
       foreach ($temp_info['robot_weaknesses'] AS $weakness){ $mmrpg_database_mechas_types['weaknesses'][$weakness]++; }
@@ -94,56 +98,15 @@ foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){
     } else {
       $mmrpg_database_mechas_types['immunities']['none']++;
     }
-    
+
     // Update the main database array with the changes
     $mmrpg_database_mechas[$temp_token] = $temp_info;
-    
+
   }
 }
 
 // DEBUG DEBUG DEBUG
 //die('<pre>$mmrpg_database_mechas : '.print_r($mmrpg_database_mechas, true).'</pre>');
-
-// Sort the mecha index based on mecha number
-$temp_last_mechas = array('met');
-$temp_serial_ordering = array(
-	'DLN', // Dr. Light Number
-	'DWN', // Dr. Wily Number
-	'DCN', // Dr. Cossack Number
-  'DLM'  // Dr. Light Robot
-  );
-function mmrpg_index_sort_mechas($mecha_one, $mecha_two){
-  global $temp_last_mechas, $temp_serial_ordering;
-  $mecha_one['robot_game'] = !empty($mecha_one['robot_game']) ? $mecha_one['robot_game'] : 'MM00';
-  $mecha_two['robot_game'] = !empty($mecha_two['robot_game']) ? $mecha_two['robot_game'] : 'MM00';
-  $mecha_one['robot_class'] = !empty($mecha_one['robot_class']) ? $mecha_one['robot_class'] : 'master';
-  $mecha_two['robot_class'] = !empty($mecha_two['robot_class']) ? $mecha_two['robot_class'] : 'master';
-  $mecha_one['robot_token_position'] = array_search($mecha_one['robot_token'], $temp_last_mechas);
-  $mecha_two['robot_token_position'] = array_search($mecha_two['robot_token'], $temp_last_mechas);
-  if ($mecha_one['robot_token_position'] !== false && $mecha_two['robot_token_position'] !== false){
-    if ($mecha_one['robot_token_position'] > $mecha_two['robot_token_position']){ return -1; }
-    elseif ($mecha_one['robot_token_position'] < $mecha_two['robot_token_position']){ return 1; }
-    else { return 0; }
-  }
-  elseif ($mecha_one['robot_token_position'] !== false || $mecha_two['robot_token_position'] !== false){
-    if ($mecha_one['robot_token_position'] === false){ return -1; }
-    elseif ($mecha_two['robot_token_position'] === false){ return 1; }
-    else { return 0; }
-  }
-  elseif ($mecha_one['robot_token_position'] === false && $mecha_two['robot_token_position'] === false){
-    if ($mecha_one['robot_class'] > $mecha_two['robot_class']){ return 1; }
-    elseif ($mecha_one['robot_class'] < $mecha_two['robot_class']){ return -1; }
-    elseif ($mecha_one['robot_game'] > $mecha_two['robot_game']){ return 1; }
-    elseif ($mecha_one['robot_game'] < $mecha_two['robot_game']){ return -1; }
-    elseif ($mecha_one['robot_master_number'] > $mecha_two['robot_master_number']){ return 1; }
-    elseif ($mecha_one['robot_master_number'] < $mecha_two['robot_master_number']){ return -1; }
-    elseif ($mecha_one['robot_number'] > $mecha_two['robot_number']){ return 1; }
-    elseif ($mecha_one['robot_number'] < $mecha_two['robot_number']){ return -1; }
-    else { return 0; }
-  }
-  return 0;
-}
-uasort($mmrpg_database_mechas, 'mmrpg_index_sort_mechas');
 
 // Sort the mecha type index based on values
 foreach ($mmrpg_database_mechas_types AS $token => $array){
@@ -161,14 +124,28 @@ unset($temp_mecha_tokens);
 // Count the number of mechas collected and filtered
 $mmrpg_database_mechas_count = count($mmrpg_database_mechas);
 
+// Define the max stat value before we filter and update
+if (!isset($mmrpg_stat_base_max_value)){ $mmrpg_stat_base_max_value = array(); }
+$mmrpg_stat_base_max_value['mecha'] = 0;
+
 // Loop through the database and generate the links for these mechas
 $key_counter = 0;
+$last_game_code = '';
 $mmrpg_database_mechas_links = '';
 $mmrpg_database_mechas_links_counter = 0;
 foreach ($mmrpg_database_mechas AS $mecha_key => $mecha_info){
   // If a type filter has been applied to the robot page
   if (isset($this_current_filter) && $this_current_filter == 'none' && $mecha_info['robot_core'] != ''){ $key_counter++; continue; }
-  elseif (isset($this_current_filter) && $this_current_filter != 'none' && $mecha_info['robot_core'] != $this_current_filter){ $key_counter++; continue; }
+  elseif (isset($this_current_filter) && $this_current_filter != 'none' && $mecha_info['robot_core'] != $this_current_filter && $mecha_info['robot_core2'] != $this_current_filter){ $key_counter++; continue; }
+
+  // If this is the first in a new group
+  $game_code = !empty($mecha_info['robot_game']) ? $mecha_info['robot_game'] : 'MMRPG';
+  if ($game_code != $last_game_code){
+    if ($key_counter != 0){ $mmrpg_database_mechas_links .= '</div>'; }
+    $mmrpg_database_mechas_links .= '<div class="float link group" data-game="'.$game_code.'">';
+    $last_game_code = $game_code;
+  }
+
   // Check if this is a mecha and prepare extra text
   $mecha_info['robot_name_append'] = '';
   if (!empty($mecha_info['robot_class']) && $mecha_info['robot_class'] == 'mecha'){
@@ -182,13 +159,17 @@ foreach ($mmrpg_database_mechas AS $mecha_key => $mecha_info){
   $mecha_image_token = !empty($mecha_info['robot_image']) ? $mecha_info['robot_image'] : $mecha_info['robot_token'];
   $mecha_image_incomplete = $mecha_image_token == 'mecha' ? true : false;
   $mecha_is_active = !empty($this_current_token) && $this_current_token == $mecha_info['robot_token'] ? true : false;
-  $mecha_title_text = $mecha_info['robot_name'].$mecha_info['robot_name_append'].' | '.(!empty($mecha_info['robot_core']) ? ucwords($mecha_info['robot_core'].(!empty($mecha_info['robot_core2']) ? ' / '.$mecha_info['robot_core2'] : '')) : 'Neutral').' Type';
-  $mecha_image_path = 'images/robots/'.$mecha_image_token.'/mug_right_'.$mecha_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+  $mecha_title_text = $mecha_info['robot_name'].$mecha_info['robot_name_append'].' | '.$mecha_info['robot_number'].' | '.(!empty($mecha_info['robot_core']) ? ucwords($mecha_info['robot_core'].(!empty($mecha_info['robot_core2']) ? ' / '.$mecha_info['robot_core2'] : '')) : 'Neutral').' Type';
+  $mecha_title_text .= '|| [[E:'.$mecha_info['robot_energy'].' | W:'.$mecha_info['robot_weapons'].' | A:'.$mecha_info['robot_attack'].' | D:'.$mecha_info['robot_defense'].' | S:'.$mecha_info['robot_speed'].']]';
+  //$mecha_image_path = 'images/robots/'.$mecha_image_token.'/mug_right_'.$mecha_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+  $mecha_image_path = 'i/r/'.$mecha_image_token.'/mr'.$mecha_image_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+  $mecha_stat_max = $mecha_info['robot_energy'] + $mecha_info['robot_attack'] + $mecha_info['robot_defense'] + $mecha_info['robot_speed'];
+  if ($mecha_stat_max > $mmrpg_stat_base_max_value['mecha']){ $mmrpg_stat_base_max_value['mecha'] = $mecha_stat_max; }
   // Start the output buffer and collect the generated markup
   ob_start();
   ?>
-  <div title="<?= $mecha_title_text ?>" data-token="<?= $mecha_info['robot_token'] ?>" class="float float_left float_link robot_type robot_type_<?= !empty($mecha_info['robot_core']) ? $mecha_info['robot_core'] : 'none' ?>" style="<?= $mecha_image_incomplete  ? 'opacity: 0.25; ' : '' ?>">
-    <a class="sprite sprite_robot_link sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_<?= $mecha_image_size_text ?>  robot_status_active robot_position_active <?= $mecha_key == $first_mecha_token ? 'sprite_robot_current ' : '' ?>" href="<?='database/mechas/'.$mecha_info['robot_token']?>/" style="<?= $mecha_image_incomplete  ? 'opacity: 0.50; ' : '' ?>" rel="<?= $mecha_image_incomplete ? 'nofollow' : 'follow' ?>">
+  <div title="<?= $mecha_title_text ?>" data-token="<?= $mecha_info['robot_token'] ?>" class="float left link type <?= ($mecha_image_incomplete  ? 'inactive ' : '').(!empty($mecha_info['robot_core']) ? $mecha_info['robot_core'] : 'none') ?>">
+    <a class="sprite robot link mugshot size<?= $mecha_image_size.($mecha_key == $first_mecha_token ? ' current' : '') ?>" href="<?='database/mechas/'.$mecha_info['robot_token']?>/" rel="<?= $mecha_image_incomplete ? 'nofollow' : 'follow' ?>">
       <? if($mecha_image_token != 'mecha'): ?>
         <img src="<?= $mecha_image_path ?>" width="<?= $mecha_image_size ?>" height="<?= $mecha_image_size ?>" alt="<?= $mecha_title_text ?>" />
       <? else: ?>
@@ -201,5 +182,8 @@ foreach ($mmrpg_database_mechas AS $mecha_key => $mecha_info){
   $mmrpg_database_mechas_links_counter++;
   $key_counter++;
 }
+
+// End the groups, however many there were
+$mmrpg_database_mechas_links .= '</div>';
 
 ?>

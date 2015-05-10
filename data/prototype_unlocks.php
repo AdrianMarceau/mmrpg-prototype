@@ -3,61 +3,261 @@
  * DR. LIGHT UNLOCKS
  */
 
-// UNLOCK EVENT : PHASE ONE ROBOTS (LIGHT)
+// UNLOCK EVENT : PHASE ZERO START (LIGHT VS MET)
+
+// If Dr. Light has completed all of his second phase, open Dr. Wily's second
+if ($battle_complete_counter_light >= 0 && $battle_complete_counter_light < 1){
+  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+  // Create the event flag and unset the player select variable to force main menu
+  $temp_event_flag = 'unlocked-cutscene_dr-light_phase-zero-start';
+  if (empty($temp_game_flags['events'][$temp_event_flag])){
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+    $temp_game_flags['events'][$temp_event_flag] = true;
+
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_160x160 sprite_160x160_00" style="background-image: url(images/objects/intro-field-light/sprite_right_160x160.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 60px; left: 10px; z-index: 0;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/abilities/buster-shot/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 54px; left: 150px; z-index: 10;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_shoot" style="background-image: url(images/robots/met/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 60px; left: 180px; z-index: 10;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_defend" style="background-image: url(images/robots/roll/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 290px; z-index: 10;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 36px; left: 340px; z-index: 102;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_defend" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 400px; z-index: 10;"></div>';
+
+    $temp_console_markup = '<p>Mega Man! Roll! Thank goodness you\'re both okay!  I&#39;m not sure how it happened, but it looks like we&#39;ve been digitized by that alien robot and transported <em>inside</em> the prototype!</p>';
+    $temp_console_markup .= '<p>We have to find a way out of here, but first we must secure the area and activate the laboratory program. Engage the mecha virus that\'s attacking the lab and defeat it in battle. Please be careful, Mega Man!</p>';
+
+    array_push($_SESSION[$session_token]['EVENTS'], array(
+      'canvas_markup' => $temp_canvas_markup,
+      'console_markup' => $temp_console_markup
+      ));
+
+    $temp_game_flags['events'][$temp_event_flag] = true;
+    //$_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
+  }
+
+}
+
+// UNLOCK EVENT : PHASE ZERO COMPLETE (LIGHT VS SNIPERJOE)
 
 // If Dr. Light has completed all of his second phase, open Dr. Wily's second
 if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Create the event flag and unset the player select variable to force main menu
-  $temp_event_flag = 'dr-light-event-00_phase-zero-complete';
+  $temp_event_flag = 'unlocked-cutscene_dr-light_phase-zero-vs-sniperjoe';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
-    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -15px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Intro Field</div>';
-    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Intro Field</div>';
-    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 180px;">Dr. Light</div>';
-    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_victory" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 180px;">Mega Man</div>';
-    $temp_console_markup = '<p>With me by your side, you will engage the robots one by one and defeat them in battle!</p>';
-    $temp_console_markup .= '<p>Simply disabling a robot master will download its special weapon data for you, but if you can disable it <em>using only <span class="ability_type ability_type_none">Neutral Type</span> abilities</em> we might be able to download even more!</p>';
-    $temp_console_markup .= '<p>Let&#39;s go Mega Man! The whole world is counting on us!</p>';
-    array_unshift($_SESSION[$session_token]['EVENTS'], array(
-      'canvas_markup' => $temp_canvas_markup,
-      'console_markup' => $temp_console_markup
-      ));
-    
+
     $temp_game_flags['events'][$temp_event_flag] = true;
-    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Intro Field</div>';
-    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Intro Field</div>';
-    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 180px;">Dr. Light</div>';
-    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_defend" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 180px;">Mega Man</div>';
-    $temp_console_markup = '<p>Mega Man! Thank you for saving us! I&#39;m not sure how it happened, but it looks like we&#39;ve been digitized and transported <em>inside</em> of the prototype! That Met was made of pure data, and it looks like we are now too&hellip;</p>';
-    $temp_console_markup .= '<p>We have to find Dr. Cossack and make our way back to the real world, but I&#39;m afraid it won\'t be easy. Sensors detect a high concentration of enemy robot data active on this server, and it&#39;s likely they will come after us if we do not go after them first.</p>';
-    array_unshift($_SESSION[$session_token]['EVENTS'], array(
+
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_160x160 sprite_160x160_00" style="background-image: url(images/objects/intro-field-light/sprite_right_160x160.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 60px; left: 10px; z-index: 0;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_base" style="background-image: url(images/robots/roll/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 160px;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_base" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 230px;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_base" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 180px;"></div>';
+
+    $temp_console_markup = '<p>Thank you, Mega Man! This world and its battles may be digital, but I fear the danger of us being deleted while inside are indeed very real. We should all be careful.</p>';
+    $temp_console_markup .= '<p>Now that the three of us are all safe and accounted for, we should locate Dr. Cossack and Proto Man.  Let\'s head inside the laboratory and look around.</p>';
+
+    array_push($_SESSION[$session_token]['EVENTS'], array(
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       ));
-    
-    //$temp_game_flags['events'][$temp_event_flag] = true;
-    //$_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
   }
-  
+
 }
+
+// UNLOCK EVENT : PHASE ZERO COMPLETE (LIGHT VS TRILL)
+
+// If Dr. Light has completed all of his second phase, open Dr. Wily's second
+if ($battle_complete_counter_light >= 2 && $battle_complete_counter_light < 3){
+  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+  // Create the event flag and unset the player select variable to force main menu
+  $temp_event_flag = 'unlocked-cutscene_dr-light_phase-zero-vs-trill';
+  if (empty($temp_game_flags['events'][$temp_event_flag])){
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+    $temp_game_flags['events'][$temp_event_flag] = true;
+
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -15px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_base" style="background-image: url(images/robots/roll/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 160px;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_03" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 230px;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_base" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 180px;"></div>';
+
+    $temp_console_markup = '<p>The Light Laboratory field was one of the first three locations programmed into the prototype, and we made it a priority to include as many details from real lab as we could.</p>';
+    $temp_console_markup .= '<p>Now that we\'ve taken it back, we should be able to use its equipment to survey the surrounding area. Now let\'s see if I remember how to work everything&hellip;</p>';
+
+    array_push($_SESSION[$session_token]['EVENTS'], array(
+      'canvas_markup' => $temp_canvas_markup,
+      'console_markup' => $temp_console_markup
+      ));
+
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/field/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -15px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_damage" style="background-image: url(images/robots/roll/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 160px; opacity: 0.6; filter: alpha(opacity=60);"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_05" style="background-image: url(images/players/dr-light/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 210px; opacity: 0.6; filter: alpha(opacity=60);"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_damage" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 250px; opacity: 0.6; filter: alpha(opacity=60);"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_summon" style="background-image: url(images/robots/trill_alt/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 36px; left: 400px; z-index: 10; opacity: 0.3; filter: alpha(opacity=30);"></div>';
+
+    $temp_console_markup = '<p>&nbsp;</p>';
+    $temp_console_markup .= '<p style="text-align: center;">!</p>';
+    $temp_console_markup .= '<p>&nbsp;</p>';
+
+    array_push($_SESSION[$session_token]['EVENTS'], array(
+      'canvas_markup' => $temp_canvas_markup,
+      'console_markup' => $temp_console_markup
+      ));
+
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/prototype-subspace/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/prototype-subspace/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_defend" style="background-image: url(images/robots/roll/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 160px; opacity: 0.9; filter: alpha(opacity=90);"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 210px; opacity: 0.9; filter: alpha(opacity=90);"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_defend" style="background-image: url(images/robots/mega-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 250px; opacity: 0.9; filter: alpha(opacity=90);"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/trill_alt/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 36px; left: 400px; z-index: 10; opacity: 0.6; filter: alpha(opacity=60);"></div>';
+
+    $temp_console_markup = '<p>&nbsp;</p>';
+    $temp_console_markup .= '<p>&nbsp;</p>';
+    $temp_console_markup .= '<p>&nbsp;</p>';
+
+    array_push($_SESSION[$session_token]['EVENTS'], array(
+      'canvas_markup' => $temp_canvas_markup,
+      'console_markup' => $temp_console_markup
+      ));
+
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/prototype-subspace/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/prototype-subspace/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_defend" style="background-image: url(images/robots/roll/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 100px;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 185px;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_shoot" style="background-image: url(images/robots/mega-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 290px;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_shoot" style="background-image: url(images/robots/trill_alt/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 36px; left: 400px; z-index: 10;"></div>';
+
+    $temp_console_markup = '<p>What..?! Who are you? Where have you taken us?</p>';
+    $temp_console_markup .= '<p style="text-align: right; text-shadow: 1px 1px 2px purple;">Greetings, Light Unit.  My designation is <strong>Trill</strong>. I have taken you and your robots to <strong>Prototype Subspace</strong>, the final resting place of discarded data in the prototype.  The master has requested your prompt deletion and I am ready to oblige.</p>';
+    $temp_console_markup .= '<p>I don\'t understand&hellip;  but I assure you we\'re not going down without a fight!</p>';
+    $temp_console_markup .= '<p style="text-align: right; text-shadow: 1px 1px 2px purple">Very well.  I will not hold back.</p>';
+
+    array_push($_SESSION[$session_token]['EVENTS'], array(
+      'canvas_markup' => $temp_canvas_markup,
+      'console_markup' => $temp_console_markup
+      ));
+  }
+
+}
+
+// UNLOCK EVENT : PHASE ONE START (LIGHT VS EIGHT ROBOTS)
+
+// If Dr. Light has completed all of his second phase, open Dr. Wily's second
+if ($battle_complete_counter_light >= 3 && $battle_complete_counter_light < 4){
+  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+  // Create the event flag and unset the player select variable to force main menu
+  $temp_event_flag = 'unlocked-cutscene_dr-light_phase-one-start';
+  if (empty($temp_game_flags['events'][$temp_event_flag])){
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+    $temp_game_flags['events'][$temp_event_flag] = true;
+
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -15px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_base" style="background-image: url(images/robots/roll/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 160px;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 230px;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_base" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 180px;"></div>';
+
+    $temp_console_markup .= '<p>Mega Man!  Roll!  Fantastic work back there!  It looks like we made it back to the laboratory, so let us continue getting this equipment online&hellip;</p>';
+
+    array_push($_SESSION[$session_token]['EVENTS'], array(
+      'canvas_markup' => $temp_canvas_markup,
+      'console_markup' => $temp_console_markup
+      ));
+
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: -208px -46px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url(images/robots/cut-man/mug_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 110px; left: 312px; z-index: 0; width: 20px; height: 20px; background-size: 100%;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url(images/robots/bomb-man/mug_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 110px; left: 332px; z-index: 0; width: 20px; height: 20px; background-size: 100%;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url(images/robots/ice-man/mug_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 110px; left: 352px; z-index: 0; width: 20px; height: 20px; background-size: 100%;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url(images/robots/fire-man/mug_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 110px; left: 372px; z-index: 0; width: 20px; height: 20px; background-size: 100%;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url(images/robots/guts-man/mug_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 90px; left: 312px; z-index: 0; width: 20px; height: 20px; background-size: 100%;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url(images/robots/time-man/mug_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 90px; left: 332px; z-index: 0; width: 20px; height: 20px; background-size: 100%;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url(images/robots/elec-man/mug_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 90px; left: 352px; z-index: 0; width: 20px; height: 20px; background-size: 100%;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url(images/robots/oil-man/mug_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 90px; left: 372px; z-index: 0; width: 20px; height: 20px; background-size: 100%;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/roll/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 30px; left: 140px; z-index: 10;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_defend" style="background-image: url(images/robots/mega-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 34px; left: 200px; z-index: 10;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/dr-light/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 418px; z-index: 102;"></div>';
+
+    $temp_console_markup = '<p>Wonderful, the equipment is still functional! I was able to identify eight different robot master signatures in the data clusters nearby. They appear to have been activated by the alien robot, so we should approach with caution.</p>';
+    $temp_console_markup .= '<p>It\'s possible that Proto Man and Cossack are tracking these signatures as well, so we\'ll start our search for them in those areas. Be careful Mega Man, and don\'t forget that Roll is here to help!.</p>';
+
+    array_push($_SESSION[$session_token]['EVENTS'], array(
+      'canvas_markup' => $temp_canvas_markup,
+      'console_markup' => $temp_console_markup
+      ));
+  }
+
+}
+
+// UNLOCK EVENT : PHASE ONE FIRST VICTORY (LIGHT)
+
+// If Dr. Light has completed all of his second phase, open Dr. Wily's second
+if ($battle_complete_counter_light >= 4 && $battle_complete_counter_light < 5){
+  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+  // Create the event flag and unset the player select variable to force main menu
+  $temp_event_flag = 'unlocked-cutscene_dr-light_phase-one-first-victory';
+  if (empty($temp_game_flags['events'][$temp_event_flag])){
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+    $temp_game_flags['events'][$temp_event_flag] = true;
+
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -15px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 180px;"></div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 180px;"></div>';
+
+    $temp_console_markup = '<p>Fantastic work, Mega Man!  One down, seven more to go. We might just make it out of here in one piece! And best of all, we have a new robot to take with us on our missions!</p>';
+    $temp_console_markup .= '<p>Remember, if we disable a robot master using <em>only neutral type abilities</em> we can salvage its data and use it in battle! We can still use elemental abilities for an easier fight, but we\'ll only be able to download their special weapon if you do.</p>';
+
+    array_push($_SESSION[$session_token]['EVENTS'], array(
+      'canvas_markup' => $temp_canvas_markup,
+      'console_markup' => $temp_console_markup
+      ));
+  }
+
+}
+
 
 // UNLOCK ROBOT : ROLL
 
 // If the player has failured at least one battle, unlock Roll as a playable character
 if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false, 'roll')){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Unlock Roll as a playable character
   $unlock_player_info = $mmrpg_index['players']['dr-light'];
   $unlock_robot_info = mmrpg_robot::get_index_info('roll');
-  $unlock_robot_info['robot_level'] = 1;
-  $unlock_robot_info['robot_experience'] = 999;
+  $unlock_robot_info['robot_level'] = 3;
+  $unlock_robot_info['robot_experience'] = 0;
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
-  
+
 }
 
 // UNLOCK EVENT : PHASE TWO CHAPTERS (WILY)
@@ -65,15 +265,15 @@ if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false,
 // If Dr. Light has completed all of his second phase, open Dr. Wily's second
 if ($battle_complete_counter_light >= 14){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Create the event flag and unset the player select variable to force main menu
-  $temp_event_flag = 'dr-light-event-97_phase-one-complete';
+  $temp_event_flag = 'completed-phase_dr-light_one';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
   }
-  
+
 }
 
 // UNLOCK EVENT : PROTOTYPE COMPLETE (LIGHT)
@@ -81,10 +281,11 @@ if ($battle_complete_counter_light >= 14){
 // If the player has completed the entire prototype campaign, display window event
 if ($battle_complete_counter_light >= 17){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Display the prototype complete message, showing Dr. Light and Mega Man
-  $temp_event_flag = 'dr-light-event-99_prototype-complete-new';
+  $temp_event_flag = 'completed-campaign_dr-light_prototype-new';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
 
@@ -132,7 +333,7 @@ if ($battle_complete_counter_light >= 17){
           }
       }
     }
-    
+
     // Define the actual markup for the unlock event
     ob_start();
     ?>
@@ -210,7 +411,7 @@ if ($battle_complete_counter_light >= 17){
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       ));
-      
+
     $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/final-destination-3/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -32px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; opacity: 0.2; filter: alpha(opacity=20); ">Prototype Complete</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/final-destination-3/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Prototype Complete</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-light/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 150px;">Dr. Light</div>';
@@ -225,9 +426,9 @@ if ($battle_complete_counter_light >= 17){
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       ));
-      
+
   }
-  
+
 }
 
 
@@ -238,24 +439,23 @@ if ($battle_complete_counter_light >= 17){
 
 // UNLOCK PLAYER : DR. WILY
 
-// If Dr. Light has completed phase1 of his battles, unlock Dr. Wily
-if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
+// If Dr. Light has completed the first three chapters of his campaign, unlock Dr. Wily
+if (mmrpg_prototype_event_complete('chapter-complete_dr-light_three') && !$unlock_flag_wily){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Unlock Dr. Wily as a playable character
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_game_unlock_player($mmrpg_index['players']['dr-wily'], false, true);
   $_SESSION[$session_token]['values']['battle_rewards']['dr-wily']['player_points'] = 0;
-  
+
   // Ensure Bass hasn't already been unlocked by the player
   if (!mmrpg_prototype_robot_unlocked(false, 'bass')){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Unlock Bass as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-wily'];
     $unlock_robot_info = mmrpg_robot::get_index_info('bass');
-    $unlock_robot_info['robot_level'] = 11;
-    $unlock_robot_info['robot_experience'] = 999;
-    //$unlock_robot_info['robot_experience'] = 4000;
+    $unlock_robot_info['robot_level'] = 1;
+    $unlock_robot_info['robot_experience'] = mmrpg_prototype_calculate_experience_required(1) - 1;
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
     //$_SESSION[$session_token]['values']['battle_rewards']['dr-wily']['player_robots']['bass']['robot_experience'] = 4000;
   }
@@ -282,19 +482,19 @@ if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
       }
     }
   }
-      
+
   // Redirect back to this page to recalculate menus
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $unlock_flag_wily = true;
   unset($_SESSION[$session_token]['battle_settings']['this_player_token']);
   header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
   exit();
-  
+
 } elseif ($unlock_flag_wily){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Display the first level-up event showing Bass and the Proto Buster
-  $temp_event_flag = 'dr-wily-event-00_player-unlocked';
+  $temp_event_flag = 'unlocked-player_dr-wily';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
@@ -302,16 +502,16 @@ if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
     $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Wily Castle</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-wily/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 160px;">Dr. Wily</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/bass/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 160px;">Bass</div>';
-    $temp_console_markup = '<p>Congratulations!  <strong>Dr. Wily</strong> has been unlocked as a playable character!</p>';
+    $temp_console_markup = '<p>Congratulations! <strong>Dr. Wily</strong> has been unlocked as a playable character!</p>';
     $temp_console_markup .= '<p>Play through the game as <strong>Dr. Wily</strong> and <strong>Bass</strong> to experience the events from their perspective, and unlock new robots and abilities as you fight your way through an army of robot opponents&hellip; again!</p>';
     $temp_console_markup .= '<p>Use the <strong>robots</strong> option in the main menu to transfer robots between <strong>Dr. Light</strong> and <strong>Dr. Wily</strong> to gain access to even more abilities and battle combinations! Robots receive twice the experience points in battle when used by another player, so don\'t be afraid to mix it up and have fun!</p>';
-    $temp_console_markup .= '<p style="font-size: 10px;">Note : Dr. Wily may take part in robot transfers only after completing the Intro Field on his own</p>';
+    $temp_console_markup .= '<p style="font-size: 10px;">Note : Dr. Wily may take part in robot transfers only after completing Chapter One of his own campaign</p>';
     array_unshift($_SESSION[$session_token]['EVENTS'], array(
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       ));
   }
-  
+
   // If Wily has been unlocked but somehow Bass was not
   if (!mmrpg_prototype_robot_unlocked(false, 'bass')){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -323,7 +523,7 @@ if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
   }
-  
+
 }
 
 // UNLOCK ROBOT : DISCO
@@ -331,7 +531,7 @@ if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
 // If the player has failed at least two battles, unlock Disco as a playable character
 if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 'disco')){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Unlock Disco as a playable character
   $unlock_player_info = $mmrpg_index['players']['dr-wily'];
   $unlock_robot_info = mmrpg_robot::get_index_info('disco');
@@ -339,7 +539,7 @@ if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 
   $unlock_robot_info['robot_experience'] = 999;
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
-  
+
 }
 
 // UNLOCK EVENT : PHASE THREE CHAPTERS (COSSACK)
@@ -347,15 +547,15 @@ if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 
 // If Dr. Wily has completed all of his second phase, open Dr. Cossack's third
 if ($battle_complete_counter_wily >= 14){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Create the event flag and unset the player select variable to force main menu
-  $temp_event_flag = 'dr-wily-event-97_phase-one-complete';
+  $temp_event_flag = 'completed-phase_dr-wily_one';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
   }
-  
+
 }
 
 // UNLOCK EVENT : PROTOTYPE COMPLETE (WILY)
@@ -363,9 +563,9 @@ if ($battle_complete_counter_wily >= 14){
 // If the player completed the first battle and leveled up, display window event
 if ($battle_complete_counter_wily >= 17){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Display the prototype complete message, showing Dr. Wily and Bass
-  $temp_event_flag = 'dr-wily-event-99_prototype-complete-new';
+  $temp_event_flag = 'completed-campaign_dr-wily_prototype-new';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
@@ -414,7 +614,7 @@ if ($battle_complete_counter_wily >= 17){
           }
       }
     }
-    
+
     // Define the actual markup for the unlock event
     ob_start();
     ?>
@@ -486,13 +686,13 @@ if ($battle_complete_counter_wily >= 17){
     $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/prototype-complete/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Prototype Complete</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/dr-wily/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 200px;">Dr. Wily</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/bass/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 200px;">Bass</div>';
-    $temp_console_markup = '<p><strong>Congratulations, '.(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : $_SESSION[$session_token]['USER']['username']).'!</strong>  You\'ve completed the <strong>Bass RPG Prototype</strong> using <strong>Dr. Wily</strong> and <strong>Bass</strong>! '.mmrpg_battle::random_victory_quote().'! Your completion records are as follows :</p>';
+    $temp_console_markup = '<p><strong>Congratulations, '.(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : $_SESSION[$session_token]['USER']['username']).'!</strong>  You\'ve completed the <strong>Mega Man RPG Prototype</strong> using <strong>Dr. Wily</strong> and <strong>Bass</strong>! '.mmrpg_battle::random_victory_quote().'! Your completion records are as follows :</p>';
     $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', $temp_player_data).'</div></div></div>';
     array_push($_SESSION[$session_token]['EVENTS'], array(
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       ));
-      
+
     $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/final-destination-3/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -32px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; opacity: 0.2; filter: alpha(opacity=20); ">Prototype Complete</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/final-destination-3/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Prototype Complete</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-wily/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 150px;">Dr. Wily</div>';
@@ -507,9 +707,9 @@ if ($battle_complete_counter_wily >= 17){
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       ));
-      
+
   }
-  
+
 }
 
 
@@ -519,10 +719,10 @@ if ($battle_complete_counter_wily >= 17){
 
 // UNLOCK PLAYER : DR. COSSACK
 
-// If Dr. Light has completed phase1 of his battles, unlock Dr. Cossack
-if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
+// If Dr. Wily has completed the first three chapters of his campaign, unlock Dr. Cossack
+if (mmrpg_prototype_event_complete('chapter-complete_dr-wily_three') && !$unlock_flag_cossack){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Unlock Dr. Cossack as a playable character
   mmrpg_game_unlock_player($mmrpg_index['players']['dr-cossack'], false, true);
   $_SESSION[$session_token]['values']['battle_rewards']['dr-cossack']['player_points'] = 0;
@@ -533,8 +733,8 @@ if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
     // Unlock Proto Man as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-cossack'];
     $unlock_robot_info = mmrpg_robot::get_index_info('proto-man');
-    $unlock_robot_info['robot_level'] = 21;
-    $unlock_robot_info['robot_experience'] = 999;
+    $unlock_robot_info['robot_level'] = 1;
+    $unlock_robot_info['robot_experience'] = mmrpg_prototype_calculate_experience_required(1) - 1;
     //$unlock_robot_info['robot_experience'] = 4000;
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
@@ -563,35 +763,35 @@ if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
       }
     }
   }
-  
+
   // Redirect back to this page to recalculate menus
   $unlock_flag_cossack = true;
   unset($_SESSION[$session_token]['battle_settings']['this_player_token']);
   header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
   exit();
-  
+
 } elseif ($unlock_flag_cossack){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Display the first level-up event showing Proto Man and the Proto Buster
-  $temp_event_flag = 'dr-cossack-event-00_player-unlocked';
+  $temp_event_flag = 'unlocked-player_dr-cossack';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
-    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
-    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
+    $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/cossack-citadel/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
+    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/cossack-citadel/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-cossack/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 160px;">Dr. Cossack</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/proto-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 160px;">Proto Man</div>';
-    $temp_console_markup = '<p>Congratulations!  <strong>Dr. Cossack</strong> has been unlocked as a playable character!</p>';
+    $temp_console_markup = '<p>Congratulations! <strong>Dr. Cossack</strong> has been unlocked as a playable character!</p>';
     $temp_console_markup .= '<p>Play through the game as <strong>Dr. Cossack</strong> and <strong>Proto Man</strong> to experience the events from their perspective, and unlock new robots and abilities as you fight your way through an army of robot opponents&hellip; again!</p>';
     $temp_console_markup .= '<p>Use the <strong>robots</strong> option in the main menu to transfer robots between <strong>Dr. Light</strong>, <strong>Dr. Wily</strong> and <strong>Dr. Cossack</strong> and gain access to even more abilities and battle combinations! Robots receive twice the experience points in battle when used by another player, so don\'t be afraid to mix it up and have fun!</p>';
-    $temp_console_markup .= '<p style="font-size: 10px;">Note : Dr. Cossack may take part in robot transfers only after completing the Intro Field on his own</p>';
+    $temp_console_markup .= '<p style="font-size: 10px;">Note : Dr. Cossack may take part in robot transfers only after completing Chapter One of his own campaign</p>';
     array_unshift($_SESSION[$session_token]['EVENTS'], array(
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       ));
   }
-  
+
   // If Cossack has been unlocked but somehow Proto Man was not
   if (!mmrpg_prototype_robot_unlocked(false, 'proto-man')){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -603,7 +803,7 @@ if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
   }
-  
+
 }
 
 // UNLOCK ROBOT : RHYTHM
@@ -611,7 +811,7 @@ if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
 // If the player has failed at least three battles, unlock Rhythm as a playable character
 if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(false, 'rhythm')){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Unlock Rhythm as a playable character
   $unlock_player_info = $mmrpg_index['players']['dr-cossack'];
   $unlock_robot_info = mmrpg_robot::get_index_info('rhythm');
@@ -619,7 +819,7 @@ if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(fals
   $unlock_robot_info['robot_experience'] = 999;
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
-  
+
 }
 
 // UNLOCK EVENT : PHASE TWO CHAPTERS (LIGHT)
@@ -627,15 +827,15 @@ if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(fals
 // If Dr. Cossack has completed all of his first phase, open Dr. Light's second
 if ($battle_complete_counter_cossack >= 10){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Create the event flag and unset the player select variable to force main menu
-  $temp_event_flag = 'dr-cossack-event-97_phase-one-complete';
+  $temp_event_flag = 'dr-cossack_event-97_phase-one-complete';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
   }
-  
+
 }
 
 // UNLOCK EVENT : PHASE THREE CHAPTERS (ALL)
@@ -643,15 +843,15 @@ if ($battle_complete_counter_cossack >= 10){
 // If Dr. Cossack has completed all of his second phase, open all other third
 if ($battle_complete_counter_cossack >= 14){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Create the event flag and unset the player select variable to force main menu
-  $temp_event_flag = 'dr-cossack-event-97_phase-two-complete';
+  $temp_event_flag = 'dr-cossack_event-97_phase-two-complete';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
   }
-  
+
 }
 
 // UNLOCK EVENT : PROTOTYPE COMPLETE (COSSACK)
@@ -659,9 +859,9 @@ if ($battle_complete_counter_cossack >= 14){
 // If the player completed the first battle and leveled up, display window event
 if ($battle_complete_counter_cossack >= 17){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Display the prototype complete message, showing Dr. Cossack and Proto Man
-  $temp_event_flag = 'dr-cossack-event-99_prototype-complete-new';
+  $temp_event_flag = 'dr-cossack_event-99_prototype-complete-new';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
@@ -710,7 +910,7 @@ if ($battle_complete_counter_cossack >= 17){
           }
       }
     }
-    
+
     // Define the actual markup for the unlock event
     ob_start();
     ?>
@@ -782,13 +982,13 @@ if ($battle_complete_counter_cossack >= 17){
     $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/prototype-complete/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Prototype Complete</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/dr-cossack/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 200px;">Dr. Cossack</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/proto-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 200px;">Proto Man</div>';
-    $temp_console_markup = '<p><strong>Congratulations, '.(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : $_SESSION[$session_token]['USER']['username']).'!</strong>  You\'ve completed the <strong>Proto Man RPG Prototype</strong> using <strong>Dr. Cossack</strong> and <strong>Proto Man</strong>! '.mmrpg_battle::random_victory_quote().'! Your completion records are as follows :</p>';
+    $temp_console_markup = '<p><strong>Congratulations, '.(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : $_SESSION[$session_token]['USER']['username']).'!</strong>  You\'ve completed the <strong>Mega Man RPG Prototype</strong> using <strong>Dr. Cossack</strong> and <strong>Proto Man</strong>! '.mmrpg_battle::random_victory_quote().'! Your completion records are as follows :</p>';
     $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', $temp_player_data).'</div></div></div>';
     array_push($_SESSION[$session_token]['EVENTS'], array(
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       ));
-      
+
     $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/final-destination-3/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -32px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; opacity: 0.2; filter: alpha(opacity=20); ">Prototype Complete</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/final-destination-3/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Prototype Complete</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-cossack/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 150px;">Dr. Cossack</div>';
@@ -803,9 +1003,9 @@ if ($battle_complete_counter_cossack >= 17){
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       ));
-      
+
   }
-  
+
 }
 
 
@@ -826,11 +1026,11 @@ $temp_userinfo = $this_userinfo; //$DB->get_array("SELECT users.*, roles.* FROM 
 // If the player has pending battle rewards, loop through and display window events
 if (!empty($temp_battles_list)){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Loop through each of the battles and display it to the user
   foreach ($temp_battles_list AS $temp_key => $temp_battleinfo){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Collect temp playerinfo for this and the target
     $temp_this_playerinfo = $mmrpg_index['players'][$temp_battleinfo['this_player_token']];
     $temp_this_playername = !empty($temp_battleinfo['this_user_name_public']) ? $temp_battleinfo['this_user_name_public'] : $temp_battleinfo['this_user_name'];
@@ -840,9 +1040,9 @@ if (!empty($temp_battles_list)){
     $temp_target_playername = !empty($temp_userinfo['user_name_public']) ? $temp_userinfo['user_name_public'] : $temp_userinfo['user_name'];
     $temp_target_playerrobots = !empty($temp_battleinfo['target_player_robots']) ? explode(',', $temp_battleinfo['target_player_robots']) : array();
     if (!empty($temp_target_playerrobots)){ foreach ($temp_target_playerrobots AS $key => $info){ list($token, $level) = explode(':',trim($info,'[]')); $temp_target_playerrobots[$key] = array('token' => $token, 'level' => $level); } }
-    
+
     //die('<pre>'.print_r($temp_this_playerrobots, true).'</pre>');
-    
+
     // Display the player battle reward message, showing the doctor and his robots
     $temp_console_markup = '';
     $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$temp_battleinfo['battle_field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$temp_battleinfo['battle_field_name'].'</div>';
@@ -851,7 +1051,7 @@ if (!empty($temp_battles_list)){
     foreach ($temp_this_playerrobots AS $key => $info){ $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$temp_battleinfo['this_player_result'].'" style="background-image: url(images/robots/'.$info['token'].'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: '.(25 + $key * 3).'px; right: '.(-10 + $key * 20).'px; z-index: '.(10 - $key).';">'.$info['token'].' (Lv.'.$info['level'].')</div>'; }
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$temp_battleinfo['target_player_result'].'" style="background-image: url(images/players/'.$temp_target_playerinfo['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 25px; left: 110px; z-index: 20;">'.$temp_target_playerinfo['player_name'].'</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$temp_battleinfo['this_player_result'].'" style="background-image: url(images/players/'.$temp_this_playerinfo['player_token'].'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 25px; right: 110px; z-index: 20;">'.$temp_target_playerinfo['player_name'].'</div>';
-    
+
       // If this player claimed victory in the battle
       if ($temp_battleinfo['target_player_result'] == 'victory'){
         //$temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/robots/mega-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 170px;">Mega Man</div>';
@@ -866,11 +1066,11 @@ if (!empty($temp_battles_list)){
         $temp_console_markup .= '<p>Another player by the name of <strong>'.$temp_this_playername.'</strong> challenged your '.$temp_target_playerinfo['player_name'].' to battle&hellip; and won! Your team of robots were defeated&hellip;</p>';
         $temp_console_markup .= '<p>Your '.$temp_target_playerinfo['player_name'].' avoided defeat for '.$temp_battleinfo['battle_turns'].' turns and as a reward for being such a good sport, collected <strong>'.number_format($temp_battleinfo['target_player_points'], 0, '.', ',').'</strong> battle points for his participation.</p>';
       }
-    
+
     // Display the rest of the reward message
     if ($battle_complete_counter_light >= 29){ $temp_console_markup .= '<p>Now that you\'ve unlocked the Player Battle bonus mode, you too can challenge other players and earn even more experience and battle points!</p>'; }
     else { $temp_console_markup .= '<p>Complete all of '.$temp_target_playerinfo['player_name'].'\'s missions to beat the game and you too can challenge other players to battle for tons of experience and more battle points!</p><p>The phrase &quot;Chapter&nbsp;Get&nbsp;:&nbsp;Player&nbsp;Battles&quot; might also be of some use&hellip;</p>'; }
-    
+
     // Add this mesage to the event session IF VICTORY (Only good news now!)
     if ($temp_battleinfo['target_player_result'] == 'victory'){
       array_unshift($_SESSION[$session_token]['EVENTS'], array(
@@ -878,10 +1078,10 @@ if (!empty($temp_battles_list)){
         'console_markup' => $temp_console_markup
         ));
     }
-      
+
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Collect the appropriate player points to increment
     $temp_inc_points = $temp_battleinfo['target_player_points'];
     $temp_inc_player = str_replace('-', '_', $temp_target_playerinfo['player_token']);
@@ -892,9 +1092,9 @@ if (!empty($temp_battles_list)){
     $DB->update('mmrpg_battles', array(
       'target_reward_pending' => 0
       ), "battle_id = {$temp_battleinfo['battle_id']}");
-    
+
   }
-     
+
 }
 
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
