@@ -7,17 +7,8 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_prototype_data['this_player_token'] = 'dr-wily';
 $this_prototype_data['this_player_field'] = 'wily-castle';
 $this_prototype_data['this_support_robot'] = 'disco';
-$this_prototype_data['this_chapter_levels'] = array(0 => 1, 1 => 12, 2 => 20, 3 => 36, 4 => 40, 5 => 45, 6 => 50);
+$this_prototype_data['this_chapter_levels'] = array(0 => 11, 1 => 12, 2 => 20, 3 => 36, 4 => 40, 5 => 45, 6 => 50);
 $this_prototype_data['this_chapter_unlocked'] = $chapters_unlocked_wily;
-//$this_prototype_data['this_chapter_unlocked'] = array();
-//$this_prototype_data['this_chapter_unlocked']['0'] = true;
-//$this_prototype_data['this_chapter_unlocked']['1'] = $battle_complete_counter_wily >= 1 ? true : false;
-//$this_prototype_data['this_chapter_unlocked']['2'] = $battle_complete_counter_wily >= 9 ? true : false;
-//$this_prototype_data['this_chapter_unlocked']['3'] = ($battle_complete_counter_light >= 10 && $battle_complete_counter_wily >= 10 && $battle_complete_counter_cossack >= 10) ? true : false;
-//$this_prototype_data['this_chapter_unlocked']['4a'] = ($battle_complete_counter_light >= 14 && $battle_complete_counter_wily >= 14 && $battle_complete_counter_cossack >= 14) ? true : false;
-//$this_prototype_data['this_chapter_unlocked']['4b'] = ($battle_complete_counter_light >= 14 && $battle_complete_counter_wily >= 15 && $battle_complete_counter_cossack >= 14) ? true : false;
-//$this_prototype_data['this_chapter_unlocked']['4c'] = ($battle_complete_counter_light >= 14 && $battle_complete_counter_wily >= 16 && $battle_complete_counter_cossack >= 14) ? true : false;
-//$this_prototype_data['this_chapter_unlocked']['5'] = ($battle_complete_counter_light >= 14 && $battle_complete_counter_wily >= 17 && $battle_complete_counter_cossack >= 14) ? true : false;
 $this_prototype_data['target_player_token'] = 'dr-cossack';
 $this_prototype_data['battle_phase'] = 0;
 $this_prototype_data['battle_options'] = array();
@@ -68,29 +59,6 @@ if (empty($this_prototype_data['this_player_fields'])){
 // Update the session with the omega options
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $_SESSION['GAME']['values'][$temp_session_key] = $this_prototype_data['target_robot_omega'];
-
-/*
-// Define the item omega array for dynamic item options
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-$temp_session_key = $this_prototype_data['this_player_token'].'_this-item-omega_prototype';
-$this_prototype_data['this_item_omega'] = !empty($_SESSION['GAME']['values'][$temp_session_key]) ? $_SESSION['GAME']['values'][$temp_session_key] : array();
-// If the options have not already been defined, generate them
-$temp_save = false;
-if (empty($this_prototype_data['this_item_omega'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  // Define the phase one omega item factors, collected if necessary
-  if (!empty($_SESSION['GAME']['values']['battle_items'])){
-    $this_prototype_data['this_item_omega'] = array_keys($this_prototype_data['this_item_omega']);
-    $this_prototype_data['this_item_omega'] = array_slice($this_prototype_data['this_item_omega'], 0, 8);
-  } else {
-    $this_prototype_data['this_item_omega'] = array();
-  }
-  $temp_save = true;
-}
-// Update the session with the omega options
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-$_SESSION['GAME']['values'][$temp_session_key] = $this_prototype_data['this_item_omega'];
-*/
 
 // DEBUG DEBUG DEBUG
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
