@@ -45,6 +45,7 @@
 /README.md
 /mega-man-rpg-prototype.txt
 /data_functions.php
+/blank.php
 *.bak.php
 .project
 .htaccess-current
