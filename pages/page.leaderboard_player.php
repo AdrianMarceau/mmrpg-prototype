@@ -40,7 +40,7 @@ elseif ($temp_display_points > 0 && $temp_last_login_diff >= MMRPG_SETTINGS_ACTI
 elseif ($temp_display_points > 0 && $temp_last_login_diff < MMRPG_SETTINGS_ACTIVE_TIMEOUT){ $temp_display_active = 'an active player'; }
 
 // Collect the robot index for later use
-$hidden_database_robots = array('robot', 'mega-man-copy', 'proto-man-copy', 'bass-copy', 'rock', 'cache', 'bond-man', 'fake-man');
+$hidden_database_robots = array('robot', 'mega-man-ds', 'proto-man-ds', 'bass-ds', 'rock', 'cache', 'bond-man', 'fake-man');
 foreach ($hidden_database_robots AS $key => $token){ $hidden_database_robots[$key] = "'".$token."'"; }
 $temp_robots_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 AND robot_token NOT IN (".implode(',', $hidden_database_robots).");", 'robot_token');
 
@@ -53,10 +53,10 @@ $temp_counter_abilities = array('total' => 0);
 $temp_counter_stars = array('total' => 0, 'field' => 0, 'fusion' => 0);
 $temp_counter_database = array();
 $temp_counter_database['total'] = 0;
-$temp_counter_database['encountered'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
-$temp_counter_database['scanned'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
-$temp_counter_database['summoned'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
-$temp_counter_database['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
+$temp_counter_database['encountered'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+$temp_counter_database['scanned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+$temp_counter_database['summoned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+$temp_counter_database['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
 $temp_counter_levels = array();
 // Loop through the completed battles
 if (!empty($this_playerinfo['save_values_battle_complete'])){
@@ -336,12 +336,22 @@ ob_start();
 
   <div class="subbody thread_subbody thread_subbody_full thread_subbody_full_right thread_right event event_triple event_visible" style="text-align: left; position: relative; padding-bottom: 6px; margin-bottom: 4px;">
 
-    <div id="game_buttons" data-fieldtype="<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>" class="field" style="margin: 0 auto 20px;">
+    <div id="game_buttons" data-fieldtype="<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>" class="field" style="margin: 0 auto 20px; <?= $this_current_token == 'threads' || $this_current_token == 'posts' ? 'padding-bottom: 6px;' : '' ?>">
       <a class="link_button field_type <?= empty($this_current_token) ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/' ?>">Profile</a>
       <a class="link_button field_type <?= $this_current_token == 'robots' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/robots/' ?>">Robots</a>
-      <? if(!empty($temp_show_players)): ?><a class="link_button field_type <?= $this_current_token == 'players' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/players/' ?>">Players</a><? endif; ?>
-      <? if(!empty($temp_show_starforce)): ?><a class="link_button field_type <?= $this_current_token == 'starforce' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/starforce/' ?>">Starforce</a><? endif; ?>
+      <? if(!empty($temp_show_players)): ?>
+        <a class="link_button field_type <?= $this_current_token == 'players' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/players/' ?>">Players</a>
+      <? endif; ?>
+      <? if(!empty($temp_show_starforce)): ?>
+        <a class="link_button field_type <?= $this_current_token == 'starforce' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/starforce/' ?>">Starforce</a>
+      <? endif; ?>
       <a class="link_button field_type <?= $this_current_token == 'database' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/database/' ?>">Database</a>
+      <? if(!empty($this_playerinfo['thread_count'])): ?>
+        <a class="link_button field_type <?= $this_current_token == 'threads' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/threads/' ?>">Threads</a>
+      <? endif; ?>
+      <? if(!empty($this_playerinfo['post_count'])): ?>
+        <a class="link_button field_type <?= $this_current_token == 'posts' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/' ?>">Posts</a>
+      <? endif; ?>
       <? if (!empty($this_playerinfo['user_website_address']) && preg_match('/^([^@]+)@([^@]+)$/i', $this_playerinfo['user_website_address'])): ?>
         <a class="link_button field_type field_type_empty" href="mailto:<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Email</a>
       <? elseif (!empty($this_playerinfo['user_website_address'])): ?>
@@ -357,7 +367,7 @@ ob_start();
     // -- LEADERBOARD PAGES -- //
 
     // Define the allowable pages
-    $temp_allowed_pages = array('robots', 'players', 'starforce', 'database');
+    $temp_allowed_pages = array('robots', 'players', 'starforce', 'database', 'threads', 'posts');
 
     // If this is the View Profile page, show the appropriate content
     if (empty($this_current_token) || !in_array($this_current_token, $temp_allowed_pages)){
@@ -478,6 +488,232 @@ ob_start();
     ?>
 
   </div>
+
+  <?
+
+  // -- LEADERBOARD PAGES CONTINUED -- //
+
+  if ($this_current_token == 'threads'){
+
+    // Define the moderator flag to false to prevent errors
+    define('COMMUNITY_VIEW_MODERATOR', 0);
+
+    // Collect any sorting or limit variables from the request
+    $temp_thread_sort = !empty($_GET['sort']) && in_array($_GET['sort'], array('asc', 'desc')) ? $_GET['sort'] : 'desc';
+    $temp_thread_sort_string = strtoupper($temp_thread_sort);
+    $temp_thread_show = !empty($_GET['show']) && ($_GET['show'] == 'all' || is_numeric($_GET['show'])) ? $_GET['show'] : 10;
+
+    // Collect all the threads created by this user from the database
+    $this_threads_query = "SELECT threads.*, users.*, users2.*, users3.*, roles.*, categories.*, posts.post_count FROM mmrpg_threads AS threads
+      LEFT JOIN mmrpg_users AS users ON threads.user_id = users.user_id
+      LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+      LEFT JOIN (SELECT user_id AS mod_user_id, user_name AS mod_user_name, user_name_public AS mod_user_name_public, user_name_clean AS mod_user_name_clean, user_colour_token AS mod_user_colour_token FROM mmrpg_users) AS users2 ON threads.thread_mod_user = users2.mod_user_id
+      LEFT JOIN (SELECT user_id AS target_user_id, user_name AS target_user_name, user_name_public AS target_user_name_public, user_name_clean AS target_user_name_clean, user_colour_token AS target_user_colour_token, user_image_path AS target_user_image_path, user_background_path AS target_user_background_path FROM mmrpg_users) AS users3 ON threads.thread_target = users3.target_user_id
+      LEFT JOIN mmrpg_categories AS categories ON threads.category_id = categories.category_id
+      LEFT JOIN (
+      SELECT posts.thread_id, count(1) AS post_count
+      FROM mmrpg_posts AS posts
+      GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
+      WHERE threads.category_id <> 0 && threads.thread_published = 1 AND users.user_id = {$this_playerinfo['user_id']}
+      ORDER BY threads.thread_date {$temp_thread_sort_string} ";
+    $this_threads_array = $DB->get_array_list($this_threads_query);
+    $this_threads_index = array();
+    $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
+    if ($temp_thread_show > $this_threads_count){ $temp_thread_show = $this_threads_count; }
+
+    // Define the current date group
+    $this_date_group = '';
+
+    // Define the temporary timeout variables
+    $this_time = time();
+    $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
+
+    // Define the fake category info for the leaderboard
+    $this_category_info = array('category_id' => 99, 'category_token' => 'leaderboard');
+
+    // Loop through the thread array and display its contents
+    if (!empty($this_threads_array)){
+      ?>
+      <div class="subbody posts_body thread_right event event_triple event_visible" style="margin-top: -6px;">
+        <p class="text" style="font-size: 110%; padding: 6px 0 0;">
+          <strong><?= $temp_display_name ?></strong> has created a total of <strong><?= $this_playerinfo['thread_count'] == 1 ? '1 Thread' : $this_playerinfo['thread_count'].' Threads' ?></strong>
+          <span style="font-size: 80%; float: right; margin-left: 20px; text-align: right; ">
+            <strong>Limit To</strong><br />
+            <? if($this_threads_count > 10): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/threads/?sort='.$temp_thread_sort.'&amp;show=10' ?>" rel="nofollow" style="text-decoration: <?= $temp_thread_show == 10 ? 'underline' : 'none' ?>;">10</a> <span class="pipe">|</span><? endif; ?>
+            <? if($this_threads_count > 50): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/threads/?sort='.$temp_thread_sort.'&amp;show=50' ?>" rel="nofollow" style="text-decoration: <?= $temp_thread_show == 50 ? 'underline' : 'none' ?>;">50</a> <span class="pipe">|</span><? endif; ?>
+            <? if($this_threads_count > 100): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/threads/?sort='.$temp_thread_sort.'&amp;show=100' ?>" rel="nofollow" style="text-decoration: <?= $temp_thread_show == 100 ? 'underline' : 'none' ?>;">100</a> <span class="pipe">|</span><? endif; ?>
+            <? if($this_threads_count > 200): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/threads/?sort='.$temp_thread_sort.'&amp;show=200' ?>" rel="nofollow" style="text-decoration: <?= $temp_thread_show == 200 ? 'underline' : 'none' ?>;">200</a> <span class="pipe">|</span><? endif; ?>
+            <? if($this_threads_count > 500): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/threads/?sort='.$temp_thread_sort.'&amp;show=500' ?>" rel="nofollow" style="text-decoration: <?= $temp_thread_show == 500 ? 'underline' : 'none' ?>;">500</a> <span class="pipe">|</span><? endif; ?>
+            <a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/threads/?sort='.$temp_thread_sort.'&amp;show=all' ?>" rel="nofollow" style="text-decoration: <?= $temp_thread_show == 'all' ? 'underline' : 'none' ?>;">All</a>
+          </span>
+          <span style="font-size: 80%; float: right; margin-left: 20px; text-align: right; ">
+            <strong>Sort By</strong><br />
+            <a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/threads/?sort=desc&amp;show='.$temp_thread_show ?>" rel="nofollow" style="text-decoration: <?= $temp_thread_sort == 'desc' ? 'underline' : 'none' ?>;">New</a> <span class="pipe">|</span>
+            <a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/threads/?sort=asc&amp;show='.$temp_thread_show ?>" rel="nofollow" style="text-decoration: <?= $temp_thread_sort == 'asc' ? 'underline' : 'none' ?>;">Old</a>
+          </span>
+        </p>
+        <? if(!empty($this_threads_count)): ?>
+          <p class="text" style="margin-top: -4px;">
+            <?= $temp_thread_show != 'all' && $temp_thread_show < $this_threads_count ? 'Showing '.$temp_thread_show.' '.($temp_thread_sort == 'desc' ? 'Newest' : 'Oldest').' Threads' : 'Showing All Threads' ?>
+          </span>
+        <? endif; ?>
+        <?
+        // Collect markup for this thread from the function
+        foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
+          $temp_markup = mmrpg_website_community_thread_linkblock($this_thread_info, $this_category_info);
+          echo $temp_markup."\n";
+          if ($temp_thread_show != 'all' && ($this_thread_key + 1) >= $temp_thread_show){ break; }
+        }
+        ?>
+        <p class="text post_subbody" style="text-align: right; min-height: 16px;"><a class="postscroll" href="#top" style="right: 12px;">^ Top</a></p>
+      </div>
+      <?
+    } else {
+      ?>
+      <div class="subbody posts_body thread_left event event_triple event_visible" style="margin-top: -6px;">
+        <p class="text">- there are no threads to display -</p>
+        <p class="text post_subbody" style="text-align: right; min-height: 16px;"><a class="postscroll" href="#top" style="right: 12px;">^ Top</a></p>
+      </div>
+      <?
+    }
+
+  }
+  // Else if this is the View Posts page, show the appropriate content
+  elseif ($this_current_token == 'posts'){
+
+    // Define the moderator flag to false to prevent errors
+    define('COMMUNITY_VIEW_MODERATOR', 0);
+
+    // Collect any sorting or limit variables from the request
+    $temp_post_sort = !empty($_GET['sort']) && in_array($_GET['sort'], array('asc', 'desc')) ? $_GET['sort'] : 'desc';
+    $temp_post_sort_string = strtoupper($temp_post_sort);
+    $temp_post_show = !empty($_GET['show']) && ($_GET['show'] == 'all' || is_numeric($_GET['show'])) ? $_GET['show'] : 10;
+
+    // Collect all the posts for this category from the database
+    $this_posts_query = "SELECT posts.*, users.*, roles.*, categories.* FROM mmrpg_posts AS posts
+      LEFT JOIN mmrpg_users AS users ON posts.user_id = users.user_id
+      LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+      LEFT JOIN mmrpg_threads AS threads ON threads.thread_id = posts.thread_id
+      LEFT JOIN mmrpg_categories AS categories ON posts.category_id = categories.category_id
+      WHERE threads.category_id <> 0 AND posts.post_deleted = 0 AND users.user_id = {$this_playerinfo['user_id']}
+      ORDER BY posts.post_date {$temp_post_sort_string}"; //WHERE posts.post_deleted = 0
+    $this_posts_array = $DB->get_array_list($this_posts_query);
+    $this_posts_count = !empty($this_posts_array) ? count($this_posts_array) : 0;
+
+    // Loop through the posts and collect all referenced thread IDs for the index
+    $temp_required_ids = array();
+    $this_user_ids_array = array();
+    if (!empty($this_posts_array)){
+      foreach ($this_posts_array AS $key => $info){
+        if (!in_array($info['thread_id'], $temp_required_ids)){ $temp_required_ids[] = $info['thread_id']; }
+        if (!in_array($info['user_id'], $this_user_ids_array)){ $this_user_ids_array[] = $info['user_id']; }
+      }
+    }
+
+    // Collect collect an index of threads from the database for reference
+    if (!empty($temp_required_ids)){
+      $temp_include_ids = implode(',', $temp_required_ids);
+      $this_threads_query = "SELECT threads.*, users.*, users2.*, users3.*, categories.*, posts.post_count FROM mmrpg_threads AS threads
+        LEFT JOIN mmrpg_users AS users ON threads.user_id = users.user_id
+        LEFT JOIN (SELECT user_id AS mod_user_id, user_name AS mod_user_name, user_name_public AS mod_user_name_public, user_name_clean AS mod_user_name_clean, user_colour_token AS mod_user_colour_token FROM mmrpg_users) AS users2 ON threads.thread_mod_user = users2.mod_user_id
+        LEFT JOIN (SELECT user_id AS target_user_id, user_name AS target_user_name, user_name_public AS target_user_name_public, user_name_clean AS target_user_name_clean, user_colour_token AS target_user_colour_token, user_image_path AS target_user_image_path, user_background_path AS target_user_background_path FROM mmrpg_users) AS users3 ON threads.thread_target = users3.target_user_id
+        LEFT JOIN mmrpg_categories AS categories ON threads.category_id = categories.category_id
+        LEFT JOIN (
+        SELECT posts.thread_id, count(1) AS post_count
+        FROM mmrpg_posts AS posts
+        GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
+        WHERE threads.category_id <> 0 && threads.thread_published = 1 AND threads.thread_id IN ({$temp_include_ids})
+        ORDER BY threads.thread_date ASC";
+      $this_threads_index = $DB->get_array_list($this_threads_query, 'thread_id');
+      $this_threads_count = !empty($this_threads_index) ? count($this_threads_index) : 0;
+    } else {
+      $this_threads_query = '';
+      $this_threads_index = array();
+      $this_threads_count = 0;
+    }
+
+    // Collect the user post and thread count index plus leaderboard points for display
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+    $temp_id_includes = !empty($this_user_ids_array) ? 'AND mmrpg_users.user_id IN ('.implode(', ', $this_user_ids_array).')' : '';
+    if (!empty($temp_id_includes)){
+      $this_user_countindex = $DB->get_array_list('SELECT
+        mmrpg_users.user_id,
+        mmrpg_leaderboard.board_points,
+        mmrpg_threads.thread_count,
+        mmrpg_posts.post_count
+        FROM mmrpg_users
+        LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_users.user_id
+        LEFT JOIN (
+        SELECT user_id, COUNT(thread_id) AS thread_count FROM mmrpg_threads WHERE mmrpg_threads.thread_target = 0 AND thread_published = 1 GROUP BY mmrpg_threads.user_id
+        ) mmrpg_threads ON mmrpg_threads.user_id = mmrpg_users.user_id
+        LEFT JOIN (
+        SELECT user_id, COUNT(post_id) AS post_count FROM mmrpg_posts WHERE mmrpg_posts.post_target = 0 AND post_deleted = 0 GROUP BY mmrpg_posts.user_id
+        ) mmrpg_posts ON mmrpg_posts.user_id = mmrpg_users.user_id
+        WHERE mmrpg_leaderboard.board_points > 0 '.$temp_id_includes, 'user_id');
+    } else {
+      $this_user_countindex = array();
+    }
+
+
+    // Define the current date group
+    $this_date_group = '';
+
+    // Define the temporary timeout variables
+    $this_time = time();
+    $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
+
+    // Define the fake category info for the leaderboard
+    $this_category_info = array('category_id' => 99, 'category_token' => 'leaderboard');
+
+    // Loop through the post array and display its contents
+    if (!empty($this_posts_array)){
+      ?>
+      <div class="subbody posts_body post_left event event_triple event_visible" style="margin-top: -6px;">
+        <p class="text" style="font-size: 110%; padding: 6px 3px 0;">
+          <strong><?= $temp_display_name ?></strong> has created a total of <strong><?= $this_playerinfo['post_count'] == 1 ? '1 Post' : $this_playerinfo['post_count'].' Posts' ?></strong>
+          <span style="font-size: 80%; float: right; margin-left: 20px; text-align: right; ">
+            <strong>Limit To</strong><br />
+            <? if($this_posts_count > 10): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=10' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 10 ? 'underline' : 'none' ?>;">10</a> <span class="pipe">|</span><? endif; ?>
+            <? if($this_posts_count > 50): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=50' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 50 ? 'underline' : 'none' ?>;">50</a> <span class="pipe">|</span><? endif; ?>
+            <? if($this_posts_count > 100): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=100' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 100 ? 'underline' : 'none' ?>;">100</a> <span class="pipe">|</span><? endif; ?>
+            <? if($this_posts_count > 200): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=200' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 200 ? 'underline' : 'none' ?>;">200</a> <span class="pipe">|</span><? endif; ?>
+            <? if($this_posts_count > 500): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=100' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 500 ? 'underline' : 'none' ?>;">500</a> <span class="pipe">|</span><? endif; ?>
+            <a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=all' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 'all' ? 'underline' : 'none' ?>;">All</a>
+          </span>
+          <span style="font-size: 80%; float: right; margin-left: 20px; text-align: right; ">
+            <strong>Sort By</strong><br />
+            <a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort=desc&amp;show='.$temp_post_show ?>" rel="nofollow" style="text-decoration: <?= $temp_post_sort == 'desc' ? 'underline' : 'none' ?>;">New</a> <span class="pipe">|</span>
+            <a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort=asc&amp;show='.$temp_post_show ?>" rel="nofollow" style="text-decoration: <?= $temp_post_sort == 'asc' ? 'underline' : 'none' ?>;">Old</a>
+          </span>
+        </p>
+        <? if(!empty($this_posts_count)): ?>
+          <p class="text" style="margin-top: -4px;">
+            <?= $temp_post_show != 'all' && $temp_post_show < $this_posts_count ? 'Showing '.$temp_post_show.' '.($temp_post_sort == 'desc' ? 'Newest' : 'Oldest').' Posts' : 'Showing All Posts' ?>
+          </span>
+        <? endif; ?>
+        <?
+        // Collect markup for this post from the function
+        foreach ($this_posts_array AS $this_post_key => $this_post_info){
+          if (!isset($this_threads_index[$this_post_info['thread_id']])){ continue; }
+          $this_thread_info = $this_threads_index[$this_post_info['thread_id']];
+          $temp_markup = mmrpg_website_community_postblock($this_thread_info, $this_post_info, $this_category_info);
+          echo $temp_markup."\n";
+          if ($temp_post_show != 'all' && ($this_post_key + 1) >= $temp_post_show){ break; }
+        }
+        ?>
+      </div>
+      <?
+    } else {
+      ?>
+      <div class="subbody posts_body post_right event event_triple event_visible" style="margin-top: -6px;">
+        <p class="text">- there are no posts to display -</p>
+        <p class="text" style="text-align: right;"><a class="postscroll" href="#top" style="right: 12px;">^ Top</a></p>
+      </div>
+      <?
+    }
+
+  }
+  ?>
 
 </div>
 
