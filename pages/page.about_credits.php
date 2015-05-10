@@ -5,7 +5,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
  */
 
 // Define the SEO variables for this page
-$this_seo_title = 'Credits | '.$this_seo_title;
+$this_seo_title = 'Credits | About | '.$this_seo_title;
 $this_seo_description = 'The Mega Man RPG Prototype was created and is continually developed and maintained by Adrian Marceau / Ageman20XX, though the project would not have been possible without a great deal of inspiration and contributions from multiple outside sources. Being a Mega Man fan-game, this project obviously owes most of it\'s thanks to Capcom and of course, Keiji Inafune. The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster.';
 
 // Define the Open Graph variables for this page
@@ -20,7 +20,7 @@ $this_markup_header = 'Mega Man RPG Prototype Credits';
 // Collect user data for all contributors in the database
 $contributor_ids = array(
   412,  // AdrianMarceau (Developer)
-  // 92,  // ChillPenguin (Administrator)
+  92,  // ChillPenguin (Administrator)
   3842,  // MegaBossMan (Administrator)
   2,  // Brorman (Contributor)
   110,  // EliteP1 / MMX100 (Contributor)
@@ -31,7 +31,7 @@ $contributor_ids = array(
   //4831,  // ThatGuyNamedMikey (Moderator)
   4307,  // Reisrat (Moderator)
   1330, // TheDoc (Moderator)
-  ); 
+  );
   // 484 Ephnee
 $contributor_index = $DB->get_array_list("SELECT * FROM mmrpg_users LEFT JOIN mmrpg_roles ON mmrpg_users.role_id = mmrpg_roles.role_id WHERE user_id IN (".implode(', ', $contributor_ids).")", 'user_id');
 //die(print_r($contributor_index, true));
@@ -56,13 +56,13 @@ ob_start();
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Credits Overview</h2>
 
 <div class="subbody">
-  
-  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/bomb-man/sprite_left_80x80.png);">Adrian Marceau</div></div>
+
+  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_<?= mmrpg_battle::random_robot_frame() ?>" style="background-image: url(images/robots/bomb-man/sprite_left_80x80.png);"></div></div>
   <p class="text">The <strong>Mega Man RPG Prototype</strong> was created and is continually developed and maintained by Adrian Marceau / Ageman20XX, though the project would not have been possible without a great deal of inspiration and contributions from multiple outside sources.  Being a Mega Man fan-game, this project obviously owes most of it's thanks to <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> and of course, Keiji Inafune.  Most of the assets used throughout this website and game were created by Capcom for use in the original games, so their role in this project is far from minor and greatly influential. In addition, their generally positive attitude about fan-games and other types of fan-tribute have been very admirable over the years, and both this game and the Mega Man community owe them much gratitude.</p>
-  
-  <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/metal-man/sprite_right_80x80.png);">Metal Man</div></div>
+
+  <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_<?= mmrpg_battle::random_robot_frame() ?>" style="background-image: url(images/robots/metal-man/sprite_right_80x80.png);"></div></div>
   <p class="text">Capcom are not the only ones to thank, however, as many others have contributed to this project over the years.  Though most of the actual design and development has been done by Adrian thus far, hours of play-testing, tons of feature ideas, mechanics discussions, and even additional sprite editing has been provided by talented and generous outside sources over the years.  New members are being added to the team all the time, and even the smallest amount of effort is appreciated.  If you would like to help with sprite editing, bug testing, feature ideas, or anything please <a href="contact/">contact me</a> and we'll discuss the details.  You'll be credited appropriately on this page, with a link back to your home page and a custom description if you want them.</p>
-  
+
 </div>
 
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Contributors Index</h2>
@@ -79,7 +79,6 @@ foreach ($contributor_ids AS $id){
   } else {
     $temp_displayname = $temp_userinfo['user_name'];
   }
-  $temp_role_id = !empty($temp_userinfo['role_id']) ? $temp_userinfo['role_id'] : 3;
   $temp_displayname_short = !empty($temp_userinfo['user_name_public']) ? $temp_userinfo['user_name_public'] : $temp_userinfo['user_name'];
   $temp_displayline = !empty($temp_userinfo['user_credit_line']) ? $temp_userinfo['user_credit_line'] : 'Miscellaneous Contributions';
   $temp_displaytext = !empty($temp_userinfo['user_credit_text']) ? $temp_userinfo['user_credit_text'] : $temp_displayname_short.' joined the prototype on '.date('F jS, Y', $temp_userinfo['user_date_created']).' and has since become a contributor.';
@@ -94,7 +93,7 @@ foreach ($contributor_ids AS $id){
     <div class="float float_left" style="background-position: center center; background-image: url(<?= 'images/'.$temp_background.'/battle-field_avatar.png' ?>); position: absolute; left: 5px; top: 8px; height: 25px; width: 40px; padding-top: 15px;"><div class="sprite sprite_<?= $temp_size.'x'.$temp_size ?> sprite_<?= $temp_size.'x'.$temp_size ?>_02" style="background-image: url(images/<?= $temp_class.'/'.$temp_token.'/' ?>/sprite_right_<?= $temp_size.'x'.$temp_size ?>.png); <?= $temp_size == 80 ? 'margin-left: -22px; margin-top: -60px; ' : '' ?>"><?= $temp_displayname ?></div></div>
     <div class="text">
       <div>
-        <a class="player_type player_type_<?= $temp_playertype ?>" style="padding: 1px 6px 2px 22px; background: transparent url(images/abilities/item-<?= $temp_itemkind ?>/icon_left_40x40.png) scroll no-repeat -10px -11px; text-decoration: none; " href="leaderboard/<?= $temp_userinfo['user_name_clean'] ?>/"><strong><?= $temp_displayname ?></strong></a>
+        <a class="type_span type type_<?= $temp_playertype ?>" style="padding: 1px 6px 2px 22px; background: transparent url(images/abilities/item-<?= $temp_itemkind ?>/icon_left_40x40.png) scroll no-repeat -10px -11px; text-decoration: none; " href="leaderboard/<?= $temp_userinfo['user_name_clean'] ?>/"><strong><?= $temp_displayname ?></strong></a>
         <? if(!empty($temp_websitelink)): ?><span class="pipe">|</span> <a style="font-size: 10px;" href="<?= $temp_websitelink ?>" target="_blank" rel="contributor"><?= $temp_websitelink ?></a><? endif;?>
       </div>
       <div><span><?= $temp_userinfo['role_name'] ?></span> <span class="pipe">|</span> <span><?= date('F Y', $temp_userinfo['user_date_created']) ?></span> <span class="pipe">|</span> <em><?= $temp_displayline ?></em></div>
@@ -125,27 +124,6 @@ foreach ($contributor_ids AS $id){
   </p>
 </div>
 */?>
-
-<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Resources Index</h2>
-
-<div class="subbody" style="margin-bottom: 2px; ">
-  <p class="text">
-    <a href="http://www.sprites-inc.co.uk/files/Classic/" target="_blank"><strong>Sprites Inc.</strong></a> <span class="pipe">|</span> <span>Resource</span> <span class="pipe">|</span> <em>Official Sprites</em><br />
-    Many (and maybe all) sprites that appear in this game were found on the number one Mega Man sprite resource - Sprites Inc. - and without the the website I'm sure many Mega Man fan-games would not have been possible.  Even the custom sprites are based on those found on this website, and I cannot thank the creators and contributors enough for their efforts and the fantastic service they provide.  I highly recommend the website for all your Mega Man sprite needs.  :)
-  </p>
-</div>
-<div class="subbody" style="margin-bottom: 2px; ">
-  <p class="text">
-    <a href="http://megaman.wikia.com/wiki/Robot_Master" target="_blank"><strong>The Mega Man Knowledge Base</strong></a> <span class="pipe">|</span> <span>Resource</span> <span class="pipe">|</span> <em>Official Names, Weaknesses, Quotes, Data, etc&hellip;</em><br />
-    The Mega Man Knowledge Base is used as a constant reference for robot weaknesses, official names, artwork, quotes, and so much more.  This is one of the best resources on the internet for official Mega Man data and without it this game would not have been possible.  Thank you, Mega Man community, for this incredibly useful resource.  :D
-  </p>
-</div>
-<div class="subbody">
-  <p class="text">
-    <a href="http://media.io/" target="_blank"><strong>media.io</strong></a> <span class="pipe">|</span> <span>Resource</span> <span class="pipe">|</span> <em>Media Conversion Tools</em><br />
-    All MP3 tracks were converted to Firefox-compatible OGG files using this tool, and it has been incredibly helpful in easing the pain of cross-browser support.  Their online audio conversion is very simple to use and is completely free.  I am so happy that this tool exists and recommend it to anyone interested in HTML game development.
-  </p>
-</div>
 
 <?
 // Collect the buffer and define the page markup
