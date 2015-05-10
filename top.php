@@ -2,17 +2,23 @@
 
 /*
 // MAINTENANCE
-if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.226.238.61'))){
+if (!in_array($_SERVER['REMOTE_ADDR'], array('999.999.999.999'))){
   die('<div style="margin: 0; padding: 10px 25%; background-color: rgb(122, 0, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
     ATTENTION!<br /> The Mega Man RPG Prototype is currently being updated.  Please stand by until further notice.  Several parts of the website are being taken offline during this process and any progress made during will likely be lost, so please hold tight before trying to log in again.  I apologize for the inconvenience.  Thank you and look forward to lots of new stuff!<br /> - Adrian
     </div>');
 }
 */
 
-
 /*
  * GLOBAL INCLUDES
  */
+
+// Start the session
+@date_default_timezone_set('Canada/Eastern');
+//@ini_set('session.gc_maxlifetime', 24*60*60);
+//@ini_set('session.gc_probability', 1);
+//@ini_set('session.gc_divisor', 1);
+session_start();
 
 // Include mandatory config files
 require('data/config.php');
@@ -23,13 +29,6 @@ if (MMRPG_CONFIG_ADMIN_MODE){
   ini_set('display_startup_errors',1);
   error_reporting(-1);
 }
-
-// Start the session
-@date_default_timezone_set('Canada/Eastern');
-//@ini_set('session.gc_maxlifetime', 24*60*60);
-//@ini_set('session.gc_probability', 1);
-//@ini_set('session.gc_divisor', 1);
-session_start();
 
 // Include the database class first and foremost
 require('data/classes/database.php');
@@ -55,11 +54,13 @@ require('data/classes/field.php');
 require('data/classes/player.php');
 require('data/classes/robot.php');
 require('data/classes/ability.php');
+require('data/classes/item.php');
 
 // DEBUG DEBUG DEBUG
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Include mandatory function files
+require('data/functions/system.php');
 require('data/functions/website.php');
 require('data/functions/game.php');
 require('data/functions/prototype.php');
@@ -162,17 +163,17 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
   // Disable the memory limit for this script
   //ini_set('memory_limit', '128M');
   //ini_set('memory_limit', '-1');
-  
+
   // Define the first load boolean variable
   $this_first_load = false;
   // Define the game cache location path
   $this_cache_dir = MMRPG_CONFIG_ROOTDIR.'data/cache/';
   // Define the game save location path
   $this_save_dir = MMRPG_CONFIG_ROOTDIR.'data/saves/';
-  
+
   // DEBUG DEBUG DEBUG
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // If the user and file details have already been loaded to the session
   if (
     !empty($_SESSION['GAME']['USER']) && !empty($_SESSION['GAME']['USER']['username']) && !empty($_SESSION['GAME']['USER']['password'])
@@ -208,16 +209,16 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Update the global save path variable
     $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
   }
-  
+
   //  DEBUG DEBUG DEBUG
   //mmrpg_reset_game_session($this_save_filepath);
-  
+
   // DEBUG DEBUG DEBUG
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   //die('<pre>$_GET : '.print_r($_GET, true).'</pre>');
   //die($this_save_filepath);
-  
+
 }
 
 /*
@@ -230,16 +231,24 @@ $this_current_page = !empty($_GET['page']) ? strtolower($_GET['page']) : false;
 $this_current_sub = !empty($_GET['sub']) ? strtolower($_GET['sub']) : false;
 $this_current_num = !empty($_GET['num']) ? $_GET['num'] : 1;
 $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
+$this_current_cat = !empty($_GET['cat']) ? $_GET['cat'] : '';
+$this_current_id = !empty($_GET['id']) ? $_GET['id'] : 0;
 
 // Redirect the stupid friggin home pages to their friggin not home page versions (UGH!)
+//die('<pre>'.print_r($_GET, true).'</pre>');
 $this_current_uri = !empty($this_current_page) && $this_current_page != 'home' ? $this_current_page.'/' : '';
 $this_current_uri .= !empty($this_current_sub) && $this_current_sub != 'home' ? $this_current_sub.'/' : '';
-$this_current_uri .= !empty($this_current_num) && $this_current_num > 1 ? $this_current_num.'/' : '';
+if ($this_current_page != 'community'){ $this_current_uri .= !empty($this_current_num) && $this_current_num > 1 ? $this_current_num.'/' : ''; }
 if (isset($_GET['home']) || $this_current_sub == 'home' || $this_current_page == 'home'){
   $_GET['this_redirect'] = $this_current_url;
   header('HTTP/1.1 301 Moved Permanently');
   header('Location: '.$this_current_url);
   exit();
+} elseif ($this_current_page == 'about'){
+  $this_current_sub = !empty($_GET['sub']) ? strtolower($_GET['sub']) : '';
+  if (!empty($this_current_sub)){
+    $this_current_uri .= $this_current_sub.'/';
+  }
 } elseif ($this_current_page == 'updates'){
   $this_current_id = !empty($_GET['id']) ? strtolower($_GET['id']) : 0;
   $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
@@ -261,9 +270,12 @@ if (isset($_GET['home']) || $this_current_sub == 'home' || $this_current_page ==
   if (!empty($this_current_target)){
     //$this_current_uri .= $this_current_target.'/';
   }
+  if (!empty($this_current_num) && $this_current_num != 1){
+    $this_current_uri .= $this_current_num.'/';
+  }
 } elseif ($this_current_page == 'database'){
   $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
-  if (!empty($this_current_token) && isset($mmrpg_index['types'][$this_current_token])){
+  if (!empty($this_current_token) && isset($mmrpg_index['types'][$this_current_token]) || in_array($this_current_token, array('multi', 'bonus'))){
     $this_current_filter = $_GET['filter'] = $this_current_token;
     $this_current_filter_name = $this_current_filter == 'none' ? 'Neutral' : ucfirst($this_current_filter);
     $this_current_uri .= $this_current_filter.'/';
@@ -312,10 +324,10 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
     } else {
       $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
     }
-  
+
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     if (!defined('MMRPG_SCRIPT_REQUEST')){
       $this_boardinfo = $DB->get_array("SELECT * FROM mmrpg_leaderboard WHERE user_id = {$this_userid}");
       $this_boardid = $this_boardinfo['board_id'];
@@ -323,14 +335,14 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
       //if (empty($this_boardinfo['board_rank'])){ require('data/leaderboard.php'); $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank']; }
       if (empty($this_boardinfo['board_rank'])){ $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'] = mmrpg_prototype_leaderboard_rank($this_userid); }
     }
-  
+
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
   }
   // Otherwise, generate some details user details
   else {
-    
+
     // Collect the guest userinfo from the database
     $this_userid = MMRPG_SETTINGS_GUEST_ID;
     if (empty($_SESSION['GAME']['USER']['userinfo'])){
@@ -339,24 +351,24 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
     } else {
       $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
     }
-  
+
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     if (!defined('MMRPG_SCRIPT_REQUEST')){
       $this_boardinfo = array();
       $this_boardinfo['board_rank'] = 0;
       $this_boardid = 0;
     }
-  
+
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
   }
-  
+
   // DEBUG DEBUG DEBUG
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
 } else {
   // Create the userinfo array anyway to prevent errors
   $this_userinfo = array();
@@ -373,7 +385,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   $temp_field_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/intro-field';
   $temp_field_type = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : '';
   list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
-  
+
   // Collect the info for the chosen temp field
   $temp_field_data = mmrpg_field::get_index_info($temp_field_token);
   //die('<pre>'.print_r($temp_field_data, true).'</pre>');
@@ -384,10 +396,10 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   define('MMRPG_SETTINGS_CURRENT_FIELDFRAMES', count($temp_field_data['field_background_frame']));
   define('MMRPG_SETTINGS_CURRENT_FIELDMECHA', (!empty($temp_field_data['field_mechas']) ? $temp_field_data['field_mechas'][0] : 'met'));
   //die('$temp_field_type = '.$temp_field_type.'; MMRPG_SETTINGS_CURRENT_FIELDTYPE = '.MMRPG_SETTINGS_CURRENT_FIELDTYPE);
-  
+
   // DEBUG DEBUG DEBUG
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
 }
 
 /*
