@@ -13,7 +13,12 @@ $battle = array(
     'player_token' => 'player',
     'player_switch' => 2,
     'player_robots' => array(
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'met', 'robot_level' => 1, 'robot_abilities' => array('met-shot'))
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'dark-frag', 'robot_name' => 'Dark Frag A', 'robot_level' => 2, 'robot_abilities' => array('dark-boost')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'met', 'robot_level' => 1, 'robot_abilities' => array('met-shot')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'dark-frag', 'robot_name' => 'Dark Frag B', 'robot_level' => 2, 'robot_abilities' => array('dark-boost')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 4), 'robot_token' => 'met', 'robot_level' => 1, 'robot_abilities' => array('met-shot')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 5), 'robot_token' => 'dark-frag', 'robot_name' => 'Dark Frag C', 'robot_level' => 2, 'robot_abilities' => array('dark-boost')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 6), 'robot_token' => 'met', 'robot_level' => 1, 'robot_abilities' => array('met-shot'))
       )
     ),
   'battle_rewards' => array(

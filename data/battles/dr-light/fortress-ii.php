@@ -7,22 +7,31 @@ $battle = array(
   'battle_description' => 'Defeat the resurrected Enker in battle!',
   'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 1),
   'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 35 * 1),
-  'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination', 'field_name' => 'Final Destination', 'field_music' => 'final-destination-enker', 'field_mechas' => array('beak', 'beetle-borg', 'tackle-fire', 'flea', 'flutter-fly', 'picket-man', 'peng', 'spine')),
+  'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination', 'field_name' => 'Final Destination', 'field_music' => 'final-destination-enker', 'field_mechas' => array('beak', 'spine')),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',
     'player_robots' => array(
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'enker', 'robot_level' => 35, 'robot_abilities' => array('energy-boost', 'energy-break', 'mega-slide', 'mecha-support', 'spark-shock', 'search-snake', 'needle-cannon', 'buster-shot'))
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'enker', 'robot_level' => 35, 'robot_abilities' => array('energy-boost', 'energy-break', 'mega-slide', 'mecha-support', 'spark-shock', 'search-snake', 'needle-cannon', 'buster-shot')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'beak', 'robot_level' => 30),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'beak', 'robot_level' => 30),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 4), 'robot_token' => 'beak', 'robot_level' => 30)
       )
     ),
   'battle_rewards' => array(
     'abilities' => array(
       ),
     'items' => array(
-      array('chance' => 20, 'token' => 'item-energy-tank'),
-      array('chance' => 20, 'token' => 'item-weapon-tank'),
-      array('chance' => 10, 'token' => 'item-extra-life')
+      array('chance' => 10, 'token' => 'item-energy-tank'),
+      array('chance' => 10, 'token' => 'item-weapon-tank'),
+      array('chance' => 5, 'token' => 'item-extra-life')
       )
+    ),
+  'flags' => array(
+    'fortress_battle' => true
+    ),
+  'values' => array(
+    'fortress_battle_masters' => array('enker')
     )
   );
 ?>
