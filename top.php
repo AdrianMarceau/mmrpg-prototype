@@ -1,10 +1,5 @@
 <?php
 
-// BANNED LIST
-if (preg_match('/^109.201.6[6-9]./', $_SERVER['REMOTE_ADDR'])){
-  die('You have been a very bad player.  You are banned.');
-}
-
 /*
 // MAINTENANCE
 if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.226.238.61'))){
