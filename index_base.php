@@ -39,6 +39,7 @@ $this_markup_header = '';
 $this_markup_counter = '';
 $this_markup_body = '';
 $this_markup_jsready = '';
+$this_page_markup = '';
 
 // Only collect info if we're NOT in critical error mode
 if (!defined('MMRPG_CRITICAL_ERROR')){
@@ -86,17 +87,57 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 
 }
 
+/*
+// Define the path variables for this page cache
+$temp_cache_token = trim(preg_replace('/-+/', '-', preg_replace('/[^a-z0-9]+/i', '-', $this_current_uri)), '-');
+$temp_cache_path = 'page-markup_'.$temp_cache_token.'_'.MMRPG_CONFIG_CACHE_DATE.'.htm';
+//die('$temp_cache_path = '.$temp_cache_path);
+
+// If this page is allowed to be cached, check the cache for markup
+if (MMRPG_CONFIG_CACHE_PAGES && !in_array($this_current_page, array('community', 'leaderboard', 'prototype'))){
+
+  // Attempt to collect page markup from the cache
+  $this_page_markup = mmrpg_get_cached_markup($temp_cache_path);
+
+}
+
+// If no marker has been collected from a cache, require it
+if (empty($this_page_markup)){
+
+  // Save generated cache markup to the system
+  mmrpg_save_cached_markup($temp_cache_path, $this_page_markup);
+
+}
+*/
+
 // Include the required page logic files
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require_once('pages/page.'.$this_current_page.'.php');
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+// Start generating the markup for the page
+ob_start();
+?>
+<div class="page page_<?= $this_current_page ?>">
+  <div class="header">
+    <div class="header_wrapper">
+      <h1><?= $this_markup_header ?></h1>
+      <?= !empty($this_markup_counter) ? $this_markup_counter."\n" : '' ?>
+    </div>
+  </div>
+  <div class="body"><div class="body_wrapper"><?= $this_markup_body ?></div></div>
+  <?= false ? '<pre>'.print_r($_GET, true).'</pre>' : '' ?>
+</div>
+<?
+// Collect the markup for the page into a var
+$this_page_markup = ob_get_clean();
 
 ?>
 <!DOCTYPE html>
 <html lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
 <head>
 <meta charset="UTF-8" />
-<title><?= $this_seo_title ?></title>
+<title><?= (!MMRPG_CONFIG_IS_LIVE ? '@ ' : '').$this_seo_title ?></title>
 <meta name="keywords" content="<?= $this_seo_keywords ?>" />
 <meta name="description" content="<?= $this_seo_description ?>" />
 <meta name="robots" content="<?= !defined('MMRPG_CRITICAL_ERROR') && empty($_REQUEST['action']) && !empty($this_seo_robots) ? $this_seo_robots : 'noindex,nofollow' ?>,noodp" />
@@ -160,8 +201,8 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
       }
       //die($temp_background_path);
       ?>
-      <a class="anchor" id="top">&nbsp;</a>
-      <div class="sprite background banner_background" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_background_base.gif' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>);"><?= ucwords(str_replace('-', ' ', MMRPG_SETTINGS_CURRENT_FIELDTOKEN)) ?></div>
+      <a class="anchor" id="top"></a>
+      <div class="sprite background banner_background" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_background_base.gif' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>);"></div>
       <?
       // Only continue if we're NOT in critical error mode
       if (!defined('MMRPG_CRITICAL_ERROR')){
@@ -196,16 +237,16 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
             $this_animate = implode(',', $this_frames);
             $this_direction = $this_info[$this_class.'_direction'];
             $this_float = $this_direction == 'left' ? 'right' : 'left';
-            echo '<div data-id="background_attachment_'.$this_key.'" class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" data-type="attachment" data-position="background" data-size="'.$this_size.'" data-direction="'.$this_direction.'" data-frame="'.$this_frame.'" data-animate="'.$this_animate.'" style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_token.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.ucwords(str_replace('-', ' ', $this_token)).'</div>';
+            echo '<div data-id="background_attachment_'.$this_key.'" class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" data-type="attachment" data-position="background" data-size="'.$this_size.'" data-direction="'.$this_direction.'" data-frame="'.$this_frame.'" data-animate="'.$this_animate.'" style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_token.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
           }
           echo '</div>';
         }
 
       }
       ?>
-      <div class="foreground scanlines" style="background-image: url(images/gui/canvas-scanlines.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">&nbsp;</div>
+      <div class="foreground scanlines" style="background-image: url(images/gui/canvas-scanlines.png?<?=MMRPG_CONFIG_CACHE_DATE?>);"></div>
       <div class="sprite credits banner_credits" style="background-image: url(images/menus/menu-banner_credits.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
-      <div class="sprite overlay banner_overlay" style="">&nbsp;</div>
+      <div class="sprite overlay banner_overlay" style=""></div>
 
       <? if(!defined('MMRPG_CRITICAL_ERROR') && MMRPG_CONFIG_IS_LIVE): ?>
         <? if($this_current_page != 'file'): ?>
@@ -226,7 +267,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
 
       <? if(!defined('MMRPG_CRITICAL_ERROR')): ?>
         <div class="userinfo" style="">
-          <div class="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="">&nbsp;</div>
+          <div class="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style=""></div>
           <?/*
           <? if($this_userid == MMRPG_SETTINGS_GUEST_ID || !MMRPG_CONFIG_ADMIN_MODE): ?>
             <div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>
@@ -282,18 +323,26 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
           <?/*<a href="<?= MMRPG_CONFIG_ROOTURL ?>updates/" class="link <?= $this_current_page == 'updates' ? 'link_active field_type_empty' : '' ?>"><span>Updates</span></a>*/?>
           <a href="<?= MMRPG_CONFIG_ROOTURL ?>gallery/" class="link <?= $this_current_page == 'gallery' ? 'link_active field_type_empty' : '' ?>"><span>Gallery</span></a>
           <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/" class="link <?= $this_current_page == 'database' ? 'link_active field_type_empty' : '' ?>"><span>Database</span></a>
-          <a href="<?= MMRPG_CONFIG_ROOTURL ?>community/" class="link <?= $this_current_page == 'community' ? 'link_active field_type_empty' : '' ?>"><span>Community</span><?= !empty($temp_new_threads) ? '<sup class="sup field_type field_type_electric" title="'.count($temp_new_threads).' New Comments">'.count($temp_new_threads).'</sup>' : '' ?><?= !empty($temp_viewing_community) ? '<sup class="sup field_type field_type_nature" title="'.count($temp_viewing_community).' Members Viewing" style="'.(!empty($temp_new_threads) ? 'margin-left: -3px;' : '').'">'.count($temp_viewing_community).'</sup>' : '' ?></a>
+          <a href="<?= MMRPG_CONFIG_ROOTURL ?>prototype/" target="_blank" class="link <?= $this_current_page == 'prototype' ? 'link_active field_type_empty' : '' ?>"><span>Play the Prototype</span></a>
           <a href="<?= MMRPG_CONFIG_ROOTURL ?>leaderboard/" class="link <?= $this_current_page == 'leaderboard' ? 'link_active field_type_empty' : '' ?>"><span>Leaderboard</span><?= !empty($temp_leaderboard_online) ? '<sup class="sup field_type field_type_nature" title="'.count($temp_leaderboard_online).' Players Online">'.count($temp_leaderboard_online).'</sup>' : '' ?></a>
-          <a href="<?= MMRPG_CONFIG_ROOTURL ?>prototype/" target="_blank" class="link <?= $this_current_page == 'prototype' ? 'link_active field_type_empty' : '' ?>"><span>Prototype</span></a>
-          <a href="<?= MMRPG_CONFIG_ROOTURL ?>credits/" class="link <?= $this_current_page == 'credits' ? 'link_active field_type_empty' : '' ?>"><span>Credits</span></a>
+          <a href="<?= MMRPG_CONFIG_ROOTURL ?>community/" class="link <?= $this_current_page == 'community' ? 'link_active field_type_empty' : '' ?>"><span>Community</span><?= !empty($temp_new_threads) ? '<sup class="sup field_type field_type_electric" title="'.count($temp_new_threads).' New Comments">'.count($temp_new_threads).'</sup>' : '' ?><?= !empty($temp_viewing_community) ? '<sup class="sup field_type field_type_nature" title="'.count($temp_viewing_community).' Members Viewing" style="'.(!empty($temp_new_threads) ? 'margin-left: -3px;' : '').'">'.count($temp_viewing_community).'</sup>' : '' ?></a>
+          <?/* <a href="<?= MMRPG_CONFIG_ROOTURL ?>credits/" class="link <?= $this_current_page == 'credits' ? 'link_active field_type_empty' : '' ?>"><span>Credits</span></a> */?>
           <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/" class="link <?= $this_current_page == 'contact' ? 'link_active field_type_empty' : '' ?>"><span>Contact</span></a>
         </div>
-        <? if (in_array($this_current_page, array('database', 'community'))): ?>
+        <? if (in_array($this_current_page, array('about', 'database', 'community'))): ?>
         <div class="sub">
+          <? if ($this_current_page == 'about'): ?>
+            <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/story/" class="link <?= $this_current_sub == 'story' ? 'link_active field_type_empty' : '' ?>"><span>Story</span></a>
+            <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/mechanics/" class="link <?= $this_current_sub == 'mechanics' ? 'link_active field_type_empty' : '' ?>"><span>Mechanics</span></a>
+            <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/resources/" class="link <?= $this_current_sub == 'resources' ? 'link_active field_type_empty' : '' ?>"><span>Resources</span></a>
+            <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/credits/" class="link <?= $this_current_sub == 'credits' ? 'link_active field_type_empty' : '' ?>"><span>Credits</span></a>
+            <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/links/" class="link <?= $this_current_sub == 'links' ? 'link_active field_type_empty' : '' ?>"><span>Links</span></a>
+          <? endif; ?>
           <? if ($this_current_page == 'database'): ?>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/players/" class="link <?= $this_current_sub == 'players' ? 'link_active field_type_empty' : '' ?>"><span>Players</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/robots/" class="link <?= $this_current_sub == 'robots' ? 'link_active field_type_empty' : '' ?>"><span>Robots</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/mechas/" class="link <?= $this_current_sub == 'mechas' ? 'link_active field_type_empty' : '' ?>"><span>Mechas</span></a>
+            <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/bosses/" class="link <?= $this_current_sub == 'bosses' ? 'link_active field_type_empty' : '' ?>"><span>Bosses</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/abilities/" class="link <?= $this_current_sub == 'abilities' ? 'link_active field_type_empty' : '' ?>"><span>Abilities</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/items/" class="link <?= $this_current_sub == 'items' ? 'link_active field_type_empty' : '' ?>"><span>Items</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/fields/" class="link <?= $this_current_sub == 'fields' ? 'link_active field_type_empty' : '' ?>"><span>Fields</span></a>
@@ -302,26 +351,21 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
           <?
           // Print out the community links if applicable
           if ($this_current_page == 'community'){
-            // Collect the number of people currently in chat
-            $chat_online = $DB->get_array_list("SELECT * FROM ajax_chat_online WHERE 1 = 1;");
-            // Loop through the community index and print out links
             if (!empty($this_categories_index)){
               foreach ($this_categories_index AS $temp_token => $temp_category){
                 $temp_id = $temp_category['category_id'];
-                if (($temp_id == 0) && $this_userid == MMRPG_SETTINGS_GUEST_ID){ continue; }
-                //if (($temp_id == 0 || $temp_token == 'chat') && $this_userid == MMRPG_SETTINGS_GUEST_ID){ continue; }
+                if (($temp_id == 0 || $temp_token == 'chat') && $this_userid == MMRPG_SETTINGS_GUEST_ID){ continue; }
                 if (($temp_token == 'personal' || $temp_token == 'chat') && empty($this_userinfo['user_flag_postprivate'])){ continue; }
                 $temp_link = MMRPG_CONFIG_ROOTURL.'community/'.$temp_category['category_token'].'/';
                 $temp_active = $this_current_cat == $temp_category['category_token'] ? true : false;
                 $temp_count = !empty($temp_new_threads_categories[$temp_id]) ? $temp_new_threads_categories[$temp_id] : 0;
                 $temp_viewing = $temp_token != 'personal' ? mmrpg_website_sessions_active('community/'.$temp_category['category_token'].'/', 3, true) : array();
-                if ($temp_token == 'chat' && !empty($chat_online)){ $temp_viewing = $chat_online; }
                 $temp_viewing = !empty($temp_viewing) ? count($temp_viewing) : 0;
                 //die('<pre>$temp_id('.$temp_id.'); $temp_count('.$temp_count.'); $temp_new_threads_categories = '.print_r($temp_new_threads_categories, true).'</pre>');
                 echo '<a href="'.$temp_link.'" class="link '.($temp_active ? 'link_active field_type_empty' : '').'">';
                 echo '<span>'.ucfirst($temp_token).'</span>';
                 if ($temp_count > 0){ echo  '<sup class="sup field_type field_type_electric" title="'.($temp_count == 1 ? '1 Updated Thread' : $temp_count.' Updated Threads').'">'.$temp_count.'</sup>'; }
-                if ($temp_viewing > 0){ echo  '<sup class="sup field_type field_type_nature" title="'.($temp_viewing == 1 ? '1 Member Viewing' : $temp_viewing.' Members Viewing').'" style="'.($temp_count > 0 ? 'margin-left: -3px;' : '').'">'.$temp_viewing.'</sup>'; }
+                if ($temp_viewing > 0){ echo  '<sup class="sup field_type field_type_nature" title="'.($temp_viewing == 1 ? '1 Player ' : $temp_viewing.' Players ').($temp_token == 'search' ? 'Searching' : 'Browsing').'" style="'.($temp_count > 0 ? 'margin-left: -3px;' : '').'">'.$temp_viewing.'</sup>'; }
                 echo '</a>';
               }
             }
@@ -334,12 +378,22 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
       <? endif; ?>
     </div>
 
+    <?
+
+    // Print out the pre-generated page markup
+    echo $this_page_markup;
+
+    ?>
+
+    <? /*
     <div class="page page_<?= $this_current_page ?>">
       <h1 class="header"><span class="header_wrapper"><?= $this_markup_header ?></span></h1>
       <span style="display: none;"><?= !empty($this_markup_counter) ? $this_markup_counter."\n" : '' ?></span>
       <div class="body"><div class="body_wrapper"><?= $this_markup_body ?></div></div>
       <?= false ? '<pre>'.print_r($_GET, true).'</pre>' : '' ?>
     </div>
+    */ ?>
+
   </div>
   <div id="credits">
     Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.<br />
@@ -361,13 +415,13 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
   <? if($this_current_page == 'community' && $this_current_cat == 'chat'): ?>
   gameSettings.autoKeepAlive = true;
   <? endif; ?>
-  websiteSettings.currentHref = '<?= !empty($this_current_uri) ? $this_current_uri : '' ?>';
-  websiteSettings.currentPage = '<?= !empty($this_current_page) ? $this_current_page : '' ?>';
-  websiteSettings.currentSub = '<?= !empty($this_current_sub) ? $this_current_sub : '' ?>';
-  websiteSettings.currentCat = '<?= !empty($this_current_cat) ? $this_current_cat : '' ?>';
-  websiteSettings.currentToken = '<?= !empty($this_current_token) ? $this_current_token : '' ?>';
-  websiteSettings.currentNum = <?= !empty($this_current_num) ? $this_current_num : 0 ?>;
-  websiteSettings.currentId = <?= !empty($this_current_id) ? $this_current_id : 0 ?>;
+  websiteSettings.currentHref = '<?= $this_current_uri ?>';
+  websiteSettings.currentPage = '<?= $this_current_page ?>';
+  websiteSettings.currentSub = '<?= $this_current_sub ?>';
+  websiteSettings.currentCat = '<?= $this_current_cat ?>';
+  websiteSettings.currentToken = '<?= $this_current_token ?>';
+  websiteSettings.currentNum = <?= $this_current_num ?>;
+  websiteSettings.currentId = <?= $this_current_id ?>;
   </script>
   <script type="text/javascript">
   // When the document is ready for event binding

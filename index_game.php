@@ -99,7 +99,7 @@ if (count($matches)>1){
 <html<?/* not-manifest="manifest.php?<?=MMRPG_CONFIG_CACHE_DATE?>" */?> lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
 <head>
 <meta charset="UTF-8" />
-<title><?= $this_seo_title ?></title>
+<title><?= (!MMRPG_CONFIG_IS_LIVE ? '@ ' : '').$this_seo_title ?></title>
 <meta name="keywords" content="<?= $this_seo_keywords ?>" />
 <meta name="description" content="<?= $this_seo_description ?>" />
 <meta name="robots" content="index,follow,noodp" />
