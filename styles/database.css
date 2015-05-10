@@ -193,14 +193,16 @@
 #database #canvas .wrapper_robots_masters .sprite_robot {
   position: relative;
 }
-#database #canvas .wrapper_robots_mechas {
+#database #canvas .wrapper_robots_mechas,
+#database #canvas .wrapper_robots_bosses {
   min-height: 21px;
 }
 #database #canvas .wrapper_robots_mechas .sprite_robot {
   position: relative;
 }
 #database #canvas .wrapper_robots_masters .sprite_robot .complete,
-#database #canvas .wrapper_robots_mechas .sprite_robot .complete {
+#database #canvas .wrapper_robots_mechas .sprite_robot .complete,
+#database #canvas .wrapper_robots_bosses .sprite_robot .complete {
   position: absolute;
   right: -4px;
   top: -4px;

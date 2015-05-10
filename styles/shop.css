@@ -295,6 +295,7 @@
   padding: 3px 0 6px;
   margin: 0 auto 6px;
   overflow: hidden; 
+  position: relative;
 }
 #shop #console .event .shop_tabs_links .tab_link,
 #shop #console .event .shop_tabs_links .tab_spacer,
@@ -344,6 +345,15 @@
 }
 #shop #console .event .shop_tabs_links .tab_line {
   width: 56%;
+}
+#shop #console .event .shop_tabs_links .tab_level {
+  display: block;
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  color: #868686;
+  font-size: 10px;
+  line-height: 10px;
 }
 
 

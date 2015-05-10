@@ -330,7 +330,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
   overflow: visible;
   bottom: 18px; 
   width: auto; 
-  height: 26px;
+  height: 36px;
   padding: 0;
   -moz-border-radius: 27px 0 0 0;
   -webkit-border-radius: 27px 0 0 0;  
@@ -341,9 +341,20 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
   color: #70D580;
   font-size: 13px;
 }
-#prototype .banner .options_userinfo .info_username {
-  padding-right: 34px;
-  padding-left: 10px;
+#prototype .banner .options_userinfo .info_userinfo {
+  padding: 3px 34px 0 10px;
+}
+#prototype .banner .options_userinfo .info_userinfo .name {
+  display: block;
+  font-size: 13px;
+  line-height: 16px;
+}
+#prototype .banner .options_userinfo .info_userinfo .mode {
+  display: block;
+  font-size: 9px;
+  line-height: 10px;
+  color: #4F4F4F;
+  color: rgba(255, 255, 255, 0.50);
 }
 #prototype .banner .options_userinfo .info_demo {
   color: #F75656;
@@ -408,12 +419,16 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
   background-image: linear-gradient(to bottom,  rgba(0,0,0,0.40) 0%,rgba(0,0,0,0.50) 100%) !important; /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ) !important; /* IE6-9 */
 }
+#prototype .banner .points a.wrapper,
+#prototype .banner .points a.wrapper * {
+  cursor: pointer !important;
+}
 #prototype .banner .options_userinfo .wrapper {
   display: block;
   margin: 0;
   padding: 1px 10px 1px 16px;
   min-width: 140px; 
-  height: 26px;
+  height: 36px;
   -moz-border-radius: 26px 0 0 0;
   -webkit-border-radius: 26px 0 0 0;  
   border-radius: 26px 0 0 0;
@@ -424,6 +439,14 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
   background-image: -ms-linear-gradient(top,  rgba(0,0,0,0.50) 0%,rgba(0,0,0,0.50) 100%) !important; /* IE10+ */
   background-image: linear-gradient(to bottom,  rgba(0,0,0,0.50) 0%,rgba(0,0,0,0.50) 100%) !important; /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ) !important; /* IE6-9 */
+}
+
+#prototype .banner .options_userinfo a.wrapper,
+#prototype .banner .options_userinfo a.wrapper * {
+  cursor: pointer !important;
+}
+#prototype .banner .options_userinfo a.wrapper .sprite {
+  pointer-events: none !important;
 }
 #prototype .banner .options_fullmenu .wrapper {  
   display: block;
@@ -619,7 +642,7 @@ body.windowFlag_landscapeMode #prototype .select_this_player_robots .option_wrap
   
 }
 #prototype .option_wrapper_missions {
-  padding-top: 12px;
+  padding-top: 24px;
   position: relative;
 }
 #prototype .option_wrapper_missions .chapter_select {
@@ -651,8 +674,8 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 #prototype .option_wrapper_missions .chapter_select .chapter_link {
   display: block;
   float: left;
-  width: 12.36%;
-  margin: 0 2px 0 0;
+  width: 8%;
+  margin: 0 0.3% 0 0;
   border: 2px solid #2C2B2B;
   font-size: 9px;
   line-height: 12px;
@@ -676,30 +699,50 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
   border-radius: 0 0 0.75em 0.75em;
   -moz-border-radius: 0 0 0.75em 0.75em;
   -webkit-border-radius: 0 0 0.75em 0.75em;   
-}
-body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link,
-body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link {
-  width: 12.8%;
+  box-sizing: border-box;
 }
 
-#prototype .option_wrapper_missions .chapter_select_5 .chapter_link {
-  width: 18.1%;
+#prototype .option_wrapper_missions .chapter_select_1 .chapter_link {
+  width: 99.70%;
 }
-body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select_5 .chapter_link,
-body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select_5 .chapter_link {
-  width: 18.45%;
+#prototype .option_wrapper_missions .chapter_select_2 .chapter_link {
+  width: 49.70%;
+}
+#prototype .option_wrapper_missions .chapter_select_3 .chapter_link {
+  width: 33.03%;
+}
+#prototype .option_wrapper_missions .chapter_select_4 .chapter_link {
+  width: 24.70%;
+}
+#prototype .option_wrapper_missions .chapter_select_5 .chapter_link {
+  width: 19.70%;
 }
 #prototype .option_wrapper_missions .chapter_select_6 .chapter_link {
-  width: 14.7%;
+  width: 16.36%;
 }
-body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select_6 .chapter_link,
-body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select_6 .chapter_link {
-  width: 15.1%;
+#prototype .option_wrapper_missions .chapter_select_7 .chapter_link {
+  width: 13.90%;
 }
+#prototype .option_wrapper_missions .chapter_select_8 .chapter_link {
+  width: 12.2%;
+}
+#prototype .option_wrapper_missions .chapter_select_9 .chapter_link {
+  width: 10.81%;
+}
+#prototype .option_wrapper_missions .chapter_select_10 .chapter_link {
+  width: 9.70%;
+}
+#prototype .option_wrapper_missions .chapter_select_11 .chapter_link {
+  width: 8.79%;
+}
+#prototype .option_wrapper_missions .chapter_select_12 .chapter_link {
+  width: 8.03%;
+}
+
 
 #prototype .option_wrapper_missions .chapter_select .chapter_link:hover,
 #prototype .option_wrapper_missions .chapter_select .chapter_link_active {
-  text-decoration: underline;
+  text-decoration: none;
   border-color: #373737;
   background-color: #2F2F2F;
   color: #FFFFFF;
@@ -708,8 +751,10 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 #prototype .option_wrapper_missions .chapter_select .chapter_link_disabled:hover {
   text-decoration: none;
   border-color: #252525;
+  background-color: #2A2A2A;
   color: #494343;
   cursor: default; 
+  line-height: 25px;
 }
 #prototype .option_wrapper_missions .hidden_chapter_option {
   display: none !important;
@@ -1310,23 +1355,63 @@ body.mobileFlag_landscapeMode #prototype .menu {
 }
 */
 
-#prototype .option_1x1 div label.has_image,
-#prototype .option_1x2 div label.has_image,
-#prototype .option_1x3 div label.has_image,
-#prototype .option_1x4 div label.has_image {
+#prototype .option div label.has_image {
   text-align: left;
 }
-#prototype .option_1x1 div label.has_image .sprite,
-#prototype .option_1x2 div label.has_image .sprite,
-#prototype .option_1x3 div label.has_image .sprite,
-#prototype .option_1x4 div label.has_image .sprite {
+#prototype .option div label.has_image .sprite {
   pointer-events: none;
 }
-#prototype .banner .option_1x1 div label.has_image .sprite,
-#prototype .banner .option_1x2 div label.has_image .sprite,
-#prototype .banner .option_1x3 div label.has_image .sprite,
-#prototype .banner .option_1x4 div label.has_image .sprite {
+#prototype .banner .option div label.has_image .sprite {
   pointer-events: auto;
+}
+
+#prototype .option div label.has_image .sprite:nth-child(1) {
+  z-index: 100;
+  opacity: 1.00;
+}
+#prototype .option div label.has_image .sprite:nth-child(2) {
+  z-index: 99;
+  opacity: 0.91;
+}
+#prototype .option div label.has_image .sprite:nth-child(3) {
+  z-index: 98;
+  opacity: 0.82;
+}
+#prototype .option div label.has_image .sprite:nth-child(4) {
+  z-index: 97;
+  opacity: 0.73;
+}
+#prototype .option div label.has_image .sprite:nth-child(5) {
+  z-index: 96;
+  opacity: 0.64;
+}
+#prototype .option div label.has_image .sprite:nth-child(6) {
+  z-index: 95;
+  opacity: 0.55;
+}
+#prototype .option div label.has_image .sprite:nth-child(7) {
+  z-index: 94;
+  opacity: 0.46;
+}
+#prototype .option div label.has_image .sprite:nth-child(8) {
+  z-index: 93;
+  opacity: 0.37;
+}
+#prototype .option div label.has_image .sprite:nth-child(9) {
+  z-index: 92;
+  opacity: 0.28;
+}
+#prototype .option div label.has_image .sprite:nth-child(10) {
+  z-index: 91;
+  opacity: 0.22;
+}
+#prototype .option div label.has_image .sprite:nth-child(11) {
+  z-index: 90;
+  opacity: 0.11;
+}
+#prototype .option div label.has_image .sprite:nth-child(n+12) {
+  z-index: 89;
+  opacity: 0.05;
 }
 
 #prototype .option_1x1:hover .sprite_40x40_base,
@@ -1384,12 +1469,23 @@ body.mobileFlag_landscapeMode #prototype .menu {
 #prototype .option_1x1 div label .multi .online_type,
 #prototype .option_1x2 div label .multi .online_type,
 #prototype .option_1x3 div label .multi .online_type,
-#prototype .option_1x4 div label .multi .online_type {
+#prototype .option_1x4 div label .multi .online_type
+#prototype .option_1x1 div label .multi .custom_type,
+#prototype .option_1x2 div label .multi .custom_type,
+#prototype .option_1x3 div label .multi .custom_type,
+#prototype .option_1x4 div label .multi .custom_type {
   padding: 0 3px;
   margin-left: 4px;
   border-radius: 6px;
   -moz-border-radius: 6px;
   -webkit-border-radius: 6px;
+}
+#prototype .option_1x1 div label .multi .custom_type,
+#prototype .option_1x2 div label .multi .custom_type,
+#prototype .option_1x3 div label .multi .custom_type,
+#prototype .option_1x4 div label .multi .custom_type {
+  padding-right: 1px;
+  margin-left: 2px;
 }
 #prototype .option_1x1 div label .maintext,
 #prototype .option_1x2 div label .maintext,
@@ -1412,14 +1508,8 @@ body.mobileFlag_landscapeMode #prototype .menu {
   opacity: 0.33;
   filter: alpha(opacity=33);
 }
-#prototype .option_1x1 div label .subtext,
-#prototype .option_1x2 div label .subtext,
-#prototype .option_1x3 div label .subtext,
-#prototype .option_1x4 div label .subtext,
-#prototype .option_1x1 div label .subtext2,
-#prototype .option_1x2 div label .subtext2,
-#prototype .option_1x3 div label .subtext2,
-#prototype .option_1x4 div label .subtext2 {
+#prototype .option div label .subtext,
+#prototype .option div label .subtext2 {
   display: block;
   position: absolute;
   width: 65%;
@@ -1427,15 +1517,12 @@ body.mobileFlag_landscapeMode #prototype .menu {
   text-overflow: ellipsis;
   white-space: nowrap;  
   font-size: 9px;
-  line-height: 11px;
+  line-height: 13px;
   opacity: 0.8;
   top: 16px;
   z-index: 20;
 }
-#prototype .option_1x1 div label .subtext2,
-#prototype .option_1x2 div label .subtext2,
-#prototype .option_1x3 div label .subtext2,
-#prototype .option_1x4 div label .subtext2 {
+#prototype .option div label .subtext2 {
   top: 28px;
 }
 

@@ -54,14 +54,17 @@ body.index #header {
   border-radius:5px;
   padding: 4px;
   color:#fff;
+  width: auto !important;
   min-width: 100px;
-  max-width: 400px;
-  _width: 400px;
+  max-width: 450px;
   text-align: left;
   font-size: 12px;
   line-height: 16px;
   font-weight: normal;
   pointer-events: none;
+}
+#mmrpg .tooltip:empty {
+  display: none !important;
 }
 #mmrpg .tooltip .message {
   display:block;
@@ -93,6 +96,49 @@ body.index #header {
   padding: 0 2px;
   color: #262626;
 }
+#mmrpg .tooltip del {
+  color: #464646;
+}
+#mmrpg .tooltip .type,
+#mmrpg .tooltip .field_type,
+#mmrpg .tooltip .player_type,
+#mmrpg .tooltip .robot_type,
+#mmrpg .tooltip .ability_type {
+  display: inline-block;
+  padding: 0 3px;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  border-radius: 0.3em;
+}
+#mmrpg .tooltip .typelist .title {
+  display: block;
+  font-weight: bold;
+  padding: 0 6px;
+  margin: 0 auto 6px 0;
+  font-size: 13px;
+  line-height: 13px;
+  border-bottom: 1px solid #161616;
+  clear: both;
+}
+#mmrpg .tooltip .typelist .title .total {
+  padding-left: 10px;
+  font-weight: normal;
+  color: #969696;
+  font-size: 11px;
+  position: relative;
+  bottom: 2px;
+}
+#mmrpg .tooltip .typelist .type {
+  padding: 0 3px;
+  font-size: 11px;
+  margin: 0 4px 4px 0;
+}
+#mmrpg .tooltip .subtext {
+  font-size: 9px;
+  line-height: 11px;
+  font-weight: normal;
+  color: #969696;
+}
 
 #mmrpg .animate_fadein {
   display: none !important;
@@ -113,7 +159,8 @@ body.index #header {
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
 }
-#mmrpg .sprite_fullscreen {
+#mmrpg .sprite_fullscreen,
+#mmrpg .sprite.fullscreen {
   width: auto !important;
   height: auto !important;
   left: -130px !important;
@@ -125,10 +172,12 @@ body.index #header {
 #mmrpg a.sprite {
   cursor: pointer;
 }
-#mmrpg .sprite_40x40 {
+#mmrpg .sprite_40x40,
+#mmrpg .sprite.size40 {
   width: 40px;
   height: 40px;
 }
+
 #mmrpg .sprite_40x40_mugshot { background-position: 0 0; }
 #mmrpg .sprite_40x40_base { background-position: 0 0; }
 #mmrpg .sprite_40x40_taunt { background-position: -40px 0; }
@@ -162,6 +211,40 @@ body.index #header {
 #mmrpg .sprite_40x40_right_slide { background-position: -320px -40px; }
 #mmrpg .sprite_40x40_right_defend { background-position: -360px -40px; }
 #mmrpg .sprite_40x40_right_damage { background-position: -400px -40px; }
+
+#mmrpg .sprite.size40.mugshot { background-position: 0 0; }
+#mmrpg .sprite.size40.base { background-position: 0 0; }
+#mmrpg .sprite.size40.taunt { background-position: -40px 0; }
+#mmrpg .sprite.size40.victory { background-position: -80px 0; }
+#mmrpg .sprite.size40.defeat { background-position: -120px 0; }
+#mmrpg .sprite.size40.shoot { background-position: -160px 0; }
+#mmrpg .sprite.size40.throw { background-position: -200px 0; }
+#mmrpg .sprite.size40.summon { background-position: -240px 0; }
+#mmrpg .sprite.size40.slide { background-position: -280px 0; }
+#mmrpg .sprite.size40.defend { background-position: -320px 0; }
+#mmrpg .sprite.size40.damage { background-position: -360px 0; }
+#mmrpg .sprite.size40.left.mugshot { background-position: 0 0; }
+#mmrpg .sprite.size40.left.base { background-position: -40px 0; }
+#mmrpg .sprite.size40.left.taunt { background-position: -80px 0; }
+#mmrpg .sprite.size40.left.victory { background-position: -120px 0; }
+#mmrpg .sprite.size40.left.defeat { background-position: -160px 0; }
+#mmrpg .sprite.size40.left.shoot { background-position: -200px 0; }
+#mmrpg .sprite.size40.left.throw { background-position: -240px 0; }
+#mmrpg .sprite.size40.left.summon { background-position: -280px 0; }
+#mmrpg .sprite.size40.left.slide { background-position: -320px 0; }
+#mmrpg .sprite.size40.left.defend { background-position: -360px 0; }
+#mmrpg .sprite.size40.left.damage { background-position: -400px 0; }
+#mmrpg .sprite.size40.right.mugshot { background-position: 0 -40px; }
+#mmrpg .sprite.size40.right.base { background-position: -40px -40px; }
+#mmrpg .sprite.size40.right.taunt { background-position: -80px -40px; }
+#mmrpg .sprite.size40.right.victory { background-position: -120px -40px; }
+#mmrpg .sprite.size40.right.defeat { background-position: -160px -40px; }
+#mmrpg .sprite.size40.right.shoot { background-position: -200px -40px; }
+#mmrpg .sprite.size40.right.throw { background-position: -240px -40px; }
+#mmrpg .sprite.size40.right.summon { background-position: -280px -40px; }
+#mmrpg .sprite.size40.right.slide { background-position: -320px -40px; }
+#mmrpg .sprite.size40.right.defend { background-position: -360px -40px; }
+#mmrpg .sprite.size40.right.damage { background-position: -400px -40px; }
 
 #mmrpg .sprite_40x40_ { display: none; }
 #mmrpg .sprite_40x40_00 { background-position: 0 0; }
@@ -200,15 +283,52 @@ body.index #header {
 #mmrpg .sprite_40x40_right_09 { background-position: -360px -40px; }
 #mmrpg .sprite_40x40_right_10 { background-position: -400px -40px; }
 
-#mmrpg .sprite_40x40_focus {
+#mmrpg .sprite.size40.frame00 { background-position: 0 0; }
+#mmrpg .sprite.size40.frame01 { background-position: -40px 0; }
+#mmrpg .sprite.size40.frame02 { background-position: -80px 0; }
+#mmrpg .sprite.size40.frame03 { background-position: -120px 0; }
+#mmrpg .sprite.size40.frame04 { background-position: -160px 0; }
+#mmrpg .sprite.size40.frame05 { background-position: -200px 0; }
+#mmrpg .sprite.size40.frame06 { background-position: -240px 0; }
+#mmrpg .sprite.size40.frame07 { background-position: -280px 0; }
+#mmrpg .sprite.size40.frame08 { background-position: -320px 0; }
+#mmrpg .sprite.size40.frame09 { background-position: -360px 0; }
+#mmrpg .sprite.size40.frame10 { background-position: -400px 0; }
+#mmrpg .sprite.size40.left.frame00 { background-position: 0 0; }
+#mmrpg .sprite.size40.left.frame01 { background-position: -40px 0; }
+#mmrpg .sprite.size40.left.frame02 { background-position: -80px 0; }
+#mmrpg .sprite.size40.left.frame03 { background-position: -120px 0; }
+#mmrpg .sprite.size40.left.frame04 { background-position: -160px 0; }
+#mmrpg .sprite.size40.left.frame05 { background-position: -200px 0; }
+#mmrpg .sprite.size40.left.frame06 { background-position: -240px 0; }
+#mmrpg .sprite.size40.left.frame07 { background-position: -280px 0; }
+#mmrpg .sprite.size40.left.frame08 { background-position: -320px 0; }
+#mmrpg .sprite.size40.left.frame09 { background-position: -360px 0; }
+#mmrpg .sprite.size40.left.frame10 { background-position: -400px 0; }
+#mmrpg .sprite.size40.right.frame00 { background-position: 0 -40px; }
+#mmrpg .sprite.size40.right.frame01 { background-position: -40px -40px; }
+#mmrpg .sprite.size40.right.frame02 { background-position: -80px -40px; }
+#mmrpg .sprite.size40.right.frame03 { background-position: -120px -40px; }
+#mmrpg .sprite.size40.right.frame04 { background-position: -160px -40px; }
+#mmrpg .sprite.size40.right.frame05 { background-position: -200px -40px; }
+#mmrpg .sprite.size40.right.frame06 { background-position: -240px -40px; }
+#mmrpg .sprite.size40.right.frame07 { background-position: -280px -40px; }
+#mmrpg .sprite.size40.right.frame08 { background-position: -320px -40px; }
+#mmrpg .sprite.size40.right.frame09 { background-position: -360px -40px; }
+#mmrpg .sprite.size40.right.frame10 { background-position: -400px -40px; }
+
+#mmrpg .sprite_40x40_focus,
+#mmrpg .sprite.size40.focus {
   z-index: 9999 !important;
   cursor: pointer;
 }
 
-#mmrpg .sprite_80x80 {
+#mmrpg .sprite_80x80,
+#mmrpg .sprite.size80 {
   width: 80px;
   height: 80px;
 }
+
 #mmrpg .sprite_80x80_mugshot { background-position: 0 0; }
 #mmrpg .sprite_80x80_base { background-position: 0 0; }
 #mmrpg .sprite_80x80_taunt { background-position: -80px 0; }
@@ -242,6 +362,40 @@ body.index #header {
 #mmrpg .sprite_80x80_right_slide { background-position: -640px -80px; }
 #mmrpg .sprite_80x80_right_defend { background-position: -720px -80px; }
 #mmrpg .sprite_80x80_right_damage { background-position: -800px -80px; }
+
+#mmrpg .sprite.size80.mugshot { background-position: 0 0; }
+#mmrpg .sprite.size80.base { background-position: 0 0; }
+#mmrpg .sprite.size80.taunt { background-position: -80px 0; }
+#mmrpg .sprite.size80.victory { background-position: -160px 0; }
+#mmrpg .sprite.size80.defeat { background-position: -240px 0; }
+#mmrpg .sprite.size80.shoot { background-position: -320px 0; }
+#mmrpg .sprite.size80.throw { background-position: -400px 0; }
+#mmrpg .sprite.size80.summon { background-position: -480px 0; }
+#mmrpg .sprite.size80.slide { background-position: -560px 0; }
+#mmrpg .sprite.size80.defend { background-position: -640px 0; }
+#mmrpg .sprite.size80.damage { background-position: -720px 0; }
+#mmrpg .sprite.size80.left.mugshot { background-position: 0 0; }
+#mmrpg .sprite.size80.left.base { background-position: -80px 0; }
+#mmrpg .sprite.size80.left.taunt { background-position: -160px 0; }
+#mmrpg .sprite.size80.left.victory { background-position: -240px 0; }
+#mmrpg .sprite.size80.left.defeat { background-position: -320px 0; }
+#mmrpg .sprite.size80.left.shoot { background-position: -400px 0; }
+#mmrpg .sprite.size80.left.throw { background-position: -480px 0; }
+#mmrpg .sprite.size80.left.summon { background-position: -560px 0; }
+#mmrpg .sprite.size80.left.slide { background-position: -640px 0; }
+#mmrpg .sprite.size80.left.defend { background-position: -720px 0; }
+#mmrpg .sprite.size80.left.damage { background-position: -800px 0; }
+#mmrpg .sprite.size80.right.mugshot { background-position: 0 -80px; }
+#mmrpg .sprite.size80.right.base { background-position: -80px -80px; }
+#mmrpg .sprite.size80.right.taunt { background-position: -160px -80px; }
+#mmrpg .sprite.size80.right.victory { background-position: -240px -80px; }
+#mmrpg .sprite.size80.right.defeat { background-position: -320px -80px; }
+#mmrpg .sprite.size80.right.shoot { background-position: -400px -80px; }
+#mmrpg .sprite.size80.right.throw { background-position: -480px -80px; }
+#mmrpg .sprite.size80.right.summon { background-position: -560px -80px; }
+#mmrpg .sprite.size80.right.slide { background-position: -640px -80px; }
+#mmrpg .sprite.size80.right.defend { background-position: -720px -80px; }
+#mmrpg .sprite.size80.right.damage { background-position: -800px -80px; }
 
 #mmrpg .sprite_80x80_ { display: none; }
 #mmrpg .sprite_80x80_00 { background-position: 0 0; }
@@ -280,15 +434,52 @@ body.index #header {
 #mmrpg .sprite_80x80_right_09 { background-position: -720px -80px; }
 #mmrpg .sprite_80x80_right_10 { background-position: -800px -80px; }
 
-#mmrpg .sprite_80x80_focus {
+#mmrpg .sprite.size80.frame00 { background-position: 0 0; }
+#mmrpg .sprite.size80.frame01 { background-position: -80px 0; }
+#mmrpg .sprite.size80.frame02 { background-position: -160px 0; }
+#mmrpg .sprite.size80.frame03 { background-position: -240px 0; }
+#mmrpg .sprite.size80.frame04 { background-position: -320px 0; }
+#mmrpg .sprite.size80.frame05 { background-position: -400px 0; }
+#mmrpg .sprite.size80.frame06 { background-position: -480px 0; }
+#mmrpg .sprite.size80.frame07 { background-position: -560px 0; }
+#mmrpg .sprite.size80.frame08 { background-position: -640px 0; }
+#mmrpg .sprite.size80.frame09 { background-position: -720px 0; }
+#mmrpg .sprite.size80.frame10 { background-position: -800px 0; }
+#mmrpg .sprite.size80.left.frame00 { background-position: 0 0; }
+#mmrpg .sprite.size80.left.frame01 { background-position: -80px 0; }
+#mmrpg .sprite.size80.left.frame02 { background-position: -160px 0; }
+#mmrpg .sprite.size80.left.frame03 { background-position: -240px 0; }
+#mmrpg .sprite.size80.left.frame04 { background-position: -320px 0; }
+#mmrpg .sprite.size80.left.frame05 { background-position: -400px 0; }
+#mmrpg .sprite.size80.left.frame06 { background-position: -480px 0; }
+#mmrpg .sprite.size80.left.frame07 { background-position: -560px 0; }
+#mmrpg .sprite.size80.left.frame08 { background-position: -640px 0; }
+#mmrpg .sprite.size80.left.frame09 { background-position: -720px 0; }
+#mmrpg .sprite.size80.left.frame10 { background-position: -800px 0; }
+#mmrpg .sprite.size80.right.frame00 { background-position: 0 -80px; }
+#mmrpg .sprite.size80.right.frame01 { background-position: -80px -80px; }
+#mmrpg .sprite.size80.right.frame02 { background-position: -160px -80px; }
+#mmrpg .sprite.size80.right.frame03 { background-position: -240px -80px; }
+#mmrpg .sprite.size80.right.frame04 { background-position: -320px -80px; }
+#mmrpg .sprite.size80.right.frame05 { background-position: -400px -80px; }
+#mmrpg .sprite.size80.right.frame06 { background-position: -480px -80px; }
+#mmrpg .sprite.size80.right.frame07 { background-position: -560px -80px; }
+#mmrpg .sprite.size80.right.frame08 { background-position: -640px -80px; }
+#mmrpg .sprite.size80.right.frame09 { background-position: -720px -80px; }
+#mmrpg .sprite.size80.right.frame10 { background-position: -800px -80px; }
+
+#mmrpg .sprite_80x80_focus,
+#mmrpg .sprite.size80.focus {
   z-index: 9999 !important;
   cursor: pointer;
 }
 
-#mmrpg .sprite_160x160 {
+#mmrpg .sprite_160x160,
+#mmrpg .sprite.sprite160 {
   width: 160px;
   height: 160px;
 }
+
 #mmrpg .sprite_160x160_mugshot { background-position: 0 0; }
 #mmrpg .sprite_160x160_base { background-position: 0 0; }
 #mmrpg .sprite_160x160_taunt { background-position: -160px 0; }
@@ -322,6 +513,40 @@ body.index #header {
 #mmrpg .sprite_160x160_right_slide { background-position: -640px -80px; }
 #mmrpg .sprite_160x160_right_defend { background-position: -720px -80px; }
 #mmrpg .sprite_160x160_right_damage { background-position: -800px -80px; }
+
+#mmrpg .sprite.size160.mugshot { background-position: 0 0; }
+#mmrpg .sprite.size160.base { background-position: 0 0; }
+#mmrpg .sprite.size160.taunt { background-position: -160px 0; }
+#mmrpg .sprite.size160.victory { background-position: -320px 0; }
+#mmrpg .sprite.size160.defeat { background-position: -480px 0; }
+#mmrpg .sprite.size160.shoot { background-position: -640px 0; }
+#mmrpg .sprite.size160.throw { background-position: -800px 0; }
+#mmrpg .sprite.size160.summon { background-position: -960px 0; }
+#mmrpg .sprite.size160.slide { background-position: -1120px 0; }
+#mmrpg .sprite.size160.defend { background-position: -1280px 0; }
+#mmrpg .sprite.size160.damage { background-position: -1440px 0; }
+#mmrpg .sprite.size160.left.mugshot { background-position: 0 0; }
+#mmrpg .sprite.size160.left.base { background-position: -80px 0; }
+#mmrpg .sprite.size160.left.taunt { background-position: -160px 0; }
+#mmrpg .sprite.size160.left.victory { background-position: -240px 0; }
+#mmrpg .sprite.size160.left.defeat { background-position: -320px 0; }
+#mmrpg .sprite.size160.left.shoot { background-position: -400px 0; }
+#mmrpg .sprite.size160.left.throw { background-position: -480px 0; }
+#mmrpg .sprite.size160.left.summon { background-position: -560px 0; }
+#mmrpg .sprite.size160.left.slide { background-position: -640px 0; }
+#mmrpg .sprite.size160.left.defend { background-position: -720px 0; }
+#mmrpg .sprite.size160.left.damage { background-position: -800px 0; }
+#mmrpg .sprite.size160.right.mugshot { background-position: 0 -80px; }
+#mmrpg .sprite.size160.right.base { background-position: -80px -80px; }
+#mmrpg .sprite.size160.right.taunt { background-position: -160px -80px; }
+#mmrpg .sprite.size160.right.victory { background-position: -240px -80px; }
+#mmrpg .sprite.size160.right.defeat { background-position: -320px -80px; }
+#mmrpg .sprite.size160.right.shoot { background-position: -400px -80px; }
+#mmrpg .sprite.size160.right.throw { background-position: -480px -80px; }
+#mmrpg .sprite.size160.right.summon { background-position: -560px -80px; }
+#mmrpg .sprite.size160.right.slide { background-position: -640px -80px; }
+#mmrpg .sprite.size160.right.defend { background-position: -720px -80px; }
+#mmrpg .sprite.size160.right.damage { background-position: -800px -80px; }
 
 #mmrpg .sprite_160x160_ { display: none; }
 #mmrpg .sprite_160x160_00 { background-position: 0 0; }
@@ -360,17 +585,54 @@ body.index #header {
 #mmrpg .sprite_160x160_right_09 { background-position: -1440px -160px; }
 #mmrpg .sprite_160x160_right_10 { background-position: -1600px -160px; }
 
-#mmrpg .sprite_160x160_focus {
+#mmrpg .sprite.size160.frame00 { background-position: 0 0; }
+#mmrpg .sprite.size160.frame01 { background-position: -160px 0; }
+#mmrpg .sprite.size160.frame02 { background-position: -320px 0; }
+#mmrpg .sprite.size160.frame03 { background-position: -480px 0; }
+#mmrpg .sprite.size160.frame04 { background-position: -640px 0; }
+#mmrpg .sprite.size160.frame05 { background-position: -800px 0; }
+#mmrpg .sprite.size160.frame06 { background-position: -960px 0; }
+#mmrpg .sprite.size160.frame07 { background-position: -1120px 0; }
+#mmrpg .sprite.size160.frame08 { background-position: -1280px 0; }
+#mmrpg .sprite.size160.frame09 { background-position: -1440px 0; }
+#mmrpg .sprite.size160.frame10 { background-position: -1600px 0; }
+#mmrpg .sprite.size160.left.frame00 { background-position: 0 0; }
+#mmrpg .sprite.size160.left.frame01 { background-position: -160px 0; }
+#mmrpg .sprite.size160.left.frame02 { background-position: -320px 0; }
+#mmrpg .sprite.size160.left.frame03 { background-position: -480px 0; }
+#mmrpg .sprite.size160.left.frame04 { background-position: -640px 0; }
+#mmrpg .sprite.size160.left.frame05 { background-position: -800px 0; }
+#mmrpg .sprite.size160.left.frame06 { background-position: -960px 0; }
+#mmrpg .sprite.size160.left.frame07 { background-position: -1120px 0; }
+#mmrpg .sprite.size160.left.frame08 { background-position: -1280px 0; }
+#mmrpg .sprite.size160.left.frame09 { background-position: -1440px 0; }
+#mmrpg .sprite.size160.left.frame10 { background-position: -1600px 0; }
+#mmrpg .sprite.size160.right.frame00 { background-position: 0 -160px; }
+#mmrpg .sprite.size160.right.frame01 { background-position: -160px -160px; }
+#mmrpg .sprite.size160.right.frame02 { background-position: -320px -160px; }
+#mmrpg .sprite.size160.right.frame03 { background-position: -480px -160px; }
+#mmrpg .sprite.size160.right.frame04 { background-position: -640px -160px; }
+#mmrpg .sprite.size160.right.frame05 { background-position: -800px -160px; }
+#mmrpg .sprite.size160.right.frame06 { background-position: -960px -160px; }
+#mmrpg .sprite.size160.right.frame07 { background-position: -1120px -160px; }
+#mmrpg .sprite.size160.right.frame08 { background-position: -1280px -160px; }
+#mmrpg .sprite.size160.right.frame09 { background-position: -1440px -160px; }
+#mmrpg .sprite.size160.right.frame10 { background-position: -1600px -160px; }
+
+#mmrpg .sprite_160x160_focus,
+#mmrpg .sprite.size160.focus {
   z-index: 9999 !important;
   cursor: pointer;
 }
 
 
+#mmrpg .type,
 #mmrpg .ability_type,
 #mmrpg .battle_type,
 #mmrpg .field_type,
 #mmrpg .player_type,
-#mmrpg .robot_type {
+#mmrpg .robot_type,
+#mmrpg .robot_stat {
   border-color: #464646 !important;
   background-color: #414141 !important;  
   background-image: -moz-linear-gradient(top,  rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.05) 100%); /* FF3.6+ */
@@ -400,6 +662,18 @@ body.index #header {
 #mmrpg .robot_position_active {
   opacity: 1.0;
 }
+/*
+#mmrpg .robot_position_active:before {
+  display: block;
+  content: " ";
+  width: inherit;
+  height: inherit;
+  background: inherit;
+  opacity: 0.5;
+  position: absolute;
+  right: 20px;
+}
+*/
 #mmrpg .player_status_disabled,
 #mmrpg .robot_status_disabled {
   opacity: 0.95;
@@ -414,9 +688,9 @@ body.index #header {
   border: 0 none transparent;
   background: transparent none scroll no-repeat 0 0;
   width: 271px;
-  height: 150px;
+  height: 130px;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   font-size: 1px;
   line-height: 1px;
 }
@@ -446,6 +720,119 @@ body.index #header {
   top: 4px;
   right: 4px;
 }
+#mmrpg .robot_details_left .container,
+#mmrpg .robot_details_right .container {
+  position: relative;
+  width: 271px;
+  height: 120px;  
+}
+
+#mmrpg .robot_details_extended {
+  z-index: 8000; 
+  border: 0 none transparent;
+  background: transparent none scroll no-repeat 0 0;
+  width: 55px;
+  height: 85px;
+  padding: 0;
+  overflow: hidden;
+  font-size: 1px;
+  line-height: 1px;
+  top: 122px;
+}
+#mmrpg .robot_details_extended_right { 
+  right: -4px;
+}
+#mmrpg .robot_details_extended_left { 
+  left: -4px;
+}
+#mmrpg .robot_details_extended_left .container,
+#mmrpg .robot_details_extended_right .container {
+  position: relative;
+  width: 55px;
+  height: 85px;
+}
+
+#mmrpg .robot_details_extended .overlay {
+  z-index: 100; 
+  border: 0 none transparent;
+  pointer-events: none;
+  background: transparent none scroll no-repeat 0 0;
+  background-image: url(../images/assets/battle-scene_robot-details-extend.png?20141222-02);
+  width: 55px;
+  padding: 0;
+  overflow: hidden;
+  font-size: 1px;
+  line-height: 1px;
+  top: 0;
+}
+#mmrpg .robot_details_extended .overlay .container {
+
+}
+#mmrpg .robot_details_extended .overlay.cores { 
+  background-position: 0 0;
+  height: 52px;
+}
+#mmrpg .robot_details_extended .overlay.stars { 
+  background-position: -55px 0;
+  height: 52px;
+}
+#mmrpg .robot_details_extended .overlay.cores.stars {
+  background-position: -110px 0;
+  /*background-position: -165px 0;*/
+  height: 85px;
+}
+
+#mmrpg .robot_details_extended .starforce {
+  display: block;
+  border: 0 none transparent;
+  background: transparent none scroll no-repeat 0 0;
+  position: absolute;
+  z-index: 50;
+  overflow: hidden;
+  font-size: 1px;
+  line-height: 1px;
+  /*
+  -webkit-animation:spin 8s linear infinite;
+  -moz-animation:spin 8s linear infinite;
+  animation:spin 8s linear infinite;
+  */
+  top: 0;
+}
+
+/*
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+*/
+
+#mmrpg .robot_details_extended .starforce {
+  top: 48px;  
+  width: 27px;
+  height: 27px;
+  background-color: lime;
+}
+#mmrpg .robot_details_extended_left .starforce {
+  left: 13px;
+}
+#mmrpg .robot_details_extended_right .starforce {
+  right: 13px;
+}
+#mmrpg .robot_details_extended.stars .starforce {
+  top: 12px;
+}
+#mmrpg .robot_details_extended.cores.stars .starforce {
+  top: 48px;
+}
+
+#mmrpg .robot_details_extended .starforce .type {
+  display: block;
+  position: static;
+  border: 0 none transparent !important;
+  background: transparent none scroll no-repeat 0 0;
+  height: 100%;
+  width: 100%;  
+}
+
 
 #mmrpg #canvas .robot_mugshot_type {
   z-index: 9100; 
@@ -481,6 +868,9 @@ body.index #header {
 #mmrpg .sprite_40x40_mugshot_left { top: 12px; left: 12px; }
 #mmrpg .sprite_80x80_mugshot_left { top: -8px; left: -8px; }
 #mmrpg .sprite_160x160_mugshot_left { top: -48px; left: -18px; }
+#mmrpg .sprite.size40.mugshot.left { top: 12px; left: 12px; }
+#mmrpg .sprite.size80.mugshot.left { top: -8px; left: -8px; }
+#mmrpg .sprite.size160.mugshot.left { top: -48px; left: -18px; }
 
 #mmrpg .sprite_mugshot_right {
   top: 5px;
@@ -489,13 +879,10 @@ body.index #header {
 #mmrpg .sprite_40x40_mugshot_right { top: 12px; right: 12px; }
 #mmrpg .sprite_80x80_mugshot_right { top: -8px; right: -8px; }
 #mmrpg .sprite_160x160_mugshot_right { top: -48px; right: -18px; }
+#mmrpg .sprite.size40.mugshot.right { top: 12px; right: 12px; }
+#mmrpg .sprite.size80.mugshot.right { top: -8px; right: -8px; }
+#mmrpg .sprite.size160.mugshot.right { top: -48px; right: -18px; }
 
-#mmrpg .robot_details_left .container,
-#mmrpg .robot_details_right .container {
-  position: relative;
-  width: 271px;
-  height: 120px;  
-}
 #mmrpg .robot_details .robot_name,
 #mmrpg .robot_details .robot_level,
 #mmrpg .robot_details .robot_attack,
@@ -514,6 +901,12 @@ body.index #header {
   background-color: rgba(250, 250, 250, 0.2);
   background-color: transparent;
   position: absolute;
+}
+#mmrpg .robot_details .robot_attack_smalltext,
+#mmrpg .robot_details .robot_defense_smalltext,
+#mmrpg .robot_details .robot_speed_smalltext {
+  font-size: 9px;
+  letter-spacing: 2px;
 }
 #mmrpg .robot_details .robot_attack_break,
 #mmrpg .robot_details .robot_defense_break,
@@ -690,6 +1083,10 @@ body.index #header {
   letter-spacing: 0;
   /*background: transparent url(../images/assets/battle-scene_robot-results.gif) scroll no-repeat 0 0;*/
   background: transparent url(../images/assets/battle-scene_robot-results.png?20130828-2) scroll no-repeat 0 0;
+}
+#mmrpg .ability_damage_smalltext,
+#mmrpg .ability_recovery_smalltext {
+  font-size: 8px;
 }
 
 #mmrpg .ability_recovery_energy { background-position: 0 0; }
@@ -1094,16 +1491,17 @@ body.index #header {
   margin: 0 1px !important;
 }
 
-#mmrpg .canvas_ability_details {
+#mmrpg .sprite.canvas_ability_details {
   text-indent: 0; 
   left: 250px;
   right: 250px; 
   top: 42px; 
   background-color: rgba(41, 41, 41, 0.75); 
-  border: 2px solid rgba(255, 255, 255, 0.15); 
-  height: 42px; 
+  border: 1px solid rgba(255, 255, 255, 0.15); 
+  border-color: #000000 !important;
+  height: 44px; 
   padding: 0 36px; 
-  width: 200px; 
+  width: 202px; 
   border-radius: 5px;
   white-space: nowrap;
   overflow: hidden;
@@ -1142,6 +1540,90 @@ body.index #header {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+#mmrpg .sprite.canvas_ability_stats {
+  text-indent: 0; 
+  left: 230px;
+  right: 230px; 
+  top: 92px; 
+  background-color: transparent; 
+  border: 0 none transparent; 
+  height: 9px; 
+  width: 316px;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: ellipsis;
+  z-index: 5200;
+  color: #FFFFFF;
+  background-color: rgb(29,29,29);
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgb(0,0,0);
+  -moz-border-radius: 0.6em;
+  -webkit-border-radius: 0.6em;
+  border-radius: 0.6em;
+  font-size: 9px; 
+  line-height: 9px;
+  
+}
+#mmrpg .canvas_ability_stats .wrap {
+  position: absolute;
+  text-align: center;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+}
+#canvas .canvas_ability_stats .robot_stat,
+#canvas .canvas_ability_stats .vs {
+  text-indent: 0; 
+  color: #FFFFFF; 
+  font-size: 10px; 
+  line-height: 13px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 auto; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid #000000; 
+}
+#canvas .canvas_ability_stats .vs {
+  position: relative;
+  top: -7px;
+  padding: 1px 8px 2px;
+  font-size: 8px;
+  background-color: #090909;
+  -moz-border-radius: 0 0 0.6em 0.6em;
+  -webkit-border-radius: 0 0 0.6em 0.6em;
+  border-radius: 0 0 0.6em 0.6em;
+}
+#canvas .canvas_ability_stats .robot_stat {
+  position: absolute;
+  top: -3px;
+  padding: 0 6px;
+  letter-spacing: 1px;
+  background-color: #000000;
+  -moz-border-radius: 0.6em;
+  -webkit-border-radius: 0.6em;
+  border-radius: 0.6em;
+  font-size: 11px;
+}
+#canvas .canvas_ability_stats .robot_stat_left {
+  left: -6px;
+  right: auto;
+  bottom: auto;
+}
+#canvas .canvas_ability_stats .robot_stat_right {
+  right: -6px;
+  left: auto;
+  bottom: auto;
+}
+#canvas .canvas_ability_stats .robot_stat .star {
+  font-size: 10px;
+  position: relative;
+  bottom: 1px;
+  font-family: Arial;
+  padding: 0 2px;
 }
 
 body.mobileFlag_landscapeMode #battle .canvas_overlay_header,
@@ -1223,7 +1705,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #events .event_container p {
   font-size: 14px;
   line-height: 18px;
-  text-align: justify;
+  text-align: left;
   padding: 0 5px 5px;
 }
 #events .event_container p a {
@@ -1267,6 +1749,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   padding-right: 15px;
   width: 576px;
   height: auto;
+  min-height: 71px;
   max-height: 290px;  
 }
 #events #buttons {
@@ -1274,6 +1757,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   border: 0 none transparent !important;
   color: #FFFFFF;
 }
+#events #messages .type,
 #events #messages .player_type,
 #events #messages .robot_type,
 #events #messages .ability_type,
@@ -1297,6 +1781,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   line-height: 13px;
   position: relative;
   margin-bottom: 8px !important;
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  user-select: text;
 }
 #events #messages .event:first-child {
   margin-top: 0;
@@ -1311,7 +1798,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   display: block;
   width: auto !important;
   height: 24px;
-  margin: 0 47px;
+  /*margin: 0 47px;*/
+  margin: 0 auto;
   padding: 1px 10px;
   text-align: center;
   veritcal-align: top;
@@ -1325,9 +1813,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   text-shadow: 0 1px 1px #161616;
   border: 0 none transparent;
   border-bottom-style: none;
-  border-radius: 0.5em 0.5em 0 0;
-  -moz-border-radius: 0.5em 0.5em 0 0;
-  -webkit-border-radius: 0.5em 0.5em 0 0;
+  -moz-border-radius: 0.4em 0.4em 0 0;
+  -webkit-border-radius: 0.4em 0.4em 0 0;
+  border-radius: 0.4em 0.4em 0 0;
   color: #FFFFFF;
   background-image: -webkit-gradient(
       linear,
@@ -1344,6 +1832,95 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);    
+}
+#events #messages .event .fullsize {
+  margin: 0 auto;
+  padding: 0;
+}
+#events #messages .event table td.left,
+#events #messages .event table td.right {
+  padding: 2px;
+}
+#events #messages .event table td.left label,
+#events #messages .event table td.right label {
+  display: block;
+}
+#events #messages .event table td.left {
+  text-align: left;
+}
+#events #messages .event table td.left label {
+  float: right;
+}
+#events #messages .event table td.right {
+  text-align: right;
+}
+#events #messages .event table td.right label {
+  float: left;
+}
+#events #messages .event table td .stat {
+  display: inline-block;
+  box-sizing: content-box;
+}
+#events #messages .database_container {
+
+}
+#events #messages .database_container.layout_compact {
+  margin-bottom: 2px !important;
+}
+
+#events #messages .database_container .subbody table td.right label,
+#events #messages .database_container .subbody table td.left label {
+  display: block;
+  float: left;
+}
+#events #messages .database_container .subbody table td.right .stat,
+#events #messages .database_container .subbody table td.left .stat {
+  display: inline-block; 
+}
+#events #messages .database_container .subbody table td.right .stat .robot_stat.type_empty,
+#events #messages .database_container .subbody table td.left .stat .robot_stat.type_empty {
+  display: inline-block;  
+  -moz-box-sizing: border-box; 
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%; 
+  line-height: 124%;
+}
+#events #messages .database_container .subbody table td.right .stat .robot_stat .robot_stat,
+#events #messages .database_container .subbody table td.left .stat .robot_stat .robot_stat {
+  margin-right: -4px;
+  display: inline;
+  width: auto;
+}
+#events #messages .database_container .subbody table td.right .stat .robot_stat span,
+#events #messages .database_container .subbody table td.left .stat .robot_stat span {
+  display: inline-block; 
+  width: 35px;
+}
+
+#events #messages .database_container .subbody .body_left {
+  margin-right: 0; 
+  margin-bottom: 5px; 
+  padding: 2px 0; 
+  min-height: 10px; 
+}
+#events #messages .database_container .subbody .body_left.fullsize {
+  margin-left: 0;
+}
+#events #messages .database_container.layout_event .subbody .body_left {
+  font-size: 10px; 
+  min-height: 150px;
+}
+#events #messages .database_container .subbody .body_left table.full {
+  margin: 5px auto -2px;
+}
+#events #messages .database_container.layout_website .subbody .body_left table.full {
+  margin: 5px auto 10px;
+}
+
+#events #messages .database_container .subbody .link_top,
+#events #messages .database_container .subbody .link_permalink {
+  margin-bottom: 4px;
 }
 
 #events #messages .event .header_left {
@@ -1770,6 +2347,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   margin-top: -2px;
   position: static;
 }
+
 #console .event .sprite_40x40 { margin-top: -2px; }
 #console .event .sprite_80x80 { margin-top: -42px; }
 #console .event .sprite_160x160 { margin-top: -82px; }
@@ -1780,11 +2358,26 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #console .event .sprite_right .sprite_80x80 { margin-left: -20px; }
 #console .event .sprite_right .sprite_160x160 { margin-left: -40px; }
 
+#console .event .sprite.size40 { margin-top: -2px; }
+#console .event .sprite.size80 { margin-top: -42px; }
+#console .event .sprite.size160 { margin-top: -82px; }
+#console .event .sprite.left .sprite.size40 { margin-left: 0; }
+#console .event .sprite.left .sprite.size80 { margin-left: -20px; }
+#console .event .sprite.left .sprite.size160 { margin-left: -40px; }
+#console .event .sprite.right .sprite.size40 { margin-left: 0; }
+#console .event .sprite.right .sprite.size80 { margin-left: -20px; }
+#console .event .sprite.right .sprite.size160 { margin-left: -40px; }
+
 #console .event .sprite_left .sprite_80x80_mugshot { margin-top: -1px; margin-left: -1px; background-position: -20px -20px; }
 #console .event .sprite_right .sprite_80x80_mugshot { margin-top: -1px; margin-left: -1px; background-position: -20px -20px; }
 
+#console .event .sprite.left .sprite.size80.mugshot { margin-top: -1px; margin-left: -1px; background-position: -20px -20px; }
+#console .event .sprite.right .sprite.size80.mugshot { margin-top: -1px; margin-left: -1px; background-position: -20px -20px; }
+
 #console .event .sprite_left,
-#console .event .sprite_right {
+#console .event .sprite_right,
+#console .event .sprite.left,
+#console .event .sprite.right {
   display: block;
   position: absolute;
   width: 40px;
@@ -1798,11 +2391,13 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   -moz-border-radius: 0.5em;
   -webkit-border-radius: 0.5em;
 }
-#console .event .sprite_left {
+#console .event .sprite_left,
+#console .event .sprite.left {
   top: 2px;
   left: 2px;
 }
-#console .event .sprite_right {
+#console .event .sprite_right,
+#console .event .sprite.right {
   top: 2px;
   right: 2px;
 }
@@ -1827,7 +2422,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   
 }
 #console .event .sprite_left .energy,
-#console .event .sprite_right .energy {
+#console .event .sprite_right .energy,
+#console .event .sprite.left .energy,
+#console .event .sprite.right .energy {
   display: block;
   width: 38px;
   height: 5px;
@@ -1839,13 +2436,16 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   border: 1px solid rgb(56,56,56);
   background: #222222 url(../images/tiles/horizontal-gradient_energy-bar.gif) scroll no-repeat 0 0;
 }
-#console .event .sprite_left .energy {
+#console .event .sprite_left .energy,
+#console .event .sprite.left .energy {
   background-position: -80px 0;
 }
-#console .event .sprite_right .energy {
+#console .event .sprite_right .energy,
+#console .event .sprite.right .energy {
   background-position: -40px 0;
 }
-#console .event .this_sprite .energy {
+#console .event .this_sprite .energy,
+#console .event .this.sprite .energy {
   display: block;
   width: 38px;
   height: 5px;
@@ -1858,7 +2458,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 
 #console .event .sprite_robot_mug,
-#console .event .sprite_ability_icon {
+#console .event .sprite_ability_icon,
+#console .event .sprite.robot.mug,
+#console .event .sprite.ability.icon {
   border: 1px solid #191919;
   background-color: #000000;
   border-radius: 0.5em;
@@ -1869,6 +2471,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
   background-position: -1px -1px;
 }
 
+#console .event .type,
 #console .event .player_name,
 #console .event .player_type,
 #console .event .player_stat,
@@ -1893,7 +2496,34 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #console .event .recovery_misses,
 #console .event .recovery_result,
 #console .event .recovery_amount,
-#console .event .recovery_overkill {
+#console .event .recovery_overkill,
+#canvas .links .type,
+#canvas .links .player_name,
+#canvas .links .player_type,
+#canvas .links .player_stat,
+#canvas .links .robot_number,
+#canvas .links .robot_name,
+#canvas .links .robot_stat,
+#canvas .links .robot_type,
+#canvas .links .robot_core,
+#canvas .links .robot_weakness,
+#canvas .links .robot_resistance,
+#canvas .links .robot_affinity,
+#canvas .links .robot_immunity,
+#canvas .links .field_name,
+#canvas .links .ability_name,
+#canvas .links .item_name,
+#canvas .links .ability_stat,
+#canvas .links .damage_strikes,
+#canvas .links .damage_misses,
+#canvas .links .damage_result,
+#canvas .links .damage_amount,
+#canvas .links .damage_overkill,
+#canvas .links .recovery_strikes,
+#canvas .links .recovery_misses,
+#canvas .links .recovery_result,
+#canvas .links .recovery_amount,
+#canvas .links .recovery_overkill {
   background: rgb(65,65,65) none scroll no-repeat 0 0;
   border: 1px solid rgb(70,70,70);
   padding: 0 3px;
@@ -2348,7 +2978,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .sprite_40x40,
 #actions .actions_scan .action_scan label .sprite_40x40,
 #actions .actions_target .action_target label .sprite_40x40,
-#actions .actions_ability .action_ability label .sprite_40x40 {
+#actions .actions_ability .action_ability label .sprite_40x40,
+#actions .actions .action label .sprite.size40 {
   background-color: #000000 !important;
   border: 1px solid #373737;
   width: 40px;
@@ -2360,7 +2991,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .sprite_40x40_ability,
 #actions .actions_scan .action_scan label .sprite_40x40_ability,
 #actions .actions_target .action_target label .sprite_40x40_ability,
-#actions .actions_ability .action_ability label .sprite_40x40_ability {
+#actions .actions_ability .action_ability label .sprite_40x40_ability,
+#actions .actions .action label .sprite.size40.ability {
   height: 30px; 
   background-position-y: -5px !important; 
   border-radius: 5px 5px 0 0;   
@@ -2370,7 +3002,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .sprite_40x40_weapons,
 #actions .actions_scan .action_scan label .sprite_40x40_weapons,
 #actions .actions_target .action_target label .sprite_40x40_weapons,
-#actions .actions_ability .action_ability label .sprite_40x40_weapons {
+#actions .actions_ability .action_ability label .sprite_40x40_weapons,
+#actions .actions .action label .sprite.size40.weapons {
   height: 8px;
   padding-bottom: 4px; 
   border-radius: 0 0 5px 5px;   
@@ -2388,44 +3021,51 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .sprite_40x40_energy_high,
 #actions .actions_scan .action_scan label .sprite_40x40_energy_high,
 #actions .actions_target .action_target label .sprite_40x40_energy_high,
-#actions .actions_ability .action_ability label .sprite_40x40_energy_high {
+#actions .actions_ability .action_ability label .sprite_40x40_energy_high,
+#actions .actions .action label .sprite.size40.energy.high {
   background-color: #09210A;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_energy_medium,
 #actions .actions_scan .action_scan label .sprite_40x40_energy_medium,
 #actions .actions_target .action_target label .sprite_40x40_energy_medium,
-#actions .actions_ability .action_ability label .sprite_40x40_energy_medium {
+#actions .actions_ability .action_ability label .sprite_40x40_energy_medium,
+#actions .actions .action label .sprite.size40.energy.medium {
   background-color: #282204;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_energy_low,
 #actions .actions_scan .action_scan label .sprite_40x40_energy_low,
 #actions .actions_target .action_target label .sprite_40x40_energy_low,
-#actions .actions_ability .action_ability label .sprite_40x40_energy_low {
+#actions .actions_ability .action_ability label .sprite_40x40_energy_low,
+#actions .actions .action label .sprite.size40.energy.low {
   background-color: #2B0A0A;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_base,
 #actions .actions_scan .action_scan label .sprite_40x40_base,
 #actions .actions_target .action_target label .sprite_40x40_base,
-#actions .actions_ability .action_ability label .sprite_40x40_base {
+#actions .actions_ability .action_ability label .sprite_40x40_base,
+#actions .actions .action label .sprite.size40.base {
   background-position: 0 1px;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_defend,
 #actions .actions_scan .action_scan label .sprite_40x40_defend,
 #actions .actions_target .action_target label .sprite_40x40_defend,
-#actions .actions_ability .action_ability label .sprite_40x40_defend {
+#actions .actions_ability .action_ability label .sprite_40x40_defend,
+#actions .actions .action label .sprite.size40.defend {
   background-position: -320px 1px;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_defeat,
 #actions .actions_scan .action_scan label .sprite_40x40_defeat,
 #actions .actions_target .action_target label .sprite_40x40_defeat,
-#actions .actions_ability .action_ability label .sprite_40x40_defeat {
+#actions .actions_ability .action_ability label .sprite_40x40_defeat,
+#actions .actions .action label .sprite.size40.defeat {
   background-position: -120px 1px;
 }
 
 #actions .actions_switch .action_switch label .sprite_80x80,
 #actions .actions_scan .action_scan label .sprite_80x80,
 #actions .actions_target .action_target label .sprite_80x80,
-#actions .actions_ability .action_ability label .sprite_80x80 {
+#actions .actions_ability .action_ability label .sprite_80x80,
+#actions .actions .action label .sprite.size80 {
   background-color: #000000 !important;
   border: 1px solid #373737;
   width: 40px;
@@ -2437,44 +3077,51 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .sprite_80x80_energy_high,
 #actions .actions_scan .action_scan label .sprite_80x80_energy_high,
 #actions .actions_target .action_target label .sprite_80x80_energy_high,
-#actions .actions_ability .action_ability label .sprite_80x80_energy_high {
+#actions .actions_ability .action_ability label .sprite_80x80_energy_high,
+#actions .actions .action label .sprite.size80.energy.high {
   background-color: #09210A;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_energy_medium,
 #actions .actions_scan .action_scan label .sprite_80x80_energy_medium,
 #actions .actions_target .action_target label .sprite_80x80_energy_medium,
-#actions .actions_ability .action_ability label .sprite_80x80_energy_medium {
+#actions .actions_ability .action_ability label .sprite_80x80_energy_medium,
+#actions .actions .action label .sprite.size80.energy.medium {
   background-color: #282204;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_energy_low,
 #actions .actions_scan .action_scan label .sprite_80x80_energy_low,
 #actions .actions_target .action_target label .sprite_80x80_energy_low,
-#actions .actions_ability .action_ability label .sprite_80x80_energy_low {
+#actions .actions_ability .action_ability label .sprite_80x80_energy_low,
+#actions .actions .action label .sprite.size80.energy.low {
   background-color: #2B0A0A;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_base,
 #actions .actions_scan .action_scan label .sprite_80x80_base,
 #actions .actions_target .action_target label .sprite_80x80_base,
-#actions .actions_ability .action_ability label .sprite_80x80_base {
+#actions .actions_ability .action_ability label .sprite_80x80_base,
+#actions .actions .action label .sprite.size80.base {
   background-position: -19px -42px;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_defend,
 #actions .actions_scan .action_scan label .sprite_80x80_defend,
 #actions .actions_target .action_target label .sprite_80x80_defend,
-#actions .actions_ability .action_ability label .sprite_80x80_defend {
+#actions .actions_ability .action_ability label .sprite_80x80_defend,
+#actions .actions .action label .sprite.size80.defend {
   background-position: -658px -42px;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_defeat,
 #actions .actions_scan .action_scan label .sprite_80x80_defeat,
 #actions .actions_target .action_target label .sprite_80x80_defeat,
-#actions .actions_ability .action_ability label .sprite_80x80_defeat {
+#actions .actions_ability .action_ability label .sprite_80x80_defeat,
+#actions .actions .action label .sprite.size80.defeat {
   background-position: -260px -42px;
 }
 
 #actions .actions_switch .action_switch label .sprite_160x160,
 #actions .actions_scan .action_scan label .sprite_160x160,
 #actions .actions_target .action_target label .sprite_160x160,
-#actions .actions_ability .action_ability label .sprite_160x160 {
+#actions .actions_ability .action_ability label .sprite_160x160,
+#actions .actions .action label .sprite.size160 {
   background-color: #000000 !important;
   border: 1px solid #373737;
   width: 160px;
@@ -2486,44 +3133,51 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .sprite_160x160_energy_high,
 #actions .actions_scan .action_scan label .sprite_160x160_energy_high,
 #actions .actions_target .action_target label .sprite_160x160_energy_high,
-#actions .actions_ability .action_ability label .sprite_160x160_energy_high {
+#actions .actions_ability .action_ability label .sprite_160x160_energy_high,
+#actions .actions .action label .sprite.size160.energy.high {
   background-color: #09210A;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_energy_medium,
 #actions .actions_scan .action_scan label .sprite_160x160_energy_medium,
 #actions .actions_target .action_target label .sprite_160x160_energy_medium,
-#actions .actions_ability .action_ability label .sprite_160x160_energy_medium {
+#actions .actions_ability .action_ability label .sprite_160x160_energy_medium,
+#actions .actions .action label .sprite.size160.energy.medium {
   background-color: #282204;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_energy_low,
 #actions .actions_scan .action_scan label .sprite_160x160_energy_low,
 #actions .actions_target .action_target label .sprite_160x160_energy_low,
-#actions .actions_ability .action_ability label .sprite_160x160_energy_low {
+#actions .actions_ability .action_ability label .sprite_160x160_energy_low,
+#actions .actions .action label .sprite.size160.energy.low {
   background-color: #2B0A0A;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_base,
 #actions .actions_scan .action_scan label .sprite_160x160_base,
 #actions .actions_target .action_target label .sprite_160x160_base,
-#actions .actions_ability .action_ability label .sprite_160x160_base {
+#actions .actions_ability .action_ability label .sprite_160x160_base,
+#actions .actions .action label .sprite.size160.base {
   background-position: 0 1px;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_defend,
 #actions .actions_scan .action_scan label .sprite_160x160_defend,
 #actions .actions_target .action_target label .sprite_160x160_defend,
-#actions .actions_ability .action_ability label .sprite_160x160_defend {
+#actions .actions_ability .action_ability label .sprite_160x160_defend,
+#actions .actions .action label .sprite.size160.defend {
   background-position: -1280px 1px;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_defeat,
 #actions .actions_scan .action_scan label .sprite_160x160_defeat,
 #actions .actions_target .action_target label .sprite_160x160_defeat,
-#actions .actions_ability .action_ability label .sprite_160x160_defeat {
+#actions .actions_ability .action_ability label .sprite_160x160_defeat,
+#actions .actions .action label .sprite.size160.defeat {
   background-position: -640px 1px;
 }
 
 #actions .actions_switch .action_switch label .multi,
 #actions .actions_scan .action_scan label .multi,
 #actions .actions_target .action_target label .multi,
-#actions .actions_ability .action_ability label .multi {
+#actions .actions_ability .action_ability label .multi,
+#actions .actions .action label .multi {
   text-align: left;
   margin: 7px 5px 0 5px;
 }
@@ -2531,10 +3185,12 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_scan .action_scan label .maintext,
 #actions .actions_target .action_target label .maintext,
 #actions .actions_ability .action_ability label .maintext,
+#actions .actions .action label .maintext,
 #actions .actions_switch .action_switch label .subtext,
 #actions .actions_scan .action_scan label .subtext,
 #actions .actions_target .action_target label .subtext,
-#actions .actions_ability .action_ability label .subtext {
+#actions .actions_ability .action_ability label .subtext,
+#actions .actions .action label .subtext {
   display: block;
   width: 100%;
   overflow: hidden;
@@ -2544,7 +3200,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .maintext,
 #actions .actions_scan .action_scan label .maintext,
 #actions .actions_target .action_target label .maintext,
-#actions .actions_ability .action_ability label .maintext {
+#actions .actions_ability .action_ability label .maintext,
+#actions .actions .action label .maintext {
   margin-bottom: 0;
   font-size: 11px;
   line-height: 14px;
@@ -2553,7 +3210,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .subtext,
 #actions .actions_scan .action_scan label .subtext,
 #actions .actions_target .action_target label .subtext,
-#actions .actions_ability .action_ability label .subtext {
+#actions .actions_ability .action_ability label .subtext,
+#actions .actions .action label .subtext {
   margin-bottom: 0;
   font-size: 9px;
   line-height: 13px;
@@ -2651,6 +3309,12 @@ body.windowFlag_landscapeMode #canvas .clearback .robot_details_left {
 }
 body.windowFlag_landscapeMode #canvas .clearback .robot_details_right {
   right: -124px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .robot_details_extended_left {
+  left: -132px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .robot_details_extended_right {
+  right: -132px;
 }
 body.windowFlag_landscapeMode #canvas .clearback .sprite_mugshot_left {
   left: -116px;
