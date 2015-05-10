@@ -21,7 +21,8 @@
 /images/gallery/updates/
 /images/robots/_*
 /images/robots_shadows/_*
-/images/abilities/*
+/images/abilities/_*
+/images/abilities/item-*
 /images/fields/*
 /images/objects/*
 /images/shops/*
