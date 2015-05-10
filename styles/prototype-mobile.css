@@ -1,0 +1,209 @@
+body.prototype {
+  background-color: transparent;
+}
+#prototype {
+  margin: 0;
+  /*height: 1004px;*/
+  border: 0 none transparent;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  box-shadow: 0 0 0 transparent;
+  -moz-box-shadow: 0 0 0 transparent;
+  -website-box-shadow: 0 0 0 transparent;  
+  background-color: transparent;
+}
+#prototype .banner {
+  /* border-color: #373737; */
+}
+
+
+#prototype .banner .points {   
+  box-shadow: 0 0 0 transparent;
+  -moz-box-shadow: 0 0 0 transparent;
+  -website-box-shadow: 0 0 0 transparent;  
+}
+#prototype .banner .points .amount {
+  color: #CFCFCF !important;
+  text-decoration: none !important;
+}
+#prototype .banner .points .amount .padding {
+  color: #4F4F4F !important;
+  text-decoration: none !important;
+}
+
+#prototype .battle {
+
+}
+#prototype .option_wrapper {
+  /*margin-right: -10px;*/
+}
+#prototype .option_back {
+  left: 7px;
+}
+
+
+
+#prototype .option_wrapper_missions .chapter_select {
+      
+}
+#prototype .option {
+  
+}
+
+body.mobileFlag_portraitMode #prototype {
+  height: 1004px;
+  width: 768px;  
+}
+body.mobileFlag_portraitMode_notFullscreen #prototype {
+  height: 876px;
+}
+body.mobileFlag_portraitMode #prototype .banner {
+  width: 748px;
+}
+body.mobileFlag_portraitMode #prototype .header,
+body.mobileFlag_portraitMode #prototype .option {
+  width: 748px;
+}
+body.mobileFlag_portraitMode #prototype #canvas,
+body.mobileFlag_portraitMode #prototype #console,
+body.mobileFlag_portraitMode #prototype #actions {
+  width: 748px;
+}
+body.mobileFlag_portraitMode #prototype .option_scroll {
+  width: 34px;
+}
+body.mobileFlag_portraitMode #prototype .option_prototype-4 {
+  width: 748px;
+}
+body.mobileFlag_portraitMode #prototype .option_dr-light,
+body.mobileFlag_portraitMode #prototype .option_dr-wily {
+
+}
+body.mobileFlag_portraitMode #prototype .option_field,
+body.mobileFlag_portraitMode #prototype .option_guts-field,
+body.mobileFlag_portraitMode #prototype .option_ice-field,
+body.mobileFlag_portraitMode #prototype .option_elec-field {
+  width: 370px;
+}
+body.mobileFlag_portraitMode #prototype .option_1x1 {
+  width: 181px;
+}
+body.mobileFlag_portraitMode #prototype .option_1x2 {
+  width: 369px;
+}
+body.mobileFlag_portraitMode #prototype .option_1x3 {
+  width: 557px;
+}
+body.mobileFlag_portraitMode #prototype .option_1x4 {
+
+}
+body.mobileFlag_portraitMode #prototype .option_1x1 div,
+body.mobileFlag_portraitMode #prototype .option_1x2 div,
+body.mobileFlag_portraitMode #prototype .option_1x3 div,
+body.mobileFlag_portraitMode #prototype .option_1x4 div {
+  
+}
+body.mobileFlag_portraitMode #prototype .option_1x1 div label,
+body.mobileFlag_portraitMode #prototype .option_1x2 div label,
+body.mobileFlag_portraitMode #prototype .option_1x3 div label,
+body.mobileFlag_portraitMode #prototype .option_1x4 div label {
+
+}
+body.mobileFlag_portraitMode #prototype .option_1x1 div {
+
+}
+body.mobileFlag_portraitMode #prototype .option_1x2 div {
+
+}
+body.mobileFlag_portraitMode #prototype .option_1x3 div {
+
+}
+body.mobileFlag_portraitMode #prototype .option_1x4 div {
+
+}
+body.mobileFlag_portraitMode #prototype .block_2, 
+body.mobileFlag_portraitMode #prototype .block_4, 
+body.mobileFlag_portraitMode #prototype .block_6, 
+body.mobileFlag_portraitMode #prototype .block_8, 
+body.mobileFlag_portraitMode #prototype .block_10 {
+  /*width: 371px;*/
+}
+
+body.mobileFlag_landscapeMode #prototype {
+  height: 748px;
+  width: 1024px;  
+}
+body.mobileFlag_landscapeMode_notFullscreen #prototype {
+  height: 685px;
+}
+body.mobileFlag_landscapeMode #prototype .banner {
+  width: 1004px;
+}
+body.mobileFlag_landscapeMode #prototype .header,
+body.mobileFlag_landscapeMode #prototype .option {
+  width: 1004px;
+}
+body.mobileFlag_landscapeMode #prototype #canvas,
+body.mobileFlag_landscapeMode #prototype #console,
+body.mobileFlag_landscapeMode #prototype #actions {
+  width: 1004px;
+}
+body.mobileFlag_landscapeMode #prototype .option_scroll {
+  width: 34px;
+}
+body.mobileFlag_landscapeMode #prototype .option_prototype-4 {
+  width: 1004px;
+}
+body.mobileFlag_landscapeMode #prototype .option_dr-light,
+body.mobileFlag_landscapeMode #prototype .option_dr-wily {
+
+}
+body.mobileFlag_landscapeMode #prototype .option_field,
+body.mobileFlag_landscapeMode #prototype .option_guts-field,
+body.mobileFlag_landscapeMode #prototype .option_ice-field,
+body.mobileFlag_landscapeMode #prototype .option_elec-field {
+  width: 498px;
+}
+body.mobileFlag_landscapeMode #prototype .option_1x1 {
+  width: 245px;
+}
+body.mobileFlag_landscapeMode #prototype .option_1x2 {
+  width: 497px;
+}
+body.mobileFlag_landscapeMode #prototype .option_1x3 {
+  width: 741px;
+}
+body.mobileFlag_landscapeMode #prototype .option_1x4 {
+
+}
+body.mobileFlag_landscapeMode #prototype .option_1x1 div,
+body.mobileFlag_landscapeMode #prototype .option_1x2 div,
+body.mobileFlag_landscapeMode #prototype .option_1x3 div,
+body.mobileFlag_landscapeMode #prototype .option_1x4 div {
+}
+body.mobileFlag_landscapeMode #prototype .option_1x1 div {
+
+}
+body.mobileFlag_landscapeMode #prototype .option_1x2 div {
+
+}
+body.mobileFlag_landscapeMode #prototype .option_1x3 div {
+
+}
+body.mobileFlag_landscapeMode #prototype .option_1x4 div {
+
+}
+body.mobileFlag_landscapeMode #prototype .option_1x1 div label,
+body.mobileFlag_landscapeMode #prototype .option_1x2 div label,
+body.mobileFlag_landscapeMode #prototype .option_1x3 div label,
+body.mobileFlag_landscapeMode #prototype .option_1x4 div label {
+ 
+}
+body.mobileFlag_landscapeMode #prototype .block_2, 
+body.mobileFlag_landscapeMode #prototype .block_4, 
+body.mobileFlag_landscapeMode #prototype .block_6, 
+body.mobileFlag_landscapeMode #prototype .block_8, 
+body.mobileFlag_landscapeMode #prototype .block_10 {
+  /*width: 499px;*/
+}

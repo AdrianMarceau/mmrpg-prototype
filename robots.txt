@@ -1,0 +1,21 @@
+User-agent: *
+Disallow: 
+Disallow: /cgi-bin/
+Disallow: /_developer/
+Disallow: /_ext/
+Disallow: /_legacy/
+Disallow: /_logs/
+Disallow: /_preview/
+Disallow: /_share/
+Disallow: /_tmp/
+Disallow: /data/
+Disallow: /pages/
+Disallow: /frames/
+Disallow: /scripts/
+Disallow: /styles/
+Disallow: /sounds/
+Disallow: /images/gallery/screenshots/_thumbs/
+Disallow: /images/gallery/screenshots/thumbs/
+Disallow: /file/
+Disallow: /community/personal/
+Sitemap: http://rpg.megamanpoweredup.net/sitemap.xml

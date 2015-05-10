@@ -1,0 +1,2795 @@
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  border-color: transparent;
+  border-width: 0;
+}
+em {
+  font-style: italic;
+}
+strong {
+  font-weight: bold;
+}
+body {
+  font-family: Arial, Verdana;
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+  background-color: #3E3E3E;
+  padding: 0;
+}
+body.index {
+  background: #000000 url(../images/assets/index-background.gif) scroll repeat 0 0;
+}
+#window,
+#window iframe,
+body.battle {
+  background-color: #262626;   
+  border-color: #262626; 
+}
+#window iframe {
+  background-color: transparent;
+}
+#window iframe.loading {
+  visibility: hidden;
+}
+
+body.index #header {
+  display: block;
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+}
+
+#mmrpg .tooltip {
+  display:none;
+  position: absolute !important;
+  z-index: 999999;
+  border: 2px solid #262626;
+  background-color: #161616;
+  background-color: rgba(16, 16, 16, 0.99);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+  -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+  border-radius:5px;
+  padding: 4px;
+  color:#fff;
+  min-width: 100px;
+  max-width: 400px;
+  _width: 400px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: normal;
+  pointer-events: none;
+}
+#mmrpg .tooltip .message {
+  display:block;
+  margin: 0;
+  border: 1px solid #060606;
+  background-color: #161616;
+  background-color: rgba(16, 16, 16, 0.99);
+  border-radius: 5px;
+  padding: 6px 12px;
+  color:#fff;
+  min-width: 100px;
+  max-width: 400px;
+  _width: 400px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: normal;
+}
+#mmrpg .tooltip hr {
+  display: block;
+  margin: 0 0 3px;
+  height: 1px;
+  width: auto;
+  border: 0 none transparent;
+  background-color: transparent;
+  color: transparent;
+}
+#mmrpg .tooltip .pipe {
+  padding: 0 2px;
+  color: #262626;
+}
+
+#mmrpg .animate_fadein {
+  display: none !important;
+}
+
+#mmrpg .sprite {
+  display: block;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  text-indent: -9999px;
+  color: transparent;
+  position: absolute;
+  background: transparent none scroll no-repeat 0 0;
+  image-rendering: -moz-crisp-edges;         /* Firefox */
+  image-rendering:   -o-crisp-edges;         /* Opera */
+  image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+}
+#mmrpg .sprite_fullscreen {
+  width: auto !important;
+  height: auto !important;
+  left: -130px !important;
+  right: -126px !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  background-repeat: repeat !important;  
+}
+#mmrpg a.sprite {
+  cursor: pointer;
+}
+#mmrpg .sprite_40x40 {
+  width: 40px;
+  height: 40px;
+}
+#mmrpg .sprite_40x40_mugshot { background-position: 0 0; }
+#mmrpg .sprite_40x40_base { background-position: 0 0; }
+#mmrpg .sprite_40x40_taunt { background-position: -40px 0; }
+#mmrpg .sprite_40x40_victory { background-position: -80px 0; }
+#mmrpg .sprite_40x40_defeat { background-position: -120px 0; }
+#mmrpg .sprite_40x40_shoot { background-position: -160px 0; }
+#mmrpg .sprite_40x40_throw { background-position: -200px 0; }
+#mmrpg .sprite_40x40_summon { background-position: -240px 0; }
+#mmrpg .sprite_40x40_slide { background-position: -280px 0; }
+#mmrpg .sprite_40x40_defend { background-position: -320px 0; }
+#mmrpg .sprite_40x40_damage { background-position: -360px 0; }
+#mmrpg .sprite_40x40_left_mugshot { background-position: 0 0; }
+#mmrpg .sprite_40x40_left_base { background-position: -40px 0; }
+#mmrpg .sprite_40x40_left_taunt { background-position: -80px 0; }
+#mmrpg .sprite_40x40_left_victory { background-position: -120px 0; }
+#mmrpg .sprite_40x40_left_defeat { background-position: -160px 0; }
+#mmrpg .sprite_40x40_left_shoot { background-position: -200px 0; }
+#mmrpg .sprite_40x40_left_throw { background-position: -240px 0; }
+#mmrpg .sprite_40x40_left_summon { background-position: -280px 0; }
+#mmrpg .sprite_40x40_left_slide { background-position: -320px 0; }
+#mmrpg .sprite_40x40_left_defend { background-position: -360px 0; }
+#mmrpg .sprite_40x40_left_damage { background-position: -400px 0; }
+#mmrpg .sprite_40x40_right_mugshot { background-position: 0 -40px; }
+#mmrpg .sprite_40x40_right_base { background-position: -40px -40px; }
+#mmrpg .sprite_40x40_right_taunt { background-position: -80px -40px; }
+#mmrpg .sprite_40x40_right_victory { background-position: -120px -40px; }
+#mmrpg .sprite_40x40_right_defeat { background-position: -160px -40px; }
+#mmrpg .sprite_40x40_right_shoot { background-position: -200px -40px; }
+#mmrpg .sprite_40x40_right_throw { background-position: -240px -40px; }
+#mmrpg .sprite_40x40_right_summon { background-position: -280px -40px; }
+#mmrpg .sprite_40x40_right_slide { background-position: -320px -40px; }
+#mmrpg .sprite_40x40_right_defend { background-position: -360px -40px; }
+#mmrpg .sprite_40x40_right_damage { background-position: -400px -40px; }
+
+#mmrpg .sprite_40x40_ { display: none; }
+#mmrpg .sprite_40x40_00 { background-position: 0 0; }
+#mmrpg .sprite_40x40_01 { background-position: -40px 0; }
+#mmrpg .sprite_40x40_02 { background-position: -80px 0; }
+#mmrpg .sprite_40x40_03 { background-position: -120px 0; }
+#mmrpg .sprite_40x40_04 { background-position: -160px 0; }
+#mmrpg .sprite_40x40_05 { background-position: -200px 0; }
+#mmrpg .sprite_40x40_06 { background-position: -240px 0; }
+#mmrpg .sprite_40x40_07 { background-position: -280px 0; }
+#mmrpg .sprite_40x40_08 { background-position: -320px 0; }
+#mmrpg .sprite_40x40_09 { background-position: -360px 0; }
+#mmrpg .sprite_40x40_10 { background-position: -400px 0; }
+#mmrpg .sprite_40x40_left_ { display: none; }
+#mmrpg .sprite_40x40_left_00 { background-position: 0 0; }
+#mmrpg .sprite_40x40_left_01 { background-position: -40px 0; }
+#mmrpg .sprite_40x40_left_02 { background-position: -80px 0; }
+#mmrpg .sprite_40x40_left_03 { background-position: -120px 0; }
+#mmrpg .sprite_40x40_left_04 { background-position: -160px 0; }
+#mmrpg .sprite_40x40_left_05 { background-position: -200px 0; }
+#mmrpg .sprite_40x40_left_06 { background-position: -240px 0; }
+#mmrpg .sprite_40x40_left_07 { background-position: -280px 0; }
+#mmrpg .sprite_40x40_left_08 { background-position: -320px 0; }
+#mmrpg .sprite_40x40_left_09 { background-position: -360px 0; }
+#mmrpg .sprite_40x40_left_10 { background-position: -400px 0; }
+#mmrpg .sprite_40x40_right_ { display: none; }
+#mmrpg .sprite_40x40_right_00 { background-position: 0 -40px; }
+#mmrpg .sprite_40x40_right_01 { background-position: -40px -40px; }
+#mmrpg .sprite_40x40_right_02 { background-position: -80px -40px; }
+#mmrpg .sprite_40x40_right_03 { background-position: -120px -40px; }
+#mmrpg .sprite_40x40_right_04 { background-position: -160px -40px; }
+#mmrpg .sprite_40x40_right_05 { background-position: -200px -40px; }
+#mmrpg .sprite_40x40_right_06 { background-position: -240px -40px; }
+#mmrpg .sprite_40x40_right_07 { background-position: -280px -40px; }
+#mmrpg .sprite_40x40_right_08 { background-position: -320px -40px; }
+#mmrpg .sprite_40x40_right_09 { background-position: -360px -40px; }
+#mmrpg .sprite_40x40_right_10 { background-position: -400px -40px; }
+
+#mmrpg .sprite_40x40_focus {
+  z-index: 9999 !important;
+  cursor: pointer;
+}
+
+#mmrpg .sprite_80x80 {
+  width: 80px;
+  height: 80px;
+}
+#mmrpg .sprite_80x80_mugshot { background-position: 0 0; }
+#mmrpg .sprite_80x80_base { background-position: 0 0; }
+#mmrpg .sprite_80x80_taunt { background-position: -80px 0; }
+#mmrpg .sprite_80x80_victory { background-position: -160px 0; }
+#mmrpg .sprite_80x80_defeat { background-position: -240px 0; }
+#mmrpg .sprite_80x80_shoot { background-position: -320px 0; }
+#mmrpg .sprite_80x80_throw { background-position: -400px 0; }
+#mmrpg .sprite_80x80_summon { background-position: -480px 0; }
+#mmrpg .sprite_80x80_slide { background-position: -560px 0; }
+#mmrpg .sprite_80x80_defend { background-position: -640px 0; }
+#mmrpg .sprite_80x80_damage { background-position: -720px 0; }
+#mmrpg .sprite_80x80_left_mugshot { background-position: 0 0; }
+#mmrpg .sprite_80x80_left_base { background-position: -80px 0; }
+#mmrpg .sprite_80x80_left_taunt { background-position: -160px 0; }
+#mmrpg .sprite_80x80_left_victory { background-position: -240px 0; }
+#mmrpg .sprite_80x80_left_defeat { background-position: -320px 0; }
+#mmrpg .sprite_80x80_left_shoot { background-position: -400px 0; }
+#mmrpg .sprite_80x80_left_throw { background-position: -480px 0; }
+#mmrpg .sprite_80x80_left_summon { background-position: -560px 0; }
+#mmrpg .sprite_80x80_left_slide { background-position: -640px 0; }
+#mmrpg .sprite_80x80_left_defend { background-position: -720px 0; }
+#mmrpg .sprite_80x80_left_damage { background-position: -800px 0; }
+#mmrpg .sprite_80x80_right_mugshot { background-position: 0 -80px; }
+#mmrpg .sprite_80x80_right_base { background-position: -80px -80px; }
+#mmrpg .sprite_80x80_right_taunt { background-position: -160px -80px; }
+#mmrpg .sprite_80x80_right_victory { background-position: -240px -80px; }
+#mmrpg .sprite_80x80_right_defeat { background-position: -320px -80px; }
+#mmrpg .sprite_80x80_right_shoot { background-position: -400px -80px; }
+#mmrpg .sprite_80x80_right_throw { background-position: -480px -80px; }
+#mmrpg .sprite_80x80_right_summon { background-position: -560px -80px; }
+#mmrpg .sprite_80x80_right_slide { background-position: -640px -80px; }
+#mmrpg .sprite_80x80_right_defend { background-position: -720px -80px; }
+#mmrpg .sprite_80x80_right_damage { background-position: -800px -80px; }
+
+#mmrpg .sprite_80x80_ { display: none; }
+#mmrpg .sprite_80x80_00 { background-position: 0 0; }
+#mmrpg .sprite_80x80_01 { background-position: -80px 0; }
+#mmrpg .sprite_80x80_02 { background-position: -160px 0; }
+#mmrpg .sprite_80x80_03 { background-position: -240px 0; }
+#mmrpg .sprite_80x80_04 { background-position: -320px 0; }
+#mmrpg .sprite_80x80_05 { background-position: -400px 0; }
+#mmrpg .sprite_80x80_06 { background-position: -480px 0; }
+#mmrpg .sprite_80x80_07 { background-position: -560px 0; }
+#mmrpg .sprite_80x80_08 { background-position: -640px 0; }
+#mmrpg .sprite_80x80_09 { background-position: -720px 0; }
+#mmrpg .sprite_80x80_10 { background-position: -800px 0; }
+#mmrpg .sprite_80x80_left_ { display: none; }
+#mmrpg .sprite_80x80_left_00 { background-position: 0 0; }
+#mmrpg .sprite_80x80_left_01 { background-position: -80px 0; }
+#mmrpg .sprite_80x80_left_02 { background-position: -160px 0; }
+#mmrpg .sprite_80x80_left_03 { background-position: -240px 0; }
+#mmrpg .sprite_80x80_left_04 { background-position: -320px 0; }
+#mmrpg .sprite_80x80_left_05 { background-position: -400px 0; }
+#mmrpg .sprite_80x80_left_06 { background-position: -480px 0; }
+#mmrpg .sprite_80x80_left_07 { background-position: -560px 0; }
+#mmrpg .sprite_80x80_left_08 { background-position: -640px 0; }
+#mmrpg .sprite_80x80_left_09 { background-position: -720px 0; }
+#mmrpg .sprite_80x80_left_10 { background-position: -800px 0; }
+#mmrpg .sprite_80x80_right_ { display: none; }
+#mmrpg .sprite_80x80_right_00 { background-position: 0 -80px; }
+#mmrpg .sprite_80x80_right_01 { background-position: -80px -80px; }
+#mmrpg .sprite_80x80_right_02 { background-position: -160px -80px; }
+#mmrpg .sprite_80x80_right_03 { background-position: -240px -80px; }
+#mmrpg .sprite_80x80_right_04 { background-position: -320px -80px; }
+#mmrpg .sprite_80x80_right_05 { background-position: -400px -80px; }
+#mmrpg .sprite_80x80_right_06 { background-position: -480px -80px; }
+#mmrpg .sprite_80x80_right_07 { background-position: -560px -80px; }
+#mmrpg .sprite_80x80_right_08 { background-position: -640px -80px; }
+#mmrpg .sprite_80x80_right_09 { background-position: -720px -80px; }
+#mmrpg .sprite_80x80_right_10 { background-position: -800px -80px; }
+
+#mmrpg .sprite_80x80_focus {
+  z-index: 9999 !important;
+  cursor: pointer;
+}
+
+#mmrpg .sprite_160x160 {
+  width: 160px;
+  height: 160px;
+}
+#mmrpg .sprite_160x160_mugshot { background-position: 0 0; }
+#mmrpg .sprite_160x160_base { background-position: 0 0; }
+#mmrpg .sprite_160x160_taunt { background-position: -160px 0; }
+#mmrpg .sprite_160x160_victory { background-position: -320px 0; }
+#mmrpg .sprite_160x160_defeat { background-position: -480px 0; }
+#mmrpg .sprite_160x160_shoot { background-position: -640px 0; }
+#mmrpg .sprite_160x160_throw { background-position: -800px 0; }
+#mmrpg .sprite_160x160_summon { background-position: -960px 0; }
+#mmrpg .sprite_160x160_slide { background-position: -1120px 0; }
+#mmrpg .sprite_160x160_defend { background-position: -1280px 0; }
+#mmrpg .sprite_160x160_damage { background-position: -1440px 0; }
+#mmrpg .sprite_160x160_left_mugshot { background-position: 0 0; }
+#mmrpg .sprite_160x160_left_base { background-position: -80px 0; }
+#mmrpg .sprite_160x160_left_taunt { background-position: -160px 0; }
+#mmrpg .sprite_160x160_left_victory { background-position: -240px 0; }
+#mmrpg .sprite_160x160_left_defeat { background-position: -320px 0; }
+#mmrpg .sprite_160x160_left_shoot { background-position: -400px 0; }
+#mmrpg .sprite_160x160_left_throw { background-position: -480px 0; }
+#mmrpg .sprite_160x160_left_summon { background-position: -560px 0; }
+#mmrpg .sprite_160x160_left_slide { background-position: -640px 0; }
+#mmrpg .sprite_160x160_left_defend { background-position: -720px 0; }
+#mmrpg .sprite_160x160_left_damage { background-position: -800px 0; }
+#mmrpg .sprite_160x160_right_mugshot { background-position: 0 -80px; }
+#mmrpg .sprite_160x160_right_base { background-position: -80px -80px; }
+#mmrpg .sprite_160x160_right_taunt { background-position: -160px -80px; }
+#mmrpg .sprite_160x160_right_victory { background-position: -240px -80px; }
+#mmrpg .sprite_160x160_right_defeat { background-position: -320px -80px; }
+#mmrpg .sprite_160x160_right_shoot { background-position: -400px -80px; }
+#mmrpg .sprite_160x160_right_throw { background-position: -480px -80px; }
+#mmrpg .sprite_160x160_right_summon { background-position: -560px -80px; }
+#mmrpg .sprite_160x160_right_slide { background-position: -640px -80px; }
+#mmrpg .sprite_160x160_right_defend { background-position: -720px -80px; }
+#mmrpg .sprite_160x160_right_damage { background-position: -800px -80px; }
+
+#mmrpg .sprite_160x160_ { display: none; }
+#mmrpg .sprite_160x160_00 { background-position: 0 0; }
+#mmrpg .sprite_160x160_01 { background-position: -160px 0; }
+#mmrpg .sprite_160x160_02 { background-position: -320px 0; }
+#mmrpg .sprite_160x160_03 { background-position: -480px 0; }
+#mmrpg .sprite_160x160_04 { background-position: -640px 0; }
+#mmrpg .sprite_160x160_05 { background-position: -800px 0; }
+#mmrpg .sprite_160x160_06 { background-position: -960px 0; }
+#mmrpg .sprite_160x160_07 { background-position: -1120px 0; }
+#mmrpg .sprite_160x160_08 { background-position: -1280px 0; }
+#mmrpg .sprite_160x160_09 { background-position: -1440px 0; }
+#mmrpg .sprite_160x160_10 { background-position: -1600px 0; }
+#mmrpg .sprite_160x160_left_ { display: none; }
+#mmrpg .sprite_160x160_left_00 { background-position: 0 0; }
+#mmrpg .sprite_160x160_left_01 { background-position: -160px 0; }
+#mmrpg .sprite_160x160_left_02 { background-position: -320px 0; }
+#mmrpg .sprite_160x160_left_03 { background-position: -480px 0; }
+#mmrpg .sprite_160x160_left_04 { background-position: -640px 0; }
+#mmrpg .sprite_160x160_left_05 { background-position: -800px 0; }
+#mmrpg .sprite_160x160_left_06 { background-position: -960px 0; }
+#mmrpg .sprite_160x160_left_07 { background-position: -1120px 0; }
+#mmrpg .sprite_160x160_left_08 { background-position: -1280px 0; }
+#mmrpg .sprite_160x160_left_09 { background-position: -1440px 0; }
+#mmrpg .sprite_160x160_left_10 { background-position: -1600px 0; }
+#mmrpg .sprite_160x160_right_ { display: none; }
+#mmrpg .sprite_160x160_right_00 { background-position: 0 -160px; }
+#mmrpg .sprite_160x160_right_01 { background-position: -160px -160px; }
+#mmrpg .sprite_160x160_right_02 { background-position: -320px -160px; }
+#mmrpg .sprite_160x160_right_03 { background-position: -480px -160px; }
+#mmrpg .sprite_160x160_right_04 { background-position: -640px -160px; }
+#mmrpg .sprite_160x160_right_05 { background-position: -800px -160px; }
+#mmrpg .sprite_160x160_right_06 { background-position: -960px -160px; }
+#mmrpg .sprite_160x160_right_07 { background-position: -1120px -160px; }
+#mmrpg .sprite_160x160_right_08 { background-position: -1280px -160px; }
+#mmrpg .sprite_160x160_right_09 { background-position: -1440px -160px; }
+#mmrpg .sprite_160x160_right_10 { background-position: -1600px -160px; }
+
+#mmrpg .sprite_160x160_focus {
+  z-index: 9999 !important;
+  cursor: pointer;
+}
+
+
+#mmrpg .ability_type,
+#mmrpg .battle_type,
+#mmrpg .field_type,
+#mmrpg .player_type,
+#mmrpg .robot_type {
+  border-color: #464646 !important;
+  background-color: #414141 !important;  
+  background-image: -moz-linear-gradient(top,  rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.05) 100%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.05)), color-stop(100%,rgba(0,0,0,0.05))); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* Chrome10+,Safari5.1+ */
+  background-image: -o-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* Opera 11.10+ */
+  background-image: -ms-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* IE10+ */
+  background-image: linear-gradient(to bottom,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ); /* IE6-9 */  
+  position: relative;
+  background-repeat: no-repeat !important;
+}
+#mmrpg .ability_type a,
+#mmrpg .battle_type a,
+#mmrpg .field_type a,
+#mmrpg .player_type a,
+#mmrpg .robot_type a {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+#mmrpg .player_status_active,
+#mmrpg .robot_status_active {
+  opacity: 1.0;
+}
+#mmrpg .player_position_active,
+#mmrpg .robot_position_active {
+  opacity: 1.0;
+}
+#mmrpg .player_status_disabled,
+#mmrpg .robot_status_disabled {
+  opacity: 0.95;
+}
+#mmrpg .player_position_bench,
+#mmrpg .robot_position_bench {
+  /*opacity: 0.9;*/
+}
+
+#mmrpg .robot_details {
+  z-index: 9000; 
+  border: 0 none transparent;
+  background: transparent none scroll no-repeat 0 0;
+  width: 271px;
+  height: 150px;
+  padding: 0;
+  overflow: hidden;
+  font-size: 1px;
+  line-height: 1px;
+}
+/*
+#mmrpg .robot_details_idle {
+  opacity: 0.9 !important;
+  filter: alpha(opacity=90) !important;
+}
+#mmrpg .robot_details:hover,
+#mmrpg .robot_details_idle:hover {
+  opacity: 1.0 !important;
+  filter: alpha(opacity=100) !important;
+}
+*/
+
+#mmrpg .robot_details_left { 
+  background-image: url(../images/assets/battle-scene_robot-details.png?20130908-01);
+  background-position: 0 0;
+  text-align: left;
+  top: 4px;
+  left: 4px;
+}
+#mmrpg .robot_details_right { 
+  background-image: url(../images/assets/battle-scene_robot-details.png?20130908-01);
+  background-position: -271px 0;
+  text-align: right;
+  top: 4px;
+  right: 4px;
+}
+
+#mmrpg #canvas .robot_mugshot_type {
+  z-index: 9100; 
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px; 
+  width: 38px; 
+  height: 38px; 
+  top: 12px; 
+  border: 1px solid #000000; 
+  position: absolute;
+}
+#mmrpg #canvas .robot_mugshot_type .sprite {
+  position: relative;
+  border: 1px solid #000000; 
+  border-radius: 3px; 
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, .5); 
+  top: 2px; 
+  left: 2px; 
+  right: 2px; 
+  width: 32px; 
+  height: 32px; 
+}
+#mmrpg #canvas .robot_mugshot .robot_mugshot {
+  pointer-events: none;
+}
+
+#mmrpg .sprite_mugshot_left {
+  top: 5px;
+  left: 5px;
+}
+#mmrpg .sprite_40x40_mugshot_left { top: 12px; left: 12px; }
+#mmrpg .sprite_80x80_mugshot_left { top: -8px; left: -8px; }
+#mmrpg .sprite_160x160_mugshot_left { top: -48px; left: -18px; }
+
+#mmrpg .sprite_mugshot_right {
+  top: 5px;
+  right: 5px;
+}
+#mmrpg .sprite_40x40_mugshot_right { top: 12px; right: 12px; }
+#mmrpg .sprite_80x80_mugshot_right { top: -8px; right: -8px; }
+#mmrpg .sprite_160x160_mugshot_right { top: -48px; right: -18px; }
+
+#mmrpg .robot_details_left .container,
+#mmrpg .robot_details_right .container {
+  position: relative;
+  width: 271px;
+  height: 120px;  
+}
+#mmrpg .robot_details .robot_name,
+#mmrpg .robot_details .robot_level,
+#mmrpg .robot_details .robot_attack,
+#mmrpg .robot_details .robot_defense,
+#mmrpg .robot_details .robot_speed {
+  display: block;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+  font-size: 12px;
+  line-height: 12px;
+  white-space: nowrap;
+  color: #FFFFFF;
+  text-shadow: 0 0 1px #000000;
+  border: 0 none transparent;
+  background-color: rgba(250, 250, 250, 0.2);
+  background-color: transparent;
+  position: absolute;
+}
+#mmrpg .robot_details .robot_attack_break,
+#mmrpg .robot_details .robot_defense_break,
+#mmrpg .robot_details .robot_speed_break { 
+  color: red;
+}
+#mmrpg .robot_details .robot_attack_break_chance,
+#mmrpg .robot_details .robot_defense_break_chance,
+#mmrpg .robot_details .robot_speed_break_chance { 
+  color: yellow;
+}
+#mmrpg .robot_details .robot_name {
+  height: 19px;
+  font-size: 13px;
+  line-height: 19px;
+  text-transform: none;
+  overflow: hidden;
+  text-overflow: ellipsis;  
+  width: 144px;
+  top: 7px;
+  letter-spacing: 2px;
+}
+#mmrpg .robot_details .robot_level {
+  height: 12px;
+  font-size: 9px;
+  line-height: 12px;
+  text-transform: none; 
+  width: 50px;
+  top: 9px;
+  padding: 0 5px;  
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+}
+#mmrpg .robot_details .robot_attack,
+#mmrpg .robot_details .robot_defense,
+#mmrpg .robot_details .robot_speed { 
+  height: 10px;
+  width: 43px; 
+  text-align: center;
+  font-family: "Courier New";
+}
+#mmrpg .robot_details .robot_attack { 
+  top: 63px;
+}
+#mmrpg .robot_details .robot_defense { 
+  top: 87px;
+}
+#mmrpg .robot_details .robot_speed { 
+  top: 111px;
+}
+#mmrpg .robot_details_left .robot_name {
+  left: 62px;
+}
+#mmrpg .robot_details_left .robot_level {
+  left: 203px;
+}
+#mmrpg .robot_details_left .robot_attack,
+#mmrpg .robot_details_left .robot_defense,
+#mmrpg .robot_details_left .robot_speed { 
+  left: 7px;  
+}
+#mmrpg .robot_details_right .robot_name {
+  right: 60px;
+}
+#mmrpg .robot_details_right .robot_level {
+  right: 203px;
+}
+#mmrpg .robot_details_right .robot_attack,
+#mmrpg .robot_details_right .robot_defense,
+#mmrpg .robot_details_right .robot_speed { 
+  right: 6px;  
+}
+
+#mmrpg .robot_details_left .robot_name {
+  text-align: left;
+}
+#mmrpg .robot_details_left .robot_level {
+  text-align: center;
+}
+#mmrpg .robot_details_left .robot_attack,
+#mmrpg .robot_details_left .robot_defense,
+#mmrpg .robot_details_left .robot_speed {
+
+}
+#mmrpg .robot_details_left .robot_speed {
+
+}
+#mmrpg .robot_details_right .robot_name {
+  text-align: right;
+}
+#mmrpg .robot_details_right .robot_level {
+  text-align: center;
+}
+#mmrpg .robot_details_right .robot_attack,
+#mmrpg .robot_details_right .robot_defense,
+#mmrpg .robot_details_right .robot_speed {
+
+}
+#mmrpg .robot_details_right .robot_attack {
+  margin-left: 0;
+}
+
+
+#mmrpg .robot_details .energy {
+  display: block;
+  width: 109px;
+  height: 12px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  text-indent: -9999px;
+  color: transparent;
+  border: 1px solid #000000;
+  background: transparent url(../images/tiles/horizontal-gradient_energy-bar-large.gif?20130804-02) scroll no-repeat 0 0;
+  position: relative;
+  top: 30px;
+}
+#mmrpg .robot_details_left .energy {
+  background-position: -160px 0;
+  margin: 0 auto -7px 0;
+  left: 57px;
+}
+#mmrpg .robot_details_right .energy {
+  background-position: -80px 0;
+  margin: 0 0 -7px auto;
+  right: 57px;
+}
+
+#mmrpg .robot_details .experience,
+#mmrpg .robot_details .weapons {
+  display: block;
+  width: 59px;
+  height: 6px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  text-indent: -9999px;
+  color: transparent;
+  border: 1px solid #000000;
+  background: transparent url(../images/tiles/horizontal-gradient_experience-bar-large.gif?20130805-02) scroll no-repeat 0 0;
+  position: relative;
+  top: 56px;
+}
+#mmrpg .robot_details .weapons {
+  background: transparent url(../images/tiles/horizontal-gradient_weapons-bar-large.gif?20130805-02) scroll no-repeat 0 0;
+  top: 38px;
+}
+#mmrpg .robot_details_left .experience,
+#mmrpg .robot_details_left .weapons {
+  background-position: -132px 0;
+  margin: 0 auto -7px 0;
+  left: 57px;
+}
+#mmrpg .robot_details_right .experience,
+#mmrpg .robot_details_right .weapons {
+  background-position: -66px 0;
+  margin: 0 0 -7px auto;
+  right: 57px;
+}
+
+#mmrpg .ability_damage,
+#mmrpg .ability_recovery {
+  z-index: 9100;
+  width: 52px;
+  height: 41px;
+  color: #FFFFFF;
+  font-family: "Courier New";
+  text-align: center;
+  text-indent: 0;
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 48px;
+  letter-spacing: 0;
+  /*background: transparent url(../images/assets/battle-scene_robot-results.gif) scroll no-repeat 0 0;*/
+  background: transparent url(../images/assets/battle-scene_robot-results.png?20130828-2) scroll no-repeat 0 0;
+}
+
+#mmrpg .ability_recovery_energy { background-position: 0 0; }
+#mmrpg .ability_recovery_weapons { background-position: -52px 0; }
+#mmrpg .ability_recovery_attack { background-position: -104px 0; }
+#mmrpg .ability_recovery_defense { background-position: -156px 0; }
+#mmrpg .ability_recovery_speed { background-position: -208px 0; }
+#mmrpg .ability_recovery_experience { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px 0; }
+#mmrpg .ability_recovery_level { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px 0; }
+
+#mmrpg .ability_damage_energy { background-position: 0 -123px; }
+#mmrpg .ability_damage_weapons { background-position: -52px -123px; }
+#mmrpg .ability_damage_attack { background-position: -104px -123px; }
+#mmrpg .ability_damage_defense { background-position: -156px -123px; }
+#mmrpg .ability_damage_speed { background-position: -208px -123px; }
+#mmrpg .ability_damage_experience { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -123px; }
+#mmrpg .ability_damage_level { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -123px; }
+
+#mmrpg .ability_recovery_energy_low { background-position: 0 0; }
+#mmrpg .ability_recovery_weapons_low { background-position: -52px 0; }
+#mmrpg .ability_recovery_attack_low { background-position: -104px 0; }
+#mmrpg .ability_recovery_defense_low { background-position: -156px 0; }
+#mmrpg .ability_recovery_speed_low { background-position: -208px 0; }
+#mmrpg .ability_recovery_experience_low { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px 0; }
+#mmrpg .ability_recovery_level_low { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px 0; }
+
+#mmrpg .ability_damage_energy_low { background-position: 0 -123px; }
+#mmrpg .ability_damage_weapons_low { background-position: -52px -123px; }
+#mmrpg .ability_damage_attack_low { background-position: -104px -123px; }
+#mmrpg .ability_damage_defense_low { background-position: -156px -123px; }
+#mmrpg .ability_damage_speed_low { background-position: -208px -123px; }
+#mmrpg .ability_damage_experience_low { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -123px; }
+#mmrpg .ability_damage_level_low { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -123px; }
+
+#mmrpg .ability_recovery_energy_base { background-position: 0 -41px; }
+#mmrpg .ability_recovery_weapons_base { background-position: -52px -41px; }
+#mmrpg .ability_recovery_attack_base { background-position: -104px -41px; }
+#mmrpg .ability_recovery_defense_base { background-position: -156px -41px; }
+#mmrpg .ability_recovery_speed_base { background-position: -208px -41px; }
+#mmrpg .ability_recovery_experience_base { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -41px; }
+#mmrpg .ability_recovery_level_base { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -41px; }
+
+#mmrpg .ability_damage_energy_base { background-position: 0 -164px; }
+#mmrpg .ability_damage_weapons_base { background-position: -52px -164px; }
+#mmrpg .ability_damage_attack_base { background-position: -104px -164px; }
+#mmrpg .ability_damage_defense_base { background-position: -156px -164px; }
+#mmrpg .ability_damage_speed_base { background-position: -208px -164px; }
+#mmrpg .ability_damage_experience_base { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -164px; }
+#mmrpg .ability_damage_level_base { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -164px; }
+
+#mmrpg .ability_recovery_energy_high { background-position: 0 -82px; }
+#mmrpg .ability_recovery_weapons_high { background-position: -52px -82px; }
+#mmrpg .ability_recovery_attack_high { background-position: -104px -82px; }
+#mmrpg .ability_recovery_defense_high { background-position: -156px -82px; }
+#mmrpg .ability_recovery_speed_high { background-position: -208px -82px; }
+#mmrpg .ability_recovery_experience_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -82px; }
+#mmrpg .ability_recovery_level_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -82px; }
+
+#mmrpg .ability_damage_energy_high { background-position: 0 -205px; }
+#mmrpg .ability_damage_weapons_high { background-position: -52px -205px; }
+#mmrpg .ability_damage_attack_high { background-position: -104px -205px; }
+#mmrpg .ability_damage_defense_high { background-position: -156px -205px; }
+#mmrpg .ability_damage_speed_high { background-position: -208px -205px; }
+#mmrpg .ability_damage_experience_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -205px; }
+#mmrpg .ability_damage_level_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -205px; }
+
+
+#mmrpg .ability_overlay,
+#mmrpg .scan_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5000; 
+  border: 0 none transparent;
+  background: #000000 none scroll no-repeat 0 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  font-size: 1px;
+  line-height: 1px;
+  opacity: 0.50;
+  filter: alpha(opacity=50%);
+  pointer-events: none;
+}
+
+#window {
+  margin: 0 auto 10px;
+  width: 768px;
+  height: 754px; /*690px;*/
+  padding: 2px 4px;
+  border: 2px solid #0C0C0C;
+  border-top: 0 none transparent;
+  border-radius: 0 0 0.75em 0.75em;
+  -moz-border-radius: 0 0 0.75em 0.75em;
+  -webkit-border-radius: 0 0 0.75em 0.75em;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  -webkit-text-size-adjust: none;
+}
+#window iframe {
+  margin: 0 auto;
+  width: 768px;
+  height: 748px; /*684px;*/
+  padding: 0;
+  border-style: solid;
+  border-width: 1px;
+  overflow: hidden;
+  background-color: transparent;
+}
+#credits {
+  margin: 0 auto 10px;
+  font-size: 10px;
+  color: #414141;
+}
+#credits a {
+  padding: 0;
+  color: #464646;
+  text-decoration: none;
+}
+#credits a:hover {
+  color: #494949;
+  text-decoration: underline;
+}
+
+#music,
+#animate,
+#events {
+  position: absolute;
+  top: 19px;
+  left: 48%;
+  display: block;
+  width: 30px;
+  height: 30px;
+  border: 0 none transparent;
+  border-top: 0 none transparent;
+  background-color: transparent;
+  z-index: 9999;
+  border-radius: 0 0 0.5em 0.5em;
+  -moz-border-radius: 0 0 0.5em 0.5em;
+  -webkit-border-radius: 0 0 0.5em 0.5em;
+  text-align: center;
+}
+#animate {
+  left: 51%;
+  top: 8px;
+}
+#music a.toggle,
+#animate a.toggle {
+  position: relative;
+  display: block;
+  height: 30px;
+  width: 30px;
+  margin: 0;
+  color: #FFFFFF;
+  text-decoration: none;
+  border: 0 none transparent;
+  background-color: transparent;
+  background-image: url(../images/assets/volume-control.png?123);
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  font-size: 10px;
+  line-height: 30px;
+  font-family: Arial;
+  text-indent: -9999px;
+  cursor: pointer;
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  opacity: 0.40;
+  filter: alpha(opacity=40);
+}
+#animate a.toggle {
+  background-image: url(../images/assets/animate-control.png?123);
+}
+#music a.toggle:hover,
+#animate a.toggle:hover {
+  opacity: 0.75;
+  filter: alpha(opacity=75);
+}
+#music a.playing,
+#animate a.playing {
+  background-position: 0 0;
+}
+#music a.paused,
+#animate a.paused {
+  background-position: 0 -30px;
+}
+
+#music.onload {
+  top: 2px;
+  left: 2px;
+  bottom: 2px;
+  right: 2px;
+  width: auto;
+  height: auto;
+  border: 0 none transparent;
+  background-color: rgb(13,13,13);
+  background-color: rgba(13,13,13,1.00);  
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgba(13,13,13,0.75)),
+      color-stop(0.75, rgba(09,09,09,0.75))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgba(13,13,13,0.75) 15%,
+      rgba(09,09,09,0.75) 75%
+  );   
+}
+#music.onload a {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0 none transparent;
+  background: transparent none scroll no-repeat 0 0;
+  background-image: url(../images/menus/menu-banner_credits.png?20131019-01);  
+  background-repeat: no-repeat;
+  background-position: center 75px;
+  font-size: 78px;
+  line-height: 78px;
+  letter-spacing: 10px;
+  text-indent: 0;
+  color: #FFFFFF;
+  background-color: rgb(20, 20, 20);
+  background-color: rgba(20, 20, 20, 0.75);
+  text-shadow: 2px 2px 3px #000000;
+}
+#music.onload a span {
+  display: block;
+  margin: 256px auto;
+}
+#music.onload a span span {
+  font-size: 20px;
+  color: #DEDEDE;
+}
+#music.onload a .start {
+  display: block;
+  overflow: hidden;
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
+}
+#music.onload a .start .title {
+  display: block;
+  font-size: 72px;
+  line-height: 72px;
+}
+#music.onload a .start .subtitle {
+  display: none;
+  font-size: 20px;
+  line-height: 28px;
+}
+#music.onload a .start .info {
+  display: block;
+  float: left;
+  position: relative;
+  font-size: 10px;
+  line-height: 16px;
+  letter-spacing: 6px;
+  margin-left: 29px;
+  margin-top: 5px;
+  text-align: left;
+  opacity: 0.75;
+  filter: alpha(opacity=75);    
+}
+#music.onload a .start .icon {
+  float: left;
+  position: absolute;
+  right: 16px;
+  top: 0;
+  display: block;
+  height: 16px;
+  width: 16px;
+  margin: 0;
+  text-decoration: none;
+  border: 0 none transparent;
+  background-color: transparent;
+  background-image: url(../images/assets/volume-control.png);
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-size: 16px 32px;
+  font-size: 10px;
+  line-height: 30px;
+  font-family: Arial;
+  text-indent: -9999px;
+  overflow: hidden;
+  opacity: 0.75;
+  filter: alpha(opacity=75);    
+}
+
+#mmrpg .canvas_overlay_header {
+  position: absolute; 
+  top: 11px; 
+  height: 22px; 
+  left: 0; 
+  right: 0; 
+  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.5); 
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-width: 1px 0;
+  z-index: 100;
+}
+#mmrpg .canvas_overlay_footer {
+  display: block;
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  right: 0; 
+  height: 14px;
+  line-height: 15px;
+  text-transform: none;
+  text-align: center; 
+  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.6); 
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-width: 1px 0 0;
+  padding: 10px; color: #FFFFFF; 
+  text-indent: 0; 
+  z-index: 999999;
+}
+#mmrpg .canvas_overlay_hidden {
+  opacity: 0;
+}
+#mmrpg .canvas_overlay_footer .overlay_label {
+  display: block;
+  font-size: 9px;
+  line-height: 11px;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.60);
+  width: 140px;
+  margin: -8px auto 2px;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+}
+#mmrpg .canvas_overlay_footer .field_multiplier {
+  margin: 0 5px; 
+  border-style: solid; 
+  border-width: 1px; 
+  border-radius: 0.5em; 
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  padding: 0 6px; 
+  box-shadow: 1px 1px 1px #000000; 
+  letter-spacing: 1px;
+  white-space: nowrap;  
+  font-family: Arial;
+  font-size: 9px;
+  line-height: 9px;
+}
+#mmrpg .canvas_overlay_footer .field_multiplier .type {
+
+}
+#mmrpg .canvas_overlay_footer .field_multiplier .cross {
+  position: relative; 
+  bottom: 1px; 
+  font-size: 10px; 
+  padding: 0;
+}
+/*
+#mmrpg .canvas_overlay_footer .field_multiplier_count_8 {
+  margin: 0 2px;
+}
+#mmrpg .canvas_overlay_footer .field_multiplier_count_9 {
+  margin: 0 -2px;
+}
+#mmrpg .canvas_overlay_footer .field_multiplier_count_10 {
+  margin: 0 -4px 0 0;
+}
+#mmrpg .canvas_overlay_footer .field_multiplier_count_11 {
+  margin: 0 -6px 0 0;
+}
+*/
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_8 .type,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_9 .type,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_10 .type,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_11 .type {
+  /*
+  display: inline-block;
+  zoom: 1;
+  width: 16px;
+  overflow: hidden;
+  margin-right: 4px;
+  text-overflow: clip;
+  */
+}
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_10 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_11 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_12 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_13 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_14 .field_multiplier {
+  margin: 0 1px !important;
+}
+
+#mmrpg .canvas_ability_details {
+  text-indent: 0; 
+  left: 250px;
+  right: 250px; 
+  top: 42px; 
+  background-color: rgba(41, 41, 41, 0.75); 
+  border: 2px solid rgba(255, 255, 255, 0.15); 
+  height: 42px; 
+  padding: 0 36px; 
+  width: 200px; 
+  border-radius: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 5100;
+}
+#canvas .canvas_ability_details .ability_icon {
+  top: 5px; 
+  left: 5px; 
+  width: 30px; 
+  height: 30px; 
+  border: 1px solid #000000; 
+  border-radius: 5px 0 0 5px;
+  -moz-border-radius: 5px 0 0 5px;
+  -webkit-border-radius: 5px 0 0 5px;
+  background: #000000 none scroll no-repeat -5px -5px;
+}
+#canvas .canvas_ability_details .ability_icon_right {
+  left: auto;
+  right: 5px;
+  border-radius: 0 5px 5px 0;
+  -moz-border-radius: 0 5px 5px 0;
+  -webkit-border-radius: 0 5px 5px 0;
+}
+#canvas .canvas_ability_details .ability_name {
+  text-indent: 0; 
+  color: #FFFFFF; 
+  font-size: 12px; 
+  font-weight: bold;
+  text-align: center;
+  margin: 5px 0; 
+  line-height: 30px;  
+  border-radius: 0;
+  border: 1px solid #000000; 
+  background-color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.mobileFlag_landscapeMode #battle .canvas_overlay_header,
+body.windowFlag_landscapeMode #battle .canvas_overlay_header,
+body.mobileFlag_landscapeMode #battle .canvas_overlay_footer,
+body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
+  left: 2;
+  right: 0px;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+}
+body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
+  left: -130px;
+  right: -127px;
+  border-radius: 0 0 5px 5px;
+  -moz-border-radius: 0 0 5px 5px;
+  -webkit-border-radius: 0 0 5px 5px;
+}
+
+#events {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;  
+  width: auto;
+  height: auto;
+  z-index: 9985;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border: 2px solid #1A1A1A;
+  background-color: rgba(0, 0, 0, 0.75);  
+}
+#events.hidden {
+  display: none;
+}
+#events .event_wrapper {
+  position: absolute;
+  top: 60px;
+  left: 85px;
+  right: auto;
+  bottom: auto;  
+  height: auto;
+  min-height: 300px;
+  width: 600px;
+  overflow: hidden;
+  z-index: 9990;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border: 2px solid #1A1A1A;
+  background-color: #222222;  
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgba(0, 0, 0, 0.05)),
+      color-stop(0.75, rgba(255, 255, 255, 0.05))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgba(0, 0, 0, 0.05) 15%,
+      rgba(255, 255, 255, 0.05) 75%
+  ); 
+  text-shadow: 1px 1px 4px #333333;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;    
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);  
+}
+#events .event_container {
+  padding: 10px;
+}
+#events .event_container p {
+  font-size: 14px;
+  line-height: 18px;
+  text-align: justify;
+  padding: 0 5px 5px;
+}
+#events .event_container p a {
+  text-decoration: none;
+  color: #FFFFFF;
+  font-weight: bold;
+}
+#events #canvas,
+#events #messages {
+  width: auto;
+  height: 150px;
+  border: 2px solid #000000;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;  
+  overflow: auto;   
+}
+#events #canvas {
+  overflow: hidden;
+  margin: 0 0 5px;
+  background-color: rgb(13,13,13);
+  background-color: rgba(13,13,13,0.85);  
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgba(13,13,13,0.75)),
+      color-stop(0.75, rgba(09,09,09,0.75))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgba(13,13,13,0.75) 15%,
+      rgba(09,09,09,0.75) 75%
+  );   
+}
+#events #messages {
+  margin: 5px 0 0;
+  border: 0 none transparent !important;
+  color: #FFFFFF;
+  margin-right: -30px;
+  padding-right: 15px;
+  width: 576px;
+  height: auto;
+  max-height: 290px;  
+}
+#events #buttons {
+  margin: 10px 0 0;
+  border: 0 none transparent !important;
+  color: #FFFFFF;
+}
+#events #messages .player_type,
+#events #messages .robot_type,
+#events #messages .ability_type,
+#events #messages .field_type {
+  padding: 0 6px;
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  white-space: nowrap;
+  font-weight: normal;
+}
+
+
+#events #messages .event {
+  margin: 3px 8px;
+  min-height: 55px;
+  text-align: left;
+  veritcal-align: top;
+  padding: 2px;
+  font-size: 10px;
+  line-height: 13px;
+  position: relative;
+  margin-bottom: 8px !important;
+}
+#events #messages .event:first-child {
+  margin-top: 0;
+}
+#events #messages .event_double {
+  min-height: 120px;
+}
+#events #messages .event_triple {
+  min-height: 184px;
+}
+#events #messages .event .header {
+  display: block;
+  width: auto !important;
+  height: 24px;
+  margin: 0 47px;
+  padding: 1px 10px;
+  text-align: center;
+  veritcal-align: top;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 1px;
+  text-transform: none;
+  text-decoration: none;
+  text-shadow: 0 1px 1px #161616;
+  border: 0 none transparent;
+  border-bottom-style: none;
+  border-radius: 0.5em 0.5em 0 0;
+  -moz-border-radius: 0.5em 0.5em 0 0;
+  -webkit-border-radius: 0.5em 0.5em 0 0;
+  color: #FFFFFF;
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgba(0, 0, 0, 0.05)),
+      color-stop(0.75, rgba(255, 255, 255, 0.05))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgba(0, 0, 0, 0.05) 15%,
+      rgba(255, 255, 255, 0.05) 75%
+  );
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);    
+}
+
+#events #messages .event .header_left {
+  text-align: left;
+}
+#events #messages .event .header_right {
+  text-align: right;
+}
+
+#events #messages .event .header_left .header_core,
+#events #messages .event .header_right .header_core {
+  display: block;
+  color: #F2F2F2;
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 15px;
+  margin: 3px 0 0;
+  padding: 0 6px;  
+}
+#events #messages .event .header_left .header_core {
+  float: right;
+}
+#events #messages .event .header_right .header_core {
+  float: left;
+}
+
+
+
+#events #buttons .event_continue {
+  display: block;
+  width: 100%;
+  height: 36px;
+  font-size: 16px;
+  line-height: 34px;
+  text-decoration: none;
+  color: #EFEFEF;
+  border: 2px solid #000000;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;  
+  background-color: rgb(13,13,13);
+  background-color: rgba(13,13,13,1.0);  
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgba(13,13,13,0.75)),
+      color-stop(0.75, rgba(09,09,09,0.75))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgba(13,13,13,0.75) 15%,
+      rgba(09,09,09,0.75) 75%
+  );   
+  cursor: pointer;
+}
+#events #buttons input:hover {
+  background-color: rgb(33,33,33);
+  background-color: rgba(33,33,33,1.0); 
+}
+
+
+#battle {
+  margin: 0 auto;
+  width: 768px;
+  height: 684px;
+  padding: 0;
+  border: 0 none transparent;
+  background-color: transparent;
+  border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  -webkit-border-radius: 0.75em;
+  -webkit-text-size-adjust: none;
+}
+#battle.hidden {
+  display: none;
+}
+
+#engine {
+  display: none;
+}
+
+#connect {
+  display: none;
+  margin: 10px auto;
+  vertical-align: top;
+  width: 500px;
+  height: 500px;
+  border: 1px solid #DEDEDE;
+  background-color: #676767;
+}
+
+#canvas {
+  margin: 0 auto 0;
+  vertical-align: top;
+  width: 768px;
+  height: 267px;
+  border: 0 none transparent;
+  border-bottom-style: none;
+  background-color: transparent;
+  position: relative;
+  overflow: hidden;
+}
+#canvas .wrapper {
+  padding: 0;
+  margin: 0;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+}
+#canvas .event {
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 750px;
+  /* height: 181px + 67px; */
+  height: 248px;
+  position: absolute;
+  top: 0;
+  border: 2px solid #1A1A1A;
+  font-size: 10px;
+  /* line-height: 181px + 67px; */
+  line-height: 248px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 0;
+  border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  -webkit-border-radius: 0.75em;
+  color: #696969;
+  background-color: rgb(43,43,43);  
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgb(43,43,43)),
+      color-stop(0.75, rgb(41,41,41))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgb(43,43,43) 15%,
+      rgb(41,41,41) 75%
+  ); 
+  text-shadow: 1px 1px 4px #333333;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;    
+  box-shadow: 0 1px 5px #000000;
+  -moz-box-shadow: 0 1px 5px #000000;
+  -webkit-box-shadow: 0 1px 5px #000000;  
+  overflow: hidden;
+  
+}
+#canvas .clearback {
+  background: transparent none scroll no-repeat 0 0;
+  left: -2px;
+}
+#canvas .event_details {
+  z-index: 1000; 
+  /*pointer-events: none;*/ 
+  height: 10px;
+  overflow: visible; 
+  border-color: transparent;
+  box-shadow: 0 0 0 transparent; 
+  -webkit-box-shadow: 0 0 0 transparent; 
+  -moz-box-shadow: 0 0 0 transparent;
+}
+#canvas .event .background,
+#canvas .event .foreground,
+#canvas .event .scanlines {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent none scroll repeat-x center top;
+  border: 0 none transparent;
+  border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  -webkit-border-radius: 0.75em;
+  pointer-events: none;
+}
+#canvas .event .background {
+  z-index: 25;
+}
+#canvas .event .foreground {
+  z-index: 50;
+}
+#canvas .event .scanlines {
+  z-index: 100; 
+  width: auto; 
+  left: -300px; 
+  right: -300px;
+  height: 250px;
+}
+#canvas .event .background_00,
+#canvas .event .foreground_00 {
+  background-position: center 0;
+}
+#canvas .event .background_01,
+#canvas .event .foreground_01 {
+  background-position: center -248px;
+}
+#canvas .event .background_02,
+#canvas .event .foreground_02 {
+  background-position: center -496px;
+}
+#canvas .event .background_03,
+#canvas .event .foreground_03 {
+  background-position: center -744px;
+}
+#canvas .event .background_04,
+#canvas .event .foreground_04 {
+  background-position: center -992px;
+}
+#canvas .event .background_05,
+#canvas .event .foreground_05 {
+  background-position: center -1240px;
+}
+#canvas .event .background_06,
+#canvas .event .foreground_06 {
+  background-position: center -1488px;
+}
+#canvas .event .background_07,
+#canvas .event .foreground_07 {
+  background-position: center -1736px;
+}
+#canvas .event .background_08,
+#canvas .event .foreground_08 {
+  background-position: center -1984px;
+}
+#canvas .event .background_09,
+#canvas .event .foreground_09 {
+  background-position: center -2232px;
+}
+#canvas .event pre {
+  position: absolute;
+  z-index: 9999;
+  bottom: 0;
+  height: 50px;
+  width: 100%;
+  color: #A3FFA7;
+  padding: 5px;
+  font-size: 10px;
+  line-height: 10px;
+  text-transform: none;
+  text-align: left;
+  text-indent: 0;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.60);
+}
+
+#console {
+  margin: 0 auto;
+  vertical-align: top;
+  width: 768px;
+  height: 256px; /*192px;*/
+  border: 0 none transparent;
+  border-top-style: none;
+  border-bottom-style: none;
+  overflow: hidden;  
+  background-color: transparent; 
+}
+#console .wrapper {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+#console .event {
+  margin: 3px 8px;
+  min-height: 55px;
+  text-align: left;
+  vertical-align: top;
+  color: #FAFAFA;
+  border: 1px solid #1A1A1A;
+  background-color: #222222;  
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgba(0, 0, 0, 0.05)),
+      color-stop(0.75, rgba(255, 255, 255, 0.05))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgba(0, 0, 0, 0.05) 15%,
+      rgba(255, 255, 255, 0.05) 75%
+  );  
+  padding: 2px;
+  font-size: 10px;
+  line-height: 13px;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);  
+}
+#console .event:first-child {
+  margin-top: 0;
+}
+#console .event_double {
+  min-height: 120px;
+}
+#console .event_triple {
+  min-height: 184px;
+}
+#console .event:hover {
+  background-color: #262626;
+}
+#console .event .header {
+  display: block;
+  margin: 0 47px;
+  padding: 1px 10px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #B4B4B4;
+  font-size: 8px;
+  line-height: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 1px #161616;
+  border: 0 none transparent;
+  border-bottom-style: none;
+  border-radius: 0.5em 0.5em 0 0;
+  -moz-border-radius: 0.5em 0.5em 0 0;
+  -webkit-border-radius: 0.5em 0.5em 0 0;
+}
+#console .event .header_left {
+  text-align: left;
+}
+#console .event .header_right {
+  text-align: right;
+}
+#console .event .header_full {
+  margin: 0 2px;
+}
+#console .event:hover .turn_number {
+  background-color: #797979;
+}
+#console .event .body {
+  display: block;
+  min-height: 36px;
+  margin: 0 47px;
+  padding: 2px 10px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.025);  
+  color: #FFFFFF;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  border: 0 none transparent;
+  border-top-style: none;
+  border-radius: 0 0 0.5em 0.5em;
+  -moz-border-radius: 0 0 0.5em 0.5em;
+  -webkit-border-radius: 0 0 0.5em 0.5em;
+}
+#console .field_type_event .header {
+  background-color: rgba(0, 0, 0, 0.45);
+}
+#console .field_type_event .body {
+  background-color: rgba(0, 0, 0, 0.35);
+}
+#console .event_double .body {
+  min-height: 101px;
+}
+#console .event_triple .body {
+  min-height: 166px;
+}
+#console .event table {
+  margin: 0 auto;
+}
+#console .event table.full {
+  margin: 0;
+  width: 100%;
+}
+#console .event table tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.025);
+}
+#console .event table tr:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+#console .event table td {
+  padding: 0 5px;
+  text-align: center;
+  white-space: nowrap;
+}
+#console .event table td.left {
+  text-align: left;
+}
+#console .event table td.right {
+  text-align: right;
+}
+#console .event .body_left {
+  text-align: left;
+}
+#console .event .body_right {
+  text-align: right;
+}
+#console .event .body_full {
+  margin: 0 2px;
+}
+#console .event .body_left table {
+  margin: 0 auto 0 0;
+}
+#console .event .body_right table {
+  margin: 0 0 0 auto;
+}
+
+#console .event .sprite {
+  margin-bottom: 2px;
+  margin-top: -2px;
+  position: static;
+}
+#console .event .sprite_40x40 { margin-top: -2px; }
+#console .event .sprite_80x80 { margin-top: -42px; }
+#console .event .sprite_160x160 { margin-top: -82px; }
+#console .event .sprite_left .sprite_40x40 { margin-left: 0; }
+#console .event .sprite_left .sprite_80x80 { margin-left: -20px; }
+#console .event .sprite_left .sprite_160x160 { margin-left: -40px; }
+#console .event .sprite_right .sprite_40x40 { margin-left: 0; }
+#console .event .sprite_right .sprite_80x80 { margin-left: -20px; }
+#console .event .sprite_right .sprite_160x160 { margin-left: -40px; }
+
+#console .event .sprite_left .sprite_80x80_mugshot { margin-top: -1px; margin-left: -1px; background-position: -20px -20px; }
+#console .event .sprite_right .sprite_80x80_mugshot { margin-top: -1px; margin-left: -1px; background-position: -20px -20px; }
+
+#console .event .sprite_left,
+#console .event .sprite_right {
+  display: block;
+  position: absolute;
+  width: 40px;
+  height: 49px;
+  margin: 0;
+  padding: 2px 2px 4px;
+  text-align: left;
+  background-color: rgb(60,60,60);  
+  border: 0 none transparent;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+}
+#console .event .sprite_left {
+  top: 2px;
+  left: 2px;
+}
+#console .event .sprite_right {
+  top: 2px;
+  right: 2px;
+}
+#console .event .this_sprite {
+  background-color: rgba(255, 255, 255, 0.025);  
+  /*
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgb(75,75,75)),
+      color-stop(0.75, rgb(81,81,81))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgb(90,90,90) 15%,
+      rgb(96,96,96) 75%
+  );
+  */
+}
+#console .event .target_sprite {
+  
+}
+#console .event .sprite_left .energy,
+#console .event .sprite_right .energy {
+  display: block;
+  width: 38px;
+  height: 5px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  text-indent: -9999px;
+  color: transparent;
+  border: 1px solid rgb(56,56,56);
+  background: #222222 url(../images/tiles/horizontal-gradient_energy-bar.gif) scroll no-repeat 0 0;
+}
+#console .event .sprite_left .energy {
+  background-position: -80px 0;
+}
+#console .event .sprite_right .energy {
+  background-position: -40px 0;
+}
+#console .event .this_sprite .energy {
+  display: block;
+  width: 38px;
+  height: 5px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  text-indent: -9999px;
+  color: transparent;
+  border-color: #1A1A1A;
+}
+
+#console .event .sprite_robot_mug,
+#console .event .sprite_ability_icon {
+  border: 1px solid #191919;
+  background-color: #000000;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  width: 38px;
+  height: 38px;
+  background-position: -1px -1px;
+}
+
+#console .event .player_name,
+#console .event .player_type,
+#console .event .player_stat,
+#console .event .robot_number,
+#console .event .robot_name,
+#console .event .robot_stat,
+#console .event .robot_type,
+#console .event .robot_core,
+#console .event .robot_weakness,
+#console .event .robot_resistance,
+#console .event .robot_affinity,
+#console .event .robot_immunity,
+#console .event .field_name,
+#console .event .ability_name,
+#console .event .ability_stat,
+#console .event .damage_strikes,
+#console .event .damage_misses,
+#console .event .damage_result,
+#console .event .damage_amount,
+#console .event .damage_overkill,
+#console .event .recovery_strikes,
+#console .event .recovery_misses,
+#console .event .recovery_result,
+#console .event .recovery_amount,
+#console .event .recovery_overkill {
+  background: rgb(65,65,65) none scroll no-repeat 0 0;
+  border: 1px solid rgb(70,70,70);
+  padding: 0 3px;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  line-height: 11px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+#console .event .player_name {
+
+}
+#console .event .robot_name {
+
+}
+#console .event .ability_name {
+
+}
+#console .event .damage_amount {
+
+}
+#console .event .damage_overkill {
+
+}
+
+#console .event sup {
+  position: relative;
+  bottom: 0.5em;
+  font-family: "Courier New";
+  font-size: 0.8em;
+}
+#console .damage {
+}
+#console .damage_weakness {
+  font-weight: bold;
+  color: #FF9C32;
+}
+#console .damage_resistance {
+  font-weight: bold;
+  color: #FF5555;
+}
+#console .damage_critical {
+  font-weight: bold;
+  font-style: italic;
+  color: #E4A3FF;
+}
+
+
+#actions {
+  margin: 0 auto;
+  vertical-align: top;
+  width: 768px;
+  height: 225px;
+  border: 0 none transparent;
+  border-top-style: none;
+  background-color: transparent;
+  overflow: hidden;
+}
+#actions .wrapper {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+#actions .button {
+  display: block;
+  float: left;
+  margin: 0 3px 3px 0;
+  vertical-align: top;
+  border: 2px solid #1A1A1A; /*rgb(55,55,55);*/
+  border-color: #1A1A1A !important;
+  font-size: 12px;
+  line-height: 12px;
+  letter-spacing: 3px;
+  /*text-transform: uppercase;*/
+  text-decoration: none;
+  padding: 0;
+  border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  -webkit-border-radius: 0.75em;
+  cursor: pointer;
+  color: #FFFFFF;
+  background-color: #222222;  
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgba(0, 0, 0, 0.05)),
+      color-stop(0.75, rgba(255, 255, 255, 0.05))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgba(0, 0, 0, 0.05) 15%,
+      rgba(255, 255, 255, 0.05) 75%
+  );  
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;    
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+#actions .button:hover {
+  color: #FFFFFF;
+  background-color: #222222;  
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgba(0, 0, 0, 0.075)),
+      color-stop(0.75, rgba(255, 255, 255, 0.075))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgba(0, 0, 0, 0.075) 15%,
+      rgba(255, 255, 255, 0.075) 75%
+  );  
+}
+#actions .button_hover,
+#actions .button_hover:hover {
+  border-color: rgba(255, 255, 255, 0.20) !important; 
+  animation: border-pulsate 2s infinite;
+}
+#actions .button_disabled {
+  opacity: 0.45;
+  cursor: default;
+  background-image: none;
+  border-color: #1A1A1A !important;  
+  color: #CACACA;  
+}
+#actions .button_disabled:hover {
+  color: #CACACA;
+  border-color: #1A1A1A !important;
+}
+#actions .button label {
+  display: block;
+  margin: 5px;
+  padding: 0;
+  background-color: #2A2A2A;
+  background-color: rgba(42, 42, 42, 0.85);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
+  -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
+  border: 1px solid #1A1A1A;
+  border-color: #1A1A1A !important;
+  border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  -webkit-border-radius: 0.75em; 
+  cursor: pointer;
+  position: relative;
+}
+#actions .button:hover label,
+#actions .button label:hover {
+  background-color: #2D2D2D;
+  background-color: rgba(42, 42, 42, 0.75);
+}
+#actions .button_disabled:hover label,
+#actions .button_disabled label:hover {
+  background-color: #2A2A2A;
+  cursor: default;
+}
+
+#actions .main_actions {
+  width: auto;
+  height: 145px;
+  line-height: 155px;
+  margin: 0;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+}
+#actions .main_actions_hastitle {
+  padding-top: 18px;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  height: 130px;
+  line-height: 130px;
+  background: -moz-linear-gradient(top,  rgba(0,0,0,0.33) 0%, rgba(0,0,0,0.33) 1%, rgba(0,0,0,0) 75%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.33)), color-stop(1%,rgba(0,0,0,0.33)), color-stop(75%,rgba(0,0,0,0))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  rgba(0,0,0,0.33) 0%,rgba(0,0,0,0.33) 1%,rgba(0,0,0,0) 75%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  rgba(0,0,0,0.33) 0%,rgba(0,0,0,0.33) 1%,rgba(0,0,0,0) 75%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  rgba(0,0,0,0.33) 0%,rgba(0,0,0,0.33) 1%,rgba(0,0,0,0) 75%); /* IE10+ */
+  background: linear-gradient(to bottom,  rgba(0,0,0,0.33) 0%,rgba(0,0,0,0.33) 1%,rgba(0,0,0,0) 75%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#54000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */  
+}
+#actions .main_actions_hastitle .main_actions_title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8px;
+  height: 25px;
+  text-align: center;
+  font-size: 10px;
+  line-height: 25px;
+  text-transform: uppercase;
+  color: #696969;
+  background-color: #191919;
+  letter-spacing: 2px;  
+  border-radius: 10px 10px 0 0;
+}
+#actions .main_actions_hastitle .main_actions_title .float_title {
+  position: static;
+  float: left;
+  width: 49%;
+  text-align: right;
+}
+#actions .main_actions_hastitle .main_actions_title .float_links {
+  position: static;
+  float: right;
+  width: 49%;
+  text-align: left;
+}
+#actions .main_actions_hastitle .main_actions_title .float_links .page {  
+  color: #696969;
+}
+#actions .main_actions_hastitle .main_actions_title .float_links .num {
+  color: #696969;
+  padding-left: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  _cursor: hand;
+}
+
+#actions .main_actions_hastitle .main_actions_title .float_links .num:hover,
+#actions .main_actions_hastitle .main_actions_title .float_links .active {
+  color: #797979;
+  text-decoration: underline;
+}
+#actions .main_actions_hastitle .main_actions_title_disabled,
+#actions .main_actions_hastitle .main_actions_title_disabled * {
+  text-decoration: line-through !important;
+}
+#actions .sub_actions {
+  width: auto;
+  height: 40px;
+  line-height: 40px;
+  margin: 0;
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+}
+#actions .actions_battle .sub_actions {
+  height: 56px;
+  line-height: 56px;
+}
+
+#actions .action_back {
+  width: auto;
+  height: auto;
+  position: absolute;
+  line-height: 40px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+}
+#actions .action_back label {
+  width: auto;
+  height: 24px;
+  line-height: 24px;
+}
+
+#actions .actions_resend {
+  position: absolute;
+  text-indent: -9999px;
+  color: transparent;
+  right: -5px;
+  bottom: -5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.3);
+  background-image: none;  
+  cursor: pointer;  
+  z-index: 9999;
+  opacity: 0;
+  filter: alpha(opacity=0);
+}
+#actions .actions_resend:hover {
+  opacity: 0.10;
+  filter: alpha(opacity=10);
+}
+
+#actions .actions_loading .main_actions {
+  height: auto;
+  bottom: 8px;
+}
+#actions .actions_loading .action_loading {
+  width: auto;
+  height: auto;
+  line-height: 225px;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+#actions .actions_loading .action_loading label {
+  width: auto;
+  height: 193px;
+  line-height: 193px;
+}
+
+
+#actions .actions_start .main_actions {
+  height: auto;
+  bottom: 8px;
+}
+#actions .actions_start .action_start {
+  width: auto;
+  height: auto;
+  line-height: 225px;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+#actions .actions_start .action_start label {
+  width: auto;
+  height: 193px;
+  line-height: 193px;
+}
+
+#actions .actions_event .main_actions {
+  height: auto;
+  bottom: 8px;
+}
+#actions .actions_event .action_continue {
+  width: auto;
+  height: auto;
+  line-height: 225px;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+#actions .actions_event .action_continue label {
+  width: auto;
+  height: 193px;
+  line-height: 193px;
+}
+
+#actions .actions_battle .action_ability {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: auto;
+  height: 145px;
+  line-height: 145px;
+  margin: 0;
+}
+#actions .actions_battle .action_ability label {
+  width: auto;
+  height: 132px;
+  line-height: 132px;
+}
+#actions .actions_battle .action_scan,
+#actions .actions_battle .action_item,
+#actions .actions_battle .action_target,
+#actions .actions_battle .action_option,
+#actions .actions_battle .action_switch {
+  width: 181px;
+  height: 48px;
+  line-height: 48px;
+}
+#actions .actions_battle .action_scan label,
+#actions .actions_battle .action_item label,
+#actions .actions_battle .action_target label,
+#actions .actions_battle .action_option label,
+#actions .actions_battle .action_switch label {
+  width: auto;
+  height: 36px;
+  line-height: 36px;
+}
+#actions .actions_battle .action_switch {
+  margin-right: 0;
+}
+#actions .actions_battle .action_switch label {
+  width: auto;
+}
+
+#actions .actions_option .main_actions,
+#actions .actions_settings .main_actions,
+#actions .actions_settings_eventTimeout .main_actions,
+#actions .actions_settings_volumeControl .main_actions,
+#actions .actions_settings_autoScan .main_actions,
+#actions .actions_switch .main_actions,
+#actions .actions_scan .main_actions,
+#actions .actions_ability .main_actions {
+  
+}
+#actions .actions_option .action_option,
+#actions .actions_settings .action_setting,
+#actions .actions_settings_eventTimeout .action_setting,
+#actions .actions_settings_volumeControl .action_setting,
+#actions .actions_settings_autoScan .action_setting,
+#actions .actions_switch .action_switch,
+#actions .actions_scan .action_scan,
+#actions .actions_target .action_target,
+#actions .actions_ability .action_ability {
+  width: 181px;
+  height: 68px;
+  line-height: 68px;
+  margin: 0 3px 3px 0;
+}
+#actions .actions_option .action_option label,
+#actions .actions_settings .action_setting label,
+#actions .actions_settings_eventTimeout .action_setting label,
+#actions .actions_settings_volumeControl .action_setting label,
+#actions .actions_settings_autoScan .action_setting label,
+#actions .actions_switch .action_switch label,
+#actions .actions_scan .action_scan label,
+#actions .actions_target .action_target label,
+#actions .actions_ability .action_ability label {
+  width: auto;
+  height: 56px;
+  line-height: 56px;
+  padding-left: 48px;
+}
+#actions .actions_option .action_option label .multi,
+#actions .actions_settings .action_setting label .multi,
+#actions .actions_settings_eventTimeout .action_setting label .multi,
+#actions .actions_settings_volumeControl .action_setting label .multi,
+#actions .actions_settings_autoScan .action_setting label .multi,
+#actions .actions_switch .action_switch label .multi,
+#actions .actions_scan .action_scan label .multi,
+#actions .actions_target .action_target label .multi,
+#actions .actions_ability .action_ability label .multi {
+  display: block;
+  line-height: 14px;
+  margin-top: 13px;
+}
+
+#actions .actions_switch .action_switch label .sprite_40x40,
+#actions .actions_scan .action_scan label .sprite_40x40,
+#actions .actions_target .action_target label .sprite_40x40,
+#actions .actions_ability .action_ability label .sprite_40x40 {
+  background-color: #000000 !important;
+  border: 1px solid #373737;
+  width: 40px;
+  height: 44px;
+  border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  -webkit-border-radius: 0.75em;
+}
+#actions .actions_switch .action_switch label .sprite_40x40_ability,
+#actions .actions_scan .action_scan label .sprite_40x40_ability,
+#actions .actions_target .action_target label .sprite_40x40_ability,
+#actions .actions_ability .action_ability label .sprite_40x40_ability {
+  height: 30px; 
+  background-position-y: -5px !important; 
+  border-radius: 5px 5px 0 0;   
+  -moz-border-radius: 5px 5px 0 0;   
+  -webkit-border-radius: 5px 5px 0 0; 
+}
+#actions .actions_switch .action_switch label .sprite_40x40_weapons,
+#actions .actions_scan .action_scan label .sprite_40x40_weapons,
+#actions .actions_target .action_target label .sprite_40x40_weapons,
+#actions .actions_ability .action_ability label .sprite_40x40_weapons {
+  height: 8px;
+  padding-bottom: 4px; 
+  border-radius: 0 0 5px 5px;   
+  -moz-border-radius: 0 0 5px 5px;   
+  -webkit-border-radius: 0 0 5px 5px; 
+  border-top-style: none;
+  font-size: 8px;
+  line-height: 8px;
+  letter-spacing: 0;
+  text-indent: 0;
+  text-align: center; 
+  color: #9C9C9C;
+  font-family: Arial; 
+}
+#actions .actions_switch .action_switch label .sprite_40x40_energy_high,
+#actions .actions_scan .action_scan label .sprite_40x40_energy_high,
+#actions .actions_target .action_target label .sprite_40x40_energy_high,
+#actions .actions_ability .action_ability label .sprite_40x40_energy_high {
+  background-color: #09210A;
+}
+#actions .actions_switch .action_switch label .sprite_40x40_energy_medium,
+#actions .actions_scan .action_scan label .sprite_40x40_energy_medium,
+#actions .actions_target .action_target label .sprite_40x40_energy_medium,
+#actions .actions_ability .action_ability label .sprite_40x40_energy_medium {
+  background-color: #282204;
+}
+#actions .actions_switch .action_switch label .sprite_40x40_energy_low,
+#actions .actions_scan .action_scan label .sprite_40x40_energy_low,
+#actions .actions_target .action_target label .sprite_40x40_energy_low,
+#actions .actions_ability .action_ability label .sprite_40x40_energy_low {
+  background-color: #2B0A0A;
+}
+#actions .actions_switch .action_switch label .sprite_40x40_base,
+#actions .actions_scan .action_scan label .sprite_40x40_base,
+#actions .actions_target .action_target label .sprite_40x40_base,
+#actions .actions_ability .action_ability label .sprite_40x40_base {
+  background-position: 0 1px;
+}
+#actions .actions_switch .action_switch label .sprite_40x40_defend,
+#actions .actions_scan .action_scan label .sprite_40x40_defend,
+#actions .actions_target .action_target label .sprite_40x40_defend,
+#actions .actions_ability .action_ability label .sprite_40x40_defend {
+  background-position: -320px 1px;
+}
+#actions .actions_switch .action_switch label .sprite_40x40_defeat,
+#actions .actions_scan .action_scan label .sprite_40x40_defeat,
+#actions .actions_target .action_target label .sprite_40x40_defeat,
+#actions .actions_ability .action_ability label .sprite_40x40_defeat {
+  background-position: -120px 1px;
+}
+
+#actions .actions_switch .action_switch label .sprite_80x80,
+#actions .actions_scan .action_scan label .sprite_80x80,
+#actions .actions_target .action_target label .sprite_80x80,
+#actions .actions_ability .action_ability label .sprite_80x80 {
+  background-color: #000000 !important;
+  border: 1px solid #373737;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  -webkit-border-radius: 0.75em;
+}
+#actions .actions_switch .action_switch label .sprite_80x80_energy_high,
+#actions .actions_scan .action_scan label .sprite_80x80_energy_high,
+#actions .actions_target .action_target label .sprite_80x80_energy_high,
+#actions .actions_ability .action_ability label .sprite_80x80_energy_high {
+  background-color: #09210A;
+}
+#actions .actions_switch .action_switch label .sprite_80x80_energy_medium,
+#actions .actions_scan .action_scan label .sprite_80x80_energy_medium,
+#actions .actions_target .action_target label .sprite_80x80_energy_medium,
+#actions .actions_ability .action_ability label .sprite_80x80_energy_medium {
+  background-color: #282204;
+}
+#actions .actions_switch .action_switch label .sprite_80x80_energy_low,
+#actions .actions_scan .action_scan label .sprite_80x80_energy_low,
+#actions .actions_target .action_target label .sprite_80x80_energy_low,
+#actions .actions_ability .action_ability label .sprite_80x80_energy_low {
+  background-color: #2B0A0A;
+}
+#actions .actions_switch .action_switch label .sprite_80x80_base,
+#actions .actions_scan .action_scan label .sprite_80x80_base,
+#actions .actions_target .action_target label .sprite_80x80_base,
+#actions .actions_ability .action_ability label .sprite_80x80_base {
+  background-position: -19px -42px;
+}
+#actions .actions_switch .action_switch label .sprite_80x80_defend,
+#actions .actions_scan .action_scan label .sprite_80x80_defend,
+#actions .actions_target .action_target label .sprite_80x80_defend,
+#actions .actions_ability .action_ability label .sprite_80x80_defend {
+  background-position: -658px -42px;
+}
+#actions .actions_switch .action_switch label .sprite_80x80_defeat,
+#actions .actions_scan .action_scan label .sprite_80x80_defeat,
+#actions .actions_target .action_target label .sprite_80x80_defeat,
+#actions .actions_ability .action_ability label .sprite_80x80_defeat {
+  background-position: -260px -42px;
+}
+
+#actions .actions_switch .action_switch label .sprite_160x160,
+#actions .actions_scan .action_scan label .sprite_160x160,
+#actions .actions_target .action_target label .sprite_160x160,
+#actions .actions_ability .action_ability label .sprite_160x160 {
+  background-color: #000000 !important;
+  border: 1px solid #373737;
+  width: 160px;
+  height: 160px;
+  border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  -webkit-border-radius: 0.75em;
+}
+#actions .actions_switch .action_switch label .sprite_160x160_energy_high,
+#actions .actions_scan .action_scan label .sprite_160x160_energy_high,
+#actions .actions_target .action_target label .sprite_160x160_energy_high,
+#actions .actions_ability .action_ability label .sprite_160x160_energy_high {
+  background-color: #09210A;
+}
+#actions .actions_switch .action_switch label .sprite_160x160_energy_medium,
+#actions .actions_scan .action_scan label .sprite_160x160_energy_medium,
+#actions .actions_target .action_target label .sprite_160x160_energy_medium,
+#actions .actions_ability .action_ability label .sprite_160x160_energy_medium {
+  background-color: #282204;
+}
+#actions .actions_switch .action_switch label .sprite_160x160_energy_low,
+#actions .actions_scan .action_scan label .sprite_160x160_energy_low,
+#actions .actions_target .action_target label .sprite_160x160_energy_low,
+#actions .actions_ability .action_ability label .sprite_160x160_energy_low {
+  background-color: #2B0A0A;
+}
+#actions .actions_switch .action_switch label .sprite_160x160_base,
+#actions .actions_scan .action_scan label .sprite_160x160_base,
+#actions .actions_target .action_target label .sprite_160x160_base,
+#actions .actions_ability .action_ability label .sprite_160x160_base {
+  background-position: 0 1px;
+}
+#actions .actions_switch .action_switch label .sprite_160x160_defend,
+#actions .actions_scan .action_scan label .sprite_160x160_defend,
+#actions .actions_target .action_target label .sprite_160x160_defend,
+#actions .actions_ability .action_ability label .sprite_160x160_defend {
+  background-position: -1280px 1px;
+}
+#actions .actions_switch .action_switch label .sprite_160x160_defeat,
+#actions .actions_scan .action_scan label .sprite_160x160_defeat,
+#actions .actions_target .action_target label .sprite_160x160_defeat,
+#actions .actions_ability .action_ability label .sprite_160x160_defeat {
+  background-position: -640px 1px;
+}
+
+#actions .actions_switch .action_switch label .multi,
+#actions .actions_scan .action_scan label .multi,
+#actions .actions_target .action_target label .multi,
+#actions .actions_ability .action_ability label .multi {
+  text-align: left;
+  margin: 7px 5px 0 5px;
+}
+#actions .actions_switch .action_switch label .maintext,
+#actions .actions_scan .action_scan label .maintext,
+#actions .actions_target .action_target label .maintext,
+#actions .actions_ability .action_ability label .maintext,
+#actions .actions_switch .action_switch label .subtext,
+#actions .actions_scan .action_scan label .subtext,
+#actions .actions_target .action_target label .subtext,
+#actions .actions_ability .action_ability label .subtext {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#actions .actions_switch .action_switch label .maintext,
+#actions .actions_scan .action_scan label .maintext,
+#actions .actions_target .action_target label .maintext,
+#actions .actions_ability .action_ability label .maintext {
+  margin-bottom: 0;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: bold;
+}
+#actions .actions_switch .action_switch label .subtext,
+#actions .actions_scan .action_scan label .subtext,
+#actions .actions_target .action_target label .subtext,
+#actions .actions_ability .action_ability label .subtext {
+  margin-bottom: 0;
+  font-size: 9px;
+  line-height: 13px;
+  opacity: 0.8;
+}
+#actions .actions_option .action_option label,
+#actions .actions_settings .action_setting label,
+#actions .actions_settings_eventTimeout .action_setting label,
+#actions .actions_settings_volumeControl .action_setting label,
+#actions .actions_settings_autoScan .action_setting label {
+  padding-left: 0;
+  width: auto;
+}
+#actions .block_4,
+#actions .block_8 {
+  margin-right: 0 !important;
+  width: 184px !important;
+}
+#actions .block_4 label,
+#actions .block_8 label {
+
+}
+#actions .actions_option .block_4 label,
+#actions .actions_option .block_8 label,
+#actions .actions_settings .block_4 label,
+#actions .actions_settings .block_8 label,
+#actions .actions_settings_eventTimeout .block_4 label,
+#actions .actions_settings_eventTimeout .block_8 label,
+#actions .actions_settings_volumeControl .block_4 label,
+#actions .actions_settings_volumeControl .block_8 label,
+#actions .actions_settings_autoScan .block_4 label,
+#actions .actions_settings_autoScan .block_8 label {
+
+}
+#actions .block_5,
+#actions .block_6,
+#actions .block_7,
+#actions .block_8 {
+  margin-bottom: 0 !important;
+}
+
+
+/* WINDOW SIZE STYLES */
+
+body.windowFlag_landscapeMode {
+  /*width: 1024px;*/ 
+}
+body.windowFlag_landscapeMode #prototype,
+body.windowFlag_landscapeMode #window,
+body.windowFlag_landscapeMode #window iframe,
+body.windowFlag_landscapeMode #battle {
+  width: 1024px;  
+}
+body.windowFlag_landscapeMode #prototype .banner {
+  width: 1004px;
+}
+body.windowFlag_landscapeMode #prototype .header,
+body.windowFlag_landscapeMode #prototype .option {
+  width: 1004px;
+}
+body.windowFlag_landscapeMode #prototype .option_prototype-4 {
+  /*width: 1004px;*/
+}
+body.windowFlag_landscapeMode #prototype .block_2, 
+body.windowFlag_landscapeMode #prototype .block_4, 
+body.windowFlag_landscapeMode #prototype .block_6, 
+body.windowFlag_landscapeMode #prototype .block_8, 
+body.windowFlag_landscapeMode #prototype .block_10 {
+  /*width: 499px;*/
+}
+body.windowFlag_landscapeMode #canvas {
+  width: 1024px;
+}
+body.windowFlag_landscapeMode #canvas .event {
+  width: 1006px;
+}
+
+body.windowFlag_landscapeMode #events .event_wrapper,
+body.mobileFlag_landscapeMode #events .event_wrapper {
+  left: 235px;
+}
+
+body.windowFlag_landscapeMode #canvas .clearback {
+  width: 750px;
+  border-color: transparent;
+  box-shadow: 0 0 0 transparent;
+  -moz-box-shadow: 0 0 0 transparent;
+  -webkit-box-shadow: 0 0 0 transparent;
+  left: auto;
+  right: 124px;
+  overflow: visible;
+}
+body.windowFlag_landscapeMode #canvas .clearback .robot_details_left {
+  left: -124px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .robot_details_right {
+  right: -124px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .sprite_mugshot_left {
+  left: -116px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .sprite_80x80_mugshot_left {
+  left: -136px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .sprite_160x160_mugshot_left {
+  left: -163px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .sprite_mugshot_right {
+  right: -116px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .sprite_80x80_mugshot_right {
+  right: -136px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .sprite_160x160_mugshot_right {
+  right: -163px;
+}
+body.windowFlag_landscapeMode #canvas .clearback .ability_overlay, 
+body.windowFlag_landscapeMode #canvas .clearback .scan_overlay {
+  width: auto;
+  left: -130px;
+  right: -130px;
+}
+body.windowFlag_landscapeMode #console {
+  width: 1024px;
+}
+body.windowFlag_landscapeMode #actions {
+  width: 1024px;  
+}
+body.windowFlag_landscapeMode #actions .action_back label {
+  width: auto;
+}
+body.windowFlag_landscapeMode #actions .actions_start .action_start label {
+  width: auto;
+}
+body.windowFlag_landscapeMode #actions .actions_loading .action_loading label {
+  width: auto;
+}
+body.windowFlag_landscapeMode #actions .actions_event .action_continue label {
+  width: auto;
+}
+body.windowFlag_landscapeMode #actions .actions_battle .action_scan,
+body.windowFlag_landscapeMode #actions .actions_battle .action_item, 
+body.windowFlag_landscapeMode #actions .actions_battle .action_target, 
+body.windowFlag_landscapeMode #actions .actions_battle .action_option, 
+body.windowFlag_landscapeMode #actions .actions_battle .action_switch {
+  width: 245px;
+}
+body.windowFlag_landscapeMode #actions .actions_battle .action_scan label, 
+body.windowFlag_landscapeMode #actions .actions_battle .action_target label, 
+body.windowFlag_landscapeMode #actions .actions_battle .action_option label, 
+body.windowFlag_landscapeMode #actions .actions_battle .action_switch label {
+  width: auto;
+}
+body.windowFlag_landscapeMode #actions .actions_battle .action_switch label {
+  width: auto;
+}
+
+body.windowFlag_landscapeMode #actions .actions_option .action_option,
+body.windowFlag_landscapeMode #actions .actions_settings .action_setting, 
+body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting,
+body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting,
+body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting,
+body.windowFlag_landscapeMode #actions .actions_switch .action_switch, 
+body.windowFlag_landscapeMode #actions .actions_scan .action_scan, 
+body.windowFlag_landscapeMode #actions .actions_target .action_target, 
+body.windowFlag_landscapeMode #actions .actions_ability .action_ability {
+  width: 245px;
+}
+body.windowFlag_landscapeMode #actions .actions_option .action_option label,
+body.windowFlag_landscapeMode #actions .actions_settings .action_setting label,
+body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
+body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting label,
+body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label,  
+body.windowFlag_landscapeMode #actions .actions_scan .action_scan label,
+body.windowFlag_landscapeMode #actions .actions_target .action_target label {
+  width: auto;
+}
+body.windowFlag_landscapeMode #actions .actions_scan .action_switch label {
+  width: auto;
+}
+
+body.windowFlag_landscapeMode #actions .actions_battle .action_ability label {
+  width: auto;
+}
+
+body.windowFlag_landscapeMode #actions .actions_option .action_option label, 
+body.windowFlag_landscapeMode #actions .actions_option .action_option label, 
+body.windowFlag_landscapeMode #actions .actions_settings .action_setting label, 
+body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
+body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting label,
+body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label,  
+body.windowFlag_landscapeMode #actions .actions_scan .action_scan label, 
+body.windowFlag_landscapeMode #actions .actions_target .action_target label, 
+body.windowFlag_landscapeMode #actions .actions_ability .action_ability label,
+body.windowFlag_landscapeMode #actions .actions_switch .action_switch label {
+  width: auto;
+}
+body.windowFlag_landscapeMode #actions .actions_option .action_option label,
+body.windowFlag_landscapeMode #actions .actions_settings .action_setting label,
+body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
+body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting label,
+body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label {
+  width: auto;
+}
+
+body.windowFlag_landscapeMode #actions .block_4, 
+body.windowFlag_landscapeMode #actions .block_8 {
+  width: 248px !important;
+}
+body.windowFlag_landscapeMode #actions .block_4 label, 
+body.windowFlag_landscapeMode #actions .block_8 label {
+
+}
+body.windowFlag_landscapeMode #actions .actions_option .block_4 label, 
+body.windowFlag_landscapeMode #actions .actions_option .block_8 label,
+body.windowFlag_landscapeMode #actions .actions_settings .block_4 label, 
+body.windowFlag_landscapeMode #actions .actions_settings .block_8 label,
+body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .block_4 label, 
+body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .block_8 label,
+body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .block_4 label,
+body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .block_8 label,
+body.windowFlag_landscapeMode #actions .actions_settings_autoScan .block_4 label, 
+body.windowFlag_landscapeMode #actions .actions_settings_autoScan .block_8 label {
+
+}
+
+/* -- DEBUG DEBUG DEBUG DEBUG DEBUG -- */
+
+/*
+#connect {
+  display: block;
+  position: relative;
+  bottom: 545px;
+  width: 995px;
+  height: 300px;
+  border-color: rgba(200, 200, 200, 0.3);
+  background-color: rgba(125, 125, 125, 0.2);
+}
+*/

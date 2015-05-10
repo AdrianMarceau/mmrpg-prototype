@@ -1,0 +1,330 @@
+body {
+  background-color: #262626; /*#000000;*/
+    /*background-color: blue;*/
+  margin: 0;
+  padding: 0;
+  /*height: 1004px;*/
+}
+body.index {
+  background-image: none;
+  background-color: #262626; 
+}
+body.battle {
+  background-color: transparent;
+}
+
+#window {
+  margin: 0;
+  /*height: 1004px;*/
+  padding: 0;
+  border: 0 none transparent;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  box-shadow: 0 0 0 transparent;
+  -moz-box-shadow: 0 0 0 transparent;
+  -website-box-shadow: 0 0 0 transparent;
+  background-color: transparent;
+}
+#window iframe {
+  display: block;
+  margin: 0;
+  /*height: 1004px;*/
+  padding: 0;
+  border: 0 none transparent;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+#animate {
+  top: 11px;
+}
+
+#battle {
+  margin: 0 auto;
+  /*height: 1004px;*/
+  border: 0 none transparent;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  background-color: transparent;
+}
+#canvas {
+  background-color: transparent;
+}
+#canvas .event {
+
+}
+#console {
+  background-color: transparent;
+}
+#console .wrapper {
+  overflow: scroll;
+  overflow-x: hidden;
+}
+#actions { 
+  background-color: transparent;
+}
+#actions .button_disabled {
+  /* opacity: 0.5; */
+}
+#events #messages {
+  margin-right: 0;
+  padding-right: 0;
+}
+
+
+
+body.mobileFlag_portraitMode {
+  height: 1004px;
+  width: 768px; 
+}
+body.mobileFlag_portraitMode_notFullscreen {
+  height: 876px;
+}
+body.mobileFlag_portraitMode #window,
+body.mobileFlag_portraitMode #window iframe,
+body.mobileFlag_portraitMode #battle {
+  height: 1004px;
+  width: 768px;  
+}
+body.mobileFlag_portraitMode_notFullscreen #window,
+body.mobileFlag_portraitMode_notFullscreen #window iframe,
+body.mobileFlag_portraitMode_notFullscreen #battle {
+  height: 876px;  
+}
+body.mobileFlag_portraitMode #canvas {
+  width: 768px;
+}
+body.mobileFlag_portraitMode #canvas .event {
+  width: 750px;
+}
+body.mobileFlag_portraitMode #console {
+  height: 512px;
+  width: 768px;  
+}
+body.mobileFlag_portraitMode_notFullscreen #console {
+  height: 384px; 
+}
+body.mobileFlag_portraitMode #actions {
+  width: 768px;  
+}
+body.mobileFlag_portraitMode #actions #actions_battle .action_scan,
+body.mobileFlag_portraitMode #actions #actions_battle .action_item, 
+body.mobileFlag_portraitMode #actions #actions_battle .action_target, 
+body.mobileFlag_portraitMode #actions #actions_battle .action_option,
+body.mobileFlag_portraitMode #actions #actions_battle .action_switch {
+  width: 181px;
+}
+body.mobileFlag_portraitMode #actions #actions_option .action_option,
+body.mobileFlag_portraitMode #actions #actions_settings .action_settings,
+body.mobileFlag_portraitMode #actions #actions_settings_eventTimeout .action_settings, 
+body.mobileFlag_portraitMode #actions #actions_settings_autoScan .action_settings, 
+body.mobileFlag_portraitMode #actions #actions_switch .action_switch, 
+body.mobileFlag_portraitMode #actions #actions_scan .action_scan, 
+body.mobileFlag_portraitMode #actions #actions_item .action_item,
+body.mobileFlag_portraitMode #actions #actions_target .action_target, 
+body.mobileFlag_portraitMode #actions #actions_ability .action_ability {
+  width: 181px;
+}
+body.mobileFlag_portraitMode #actions .block_4, 
+body.mobileFlag_portraitMode #actions .block_8 {
+  width: 184px !important;
+}
+
+
+
+body.mobileFlag_landscapeMode {
+  height: 748px;
+  width: 1024px; 
+}
+body.mobileFlag_landscapeMode_notFullscreen {
+  height: 685px;
+}
+body.mobileFlag_landscapeMode #window,
+body.mobileFlag_landscapeMode #window iframe,
+body.mobileFlag_landscapeMode #battle {
+  height: 748px;
+  width: 1024px;  
+}
+body.mobileFlag_landscapeMode_notFullscreen #window,
+body.mobileFlag_landscapeMode_notFullscreen #window iframe,
+body.mobileFlag_landscapeMode_notFullscreen #battle {
+  height: 685px;
+}
+body.mobileFlag_landscapeMode #canvas {
+  width: 1024px;
+}
+body.mobileFlag_landscapeMode #canvas .event {
+  width: 1006px;
+}
+body.mobileFlag_landscapeMode #events .event_wrapper {
+  left: 250px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback {
+  width: 750px;
+  border-color: transparent;
+  box-shadow: 0 0 0 transparent;
+  -moz-box-shadow: 0 0 0 transparent;
+  -webkit-box-shadow: 0 0 0 transparent;
+  left: auto;
+  right: 124px;
+  overflow: visible;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .robot_details_left {
+  left: -124px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .robot_details_right {
+  right: -124px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .sprite_mugshot_left {
+  left: -123px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .sprite_mugshot_right {
+  right: -123px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .ability_overlay, 
+body.mobileFlag_landscapeMode #canvas .clearback .scan_overlay {
+  width: auto;
+  left: -130px;
+  right: -130px;
+}
+body.mobileFlag_landscapeMode #canvas .canvas_overlay_footer {
+  left: -130px;
+  right: -130px;
+  border-radius: 0 0 5px 5px;
+  -moz-border-radius: 0 0 5px 5px;
+  -webkit-border-radius: 0 0 5px 5px;
+}
+
+body.mobileFlag_landscapeMode #console {
+    height: 256px;
+  width: 1024px;
+}
+body.mobileFlag_landscapeMode_notFullscreen #console {
+  height: 191px;
+}
+body.mobileFlag_landscapeMode #actions {
+  width: 1024px;  
+}
+body.mobileFlag_landscapeMode #actions .action_back label {
+  width: auto;
+}
+body.mobileFlag_landscapeMode #actions .actions_start .action_start label {
+  width: auto;
+}
+body.mobileFlag_landscapeMode #actions .actions_loading .action_loading label {
+  width: auto;
+}
+body.mobileFlag_landscapeMode #actions .actions_event .action_continue label {
+  width: auto;
+}
+body.mobileFlag_landscapeMode #actions .actions_battle .action_scan,
+body.mobileFlag_landscapeMode #actions .actions_battle .action_item, 
+body.mobileFlag_landscapeMode #actions .actions_battle .action_target, 
+body.mobileFlag_landscapeMode #actions .actions_battle .action_option, 
+body.mobileFlag_landscapeMode #actions .actions_battle .action_switch {
+  width: 245px;
+}
+body.mobileFlag_landscapeMode #actions .actions_battle .action_scan label,
+body.mobileFlag_landscapeMode #actions .actions_battle .action_item label, 
+body.mobileFlag_landscapeMode #actions .actions_battle .action_target label, 
+body.mobileFlag_landscapeMode #actions .actions_battle .action_option label, 
+body.mobileFlag_landscapeMode #actions .actions_battle .action_switch label {
+  width: auto;
+}
+body.mobileFlag_landscapeMode #actions .actions_battle .action_switch label {
+  width: auto;
+}
+
+body.mobileFlag_landscapeMode #actions .actions_option .action_option,
+body.mobileFlag_landscapeMode #actions .actions_settings .action_setting, 
+body.mobileFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting,
+body.mobileFlag_landscapeMode #actions .actions_settings_autoScan .action_setting,
+body.mobileFlag_landscapeMode #actions .actions_switch .action_switch, 
+body.mobileFlag_landscapeMode #actions .actions_scan .action_scan, 
+body.mobileFlag_landscapeMode #actions .actions_item .action_item, 
+body.mobileFlag_landscapeMode #actions .actions_item .action_ability,
+body.mobileFlag_landscapeMode #actions .actions_target .action_target, 
+body.mobileFlag_landscapeMode #actions .actions_ability .action_ability {
+  width: 245px;
+}
+body.mobileFlag_landscapeMode #actions .actions_option .action_option label,
+body.mobileFlag_landscapeMode #actions .actions_settings .action_setting label,
+body.mobileFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
+body.mobileFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label,  
+body.mobileFlag_landscapeMode #actions .actions_scan .action_scan label,  
+body.mobileFlag_landscapeMode #actions .actions_item .action_item label,
+body.mobileFlag_landscapeMode #actions .actions_target .action_target label {
+  width: auto;
+}
+body.mobileFlag_landscapeMode #actions .actions_scan .action_switch label {
+  width: auto;
+}
+
+body.mobileFlag_landscapeMode #actions .actions_battle .action_ability label {
+  width: auto;
+}
+
+body.mobileFlag_landscapeMode #actions .actions_option .action_option label, 
+body.mobileFlag_landscapeMode #actions .actions_option .action_option label, 
+body.mobileFlag_landscapeMode #actions .actions_settings .action_setting label, 
+body.mobileFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
+body.mobileFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label,  
+body.mobileFlag_landscapeMode #actions .actions_scan .action_scan label,   
+body.mobileFlag_landscapeMode #actions .actions_item .action_item label, 
+body.mobileFlag_landscapeMode #actions .actions_target .action_target label, 
+body.mobileFlag_landscapeMode #actions .actions_ability .action_ability label,
+body.mobileFlag_landscapeMode #actions .actions_switch .action_switch label {
+  width: auto;
+}
+body.mobileFlag_landscapeMode #actions .actions_option .action_option label,
+body.mobileFlag_landscapeMode #actions .actions_settings .action_setting label,
+body.mobileFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
+body.mobileFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label {
+  width: auto;
+}
+
+body.mobileFlag_landscapeMode #actions .block_4, 
+body.mobileFlag_landscapeMode #actions .block_8 {
+  width: 248px !important;
+}
+body.mobileFlag_landscapeMode #actions .block_4 label, 
+body.mobileFlag_landscapeMode #actions .block_8 label {
+
+}
+body.mobileFlag_landscapeMode #actions .actions_option .block_4 label, 
+body.mobileFlag_landscapeMode #actions .actions_option .block_8 label,
+body.mobileFlag_landscapeMode #actions .actions_settings .block_4 label, 
+body.mobileFlag_landscapeMode #actions .actions_settings .block_8 label,
+body.mobileFlag_landscapeMode #actions .actions_settings_eventTimeout .block_4 label, 
+body.mobileFlag_landscapeMode #actions .actions_settings_eventTimeout .block_8 label,
+body.mobileFlag_landscapeMode #actions .actions_settings_autoScan .block_4 label, 
+body.mobileFlag_landscapeMode #actions .actions_settings_autoScan .block_8 label {
+
+}
+
+body.mobileFlag_landscapeMode #canvas .clearback .robot_details_left {
+  left: -124px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .robot_details_right {
+  right: -124px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .sprite_mugshot_left {
+  left: -116px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .sprite_80x80_mugshot_left {
+  left: -143px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .sprite_160x160_mugshot_left {
+  left: -163px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .sprite_mugshot_right {
+  right: -116px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .sprite_80x80_mugshot_right {
+  right: -136px;
+}
+body.mobileFlag_landscapeMode #canvas .clearback .sprite_160x160_mugshot_right {
+  right: -163px;
+}

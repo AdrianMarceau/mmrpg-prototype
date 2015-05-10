@@ -1,0 +1,15 @@
+body {
+  width: 768px !important;
+}
+#window {
+  border-left: 0 none transparent;
+  border-right: 0 none transparent;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+}
+#music {
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+}

@@ -1,0 +1,565 @@
+#mmrpg,
+#prototype {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  width: 762px;
+  background-color: #262626;
+}
+#mmrpg.windowFlag_landscapeMode,
+#mmrpg.mobileFlag_landscapeMode,
+#mmrpg.windowFlag_landscapeMode #prototype,
+#mmrpg.mobileFlag_landscapeMode #prototype {
+  width: 1024px;
+}
+#shop .header {
+  width: 100%;
+}
+#shop #canvas {
+  display: block;
+  float: none;
+  margin: 0 auto 2px;
+  height: auto;
+  width: 100%;
+  overflow: hidden; 
+}
+#shop #canvas .wrapper {
+  display: block;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  min-height: 78px;
+  width: auto;
+  padding: 4px;
+  margin: 0 0 4px;
+  top: auto;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  opacity: 0.30;
+  filter: alpha(opacity=30);
+  cursor: pointer;
+  _cursor: hand;
+}
+#shop #canvas .wrapper:hover {
+  opacity: 0.90;
+  filter: alpha(opacity=90);
+}
+#shop #canvas .wrapper_active {
+  opacity: 1.00;
+  filter: alpha(opacity=100);
+}
+#shop #canvas .wrapper_header {
+  display: block;
+  clear: both;
+  margin: 0 auto 2px;
+  padding: 0 6px;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  color: #FFFFFF;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#shop #canvas .wrapper_left {
+  /*float: left;*/
+}
+#shop #canvas .wrapper_right {
+  /*float: left;
+  margin-left: 2px;*/
+}
+#shop #canvas .wrapper .event {
+  width: 100%;
+}
+#shop #canvas .sprite_player {
+  position: static;
+  float: left;
+  height: 50px;
+  width: 50px;
+  background-color: #000000;
+  border: 1px solid rgba(0, 0, 0, 0.6) !important;
+  border-radius: 0.25em;
+  -moz-border-radius: 0.25em;
+  -webkit-border-radius: 0.25em;
+  margin: 2px 2px 0;
+  background-position: -8px -12px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+#shop #canvas .wrapper_left .sprite_player {
+
+}
+#shop #canvas .wrapper_right .sprite_player {
+
+}
+
+#shop #canvas .options {
+  display: block;
+  position: absolute;
+  bottom: -2px;
+  left: -2px;
+  width: 46px;
+  height: 17px;
+  border: 1px solid rgb(36,36,36);
+  border-width: 1px 0 0 1px;
+  font-size: 6px;
+  line-height: 12px;
+  letter-spacing: 2px;
+  text-align: right;
+  text-transform: none;
+  padding: 1px 16px 1px 6px;
+  border-radius: 0 5em 0 0;
+  -moz-border-radius: 0 5em 0 0;
+  -webkit-border-radius: 0 5em 0 0;
+  background-color: rgb(43,43,43);
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgb(43,43,43)),
+      color-stop(0.75, rgb(41,41,41))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgb(43,43,43) 15%,
+      rgb(41,41,41) 75%
+  );
+  text-shadow: 1px 1px 4px #333333;
+  cursor: pointer;
+  _cursor: hand;
+  box-shadow: 0 1px 2px #191919;
+  -moz-box-shadow: 0 1px 2px #191919;
+  -webkit-box-shadow: 0 1px 2px #191919;
+  overflow: hidden;
+  z-index: 30;
+  text-decoration: none;
+}
+
+#shop #console {
+  /* width: 100% !important; */
+  overflow: visible;
+  height: auto;
+  float: none;
+  margin: 0 auto 2px;
+  width: 100% !important;
+  min-height: 230px;  
+}
+#shop #console .event {
+  margin: 0;
+  min-height: 272px;  
+}
+#shop #console .event_hidden {
+  display: none;
+}
+#shop #console .event_visible {
+  
+}
+#shop #console .event table td.right {
+  line-height: 21px;
+}
+#shop #console .event .player_name {
+  display: block; 
+  float: right;
+  padding: 1px 0; 
+  margin: 2px 0 0;
+  width: 135px; 
+  text-align: center; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+  height: 13px;
+  cursor: pointer;
+  _cursor: hand;
+}
+#shop #console .event .player_name:hover {
+  background-color: #515151;
+}
+#shop #console .event .player_name label {
+  display: block; 
+  margin: 0;
+  padding-left: 10px;
+  width: auto; 
+  text-align: center; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+  height: 13px;
+  cursor: pointer;
+  _cursor: hand;
+  pointer-events:none;
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: 0 -3px;
+  background-size: 17px 17px;
+}
+#shop #console .event select.player_name,
+#shop #console .event select.player_name:hover {
+  display: block; 
+  margin: 0;
+  padding: 2px 3px 2px 8px; 
+  width: 135px; 
+  text-align: left;
+  overflow: hidden; 
+  white-space: nowrap;
+  height: 13px;
+  position: relative;
+  top: -16px;
+  left: -2px;
+  border: 0 none transparent;
+  background-color: rgb(43,43,43);
+  color: #FFFFFF;
+  opacity: 0;
+  font-size: 12px;
+  line-height: 19px;
+  height: 19px;
+  cursor: pointer;
+  _cursor: hand; 
+  text-decoration: none;
+  font-weight: normal;
+  /*
+  background-color: red;
+  opacity: 0.30;
+  */ 
+}
+#shop #console .event select.player_name option {
+  text-align: center;
+}
+#shop #console .event .player_name label .arrow {
+  display: block; 
+  width: auto;
+  height: auto;
+  text-align: center; 
+  cursor: pointer;
+  _cursor: hand;  
+  color: #FFFFFF;
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  font-size: 8px;
+  line-height: 8px;
+  opacity: 0.75;
+  filter: alpha(opacity=75);
+}
+#shop #console .event .player_name:hover label .arrow {   
+  opacity: 1.00;
+  filter: alpha(opacity=100);
+}
+
+#shop #console .event .player_level_reset {
+  color: #FFFFFF !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+#shop #console .event td.left {
+  padding-right: 5px;
+  text-align: left;
+}
+#shop #console .event td.right {
+  padding-left: 5px;
+  text-align: left;
+}
+#shop #console .event .item_header,
+#shop #console .event .field_header {
+  display: block; 
+  float: none;
+  clear: both; 
+  text-align: left;
+  font-size: 12px;
+}
+#shop #console .event .item_container,
+#shop #console .event .field_container {
+  display: block; 
+  float: none;
+  clear: both; 
+  padding-top: 2px;
+  width: auto; 
+  text-align: left; 
+  overflow: hidden; 
+  height: 50px;
+}
+
+#shop #console .event .shop_tabs_links {
+  display: block;
+  padding: 3px 0 6px;
+  margin: 0 auto 6px;
+  overflow: hidden; 
+}
+#shop #console .event .shop_tabs_links .tab_link,
+#shop #console .event .shop_tabs_links .tab_spacer,
+#shop #console .event .shop_tabs_links .tab_line {
+  display: block;
+  float: left;
+  width: 20%;
+  margin: 0 -1px 0 0;
+  padding: 0;
+  border: 1px solid #1F1F1F;
+  border-radius: 5px 5px 0 0;
+  -moz-border-radius: 5px 5px 0 0;
+  -webkit-border-radius: 5px 5px 0 0;
+  box-shadow: 1px -1px 1px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 1px -1px 1px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 1px -1px 1px rgba(0, 0, 0, 0.2);  
+  text-align: center;
+  text-decoration: none;
+  color: #FFFFFF;
+}
+#shop #console .event .shop_tabs_links .tab_link .inset,
+#shop #console .event .shop_tabs_links .tab_spacer .inset,
+#shop #console .event .shop_tabs_links .tab_line .inset {
+  display: block;
+  padding: 2px 6px 0;
+}
+#shop #console .event .shop_tabs_links .tab_link {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+#shop #console .event .shop_tabs_links .tab_link:hover {
+  background-color: rgba(0, 0, 0, 0);
+}
+#shop #console .event .shop_tabs_links .tab_link_active {
+  background-color: rgba(0, 0, 0, 0);
+  border-bottom-color: transparent;
+  text-decoration: underline;
+}
+#shop #console .event .shop_tabs_links .tab_spacer,
+#shop #console .event .shop_tabs_links .tab_line {
+  width: 1%;
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  -moz-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  -webkit-box-shadow: 0 0 0 rgba(0, 0, 0, 0);  
+}
+#shop #console .event .shop_tabs_links .tab_line {
+  width: 56%;
+}
+
+
+#shop #console .event .shop_tabs_containers {
+
+}
+#shop #console .event .shop_tabs_containers .tab_container {
+  display: none;
+}
+#shop #console .event .shop_tabs_containers .tab_container_active {
+  display: block;
+}
+
+#shop #console .event .shop_quote {
+  font-size: 11px;
+  line-height: 15px;
+  font-style: italic;
+  margin: 0 1% 6px 0;
+  padding: 2px 3px;
+  background-color: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.025);
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  
+}
+
+#shop #console .event .item_cell,
+#shop #console .event .item_confirm {
+  
+}
+#shop #console .event .item_cell_disabled {
+  opacity: 0.15;
+  filter: alpha(opacity=15);
+}
+#shop #console .event .item_cell_disabled .buy_button,
+#shop #console .event .item_cell_disabled .sell_button {
+  cursor: default;
+}
+#shop #console .event .item_cell_confirm {
+  padding: 6px;
+}
+#shop #console .event .item_cell_confirm .placeholder {
+  color: #565656;
+  text-align: center;
+  padding-bottom: 8px;
+}
+#shop #console .event .item_cell_confirm .success {
+  color: #65AF5B;
+  text-align: center;
+  padding-bottom: 8px;
+}
+#shop #console .event .item_cell_confirm .success .zenny {
+  display: block; 
+  font-size: 13px; 
+  line-height: 13px; 
+}
+#shop #console .event .this_sprite .sprite {
+  background-position: 0 0;
+}
+#shop #console .event .this_sprite:hover .sprite,
+#shop #console .event .this_sprite .sprite:hover {
+  background-position: -40px 0;
+}
+#shop #console .event .item_name,
+#shop #console .event .ability_name,
+#shop #console .event .field_name,
+#shop #console .event .buy_button,
+#shop #console .event .sell_button,
+#shop #console .event .confirm_button,
+#shop #console .event .cancel_button,
+#shop #console .event .player_button,
+#shop #console .event .item_price,
+#shop #console .event .item_quantity,
+#shop #console .event .item_owned {
+  display: block; 
+  float: left;
+  padding: 0 6px; 
+  margin: 2px auto 3px 0;
+  height: auto;
+  width: auto; 
+  max-width: 50%;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: left; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+  border-width: 1px;
+  border-style: solid;  
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  color: #FFFFFF;
+  text-decoration: none; 
+  cursor: default; 
+}
+#shop #console .event .item_cell_confirm .item_name {
+  float: right;
+  margin-right: 30px;
+}
+#shop #console .event .buy_button,
+#shop #console .event .sell_button,
+#shop #console .event .confirm_button,
+#shop #console .event .cancel_button,
+#shop #console .event .player_button {
+  float: right;
+  width: 30px;
+  text-transform: uppercase;
+  font-size: 10px;
+  text-align: center;
+  cursor: pointer;
+  _cursor: hand;
+  opacity: 0.9;
+  filter: alpha(opacity=90);
+  margin-left: 10px;
+}
+#shop #console .event .buy_button:hover,
+#shop #console .event .sell_button:hover {
+  opacity: 1.0;
+  filter: alpha(opacity=100);
+}
+#shop #console .event .confirm_button,
+#shop #console .event .cancel_button,
+#shop #console .event .player_button {
+  margin-left: 20px;
+  width: auto;
+}
+#shop #console .event .cancel_button {
+  margin-left: 4px;
+}
+#shop #console .event .player_button {
+  margin-left: 4px;
+}
+#shop #console .event .player_button_1 {
+  /*margin-left: 20px;*/
+}
+#shop #console .event .player_button_disabled,
+#shop #console .event .confirm_button_disabled {
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+  cursor: default;
+}
+#shop #console .event .item_price,
+#shop #console .event .item_quantity,
+#shop #console .event .item_owned {
+  float: right;
+  font-size: 11px;
+  color: #FFFFFF;
+  border: 0 none transparent;
+  padding-right: 0;
+}
+#shop #console .event .item_cell_confirm .item_price,
+#shop #console .event .item_cell_confirm .item_quantity,
+#shop #console .event .item_cell_confirm .item_owned {
+  margin-left: 10px;
+}
+#shop #console .event .item_quantity {
+  width: 30px;
+  text-align: right;
+}
+#shop #console .event .item_owned {
+  width: 52px;
+  text-align: right;
+}
+#shop #console .event .item_owned .player_type {
+  font-size: 9px;
+}
+
+#shop #console .event .buy_button_header,
+#shop #console .event .sell_button_header,
+#shop #console .event .confirm_button_header,
+#shop #console .event .cancel_button_header {
+  border-color: transparent;
+  background-color: transparent;
+  visibility: hidden;
+  margin-bottom: 0;
+  color: #868686;
+  line-height: 10px;
+}
+#shop #console .event .item_price_header,
+#shop #console .event .item_quantity_header,
+#shop #console .event .item_owned_header {
+  font-size: 10px;
+  line-height: 10px;
+  text-align: right;
+  margin-bottom: 0;
+  color: #868686;
+  
+}
+
+#shop #console .header {
+  height: auto;
+  width: auto;
+  float: none;
+  box-shadow: 0 0 0 transparent;
+  background-image: none;
+  font-size: 10px;
+  padding: 5px 8px;
+  color: #FFFFFF;
+  position: relative;
+}
+#shop #console .header .player_type {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  padding: 2px 6px;  
+  background-color: rgba(0, 0, 0, 0.25) !important;
+  border-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+/*
+ * MOBILE OVERRIDE STYLES
+ */
+ 
+body.mobileFlag_portraitMode #prototype #canvas,
+body.mobileFlag_landscapeMode #prototype #canvas {
+  width: 100% !important;
+} 

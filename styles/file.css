@@ -1,0 +1,258 @@
+#mmrpg,
+#prototype {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  width: 762px;
+}
+#mmrpg.windowFlag_landscapeMode,
+#mmrpg.mobileFlag_landscapeMode,
+#mmrpg.windowFlag_landscapeMode #prototype,
+#mmrpg.mobileFlag_landscapeMode #prototype {
+  width: 1024px;
+}
+#prototype .header {
+  width: 100%;
+}
+#prototype .menu .wrapper {
+  display: block;
+  margin-bottom: 5px;
+  border: 2px solid rgb(55,55,55);
+  text-align: left;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 1px;
+  text-decoration: none;
+  padding: 14px;
+  border-radius: 0.75em;
+  -moz-border-radius: 0.75em;
+  -webkit-border-radius: 0.75em;
+  color: #FFFFFF;
+  background-position: center top;
+  background-color: rgb(65,65,65);
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgb(65,65,65)),
+      color-stop(0.75, rgb(71,71,71))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgb(65,65,65) 15%,
+      rgb(71,71,71) 75%
+  );
+  text-shadow: 1px 1px 4px #333333;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  box-shadow: 0 1px 5px #000000;
+  -moz-box-shadow: 0 1px 5px #000000;
+  -website-box-shadow: 0 1px 5px #000000;  
+  overflow: hidden;
+}
+#prototype .menu .intro {
+  margin: 0 auto 16px;
+}
+#prototype .menu .intro a {
+  color: #FFFFFF;
+  cursor: pointer;
+  _cursor: hand;
+}
+#prototype .menu .intro a:hover {
+  text-decoration: underline;
+}
+#prototype .menu .messages_wrapper,
+#prototype .menu .fields_wrapper,
+#prototype .menu .buttons_wrapper {
+  float: none;
+  clear: left;
+  overflow: hidden;
+  margin: 0;
+}
+#prototype .menu .messages_wrapper {
+  margin: 10px 0 20px;
+}
+#prototype .menu .messages_wrapper .error,
+#prototype .menu .messages_wrapper .success,
+#prototype .menu .messages_wrapper .help {
+  display: block;
+  font-size: 12px;
+  line-height: 16px;
+}
+#prototype .menu .messages_wrapper .error a,
+#prototype .menu .messages_wrapper .success a,
+#prototype .menu .messages_wrapper .help a {
+  text-decoration: none;
+}
+#prototype .menu .messages_wrapper .error a:hover,
+#prototype .menu .messages_wrapper .success a:hover,
+#prototype .menu .messages_wrapper .help a:hover {
+  text-decoration: underline;
+}
+#prototype .menu .messages_wrapper .error,
+#prototype .menu .messages_wrapper .error a {
+  color: #F75656;
+}
+#prototype .menu .messages_wrapper .success,
+#prototype .menu .messages_wrapper .success a {
+  color: #70D580;
+}
+#prototype .menu .messages_wrapper .help,
+#prototype .menu .messages_wrapper .help a {
+  color: #FDD56D;
+}
+#prototype .menu .buttons_wrapper {
+  padding-bottom: 4px;
+}
+#prototype .menu .label {
+  display: block;
+  clear: left;
+  height: 22px;
+  font-size: 12px;
+  line-height: 26px;
+  width: 120px;
+  float: left;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  
+}
+#prototype .menu .text,
+#prototype .menu .select {
+  display: block;
+  height: 22px;
+  width: 175px;
+  padding-left: 5px;
+  padding-right: 5px;
+  line-height: 22px;
+  float: left;
+  margin-bottom: 6px;
+  color: #F2F2F2;
+  border: 1px solid rgb(60, 60, 60);
+  background-color: rgb(39, 39, 39);
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;
+  box-sizing: border-box;
+}
+#prototype .menu .text[disabled],
+#prototype .menu .select[disabled] {
+  color: #969696;
+}
+#prototype .menu .captcha {
+  display: block;
+  padding: 4px 2px;
+  float: left;
+  margin-bottom: 2px;
+  color: #F2F2F2;
+  border: 1px solid rgb(60, 60, 60);
+  background-color: rgb(39, 39, 39);
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  overflow: hidden;
+}
+
+
+#prototype .menu .captcha {
+  display: block;
+  padding-left: 5px;
+  padding-right: 5px;
+  line-height: 22px;
+  float: left;
+  margin-bottom: 6px;
+}
+#prototype .menu .button {
+  display: block;
+  float: left;
+  display: block;
+  float: left;
+  height: 36px;
+  width: auto;
+  margin: 16px 6px 0 0;
+  veritcal-align: top;
+  border: 1px solid #262626;
+  font-size: 14px;
+  line-height: 30px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0 15px;
+  border-radius: 0.25em;
+  -moz-border-radius: 0.25em;
+  -webkit-border-radius: 0.25em;
+  color: #FFFFFF;
+  background-color: rgb(45,45,45);
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0.15, rgb(45,45,45)),
+      color-stop(0.75, rgb(51,51,51))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgb(45,45,45) 15%,
+      rgb(51,51,51) 75%
+  );
+  text-shadow: 1px 1px 4px #333333;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  -website-box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  _cursor: hand;
+}
+#prototype .menu .extra_options {
+  float: left;
+  overflow: hidden;
+  clear: left;
+  margin: 16px 0 0;
+  padding: 8px 0 0;
+  border-top: 1px dotted rgba(0, 0, 0, 0.15);
+  width: 100%;
+}
+#prototype .menu .reset_wrapper {
+  float: left; 
+  margin: 8px 4px 0 0; 
+  padding: 2px; 
+  text-align: center; 
+  background-color: rgba(0, 0, 0, 0.1); 
+  border: 1px solid rgba(0, 0, 0, 0.3); 
+  border-radius: 0.3em; 
+  -moz-border-radius: 0.3em; 
+  -webkit-border-radius: 0.3em;
+}
+#prototype .menu .reset_wrapper .wrapper_header {
+  font-size: 12px; 
+  line-height: 15px; 
+  background-color: rgba(0, 0, 0, 0.3); 
+  color: rgba(255, 255, 255, 0.5); 
+  border-radius: 0.3em; 
+  -moz-border-radius: 0.3em; 
+  -webkit-border-radius: 0.3em; 
+}
+#prototype .menu .reset_wrapper .button_reset {
+  margin: 6px;
+  font-size: 11px;
+  line-height: 11px;
+  height: 25px;
+  letter-spacing: 1px;
+  padding: 3px 9px;
+}
+#prototype .menu .wrapper_dr-light {
+  background-color: rgba(0, 0, 255, 0.15);
+  clear: left;
+}
+#prototype .menu .wrapper_dr-wily {
+  background-color: rgba(255, 0, 0, 0.15);
+}
+#prototype .menu .wrapper_dr-cossack {
+  background-color: rgba(200, 0, 200, 0.15);
+}
