@@ -9,7 +9,8 @@ unset($THIS_DOMAIN);
 $is_admin = in_array($_SERVER['REMOTE_ADDR'], explode(',', MMRPG_CONFIG_ADMIN_LIST)) ? true : false;
 define('MMRPG_CONFIG_ADMIN_MODE', $is_admin);
 
-// Define the cache path on this system
+// Define the cache date and path on this system
+define('MMRPG_CONFIG_CACHE_DATE', '20150510-01');
 define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'data/cache/');
 
 // Define the cache and index paths for battles
