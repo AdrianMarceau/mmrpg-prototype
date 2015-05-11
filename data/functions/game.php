@@ -1,4 +1,5 @@
 <?php
+
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Define a function for collecting the current GAME token
@@ -166,7 +167,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 
   // Only show the event if allowed by the function args
   if ($create_event){
-    
+
     // Generate the attributes and text variables for this robot unlock
     $robot_info_size = isset($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] * 2 : 40 * 2;
     $robot_info_size_token = $robot_info_size.'x'.$robot_info_size;
@@ -243,14 +244,14 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
     $temp_console_markup = '<p>Congratulations!  <strong>'.$player_info['player_name'].'</strong> unlocked <strong>'.$this_name.'</strong> as a playable character! <strong>'.$this_name.'</strong> is '.$this_best_attribute.' '.(!empty($robot_info['robot_core']) ? '<strong data-class="robot_type robot_type_'.$robot_info['robot_core'].'">'.ucfirst($robot_info['robot_core']).' Core</strong> ' : '<strong data-class="robot_type robot_type_none">Neutral Core</strong> ').'robot '.$this_first_appearance.'. <strong>'.$this_name.'</strong>&#39;s data was '.($temp_data_existed ? 'updated in ' : 'added to ' ).' the <strong>Robot Database</strong>.</p>';
     $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', mmrpg_robot::print_database_markup($robot_info, array('layout_style' => 'event'))).'</div></div></div>';
     //die(''.$this_robot_token.': '.$temp_console_markup);
-    
+
     $_SESSION[$session_token]['EVENTS'][] = array(
       'canvas_markup' => $temp_canvas_markup,
       'console_markup' => $temp_console_markup
       );
-    
+
   }
-  
+
   // Return true on success
   return true;
 }
