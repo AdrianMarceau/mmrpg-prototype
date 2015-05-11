@@ -70,12 +70,12 @@ function mmrpg_prototype_player_stars_available($player_token){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_stars_available('{$player_token}')");  }
   // Return the current rewards array for this player
   $session_token = mmrpg_game_token();
-  
+
   // Collect the omega factors from the session
   $temp_session_key = $player_token.'_target-robot-omega_prototype';
   if (empty($_SESSION[$session_token]['values'][$temp_session_key])){ return array('field' => 0, 'fusion' => 0); }
   $new_target_robot_omega = $_SESSION[$session_token]['values'][$temp_session_key];
-  
+
   // Define the arrays to hold all available stars
   $temp_field_stars = array();
   $temp_fusion_stars = array();
@@ -108,7 +108,7 @@ function mmrpg_prototype_player_stars_available($player_token){
   // Count the fusion stars
   $temp_fusion_stars = array_values($temp_fusion_stars);
   $temp_fusion_stars_count = count($temp_fusion_stars);
-  
+
   /*
   // DEBUG DEBUG
   die(
@@ -321,7 +321,7 @@ function mmrpg_prototype_robots_unlocked($player_token = ''){
     }
     return $robot_counter;
   }
-  
+
 }
 // Define a function for checking how many hearts have been unlocked by a player
 function mmrpg_prototype_hearts_unlocked($player_token = ''){
@@ -398,24 +398,24 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
   $mmrpg_index_fields = mmrpg_field::get_index();
   // Define the variable to collect option markup
   $this_markup = '';
-  
+
   // Count the number of completed battle options for this group and update the variable
   $battle_options_reversed = $battle_options; //array_reverse($battle_options);
   foreach ($battle_options_reversed AS $this_key => $this_info){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Define the chapter if not set
     if (!isset($this_info['option_chapter'])){ $this_info['option_chapter'] = '0'; }
     // If this is an event message type option, simply display the text/images
     if (!empty($this_info['option_type']) && $this_info['option_type'] == 'message'){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // Generate the option markup for the event message
       $temp_optiontitle = $this_info['option_maintext'];
       $temp_optionimages = !empty($this_info['option_images']) ? $this_info['option_images'] : '';
       $temp_optiontext = '<span class="multi"><span class="maintext">'.$this_info['option_maintext'].'</span></span>';
       $this_markup .= '<a data-chapter="'.$this_info['option_chapter'].'" class="option option_message option_1x4 option_this-'.$player_token.'-message" style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'"><div class="chrome"><div class="inset"><label class="'.(!empty($temp_optionimages) ? 'has_image' : '').'">'.$temp_optionimages.$temp_optiontext.'</label></div></div></a>'."\n";
-      
+
     }
     // Otherwise, if this is a normal battle option
     else {
@@ -437,15 +437,15 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
         ? array_replace(mmrpg_field::parse_index_info($mmrpg_index_fields[$this_fieldtoken]), $this_battleinfo['battle_field_base'])
         : $this_battleinfo['battle_field_base'];
       $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
-            
+
       // Collect the robot index for calculation purposes
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-      
+
       // Check the GAME session to see if this battle has been completed, increment the counter if it was
       $this_battleinfo['battle_option_complete'] = mmrpg_prototype_battle_complete($player_token, $this_info['battle_token']);
       $this_battleinfo['battle_option_failure'] = mmrpg_prototype_battle_failure($player_token, $this_info['battle_token']);
-      
+
       // Generate the markup fields for display
       $this_option_token = $this_battleinfo['battle_token'];
       $this_option_limit = !empty($this_battleinfo['battle_robot_limit']) ? $this_battleinfo['battle_robot_limit'] : 8;
@@ -489,7 +489,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
       $this_targetinfo = !empty($mmrpg_index['players'][$this_targetinfo['player_token']]) ? array_merge($mmrpg_index['players'][$this_targetinfo['player_token']], $this_targetinfo) : $mmrpg_index['players']['player'];
       if ($this_targetinfo['player_token'] != 'player'){  $this_battleinfo['battle_sprite'][] = array('path' => 'players/'.$this_targetinfo['player_token'], 'size' => !empty($this_targetinfo['player_image_size']) ? $this_targetinfo['player_image_size'] : 40);  }
       if (!empty($this_targetinfo['player_robots'])){
-        
+
         // Count the number of masters in this battle
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_master_count = 0;
@@ -510,30 +510,30 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
         $temp_robot_tokens = array_unique($temp_robot_tokens);
         $temp_robot_tokens_count = count($temp_robot_tokens);
         $temp_robot_target_count = count($this_targetinfo['player_robots']);
-                
+
         // Create a list of the different robot tokens in this battle
         // Now loop through robots again and display 'em
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         foreach ($this_targetinfo['player_robots'] AS $this_robotinfo){
-          
+
           // HIDE MECHAS
           if (empty($this_battleinfo['flags']['starter_battle']) && empty($this_battleinfo['flags']['player_battle'])
             && !empty($this_robotinfo['robot_class']) && $this_robotinfo['robot_class'] == 'mecha'
             && $temp_robot_tokens_count > 1 && $this_master_count > 0){ continue; }
-            
+
           // HIDE HIDDEN
           if (!empty($this_robotinfo['flags']['hide_from_mission_select'])){ continue; }
-            
+
           $this_robotinfo['robot_image'] = !empty($this_robotinfo['robot_image']) ? $this_robotinfo['robot_image'] : $this_robotinfo['robot_token'];
           //if (!empty($this_robotinfo['flags']['hide_from_mission_select'])){ $temp_path = 'robots/robot'; }
           //else { $temp_path = 'robots/'.$this_robotinfo['robot_image']; }
           $temp_path = 'robots/'.$this_robotinfo['robot_image'];
           $this_battleinfo['battle_sprite'][] = array('path' => $temp_path, 'size' => !empty($this_robotinfo['robot_image_size']) ? $this_robotinfo['robot_image_size'] : 40);
-          
+
           $this_robot_level = !empty($this_robotinfo['robot_level']) ? $this_robotinfo['robot_level'] : 1;
           if ($this_option_min_level === false || $this_option_min_level > $this_robot_level){ $this_option_min_level = $this_robot_level; }
           if ($this_option_max_level === false || $this_option_max_level < $this_robot_level){ $this_option_max_level = $this_robot_level; }
-          
+
         }
       }
       // Add the fusion star sprite if one has been added
@@ -556,7 +556,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
         $temp_star_front = array('path' => 'abilities/item-star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'], 'size' => 40, 'frame' => $temp_star_back_info['frame']);
         //if ($temp_field_type_1 == 'wind'){ die('<pre>'.print_r($temp_star_back, true).' '.print_r($temp_star_front, true).'</pre>'); }
         array_unshift($this_battleinfo['battle_sprite'], $temp_star_back, $temp_star_front);
-        
+
       }
       // Loop through the battle sprites and display them
       if (!empty($this_battleinfo['battle_sprite'])){
@@ -674,9 +674,9 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
       // Update the main battle option array with recent changes
       $this_battleinfo['flag_skip'] = true;
       $battle_options[$this_key] = $this_battleinfo;
-      
+
     }
-    
+
   }
   // Return the generated markup
   return $this_markup;
@@ -693,7 +693,7 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
 /*
  * MISSION GENERATION
  */
-  
+
 // Define a function for generating an ability set for a given robot
 function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $ability_num = 1){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_generate_abilities('{$robot_info}', {$robot_level}, {$ability_num})");  }
@@ -735,7 +735,7 @@ function mmrpg_prototype_mission_double($this_prototype_data, $this_robot_tokens
   require('prototype_mission-double.php');
   // Return the generated battle data
   return $temp_battle_omega;
-  
+
 }
 
 // Define a function for generating the PLAYER missions
@@ -813,18 +813,18 @@ function mmrpg_prototype_sort_robots_position($info1, $info2){
 function mmrpg_prototype_robot_select_markup($this_prototype_data){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_robot_select_markup($this_prototype_data)');  }
   global $DB;
-  
+
   // Define the temporary robot markup string
   $this_robots_markup = '';
-  
+
   // Collect the robot index for calculation purposes
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-  
+
   // Collect the ability index for calculation purposes
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-  
+
   // Loop through and display the available robot options for this player
   $temp_robot_option_count = count($this_prototype_data['robot_options']);
   $temp_player_favourites = mmrpg_prototype_robot_favourites();
@@ -874,7 +874,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
     $this_robot_attack = $this_robot_attack > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_attack;
     $this_robot_defense = $this_robot_defense > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_defense;
     $this_robot_speed = $this_robot_speed > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_speed;
-    
+
     $this_robot_abilities_current = !empty($info['robot_abilities']) ? array_keys($info['robot_abilities']) : array('buster-shot');
     $this_option_title = ''; //-- Basics -------------------------------  <br />';
     $this_option_title .= $info['robot_name']; //''.$info['robot_number'].' '.$info['robot_name'];
@@ -902,7 +902,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
     $this_robots_markup .= '<div class="chrome chrome_type robot_type_'.(!empty($info['robot_core']) ? $info['robot_core'] : 'none').'" data-tooltip="'.$this_option_title_tooltip.'"><div class="inset"><label class="has_image">'.$this_option_label.'</label></div></div>';
     $this_robots_markup .= '</a>'."\r\n";
   }
-  
+
   // Loop through and display any option padding cells
   //if ($this_prototype_data['robots_unlocked'] >= 3){
   if ($temp_robot_option_count >= 3){
@@ -920,10 +920,10 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
       }
     }
   }
-  
+
   // Return the generated robot markup
   return $this_robots_markup;
-  
+
 }
 
 
@@ -996,7 +996,7 @@ function mmrpg_prototype_leaderboard_rank($user_id){
   $this_leaderboard_list = array_unique($this_leaderboard_list);
   sort($this_leaderboard_list);
   $this_leaderboard_list = array_reverse($this_leaderboard_list);
-  
+
   // Now collect the leaderboard rank based on position
   if (in_array($this_leaderboard_points, $this_leaderboard_list)){
     $this_leaderboard_rank = array_search($this_leaderboard_points, $this_leaderboard_list);
@@ -1005,10 +1005,10 @@ function mmrpg_prototype_leaderboard_rank($user_id){
     $this_leaderboard_rank = 0;
   }
   //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "\$this_leaderboard_rank = {$this_leaderboard_rank}; \$this_leaderboard_points = {$this_leaderboard_points}; \$this_leaderboard_list = <pre>".print_r($this_leaderboard_list, true)."</pre>");  }
-  
+
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "return {$this_leaderboard_rank};");  }
   return $this_leaderboard_rank;
-  
+
 }
 
 // Define a function for pulling the leaderboard online player
@@ -1200,11 +1200,11 @@ function mmrpg_prototype_leaderboard_targets_sort_online($player1, $player2){
 function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   global $mmrpg_index, $DB;
-  
+
   $temp_session_key = $player_token.'_target-robot-omega_prototype';
   $temp_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
   $temp_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-  
+
   // Count the games representaed and order by count
   $temp_game_counters = array();
   foreach ($temp_robot_omega AS $omega){
@@ -1214,36 +1214,36 @@ function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'
     if (!isset($temp_game_counters[$game])){ $temp_game_counters[$game] = 0; }
     $temp_game_counters[$game] += 1;
   }
-  
+
   //die('<pre>$temp_game_counters = '.print_r($temp_game_counters, true).'</pre>');
-  
+
   if (empty($temp_game_counters)){
     if ($player_token == 'dr-light'){ $temp_game_counters['mm01'] = 1; }
     if ($player_token == 'dr-wily'){ $temp_game_counters['mm02'] = 1; }
     if ($player_token == 'dr-cossack'){ $temp_game_counters['mm04'] = 1; }
   }
-  
+
   asort($temp_game_counters, SORT_NUMERIC);
-  
+
   //echo("\n".'-------'.$player_token.'-------'."\n".'<pre>$temp_game_counters = '.print_r($temp_game_counters, true).'</pre>'."\n");
-  
+
   // Get the last element in the array
   end($temp_game_counters);
   $most_key = key($temp_game_counters);
   $most_count = $temp_game_counters[$most_key];
-  
+
   //echo("\n".'<pre>$most_key = '.print_r($most_key, true).'; $most_count = '.print_r($most_count, true).'</pre>'."\n");
-  
+
   $most_options = array($most_key);
   foreach ($temp_game_counters AS $key => $count){ if ($key != $most_key && $count >= $most_count){ $most_options[] = $key; } }
   if (count($most_options) > 1){ $most_key = $most_options[array_rand($most_options, 1)];  }
-  
+
   //echo("\n".'<pre>$most_options = '.print_r($most_options, true).'</pre>'."\n");
-    
+
   //echo("\n".'<pre>$most_key = '.print_r($most_key, true).'; $most_count = '.print_r($most_count, true).'</pre>'."\n");
-  
+
   return $most_key;
-  
+
 }
 
 // Define a function for determining a player's battle music
@@ -1260,7 +1260,7 @@ function mmrpg_prototype_get_player_boss_music($player_token, $session_token = '
   $most_key = mmrpg_prototype_get_player_music($player_token, $session_token);
   $most_key_int = preg_replace('/^mm0?/i', '', $most_key);
   return 'prototype-complete'.($most_key_int > 1 ? '-'.$most_key_int : '');
-  
+
 }
 
 // Define a function for collecting robot sprite markup
@@ -1291,30 +1291,4 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
   }
   return $text_sprites_markup;
 }
-
-/*
-// Define a function for encoding a robot's reward and setting data
-function mmrpg_prototype_encode_robot_data($robot_data){
-  $robot_data = json_encode($robot_data);
-  return $robot_data;
-}
-// Define a function for decoding a robot's reward and setting data
-function mmrpg_prototype_decode_robot_data($robot_data){
-  if (!strstr('////', $robot_data)){ return false; }
-  list($robot_data, $salt_data) = explode('////', $robot_data);
-  $robot_data = base64_decode($robot_data);
-  $salt_data = base64_decode($salt_data);
-  if ($salt_data != MMRPG_SETTINGS_ROBOT_ENCODING_SALT){ return false; }
-  $robot_data = json_decode($robot_data, true);
-  return $robot_data;
-}
-*/
-
-/*
-// If possible, attempt to save the game to the session
-if (!empty($this_save_filepath)){
-  // Save the game session
-  mmrpg_save_game_session($this_save_filepath);
-}
-*/
 ?>
