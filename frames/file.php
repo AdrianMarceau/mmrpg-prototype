@@ -85,7 +85,7 @@ while ($this_action == 'save'){
     break;
 
   }
-  
+
   // Sort the robot index based on robot number
   function mmrpg_index_sort_robots($robot_one, $robot_two){
     global $temp_serial_ordering;
@@ -134,7 +134,7 @@ while ($this_action == 'save'){
     // Display Name
     $html_form_fields .= '<label class="label label_displayname" style="width: 130px; ">Display Name :</label>';
     $html_form_fields .= '<input class="text text_displayname" style="width: 230px; " type="text" name="displayname" maxlength="18" value="'.htmlentities(trim(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
-      
+
     // Player Colour
     $mmrpg_database_type = $mmrpg_index['types'];
     sort($mmrpg_database_type);
@@ -158,7 +158,7 @@ while ($this_action == 'save'){
       $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['colourtoken'].'"', 'value="'.$_SESSION['GAME']['USER']['colourtoken'].'" selected="selected"', implode('', $html_colour_options));
       $html_form_fields .= '<select class="select select_colourtoken" style="width: 230px; " name="colourtoken">'.$temp_select_options.'</select>';
     //$html_form_fields .= '</div>';
-    
+
     // Robot Avatar
     //$html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
       $html_form_fields .= '<label class="label label_imagepath" style="width: 130px; ">Robot Avatar :</label>';
@@ -423,7 +423,7 @@ while ($this_action == 'new'){
 }
 // Else, if the LOAD action was requested
 while ($this_action == 'load'){
-  
+
   // Define the coppa flag
   $html_form_show_coppa = false;
 
@@ -481,7 +481,7 @@ while ($this_action == 'load'){
 
         // The password was correct, but let's also make sure the user is old enough
         if (!empty($temp_database_user['user_date_birth']) && !empty($temp_database_user['user_flag_approved'])){
-                
+
           // The password was correct! Update the session with these credentials
           $_SESSION['GAME']['DEMO'] = 0;
           $_SESSION['GAME']['USER'] = $this_user;
@@ -497,24 +497,15 @@ while ($this_action == 'load'){
           // Update the form markup, then break from the loop
           $file_has_updated = true;
           break;
-          
+
         }
         // The user has not confirmed their date of birth, produce an error
         else {
-      
+
           // Define the data of birth checking variables
           $min_dateofbirth = date('Y/m/d', strtotime('13 years ago'));
           $bypass_dateofbirth = false;
-          
-          // Allow the test user to bypass age concent, we got an email
-          $bypass_dateofbirth_index = array();
-          $temp_dateofbirth_index = explode(',', preg_replace('/\s+/', '', MMRPG_COPPA_COMPLIANCE_PERMISSIONS));
-          $temp_username_token = trim(strtolower($_REQUEST['username']));
-          $temp_email_token = !empty($temp_database_user['user_email_address']) ? trim(strtolower($temp_database_user['user_email_address'])) : 'email@domain.com';
-          foreach ($temp_dateofbirth_index AS $string){ list($username, $email) = explode('/', $string); $bypass_dateofbirth_index[strtolower($username)] = strtolower($email); }
-          if (!empty($bypass_dateofbirth_index[$temp_username_token]) && $bypass_dateofbirth_index[$temp_username_token] == $temp_email_token){ $bypass_dateofbirth = true; }
-          //die('<pre>$bypass_dateofbirth_index = '.print_r($bypass_dateofbirth_index, true).'</pre>');
-          
+
           // Ensure the dateofbirth is valid
           //die('$min_dateofbirth = '.$min_dateofbirth);
           if (empty($_REQUEST['dateofbirth'])){
@@ -537,7 +528,7 @@ while ($this_action == 'load'){
             $html_form_verified = false;
             $html_form_show_coppa = true;
           }
-                    
+
           // The password was correct! Update the session with these credentials
           $_SESSION['GAME']['DEMO'] = 0;
           $_SESSION['GAME']['USER'] = $this_user;
@@ -557,7 +548,7 @@ while ($this_action == 'load'){
           // Update the form markup, then break from the loop
           $file_has_updated = true;
           break;
-          
+
         }
 
       }
@@ -736,7 +727,7 @@ function windowResizeFrame(){
 
   var newBodyHeight = windowHeight;
   var newFrameHeight = newBodyHeight - headerHeight;
-  
+
   if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
   else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 
