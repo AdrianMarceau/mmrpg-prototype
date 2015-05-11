@@ -12,8 +12,10 @@
 /data/analytics.php
 /data/cache/*
 /data/saves/*
-/images/*
-/sounds/*
+/images/.git
+/sounds/.git
+/images/.gitignore
+/sounds/.gitignore
 /ability-generator.php
 /debug.php
 /kinetic.php
@@ -21,8 +23,6 @@
 /session.php
 /session_editor.php
 /session2.php
-/LICENSE
-/README.md
 /mega-man-rpg-prototype.txt
 /data_functions.php
 /blank.php
