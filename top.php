@@ -16,6 +16,8 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.
 
 // Include mandatory config files
 require('data/config.php');
+require('data/settings.php');
+require('data/debug.php');
 
 // Turn on error reporting
 if (MMRPG_CONFIG_ADMIN_MODE){
@@ -162,17 +164,17 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
   // Disable the memory limit for this script
   //ini_set('memory_limit', '128M');
   //ini_set('memory_limit', '-1');
-  
+
   // Define the first load boolean variable
   $this_first_load = false;
   // Define the game cache location path
   $this_cache_dir = MMRPG_CONFIG_ROOTDIR.'data/cache/';
   // Define the game save location path
   $this_save_dir = MMRPG_CONFIG_ROOTDIR.'data/saves/';
-  
+
   // DEBUG DEBUG DEBUG
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // If the user and file details have already been loaded to the session
   if (
     !empty($_SESSION['GAME']['USER']) && !empty($_SESSION['GAME']['USER']['username']) && !empty($_SESSION['GAME']['USER']['password'])
@@ -208,16 +210,16 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Update the global save path variable
     $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
   }
-  
+
   //  DEBUG DEBUG DEBUG
   //mmrpg_reset_game_session($this_save_filepath);
-  
+
   // DEBUG DEBUG DEBUG
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   //die('<pre>$_GET : '.print_r($_GET, true).'</pre>');
   //die($this_save_filepath);
-  
+
 }
 
 /*
@@ -312,10 +314,10 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
     } else {
       $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
     }
-  
+
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     if (!defined('MMRPG_SCRIPT_REQUEST')){
       $this_boardinfo = $DB->get_array("SELECT * FROM mmrpg_leaderboard WHERE user_id = {$this_userid}");
       $this_boardid = $this_boardinfo['board_id'];
@@ -323,14 +325,14 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
       //if (empty($this_boardinfo['board_rank'])){ require('data/leaderboard.php'); $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank']; }
       if (empty($this_boardinfo['board_rank'])){ $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'] = mmrpg_prototype_leaderboard_rank($this_userid); }
     }
-  
+
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
   }
   // Otherwise, generate some details user details
   else {
-    
+
     // Collect the guest userinfo from the database
     $this_userid = MMRPG_SETTINGS_GUEST_ID;
     if (empty($_SESSION['GAME']['USER']['userinfo'])){
@@ -339,24 +341,24 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
     } else {
       $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
     }
-  
+
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     if (!defined('MMRPG_SCRIPT_REQUEST')){
       $this_boardinfo = array();
       $this_boardinfo['board_rank'] = 0;
       $this_boardid = 0;
     }
-  
+
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
   }
-  
+
   // DEBUG DEBUG DEBUG
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
 } else {
   // Create the userinfo array anyway to prevent errors
   $this_userinfo = array();
@@ -373,7 +375,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   $temp_field_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/intro-field';
   $temp_field_type = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : '';
   list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
-  
+
   // Collect the info for the chosen temp field
   $temp_field_data = mmrpg_field::get_index_info($temp_field_token);
   //die('<pre>'.print_r($temp_field_data, true).'</pre>');
@@ -384,10 +386,10 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   define('MMRPG_SETTINGS_CURRENT_FIELDFRAMES', count($temp_field_data['field_background_frame']));
   define('MMRPG_SETTINGS_CURRENT_FIELDMECHA', (!empty($temp_field_data['field_mechas']) ? $temp_field_data['field_mechas'][0] : 'met'));
   //die('$temp_field_type = '.$temp_field_type.'; MMRPG_SETTINGS_CURRENT_FIELDTYPE = '.MMRPG_SETTINGS_CURRENT_FIELDTYPE);
-  
+
   // DEBUG DEBUG DEBUG
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
 }
 
 /*
