@@ -12,8 +12,8 @@
 /data/analytics.php
 /data/cache/*
 /data/saves/*
-/sounds/*
 /images/*
+/sounds/*
 /ability-generator.php
 /debug.php
 /kinetic.php

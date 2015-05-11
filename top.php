@@ -22,6 +22,8 @@ session_start();
 
 // Include mandatory config files
 require('data/config.php');
+require('data/settings.php');
+require('data/debug.php');
 
 // Turn on error reporting
 if (MMRPG_CONFIG_ADMIN_MODE){
