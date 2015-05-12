@@ -71,7 +71,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
         if ($temp_robot_settings['original_player'] != $player_token){ continue; }
         //$debug_experience_sum .= $temp_robot_info['robot_token'].', ';
         $player_info['player_robots_count']++;
-        if (!empty($temp_robot_info['robot_level'])){ $player_info['player_experience'] += $temp_robot_info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL; }
+        if (!empty($temp_robot_info['robot_level'])){ $player_info['player_experience'] += $temp_robot_info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT; }
         if (!empty($temp_robot_info['robot_experience'])){ $player_info['player_experience'] += $temp_robot_info['robot_experience']; }
       }
     }
