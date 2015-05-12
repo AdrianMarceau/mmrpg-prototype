@@ -32,8 +32,8 @@ $temp_battle_omega['flags']['bonus_battle'] = true;
 $temp_battle_omega['battle_token'] = $temp_battle_token;
 $temp_battle_omega['battle_size'] = '1x4';
 $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
-if ($this_robot_class == 'mecha'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERMECHA * $this_robot_count; }
-elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERROBOT * $this_robot_count; }
+//if ($this_robot_class == 'mecha'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERMECHA * $this_robot_count; }
+//elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERROBOT * $this_robot_count; }
 //$temp_battle_omega['battle_points'] = ceil(($this_prototype_data['battles_complete'] > 1 ? 100 : 1000) * $temp_rand_num);
 //shuffle($temp_battle_omega['battle_target_player']['player_robots']);
 
@@ -83,7 +83,6 @@ usort($temp_battle_omega['battle_target_player']['player_robots'], function($r1,
 //die('<pre>field_types = '.implode(', ', $temp_field_types).' | player_robots '.print_r($temp_battle_omega['battle_target_player']['player_robots'], true).'</pre>');
 
 $temp_battle_omega['battle_target_player']['player_robots'] = array_slice($temp_battle_omega['battle_target_player']['player_robots'], 0, $this_robot_count);
-$temp_battle_omega['battle_robot_limit'] = MMRPG_SETTINGS_BATTLEROBOTS_SELECT_MAX;
 
 // Calculate what level these bonus robots should be in the range of
 $temp_player_rewards = mmrpg_prototype_player_rewards($this_prototype_data['this_player_token']);
@@ -102,19 +101,50 @@ if (!empty($temp_player_rewards['player_robots'])){
   //$temp_bonus_level_min = ceil($temp_bonus_level_max / 3);
 }
 
-// Loop through each of the bonus robots and update their levels
+// Start all the point-based battle vars at zero
 $temp_battle_omega['battle_points'] = 0;
+$temp_battle_omega['battle_turns'] = 0;
+$temp_battle_omega['battle_robot_limit'] = 0;
+
+// Loop through each of the bonus robots and update their levels
 foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $info){
   $info['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
+  $index = mmrpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
   if ($this_robot_class != 'mecha'){
-    $index = mmrpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
     $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
   }
-  $temp_battle_omega['battle_points'] += $info['robot_level'] * ($this_robot_class == 'master' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2);
+
+  // Increment the battle's turn limit based on the class of target robot
+  if ($index['robot_class'] == 'master'){ $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERROBOT; }
+  elseif ($index['robot_class'] == 'mecha'){ $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERMECHA; }
+  elseif ($index['robot_class'] == 'boss'){ $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERBOSS; }
+  // Increment the battle's point reward based on the class of target robot
+  if ($index['robot_class'] == 'master'){ $temp_battle_omega['battle_points'] += $info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT; }
+  elseif ($index['robot_class'] == 'mecha'){ $temp_battle_omega['battle_points'] += $info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERMECHA; }
+  elseif ($index['robot_class'] == 'boss'){ $temp_battle_omega['battle_points'] += $info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERBOSS; }
+  // Increment the battle's robot limit based on the class of target robot
+  if ($index['robot_class'] == 'master'){ $temp_battle_omega['battle_robot_limit'] += MMRPG_SETTINGS_BATTLEROBOTS_PERROBOT; }
+  elseif ($index['robot_class'] == 'mecha'){ $temp_battle_omega['battle_robot_limit'] += MMRPG_SETTINGS_BATTLEROBOTS_PERMECHA; }
+  elseif ($index['robot_class'] == 'boss'){ $temp_battle_omega['battle_robot_limit'] += MMRPG_SETTINGS_BATTLEROBOTS_PERBOSS; }
+
   $temp_battle_omega['battle_target_player']['player_robots'][$key] = $info;
 }
-// Multiply battle points by ten for bonus amount
+
+// Fix any zero or invalid battle values
+if ($temp_battle_omega['battle_points'] < 1){ $temp_battle_omega['battle_points'] = 1; }
+else { $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points']); }
+if ($temp_battle_omega['battle_turns'] < 1){ $temp_battle_omega['battle_turns'] = 1; }
+else { $temp_battle_omega['battle_turns'] = ceil($temp_battle_omega['battle_turns']); }
+if ($temp_battle_omega['battle_robot_limit'] < 1){ $temp_battle_omega['battle_robot_limit'] = 1; }
+else { $temp_battle_omega['battle_robot_limit'] = ceil($temp_battle_omega['battle_robot_limit']); }
+
+// Multiply battle points by ten for bonus amount (basically a cheating stage)
 $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10);
+
+
+//if ($this_robot_class == 'mecha'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 100); }
+//elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10); }
+//elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10); }
 //if ($this_robot_class == 'mecha'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 100); }
 //elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10); }
 //elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10); }

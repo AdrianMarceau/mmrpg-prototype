@@ -209,7 +209,7 @@ if (!empty($temp_player_robots_rewards)){
     if (!empty($temp_robot_rewards['robot_attack'])){ $temp_stat_counter += $temp_robot_rewards['robot_attack']; }
     if (!empty($temp_robot_rewards['robot_defense'])){ $temp_stat_counter += $temp_robot_rewards['robot_defense']; }
     if (!empty($temp_robot_rewards['robot_speed'])){ $temp_stat_counter += $temp_robot_rewards['robot_speed']; }
-    $temp_battle_omega['battle_points'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * $info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER) + $temp_stat_counter;
+    $temp_battle_omega['battle_points'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT * $info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER) + $temp_stat_counter;
     $temp_battle_omega['battle_points'] += !empty($temp_star_boost) ? ceil(($temp_star_boost * $temp_stat_counter) / MMRPG_SETTINGS_STARS_ATTACKBOOST) : 0;
     $temp_battle_omega['values']['player_battle_masters'][] = $info['robot_token'];
   }
