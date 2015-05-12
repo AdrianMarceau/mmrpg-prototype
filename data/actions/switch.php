@@ -82,6 +82,7 @@ ob_start();
         // Loop through this robot's current abilities and list them as well
         $temp_robot_title .= ' <br />';
         foreach ($temp_robot->robot_abilities AS $key => $token){
+          if (!isset($temp_abilities_index[$token])){ continue; }
           if ($key > 0 && $key % 4 != 0){ $temp_robot_title .= '&nbsp;|&nbsp;'; }
           if ($key > 0 && $key % 4 == 0){ $temp_robot_title .= '<br /> '; }
           $info = mmrpg_ability::parse_index_info($temp_abilities_index[$token]);

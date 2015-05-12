@@ -413,6 +413,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       // Loop through each of this robot's abilities and trigger the start event
       $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       foreach ($this_robot->robot_abilities AS $this_key => $this_token){
+        if (!isset($temp_abilities_index[$this_token])){ continue; }
         // Define the current ability object using the loaded ability data
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_abilityinfo = mmrpg_ability::parse_index_info($temp_abilities_index[$this_token]);
