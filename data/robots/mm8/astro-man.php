@@ -6,7 +6,6 @@ $robot = array(
   'robot_name' => 'Astro Man',
   'robot_token' => 'astro-man',
   'robot_core' => 'space',
-  'robot_field' => 'underground-laboratory',
   'robot_description' => 'Holographic Illusions Robot',
   'robot_energy' => 100,
   'robot_attack' => 100,
