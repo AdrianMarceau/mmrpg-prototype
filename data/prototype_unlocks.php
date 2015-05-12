@@ -327,7 +327,7 @@ if ($battle_complete_counter_light >= 17){
               if (empty($temp_robot_settings['original_player']) && $temp_player != $player_token){ continue; }
               if ($temp_robot_settings['original_player'] != $player_token){ continue; }
               $player_info['player_robots_count']++;
-              if (!empty($temp_robot_info['robot_level'])){ $player_info['player_experience'] += $temp_robot_info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL; }
+              if (!empty($temp_robot_info['robot_level'])){ $player_info['player_experience'] += $temp_robot_info['robot_level'] * MMRPG_SETTINGS_EXPERIENCE_MIN; }
               if (!empty($temp_robot_info['robot_experience'])){ $player_info['player_experience'] += $temp_robot_info['robot_experience']; }
             }
           }
@@ -608,7 +608,7 @@ if ($battle_complete_counter_wily >= 17){
               if (empty($temp_robot_settings['original_player']) && $temp_player != $player_token){ continue; }
               if ($temp_robot_settings['original_player'] != $player_token){ continue; }
               $player_info['player_robots_count']++;
-              if (!empty($temp_robot_info['robot_level'])){ $player_info['player_experience'] += $temp_robot_info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL; }
+              if (!empty($temp_robot_info['robot_level'])){ $player_info['player_experience'] += $temp_robot_info['robot_level'] * MMRPG_SETTINGS_EXPERIENCE_MIN; }
               if (!empty($temp_robot_info['robot_experience'])){ $player_info['player_experience'] += $temp_robot_info['robot_experience']; }
             }
           }
@@ -904,7 +904,7 @@ if ($battle_complete_counter_cossack >= 17){
               if (empty($temp_robot_settings['original_player']) && $temp_player != $player_token){ continue; }
               if ($temp_robot_settings['original_player'] != $player_token){ continue; }
               $player_info['player_robots_count']++;
-              if (!empty($temp_robot_info['robot_level'])){ $player_info['player_experience'] += $temp_robot_info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL; }
+              if (!empty($temp_robot_info['robot_level'])){ $player_info['player_experience'] += $temp_robot_info['robot_level'] * MMRPG_SETTINGS_EXPERIENCE_MIN; }
               if (!empty($temp_robot_info['robot_experience'])){ $player_info['player_experience'] += $temp_robot_info['robot_experience']; }
             }
           }
