@@ -120,7 +120,7 @@ if ($target_player->player_token != 'player'){
     $target_player_robots_count = count($target_player_robots);
     $other_player_points = 0;
     $other_player_turns = $target_player_robots_count * MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
-    foreach ($target_player_robots AS $disabled_robotinfo){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
+    foreach ($target_player_robots AS $disabled_robotinfo){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
 
     // Collect the battle points from the function
     $other_battle_points_modded = $this->calculate_battle_points($target_player, $other_player_points, $other_player_turns);
@@ -185,7 +185,7 @@ if ($target_player->player_token != 'player'){
     $target_player_robots_count = count($target_player_robots);
     $other_player_points = 0;
     $other_player_turns = $target_player_robots_count * MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
-    foreach ($target_player_robots AS $disabled_robotinfo){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
+    foreach ($target_player_robots AS $disabled_robotinfo){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
 
     // Collect the battle points from the function
     $other_battle_points_modded = $this->calculate_battle_points($target_player, $other_player_points, $other_player_turns);
