@@ -17,58 +17,6 @@ if (!empty($_REQUEST['return']) && $_REQUEST['return'] == 'index'){
  * ROBOT DATABASE PAGE
  */
 
-// DEBUG DEBUG DEBUG
-if (!empty($_GET['debug'])){
-
-  $temp_robots = array_slice(array_keys($mmrpg_database_robots), 0, 10);
-  $temp_levels = array(1, 2, 5, 10, 25, 50, 100);
-
-  $stat_tester_index = array();
-  foreach ($temp_robots AS $token){
-    // Collect reference to robot
-    $stat_reference = $mmrpg_database_robots[$token];
-    // Collect only relevant base stats
-    $robot_token = $stat_reference['robot_token'];
-    $robot_stats = array('energy' => $stat_reference['robot_energy'], 'attack' => $stat_reference['robot_attack'], 'defense' => $stat_reference['robot_defense'], 'speed' => $stat_reference['robot_speed']);
-    $stat_tester = array('name' => $robot_token, 'stats_base' => $robot_stats);
-
-    // Apply stat boosts at key levels and record
-    foreach ($temp_levels AS $level){
-      $stat_tester['stats_level_'.$level] = array(
-        'energy' => $robot_stats['energy'].' base '.
-          ' =>  '.($robot_stats['energy'] + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($robot_stats['energy'], $level)).' min '.
-        	' =>  '.MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['energy'], $level).' max '.
-        	' +=  '.MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['energy'], $level).' player '.
-          ' ==  '.(MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['energy'], $level) + MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['energy'], $level)).' total',
-        'attack' => $robot_stats['attack'].' base '.
-          ' =>  '.($robot_stats['attack'] + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($robot_stats['attack'], $level)).' min '.
-          ' =>  '.MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['attack'], $level).' max '.
-          ' +=  '.MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['attack'], $level).' player'.
-          ' ==  '.(MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['attack'], $level) + MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['attack'], $level)).' total',
-        'defense' => $robot_stats['defense'].' base '.
-          ' =>  '.($robot_stats['defense'] + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($robot_stats['defense'], $level)).' min '.
-          ' =>  '.MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['defense'], $level).' max '.
-          ' +=  '.MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['defense'], $level).' player '.
-          ' ==  '.(MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['defense'], $level) + MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['defense'], $level)).' total',
-        'speed' => $robot_stats['speed'].' base '.
-          ' =>  '.($robot_stats['speed'] + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($robot_stats['speed'], $level)).' min '.
-          ' =>  '.MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['speed'], $level).' max '.
-          ' +=  '.MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['speed'], $level).' player '.
-          ' ==  '.(MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_stats['speed'], $level) + MMRPG_SETTINGS_STATS_GET_PLAYERMAX($robot_stats['speed'], $level)).' total',
-        );
-    }
-
-    $stat_tester_index[] = $stat_tester;
-  }
-
-
-  die('<pre>$stat_tester_index = '.print_r($stat_tester_index, true).'</pre>');
-
-
-
-}
-
-
 // Define the SEO variables for this page
 $this_seo_title = 'Robots '.(!empty($this_current_filter) ? '('.$this_current_filter_name.' Core) ' : '').'| Database | '.$this_seo_title;
 $this_seo_description = 'The robot database contains detailed information about the Mega Man RPG Prototype\'s unlockable robots including their equippable abilities, battle quotes, base stats, weaknesses, resistances, affinities, immunities, and sprite sheets. The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster.';
