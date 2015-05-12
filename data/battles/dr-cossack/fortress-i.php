@@ -5,8 +5,6 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat Dr. Light\'s Mega Man and Roll!',
-  'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 2),
-  'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 30 * 2),
   'battle_field_base' => array('field_id' => 100, 'field_token' => 'light-laboratory', 'field_name' => 'Light Laboratory', 'field_music' => 'light-laboratory'),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,

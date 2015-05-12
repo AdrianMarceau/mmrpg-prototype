@@ -5,8 +5,6 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat the powered up copies of Mega Man, Bass, and Proto Man!',
-  'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 3),
-  'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 40 * 3),
   'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination-2', 'field_name' => 'Final Destination II', 'field_music' => 'final-destination-2', 'field_mechas' => array('beak', 'spine')),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,

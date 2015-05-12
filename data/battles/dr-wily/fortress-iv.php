@@ -5,8 +5,6 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat the army of powered up Robot Master copies and download their data!',
-  'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 8),
-  'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 50 * 8),
   'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination-3', 'field_name' => 'Final Destination III', 'field_music' => 'final-destination', 'field_mechas' => array('batton-3', 'crazy-cannon-3', 'fan-fiend-3', 'killer-bullet-3', 'pierrobot-3', 'snapper-3', 'spring-head-3', 'telly-3')),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
