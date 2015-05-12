@@ -15,6 +15,8 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.
  */
 
 // Include mandatory config files
+define('MMRPG_BUILD', 'mmrpg2k11');
+define('MMRPG_VERSION', '2.6.2');
 require('data/config.php');
 require('data/settings.php');
 require('data/debug.php');
