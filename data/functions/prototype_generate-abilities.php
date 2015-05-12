@@ -8,6 +8,7 @@ $mmrpg_prototype_core_abilities = array(
     'bright-burst', 'rain-flush', 'drill-blitz', 'pharaoh-soul', 'ring-boomerang', 'dust-crusher', 'dive-missile', 'skull-barrier',
     'flame-shot', 'flame-buster', 'freeze-shot', 'freeze-buster',
     'electric-shot', 'electric-buster', 'space-shot', 'space-buster',
+    'cutter-shot', 'cutter-buster',
     ),
   array(
     'rising-cutter', 'super-arm', 'ice-slasher', 'danger-bomb', 'fire-chaser', 'thunder-beam', 'time-slow', 'oil-slider',
