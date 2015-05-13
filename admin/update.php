@@ -166,8 +166,8 @@ function mmrpg_admin_encode_save_data($data, $cache){
         );
     }
 
-    // If this was before the April 2015 serialization and typo purge
-    if ($cache < '20150405-05'){
+    // If this was before the projected 2k15 update's release
+    if ($cache < '20160101-01'){
       $typo_find_replace = array(
         'dive-torpedo' => 'dive-missile',
         'pharaoh-shot' => 'pharaoh-soul'
