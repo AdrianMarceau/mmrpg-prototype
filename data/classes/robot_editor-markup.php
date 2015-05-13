@@ -215,7 +215,7 @@ ob_start();
   //echo $robot_info['robot_token'].' robot_image_unlock_current = '.$robot_image_unlock_current.' | robot_alt_options = '.implode(',',array_keys($robot_alt_options)).'<br />';
 
   ?>
-  <div class="event event_double event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?> <?= false && $robot_info['robot_level'] >= 100 && $robot_info['robot_core'] != 'copy' ? 'event_has_subcore' : '' ?>" data-token="<?=$player_info['player_token'].'_'.$robot_info['robot_token']?>" data-player="<?= $player_info['player_token'] ?>" data-robot="<?= $robot_info['robot_token'] ?>">
+  <div class="event event_double event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?> <?= false && $robot_info['robot_level'] >= 100 && $robot_info['robot_core'] != 'copy' ? 'event_has_subcore' : '' ?>" data-token="<?=$player_info['player_token'].'_'.$robot_info['robot_token']?>" data-player="<?= $player_info['player_token'] ?>" data-robot="<?= $robot_info['robot_token'] ?>" data-types="<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') : 'none' ?>">
 
     <div class="this_sprite sprite_left event_robot_mugshot" style="">
       <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
@@ -687,79 +687,98 @@ ob_start();
           <tr>
             <td class="right" style="padding-top: 4px;">
               <?/*<label style="display: block; float: left; font-size: 12px;">Abilities :</label>*/?>
-              <div class="ability_container" style="height: auto;">
               <?
+              // Loop through all the abilities collected by the player and collect IDs
+              $allowed_ability_ids = array();
+              if (!empty($player_ability_rewards)){
+                foreach ($player_ability_rewards AS $ability_token => $ability_info){
 
-              // Sort the player ability index based on ability number
-              uasort($player_ability_rewards, array('mmrpg_player', 'abilities_sort_for_editor'));
+                  if (empty($ability_info['ability_token'])){ continue; }
+                  elseif ($ability_info['ability_token'] == '*'){ continue; }
+                  elseif ($ability_info['ability_token'] == 'ability'){ continue; }
+                  elseif (!isset($mmrpg_database_abilities[$ability_info['ability_token']])){ continue; }
+                  elseif (!mmrpg_robot::has_ability_compatibility($robot_info['robot_token'], $ability_token)){ continue; }
+                  $ability_info['ability_id'] = $mmrpg_database_abilities[$ability_info['ability_token']]['ability_id'];
 
-              // Sort the robot ability index based on ability number
-              sort($robot_ability_rewards);
-
-              // Collect the ability reward options to be used on all selects
-              $ability_rewards_options = $global_allow_editing ? mmrpg_ability::print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info) : '';
-
-              // Loop through the robot's current abilities and list them one by one
-              $empty_ability_counter = 0;
-              if (!empty($robot_info['robot_abilities'])){
-                $temp_string = array();
-                $temp_inputs = array();
-                $ability_key = 0;
-
-                // DEBUG
-                //echo 'robot-ability:';
-                foreach ($robot_info['robot_abilities'] AS $robot_ability){
-
-                  if (empty($robot_ability['ability_token'])){ continue; }
-                  elseif ($robot_ability['ability_token'] == '*'){ continue; }
-                  elseif ($robot_ability['ability_token'] == 'ability'){ continue; }
-                  elseif (!isset($mmrpg_database_abilities[$robot_ability['ability_token']])){ continue; }
-                  elseif ($ability_key > 7){ continue; }
-                  $this_ability = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$robot_ability['ability_token']]);
-                  if (empty($this_ability)){ continue; }
-
-                  $temp_select_markup = mmrpg_ability::print_editor_select_markup($ability_rewards_options, $player_info, $robot_info, $this_ability, $ability_key);
-
-                  $temp_string[] = $temp_select_markup;
-                  $ability_key++;
+                  $allowed_ability_ids[] = $ability_info['ability_id'];
 
                 }
+              }
 
-                if ($ability_key <= 7){
-                  for ($ability_key; $ability_key <= 7; $ability_key++){
+              ?>
+              <div class="ability_container" data-compatible="<?= implode(',', $allowed_ability_ids) ?>">
+                <?
+
+                // Sort the player ability index based on ability number
+                uasort($player_ability_rewards, array('mmrpg_player', 'abilities_sort_for_editor'));
+
+                // Sort the robot ability index based on ability number
+                sort($robot_ability_rewards);
+
+                // Collect the ability reward options to be used on all selects
+                $ability_rewards_options = $global_allow_editing ? mmrpg_ability::print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info) : '';
+
+                // Loop through the robot's current abilities and list them one by one
+                $empty_ability_counter = 0;
+                if (!empty($robot_info['robot_abilities'])){
+                  $temp_string = array();
+                  $temp_inputs = array();
+                  $ability_key = 0;
+
+                  // DEBUG
+                  //echo 'robot-ability:';
+                  foreach ($robot_info['robot_abilities'] AS $robot_ability){
+
+                    if (empty($robot_ability['ability_token'])){ continue; }
+                    elseif ($robot_ability['ability_token'] == '*'){ continue; }
+                    elseif ($robot_ability['ability_token'] == 'ability'){ continue; }
+                    elseif (!isset($mmrpg_database_abilities[$robot_ability['ability_token']])){ continue; }
+                    elseif ($ability_key > 7){ continue; }
+                    $this_ability = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$robot_ability['ability_token']]);
+                    if (empty($this_ability)){ continue; }
+
+                    $temp_select_markup = mmrpg_ability::print_editor_select_markup($ability_rewards_options, $player_info, $robot_info, $this_ability, $ability_key);
+
+                    $temp_string[] = $temp_select_markup;
+                    $ability_key++;
+
+                  }
+
+                  if ($ability_key <= 7){
+                    for ($ability_key; $ability_key <= 7; $ability_key++){
+                      $empty_ability_counter++;
+                      if ($empty_ability_counter >= 2){ $empty_ability_disable = true; }
+                      else { $empty_ability_disable = false; }
+                      //$temp_select_options = str_replace('value=""', 'value="" selected="selected" disabled="disabled"', $ability_rewards_options);
+                      $this_ability_title_html = '<label>-</label>';
+                      //if ($global_allow_editing){ $this_ability_title_html .= '<select class="ability_name" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" '.($empty_ability_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>'; }
+                      $temp_string[] = '<a class="ability_name " style="'.(($ability_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_ability_disable ? 'opacity:0.25; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-ability="" title="" data-tooltip="">'.$this_ability_title_html.'</a>';
+                    }
+                  }
+
+                } else {
+
+                  for ($ability_key = 0; $ability_key <= 7; $ability_key++){
                     $empty_ability_counter++;
                     if ($empty_ability_counter >= 2){ $empty_ability_disable = true; }
                     else { $empty_ability_disable = false; }
-                    //$temp_select_options = str_replace('value=""', 'value="" selected="selected" disabled="disabled"', $ability_rewards_options);
+                    //$temp_select_options = str_replace('value=""', 'value="" selected="selected"', $ability_rewards_options);
                     $this_ability_title_html = '<label>-</label>';
                     //if ($global_allow_editing){ $this_ability_title_html .= '<select class="ability_name" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" '.($empty_ability_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>'; }
-                    $temp_string[] = '<a class="ability_name " style="'.(($ability_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_ability_disable ? 'opacity:0.25; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-ability="" title="" data-tooltip="">'.$this_ability_title_html.'</a>';
+                    $temp_string[] = '<a class="ability_name " style="'.(($ability_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_ability_disable ? 'opacity:0.25; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-ability="">'.$this_ability_title_html.'</a>';
                   }
+
                 }
+                // DEBUG
+                //echo 'temp-string:';
+                echo !empty($temp_string) ? implode(' ', $temp_string) : '';
+                // DEBUG
+                //echo '<br />temp-inputs:';
+                echo !empty($temp_inputs) ? implode(' ', $temp_inputs) : '';
+                // DEBUG
+                //echo '<br />';
 
-              } else {
-
-                for ($ability_key = 0; $ability_key <= 7; $ability_key++){
-                  $empty_ability_counter++;
-                  if ($empty_ability_counter >= 2){ $empty_ability_disable = true; }
-                  else { $empty_ability_disable = false; }
-                  //$temp_select_options = str_replace('value=""', 'value="" selected="selected"', $ability_rewards_options);
-                  $this_ability_title_html = '<label>-</label>';
-                  //if ($global_allow_editing){ $this_ability_title_html .= '<select class="ability_name" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" '.($empty_ability_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>'; }
-                  $temp_string[] = '<a class="ability_name " style="'.(($ability_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_ability_disable ? 'opacity:0.25; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-ability="">'.$this_ability_title_html.'</a>';
-                }
-
-              }
-              // DEBUG
-              //echo 'temp-string:';
-              echo !empty($temp_string) ? implode(' ', $temp_string) : '';
-              // DEBUG
-              //echo '<br />temp-inputs:';
-              echo !empty($temp_inputs) ? implode(' ', $temp_inputs) : '';
-              // DEBUG
-              //echo '<br />';
-
-              ?>
+                ?>
               </div>
             </td>
           </tr>
@@ -772,9 +791,6 @@ ob_start();
 
   // Return the backup of the player selector
   $allow_player_selector = $allow_player_selector_backup;
-
-
-
 
 // Collect the outbut buffer contents
 $this_markup = trim(ob_get_clean());

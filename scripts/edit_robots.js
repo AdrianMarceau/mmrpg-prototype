@@ -19,6 +19,7 @@ $(document).ready(function(){
   thisPrototype = $('#prototype', thisBody);
   thisWindow = $(window);
   thisEditor = $('#edit', thisBody);
+  thisConsole = $('#console', thisEditor);
   thisCanvas = $('#canvas', thisEditor);
   thisRobotCanvas = $('div[data-canvas=robots]', gameCanvas);
   thisAbilityCanvas = $('div[data-canvas=abilities]', gameCanvas);
@@ -27,6 +28,10 @@ $(document).ready(function(){
   // Update the player and robot count by counting elements
   //thisEditorData.playerTotal = $('.robot_canvas .wrapper[data-player]', thisCanvas).length;
   //thisEditorData.robotTotal = $('.robot_canvas .sprite[data-robot]', thisCanvas).length;
+  
+  // Automatically hide the console and canvas areas until we're ready
+  thisConsole.css({height:0,minHeight:0});
+  //thisCanvas.css({height:0,minHeight:0});
   
   //console.log(thisEditorData);
   
@@ -68,7 +73,7 @@ $(document).ready(function(){
       //console.log('console data received, appending '+thisPlayerToken+' '+thisRobotToken+'...');
 
       if (index == 0){
-        $('#console').animate({height:'230px',opacity:1},600,'swing',function(){
+        thisConsole.animate({height:'230px',opacity:1},600,'swing',function(){
           //console.log('console animation complete');
           $(this).css({height:'auto'});
           });
@@ -322,93 +327,7 @@ $(document).ready(function(){
     // Call the trasfer robot function to take care of the rest
     return transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToken, true, true);
     
-    /*
-    
-    // Define the post options for the ajax call
-    var postData = {action:'player',robot:thisRobotToken,player1:currentPlayerToken,player2:newPlayerToken};
-    // Trigger a transfer of this robot to the requested player
-    var confirmTransfer = true; //confirm('Transfer ownership of '+thisRobotName+' from '+currentPlayerLabel+' to '+newPlayerLabel+'?');
-    if (confirmTransfer){
-      $('#edit_overlay', thisPrototype).css({display:'block'});
-      // Post the transfer request to the server
-      $.ajax({
-        type: 'POST',
-        url: 'frames/edit_robots.php',
-        data: postData,
-        success: function(data, status){
-          
-          // DEBUG
-          //alert(data);
-          
-          // Break apart the response into parts
-          var data = data.split('|');
-          var dataStatus = data[0] != undefined ? data[0] : false;
-          var dataMessage = data[1] != undefined ? data[1] : false;
-          var dataContent = data[2] != undefined ? data[2] : false;
-          
-          // If there was an error, reset select, otherwise, refresh the page
-          if (dataStatus == 'error'){
-            // Reset the select button's position and return false
-            thisPlayerSelect.val(currentPlayerToken);
-            //console.log(data);
-            $('#edit_overlay', thisPrototype).css({display:'none'});
-            return false;
-            } else if (dataStatus == 'success'){
-            //console.log('success! now let\'s move the robot...');
-            //console.log(data);
-            var newData = data.slice(2);
-            newData = newData.join('|');
-            $('#console #robots').append(newData);
-            // Collect the container and token references and prepare the move
-            var canvasButton = $('.sprite[data-robot='+thisRobotToken+']', gameCanvas);
-            var consoleEvent = $('.event[data-token='+currentPlayerToken+'_'+thisRobotToken+']', gameConsole);
-            var consolePlayerSelect = $('.player_select_block', consoleEvent);
-            //if (!consolePlayerSelect.length){ //console.log('player select block not found'); }
-            consolePlayerSelect.css({backgroundColor:'blue !important'});
-            var newCanvasWrapper = $('.wrapper_'+newPlayerToken+'[data-select=robots]', gameCanvas);
-            var newConsoleToken = newPlayerToken+'_'+thisRobotToken;
-            if (newPlayerToken == 'dr-light'){ var newPlayerName = 'Dr. Light'; }
-            else if (newPlayerToken == 'dr-wily'){ var newPlayerName = 'Dr. Wily'; }
-            else if (newPlayerToken == 'dr-cossack'){ var newPlayerName = 'Dr. Cossack'; }
-            // Remove this robot from the console
-            consoleEvent.remove();            
-            // Move this robot's button to the new wrapper and update their data token
-            //$('.current_player', consolePlayerSelect).removeClass('current_player_'+currentPlayerToken).addClass('current_player_'+newPlayerToken);
-            //$('.player_name label', consolePlayerSelect).html(newPlayerName);
-            //$('.player_name select', consolePlayerSelect).attr('data-player', newPlayerToken);   
-            //$('select.ability_name', consoleEvent).attr('data-player', newPlayerToken);
-            canvasButton.removeClass('sprite_robot_'+currentPlayerToken).removeClass('sprite_robot_'+currentPlayerToken+'_current');
-            canvasButton.addClass('sprite_robot_'+newPlayerToken).addClass('sprite_robot_'+newPlayerToken+'_current');    
-            canvasButton.attr('data-player', newPlayerToken);
-            canvasButton.attr('data-token', newConsoleToken);
-            canvasButton.appendTo(newCanvasWrapper);
-            //consoleEvent.attr('data-token', newConsoleToken); 
-            // Reload the current page and return true  
-            //window.location = window.location.href;
-            // Trigger the wrapper resize function based on the new robot amount
-            resizePlayerWrapper();
-            $('#edit_overlay', thisPrototype).css({display:'none'});
-            return true;
-            } else {
-            //console.log('ummmm');
-            //console.log(data);
-            $('#edit_overlay', thisPrototype).css({display:'none'});
-            return false;
-            }
-          
-          // DEBUG
-          //alert('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');  
-          
-          }
-        });
-      
-      }
-        
-    return false;
-    
-    */
-    
-  });
+    });
 
   // Prevent clicks if the parent container is disabled
   $('a.ability_name', gameConsole).live('click', function(e){
@@ -421,13 +340,13 @@ $(document).ready(function(){
     console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus);
     if (thisContainerStatus == 'disabled'){
 
-      console.log('container is disabled');
+      //console.log('container is disabled');
       
       return false;
       
       } else if (thisLinkStatus == 'pending'){
 
-      console.log('ability already selected, revert to normal menu');
+      //console.log('ability already selected, revert to normal menu');
       
       $('a.player_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
       $('a.item_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
@@ -451,6 +370,17 @@ $(document).ready(function(){
       var thisRobotToken = thisRobotEvent.attr('data-robot');
       var thisRobotName = thisRobotEvent.find('.header .title').html();
       var thisAbilityKey = parseInt(thisLink.attr('data-key'));
+      var thisAbilityID = parseInt(thisLink.attr('data-id'));
+      
+      var thisAbilityCompatible = thisRobotEvent.find('.ability_container').attr('data-compatible');
+      thisAbilityCompatible = thisAbilityCompatible.split(',');
+      var thisAbilityEquipped = [];
+      $('.ability_container .ability_name[data-id]', thisRobotEvent).each(function(index,element){
+        var thisID = $(this).attr('data-id');
+        thisAbilityEquipped.push(thisID);
+        });
+      
+      var thisRobotTypes = thisRobotEvent.attr('data-types');
         
       thisLink.css({opacity:''});
       thisLink.attr('data-status', 'pending');
@@ -460,7 +390,7 @@ $(document).ready(function(){
       
       loadCanvasAbilitiesMarkup(function(){
         
-        console.log('custom complete function!');
+        //console.log('custom complete function!');
         
         thisAbilityCanvas.attr('data-player', thisPlayerToken);
         thisAbilityCanvas.attr('data-robot', thisRobotToken);
@@ -468,8 +398,23 @@ $(document).ready(function(){
         
         thisItemCanvas.addClass('hidden');
         thisRobotCanvas.addClass('hidden');
-        thisAbilityCanvas.find('.wrapper_header').html('Select Ability for '+thisRobotName);
+        thisAbilityCanvas.find('.wrapper_header').html('Select Ability for '+thisRobotName).attr('class', 'wrapper_header ability_type type_'+thisRobotTypes);
         thisAbilityCanvas.removeClass('hidden');
+        
+        $('.wrapper_overflow', thisAbilityCanvas).scrollTop(0).perfectScrollbar('update');
+        
+        $('.ability_name[data-id]', thisAbilityCanvas).each(function(index, element){
+          var thisID = $(this).attr('data-id');
+          if (thisAbilityCompatible.indexOf(thisID) == -1){               
+            //console.log('ID '+thisID+' is NOT compatible'); 
+            $(this).attr('data-status', 'disabled').css({display:'none',opacity:''});            
+            } else {               
+            //console.log('ID '+thisID+' is compatible');   
+            if (thisID == thisAbilityID){ $(this).attr('data-status', 'disabled').css({display:''}); }
+            else if (thisAbilityEquipped.indexOf(thisID) != -1){ $(this).attr('data-status', 'disabled').css({display:''}); }
+            else { $(this).removeAttr('data-status').css({display:''});  }                        
+            }
+          });
       
         });  
       
@@ -487,13 +432,13 @@ $(document).ready(function(){
     console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus);
     if (thisContainerStatus == 'disabled'){
 
-      console.log('container is disabled');
+      //console.log('container is disabled');
       
       return false;
       
       } else if (thisLinkStatus == 'pending'){
 
-      console.log('item already selected, revert to normal menu');
+      //console.log('item already selected, revert to normal menu');
       
       $('a.player_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
       $('a.item_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
@@ -501,8 +446,8 @@ $(document).ready(function(){
       
       thisItemCanvas.attr('data-player', '');
       thisItemCanvas.attr('data-robot', '');
-      
-      thisItemCanvas.addClass('hidden');
+
+      thisAbilityCanvas.addClass('hidden');
       thisItemCanvas.addClass('hidden');
       thisItemCanvas.find('.wrapper_header').html('Select Item');      
       
@@ -524,15 +469,28 @@ $(document).ready(function(){
       
       loadCanvasItemsMarkup(function(){
         
-        console.log('custom complete function!');
+        //console.log('custom complete function!');
         
         thisItemCanvas.attr('data-player', thisPlayerToken);
         thisItemCanvas.attr('data-robot', thisRobotToken);
-        
-        thisItemCanvas.addClass('hidden');
+
+        thisAbilityCanvas.addClass('hidden');
         thisRobotCanvas.addClass('hidden');
         thisItemCanvas.find('.wrapper_header').html('Select Hold Item for '+thisRobotName);
         thisItemCanvas.removeClass('hidden');
+        
+        $('.wrapper_overflow', thisItemCanvas).scrollTop(0).perfectScrollbar('update');
+        
+        $('.item_name[data-count]', thisItemCanvas).each(function(index, element){
+          var thisCount = parseInt($(this).attr('data-count'));
+          if (thisCount < 1){               
+            //console.log('Count '+thisCount+' is less than one'); 
+            $(this).attr('data-status', 'disabled').css({display:'none'});            
+            } else {               
+            //console.log('thisCount '+thisCount+' is more than one'); 
+            $(this).removeAttr('data-status').css({display:''});            
+            }
+          });
       
         });  
       
@@ -1141,7 +1099,6 @@ function updateSpriteFrame(thisSprite, newFrame){
 // Define an initialization function to run when document ready
 function robotEditorCanvasInit(){
 
-
   var robotCanvas = $('.robot_canvas', gameCanvas);
   var robotCanvasPlayerWrappers = false;
   
@@ -1157,9 +1114,9 @@ function robotEditorCanvasInit(){
       //console.log('canvas data received, appending...');
       $('.links', robotCanvas).append(data);
       robotCanvas.animate({height:'154px',opacity:1},2000,'swing',function(){
-          //console.log('canvas animation complete');
-          $(this).css({height:'auto'});
-          });
+        //console.log('canvas animation complete');
+        $(this).css({height:'auto'});
+        });
       thisEditorData.playerTotal = $('.wrapper[data-player]', robotCanvas).length;
       thisEditorData.robotTotal = $('.sprite[data-robot]', robotCanvas).length;
       
