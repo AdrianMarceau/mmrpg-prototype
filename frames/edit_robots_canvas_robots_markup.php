@@ -15,7 +15,7 @@ foreach($allowed_edit_data AS $player_token => $player_info){
   elseif (!empty($player_info['player_speed'])){ $player_colour = 'speed'; }
 echo '<td style="width: '.floor(100 / $allowed_edit_player_count).'%;">'."\n";
   echo '<div class="wrapper wrapper_'.($player_counter % 2 != 0 ? 'left' : 'right').' wrapper_'.$player_token.'" data-select="robots" data-player="'.$player_info['player_token'].'">'."\n";
-    echo '<div class="wrapper_header player_type player_type_'.$player_colour.'">'.$player_info['player_name'].'</div>';
+    echo '<div class="wrapper_header player_type player_type_'.$player_colour.'">'.$player_info['player_name'].' <span class="count">'.count($player_info['player_robots']).'</span></div>';
     echo '<div class="wrapper_overflow">';
       foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
         $robot_key = $key_counter;
