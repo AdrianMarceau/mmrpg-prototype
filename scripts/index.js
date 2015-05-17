@@ -2,12 +2,17 @@
 var thisBody = false;
 var thisPrototype = false;
 var thisWindow = false;
+var thisHeaderBanner = false;
+var thisHeaderMenu = false;
 $(document).ready(function(){
   
   // Update global reference variables
   thisBody = $('#mmrpg');
   thisIndex = $('#window', thisBody);
   thisWindow = $(window);
+  thisHeaderBanner = $('.banner', thisIndex);
+  thisHeaderMenu = $('.menu', thisIndex);
+  
   
   // Create the window resize events to ensure scrolling works
   /*
@@ -46,6 +51,33 @@ $(document).ready(function(){
     return window.prompt("Copy to clipboard: Ctrl+C or Cmd-C, Enter", thisText);
     //alert('data-clickcopy = '+thisText);
     });
+  
+  
+  /*
+   * MAIN MENU EVENTS
+   */
+  
+  // Capture and clicks to the main menu expand toggle
+  $('.userinfo .expand', thisHeaderBanner).click(function(e){
+    console.log('expand clicked!');
+    e.preventDefault();
+    var menuButton = $(this);
+    var menuContainer = $('.main', thisHeaderMenu);
+    if (!menuContainer.hasClass('expanded')){
+      
+      menuContainer.addClass('expanded');
+      menuButton.find('span').html('×');
+      
+      } else {
+      
+        menuContainer.removeClass('expanded');
+        menuButton.find('span').html('+');
+        
+      }
+    
+    
+    });
+  
   
   /*
    * GALLERY LINK EVENTS
