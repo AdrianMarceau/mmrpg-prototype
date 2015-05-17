@@ -5,12 +5,6 @@
   background-color: transparent;
   width: 762px;
 }
-#mmrpg.windowFlag_landscapeMode,
-#mmrpg.mobileFlag_landscapeMode,
-#mmrpg.windowFlag_landscapeMode #prototype,
-#mmrpg.mobileFlag_landscapeMode #prototype {
-  width: 1024px;
-}
 #prototype .header {
   width: 100%;
 }
@@ -33,10 +27,6 @@
   margin-right: -17px;
   padding-right: 3px;
   padding-left: 3px;
-}
-body.windowFlag_landscapeMode #prototype .help .wrapper,
-body.mobileFlag_landscapeMode #prototype .help .wrapper {
-  padding-left: 0;
 }
 #prototype .help .wrapper_full {
   height: auto; 
@@ -211,4 +201,22 @@ body.mobileFlag_landscapeMode #prototype .help .wrapper {
 #prototype .help .container {
   display: block;
   margin: 5px auto 0;
+}
+
+
+/*
+ * MOBILE OVERRIDE STYLES
+ */
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+  
+  #mmrpg,
+  #mmrpg #prototype {
+    width: 1024px;
+  }
+  #prototype .help .wrapper {
+    padding-left: 0;
+  }
+
 }

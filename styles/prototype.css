@@ -174,12 +174,6 @@ body.prototype {
   height: auto;  
   bottom: -86px;
 }
-body.windowFlag_landscapeMode #prototype .banner .tooltip,
-body.mobileFlag_landscapeMode #prototype .banner .tooltip {
-  bottom: -50px;
-}
-body.windowFlag_landscapeMode #prototype .banner .tooltip:hover,
-body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .tooltip:hover {
   bottom: 0;
 }
@@ -628,9 +622,6 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
   overflow-y: scroll;  
   margin-right: -26px;
 }
-body.windowFlag_landscapeMode #prototype .select_this_player_robots .option_wrapper {
-  margin-right: -30px;
-}
 #prototype .option_wrapper_full {
   height: auto; 
   overflow: hidden;
@@ -666,10 +657,6 @@ body.windowFlag_landscapeMode #prototype .select_this_player_robots .option_wrap
   -moz-user-select: none;
   -o-user-select: none;
   user-select: none;  
-}
-body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select,
-body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select {
-  right: -6px;
 }
 #prototype .option_wrapper_missions .chapter_select .chapter_link {
   display: block;
@@ -935,10 +922,6 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
   margin-left: 460px !important;
   padding-left: 0 !important;
 }
-body.windowFlag_landscapeMode #prototype .option_this-team-select .chrome label,
-body.mobileFlag_landscapeMode #prototype .option_this-team-select .chrome label {
-  margin-left: 560px !important;
-}
 #prototype .option label {
   padding: 15px 50px;
   background-color: #2A2A2A;
@@ -960,10 +943,6 @@ body.mobileFlag_landscapeMode #prototype .option_this-team-select .chrome label 
 #prototype .menu {
   overflow: hidden;
   padding: 0 6px 0 6px;
-}
-body.windowFlag_landscapeMode #prototype .menu,
-body.mobileFlag_landscapeMode #prototype .menu {
-  padding: 0 10px 0 5px;
 }
 #prototype .menu_hide {
   display: none;
@@ -1544,68 +1523,65 @@ body.mobileFlag_landscapeMode #prototype .menu {
 
 /* WINDOW SIZE STYLES */
 
-body.windowFlag_landscapeMode #prototype {
-  width: 1024px;  
-}
-body.windowFlag_landscapeMode #prototype .banner {
-  width: auto;
-  float: none;
-  clear: both;
-}
-body.windowFlag_landscapeMode #prototype .header,
-body.windowFlag_landscapeMode #prototype .option_1x4 {
-  width: auto;
-  float: none;
-  clear: both;
-}
-body.windowFlag_landscapeMode #prototype .option_scroll {
-  width: 34px;
-}
-body.windowFlag_landscapeMode #prototype .option_1x1,
-body.windowFlag_landscapeMode #prototype .option_1x2,
-body.windowFlag_landscapeMode #prototype .option_1x3,
-body.windowFlag_landscapeMode #prototype .option_1x4 {
-  /*
-  height: 73px;
-  line-height: 73px;
-  */ 
-}
-body.windowFlag_landscapeMode #prototype .option_1x1 {
-  width: 245px;
-}
-body.windowFlag_landscapeMode #prototype .option_1x2 {
-  width: 497px;
-}
-body.windowFlag_landscapeMode #prototype .option_1x3 {
-  width: 741px;
-}
-body.windowFlag_landscapeMode #prototype .option_1x4 {
-  width: 1000px;
-}
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
 
-body.windowFlag_landscapeMode #prototype .option_1x1 .inset,
-body.windowFlag_landscapeMode #prototype .option_1x2 .inset,
-body.windowFlag_landscapeMode #prototype .option_1x3 .inset,
-body.windowFlag_landscapeMode #prototype .option_1x4 .inset {
-  /*
-  height: 48px;
-  line-height: 48px;
-  */
-}
-body.windowFlag_landscapeMode #prototype .option_1x1 div label,
-body.windowFlag_landscapeMode #prototype .option_1x2 div label,
-body.windowFlag_landscapeMode #prototype .option_1x3 div label,
-body.windowFlag_landscapeMode #prototype .option_1x4 div label {
-  background-color: transparent;
-  border-color: transparent;
-  box-shadow: none;  
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
-}
-body.windowFlag_landscapeMode #prototype .block_2, 
-body.windowFlag_landscapeMode #prototype .block_4, 
-body.windowFlag_landscapeMode #prototype .block_6, 
-body.windowFlag_landscapeMode #prototype .block_8, 
-body.windowFlag_landscapeMode #prototype .block_10 {
-  /*width: 499px;*/
+  #prototype {
+    width: 1024px;  
+  }
+  #prototype .banner {
+    width: auto;
+    float: none;
+    clear: both;
+  }
+  #prototype .banner .tooltip {
+    bottom: -50px;
+  }
+  #prototype .banner .tooltip:hover {
+    bottom: 0;
+  }
+  #prototype .header,
+  #prototype .option_1x4 {
+    width: auto;
+    float: none;
+    clear: both;
+  }
+  #prototype .option_scroll {
+    width: 34px;
+  }
+  #prototype .option_1x1 {
+    width: 245px;
+  }
+  #prototype .option_1x2 {
+    width: 497px;
+  }
+  #prototype .option_1x3 {
+    width: 741px;
+  }
+  #prototype .option_1x4 {
+    width: 1000px;
+  }
+  #prototype .option_1x1 div label,
+  #prototype .option_1x2 div label,
+  #prototype .option_1x3 div label,
+  #prototype .option_1x4 div label {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;  
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+  }
+  #prototype .select_this_player_robots .option_wrapper {
+    margin-right: -30px;
+  }
+  #prototype .option_wrapper_missions .chapter_select {
+    right: -6px;
+  }  
+  #prototype .option_this-team-select .chrome label {
+    margin-left: 560px !important;
+  }  
+  #prototype .menu {
+    padding: 0 10px 0 5px;
+  }
+
 }

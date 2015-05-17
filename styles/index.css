@@ -223,6 +223,10 @@ html {
   -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);    
 }
+#window .banner .userinfo .expand {
+  display: none;
+  
+}
 
 #window .banner .userinfo .field_type {
   display: block;
@@ -281,7 +285,7 @@ html {
 
 #window .banner .userinfo .info {
   display: block; 
-  float: left; 
+  float: right; 
   text-align: right; 
   overflow: hidden; 
   text-transform: none; 
@@ -658,7 +662,7 @@ html {
   font-size: 13px;
   line-height: 19px;  
   text-align: left;
-  background-color: rgba(0, 0, 0, 0.20);
+  background-color: rgb(30, 30, 30);
   border: 1px solid transparent;
   border-radius: 0.3em;
   -moz-border-radius: 0.3em;
@@ -1929,10 +1933,6 @@ html {
   -moz-border-radius: 6px;
   -webkit-border-radius: 6px;
 }
-body.mobileFlag_landscapeMode #window .page .leaderboard .subbody .player_stats,
-body.windowFlag_landscapeMode #window .page .leaderboard .subbody .player_stats {
-  width: 468px;
-}
 #window .page .leaderboard .subbody .player_stats .label {
   display: block;
   font-weight: bold;
@@ -2081,10 +2081,6 @@ body.windowFlag_landscapeMode #window .page .leaderboard .subbody .player_stats 
   width: 100px !important;
   margin-left: 460px !important;
   padding-left: 0 !important;
-}
-body.windowFlag_landscapeMode #window .page .event .option_this-team-select .chrome label,
-body.mobileFlag_landscapeMode #window .page .event .option_this-team-select .chrome label {
-  margin-left: 560px !important;
 }
 #window .page .event .option label {
   padding: 15px 50px;
@@ -2414,9 +2410,6 @@ body.mobileFlag_landscapeMode #window .page .event .option_this-team-select .chr
   max-height: 130px;
   margin-bottom: 6px;
 }
-body.windowFlag_landscapeMode #window .page_home .gallery .wrapper {
-  max-height: 160px;
-}
 #window .page .gallery .wrapper_full {
   height: auto; 
   overflow: hidden;
@@ -2440,12 +2433,6 @@ body.windowFlag_landscapeMode #window .page_home .gallery .wrapper {
 #window .page .gallery .screenshot:hover {
   border: 1px solid rgba(10, 10, 10, 0.15);
 }
-body.windowFlag_landscapeMode #window .page .gallery .dateblock,
-body.windowFlag_landscapeMode #window .page .gallery .screenshot {
-  width: 120px; 
-  height: 70px;
-  margin: 0 4px 4px 0; 
-}
 #window .page .gallery .screenshot img {
   display: block; 
   margin: 0;
@@ -2454,9 +2441,6 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot {
 }
 #window .page .gallery .screenshot:hover img {
   opacity: 1.00;
-}
-body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
-  width: 120px;
 }
 #window .page .gallery .screenshot .title,
 #window .page .gallery .screenshot .date {
@@ -2575,13 +2559,6 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
   padding-top: 8px;
   color: #F2F2F2 !important;
 }
-body.windowFlag_landscapeMode #window .page .subbody .float_link .sprite,
-body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite { 
-  width: 29px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-}
 #window .page .subbody .float_link .sprite_size_40x40,
 #window .page .subbody .float.link .sprite_size_40x40,
 #window .page .subbody .float.link .sprite.size40 {
@@ -2595,15 +2572,6 @@ body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite {
 #window .page .subbody .float.link .sprite.size40 img {
   margin-top: -4px;
   margin-left: -10px;
-}
-body.windowFlag_landscapeMode #window .page .subbody .float_link .sprite_size_40x40 span,
-body.windowFlag_landscapeMode #window .page .subbody .float_link .sprite_size_40x40 img,
-body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite_size_40x40 span,
-body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite_size_40x40 img,
-body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite.size40 span,
-body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite.size40 img {
-  margin-top: -4px;
-  margin-left: -6px;
 }
 #window .page .subbody .float_link .sprite_size_80x80,
 #window .page .subbody .float.link .sprite_size_80x80,
@@ -2628,24 +2596,10 @@ body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite.size40 
   background-color: #171717; 
   border-radius: 0.3em;
 }
-body.windowFlag_landscapeMode #window .page .body .subbody .float_link_group,
-body.windowFlag_landscapeMode #window .page .body .subbody .float.link.group {
-  margin: 0 8px 8px 0 !important;
-  padding: 2px 2px 4px 4px;
-}
 #window .page .body .subbody .break,
 #window .page .body .subbody .break {
   display: block;
   clear: both;
-}
-body.windowFlag_landscapeMode #window .page .subbody .float_link .sprite_size_80x80 span,
-body.windowFlag_landscapeMode #window .page .subbody .float_link .sprite_size_80x80 img,
-body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite_size_80x80 span,
-body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite_size_80x80 img,
-body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite.size80 span,
-body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite.size80 img {
-  margin-top: -24px;
-  margin-left: -26px;
 }
 
 #window .page .subbody .this_sprite .sprite_player_sprite,
@@ -3020,9 +2974,6 @@ body.windowFlag_landscapeMode #window .page .subbody .float.link .sprite.size80 
   padding: 2px 3px;
   margin: 0 4px 4px 0;
   text-align: center;
-}
-body.windowFlag_landscapeMode #window .page .type_block {
-  width: 86px;
 }
 
 #window .page .event .section_tabs {
@@ -3899,10 +3850,6 @@ body.windowFlag_landscapeMode #window .page .type_block {
 #window .page .body .community:hover .thread_subbody_compact:hover {
   opacity: 1.00;
 }
-body.windowFlag_landscapeMode #window .page .body .community .thread_subbody_compact,
-body.mobileFlag_landscapeMode #window .page .body .community .thread_subbody_compact {
-  width: 490px;
-}
 #window .page .body .community .thread_subbody .thread_linkblock {
   padding: 3px 0 5px 60px;
   border-radius: 0.3em;
@@ -3957,9 +3904,6 @@ body.mobileFlag_landscapeMode #window .page .body .community .thread_subbody_com
   overflow: hidden; 
   white-space: nowrap; 
   text-overflow: ellipsis;
-}
-body.windowFlag_landscapeMode #window .page .body .community .thread_name .thread_namewrapper {
-  width: 700px; 
 }
 #window .page .body .community .thread_name .thread_namewrapper .link {
   display: inline;
@@ -4451,10 +4395,6 @@ body.windowFlag_landscapeMode #window .page .body .community .thread_name .threa
   background-color: transparent;
 }
 
-body.mobileFlag_landscapeMode #window .page .body .bodytext .field_panel_foreground,
-body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foreground {
-  /*background-size: 101% auto;*/
-}
 #window .page .body .bodytext .field_panel .align_left,
 #window .page .body .bodytext .field_panel .align_right,
 #window .page .body .bodytext .field_panel .align_center,
@@ -4744,13 +4684,6 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
 #window .page_community .form .field_thread_body .textarea {
   height: auto;
 }
-body.windowFlag_landscapeMode #window .page_community .form .field_thread_body input.text,
-body.windowFlag_landscapeMode #window .page_community .form .field_thread_body select.select2,
-body.windowFlag_landscapeMode #window .page_community .form .field_thread_body .textarea,
-body.windowFlag_landscapeMode #window .page_community .form .field_post_body .textarea,
-body.windowFlag_landscapeMode #window .page_file .form .field_post_body .textarea {
-  width: 862px;
-}
 #window .page_community .form .buttons,
 #window .page_file .form .buttons {
   margin-top: 6px;
@@ -4966,91 +4899,447 @@ body.windowFlag_landscapeMode #window .page_file .form .field_post_body .textare
   border-color: transparent !important;
   overflow: visible;
 }
-body.windowFlag_landscapeMode #game_frames iframe,
-body.mobileFlag_landscapeMode #game_frames iframe {
-  width: 1000px !important;
-  left: -14px !important; 
-}
 
 
+/*
+ * MOBILE OVERRIDE STYLES
+ */
 
-/* WINDOW SIZE STYLES */
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+  
+  #window .page .leaderboard .subbody .player_stats {
+    width: 468px;
+  }
+  #window .page .event .option_this-team-select .chrome label {
+    margin-left: 560px !important;
+  } 
+  #window .page_home .gallery .wrapper {
+    max-height: 160px;
+  }
+  #window .page .gallery .dateblock,
+  #window .page .gallery .screenshot {
+    width: 120px; 
+    height: 70px;
+    margin: 0 4px 4px 0; 
+  }
+  #window .page .gallery .screenshot img {
+    width: 120px;
+  }
+  #window .page .subbody .float_link .sprite,
+  #window .page .subbody .float.link .sprite { 
+    width: 29px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  }
+  #window .page .subbody .float_link .sprite_size_40x40 span,
+  #window .page .subbody .float_link .sprite_size_40x40 img,
+  #window .page .subbody .float.link .sprite_size_40x40 span,
+  #window .page .subbody .float.link .sprite_size_40x40 img,
+  #window .page .subbody .float.link .sprite.size40 span,
+  #window .page .subbody .float.link .sprite.size40 img {
+    margin-top: -4px;
+    margin-left: -6px;
+  }
+  #window .page .body .subbody .float_link_group,
+  #window .page .body .subbody .float.link.group {
+    margin: 0 8px 8px 0 !important;
+    padding: 2px 2px 4px 4px;
+  }
+  #window .page .subbody .float_link .sprite_size_80x80 span,
+  #window .page .subbody .float_link .sprite_size_80x80 img,
+  #window .page .subbody .float.link .sprite_size_80x80 span,
+  #window .page .subbody .float.link .sprite_size_80x80 img,
+  #window .page .subbody .float.link .sprite.size80 span,
+  #window .page .subbody .float.link .sprite.size80 img {
+    margin-top: -24px;
+    margin-left: -26px;
+  }
+  #window .page .type_block {
+    width: 86px;
+  }
+  #window .page .body .community .thread_subbody_compact {
+    width: 490px;
+  }
+  #window .page .body .community .thread_name .thread_namewrapper {
+    width: 700px; 
+  }
+  #window .page_community .form .field_thread_body input.text,
+  #window .page_community .form .field_thread_body select.select2,
+  #window .page_community .form .field_thread_body .textarea,
+  #window .page_community .form .field_post_body .textarea,
+  #window .page_file .form .field_post_body .textarea {
+    width: 862px;
+  }
+  #game_frames iframe,
+  #game_frames iframe {
+    width: 1000px !important;
+    left: -14px !important; 
+  }
+  #window .page .event .robot_container .robot_name,
+  #window .page .event .ability_container .ability_name {
+    width: 48.30%; 
+  }
+  #window .page #robots .event .robot_name,
+  #window .page #abilities .event .ability_name {
+    width: auto; 
+  }
+  #window .banner .event {
+    left: auto;
+    right: 123px;
+    overflow: visible;
+  }
+  #window {
+    width: 1024px;  
+  }
+  #window .banner,
+  #window .menu {
+    width: 1004px;
+  }
+  #window .header,
+  #window .option {
+    width: 1004px;
+  }
+  #window .option_scroll {
+    width: 34px;
+  }
+  #window .option_1x1,
+  #window .option_1x2,
+  #window .option_1x3,
+  #window .option_1x4 {
+    height: 73px;
+    line-height: 73px;
+  }
+  #window .option_1x1 {
+    width: 245px;
+  }
+  #window .option_1x2 {
+    width: 497px;
+  }
+  #window .option_1x3 {
+    width: 741px;
+  }
+  #window .option_1x1 div,
+  #window .option_1x2 div,
+  #window .option_1x3 div,
+  #window .option_1x4 div {
+    height: 48px;
+    line-height: 48px;
+  }
+  #window .option_1x1 div label,
+  #window .option_1x2 div label,
+  #window .option_1x3 div label,
+  #window .option_1x4 div label {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;  
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+  }
+  #window .page .body .subwrap .image_1x5 {
+    width: 18.40%;
+  }  
 
-
-body.windowFlag_landscapeMode #window .page .event .robot_container .robot_name,
-body.windowFlag_landscapeMode #window .page .event .ability_container .ability_name {
-  width: 48.30%; 
-}
-body.windowFlag_landscapeMode #window .page #robots .event .robot_name,
-body.windowFlag_landscapeMode #window .page #abilities .event .ability_name {
-  width: auto; 
 }
 
-body.windowFlag_landscapeMode #window .banner .event {
-  left: auto;
-  right: 123px;
-  overflow: visible;
-}
-
-body.windowFlag_landscapeMode #window {
-  width: 1024px;  
-}
-body.windowFlag_landscapeMode #window .banner,
-body.windowFlag_landscapeMode #window .menu {
-  width: 1004px;
-}
-body.windowFlag_landscapeMode #window .header,
-body.windowFlag_landscapeMode #window .option {
-  width: 1004px;
-}
-body.windowFlag_landscapeMode #window .option_scroll {
-  width: 34px;
-}
-body.windowFlag_landscapeMode #window .option_1x1,
-body.windowFlag_landscapeMode #window .option_1x2,
-body.windowFlag_landscapeMode #window .option_1x3,
-body.windowFlag_landscapeMode #window .option_1x4 {
-  height: 73px;
-  line-height: 73px;
-}
-body.windowFlag_landscapeMode #window .option_1x1 {
-  width: 245px;
-}
-body.windowFlag_landscapeMode #window .option_1x2 {
-  width: 497px;
-}
-body.windowFlag_landscapeMode #window .option_1x3 {
-  width: 741px;
-}
-body.windowFlag_landscapeMode #window .option_1x4 {
+/* -- Portrait Mode -- */
+@media (max-width: 1060px){
+  
+  #mmrpg #window .menu {
+    width: auto;
+  }
+  #window .header {
+    width: auto;
+  }
   
 }
 
-body.windowFlag_landscapeMode #window .option_1x1 div,
-body.windowFlag_landscapeMode #window .option_1x2 div,
-body.windowFlag_landscapeMode #window .option_1x3 div,
-body.windowFlag_landscapeMode #window .option_1x4 div {
-  height: 48px;
-  line-height: 48px;
-}
-body.windowFlag_landscapeMode #window .option_1x1 div label,
-body.windowFlag_landscapeMode #window .option_1x2 div label,
-body.windowFlag_landscapeMode #window .option_1x3 div label,
-body.windowFlag_landscapeMode #window .option_1x4 div label {
-  background-color: transparent;
-  border-color: transparent;
-  box-shadow: none;  
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
-}
-body.windowFlag_landscapeMode #window .block_2, 
-body.windowFlag_landscapeMode #window .block_4, 
-body.windowFlag_landscapeMode #window .block_6, 
-body.windowFlag_landscapeMode #window .block_8, 
-body.windowFlag_landscapeMode #window .block_10 {
-  /*width: 499px;*/
-}
 
-body.windowFlag_landscapeMode #window .page .body .subwrap .image_1x5 {
-  width: 18.40%;
+/* -- iPhone Portrait Mode -- */
+@media (max-width: 350px){
+
+  #mmrpg {
+    background-color: magenta;
+    background-color: #262626;
+    background-image: none;
+    padding-bottom: 10px;
+  }
+  #mmrpg #window {
+    background-color: transparent;
+    border-bottom: 0 none transparent;
+    box-shadow: 0 0 0 transparent;
+    min-width: 320px;
+  }
+  
+  #window .banner {
+    height: 164px;
+  }
+  
+  #window .banner .event {
+    width: auto;
+  }
+  #window .banner .event .sprite[data-type=attachment] {
+    display: none;
+  }
+  
+  #window .banner .userinfo {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 6px 6px;
+    border-top-width: 2px;
+    border-style: solid none none;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+  }
+  #window .banner .userinfo .expand {
+    display: block;
+    position: absolute;
+    left: 3px;
+    bottom: 3px;
+    font-size: 34px;
+    line-height: 34px;
+    border: 1px solid #1A1A1A;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    border-radius: 3px;
+    text-decoration: none;
+    color: #FFFFFF;   
+    background-color: #222222;  
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0.15, rgba(0, 0, 0, 0.05)),
+        color-stop(0.75, rgba(255, 255, 255, 0.05))
+    );
+    background-image: -moz-linear-gradient(
+        center bottom,
+        rgba(0, 0, 0, 0.05) 15%,
+        rgba(255, 255, 255, 0.05) 75%
+    ); 
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);  
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  }
+  #window .banner .userinfo .expand:hover {
+    background-color: #292929;  
+  }
+  #window .banner .userinfo .avatar {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  #window .banner .userinfo .info {
+    height: auto;
+    text-align: right;
+    float: right;
+    width: 70%;
+    width: calc(100% - 72px);
+  }
+  #window .banner .userinfo .info .username {
+    font-size: 12px;
+    line-height: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #window .banner .userinfo .info .username .pipe {
+    display: none;
+  }
+  #window .banner .userinfo .info .username .place {
+    display: none;
+  }
+  #window .banner .userinfo .info .username .place span {
+    display: none;
+  }
+  #window .banner .userinfo .info .file {
+    font-size: 11px;
+    line-height: 13px;
+  }
+  #window .banner .userinfo .field_type {
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    border: 0 none transparent;
+  }
+  
+  #window .menu .main {
+    height: 0;
+  }
+  #window .menu .main.expanded {
+    height: auto;
+  }
+  #window .menu .link {
+    display: block;
+    float: none;
+    clear: both;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    border-bottom: 1px solid #090909;
+    line-height: 30px;
+  }
+  #window .menu .link:last-child {
+    border-bottom: 0 none transparent;
+  }
+  #window .menu .sub {
+    display: none;
+  }
+  #window .menu .sub .link {
+    line-height: 20px;
+  }
+  #window .menu .link:after {
+    display: none;
+  }
+  
+  #window .header {
+    height: auto;
+    font-size: 16px;
+  }
+  #window .page .header .count {
+    float: none;
+    display: block;
+    clear: both;
+    font-size: 12px;
+    line-height: 12px;
+    margin-top: -4px;
+    padding-bottom: 10px;
+  }
+  
+  #window .page .subbody .float.link .sprite {
+    width: 25px;
+  }
+  #window .page .subbody .float.link .sprite.size40 span, 
+  #window .page .subbody .float.link .sprite.size40 img {
+    margin-left: -8px;
+  }
+  #window .page .subbody .float.link .sprite.size80 span, 
+  #window .page .subbody .float.link .sprite.size80 img {
+    margin-left: -28px;
+  }
+  #window .page .subbody[data-class="bosses"] .float.link.group[data-game=MM30] .sprite {
+    width: 19px;
+  }
+  #window .page .subbody[data-class="bosses"] .float.link.group[data-game=MM30] .sprite.size40 span, 
+  #window .page .subbody[data-class="bosses"] .float.link.group[data-game=MM30] .sprite.size40 img {
+    margin-left: -6px;
+  }
+  
+  #window .page .body .subbody[data-class="abilities"] .float.link.group {
+    margin-right: 4px !important;
+    margin-bottom: 4px !important;
+  }
+  #window .page .subbody[data-class="abilities"] .float.link .sprite {
+    width: 22px;
+  }
+  #window .page .subbody[data-class="abilities"] .float.link .sprite.size40 span, 
+  #window .page .subbody[data-class="abilities"] .float.link .sprite.size40 img {
+    margin-left: -9px;
+  }
+  
+  
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MM00/Weapons/"] .sprite {
+    width: 24px;
+  }
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MM00/Weapons/"] .sprite.size40 span,
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MM00/Weapons/"] .sprite.size40 img {
+    margin-left: -8px;
+  }
+  
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game="MM30/Weapons/Stardroid"] .sprite {
+    width: 19px;
+  }
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game="MM30/Weapons/Stardroid"] .sprite.size40 img {
+    margin-left: -12px;
+  }
+  
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Weapons/"] .sprite {
+    width: 20px;
+  }
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Weapons/"] .sprite.size40 span,
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Weapons/"] .sprite.size40 img {
+    margin-left: -10px;
+  }
+  
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Support/"] .sprite {
+    width: 20px;
+  }
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Support/"] .sprite.size40 span,
+  #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Support/"] .sprite.size40 img {
+    margin-left: -10px;
+  }
+  
+  #window .page .subbody[data-class="items"] .float.link.group[data-game^="MM00/Items/"] .sprite {
+    width: 20px;
+  }
+  #window .page .subbody[data-class="items"] .float.link.group[data-game^="MM00/Items/"] .sprite.size40 span,
+  #window .page .subbody[data-class="items"] .float.link.group[data-game^="MM00/Items/"] .sprite.size40 img {
+    margin-left: -10px;
+  }
+  
+  #window .page .subbody[data-class="items"] .float.link.group[data-game^="MMRPG/Items/"] .sprite {
+    width: 18px;
+  }
+  #window .page .subbody[data-class="items"] .float.link.group[data-game^="MMRPG/Items/"] .sprite.size40 span,
+  #window .page .subbody[data-class="items"] .float.link.group[data-game^="MMRPG/Items/"] .sprite.size40 img {
+    margin-left: -11px;
+  }
+  
+  #window .page_database .type_block {
+    width: 45%;
+  }
+  
+  #window .page .body .subheader .inline_link {
+    font-size: 14px;
+    line-height: 16px;
+  }
+  #window .page .header .count, 
+  #window .page .body .subheader .count {
+    float: right;
+  }
+  #window .page .body .subheader .float_link, 
+  #window .page .body .subheader .float_link2 {
+    display: none;
+  }
+  
+  #window .page .event table td.right {
+    display: block;
+    float: none;
+    clear: none;
+    width: auto;
+    padding: 2px 5px;
+  }
+  #window .page .event table td:not([class]) {
+    display: none;
+  }
+  
+  #window .page .event .robot_container .robot_name, 
+  #window .page .event .ability_container .ability_name {
+    display: block;
+    float: none;
+    width: auto;
+    clear: both;
+  }
+  #window .page .event .robot_container .robot_name .label, 
+  #window .page .event .ability_container .ability_name .label {
+    width: 75%;
+    width: calc(100% - 42px);
+  }
+  
+  
+  #mmrpg #credits {
+    margin: -12px 10px 0;
+    padding: 6px 26px;
+    background-color: rgb(30, 30, 30);
+    color: #464646;
+    text-shadow: 0 0 0 transparent;    
+    border-radius: 0.3em;
+  }
+  
+ 
 }

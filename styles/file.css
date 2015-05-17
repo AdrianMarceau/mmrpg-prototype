@@ -5,12 +5,6 @@
   background-color: transparent;
   width: 762px;
 }
-#mmrpg.windowFlag_landscapeMode,
-#mmrpg.mobileFlag_landscapeMode,
-#mmrpg.windowFlag_landscapeMode #prototype,
-#mmrpg.mobileFlag_landscapeMode #prototype {
-  width: 1024px;
-}
 #prototype .header {
   width: 100%;
 }
@@ -255,4 +249,20 @@
 }
 #prototype .menu .wrapper_dr-cossack {
   background-color: rgba(200, 0, 200, 0.15);
+}
+
+
+
+/*
+ * MOBILE OVERRIDE STYLES
+ */
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+  
+  #mmrpg,
+  #mmrpg #prototype {
+    width: 1024px;
+  }
+
 }

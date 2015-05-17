@@ -1626,24 +1626,6 @@ body.index #header {
   padding: 0 2px;
 }
 
-body.mobileFlag_landscapeMode #battle .canvas_overlay_header,
-body.windowFlag_landscapeMode #battle .canvas_overlay_header,
-body.mobileFlag_landscapeMode #battle .canvas_overlay_footer,
-body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
-  left: 2;
-  right: 0px;
-  border-radius: 0;
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
-}
-body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
-  left: -130px;
-  right: -127px;
-  border-radius: 0 0 5px 5px;
-  -moz-border-radius: 0 0 5px 5px;
-  -webkit-border-radius: 0 0 5px 5px;
-}
-
 #events {
   top: 0;
   left: 0;
@@ -3256,193 +3238,200 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 
 /* WINDOW SIZE STYLES */
 
-body.windowFlag_landscapeMode {
-  /*width: 1024px;*/ 
-}
-body.windowFlag_landscapeMode #prototype,
-body.windowFlag_landscapeMode #window,
-body.windowFlag_landscapeMode #window iframe,
-body.windowFlag_landscapeMode #battle {
-  width: 1024px;  
-}
-body.windowFlag_landscapeMode #prototype .banner {
-  width: 1004px;
-}
-body.windowFlag_landscapeMode #prototype .header,
-body.windowFlag_landscapeMode #prototype .option {
-  width: 1004px;
-}
-body.windowFlag_landscapeMode #prototype .option_prototype-4 {
-  /*width: 1004px;*/
-}
-body.windowFlag_landscapeMode #prototype .block_2, 
-body.windowFlag_landscapeMode #prototype .block_4, 
-body.windowFlag_landscapeMode #prototype .block_6, 
-body.windowFlag_landscapeMode #prototype .block_8, 
-body.windowFlag_landscapeMode #prototype .block_10 {
-  /*width: 499px;*/
-}
-body.windowFlag_landscapeMode #canvas {
-  width: 1024px;
-}
-body.windowFlag_landscapeMode #canvas .event {
-  width: 1006px;
-}
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
 
-body.windowFlag_landscapeMode #events .event_wrapper,
-body.mobileFlag_landscapeMode #events .event_wrapper {
-  left: 235px;
-}
-
-body.windowFlag_landscapeMode #canvas .clearback {
-  width: 750px;
-  border-color: transparent;
-  box-shadow: 0 0 0 transparent;
-  -moz-box-shadow: 0 0 0 transparent;
-  -webkit-box-shadow: 0 0 0 transparent;
-  left: auto;
-  right: 124px;
-  overflow: visible;
-}
-body.windowFlag_landscapeMode #canvas .clearback .robot_details_left {
-  left: -124px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .robot_details_right {
-  right: -124px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .robot_details_extended_left {
-  left: -132px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .robot_details_extended_right {
-  right: -132px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_mugshot_left {
-  left: -116px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_80x80_mugshot_left {
-  left: -136px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_160x160_mugshot_left {
-  left: -163px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_mugshot_right {
-  right: -116px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_80x80_mugshot_right {
-  right: -136px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_160x160_mugshot_right {
-  right: -163px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .ability_overlay, 
-body.windowFlag_landscapeMode #canvas .clearback .scan_overlay {
-  width: auto;
-  left: -130px;
-  right: -130px;
-}
-body.windowFlag_landscapeMode #console {
-  width: 1024px;
-}
-body.windowFlag_landscapeMode #actions {
-  width: 1024px;  
-}
-body.windowFlag_landscapeMode #actions .action_back label {
-  width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_start .action_start label {
-  width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_loading .action_loading label {
-  width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_event .action_continue label {
-  width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_battle .action_scan,
-body.windowFlag_landscapeMode #actions .actions_battle .action_item, 
-body.windowFlag_landscapeMode #actions .actions_battle .action_target, 
-body.windowFlag_landscapeMode #actions .actions_battle .action_option, 
-body.windowFlag_landscapeMode #actions .actions_battle .action_switch {
-  width: 245px;
-}
-body.windowFlag_landscapeMode #actions .actions_battle .action_scan label, 
-body.windowFlag_landscapeMode #actions .actions_battle .action_target label, 
-body.windowFlag_landscapeMode #actions .actions_battle .action_option label, 
-body.windowFlag_landscapeMode #actions .actions_battle .action_switch label {
-  width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_battle .action_switch label {
-  width: auto;
-}
-
-body.windowFlag_landscapeMode #actions .actions_option .action_option,
-body.windowFlag_landscapeMode #actions .actions_settings .action_setting, 
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting,
-body.windowFlag_landscapeMode #actions .actions_switch .action_switch, 
-body.windowFlag_landscapeMode #actions .actions_scan .action_scan, 
-body.windowFlag_landscapeMode #actions .actions_target .action_target, 
-body.windowFlag_landscapeMode #actions .actions_ability .action_ability {
-  width: 245px;
-}
-body.windowFlag_landscapeMode #actions .actions_option .action_option label,
-body.windowFlag_landscapeMode #actions .actions_settings .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label,  
-body.windowFlag_landscapeMode #actions .actions_scan .action_scan label,
-body.windowFlag_landscapeMode #actions .actions_target .action_target label {
-  width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_scan .action_switch label {
-  width: auto;
-}
-
-body.windowFlag_landscapeMode #actions .actions_battle .action_ability label {
-  width: auto;
-}
-
-body.windowFlag_landscapeMode #actions .actions_option .action_option label, 
-body.windowFlag_landscapeMode #actions .actions_option .action_option label, 
-body.windowFlag_landscapeMode #actions .actions_settings .action_setting label, 
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label,  
-body.windowFlag_landscapeMode #actions .actions_scan .action_scan label, 
-body.windowFlag_landscapeMode #actions .actions_target .action_target label, 
-body.windowFlag_landscapeMode #actions .actions_ability .action_ability label,
-body.windowFlag_landscapeMode #actions .actions_switch .action_switch label {
-  width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_option .action_option label,
-body.windowFlag_landscapeMode #actions .actions_settings .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label {
-  width: auto;
-}
-
-body.windowFlag_landscapeMode #actions .block_4, 
-body.windowFlag_landscapeMode #actions .block_8 {
-  width: 248px !important;
-}
-body.windowFlag_landscapeMode #actions .block_4 label, 
-body.windowFlag_landscapeMode #actions .block_8 label {
+  #prototype,
+  #window,
+  #window iframe,
+  #battle {
+    width: 1024px;  
+  }
+  #prototype .banner {
+    width: 1004px;
+  }
+  #prototype .header,
+  #prototype .option {
+    width: 1004px;
+  }
+  #canvas {
+    width: 1024px;
+  }
+  #canvas .event {
+    width: 1006px;
+  }
+  #events .event_wrapper {
+    left: 235px;
+  }
+  #canvas .clearback {
+    width: 750px;
+    border-color: transparent;
+    box-shadow: 0 0 0 transparent;
+    -moz-box-shadow: 0 0 0 transparent;
+    -webkit-box-shadow: 0 0 0 transparent;
+    left: auto;
+    right: 124px;
+    overflow: visible;
+  }
+  #canvas .clearback .robot_details_left {
+    left: -124px;
+  }
+  #canvas .clearback .robot_details_right {
+    right: -124px;
+  }
+  #canvas .clearback .robot_details_extended_left {
+    left: -132px;
+  }
+  #canvas .clearback .robot_details_extended_right {
+    right: -132px;
+  }
+  #canvas .clearback .sprite_mugshot_left {
+    left: -116px;
+  }
+  #canvas .clearback .sprite_80x80_mugshot_left {
+    left: -136px;
+  }
+  #canvas .clearback .sprite_160x160_mugshot_left {
+    left: -163px;
+  }
+  #canvas .clearback .sprite_mugshot_right {
+    right: -116px;
+  }
+  #canvas .clearback .sprite_80x80_mugshot_right {
+    right: -136px;
+  }
+  #canvas .clearback .sprite_160x160_mugshot_right {
+    right: -163px;
+  }
+  #canvas .clearback .ability_overlay, 
+  #canvas .clearback .scan_overlay {
+    width: auto;
+    left: -130px;
+    right: -130px;
+  }
+  #console {
+    width: 1024px;
+  }
+  #actions {
+    width: 1024px;  
+  }
+  #actions .action_back label {
+    width: auto;
+  }
+  #actions .actions_start .action_start label {
+    width: auto;
+  }
+  #actions .actions_loading .action_loading label {
+    width: auto;
+  }
+  #actions .actions_event .action_continue label {
+    width: auto;
+  }
+  #actions .actions_battle .action_scan,
+  #actions .actions_battle .action_item, 
+  #actions .actions_battle .action_target, 
+  #actions .actions_battle .action_option, 
+  #actions .actions_battle .action_switch {
+    width: 245px;
+  }
+  #actions .actions_battle .action_scan label, 
+  #actions .actions_battle .action_target label, 
+  #actions .actions_battle .action_option label, 
+  #actions .actions_battle .action_switch label {
+    width: auto;
+  }
+  #actions .actions_battle .action_switch label {
+    width: auto;
+  }
+  #actions .actions_option .action_option,
+  #actions .actions_settings .action_setting, 
+  #actions .actions_settings_eventTimeout .action_setting,
+  #actions .actions_settings_volumeControl .action_setting,
+  #actions .actions_settings_autoScan .action_setting,
+  #actions .actions_switch .action_switch, 
+  #actions .actions_scan .action_scan, 
+  #actions .actions_target .action_target, 
+  #actions .actions_ability .action_ability {
+    width: 245px;
+  }
+  #actions .actions_option .action_option label,
+  #actions .actions_settings .action_setting label,
+  #actions .actions_settings_eventTimeout .action_setting label,
+  #actions .actions_settings_volumeControl .action_setting label,
+  #actions .actions_settings_autoScan .action_setting label,  
+  #actions .actions_scan .action_scan label,
+  #actions .actions_target .action_target label {
+    width: auto;
+  }
+  #actions .actions_scan .action_switch label {
+    width: auto;
+  }
+  #actions .actions_battle .action_ability label {
+    width: auto;
+  }
+  #actions .actions_option .action_option label, 
+  #actions .actions_option .action_option label, 
+  #actions .actions_settings .action_setting label, 
+  #actions .actions_settings_eventTimeout .action_setting label,
+  #actions .actions_settings_volumeControl .action_setting label,
+  #actions .actions_settings_autoScan .action_setting label,  
+  #actions .actions_scan .action_scan label, 
+  #actions .actions_target .action_target label, 
+  #actions .actions_ability .action_ability label,
+  #actions .actions_switch .action_switch label {
+    width: auto;
+  }
+  #actions .actions_option .action_option label,
+  #actions .actions_settings .action_setting label,
+  #actions .actions_settings_eventTimeout .action_setting label,
+  #actions .actions_settings_volumeControl .action_setting label,
+  #actions .actions_settings_autoScan .action_setting label {
+    width: auto;
+  }
+  #actions .block_4, 
+  #actions .block_8 {
+    width: 248px !important;
+  }  
+  
+  #battle .canvas_overlay_header,
+  #battle .canvas_overlay_footer {
+    left: 2;
+    right: 0px;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+  }
+  #battle .canvas_overlay_footer {
+    left: -130px;
+    right: -127px;
+    border-radius: 0 0 5px 5px;
+    -moz-border-radius: 0 0 5px 5px;
+    -webkit-border-radius: 0 0 5px 5px;
+  }
 
 }
-body.windowFlag_landscapeMode #actions .actions_option .block_4 label, 
-body.windowFlag_landscapeMode #actions .actions_option .block_8 label,
-body.windowFlag_landscapeMode #actions .actions_settings .block_4 label, 
-body.windowFlag_landscapeMode #actions .actions_settings .block_8 label,
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .block_4 label, 
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .block_8 label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .block_4 label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .block_8 label,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .block_4 label, 
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .block_8 label {
 
+/* -- Portrait Mode -- */
+@media (max-width: 1060px){
+  
+  #window {
+    margin: 0 auto;
+    border-left: 0 none transparent;
+    border-right: 0 none transparent;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: auto;
+  }
+  #window .banner {
+    width: auto;
+  }
+  
 }
+
+
 
 /* -- DEBUG DEBUG DEBUG DEBUG DEBUG -- */
 

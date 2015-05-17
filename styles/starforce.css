@@ -5,12 +5,6 @@
   background-color: transparent;
   width: 762px;
 }
-#mmrpg.windowFlag_landscapeMode,
-#mmrpg.mobileFlag_landscapeMode,
-#mmrpg.windowFlag_landscapeMode #prototype,
-#mmrpg.mobileFlag_landscapeMode #prototype {
-  width: 1024px;
-}
 #prototype {
   margin-right: 10px;
 }
@@ -183,19 +177,27 @@
   background-color: #2F2F2F;
 }
 
-body.mobileFlag_landscapeMode #prototype,
-body.windowFlag_landscapeMode #prototype {
-  width: auto;
-}
-body.mobileFlag_landscapeMode #prototype .starforce .stars_container,
-body.windowFlag_landscapeMode #prototype .starforce .stars_container {
-  width: 610px;
-}
-body.mobileFlag_landscapeMode #prototype .starforce .stars_container .sprite_star,
-body.windowFlag_landscapeMode #prototype .starforce .stars_container .sprite_star {
+
+/*
+ * MOBILE OVERRIDE STYLES
+ */
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
   
-}
-body.windowFlag_landscapeMode #prototype .header, 
-body.windowFlag_landscapeMode #prototype .option {
-  width: 100%;
+  #mmrpg,
+  #mmrpg #prototype {
+    width: 1024px;
+  }
+  #prototype {
+    width: auto;
+  }
+  #prototype .starforce .stars_container {
+    width: 610px;
+  }
+  #prototype .header, 
+  #prototype .option {
+    width: 100%;
+  }
+
 }

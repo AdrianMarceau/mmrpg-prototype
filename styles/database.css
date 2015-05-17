@@ -5,12 +5,6 @@
   background-color: transparent;
   width: 762px;
 }
-#mmrpg.windowFlag_landscapeMode,
-#mmrpg.mobileFlag_landscapeMode,
-#mmrpg.windowFlag_landscapeMode #prototype,
-#mmrpg.mobileFlag_landscapeMode #prototype {
-  width: 1024px;
-}
 #database .header {
   width: 100%;
 }
@@ -361,4 +355,21 @@
   -webkit-border-radius: 0.3em;
   border-color: rgba(0, 0, 0, 0.40) !important;
   background-color: rgba(0, 0, 0, 0.20) !important;
+}
+
+
+/*
+ * MOBILE OVERRIDE STYLES
+ */
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+  
+  #mmrpg,
+  #mmrpg #prototype {
+    width: 1024px;
+  }
+
+  
+
 }

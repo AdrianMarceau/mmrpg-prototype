@@ -13,83 +13,6 @@ html, body {
   margin-right: 0;
 }
 
-/* WINDOW SIZE STYLES */
-
-body.mobileFlag_landscapeMode #window .banner .event {
-  left: auto;
-  right: 123px;
-  overflow: visible;
-}
-
-body.mobileFlag_landscapeMode #window {
-  width: 1024px;   
-}
-body.mobileFlag_landscapeMode #window .banner,
-body.mobileFlag_landscapeMode #window .menu {
-  width: 1004px;
-}
-body.mobileFlag_landscapeMode #window .header,
-body.mobileFlag_landscapeMode #window .option {
-  width: 1004px;
-}
-body.mobileFlag_landscapeMode #window .option_scroll {
-  width: 34px;
-}
-body.mobileFlag_landscapeMode #window .option_1x1,
-body.mobileFlag_landscapeMode #window .option_1x2,
-body.mobileFlag_landscapeMode #window .option_1x3,
-body.mobileFlag_landscapeMode #window .option_1x4 {
-  height: 73px;
-  line-height: 73px;
-}
-body.mobileFlag_landscapeMode #window .option_1x1 {
-  width: 245px;
-}
-body.mobileFlag_landscapeMode #window .option_1x2 {
-  width: 497px;
-}
-body.mobileFlag_landscapeMode #window .option_1x3 {
-  width: 741px;
-}
-body.mobileFlag_landscapeMode #window .option_1x4 {
-  
-}
-
-body.mobileFlag_landscapeMode #window .option_1x1 div,
-body.mobileFlag_landscapeMode #window .option_1x2 div,
-body.mobileFlag_landscapeMode #window .option_1x3 div,
-body.mobileFlag_landscapeMode #window .option_1x4 div {
-  height: 48px;
-  line-height: 48px;
-}
-body.mobileFlag_landscapeMode #window .option_1x1 div label,
-body.mobileFlag_landscapeMode #window .option_1x2 div label,
-body.mobileFlag_landscapeMode #window .option_1x3 div label,
-body.mobileFlag_landscapeMode #window .option_1x4 div label {
-  background-color: transparent;
-  border-color: transparent;
-  box-shadow: none;  
-  -moz-box-shadow: none;
-  -webkit-box-shadow: none;
-}
-body.mobileFlag_landscapeMode #window .block_2, 
-body.mobileFlag_landscapeMode #window .block_4, 
-body.mobileFlag_landscapeMode #window .block_6, 
-body.mobileFlag_landscapeMode #window .block_8, 
-body.mobileFlag_landscapeMode #window .block_10 {
-  /*width: 499px;*/
-}
-
-body.mobileFlag_landscapeMode #window .page .body .subwrap .image_1x5 {
-  width: 18.40%;
-}
-
-body.mobileFlag_landscapeMode #window .page_community .form .field_thread_body input.rexr,
-body.mobileFlag_landscapeMode #window .page_community .form .field_thread_body .textarea,
-body.mobileFlag_landscapeMode #window .page_community .form .field_post_body .textarea,
-body.mobileFlag_landscapeMode #window .page_file .form .field_post_body .textarea {
-  width: 870px;
-}
 
 /* -- OTHER STYLES -- */
 
@@ -99,4 +22,79 @@ body.mobileFlag_landscapeMode #window .page_file .form .field_post_body .textare
 }
 #window .page .body .community .thread_subbody_small {
   opacity: 1.00;
+}
+
+
+/*
+ * MOBILE OVERRIDE STYLES
+ */
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+
+  #window {
+    width: 1024px;   
+  }
+  #window .banner .event {
+    left: auto;
+    right: 123px;
+    overflow: visible;
+  }
+  #window .banner,
+  #window .menu {
+    width: 1004px;
+  }
+  #window .header,
+  #window .option {
+    width: 1004px;
+  }
+  #window .option_scroll {
+    width: 34px;
+  }
+  #window .option_1x1,
+  #window .option_1x2,
+  #window .option_1x3,
+  #window .option_1x4 {
+    height: 73px;
+    line-height: 73px;
+  }
+  #window .option_1x1 {
+    width: 245px;
+  }
+  #window .option_1x2 {
+    width: 497px;
+  }
+  #window .option_1x3 {
+    width: 741px;
+  }
+  #window .option_1x4 {
+    
+  }
+  #window .option_1x1 div,
+  #window .option_1x2 div,
+  #window .option_1x3 div,
+  #window .option_1x4 div {
+    height: 48px;
+    line-height: 48px;
+  }
+  #window .option_1x1 div label,
+  #window .option_1x2 div label,
+  #window .option_1x3 div label,
+  #window .option_1x4 div label {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;  
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+  }
+  #window .page .body .subwrap .image_1x5 {
+    width: 18.40%;
+  }
+  #window .page_community .form .field_thread_body input.rexr,
+  #window .page_community .form .field_thread_body .textarea,
+  #window .page_community .form .field_post_body .textarea,
+  #window .page_file .form .field_post_body .textarea {
+    width: 870px;
+  }
+
 }

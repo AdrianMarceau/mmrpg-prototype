@@ -51,159 +51,97 @@ body.prototype {
   
 }
 
-body.mobileFlag_portraitMode #prototype {
-  height: 1004px;
+#prototype {
+  height: 876px;
   width: 768px;  
 }
-body.mobileFlag_portraitMode_notFullscreen #prototype {
-  height: 876px;
-}
-body.mobileFlag_portraitMode #prototype .banner {
+#prototype .banner {
   width: 748px;
 }
-body.mobileFlag_portraitMode #prototype .header,
-body.mobileFlag_portraitMode #prototype .option {
+#prototype .header,
+#prototype .option {
   width: 748px;
 }
-body.mobileFlag_portraitMode #prototype #canvas,
-body.mobileFlag_portraitMode #prototype #console,
-body.mobileFlag_portraitMode #prototype #actions {
+#prototype #canvas,
+#prototype #console,
+#prototype #actions {
   width: 748px;
 }
-body.mobileFlag_portraitMode #prototype .option_scroll {
+#prototype .option_scroll {
   width: 34px;
 }
-body.mobileFlag_portraitMode #prototype .option_prototype-4 {
+#prototype .option_prototype-4 {
   width: 748px;
 }
-body.mobileFlag_portraitMode #prototype .option_dr-light,
-body.mobileFlag_portraitMode #prototype .option_dr-wily {
+#prototype .option_dr-light,
+#prototype .option_dr-wily {
 
 }
-body.mobileFlag_portraitMode #prototype .option_field,
-body.mobileFlag_portraitMode #prototype .option_guts-field,
-body.mobileFlag_portraitMode #prototype .option_ice-field,
-body.mobileFlag_portraitMode #prototype .option_elec-field {
+#prototype .option_field,
+#prototype .option_guts-field,
+#prototype .option_ice-field,
+#prototype .option_elec-field {
   width: 370px;
 }
-body.mobileFlag_portraitMode #prototype .option_1x1 {
+#prototype .option_1x1 {
   width: 181px;
 }
-body.mobileFlag_portraitMode #prototype .option_1x2 {
+#prototype .option_1x2 {
   width: 369px;
 }
-body.mobileFlag_portraitMode #prototype .option_1x3 {
+#prototype .option_1x3 {
   width: 557px;
 }
-body.mobileFlag_portraitMode #prototype .option_1x4 {
 
-}
-body.mobileFlag_portraitMode #prototype .option_1x1 div,
-body.mobileFlag_portraitMode #prototype .option_1x2 div,
-body.mobileFlag_portraitMode #prototype .option_1x3 div,
-body.mobileFlag_portraitMode #prototype .option_1x4 div {
+
+/*
+ * MOBILE OVERRIDE STYLES
+ */
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+
+  #prototype {
+    height: 748px;
+    width: 1024px;  
+  }
+  body.mobileFlag_landscapeMode_notFullscreen #prototype {
+    height: 685px;
+  }
+  #prototype .banner {
+    width: 1004px;
+  }
+  #prototype .header,
+  #prototype .option {
+    width: 1004px;
+  }
+  #prototype #canvas,
+  #prototype #console,
+  #prototype #actions {
+    width: 1004px;
+  }
+  #prototype .option_scroll {
+    width: 34px;
+  }
+  #prototype .option_prototype-4 {
+    width: 1004px;
+  }
+  #prototype .option_field,
+  #prototype .option_guts-field,
+  #prototype .option_ice-field,
+  #prototype .option_elec-field {
+    width: 498px;
+  }
+  #prototype .option_1x1 {
+    width: 245px;
+  }
+  #prototype .option_1x2 {
+    width: 497px;
+  }
+  #prototype .option_1x3 {
+    width: 741px;
+  }
+
   
-}
-body.mobileFlag_portraitMode #prototype .option_1x1 div label,
-body.mobileFlag_portraitMode #prototype .option_1x2 div label,
-body.mobileFlag_portraitMode #prototype .option_1x3 div label,
-body.mobileFlag_portraitMode #prototype .option_1x4 div label {
 
-}
-body.mobileFlag_portraitMode #prototype .option_1x1 div {
-
-}
-body.mobileFlag_portraitMode #prototype .option_1x2 div {
-
-}
-body.mobileFlag_portraitMode #prototype .option_1x3 div {
-
-}
-body.mobileFlag_portraitMode #prototype .option_1x4 div {
-
-}
-body.mobileFlag_portraitMode #prototype .block_2, 
-body.mobileFlag_portraitMode #prototype .block_4, 
-body.mobileFlag_portraitMode #prototype .block_6, 
-body.mobileFlag_portraitMode #prototype .block_8, 
-body.mobileFlag_portraitMode #prototype .block_10 {
-  /*width: 371px;*/
-}
-
-body.mobileFlag_landscapeMode #prototype {
-  height: 748px;
-  width: 1024px;  
-}
-body.mobileFlag_landscapeMode_notFullscreen #prototype {
-  height: 685px;
-}
-body.mobileFlag_landscapeMode #prototype .banner {
-  width: 1004px;
-}
-body.mobileFlag_landscapeMode #prototype .header,
-body.mobileFlag_landscapeMode #prototype .option {
-  width: 1004px;
-}
-body.mobileFlag_landscapeMode #prototype #canvas,
-body.mobileFlag_landscapeMode #prototype #console,
-body.mobileFlag_landscapeMode #prototype #actions {
-  width: 1004px;
-}
-body.mobileFlag_landscapeMode #prototype .option_scroll {
-  width: 34px;
-}
-body.mobileFlag_landscapeMode #prototype .option_prototype-4 {
-  width: 1004px;
-}
-body.mobileFlag_landscapeMode #prototype .option_dr-light,
-body.mobileFlag_landscapeMode #prototype .option_dr-wily {
-
-}
-body.mobileFlag_landscapeMode #prototype .option_field,
-body.mobileFlag_landscapeMode #prototype .option_guts-field,
-body.mobileFlag_landscapeMode #prototype .option_ice-field,
-body.mobileFlag_landscapeMode #prototype .option_elec-field {
-  width: 498px;
-}
-body.mobileFlag_landscapeMode #prototype .option_1x1 {
-  width: 245px;
-}
-body.mobileFlag_landscapeMode #prototype .option_1x2 {
-  width: 497px;
-}
-body.mobileFlag_landscapeMode #prototype .option_1x3 {
-  width: 741px;
-}
-body.mobileFlag_landscapeMode #prototype .option_1x4 {
-
-}
-body.mobileFlag_landscapeMode #prototype .option_1x1 div,
-body.mobileFlag_landscapeMode #prototype .option_1x2 div,
-body.mobileFlag_landscapeMode #prototype .option_1x3 div,
-body.mobileFlag_landscapeMode #prototype .option_1x4 div {
-}
-body.mobileFlag_landscapeMode #prototype .option_1x1 div {
-
-}
-body.mobileFlag_landscapeMode #prototype .option_1x2 div {
-
-}
-body.mobileFlag_landscapeMode #prototype .option_1x3 div {
-
-}
-body.mobileFlag_landscapeMode #prototype .option_1x4 div {
-
-}
-body.mobileFlag_landscapeMode #prototype .option_1x1 div label,
-body.mobileFlag_landscapeMode #prototype .option_1x2 div label,
-body.mobileFlag_landscapeMode #prototype .option_1x3 div label,
-body.mobileFlag_landscapeMode #prototype .option_1x4 div label {
- 
-}
-body.mobileFlag_landscapeMode #prototype .block_2, 
-body.mobileFlag_landscapeMode #prototype .block_4, 
-body.mobileFlag_landscapeMode #prototype .block_6, 
-body.mobileFlag_landscapeMode #prototype .block_8, 
-body.mobileFlag_landscapeMode #prototype .block_10 {
-  /*width: 499px;*/
 }

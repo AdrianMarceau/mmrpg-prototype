@@ -6,12 +6,6 @@
   width: 762px;
   background-color: #262626;
 }
-#mmrpg.windowFlag_landscapeMode,
-#mmrpg.mobileFlag_landscapeMode,
-#mmrpg.windowFlag_landscapeMode #prototype,
-#mmrpg.mobileFlag_landscapeMode #prototype {
-  width: 1024px;
-}
 #shop .header {
   width: 100%;
 }
@@ -565,11 +559,22 @@
   border-color: rgba(0, 0, 0, 0.25) !important;
 }
 
+
 /*
  * MOBILE OVERRIDE STYLES
  */
- 
-body.mobileFlag_portraitMode #prototype #canvas,
-body.mobileFlag_landscapeMode #prototype #canvas {
-  width: 100% !important;
-} 
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+  
+  #mmrpg,
+  #mmrpg #prototype {
+    width: 1024px;
+  }
+  #prototype #canvas {
+    width: 100% !important;
+  } 
+
+  
+
+}
