@@ -5,12 +5,6 @@
   background-color: transparent;
   width: 762px;
 }
-#mmrpg.windowFlag_landscapeMode,
-#mmrpg.mobileFlag_landscapeMode,
-#mmrpg.windowFlag_landscapeMode #prototype,
-#mmrpg.mobileFlag_landscapeMode #prototype {
-  width: 1024px;
-}
 #edit .header {
   width: 100%;
 }
@@ -127,7 +121,7 @@
   padding: 0 6px;
   font-size: 10px;
   line-height: 16px;
-  text-align: center;
+  text-align: left;
   background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid #1A1A1A;
   border-radius: 0.3em;
@@ -141,6 +135,12 @@
   text-transform: uppercase;
   font-weight: bold;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+#edit #canvas .wrapper_header .count {
+  float: right;
+  font-size: 9px;
+  position: relative;
+  bottom: 1px;
 }
 #edit #canvas .wrapper .sort_wrapper {
   display: block;
@@ -817,11 +817,21 @@
   width: 100%;
 }
 
+
+
 /*
  * MOBILE OVERRIDE STYLES
  */
- 
-body.mobileFlag_portraitMode #prototype #canvas,
-body.mobileFlag_landscapeMode #prototype #canvas {
-  width: 100% !important;
-} 
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+
+  #mmrpg #prototype {
+    width: 1024px;
+  }
+  
+  #prototype #canvas {
+    width: 100% !important;
+  }
+  
+}

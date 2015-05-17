@@ -48,7 +48,8 @@ $(document).ready(function(){
       if (tempRobotCount < 2){ tempPlayerWrapper.find('.sort_wrapper').css({display:'none'}); }
       else { tempPlayerWrapper.find('.sort_wrapper').css({display:''}); }
       //console.log(thisEditorData);
-      //console.log(tempPlayerToken+' has '+tempRobotCount+' robots which is '+tempRobotPercent+'% of the total');
+      console.log(tempPlayerToken+' has '+tempRobotCount+' robots which is '+tempRobotPercent+'% of the total');
+      tempPlayerWrapper.find('.wrapper_header .count').html(tempRobotCount);
       });
     };
 
@@ -1158,6 +1159,12 @@ function robotEditorCanvasInit(){
         opacity: 0.7,
         //axis: 'y',
         //handle: '.sprite',
+        start: function(event, ui) { 
+          return startDragRobot(event, ui); 
+          },
+        stop: function(event, ui) { 
+          return stopDragRobot(event, ui); 
+          },
         update: function(event, ui) { 
           return completeDragRobot(event, ui); 
           }
@@ -1167,7 +1174,7 @@ function robotEditorCanvasInit(){
       resizePlayerWrapper();
       
       // Trigger scrollbars on any overflow containers
-      $('.wrapper_overflow', thisEditor).perfectScrollbar();
+      $('.robot_canvas .wrapper_overflow', thisEditor).perfectScrollbar();
 
       });
   
@@ -1181,6 +1188,34 @@ function robotEditorCanvasInit(){
   thisItemCanvas.addClass('hidden');
   loadCanvasItemsMarkup();
   
+}
+
+//Define a function to trigger when a robot drag has started
+function startDragRobot(event, ui){
+  
+  console.log('robot drag has started');
+  
+  $('.robot_canvas .wrapper_overflow', gameCanvas).each(function(){
+    var overflowHeight = $(this).innerHeight();
+    var overflowPlayer = $(this).parent().attr('data-player');
+    console.log('add hard-coded height of '+overflowHeight+' to '+overflowPlayer);
+    $(this).css({height:overflowHeight+'px',overflow:'visible'});
+    });
+  
+  
+}
+
+//Define a function to trigger when a robot drag has stopped
+function stopDragRobot(event, ui){
+
+console.log('robot drag has stopped');
+
+$('.robot_canvas .wrapper_overflow', gameCanvas).each(function(){
+  var overflowPlayer = $(this).parent().attr('data-player');
+  console.log('remove hard-coded height from '+overflowPlayer);
+  $(this).css({height:'',overflow:''});
+  });
+
 }
 
 // Define a function to trigger when a robot has been dragged around
@@ -1390,8 +1425,10 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
           //$('.player_name label', consolePlayerSelect).html(newPlayerName);
           //$('.player_name select', consolePlayerSelect).attr('data-player', newPlayerToken);   
           //$('select.ability_name', consoleEvent).attr('data-player', newPlayerToken);
-          canvasButton.removeClass('sprite_robot_'+currentPlayerToken).removeClass('sprite_robot_'+currentPlayerToken+'_current');
-          canvasButton.addClass('sprite_robot_'+newPlayerToken).addClass('sprite_robot_'+newPlayerToken+'_current');    
+          canvasButton.removeClass('sprite_robot_'+currentPlayerToken);
+          if (updateInCanvas){ canvasButton.removeClass('sprite_robot_'+currentPlayerToken+'_current'); }
+          canvasButton.addClass('sprite_robot_'+newPlayerToken);
+          if (updateInCanvas){ canvasButton.addClass('sprite_robot_'+newPlayerToken+'_current'); }
           canvasButton.attr('data-player', newPlayerToken);
           canvasButton.attr('data-token', newConsoleToken);
           if (updateInCanvas){ canvasButton.appendTo(newCanvasWrapper); }
