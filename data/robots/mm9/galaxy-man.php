@@ -5,6 +5,7 @@ $robot = array(
   'robot_game' => 'MM09',
   'robot_name' => 'Galaxy Man',
   'robot_token' => 'galaxy-man',
+  'robot_image_editor' => 3842,
   'robot_core' => 'space',
   'robot_description' => 'Astronomic Calculations Robot',
   'robot_energy' => 100,
