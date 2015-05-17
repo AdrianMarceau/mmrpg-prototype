@@ -154,7 +154,8 @@ $this_page_markup = ob_get_clean();
 <link type="text/css" href="_ext/colorbox/jquery.colorbox.css" rel="stylesheet" />
 <? endif; ?>
 <meta name="format-detection" content="telephone=no">
-<?if($flag_wap):?>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<? /*if($flag_wap):?>
 <meta name="viewport" content="user-scalable=yes, initial-scale=1.0, minimum-scale=1.0, width=768, height=1004">
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -162,7 +163,7 @@ $this_page_markup = ob_get_clean();
 <?elseif($flag_iphone):?>
 <meta name="viewport" content="user-scalable=yes, width=768, height=1004">
 <link type="text/css" href="styles/style-mobile-iphone.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<?endif;?>
+<?endif; */ ?>
 </head>
 <? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
 <body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?>">
@@ -267,6 +268,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
 
       <? if(!defined('MMRPG_CRITICAL_ERROR')): ?>
         <div class="userinfo" style="">
+          <a class="expand" href="#" rel="nofollow"><span>+</span></a>
           <div class="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style=""></div>
           <?/*
           <? if($this_userid == MMRPG_SETTINGS_GUEST_ID || !MMRPG_CONFIG_ADMIN_MODE): ?>
@@ -302,7 +304,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
           <? else: ?>
             <div class="<?= $temp_avatar_class ?>" style=""><div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_user_name ?></div></div>
             <div class="info" style="">
-              <strong class="username" style="">Welcome, <?= $temp_user_name ?> <span class="pipe">|</span> <a class="place <?= $this_current_page == 'leaderboard' && $this_current_sub == $this_userinfo['user_name_clean'] ? 'place_active ' : '' ?>" href="leaderboard/<?= $this_userinfo['user_name_clean'] ?>/" rel="nofollow"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?> Place</a></strong>
+              <strong class="username" style="">Welcome, <?= $temp_user_name ?> <span class="pipe">|</span> <a class="place <?= $this_current_page == 'leaderboard' && $this_current_sub == $this_userinfo['user_name_clean'] ? 'place_active ' : '' ?>" href="leaderboard/<?= $this_userinfo['user_name_clean'] ?>/" rel="nofollow"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?><span> Place</span></a></strong>
               <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'game' ? 'file_active ' : '' ?>" href="file/game/" rel="nofollow" style="">view game</a> <span class="pipe">|</span>
               <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'profile' ? 'file_active ' : '' ?>" href="file/profile/" rel="nofollow" style="">edit profile</a> <span class="pipe">|</span>
               <a class="file file_exit <?= $this_current_page == 'file' && $this_current_sub == 'exit' ? 'file_active ' : '' ?>" href="file/exit/" rel="nofollow" style="">exit game</a>
