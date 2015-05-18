@@ -559,6 +559,8 @@ class mmrpg_robot {
     elseif ($this_robot->has_ability('energy-break') && $target_robot->robot_energy < ($target_robot->robot_base_energy / 4)){ $options[] = 'energy-break'; $weights[] = 10 * $support_multiplier;  }
     elseif ($this_robot->has_ability('energy-break') && $target_robot->robot_energy < ($target_robot->robot_base_energy / 3)){ $options[] = 'energy-break'; $weights[] = 12 * $support_multiplier;  }
     elseif ($this_robot->has_ability('energy-break') && $target_robot->robot_energy < ($target_robot->robot_base_energy / 2)){ $options[] = 'energy-break'; $weights[] = 14 * $support_multiplier;  }
+    // Define the frequency of the energy swap ability if set
+    if ($this_robot->has_ability('energy-swap') && $target_robot->robot_energy > $this_robot->robot_energy){ $options[] = 'energy-swap'; $weights[] = 28 * $support_multiplier;  }
     // Define the frequency of the attack, defense, and speed boost abiliies if set
     if ($this_robot->has_ability('attack-boost') && $this_robot->robot_attack < ($this_robot->robot_base_attack * 0.5)){ $options[] = 'attack-boost'; $weights[] = 3 * $support_multiplier;  }
     elseif ($this_robot->has_ability('attack-boost')){ $options[] = 'attack-boost'; $weights[] = 1;  }
