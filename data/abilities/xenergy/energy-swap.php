@@ -29,7 +29,7 @@ $ability = array(
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(0, 0, 10, -10, $this_robot->print_robot_name().' triggered an '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 0, 10, -10, $this_robot->print_robot_name().' triggered an '.$this_ability->print_ability_name().' with '.$target_robot->print_robot_name().'!')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -38,11 +38,11 @@ $ability = array(
     $target_robot->update_session();
 
     // Create a function that increases or decreases a robot's energy to target
-    $temp_energy_function = function($this_robot, $this_ability, $temp_target_energy){
+    $temp_energy_function = function($this_robot, $this_ability, $temp_this_energy, $temp_target_energy){
       global $this_battle;
 
       // Collect the target's current energy amount
-      $temp_this_energy = $this_robot->robot_energy.'/'.$this_robot->robot_base_energy;
+      //$temp_this_energy = $this_robot->robot_energy.'/'.$this_robot->robot_base_energy;
 
       //$this_battle->events_create(false, false, 'DEBUG '.__LINE__, '$temp_this_energy = '.$temp_this_energy.', $temp_target_energy = '.$temp_target_energy);
 
@@ -90,9 +90,9 @@ $ability = array(
     $temp_target_energy = $target_robot->robot_energy.'/'.$target_robot->robot_base_energy;
 
     // Update this robot's energy to that of the target's
-    $temp_energy_function($this_robot, $this_ability, $temp_target_energy);
+    $temp_energy_function($this_robot, $this_ability, $temp_this_energy, $temp_target_energy);
     // Update the target's energy to that of this robot
-    $temp_energy_function($target_robot, $this_ability, $temp_this_energy);
+    $temp_energy_function($target_robot, $this_ability, $temp_target_energy, $temp_this_energy);
 
     // Return true on success
     return true;

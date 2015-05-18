@@ -48,6 +48,15 @@ if (!mmrpg_prototype_event_complete('completed-chapter_dr-cossack_one')){ unset(
 $allowed_edit_data_count = count($allowed_edit_data);
 //die('$prototype_player_counter = '.$prototype_player_counter.'; $allowed_edit_data = <pre>'.print_r($allowed_edit_data, true).'</pre>');
 
+// DEBUG DEBUG DEBUG
+//$_SESSION[$session_token]['counters']['battle_zenny'] = 500000;
+
+// Define the array to hold all the item quantities
+$global_item_quantities = array();
+$global_item_prices = array();
+$global_zenny_counter = !empty($_SESSION[$session_token]['counters']['battle_zenny']) ? $_SESSION[$session_token]['counters']['battle_zenny'] : 0;
+
+
 // -- PROCESS SHOP SELL ACTION -- //
 
 // Check if an action request has been sent with an sell type
@@ -1118,7 +1127,7 @@ if (true){
   // Determine the token for the very first player in the edit
   $temp_shop_tokens = array_keys($allowed_edit_data);
   $first_shop_token = array_shift($temp_shop_tokens);
-  //$first_shop_token = $first_shop_token['shop_token'];
+  $first_shop_token = isset($first_shop_token['shop_token']) ? $first_shop_token['shop_token'] : $first_shop_token;
   unset($temp_shop_tokens);
 
   // Start generating the edit markup

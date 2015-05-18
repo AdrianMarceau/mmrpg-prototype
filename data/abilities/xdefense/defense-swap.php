@@ -29,7 +29,7 @@ $ability = array(
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(0, 0, 10, -10, $this_robot->print_robot_name().' triggered a '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 0, 10, -10, $this_robot->print_robot_name().' triggered a '.$this_ability->print_ability_name().' with '.$target_robot->print_robot_name().'!')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -38,11 +38,11 @@ $ability = array(
     $target_robot->update_session();
 
     // Create a function that increases or decreases a robot's defense to target
-    $temp_defense_function = function($this_robot, $this_ability, $temp_target_defense){
+    $temp_defense_function = function($this_robot, $this_ability, $temp_this_defense, $temp_target_defense){
       global $this_battle;
 
       // Collect the target's current defense amount
-      $temp_this_defense = $this_robot->robot_defense.'/'.$this_robot->robot_base_defense;
+      //$temp_this_defense = $this_robot->robot_defense.'/'.$this_robot->robot_base_defense;
 
       //$this_battle->events_create(false, false, 'DEBUG '.__LINE__, '$temp_this_defense = '.$temp_this_defense.', $temp_target_defense = '.$temp_target_defense);
 
@@ -90,9 +90,9 @@ $ability = array(
     $temp_target_defense = $target_robot->robot_defense.'/'.$target_robot->robot_base_defense;
 
     // Update this robot's defense to that of the target's
-    $temp_defense_function($this_robot, $this_ability, $temp_target_defense);
+    $temp_defense_function($this_robot, $this_ability, $temp_this_defense, $temp_target_defense);
     // Update the target's defense to that of this robot
-    $temp_defense_function($target_robot, $this_ability, $temp_this_defense);
+    $temp_defense_function($target_robot, $this_ability, $temp_target_defense, $temp_this_defense);
 
     // Return true on success
     return true;

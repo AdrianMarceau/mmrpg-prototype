@@ -29,7 +29,7 @@ $ability = array(
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(0, 0, 10, -10, $this_robot->print_robot_name().' triggered a '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 0, 10, -10, $this_robot->print_robot_name().' triggered a '.$this_ability->print_ability_name().' with '.$target_robot->print_robot_name().'!')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -38,11 +38,11 @@ $ability = array(
     $target_robot->update_session();
 
     // Create a function that increases or decreases a robot's speed to target
-    $temp_speed_function = function($this_robot, $this_ability, $temp_target_speed){
+    $temp_speed_function = function($this_robot, $this_ability, $temp_this_speed, $temp_target_speed){
       global $this_battle;
 
       // Collect the target's current speed amount
-      $temp_this_speed = $this_robot->robot_speed.'/'.$this_robot->robot_base_speed;
+      //$temp_this_speed = $this_robot->robot_speed.'/'.$this_robot->robot_base_speed;
 
       //$this_battle->events_create(false, false, 'DEBUG '.__LINE__, '$temp_this_speed = '.$temp_this_speed.', $temp_target_speed = '.$temp_target_speed);
 
@@ -90,9 +90,9 @@ $ability = array(
     $temp_target_speed = $target_robot->robot_speed.'/'.$target_robot->robot_base_speed;
 
     // Update this robot's speed to that of the target's
-    $temp_speed_function($this_robot, $this_ability, $temp_target_speed);
+    $temp_speed_function($this_robot, $this_ability, $temp_this_speed, $temp_target_speed);
     // Update the target's speed to that of this robot
-    $temp_speed_function($target_robot, $this_ability, $temp_this_speed);
+    $temp_speed_function($target_robot, $this_ability, $temp_target_speed, $temp_this_speed);
 
     // Return true on success
     return true;
