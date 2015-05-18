@@ -125,18 +125,18 @@ $this_omega_factors_nine[] = array('robot' => 'plug-man', 'field' => 'field', 't
 $this_omega_factors_nine[] = array('robot' => 'jewel-man', 'field' => 'gemstone-cavern', 'type' => 'crystal');
 $this_omega_factors_nine[] = array('robot' => 'hornet-man', 'field' => 'field', 'type' => 'nature');
 //$this_omega_factors_nine[] = array('robot' => 'magma-man', 'field' => 'field', 'type' => 'flame');
-//$this_omega_factors_nine[] = array('robot' => 'galaxy-man', 'field' => 'field', 'type' => 'space');
+$this_omega_factors_nine[] = array('robot' => 'galaxy-man', 'field' => 'field', 'type' => 'space');
 
 // Define the expansion omega factors for DR. LIGHT (MEGA MAN 10)
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_ten = array();
-//$this_omega_factors_ten[] = array('robot' => 'something-man', 'field' => 'field', 'type' => 'type');
-//$this_omega_factors_ten[] = array('robot' => 'something-man', 'field' => 'field', 'type' => 'type');
-//$this_omega_factors_ten[] = array('robot' => 'something-man', 'field' => 'field', 'type' => 'type');
-//$this_omega_factors_ten[] = array('robot' => 'something-man', 'field' => 'field', 'type' => 'type');
-//$this_omega_factors_ten[] = array('robot' => 'something-man', 'field' => 'field', 'type' => 'type');
-//$this_omega_factors_ten[] = array('robot' => 'something-man', 'field' => 'field', 'type' => 'type');
-//$this_omega_factors_ten[] = array('robot' => 'something-man', 'field' => 'field', 'type' => 'type');
-//$this_omega_factors_ten[] = array('robot' => 'something-man', 'field' => 'field', 'type' => 'type');
+//$this_omega_factors_ten[] = array('robot' => 'blade-man', 'field' => 'field', 'type' => 'cutter');
+//$this_omega_factors_ten[] = array('robot' => 'pump-man', 'field' => 'field', 'type' => 'water');
+//$this_omega_factors_ten[] = array('robot' => 'commando-man', 'field' => 'field', 'type' => 'missile');
+//$this_omega_factors_ten[] = array('robot' => 'chill-man', 'field' => 'field', 'type' => 'freeze');
+//$this_omega_factors_ten[] = array('robot' => 'sheep-man', 'field' => 'field', 'type' => 'electric');
+$this_omega_factors_ten[] = array('robot' => 'strike-man', 'field' => 'field', 'type' => 'impact');
+//$this_omega_factors_ten[] = array('robot' => 'nitro-man', 'field' => 'field', 'type' => 'swift');
+//$this_omega_factors_ten[] = array('robot' => 'solar-man', 'field' => 'field', 'type' => 'flame');
 
 ?>

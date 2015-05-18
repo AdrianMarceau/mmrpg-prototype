@@ -29,3 +29,4 @@
 *.bak.php
 .project
 .htaccess-current
+*.orig
