@@ -15,10 +15,12 @@ $robot = array(
   'robot_defense' => 50,
   'robot_speed' => 50,
   'robot_immunities' => array('copy', 'crystal', 'cutter', 'earth', 'electric', 'explode', 'flame', 'freeze', 'impact', 'laser', 'missile', 'nature', 'shadow', 'shield', 'space', 'swift', 'time', 'water', 'wind'),
-  'robot_abilities' => array('dark-boost'),
+  'robot_abilities' => array('dark-boost', 'dark-break', 'dark-drain'),
   'robot_rewards' => array(
     'abilities' => array(
-        array('level' => 0, 'token' => 'dark-boost')
+        array('level' => 0, 'token' => 'dark-boost'),
+        array('level' => 10, 'token' => 'dark-break'),
+        array('level' => 20, 'token' => 'dark-drain')
       )
     ),
   'robot_quotes' => array(
