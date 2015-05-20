@@ -53,7 +53,7 @@ $this_player->update_session();
 
 // Create the robot disabled event
 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-$disabled_text = in_array($this_robot->robot_token, array('dark-frag', 'dark-spire', 'dark-tower')) ? 'destroyed' : 'disabled';
+$disabled_text = in_array($this_robot->robot_token, array('dark-frag', 'dark-spire', 'dark-tower')) || $this_robot->robot_core == 'empty' ? 'destroyed' : 'disabled';
 $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
 $event_body = ($this_player->player_token != 'player' ? $this_player->print_player_name().'&#39;s ' : 'The target ').' '.$this_robot->print_robot_name().' was '.$disabled_text.'!<br />'; //'.($this_robot->robot_position == 'bench' ? ' and removed from battle' : '').'
 if (isset($this_robot->robot_quotes['battle_defeat'])){
