@@ -882,12 +882,14 @@ body.prototype {
 #prototype .option_wrapper_complete .option_complete:hover {
   opacity: 0.75;
 }
+/*
 #prototype .option_wrapper_complete .option_complete {
   opacity: 0.75;
 }
 #prototype .option_wrapper_complete .option_complete:hover {
   opacity: 1.00;
 }
+*/
 
 #prototype .option_disabled {
   opacity: 0.2;
@@ -1570,6 +1572,10 @@ body.prototype {
     box-shadow: none;  
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
+  }
+  #prototype .option_back {
+    width: auto;
+    right: 8px;
   }
   #prototype .select_this_player_robots .option_wrapper {
     margin-right: -30px;
