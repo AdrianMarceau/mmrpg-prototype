@@ -125,9 +125,9 @@ define('MMRPG_SETTINGS_BATTLETURNS_PERROBOT', 3); // Target number of battle tur
 define('MMRPG_SETTINGS_BATTLETURNS_PERBOSS',  6); // Target number of battle turns per each opposing fortress boss
 
 // Define the global variables that determine target robot values
-define('MMRPG_SETTINGS_BATTLEROBOTS_PERMECHA', 0.5); // Target number of player robots per each opposing support mecha
-define('MMRPG_SETTINGS_BATTLEROBOTS_PERROBOT', 1.0); // Target number of player robots per each opposing robot master
-define('MMRPG_SETTINGS_BATTLEROBOTS_PERBOSS',  1.5); // Target number of player robots per each opposing fortress boss
+define('MMRPG_SETTINGS_BATTLEROBOTS_PERMECHA', 0); // Target number of player robots per each opposing support mecha
+define('MMRPG_SETTINGS_BATTLEROBOTS_PERROBOT', 1); // Target number of player robots per each opposing robot master
+define('MMRPG_SETTINGS_BATTLEROBOTS_PERBOSS',  2); // Target number of player robots per each opposing fortress boss
 
 // -- EASY MODE -- //
 if (MMRPG_SETTINGS_GAME_DIFFICULTY == 'easy'){
