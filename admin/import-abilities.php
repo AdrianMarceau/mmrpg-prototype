@@ -176,6 +176,12 @@ function mmrpg_index_sort_abilities($ability_one, $ability_two){
   // Collect the name prefixes for sorting purposes
   $prefix_one = preg_replace('/^([a-z0-9]+)-(.*)$/i', '$1', $ability_one['ability_token']);
   $prefix_two = preg_replace('/^([a-z0-9]+)-(.*)$/i', '$1', $ability_two['ability_token']);
+  $suffix_one = preg_replace('/^(.*)-([a-z0-9]+)$/i', '$2', $ability_one['ability_token']);
+  $suffix_two = preg_replace('/^(.*)-([a-z0-9]+)$/i', '$2', $ability_two['ability_token']);
+  // Define the shot flags for sorting purposes
+  $shot_buster_overdrive_index = array('shot' => 1, 'buster' => 2, 'overdrive' => 3);
+  $shot_buster_overdrive_one = isset($shot_buster_overdrive_index[$suffix_one]) ? $shot_buster_overdrive_index[$suffix_one] : 0;
+  $shot_buster_overdrive_two = isset($shot_buster_overdrive_index[$suffix_two]) ? $shot_buster_overdrive_index[$suffix_two] : 0;
   // Collect the primary type orders for sorting purposes
   $type_one = !empty($ability_one['ability_type']) ? $ability_one['ability_type'] : 'none';
   $type_two = !empty($ability_two['ability_type']) ? $ability_two['ability_type'] : 'none';
@@ -199,6 +205,9 @@ function mmrpg_index_sort_abilities($ability_one, $ability_two){
   // If the abilities have serials, order them by their token alphabetically
   elseif ($serial_number_one > $serial_number_two){ return 1; }
   elseif ($serial_number_one < $serial_number_two){ return -1; }
+  // If the abilities are of the shot/buster/overdrive type sort by power
+  elseif ($shot_buster_overdrive_one > $shot_buster_overdrive_two){ return 1; }
+  elseif ($shot_buster_overdrive_one < $shot_buster_overdrive_two){ return -1; }
   // If the abilities have energy/attack/defense/speed prefixes, favour them first
   elseif (preg_match($temp_energy_pattern, $ability_one['ability_token']) && !preg_match($temp_energy_pattern, $ability_two['ability_token'])){ return -1; }
   elseif (!preg_match($temp_energy_pattern, $ability_one['ability_token']) && preg_match($temp_energy_pattern, $ability_two['ability_token'])){ return 1; }
@@ -218,6 +227,8 @@ function mmrpg_index_sort_abilities($ability_one, $ability_two){
     elseif ($ability_one['ability_game'] < $ability_two['ability_game']){ return -1; }
     elseif ($prefix_one > $prefix_two){ return 1; }
     elseif ($prefix_one < $prefix_two){ return -1; }
+    elseif ($suffix_one > $suffix_two){ return 1; }
+    elseif ($suffix_one < $suffix_two){ return -1; }
     elseif ($ability_one['ability_energy'] > $ability_two['ability_energy']){ return 1; }
     elseif ($ability_one['ability_energy'] < $ability_two['ability_energy']){ return -1; }
     elseif ($ability_one['ability_token'] > $ability_two['ability_token']){ return 1; }
@@ -242,6 +253,8 @@ function mmrpg_index_sort_abilities($ability_one, $ability_two){
     elseif ($ability_one['ability_game'] < $ability_two['ability_game']){ return -1; }
     elseif ($prefix_one > $prefix_two){ return -1; }
     elseif ($prefix_one < $prefix_two){ return 1; }
+    elseif ($suffix_one > $suffix_two){ return 1; }
+    elseif ($suffix_one < $suffix_two){ return -1; }
     elseif ($ability_one['ability_token'] > $ability_two['ability_token']){ return 1; }
     elseif ($ability_one['ability_token'] < $ability_two['ability_token']){ return -1; }
     else { return 0; }
@@ -252,6 +265,8 @@ function mmrpg_index_sort_abilities($ability_one, $ability_two){
   }
 }
 uasort($mmrpg_index['abilities'], 'mmrpg_index_sort_abilities');
+
+//die('abilities : <pre>'.print_r(array_keys($mmrpg_index['abilities']), true).'</pre>');
 
 // DEBUG
 $this_page_markup .= '<p style="margin-bottom: 10px;"><strong>$mmrpg_database_abilities</strong><br />';
