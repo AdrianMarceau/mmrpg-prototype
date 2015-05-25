@@ -5331,6 +5331,27 @@ html {
     width: calc(100% - 42px);
   }
   
+  #window .page .body .community .thread_subbody_compact {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  #window .page .body .community .thread_subbody .thread_linkblock .link,
+  #window .page .body .community .thread_subbody .thread_linkblock .info,
+  #window .page .body .community .thread_subbody .thread_linkblock .count {
+    width: 98%;
+    width: calc(100% - 10px);
+  }
+  #window .page .body .community .thread_subbody .thread_linkblock .count .comments,
+  #window .page .body .community .thread_subbody .thread_linkblock .count .newpost {
+    display: block;
+    float: left;
+    clear: both;   
+  }
+  #window .page .body .community .thread_subbody .thread_linkblock .count .newpost {
+    margin: 6px 0 0;
+    padding: 0; 
+  }
+  
   
   #mmrpg #credits {
     margin: -12px 10px 0;
