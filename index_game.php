@@ -102,7 +102,7 @@ if (count($matches)>1){
 <title><?= (!MMRPG_CONFIG_IS_LIVE ? '@ ' : '').$this_seo_title ?></title>
 <meta name="keywords" content="<?= $this_seo_keywords ?>" />
 <meta name="description" content="<?= $this_seo_description ?>" />
-<meta name="robots" content="index,follow,noodp" />
+<meta name="robots" content="<?= MMRPG_CONFIG_IS_LIVE ? 'index,follow' : 'noindex,nofollow' ?>" />
 <link rel="sitemap" type="application/xml" title="Sitemap" href="<?= MMRPG_CONFIG_ROOTURL ?>sitemap.xml" />
 <meta name="format-detection" content="telephone=no" />
 <base href="<?= MMRPG_CONFIG_ROOTURL ?>">

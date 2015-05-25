@@ -31,7 +31,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Define the default SEO and markup variables
-$this_seo_robots = 'index,follow';
+$this_seo_robots = MMRPG_CONFIG_IS_LIVE ? 'index,follow' : 'noindex,nofollow';
 $this_seo_title = 'Mega Man RPG Prototype | Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE);
 $this_seo_keywords = 'megaman,mega man,protoman,proto man,bass,rpg,prototype,dr.light,dr.wily,dr.cossack,battle,browser,pbbg,ipad,firefox,chrome,safari';
 $this_seo_description = 'Battle through more than thirty robot masters in classic RPG style with either Dr. Light and Mega Man, Dr. Wily and Bass, or Dr. Cossack and Proto Man!  The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster.';
@@ -379,6 +379,14 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
         &hellip;&gt;_&lt;&hellip;
       <? endif; ?>
     </div>
+
+    <? if (!MMRPG_CONFIG_IS_LIVE){ ?>
+    <p class="type type_flame" style="display: block; margin: -4px 10px 6px; color: #FFFFFF; border-radius: 6px; padding: 5px;;">
+      This version of the game is NOT live and progress will NOT be saved!<br />
+      Please treat this buggy, beta build of the new update as a PREVIEW ONLY!<br />
+      Developmental progress of this update can be tracked on <a style="color: #FFFFFF;" href="https://github.com/AdrianMarceau/mmrpg-prototype/tree/mmrpg2k15" target="_blank">GitHub</a>.
+    </p>
+    <? } ?>
 
     <?
 
