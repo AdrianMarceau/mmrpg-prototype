@@ -597,70 +597,79 @@ class mmrpg_robot {
       if (!empty($return_token)){ return $return_token; }
     }
 
+    // Define the base frequency of the various boost and break abilities
+    $temp_energy_boost_rate = $temp_attack_boost_rate = $temp_defense_boost_rate = $temp_speed_boost_rate = 0;
+    $temp_energy_break_rate = $temp_attack_break_rate = $temp_defense_break_rate = $temp_speed_break_rate = 0;
+    $temp_energy_swap_rate = $temp_attack_swap_rate = $temp_defense_swap_rate = $temp_speed_swap_rate = 0;
+    $temp_energy_mode_rate = $temp_attack_mode_rate = $temp_defense_mode_rate = $temp_speed_mode_rate = 0;
+    
+    // Apply energy boost mods based on current life energy of this robot
+    if ($this_robot->robot_energy < ($this_robot->robot_base_energy / 4)){ $temp_energy_boost_rate += 20; }
+    elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 3)){ $temp_energy_boost_rate += 15; }
+    elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 2)){ $temp_energy_boost_rate += 10; }
+    // Apply energy break mods based on current life energy of the target robot
+    if ($target_robot->robot_energy < ($target_robot->robot_base_energy / 4)){ $temp_energy_break_rate += 10; }
+    elseif ($target_robot->robot_energy < ($target_robot->robot_base_energy / 3)){ $temp_energy_break_rate += 15; }
+    elseif ($target_robot->robot_energy < ($target_robot->robot_base_energy / 2)){ $temp_energy_break_rate += 20; }
+    // Apply attack/defense boost/break mods based on the current stats of both robots
+    if ($this_robot->robot_attack < $target_robot->robot_defense){ $temp_attack_boost_rate += 20; $temp_defense_break_rate += 20; }
+    if ($this_robot->robot_defense < $target_robot->robot_attack){ $temp_defense_boost_rate += 20; $temp_attack_break_rate += 20; }
+    // Apply speed boost/break mods based on the current stats of both robots
+    if ($this_robot->robot_speed < $target_robot->robot_speed){ $temp_speed_boost_rate += 20; $temp_speed_break_rate += 20; }
+    // Apply energy swap mods based on current life energy of both robots
+    if ($this_robot->robot_energy < $target_robot->robot_energy){ $temp_energy_swap_rate += 20; }
+    // Apply attack/defense swap mods based on the current stats of both robots
+    if ($this_robot->robot_attack < $target_robot->robot_attack){ $temp_attack_swap_rate += 20; }
+    if ($this_robot->robot_defense < $target_robot->robot_defense){ $temp_defense_swap_rate += 20; }
+    // Apply speed swap mods based on the current stats of both robots
+    if ($this_robot->robot_speed < $target_robot->robot_speed){ $temp_speed_swap_rate += 20; }
+    // Apply the various mode mods based on the robot's current stats vs base
+    if ($this_robot->robot_energy < ($this_robot->robot_base_energy / 2)){ $temp_energy_mode_rate += 15; }
+    if ($this_robot->robot_attack < ($this_robot->robot_base_attack / 2)){ $temp_attack_mode_rate += 15; }
+    if ($this_robot->robot_defense < ($this_robot->robot_base_defense / 2)){ $temp_defense_mode_rate += 15; }
+    if ($this_robot->robot_speed < ($this_robot->robot_base_speed / 2)){ $temp_speed_mode_rate += 15; }
+
     // Create the ability options and weights variables
     $options = array();
     $weights = array();
+    
     // Define the support multiplier for this robot
     $support_multiplier = 1;
-    if (in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm'))){ $support_multiplier += 1; }
-    // Define the freency of the default buster ability if set
+    if (in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm')) || $this_robot->robot_class == 'mecha'){ $support_multiplier += 1; }
+    
+    // Define the frequency of the default buster ability if set
     if ($this_robot->has_ability('buster-shot')){ $options[] = 'buster-shot'; $weights[] = $this_robot->robot_token == 'met' ? 90 : 1;  }
     if ($this_robot->has_ability('super-throw')){ $options[] = 'super-throw'; $weights[] = 1;  }
-    // Define the frequency of the energy boost ability if set
-    if ($this_robot->has_ability('energy-boost') && $this_robot->robot_energy >= $this_robot->robot_base_energy){ $options[] = 'energy-boost'; $weights[] = 0;  }
-    elseif ($this_robot->has_ability('energy-boost') && $this_robot->robot_energy < ($this_robot->robot_base_energy / 4)){ $options[] = 'energy-boost'; $weights[] = 14 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('energy-boost') && $this_robot->robot_energy < ($this_robot->robot_base_energy / 3)){ $options[] = 'energy-boost'; $weights[] = 12 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('energy-boost') && $this_robot->robot_energy < ($this_robot->robot_base_energy / 2)){ $options[] = 'energy-boost'; $weights[] = 10 * $support_multiplier;  }
-    // Define the frequency of the energy break ability if set
-    if ($this_robot->has_ability('energy-break') && $target_robot->robot_energy >= $target_robot->robot_base_energy){ $options[] = 'energy-break'; $weights[] = 28 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('energy-break') && $target_robot->robot_energy < ($target_robot->robot_base_energy / 4)){ $options[] = 'energy-break'; $weights[] = 10 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('energy-break') && $target_robot->robot_energy < ($target_robot->robot_base_energy / 3)){ $options[] = 'energy-break'; $weights[] = 12 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('energy-break') && $target_robot->robot_energy < ($target_robot->robot_base_energy / 2)){ $options[] = 'energy-break'; $weights[] = 14 * $support_multiplier;  }
-    // Define the frequency of the energy swap ability if set
-    if ($this_robot->has_ability('energy-swap') && $target_robot->robot_energy > $this_robot->robot_energy){ $options[] = 'energy-swap'; $weights[] = 28 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('energy-swap') && $target_robot->robot_energy <= $this_robot->robot_energy){ $options[] = 'energy-swap'; $weights[] = 0;  }
-    // Define the frequency of the attack, defense, and speed boost abiliies if set
-    if ($this_robot->has_ability('attack-boost') && $this_robot->robot_attack < ($this_robot->robot_base_attack * 0.5)){ $options[] = 'attack-boost'; $weights[] = 3 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('attack-boost')){ $options[] = 'attack-boost'; $weights[] = 1;  }
-    if ($this_robot->has_ability('defense-boost') && $this_robot->robot_defense < ($this_robot->robot_base_defense * 0.5)){ $options[] = 'defense-boost'; $weights[] = 3 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('defense-boost')){ $options[] = 'defense-boost'; $weights[] = 1;  }
-    if ($this_robot->has_ability('speed-boost') && $this_robot->robot_speed < ($this_robot->robot_base_speed * 0.5)){ $options[] = 'speed-boost'; $weights[] = 3 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('speed-boost')){ $options[] = 'speed-boost'; $weights[] = 1;  }
-    // Define the frequency of the attack, defense, and speed break abilities if set
-    if ($this_robot->has_ability('attack-break') && $target_robot->robot_attack > $this_robot->robot_defense){ $options[] = 'attack-break'; $weights[] = 3 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('attack-break')){ $options[] = 'attack-break'; $weights[] = 1;  }
-    if ($this_robot->has_ability('defense-break') && $target_robot->robot_defense > $this_robot->robot_attack){ $options[] = 'defense-break'; $weights[] = 3 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('defense-break')){ $options[] = 'defense-break'; $weights[] = 1;  }
-    if ($this_robot->has_ability('speed-break') && $this_robot->robot_speed < $target_robot->robot_speed){ $options[] = 'speed-break'; $weights[] = 3 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('speed-break')){ $options[] = 'speed-break'; $weights[] = 1;  }
-    // Define the frequency of the attack, defense, and speed swap abilities if set
-    if ($this_robot->has_ability('attack-swap') && $target_robot->robot_attack > $this_robot->robot_attack){ $options[] = 'attack-swap'; $weights[] = 3 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('attack-swap')){ $options[] = 'attack-swap'; $weights[] = 1;  }
-    if ($this_robot->has_ability('defense-swap') && $target_robot->robot_defense > $this_robot->robot_defense){ $options[] = 'defense-swap'; $weights[] = 3 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('defense-swap')){ $options[] = 'defense-swap'; $weights[] = 1;  }
-    if ($this_robot->has_ability('speed-swap') && $target_robot->robot_speed > $this_robot->robot_speed){ $options[] = 'speed-swap'; $weights[] = 3 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('speed-swap')){ $options[] = 'speed-swap'; $weights[] = 1;  }
-    // Define the frequency of the repair mode ability if set
-    if ($this_robot->has_ability('repair-mode') && $this_robot->robot_energy < ($this_robot->robot_base_energy * 0.5)){ $options[] = 'repair-mode'; $weights[] = 9 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('repair-mode')){ $options[] = 'repair-mode'; $weights[] = 1;  }
-    // Define the frequency of the attack, defense, and speed mode abilities if set
-    if ($this_robot->has_ability('attack-mode') && $this_robot->robot_attack < ($this_robot->robot_base_attack * 0.10)){ $options[] = 'attack-mode'; $weights[] = 6 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('attack-mode')){ $options[] = 'attack-mode'; $weights[] = 1;  }
-    if ($this_robot->has_ability('defense-mode') && $this_robot->robot_defense < ($this_robot->robot_base_defense * 0.10)){ $options[] = 'defense-mode'; $weights[] = 6 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('defense-mode')){ $options[] = 'defense-mode'; $weights[] = 1;  }
-    if ($this_robot->has_ability('speed-mode') && $this_robot->robot_speed < ($this_robot->robot_base_speed * 0.10)){ $options[] = 'speed-mode'; $weights[] = 6 * $support_multiplier;  }
-    elseif ($this_robot->has_ability('speed-mode')){ $options[] = 'speed-mode'; $weights[] = 1;  }
+
     // Loop through any leftover abilities and add them to the weighted ability options
-    $temp_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $temp_ability_index = $DB->get_array_list("SELECT ability_id, ability_token, ability_name, ability_type, ability_type2 FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $temp_boost_pattern = 'boost|hone|temper|cool|blast|blaze|charge|haste|harden|breeze|douse|surge|growth|rocket|polish|charm|cosmos|guard|glow';
+    $temp_break_pattern = 'break|blunt|hammer|chill|burst|burn|shock|slow|crumble|squall|drench|stall|decay|torpedo|tarnish|curse|chaos|block|fade';
     foreach ($this_robot->robot_abilities AS $key => $token){
       if (!in_array($token, $options)){
-        $info = mmrpg_ability::parse_index_info($temp_ability_index[$token]);
+        $info = $temp_ability_index[$token];
         $value = 3;
-        if (!empty($this_robot->robot_core) && !empty($info['ability_type'])){
+        if (preg_match('/^(energy|repair)-('.$temp_boost_pattern.')$/i', $token)){ $value = $temp_energy_boost_rate * $support_multiplier; }
+        elseif (preg_match('/^(attack|weapon)-('.$temp_boost_pattern.')$/i', $token)){ $value = $temp_attack_boost_rate * $support_multiplier; }
+        elseif (preg_match('/^(defense|shield)-('.$temp_boost_pattern.')$/i', $token)){ $value = $temp_defense_boost_rate * $support_multiplier; }
+        elseif (preg_match('/^(speed|mobility)-('.$temp_boost_pattern.')$/i', $token)){ $value = $temp_speed_boost_rate * $support_multiplier; }
+        elseif (preg_match('/^(energy|repair)-('.$temp_break_pattern.')$/i', $token)){ $value = $temp_energy_break_rate * $support_multiplier; }
+        elseif (preg_match('/^(attack|weapon)-('.$temp_break_pattern.')$/i', $token)){ $value = $temp_attack_break_rate * $support_multiplier; }
+        elseif (preg_match('/^(defense|shield)-('.$temp_break_pattern.')$/i', $token)){ $value = $temp_defense_break_rate * $support_multiplier; }
+        elseif (preg_match('/^(speed|mobility)-('.$temp_break_pattern.')$/i', $token)){ $value = $temp_speed_break_rate * $support_multiplier; }
+        elseif (preg_match('/^(energy|repair)-(swap)$/i', $token)){ $value = $temp_energy_swap_rate; }
+        elseif (preg_match('/^(attack|weapon)-(swap)$/i', $token)){ $value = $temp_attack_swap_rate; }
+        elseif (preg_match('/^(defense|shield)-(swap)$/i', $token)){ $value = $temp_defense_swap_rate; }
+        elseif (preg_match('/^(speed|mobility)-(swap)$/i', $token)){ $value = $temp_speed_swap_rate; }
+        elseif (preg_match('/^(energy|repair)-(mode)$/i', $token)){ $value = $temp_energy_mode_rate; }
+        elseif (preg_match('/^(attack|weapon)-(mode)$/i', $token)){ $value = $temp_attack_mode_rate; }
+        elseif (preg_match('/^(defense|shield)-(mode)$/i', $token)){ $value = $temp_defense_mode_rate; }
+        elseif (preg_match('/^(speed|mobility)-(mode)$/i', $token)){ $value = $temp_speed_mode_rate; }
+        elseif (!empty($this_robot->robot_core) && !empty($info['ability_type'])){
           if ($this_robot->robot_core == $info['ability_type']){ $value = 50; }
+          elseif ($this_robot->robot_core == $info['ability_type2']){ $value = 25; }
           elseif ($this_robot->robot_core == 'copy'){ $value = 40; }
-          elseif ($this_robot->robot_core != $info['ability_type']){ $value = 30; }
-          if (preg_match('/^(attack|defense|speed)-(burn|blaze)$/i', $token)){ $value = ceil($value * 0.10); }
+          elseif ($this_robot->robot_core != $info['ability_type']){ $value = 30; }          
         } elseif (empty($this_robot->robot_core)){
           $value = 30;
         } else {
