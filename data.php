@@ -1008,6 +1008,7 @@ elseif ($this_action == 'ability'){
 
   // Loop through the target robot's current abilities and check weapon energy
   $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+  $temp_abilities_backup = $active_target_robot->robot_abilities;
   foreach ($active_target_robot->robot_abilities AS $key => $token){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Collect the data for this ability from the index
@@ -1025,7 +1026,7 @@ elseif ($this_action == 'ability'){
   $active_target_robot->update_session();
 
   // Collect the ability choice from the robot
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_robot::robot_choices_abilities('.$active_target_robot->robot_token.') <br /> $active_target_robot->robot_abilities = '.implode(',', $active_target_robot->robot_abilities));  }
   $temp_token = mmrpg_robot::robot_choices_abilities(array(
     'this_index' => &$mmrpg_index,
     'this_battle' => &$this_battle,
@@ -1038,6 +1039,10 @@ elseif ($this_action == 'ability'){
   $temp_id = array_search($temp_token, $active_target_robot->robot_abilities);
   if (empty($temp_id)){ $temp_id = $temp_abilities_index[$temp_token]['ability_id']; }
   $target_action_token = $temp_id.'_'.$temp_token;
+
+  // Put the rest of the abilities back into the robot (in case it can use next turn)
+  $active_target_robot->robot_abilities = $temp_abilities_backup;
+  $active_target_robot->update_session();
 
   // Now that we're done selecting an ability, reset to normal
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -1298,6 +1303,7 @@ elseif ($this_action == 'ability'){
     $target_action_token = '';
     // Check if this robot has choice data defined
     if (true){
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_robot::robot_choices_abilities('.$active_target_robot->robot_token.') <br /> $active_target_robot->robot_abilities = '.implode(',', $active_target_robot->robot_abilities));  }
       // Collect the ability choice from the robot
       $temp_token = mmrpg_robot::robot_choices_abilities(array(
         'this_index' => &$mmrpg_index,
