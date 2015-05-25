@@ -216,7 +216,7 @@ foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 =>
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $robot['robot_level'] = mt_rand(ceil($temp_omega_robot_level / 2), $temp_omega_robot_level);
     $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_level'] = $robot['robot_level'];
-    //$temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_abilities'] = mmrpg_prototype_generate_abilities($robot, $omega_robot_level, $temp_ability_count);
+    $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_abilities'] = mmrpg_prototype_generate_abilities($robot, $omega_robot_level, ceil($temp_ability_count / 2));
   }
   elseif ($robot['robot_class'] == 'master'){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
