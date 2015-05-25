@@ -146,13 +146,13 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Combine into the actions index
-    $temp_actions_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
     // DEFINE ABILITY TOKEN
 
     // If an ability token was not collected
     if (empty($this_token)){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_robot::robot_choices_abilities('.$this_robot->robot_token.') <br /> $this_robot->robot_abilities = '.implode(',', $this_robot->robot_abilities));  }
       // Collect the ability choice from the robot
       $temp_token = mmrpg_robot::robot_choices_abilities(array(
         'this_battle' => &$this,
@@ -166,7 +166,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       if (empty($temp_id)){ $temp_id = $this->index['abilities'][$temp_token]['ability_id']; }
       $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
       //$this_token = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
-      $this_token = mmrpg_ability::parse_index_info($temp_actions_index[$temp_token]);
+      $this_token = mmrpg_ability::parse_index_info($temp_abilities_index[$temp_token]);
       $this_token['ability_id'] = $temp_id;
     }
     // Otherwise, parse the token for data
@@ -175,7 +175,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       // Define the ability choice data for this robot
       list($temp_id, $temp_token) = explode('_', $this_token);
       //$this_token = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
-      $this_token = mmrpg_ability::parse_index_info($temp_actions_index[$temp_token]);
+      $this_token = mmrpg_ability::parse_index_info($temp_abilities_index[$temp_token]);
       $this_token['ability_id'] = $temp_id;
     }
 
@@ -478,6 +478,9 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     $temp_target_robot_affinities = $temp_target_robot->print_robot_affinities();
     $temp_target_robot_immunities = $temp_target_robot->print_robot_immunities();
 
+    // Collect the list of abilities for this robot
+    $temp_target_robot_abilities = implode(', ', $temp_target_robot->robot_abilities);
+
     // Change the target robot's frame to defend base and save
     $temp_target_robot->robot_frame = 'taunt';
     $temp_target_robot->update_session();
@@ -560,6 +563,12 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
               <td class="center">&nbsp;</td>
               <td class="left">Speed : </td>
               <td  class="right"><span title="<?= ceil(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_target_robot->robot_speed ?></span></span></td>
+            </tr>
+            <tr>
+              <td class="left" colspan="5">
+                Abilities :
+                <?= !empty($temp_target_robot_abilities) ? $temp_target_robot_abilities : '<span class="ability_name">None</span>' ?>
+              </td>
             </tr>
           </tbody>
         </table>
