@@ -15,7 +15,7 @@ define('MMRPG_CONFIG_DBHOST', 'localhost');
 define('MMRPG_CONFIG_DBUSERNAME', 'username');
 define('MMRPG_CONFIG_DBPASSWORD', 'password');
 define('MMRPG_CONFIG_DBCHARSET', 'utf8');
-define('MMRPG_CONFIG_DBNAME', 'mmrpg2k11');
+define('MMRPG_CONFIG_DBNAME', 'mmrpg2k15');
 
 // Define the list of administrator-approved remote addresses
 define('MMRPG_CONFIG_ADMIN_LIST', '127.0.0.1,999.999.999.999');
