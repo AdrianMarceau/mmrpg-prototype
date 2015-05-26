@@ -1030,12 +1030,14 @@ function mmrpg_website_community_postblock($this_thread_info, $this_post_info, $
       //$this_post_votes_text = '-'.$this_post_votes_text;
       $this_post_votes_type = 'negative';
     }
-    ?>
+    /*
     <div class="postvotes">
       <a class="upvote <?= mt_rand(0,9) == 6 ? 'active' : '' ?>" href="#">&#x25B2;</a>
       <strong class="votes <?= $this_post_votes_type ?>"><?= $this_post_votes_text ?></strong>
       <a class="downvote <?= mt_rand(0,9) == 3 ? 'active' : '' ?>" href="#">&#x25BC;</a>
     </div>
+     */
+    ?>
 
   </div>
   <?
