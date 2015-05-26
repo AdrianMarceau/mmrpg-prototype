@@ -860,6 +860,9 @@ while ($this_action == 'load'){
   // Update the header markup title
   $html_header_title .= 'Load Existing Game File';
   // Update the header markup text
+  $html_header_text .= '<span style="color: red;">WARNING! This build of the game has many bugs that are in progress of being fixed! Do not report them!</span><br />';
+  $html_header_text .= '<span style="color: red;">WARNING! Any progress made in this build WILL BE RESET! Data may accidentally be deleted by untested features!</span><br />';
+  $html_header_text .= '<span style="color: red;">WARNING! Robots are currently unable to switch equipped abilities or items! This will be fixed soon!</span><br />';
   $html_header_text .= 'Please enter the username and password of your save file below. Passwords are case-sensitive, though usernames are not.';
   if ($html_form_show_coppa){
     $html_header_text .= '<br /> Your date of birth must now be confirmed in accordance with <a href="http://www.coppa.org/" target="_blank">COPPA</a> guidelines.';
