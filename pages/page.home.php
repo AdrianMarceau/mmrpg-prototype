@@ -15,7 +15,7 @@ $this_graph_data['description'] = 'Welcome to the Mega Man RPG Prototype, where 
 //$this_graph_data['type'] = 'website';
 
 // Define the MARKUP variables for this page
-$this_markup_header = 'Mega Man RPG Prototype <span class="count">( Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE).' )</span>';
+$this_markup_header = 'Mega Man RPG Prototype Developer Build <span class="count">( Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE).' )</span>';
 
 // Start generating the page markup
 ob_start();
@@ -43,9 +43,9 @@ ob_start();
   </p>
 </div>
 <div class="subbody" style="position: relative; ">
-  <div id="youtube_playlist" style="">
+  <?/*<div id="youtube_playlist" style="">
     <iframe width="356" height="200" src="//www.youtube.com/embed/videoseries?list=PL2yhjPks7HSo_vJNq02ls_DwhmrA2pmU5" frameborder="0" allowfullscreen></iframe>
-  </div>
+  </div>*/?>
   <p class="text">
     <span class="float float_right"><span class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png);">Mega Man</span></span>
     The <strong>Mega Man RPG Prototype</strong> is an ongoing fangame project with the goal of creating a progress-saving, no-download, no-install, cross-platform, browser-based Mega Man RPG (or what some would call a <a href="http://www.pbbg.org/" target="_blank" rel="related">PBBG</a>) that combines the addictive collection and battle mechanics of the Pokémon series with the beloved robots and special weapons of the classic Mega Man series. Fight your way through more than fifty different robot masters in a turn-based battle system reminiscent of both play-by-post forum games and early 8-bit role-playing games.
@@ -71,7 +71,7 @@ require('data/leaderboard.php');
 <div class="leaderboard" style="margin-bottom: 12px; overflow: visible;">
   <div class="wrapper" style="margin-bottom: 0; overflow: visible;">
   <?
-  
+
   // Define the leaderboard displauy limit
   $leaderboard_display_limit = $this_display_limit_default;
   // Print out the generated leaderboard markup
@@ -97,7 +97,7 @@ require_once('data/gallery.php');
 <div class="gallery" style="margin-bottom: 12px;">
   <div class="wrapper" style="margin-bottom: 0;">
   <?
-  
+
   // Define the gallery displauy limit
   $gallery_display_limit = 16;
   // Print out the generated gallery markup
@@ -136,25 +136,25 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><span class="subheader_typewrapper"><a class="link" href="community/news/">Mega Man RPG Prototype News &amp; Updates <span class="count">( <?= !empty($this_threads_count) ? ($this_threads_count == 1 ? '1 Post' : $this_threads_count.' Posts') : '0 Posts' ?> )</span></a><a class="float_link" href="community/news/">View More Posts &raquo;</a></span></h2>
 <div class="community" style="margin-bottom: 12px;">
   <?
-  
+
   // Define the current date group
   $this_date_group = '';
   $this_date_group_count = 0;
-  
+
   // Define the temporary timeout variables
   $this_time = time();
   $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
-  
+
   // Loop through the thread array and display its contents
   if (!empty($this_threads_array)){
     foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
-    
+
       // Define this thread's session tracker token
       $temp_session_token = $this_thread_info['thread_id'].'_';
       $temp_session_token .= !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date'];
       // Check if this thread has already been viewed this session
       $temp_session_viewed = in_array($temp_session_token, $_SESSION['COMMUNITY']['threads_viewed']) ? true : false;
-      
+
       // Update the temp date group if necessary
       $temp_thread_date = !empty($this_thread_info['thread_date']) ? $this_thread_info['thread_date'] : mktime(0, 0, 1, 1, 1, 2011);
       $temp_thread_mod_date = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $temp_thread_date;
@@ -167,7 +167,7 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
       // Break if over the limit
       //if ($this_date_group_count > 1 || $this_thread_key > 5){ break; }
       if ($this_thread_key > 13){ break; }
-      
+
       // Define the temporary display variables
       $temp_category_id = $this_thread_info['category_id'];
       $temp_category_token = $this_thread_info['category_token']; //!empty($this_categories_index[$temp_category_id]) ? $this_categories_index[$temp_category_id]['category_token'].'/' : '';
@@ -184,7 +184,7 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
       $temp_posts_count = !empty($this_thread_info['post_count']) ? $this_thread_info['post_count'] : 0;
       $temp_thread_timestamp = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date'];
       $temp_thread_link = 'community/'.$temp_category_token.'/'.$temp_thread_id.'/'.$temp_thread_token.'/';
-      
+
       // Define the avatar class and path variables
       $temp_avatar_frame = !empty($this_thread_info['thread_frame']) ? $this_thread_info['thread_frame'] : '00';
       $temp_avatar_path = !empty($this_thread_info['user_image_path']) ? $this_thread_info['user_image_path'] : 'robots/mega-man/40';
@@ -195,7 +195,7 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
       $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_'.$temp_avatar_frame;
       $temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_right_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png';
       $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_avatar.png';
-      
+
       // Define if this post is new to the logged in user or not
       $temp_is_new = false;
       // Supress the new flag if thread has already been viewed
@@ -236,7 +236,7 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
     }
     unset($this_threads_array);
   }
-  
+
   ?>
 </div>
 <?
