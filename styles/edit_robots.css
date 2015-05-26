@@ -47,6 +47,11 @@
 #edit #canvas .item_canvas div.links {
   width: 100%;
 }
+#edit #canvas .ability_canvas div.links,
+#edit #canvas .item_canvas div.links {
+  width: 100%;
+  min-height: 90px;
+}
 #edit #canvas .robot_canvas table.links td,
 #edit #canvas .ability_canvas div.links a,
 #edit #canvas .item_canvas div.links a {
@@ -87,6 +92,10 @@
   -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+#edit #canvas .ability_canvas .wrapper,
+#edit #canvas .item_canvas .wrapper {
+  width: 99%;
 }
 #edit #canvas .wrapper .wrapper_overflow {
   display: block;
@@ -644,6 +653,7 @@
   float: right; 
   padding-top: 2px;
   width: auto; 
+  min-width: 98%;
   text-align: left; 
   overflow: hidden; 
   height: auto;

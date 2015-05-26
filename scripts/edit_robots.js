@@ -48,13 +48,15 @@ $(document).ready(function(){
       if (tempRobotCount < 2){ tempPlayerWrapper.find('.sort_wrapper').css({display:'none'}); }
       else { tempPlayerWrapper.find('.sort_wrapper').css({display:''}); }
       //console.log(thisEditorData);
-      console.log(tempPlayerToken+' has '+tempRobotCount+' robots which is '+tempRobotPercent+'% of the total');
+      //console.log(tempPlayerToken+' has '+tempRobotCount+' robots which is '+tempRobotPercent+'% of the total');
       tempPlayerWrapper.find('.wrapper_header .count').html(tempRobotCount);
       });
     };
 
   // Define the batch function for loading robot data in a loop
   loadConsoleRobotMarkup = function(thisSprite, index, complete){
+    
+    thisBody.addClass('loading');
     
     var thisPlayerToken = thisSprite.attr('data-player');
     var thisRobotToken = thisSprite.attr('data-robot');
@@ -71,19 +73,20 @@ $(document).ready(function(){
       robot: thisRobotToken
       }, function(data, status){
 
-      //console.log('console data received, appending '+thisPlayerToken+' '+thisRobotToken+'...');
-
+      //console.log('console data received, appending '+thisPlayerToken+' '+thisRobotToken+'...');       
+        
       if (index == 0){
-        thisConsole.animate({height:'230px',opacity:1},600,'swing',function(){
-          //console.log('console animation complete');
+        thisConsole.animate({height:'230px',opacity:1},300,'swing',function(){
+          //console.log('console animation complete'); 
           $(this).css({height:'auto'});
           });
         }
 
       $('#console #robots').append(data);
       thisSprite.animate({opacity:0.3},{duration:300,queue:false,easing:'swing',complete:function(){
-        //console.log(thisPlayerToken+' '+thisRobotToken+' sprite animation complete');
-        $(this).removeClass('notloaded').css({opacity:''});
+        //console.log(thisPlayerToken+' '+thisRobotToken+' sprite animation complete');   
+        $(this).removeClass('notloaded').css({opacity:''});    
+        thisBody.removeClass('loading');
         complete();
         }});
 
@@ -98,7 +101,7 @@ $(document).ready(function(){
   // Define the batch function for loading all unlocked ability data
   loadCanvasAbilitiesMarkup = function(onComplete){  
     
-    console.log('calling the loadCanvasAbilitiesMarkup() function'); 
+    //console.log('calling the loadCanvasAbilitiesMarkup() function'); 
     
     if (onComplete == undefined){ 
       onComplete = function(){
@@ -117,7 +120,7 @@ $(document).ready(function(){
         edit: gameSettings.allowEditing ? 'true' : 'false',
         user_id: gameSettings.userNumber
         }, function(data, status){
-        console.log('console ability data received, appending...');
+        //console.log('console ability data received, appending...');
         //console.log(data);
         // Append the link markup to the canvas
         $('#canvas .ability_canvas .links').empty().append(data);
@@ -138,7 +141,7 @@ $(document).ready(function(){
   // Define the batch function for loading all unlocked item data
   loadCanvasItemsMarkup = function(onComplete){  
     
-    console.log('calling the loadCanvasItemsMarkup() function'); 
+    //console.log('calling the loadCanvasItemsMarkup() function'); 
     
     if (onComplete == undefined){ 
       onComplete = function(){
@@ -157,7 +160,7 @@ $(document).ready(function(){
         edit: gameSettings.allowEditing ? 'true' : 'false',
         user_id: gameSettings.userNumber
         }, function(data, status){
-        console.log('console item data received, appending...');
+        //console.log('console item data received, appending...');
         //console.log(data);
         // Append the link markup to the canvas
         $('#canvas .item_canvas .links').empty().append(data);
@@ -177,6 +180,8 @@ $(document).ready(function(){
     
   // Create the click event for canvas sort button
   $('div[data-canvas=robots] .sort', gameCanvas).live('click', function(e){
+    e.preventDefault();
+    if (thisBody.hasClass('loading')){ return false; }
     
     var thisSortButton = $(this);
     var thisSortToken = thisSortButton.attr('data-sort');
@@ -187,7 +192,7 @@ $(document).ready(function(){
     var thisPlayerRobotsTokens = [];
     thisPlayerRobots.each(function(){ thisPlayerRobotsTokens.push($(this).attr('data-robot')); });
     thisPlayerRobotsTokens.join(',');
-    console.log('clicked sort; robot tokens = '+thisPlayerRobotsTokens);
+    //console.log('clicked sort; robot tokens = '+thisPlayerRobotsTokens);
     // Define the post options for the ajax call
     var postData = {action:'sort',token:thisSortToken,order:thisSortOrder,player:thisSortPlayer};    
     //console.log('postData', postData);
@@ -195,6 +200,7 @@ $(document).ready(function(){
     if (thisSortOrder == 'asc'){ thisSortButton.attr('data-order', 'desc'); }
     else if (thisSortOrder == 'desc'){ thisSortButton.attr('data-order', 'asc'); }
     // Post the sort request to the server
+    thisBody.addClass('loading');
     $.ajax({
       type: 'POST',
       url: 'frames/edit_robots.php',
@@ -214,6 +220,7 @@ $(document).ready(function(){
         if (dataStatus == 'error'){
           //console.log('error');
           //console.log(data);
+          thisBody.removeClass('loading');
           return false;
           } else if (dataStatus == 'success'){            
           //console.log('success');
@@ -242,11 +249,13 @@ $(document).ready(function(){
             });     
           // put sorted results back on page
           thisPlayerContainer.find('.sprite[data-token]').remove();
-          thisPlayerContainer.append(myArray);
+          thisPlayerContainer.find('.wrapper_overflow').append(myArray);
+          thisBody.removeClass('loading');
           return true;
           } else {
           //console.log('ummmm');
           //console.log(data);
+          thisBody.removeClass('loading');
           return false;
           }
         
@@ -261,7 +270,8 @@ $(document).ready(function(){
   
   // Create the click event for canvas sprites
   $('.robot_canvas .sprite[data-token]', gameCanvas).live('click', function(e){
-    e.preventDefault();
+    e.preventDefault();    
+    if (thisBody.hasClass('loading')){ return false; }
     
     var dataSprite = $(this);
     var dataSpriteIndex = dataSprite.index();      
@@ -303,10 +313,9 @@ $(document).ready(function(){
     });  
   
   // Create the change event for the player selectors
-  $('select.player_name', gameConsole).live('change', function(e){
-    
-    // Prevent the default action
-    e.preventDefault(); 
+  $('select.player_name', gameConsole).live('change', function(e){    
+    e.preventDefault();     
+    if (thisBody.hasClass('loading')){ return false; }
     
     // Collect a reference to this select object
     var thisPlayerSelect = $(this);
@@ -332,13 +341,15 @@ $(document).ready(function(){
 
   // Prevent clicks if the parent container is disabled
   $('a.ability_name', gameConsole).live('click', function(e){
-    e.preventDefault();
+    e.preventDefault();    
+    if (thisBody.hasClass('loading')){ return false; }
+    
     var thisLink = $(this);
     var thisContainer = thisLink.parent();
     var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
     var thisLinkStatus = thisLink.attr('data-status') != undefined ? thisLink.attr('data-status') : 'enabled';
     var thisRobotEvent = thisLink.parents('.event[data-player][data-robot]');
-    console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus);
+    //console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus);
     if (thisContainerStatus == 'disabled'){
 
       //console.log('container is disabled');
@@ -424,13 +435,15 @@ $(document).ready(function(){
 
   // Prevent clicks if the parent container is disabled
   $('a.item_name', gameConsole).live('click', function(e){
-    e.preventDefault();
+    e.preventDefault();    
+    if (thisBody.hasClass('loading')){ return false; }
+    
     var thisLink = $(this);
     var thisContainer = thisLink.parent();
     var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
     var thisLinkStatus = thisLink.attr('data-status') != undefined ? thisLink.attr('data-status') : 'enabled';
     var thisRobotEvent = thisLink.parents('.event[data-player][data-robot]');
-    console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus);
+    //console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus);
     if (thisContainerStatus == 'disabled'){
 
       //console.log('container is disabled');
@@ -1062,6 +1075,7 @@ $(document).ready(function(){
     }, false, true);
   
   // Initialize the canvas markup
+  thisBody.addClass('loading');
   robotEditorCanvasInit();
   
 });
@@ -1137,11 +1151,13 @@ function robotEditorCanvasInit(){
       while (countRobotsTriggered < countRobotLinks){
 
         $('.wrapper[data-player]', robotCanvas).each(function(index){
+          
           var tempWrapper = $(this);
           var tempPlayer = $(this).attr('data-player');
           var tempRobot = $('.sprite[data-robot]', tempWrapper).eq(countWrapperLoop);
           if (!tempRobot.length || tempRobot == undefined){ return false; }
           else { loadConsoleRobotMarkup(tempRobot, index); }
+          return false;
 
           });
 
@@ -1193,12 +1209,12 @@ function robotEditorCanvasInit(){
 //Define a function to trigger when a robot drag has started
 function startDragRobot(event, ui){
   
-  console.log('robot drag has started');
+  //console.log('robot drag has started');
   
   $('.robot_canvas .wrapper_overflow', gameCanvas).each(function(){
     var overflowHeight = $(this).innerHeight();
     var overflowPlayer = $(this).parent().attr('data-player');
-    console.log('add hard-coded height of '+overflowHeight+' to '+overflowPlayer);
+    //console.log('add hard-coded height of '+overflowHeight+' to '+overflowPlayer);
     $(this).css({height:overflowHeight+'px',overflow:'visible'});
     });
   
@@ -1212,7 +1228,7 @@ console.log('robot drag has stopped');
 
 $('.robot_canvas .wrapper_overflow', gameCanvas).each(function(){
   var overflowPlayer = $(this).parent().attr('data-player');
-  console.log('remove hard-coded height from '+overflowPlayer);
+  //console.log('remove hard-coded height from '+overflowPlayer);
   $(this).css({height:'',overflow:''});
   });
 
@@ -1258,7 +1274,7 @@ function completeDragRobot(event, ui){
 //Define a function to call when a player wrapper needs to have it's sort updated
 function updatePlayerSortOrder(sortPlayer){
 
-  console.log('updatePlayerSortOrder(sortPlayer = '+sortPlayer+')');
+  //console.log('updatePlayerSortOrder(sortPlayer = '+sortPlayer+')');
   
   var thisSortToken = 'manual';
   var thisSortOrder = 'auto';
@@ -1268,7 +1284,7 @@ function updatePlayerSortOrder(sortPlayer){
   var thisPlayerRobotsTokens = [];
   thisPlayerRobots.each(function(){ thisPlayerRobotsTokens.push($(this).attr('data-robot')); });
   thisPlayerRobotsTokens = thisPlayerRobotsTokens.join(',');
-  console.log('manual for '+thisSortPlayer+' sort; robot tokens = '+thisPlayerRobotsTokens);
+  //console.log('manual for '+thisSortPlayer+' sort; robot tokens = '+thisPlayerRobotsTokens);
   
   // Define the post options for the ajax call
   var postData = {action:'sort',token:thisSortToken,order:thisSortOrder,player:thisSortPlayer,robots:thisPlayerRobotsTokens};    
@@ -1278,6 +1294,7 @@ function updatePlayerSortOrder(sortPlayer){
   if (thisSortOrder == 'asc'){ thisSortButton.attr('data-order', 'desc'); }
   else if (thisSortOrder == 'desc'){ thisSortButton.attr('data-order', 'asc'); }
   // Post the sort request to the server
+  thisBody.addClass('loading');
   $.ajax({
    type: 'POST',
    url: 'frames/edit_robots.php',
@@ -1297,6 +1314,7 @@ function updatePlayerSortOrder(sortPlayer){
      if (dataStatus == 'error'){
        //console.log('error');
        //console.log(data);
+       thisBody.removeClass('loading');
        return false;
        } else if (dataStatus == 'success'){            
        //console.log('success');
@@ -1326,10 +1344,12 @@ function updatePlayerSortOrder(sortPlayer){
        // put sorted results back on page
        thisPlayerContainer.find('.sprite[data-token]').remove();
        thisPlayerContainer.find('.wrapper_overflow').append(myArray);
+       thisBody.removeClass('loading');
        return true;
        } else {
        //console.log('ummmm');
        //console.log(data);
+       thisBody.removeClass('loading');
        return false;
        }
      
@@ -1344,7 +1364,7 @@ function updatePlayerSortOrder(sortPlayer){
 // Define a function to call when a player wrapper needs to have it's sort updated
 function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToken, showInConsole, updateInCanvas, onComplete){
   
-  console.log('transferRobotToPlayer(thisRobotToken = '+thisRobotToken+', currentPlayerToken = '+currentPlayerToken+', newPlayerToken = '+newPlayerToken+')');
+  //console.log('transferRobotToPlayer(thisRobotToken = '+thisRobotToken+', currentPlayerToken = '+currentPlayerToken+', newPlayerToken = '+newPlayerToken+')');
   
   // Define the oncomplete if not defined
   if (onComplete == undefined){ onComplete = function(){ return true; }; }
@@ -1370,7 +1390,8 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
   // Trigger a transfer of this robot to the requested player
   var confirmTransfer = true; //confirm('Transfer ownership of '+thisRobotName+' from '+currentPlayerLabel+' to '+newPlayerLabel+'?');
   if (confirmTransfer){
-    $('#edit_overlay', thisPrototype).css({display:'block'});
+    //$('#edit_overlay', thisPrototype).css({display:'block'});
+    thisBody.addClass('loading');
     // Post the transfer request to the server
     $.ajax({
       type: 'POST',
@@ -1395,7 +1416,8 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
           // Reset the select button's position and return false
           thisPlayerSelect.val(currentPlayerToken);
           //console.log(data);
-          $('#edit_overlay', thisPrototype).css({display:'none'});
+          //$('#edit_overlay', thisPrototype).css({display:'none'});
+          thisBody.removeClass('loading');
           return false;
           
           } else if (dataStatus == 'success'){
@@ -1437,7 +1459,8 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
           //window.location = window.location.href;
           // Trigger the wrapper resize function based on the new robot amount
           resizePlayerWrapper();
-          $('#edit_overlay', thisPrototype).css({display:'none'});
+          //$('#edit_overlay', thisPrototype).css({display:'none'});
+          thisBody.removeClass('loading');
           return onComplete();
           //return true;
           
@@ -1447,7 +1470,8 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
             
           //console.log('ummmm');
           //console.log(data);
-          $('#edit_overlay', thisPrototype).css({display:'none'});
+          //$('#edit_overlay', thisPrototype).css({display:'none'});
+          thisBody.removeClass('loading');
           return false;
           
           }

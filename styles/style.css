@@ -21,6 +21,13 @@ body {
 body.index {
   background: #000000 url(../images/assets/index-background.gif) scroll repeat 0 0;
 }
+body.loading,
+body.loading a {
+  cursor: wait !important;
+}
+body.loading > * {
+  pointer-events: none !important;
+}
 #window,
 #window iframe,
 body.battle {
