@@ -8,8 +8,11 @@ echo '<div class="wrapper">';
   echo '<div class="wrapper_overflow">';
     //echo '<table><tr>';
 
+    // Print out the remove ability option
+    echo '<a class="ability_name" style="" data-id="0" data-key="0" data-player="player" data-robot="robot" data-ability="" title="" data-tooltip=""><label>- Remove Ability -</label></a>';
+
     // Loop through and print abilities
-    $key_counter = 0;
+    $key_counter = 1;
     if (!empty($mmrpg_database_abilities)){
       $row_count = 4;
       $column_count = ceil(count($mmrpg_database_abilities) / $row_count);

@@ -25,15 +25,13 @@ $(document).ready(function(){
   thisAbilityCanvas = $('div[data-canvas=abilities]', gameCanvas);
   thisItemCanvas = $('div[data-canvas=items]', gameCanvas);
   
-  // Update the player and robot count by counting elements
-  //thisEditorData.playerTotal = $('.robot_canvas .wrapper[data-player]', thisCanvas).length;
-  //thisEditorData.robotTotal = $('.robot_canvas .sprite[data-robot]', thisCanvas).length;
-  
   // Automatically hide the console and canvas areas until we're ready
   thisConsole.css({height:0,minHeight:0});
-  //thisCanvas.css({height:0,minHeight:0});
   
   //console.log(thisEditorData);
+  
+  
+  // -- RESIZE WRAPPER FUNCTIONS -- //
   
   // Define a function for resizing player wrappers based on robot count
   resizePlayerWrapper = function(){
@@ -53,6 +51,9 @@ $(document).ready(function(){
       });
     };
 
+    
+  // -- MARKUP LOADING FUNCTIONS -- //
+    
   // Define the batch function for loading robot data in a loop
   loadConsoleRobotMarkup = function(thisSprite, index, complete){
     
@@ -178,6 +179,53 @@ $(document).ready(function(){
 
     };
     
+    
+    // -- ROBOT CANVAS EVENTS -- //
+    
+    // Create the click event for canvas sprites
+    $('.robot_canvas .sprite[data-token]', gameCanvas).live('click', function(e){
+      e.preventDefault();    
+      if (thisBody.hasClass('loading')){ return false; }
+      
+      var dataSprite = $(this);
+      var dataSpriteIndex = dataSprite.index();      
+      var dataParent = dataSprite.closest('.wrapper')
+      var dataSelect = dataParent.attr('data-select');
+      var dataToken = dataSprite.attr('data-token');
+      var dataRobot = dataSprite.attr('data-robot');
+      var dataPlayer = dataSprite.attr('data-player');
+      if (dataSprite.hasClass('loading')){ return false; }
+      dataSprite.addClass('loading');
+      
+      $('.robot_canvas .sprite[data-token]', gameCanvas).css({opacity:''});
+      
+      // Define the show function for this sprite
+      var showFunction = function(){
+        var dataSelectorCurrent = '#'+dataSelect+' .event_visible';
+        var dataSelectorNext = '#'+dataSelect+' .event[data-token='+dataToken+']';
+        $('.sprite[data-token]', gameCanvas).removeClass('sprite_robot_current').removeClass('sprite_robot_dr-light_current sprite_robot_dr-wily_current sprite_robot_dr-cossack_current');
+        dataSprite.addClass('sprite_robot_current').addClass('sprite_robot_current').addClass('sprite_robot_'+dataPlayer+'_current');
+        dataParent.css({display:'block'});
+        if ($(dataSelectorCurrent, gameConsole).length){
+          $(dataSelectorCurrent, gameConsole).stop().animate({opacity:0},250,'swing',function(){
+            $(this).removeClass('event_visible').addClass('event_hidden').css({opacity:1});
+            $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
+            });
+          } else {
+            $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
+          } 
+        dataSprite.removeClass('loading');
+        }    
+      
+      // Load the robot data if not already loaded
+      if (loadedConsoleRobotTokens.indexOf(dataRobot) == -1){
+        loadConsoleRobotMarkup(dataSprite, dataSpriteIndex, showFunction); 
+        } else {
+        showFunction();
+        }
+      
+      });
+    
   // Create the click event for canvas sort button
   $('div[data-canvas=robots] .sort', gameCanvas).live('click', function(e){
     e.preventDefault();
@@ -266,80 +314,11 @@ $(document).ready(function(){
       });
  
     });
- 
   
-  // Create the click event for canvas sprites
-  $('.robot_canvas .sprite[data-token]', gameCanvas).live('click', function(e){
-    e.preventDefault();    
-    if (thisBody.hasClass('loading')){ return false; }
-    
-    var dataSprite = $(this);
-    var dataSpriteIndex = dataSprite.index();      
-    var dataParent = dataSprite.closest('.wrapper')
-    var dataSelect = dataParent.attr('data-select');
-    var dataToken = dataSprite.attr('data-token');
-    var dataRobot = dataSprite.attr('data-robot');
-    var dataPlayer = dataSprite.attr('data-player');
-    if (dataSprite.hasClass('loading')){ return false; }
-    dataSprite.addClass('loading');
-    
-    $('.robot_canvas .sprite[data-token]', gameCanvas).css({opacity:''});
-    
-    // Define the show function for this sprite
-    var showFunction = function(){
-      var dataSelectorCurrent = '#'+dataSelect+' .event_visible';
-      var dataSelectorNext = '#'+dataSelect+' .event[data-token='+dataToken+']';
-      $('.sprite[data-token]', gameCanvas).removeClass('sprite_robot_current').removeClass('sprite_robot_dr-light_current sprite_robot_dr-wily_current sprite_robot_dr-cossack_current');
-      dataSprite.addClass('sprite_robot_current').addClass('sprite_robot_current').addClass('sprite_robot_'+dataPlayer+'_current');
-      dataParent.css({display:'block'});
-      if ($(dataSelectorCurrent, gameConsole).length){
-        $(dataSelectorCurrent, gameConsole).stop().animate({opacity:0},250,'swing',function(){
-          $(this).removeClass('event_visible').addClass('event_hidden').css({opacity:1});
-          $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
-          });
-        } else {
-          $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
-        } 
-      dataSprite.removeClass('loading');
-      }    
-    
-    // Load the robot data if not already loaded
-    if (loadedConsoleRobotTokens.indexOf(dataRobot) == -1){
-      loadConsoleRobotMarkup(dataSprite, dataSpriteIndex, showFunction); 
-      } else {
-      showFunction();
-      }
-    
-    });  
   
-  // Create the change event for the player selectors
-  $('select.player_name', gameConsole).live('change', function(e){    
-    e.preventDefault();     
-    if (thisBody.hasClass('loading')){ return false; }
-    
-    // Collect a reference to this select object
-    var thisPlayerSelect = $(this);
-    var thisPlayerLink = thisPlayerSelect.parent();
-    var newPlayerOption = $('option:selected', thisPlayerSelect);
-    // Collect the current robot name and token
-    var thisRobotToken = thisPlayerSelect.attr('data-robot');
-    var thisRobotName = $('a[data-robot='+thisRobotToken+']', gameCanvas).attr('title');
-    // Collect the current and target player tokens
-    var currentPlayerToken = thisPlayerSelect.attr('data-player');
-    var currentPlayerLabel = $('label', thisPlayerLink).html();
-    var newPlayerToken = newPlayerOption.val();
-    var newPlayerLabel = newPlayerOption.html();
-    // Count the number of other options for this player
-    var thisParentWrapper = $('.wrapper_'+currentPlayerToken, gameCanvas);
-    var countRobotOptions = $('a[data-token]', thisParentWrapper).length;    
-    if (countRobotOptions < 2){ thisPlayerSelect.val(currentPlayerToken); return false; }
-    
-    // Call the trasfer robot function to take care of the rest
-    return transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToken, true, true);
-    
-    });
-
-  // Prevent clicks if the parent container is disabled
+  // -- ABILITY EQUIPPING EVENTS -- //
+  
+  // Create the click event for ability buttons in the console
   $('a.ability_name', gameConsole).live('click', function(e){
     e.preventDefault();    
     if (thisBody.hasClass('loading')){ return false; }
@@ -349,7 +328,8 @@ $(document).ready(function(){
     var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
     var thisLinkStatus = thisLink.attr('data-status') != undefined ? thisLink.attr('data-status') : 'enabled';
     var thisRobotEvent = thisLink.parents('.event[data-player][data-robot]');
-    //console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus);
+    var thisRobotAbilitiesEquipped = $('.ability_name[data-ability!=""]', thisRobotEvent).length;
+    //console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus+', thisRobotAbilitiesEquipped = '+thisRobotAbilitiesEquipped);
     if (thisContainerStatus == 'disabled'){
 
       //console.log('container is disabled');
@@ -417,14 +397,28 @@ $(document).ready(function(){
         
         $('.ability_name[data-id]', thisAbilityCanvas).each(function(index, element){
           var thisID = $(this).attr('data-id');
-          if (thisAbilityCompatible.indexOf(thisID) == -1){               
+          //console.log('thisID('+thisID+') vs thisAbilityID('+thisAbilityID+')');
+          if (thisID > 0 && thisAbilityCompatible.indexOf(thisID) == -1){               
             //console.log('ID '+thisID+' is NOT compatible'); 
             $(this).attr('data-status', 'disabled').css({display:'none',opacity:''});            
             } else {               
             //console.log('ID '+thisID+' is compatible');   
-            if (thisID == thisAbilityID){ $(this).attr('data-status', 'disabled').css({display:''}); }
-            else if (thisAbilityEquipped.indexOf(thisID) != -1){ $(this).attr('data-status', 'disabled').css({display:''}); }
-            else { $(this).removeAttr('data-status').css({display:''});  }                        
+            if (thisID == thisAbilityID){ 
+              //console.log('Cannot select same ID');
+              $(this).attr('data-status', 'disabled').css({display:''}); 
+              }
+            else if (thisID > 0 && thisAbilityEquipped.indexOf(thisID) != -1){ 
+              //console.log('Ability is already equipped');
+              $(this).attr('data-status', 'disabled').css({display:''}); 
+              }
+            else if (thisID == 0 && thisRobotAbilitiesEquipped < 2){ 
+              //console.log('Cannot remove last ability');
+              $(this).attr('data-status', 'disabled').css({display:''}); 
+              }
+            else { 
+              //console.log('Ability is totally available');
+              $(this).removeAttr('data-status').css({display:''});  
+              }                        
             }
           });
       
@@ -433,10 +427,118 @@ $(document).ready(function(){
       }
     });
 
-  // Prevent clicks if the parent container is disabled
+  // Create the click event for the ability buttons in the canvas
+  $('a.ability_name', thisAbilityCanvas).live('click', function(e){
+    e.preventDefault();    
+    if (thisBody.hasClass('loading')){ return false; }
+    
+    // Collect the target data from the ability canvas
+    var targetPlayerToken =  thisAbilityCanvas.attr('data-player') != undefined ? thisAbilityCanvas.attr('data-player') : '';
+    var targetRobotToken =  thisAbilityCanvas.attr('data-robot') != undefined ? thisAbilityCanvas.attr('data-robot') : '';    
+    var targetAbilityKey =  thisAbilityCanvas.attr('data-key') != undefined ? thisAbilityCanvas.attr('data-key') : '';  
+
+    // Collect referneces to the target objects
+    var targetRobotEvent = $('.event[data-player='+targetPlayerToken+'][data-robot='+targetRobotToken+']', gameConsole);
+    var targetAbilityLink = $('.ability_name[data-key='+targetAbilityKey+']', targetRobotEvent);
+    
+    // Collect references to this new ability link
+    var thisAbilityLink = $(this);
+    var thisAbilityStatus = thisAbilityLink.attr('data-status') != undefined ? thisAbilityLink.attr('data-status') : 'enabled';
+    var thisAbilityToken =  thisAbilityLink.attr('data-ability') != undefined ? thisAbilityLink.attr('data-ability') : '';
+        
+    //console.log('ability name in selection canvas clicked');
+    //console.log('status:'+thisAbilityStatus+' | player:'+targetPlayerToken+' | robot:'+targetRobotToken+' | key:'+targetAbilityKey+' | ability:'+thisAbilityToken+'');
+    
+    // Ensure all data was provided before continuing
+    if (thisAbilityStatus == 'disabled'){ 
+      //console.log('link status disabled');
+      return false; 
+      } else if (!targetPlayerToken.length){ 
+      //console.log('ability player empty');
+      return false; 
+      } else if (!targetRobotToken.length){ 
+      //console.log('ability robot empty');
+      return false; 
+      } else if (!targetAbilityKey.length){ 
+      //console.log('ability key empty');
+      return false; 
+      }
+    
+    // Prepare ajax data to be sent to the server
+    var postData = {action:'ability',player:targetPlayerToken,robot:targetRobotToken,key:targetAbilityKey};
+    if (thisAbilityToken.length){ postData.ability = thisAbilityToken; } 
+    else { postData.ability = ''; }
+    
+    // Post this change back to the server
+    thisBody.addClass('loading');
+    $.ajax({
+      type: 'POST',
+      url: 'frames/edit_robots.php',
+      data: postData,
+      success: function(data, status){
+        
+        // Break apart the response into parts
+        var data = data.split('|');
+        var dataStatus = data[0] != undefined ? data[0] : false;
+        var dataMessage = data[1] != undefined ? data[1] : false;
+        var dataContent = data[2] != undefined ? data[2] : false;
+        
+        // DEBUG
+        //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
+        
+        // If the ability change was a success, update the console link
+        if (dataStatus == 'success'){ 
+          
+          // If a non-empty ability token was provided, normal equip
+          if (thisAbilityToken.length){
+            
+            // Update the target ability link with new data
+            targetAbilityLink.attr('class', thisAbilityLink.attr('class'));
+            targetAbilityLink.attr('data-id', thisAbilityLink.attr('data-id'));
+            targetAbilityLink.attr('data-ability', thisAbilityLink.attr('data-ability'));
+            targetAbilityLink.attr('data-type', thisAbilityLink.attr('data-type'));
+            targetAbilityLink.attr('data-type2', thisAbilityLink.attr('data-type2'));
+            targetAbilityLink.attr('data-tooltip', thisAbilityLink.attr('data-tooltip'));
+            // Clone the inner html into the target ability link
+            targetAbilityLink.html(thisAbilityLink.html());
+            
+            }
+          // Otherwise if this was an ability remove option, clear stuff
+          else {
+            
+            // Update the target ability link with empty data
+            targetAbilityLink.attr('class', 'ability_name');
+            targetAbilityLink.attr('data-id', '0');
+            targetAbilityLink.attr('data-ability', '');
+            targetAbilityLink.attr('data-type', '');
+            targetAbilityLink.attr('data-type2', '');
+            targetAbilityLink.attr('data-tooltip', '');            
+            // Remove the label text and replace with empty hyphen
+            targetAbilityLink.find('label').attr('style', '').html('-');
+            
+            }
+          
+          }
+        
+        thisBody.removeClass('loading');
+        targetAbilityLink.trigger('click');
+      
+                 
+        }
+      });
+
+    });
+  
+  
+  // -- ITEM EQUIPPING EVENTS -- //
+
+  // Create the event for item buttons in the console
   $('a.item_name', gameConsole).live('click', function(e){
     e.preventDefault();    
     if (thisBody.hasClass('loading')){ return false; }
+    
+    // NOT READY YET!!!
+    return false;
     
     var thisLink = $(this);
     var thisContainer = thisLink.parent();
@@ -510,203 +612,6 @@ $(document).ready(function(){
       
       }
     });
-  
-  // Prevent clicks if the parent container is disabled
-  $('select.ability_name', gameConsole).live('click', function(e){
-    var thisSelect = $(this);
-    var thisLink = thisSelect.parent();
-    var thisContainer = thisLink.parent();
-    var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
-    if (thisContainerStatus == 'disabled'){
-      e.preventDefault();
-      return false;
-      }
-    });
-  
-  // Create the change event for the ability selectors
-  $('select.ability_name', gameConsole).live('change', function(e){
-    // Prevent the default action
-    e.preventDefault();
-    // Collect the global reference objects
-    var thisSelect = $(this);
-    var thisLink = thisSelect.parent();
-    var thisContainer = thisLink.parent();
-    var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
-    var thisLabel = $('label', thisLink);
-    var dataKey = thisSelect.attr('data-key');
-    var dataPlayer = thisSelect.attr('data-player');
-    var dataRobot = thisSelect.attr('data-robot');
-    var optionSelected = $('option:selected', thisSelect);
-    var optionAbilityToken = optionSelected.val();
-    var postData = {action:'ability',key:dataKey,player:dataPlayer,robot:dataRobot};
-    //if (dataKey == 0 && !optionAbilityToken.length){ alert('first option cannot be empty!'); return false; }
-    if (optionAbilityToken.length){ postData.ability = optionAbilityToken; } 
-    else { postData.ability = ''; }
-
-    // Ensure the parent container is enabled before sending any AJAX, else just update text
-    if (thisContainerStatus == 'enabled'){
-      
-      // Change the body cursor to wait
-      $('body').css('cursor', 'wait !important');
-      // Temporarily disable the window while we update stuff
-      thisContainer.css({opacity:0.25}).attr('data-status', 'disabled');
-      // Loop through all this ability links for this robot and disable
-      $('select.ability_name', thisContainer).each(function(key, value){
-        $(this).attr('disabled', 'disabled').prop('disabled', true);
-        });
-      
-      
-      
-      // Post this change back to the server
-      $.ajax({
-        type: 'POST',
-        url: 'frames/edit_robots.php',
-        data: postData,
-        success: function(data, status){
-          
-          // DEBUG
-          //alert(data);
-          
-          // Break apart the response into parts
-          var data = data.split('|');
-          var dataStatus = data[0] != undefined ? data[0] : false;
-          var dataMessage = data[1] != undefined ? data[1] : false;
-          var dataContent = data[2] != undefined ? data[2] : false;
-          
-          // DEBUG
-          //alert('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
-          
-          // If the ability change was a success, flash the box green
-          if (dataStatus == 'success'){
-            
-            // Make the clicked link flash green to show success
-            thisLink.css({borderColor:'green !important'});
-            var tempTimeout = setTimeout(function(){ thisLink.css({borderColor:''}); }, 1000);          
-            
-            // Update the link attributes based on if the ability was empty
-            if (optionAbilityToken.length){
-              var optionAbilityLabel = optionSelected.attr('data-label');
-              var optionAbilityTitle = optionSelected.attr('title');
-              var optionAbilityTooltip = optionSelected.attr('data-tooltip');
-              var optionAbilityImage = 'images/abilities/'+optionAbilityToken+'/icon_left_40x40.png?';
-              var optionAbilityType = optionSelected.attr('data-type');
-              var optionAbilityType2 = optionSelected.attr('data-type2');
-              thisLink.attr('data-ability', optionAbilityToken).attr('title', optionAbilityTitle).attr('data-tooltip', optionAbilityTooltip);
-              thisLink.removeClass().addClass('ability_name ability_type ability_type_'+optionAbilityType+(optionAbilityType2.length ? '_'+optionAbilityType2 : '')+'');
-              thisSelect.attr('data-ability', optionAbilityToken);
-              thisLabel.html(optionAbilityLabel).css({backgroundImage:'url('+optionAbilityImage+')'});
-              } else {
-              thisLink.attr('data-ability', '').attr('title', '-').attr('data-tooltip', '-');
-              thisLink.removeClass().addClass('ability_name ability_type ability_type_none');
-              thisSelect.attr('data-ability', '').val('');
-              thisLabel.html('-').css({backgroundImage:'none'});
-              }         
-            
-            // Create the empty ability count variable
-            var emptyAbilityCount = 0;
-            // If the new ability list was provided, break it apart
-            if (dataContent.length){ var newAbilityList = dataContent.split(','); }
-            else { var newAbilityList = []; }
-            
-            // Loop through all this ability links for this robot and update
-            $('a.ability_name', thisContainer).each(function(key, value){
-              
-              // Collect the approriate reference variables
-              var tempLink = $(this);
-              var tempSelect = $('select', tempLink);
-              var tempOption = $('option:selected', tempSelect);
-              var tempLabel = $('label', tempLink);
-              var tempAbility = tempOption.val();
-              
-              // If a new ability list was provided, update this link
-              if (newAbilityList.length){
-                
-                // Collect the new ability from this position in the list
-                var newAbility = newAbilityList[key] != undefined ? newAbilityList[key]: '';
-                
-                // DEBUG
-                //alert('current ability at position '+key+' is ['+tempAbility+']...');
-                
-                // Update the select box with the new ability and recollect it's value
-                tempSelect.val(newAbility);
-                tempOption = $('option:selected', tempSelect);
-                tempAbility = tempOption.val();
-                
-                // Update the link attributes based on if the new ability was empty
-                if (newAbility.length){
-                  var newAbilityLabel = tempOption.attr('data-label');
-                  var newAbilityTitle = tempOption.attr('title');
-                  var newAbilityTooltip = tempOption.attr('data-tooltip');
-                  var newAbilityImage = 'images/abilities/'+newAbility+'/icon_left_40x40.png?';
-                  var newAbilityType = tempOption.attr('data-type');
-                  var newAbilityType2 = tempOption.attr('data-type2');
-                  tempLink.attr('data-ability', newAbility).attr('title', newAbilityTitle).attr('data-tooltip', newAbilityTooltip);
-                  tempLink.removeClass().addClass('ability_name ability_type ability_type_'+newAbilityType+(newAbilityType2.length ? '_'+newAbilityType2 : ''));
-                  tempSelect.attr('data-ability', newAbility);
-                  tempSelect.find('option').prop('disabled', false);
-                  tempSelect.find('option[value='+newAbility+']').prop('disabled', true);
-                  tempLabel.html(newAbilityLabel).css({backgroundImage:'url('+newAbilityImage+')'});
-                  } else {
-                  tempLink.attr('data-ability', '').attr('title', '-').attr('data-tooltip', '-');
-                  tempLink.removeClass().addClass('ability_name ability_type ability_type_none');
-                  tempSelect.attr('data-ability', '').val('');
-                  tempSelect.find('option').prop('disabled', false);
-                  tempLabel.html('-').css({backgroundImage:'none'});
-                  }                 
-                
-                // DEBUG
-                //alert('...but should be ['+newAbility+']!');
-                                
-                }            
-              
-              // Disable any overflow ability containers
-              if (!tempAbility.length){ emptyAbilityCount++; }
-              if (emptyAbilityCount >= 2){ tempLink.css({opacity:0.25}); tempSelect.attr('disabled', 'disabled'); }
-              else { tempLink.css({opacity:1.0}); tempSelect.removeAttr('disabled'); }
-              
-              });           
-  
-            }
-          
-            // Change the body cursor back to default
-            $('body').css('cursor', '');
-            // Enable the conatiner again now that we're done
-            thisContainer.css({opacity:1.0}).attr('data-status', 'enabled');      
-            // Loop through all this ability links for this robot and disable
-            $('select.ability_name', thisContainer).each(function(key, value){
-              $(this).removeAttr('disabled').prop('disabled', false);
-              });          
-                   
-          }
-        });      
-      
-      } else {
-        
-      // Update the link attributes based on if the ability was empty
-      if (optionAbilityToken.length){
-        var optionAbilityLabel = optionSelected.attr('data-label');
-        var optionAbilityImage = 'images/abilities/'+optionAbilityToken+'/icon_left_40x40.png?';
-        var optionAbilityTitle = optionSelected.attr('title');
-        var optionAbilityTooltip = optionSelected.attr('data-tooltip');
-        var optionAbilityType = optionSelected.attr('data-type');
-        thisLink.attr('data-ability', optionAbilityToken).attr('title', optionAbilityTitle).attr('data-tooltip', optionAbilityTooltip);
-        thisLink.removeClass().addClass('ability_name ability_type ability_type_'+optionAbilityType);
-        thisSelect.attr('data-ability', optionAbilityToken);
-        thisLabel.html(optionAbilityLabel).css({backgroundImage:'url('+optionAbilityImage+')'});
-        } else {
-        thisLink.attr('data-ability', '').attr('title', '-').attr('data-tooltip', '-');
-        thisLink.removeClass().addClass('ability_name ability_type ability_type_none');
-        thisSelect.attr('data-ability', '').val('');
-        thisLabel.html('-').css({backgroundImage:'none'});
-        }
-        
-      }
-    
-    
-    
-    
-    
-    });//.trigger('change');
   
   
   // PROCESS ALT CHANGE ACTION
@@ -1245,6 +1150,8 @@ function completeDragRobot(event, ui){
 
   //var data = thisSortRobot.attr('class'); //sortable('serialize');
   //console.log(data)
+
+  thisBody.addClass('loading');
   
   // -- SORT ROBOT WITHIN SAME PARENT -- //
   
@@ -1252,6 +1159,7 @@ function completeDragRobot(event, ui){
   if (thisSortRobotPlayer == thisSortParentPlayer){
 
     updatePlayerSortOrder(thisSortRobotPlayer);
+    thisBody.removeClass('loading');
     
   }
   
@@ -1264,7 +1172,8 @@ function completeDragRobot(event, ui){
     var updateInCanvas = false;
     transferRobotToPlayer(thisSortRobotToken, thisSortRobotPlayer, thisSortParentPlayer, showInConsole, updateInCanvas, function(){
       updatePlayerSortOrder(thisSortRobotPlayer);
-      updatePlayerSortOrder(thisSortParentPlayer);      
+      updatePlayerSortOrder(thisSortParentPlayer); 
+      thisBody.removeClass('loading');
       });
     
   }
@@ -1371,24 +1280,20 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
   
   // Collect a reference to this select object
   var thisRobotConsole = $('.event[data-robot='+thisRobotToken+']', gameConsole);
-  var thisPlayerSelect = $('select.player_name', thisRobotConsole);
-  var thisPlayerLink = thisPlayerSelect.parent();
-  var newPlayerOption = $('option[value='+newPlayerToken+']', thisPlayerSelect);
-  thisPlayerSelect.val(newPlayerToken);
+  var thisPlayerLink = $('a.player_name[data-player="'+currentPlayerToken+'"]', thisRobotConsole);
   // Collect the current robot name and token
   var thisRobotName = $('a[data-robot='+thisRobotToken+']', gameCanvas).attr('title');
   // Collect the current and target player tokens
   var currentPlayerLabel = $('label', thisPlayerLink).html();
-  var newPlayerLabel = newPlayerOption.html();
   // Count the number of other options for this player
   var thisParentWrapper = $('.wrapper_'+currentPlayerToken, gameCanvas);
   var countRobotOptions = $('a[data-token]', thisParentWrapper).length;    
-  if (countRobotOptions < 2){ thisPlayerSelect.val(currentPlayerToken); return false; }
+  if (countRobotOptions < 2){ return false; }
   
   // Define the post options for the ajax call
   var postData = {action:'player',robot:thisRobotToken,player1:currentPlayerToken,player2:newPlayerToken};
   // Trigger a transfer of this robot to the requested player
-  var confirmTransfer = true; //confirm('Transfer ownership of '+thisRobotName+' from '+currentPlayerLabel+' to '+newPlayerLabel+'?');
+  var confirmTransfer = true;
   if (confirmTransfer){
     //$('#edit_overlay', thisPrototype).css({display:'block'});
     thisBody.addClass('loading');
@@ -1414,7 +1319,6 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
           // -- POST STATUS ERROR -- //
           
           // Reset the select button's position and return false
-          thisPlayerSelect.val(currentPlayerToken);
           //console.log(data);
           //$('#edit_overlay', thisPrototype).css({display:'none'});
           thisBody.removeClass('loading');
