@@ -65,7 +65,6 @@ while ($this_action == 'save'){
         $_SESSION[$session_token]['USER']['password_encoded'] = md5($_SESSION[$session_token]['USER']['password']);
         $_SESSION[$session_token]['USER']['imagepath'] = $_POST['imagepath'];
         $_SESSION[$session_token]['USER']['colourtoken'] = $_POST['colourtoken'];
-        $_SESSION[$session_token]['USER']['difficulty'] = $_POST['difficulty'];
         $_SESSION[$session_token]['FILE']['path'] = $_SESSION[$session_token]['USER']['username_clean'].'/';
         $_SESSION[$session_token]['FILE']['name'] = $_SESSION[$session_token]['USER']['password_encoded'].'.sav';
         $this_save_filepath = $this_save_dir.$_SESSION[$session_token]['FILE']['path'].$_SESSION[$session_token]['FILE']['name'];
@@ -219,17 +218,6 @@ while ($this_action == 'save'){
     //$html_form_fields .= '</div>';
 
   $html_form_fields .= '</div>';
-
-  // Game Difficulty
-  //$html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">';
-    $html_form_fields .= '<label class="label label_difficulty" style="width: 100px; ">Mode :</label>';
-    $html_difficulty_options = array();
-    $html_difficulty_options[] = '<option value="easy">Easy Difficulty</option>';
-    $html_difficulty_options[] = '<option value="normal">Normal Difficulty</option>';
-    $html_difficulty_options[] = '<option value="hard">Hard Difficulty</option>';
-    $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['difficulty'].'"', 'value="'.$_SESSION['GAME']['USER']['difficulty'].'" selected="selected"', implode('', $html_difficulty_options));
-    $html_form_fields .= '<select class="select select_difficulty" style="width: 230px; " name="difficulty">'.$temp_select_options.'</select>';
-  //$html_form_fields .= '</div>';
 
   // Update the form markup buttons
   $html_form_buttons .= '<input class="button button_submit" type="submit" value="Save Game" />';

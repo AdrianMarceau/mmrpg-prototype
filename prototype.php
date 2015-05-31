@@ -348,7 +348,23 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       <? if(empty($_SESSION['GAME']['DEMO'])): ?>
         <a class="wrapper link link_save" data-step="file_save" data-index="98" data-source="frames/file.php?action=save" data-music="misc/file-menu" data-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
           <span class="info info_userinfo">
-            <span class="mode"><?= ucfirst(!empty($_SESSION['GAME']['USER']['difficulty']) ? $_SESSION['GAME']['USER']['difficulty'] : 'normal').' Mode' ?></span>
+            <span class="mode">
+              <?
+              // Print the prototype complete awards if they exist
+              echo mmrpg_prototype_complete('dr-light') ? '<span style="position: relative; bottom: 1px;">&hearts;</span>' : '';
+              echo mmrpg_prototype_complete('dr-wily') ? '<span style="position: relative; bottom: 1px;">&clubs;</span>' : '';
+              echo mmrpg_prototype_complete('dr-cossack') ? '<span style="position: relative; bottom: 1px;">&diams;</span>' : '';
+              // Print the player's rank based on leaderboard position
+              if ($this_boardinfo['board_rank'] == 1){ echo ' Champion Rank'; }
+              elseif ($this_boardinfo['board_rank'] <= 3){ echo ' Elite Rank'; }
+              elseif ($this_boardinfo['board_rank'] <= 50){ echo ' Master Rank'; }
+              elseif ($this_boardinfo['board_rank'] <= 100){ echo ' Platinum Rank'; }
+              elseif ($this_boardinfo['board_rank'] <= 200){ echo ' Golden Rank'; }
+              elseif ($this_boardinfo['board_rank'] <= 400){ echo ' Silver Rank'; }
+              elseif ($this_boardinfo['board_rank'] <= 800){ echo ' Bronze Rank'; }
+              else { echo 'Normal Rank'; }
+              ?>
+            </span>
             <span class="name"><?= !empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : $_SESSION['GAME']['USER']['username'] ?></span>
           </span>
           <?= $temp_avatar_markup ?>
@@ -356,6 +372,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       <? else: ?>
         <div class="wrapper">
           <span class="info info_username info_demo">
+            <span class="mode">Welcome to the</span>
             <label title="Demo Mode : Progess cannot be saved!">Demo Mode</label>
           </span>
           <?= $temp_avatar_markup ?>

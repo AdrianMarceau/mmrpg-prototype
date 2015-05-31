@@ -40,10 +40,6 @@ define('MMRPG_SETTINGS_ACTIVE_TIMEOUT', (60 * 60 * 24 * 90)); // In seconds (60s
 define('MMRPG_SETTINGS_LEGACY_TIMEOUT', (60 * 60 * 24 * 365)); // In seconds (60sec x 60min x 24hr x 365days)
 define('MMRPG_SETTINGS_UPDATE_TIMEOUT', (60 * 60 * 24 * 1)); // In seconds (60sec x 60min x 24hr x 1days)
 
-// Define the global difficulty from the session if available
-$temp_difficulty = !empty($_SESSION['GAME']['USER']['difficulty']) && in_array($_SESSION['GAME']['USER']['difficulty'], array('easy', 'normal', 'hard')) ? $_SESSION['GAME']['USER']['difficulty'] : 'normal';
-define('MMRPG_SETTINGS_GAME_DIFFICULTY', $temp_difficulty); // Define the game's difficulty level for turns/points/robots
-
 // Define the global guest ID to prevent confusion
 define('MMRPG_SETTINGS_GUEST_ID', 888888); // Doubt we'll ever get this many users
 
@@ -116,8 +112,8 @@ define('MMRPG_SETTINGS_BATTLETURNS_MAXAMOUNT', 99); // The maximum target turn v
 define('MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER', 2.0); // The point rate per robot level multiplier for player battles
 define('MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER', 0.5); // The point rate per target robot multiplier for player battles
 
-// -- DIFFICULTY SETTINGS -- //
-// Define global multipliers that differ based on difficulty level
+
+// -- CHALLENGE SETTINGS -- //
 
 // Define the global variables that determine target turn values
 define('MMRPG_SETTINGS_BATTLETURNS_PERMECHA', 1); // Target number of battle turns per each opposing support mecha
@@ -129,39 +125,12 @@ define('MMRPG_SETTINGS_BATTLEROBOTS_PERMECHA', 0); // Target number of player ro
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERROBOT', 1); // Target number of player robots per each opposing robot master
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERBOSS',  2); // Target number of player robots per each opposing fortress boss
 
-// -- EASY MODE -- //
-if (MMRPG_SETTINGS_GAME_DIFFICULTY == 'easy'){
-
-  // Define the global variables that determine battle point values
-  define('MMRPG_SETTINGS_BATTLEPOINTS_PERMECHA',  10); // Battle point reward base per each opposing support mecha
-  define('MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT', 100); // Battle point reward base per each opposing robot master
-  define('MMRPG_SETTINGS_BATTLEPOINTS_PERBOSS', 1000); // Battle point reward base per each opposing fortress boss
-  // Define the global variables that determine opponent stat boosts
-  define('MMRPG_SETTINGS_BATTLEROBOTS_TARGET_STATBOOST', 300); // The bonus stat seed for target robot masters in battle
-
-}
-// -- NORMAL MODE -- //
-elseif (MMRPG_SETTINGS_GAME_DIFFICULTY == 'normal'){
-
-  // Define the global variables that determine battle point values
-  define('MMRPG_SETTINGS_BATTLEPOINTS_PERMECHA',  100); // Battle point reward base per each opposing support mecha
-  define('MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT', 1000); // Battle point reward base per each opposing robot master
-  define('MMRPG_SETTINGS_BATTLEPOINTS_PERBOSS', 10000); // Battle point reward base per each opposing fortress boss
-   // Define the global variables that determine opponent stat boosts
-  define('MMRPG_SETTINGS_BATTLEROBOTS_TARGET_STATBOOST', 600); // The bonus stat seed for target robot masters in battle
-
-}
-// -- HARD MODE -- //
-elseif (MMRPG_SETTINGS_GAME_DIFFICULTY == 'hard'){
-
-  // Define the global variables that determine battle point values
-  define('MMRPG_SETTINGS_BATTLEPOINTS_PERMECHA',  1000); // Battle point reward base per each opposing support mecha
-  define('MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT', 10000); // Battle point reward base per each opposing robot master
-  define('MMRPG_SETTINGS_BATTLEPOINTS_PERBOSS', 100000); // Battle point reward base per each opposing fortress boss
-  // Define the global variables that determine opponent stat boosts
-  define('MMRPG_SETTINGS_BATTLEROBOTS_TARGET_STATBOOST', 900); // The bonus stat seed for target robot masters in battle
-
-}
+// Define the global variables that determine battle point values
+define('MMRPG_SETTINGS_BATTLEPOINTS_PERMECHA',  100); // Battle point reward base per each opposing support mecha
+define('MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT', 1000); // Battle point reward base per each opposing robot master
+define('MMRPG_SETTINGS_BATTLEPOINTS_PERBOSS', 10000); // Battle point reward base per each opposing fortress boss
+ // Define the global variables that determine opponent stat boosts
+define('MMRPG_SETTINGS_BATTLEROBOTS_TARGET_STATBOOST', 600); // The bonus stat seed for target robot masters in battle
 
 // Define the global default values for game multipliers
 define('MMRPG_SETTINGS_WEAKNESS_MULTIPLIER', 2.0); // Core boosted abilites should recive a 50% boost

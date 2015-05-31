@@ -85,7 +85,6 @@ function mmrpg_save_game_session($this_save_filepath){
         $temp_user_array['user_image_path'] = !empty($this_user['imagepath']) ? $this_user['imagepath'] : '';
         $temp_user_array['user_background_path'] = !empty($this_user['backgroundpath']) ? $this_user['backgroundpath'] : '';
         $temp_user_array['user_colour_token'] = !empty($this_user['colourtoken']) ? $this_user['colourtoken'] : '';
-        $temp_user_array['user_game_difficulty'] = !empty($this_user['difficulty']) ? $this_user['difficulty'] : 'normal';
         $temp_user_array['user_gender'] = !empty($this_user['gender']) ? $this_user['gender'] : '';
         $temp_user_array['user_email_address'] = !empty($this_user['emailaddress']) ? $this_user['emailaddress'] : '';
         $temp_user_array['user_website_address'] = !empty($this_user['websiteaddress']) ? $this_user['websiteaddress'] : '';

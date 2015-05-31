@@ -43,7 +43,6 @@ function mmrpg_load_game_session($this_save_filepath){
     $new_game_data['USER']['imagepath'] = $this_database_user['user_image_path'];
     $new_game_data['USER']['backgroundpath'] = $this_database_user['user_background_path'];
     $new_game_data['USER']['colourtoken'] = $this_database_user['user_colour_token'];
-    $new_game_data['USER']['difficulty'] = $this_database_user['user_game_difficulty'];
     $new_game_data['USER']['gender'] = $this_database_user['user_gender'];
     $new_game_data['USER']['displayname'] = $this_database_user['user_name_public'];
     $new_game_data['USER']['emailaddress'] = $this_database_user['user_email_address'];
