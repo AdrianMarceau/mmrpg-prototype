@@ -358,10 +358,9 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
               if ($this_boardinfo['board_rank'] == 1){ echo ' Champion Rank'; }
               elseif ($this_boardinfo['board_rank'] <= 3){ echo ' Elite Rank'; }
               elseif ($this_boardinfo['board_rank'] <= 50){ echo ' Master Rank'; }
-              elseif ($this_boardinfo['board_rank'] <= 100){ echo ' Platinum Rank'; }
-              elseif ($this_boardinfo['board_rank'] <= 200){ echo ' Golden Rank'; }
-              elseif ($this_boardinfo['board_rank'] <= 400){ echo ' Silver Rank'; }
-              elseif ($this_boardinfo['board_rank'] <= 800){ echo ' Bronze Rank'; }
+              elseif ($this_boardinfo['board_rank'] <= 100){ echo ' Golden Rank'; }
+              elseif ($this_boardinfo['board_rank'] <= 200){ echo ' Silver Rank'; }
+              elseif ($this_boardinfo['board_rank'] <= 400){ echo ' Bronze Rank'; }
               else { echo 'Normal Rank'; }
               ?>
             </span>
