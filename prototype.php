@@ -394,10 +394,10 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         <?if (mmrpg_prototype_players_unlocked() >= 2){ ?>
           <a class="link link_players" data-step="edit_players" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>players</label></a> <span class="pipe">|</span>
         <? } ?>
-        <? if (mmrpg_prototype_items_unlocked() >= 1){ ?>
+        <? if (false && mmrpg_prototype_items_unlocked() >= 1){ ?>
           <a class="link link_items" data-step="items" data-index="<?= $temp_data_index++ ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>items</label></a> <span class="pipe">|</span>
         <? } ?>
-        <? if (mmrpg_prototype_abilities_unlocked() >= 3){ ?>
+        <? if (false && mmrpg_prototype_abilities_unlocked() >= 3){ ?>
           <a class="link link_abilities" data-step="abilities" data-index="<?= $temp_data_index++ ?>" data-source="frames/abilities.php" data-music="misc/ability-viewer" data-tooltip="<?= $this_menu_tooltips['abilities'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>abilities</label></a> <span class="pipe">|</span>
         <? } ?>
         <? if(mmrpg_prototype_stars_unlocked() >= 1){ ?>
