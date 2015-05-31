@@ -230,6 +230,7 @@ $(document).ready(function(){
   $('div[data-canvas=robots] .sort', gameCanvas).live('click', function(e){
     e.preventDefault();
     if (thisBody.hasClass('loading')){ return false; }
+    if (!gameSettings.allowEditing){ return false; }
     
     var thisSortButton = $(this);
     var thisSortToken = thisSortButton.attr('data-sort');
@@ -322,6 +323,7 @@ $(document).ready(function(){
   $('a.ability_name', gameConsole).live('click', function(e){
     e.preventDefault();    
     if (thisBody.hasClass('loading')){ return false; }
+    if (!gameSettings.allowEditing){ return false; }
     
     var thisLink = $(this);
     var thisContainer = thisLink.parent();
@@ -431,6 +433,7 @@ $(document).ready(function(){
   $('a.ability_name', thisAbilityCanvas).live('click', function(e){
     e.preventDefault();    
     if (thisBody.hasClass('loading')){ return false; }
+    if (!gameSettings.allowEditing){ return false; }
     
     // Collect the target data from the ability canvas
     var targetPlayerToken =  thisAbilityCanvas.attr('data-player') != undefined ? thisAbilityCanvas.attr('data-player') : '';
@@ -536,6 +539,7 @@ $(document).ready(function(){
   $('a.item_name', gameConsole).live('click', function(e){
     e.preventDefault();    
     if (thisBody.hasClass('loading')){ return false; }
+    if (!gameSettings.allowEditing){ return false; }
     
     // NOT READY YET!!!
     return false;
@@ -641,9 +645,8 @@ $(document).ready(function(){
   // Attach a click event to the sprite image switcher
   $('a.robot_image_alts', gameConsole).live('click', function(e){
     e.preventDefault();
-    
-    // If we're not supposed to be editing, return false
-    if (!gameSettings.allowEditing){ return false; }        
+    if (thisBody.hasClass('loading')){ return false; }
+    if (!gameSettings.allowEditing){ return false; }     
     
     // Collect references to the editor objects and player/robot tokens
     var thisLink = $(this);
@@ -1072,24 +1075,27 @@ function robotEditorCanvasInit(){
 
         }
       
-      robotCanvas.sortable({
-        items: '.sprite[data-robot]',
-        cancel: '.sprite:only-of-type',
-        containment: robotCanvas, //'parent',
-        connectWidth: robotCanvasPlayerWrappers, //'.wrapper[data-player]',
-        opacity: 0.7,
-        //axis: 'y',
-        //handle: '.sprite',
-        start: function(event, ui) { 
-          return startDragRobot(event, ui); 
-          },
-        stop: function(event, ui) { 
-          return stopDragRobot(event, ui); 
-          },
-        update: function(event, ui) { 
-          return completeDragRobot(event, ui); 
-          }
-        });
+      if (gameSettings.allowEditing){
+        robotCanvas.sortable({
+          items: '.sprite[data-robot]',
+          cancel: '.sprite:only-of-type',
+          containment: robotCanvas, //'parent',
+          connectWidth: robotCanvasPlayerWrappers, //'.wrapper[data-player]',
+          opacity: 0.7,
+          //axis: 'y',
+          //handle: '.sprite',
+          start: function(event, ui) { 
+            return startDragRobot(event, ui); 
+            },
+          stop: function(event, ui) { 
+            return stopDragRobot(event, ui); 
+            },
+          update: function(event, ui) { 
+            return completeDragRobot(event, ui); 
+            }
+          });
+        
+        }
 
       // Resize the player wrapper when done
       resizePlayerWrapper();
