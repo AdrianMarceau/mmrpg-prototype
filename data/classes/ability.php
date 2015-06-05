@@ -1514,15 +1514,20 @@ class mmrpg_ability {
     // Extract all objects into the current scope
     extract($objects);
 
-    // Collect the user's weapon energy base and adjust accordingly
+    // Update this abilities weapon energy to whatever the user currently has
+    $this_ability->ability_energy = $this_robot->robot_weapons;
+    if ($this_ability->ability_energy < 1){ $this_ability->ability_energy = 1; }
+    if ($this_ability->ability_type == $this_robot->robot_core){ $this_ability->ability_energy = $this_ability->ability_energy * 2; }
+
+    // Calculate the user's current life damage percent for calculations
     $robot_energy_damage = $this_robot->robot_base_energy - $this_robot->robot_energy;
     $robot_energy_damage_percent = !empty($robot_energy_damage) ? ceil(($robot_energy_damage / $this_robot->robot_base_energy) * 100) : 0;
-    $this_ability->ability_damage = 1 + $robot_energy_damage_percent;
-    $this_ability->ability_energy = $this_robot->robot_base_weapons;
-    if ($this_ability->ability_type == $this_robot->robot_core){
-      $this_ability->ability_energy = $this_ability->ability_energy * 2;
-      $this_ability->ability_base_energy = $this_ability->ability_base_energy * 2;
-    }
+
+    // Multiply the user's damage by the remaining weapon energy for damage total
+    $ability_damage_amount = ceil($this_robot->robot_weapons * (1 + $robot_energy_damage_percent));
+    $this_ability->ability_damage = $ability_damage_amount;
+
+    // Ability ability session before returning
     $this_ability->update_session();
 
     // Return true on success
