@@ -91,13 +91,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
     if ($this_targetinfo['player_token'] != 'player'){
       $this_battleinfo['battle_sprite'][] = array('path' => 'players/'.$this_targetinfo['player_token'], 'size' => !empty($this_targetinfo['player_image_size']) ? $this_targetinfo['player_image_size'] : 40);
     }
-    /*
-    if (false && !empty($this_battleinfo['flags']['player_battle'])){
-
-    } elseif ($this_targetinfo['player_token'] != 'player'){
-      $this_battleinfo['battle_sprite'][] = array('path' => 'players/'.$this_targetinfo['player_token'], 'size' => !empty($this_targetinfo['player_image_size']) ? $this_targetinfo['player_image_size'] : 40);
-    }
-    */
     if (!empty($this_targetinfo['player_robots'])){
 
       // Count the number of masters in this battle
@@ -143,11 +136,12 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
         //else { $temp_path = 'robots/'.$this_robotinfo['robot_image']; }
         //$temp_path = 'robots/'.(empty($this_battleinfo['flags']['player_battle']) ? $this_robotinfo['robot_image'] : 'robot');
         $temp_path = 'robots/'.$this_robotinfo['robot_image'];
+        $temp_size = !empty($this_robotinfo['robot_image_size']) ? $this_robotinfo['robot_image_size'] : 40;
         if (!empty($this_battleinfo['flags']['player_battle'])){
           $temp_path = in_array($this_robotinfo['robot_token'], array('roll', 'disco', 'rhythm', 'splash-woman')) ? 'robots/robot2' : 'robots/robot';
-          $this_robotinfo['robot_image_size'] = 40;
+          $temp_size = 40;
         }
-        $this_battleinfo['battle_sprite'][] = array('path' => $temp_path, 'size' => !empty($this_robotinfo['robot_image_size']) ? $this_robotinfo['robot_image_size'] : 40);
+        $this_battleinfo['battle_sprite'][] = array('path' => $temp_path, 'size' => $temp_size);
 
         $this_robot_level = !empty($this_robotinfo['robot_level']) ? $this_robotinfo['robot_level'] : 1;
         if ($this_option_min_level === false || $this_option_min_level > $this_robot_level){ $this_option_min_level = $this_robot_level; }
@@ -276,6 +270,9 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
     //if ($this_battleinfo['battle_token'] == 'base-spark-man') die('<pre>'.print_r(htmlentities($this_option_label), true).'</pre>');
     //$this_option_button_text = !empty($this_battleinfo['battle_button']) ? $this_battleinfo['battle_button'] : '';
     //$this_option_button_text = !empty($this_fieldinfo['field_name']) ? $this_fieldinfo['field_name'] : '';
+    if (!isset($this_battleinfo['battle_robot_limit'])){ $this_battleinfo['battle_robot_limit'] = 1; }
+    if (!isset($this_battleinfo['battle_points'])){ $this_battleinfo['battle_points'] = 0; }
+    if (!isset($this_battleinfo['battle_zenny'])){ $this_battleinfo['battle_zenny'] = 0; }
     if (!empty($this_battleinfo['battle_button'])){ $this_option_button_text = $this_battleinfo['battle_button']; }
     elseif (!empty($this_fieldinfo['field_name'])){ $this_option_button_text = $this_fieldinfo['field_name']; }
     else { $this_option_button_text = 'Battle'; }
@@ -288,6 +285,7 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
     if (!empty($this_option_button_text)){ $this_option_label .= '<span class="multi"><span class="maintext">'.$this_option_button_text.'</span><span class="subtext">'.$this_option_point_amount.'</span><span class="subtext2">'.$this_option_level_range.'</span></span>'.(!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore)) ? '<span class="arrow"> &#9658;</span>' : ''); }
     else { $this_option_label .= '<span class="single">???</span>'; }
 
+
     // Generate this options hover tooltip details
     $this_option_title = ''; //$this_battleinfo['battle_button'];
     //$this_option_title .= '$this_master_count = '.$this_master_count.'; $this_mecha_count = '.$this_mecha_count.'; ';
@@ -298,11 +296,9 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
       if (!empty($this_fieldinfo['field_type2'])){ $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' / '.ucfirst($this_fieldinfo['field_type2']).' Type'; }
       else { $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' Type'; }
     }
-    $this_option_title .= ' <br />'.$this_option_level_range; //.$this_option_star_force;
-    $this_option_title .= ' | '.($this_battleinfo['battle_points'] == 1 ? '1 Point' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Points');
-    $this_option_title .= ' | '.($this_battleinfo['battle_turns'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns'].' Turns');
-    if (!empty($this_battleinfo['battle_robot_limit'])){ $this_option_title .= ' | '.($this_battleinfo['battle_robot_limit'] == 1 ? '1 Robot' : '1 - '.$this_battleinfo['battle_robot_limit'].' Robots'); }
-    else { $this_option_title .= ' | ??? Robots'; }
+    $this_option_title .= ' | '.$this_option_level_range.' <br />'; //.$this_option_star_force;
+    $this_option_title .= 'Goal : '.($this_battleinfo['battle_turns'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns'].' Turns').' with '.($this_battleinfo['battle_robot_limit'] == 1 ? '1 Robot' : $this_battleinfo['battle_robot_limit'].' Robots').' <br />';
+    $this_option_title .= 'Reward : '.($this_battleinfo['battle_points'] == 1 ? '1 Point' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Points').' and '.($this_battleinfo['battle_zenny'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_zenny'], 0, '.', ',').' Zenny');
 
     $this_option_title .= ' <br />'.$this_battleinfo['battle_description'].(!empty($this_battleinfo['battle_description2']) ? ' '.$this_battleinfo['battle_description2'] : '');
 
@@ -327,27 +323,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
         }
       }
     }
-    */
-
-    /*
-    // DEBUG DEBUG DEBUG ALLVARS
-    $this_option_title = '<strong>allvars('.date('H:i:s').')</strong> : '.implode(', ', array_keys($this_battleinfo));
-    if (!empty($this_battleinfo['flags'])){
-      $this_option_title .= ' <br /><strong>flags</strong> : ';
-      $inner_option_title = array();
-      foreach ($this_battleinfo['flags'] AS $token => $value){ $inner_option_title[] = $token.'='.($value ? 'true' : 'false'); }
-      $this_option_title .= implode(', ', $inner_option_title);
-    }
-    if (!empty($this_battleinfo['values'])){
-      $this_option_title .= ' <br /><strong>values</strong> : ';
-      $inner_option_title = array();
-      foreach ($this_battleinfo['values'] AS $token => $value){
-        if (isset($value[0])){ $inner_option_title[] = $token.'='.implode(',', array_values($value)); }
-        else { $inner_option_title[] = $token.'='.preg_replace('/^Array\s?\(\s?(.*?)\s?\)$/i', '$1', preg_replace('/\s+/', ' ', print_r($value, true))); }
-      }
-      $this_option_title .= implode(', ', $inner_option_title);
-    }
-    if (!empty($this_battleinfo['counters'])){ $this_option_title .= ' <br /><strong>counters</strong> : '.implode(', ', array_keys($this_battleinfo['counters'])); }
     */
 
     $this_option_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_option_title));
