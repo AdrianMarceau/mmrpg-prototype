@@ -321,13 +321,21 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       <a class="wrapper link link_leaderboard" data-step="leaderboard" data-index="99" data-source="frames/leaderboard.php" data-music="misc/leader-board" data-tooltip="<?= $this_menu_tooltips['leaderboard'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <label class="label">Battle Points</label>
         <span class="amount">
-          <?= preg_replace('#^([0]+)([0-9]+)$#', '<span class="padding">$1</span><span class="value">$2</span>', str_pad((!empty($_SESSION['GAME']['counters']['battle_points']) ? $_SESSION['GAME']['counters']['battle_points'] : 0), 13, '0', STR_PAD_LEFT)) ?>
+          <? /*= preg_replace('#^([0]+)([0-9]+)$#', '<span class="padding">$1</span><span class="value">$2</span>', str_pad((!empty($_SESSION['GAME']['counters']['battle_points']) ? $_SESSION['GAME']['counters']['battle_points'] : 0), 13, '0', STR_PAD_LEFT)) */ ?>
+          <?= number_format($_SESSION['GAME']['counters']['battle_points'], 0, '.', ',') ?>
           <? if(empty($_SESSION['GAME']['DEMO']) && !empty($this_boardinfo['board_rank'])): ?>
             <span class="pipe">|</span>
             <span class="place"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?></span>
           <? endif; ?>
         </span>
       </a>
+    </div>
+    <div class="zenny field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+      <div class="wrapper">
+        <span class="amount">
+          <?= number_format($_SESSION['GAME']['counters']['battle_zenny'], 0, '.', ',') ?> z
+        </span>
+      </div>
     </div>
 
     <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
