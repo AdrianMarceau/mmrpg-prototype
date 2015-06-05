@@ -373,7 +373,9 @@ $(document).ready(function(){
             }
             */
           
-          $('#zenny_counter', thisBody).css({color:'#8CEB80'}).html(printNumberWithCommas(newZennyTotal));
+          var thisZennyFormatted = printNumberWithCommas(newZennyTotal);
+          $('#zenny_counter', thisBody).css({color:'#8CEB80'}).html(thisZennyFormatted);
+          if (window.self !== window.parent){ parent.prototype_update_zenny(thisZennyFormatted+' z'); }
           
           updateItemCells();
           
