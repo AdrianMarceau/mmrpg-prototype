@@ -467,12 +467,19 @@ elseif ($this_action == 'start'){
   $this_battle->counters['battle_turn'] = 0;
   $this_battle->update_session();
 
+  // Collect the base point and zenny rewards for this battle
+  $temp_target_turns_base = !empty($this_battle->battle_turns) ? $this_battle->battle_turns : 0;
+  $temp_target_robots_base = !empty($this_battle->battle_robot_limit) ? $this_battle->battle_robot_limit : 0;
+  $temp_reward_points_base = !empty($this_battle->battle_points) ? number_format($this_battle->battle_points, 0, '.', ',') : 0;
+  $temp_reward_zenny_base = !empty($this_battle->battle_zenny) ? number_format($this_battle->battle_zenny, 0, '.', ',') : 0;
+  // Collect the mission complete/failure records to display
+  //$temp_battle_complete_count = isset($_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this_battle->battle_token]['battle_count']) ? $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this_battle->battle_token]['battle_count'] : 0;
+  //$temp_battle_failure_count = isset($_SESSION['GAME']['values']['battle_failure'][$this_player->player_token][$this_battle->battle_token]['battle_count']) ? $_SESSION['GAME']['values']['battle_failure'][$this_player->player_token][$this_battle->battle_token]['battle_count'] : 0;
+
   // Define the first event body markup, regardless of player type
-  $first_event_header = $this_battle->battle_name.' <span style="opacity:0.25;">|</span> '.$this_battle->battle_field->field_name;
+  $first_event_header = $this_battle->battle_name.' <span class="pipe">|</span> '.$this_battle->battle_field->field_name;
   $first_event_body = $this_battle->battle_description.'<br />';
-  // If this is a player battle
-  //if ($target_player_id != MMRPG_SETTINGS_TARGET_PLAYERID){ $first_event_body .= '| player battle | target_player_id : '.$target_player_id.' '; }
-  $first_event_body .= 'Goal : '.$this_battle->battle_turns.($this_battle->battle_turns > 1 ? ' Turns' : ' Turn').'  <span style="opacity:0.25;">|</span> Reward : '.number_format($this_battle->battle_points, 0, '.', ',').($this_battle->battle_points > 1 ? ' Battle Points' : ' Battle Point').'<br />';
+  $first_event_body .= 'Target : '.($temp_target_turns_base == 1 ? '1 Turn' : $temp_target_turns_base.' Turns').' with '.($temp_target_robots_base == 1 ? '1 Robot' : $temp_target_robots_base.' Robots').'  <span class="pipe">|</span> Reward : '.($temp_reward_points_base == 1 ? '1 Point' : $temp_reward_points_base.' Points').' and '.($temp_reward_zenny_base == 1 ? '1 Zenny' : $temp_reward_zenny_base.' Zenny').'<br />';
 
   // Update the summon counts for all this player's robots
   foreach ($this_player->values['robots_active'] AS $key => $info){
@@ -846,6 +853,10 @@ elseif ($this_action == 'ability' && preg_match('/^([0-9]+)_item-/i', $this_acti
 
   // Create a flag on this player, preventing multiple items per turn
   $this_player->flags['item_used_this_turn'] = true;
+  // Update the counter for items used this battle
+  if (!isset($this_player->counters['items_used_this_battle'])){ $this_player->counters['items_used_this_battle'] = 0; }
+  $this_player->counters['items_used_this_battle'] += 1;
+  // Update the session
   $this_player->update_session();
 
   // Now execute the stored actions (and any created in the process of executing them!)
