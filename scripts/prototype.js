@@ -439,7 +439,7 @@ function prototype_menu_loaded(){
       gameSettings.nextSlideDirection = false;
       // Fade out the overlay to prevent clicking other banner links      
       bannerOverlay.stop().css({opacity:0.75}).animate({opacity:0.0},{duration:1000,easing:'swing',queue:false,complete:function(){ $(this).addClass('overlay_hidden'); }});
-      $('.banner .points, .banner .options, .banner .tooltip', thisPrototype).stop().animate({opacity:1},500,'swing');
+      $('.banner .points, .banner .zenny, .banner .options, .banner .tooltip', thisPrototype).stop().animate({opacity:1},500,'swing');
       }});    
     }
 }
@@ -552,7 +552,7 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
     bannerOverlay.stop().css({opacity:0.00}).removeClass('overlay_hidden').animate({opacity:0.75},{duration:1000,easing:'swing',queue:false});    
     var thisBanner = $('.banner', thisPrototype);
     $('.canvas_overlay_footer', thisBanner).remove();
-    $('.points, .options, .tooltip', thisBanner).stop().animate({opacity:0},500,'swing');
+    $('.points, .zenny, .options, .tooltip', thisBanner).stop().animate({opacity:0},500,'swing');
     
   }        
   // Switch to the loading menu, and wait for the next menu to finish loading
@@ -650,7 +650,7 @@ function prototype_menu_click_option(thisContext, thisOption){
     $('label', tokenParent).append(cloneSprite);
     
     // Hide the placeholder appropriate sprite
-    $('.sprite_40x40_placeholder:eq('+(gameSettings.nextRobotLimit - tokenParentCount)+')', tokenParent).css({display:'none'});
+    $('.sprite_40x40_placeholder:eq('+(gameSettings.totalRobotLimit - tokenParentCount)+')', tokenParent).css({display:'none'});
     
     // Brighten the opacity of the parent element proportionately
     //var newOpacity = 1.0; //0.2 + (0.8 * (tokenParentCount/tokenParentLimit));
@@ -685,7 +685,7 @@ function prototype_menu_click_option(thisContext, thisOption){
       // Enable the parent option for clicking
       tokenParent.removeClass('option_disabled');
       // Disable all other child options if we're at the total limit
-      if (tokenParentCount >= gameSettings.totalRobotLimit || tokenParentCount >= gameSettings.nextRobotLimit){
+      if (tokenParentCount >= gameSettings.totalRobotLimit){
         $('.option[data-child]', thisParent).addClass('option_disabled');  
         }          
       }
@@ -735,7 +735,7 @@ function prototype_menu_click_option(thisContext, thisOption){
       // Find the parent token container
       var tempWrapper = $('.option_wrapper[data-condition="'+tempCondition+'"]', tempMenu);
       var tokenParent = $('.option[data-parent]', tempWrapper);
-      var tokenParentLimit = tempMenu.attr('data-limit');
+      var tokenParentLimit = gameSettings.totalRobotLimit; //tempMenu.attr('data-limit');
       
       // Count the number of available robots right now
       var requiredRobots = nextLimit;
@@ -788,13 +788,13 @@ function prototype_menu_click_option(thisContext, thisOption){
       var iCounter = 1;
       var spriteMarkup = '';
       //for (iCounter; iCounter <= nextLimit; iCounter++){
-      for (iCounter; iCounter <= gameSettings.nextRobotLimit; iCounter++){
+      for (iCounter; iCounter <= gameSettings.totalRobotLimit; iCounter++){
         var someValue = 80 + ((tokenParentLimit * 40) - (iCounter * 40) + 40);
         //var someValue = (gameSettings.totalRobotLimit * 40) - (iCounter * 40) + 40;
         var spriteClass = 'sprite sprite_40x40 sprite_40x40_defend sprite_40x40_placeholder ';
         //var spriteStyle = 'background-image: url(images/robots/robot/sprite_right_40x40.png?'+gameSettings.cacheTime+'); bottom: 6px; left: '+someValue+'px; right: auto; opacity: 0.8; ';
         var spriteStyle = 'background-image: url(images/robots/robot/sprite_right_40x40.png?'+gameSettings.cacheTime+'); bottom: 6px; right: '+someValue+'px; left: auto; opacity: 0.8; ';
-        spriteMarkup += '<span data-key="'+(gameSettings.nextRobotLimit - iCounter)+'" class="'+spriteClass+'" style="'+spriteStyle+'">Select Robot</span>';
+        spriteMarkup += '<span data-key="'+(gameSettings.totalRobotLimit - iCounter)+'" class="'+spriteClass+'" style="'+spriteStyle+'">Select Robot</span>';
         }
       
       // Prepend the sprite to the parent's label value
@@ -906,7 +906,7 @@ function prototype_menu_click_option(thisContext, thisOption){
       var bannerOverlay = $('.banner_overlay', thisBanner);
       //thisBanner.stop().removeClass('banner_compact').animate({height:'124px'},{duration:1000,easing:'swing',queue:false});
       bannerOverlay.stop().removeClass('overlay_hidden').animate({opacity:0.75},{duration:1000,easing:'swing',queue:false});      
-      $('.points, .options, .tooltip', thisBanner).stop().animate({opacity:0},{duration:500,easing:'swing',queue:false});
+      $('.points, .zenny, .options, .tooltip', thisBanner).stop().animate({opacity:0},{duration:500,easing:'swing',queue:false});
       // Add the canvas overlay footer to the canvas with multipliers
       var thisFieldName = thisOption.attr('data-field');
       var thisBattleDescription = thisOption.attr('data-description').replace('-', '&#8209;');
@@ -1024,7 +1024,7 @@ function prototype_menu_click_back(thisContext, thisLink){
         newBannerForeground.insertAfter(oldBannerForeground).animate({opacity:1.0},{duration:1000,easing:'swing',queue:false,complete:function(){ oldBannerForeground.remove(); $(this).css({zIndex:''}); }});
         // Fade out the overlay to allow clicking on banner links
         var bannerOverlay = $('.banner_overlay', thisBanner).stop().animate({opacity:0},{duration:1000,easing:'swing',queue:false,complete:function(){ $(this).addClass('overlay_hidden'); }});      
-        $('.points, .options, .tooltip', thisBanner).stop().animate({opacity:1},500,'swing');
+        $('.points, .zenny, .options, .tooltip', thisBanner).stop().animate({opacity:1},500,'swing');
         //alert(newBackgroundImage); 
         // Remove the field details overlay
         $('.canvas_overlay_footer', thisBanner).remove();
@@ -1431,4 +1431,10 @@ function prototype_menu_switch(switchOptions){
     
     
     }
+}
+
+// Define a function for updating the zenny amount in the menu
+function prototype_update_zenny(newZenny){
+  var thisZennyContainer = $('.banner .zenny .amount', thisPrototype);
+  thisZennyContainer.html(newZenny);  
 }
