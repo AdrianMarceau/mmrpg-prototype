@@ -389,6 +389,9 @@ class mmrpg_player {
     // Create the flag variables if they don't exist
 
     // Create the counter variables and defeault to zero
+    $this->counters['robots_masters_total'] = 0;
+    $this->counters['robots_mechas_total'] = 0;
+    $this->counters['robots_bosses_total'] = 0;
     $this->counters['robots_total'] = 0;
     $this->counters['robots_active'] = 0;
     $this->counters['robots_disabled'] = 0;
@@ -420,6 +423,10 @@ class mmrpg_player {
         $temp_robot = new mmrpg_robot($this->battle, $this, $this_robotinfo);
         $temp_robot->robot_key = $this_key;
         $temp_robot->update_session();
+        // Increment the robot class counter for this player
+        if ($temp_robot->robot_class == 'master'){ $this->counters['robots_masters_total']++; }
+        elseif ($temp_robot->robot_class == 'mecha'){ $this->counters['robots_mechas_total']++; }
+        elseif ($temp_robot->robot_class == 'boss'){ $this->counters['robots_bosses_total']++; }
         // Check if this robot is in the active position
         if ($temp_robot->robot_position == 'active'){
           $this->values['current_robot'] = $temp_robot->robot_string;
