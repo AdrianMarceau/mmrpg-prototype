@@ -479,7 +479,16 @@ elseif ($this_action == 'start'){
   // Define the first event body markup, regardless of player type
   $first_event_header = $this_battle->battle_name.' <span class="pipe">|</span> '.$this_battle->battle_field->field_name;
   $first_event_body = $this_battle->battle_description.'<br />';
-  $first_event_body .= 'Target : '.($temp_target_turns_base == 1 ? '1 Turn' : $temp_target_turns_base.' Turns').' with '.($temp_target_robots_base == 1 ? '1 Robot' : $temp_target_robots_base.' Robots').'  <span class="pipe">|</span> Reward : '.($temp_reward_points_base == 1 ? '1 Point' : $temp_reward_points_base.' Points').' and '.($temp_reward_zenny_base == 1 ? '1 Zenny' : $temp_reward_zenny_base.' Zenny').'<br />';
+  $first_event_body .= 'Target : '.
+    ($this_battle->battle_turns == 1 ? '1 Turn' : $temp_target_turns_base.' Turns').
+    ' with '.
+    ($this_battle->battle_robot_limit == 1 ? '1 Robot' : $temp_target_robots_base.' Robots').
+    '  <span class="pipe">|</span> '.
+    'Reward : '.
+    ($this_battle->battle_points == 1 ? '1 Point' : $temp_reward_points_base.' Points').
+    ' and '.
+    ($this_battle->battle_zenny == 1 ? '1 Zenny' : $temp_reward_zenny_base.' Zenny').
+    '<br />';
 
   // Update the summon counts for all this player's robots
   foreach ($this_player->values['robots_active'] AS $key => $info){
