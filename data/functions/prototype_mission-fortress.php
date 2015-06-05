@@ -53,6 +53,7 @@ if (!empty($temp_support_mechas)){
 
 // Start all the point-based battle vars at zero
 $temp_battle_omega['battle_points'] = 0;
+$temp_battle_omega['battle_zenny'] = 0;
 $temp_battle_omega['battle_turns'] = 0;
 $temp_battle_omega['battle_robot_limit'] = 0;
 
@@ -77,10 +78,17 @@ if (!empty($temp_battle_omega['battle_target_player']['player_robots'])){
     if ($index['robot_class'] == 'master'){ $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERROBOT; }
     elseif ($index['robot_class'] == 'mecha'){ $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERMECHA; }
     elseif ($index['robot_class'] == 'boss'){ $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERBOSS; }
+
     // Increment the battle's point reward based on the class of target robot
     if ($index['robot_class'] == 'master'){ $temp_battle_omega['battle_points'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT; }
     elseif ($index['robot_class'] == 'mecha'){ $temp_battle_omega['battle_points'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERMECHA; }
     elseif ($index['robot_class'] == 'boss'){ $temp_battle_omega['battle_points'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERBOSS; }
+
+    // Increment the battle's zenny reward based on the class of target robot
+    if ($index['robot_class'] == 'master'){ $temp_battle_omega['battle_zenny'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEZENNY_PERROBOT; }
+    elseif ($index['robot_class'] == 'mecha'){ $temp_battle_omega['battle_zenny'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEZENNY_PERMECHA; }
+    elseif ($index['robot_class'] == 'boss'){ $temp_battle_omega['battle_zenny'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEZENNY_PERBOSS; }
+
     // Increment the battle's robot limit based on the class of target robot
     if ($index['robot_class'] == 'master'){ $temp_battle_omega['battle_robot_limit'] += MMRPG_SETTINGS_BATTLEROBOTS_PERROBOT; }
     elseif ($index['robot_class'] == 'mecha'){ $temp_battle_omega['battle_robot_limit'] += MMRPG_SETTINGS_BATTLEROBOTS_PERMECHA; }

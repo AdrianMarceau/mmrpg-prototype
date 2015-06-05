@@ -65,6 +65,7 @@ for ($i = 0; $i < $temp_target_count; $i++){
 
 // Start all the point-based battle vars at zero
 $temp_battle_omega['battle_points'] = 0;
+$temp_battle_omega['battle_zenny'] = 0;
 $temp_battle_omega['battle_turns'] = 0;
 $temp_battle_omega['battle_robot_limit'] = 0;
 
@@ -101,6 +102,10 @@ foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 =>
   if ($robot['robot_class'] == 'master'){ $temp_battle_omega['battle_points'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERROBOT; }
   elseif ($robot['robot_class'] == 'mecha'){ $temp_battle_omega['battle_points'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERMECHA; }
   elseif ($robot['robot_class'] == 'boss'){ $temp_battle_omega['battle_points'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERBOSS; }
+  // Increment the battle's zenny reward based on the class of target robot
+  if ($robot['robot_class'] == 'master'){ $temp_battle_omega['battle_zenny'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEZENNY_PERROBOT; }
+  elseif ($robot['robot_class'] == 'mecha'){ $temp_battle_omega['battle_zenny'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEZENNY_PERMECHA; }
+  elseif ($robot['robot_class'] == 'boss'){ $temp_battle_omega['battle_zenny'] += $robot['robot_level'] * MMRPG_SETTINGS_BATTLEZENNY_PERBOSS; }
   // Increment the battle's robot limit based on the class of target robot
   if ($robot['robot_class'] == 'master'){ $temp_battle_omega['battle_robot_limit'] += MMRPG_SETTINGS_BATTLEROBOTS_PERROBOT; }
   elseif ($robot['robot_class'] == 'mecha'){ $temp_battle_omega['battle_robot_limit'] += MMRPG_SETTINGS_BATTLEROBOTS_PERMECHA; }
@@ -162,6 +167,8 @@ if ($this_field_token == 'intro-field'){
   if (empty($temp_battle_omega['battle_complete'])){
     $temp_battle_omega['battle_turns'] = 3;
     $temp_battle_omega['battle_rewards']['items'][] = array('chance' => 100, 'token' => 'item-screw-small');
+  } else {
+    $temp_battle_omega['battle_turns'] = 1;
   }
 
 }
@@ -183,10 +190,12 @@ elseif (in_array($this_field_token, array('light-laboratory', 'wily-castle', 'co
     //$temp_battle_omega['battle_rewards']['robots'][] = array('token' => $this_rescue_token, 'level' => $this_start_level);
   }
 
-  // Hard code a large screw drop if this is the first time through
+  // Hard code a large screw drop if this is the first time through, else other stuff
   if (empty($temp_battle_omega['battle_complete'])){
     $temp_battle_omega['battle_turns'] = 6;
     $temp_battle_omega['battle_rewards']['items'][] = array('chance' => 100, 'token' => 'item-screw-large');
+  } else {
+    $temp_battle_omega['battle_turns'] = 3;
   }
 
 }
@@ -287,6 +296,8 @@ elseif ($this_field_token == 'prototype-subspace'){
   if (empty($temp_battle_omega['battle_complete'])){
     $temp_battle_omega['battle_turns'] = 9;
     $temp_battle_omega['battle_rewards']['items'][] = array('chance' => 100, 'token' => 'item-'.$temp_challenger_stat_boost[0].'-capsule');
+  } else {
+    $temp_battle_omega['battle_turns'] = 6;
   }
 
 }
