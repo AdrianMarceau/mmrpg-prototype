@@ -48,6 +48,14 @@ body.index #header {
   top: -9999px;
 }
 
+#mmrpg .event .pipe {
+  opacity: 0.25;
+  filter: alpha(opacity=25);
+  padding: 0 0.5%;
+  text-shadow: none;
+  font-weight: normal;
+}
+
 #mmrpg .tooltip {
   display:none;
   position: absolute !important;
@@ -2314,6 +2322,15 @@ body.index #header {
 }
 #console .event table td.right {
   text-align: right;
+}
+#console .event table td.center {
+  text-align: center;
+}
+#console .event table td.positive {
+  color: rgb(116, 244, 116);
+}
+#console .event table td.negative {
+  color: rgb(236, 124, 124);
 }
 #console .event .body_left {
   text-align: left;
