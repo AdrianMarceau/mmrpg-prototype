@@ -92,8 +92,8 @@ $ability = array(
     // Update this robot's attack to that of the target's
     $temp_attack_function($this_robot, $this_ability, $temp_this_attack, $temp_target_attack);
     // Update the target's attack to that of this robot
-    $temp_attack_function($target_robot, $this_ability, $temp_this_attack);
-    
+    $temp_attack_function($target_robot, $this_ability, $temp_target_attack, $temp_this_attack);
+
     // Return true on success
     return true;
 
