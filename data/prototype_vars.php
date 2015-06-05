@@ -154,7 +154,7 @@ else {
   $chapters_unlocked_light['five-2'] = $battle_complete_counter_light >= $chapter_mission_count_totals['four'] + 1 ? true : false;
   $chapters_unlocked_light['five-3'] = $battle_complete_counter_light >= $chapter_mission_count_totals['four'] + 2 ? true : false;
   $chapters_unlocked_light['bonus'] = $prototype_complete_flag_light || $chapters_complete_light['five'] ? true : false;
-  $chapters_unlocked_light['player'] = $prototype_complete_flag_light ? true : false;
+  $chapters_unlocked_light['player'] = false; //$prototype_complete_flag_light ? true : false;
 
   // If the player has manually unlocked any Dr. Light chapters via password, update their flags
   if (!$chapters_unlocked_light['player']){
@@ -203,7 +203,7 @@ else {
   $chapters_unlocked_wily['five-2'] = $battle_complete_counter_wily >= $chapter_mission_count_totals['four'] + 1 ? true : false;
   $chapters_unlocked_wily['five-3'] = $battle_complete_counter_wily >= $chapter_mission_count_totals['four'] + 2 ? true : false;
   $chapters_unlocked_wily['bonus'] = $prototype_complete_flag_wily || $chapters_complete_wily['five'] ? true : false;
-  $chapters_unlocked_wily['player'] = $prototype_complete_flag_wily ? true : false;
+  $chapters_unlocked_wily['player'] = false; //$prototype_complete_flag_wily ? true : false;
 
   // If the player has manually unlocked any Dr. Wily chapters via password, update their flags
   if (!$chapters_unlocked_wily['player']){
@@ -252,7 +252,7 @@ else {
   $chapters_unlocked_cossack['five-2'] = $battle_complete_counter_cossack >= $chapter_mission_count_totals['four'] + 1 ? true : false;
   $chapters_unlocked_cossack['five-3'] = $battle_complete_counter_cossack >= $chapter_mission_count_totals['four'] + 2 ? true : false;
   $chapters_unlocked_cossack['bonus'] = $prototype_complete_flag_cossack || $chapters_complete_cossack['five'] ? true : false;
-  $chapters_unlocked_cossack['player'] = $prototype_complete_flag_cossack ? true : false;
+  $chapters_unlocked_cossack['player'] = false; //$prototype_complete_flag_cossack ? true : false;
 
   // If the player has manually unlocked any Dr. Cossack chapters via password, update their flags
   if (!$chapters_unlocked_cossack['player']){
