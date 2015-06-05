@@ -217,9 +217,9 @@ class mmrpg_battle {
     $this->battle_target_player = isset($this_battleinfo['battle_target_player']) ? $this_battleinfo['battle_target_player'] : array();
     $this->battle_rewards = isset($this_battleinfo['battle_rewards']) ? $this_battleinfo['battle_rewards'] : array();
     $this->battle_points = isset($this_battleinfo['battle_points']) ? $this_battleinfo['battle_points'] : 0;
+    $this->battle_zenny = isset($this_battleinfo['battle_zenny']) ? $this_battleinfo['battle_zenny'] : 0;
     $this->battle_level = isset($this_battleinfo['battle_level']) ? $this_battleinfo['battle_level'] : 0;
     $this->battle_overkill = isset($this_battleinfo['battle_overkill']) ? $this_battleinfo['battle_overkill'] : 0;
-    $this->battle_zenny = isset($this_battleinfo['battle_zenny']) ? $this_battleinfo['battle_zenny'] : 0;
 
     // Define the internal robot base values using the robots index array
     $this->battle_base_name = isset($this_battleinfo['battle_base_name']) ? $this_battleinfo['battle_base_name'] : $this->battle_name;
@@ -228,9 +228,9 @@ class mmrpg_battle {
     $this->battle_base_turns = isset($this_battleinfo['battle_base_turns']) ? $this_battleinfo['battle_base_turns'] : $this->battle_turns;
     $this->battle_base_rewards = isset($this_battleinfo['battle_base_rewards']) ? $this_battleinfo['battle_base_rewards'] : $this->battle_rewards;
     $this->battle_base_points = isset($this_battleinfo['battle_base_points']) ? $this_battleinfo['battle_base_points'] : $this->battle_points;
+    $this->battle_base_zenny = isset($this_battleinfo['battle_base_zenny']) ? $this_battleinfo['battle_base_zenny'] : $this->battle_zenny;
     $this->battle_base_level = isset($this_battleinfo['battle_base_level']) ? $this_battleinfo['battle_base_level'] : $this->battle_level;
     $this->battle_base_overkill = isset($this_battleinfo['battle_base_overkill']) ? $this_battleinfo['battle_base_overkill'] : $this->battle_overkill;
-    $this->battle_base_zenny = isset($this_battleinfo['battle_base_zenny']) ? $this_battleinfo['battle_base_zenny'] : $this->battle_zenny;
 
     // Update the session variable
     $this->update_session();
@@ -712,16 +712,22 @@ class mmrpg_battle {
   }
 
   // Define a function for calculating the amount of BATTLE POINTS a player gets in battle
-  public function calculate_battle_points($this_player, $base_points = 0, $base_turns = 0){
+  public function calculate_battle_points($this_player, $base_points = 0, $base_turns = 0, $battle_robots = 0){
 
     // Calculate the number of turn points for this player using the base amounts
     $this_base_points = $base_points;
-    if ($this->counters['battle_turn'] < $base_turns
-      || $this->counters['battle_turn'] > $base_turns){
-      //$this_half_points = $base_points * 0.10;
-      //$this_turn_points = ceil($this_half_points * ($base_turns / $this->counters['battle_turn']));
-      $this_base_points = ceil($this_base_points * ($base_turns / $this->counters['battle_turn']));
-    }
+
+    $temp_bonus_one = 0;
+    if ($this->counters['battle_turn'] < $base_turns){ $temp_bonus_one = round((($base_turns / $this->counters['battle_turn']) - 1) * 100); }
+    else { $temp_bonus_one = round((($base_turns / $this->counters['battle_turn']) - 1) * 100); }
+
+    if ($temp_bonus_one != 0){ $this_base_points += ceil($base_points * ($temp_bonus_one / 100)); }
+
+    $temp_bonus_two = 0;
+    if ($this_player->counters['robots_masters_total'] < $battle_robots){ $temp_bonus_two = round((($this_player->counters['robots_masters_total'] / $battle_robots) - 1) * 100); }
+    else { $temp_bonus_two = round((($battle_robots / $this_player->counters['robots_masters_total']) - 1) * 100); }
+
+    if ($temp_bonus_two != 0){ $this_base_points += ceil($base_points * ($temp_bonus_two / 100)); }
 
     //$this_battle_points = $this_base_points + $this_turn_points + $this_stat_points;
     $this_battle_points = $this_base_points;
@@ -1182,18 +1188,18 @@ class mmrpg_battle {
       'battle_turns' => $this->battle_turns,
       'battle_rewards' => $this->battle_rewards,
       'battle_points' => $this->battle_points,
+      'battle_zenny' => $this->battle_zenny,
       'battle_level' => $this->battle_level,
       'battle_overkill' => $this->battle_overkill,
-      'battle_zenny' => $this->battle_zenny,
       'battle_base_name' => $this->battle_base_name,
       'battle_base_token' => $this->battle_base_token,
       'battle_base_description' => $this->battle_base_description,
       'battle_base_turns' => $this->battle_base_turns,
       'battle_base_rewards' => $this->battle_base_rewards,
       'battle_base_points' => $this->battle_base_points,
+      'battle_base_zenny' => $this->battle_base_zenny,
       'battle_base_level' => $this->battle_base_level,
       'battle_base_overkill' => $this->battle_base_overkill,
-      'battle_base_zenny' => $this->battle_base_zenny,
       'battle_counts' => $this->battle_counts,
       'battle_status' => $this->battle_status,
       'battle_result' => $this->battle_result,
