@@ -564,12 +564,14 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
               <td class="left">Speed : </td>
               <td  class="right"><span title="<?= ceil(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_target_robot->robot_speed ?></span></span></td>
             </tr>
+            <?/*
             <tr>
               <td class="left" colspan="5">
                 Abilities :
                 <?= !empty($temp_target_robot_abilities) ? $temp_target_robot_abilities : '<span class="ability_name">None</span>' ?>
               </td>
             </tr>
+            */?>
           </tbody>
         </table>
     <?
