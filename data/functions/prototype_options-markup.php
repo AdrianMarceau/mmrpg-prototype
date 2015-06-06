@@ -297,7 +297,7 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
       else { $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' Type'; }
     }
     $this_option_title .= ' | '.$this_option_level_range.' <br />'; //.$this_option_star_force;
-    $this_option_title .= 'Goal : '.($this_battleinfo['battle_turns'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns'].' Turns').' with '.($this_battleinfo['battle_robot_limit'] == 1 ? '1 Robot' : $this_battleinfo['battle_robot_limit'].' Robots').' <br />';
+    $this_option_title .= 'Target : '.($this_battleinfo['battle_turns'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns'].' Turns').' with '.($this_battleinfo['battle_robot_limit'] == 1 ? '1 Robot' : $this_battleinfo['battle_robot_limit'].' Robots').' <br />';
     $this_option_title .= 'Reward : '.($this_battleinfo['battle_points'] == 1 ? '1 Point' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Points').' and '.($this_battleinfo['battle_zenny'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_zenny'], 0, '.', ',').' Zenny');
 
     $this_option_title .= ' <br />'.$this_battleinfo['battle_description'].(!empty($this_battleinfo['battle_description2']) ? ' '.$this_battleinfo['battle_description2'] : '');
