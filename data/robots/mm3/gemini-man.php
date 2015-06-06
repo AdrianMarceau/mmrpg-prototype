@@ -8,7 +8,8 @@ $robot = array(
   'robot_image_editor' => 110,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Gemini Man (Kunzite Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Gemini Man (Emerald Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Gemini Man (Emerald Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Gemini Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_image_size' => 80,
   'robot_core' => 'crystal',

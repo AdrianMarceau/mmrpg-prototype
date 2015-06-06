@@ -8,7 +8,8 @@ $robot = array(
   'robot_image_editor' => 110,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Snake Man (Amber Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Snake Man (Crimson Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Snake Man (Crimson Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Snake Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'nature',
   'robot_field' => 'serpent-column',

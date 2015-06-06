@@ -8,7 +8,8 @@ $robot = array(
   'robot_image_editor' => 110,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Top Man (Purple Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Top Man (Green Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Top Man (Green Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Top Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'swift',
   'robot_field' => 'spinning-greenhouse',

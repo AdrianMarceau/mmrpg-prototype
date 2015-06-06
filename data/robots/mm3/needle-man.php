@@ -9,7 +9,8 @@ $robot = array(
   'robot_image_size' => 80,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Needle Man (Magenta Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Needle Man (Emerald Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Needle Man (Emerald Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Needle Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'cutter',
   'robot_field' => 'construction-site',
