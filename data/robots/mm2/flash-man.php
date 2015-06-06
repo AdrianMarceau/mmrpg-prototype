@@ -8,7 +8,8 @@ $robot = array(
   'robot_image_editor' => 412,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Flash Man (Red Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Flash Man (Green Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Flash Man (Green Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Flash Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'time',
   'robot_description' => 'Temporal Shift Robot',

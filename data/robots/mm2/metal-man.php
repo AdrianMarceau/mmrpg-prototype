@@ -8,7 +8,8 @@ $robot = array(
   'robot_image_editor' => 18,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Metal Man (Blue Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Metal Man (Green Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Metal Man (Green Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Metal Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'cutter',
   'robot_description' => 'Lethal Blades Robot',
