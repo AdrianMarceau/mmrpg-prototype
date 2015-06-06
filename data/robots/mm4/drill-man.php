@@ -8,7 +8,8 @@ $robot = array(
   'robot_image_editor' => 18,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Drill Man (Green Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Drill Man (Blue Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Drill Man (Blue Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Drill Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'earth',
   'robot_field' => 'mineral-quarry',

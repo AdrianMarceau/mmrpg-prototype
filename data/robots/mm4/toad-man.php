@@ -9,7 +9,8 @@ $robot = array(
   'robot_image_size' => 80,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Toad Man (Watermelon Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Toad Man (Blueberry Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Toad Man (Blueberry Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Toad Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'water',
   'robot_field' => 'rainy-sewers',

@@ -8,7 +8,8 @@ $robot = array(
   'robot_image_editor' => 18,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Pharaoh Man (Cursed Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Pharaoh Man (Blessed Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Pharaoh Man (Blessed Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Pharaoh Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'flame',
   'robot_field' => 'egyptian-excavation',
