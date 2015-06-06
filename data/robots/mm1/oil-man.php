@@ -8,7 +8,8 @@ $robot = array(
   'robot_image_editor' => 412,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Oil Man (Black Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Oil Man (White Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Oil Man (White Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Oil Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'earth',
   'robot_description' => 'Slick Sliding Robot',

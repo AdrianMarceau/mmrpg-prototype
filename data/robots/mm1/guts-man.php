@@ -8,7 +8,8 @@ $robot = array(
   'robot_image_editor' => 412,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Guts Man (Blue Alt)', 'summons' => 100),
-    array('token' => 'alt2', 'name' => 'Guts Man (Green Alt)', 'summons' => 200)
+    array('token' => 'alt2', 'name' => 'Guts Man (Green Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Guts Man (Darkness Alt)', 'summons' => 900)
     ),
   'robot_core' => 'impact',
   'robot_description' => 'Tough Construction Robot',
