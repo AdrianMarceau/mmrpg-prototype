@@ -7,12 +7,12 @@ $ability = array(
   'ability_group' => 'MM01/Weapons/008',
   'ability_master' => 'elec-man',
   'ability_number' => 'DLN-008',
-  'ability_description' => 'The user throws a powerful bolt of electricity at the target, inflicting damage and occasionally raising the user\'s attack by {RECOVERY2}%!',
+  'ability_description' => 'The user throws a powerful bolt of electricity at the target, inflicting damage and raising the user\'s attack by {RECOVERY2}%!',
   'ability_type' => 'electric',
   'ability_type2' => 'laser',
   'ability_energy' => 8,
   'ability_damage' => 24,
-  'ability_recovery2' => 20,
+  'ability_recovery2' => 10,
   'ability_recovery2_percent' => true,
   'ability_accuracy' => 85,
   'ability_function' => function($objects){
@@ -48,8 +48,7 @@ $ability = array(
     if ($this_robot->robot_status != 'disabled'
       && $this_robot->robot_attack < MMRPG_SETTINGS_STATS_MAX
       && $this_ability->ability_results['this_result'] != 'failure'
-      && $this_ability->ability_results['this_amount'] > 0
-      && $this_battle->critical_chance(50)){
+      && $this_ability->ability_results['this_amount'] > 0){
       // Decrease the target robot's attack stat
       $this_ability->damage_options_update(array(
         'kind' => 'attack',

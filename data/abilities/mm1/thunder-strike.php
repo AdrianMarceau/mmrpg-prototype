@@ -11,6 +11,7 @@ $ability = array(
   'ability_type' => 'electric',
   'ability_energy' => 4,
   'ability_damage' => 16,
+  'ability_target' => 'select_target',
   'ability_accuracy' => 100,
   'ability_function' => function($objects){
 

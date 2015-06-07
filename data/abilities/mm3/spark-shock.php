@@ -7,11 +7,11 @@ $ability = array(
   'ability_group' => 'MM03/Weapons/023',
   'ability_master' => 'spark-man',
   'ability_number' => 'DWN-023',
-  'ability_description' => 'The user loses a large ball of electricity at the target, inflicting damage and occasionally lowering its defense by {DAMAGE2}%!',
+  'ability_description' => 'The user loses a large ball of electricity at the target, inflicting damage and lowering its defense by {DAMAGE2}%!',
   'ability_type' => 'electric',
   'ability_energy' => 4,
   'ability_damage' => 16,
-  'ability_damage2' => 10,
+  'ability_damage2' => 5,
   'ability_damage2_percent' => true,
   'ability_accuracy' => 90,
   'ability_function' => function($objects){
@@ -46,8 +46,8 @@ $ability = array(
     // Randomly trigger a defense break if the ability was successful
     if ($target_robot->robot_status != 'disabled'
       && $target_robot->robot_speed > 0
-      && $this_ability->ability_results['this_result'] != 'failure' && $this_ability->ability_results['this_amount'] > 0
-      && $this_battle->critical_chance(50)){
+      && $this_ability->ability_results['this_result'] != 'failure'
+      && $this_ability->ability_results['this_amount'] > 0){
       // Decrease the target robot's speed stat
       $this_ability->damage_options_update(array(
         'kind' => 'defense',

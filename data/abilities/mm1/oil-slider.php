@@ -7,13 +7,13 @@ $ability = array(
   'ability_group' => 'MM01/Weapons/00B',
   'ability_master' => 'oil-man',
   'ability_number' => 'DLN-00B',
-  'ability_description' => 'The user quickly slides toward the target on a wave of crude oil, inflicting damage and occasionally raising the user\'s speed by {RECOVERY2}%!',
+  'ability_description' => 'The user quickly slides toward the target on a wave of crude oil, inflicting damage and raising the user\'s speed by {RECOVERY2}%!',
   'ability_type' => 'earth',
   'ability_type2' => 'impact',
   'ability_energy' => 8,
   'ability_speed' => 2,
   'ability_damage' => 24,
-  'ability_recovery2' => 10,
+  'ability_recovery2' => 5,
   'ability_recovery2_percent' => true,
   'ability_accuracy' => 92,
   'ability_function' => function($objects){
@@ -48,8 +48,8 @@ $ability = array(
 
     // Randomly trigger a speed boost if the ability was successful
     if ($this_robot->robot_speed < MMRPG_SETTINGS_STATS_MAX
-      && $this_ability->ability_results['this_result'] != 'failure' && $this_ability->ability_results['this_amount'] > 0
-      && $this_battle->critical_chance(50)){
+      && $this_ability->ability_results['this_result'] != 'failure'
+      && $this_ability->ability_results['this_amount'] > 0){
       $this_ability->recovery_options_update(array(
         'kind' => 'speed',
         'frame' => 'taunt',
