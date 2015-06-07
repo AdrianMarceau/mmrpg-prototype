@@ -8,7 +8,7 @@ $ability = array(
   'ability_description' => 'The user fires a small explosive shot at the target to inflict Explode type damage. This ability\'s power increases if the user if holding a buster charge of the same element.',
   'ability_type' => 'explode',
   'ability_energy' => 0,
-  'ability_damage' => 10,
+  'ability_damage' => 20,
   'ability_accuracy' => 100,
   'ability_function' => function($objects){
 
