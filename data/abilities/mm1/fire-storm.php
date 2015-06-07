@@ -110,7 +110,7 @@ $ability = array(
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array($shot_power_frame, 100 + (30 * $shot_power), 0, 10, $this_robot->print_robot_name().' throws an '.$this_ability->print_ability_name().'!') // [shot_power='.$shot_power.'|attachment_defense='.$this_attachment_info['attachment_defense'].']
+      'success' => array($shot_power_frame, 100 + (30 * $shot_power), 0, 10, $this_robot->print_robot_name().' throws an '.$this_ability->print_ability_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
