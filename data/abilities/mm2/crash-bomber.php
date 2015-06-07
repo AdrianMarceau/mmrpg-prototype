@@ -7,7 +7,7 @@ $ability = array(
   'ability_group' => 'MM02/Weapons/013',
   'ability_master' => 'crash-man',
   'ability_number' => 'DWN-013',
-  'ability_description' => 'The user fires a small explosive that seeks out and latches onto the target, building power for two turns and then exploding to deal damage equal to {DAMAGE}% of the target\'s base life energy! Manually triggering this ability early appears to weaken its power...',
+  'ability_description' => 'The user fires a small explosive that seeks out and latches onto the target, building power for two turns and then exploding to deal damage equal to {DAMAGE}% of the target\'s base life energy! Manually triggering this explosive early appears to increase its power...',
   'ability_type' => 'explode',
   'ability_energy' => 4,
   'ability_damage' => 16,
@@ -204,8 +204,8 @@ $ability = array(
       $this_ability->damage_options_update($this_attachment_info['attachment_destroy']);
       $this_ability->update_session();
 
-      // Collect the energy damage amount and cut it in half for triggering early
-      $energy_damage_amount = round($this_attachment_info['attachment_energy'] * 0.5);
+      // Collect the energy damage amount and double it for triggering early
+      $energy_damage_amount = round($this_attachment_info['attachment_energy'] * 2.0);
 
       // Now that we have the new amount, we can trigger the reduced damage
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, true, $this_attachment_info['attachment_destroy']['options']);
