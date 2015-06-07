@@ -1657,13 +1657,13 @@ class mmrpg_ability {
   }
   // Define alias functions for each stat in attack/defense/speed stats for cleaner function calls
   public static function ability_function_elemental_attack_break($objects, $damage_text = 'damaged', $recovery_text = 'recovered'){
-    return mmrpg_ability::ability_function_elemental_stat_break($objects, 'attack', 'weapon systems', $shot_text, $damage_text, $recovery_text);
+    return mmrpg_ability::ability_function_elemental_stat_break($objects, 'attack', 'weapon systems', $damage_text, $recovery_text);
   }
   public static function ability_function_elemental_defense_break($objects, $damage_text = 'damaged', $recovery_text = 'recovered'){
-    return mmrpg_ability::ability_function_elemental_stat_break($objects, 'defense', 'shield systems', $shot_text, $damage_text, $recovery_text);
+    return mmrpg_ability::ability_function_elemental_stat_break($objects, 'defense', 'shield systems', $damage_text, $recovery_text);
   }
   public static function ability_function_elemental_speed_break($objects, $damage_text = 'damaged', $recovery_text = 'recovered'){
-    return mmrpg_ability::ability_function_elemental_stat_break($objects, 'speed', 'mobility systems', $shot_text, $damage_text, $recovery_text);
+    return mmrpg_ability::ability_function_elemental_stat_break($objects, 'speed', 'mobility systems', $damage_text, $recovery_text);
   }
 
   // Define a static onload function to use as the common action for all elemental stat break abilities
