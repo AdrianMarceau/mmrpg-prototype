@@ -666,13 +666,10 @@ function mmrpg_website_community_thread_linkblock($this_thread_info, $this_categ
   $temp_thread_date = !empty($this_thread_info['thread_date']) ? $this_thread_info['thread_date'] : mktime(0, 0, 1, 1, 1, 2011);
   $temp_thread_mod_date = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $temp_thread_date;
   $temp_date_group = date('Y-m', $temp_thread_mod_date);
-  if (!empty($this_thread_info['thread_locked'])){ $temp_date_group = 'locked'; }
-  elseif (!empty($this_thread_info['thread_sticky'])){ $temp_date_group = 'sticky'; }
+  if (!empty($this_thread_info['thread_sticky'])){ $temp_date_group = 'sticky'; }
   if (!in_array($this_category_info['category_token'], array('search', 'leaderboard')) && $display_style == 'full' && $temp_date_group != $this_date_group){
     $this_date_group = $temp_date_group;
-    if ($temp_date_group == 'locked'){
-      echo '<h3 id="date-'.$temp_date_group.'" data-group="'.$temp_date_group.'" class="subheader category_date_group" style="color: #464646;">Locked Threads</h3>';
-    } elseif ($temp_date_group == 'sticky'){
+    if ($temp_date_group == 'sticky'){
       echo '<h3 id="date-'.$temp_date_group.'" data-group="'.$temp_date_group.'" class="subheader category_date_group">Sticky Threads</h3>';
     } else {
       echo '<h3 id="date-'.$temp_date_group.'" data-group="'.$temp_date_group.'" class="subheader category_date_group">'.date('F Y', $temp_thread_mod_date).'</h3>';
@@ -720,7 +717,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_info, $this_categ
   }
 
   ?>
-  <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" data-key="<?= $this_thread_key ?>"  class="subbody thread_subbody thread_subbody_small <?= $display_style == 'compact' ? 'thread_subbody_compact' : '' ?> thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>" style="text-align: left; margin: 2px 0;">
+  <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" data-key="<?= $this_thread_key ?>"  class="subbody thread_subbody thread_subbody_small <?= !empty($this_thread_info['thread_locked']) ? 'locked' : '' ?> <?= $display_style == 'compact' ? 'thread_subbody_compact' : '' ?> thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>" style="text-align: left; margin: 2px 0;">
     <?
 
     // If this thread has a specific target, display their avatar to the right

@@ -119,18 +119,20 @@ require_once('data/gallery.php');
 
 // Collect all the threads for this category from the database
 $this_category_id = 1; // News
-$this_threads_query = "SELECT threads.*, users.*, users2.*, categories.*, posts.post_count FROM mmrpg_threads AS threads
+$this_threads_query = "SELECT threads.*, users.*, users2.*, users3.*, categories.*, posts.post_count FROM mmrpg_threads AS threads
   LEFT JOIN mmrpg_users AS users ON threads.user_id = users.user_id
-  LEFT JOIN (SELECT user_id AS mod_user_id, user_name AS mod_user_name, user_name_public AS mod_user_name_public FROM mmrpg_users) AS users2 ON threads.thread_mod_user = users2.mod_user_id
+  LEFT JOIN (SELECT user_id AS mod_user_id, user_name AS mod_user_name, user_name_public AS mod_user_name_public, user_name_clean AS mod_user_name_clean, user_colour_token AS mod_user_colour_token FROM mmrpg_users) AS users2 ON threads.thread_mod_user = users2.mod_user_id
+  LEFT JOIN (SELECT user_id AS target_user_id, user_name AS target_user_name, user_name_public AS target_user_name_public, user_name_clean AS target_user_name_clean, user_colour_token AS target_user_colour_token, user_image_path AS target_user_image_path, user_background_path AS target_user_background_path FROM mmrpg_users) AS users3 ON threads.thread_target = users3.target_user_id
   LEFT JOIN mmrpg_categories AS categories ON threads.category_id = categories.category_id
   LEFT JOIN (
   SELECT posts.thread_id, count(1) AS post_count
   FROM mmrpg_posts AS posts WHERE posts.post_deleted = 0
   GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
   WHERE threads.category_id = {$this_category_id} AND threads.thread_published = 1
-  ORDER BY threads.thread_date DESC";
+  ORDER BY threads.thread_sticky DESC, threads.thread_date DESC";
 $this_threads_array = $DB->get_array_list($this_threads_query);
 $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
+$this_category_info = $DB->get_array("SELECT * FROM mmrpg_categories WHERE category_id = {$this_category_id}");
 
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><span class="subheader_typewrapper"><a class="link" href="community/news/">Mega Man RPG Prototype News &amp; Updates <span class="count">( <?= !empty($this_threads_count) ? ($this_threads_count == 1 ? '1 Post' : $this_threads_count.' Posts') : '0 Posts' ?> )</span></a><a class="float_link" href="community/news/">View More Posts &raquo;</a></span></h2>
@@ -149,92 +151,14 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
   if (!empty($this_threads_array)){
     foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
 
-      // Define this thread's session tracker token
-      $temp_session_token = $this_thread_info['thread_id'].'_';
-      $temp_session_token .= !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date'];
-      // Check if this thread has already been viewed this session
-      $temp_session_viewed = in_array($temp_session_token, $_SESSION['COMMUNITY']['threads_viewed']) ? true : false;
+      // If this thread is over the display limit, break from the loop
+      if ($this_thread_key >= MMRPG_SETTINGS_THREADS_RECENT){ break; }
 
-      // Update the temp date group if necessary
-      $temp_thread_date = !empty($this_thread_info['thread_date']) ? $this_thread_info['thread_date'] : mktime(0, 0, 1, 1, 1, 2011);
-      $temp_thread_mod_date = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $temp_thread_date;
-      $temp_date_group = date('Y-m', $temp_thread_mod_date);
-      if ($temp_date_group != $this_date_group){
-        $this_date_group = $temp_date_group;
-        $this_date_group_count++;
-        //echo '<h3 id="date-'.$temp_date_group.'" data-group="'.$temp_date_group.'" class="subheader category_date_group">'.date('F Y', $temp_thread_mod_date).'</h3>';
-      }
-      // Break if over the limit
-      //if ($this_date_group_count > 1 || $this_thread_key > 5){ break; }
-      if ($this_thread_key > 13){ break; }
+      // Collect markup for this thread from the function
+      $temp_markup = mmrpg_website_community_thread_linkblock($this_thread_info, $this_category_info, 'compact');
+      echo $temp_markup."\n";
 
-      // Define the temporary display variables
-      $temp_category_id = $this_thread_info['category_id'];
-      $temp_category_token = $this_thread_info['category_token']; //!empty($this_categories_index[$temp_category_id]) ? $this_categories_index[$temp_category_id]['category_token'].'/' : '';
-      $temp_thread_id = $this_thread_info['thread_id'];
-      $temp_thread_token = $this_thread_info['thread_token'];
-      $temp_thread_name = $this_thread_info['thread_name'];
-      $temp_thread_author = !empty($this_thread_info['user_name_public']) ? $this_thread_info['user_name_public'] : $this_thread_info['user_name'];
-      $temp_thread_author_colour = !empty($this_thread_info['user_colour_token']) ? $this_thread_info['user_colour_token'] : 'none';
-      $temp_thread_date = date('F jS, Y', $temp_thread_date).' at '.date('g:ia', $temp_thread_date);
-      $temp_thread_mod_user = !empty($this_thread_info['mod_user_name_public']) ? $this_thread_info['mod_user_name_public'] : $this_thread_info['mod_user_name'];
-      $temp_thread_mod_date = !empty($this_thread_info['thread_mod_date']) && $this_thread_info['thread_mod_date'] != $this_thread_info['thread_date'] ? $this_thread_info['thread_mod_date'] : false;
-      $temp_thread_mod_date = !empty($temp_thread_mod_date) ? 'Updated by '.$temp_thread_mod_user : false;
-      $temp_thread_body = strlen($this_thread_info['thread_body']) > 255 ? substr($this_thread_info['thread_body'], 0, 255).'&hellip;' : $this_thread_info['thread_body'];
-      $temp_posts_count = !empty($this_thread_info['post_count']) ? $this_thread_info['post_count'] : 0;
-      $temp_thread_timestamp = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date'];
-      $temp_thread_link = 'community/'.$temp_category_token.'/'.$temp_thread_id.'/'.$temp_thread_token.'/';
-
-      // Define the avatar class and path variables
-      $temp_avatar_frame = !empty($this_thread_info['thread_frame']) ? $this_thread_info['thread_frame'] : '00';
-      $temp_avatar_path = !empty($this_thread_info['user_image_path']) ? $this_thread_info['user_image_path'] : 'robots/mega-man/40';
-      $temp_background_path = !empty($this_thread_info['user_background_path']) ? $this_thread_info['user_background_path'] : 'fields/intro-field';
-      list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
-      list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
-      $temp_avatar_class = 'avatar avatar_40x40 float float_left ';
-      $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_'.$temp_avatar_frame;
-      $temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_right_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png';
-      $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_avatar.png';
-
-      // Define if this post is new to the logged in user or not
-      $temp_is_new = false;
-      // Supress the new flag if thread has already been viewed
-      if (!$temp_session_viewed){
-        if ($this_userid != MMRPG_SETTINGS_GUEST_ID
-          //&& $this_thread_info['user_id'] != $this_userinfo['user_id']
-          && $this_thread_info['thread_mod_user'] != $this_userinfo['user_id']
-          && $temp_thread_timestamp > $this_userinfo['user_backup_login']){
-          $temp_is_new = true;
-        } elseif ($this_userid == MMRPG_SETTINGS_GUEST_ID
-          && (($this_time - $temp_thread_timestamp) <= MMRPG_SETTINGS_UPDATE_TIMEOUT)){
-          $temp_is_new = true;
-        }
-      }
-      ?>
-      <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" class="subbody thread_subbody thread_subbody_right thread_subbody_small thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>" style="margin: 0 0 2px;">
-        <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 60px 60px;">
-        &nbsp;
-        </div>
-        <div class="<?= $temp_avatar_class ?> avatar_userimage avatar_userimage_left">
-          <?/*<div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/mega-man/sprite_left_40x40.png);"><?= $temp_thread_author ?></div>*/?>
-          <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_thread_author ?></div>
-        </div>
-        <div class="text thread_linkblock">
-          <a class="link" href="<?= $temp_thread_link ?>"><span><?= $temp_thread_name ?></span></a>
-          <div class="info">
-            <strong class="player_type player_type_<?= $temp_thread_author_colour ?>"><?= $temp_thread_author ?></strong> on <strong><?= $temp_thread_date ?></strong>
-          </div>
-          <div class="count" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-            <a class="comments <?= !empty($temp_posts_count) ? 'field_type field_type_none' : '' ?>" style="<?= empty($temp_posts_count) ? 'padding-left: 0;' : '' ?>" href="<?= $temp_thread_link.(!empty($temp_posts_count) ? '#comment-listing' : '#comment-form') ?>"><?= !empty($temp_posts_count) ? ($temp_posts_count == 1 ? '1 Comment' : $temp_posts_count.' Comments') : 'No Comments' ?></a>
-            <?= $temp_is_new ? '<strong class="newpost field_type field_type_electric">New!</strong>' : '' ?>
-            <?= !empty($temp_thread_mod_date) ? '<span class="newpost" style="letter-spacing: 0;">'.$temp_thread_mod_date.'</span>' : '' ?>
-          </div>
-        </div>
-      </div>
-      <?
-     unset($this_thread_info);
     }
-    unset($this_threads_array);
   }
 
   ?>

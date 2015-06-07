@@ -27,7 +27,7 @@ $index_threads_query = "SELECT threads.*, users.*, users2.*, users3.*, categorie
   FROM mmrpg_posts AS posts WHERE posts.post_deleted = 0
   GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
   WHERE threads.thread_published = 1
-  ORDER BY threads.thread_locked ASC, threads.thread_sticky DESC, threads.thread_date DESC";
+  ORDER BY threads.thread_sticky DESC, threads.thread_date DESC";
 $index_threads_array = $DB->get_array_list($index_threads_query);
 $index_threads_count = !empty($index_threads_array) ? count($index_threads_array) : 0;
 if (empty($index_threads_array)){ $index_threads_array = array(); }
@@ -112,8 +112,6 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
 
       // If this thread is over the display limit, break from the loop
       if ($this_thread_key >= MMRPG_SETTINGS_THREADS_RECENT){ break; }
-      // If this thread is locked, continue
-      if (!empty($this_thread_info['thread_locked'])){ continue; }
 
       // Collect markup for this thread from the function
       $temp_markup = mmrpg_website_community_thread_linkblock($this_thread_info, $this_category_info, 'compact');

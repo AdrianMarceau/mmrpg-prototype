@@ -46,7 +46,7 @@ else {
     FROM mmrpg_posts AS posts
     GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
     WHERE threads.category_id = {$this_category_info['category_id']} AND threads.thread_published = 1 AND (threads.thread_target = 0 OR threads.thread_target = {$this_userinfo['user_id']} OR threads.user_id = {$this_userinfo['user_id']})
-    ORDER BY threads.thread_locked ASC, {$temp_order_by}"; //WHERE posts.post_deleted = 0
+    ORDER BY {$temp_order_by}";
   $this_threads_array = $DB->get_array_list($this_threads_query);
   $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
   //die('<pre>'.print_r($this_threads_array, true).'</pre>');

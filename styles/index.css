@@ -3287,6 +3287,7 @@ html {
   right: 8px;
   top: 8px;
 }
+
 #window .page .body .community .thread_subbody_full {
   padding: 10px 10px 10px 15px;
   min-height: 160px;
@@ -3966,6 +3967,14 @@ html {
 #window .page .body .community .thread_subbody .thread_linkblock .comments .num:hover {
   text-decoration: underline;
 }
+
+#window .page .body .community .thread_subbody.locked .thread_linkblock .link span,
+#window .page .body .community .thread_subbody.locked .thread_linkblock .comments .num,
+#window .page .body .community .thread_subbody.locked .thread_linkblock .comments .num:first-child {
+  text-decoration: line-through; 
+  cursor: default;
+}
+
 #window .page .body .community .thread_subbody .thread_linkblock .newpost {
   margin-left: 6px; 
   color: rgb(255, 251, 158); 
