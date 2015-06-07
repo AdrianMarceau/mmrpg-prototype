@@ -7,11 +7,12 @@ $ability = array(
   'ability_group' => 'MM03/Weapons/017',
   'ability_master' => 'needle-man',
   'ability_number' => 'DWN-017',
-  'ability_description' => 'The user fires a volley of three needle-like projectiles that piece the target\'s defenses and inflict damage!',
+  'ability_description' => 'The user fires a volley of three needle-like projectiles that pierce the target\'s defenses and inflict damage!',
   'ability_type' => 'cutter',
   'ability_type2' => 'missile',
   'ability_energy' => 8,
   'ability_damage' => 16,
+  'ability_damage_percent' => true,
   'ability_accuracy' => 88,
   'ability_function' => function($objects){
 
@@ -59,8 +60,9 @@ $ability = array(
       'success' => array(1, -80, -25, 10, 'A needle hit!'),
       'failure' => array(1, -100, -25, -10, 'One of the needles missed!')
       ));
-    $energy_damage_amount = $this_ability->ability_damage;
-    $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+    $energy_damage_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_damage / 100));
+    $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => false);
+    $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, $trigger_options);
 
     // Ensure the target has not been disabled
     if ($target_robot->robot_status != 'disabled'){
@@ -97,7 +99,7 @@ $ability = array(
         'success' => array(1, -40, 25, 10, $success_text),
         'failure' => array(1, -60, 25, -10, $failure_text)
         ));
-      $target_robot->trigger_damage($this_robot, $this_ability,  $energy_damage_amount);
+      $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, $trigger_options);
 
       // Ensure the target has not been disabled
       if ($target_robot->robot_status != 'disabled'){
@@ -128,7 +130,7 @@ $ability = array(
           'success' => array(1, -70, -25, 10, $success_text),
           'failure' => array(1, -90, -25, -10, $failure_text)
           ));
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, $trigger_options);
 
       }
 
