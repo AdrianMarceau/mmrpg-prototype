@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'gravity-man',
   'robot_image_editor' => 18,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Gravity Man (Blue Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Gravity Man (Purple Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Gravity Man (Darkness Alt)', 'summons' => 900)
+    ),
   'robot_core' => 'electric',
   'robot_description' => 'Gravity Manipulation Robot',
   'robot_energy' => 100,
