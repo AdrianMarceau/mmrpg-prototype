@@ -7,10 +7,10 @@ $ability = array(
   'ability_group' => 'MM04/Weapons/027',
   'ability_master' => 'drill-man',
   'ability_number' => 'DCN-027',
-  'ability_description' => 'The user fires a series of sharp drills at any target to pierce their immunities and defenses and deal damage!',
+  'ability_description' => 'The user fires a series of sharp drills at any target to pierce their immunities and deal massive damage!',
   'ability_type' => 'earth',
   'ability_energy' => 4,
-  'ability_damage' => 8,
+  'ability_damage' => 9,
   'ability_accuracy' => 90,
   'ability_target' => 'select_target',
   'ability_function' => function($objects){
@@ -34,10 +34,10 @@ $ability = array(
     $this_robot->update_session();
 
     // Backup the target robot's earth weakness, if it has one
-    $temp_target_weaknesses_backup = array();
+    $temp_target_immunities_backup = array();
     if ($target_robot->has_immunity($this_ability->ability_type)){
-      $temp_target_weaknesses_backup = $target_robot->robot_weaknesses;
-      unset($target_robot->robot_weaknesses[array_search($this_ability->ability_type, $target_robot->robot_weaknesses)]);
+      $temp_target_immunities_backup = $target_robot->robot_immunities;
+      unset($target_robot->robot_immunities[array_search($this_ability->ability_type, $target_robot->robot_immunities)]);
       $target_robot->update_session();
     }
 
@@ -155,8 +155,8 @@ $ability = array(
     }
 
     // If this robot has an immunity removed, re-add it and update session
-    if (!empty($temp_target_weaknesses_backup)){
-      $target_robot->robot_weaknesses = $temp_target_weaknesses_backup;
+    if (!empty($temp_target_immunities_backup)){
+      $target_robot->robot_immunities = $temp_target_immunities_backup;
       $target_robot->update_session();
     }
 
