@@ -208,11 +208,11 @@ class mmrpg_ability {
   }
 
   // Define public print functions for markup generation
-  public function print_ability_name(){
+  public function print_ability_name($plural = false){
     $type_class = !empty($this->ability_type) ? $this->ability_type : 'none';
     if ($type_class != 'none' && !empty($this->ability_type2)){ $type_class .= '_'.$this->ability_type2; }
     elseif ($type_class == 'none' && !empty($this->ability_type2)){ $type_class = $this->ability_type2; }
-  	return '<span class="ability_name ability_type ability_type_'.$type_class.'">'.$this->ability_name.'</span>';
+  	return '<span class="ability_name ability_type ability_type_'.$type_class.'">'.$this->ability_name.($plural ? 's' : '').'</span>';
   }
   //public function print_ability_name(){ return '<span class="ability_name">'.$this->ability_name.'</span>'; }
   public function print_ability_token(){ return '<span class="ability_token">'.$this->ability_token.'</span>'; }
