@@ -161,7 +161,7 @@ else {
     if ($battle_complete_counter_light > 0
       && (!empty($temp_game_flags['drlight_password_playerbattlebonus20130324'])
         || !empty($temp_game_flags['drlight_password_chaptergetplayerbattles']))){
-        $chapters_unlocked_light['player'] = true;
+        //$chapters_unlocked_light['player'] = true;
       }
   }
 
@@ -210,7 +210,7 @@ else {
     if ($battle_complete_counter_wily > 0
       && (!empty($temp_game_flags['drwily_password_playerbattlebonus20130324'])
         || !empty($temp_game_flags['drwily_password_chaptergetplayerbattles']))){
-        $chapters_unlocked_wily['player'] = true;
+        //$chapters_unlocked_wily['player'] = true;
       }
   }
 
@@ -259,7 +259,7 @@ else {
     if ($battle_complete_counter_cossack > 0
       && (!empty($temp_game_flags['drcossack_password_playerbattlebonus20130324'])
         || !empty($temp_game_flags['drcossack_password_chaptergetplayerbattles']))){
-        $chapters_unlocked_cossack['player'] = true;
+        //$chapters_unlocked_cossack['player'] = true;
       }
   }
 
