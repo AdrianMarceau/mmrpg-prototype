@@ -5,7 +5,7 @@ $ability = array(
   'ability_token' => 'defense-boost',
   'ability_game' => 'MMRPG',
   'ability_group' => 'MMRPG/Support/Defense',
-  'ability_description' => 'The user optimizes internal systems to improve shields and raise defense by {RECOVERY}% of its base value!',
+  'ability_description' => 'The user optimizes internal systems to improve shields and raise defense by {RECOVERY}%!',
   'ability_energy' => 8,
   'ability_recovery' => 30,
   'ability_recovery_percent' => true,
@@ -33,7 +33,7 @@ $ability = array(
         'success' => array(0, -2, 0, -10, $target_robot->print_robot_name().'&#39;s shields powered up!'),
         'failure' => array(9, -2, 0, -10, $target_robot->print_robot_name().'&#39;s shields were not affected&hellip;')
         ));
-      $defense_recovery_amount = ceil($target_robot->robot_base_defense * ($this_ability->ability_recovery / 100));
+      $defense_recovery_amount = ceil($target_robot->robot_defense * ($this_ability->ability_recovery / 100));
       $target_robot->trigger_recovery($target_robot, $this_ability, $defense_recovery_amount);
 
     }
