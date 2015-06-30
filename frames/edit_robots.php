@@ -100,6 +100,14 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'ability'){
   require('edit_robots_action_ability.php');
 }
 
+// -- PROCESS ITEM ACTION -- //
+
+// Check if an action request has been sent with an item type
+if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'item'){
+  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+  require('edit_robots_action_item.php');
+}
+
 
 // -- PROCESS ALTIMAGE ACTION -- //
 
