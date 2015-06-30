@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MM00',
   'ability_group' => 'MM00/Items/Energy',
   'ability_class' => 'item',
+  'ability_subclass' => 'consumable',
   'ability_image_sheets' => 3,
   'ability_type' => 'energy',
   'ability_type2' => 'weapons',
