@@ -8,6 +8,9 @@ echo '<div class="wrapper">';
   echo '<div class="wrapper_overflow">';
     //echo '<table><tr>';
 
+    // Print out the remove item option
+    echo '<a class="item_name" style="" data-id="0" data-key="0" data-player="player" data-robot="robot" data-ability="" title="" data-tooltip=""><label>- Remove Item -</label></a>';
+
     // Loop through and print items
     $key_counter = 0;
     if (!empty($mmrpg_database_items)){
@@ -33,12 +36,14 @@ echo '<div class="wrapper">';
 
       foreach ($mmrpg_database_items AS $item_token => $item_info){
         if (!isset($player_item_rewards[$item_token])){ continue; }
+        if ($item_info['ability_subclass'] != 'holdable'){ continue; }
         //if ($key_counter > 0 && $key_counter % 5 == 0){ echo '</tr><tr>'; }
         //echo '<td>';
 
         $temp_select_markup = mmrpg_item::print_editor_select_markup($item_rewards_options, $player_info, $robot_info, $item_info, $key_counter);
 
         //echo $item_token.'<br />';
+        //echo $item_info['ability_subclass'].'<br />';
         echo $temp_select_markup.' ';
 
 
