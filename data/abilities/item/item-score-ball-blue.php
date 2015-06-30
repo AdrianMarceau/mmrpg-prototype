@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MM00',
   'ability_group' => 'MMRPG/Items/Points',
   'ability_class' => 'item',
+  'ability_subclass' => 'consumable',
   'ability_type' => '',
   'ability_type2' => 'water',
   'ability_description' => 'A small blue sphere that glows with a mysterious power. Using this item in battle grants the player an addition {RECOVERY} battle points at the end of the current mission, but only of they are victorious.',

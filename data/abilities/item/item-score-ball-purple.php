@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MM00',
   'ability_group' => 'MMRPG/Items/Points',
   'ability_class' => 'item',
+  'ability_subclass' => 'consumable',
   'ability_type' => '',
   'ability_type2' => 'time',
   'ability_description' => 'A large purple sphere that radiates with mysterious power. Using this item in battle grants the player an additional {RECOVERY}% battle points at the end of the current mission, but only if they are victorious.',
