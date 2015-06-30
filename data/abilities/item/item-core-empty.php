@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MMRPG',
   'ability_group' => 'MMRPG/Items/Empty',
   'ability_class' => 'item',
+  'ability_subclass' => 'holdable',
   'ability_type' => 'empty',
   'ability_description' => 'A mysterious elemental core that radiates with the Empty type energy of a defeated robot master.  These items have no effect in battle, but are loved by a certain character and can be traded in for a respectable amount of Zenny.',
   'ability_energy' => 0,

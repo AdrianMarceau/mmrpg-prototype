@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MMRPG',
   'ability_group' => 'MMRPG/Items/Copy',
   'ability_class' => 'item',
+  'ability_subclass' => 'holdable',
   'ability_type' => 'copy',
   'ability_description' => 'A mysterious elemental core that radiates with the Copy type energy of a defeated robot master.  This item can be thrown in battle to deal massive Copy type damage to the target, but it is also coveted by a certain character and can be traded in for a variable amount of Zenny.',
   'ability_energy' => 0,
