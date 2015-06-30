@@ -25,19 +25,19 @@ $ability = array(
       'class' => 'ability',
       'ability_token' => $this_ability->ability_token,
       'ability_frame' => 0,
-      'ability_frame_animate' => array(0),
+      'ability_frame_animate' => array(0,1),
       'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => 0)
       );
     $this_robot->robot_attachments[$this_attachment_token.'_1'] = $this_attachment_info;
     $this_robot->robot_attachments[$this_attachment_token.'_2'] = $this_attachment_info;
-    $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame_offset'] = array('x' => 75, 'y' => 5, 'z' => -10);
-    $this_robot->robot_attachments[$this_attachment_token.'_2']['ability_frame_offset'] = array('x' => 95, 'y' => 5, 'z' => -10);
+    $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame_offset'] = array('x' => 75, 'y' => 0, 'z' => -10);
+    $this_robot->robot_attachments[$this_attachment_token.'_2']['ability_frame_offset'] = array('x' => 55, 'y' => 0, 'z' => -10);
     $this_robot->update_session();
 
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array(0, 75, 0, 10, $this_robot->print_robot_name().' fires a series of '.$this_ability->print_ability_name(true).'!')
+      'success' => array(0, 95, 0, 10, $this_robot->print_robot_name().' fires a series of '.$this_ability->print_ability_name(true).'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
