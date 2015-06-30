@@ -38,7 +38,7 @@ $ability = array(
     $backup_robots_active = $target_player->values['robots_active'];
     $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
     if ($backup_robots_active_count > 0){
-      // Loop through the this's benched robots, restoring attack one by one
+      // Loop through the target player's benched robots, lowering attack one by one
       $this_key = 0;
       foreach ($backup_robots_active AS $key => $info){
         if ($info['robot_id'] == $target_robot->robot_id){ continue; }
