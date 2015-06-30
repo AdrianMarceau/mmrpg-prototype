@@ -83,7 +83,9 @@ $(document).ready(function(){
           });
         }
 
+      //$('#console #robots').find('.event[data-player='+thisPlayerToken+'][data-robot='+thisRobotToken+']').remove();
       $('#console #robots').append(data);
+      
       thisSprite.animate({opacity:0.3},{duration:300,queue:false,easing:'swing',complete:function(){
         //console.log(thisPlayerToken+' '+thisRobotToken+' sprite animation complete');   
         $(this).removeClass('notloaded').css({opacity:''});    
@@ -319,11 +321,21 @@ $(document).ready(function(){
   
   // -- ABILITY EQUIPPING EVENTS -- //
   
-  // Create the click event for ability buttons in the console
+  // Create the click event for ability buttons in the console (click the ability slot itself)
   $('a.ability_name', gameConsole).live('click', function(e){
     e.preventDefault();    
-    if (thisBody.hasClass('loading')){ return false; }
-    if (!gameSettings.allowEditing){ return false; }
+    
+    var abilityToken = $(this).attr('data-ability');
+    //console.log('a.ability_name[data-ability='+abilityToken+'] was clicked');
+    
+    if (thisBody.hasClass('loading')){ 
+      //console.log('a.ability_name : sorry but we are loading');
+      return false; 
+      }
+    if (!gameSettings.allowEditing){ 
+      //console.log('a.ability_name : sorry but editing is disabled');      
+      return false; 
+      }
     
     var thisLink = $(this);
     var thisContainer = thisLink.parent();
@@ -332,6 +344,7 @@ $(document).ready(function(){
     var thisRobotEvent = thisLink.parents('.event[data-player][data-robot]');
     var thisRobotAbilitiesEquipped = $('.ability_name[data-ability!=""]', thisRobotEvent).length;
     //console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus+', thisRobotAbilitiesEquipped = '+thisRobotAbilitiesEquipped);
+    
     if (thisContainerStatus == 'disabled'){
 
       //console.log('container is disabled');
@@ -341,22 +354,8 @@ $(document).ready(function(){
       } else if (thisLinkStatus == 'pending'){
 
       //console.log('ability already selected, revert to normal menu');
-      
-      $('a.player_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
-      $('a.item_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
-      $('a.ability_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
-      
-      thisAbilityCanvas.attr('data-player', '');
-      thisAbilityCanvas.attr('data-robot', '');
-      thisAbilityCanvas.attr('data-key', '');
-      
-      thisItemCanvas.addClass('hidden');
-      thisAbilityCanvas.addClass('hidden');
-      thisAbilityCanvas.find('.wrapper_header').html('Select Ability');      
-      
-      thisRobotCanvas.removeClass('hidden');
-      
-      return true;
+        
+      return resetEditorMenus(thisRobotEvent);
       
       } else {
         
@@ -428,8 +427,8 @@ $(document).ready(function(){
       
       }
     });
-
-  // Create the click event for the ability buttons in the canvas
+  
+  // Create the click event for the ability buttons in the canvas (select a new ability from the list)
   $('a.ability_name', thisAbilityCanvas).live('click', function(e){
     e.preventDefault();    
     if (thisBody.hasClass('loading')){ return false; }
@@ -534,15 +533,16 @@ $(document).ready(function(){
   
   
   // -- ITEM EQUIPPING EVENTS -- //
-
-  // Create the event for item buttons in the console
+  
+  // Create the event for item buttons in the console (clicking the item slot itself)
   $('a.item_name', gameConsole).live('click', function(e){
     e.preventDefault();    
     if (thisBody.hasClass('loading')){ return false; }
     if (!gameSettings.allowEditing){ return false; }
+    //console.log('gameConsole > a.item_name clicked');
     
     // NOT READY YET!!!
-    return false;
+    //return false;
     
     var thisLink = $(this);
     var thisContainer = thisLink.parent();
@@ -559,21 +559,8 @@ $(document).ready(function(){
       } else if (thisLinkStatus == 'pending'){
 
       //console.log('item already selected, revert to normal menu');
-      
-      $('a.player_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
-      $('a.item_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
-      $('a.ability_name', thisRobotEvent).css({opacity:''}).removeAttr('data-status');
-      
-      thisItemCanvas.attr('data-player', '');
-      thisItemCanvas.attr('data-robot', '');
-
-      thisAbilityCanvas.addClass('hidden');
-      thisItemCanvas.addClass('hidden');
-      thisItemCanvas.find('.wrapper_header').html('Select Item');      
-      
-      thisRobotCanvas.removeClass('hidden');
-      
-      return true;
+        
+      return resetEditorMenus(thisRobotEvent);
       
       } else {
         
@@ -605,16 +592,178 @@ $(document).ready(function(){
           var thisCount = parseInt($(this).attr('data-count'));
           if (thisCount < 1){               
             //console.log('Count '+thisCount+' is less than one'); 
-            $(this).attr('data-status', 'disabled').css({display:'none'});            
+            $(this).attr('data-status', 'disabled'); //.css({display:'none'});            
             } else {               
             //console.log('thisCount '+thisCount+' is more than one'); 
-            $(this).removeAttr('data-status').css({display:''});            
+            $(this).removeAttr('data-status'); //.css({display:''});            
             }
           });
       
         });  
       
       }
+    });
+
+  // Create the click event for the item buttons in the canvas (select a new item from the list)
+  $('a.item_name', thisItemCanvas).live('click', function(e){
+    e.preventDefault();    
+    if (thisBody.hasClass('loading')){ return false; }
+    if (!gameSettings.allowEditing){ return false; }
+    //console.log('thisItemCanvas > a.item_name clicked');
+    
+    // Collect the target data from the item canvas
+    var targetPlayerToken =  thisItemCanvas.attr('data-player') != undefined ? thisItemCanvas.attr('data-player') : '';
+    var targetRobotToken =  thisItemCanvas.attr('data-robot') != undefined ? thisItemCanvas.attr('data-robot') : '';      
+
+    // Collect referneces to the target objects
+    var targetRobotEvent = $('.event[data-player='+targetPlayerToken+'][data-robot='+targetRobotToken+']', gameConsole);
+    var targetItemLink = $('.item_name', targetRobotEvent);
+    
+    // Collect references to this new item link
+    var thisItemLink = $(this);
+    var thisItemStatus = thisItemLink.attr('data-status') != undefined ? thisItemLink.attr('data-status') : 'enabled';
+    var oldItemToken =  targetItemLink.attr('data-item') != undefined ? targetItemLink.attr('data-item') : '';
+    var thisItemToken =  thisItemLink.attr('data-item') != undefined ? thisItemLink.attr('data-item') : '';
+    
+    //console.log('item name in selection canvas clicked');
+    //console.log('status:'+thisItemStatus+' | player:'+targetPlayerToken+' | robot:'+targetRobotToken+' | old-item:'+oldItemToken+' | new-item:'+thisItemToken+'');
+    
+    // Ensure all data was provided before continuing
+    if (thisItemStatus == 'disabled'){ 
+      //console.log('link status disabled');
+      return false; 
+      } else if (!targetPlayerToken.length){ 
+      //console.log('item player empty');
+      return false; 
+      } else if (!targetRobotToken.length){ 
+      //console.log('item robot empty');
+      return false; 
+      }
+    
+    // Prepare ajax data to be sent to the server
+    var postData = {action:'item',player:targetPlayerToken,robot:targetRobotToken};
+    if (thisItemToken.length){ postData.item = thisItemToken; } 
+    else { postData.item = ''; }
+    
+    // Post this change back to the server
+    thisBody.addClass('loading');
+    $.ajax({
+      type: 'POST',
+      url: 'frames/edit_robots.php',
+      data: postData,
+      success: function(data, status){
+        
+        // Break apart the response into parts
+        var data = data.split('|');
+        var dataStatus = data[0] != undefined ? data[0] : false;
+        var dataMessage = data[1] != undefined ? data[1] : false;
+        var dataContent = data[2] != undefined ? data[2] : false;
+        var dataAbilities = data[3] != undefined ? data[3] : false;
+        
+        // DEBUG
+        //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+', dataAbilities = '+dataAbilities+' ');
+        
+        // If the item change was a success, update the console link
+        if (dataStatus == 'success'){
+          
+          // Increment the old item's count if not empty (we're putting it back)
+          if (oldItemToken.length){ 
+            var tempLink = $('a.item_name[data-item='+oldItemToken+']', thisItemCanvas);
+            var oldCount = parseInt(tempLink.attr('data-count'));
+            var newCount = oldCount + 1;
+            tempLink.attr('data-count', newCount).find('.count').html(newCount);
+            }
+          
+         // Decrement the old item's count if not empty (we're taking it out)
+          if (thisItemToken.length){ 
+            var tempLink = $('a.item_name[data-item='+thisItemToken+']', thisItemCanvas);
+            var oldCount = parseInt(tempLink.attr('data-count'));
+            var newCount = oldCount - 1;
+            tempLink.attr('data-count', newCount).find('.count').html(newCount);
+            }
+          
+          // If a non-empty item token was provided, normal equip
+          if (thisItemToken.length){
+            
+            // Update the target item link with new data
+            targetItemLink.attr('class', thisItemLink.attr('class'));
+            targetItemLink.attr('data-id', thisItemLink.attr('data-id'));
+            targetItemLink.attr('data-item', thisItemLink.attr('data-item'));
+            targetItemLink.attr('data-type', thisItemLink.attr('data-type'));
+            targetItemLink.attr('data-type2', thisItemLink.attr('data-type2'));
+            targetItemLink.attr('data-tooltip', thisItemLink.attr('data-tooltip').replace(/\|\s[0-9]+\sUnits?/i, ''));
+            // Clone the inner html into the target item link
+            targetItemLink.html(thisItemLink.html()).find('.count').remove();
+            
+            }
+          // Otherwise if this was an item remove option, clear stuff
+          else {
+            
+            // Update the target item link with empty data
+            targetItemLink.attr('class', 'item_name type none');
+            targetItemLink.attr('data-id', '0');
+            targetItemLink.attr('data-item', '');
+            targetItemLink.attr('data-type', '');
+            targetItemLink.attr('data-type2', '');
+            targetItemLink.attr('data-tooltip', '');            
+            // Remove the label text and replace with empty hyphen
+            targetItemLink.find('label').attr('style', '').html('No Item <span class="arrow">&#8711;</span>');
+            
+            }
+          
+          // Update this robot's ability compatibility
+          if (dataAbilities.length){ 
+            
+            var thisAbilityContainer = targetRobotEvent.find('.ability_container');
+            var thisAbilityCompatible = dataAbilities.split(',');
+            
+            thisAbilityContainer.attr('data-compatible', thisAbilityCompatible.join(',')); 
+            
+            $('.ability_name[data-id]', thisAbilityContainer).each(function(index, element){
+              var thisID = $(this).attr('data-id');
+              var thisLink = $(this);
+              var thisIndex = thisLink.index();
+              //console.log('thisID('+thisID+')');
+              if (thisID > 0 && thisAbilityCompatible.indexOf(thisID) == -1){
+                
+                //console.log('ID '+thisID+' is NOT compatible, triggering removal...');
+                
+                thisLink.attr('class', 'ability_name');
+                thisLink.attr('data-id', '0');
+                thisLink.attr('data-ability', '');
+                thisLink.attr('title', '');
+                thisLink.attr('data-tooltip', '');
+                thisLink.removeAttr('data-type');
+                thisLink.removeAttr('data-type2');
+                thisLink.html('<label>-</label>');
+                
+                //return true;
+                                
+                } else { 
+                //console.log('Ability ID '+thisID+' is totally compatible');
+                //$(this).removeAttr('data-status').css({display:''});  
+                }
+              });           
+            
+          
+          }          
+          
+          /*
+          // Reload the console robot markup
+          reloadConsoleRobotMarkup(targetPlayerToken, targetRobotToken, function(){ 
+            //console.log('complete me targetPlayerToken='+targetPlayerToken+' and targetRobotToken='+targetRobotToken); 
+            });
+          */
+          
+          }
+        
+        thisBody.removeClass('loading');
+        targetItemLink.trigger('click');
+      
+                 
+        }
+      });
+
     });
   
   
@@ -1396,4 +1545,46 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
       
   return false;  
 
+}
+
+//Define a function for triggering a reload on robot console markup
+function reloadConsoleRobotMarkup(playerToken, robotToken, onComplete){
+  //console.log('reloadConsoleRobotMarkup('+playerToken+', '+robotToken+', onComplete)');
+  
+  if (playerToken == undefined){ playerToken = 'player'; }
+  if (robotToken == undefined){ robotToken = 'robot'; }
+  if (onComplete == undefined){ onComplete = function(){ return true; }; }
+  
+  var thisRobot = $('.sprite[data-robot='+robotToken+'][data-player='+playerToken+']', thisRobotCanvas);
+  var thisRobotIndex = thisRobot.index();
+  
+  //console.log('.sprite[data-robot='+robotToken+'][data-player='+playerToken+'] = ', thisRobot);
+  
+  return loadConsoleRobotMarkup(thisRobot, thisRobotIndex, onComplete);
+  
+}
+
+
+
+function resetEditorMenus(robotEvent, onComplete){
+  
+  if (onComplete == undefined){ onComplete = function(){}; }
+  
+  $('a.player_name', robotEvent).css({opacity:''}).removeAttr('data-status');
+  $('a.item_name', robotEvent).css({opacity:''}).removeAttr('data-status');
+  $('a.ability_name', robotEvent).css({opacity:''}).removeAttr('data-status');
+  
+  thisAbilityCanvas.attr('data-player', '');
+  thisAbilityCanvas.attr('data-robot', '');
+  thisAbilityCanvas.attr('data-key', '');
+  
+  thisItemCanvas.addClass('hidden');
+  thisAbilityCanvas.addClass('hidden');
+  thisAbilityCanvas.find('.wrapper_header').html('Select Ability');      
+  
+  thisRobotCanvas.removeClass('hidden');
+  
+  return onComplete();
+  
+  
 }
