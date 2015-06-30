@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MM00',
   'ability_group' => 'MM00/Items/Energy',
   'ability_class' => 'item',
+  'ability_subclass' => 'consumable',
   'ability_type' => 'energy',
   'ability_description' => 'A large health capsule that restores 40% life energy to one robot on the user\'s side of the field.',
   'ability_energy' => 0,

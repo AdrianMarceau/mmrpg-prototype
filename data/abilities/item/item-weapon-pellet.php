@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MM00',
   'ability_group' => 'MM00/Items/Weapons',
   'ability_class' => 'item',
+  'ability_subclass' => 'consumable',
   'ability_type' => 'weapons',
   'ability_description' => 'A small ammo pellet that restores 20% weapon energy to one robot on the user\'s side of the field.',
   'ability_energy' => 0,

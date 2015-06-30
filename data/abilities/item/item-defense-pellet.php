@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Defense',
   'ability_class' => 'item',
+  'ability_subclass' => 'consumable',
   'ability_type' => 'defense',
   'ability_description' => 'A small shield pellet that boosts the defense stat of one robot on the user\'s side of the field by {RECOVERY}%.',
   'ability_energy' => 0,

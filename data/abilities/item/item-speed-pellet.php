@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Speed',
   'ability_class' => 'item',
+  'ability_subclass' => 'consumable',
   'ability_type' => 'speed',
   'ability_description' => 'A small mobility pellet that boosts the speed stat of one robot on the user\'s side of the field by {RECOVERY}%.',
   'ability_energy' => 0,

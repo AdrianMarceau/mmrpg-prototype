@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Attack',
   'ability_class' => 'item',
+  'ability_subclass' => 'consumable',
   'ability_type' => 'attack',
   'ability_description' => 'A small weapon pellet that boosts the attack stat of one robot on the user\'s side of the field by {RECOVERY}%.',
   'ability_energy' => 0,

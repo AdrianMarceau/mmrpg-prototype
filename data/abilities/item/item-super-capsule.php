@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Super',
   'ability_class' => 'item',
+  'ability_subclass' => 'consumable',
   'ability_type' => '',
   'ability_type2' => 'shield',
   'ability_description' => 'A large energy capsule that that boosts the attack, defense, and speed stat of one robot on the user\'s side of the field by {RECOVERY2}% each.',
