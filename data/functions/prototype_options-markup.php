@@ -69,7 +69,7 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
 
     $this_option_class = 'option option_fieldback option_this-'.$player_token.'-battle-select option_'.$this_battleinfo['battle_size'].' option_'.$this_option_status.' block_'.($this_key + 1).' '.($this_option_complete && !$this_has_field_star && !$this_has_dark_tower ? 'option_complete ' : '').($this_option_disabled ? 'option_disabled '.($this_option_encore ? 'option_disabled_clickable ' : '') : '');
     $this_option_style = 'background-position: -'.mt_rand(5, 50).'px -'.mt_rand(5, 50).'px; ';
-    if (!empty($this_fieldinfo['field_type'])){ $this_option_class .= 'field_type field_type_'.$this_fieldinfo['field_type'].(!empty($this_fieldinfo['field_type2']) ? '_'.$this_fieldinfo['field_type2'] : ''); }
+    if (!empty($this_fieldinfo['field_type'])){ $this_option_class .= 'field_type field_type_'.$this_fieldinfo['field_type'].(!empty($this_fieldinfo['field_type2']) && $this_fieldinfo['field_type2'] != $this_fieldinfo['field_type'] ? '_'.$this_fieldinfo['field_type2'] : ''); }
     else { $this_option_class .= 'field_type field_type_none'; }
     if (!empty($this_fieldinfo['field_background'])){
       //$this_background_x = $this_background_y = -20;
