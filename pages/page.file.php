@@ -778,6 +778,7 @@ while ($this_action == 'load'){
           $min_dateofbirth = date('Y/m/d', strtotime('13 years ago'));
           $bypass_dateofbirth = false;
 
+          /*
           // Allow the test user to bypass age concent, we got an email
           $bypass_dateofbirth_index = array();
           $temp_dateofbirth_index = explode(',', preg_replace('/\s+/', '', MMRPG_COPPA_COMPLIANCE_PERMISSIONS));
@@ -786,6 +787,7 @@ while ($this_action == 'load'){
           foreach ($temp_dateofbirth_index AS $string){ list($username, $email) = explode('/', $string); $bypass_dateofbirth_index[strtolower($username)] = strtolower($email); }
           if (!empty($bypass_dateofbirth_index[$temp_username_token]) && $bypass_dateofbirth_index[$temp_username_token] == $temp_email_token){ $bypass_dateofbirth = true; }
           //die('<pre>$bypass_dateofbirth_index = '.print_r($bypass_dateofbirth_index, true).'</pre>');
+          */
 
           // Ensure the dateofbirth is valid
           //die('$min_dateofbirth = '.$min_dateofbirth);
