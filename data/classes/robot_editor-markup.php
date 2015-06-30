@@ -5,7 +5,7 @@ global $mmrpg_index, $this_current_uri, $this_current_url, $DB;
 global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
 global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
 global $key_counter, $player_rewards, $player_ability_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
-global $mmrpg_database_abilities;
+global $mmrpg_database_abilities, $mmrpg_database_items;
 global $session_token;
 // Collect values for potentially missing global variables
 if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
@@ -16,7 +16,8 @@ if (empty($robot_info)){ return 'error:robot-empty'; }
 
 // Collect the approriate database indexes
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-if (empty($mmrpg_database_abilities)){ $mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token'); }
+if (empty($mmrpg_database_abilities)){ $mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class <> 'item';", 'ability_token'); }
+if (empty($mmrpg_database_items)){ $mmrpg_database_items = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'item';", 'ability_token'); }
 
 // Define the quick-access variables for later use
 $player_token = $player_info['player_token'];
@@ -328,11 +329,12 @@ ob_start();
 
     // Check to see if the player has unlocked the ability to hold items
     $temp_item_hold_unlocked = mmrpg_prototype_event_complete('completed-chapter_dr-cossack_one');
+    $current_item_token = '';
     // If this player has unlocked the ability to let robots hold items
     if ($temp_item_hold_unlocked){
       // Collect the currently held item and token, if available
-      $current_item_token = 'item-attack-capsule'; //!empty($robot_info['robot_item']) ? $robot_info['robot_item'] : '';
-      $current_item_info = !empty($mmrpg_database_abilities[$current_item_token]) ? $mmrpg_database_abilities[$current_item_token] : array();
+      $current_item_token = !empty($robot_info['robot_item']) ? $robot_info['robot_item'] : '';
+      $current_item_info = !empty($mmrpg_database_items[$current_item_token]) ? $mmrpg_database_items[$current_item_token] : array();
       $current_item_name = !empty($current_item_info['ability_name']) ? $current_item_info['ability_name'] : 'No Item';
       $current_item_image = !empty($current_item_info['ability_image']) ? $current_item_info['ability_image'] : $current_item_token;
       $current_item_type = !empty($current_item_info['ability_type']) ? $current_item_info['ability_type'] : 'none';
@@ -341,7 +343,7 @@ ob_start();
       ob_start();
       ?>
       <td  class="right">
-        <label style="display: block; float: left;">Item :</label>
+        <label style="display: block; float: left;">Item:</label>
         <? if($global_allow_editing): ?>
           <a title="Change Item?" class="item_name type <?= $current_item_type ?>"><label style="background-image: url(i/a/<?= $current_item_image ?>/il40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?><span class="arrow">&#8711;</span></label></a>
         <? else: ?>
@@ -698,7 +700,7 @@ ob_start();
                   elseif ($ability_info['ability_token'] == '*'){ continue; }
                   elseif ($ability_info['ability_token'] == 'ability'){ continue; }
                   elseif (!isset($mmrpg_database_abilities[$ability_info['ability_token']])){ continue; }
-                  elseif (!mmrpg_robot::has_ability_compatibility($robot_info['robot_token'], $ability_token)){ continue; }
+                  elseif (!mmrpg_robot::has_ability_compatibility($robot_info['robot_token'], $ability_token, $current_item_token)){ continue; }
                   $ability_info['ability_id'] = $mmrpg_database_abilities[$ability_info['ability_token']]['ability_id'];
 
                   $allowed_ability_ids[] = $ability_info['ability_id'];
@@ -735,8 +737,11 @@ ob_start();
                     elseif ($robot_ability['ability_token'] == 'ability'){ continue; }
                     elseif (!isset($mmrpg_database_abilities[$robot_ability['ability_token']])){ continue; }
                     elseif ($ability_key > 7){ continue; }
-                    $this_ability = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$robot_ability['ability_token']]);
-                    if (empty($this_ability)){ continue; }
+
+                    $ability_token = $robot_ability['ability_token'];
+                    $this_ability = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$ability_token]);
+                    if (empty($ability_token) || empty($this_ability)){ continue; }
+                    elseif (!mmrpg_robot::has_ability_compatibility($robot_info['robot_token'], $ability_token, $current_item_token)){ continue; }
 
                     $temp_select_markup = mmrpg_ability::print_editor_select_markup($ability_rewards_options, $player_info, $robot_info, $this_ability, $ability_key);
 
