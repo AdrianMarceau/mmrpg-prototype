@@ -162,7 +162,9 @@ $(document).ready(function(){
         $('.option[data-chapter!='+thisChapterToken+']', thisChapterWrapper).addClass('hidden_chapter_option');
         $('.option[data-chapter='+thisChapterToken+']', thisChapterWrapper).removeClass('hidden_chapter_option');
         // Update the battle options with the last selected chapter
-        $.post('scripts/script.php',{requestType:'session',requestData:'battle_settings,'+thisChapterPlayer+'_current_chapter,'+thisChapterToken});
+        var postData = {requestType:'session',requestData:'battle_settings,'+thisChapterPlayer+'_current_chapter,'+thisChapterToken};
+        //console.log('scripts/script.php', postData);
+        $.post('scripts/script.php', postData);
         // DEBUG DEBUG
         //alert('clicked chapter '+thisChapterToken+'!');
         });
@@ -261,8 +263,10 @@ $(document).ready(function(){
         // Update the session with this password string
         var thisRequestType = 'session';
         var thisRequestData = 'values,battle_passwords,'+thisPlayer+','+thisPassword+',true';
-        $.post('scripts/script.php',{requestType:'session',requestData:thisRequestData},function(){
-          window.location.href = 'prototype.php?wap='+(gameSettings.wapFlag ? 'true' : 'false');
+        var thisPostData = {requestType:'session',requestData:thisRequestData};
+        //console.log('scripts/script.php', thisPostData);
+        $.post('scripts/script.php', thisPostData, function(){ 
+          window.location.href = 'prototype.php?wap='+(gameSettings.wapFlag ? 'true' : 'false'); 
           });
         }
       }
@@ -1352,6 +1356,8 @@ function prototype_menu_switch(switchOptions){
             var requestType = 'session';
             var requestData = '';
             for (optionToken in battleOptions){
+              // Skip if this is an invalid option
+              if (optionToken == 'this_player_robots'){ continue; }
               // Collect the option token and value
               var thisOptionToken = optionToken;
               var thisOptionValue = battleOptions[optionToken];
@@ -1359,7 +1365,9 @@ function prototype_menu_switch(switchOptions){
               requestData += 'battle_settings,'+thisOptionToken+','+thisOptionValue+';';
               }
             // Post the generated request data to the server and wait for a reply
-            $.post('scripts/script.php',{requestType:requestType,requestData:requestData},function(data){
+            var thisPostData = {requestType:requestType,requestData:requestData};
+            //console.log('scripts/script.php', thisPostData);
+            $.post('scripts/script.php',thisPostData,function(data){
               //alert(data);
               // Execute the onComplete function
               switchOptions.onComplete();                                  
