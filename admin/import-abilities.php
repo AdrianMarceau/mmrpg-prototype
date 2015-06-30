@@ -51,6 +51,7 @@ $mmrpg_index['items'] = array();
 if (!empty($mmrpg_index['abilities'])){
   foreach ($mmrpg_index['abilities'] AS $token => $ability){
     $ability['ability_class'] = isset($ability['ability_class']) ? $ability['ability_class'] : 'master';
+    $ability['ability_subclass'] = isset($ability['ability_subclass']) ? $ability['ability_subclass'] : '';
     $ability['ability_game'] = isset($ability['ability_game']) ? $ability['ability_game'] : 'MMRPG';
     $ability['ability_group'] = isset($ability['ability_group']) ? $ability['ability_group'] : 'MMRPG';
     $ability['ability_master'] = isset($ability['ability_master']) ? $ability['ability_master'] : '';
@@ -295,6 +296,7 @@ if (!empty($mmrpg_index['abilities'])){
     $temp_insert_array['ability_game'] = !empty($ability_data['ability_game']) ? $ability_data['ability_game'] : '';
     $temp_insert_array['ability_group'] = !empty($ability_data['ability_group']) ? $ability_data['ability_group'] : '';
     $temp_insert_array['ability_class'] = !empty($ability_data['ability_class']) ? $ability_data['ability_class'] : 'master';
+    $temp_insert_array['ability_subclass'] = !empty($ability_data['ability_subclass']) ? $ability_data['ability_subclass'] : '';
     $temp_insert_array['ability_master'] = !empty($ability_data['ability_master']) ? $ability_data['ability_master'] : '';
     $temp_insert_array['ability_number'] = !empty($ability_data['ability_number']) ? $ability_data['ability_number'] : '';
     $temp_insert_array['ability_image'] = !empty($ability_data['ability_image']) ? $ability_data['ability_image'] : '';
@@ -434,6 +436,11 @@ $temp_pattern_first[] = '/^item-score-ball-red$/i';
 $temp_pattern_first[] = '/^item-score-ball-blue$/i';
 $temp_pattern_first[] = '/^item-score-ball-green$/i';
 $temp_pattern_first[] = '/^item-score-ball-purple$/i';
+$temp_pattern_first[] = '/^item-energy-program$/i';
+$temp_pattern_first[] = '/^item-weapon-program$/i';
+$temp_pattern_first[] = '/^item-attack-program$/i';
+$temp_pattern_first[] = '/^item-defense-program$/i';
+$temp_pattern_first[] = '/^item-speed-program$/i';
 //die('$temp_pattern_first = <pre>'.print_r($temp_pattern_first, true).'</pre>');
 $temp_pattern_last = array();
 //$temp_pattern_last[] = '/^item-heart$/i';
@@ -495,6 +502,7 @@ if (!empty($mmrpg_index['items'])){
     $temp_insert_array['ability_game'] = !empty($item_data['ability_game']) ? $item_data['ability_game'] : '';
     $temp_insert_array['ability_group'] = !empty($item_data['ability_group']) ? $item_data['ability_group'] : '';
     $temp_insert_array['ability_class'] = !empty($item_data['ability_class']) ? $item_data['ability_class'] : 'master';
+    $temp_insert_array['ability_subclass'] = !empty($item_data['ability_subclass']) ? $item_data['ability_subclass'] : '';
     $temp_insert_array['ability_image'] = !empty($item_data['ability_image']) ? $item_data['ability_image'] : '';
     $temp_insert_array['ability_image_sheets'] = isset($item_data['ability_image_sheets']) ? $item_data['ability_image_sheets'] : 1;
     $temp_insert_array['ability_image_size'] = !empty($item_data['ability_image_size']) ? $item_data['ability_image_size'] : 40;
