@@ -6,6 +6,7 @@ $ability = array(
   'ability_game' => 'MMRPG',
   'ability_group' => 'MMRPG/Items/Crystal',
   'ability_class' => 'item',
+  'ability_subclass' => 'collectible',
   'ability_type' => 'crystal',
   'ability_description' => 'A mysterious elemental shard that radiates with the Crystal type energy of a defeated support mecha.  Collect four of these items to generate a new core that can be thrown in battle to deal Crystal type damage or traded in at the shop for a variable amount of Zenny.',
   'ability_energy' => 0,
