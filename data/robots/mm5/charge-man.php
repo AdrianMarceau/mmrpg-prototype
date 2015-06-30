@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'charge-man',
   'robot_image_editor' => 18,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Charge Man (Steel Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Charge Man (Copper Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Charge Man (Darkness Alt)', 'summons' => 900)
+    ),
   'robot_core' => 'swift',
   'robot_description' => 'Chugging Locomotive Robot',
   'robot_energy' => 100,

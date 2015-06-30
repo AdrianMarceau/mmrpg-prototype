@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'gyro-man',
   'robot_image_editor' => 110,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Gyro Man (Redhot Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Gyro Man (Skyblue Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Gyro Man (Darkness Alt)', 'summons' => 900)
+    ),
   'robot_core' => 'wind',
   'robot_description' => 'Aerial Strike Robot',
   'robot_energy' => 100,

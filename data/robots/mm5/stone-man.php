@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'stone-man',
   'robot_image_editor' => 110,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Stone Man (Mossy Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Stone Man (Frozen Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Stone Man (Darkness Alt)', 'summons' => 900)
+    ),
   'robot_core' => 'earth',
   'robot_description' => 'Disassembling Brick Robot',
   'robot_energy' => 100,

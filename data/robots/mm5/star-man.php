@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Star Man',
   'robot_token' => 'star-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Star Man (Solar Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Star Man (Lunar Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Star Man (Darkness Alt)', 'summons' => 900)
+    ),
   'robot_core' => 'space',
   'robot_description' => 'Interstellar Research Robot',
   'robot_energy' => 100,

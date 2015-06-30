@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'napalm-man',
   'robot_image_editor' => 110,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Napalm Man (Orange Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Napalm Man (Emerald Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Napalm Man (Darkness Alt)', 'summons' => 900)
+    ),
   'robot_core' => 'explode',
   'robot_description' => 'Walking Arsenal Robot',
   'robot_energy' => 100,

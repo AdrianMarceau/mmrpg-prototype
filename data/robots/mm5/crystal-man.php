@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Crystal Man',
   'robot_token' => 'crystal-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Crystal Man (Bubblegum Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Crystal Man (Sugarplum Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Crystal Man (Darkness Alt)', 'summons' => 900)
+    ),
   'robot_core' => 'crystal',
   'robot_field' => 'crystal-catacombs',
   'robot_description' => 'Gemstone Counterfeiting Robot',

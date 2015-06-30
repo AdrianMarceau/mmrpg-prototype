@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'wave-man',
   'robot_image_editor' => 18,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Wave Man (Seaweed Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Wave Man (Royalty Alt)', 'summons' => 200),
+    array('token' => 'alt9', 'name' => 'Wave Man (Darkness Alt)', 'summons' => 900)
+    ),
   'robot_core' => 'water',
   'robot_description' => 'Amphibious Assault Robot',
   'robot_description2' => 'The Wave Man series is a series of robots meant for amphious combat and as such are skilled in aquatic regions. The Wave Man series is great with long-range combat, being equipped with a harpoon and can make powerful water waves, but do not have good close-range combat weapons. This series is very anti-social and attacks anyone who comes near. Seeing sludge provokes them even more, which makes them very dangerous opponents.',
