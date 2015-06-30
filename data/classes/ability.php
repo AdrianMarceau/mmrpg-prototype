@@ -110,6 +110,7 @@ class mmrpg_ability {
     $this->ability_name = isset($this_abilityinfo['ability_name']) ? $this_abilityinfo['ability_name'] : 'Ability';
     $this->ability_token = isset($this_abilityinfo['ability_token']) ? $this_abilityinfo['ability_token'] : 'ability';
     $this->ability_class = isset($this_abilityinfo['ability_class']) ? $this_abilityinfo['ability_class'] : 'master';
+    $this->ability_subclass = isset($this_abilityinfo['ability_subclass']) ? $this_abilityinfo['ability_subclass'] : '';
     $this->ability_master = isset($this_abilityinfo['ability_master']) ? $this_abilityinfo['ability_master'] : '';
     $this->ability_number = isset($this_abilityinfo['ability_number']) ? $this_abilityinfo['ability_number'] : '';
     $this->ability_image = isset($this_abilityinfo['ability_image']) ? $this_abilityinfo['ability_image'] : $this->ability_token;
@@ -894,6 +895,7 @@ class mmrpg_ability {
       'ability_name' => $this->ability_name,
       'ability_token' => $this->ability_token,
       'ability_class' => $this->ability_class,
+      'ability_subclass' => $this->ability_subclass,
       'ability_master' => $this->ability_master,
       'ability_number' => $this->ability_number,
       'ability_image' => $this->ability_image,
