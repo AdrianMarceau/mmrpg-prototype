@@ -448,33 +448,38 @@ class mmrpg_robot {
   }
 
   // Define a function for checking if this robot is compatible with a specific ability
-  static public function has_ability_compatibility($robot_token, $ability_token){
+  static public function has_ability_compatibility($robot_token, $ability_token, $item_token = ''){
     global $mmrpg_index;
     if (empty($robot_token) || empty($ability_token)){ return false; }
     $robot_info = is_array($robot_token) ? $robot_token : mmrpg_robot::get_index_info($robot_token);
     $ability_info = is_array($ability_token) ? $ability_token : mmrpg_ability::get_index_info($ability_token);
+    $item_info = is_array($item_token) ? $item_token : mmrpg_ability::get_index_info($item_token);
     if (empty($robot_info) || empty($ability_info)){ return false; }
+    $ability_token = !empty($ability_info) ? $ability_info['ability_token'] : '';
+    $item_token = !empty($item_info) ? $item_info['ability_token'] : '';
     $robot_token = $robot_info['robot_token'];
-    $ability_token = $ability_info['ability_token'];
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'has_ability_compatibility('.$robot_token.', '.$ability_token.')');  }
+    $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+    $robot_core2 = !empty($item_token) && preg_match('/^item-core-/i', $item_token) ? preg_replace('/^item-core-/i', '', $item_token) : '';
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'has_ability_compatibility('.$robot_token.', '.$ability_token.', '.$robot_core.', '.$robot_core2.')');  }
+    //echo 'has_ability_compatibility('.$robot_token.', '.$ability_token.', '.$robot_core.', '.$robot_core2.')'."\n";
     // Define the compatibility flag and default to false
     $temp_compatible = false;
     // If this ability has a type, check it against this robot
     if (!empty($ability_info['ability_type']) || !empty($ability_info['ability_type2'])){
       //$debug_fragment .= 'has-type '; // DEBUG
-      if (!empty($robot_info['robot_core'])){
+      if (!empty($robot_core) || !empty($robot_core2)){
       //$debug_fragment .= 'has-core '; // DEBUG
-        if ($robot_info['robot_core'] == 'copy'){
+        if ($robot_core == 'copy'){
           //$debug_fragment .= 'copy-core '; // DEBUG
           $temp_compatible = true;
         }
         elseif (!empty($ability_info['ability_type'])
-          && $ability_info['ability_type'] == $robot_info['robot_core']){
+          && ($ability_info['ability_type'] == $robot_core || $ability_info['ability_type'] == $robot_core2)){
           //$debug_fragment .= 'core-match1 '; // DEBUG
           $temp_compatible = true;
         }
         elseif (!empty($ability_info['ability_type2'])
-          && $ability_info['ability_type2'] == $robot_info['robot_core']){
+          && ($ability_info['ability_type2'] == $robot_core || $ability_info['ability_type2'] == $robot_core2)){
           //$debug_fragment .= 'core-match2 '; // DEBUG
           $temp_compatible = true;
         }
@@ -602,7 +607,7 @@ class mmrpg_robot {
     $temp_energy_break_rate = $temp_attack_break_rate = $temp_defense_break_rate = $temp_speed_break_rate = 0;
     $temp_energy_swap_rate = $temp_attack_swap_rate = $temp_defense_swap_rate = $temp_speed_swap_rate = 0;
     $temp_energy_mode_rate = $temp_attack_mode_rate = $temp_defense_mode_rate = $temp_speed_mode_rate = 0;
-    
+
     // Apply energy boost mods based on current life energy of this robot
     if ($this_robot->robot_energy < ($this_robot->robot_base_energy / 4)){ $temp_energy_boost_rate += 20; }
     elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 3)){ $temp_energy_boost_rate += 15; }
@@ -632,11 +637,11 @@ class mmrpg_robot {
     // Create the ability options and weights variables
     $options = array();
     $weights = array();
-    
+
     // Define the support multiplier for this robot
     $support_multiplier = 1;
     if (in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm')) || $this_robot->robot_class == 'mecha'){ $support_multiplier += 1; }
-    
+
     // Define the frequency of the default buster ability if set
     if ($this_robot->has_ability('buster-shot')){ $options[] = 'buster-shot'; $weights[] = $this_robot->robot_token == 'met' ? 90 : 1;  }
     if ($this_robot->has_ability('super-throw')){ $options[] = 'super-throw'; $weights[] = 1;  }
@@ -669,7 +674,7 @@ class mmrpg_robot {
           if ($this_robot->robot_core == $info['ability_type']){ $value = 50; }
           elseif ($this_robot->robot_core == $info['ability_type2']){ $value = 25; }
           elseif ($this_robot->robot_core == 'copy'){ $value = 40; }
-          elseif ($this_robot->robot_core != $info['ability_type']){ $value = 30; }          
+          elseif ($this_robot->robot_core != $info['ability_type']){ $value = 30; }
         } elseif (empty($this_robot->robot_core)){
           $value = 30;
         } else {
