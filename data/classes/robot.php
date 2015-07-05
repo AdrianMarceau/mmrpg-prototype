@@ -124,6 +124,7 @@ class mmrpg_robot {
     $this->robot_field = isset($this_robotinfo['robot_field']) ? $this_robotinfo['robot_field'] : 'field';
     $this->robot_class = isset($this_robotinfo['robot_class']) ? $this_robotinfo['robot_class'] : 'master';
     $this->robot_gender = isset($this_robotinfo['robot_gender']) ? $this_robotinfo['robot_gender'] : 'none';
+    $this->robot_item = isset($this_robotinfo['robot_item']) ? $this_robotinfo['robot_item'] : '';
     $this->robot_image = isset($this_robotinfo['robot_image']) ? $this_robotinfo['robot_image'] : $this->robot_token;
     $this->robot_image_size = isset($this_robotinfo['robot_image_size']) ? $this_robotinfo['robot_image_size'] : 40;
     $this->robot_image_overlay = isset($this_robotinfo['robot_image_overlay']) ? $this_robotinfo['robot_image_overlay'] : array();
@@ -171,6 +172,7 @@ class mmrpg_robot {
     // Define the internal robot base values using the robots index array
     $this->robot_base_name = isset($this_robotinfo['robot_base_name']) ? $this_robotinfo['robot_base_name'] : $this->robot_name;
     $this->robot_base_token = isset($this_robotinfo['robot_base_token']) ? $this_robotinfo['robot_base_token'] : $this->robot_token;
+    $this->robot_base_item = isset($this_robotinfo['robot_base_item']) ? $this_robotinfo['robot_base_item'] : $this->robot_item;
     $this->robot_base_image = isset($this_robotinfo['robot_base_image']) ? $this_robotinfo['robot_base_image'] : $this->robot_base_token;
     $this->robot_base_image_size = isset($this_robotinfo['robot_base_image_size']) ? $this_robotinfo['robot_base_image_size'] : $this->robot_image_size;
     $this->robot_base_image_overlay = isset($this_robotinfo['robot_base_image_overlay']) ? $this_robotinfo['robot_base_image_overlay'] : $this->robot_image_overlay;
@@ -208,20 +210,32 @@ class mmrpg_robot {
 
     // If this is a player-controlled robot, load abilities and image from session
     if ($this->player->player_side == 'left' && empty($this->flags['apply_session_abilities'])){
-      // Collect the abilities for this robot from the session
+
+      // Collect the Settings for this robot from the session
       $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
+
+      // Parse the abilities for this robot from the session
       if (!empty($temp_robot_settings['robot_abilities'])){
         $temp_robot_abilities = $temp_robot_settings['robot_abilities'];
         $this->robot_abilities = array();
         foreach ($temp_robot_abilities AS $token => $info){ $this->robot_abilities[] = $token; }
       }
+
       // If there is an alternate image set, apply it
       if (!empty($temp_robot_settings['robot_image'])){
         $this->robot_image = $temp_robot_settings['robot_image'];
         $this->robot_base_image = $this->robot_image;
       }
+
+      // If there is a held item set, apply it
+      if (!empty($temp_robot_settings['robot_item'])){
+        $this->robot_item = $temp_robot_settings['robot_item'];
+        $this->robot_base_item = $this->robot_item;
+      }
+
       // Set the session ability flag to true
       $this->flags['apply_session_abilities'] = true;
+
     }
 
     // Remove any abilities that do not exist in the index
@@ -1090,11 +1104,21 @@ class mmrpg_robot {
     // Generate default trigger options if not set
     if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = $this_ability->damage_options['damage_modifiers'] == false ? false : true; }
     if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_weakness_modifiers']) || $trigger_options['apply_weakness_modifiers'] == false){ $trigger_options['apply_weakness_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_resistance_modifiers']) || $trigger_options['apply_resistance_modifiers'] == false){ $trigger_options['apply_resistance_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_affinity_modifiers']) || $trigger_options['apply_affinity_modifiers'] == false){ $trigger_options['apply_affinity_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_immunity_modifiers']) || $trigger_options['apply_immunity_modifiers'] == false){ $trigger_options['apply_immunity_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_core_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_core_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['referred_damage'])){ $trigger_options['referred_damage'] = false; }
+    if (!isset($trigger_options['referred_player'])){ $trigger_options['referred_player'] = false; }
+    if (!isset($trigger_options['referred_robot'])){ $trigger_options['referred_robot'] = false; }
+    if (!isset($trigger_options['referred_energy'])){ $trigger_options['referred_energy'] = false; }
+    if (!isset($trigger_options['referred_attack'])){ $trigger_options['referred_attack'] = false; }
+    if (!isset($trigger_options['referred_defense'])){ $trigger_options['referred_defense'] = false; }
+    if (!isset($trigger_options['referred_speed'])){ $trigger_options['referred_speed'] = false; }
     // Require the external function for triggering damage
     require('robot_trigger-damage.php');
     // Return the final damage results
@@ -1108,11 +1132,21 @@ class mmrpg_robot {
     // Generate default trigger options if not set
     if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = $this_ability->recovery_options['recovery_modifiers'] == false ? false : true; }
     if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_weakness_modifiers']) || $trigger_options['apply_weakness_modifiers'] == false){ $trigger_options['apply_weakness_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_resistance_modifiers']) || $trigger_options['apply_resistance_modifiers'] == false){ $trigger_options['apply_resistance_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_affinity_modifiers']) || $trigger_options['apply_affinity_modifiers'] == false){ $trigger_options['apply_affinity_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_immunity_modifiers']) || $trigger_options['apply_immunity_modifiers'] == false){ $trigger_options['apply_immunity_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_core_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_core_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['referred_recovery'])){ $trigger_options['referred_recovery'] = false; }
+    if (!isset($trigger_options['referred_player'])){ $trigger_options['referred_player'] = false; }
+    if (!isset($trigger_options['referred_robot'])){ $trigger_options['referred_robot'] = false; }
+    if (!isset($trigger_options['referred_energy'])){ $trigger_options['referred_energy'] = false; }
+    if (!isset($trigger_options['referred_attack'])){ $trigger_options['referred_attack'] = false; }
+    if (!isset($trigger_options['referred_defense'])){ $trigger_options['referred_defense'] = false; }
+    if (!isset($trigger_options['referred_speed'])){ $trigger_options['referred_speed'] = false; }
     // Require the external function for triggering recovery
     require('robot_trigger-recovery.php');
     // Return the final recovery results
@@ -1376,6 +1410,7 @@ class mmrpg_robot {
       'robot_field' => $this->robot_field,
       'robot_class' => $this->robot_class,
       'robot_gender' => $this->robot_gender,
+      'robot_item' => $this->robot_item,
       'robot_image' => $this->robot_image,
       'robot_image_size' => $this->robot_image_size,
       'robot_image_overlay' => $this->robot_image_overlay,
@@ -1400,6 +1435,7 @@ class mmrpg_robot {
       'robot_functions' => $this->robot_functions,
       'robot_base_name' => $this->robot_base_name,
       'robot_base_token' => $this->robot_base_token,
+      'robot_base_item' => $this->robot_base_item,
       'robot_base_image' => $this->robot_base_image,
       'robot_base_image_size' => $this->robot_base_image_size,
       'robot_base_image_overlay' => $this->robot_base_image_overlay,

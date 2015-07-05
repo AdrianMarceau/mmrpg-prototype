@@ -16,6 +16,35 @@ $this_ability_backup_frame = $this_ability->ability_frame;
 $this_robot_energy_start = $this->robot_energy;
 $this_robot_energy_start_max = $this_robot_energy_start >= $this->robot_base_energy ? true : false;
 
+// If this damage has been referred, update target variables
+if (!empty($trigger_options['referred_damage'])){
+
+  // If a referred player was provided, replace the target player object
+  if (!empty($trigger_options['referred_player'])){
+    $target_player = new mmrpg_player($this->battle, $trigger_options['referred_player']);
+  }
+
+  // If a referred player and robot were provided, replace the target robot object
+  if (!empty($trigger_options['referred_player']) && !empty($trigger_options['referred_robot'])){
+    $target_robot = new mmrpg_robot($this->battle, $target_player, $trigger_options['referred_robot']);
+  }
+
+  // Collect references to referred damage stats if they exist
+  $target_robot_energy_start = !empty($trigger_options['referred_energy']) ? $trigger_options['referred_energy'] : $target_robot->robot_energy;
+  $target_robot_attack_start = !empty($trigger_options['referred_attack']) ? $trigger_options['referred_attack'] : $target_robot->robot_attack;
+  $target_robot_defense_start = !empty($trigger_options['referred_defense']) ? $trigger_options['referred_defense'] : $target_robot->robot_defense;
+  $target_robot_speed_start = !empty($trigger_options['referred_speed']) ? $trigger_options['referred_speed'] : $target_robot->robot_speed;
+
+} else {
+
+  // Collect references to the target robots stats
+  $target_robot_energy_start = $target_robot->robot_energy;
+  $target_robot_attack_start = $target_robot->robot_attack;
+  $target_robot_defense_start = $target_robot->robot_defense;
+  $target_robot_speed_start = $target_robot->robot_speed;
+
+}
+
 // Define the event console options
 $event_options = array();
 $event_options['console_container_height'] = 1;
@@ -41,18 +70,15 @@ $debug = array();
 foreach ($trigger_options AS $key => $value){ $debug[] = (!$value ? '<del>' : '<span>').preg_replace('/^apply_(.*)_modifiers$/i', '$1_modifiers', $key).(!$value ? '</del>' : '</span>'); }
 //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' : damage_trigger_options <br /> '.implode(', ', $debug));
 
-/*
-// Only apply weakness, resistance, etc. if not percent
-if (true || !$this_ability->damage_options['damage_percent']){
-*/
 // Only apply modifiers if they have not been disabled
 if ($trigger_options['apply_modifiers'] != false){
 
   // Skip all weakness, resistance, etc. calculations if robot is targetting self
-  if ($trigger_options['apply_type_modifiers'] != false && ($this->robot_id != $target_robot->robot_id || $trigger_options['referred_damage'])){
+  if ($trigger_options['apply_type_modifiers'] != false
+    && ($this->robot_id != $target_robot->robot_id || $trigger_options['referred_damage'])){
 
     // If target robot has affinity to the ability (based on type)
-    if ($this->has_affinity($this_ability->damage_options['damage_type']) && !$this->has_weakness($this_ability->damage_options['damage_type2'])){
+    if ($trigger_options['apply_affinity_modifiers'] != false && $this->has_affinity($this_ability->damage_options['damage_type']) && !$this->has_weakness($this_ability->damage_options['damage_type2'])){
       //$this_ability->ability_results['counter_affinities'] += 1;
       //$this_ability->ability_results['flag_affinity'] = true;
       return $this->trigger_recovery($target_robot, $this_ability, $damage_amount);
@@ -61,14 +87,14 @@ if ($trigger_options['apply_modifiers'] != false){
     }
 
     // If target robot has affinity to the ability (based on type2)
-    if ($this->has_affinity($this_ability->damage_options['damage_type2']) && !$this->has_weakness($this_ability->damage_options['damage_type'])){
+    if ($trigger_options['apply_affinity_modifiers'] != false && $this->has_affinity($this_ability->damage_options['damage_type2']) && !$this->has_weakness($this_ability->damage_options['damage_type'])){
       $this_ability->ability_results['counter_affinities'] += 1;
       $this_ability->ability_results['flag_affinity'] = true;
       return $this->trigger_recovery($target_robot, $this_ability, $damage_amount);
     }
 
     // If this robot has weakness to the ability (based on type)
-    if ($this->has_weakness($this_ability->damage_options['damage_type']) && !$this->has_affinity($this_ability->damage_options['damage_type2'])){
+    if ($trigger_options['apply_weakness_modifiers'] != false && $this->has_weakness($this_ability->damage_options['damage_type']) && !$this->has_affinity($this_ability->damage_options['damage_type2'])){
       $this_ability->ability_results['counter_weaknesses'] += 1;
       $this_ability->ability_results['flag_weakness'] = true;
     } else {
@@ -76,13 +102,13 @@ if ($trigger_options['apply_modifiers'] != false){
     }
 
     // If this robot has weakness to the ability (based on type2)
-    if ($this->has_weakness($this_ability->damage_options['damage_type2']) && !$this->has_affinity($this_ability->damage_options['damage_type'])){
+    if ($trigger_options['apply_weakness_modifiers'] != false && $this->has_weakness($this_ability->damage_options['damage_type2']) && !$this->has_affinity($this_ability->damage_options['damage_type'])){
       $this_ability->ability_results['counter_weaknesses'] += 1;
       $this_ability->ability_results['flag_weakness'] = true;
     }
 
     // If target robot has resistance tp the ability (based on type)
-    if ($this->has_resistance($this_ability->damage_options['damage_type'])){
+    if ($trigger_options['apply_resistance_modifiers'] != false && $this->has_resistance($this_ability->damage_options['damage_type'])){
       $this_ability->ability_results['counter_resistances'] += 1;
       $this_ability->ability_results['flag_resistance'] = true;
     } else {
@@ -90,13 +116,13 @@ if ($trigger_options['apply_modifiers'] != false){
     }
 
     // If target robot has resistance tp the ability (based on type2)
-    if ($this->has_resistance($this_ability->damage_options['damage_type2'])){
+    if ($trigger_options['apply_resistance_modifiers'] != false && $this->has_resistance($this_ability->damage_options['damage_type2'])){
       $this_ability->ability_results['counter_resistances'] += 1;
       $this_ability->ability_results['flag_resistance'] = true;
     }
 
     // If target robot has immunity to the ability (based on type)
-    if ($this->has_immunity($this_ability->damage_options['damage_type'])){
+    if ($trigger_options['apply_immunity_modifiers'] != false && $this->has_immunity($this_ability->damage_options['damage_type'])){
       $this_ability->ability_results['counter_immunities'] += 1;
       $this_ability->ability_results['flag_immunity'] = true;
     } else {
@@ -104,7 +130,7 @@ if ($trigger_options['apply_modifiers'] != false){
     }
 
     // If target robot has immunity to the ability (based on type2)
-    if ($this->has_immunity($this_ability->damage_options['damage_type2'])){
+    if ($trigger_options['apply_immunity_modifiers'] != false && $this->has_immunity($this_ability->damage_options['damage_type2'])){
       $this_ability->ability_results['counter_immunities'] += 1;
       $this_ability->ability_results['flag_immunity'] = true;
     }
@@ -188,7 +214,7 @@ if ($this_ability->damage_options['success_rate'] == 'auto'){
     $this_ability->damage_options['success_rate'] = $this_ability->ability_accuracy;
   }
   // Otherwise, if this robot is in speed break or ability accuracy 100%
-  elseif ($target_robot->robot_speed <= 0 && $this->robot_speed > 0){
+  elseif ($target_robot_speed_start <= 0 && $this->robot_speed > 0){
     // Hard-code the success rate at 100% accuracy
       $this_ability->damage_options['success_rate'] = 0;
   }
@@ -202,9 +228,9 @@ if ($this_ability->damage_options['success_rate'] == 'auto'){
     // Collect this ability's accuracy stat for modification
     $this_ability_accuracy = $this_ability->ability_accuracy;
     // If the target was faster/slower, boost/lower the ability accuracy
-    if ($target_robot->robot_speed > $this->robot_speed
-      || $target_robot->robot_speed < $this->robot_speed){
-      $this_modifier = $target_robot->robot_speed / $this->robot_speed;
+    if ($target_robot_speed_start > $this->robot_speed
+      || $target_robot_speed_start < $this->robot_speed){
+      $this_modifier = $target_robot_speed_start / $this->robot_speed;
       //$this_ability_accuracy = ceil($this_ability_accuracy * $this_modifier);
       $this_ability_accuracy = ceil($this_ability_accuracy * 0.95) + ceil(($this_ability_accuracy * 0.05) * $this_modifier);
       if ($this_ability_accuracy > 100){ $this_ability_accuracy = 100; }
@@ -231,7 +257,7 @@ if ($this->robot_speed == 0 && $this_ability->damage_options['success_rate'] > 0
   $this_ability->damage_options['failure_rate'] = ceil($this_ability->damage_options['failure_rate'] / 2);
 }
 // If the target robot is in speed break, decease the success rate, increase failure
-elseif ($target_robot->robot_speed == 0 && $this_ability->damage_options['success_rate'] > 0){
+elseif ($target_robot_speed_start == 0 && $this_ability->damage_options['success_rate'] > 0){
   $this_ability->damage_options['success_rate'] = ceil($this_ability->damage_options['success_rate'] / 2);
   $this_ability->damage_options['failure_rate'] = ceil($this_ability->damage_options['failure_rate'] * 2);
 }
@@ -370,7 +396,7 @@ if ($this_ability->ability_results['this_result'] == 'success'){
       $temp_amount_backup = $this_ability->ability_results['this_amount'];
 
       // If this robot's defense is at absolute zero, and the target's attack isnt, OHKO
-      if ($this->robot_defense <= 0 && $target_robot->robot_attack >= 1){
+      if ($this->robot_defense <= 0 && $target_robot_attack_start >= 1){
         // Set the new damage amount to OHKO this robot
         $temp_new_amount = $this->robot_base_energy;
         // DEBUG
@@ -379,26 +405,25 @@ if ($this_ability->ability_results['this_result'] == 'success'){
         $this_ability->ability_results['this_amount'] = $temp_new_amount;
       }
       // Elseif the target robot's attack is at absolute zero, and the this's defense isnt, NOKO
-      elseif ($target_robot->robot_attack <= 0 && $this->robot_defense >= 1){
+      elseif ($target_robot_attack_start <= 0 && $this->robot_defense >= 1){
         // Set the new damage amount to NOKO this robot
         $temp_new_amount = 0;
         // DEBUG
-        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break | A:'.$target_robot->robot_attack.' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
+        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break | A:'.$target_robot_attack_start.' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
         // Update the amount with the new calculation
         $this_ability->ability_results['this_amount'] = $temp_new_amount;
       }
       // Elseif this robot's defense is at absolute zero and the target's attack is too, NOKO
-      elseif ($this->robot_defense <= 0 && $target_robot->robot_attack <= 0){
+      elseif ($this->robot_defense <= 0 && $target_robot_attack_start <= 0){
         // Set the new damage amount to NOKO this robot
         $temp_new_amount = 0;
         // DEBUG
-        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break and '.$this->robot_token.'_defense_break | A:'.$target_robot->robot_attack.' D:'.$this->robot_defense.' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
+        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break and '.$this->robot_token.'_defense_break | A:'.$target_robot_attack_start.' D:'.$this->robot_defense.' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
         // Update the amount with the new calculation
         $this_ability->ability_results['this_amount'] = $temp_new_amount;
       }
       // Otherwise if both robots have normal stats, calculate the new amount normally
       else {
-
 
         // Check to make sure starforce is enabled right now
         $temp_starforce_enabled = true;
@@ -406,7 +431,7 @@ if ($this_ability->ability_results['this_result'] == 'success'){
         if (!empty($target_robot->player->counters['dark_elements'])){ $temp_starforce_enabled = false; }
 
         // Collect the target's attack stat and this robot's defense values
-        $target_robot_attack = $target_robot->robot_attack;
+        $target_robot_attack = $target_robot_attack_start;
         $this_robot_defense = $this->robot_defense;
         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | attack_vs_defense | A:'.$target_robot_attack.' vs. D:'.$this_robot_defense.' ');
 
@@ -676,7 +701,7 @@ if ($this_ability->ability_results['this_result'] == 'success'){
     if (!empty($this_ability->ability_results['flag_affinity'])){ $this_flag_string[] = 'affinity'; }
     if (!empty($this_ability->ability_results['flag_resistance'])){ $this_flag_string[] = 'resistance'; }
     if ($trigger_options['apply_modifiers'] != false && !$this_ability->damage_options['damage_percent']){
-    if (!empty($this_ability->ability_results['flag_critical'])){ $this_flag_string[] = 'critical'; }
+      if (!empty($this_ability->ability_results['flag_critical'])){ $this_flag_string[] = 'critical'; }
     }
   }
   $this_flag_name = (!empty($this_flag_string) ? implode('_', $this_flag_string).'_' : '').'text';
@@ -1030,7 +1055,6 @@ elseif ($this->robot_status != 'disabled'){
                 $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                 $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                 $temp_attachment->update_session();
-                //$this->trigger_damage($target_robot, $temp_attachment, 0, false);
                 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $this->trigger_target($target_robot, $temp_attachment, array('canvas_show_this_ability' => false, 'prevent_default_text' => true));
               }
