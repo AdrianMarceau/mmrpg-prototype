@@ -481,6 +481,7 @@ ob_start();
                   $robot_method_key = 0;
                   $robot_method = '';
                   $temp_global_abilities = array(
+                    'buster-shot', 'buster-charge', 'buster-relay',
                     'light-buster', 'wily-buster', 'cossack-buster',
                   	'energy-boost', 'attack-boost', 'defense-boost', 'speed-boost',
                   	'energy-break', 'attack-break', 'defense-break', 'speed-break',
@@ -536,14 +537,13 @@ ob_start();
                     $this_robot_title_html = '<span class="label">'.$this_robot_title_html.'</span>';
                     //$this_robot_title_html = (is_numeric($this_level) && $this_level > 1 ? 'Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).' : ' : $this_level.' : ').$this_robot_title_html;
                     if ($robot_method != $this_robot_method){
+                      if ($this_robot_method == 'level' && $ability_info['ability_token'] == 'buster-shot'){ continue; }
                       $temp_separator = '<div class="robot_separator">'.$this_robot_method_text.'</div>';
                       $temp_string[] = $temp_separator;
                       $robot_method = $this_robot_method;
                       $robot_method_key++;
                       // Print out the disclaimer if a global ability
-                      if ($this_robot_method == 'level' && $ability_info['ability_token'] == 'buster-shot'){
-                        $temp_string[] = '<div class="" style="margin: 10px auto; text-align: center; color: #767676; font-size: 11px;">'.$ability_info['ability_name'].' is known by <em>all</em> robot masters from the start!</div>';
-                      } elseif ($this_robot_method != 'level' && in_array($ability_info['ability_token'], $temp_global_abilities)){
+                      if (in_array($ability_info['ability_token'], $temp_global_abilities)){
                         $temp_string[] = '<div class="" style="margin: 10px auto; text-align: center; color: #767676; font-size: 11px;">'.$ability_info['ability_name'].' can be equipped by <em>any</em> robot master!</div>';
                       }
                     }
