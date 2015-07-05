@@ -7,11 +7,10 @@ $ability = array(
   'ability_group' => 'MM02/Weapons/013',
   'ability_master' => 'crash-man',
   'ability_number' => 'DWN-013',
-  'ability_description' => 'The user fires a small explosive that seeks out and latches onto the target, building power for two turns and then exploding to deal damage equal to {DAMAGE}% of the target\'s base life energy! Manually triggering this explosive early appears to increase its power...',
+  'ability_description' => 'The user fires a small explosive that seeks out and latches onto the target, building power two turns before exploding to deal massive damage to the target! Manually triggering this explosive early is possible but appears to decrease its power...',
   'ability_type' => 'explode',
   'ability_energy' => 4,
-  'ability_damage' => 16,
-  'ability_damage_percent' => true,
+  'ability_damage' => 40,
   'ability_target' => 'select_target',
   'ability_accuracy' => 96,
   'ability_function' => function($objects){
@@ -102,7 +101,7 @@ $ability = array(
         'kind' => 'energy',
         'trigger' => 'damage',
         'type' => $this_ability->ability_type,
-        'percent' => true,
+        'percent' => false,
         'modifiers' => true,
         'frame' => 'damage',
         'rates' => array(100, 0, 0),
@@ -111,10 +110,17 @@ $ability = array(
         'options' => array(
           'apply_modifiers' => true,
           'apply_type_modifiers' => true,
-          'apply_core_modifiers' => false,
+          'apply_core_modifiers' => true,
+          'apply_position_modifiers' => false,
           'apply_field_modifiers' => true,
-          'apply_stat_modifiers' => false,
-          'referred_damage' => true
+          'apply_stat_modifiers' => true,
+          'referred_damage' => true,
+          'referred_player' => array('player_token' => $this_player->player_token, 'player_id' => $this_player->player_id),
+          'referred_robot' => array('robot_token' => $this_robot->robot_token, 'robot_id' => $this_robot->robot_id),
+          'referred_energy' => $this_robot->robot_energy,
+          'referred_attack' => $this_robot->robot_attack,
+          'referred_defense' => $this_robot->robot_defense,
+          'referred_speed' => $this_robot->robot_speed
           )
         )
       );
@@ -130,16 +136,12 @@ $ability = array(
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
 
-      // Define the energy mod amount for this ability based on percent
-      $this_attachment_info['attachment_energy'] = ceil($target_robot->robot_base_energy * ($this_ability->ability_damage / 100));
-      // If this ability is being used by a CORE MATCH robot, increase the power
-      if (!empty($this_robot->robot_core) && $this_robot->robot_core == $this_ability->ability_type){ $this_attachment_info['attachment_energy'] = round($this_attachment_info['attachment_energy'] * MMRPG_SETTINGS_COREBOOST_MULTIPLIER); }
+      // Define the energy mod amount for this ability based on it's damage
+      $this_attachment_info['attachment_energy'] = $this_ability->ability_damage;
 
       // Decrease this robot's speed stat if the attachment does not already exist
       $this_ability->damage_options_update($this_attachment_info['attachment_create']);
       $this_ability->update_session();
-      //$energy_damage_amount = $this_attachment_info['attachment_energy'];
-      //$target_robot->trigger_damage($this_robot, $this_ability, 0);
 
       // Attach this ability attachment to the robot using it
       $target_robot->robot_frame = !$target_robot->has_immunity($this_ability->ability_type) ? 'damage' : 'defend';
@@ -172,7 +174,7 @@ $ability = array(
         $target_robot->update_session();
 
       }
-      // Else if the target robot has an IMMUNITY to the ability
+      // Else if the target robot has an AFFINITY to the ability
       elseif ($target_robot->has_affinity($this_ability->ability_type)){
 
         // Attach this ability attachment to the robot using it
@@ -183,7 +185,7 @@ $ability = array(
       }
 
     }
-    // Otherwise, if this ability has already been attached ot the target
+    // Otherwise, if this ability has already been attached to the target
     else {
 
       // Target the opposing robot
@@ -204,8 +206,11 @@ $ability = array(
       $this_ability->damage_options_update($this_attachment_info['attachment_destroy']);
       $this_ability->update_session();
 
-      // Collect the energy damage amount and double it for triggering early
-      $energy_damage_amount = round($this_attachment_info['attachment_energy'] * 2.0);
+      // Collect the energy damage amount and reduce it for triggering early
+      $energy_damage_amount = $this_attachment_info['attachment_duration'] > 0 ? round($this_attachment_info['attachment_energy'] / $this_attachment_info['attachment_duration']) : $this_attachment_info['attachment_energy'];
+
+      // Update the attachment options for the destroy and remove referred flag
+      // $this_attachment_info['attachment_destroy']['options']['referred_damage'] = false;
 
       // Now that we have the new amount, we can trigger the reduced damage
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, true, $this_attachment_info['attachment_destroy']['options']);
