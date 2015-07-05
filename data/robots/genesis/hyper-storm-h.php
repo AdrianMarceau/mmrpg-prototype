@@ -17,7 +17,7 @@ $robot = array(
   'robot_resistances' => array('impact'),
   'robot_abilities' => array(
   	'hyper-storm',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',

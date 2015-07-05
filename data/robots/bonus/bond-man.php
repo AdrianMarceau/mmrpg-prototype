@@ -17,7 +17,7 @@ $robot = array(
   'robot_resistances' => array('flame', 'freeze', 'water', 'electric'),
   'robot_abilities' => array(
   	'sticky-shot', 'sticky-bond',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
     'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
     'attack-break', 'defense-break', 'speed-break', 'energy-break',
     'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',

@@ -20,7 +20,7 @@ $robot = array(
   'robot_abilities' => array(
   	'sunstar-supernova',
     'spark-chaser', 'grab-buster', 'bubble-bomb', 'photon-missile', 'electric-shock', 'black-hole', 'deep-digger', 'salt-water', 'break-dash',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',

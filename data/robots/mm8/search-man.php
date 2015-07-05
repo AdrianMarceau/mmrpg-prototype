@@ -15,7 +15,7 @@ $robot = array(
   'robot_resistances' => array('nature', 'earth'),
   'robot_abilities' => array(
   	'homing-sniper',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-mode',

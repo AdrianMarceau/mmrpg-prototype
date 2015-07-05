@@ -15,7 +15,7 @@ $robot = array(
   'robot_immunities' => array('earth'),
   'robot_abilities' => array(
   	'tornado-hold', 'tengu-blade',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-mode',

@@ -23,7 +23,7 @@ $robot = array(
   'robot_resistances' => array('space', 'time', 'shadow'),
   'robot_abilities' => array(
   	'skull-barrier',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-mode',

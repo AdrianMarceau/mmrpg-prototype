@@ -16,7 +16,7 @@ $robot = array(
   'robot_weaknesses' => array('electric', 'cutter'),
   'robot_resistances' => array('impact', 'explode'),
   'robot_abilities' => array(
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-mode',

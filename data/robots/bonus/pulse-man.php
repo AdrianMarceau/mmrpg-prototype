@@ -17,7 +17,7 @@ $robot = array(
   'robot_resistances' => array('swift', 'shield', 'laser'),
   'robot_affinities' => array('electric'),
   'robot_abilities' => array(
-  	'buster-shot', 'volt-tackle',
+  	'buster-shot', 'buster-charge', 'volt-tackle',
   	'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-swap', 'speed-mode',

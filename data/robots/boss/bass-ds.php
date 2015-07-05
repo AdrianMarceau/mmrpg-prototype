@@ -20,7 +20,7 @@ $robot = array(
   'robot_affinities' => array('shadow'),
   'robot_immunities' => array('flame', 'space'),
   'robot_abilities' => array(
-    'buster-shot',
+    'buster-shot', 'buster-charge',
     'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
     'attack-break', 'defense-break', 'speed-break', 'energy-break',
     'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',

@@ -16,7 +16,7 @@ $robot = array(
   'robot_immunities' => array('water'),
   'robot_abilities' => array(
   	'water-shield',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-mode',

@@ -24,7 +24,7 @@ $robot = array(
   'robot_resistances' => array('cutter', 'freeze', 'flame'),
   'robot_abilities' => array(
   	'hard-knuckle',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-mode',

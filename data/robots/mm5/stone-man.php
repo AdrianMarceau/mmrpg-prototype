@@ -22,7 +22,7 @@ $robot = array(
   'robot_resistances' => array('swift', 'electric'),
   'robot_abilities' => array(
   	'power-stone',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-mode',

@@ -23,7 +23,7 @@ $robot = array(
   'robot_affinities' => array('wind'),
   'robot_abilities' => array(
   	'air-shooter',
-  	'buster-shot',
+  	'buster-shot', 'buster-charge',
   	'attack-boost', 'attack-break', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-mode',
