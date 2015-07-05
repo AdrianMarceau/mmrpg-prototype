@@ -3,7 +3,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // -- DR. LIGHT MENU OPTIONS -- //
 
-// Define the robot options and counter for this mode
+// Define the robot options and counter for Dr. Light mode
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_prototype_data['this_player_token'] = 'dr-light';
 $this_prototype_data['this_player_field'] = 'light-laboratory';
@@ -90,7 +90,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Require the PASSWORDS file for this player
 if (!defined('MMRPG_SCRIPT_REQUEST')){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  //require_once('prototype_'.$this_prototype_data['this_player_token'].'_passwords.php');
   require('prototype_dr-xxx_passwords.php');
 }
 
@@ -103,7 +102,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Require the MISSIONS file for this player
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require('prototype_dr-xxx_missions.php');
-//die('<pre>checkpoint 8 i guess? : ---</pre>');
 
 // DEBUG DEBUG DEBUG
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -117,9 +115,9 @@ if (empty($_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].
       unset($this_prototype_data['robot_options'][$key]);
     } else {
       $temp_settings = mmrpg_prototype_robot_settings($this_prototype_data['this_player_token'], $info['robot_token']);
-      //die(print_r($temp_settings, true));
       $this_prototype_data['robot_options'][$key]['original_player'] = !empty($temp_settings['original_player']) ? $temp_settings['original_player'] : $this_prototype_data['this_player_token'];
       $this_prototype_data['robot_options'][$key]['robot_abilities'] = !empty($temp_settings['robot_abilities']) ? $temp_settings['robot_abilities'] : array();
+      $this_prototype_data['robot_options'][$key]['robot_item'] = !empty($temp_settings['robot_item']) ? $temp_settings['robot_item'] : '';
     }
   }
   $this_prototype_data['robot_options'] = array_values($this_prototype_data['robot_options']);
@@ -154,5 +152,4 @@ unset($this_prototype_data);
 
 // DEBUG DEBUG DEBUG
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-//die('OMG THIS IS GAY LIGHT '.time());
 ?>
