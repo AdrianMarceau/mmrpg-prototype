@@ -434,8 +434,13 @@
 }
 
 
+#edit #console .event .event_robot_images span.robot_image_alts {
+  cursor: default;
+  display: block;
+}
 #edit #console .event .event_robot_images a.robot_image_alts {
   cursor: pointer;
+  display: block;
 }
 
 #edit #console .event .event_robot_images .sprite_wrapper .token {

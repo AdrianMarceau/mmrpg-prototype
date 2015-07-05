@@ -618,6 +618,11 @@ $(document).ready(function(){
     // Collect referneces to the target objects
     var targetRobotEvent = $('.event[data-player='+targetPlayerToken+'][data-robot='+targetRobotToken+']', gameConsole);
     var targetItemLink = $('.item_name', targetRobotEvent);
+    var targetRobotCores = targetRobotEvent.attr('data-types');
+    
+    // Collect the target robot's core type(s)
+    if (targetRobotCores.match(',')){ targetRobotCores = targetRobotCores.split(','); }
+    else { targetRobotCores = [targetRobotCores]; }
     
     // Collect references to this new item link
     var thisItemLink = $(this);
@@ -695,6 +700,18 @@ $(document).ready(function(){
             // Clone the inner html into the target item link
             targetItemLink.html(thisItemLink.html()).find('.count').remove();
             
+            // Check if the item token was a robot core
+            if (thisItemToken.match(/^item-core-/i)){
+              // Collect the held item's core type for later
+              var thisCoreType = thisItemToken.replace(/^item-core-/i, '');
+              // If the target robot is a copy core, change alts
+              if (targetRobotCores.indexOf('copy') != -1){
+                // Collect the new image name (core type) and trigger function
+                var newImageToken = thisCoreType;
+                updateRobotImageAlt(targetPlayerToken, targetRobotToken, newImageToken);
+                }
+              }
+            
             }
           // Otherwise if this was an item remove option, clear stuff
           else {
@@ -708,6 +725,13 @@ $(document).ready(function(){
             targetItemLink.attr('data-tooltip', '');            
             // Remove the label text and replace with empty hyphen
             targetItemLink.find('label').attr('style', '').html('No Item <span class="arrow">&#8711;</span>');
+            
+            // If the target robot is a copy core, change alts
+            if (targetRobotCores.indexOf('copy') != -1){
+              // Define the new image name (base) and trigger function
+              var newImageToken = 'base';
+              updateRobotImageAlt(targetPlayerToken, targetRobotToken, newImageToken);
+              }
             
             }
           
@@ -758,8 +782,7 @@ $(document).ready(function(){
           }
         
         thisBody.removeClass('loading');
-        targetItemLink.trigger('click');
-      
+        targetItemLink.trigger('click');      
                  
         }
       });
@@ -806,140 +829,18 @@ $(document).ready(function(){
     // If we're already animating, return false
     if (thisSprite.is(':animated')){ return false; }
     
-    // Collect all relevant sprites based on the above info from both the console and canvas areas
-    var thisConsoleSprites = $('.event_visible[data-token='+thisPlayerToken+'_'+thisRobotToken+'] .sprite_robot', gameConsole);    
-    var thisCanvasSprites = $('.robot_canvas .sprite_robot[data-token='+thisPlayerToken+'_'+thisRobotToken+']', gameCanvas);
-    
-    // DEBUG
-    //console.log('robot image alt switch!  :D');
-    
-    // Collect the size of the clicked robot sprite and use it to generate classes
-    var robotSize = thisSprite.hasClass('.sprite_80x80') ? 80 : 40;
-    var robotSizeText = robotSize+'x'+robotSize;
-    var robotSizeClass = '.sprite_'+robotSizeText;
-    
     // Collect the alternate skin/image index for this robot, break it down, and find our positions
     var robotImageIndex = thisLink.attr('data-alt-index') != undefined ? thisLink.attr('data-alt-index') : 'base';
     robotImageIndex = robotImageIndex.match(',') ? robotImageIndex.split(',') : [robotImageIndex];
     var thisCurrentImageToken = thisLink.attr('data-alt-current') != undefined ? thisLink.attr('data-alt-current') : 'base';
     var thisCurrentImageIndex = robotImageIndex.indexOf(thisCurrentImageToken);
-    var thisCurrentFilePath = '/'+thisRobotToken+(thisCurrentImageToken != 'base' ? '_'+thisCurrentImageToken : '')+'/';
     
     // Generate the index key and file path for the skin/image we'll be switching to
     var newImageIndex = thisCurrentImageIndex + 1;
     if (newImageIndex >= robotImageIndex.length){ newImageIndex = 0; }
-    var newImageToken = robotImageIndex[newImageIndex];
-    var newFilePath = '/'+thisRobotToken+(newImageToken != 'base' ? '_'+newImageToken : '')+'/';
+    var newImageToken = robotImageIndex[newImageIndex];  
     
-    // Collect the background image for this sprite and generate the new path
-    var thisCurrentBackgroundImage = thisSprite.css('background-image');
-    var newBackgroundImage = thisCurrentBackgroundImage.replace(thisCurrentFilePath, newFilePath);
-    // Start preloading the new sprite sheet and mugshot images
-    var preloadImages = {sprite:false,mugshot:false};
-    var newSpritePath = newBackgroundImage.replace(/^url\("?([^\)\(]+)"?\)$/i, '$1');
-    preloadImages.sprite = new Image();
-    preloadImages.sprite.src = newSpritePath;
-    var newMugPath = newSpritePath.replace('sprite_', 'mug_');
-    preloadImages.mugshot = new Image();
-    preloadImages.mugshot.src = newMugPath;
-    
-    // Update this robot to its victory frame so it's ready for switching
-    updateSpriteFrame(thisSprite, 'victory');    
-
-    // DEBUG
-    //console.log({robotSize:robotSize,robotSizeText:robotSizeText,robotSizeClass:robotSizeClass});
-    //console.log({robotImageIndex:robotImageIndex,thisCurrentImageToken:thisCurrentImageToken,thisCurrentImageIndex:thisCurrentImageIndex,thisCurrentFilePath:thisCurrentFilePath});
-    //console.log({newImageIndex:newImageIndex,newImageToken:newImageToken,newFilePath:newFilePath});
-    //console.log({thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});       
-    
-    // Define a function for when all the background sprites have been updates
-    var afterBackgroundUpdateComplete = function(nextGroup){
-      //console.log('backgrounds have finished switching');                        
-      if (nextGroup != undefined){
-        // We still have to update the mugshot images and tokens
-        //console.log('nextGroup provided, updating tokens and then mugshot background images');
-        $('.token', thisLink).removeClass('token_active');
-        $('.token', thisLink).eq(newImageIndex).addClass('token_active');
-        nextGroup.each(function(){ updateBackgroundImageFunction($(this)); });           
-        } else {
-        //console.log('nextGroup undefined, updating server with new choice');
-  
-        // Post this change back to the server
-        var postData = {action:'altimage',robot:thisRobotToken,player:thisPlayerToken,image:newImageToken};
-        $.ajax({
-          type: 'POST',
-          url: 'frames/edit_robots.php',
-          data: postData,
-          success: function(data, status){        
-            // DEBUG
-            //alert(data);            
-            // Break apart the response into parts
-            var data = data.split('|');
-            var dataStatus = data[0] != undefined ? data[0] : false;
-            var dataMessage = data[1] != undefined ? data[1] : false;
-            var dataContent = data[2] != undefined ? data[2] : false;            
-            // DEBUG
-            //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+',\n dataContent = '+dataContent+'; ');
-            //console.log(data);
-            //console.log('dataStatus:'+dataStatus);
-            //console.log('dataMessage:'+dataMessage);   
-            //console.log('dataContent:'+dataContent);            
-            // If the ability change was a success, flash the box green
-            if (dataStatus == 'success'){                            
-              //console.log('success! this robot alt image has been updated');
-              //console.log(data);                 
-              return true;              
-              }   
-            
-    
-            // Hide the overlay to allow using the robot again
-            return true;
-            
-            }
-          });        
-        
-        
-        }  
-      };
-    
-    // Define a function for updating the backgrounds images of all relevant sprites
-    var updateBackgroundTimeout = false;
-    var updateBackgroundImageFunction = function(thisSprite, nextGroup){
-      var thisParent = thisSprite.parent();
-      var thisCurrentBackgroundImage = thisSprite.css('background-image');
-      var newBackgroundImage = thisCurrentBackgroundImage.replace(thisCurrentFilePath, newFilePath);
-      //console.log({thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});      
-      
-      // If this sprite's parent element was a wrapper
-      if (thisParent.is('.sprite_wrapper')){
-        //console.log('parent wrapper was a sprite link');
-        thisSprite.css({zIndex:1});
-        var cloneSprite = thisSprite.clone();
-        cloneSprite.css({backgroundImage:newBackgroundImage,opacity:0,zIndex:100});
-        cloneSprite.appendTo(thisParent);
-        cloneSprite.animate({opacity:1},{duration:1000,easing:'swing',queue:false,complete:function(){ 
-          //console.log('animation complete');
-          thisSprite.remove();          
-          updateSpriteFrame(cloneSprite, 'base');
-          }});
-        }
-      // Otherwise, just swap the image
-      else {
-        //console.log('parent wrapper was something else '+thisParent.attr('class'));
-        thisSprite.css({backgroundImage:newBackgroundImage});
-        updateSpriteFrame(thisSprite);  
-        }        
-                  
-      clearTimeout(updateBackgroundTimeout);
-      updateBackgroundTimeout = setTimeout(function(){ afterBackgroundUpdateComplete(nextGroup); }, 1100);
-      
-      
-      };
-      
-    thisLink.attr('data-alt-current', newImageToken);
-    thisConsoleSprites.each(function(){ return updateBackgroundImageFunction($(this), thisCanvasSprites); });
-    
-    return true;
+    return updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken);
     
     });
   
@@ -1157,17 +1058,6 @@ function windowResizeFrame(){
 
 }
 
-// Define a function for swapping the frame of a sprite
-function updateSpriteFrame(thisSprite, newFrame){
-  //console.log('updateSpriteFrame(thisSprite, '+newFrame+')');  
-  thisSprite.attr('class', function(index,classes){
-    //console.log('thisSprite.attr(class, function('+index+','+classes+')');
-    var newClasses = classes.replace(/(^|\s)(sprite_[0-9]+x[0-9]+_)([a-z0-9]+)(\s|$)/i, '$1$2'+newFrame+'$4'); 
-    //console.log('classes.replace($1$2'+newFrame+'$4) | newClasses =  '+newClasses);
-    return newClasses;
-    });  
-}
-
 // Define an initialization function to run when document ready
 function robotEditorCanvasInit(){
 
@@ -1264,6 +1154,166 @@ function robotEditorCanvasInit(){
   thisItemCanvas.addClass('hidden');
   loadCanvasItemsMarkup();
   
+}
+
+
+//Define a function for changing a robot's image (to an alt, for example)
+function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
+  //console.log('updateRobotImageAlt('+thisPlayerToken+', '+thisRobotToken+', '+newImageToken+');');
+
+  // Collect references to the editor objects and player/robot tokens
+  var thisLink = $('.robot_image_alts[data-player='+thisPlayerToken+'][data-robot='+thisRobotToken+']', gameConsole);
+  var thisSprite = thisLink.find('.sprite_robot');
+  
+  // If we're already animating, return false
+  if (thisSprite.is(':animated')){ return false; }
+  
+  // Collect all relevant sprites based on the above info from both the console and canvas areas
+  var thisConsoleSprites = $('.event_visible[data-token='+thisPlayerToken+'_'+thisRobotToken+'] .sprite_robot', gameConsole);    
+  var thisCanvasSprites = $('.robot_canvas .sprite_robot[data-token='+thisPlayerToken+'_'+thisRobotToken+']', gameCanvas);
+  
+  // DEBUG
+  //console.log('robot image alt switch!  :D');
+  
+  // Collect the size of the clicked robot sprite and use it to generate classes
+  var robotSize = thisSprite.hasClass('.sprite_80x80') ? 80 : 40;
+  var robotSizeText = robotSize+'x'+robotSize;
+  var robotSizeClass = '.sprite_'+robotSizeText;
+  
+  // Collect the alternate skin/image index for this robot, break it down, and find our positions
+  var robotImageIndex = thisLink.attr('data-alt-index') != undefined ? thisLink.attr('data-alt-index') : 'base';
+  robotImageIndex = robotImageIndex.match(',') ? robotImageIndex.split(',') : [robotImageIndex];
+  var thisCurrentImageToken = thisLink.attr('data-alt-current') != undefined ? thisLink.attr('data-alt-current') : 'base';
+  var thisCurrentImageIndex = robotImageIndex.indexOf(thisCurrentImageToken);
+  var thisCurrentFilePath = '/'+thisRobotToken+(thisCurrentImageToken != 'base' ? '_'+thisCurrentImageToken : '')+'/';
+  
+  // Generate the index key and file path for the skin/image we'll be switching to
+  var newImageIndex = robotImageIndex.indexOf(newImageToken);
+  var newFilePath = '/'+thisRobotToken+(newImageToken != 'base' ? '_'+newImageToken : '')+'/';
+  
+  // Collect the background image for this sprite and generate the new path
+  var thisCurrentBackgroundImage = thisSprite.css('background-image');
+  var newBackgroundImage = thisCurrentBackgroundImage.replace(thisCurrentFilePath, newFilePath);
+  // Start preloading the new sprite sheet and mugshot images
+  var preloadImages = {sprite:false,mugshot:false};
+  var newSpritePath = newBackgroundImage.replace(/^url\("?([^\)\(]+)"?\)$/i, '$1');
+  preloadImages.sprite = new Image();
+  preloadImages.sprite.src = newSpritePath;
+  var newMugPath = newSpritePath.replace('sprite_', 'mug_');
+  preloadImages.mugshot = new Image();
+  preloadImages.mugshot.src = newMugPath;
+  
+  // Update this robot to its victory frame so it's ready for switching
+  updateSpriteFrame(thisSprite, 'victory');    
+  
+  // DEBUG
+  //console.log({robotSize:robotSize,robotSizeText:robotSizeText,robotSizeClass:robotSizeClass});
+  //console.log({robotImageIndex:robotImageIndex,thisCurrentImageToken:thisCurrentImageToken,thisCurrentImageIndex:thisCurrentImageIndex,thisCurrentFilePath:thisCurrentFilePath});
+  //console.log({newImageIndex:newImageIndex,newImageToken:newImageToken,newFilePath:newFilePath});
+  //console.log({thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});       
+  
+  // Define a function for when all the background sprites have been updated
+  var afterBackgroundUpdateComplete = function(nextGroup){
+   //console.log('backgrounds have finished switching');                        
+   if (nextGroup != undefined){
+     // We still have to update the mugshot images and tokens
+     //console.log('nextGroup provided, updating tokens and then mugshot background images');
+     if (newImageIndex != -1){
+       $('.token', thisLink).removeClass('token_active');
+       $('.token', thisLink).eq(newImageIndex).addClass('token_active');       
+       }
+     nextGroup.each(function(){ updateBackgroundImageFunction($(this)); });           
+     } else {
+     //console.log('nextGroup undefined, updating server with new choice');
+  
+     // Post this change back to the server
+     var postData = {action:'altimage',robot:thisRobotToken,player:thisPlayerToken,image:newImageToken};
+     $.ajax({
+       type: 'POST',
+       url: 'frames/edit_robots.php',
+       data: postData,
+       success: function(data, status){        
+         // DEBUG
+         //alert(data);            
+         // Break apart the response into parts
+         var data = data.split('|');
+         var dataStatus = data[0] != undefined ? data[0] : false;
+         var dataMessage = data[1] != undefined ? data[1] : false;
+         var dataContent = data[2] != undefined ? data[2] : false;            
+         // DEBUG
+         //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+',\n dataContent = '+dataContent+'; ');
+         //console.log(data);
+         //console.log('dataStatus:'+dataStatus);
+         //console.log('dataMessage:'+dataMessage);   
+         //console.log('dataContent:'+dataContent);            
+         // If the ability change was a success, flash the box green
+         if (dataStatus == 'success'){                            
+           //console.log('success! this robot alt image has been updated');
+           //console.log(data);                 
+           return true;              
+           }   
+         
+  
+         // Hide the overlay to allow using the robot again
+         return true;
+         
+         }
+       });        
+     
+     
+     }  
+   };
+  
+  // Define a function for updating the backgrounds images of all relevant sprites
+  var updateBackgroundTimeout = false;
+  var updateBackgroundImageFunction = function(thisSprite, nextGroup){
+   var thisParent = thisSprite.parent();
+   var thisCurrentBackgroundImage = thisSprite.css('background-image');
+   var newBackgroundImage = thisCurrentBackgroundImage.replace(thisCurrentFilePath, newFilePath);
+   //console.log({thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});      
+   
+   // If this sprite's parent element was a wrapper
+   if (thisParent.is('.sprite_wrapper')){
+     //console.log('parent wrapper was a sprite link');
+     thisSprite.css({zIndex:1});
+     var cloneSprite = thisSprite.clone();
+     cloneSprite.css({backgroundImage:newBackgroundImage,opacity:0,zIndex:100});
+     cloneSprite.appendTo(thisParent);
+     cloneSprite.animate({opacity:1},{duration:1000,easing:'swing',queue:false,complete:function(){ 
+       //console.log('animation complete');
+       thisSprite.remove();          
+       updateSpriteFrame(cloneSprite, 'base');
+       }});
+     }
+   // Otherwise, just swap the image
+   else {
+     //console.log('parent wrapper was something else '+thisParent.attr('class'));
+     thisSprite.css({backgroundImage:newBackgroundImage});
+     updateSpriteFrame(thisSprite);  
+     }        
+               
+   clearTimeout(updateBackgroundTimeout);
+   updateBackgroundTimeout = setTimeout(function(){ afterBackgroundUpdateComplete(nextGroup); }, 1100);
+   
+   
+   };
+   
+  thisLink.attr('data-alt-current', newImageToken);
+  thisConsoleSprites.each(function(){ return updateBackgroundImageFunction($(this), thisCanvasSprites); });
+  
+  return true;
+
+}
+
+//Define a function for swapping the frame of a sprite
+function updateSpriteFrame(thisSprite, newFrame){
+  //console.log('updateSpriteFrame(thisSprite, '+newFrame+')');  
+  thisSprite.attr('class', function(index,classes){
+   //console.log('thisSprite.attr(class, function('+index+','+classes+')');
+   var newClasses = classes.replace(/(^|\s)(sprite_[0-9]+x[0-9]+_)([a-z0-9]+)(\s|$)/i, '$1$2'+newFrame+'$4'); 
+   //console.log('classes.replace($1$2'+newFrame+'$4) | newClasses =  '+newClasses);
+   return newClasses;
+   });  
 }
 
 //Define a function to trigger when a robot drag has started
