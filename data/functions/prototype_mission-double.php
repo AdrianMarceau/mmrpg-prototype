@@ -307,10 +307,9 @@ if (true){
         // This robot should also have more stats than usual, so let's give 'em more
         $temp_stat_reward_boost = 2.0;
       }
-      // If the defined robot image does not actually exist, replace with placeholder robot sprite
+      // If the defined robot image does not actually exist, replace with placeholder base sprite
       if (isset($info['robot_image']) && !file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$info['robot_image'].'/')){
-        $info['robot_image'] = 'robot';
-        $info['robot_image_size'] = 40;
+        $info['robot_image'] = $info['robot_token'];
       }
 
     }
