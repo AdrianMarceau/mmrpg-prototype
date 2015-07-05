@@ -7,10 +7,10 @@ $ability = array(
   'ability_group' => 'MM04/Weapons/027',
   'ability_master' => 'drill-man',
   'ability_number' => 'DCN-027',
-  'ability_description' => 'The user fires a series of sharp drills at any target to pierce their immunities and deal massive damage!',
+  'ability_description' => 'The user generates a series of sharp drills that rush toward the target to deal massive damage, ignoring both resistance and immunity!',
   'ability_type' => 'earth',
   'ability_energy' => 4,
-  'ability_damage' => 9,
+  'ability_damage' => 10,
   'ability_accuracy' => 90,
   'ability_target' => 'select_target',
   'ability_function' => function($objects){
@@ -58,14 +58,22 @@ $ability = array(
       'kind' => 'energy',
       'kickback' => array(5, 0, 0),
       'success' => array(1, -80, -25, 10, 'A drill hit!'),
-      'failure' => array(1, -100, -25, -10, 'One of the drills missed!')
+      'failure' => array(1, -100, -25, -10, 'One of the drills missed!'),
+      'options' => array(
+        'apply_resistance_modifiers' => false,
+        'apply_immunity_modifiers' => false,
+        )
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(0, 0, 0),
       'success' => array(1, -80, -25, 10, 'A drill was absorbed!'),
-      'failure' => array(1, -100, -25, -10, 'One of the drills missed!')
+      'failure' => array(1, -100, -25, -10, 'One of the drills missed!'),
+      'options' => array(
+        'apply_resistance_modifiers' => false,
+        'apply_immunity_modifiers' => false,
+        )
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
