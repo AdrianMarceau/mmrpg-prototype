@@ -65,8 +65,12 @@ ob_start();
         $temp_robot_title = $temp_robot->robot_name.'  (Lv. '.$temp_robot->robot_level.')';
         //$temp_robot_title .= ' | '.$temp_robot->robot_id.'';
         $temp_robot_title .= ' <br />'.(!empty($temp_robot->robot_core) ? ucfirst($temp_robot->robot_core).' Core' : 'Neutral Core').' | '.ucfirst($temp_robot->robot_position).' Position';
+        // Display the robot's item if it exists
+        if (!empty($temp_robot->robot_item)){ $temp_robot_title .= ' | + '.$temp_abilities_index[$temp_robot->robot_item]['ability_name'].' '; }
+        // Display the robot's life and weapon energy current and base
         $temp_robot_title .= ' <br />'.$temp_robot->robot_energy.' / '.$temp_robot->robot_base_energy.' LE';
         $temp_robot_title .= ' | '.$temp_robot->robot_weapons.' / '.$temp_robot->robot_base_weapons.' WE';
+        // Display the robot's experience points if on the player side
         $temp_required_experience = mmrpg_prototype_calculate_experience_required($temp_robot->robot_level);
         if ($robot_direction == 'right' && $temp_robot->robot_class != 'mecha'){
           $temp_robot_title .= ' | '.$temp_robot->robot_experience.' / '.$temp_required_experience.' EXP';
@@ -92,6 +96,14 @@ ob_start();
         // Encode the tooltip for markup insertion and create a plain one too
         $temp_robot_title_plain = strip_tags(str_replace('<br />', '//', $temp_robot_title));
         $temp_robot_title_tooltip = htmlentities($temp_robot_title, ENT_QUOTES, 'UTF-8');
+
+        // Collect the robot's core types for display
+        $temp_robot_core_type = !empty($temp_robot->robot_core) ? $temp_robot->robot_core : 'none';
+        $temp_robot_core2_type = !empty($temp_robot->robot_core2) ? $temp_robot->robot_core2 : '';
+        if (!empty($temp_robot->robot_item) && preg_match('/^item-core-/', $temp_robot->robot_item)){
+          $temp_item_core_type = preg_replace('/^item-core-/', '', $temp_robot->robot_item);
+          if (empty($temp_robot_core2_type)){ $temp_robot_core2_type = $temp_item_core_type; }
+        }
 
         // Define the robot button text variables
         $temp_robot_label = '<span class="multi">';
@@ -131,7 +143,7 @@ ob_start();
         $temp_order_counter += $allow_button ? 1 : 0;
         // Now use the new object to generate a snapshot of this switch button
         /*?><a <?=$order_button_markup?> title="<?=$temp_robot_title_plain?>" data-tooltip="<?=$temp_robot_title_tooltip?>" class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_switch switch_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= !empty($temp_robot->robot_core) ? $temp_robot->robot_core : 'none' ?> block_<?= $robot_key + 1 ?>" type="button" <?if($allow_button):?>data-action="switch_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?*/
-        ?><a <?= $order_button_markup ?> data-key="<?= $temp_robot->robot_key ?>" data-tooltip="<?= $temp_robot_title_tooltip ?>" class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_switch switch_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= !empty($temp_robot->robot_core) ? $temp_robot->robot_core : 'none' ?> block_<?= $robot_key + 1 ?>" type="button" <?if($allow_button):?>data-action="switch_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?
+        ?><a <?= $order_button_markup ?> data-key="<?= $temp_robot->robot_key ?>" data-tooltip="<?= $temp_robot_title_tooltip ?>" class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_switch switch_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= $temp_robot_core_type.(!empty($temp_robot_core2_type) ? '_'.$temp_robot_core2_type : '') ?> block_<?= $robot_key + 1 ?>" type="button" <?if($allow_button):?>data-action="switch_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?
       }
     }
     // If there were less than 8 robots, fill in the empty spaces
