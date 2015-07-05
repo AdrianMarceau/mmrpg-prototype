@@ -31,7 +31,8 @@ $ability = array(
       'kind' => 'energy',
       'kickback' => array(15, 5, 0),
       'success' => array(0, $temp_offset, 0, 10, 'The '.$this_ability->print_ability_name().' burned through the target!'),
-      'failure' => array(0, ($temp_offset - 50), 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'failure' => array(0, ($temp_offset - 50), 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;'),
+      'options' => array('apply_position_modifiers' => false)
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
@@ -39,7 +40,8 @@ $ability = array(
       'frame' => 'taunt',
       'kickback' => array(5, 0, 0),
       'success' => array(0, $temp_offset, 0, 10, 'The '.$this_ability->print_ability_name().' energy was absorbed by the target!'),
-      'failure' => array(0, ($temp_offset - 50), 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'failure' => array(0, ($temp_offset - 50), 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;'),
+      'options' => array('apply_position_modifiers' => false)
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
@@ -64,12 +66,14 @@ $ability = array(
         $this_ability->damage_options_update(array(
           'kickback' => array($temp_kickback, 0, 0),
           'success' => array($temp_frame, $temp_offset, 0, 10, 'The '.$this_ability->print_ability_name().' burned through the target!'),
-          'failure' => array($temp_frame, ($temp_offset * 2), 0, 10, '')
+          'failure' => array($temp_frame, ($temp_offset * 2), 0, 10, ''),
+          'options' => array('apply_position_modifiers' => false)
           ));
         $this_ability->recovery_options_update(array(
           'kickback' => array($temp_kickback, 0, 0),
           'success' => array($temp_frame, $temp_offset, 0, 10, 'The '.$this_ability->print_ability_name().'&#39;s energy was absorbed by the target!'),
-          'failure' => array($temp_frame, $temp_offset * 2, 0, 10, '')
+          'failure' => array($temp_frame, $temp_offset * 2, 0, 10, ''),
+          'options' => array('apply_position_modifiers' => false)
           ));
         //$energy_damage_amount = ceil($this_ability->ability_damage / ($key + 2));
         $energy_damage_amount = ceil($this_ability->ability_damage / ($target_robot->robot_key + 2));
