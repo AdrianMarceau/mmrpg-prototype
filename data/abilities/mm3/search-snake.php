@@ -7,7 +7,7 @@ $ability = array(
   'ability_group' => 'MM03/Weapons/022',
   'ability_master' => 'snake-man',
   'ability_number' => 'DWN-022',
-  'ability_description' => 'The user fires a series of three remote-controlled snake robots that seek out any target to deal damage with perfect accuracy!',
+  'ability_description' => 'The user fires a series of three remote-controlled snake robots that seek out any target to deal damage unaffected by distance and with perfect accuracy!',
   'ability_type' => 'nature',
   'ability_energy' => 4,
   'ability_speed' => 2,
@@ -51,14 +51,16 @@ $ability = array(
       'kind' => 'energy',
       'kickback' => array(10, 0, 0),
       'success' => array(1, -45, 0, 10, 'The '.$this_ability->print_ability_name().' collided with the target!'),
-      'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_ability_name().' slithered past the target&hellip;')
+      'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_ability_name().' slithered past the target&hellip;'),
+      'options' => array('apply_position_modifiers' => false)
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(10, 0, 0),
       'success' => array(1, -45, 0, 10, 'The '.$this_ability->print_ability_name().' healed the target!'),
-      'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_ability_name().' slithered past the target&hellip;')
+      'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_ability_name().' slithered past the target&hellip;'),
+      'options' => array('apply_position_modifiers' => false)
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
@@ -89,14 +91,16 @@ $ability = array(
         'kind' => 'energy',
         'kickback' => array(10, 0, 0),
         'success' => array(1, -40, 5, 10, $success_text),
-        'failure' => array(1, -60, 5, -10, $failure_text)
+        'failure' => array(1, -60, 5, -10, $failure_text),
+        'options' => array('apply_position_modifiers' => false)
         ));
       $this_ability->recovery_options_update(array(
         'kind' => 'energy',
         'frame' => 'taunt',
         'kickback' => array(0, 0, 0),
         'success' => array(1, -40, 5, 10, $success_text),
-        'failure' => array(1, -60, 5, -10, $failure_text)
+        'failure' => array(1, -60, 5, -10, $failure_text),
+        'options' => array('apply_position_modifiers' => false)
         ));
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
@@ -120,14 +124,16 @@ $ability = array(
           'kind' => 'energy',
           'kickback' => array(15, 0, 0),
           'success' => array(1, -70, 5, 10, $success_text),
-          'failure' => array(1, -90, 5, -10, $failure_text)
+          'failure' => array(1, -90, 5, -10, $failure_text),
+          'options' => array('apply_position_modifiers' => false)
           ));
         $this_ability->recovery_options_update(array(
           'kind' => 'energy',
           'frame' => 'taunt',
           'kickback' => array(0, 0, 0),
           'success' => array(1, -70, 5, 10, $success_text),
-          'failure' => array(1, -90, 5, -10, $failure_text)
+          'failure' => array(1, -90, 5, -10, $failure_text),
+          'options' => array('apply_position_modifiers' => false)
           ));
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
