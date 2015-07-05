@@ -49,7 +49,7 @@ ob_start();
     $temp_robotinfo = $temp_robots_index[$this_robot->robot_token];
     $temp_robotinfo = mmrpg_robot::parse_index_info($temp_robotinfo);
     if ($temp_robotinfo['robot_core'] != $this_robot->robot_core){ $temp_robotinfo['robot_core'] = $this_robot->robot_core; }
-    $temp_robotinfo['robot_core2'] = preg_match('/^item-core-/i', $current_robot_item) ? preg_replace('/^item-core-/i', $current_robot_item) : '';
+    $temp_robotinfo['robot_core2'] = preg_match('/^item-core-/i', $current_robot_item) ? preg_replace('/^item-core-/i', '', $current_robot_item) : '';
     if ($temp_robotinfo['robot_core2'] == 'none'){ $temp_robotinfo['robot_core2'] = ''; }
     //if (empty($temp_abilities_index)){ $temp_abilities_index = array(); }
     // Loop through each ability and display its button
