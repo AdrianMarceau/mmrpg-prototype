@@ -8,28 +8,18 @@ $ability = array(
   'ability_master' => 'guts-man',
   'ability_number' => 'DLN-004',
   'ability_image_sheets' => 8,
-  'ability_description' => 'The user creates a blockade using the surrounding environment to bolster shields and reduce all damage by 25%!  The blockade can also be thrown at the target for massive damage!',
+  'ability_description' => 'The user creates a blockade using the surrounding environment to bolster shields and reduce damage by {RECOVERY2}%!  The blockade can also be thrown at the target to deal massive damage!',
   'ability_type' => 'impact',
   'ability_type2' => 'shield',
   'ability_energy' => 8,
-  'ability_damage' => 30,
-  'ability_accuracy' => 95,
+  'ability_damage' => 36,
+  'ability_recovery2' => 40,
+  'ability_recovery2_percent' => true,
+  'ability_accuracy' => 92,
   'ability_function' => function($objects){
 
     // Extract all objects into the current scope
     extract($objects);
-
-    /*
-    // Define the sprite sheet index for the fields for internal reference
-    Sheet 1 : field, intro-field, wily-castle/light-laboratory/cossack-citadel, final-destination, prototype-complete
-    Sheet 2 : mountain-mines, arctic-jungle, steel-mill, electrical-tower, abandoned-warehouse
-    Sheet 3 : oil-wells, clock-citadel, orb-city, pipe-station, atomic-furnace
-    Sheet 4 : industrial-facility, underground-laboratory, preserved-forest, photon-collider, waterfall-institute
-    Sheet 5 : sky-ridge, mineral-quarry,
-    Sheet 6 :
-    Sheet 7 :
-    Sheet 8 :
-     */
 
     // Define the sprite sheet and animation defaults
     $this_field_token = $this_battle->battle_field->field_background;
@@ -37,7 +27,7 @@ $ability = array(
     $this_target_frame = 0;
     $this_impact_frame = 1;
     $this_object_name = 'boulder';
-    $this_object_weaknesses = array('explode');
+    $this_object_weaknesses = array('explode', 'impact');
 
     // Define the sprite sheets and the stages they contain
     $this_sprite_index = !empty($this_ability->values['this_sprite_index']) ? $this_ability->values['this_sprite_index'] : array();
@@ -60,7 +50,7 @@ $ability = array(
       'ability_image' => 'super-arm'.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : ''),
       'attachment_sticky' => true,
       //'attachment_duration' => 3,
-      'attachment_damage_breaker' => 0.75,
+      'attachment_damage_breaker' => ((100 - $this_ability->ability_recovery2) / 100),
       'attachment_defense' => 0,
     	'attachment_weaknesses' => $this_object_weaknesses,
     	'attachment_create' => array(

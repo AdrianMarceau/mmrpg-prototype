@@ -7,12 +7,15 @@ $ability = array(
   'ability_group' => 'MM02/Weapons/016',
   'ability_master' => 'wood-man',
   'ability_number' => 'DWN-016',
-  'ability_description' => 'The user surrounds itself with sharp, leaf-like blades to bolster shields and reduce all damage by 50%! The shield can also be thrown at the target for massive damage!',
+  'ability_image_sheets' => 1,
+  'ability_description' => 'The user surrounds itself with sharp, leaf-like blades to bolster shields and reduce all damage by {RECOVERY2}%! The shield can also be thrown at the target for massive damage!',
   'ability_type' => 'nature',
   'ability_type2' => 'shield',
   'ability_energy' => 8,
-  'ability_damage' => 38,
-  'ability_accuracy' => 95,
+  'ability_damage' => 34,
+  'ability_recovery2' => 30,
+  'ability_recovery2_percent' => true,
+  'ability_accuracy' => 98,
   'ability_function' => function($objects){
 
     // Extract all objects into the current scope
@@ -24,7 +27,7 @@ $ability = array(
     	'class' => 'ability',
     	'ability_token' => $this_ability->ability_token,
     	//'attachment_duration' => 3,
-      'attachment_damage_breaker' => 0.50,
+      'attachment_damage_breaker' => ((100 - $this_ability->ability_recovery2) / 100),
       //'attachment_defense' => 0,
     	'attachment_weaknesses' => array('flame', 'cutter'),
     	'attachment_create' => array(
