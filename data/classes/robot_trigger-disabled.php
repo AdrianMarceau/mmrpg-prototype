@@ -1060,17 +1060,15 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
   // If this robot was a MECHA class and destroyed by WEAKNESS, it may drop a CORE
   if ($this_robot->robot_class == 'mecha' && !empty($this_robot->flags['triggered_weakness'])){
     $temp_shard_type = !empty($this->robot_core) ? $this->robot_core : 'none';
-    $temp_chance_value = $temp_value_total > 0 ? $temp_value_total * 2 : 50; // 50%
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add item shard '.$temp_shard_type.' with '.$temp_chance_value.' chance');  }
-    $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => 'item-shard-'.$temp_shard_type);
+    $target_player_rewards['items'] = array();
+    $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-shard-'.$temp_shard_type);
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$target_player_rewards[\'items\'] = '.json_encode($target_player_rewards['items']));  }
   }
   // If this robot was a MASTER class and destroyed by WEAKNESS, it may drop a CORE
   elseif ($this_robot->robot_class == 'master' && !empty($this_robot->flags['triggered_weakness'])){
     $temp_core_type = !empty($this->robot_core) ? $this->robot_core : 'none';
-    $temp_chance_value = $temp_value_total > 0 ? $temp_value_total * 2 : 25; // 25%
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add item core '.$temp_core_type.' with '.$temp_chance_value.' chance');  }
-    $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => 'item-core-'.$temp_core_type);
+    $target_player_rewards['items'] = array();
+    $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-core-'.$temp_core_type);
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$target_player_rewards[\'items\'] = '.json_encode($target_player_rewards['items']));  }
   }
 
