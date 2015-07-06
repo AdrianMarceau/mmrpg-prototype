@@ -283,7 +283,7 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
     }
 
     // ATTACHMENT ANIMATION STUFF
-    if (!empty($this_robot->robot_attachments)){
+    if (empty($this_robot->flags['apply_disabled_state']) && !empty($this_robot->robot_attachments)){
 
       // Loop through each attachment and process it
       foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
@@ -486,7 +486,7 @@ if ($options['canvas_show_target_robots'] && !empty($eventinfo['target_player']-
     $target_robot_data = $target_robot->canvas_markup($target_options, $target_player_data);
 
     // ATTACHMENT ANIMATION STUFF
-    if (!empty($target_robot->robot_attachments)){
+    if (empty($target_robot->flags['apply_disabled_state']) && !empty($target_robot->robot_attachments)){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
       // Loop through each attachment and process it
