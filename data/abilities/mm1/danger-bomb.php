@@ -7,7 +7,7 @@ $ability = array(
   'ability_group' => 'MM01/Weapons/006',
   'ability_master' => 'bomb-man',
   'ability_number' => 'DLN-006',
-  'ability_description' => 'The user throws a dangerous and powerful bomb that explodes mid-air to inflict massive damage on the target! The user of this devasting attack receives {DAMAGE2}% recoil damage and benched team members are occasionally hit with the blast as well, so use with extreme caution.',
+  'ability_description' => 'The user throws a dangerous and powerful bomb that explodes mid-air to inflict massive damage on the target! The user of this devasting attack receives {DAMAGE2}% recoil damage and benched team members on both sides are occasionally hit by the blast, so use with extreme caution.',
   'ability_type' => 'explode',
   'ability_energy' => 8,
   'ability_damage' => 50,
@@ -49,6 +49,8 @@ $ability = array(
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
+    // -- DAMAGE TARGET ROBOT -- //
+
     // Inflict damage on the opposing robot
     $target_robot->robot_attachments[$this_attachment_token_one] = $this_attachment_info_one;
     $target_robot->robot_attachments[$this_attachment_token_two] = $this_attachment_info_two;
@@ -73,9 +75,13 @@ $ability = array(
     unset($target_robot->robot_attachments[$this_attachment_token_two]);
     $target_robot->update_session();
 
-    // If the ability was successful against the target, this robot gets exactly half damage
-    if ($this_ability->ability_results['this_result'] != 'failure'
-      && $this_ability->ability_results['this_amount'] > 0){
+    // Collect this first strike's damage to use as a base later
+    $first_strike_ability_damage = $this_ability->ability_results['this_result'] != 'failure' && $this_ability->ability_results['this_amount'] > 0 ? $this_ability->ability_results['this_amount'] : 0;
+
+    // If the first ability was a success, continue down the line
+    if (!empty($first_strike_ability_damage)){
+
+      // -- DAMAGE THIS ROBOT -- //
 
       // Inflict damage on the opposing robot
       $this_ability->damage_options_update(array(
@@ -98,19 +104,58 @@ $ability = array(
         'success' => array(3, -30, 0, 10, $this_robot->print_robot_name().' was invigorated by the blast!'),
         'failure' => array(3, -65, 0, -10, $this_robot->print_robot_name().' avoided the blast&hellip;')
         ));
-      $energy_damage_amount = $this_ability->ability_results['this_amount'];
+      $energy_damage_amount = $first_strike_ability_damage;
       $energy_damage_amount += !empty($this_ability->ability_results['this_overkill']) ? $this_ability->ability_results['this_overkill'] : 0;
       $energy_damage_amount = round($energy_damage_amount * ($this_ability->ability_damage2 / 100));
-      //$energy_damage_amount = round($energy_damage_amount * (2 / 3));
-      $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, false);
+      $this_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
 
-      // Randomly trigger a bench damage if the ability was successful
-      $backup_robots_active = $this_player->values['robots_active'];
-      $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
-      if ($backup_robots_active_count > 1){
+      // -- RANDOM DAMAGE ALL BENCHED ROBOTS -- //
 
-        // Loop through the target's benched robots, inflicting 10% base damage to each
-        foreach ($backup_robots_active AS $key => $info){
+      // Collect backup active robots for this player
+      $this_backup_robots_active = $this_player->values['robots_active'];
+      $this_backup_robots_active_count = !empty($this_backup_robots_active) ? count($this_backup_robots_active) : 0;
+
+      // Collect backup active robots for the target player
+      $target_backup_robots_active = $this_player->values['robots_active'];
+      $target_backup_robots_active_count = !empty($target_backup_robots_active) ? count($target_backup_robots_active) : 0;
+
+      // Loop through any benched robots on either side and trigger damage maybe
+      for ($key = 0; $key < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX; $key++){
+
+        // Define the bench damage relative to the bench position times the recoil above
+        $robot_bench_damage_amount = ceil($first_strike_ability_damage / ($key + 1));
+
+        // If a robot on the target side exists at the given key
+        if (isset($target_backup_robots_active[$key])){
+
+          // Collect a reference to the robot and create the necessary data
+          $info = $target_backup_robots_active[$key];
+          if ($info['robot_id'] == $target_robot->robot_id){ continue; }
+          if (!$this_battle->critical_chance(ceil((9 - $info['robot_key']) * 10))){ break; }
+          $this_ability->ability_results_reset();
+          $temp_target_robot = new mmrpg_robot($this_battle, $this_player, $info);
+          // Update the ability options text
+          $this_ability->damage_options_update(array(
+            'success' => array(2, -20, -5, -5, $temp_target_robot->print_robot_name().' was damaged by the blast!'),
+            'failure' => array(3, 0, 0, -9999, ''),
+            'options' => array('apply_modifiers' => false)
+            ));
+          $this_ability->recovery_options_update(array(
+            'success' => array(2, -20, -5, -5, $temp_target_robot->print_robot_name().' was refreshed by the blast!'),
+            'failure' => array(3, 0, 0, -9999, ''),
+            'options' => array('apply_modifiers' => false)
+            ));
+          $energy_damage_amount = $robot_bench_damage_amount;
+          $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+          if ($this_ability->ability_results['this_result'] == 'failure'){ break; }
+
+        }
+
+        // If a robot on this side exists at the given key
+        if (isset($this_backup_robots_active[$key])){
+
+          // Collect a reference to the robot and create the necessary data
+          $info = $this_backup_robots_active[$key];
           if ($info['robot_id'] == $this_robot->robot_id){ continue; }
           if (!$this_battle->critical_chance(ceil((9 - $info['robot_key']) * 10))){ break; }
           $this_ability->ability_results_reset();
@@ -118,21 +163,59 @@ $ability = array(
           // Update the ability options text
           $this_ability->damage_options_update(array(
             'success' => array(2, -20, -5, -5, $temp_this_robot->print_robot_name().' was damaged by the blast!'),
-            'failure' => array(3, 0, 0, -9999, '')
+            'failure' => array(3, 0, 0, -9999, ''),
+            'options' => array('apply_modifiers' => false)
             ));
           $this_ability->recovery_options_update(array(
             'success' => array(2, -20, -5, -5, $temp_this_robot->print_robot_name().' was refreshed by the blast!'),
-            'failure' => array(3, 0, 0, -9999, '')
+            'failure' => array(3, 0, 0, -9999, ''),
+            'options' => array('apply_modifiers' => false)
             ));
-          $energy_damage_amount = $this_ability->ability_results['this_amount'];
-          $energy_damage_amount += !empty($this_ability->ability_results['this_overkill']) ? $this_ability->ability_results['this_overkill'] : 0;
-          $energy_damage_amount = round($energy_damage_amount * ($this_ability->ability_damage2 / 100));
+          $energy_damage_amount = $robot_bench_damage_amount;
           $temp_this_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
           if ($this_ability->ability_results['this_result'] == 'failure'){ break; }
+
         }
 
       }
 
+      // If this robot is no longer active, find a new active robot for this player
+      $this_active_robot = $this_robot;
+      if ($this_robot->robot_energy < 1 || $this_robot->robot_status == 'disabled'){
+        foreach ($this_player->values['robots_active'] AS $key => $info){
+          if ($info['robot_position'] != 'bench'){
+              $this_active_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']));
+            }
+        }
+      }
+
+      // Trigger the disabled event on these robots now if necessary
+      if (!empty($this_backup_robots_active)){
+        foreach ($this_backup_robots_active AS $key => $info){
+          if ($info['robot_id'] == $this_robot->robot_id){ continue; }
+          $temp_this_robot = new mmrpg_robot($this_battle, $this_player, $info);
+          if ($temp_this_robot->robot_energy <= 0 || $temp_this_robot->robot_status == 'disabled'){ $temp_this_robot->trigger_disabled($this_robot, $this_ability); }
+        }
+      }
+
+      // Trigger the disabled event on this robot now if necessary
+      if ($this_robot->robot_energy < 1 || $this_robot->robot_status == 'disabled'){
+        $this_robot->trigger_disabled($target_robot, $this_ability);
+      }
+
+      // Trigger the disabled event on the targets now if necessary
+      if (!empty($target_backup_robots_active)){
+        foreach ($target_backup_robots_active AS $key => $info){
+          if ($info['robot_id'] == $this_robot->robot_id){ continue; }
+          $temp_this_robot = new mmrpg_robot($this_battle, $this_player, $info);
+          if ($temp_this_robot->robot_energy <= 0 || $temp_this_robot->robot_status == 'disabled'){ $temp_this_robot->trigger_disabled($this_robot, $this_ability); }
+        }
+      }
+
+      // Trigger the disabled event on the target robot now if necessary
+      if ($target_robot->robot_energy < 1 || $target_robot->robot_status == 'disabled'){
+        $target_robot->trigger_disabled($this_active_robot, $this_ability);
+      }
 
     }
     // Otherwise, if the ability missed or was absored somehow, treat as attack from target
@@ -157,49 +240,9 @@ $ability = array(
         'success' => array(3, -65, 0, -10, $this_robot->print_robot_name().' avoided the blast&hellip;'),
         'failure' => array(3, -65, 0, -10, $this_robot->print_robot_name().' avoided the blast&hellip;')
         ));
-      $energy_damage_amount = 0; //ceil($this_ability->ability_damage * ($this_robot->robot_attack / $this_robot->robot_defense));
+      $energy_damage_amount = 0;
       $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, false);
 
-    }
-
-    // Update the player session quickly
-
-    // If this robot is no longer active, find a new active robot for this player
-    $this_active_robot = $this_robot;
-    if ($this_robot->robot_energy < 1 || $this_robot->robot_status == 'disabled'){
-      foreach ($this_player->values['robots_active'] AS $key => $info){
-        if ($info['robot_position'] != 'bench'){
-            $this_active_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']));
-          }
-      }
-    }
-
-    // Trigger the disabled event on the target robot now if necessary
-    if ($target_robot->robot_energy < 1 || $target_robot->robot_status == 'disabled'){
-      $target_robot->trigger_disabled($this_active_robot, $this_ability);
-    }
-
-    // Trigger the disabled event on this robot now if necessary
-    if ($this_robot->robot_energy < 1 || $this_robot->robot_status == 'disabled'){
-      //$this_robot->robot_energy = 1;
-      //$this_robot->robot_status = 'active';
-      //$this_robot->robot_frame = 'defeat';
-      //$this_robot->update_session();
-      $this_robot->trigger_disabled($target_robot, $this_ability);
-      //$this_battle->actions_empty();
-      //$this_robot->robot_energy = 0;
-      //$this_robot->robot_status = 'disabled';
-      //$this_robot->update_session();
-    }
-
-    // Trigger the disabled event on the targets now if necessary
-    //if ($target_robot->robot_energy < 1 || $target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot, $this_ability); }
-    if (!empty($backup_robots_active)){
-      foreach ($backup_robots_active AS $key => $info){
-        if ($info['robot_id'] == $this_robot->robot_id){ continue; }
-        $temp_this_robot = new mmrpg_robot($this_battle, $this_player, $info);
-        if ($temp_this_robot->robot_energy <= 0 || $temp_this_robot->robot_status == 'disabled'){ $temp_this_robot->trigger_disabled($this_robot, $this_ability); }
-      }
     }
 
     // Return true on success
