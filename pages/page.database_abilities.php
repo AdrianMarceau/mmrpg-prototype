@@ -101,9 +101,9 @@ if (empty($this_current_token)){
         The ability database contains detailed information on <?= $mmrpg_database_abilities_links_counter == 1 ? 'the' : 'all' ?> <?= isset($this_current_filter) ? $mmrpg_database_abilities_links_counter.' <span class="type_span robot_type robot_type_'.$this_current_filter.'">'.$this_current_filter_name.' Type</span> ' : $mmrpg_database_abilities_links_counter.' ' ?><?= $mmrpg_database_abilities_links_counter == 1 ? 'unlockable ability that appears ' : 'unlockable abilities that appear ' ?> or will appear in the prototype, including <?= $mmrpg_database_abilities_links_counter == 1 ? 'its' : 'each ability\'s' ?> base stats, compatible robots, sprite sheets, and more.
         Click <?= $mmrpg_database_abilities_links_counter == 1 ? 'the icon below to scroll to the' : 'any of the icons below to scroll to an' ?> ability's summarized database entry and click the more link to see its full page with sprites and extended info. <?= isset($this_current_filter) ? 'If you wish to reset the ability type filter, <a href="database/abilities/">please click here</a>.' : '' ?>
       </p>
-      <?= preg_replace('/data-token="([-_a-z0-9]+)"/', 'data-anchor="$1"', $mmrpg_database_abilities_links) ?>
+      <div class="text iconwrap"><?= preg_replace('/data-token="([-_a-z0-9]+)"/', 'data-anchor="$1"', $mmrpg_database_abilities_links) ?></div>
     <? else: ?>
-      <?= $mmrpg_database_abilities_links ?>
+      <div class="text iconwrap"><?= $mmrpg_database_abilities_links ?></div>
     <? endif; ?>
   </div>
   <? if(!empty($this_current_token)): ?>

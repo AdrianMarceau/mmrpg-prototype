@@ -43,7 +43,7 @@ ob_start();
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="players" data-class-single="player">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_02"  href="database/players/" style="background-image: url(images/players/dr-light/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Dr. Light</a></div>*/?>
       <p class="text">The player database contains detailed information on the playable characters in the prototype, including unlockable abilities, quotes, and sprite sheets.</p>
-      <?= $mmrpg_database_players_links ?>
+      <div class="text iconwrap"><?= $mmrpg_database_players_links ?></div>
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -54,9 +54,7 @@ ob_start();
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="robots" data-class-single="robot">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_02" href="database/robots/" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Mega Man</a></div>*/?>
       <p class="text">The robot database contains detailed information on the unlockable robot masters in the prototype, including abilities, stats, quotes, and sprite sheets.</p>
-      <div class="text" style="overflow: hidden;">
-      <?= $mmrpg_database_robots_links ?>
-      </div>
+      <div class="text iconwrap"><?= $mmrpg_database_robots_links ?></div>
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -67,9 +65,7 @@ ob_start();
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="mechas" data-class-single="mecha">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_07" href="database/mechas/" style="background-image: url(images/robots/met/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Met</a></div>*/?>
       <p class="text">The mecha database contains detailed information on the various support mechas in the prototype, including abilities, stats, quotes, and sprite sheets.</p>
-      <div class="text" style="overflow: hidden;">
-      <?= $mmrpg_database_mechas_links ?>
-      </div>
+      <div class="text iconwrap"><?= $mmrpg_database_mechas_links ?></div>
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -80,9 +76,7 @@ ob_start();
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="bosses" data-class-single="boss">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_08" href="database/bosses/" style="background-image: url(images/robots/trill/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Trill</a></div>*/?>
       <p class="text">The boss database contains detailed information on the various fortress bosses in the prototype, including abilities, stats, quotes, and sprite sheets.</p>
-      <div class="text" style="overflow: hidden;">
-      <?= $mmrpg_database_bosses_links ?>
-      </div>
+      <div class="text iconwrap"><?= $mmrpg_database_bosses_links ?></div>
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -93,9 +87,7 @@ ob_start();
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="abilities" data-class-single="ability">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/abilities/" style="margin: -10px 0 5px; background-image: url(images/abilities/mega-slide/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Mega Slide</a></div>*/?>
       <p class="text">The ability database contains detailed information on the unlockable abilities in the prototype, including compatible robots, stats, and sprite sheets.</p>
-      <div class="text" style="overflow: hidden;">
-      <?= $mmrpg_database_abilities_links ?>
-      </div>
+      <div class="text iconwrap"><?= $mmrpg_database_abilities_links ?></div>
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -106,9 +98,7 @@ ob_start();
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="items" data-class-single="item">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/items/" style="margin: -10px 0 5px; background-image: url(images/abilities/item-extra-life/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Extra Life</a></div>*/?>
       <p class="text">The item database contains detailed information on the collectable items in the prototype, including stats, descriptions, and sprite sheets.</p>
-      <div class="text" style="overflow: hidden;">
-      <?= $mmrpg_database_items_links ?>
-      </div>
+      <div class="text iconwrap"><?= $mmrpg_database_items_links ?></div>
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -119,9 +109,7 @@ ob_start();
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="fields" data-class-single="field">
       <?/*<div class="float float_right" style="overflow: hidden;"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/fields/" style="margin: 0; background-image: url(images/fields/intro-field/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Intro Field</a></div>*/?>
       <p class="text">The field database contains detailed information on the battle fields of the prototype, including robot masters, mechas, stats, and sprite sheets.</p>
-      <div class="text" style="overflow: hidden;">
-      <?= $mmrpg_database_fields_links ?>
-      </div>
+      <div class="text iconwrap"><?= $mmrpg_database_fields_links ?></div>
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -131,7 +119,7 @@ ob_start();
     </h2>
     <div class="subbody">
       <p class="text">The type database contains a detailed breakdown of the elemental type distribution in the prototype, including ability counts, robot counts, and more.</p>
-      <ul style="overflow: hidden; padding: 4px 0 6px;">
+      <ul class="iconwrap" style="padding: 4px 0 6px;">
         <?
         // Loop through and display all the types to the user
         echo '<li><strong class="type_block ability_type ability_type_none">Neutral</strong></li>';
