@@ -25,7 +25,7 @@ $ability = array(
     	'ability_token' => $this_ability->ability_token,
     	'attachment_duration' => 1,
       'attachment_damage_breaker' => 0.0,
-    	'attachment_weaknesses' => array('crystal'),
+    	'attachment_weaknesses' => array('crystal', 'laser'),
     	'attachment_create' => array(
         'trigger' => 'special',
         'kind' => '',
@@ -51,8 +51,13 @@ $ability = array(
       'ability_frame_offset' => array('x' => -10, 'y' => 0, 'z' => -10)
       );
 
+    // Define the charge required flag based on existing attachments of this ability
+    $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+    // If this robot is holding a Charge Module, bypass changing and set to false
+    if ($this_robot->robot_item == 'item-charge-module'){ $this_charge_required = false; }
+
     // If the ability flag was not set, skull barrier cuts damage by half
-    if (!isset($this_robot->robot_attachments[$this_attachment_token])){
+    if ($this_charge_required){
 
       // Target this robot's self
       $this_ability->target_options_update(array(
@@ -74,7 +79,7 @@ $ability = array(
     else {
 
       // Collect the attachment from the robot to back up its info
-      $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
+      $this_attachment_info = isset($this_robot->robot_attachments[$this_attachment_token]) ? $this_robot->robot_attachments[$this_attachment_token] : $this_attachment_info;
       // Remove this ability attachment to the robot using it
       unset($this_robot->robot_attachments[$this_attachment_token]);
       $this_robot->update_session();
@@ -127,10 +132,46 @@ $ability = array(
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
+    // Define the charge required flag based on existing attachments of this ability
+    $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+
     // If the ability flag had already been set, reduce the weapon energy to zero
-    if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->ability_energy = 0; }
+    if (!$this_charge_required){ $this_ability->ability_energy = 0; }
     // Otherwise, return the weapon energy back to default
     else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
+
+    // If this robot is holding a Charge Module, bypass changing but reduce the power of the ability
+    if ($this_robot->robot_item == 'item-charge-module'){
+      $this_charge_required = false;
+      $temp_item_info = mmrpg_ability::get_index_info($this_robot->robot_item);
+      $this_ability->ability_damage = ceil($this_ability->ability_base_damage * ($temp_item_info['ability_damage2'] / $temp_item_info['ability_recovery2']));
+    } else {
+      $this_ability->ability_damage = $this_ability->ability_base_damage;
+    }
+
+    // Define the allow targetting flag based on if the user's type matches the ability
+    $this_allow_target_select = !empty($this_robot->robot_core) && $this_robot->robot_core == $this_ability->ability_type ? true : false;
+
+    // If this robot is holding a Target Module, allow target selection
+    if ($this_robot->robot_item == 'item-target-module'){ $this_allow_target_select = true; }
+
+    // If this ability is being used by a robot with the same core type AND it's already summoned, allow targetting
+    if (!$this_charge_required && $this_allow_target_select){
+
+      // Update this ability's targetting setting
+      $this_ability->ability_target = 'select_target';
+      $this_ability->update_session();
+
+    }
+    // Else if the ability attachment is not there, change the target back to auto
+    else {
+
+      // Update this ability's targetting setting
+      $this_ability->ability_target = 'auto';
+      $this_ability->update_session();
+
+    }
+
     // Update the ability session
     $this_ability->update_session();
 

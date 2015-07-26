@@ -7,7 +7,7 @@ $ability = array(
   'ability_group' => 'MM01/Weapons/007',
   'ability_master' => 'fire-man',
   'ability_number' => 'DLN-007',
-  'ability_description' => 'The user a unleashes a powerful wave of fire that chases the target, inflicting twice as much damage on slower targets but half as much on faster ones&hellip;',
+  'ability_description' => 'The user a unleashes a powerful wave of fire that chases the target to deal massive damage.  The slower the user campared to the target, the greater this ability\'s power.',
   'ability_type' => 'flame',
   'ability_type2' => 'swift',
   'ability_energy' => 8,
@@ -39,11 +39,30 @@ $ability = array(
       'success' => array(1, -75, 0, 10, 'The '.$this_ability->print_ability_name().' ignited the target!'),
       'failure' => array(1, -100, 0, -10, 'The '.$this_ability->print_ability_name().' had no effect&hellip;')
       ));
-    if ($this_robot->robot_speed < $target_robot->robot_speed){ $speed_multiplier = 0.5; }
-    elseif ($this_robot->robot_speed > $target_robot->robot_speed){ $speed_multiplier = 2.0; }
+    if ($target_robot->robot_speed > $this_robot->robot_speed){ $speed_multiplier = $target_robot->robot_speed / $this_robot->robot_speed; }
+    elseif ($this_robot->robot_speed > $target_robot->robot_speed){ $speed_multiplier = $this_robot->robot_speed / $target_robot->robot_speed; }
     else { $speed_multiplier = 1; }
     $energy_damage_amount = ceil($this_ability->ability_damage * $speed_multiplier);
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+    // Return true on success
+    return true;
+
+    },
+  'ability_function_onload' => function($objects){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // If this robot is holding a Target Module, allow target selection
+    if ($this_robot->robot_item == 'item-target-module'){
+      $this_ability->ability_target = 'select_target';
+    } else {
+      $this_ability->ability_target = $this_ability->ability_base_target;
+    }
+
+    // Update the ability session
+    $this_ability->update_session();
+
     // Return true on success
     return true;
 

@@ -29,8 +29,13 @@ $ability = array(
     // Loop through each existing attachment and alter the start frame by one
     foreach ($this_robot->robot_attachments AS $key => $info){ array_push($this_attachment_info['ability_frame_animate'], array_shift($this_attachment_info['ability_frame_animate'])); }
 
+    // Define the charge required flag based on existing attachments of this ability
+    $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+    // If this robot is holding a Charge Module, bypass changing and set to false
+    if ($this_robot->robot_item == 'item-charge-module'){ $this_charge_required = false; }
+
     // If the ability flag was not set, this ability begins charging
-    if (!isset($this_robot->robot_attachments[$this_attachment_token])){
+    if ($this_charge_required){
 
       // Target this robot's self
       $this_ability->target_options_update(array(
@@ -99,8 +104,21 @@ $ability = array(
     // Otherwise, return the weapon energy back to default
     else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
 
+    // If this robot is holding a Charge Module, reduce the power of the ability
+    if ($this_robot->robot_item == 'item-charge-module'){
+      $temp_item_info = mmrpg_ability::get_index_info($this_robot->robot_item);
+      $this_ability->ability_damage = ceil($this_ability->ability_base_damage * ($temp_item_info['ability_damage2'] / $temp_item_info['ability_recovery2']));
+    } else {
+      $this_ability->ability_damage = $this_ability->ability_base_damage;
+    }
+
+    // Define the charge required flag based on existing attachments of this ability
+    $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+    // If this robot is holding a Charge Module, bypass changing and set to false
+    if ($this_robot->robot_item == 'item-charge-module'){ $this_charge_required = false; }
+
     // If the ability attachment is already there, change target to select
-    if (isset($this_robot->robot_attachments[$this_attachment_token])){
+    if (!$this_charge_required){
 
       // Update this ability's targetting setting
       $this_ability->ability_target = 'select_target';

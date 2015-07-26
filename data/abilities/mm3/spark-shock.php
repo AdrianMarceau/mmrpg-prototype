@@ -73,6 +73,25 @@ $ability = array(
     return true;
 
 
+    },
+  'ability_function_onload' => function($objects){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // If this robot is holding a Target Module, allow target selection
+    if ($this_robot->robot_item == 'item-target-module'){
+      $this_ability->ability_target = 'select_target';
+    } else {
+      $this_ability->ability_target = $this_ability->ability_base_target;
+    }
+
+    // Update the ability session
+    $this_ability->update_session();
+
+    // Return true on success
+    return true;
+
     }
   );
 ?>

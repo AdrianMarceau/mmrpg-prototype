@@ -103,23 +103,29 @@ $ability = array(
     // Extract all objects into the current scope
     extract($objects);
 
+    // Define the allow targeting flag for the ability
+    $temp_allow_targeting = false;
+
     // If this ability is being used by a special support robot, allow targetting
     $temp_support_robots = array('roll', 'disco', 'rhythm');
-    if (in_array($this_robot->robot_token, $temp_support_robots) && $target_player->counters['robots_active'] > 1){
+    if (in_array($this_robot->robot_token, $temp_support_robots) && $target_player->counters['robots_active'] > 1){ $temp_allow_targeting = true; }
 
+    // If this robot is holding a Target Module, allow target selection
+    if ($this_robot->robot_item == 'item-target-module'){ $temp_allow_targeting = true; }
+
+    // If this ability targeting is allowed
+    if ($temp_allow_targeting){
       // Update this ability's targetting setting
       $this_ability->ability_target = 'select_target';
-      $this_ability->update_session();
-
     }
     // Else if the ability attachment is not there, change the target back to auto
     else {
-
       // Update this ability's targetting setting
       $this_ability->ability_target = 'auto';
-      $this_ability->update_session();
-
     }
+
+    // Update the ability session
+    $this_ability->update_session();
 
     // Return true on success
     return true;

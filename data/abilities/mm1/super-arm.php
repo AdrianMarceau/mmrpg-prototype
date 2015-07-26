@@ -27,7 +27,6 @@ $ability = array(
     $this_target_frame = 0;
     $this_impact_frame = 1;
     $this_object_name = 'boulder';
-    $this_object_weaknesses = array('explode', 'impact');
 
     // Define the sprite sheets and the stages they contain
     $this_sprite_index = !empty($this_ability->values['this_sprite_index']) ? $this_ability->values['this_sprite_index'] : array();
@@ -38,7 +37,6 @@ $ability = array(
       $this_target_frame = $this_sprite_index[$this_field_token][1];
       $this_impact_frame = $this_sprite_index[$this_field_token][2];
       $this_object_name = $this_sprite_index[$this_field_token][3];
-      //$this_object_weaknesses[] = '';
     }
 
     // Define this ability's attachment token
@@ -49,10 +47,8 @@ $ability = array(
     	'ability_token' => $this_ability->ability_token,
       'ability_image' => 'super-arm'.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : ''),
       'attachment_sticky' => true,
-      //'attachment_duration' => 3,
       'attachment_damage_breaker' => ((100 - $this_ability->ability_recovery2) / 100),
-      'attachment_defense' => 0,
-    	'attachment_weaknesses' => $this_object_weaknesses,
+    	'attachment_weaknesses' => array('explode', 'missile'),
     	'attachment_create' => array(
         'kind' => 'special',
         'percent' => true,
@@ -64,8 +60,6 @@ $ability = array(
         ),
     	'attachment_destroy' => array(
         'kind' => 'special',
-        'type' => '',
-        'type2' => '',
         'percent' => true,
         'modifiers' => false,
         'frame' => 'defend',
@@ -83,12 +77,13 @@ $ability = array(
     $this_ability->ability_image = $this_attachment_info['ability_image'];
     $this_ability->update_session();
 
-    // If the ability flag was not set, super arm raises defense by 30%
-    if (!isset($this_robot->robot_attachments[$this_attachment_token])){
+    // Define the charge required flag based on existing attachments of this ability
+    $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+    // If this robot is holding a Charge Module, bypass changing and set to false
+    if ($this_robot->robot_item == 'item-charge-module'){ $this_charge_required = false; }
 
-      // Define the defense mod amount for this ability
-      //$this_attachment_info['attachment_defense'] = ceil($this_robot->robot_defense * ($this_ability->ability_recovery2 / 100));
-      //if (($this_robot->robot_defense + $this_attachment_info['attachment_defense']) > MMRPG_SETTINGS_STATS_MAX){ $this_attachment_info['attachment_defense'] = MMRPG_SETTINGS_STATS_MAX - $this_robot->robot_defense; }
+    // If the ability flag was not set, this ability improves defenses
+    if ($this_charge_required){
 
       // Target this robot's self
       $this_ability->target_options_update(array(
@@ -100,27 +95,17 @@ $ability = array(
       // Increase this robot's defense stat
       $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
       $this_ability->recovery_options_update($this_attachment_info['attachment_create'], true);
-      //$defense_recovery_amount = $this_attachment_info['attachment_defense']; //ceil($this_robot->robot_defense * ($this_ability->ability_recovery / 100));
-      //$this_robot->trigger_recovery($this_robot, $this_ability, $defense_recovery_amount);
 
       // Attach this ability attachment to the robot using it
-      //$this_attachment_info['attachment_defense'] = $this_ability->ability_results['this_amount'];
       $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
       $this_robot->update_session();
 
-      // DEBUG
-      //$this_battle->events_create(false, false, 'DEBUG', '<div>'.preg_replace('/\s+/', ' ', htmlentities(print_r($this_attachment_info, true), ENT_QUOTES, 'UTF-8', true)).'</div>');
-
-      // Update this ability to allow target selection
-      //$this_ability->ability_target = 'select';
-      //$this_ability->update_session();
-
     }
-    // Else if the ability flag was set, leaf shield is thrown and defense is lowered by 30%
+    // Else if the ability flag was set, throw the shield at the target
     else {
 
       // Collect the attachment from the robot to back up its info
-      $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
+      $this_attachment_info = isset($this_robot->robot_attachments[$this_attachment_token]) ? $this_robot->robot_attachments[$this_attachment_token] : $this_attachment_info;
       // Remove this ability attachment to the robot using it
       unset($this_robot->robot_attachments[$this_attachment_token]);
       $this_robot->update_session();
@@ -149,19 +134,9 @@ $ability = array(
       $energy_damage_amount = $this_ability->ability_damage;
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
-      // DEBUG
-      //$this_battle->events_create(false, false, 'DEBUG', '<div>'.preg_replace('/\s+/', ' ', htmlentities(print_r($this_attachment_info, true), ENT_QUOTES, 'UTF-8', true)).'</div>');
-
       // Decrease this robot's defense stat
       $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
       $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
-      //$defense_damage_amount = $this_attachment_info['attachment_defense']; //ceil($this_robot->robot_defense * ($this_ability->ability_recovery / 100));
-      //$trigger_options = array('apply_modifiers' => false);
-      //$this_robot->trigger_damage($this_robot, $this_ability, $defense_damage_amount, true, $trigger_options);
-
-      // Update this ability to disable target selection
-      //$this_ability->ability_target = 'auto';
-      //$this_ability->update_session();
 
     }
 
@@ -182,21 +157,31 @@ $ability = array(
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
-    /*
-    // If the current field has a type, apply it to this ability
-    if (!empty($this_field->field_type) && $this_field->field_type != $this_ability->ability_type){
-      $this_ability->ability_type2 = $this_field->field_type;
-      $this_ability->update_session();
+    // Define the charge required flag based on existing attachments of this ability
+    $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+
+    // If the ability flag had already been set, reduce the weapon energy to zero
+    if (!$this_charge_required){ $this_ability->ability_energy = 0; }
+    // Otherwise, return the weapon energy back to default
+    else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
+
+    // If this robot is holding a Charge Module, bypass changing but reduce the power of the ability
+    if ($this_robot->robot_item == 'item-charge-module'){
+      $this_charge_required = false;
+      $temp_item_info = mmrpg_ability::get_index_info($this_robot->robot_item);
+      $this_ability->ability_damage = ceil($this_ability->ability_base_damage * ($temp_item_info['ability_damage2'] / $temp_item_info['ability_recovery2']));
     } else {
-      $this_ability->ability_type2 = '';
-      $this_ability->update_session();
+      $this_ability->ability_damage = $this_ability->ability_base_damage;
     }
-    */
+
+    // Define the allow targetting flag based on if the user's type matches the ability
+    $this_allow_target_select = !empty($this_robot->robot_core) && $this_robot->robot_core == $this_ability->ability_type ? true : false;
+
+    // If this robot is holding a Target Module, allow target selection
+    if ($this_robot->robot_item == 'item-target-module'){ $this_allow_target_select = true; }
 
     // If this ability is being used by a robot with the same core type AND it's already summoned, allow targetting
-    if ((!empty($this_robot->robot_core) && $this_robot->robot_core == $this_ability->ability_type)
-      && isset($this_robot->robot_attachments[$this_attachment_token])
-      ){
+    if (!$this_charge_required && $this_allow_target_select){
 
       // Update this ability's targetting setting
       $this_ability->ability_target = 'select_target';
@@ -282,11 +267,6 @@ $ability = array(
     if (isset($this_sprite_index[$this_field_token])){
       $this_sprite_sheet = $this_sprite_index[$this_field_token][0];
     }
-
-    // If the ability flag had already been set, reduce the weapon energy to zero
-    if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->ability_energy = 0; }
-    // Otherwise, return the weapon energy back to default
-    else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
 
     // Update the ability's image in the session
     $this_ability->ability_image = 'super-arm'.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : '');

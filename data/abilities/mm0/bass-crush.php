@@ -66,7 +66,7 @@ $ability = array(
     }
 
 
-    // If the ability flag was not set, attach the Proto Shield to the target
+    // If the ability flag was not set, attach the Bas Crush to the target
     if (!isset($target_robot->robot_attachments[$this_attachment_token])){
 
       // Define the damage multiplier amount for this ability

@@ -41,8 +41,7 @@ $ability = array(
 
     // Change the image to the full-screen rain effect
     $this_ability->ability_image = $this_ability->ability_token.'-2';
-    $this_ability->ability_frame_classes = 'sprite_fullscreen ';
-    $this_ability->ability_frame_styles = 'opacity: 0.5; filter: alpha(opacity=50); ';
+    $this_ability->ability_frame_classes = 'sprite_fullscreen sprite_fullscreen_translucent ';
     $this_ability->update_session();
 
     // Attach this ability attachment to the robot using it
@@ -134,6 +133,25 @@ $ability = array(
     // Ensure this robot stays goes back to the base frame after the attack
     $this_robot->robot_frame = 'base';
     $this_robot->update_session();
+
+    // Return true on success
+    return true;
+
+    },
+  'ability_function_onload' => function($objects){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // If this robot is holding a Target Module, allow target selection
+    if ($this_robot->robot_item == 'item-target-module'){
+      $this_ability->ability_target = 'select_target';
+    } else {
+      $this_ability->ability_target = $this_ability->ability_base_target;
+    }
+
+    // Update the ability session
+    $this_ability->update_session();
 
     // Return true on success
     return true;
