@@ -383,6 +383,12 @@
   opacity: 0.15;
   filter: alpha(opacity=15);
 }
+#shop #console .event .item_cell_disabled[data-unlocked="coming-soon"] {
+  
+}
+#shop #console .event .item_cell_disabled[data-unlocked="coming-soon"] .item_name {
+  font-size: 9px;
+}
 #shop #console .event .item_cell_disabled .buy_button,
 #shop #console .event .item_cell_disabled .sell_button {
   cursor: default;

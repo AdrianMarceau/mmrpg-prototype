@@ -478,17 +478,26 @@ function updateItemQuantity(itemToken, itemQuantity){
     var thisKind = thisCell.attr('data-kind');
     var thisAction = thisCell.attr('data-action');
     //console.log('updateItemQuantity('+thisKind+' / '+thisAction+' / '+itemToken+' / '+itemQuantity+' / '+(thisCell.hasClass('item_cell_disabled') ? 'item_cell_disabled' : 'item_cell_enabled')+')');  
-    if (thisKind == 'item'){       
+    if (thisKind == 'item'){ 
+      
       thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('x '+itemQuantity);     
       if (thisAction == 'buy' && itemQuantity >= 99){ thisCell.addClass('item_cell_disabled');  }
       else if (thisAction == 'sell' && itemQuantity <= 0){ thisCell.addClass('item_cell_disabled');  }  
-      } else if (thisKind == 'ability'){  
-      thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('&nbsp;');     
-      if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); } 
-      } else if (thisKind == 'field'){                     
+      
+      } else if (thisKind == 'ability'){
+        
+      thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('&nbsp;');   
+      if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }    
+      else if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); } 
+      
+      } else if (thisKind == 'field'){  
+        
       if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }
+      
       } else if (thisKind == 'star'){
+        
       if (itemQuantity < 1){ thisCell.addClass('item_cell_disabled');  } 
+      
       }
     });
   return true;

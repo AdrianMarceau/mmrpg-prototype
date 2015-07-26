@@ -621,6 +621,13 @@ if (true){
                     elseif ($selling_token == 'weapons'){ $ability_list_array = $shop_info['shop_weapons']['weapons_selling']; }
                     $ability_list_array_count = count($ability_list_array);
                     $ability_list_max = 20;
+
+                    /*
+                    if ($selling_token == 'weapons'){
+                      exit('<pre>$ability_list_array('.count($ability_list_array).'/'.$ability_list_max.') = '.print_r($ability_list_array, true).'</pre>');
+                    }
+                    */
+
                     /*
                     $ability_list_max = 2;
                     if ($shop_info['shop_level'] >= 5){ $ability_list_max += 2; }
@@ -650,7 +657,7 @@ if (true){
                     $ability_list_unlocked_completely = 0;
                     foreach ($ability_list_array AS $token => $price){
                       if (!isset($mmrpg_database_abilities[$token])){ unset($ability_list_array[$token]); continue; }
-                      if (mmrpg_prototype_ability_unlocked('', '', $token)){
+                      if (empty($mmrpg_database_abilities[$token]['ability_flag_complete']) || mmrpg_prototype_ability_unlocked('', '', $token)){
                         $ability_list_unlocked_completely += 1;
                         $backup_unlocked_abilities[$token] = $price;
                         unset($ability_list_array[$token]);
@@ -709,9 +716,16 @@ if (true){
                           $ability_info_unlocked = array('dr-light', 'dr-wily', 'dr-cossack');
                           $ability_info_price = 0;
                         }
+                        if (empty($ability_info['ability_flag_complete'])){
+                          //$ability_info_name = '<del>'.$ability_info_name.'</del> ';
+                          $ability_info_quantity = -1;
+                          $ability_info_unlocked = array('coming-soon');
+                          $ability_info_name = preg_replace('/[a-z0-9]/i', '?', $ability_info_name);
+                          $ability_info_price = 0;
+                        }
                         $global_item_quantities[$ability_info_token] = $ability_info_quantity;
                         $global_item_prices['buy'][$ability_info_token] = $ability_info_price;
-                        $temp_info_tooltip = mmrpg_ability::print_editor_title_markup($robot_info, $ability_info);
+                        $temp_info_tooltip = !empty($ability_info['ability_flag_complete']) ? mmrpg_ability::print_editor_title_markup($robot_info, $ability_info) : 'Coming Soon! <br /> <span style="font-size:80%;">This ability is still in development and cannot be purchased yet. <br /> Apologies for the inconveinece, and please check back later!</span>';
                         $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                         //if ($ability_info_quantity >= 3){ continue; }
                         if ($ability_counter >= $ability_list_max){ break; }
