@@ -338,7 +338,7 @@ ob_start();
       $current_item_name = !empty($current_item_info['ability_name']) ? $current_item_info['ability_name'] : 'No Item';
       $current_item_image = !empty($current_item_info['ability_image']) ? $current_item_info['ability_image'] : $current_item_token;
       $current_item_type = !empty($current_item_info['ability_type']) ? $current_item_info['ability_type'] : 'none';
-      if (!empty($current_item_info['ability_type2'])){ $current_item_type .= ' '.$current_item_info['ability_type2']; }
+      if (!empty($current_item_info['ability_type2'])){ $current_item_type = $current_item_type != 'none' ?  $current_item_type.'_'.$current_item_info['ability_type2'] : $current_item_info['ability_type2']; }
       if (empty($current_item_info)){ $current_item_token = ''; $current_item_image = 'ability'; }
       ob_start();
       ?>

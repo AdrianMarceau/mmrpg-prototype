@@ -207,7 +207,27 @@ if (true){
 
 }
 
-// Limit all stats to 9999 for display purposes
+// If this robot is holder a relavant item, apply stat upgrades
+if (!empty($this->robot_item)){
+
+  // If this robot is holding an Energy Upgrade, double the life energy stat
+  if ($this->robot_item == 'item-energy-upgrade'){
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+    $this->robot_energy += $this->robot_energy;
+    $this->robot_base_energy += $this->robot_base_energy;
+  }
+
+  // Else if this robot is holding a Weapon Upgrade, double the life energy stat
+  elseif ($this->robot_item == 'item-weapon-upgrade'){
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+    $this->robot_weapons += $this->robot_weapons;
+    $this->robot_base_weapons += $this->robot_base_weapons;
+  }
+
+}
+
+
+// Limit all stats to maximums for display purposes
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if ($this->robot_energy > MMRPG_SETTINGS_STATS_MAX){ $this->robot_energy = MMRPG_SETTINGS_STATS_MAX; }
 if ($this->robot_base_energy > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_energy = MMRPG_SETTINGS_STATS_MAX; }

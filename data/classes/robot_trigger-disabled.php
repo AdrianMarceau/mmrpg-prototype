@@ -141,6 +141,14 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     $this_speed_boost = 0;
   }
 
+  // If the target robot is holding a Growth Module, double the stat bonuses
+  if ($target_robot->robot_item == 'item-growth-module'){
+    if (!$this_energy_boost){ $this_energy_boost = $this_energy_boost * 2; }
+    if (!$this_attack_boost){ $this_attack_boost = $this_attack_boost * 2; }
+    if (!$this_defense_boost){ $this_defense_boost = $this_defense_boost * 2; }
+    if (!$this_speed_boost){ $this_speed_boost = $this_speed_boost * 2; }
+  }
+
   // Define the temporary boost actions counter
   //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_boost_actions = 1;
@@ -572,17 +580,30 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
       // If this robot has been traded, give it an additional experience boost
       $temp_experience_boost = 0;
       $temp_robot_boost_text = $temp_boost_text;
+      $temp_player_boosted = false;
       if ($temp_robot->player_token != $temp_robot->robot_original_player){
+        $temp_player_boosted = true;
         $temp_robot_boost_text = 'a player boosted ';
         $temp_experience_bak = $target_robot_experience;
         $target_robot_experience = $target_robot_experience * 2;
         $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
+        // DEBUG
+        //$event_body = 'PLAYER BOOSTED | ';
+        //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; $temp_robot->player_token('.$temp_robot->player_token.') != $temp_robot->robot_original_player('.$temp_robot->robot_original_player.'); ');
+        //$this_battle->events_create(false, false, 'DEBUG', $event_body);
       }
 
-      // DEBUG
-      //$event_body = 'PLAYER BOOSTED | ';
-      //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; ');
-      //$this_battle->events_create(false, false, 'DEBUG', $event_body);
+      // If the target robot is holding a Growth Module, double the experience bonus
+      if ($temp_robot->robot_item == 'item-growth-module'){
+        $temp_robot_boost_text = $temp_player_boosted ? 'a player and module boosted ' : 'a module boosted ';
+        $temp_experience_bak = $target_robot_experience;
+        $target_robot_experience = $target_robot_experience * 2;
+        $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
+        // DEBUG
+        //$event_body = 'MODULE BOOSTED | ';
+        //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; $temp_robot->robot_item = '.$temp_robot->robot_item.'; ');
+        //$this_battle->events_create(false, false, 'DEBUG', $event_body);
+      }
 
       // If there are field multipliers in place, apply them now
       $temp_experience_boost = 0;
@@ -1027,22 +1048,42 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
   // Otherwise, define auto items
   else {
 
+    // If the target holds a Fortune Module, increase the chance of dropps
+    $temp_fortune_module = false;
+    if ($target_robot->robot_item == 'item-fortune-module'){ $temp_fortune_module = true; }
+
     // If this robot was a MECHA class, it may drop SMALL SCREWS
     if ($this_robot->robot_class == 'mecha'){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add small screws for mechas');  }
-      $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-screw-small');
+      $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-screw-small', 'quantity' => mt_rand(1, ($temp_fortune_module ? 9 : 6)));
+      // If this robot was an empty core, it drops other items too
+      if (!empty($this_robot->robot_core) && $this_robot->robot_core == 'empty'){
+        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add super pellet empty');  }
+        $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-super-pellet');
+      }
     }
 
     // If this robot was a MASTER class, it may drop LARGE SCREWS
     if ($this_robot->robot_class == 'master'){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add large screw masters');  }
-      $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-screw-large');
+      $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-screw-large', 'quantity' => mt_rand(1, ($temp_fortune_module ? 6 : 3)));
+      // If this robot was an empty core, it drops other items too
+      if (!empty($this_robot->robot_core) && $this_robot->robot_core == 'empty'){
+        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add super capsule empty');  }
+        $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-super-capsule');
+      }
     }
 
     // If this robot was a BOSS class, it may drop EXTRA LIFE
     if ($this_robot->robot_class == 'boss'){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add extra lives for bosses');  }
-      $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-extra-life');
+      $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-extra-life', 'quantity' => mt_rand(1, ($temp_fortune_module ? 3 : 1)));
+    }
+
+    // If this robot was holding an ITEM, it should also drop that at a high rate
+    if (!empty($this_robot->robot_item)){
+      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add hold item '.$this_robot->robot_item);  }
+      $target_player_rewards['items'][] =  array('chance' => 100, 'token' => $this_robot->robot_item);
     }
 
   }
@@ -1090,7 +1131,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
   // Define a function for dealing with item drops
   if (!function_exists('temp_player_rewards_items')){
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    function temp_player_rewards_items($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_info){
+    function temp_player_rewards_items($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_info, $item_drop_count = 1){
       global $mmrpg_index;
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'temp_player_rewards_items('.$item_reward_info['ability_token'].')');  }
 
@@ -1127,7 +1168,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
       }
 
       // Define the new item quantity after increment
-      $temp_item_quantity_new = $temp_item_quantity + 1;
+      $temp_item_quantity_new = $temp_item_quantity + $item_drop_count;
       $shards_remaining = false;
       // If this is a shard piece
       if ($temp_is_shard){
@@ -1148,13 +1189,16 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
       // Otherwise, if a normal item
       else {
         // Define the normal item drop text for display
-        $temp_body_addon = $target_player->print_player_name().' added the dropped item to the inventory.';
+        $temp_body_addon = $target_player->print_player_name().' added the dropped item'.($item_drop_count > 1 ? 's' : '').' to the inventory.';
       }
 
       // Display the robot reward message markup
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $event_header = $temp_item_name.' Item Drop';
-      $event_body = mmrpg_battle::random_positive_word().' The disabled '.$this_robot->print_robot_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="ability_name ability_type ability_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
+      $event_body = mmrpg_battle::random_positive_word();
+      $event_body .= ' The disabled '.$this_robot->print_robot_name().' dropped ';
+      if ($item_drop_count == 1){ $event_body .= (preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="ability_name ability_type ability_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />'; }
+      else { $event_body .= 'x'.$item_drop_count.' <span class="ability_name ability_type ability_type_'.$temp_item_colour.'">'.$temp_item_name.'s</span>!<br />'; }
       $event_body .= $temp_body_addon;
       $event_options = array();
       $event_options['console_show_target'] = false;
@@ -1178,7 +1222,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
       // Create and/or increment the session variable for this item increasing its quantity
       if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
-      if ($temp_item_quantity < $temp_item_quantity_max){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] += 1; }
+      if ($temp_item_quantity < $temp_item_quantity_max){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] += $item_drop_count; }
 
       // If this was a shard, and it was the LAST shard
       if ($shards_remaining !== false && $shards_remaining < 1){
@@ -1218,7 +1262,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $event_header = $temp_core_name.' Item Fusion';
         $event_body = mmrpg_battle::random_positive_word().' The glowing shards fused to create a new <span class="ability_name ability_type ability_type_'.$temp_core_colour.'">'.$temp_core_name.'</span>!<br />';
-        //$event_body .= 'The new '.$temp_type_name.' Core was added to your inventory!';
         $event_body .= $target_player->print_player_name().' added the new core to the inventory.';
         $event_options = array();
         $event_options['console_show_target'] = false;
@@ -1261,26 +1304,51 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
   if (empty($_SESSION['GAME']['DEMO']) && !empty($target_player_rewards['items']) && $this->player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'let us unlock item drops now...');  }
     $temp_items_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    // Define the default success rate and multiply by the modifier
     $temp_success_value = $this_robot->robot_class == 'master' ? 50 : 25;
     $temp_success_value = ceil($temp_success_value * $temp_chance_multiplier);
+    // Empty cores always have item drops
+    if (!empty($this_robot->robot_core) && $this_robot->robot_core == 'empty'){ $temp_success_value = 100; }
+    // If the target holds a Fortune Module, increase the chance of dropps
+    if ($target_robot->robot_item == 'item-fortune-module'){ $temp_success_value = $temp_success_value * 2; }
+    // Fix success values over 100
     if ($temp_success_value > 100){ $temp_success_value = 100; }
+    // Define the failure based on success rate
     $temp_failure_value = 100 - $temp_success_value;
+    // Define the dropping result based on rates
     $temp_dropping_result = $temp_success_value == 100 ? 'success' : $this_battle->weighted_chance(array('success', 'failure'), array($temp_success_value, $temp_failure_value));
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '..and the result of the drop ('.$temp_success_value.' / '.$temp_failure_value.') is '.$temp_dropping_result);  }
+
     //$this_battle->events_create(false, false, 'DEBUG', '..and the result of the drop ('.$temp_success_value.' / '.$temp_failure_value.') is '.$temp_dropping_result);
     if ($temp_dropping_result == 'success'){
+
       $temp_value_total = 0;
       $temp_count_total = 0;
-      foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){ $temp_value_total += $item_reward_info['chance']; $temp_count_total += 1; }
+      foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){
+        $temp_value_total += $item_reward_info['chance'];
+        $temp_count_total += 1;
+      }
+
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_count_total = '.$temp_count_total.';<br /> $temp_value_total = '.$temp_value_total.'; ');  }
+      $temp_item_counts = array();
       $temp_item_tokens = array();
       $temp_item_weights = array();
-      if ($temp_value_total > 0){ foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){ $temp_item_tokens[] = $item_reward_info['token']; $temp_item_weights[] = ceil(($item_reward_info['chance'] / $temp_value_total) * 100); } }
+      if ($temp_value_total > 0){
+        foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){
+          $temp_item_tokens[] = $item_reward_info['token'];
+          $temp_item_weights[] = ceil(($item_reward_info['chance'] / $temp_value_total) * 100);
+          $temp_item_counts[$item_reward_info['token']] = isset($item_reward_info['quantity']) ? $item_reward_info['quantity'] : 1;
+        }
+      }
+
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_item_tokens = '.implode(',', $temp_item_tokens).';<br /> $temp_item_weights = '.implode(',', $temp_item_weights).'; ');  }
       $temp_random_item = $this_battle->weighted_chance($temp_item_tokens, $temp_item_weights);
+
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_random_item = '.$temp_random_item);  }
       $item_index_info = mmrpg_ability::parse_index_info($temp_items_index[$temp_random_item]);
-      temp_player_rewards_items($this_battle, $target_player, $target_robot, $this, $item_reward_key, $item_index_info);
+      $item_drop_count = $temp_item_counts[$temp_random_item];
+
+      temp_player_rewards_items($this_battle, $target_player, $target_robot, $this, $item_reward_key, $item_index_info, $item_drop_count);
     }
   }
 

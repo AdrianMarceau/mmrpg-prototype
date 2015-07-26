@@ -481,8 +481,10 @@ if ($this_ability->ability_results['this_result'] == 'success'){
 
     }
 
-    // If this is a critical hit (random chance)
-    if ($this->battle->critical_chance($this_ability->recovery_options['critical_rate'])){
+    // If this is a critical hit (lucky, based on turn and level)
+    $temp_flag_critical = $this->battle->critical_turn($this->battle->counters['battle_turn'], $target_robot->robot_level, $target_robot->robot_item);
+    //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | critical_chance | level:'.$target_robot->robot_level.' / turn:'.$this->battle->counters['battle_turn'].' | critical:'.($temp_flag_critical ? 'true' : 'false'));
+    if ($temp_flag_critical){
       $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] * $this_ability->recovery_options['critical_multiplier'];
       $this_ability->ability_results['flag_critical'] = true;
       // DEBUG
