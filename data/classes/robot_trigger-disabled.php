@@ -1105,8 +1105,8 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-shard-'.$temp_shard_type);
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$target_player_rewards[\'items\'] = '.json_encode($target_player_rewards['items']));  }
   }
-  // If this robot was a MASTER class and destroyed by WEAKNESS, it may drop a CORE
-  elseif ($this_robot->robot_class == 'master' && !empty($this_robot->flags['triggered_weakness'])){
+  // If this robot was a MASTER OR BOSS class and destroyed by WEAKNESS, it may drop a CORE
+  elseif (in_array($this_robot->robot_class, array('master', 'boss')) && !empty($this_robot->flags['triggered_weakness'])){
     $temp_core_type = !empty($this->robot_core) ? $this->robot_core : 'none';
     $target_player_rewards['items'] = array();
     $target_player_rewards['items'][] =  array('chance' => 100, 'token' => 'item-core-'.$temp_core_type);
