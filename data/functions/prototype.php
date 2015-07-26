@@ -735,7 +735,7 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
  */
 
 // Define a function for generating an ability set for a given robot
-function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $ability_num = 1){
+function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $ability_num = 1, $robot_item = ''){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_generate_abilities(\$robot_info, {$robot_level}, {$ability_num})");  }
   global $DB;
   // Require the actual code file

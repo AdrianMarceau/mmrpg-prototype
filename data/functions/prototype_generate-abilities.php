@@ -20,11 +20,9 @@ $mmrpg_prototype_master_support_abilities = array(
     'buster-shot'
     ),
   array(
-    'attack-blaze', 'defense-blaze', 'speed-blaze',
     'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
     ),
   array(
-    'attack-burn', 'defense-burn', 'speed-burn',
     'attack-break', 'defense-break', 'speed-break', 'energy-break',
     ),
   array(
@@ -50,11 +48,9 @@ $mmrpg_prototype_master_support_abilities = array(
   );
 $mmrpg_prototype_mecha_support_abilities = array(
   array(
-    'attack-blaze', 'defense-blaze', 'speed-blaze',
     'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
     ),
   array(
-    'attack-burn', 'defense-burn', 'speed-burn',
     'attack-break', 'defense-break', 'speed-break', 'energy-break',
     ),
   array(
@@ -89,26 +85,14 @@ if (!empty($this_robot_index['robot_rewards']['abilities'])){
   }
 }
 
-if ($this_robot_index['robot_class'] == 'mecha'){
-  //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre>');
-}
-
 // Define a new array to hold all the addon abilities
 $this_robot_abilities_addons = array('base' => $this_robot_abilities, 'weapons' => array(), 'support' => array());
-
-if ($this_robot_index['robot_class'] == 'mecha'){
-  //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre><hr />$this_robot_abilities_addons = <pre>'.print_r($this_robot_abilities_addons, true).'</pre>');
-}
 
 // If we have already enough abilities, we have nothing more to do
 if (count($this_robot_abilities) >= $ability_num){
 
   // Simple slice to make sure we don't go over eight
   $this_robot_abilities = array_slice($this_robot_abilities, 0, $ability_num);
-
-  if ($this_robot_index['robot_class'] == 'mecha'){
-    //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre>');
-  }
 
 }
 // Otherwise, if we need more abilities, we generate them dynamically
@@ -121,6 +105,9 @@ else {
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
+  // Check if this robot is holding a core
+  $robot_item_core = !empty($robot_item) && preg_match('/^item-core-/i', $robot_item) ? preg_replace('/^item-core-/i', '', $robot_item) : '';
+
   // Define the number of core and support abilities for the robot
   if ($this_robot_index['robot_class'] == 'master'){
     foreach ($mmrpg_prototype_core_abilities AS $group_key => $group_abilities){
@@ -129,12 +116,18 @@ else {
         if (in_array($ability_token, $this_robot_abilities) || in_array($ability_token, $this_robot_abilities_addons['weapons']) || in_array($ability_token, $this_robot_abilities_addons['support'])){ continue; }
         $ability_info = mmrpg_ability::parse_index_info($this_ability_index[$ability_token]);
         $is_compatible = false;
-        if (in_array($ability_token, $this_robot_index['robot_abilities'])){
+        if (!$is_compatible && in_array($ability_token, $this_robot_index['robot_abilities'])){
           $is_compatible = true;
-        } elseif (!empty($this_robot_index['robot_core'])){
+        }
+        if (!$is_compatible && !empty($this_robot_index['robot_core'])){
           if ($this_robot_index['robot_core'] == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
           elseif (!empty($ability_info['ability_type']) && $this_robot_index['robot_core'] == $ability_info['ability_type']){ $is_compatible = true; }
           elseif (!empty($ability_info['ability_type2']) && $this_robot_index['robot_core'] == $ability_info['ability_type2']){ $is_compatible = true; }
+        }
+        if (!$is_compatible && !empty($robot_item_core)){
+          if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
+          elseif (!empty($ability_info['ability_type']) && $robot_item_core == $ability_info['ability_type']){ $is_compatible = true; }
+          elseif (!empty($ability_info['ability_type2']) && $robot_item_core == $ability_info['ability_type2']){ $is_compatible = true; }
         }
         // DEBUG
         //if ($robot_token == 'jewel-man'){ echo('Testing ability '.$ability_token.'... '.($is_compatible ? 'compatible!' : 'not compatible...').'<br />'); }
@@ -142,10 +135,6 @@ else {
       }
       unset($ability_info);
     }
-  }
-
-  if ($this_robot_index['robot_class'] == 'mecha'){
-    //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre><hr />$this_robot_abilities_addons = <pre>'.print_r($this_robot_abilities_addons, true).'</pre>');
   }
 
   // Define the number of core and master support abilities for the robot
@@ -156,11 +145,18 @@ else {
         if (in_array($ability_token, $this_robot_abilities) || in_array($ability_token, $this_robot_abilities_addons['support'])){ continue; }
         $ability_info = mmrpg_ability::parse_index_info($this_ability_index[$ability_token]);
         $is_compatible = false;
-        if (in_array($ability_token, $this_robot_index['robot_abilities'])){ $is_compatible = true; }
-        elseif (!empty($this_robot_index['robot_core'])){
-          if ($this_robot_index['robot_core'] == 'copy'){ $is_compatible = true; }
+        if (!$is_compatible && in_array($ability_token, $this_robot_index['robot_abilities'])){
+          $is_compatible = true;
+        }
+        if (!$is_compatible && !empty($this_robot_index['robot_core'])){
+          if ($this_robot_index['robot_core'] == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
           elseif (!empty($ability_info['ability_type']) && $this_robot_index['robot_core'] == $ability_info['ability_type']){ $is_compatible = true; }
           elseif (!empty($ability_info['ability_type2']) && $this_robot_index['robot_core'] == $ability_info['ability_type2']){ $is_compatible = true; }
+        }
+        if (!$is_compatible && !empty($robot_item_core)){
+          if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
+          elseif (!empty($ability_info['ability_type']) && $robot_item_core == $ability_info['ability_type']){ $is_compatible = true; }
+          elseif (!empty($ability_info['ability_type2']) && $robot_item_core == $ability_info['ability_type2']){ $is_compatible = true; }
         }
         if ($is_compatible){ $this_robot_abilities_addons['support'][] = $ability_token; }
       }
@@ -175,20 +171,23 @@ else {
         if (in_array($ability_token, $this_robot_abilities) || in_array($ability_token, $this_robot_abilities_addons['support'])){ continue; }
         $ability_info = mmrpg_ability::parse_index_info($this_ability_index[$ability_token]);
         $is_compatible = false;
-        if (empty($ability_info['ability_type'])){ $is_compatible = true; }
-        elseif (!empty($ability_info['ability_type'])){
-          if ($this_robot_index['robot_core'] == 'copy'){ $is_compatible = true; }
+        if (!$is_compatible && empty($ability_info['ability_type'])){
+          $is_compatible = true;
+        }
+        if (!$is_compatible && !empty($ability_info['ability_type'])){
+          if ($this_robot_index['robot_core'] == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
           elseif (!empty($ability_info['ability_type']) && $this_robot_index['robot_core'] == $ability_info['ability_type']){ $is_compatible = true; }
           elseif (!empty($ability_info['ability_type2']) && $this_robot_index['robot_core'] == $ability_info['ability_type2']){ $is_compatible = true; }
+        }
+        if (!$is_compatible && !empty($robot_item_core)){
+          if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
+          elseif (!empty($ability_info['ability_type']) && $robot_item_core == $ability_info['ability_type']){ $is_compatible = true; }
+          elseif (!empty($ability_info['ability_type2']) && $robot_item_core == $ability_info['ability_type2']){ $is_compatible = true; }
         }
         if ($is_compatible){ $this_robot_abilities_addons['support'][] = $ability_token; }
       }
       unset($ability_info);
     }
-  }
-
-  if ($this_robot_index['robot_class'] == 'mecha'){
-    //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre><hr />$this_robot_abilities_addons = <pre>'.print_r($this_robot_abilities_addons, true).'</pre>');
   }
 
   // Define the number of darkness abilities for the robot
@@ -199,11 +198,18 @@ else {
         if (in_array($ability_token, $this_robot_abilities) || in_array($ability_token, $this_robot_abilities_addons['support'])){ continue; }
         $ability_info = mmrpg_ability::parse_index_info($this_ability_index[$ability_token]);
         $is_compatible = false;
-        if (in_array($ability_token, $this_robot_index['robot_abilities'])){ $is_compatible = true; }
-        elseif (!empty($this_robot_index['robot_core'])){
+        if (!$is_compatible && in_array($ability_token, $this_robot_index['robot_abilities'])){
+          $is_compatible = true;
+        }
+        if (!$is_compatible && !empty($this_robot_index['robot_core'])){
           if ($this_robot_index['robot_core'] == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
           elseif (!empty($ability_info['ability_type']) && $this_robot_index['robot_core'] == $ability_info['ability_type']){ $is_compatible = true; }
           elseif (!empty($ability_info['ability_type2']) && $this_robot_index['robot_core'] == $ability_info['ability_type2']){ $is_compatible = true; }
+        }
+        if (!$is_compatible && !empty($robot_item_core)){
+          if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
+          elseif (!empty($ability_info['ability_type']) && $robot_item_core == $ability_info['ability_type']){ $is_compatible = true; }
+          elseif (!empty($ability_info['ability_type2']) && $robot_item_core == $ability_info['ability_type2']){ $is_compatible = true; }
         }
         if ($is_compatible){ $this_robot_abilities_addons['support'][] = $ability_token; }
       }
@@ -211,27 +217,15 @@ else {
     }
   }
 
-  if ($this_robot_index['robot_class'] == 'mecha'){
-    //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre><hr />$this_robot_abilities_addons = <pre>'.print_r($this_robot_abilities_addons, true).'</pre>');
-  }
-
   // Shuffle the weapons and support arrays
   shuffle($this_robot_abilities_addons['weapons']);
   shuffle($this_robot_abilities_addons['support']);
-
-  if ($this_robot_index['robot_class'] == 'mecha'){
-    //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre><hr />$this_robot_abilities_addons = <pre>'.print_r($this_robot_abilities_addons, true).'</pre>');
-  }
 
   // If there were no main abilities, give them an addons
   if (empty($this_robot_abilities) && !empty($this_robot_abilities_addons['weapons'])){
     $temp_token = array_shift($this_robot_abilities_addons['weapons']);
     $this_robot_abilities[] = $temp_token;
     $this_robot_abilities_addons['base'][] = $temp_token;
-  }
-
-  if ($this_robot_index['robot_class'] == 'mecha'){
-    //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre><hr />$this_robot_abilities_addons = <pre>'.print_r($this_robot_abilities_addons, true).'</pre>');
   }
 
   // Define the last addon array which will have alternating values
@@ -246,24 +240,12 @@ else {
     }
   }
 
-  if ($this_robot_index['robot_class'] == 'mecha'){
-    //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre><hr />$this_robot_abilities_addons = <pre>'.print_r($this_robot_abilities_addons, true).'</pre>');
-  }
-
   // Combine the two arrays into one again
   //$this_robot_abilities = array_merge($this_robot_abilities_addons['base'], $this_robot_abilities_addons['weapons'], $this_robot_abilities_addons['support']);
   $this_robot_abilities = array_merge($this_robot_abilities, $temp_addons_final);
   // Crop the array to the requested length
   $this_robot_abilities = array_slice($this_robot_abilities, 0, $ability_num);
 
-  if ($this_robot_index['robot_class'] == 'mecha'){
-    //die('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre><hr />$this_robot_abilities_addons = <pre>'.print_r($this_robot_abilities_addons, true).'</pre>');
-  }
-
-}
-
-if ($this_robot_index['robot_class'] == 'mecha'){
-  //echo('On line '.__LINE__.' with $ability_num = '.$ability_num.' <hr />$this_robot_index = <pre>'.print_r($this_robot_index, true).'</pre><hr />$this_robot_abilities = <pre>'.print_r($this_robot_abilities, true).'</pre><hr />$this_robot_abilities_addons = <pre>'.print_r($this_robot_abilities_addons, true).'</pre>');
 }
 
 ?>
