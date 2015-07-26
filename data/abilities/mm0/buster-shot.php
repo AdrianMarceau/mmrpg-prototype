@@ -41,23 +41,23 @@ $ability = array(
     // Extract all objects into the current scope
     extract($objects);
 
-    // Define this ability's attachment token
-    $this_buster_attachment_tokens = array(
-      'ability_mega-buster', 'ability_bass-buster', 'ability_proto-buster',
-      'ability_light-buster', 'ability_wily-buster', 'ability_cossack-buster',
-      'ability_roll-buster', 'ability_disco-buster', 'ability_rhythm-buster'
-      );
-
-    // Loop through any attachments and boost power by 10% for each buster charge
+    // Loop through any attachments and boost power for each buster charge
     $temp_new_damage = $this_ability->ability_base_damage;
-    $temp_new_damage_booster = 0;
-    foreach ($this_robot->robot_attachments AS $this_attachment_token => $this_attachment_info){
-      if (in_array($this_attachment_token, $this_buster_attachment_tokens)){ $temp_new_damage_booster += 1; }
+    foreach ($this_robot->robot_attachments AS $token => $info){
+      if (preg_match('/^ability_(light|mega|roll|wily|bass|disco|cossack|proto|rhythm)-buster$/i', $token)){
+        $temp_new_damage += 1;
+      }
     }
-    $temp_new_damage += $temp_new_damage * ($temp_new_damage_booster / 7);
-    $temp_new_damage = ceil($temp_new_damage);
     // Update the ability's damage with the new amount
     $this_ability->ability_damage = $temp_new_damage;
+
+    // If this robot is holding a Target Module, allow target selection
+    if ($this_robot->robot_item == 'item-target-module'){
+      $this_ability->ability_target = 'select_target';
+    } else {
+      $this_ability->ability_target = $this_ability->ability_base_target;
+    }
+
     // Update the ability session
     $this_ability->update_session();
 
