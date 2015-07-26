@@ -63,10 +63,12 @@ $(document).ready(function(){
     if (!thisShopData.allowEdit){ return false; }
     var thisTab = $(this);
     var thisTabToken = thisTab.attr('data-tab');
+    var thisTabType = thisTab.attr('data-tab-type');
+    //console.log('clicked .tab_link[data-tab='+thisTabToken+'][data-tab-type='+thisTabType+']');
     var tabLinkBlock = thisTab.parent();
     var eventContainer = tabLinkBlock.parent();
     var tabContainerBlock = $('.shop_tabs_containers', eventContainer);
-    var thiContainer = $('.tab_container[data-tab='+thisTabToken+']', eventContainer);
+    var thiContainer = $('.tab_container[data-tab='+thisTabToken+'][data-tab-type='+thisTabType+']', eventContainer);
     $('.shop_tabs_links .tab_link[data-tab]', gameConsole).removeClass('tab_link_active');
     thisTab.addClass('tab_link_active');
     $('.shop_tabs_containers .tab_container[data-tab]', gameConsole).removeClass('tab_container_active');
@@ -192,7 +194,8 @@ $(document).ready(function(){
     var thisItemName = thisCell.find('.item_name').clone();    
     //console.log(thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / '+thisPrice+'z');    
     var itemCellConfirm = $('.item_cell_confirm', thisTab);    
-    if (thisKind == 'item' && itemCellConfirm.attr('data-token') == thisToken){      
+    if (thisKind == 'item' && itemCellConfirm.attr('data-token') == thisToken){   
+      
       buyQuantity = parseInt(itemCellConfirm.attr('data-quantity')) + 1;
       //console.log('A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
       buyPrice = buyQuantity * parseInt(thisPrice);
@@ -208,7 +211,9 @@ $(document).ready(function(){
       itemCellConfirm.attr('data-quantity', buyQuantity).attr('data-price', buyPrice).attr('data-shop', thisBuyer);
       itemCellConfirm.find('.item_quantity').attr('data-quantity', buyQuantity).html('x '+buyQuantity);
       itemCellConfirm.find('.item_price').attr('data-price', buyPrice).html('&hellip; '+printNumberWithCommas(buyPrice)+'z');  
-      } else if (thisKind == 'ability') {            
+      
+    } else if (thisKind == 'ability') {   
+      
       var actualQuantity = 1; //3 - thisQuantity;
       var actualPrice = buyPrice * actualQuantity;
       var thisUnlocked = thisCell.attr('data-unlocked').split(',');
@@ -269,11 +274,12 @@ $(document).ready(function(){
         }
       
       itemCellConfirm.append('<label class="item_price" data-price="'+actualPrice+'">&hellip; '+printNumberWithCommas(actualPrice)+'z</label>');
-      //itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+(3 - thisQuantity)+'</label>');
+      //itemCellConfirm.append('<label class="item_quantity" data-quantity="1">&#10004;</label>');
       itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
       itemCellConfirm.append(thisItemName);    
       
       } else {
+        
       //console.log('C) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');            
       itemCellConfirm.empty();
       itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer);
@@ -282,6 +288,7 @@ $(document).ready(function(){
       itemCellConfirm.append('<label class="item_price" data-price="'+buyPrice+'">&hellip; '+printNumberWithCommas(buyPrice)+'z</label>');
       itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
       itemCellConfirm.append(thisItemName);                 
+      
       }         
     return true;
     });
@@ -475,9 +482,9 @@ function updateItemQuantity(itemToken, itemQuantity){
       thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('x '+itemQuantity);     
       if (thisAction == 'buy' && itemQuantity >= 99){ thisCell.addClass('item_cell_disabled');  }
       else if (thisAction == 'sell' && itemQuantity <= 0){ thisCell.addClass('item_cell_disabled');  }  
-      } else if (thisKind == 'ability'){         
-      thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html(''); //.html(itemQuantity+' / 3');     
-      if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }    
+      } else if (thisKind == 'ability'){  
+      thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('&nbsp;');     
+      if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); } 
       } else if (thisKind == 'field'){                     
       if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }
       } else if (thisKind == 'star'){

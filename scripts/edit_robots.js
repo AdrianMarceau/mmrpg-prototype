@@ -700,16 +700,26 @@ $(document).ready(function(){
             // Clone the inner html into the target item link
             targetItemLink.html(thisItemLink.html()).find('.count').remove();
             
-            // Check if the item token was a robot core
-            if (thisItemToken.match(/^item-core-/i)){
-              // Collect the held item's core type for later
-              var thisCoreType = thisItemToken.replace(/^item-core-/i, '');
-              // If the target robot is a copy core, change alts
-              if (targetRobotCores.indexOf('copy') != -1){
+            // If the target robot is a copy core, change alts
+            if (targetRobotCores.indexOf('copy') != -1){
+              
+              // Check if the item token was a robot core, else remove any alt
+              if (thisItemToken.match(/^item-core-/i)){
+                
+                // Collect the held item's core type for alt colours
+                var thisCoreType = thisItemToken.replace(/^item-core-/i, '');
                 // Collect the new image name (core type) and trigger function
                 var newImageToken = thisCoreType;
                 updateRobotImageAlt(targetPlayerToken, targetRobotToken, newImageToken);
+                
+                } else {
+                  
+                // Define the new image name (base) and trigger function
+                var newImageToken = 'base';
+                updateRobotImageAlt(targetPlayerToken, targetRobotToken, newImageToken);
+                  
                 }
+              
               }
             
             }
@@ -728,9 +738,11 @@ $(document).ready(function(){
             
             // If the target robot is a copy core, change alts
             if (targetRobotCores.indexOf('copy') != -1){
+              
               // Define the new image name (base) and trigger function
               var newImageToken = 'base';
               updateRobotImageAlt(targetPlayerToken, targetRobotToken, newImageToken);
+              
               }
             
             }

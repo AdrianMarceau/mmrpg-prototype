@@ -19,9 +19,10 @@ $temp_ability_type2 = !empty($ability_info['ability_type2']) ? $mmrpg_index['typ
 $temp_ability_energy = mmrpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
 $temp_type_array = array();
 $temp_incompatible = false;
+$temp_global_abilities = self::get_global_abilities();
 $temp_index_abilities = !empty($robot_info['robot_index_abilities']) ? $robot_info['robot_index_abilities'] : array();
 $temp_current_abilities = !empty($robot_info['robot_abilities']) ? array_keys($robot_info['robot_abilities']) : array();
-$temp_compatible_abilities = array_merge($temp_index_abilities, $temp_current_abilities);
+$temp_compatible_abilities = array_merge($temp_global_abilities, $temp_index_abilities, $temp_current_abilities);
 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, $temp_robot_token.'/'.$temp_ability_token.'/'."\nindex_abilities = ".implode(',', $temp_index_abilities)."\ncurrent_abilities = ".implode(',', $temp_current_abilities)."\ncompatible_abilities = ".implode(',', $temp_compatible_abilities));  }
 //while (!in_array($temp_ability_token, $robot_info['robot_abilities'])){
 while (!in_array($temp_ability_token, $temp_compatible_abilities)){
