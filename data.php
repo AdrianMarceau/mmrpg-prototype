@@ -1404,10 +1404,12 @@ elseif ($this_action == 'ability'){
 
     // Loop through all this player's robots and carry out any end-turn events
     mmrpg_battle::temp_check_robot_attachments($this_battle, $this_player, $this_robot, $target_player, $target_robot);
+    mmrpg_battle::temp_check_robot_items($this_battle, $this_player, $this_robot, $target_player, $target_robot);
     mmrpg_battle::temp_check_robot_weapons($this_battle, $this_player, $this_robot, $target_player, $target_robot);
 
     // Loop through all the target player's robots and carry out any end-turn events
     mmrpg_battle::temp_check_robot_attachments($this_battle, $target_player, $target_robot, $this_player, $this_robot);
+    mmrpg_battle::temp_check_robot_items($this_battle, $target_player, $target_robot, $this_player, $this_robot);
     mmrpg_battle::temp_check_robot_weapons($this_battle, $target_player, $target_robot, $this_player, $this_robot);
 
     // Create an empty field to remove any leftover frames

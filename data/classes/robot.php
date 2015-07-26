@@ -478,8 +478,12 @@ class mmrpg_robot {
     //echo 'has_ability_compatibility('.$robot_token.', '.$ability_token.', '.$robot_core.', '.$robot_core2.')'."\n";
     // Define the compatibility flag and default to false
     $temp_compatible = false;
-    // If this ability has a type, check it against this robot
-    if (!empty($ability_info['ability_type']) || !empty($ability_info['ability_type2'])){
+    // Collect the global list and return true if match is found
+    $global_abilities = mmrpg_ability::get_global_abilities();
+    // If this ability is in the list of globally compatible
+    if (in_array($ability_token, $global_abilities)){ $temp_compatible = true; }
+    // Else if this ability has a type, check it against this robot
+    elseif (!empty($ability_info['ability_type']) || !empty($ability_info['ability_type2'])){
       //$debug_fragment .= 'has-type '; // DEBUG
       if (!empty($robot_core) || !empty($robot_core2)){
       //$debug_fragment .= 'has-core '; // DEBUG
@@ -815,7 +819,6 @@ class mmrpg_robot {
     if (!empty($this->robot_attachments)){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
-      $temp_attachments_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
@@ -833,7 +836,7 @@ class mmrpg_robot {
             $this->update_session();
             if ($attachment_info['attachment_destroy'] !== false){
               //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-              $temp_ability = mmrpg_ability::parse_index_info($temp_attachments_index[$attachment_info['ability_token']]);
+              $temp_ability = mmrpg_ability::get_index_info($attachment_info['ability_token']);
               $attachment_info = array_merge($temp_ability, $attachment_info);
               $temp_attachment = new mmrpg_ability($this->battle, $this->player, $this, $attachment_info);
               $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';

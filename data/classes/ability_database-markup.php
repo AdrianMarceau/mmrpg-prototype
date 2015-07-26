@@ -480,15 +480,7 @@ ob_start();
                   $robot_key = 0;
                   $robot_method_key = 0;
                   $robot_method = '';
-                  $temp_global_abilities = array(
-                    'buster-shot', 'buster-charge', 'buster-relay',
-                    'light-buster', 'wily-buster', 'cossack-buster',
-                  	'energy-boost', 'attack-boost', 'defense-boost', 'speed-boost',
-                  	'energy-break', 'attack-break', 'defense-break', 'speed-break',
-                  	'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
-                  	'repair-mode', 'attack-mode', 'defense-mode', 'speed-mode',
-                    'field-support', 'mecha-support'
-                    );
+                  $temp_global_abilities = self::get_global_abilities();
                   foreach ($ability_robot_rewards AS $this_info){
                     $this_level = $this_info['level'];
                     $this_robot = $mmrpg_database_robots[$this_info['token']];

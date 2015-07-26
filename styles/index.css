@@ -672,6 +672,12 @@ html {
 #window .page .body .subbody_databaselinks {
   margin-bottom: 4px;
 }
+#window .page .body .subbody_databaselinks .iconwrap {
+  overflow: hidden;
+}
+#window .page .body .subbody_databaselinks[data-class="items"] .iconwrap {
+  padding-right: 8%;
+}
 #window .page .body .subbody .text {
   display: block;
   margin: 0 0 6px;  

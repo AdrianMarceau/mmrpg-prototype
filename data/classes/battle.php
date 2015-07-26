@@ -886,6 +886,21 @@ class mmrpg_battle {
 
   }
 
+  // Define a function for determining a critical turn
+  public function critical_turn($battle_turn, $robot_level, $robot_item = ''){
+    // If the robot level and the current turn have the same last digits, it's critical
+    $temp_turn_digit = substr($battle_turn, -1, 1);
+    $temp_level_digit = substr($robot_level, -1, 1);
+    $temp_flag_critical = $temp_level_digit == $temp_turn_digit ? true : false;
+    // If the robot is holding a chance module, also look at the first digit of their level
+    if ($robot_item == 'item-fortune-module' && $temp_flag_critical == false){
+      $temp_level_digit = substr($robot_level, 0, 1);
+      $temp_flag_critical = $temp_level_digit == $temp_turn_digit ? true : false;
+    }
+    // Return the final critical result
+    return $temp_flag_critical;
+  }
+
   // Define a function for returning a critical chance
   public function critical_chance($chance_percent = 10){
 
@@ -1044,6 +1059,134 @@ class mmrpg_battle {
 
   }
 
+
+  // -- CHECK ITEMS FUNCTION -- //
+
+  // Define a function for checking ttem status
+  public static function temp_check_robot_items(&$this_battle, &$this_player, &$this_robot, &$target_player, &$target_robot){
+
+    // Loop through all the target player's robots and carry out any end-turn events
+    $temp_robot = false;
+    foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
+
+      // Create the temp robot object
+      if (empty($temp_robot)){ $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
+      else { $temp_robot->robot_load(array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
+      //if ($temp_robotinfo['robot_id'] == $this_robot->robot_id){ $temp_robot = &$this_robot; }
+      //else { $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
+
+      // Hide any disabled robots that have not been hidden yet
+      if ($temp_robotinfo['robot_status'] == 'disabled'){
+        // Hide robot and update session
+        $temp_robot->flags['apply_disabled_state'] = true;
+        //$temp_robot->flags['hidden'] = true;
+        $temp_robot->update_session();
+        // Create an empty field to remove any leftover frames
+        $this_battle->events_create(false, false, '', '');
+        // Continue
+        continue;
+      }
+
+      // If this robot has an item attached, process actions
+      if (!empty($temp_robot->robot_item)){
+        //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has item');
+
+        // If the robot is holding an Energy Booster item, apply recovery
+        if ($temp_robot->robot_item == 'item-energy-booster'){
+
+          // Define the item object and trigger info
+          $temp_item_info = array('ability_token' => 'item-energy-booster');
+          $temp_item_object = new mmrpg_ability($this_battle, $this_player, $temp_robot, $temp_item_info);
+          $temp_recovery_amount = ceil($temp_robot->robot_base_energy * ($temp_item_object->ability_recovery2 / 100));
+          if (($temp_robot->robot_energy + $temp_recovery_amount) > $temp_robot->robot_base_energy){ $temp_recovery_amount = $temp_robot->robot_base_energy - $temp_robot->robot_energy; }
+          $temp_item_object->recovery_options_update(array(
+            'kind' => 'energy',
+            'frame' => 'taunt',
+            'percent' => true,
+            'modifiers' => false,
+            'kickback' => array(0, 0, 0),
+            'success' => array(9, -10, -10, -10, 'The '.$temp_item_object->print_ability_name().' repaired '.$temp_robot->print_robot_name().'&#39;s systems!'),
+            'failure' => array(9, -10, -10, -10, '')
+            ));
+
+          // Trigger stat recovery for the holding robot
+          if (!empty($temp_recovery_amount)){ $temp_robot->trigger_recovery($temp_robot, $temp_item_object, $temp_recovery_amount); }
+
+
+        }
+        // Else the robot is holding an Attack Booster item, apply boosts
+        elseif ($temp_robot->robot_item == 'item-attack-booster'){
+
+          // Define the item object and trigger info
+          $temp_item_info = array('ability_token' => 'item-attack-booster');
+          $temp_item_object = new mmrpg_ability($this_battle, $this_player, $temp_robot, $temp_item_info);
+          $temp_recovery_amount = ceil($temp_robot->robot_base_attack * ($temp_item_object->ability_recovery2 / 100));
+          $temp_item_object->recovery_options_update(array(
+            'kind' => 'attack',
+            'frame' => 'taunt',
+            'percent' => true,
+            'modifiers' => false,
+            'kickback' => array(0, 0, 0),
+            'success' => array(9, -10, -10, -10, 'The '.$temp_item_object->print_ability_name().' improved '.$temp_robot->print_robot_name().'&#39;s weapon systems!'),
+            'failure' => array(9, -10, -10, -10, '')
+            ));
+
+          // Trigger stat recovery for the holding robot
+          if (!empty($temp_recovery_amount)){ $temp_robot->trigger_recovery($temp_robot, $temp_item_object, $temp_recovery_amount); }
+
+        }
+        // Else if the robot is holding an Defense Booster item, apply boosts
+        elseif ($temp_robot->robot_item == 'item-defense-booster'){
+
+          // Define the item object and trigger info
+          $temp_item_info = array('ability_token' => 'item-defense-booster');
+          $temp_item_object = new mmrpg_ability($this_battle, $this_player, $temp_robot, $temp_item_info);
+          $temp_recovery_amount = ceil($temp_robot->robot_base_defense * ($temp_item_object->ability_recovery2 / 100));
+          $temp_item_object->recovery_options_update(array(
+            'kind' => 'defense',
+            'frame' => 'taunt',
+            'percent' => true,
+            'modifiers' => false,
+            'kickback' => array(0, 0, 0),
+            'success' => array(9, -10, -10, -10, 'The '.$temp_item_object->print_ability_name().' improved '.$temp_robot->print_robot_name().'&#39;s shield systems!'),
+            'failure' => array(9, -10, -10, -10, '')
+            ));
+
+          // Trigger stat recovery for the holding robot
+          if (!empty($temp_recovery_amount)){ $temp_robot->trigger_recovery($temp_robot, $temp_item_object, $temp_recovery_amount); }
+
+        }
+        // Else if the robot is holding an Defense Booster item, apply boosts
+        elseif ($temp_robot->robot_item == 'item-speed-booster'){
+
+          // Define the item object and trigger info
+          $temp_item_info = array('ability_token' => 'item-speed-booster');
+          $temp_item_object = new mmrpg_ability($this_battle, $this_player, $temp_robot, $temp_item_info);
+          $temp_recovery_amount = ceil($temp_robot->robot_base_speed * ($temp_item_object->ability_recovery2 / 100));
+          $temp_item_object->recovery_options_update(array(
+            'kind' => 'speed',
+            'frame' => 'taunt',
+            'percent' => true,
+            'modifiers' => false,
+            'kickback' => array(0, 0, 0),
+            'success' => array(9, -10, -10, -10, 'The '.$temp_item_object->print_ability_name().' improved '.$temp_robot->print_robot_name().'&#39;s mobility systems!'),
+            'failure' => array(9, -10, -10, -10, '')
+            ));
+
+          // Trigger stat recovery for the holding robot
+          if (!empty($temp_recovery_amount)){ $temp_robot->trigger_recovery($temp_robot, $temp_item_object, $temp_recovery_amount); }
+
+        }
+
+      }
+
+    }
+
+    // Return true on success
+    return true;
+
+  }
+
   // -- CHECK WEAPONS FUNCTION -- //
 
   // Define a function for checking weapons status
@@ -1072,22 +1215,24 @@ class mmrpg_battle {
       }
 
       // If this robot is not at full weapon energy, increase it by one
-      if ($temp_robot->robot_weapons < $temp_robot->robot_base_weapons
-        || $temp_robot->robot_attack < $temp_robot->robot_base_attack
-        || $temp_robot->robot_defense < $temp_robot->robot_base_defense
-        || $temp_robot->robot_speed < $temp_robot->robot_base_speed){
+      if (
+        $temp_robot->robot_weapons < $temp_robot->robot_base_weapons
+        //|| $temp_robot->robot_attack < $temp_robot->robot_base_attack
+        //|| $temp_robot->robot_defense < $temp_robot->robot_base_defense
+        //|| $temp_robot->robot_speed < $temp_robot->robot_base_speed
+        ){
         // Ensure the regen weapons flag has been set to true
         if ($regen_weapons){
           // Define the multiplier based on position
           $temp_multiplier = $temp_robot->robot_position == 'bench' ? 2 : 1;
           // Increment this robot's weapons by one point and update
           $temp_robot->robot_weapons += MMRPG_SETTINGS_RECHARGE_WEAPONS * $temp_multiplier;
-          // If any of this robot's stats are in break, recover by one
-          if ($temp_robot->robot_attack <= 0){ $temp_robot->robot_attack += MMRPG_SETTINGS_RECHARGE_ATTACK * $temp_multiplier; }
-          if ($temp_robot->robot_defense <= 0){ $temp_robot->robot_defense += MMRPG_SETTINGS_RECHARGE_DEFENSE * $temp_multiplier; }
-          if ($temp_robot->robot_speed <= 0){ $temp_robot->robot_speed += MMRPG_SETTINGS_RECHARGE_SPEED * $temp_multiplier; }
           // If this robot is over its base, zero it out
           if ($temp_robot->robot_weapons > $temp_robot->robot_base_weapons){ $temp_robot->robot_weapons = $temp_robot->robot_base_weapons; }
+          // If any of this robot's stats are in break, recover by one
+          //if ($temp_robot->robot_attack <= 0){ $temp_robot->robot_attack += MMRPG_SETTINGS_RECHARGE_ATTACK * $temp_multiplier; }
+          //if ($temp_robot->robot_defense <= 0){ $temp_robot->robot_defense += MMRPG_SETTINGS_RECHARGE_DEFENSE * $temp_multiplier; }
+          //if ($temp_robot->robot_speed <= 0){ $temp_robot->robot_speed += MMRPG_SETTINGS_RECHARGE_SPEED * $temp_multiplier; }
         }
         // Update just to be sure
         $temp_robot->update_session();

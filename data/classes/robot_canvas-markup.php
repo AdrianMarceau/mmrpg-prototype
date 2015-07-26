@@ -430,6 +430,28 @@ ob_start();
         $details_data['robot_details'] .= $robot_attack_markup;
       }
 
+      // If this robot is holding an item, add it to the display
+      if (!empty($this->robot_item)){
+        $temp_item_info = mmrpg_ability::get_index_info($this->robot_item);
+        $details_data['item_title'] = $temp_item_info['ability_name'];
+        $details_data['item_type'] = !empty($temp_item_info['ability_type']) ? $temp_item_info['ability_type'] : 'none';
+        $details_data['item_type2'] = !empty($temp_item_info['ability_type2']) ? $temp_item_info['ability_type2'] : '';
+        $details_data['item_title_type'] = $details_data['item_type'];
+        $details_data['item_file'] = 'images/abilities/'.$this->robot_item.'/icon_'.$details_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $details_data['item_class'] = 'sprite size40 mugshot '.$details_data['robot_float'].' ';
+        $details_data['item_style'] = 'background-image: url('.$details_data['item_file'].'); ';
+        if (!empty($details_data['item_type2'])){
+          if ($details_data['item_title_type'] != 'none'){ $details_data['item_title_type'] .= ' '.$details_data['item_type2']; }
+          else { $details_data['item_title_type'] = $details_data['item_type2']; }
+        }
+        $item_markup = '<div class="robot_item">';
+          $item_markup .= '<div class="wrap type '.$details_data['item_title_type'].'">';
+            $item_markup .= '<div class="'.$details_data['item_class'].'" style="'.$details_data['item_style'].'" title="'.$details_data['item_title'].'" data-tooltip-type="type '.$details_data['item_title_type'].'">&nbsp;</div>';
+          $item_markup .= '</div>';
+        $item_markup .= '</div>';
+        $details_data['robot_details'] .= $item_markup;
+      }
+
       $details_data['mugshot_file'] = 'images/robots/'.$details_data['robot_image'].'/mug_'.$details_data['robot_direction'].'_'.$details_data['robot_size_base'].'x'.$details_data['robot_size_base'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
       $details_data['mugshot_class'] = 'sprite details robot_mugshot ';
       $details_data['mugshot_class'] .= 'sprite_'.$details_data['robot_size_base'].'x'.$details_data['robot_size_base'].' sprite_'.$details_data['robot_size_base'].'x'.$details_data['robot_size_base'].'_mugshot sprite_mugshot_'.$details_data['robot_float'].' sprite_'.$details_data['robot_size_base'].'x'.$details_data['robot_size_base'].'_mugshot_'.$details_data['robot_float'].' ';

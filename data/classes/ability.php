@@ -587,6 +587,10 @@ class mmrpg_ability {
     $this_data['ability_frame_classes'] = isset($options['ability_frame_classes']) ? $options['ability_frame_classes'] : $this->ability_frame_classes;
 
     $this_data['ability_scale'] = isset($robot_data['robot_scale']) ? $robot_data['robot_scale'] : ($robot_data['robot_position'] == 'active' ? 1 : 0.5 + (((8 - $robot_data['robot_key']) / 8) * 0.5));
+    if (strstr($this_data['ability_frame_classes'], 'sprite_fullscreen')){
+      $this_data['ability_frame_styles'] = '';
+      $this_data['ability_scale'] = 1;
+    }
 
     // DEBUG
     //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, '$this_data[\'robot_id_token\'] = '.$this_data['robot_id_token'].' | $options[\'this_ability_target\'] = '.$options['this_ability_target']);
@@ -1247,15 +1251,23 @@ class mmrpg_ability {
     // Extract all objects into the current scope
     extract($objects);
 
-    // Loop through any attachments and boost power by 10% for each buster charge
+    // Loop through any attachments and boost power for each buster charge
     $temp_new_damage = $this_ability->ability_base_damage;
-    $temp_new_damage_booster = 0;
     foreach ($this_robot->robot_attachments AS $this_attachment_token => $this_attachment_info){
-      if ($this_attachment_token == 'ability_'.$this_ability->ability_type.'-buster'){ $temp_new_damage_booster += 2; }
+      if ($this_attachment_token == 'ability_'.$this_ability->ability_type.'-buster'){
+        $temp_new_damage += 2;
+      }
     }
-    $temp_new_damage += $temp_new_damage_booster;
     // Update the ability's damage with the new amount
     $this_ability->ability_damage = $temp_new_damage;
+
+    // If this robot is holding a Target Module, allow target selection
+    if ($this_robot->robot_item == 'item-target-module'){
+      $this_ability->ability_target = 'select_target';
+    } else {
+      $this_ability->ability_target = $this_ability->ability_base_target;
+    }
+
     // Update the ability session
     $this_ability->update_session();
 
@@ -1298,8 +1310,13 @@ class mmrpg_ability {
       $this_attachment_info['ability_frame_offset'] = $this_attachment_offset;
     }
 
+    // Define the charge required flag based on existing attachments of this ability
+    $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+    // If this robot is holding a charge module, bypass changing and set to false
+    if (!empty($this_robot->robot_item) && $this_robot->robot_item == 'item-charge-module'){ $this_charge_required = false; }
+
     // If the ability flag was not set, this ability begins charging
-    if (!isset($this_robot->robot_attachments[$this_attachment_token])){
+    if ($this_charge_required){
 
       // Target this robot's self
       $this_ability->target_options_update(array(
@@ -1374,10 +1391,30 @@ class mmrpg_ability {
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
+    // Define the charge required flag based on existing attachments of this ability
+    $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+    // If this robot is holding a Charge Module, bypass changing and set to false
+    if ($this_robot->robot_item == 'item-charge-module'){ $this_charge_required = false; }
+
     // If the ability flag had already been set, reduce the weapon energy to zero
-    if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->ability_energy = 0; }
+    if (!$this_charge_required){ $this_ability->ability_energy = 0; }
     // Otherwise, return the weapon energy back to default
     else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
+
+    // If this robot is holding a Charge Module, cut power in half
+    if ($this_robot->robot_item == 'item-charge-module'){
+      $this_ability->ability_damage = ceil($this_ability->ability_base_damage / 2);
+    } else {
+      $this_ability->ability_damage = $this_ability->ability_base_damage;
+    }
+
+    // If this robot is holding a Target Module, allow target selection
+    if ($this_robot->robot_item == 'item-target-module'){
+      $this_ability->ability_target = !$this_charge_required ? 'select_target' : $this_ability->ability_base_target;
+    } else {
+      $this_ability->ability_target = $this_ability->ability_base_target;
+    }
+
     // Update the ability session
     $this_ability->update_session();
 
@@ -1726,6 +1763,22 @@ class mmrpg_ability {
     // Return true on success
     return true;
 
+  }
+
+  // Define a static function that returns a list of globally compatible abilities
+  public static function get_global_abilities(){
+    // Define the list of global abilities
+    $temp_global_abilities = array(
+      'buster-shot', 'buster-charge', 'buster-relay',
+      'light-buster', 'wily-buster', 'cossack-buster',
+    	'energy-boost', 'attack-boost', 'defense-boost', 'speed-boost',
+    	'energy-break', 'attack-break', 'defense-break', 'speed-break',
+    	'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
+    	'repair-mode', 'attack-mode', 'defense-mode', 'speed-mode',
+      'field-support', 'mecha-support'
+      );
+    // Return the list of global abilities
+    return $temp_global_abilities;
   }
 
 }

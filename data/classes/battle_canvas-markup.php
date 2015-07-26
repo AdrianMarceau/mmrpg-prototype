@@ -352,21 +352,22 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
 
           // Collect the attack value from this robot
           $temp_attack_value = $eventinfo['this_robot']->robot_attack;
-          $temp_attack_markup = $temp_attack_value;
+          $temp_attack_markup = $temp_attack_value.' AT';
 
           // If this player has starforce, increase the attack amount appropriately
           if ($temp_starforce_enabled && !empty($eventinfo['this_player']->player_starforce)){
 
             // Check to ensure this ability actually has a type before proceeding
             if (!empty($this_options['this_ability']->ability_type)){
+              // Define the boost value and start at zero
+              $temp_boost_value = 0;
               // If the player has a matching starforce amount, add the value
               if (!empty($eventinfo['this_player']->player_starforce[$this_options['this_ability']->ability_type])){
                 // Collect the force value for the first ability type
                 $temp_force_value = $eventinfo['this_player']->player_starforce[$this_options['this_ability']->ability_type];
                 // Increase the attack with the value times the boost constant
-                $temp_attack_value += $temp_force_value * MMRPG_SETTINGS_STARS_ATTACKBOOST;
-                // Append a star to the markup so people know it's boosted
-                $temp_attack_markup = $temp_attack_value.'<span class="star">&#9733;</span>';
+                $temp_boost_value = $temp_force_value * MMRPG_SETTINGS_STARS_ATTACKBOOST;
+                $temp_attack_value += $temp_boost_value;
               }
               // And if the ability has a second type, process that too
               if (!empty($this_options['this_ability']->ability_type2)){
@@ -375,10 +376,14 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
                   // Collect the force value for the second ability type
                   $temp_force_value = $eventinfo['this_player']->player_starforce[$this_options['this_ability']->ability_type2];
                   // Increase the attack with the value times the boost constant
-                  $temp_attack_value += $temp_force_value * MMRPG_SETTINGS_STARS_ATTACKBOOST;
-                  // Append a star to the markup so people know it's boosted
-                  $temp_attack_markup = $temp_attack_value.'<span class="star">&#9733;</span>';
+                  $temp_boost_value = $temp_force_value * MMRPG_SETTINGS_STARS_ATTACKBOOST;
+                  $temp_attack_value += $temp_boost_value;
                 }
+              }
+              // If there was a starforce boost, display it
+              if ($temp_boost_value > 0){
+                // Append a star to the markup so people know it's boosted
+                $temp_attack_markup .= ' +'.$temp_boost_value.'<span class="star">&#9733;</span>';
               }
             }
 
@@ -386,21 +391,22 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
 
           // Collect the defense value for the target robot
           $temp_defense_value = $eventinfo['target_robot']->robot_defense;
-          $temp_defense_markup = $temp_defense_value;
+          $temp_defense_markup = $temp_defense_value.' DF';
 
           // If the target player has starforce, increase the defense amount appropriately
           if ($temp_starforce_enabled && !empty($eventinfo['target_player']->player_starforce)){
 
             // Check to ensure this ability actually has a type before proceeding
             if (!empty($this_options['this_ability']->ability_type)){
+              // Define the boost value and start at zero
+              $temp_boost_value = 0;
               // If the player has a matching starforce amount, add the value
               if (!empty($eventinfo['target_player']->player_starforce[$this_options['this_ability']->ability_type])){
                 // Collect the force value for the first ability type
                 $temp_force_value = $eventinfo['target_player']->player_starforce[$this_options['this_ability']->ability_type];
                 // Increase the defense with the value times the boost constant
-                $temp_defense_value += $temp_force_value * MMRPG_SETTINGS_STARS_DEFENSEBOOST;
-                // Append a star to the markup so people know it's boosted
-                $temp_defense_markup = $temp_defense_value.'<span class="star">&#9733;</span>';
+                $temp_boost_value = $temp_force_value * MMRPG_SETTINGS_STARS_DEFENSEBOOST;
+                $temp_defense_value += $temp_boost_value;
               }
               // And if the ability has a second type, process that too
               if (!empty($this_options['this_ability']->ability_type2)){
@@ -409,10 +415,14 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
                   // Collect the force value for the second ability type
                   $temp_force_value = $eventinfo['target_player']->player_starforce[$this_options['this_ability']->ability_type2];
                   // Increase the defense with the value times the boost constant
-                  $temp_defense_value += $temp_force_value * MMRPG_SETTINGS_STARS_DEFENSEBOOST;
-                  // Append a star to the markup so people know it's boosted
-                  $temp_defense_markup = $temp_defense_value.'<span class="star">&#9733;</span>';
+                  $temp_boost_value = $temp_force_value * MMRPG_SETTINGS_STARS_DEFENSEBOOST;
+                  $temp_defense_value += $temp_boost_value;
                 }
+              }
+              // If there was a starforce boost, display it
+              if ($temp_boost_value > 0){
+                // Append a star to the markup so people know it's boosted
+                $temp_defense_markup .= ' +'.$temp_boost_value.'<span class="star">&#9733;</span>';
               }
             }
 
@@ -420,11 +430,11 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
 
           // Position the attack and defense values to right/left depending on player side
           if ($eventinfo['this_player']->player_side == 'left'){
-            $this_stat_markup_left = '<span class="robot_stat robot_stat_left type_attack">'.$temp_attack_markup.' AT</span>';
-            $this_stat_markup_right = '<span class="robot_stat robot_stat_right type_defense">'.$temp_defense_markup.' DF</span>';
+            $this_stat_markup_left = '<span class="robot_stat robot_stat_left type_attack">'.$temp_attack_markup.'</span>';
+            $this_stat_markup_right = '<span class="robot_stat robot_stat_right type_defense">'.$temp_defense_markup.'</span>';
           } elseif ($eventinfo['this_player']->player_side == 'right'){
-            $this_stat_markup_left = '<span class="robot_stat robot_stat_left type_defense">'.$temp_defense_markup.' DF</span>';
-            $this_stat_markup_right = '<span class="robot_stat robot_stat_right type_attack">'.$temp_attack_markup.' AT</span>';
+            $this_stat_markup_left = '<span class="robot_stat robot_stat_left type_defense">'.$temp_defense_markup.'</span>';
+            $this_stat_markup_right = '<span class="robot_stat robot_stat_right type_attack">'.$temp_attack_markup.'</span>';
           }
 
           // DEBUG
