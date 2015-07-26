@@ -384,6 +384,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       }
 
       // Add the masters info into the omega battle
+      $possible_items = array('item-energy-upgrade', 'item-weapon-upgrade', 'item-target-module', 'item-charge-module', 'item-fortune-module', 'item-energy-booster', 'item-attack-booster', 'item-defense-booster', 'item-speed-booster');
+      foreach ($mmrpg_index['types'] AS $token => $info){
+        if (!empty($info['type_class']) && $info['type_class'] == 'special'){ continue; }
+        elseif (in_array($token, array('copy', 'empty'))){ continue; }
+        $possible_items[] = 'item-core-'.$token;
+      }
+      $possible_items_last_key = count($possible_items) - 1;
       $temp_robot_masters_tokens = $temp_robot_masters;
       $temp_robot_masters = array();
       foreach ($temp_robot_masters_tokens AS $key => $token){
@@ -392,9 +399,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $info = array();
         $info['robot_id'] = (MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1);
         $info['robot_token'] = $token;
-        $info['robot_level'] = $chapters_levels_common['five-3'];
+        $info['robot_level'] = $chapters_levels_common['five-3'] + mt_rand(-5, 5);
+        $info['robot_item'] = $possible_items[mt_rand(0, $possible_items_last_key)];
         $info['robot_abilities'] = array();
-        $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
+        $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8, $info['robot_item']);
         $temp_robot_masters[] = $info;
       }
       shuffle($temp_robot_masters);

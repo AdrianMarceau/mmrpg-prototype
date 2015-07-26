@@ -112,7 +112,8 @@ foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => 
   $robot['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
   $index = mmrpg_robot::parse_index_info($this_robot_index[$robot['robot_token']]);
   if ($this_robot_class != 'mecha'){
-    $robot['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $robot['robot_level'], 8);
+    $robot['robot_item'] = isset($robot['robot_item']) ? $robot['robot_item'] : '';
+    $robot['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $robot['robot_level'], 8, $robot['robot_item']);
   }
 
   // Increment the battle's turn limit based on the class of target robot

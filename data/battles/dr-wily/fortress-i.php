@@ -11,8 +11,8 @@ $battle = array(
     'player_token' => 'dr-cossack',
     'player_switch' => 1.5,
     'player_robots' => array(
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'proto-man', 'robot_level' => 20, 'robot_abilities' => array('proto-buster', 'proto-shield', 'proto-strike', 'buster-shot', 'dive-missile', 'skull-barrier', 'bright-burst', 'drill-blitz', 'rain-flush', 'ring-boomerang', 'pharaoh-soul', 'dust-crusher')),
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'rhythm', 'robot_level' => 20, 'robot_abilities' => array('rhythm-buster', 'buster-shot', 'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap'))
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'proto-man', 'robot_level' => 20,'robot_item' => 'item-speed-booster',  'robot_abilities' => array('proto-buster', 'proto-shield', 'proto-strike', 'buster-shot', 'dive-missile', 'skull-barrier', 'bright-burst', 'drill-blitz', 'rain-flush', 'ring-boomerang', 'pharaoh-soul', 'dust-crusher')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'rhythm', 'robot_level' => 20,'robot_item' => 'item-energy-booster',  'robot_abilities' => array('rhythm-buster', 'buster-shot', 'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap'))
       )
     ),
   'battle_rewards' => array(

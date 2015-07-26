@@ -10,7 +10,7 @@ $battle = array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',
     'player_robots' => array(
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'punk', 'robot_level' => 40, 'robot_abilities' => array('energy-boost', 'energy-break', 'bass-baroque', 'mecha-support', 'top-spin', 'shadow-blade', 'hard-knuckle', 'buster-shot'))
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'punk', 'robot_level' => 40, 'robot_item' => 'item-weapon-upgrade', 'robot_abilities' => array('energy-boost', 'energy-break', 'bass-baroque', 'mecha-support', 'top-spin', 'shadow-blade', 'hard-knuckle', 'buster-shot'))
       )
     ),
   'battle_rewards' => array(

@@ -15,9 +15,9 @@ $battle = array(
     'player_robots' => array(
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'oil-man', 'robot_level' => 4, 'robot_abilities' => array('oil-slider', 'oil-shooter', 'defense-boost', 'attack-break', 'buster-shot')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'bubble-man', 'robot_level' => 4, 'robot_abilities' => array('bubble-lead', 'bubble-spray', 'attack-boost', 'defense-break', 'buster-shot')),
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'fire-man', 'robot_level' => 4, 'robot_abilities' => array('fire-storm', 'speed-blaze', 'speed-burn', 'buster-shot')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'fire-man', 'robot_level' => 4, 'robot_abilities' => array('fire-storm', 'speed-boost', 'speed-break', 'buster-shot')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 4), 'robot_token' => 'elec-man', 'robot_level' => 4, 'robot_abilities' => array('thunder-beam', 'defense-boost', 'attack-break', 'buster-shot')),
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 5), 'robot_token' => 'heat-man', 'robot_level' => 4, 'robot_abilities' => array('atomic-fire', 'attack-blaze', 'defense-burn', 'buster-shot')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 5), 'robot_token' => 'heat-man', 'robot_level' => 4, 'robot_abilities' => array('atomic-fire', 'attack-boost', 'defense-break', 'buster-shot')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 6), 'robot_token' => 'wood-man', 'robot_level' => 4, 'robot_abilities' => array('leaf-shield', 'speed-boost', 'speed-break', 'buster-shot'))
       )
     ),

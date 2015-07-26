@@ -10,7 +10,7 @@ $battle = array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',
     'player_robots' => array(
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'enker', 'robot_level' => 35, 'robot_abilities' => array('energy-boost', 'energy-break', 'mega-slide', 'mecha-support', 'spark-shock', 'search-snake', 'needle-cannon', 'buster-shot')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'enker', 'robot_level' => 35, 'robot_item' => 'item-weapon-upgrade', 'robot_abilities' => array('energy-boost', 'energy-break', 'mega-slide', 'mecha-support', 'spark-shock', 'search-snake', 'needle-cannon', 'buster-shot')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'beak', 'robot_level' => 30),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'beak', 'robot_level' => 30),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 4), 'robot_token' => 'beak', 'robot_level' => 30)

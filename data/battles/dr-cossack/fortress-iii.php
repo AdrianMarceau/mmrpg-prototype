@@ -10,9 +10,9 @@ $battle = array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',
     'player_robots' => array(
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'proto-man-ds', 'robot_level' => 50, 'robot_abilities' => array('drill-blitz', 'rain-flush', 'bright-burst', 'pharaoh-soul', 'ring-boomerang', 'dust-crusher', 'skull-barrier', 'dive-missile')),
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'mega-man-ds', 'robot_level' => 50, 'robot_abilities' => array('rolling-cutter', 'hyper-bomb', 'ice-breath', 'fire-storm', 'oil-shooter', 'thunder-strike', 'time-arrow', 'super-throw')),
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'bass-ds', 'robot_level' => 50, 'robot_abilities' => array('metal-blade', 'bubble-spray', 'atomic-fire', 'leaf-shield', 'air-shooter', 'crash-bomber', 'flash-stopper', 'quick-boomerang'))
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'proto-man-ds', 'robot_level' => 50, 'robot_item' => 'item-speed-booster', 'robot_abilities' => array('drill-blitz', 'rain-flush', 'bright-burst', 'pharaoh-soul', 'ring-boomerang', 'dust-crusher', 'skull-barrier', 'dive-missile')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'mega-man-ds', 'robot_level' => 50, 'robot_item' => 'item-defense-booster', 'robot_abilities' => array('rolling-cutter', 'hyper-bomb', 'ice-breath', 'fire-storm', 'oil-shooter', 'thunder-strike', 'time-arrow', 'super-throw')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'bass-ds', 'robot_level' => 50, 'robot_item' => 'item-attack-booster', 'robot_abilities' => array('metal-blade', 'bubble-spray', 'atomic-fire', 'leaf-shield', 'air-shooter', 'crash-bomber', 'flash-stopper', 'quick-boomerang'))
       )
     ),
   'battle_rewards' => array(
