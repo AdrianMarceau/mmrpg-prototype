@@ -82,10 +82,10 @@ $this_shop_index['auto'] = array(
   'shop_field' => 'light-laboratory',
   'shop_player' => 'dr-light',
   'shop_number' => 'SHOP-001',
-  'shop_kind_selling' => 'items',
-  'shop_kind_buying' => 'items',
-  'shop_quote_selling' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.',
-  'shop_quote_buying' => 'So you wanna sell something, eh? Let\'s see what you\'ve collected so far! Hopefully lots of screws!',
+  'shop_kind_selling' => array('items'),
+  'shop_kind_buying' => array('items'),
+  'shop_quote_selling' => array('items' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.'),
+  'shop_quote_buying' => array('items' => 'So you wanna sell something, eh? Let\'s see what you\'ve collected so far! Hopefully lots of screws!'),
   'shop_items' => array(
     'items_selling' => array(
 
