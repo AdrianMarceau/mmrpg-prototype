@@ -1284,7 +1284,8 @@ class mmrpg_ability {
 
     // Define this ability's attachment token
     $this_attachment_offset = array('x' => -10, 'y' => -10, 'z' => -20);
-    $this_attachment_modifier = 1 + ($this_ability->ability_recovery2 / 100);
+    $this_attachment_boost_modifier = 1 + ($this_ability->ability_recovery2 / 100);
+    $this_attachment_break_modifier = 1 - ($this_ability->ability_recovery2 / 100);
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
     	'class' => 'ability',
@@ -1292,10 +1293,10 @@ class mmrpg_ability {
       'ability_frame' => 0,
       'ability_frame_animate' => array(1, 2, 1, 0),
       'ability_frame_offset' => $this_attachment_offset,
-      'attachment_damage_output_booster_'.$this_ability->ability_type => $this_attachment_modifier,
-      'attachment_damage_input_breaker_'.$this_ability->ability_type => $this_attachment_modifier,
-      'attachment_recovery_output_booster_'.$this_ability->ability_type => $this_attachment_modifier,
-      'attachment_recovery_input_breaker_'.$this_ability->ability_type => $this_attachment_modifier
+      'attachment_damage_output_booster_'.$this_ability->ability_type => $this_attachment_boost_modifier,
+      'attachment_damage_input_breaker_'.$this_ability->ability_type => $this_attachment_break_modifier,
+      'attachment_recovery_output_booster_'.$this_ability->ability_type => $this_attachment_boost_modifier,
+      'attachment_recovery_input_breaker_'.$this_ability->ability_type => $this_attachment_break_modifier
       );
 
     // Loop through each existing attachment and alter the start frame by one
