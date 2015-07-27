@@ -85,6 +85,7 @@ $ability = array(
           }
 
           // Append this attachment to the new target robot
+          $temp_buster_exists = isset($target_robot->robot_attachments[$relay_buster_token]) ? true : false;
           $target_robot->robot_frame = $attachment_key % 2 == 0 ? 'defend' : 'taunt';
           $target_robot->robot_attachments[$relay_buster_token] = $relay_buster_info;
           $target_robot->update_session();
@@ -93,7 +94,9 @@ $ability = array(
           $this_ability->target_options_update(array(
             'frame' => $attachment_key % 2 == 0 ? 'taunt' : 'summon',
             'success' => array(9, 0, 0, -10,
-              'The '.$relay_buster_object->print_ability_name().' charge was transferred to '.$target_robot->print_robot_name().'!<br />'
+              'The '.$relay_buster_object->print_ability_name().' charge was '.
+              (!$temp_buster_exists ? 'transferred to '.$target_robot->print_robot_name().'!' : 'merged with '.$target_robot->print_robot_name().'&#39;s!').
+              '<br />'
               )
             ));
           $this_robot->trigger_target($target_robot, $this_ability);
