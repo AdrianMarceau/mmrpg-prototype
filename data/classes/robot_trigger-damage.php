@@ -610,11 +610,46 @@ if ($this_ability->ability_results['this_result'] == 'success'){
             $this_ability->ability_results['this_amount'] = $temp_new_amount;
           }
         }
+        // Next check to see if any boosters or breakers for either of this ability's types
+        if (!empty($this_ability->ability_type2)){
+          // If this robot's attachment has a damage breaker value set
+          if (isset($temp_info['attachment_damage_breaker_'.$this_ability->ability_type2])){
+            // Apply the damage breaker multiplier to the current damage amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->ability_type2]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_damage_breaker_'.$this_ability->ability_type2.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a damage booster value set
+          if (isset($temp_info['attachment_damage_booster_'.$this_ability->ability_type2])){
+            // Apply the damage breaker multiplier to the current damage amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->ability_type2]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_damage_booster_'.$this_ability->ability_type2.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a damage breaker value set
+          if (isset($temp_info['attachment_damage_input_breaker_'.$this_ability->ability_type2])){
+            // Apply the damage breaker multiplier to the current damage amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_breaker_'.$this_ability->ability_type2]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_damage_input_breaker_'.$this_ability->ability_type2.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_breaker_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a damage booster value set
+          if (isset($temp_info['attachment_damage_input_booster_'.$this_ability->ability_type2])){
+            // Apply the damage breaker multiplier to the current damage amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_booster_'.$this_ability->ability_type2]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_damage_input_booster_'.$this_ability->ability_type2.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_booster_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+        }
 
       }
     }
 
-    // If this robot has an attachment with a damage multiplier
+    // If the target robot has an attachment with a damage multiplier
     if (!empty($target_robot->robot_attachments)){
       foreach ($target_robot->robot_attachments AS $temp_token => $temp_info){
 
@@ -685,6 +720,41 @@ if ($this_ability->ability_results['this_result'] == 'success'){
             $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_booster_'.$this_ability->ability_type]);
             // DEBUG
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_damage_output_booster_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+        }
+        // Next check to see if any boosters or breakers for either of this ability's types
+        if (!empty($this_ability->ability_type2)){
+          // If this robot's attachment has a damage breaker value set
+          if (isset($temp_info['attachment_damage_breaker_'.$this_ability->ability_type2])){
+            // Apply the damage breaker multiplier to the current damage amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->ability_type2]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_damage_breaker_'.$this_ability->ability_type2.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a damage booster value set
+          if (isset($temp_info['attachment_damage_booster_'.$this_ability->ability_type2])){
+            // Apply the damage breaker multiplier to the current damage amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->ability_type2]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_damage_booster_'.$this_ability->ability_type2.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a damage breaker value set
+          if (isset($temp_info['attachment_damage_output_breaker_'.$this_ability->ability_type2])){
+            // Apply the damage breaker multiplier to the current damage amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_breaker_'.$this_ability->ability_type2]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_damage_output_breaker_'.$this_ability->ability_type2.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_breaker_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+            $this_ability->ability_results['this_amount'] = $temp_new_amount;
+          }
+          // If this robot's attachment has a damage booster value set
+          if (isset($temp_info['attachment_damage_output_booster_'.$this_ability->ability_type2])){
+            // Apply the damage breaker multiplier to the current damage amount
+            $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_booster_'.$this_ability->ability_type2]);
+            // DEBUG
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_damage_output_booster_'.$this_ability->ability_type2.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_booster_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
             $this_ability->ability_results['this_amount'] = $temp_new_amount;
           }
         }
