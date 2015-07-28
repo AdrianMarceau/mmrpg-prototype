@@ -5216,14 +5216,19 @@ html {
     height: auto;
     font-size: 16px;
   }
-  #window .page .header .count {
+  #window .header .header_wrapper {
+    overflow: hidden;
+    line-height: 24px;
+    padding: 9px 10px;
+  }
+  #window .header .count_header {
     float: none;
     display: block;
     clear: both;
     font-size: 12px;
     line-height: 12px;
-    margin-top: -4px;
-    padding-bottom: 10px;
+    margin-top: 6px;
+    padding-bottom: 6px;
   }
   
   #window .page .subbody .float.link .sprite {
@@ -5305,17 +5310,35 @@ html {
     margin-left: -11px;
   }
   
+  #window .page .body .subbody_databaselinks[data-class="items"] .iconwrap {
+    padding-right: 3%;
+  }
+  
   #window .page_database .type_block {
     width: 45%;
   }
   
+  #window .page .body .header_typewrapper, 
+  #window .page .body .subheader_typewrapper {
+    display: block;
+    overflow: hidden;
+    line-height: 16px;
+    padding-top: 3px;
+    padding-bottom: 6px;
+  }
   #window .page .body .subheader .inline_link {
     font-size: 14px;
     line-height: 16px;
   }
-  #window .page .header .count, 
+  #window .page .body .header .count, 
   #window .page .body .subheader .count {
-    float: right;
+    float: none;
+    display: block;
+    clear: both;
+    font-size: 12px;
+    line-height: 12px;
+    margin-top: 6px;
+    padding: 0;
   }
   #window .page .body .subheader .float_link, 
   #window .page .body .subheader .float_link2 {
@@ -5368,6 +5391,57 @@ html {
   }
   
   
+  #window .page .leaderboard .file .inset {
+    min-height: 80px;
+  }
+  #window .page .leaderboard .file .place {
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+  #window .page .leaderboard .file .points {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    margin: 0;
+    padding: 0;
+    text-align: right;  
+  }
+  #window .page .leaderboard .file .userinfo {
+    display: block;
+    float: none;
+    position: static;
+    width: auto;
+    text-align: left;
+    white-space: normal;
+    margin: 34px 12px 6px;
+    padding: 0;
+  }
+  #window .page .leaderboard .file .records {
+    display: none;
+    float: none;
+    position: static;
+    width: auto;
+    text-align: left;
+    white-space: normal;
+    margin: 0;
+    padding: 0;
+  }
+  #window .page .leaderboard .file .avatar {
+    float: right;
+    left: auto;
+    right: 36px;
+    bottom: 16px;
+  }
+  
+  #window .page .gallery .dateblock, 
+  #window .page .gallery .screenshot {
+    width: 93px;
+  }
+  
   #mmrpg #credits {
     margin: -12px 10px 0;
     padding: 6px 26px;
@@ -5375,6 +5449,13 @@ html {
     color: #464646;
     text-shadow: 0 0 0 transparent;    
     border-radius: 0.3em;
+  }
+  
+  #window .devbuild_warning {
+    
+  }
+  #window .devbuild_warning br {
+    display: none;
   }
   
  

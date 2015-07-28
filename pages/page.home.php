@@ -15,7 +15,7 @@ $this_graph_data['description'] = 'Welcome to the Mega Man RPG Prototype, where 
 //$this_graph_data['type'] = 'website';
 
 // Define the MARKUP variables for this page
-$this_markup_header = 'Mega Man RPG Prototype Developer Build <span class="count">( Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE).' )</span>';
+$this_markup_header = 'Mega Man RPG Prototype Developer Build <span class="count count_header">( Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE).' )</span>';
 
 // Start generating the page markup
 ob_start();
@@ -67,7 +67,13 @@ ob_start();
 $this_display_limit_default = 3;
 require('data/leaderboard.php');
 ?>
-<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><span class="subheader_typewrapper"><a class="link" href="leaderboard/">Mega Man RPG Prototype Leaderboard <span class="count">( <?= (!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').($this_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$this_leaderboard_online_count.' Online</span>' : '') ?> )</span></a><a class="float_link" href="leaderboard/">View More Players &raquo;</a></span></h2>
+<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+  <span class="subheader_typewrapper">
+    <a class="link" href="leaderboard/">Mega Man RPG Prototype Leaderboard</a>
+    <span class="count">( <?= (!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').($this_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$this_leaderboard_online_count.' Online</span>' : '') ?> )</span>
+    <a class="float_link" href="leaderboard/">View More Players &raquo;</a>
+  </span>
+</h2>
 <div class="leaderboard" style="margin-bottom: 12px; overflow: visible;">
   <div class="wrapper" style="margin-bottom: 0; overflow: visible;">
   <?
@@ -93,7 +99,13 @@ require('data/leaderboard.php');
 // Require the gallery data for display
 require_once('data/gallery.php');
 ?>
-<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><span class="subheader_typewrapper"><a class="link" href="gallery/">Mega Man RPG Prototype Gallery <span class="count">( <?= !empty($this_file_count) ? ($this_file_count == 1 ? '1 Image' : $this_file_count.' Images') : '0 Images' ?> )</span></a><a class="float_link" href="gallery/">View More Images &raquo;</a></span></h2>
+<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+  <span class="subheader_typewrapper">
+    <a class="link" href="gallery/">Mega Man RPG Prototype Gallery</a>
+    <span class="count">( <?= !empty($this_file_count) ? ($this_file_count == 1 ? '1 Image' : $this_file_count.' Images') : '0 Images' ?> )</span>
+    <a class="float_link" href="gallery/">View More Images &raquo;</a>
+  </span>
+</h2>
 <div class="gallery" style="margin-bottom: 12px;">
   <div class="wrapper" style="margin-bottom: 0;">
   <?
@@ -135,7 +147,13 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
 $this_category_info = $DB->get_array("SELECT * FROM mmrpg_categories WHERE category_id = {$this_category_id}");
 
 ?>
-<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><span class="subheader_typewrapper"><a class="link" href="community/news/">Mega Man RPG Prototype News &amp; Updates <span class="count">( <?= !empty($this_threads_count) ? ($this_threads_count == 1 ? '1 Post' : $this_threads_count.' Posts') : '0 Posts' ?> )</span></a><a class="float_link" href="community/news/">View More Posts &raquo;</a></span></h2>
+<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+  <span class="subheader_typewrapper">
+    <a class="link" href="community/news/">Mega Man RPG Prototype News &amp; Updates</a>
+    <span class="count">( <?= !empty($this_threads_count) ? ($this_threads_count == 1 ? '1 Post' : $this_threads_count.' Posts') : '0 Posts' ?> )</span>
+    <a class="float_link" href="community/news/">View More Posts &raquo;</a>
+  </span>
+</h2>
 <div class="community" style="margin-bottom: 12px;">
   <?
 

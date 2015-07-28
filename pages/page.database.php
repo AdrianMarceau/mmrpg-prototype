@@ -36,9 +36,11 @@ ob_start();
     ?>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-      <a class="inline_link" href="database/players/">Player Database </a>
-      <span class="count">( <?= !empty($mmrpg_database_players_count) ? ($mmrpg_database_players_count == 1 ? '1 Player' : $mmrpg_database_players_count.' Players') : '0 Players' ?> )</span>
-      <a class="float_link" href="database/players/">View the Player Database &raquo;</a>
+      <span class="subheader_typewrapper">
+        <a class="inline_link" href="database/players/">Player Database </a>
+        <span class="count">( <?= !empty($mmrpg_database_players_count) ? ($mmrpg_database_players_count == 1 ? '1 Player' : $mmrpg_database_players_count.' Players') : '0 Players' ?> )</span>
+        <a class="float_link" href="database/players/">View the Player Database &raquo;</a>
+      </span>
     </h2>
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="players" data-class-single="player">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_02"  href="database/players/" style="background-image: url(images/players/dr-light/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Dr. Light</a></div>*/?>
@@ -47,9 +49,11 @@ ob_start();
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-      <a class="inline_link" href="database/robots/">Robot Database</a>
-      <span class="count">( <?= !empty($mmrpg_database_robots_count) ? ($mmrpg_database_robots_count == 1 ? '1 Robot' : $mmrpg_database_robots_count.' Robots') : '0 Robots' ?> )</span>
-      <a class="float_link" href="database/robots/">View the Robot Database &raquo;</a>
+      <span class="subheader_typewrapper">
+        <a class="inline_link" href="database/robots/">Robot Database</a>
+        <span class="count">( <?= !empty($mmrpg_database_robots_count) ? ($mmrpg_database_robots_count == 1 ? '1 Robot' : $mmrpg_database_robots_count.' Robots') : '0 Robots' ?> )</span>
+        <a class="float_link" href="database/robots/">View the Robot Database &raquo;</a>
+      </span>
     </h2>
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="robots" data-class-single="robot">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_02" href="database/robots/" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Mega Man</a></div>*/?>
@@ -58,9 +62,11 @@ ob_start();
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-      <a class="inline_link" href="database/mechas/">Mecha Database</a>
-      <span class="count">( <?= !empty($mmrpg_database_mechas_count) ? ($mmrpg_database_mechas_count == 1 ? '1 Mecha' : $mmrpg_database_mechas_count.' Mechas') : '0 Mechas' ?> )</span>
-      <a class="float_link" href="database/mechas/">View the Mecha Database &raquo;</a>
+      <span class="subheader_typewrapper">
+        <a class="inline_link" href="database/mechas/">Mecha Database</a>
+        <span class="count">( <?= !empty($mmrpg_database_mechas_count) ? ($mmrpg_database_mechas_count == 1 ? '1 Mecha' : $mmrpg_database_mechas_count.' Mechas') : '0 Mechas' ?> )</span>
+        <a class="float_link" href="database/mechas/">View the Mecha Database &raquo;</a>
+      </span>
     </h2>
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="mechas" data-class-single="mecha">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_07" href="database/mechas/" style="background-image: url(images/robots/met/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Met</a></div>*/?>
@@ -69,9 +75,11 @@ ob_start();
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-      <a class="inline_link" href="database/bosses/">Boss Database</a>
-      <span class="count">( <?= !empty($mmrpg_database_bosses_count) ? ($mmrpg_database_bosses_count == 1 ? '1 Boss' : $mmrpg_database_bosses_count.' Bosses') : '0 Bosses' ?> )</span>
-      <a class="float_link" href="database/bosses/">View the Boss Database &raquo;</a>
+      <span class="subheader_typewrapper">
+        <a class="inline_link" href="database/bosses/">Boss Database</a>
+        <span class="count">( <?= !empty($mmrpg_database_bosses_count) ? ($mmrpg_database_bosses_count == 1 ? '1 Boss' : $mmrpg_database_bosses_count.' Bosses') : '0 Bosses' ?> )</span>
+        <a class="float_link" href="database/bosses/">View the Boss Database &raquo;</a>
+      </span>
     </h2>
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="bosses" data-class-single="boss">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_08" href="database/bosses/" style="background-image: url(images/robots/trill/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Trill</a></div>*/?>
@@ -80,9 +88,11 @@ ob_start();
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-      <a class="inline_link" href="database/abilities/">Ability Database</a>
-      <span class="count">( <?= !empty($mmrpg_database_abilities_count) ? ($mmrpg_database_abilities_count == 1 ? '1 Ability' : $mmrpg_database_abilities_count.' Abilities') : '0 Abilities' ?> )</span>
-      <a class="float_link" href="database/abilities/">View the Ability Database &raquo;</a>
+      <span class="subheader_typewrapper">
+        <a class="inline_link" href="database/abilities/">Ability Database</a>
+        <span class="count">( <?= !empty($mmrpg_database_abilities_count) ? ($mmrpg_database_abilities_count == 1 ? '1 Ability' : $mmrpg_database_abilities_count.' Abilities') : '0 Abilities' ?> )</span>
+        <a class="float_link" href="database/abilities/">View the Ability Database &raquo;</a>
+      </span>
     </h2>
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="abilities" data-class-single="ability">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/abilities/" style="margin: -10px 0 5px; background-image: url(images/abilities/mega-slide/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Mega Slide</a></div>*/?>
@@ -91,9 +101,11 @@ ob_start();
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-      <a class="inline_link" href="database/items/">Item Database</a>
-      <span class="count">( <?= !empty($mmrpg_database_items_count) ? ($mmrpg_database_items_count == 1 ? '1 Item' : $mmrpg_database_items_count.' Items') : '0 Items' ?> )</span>
-      <a class="float_link" href="database/items/">View the Item Database &raquo;</a>
+      <span class="subheader_typewrapper">
+        <a class="inline_link" href="database/items/">Item Database</a>
+        <span class="count">( <?= !empty($mmrpg_database_items_count) ? ($mmrpg_database_items_count == 1 ? '1 Item' : $mmrpg_database_items_count.' Items') : '0 Items' ?> )</span>
+        <a class="float_link" href="database/items/">View the Item Database &raquo;</a>
+      </span>
     </h2>
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="items" data-class-single="item">
       <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/items/" style="margin: -10px 0 5px; background-image: url(images/abilities/item-extra-life/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Extra Life</a></div>*/?>
@@ -102,9 +114,11 @@ ob_start();
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-      <a class="inline_link" href="database/fields/">Field Database </a>
-      <span class="count">( <?= !empty($mmrpg_database_fields_count) ? ($mmrpg_database_fields_count == 1 ? '1 Field' : $mmrpg_database_fields_count.' Fields') : '0 Fields' ?> )</span>
-      <a class="float_link" href="database/fields/">View the Field Database &raquo;</a>
+      <span class="subheader_typewrapper">
+        <a class="inline_link" href="database/fields/">Field Database </a>
+        <span class="count">( <?= !empty($mmrpg_database_fields_count) ? ($mmrpg_database_fields_count == 1 ? '1 Field' : $mmrpg_database_fields_count.' Fields') : '0 Fields' ?> )</span>
+        <a class="float_link" href="database/fields/">View the Field Database &raquo;</a>
+      </span>
     </h2>
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="fields" data-class-single="field">
       <?/*<div class="float float_right" style="overflow: hidden;"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/fields/" style="margin: 0; background-image: url(images/fields/intro-field/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Intro Field</a></div>*/?>
@@ -113,9 +127,11 @@ ob_start();
     </div>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-      <a class="inline_link" href="database/types/">Type Database</a>
-      <span class="count">( <?= !empty($mmrpg_database_types_count) ? $mmrpg_database_types_count.' Types' : '0 Types' ?> )</span>
-      <a class="float_link" href="database/types/">View the Type Database &raquo;</a>
+      <span class="subheader_typewrapper">
+        <a class="inline_link" href="database/types/">Type Database</a>
+        <span class="count">( <?= !empty($mmrpg_database_types_count) ? $mmrpg_database_types_count.' Types' : '0 Types' ?> )</span>
+        <a class="float_link" href="database/types/">View the Type Database &raquo;</a>
+      </span>
     </h2>
     <div class="subbody">
       <p class="text">The type database contains a detailed breakdown of the elemental type distribution in the prototype, including ability counts, robot counts, and more.</p>

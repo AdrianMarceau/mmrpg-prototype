@@ -381,7 +381,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
     </div>
 
     <? if (!MMRPG_CONFIG_IS_LIVE){ ?>
-    <p class="type type_flame" style="display: block; margin: -4px 10px 6px; color: #FFFFFF; border-radius: 6px; padding: 5px;;">
+    <p class="devbuild_warning type type_flame" style="display: block; margin: -4px 10px 6px; color: #FFFFFF; border-radius: 6px; padding: 5px;;">
       This version of the game is NOT live and progress will NOT be saved!<br />
       Please treat this buggy, beta build of the new update as a PREVIEW ONLY!<br />
       Developmental progress of this update can be tracked on <a style="color: #FFFFFF;" href="https://github.com/AdrianMarceau/mmrpg-prototype/commits/mmrpg2k15" target="_blank">GitHub</a>.
