@@ -419,9 +419,6 @@ $temp_pattern_first[] = '/^item-super-pellet$/i';
 $temp_pattern_first[] = '/^item-super-capsule$/i';
 //die('$mmrpg_index[\'types\'] = <pre>'.print_r($mmrpg_database_types, true).'</pre>');
 //$temp_element_types = $mmrpg_database_types; //array('none', 'copy', 'crystal', 'cutter', 'earth', 'electric', 'explode', 'flame', 'freeze', 'impact', 'laser', 'missile', 'nature', 'shadow', 'shield', 'space', 'swift', 'time', 'water', 'wind');
-$temp_pattern_first[] = '/^item-shard-none$/i';
-$temp_pattern_first[] = '/^item-core-none$/i';
-$temp_pattern_first[] = '/^item-star-none$/i';
 foreach ($mmrpg_database_types AS $type_token => $type_info){
   if ($type_token == 'none' || $type_token == 'copy'){ continue; }
   if (!empty($type_info['type_class']) && $type_info['type_class'] == 'special'){ continue; }
@@ -429,6 +426,9 @@ foreach ($mmrpg_database_types AS $type_token => $type_info){
   $temp_pattern_first[] = '/^item-core-'.$type_token.'$/i';
   $temp_pattern_first[] = '/^item-star-'.$type_token.'$/i';
 }
+$temp_pattern_first[] = '/^item-shard-none$/i';
+$temp_pattern_first[] = '/^item-core-none$/i';
+$temp_pattern_first[] = '/^item-star-none$/i';
 $temp_pattern_first[] = '/^item-shard-copy$/i';
 $temp_pattern_first[] = '/^item-core-copy$/i';
 $temp_pattern_first[] = '/^item-star-copy$/i';
