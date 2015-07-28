@@ -440,7 +440,7 @@ if (!empty($this_shop_index['reggae'])){
   // If the player has X, Reggae's Shop also sells weapons
   if (!empty($this_battle_shops['reggae']['cores_bought'])){
     array_unshift($this_shop_index['reggae']['shop_kind_selling'], 'weapons');
-    $this_shop_index['reggae']['shop_quote_selling']['weapons'] = 'Reggae used cores to create new weapons! Squaaak! Weapons defeat bad guys! Squaaak! You want?';
+    $this_shop_index['reggae']['shop_quote_selling']['weapons'] = 'Reggae use cores make new weapons! Squaaak! Heroes use weapons defeat bad guys! Squaaak!';
     $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
   }
 
