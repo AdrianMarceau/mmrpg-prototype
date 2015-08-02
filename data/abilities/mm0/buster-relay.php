@@ -110,20 +110,19 @@ $ability = array(
 
         }
       }
-    }
+      // Automatically fail if there was no buster charge to transfer
+      if (empty($relay_buster_token)){
 
-    // Automatically fail if there was no buster charge to transfer
-    if (empty($relay_buster_token)){
+        // Target this robot's self and show the ability failing
+        $this_ability->target_options_update(array(
+          'frame' => 'summon',
+          'success' => array(9, 0, 0, -10,
+            'But there weren\'t any buster charges to transfer&hellip;<br />'
+            )
+          ));
+        $this_robot->trigger_target($this_robot, $this_ability);
 
-      // Target this robot's self and show the ability failing
-      $this_ability->target_options_update(array(
-        'frame' => 'summon',
-        'success' => array(9, 0, 0, -10,
-          'But there weren\'t any buster charges to transfer&hellip;<br />'
-          )
-        ));
-      $this_robot->trigger_target($this_robot, $this_ability);
-
+      }
     }
 
     // Return true on success

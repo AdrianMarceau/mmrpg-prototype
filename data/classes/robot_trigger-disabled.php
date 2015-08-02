@@ -692,6 +692,10 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
       $target_player->update_session();
       $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
       if ($temp_start_level != $temp_new_level){ $temp_robot->robot_experience = $temp_new_experience; }
+      if ($temp_robot->robot_core == 'copy'){
+        $temp_robot->robot_image = $temp_robot->robot_base_image;
+        $temp_robot->robot_image_overlay = '';
+       }
       $temp_robot->update_session();
       $target_player->update_session();
     }

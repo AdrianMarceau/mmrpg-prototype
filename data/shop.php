@@ -320,13 +320,13 @@ $this_shop_index['kalinka'] = array(
       ),
     'items_selling2' => array(
       'item-energy-upgrade' => 32000, 'item-weapon-upgrade' => 32000,
-      'item-energy-booster' => 32000, 'item-attack-booster' => 32000,
-      'item-defense-booster' => 32000, 'item-speed-booster' => 32000,
+      'item-attack-booster' => 32000, 'item-defense-booster' => 32000,
+      'item-speed-booster' => 32000, 'item-field-booster' => 32000
       ),
     'items_selling3' => array(
       'item-energy-upgrade' => 32000, 'item-weapon-upgrade' => 32000,
-      'item-energy-booster' => 32000, 'item-attack-booster' => 32000,
-      'item-defense-booster' => 32000, 'item-speed-booster' => 32000,
+      'item-attack-booster' => 32000, 'item-defense-booster' => 32000,
+      'item-speed-booster' => 32000, 'item-field-booster' => 32000,
       'item-target-module' => 32000, 'item-charge-module' => 32000,
       'item-growth-module' => 32000, 'item-fortune-module' => 32000
       )

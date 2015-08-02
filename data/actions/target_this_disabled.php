@@ -44,7 +44,7 @@ ob_start();
         //$temp_robot_title .= ' | '.$temp_robot->robot_id.'';
         $temp_robot_title .= ' <br />'.(!empty($temp_robot->robot_core) ? ucfirst($temp_robot->robot_core).' Core' : 'Neutral Core').' | '.ucfirst($temp_robot->robot_position).' Position';
         // Display the robot's item if it exists
-        if (!empty($temp_robot->robot_item)){ $temp_robot_title .= ' | + '.$temp_abilities_index[$temp_robot->robot_item]['ability_name'].' '; }
+        if (!empty($temp_robot->robot_item) && !empty($temp_abilities_index[$temp_robot->robot_item])){ $temp_robot_title .= ' | + '.$temp_abilities_index[$temp_robot->robot_item]['ability_name'].' '; }
         // Display the robot's life and weapon energy current and base
         $temp_robot_title .= ' <br />'.$temp_robot->robot_energy.' / '.$temp_robot->robot_base_energy.' LE';
         $temp_robot_title .= ' | '.$temp_robot->robot_weapons.' / '.$temp_robot->robot_base_weapons.' WE';
@@ -63,6 +63,7 @@ ob_start();
         // Loop through this robot's current abilities and list them as well
         $temp_robot_title .= ' <br />';
         foreach ($temp_robot->robot_abilities AS $key => $token){
+          if (!isset($temp_abilities_index[$token])){ continue; }
           if ($key > 0 && $key % 4 != 0){ $temp_robot_title .= '&nbsp;|&nbsp;'; }
           if ($key > 0 && $key % 4 == 0){ $temp_robot_title .= '<br /> '; }
           $info = mmrpg_ability::parse_index_info($temp_abilities_index[$token]);
@@ -78,7 +79,7 @@ ob_start();
         $temp_robot_core2_type = !empty($temp_robot->robot_core2) ? $temp_robot->robot_core2 : '';
         if (!empty($temp_robot->robot_item) && preg_match('/^item-core-/', $temp_robot->robot_item)){
           $temp_item_core_type = preg_replace('/^item-core-/', '', $temp_robot->robot_item);
-          if (empty($temp_robot_core2_type)){ $temp_robot_core2_type = $temp_item_core_type; }
+          if (empty($temp_robot_core2_type) && $temp_robot_core_type != $temp_item_core_type){ $temp_robot_core2_type = $temp_item_core_type; }
         }
 
         // Define the robot button text variables

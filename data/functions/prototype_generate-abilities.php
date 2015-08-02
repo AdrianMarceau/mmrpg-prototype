@@ -15,13 +15,27 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         'metal-blade', 'air-shooter', 'bubble-spray', 'quick-boomerang', 'crash-bomber', 'flash-stopper', 'atomic-fire', 'leaf-shield',
         'needle-cannon', 'magnet-missile', 'gemini-laser', 'hard-knuckle', 'top-spin', 'search-snake', 'spark-shock', 'shadow-blade',
         'bright-burst', 'rain-flush', 'drill-blitz', 'pharaoh-soul', 'ring-boomerang', 'dust-crusher', 'dive-missile', 'skull-barrier',
-        'flame-shot', 'flame-buster', 'freeze-shot', 'freeze-buster',
-        'electric-shot', 'electric-buster', 'space-shot', 'space-buster',
         'cutter-shot', 'cutter-buster',
+        'freeze-shot', 'freeze-buster',
+        'crystal-shot', 'crystal-buster',
+        'flame-shot', 'flame-buster',
+        'electric-shot', 'electric-buster',
+        'space-shot', 'space-buster',
+        'laser-shot', 'laser-buster'
         ),
       array(
         'rising-cutter', 'super-arm', 'ice-slasher', 'danger-bomb', 'fire-chaser', 'thunder-beam', 'time-slow', 'oil-slider',
-        'bubble-lead', 'bubble-bomb'
+        'bubble-lead',
+        'bubble-bomb'
+        ),
+      array(
+        'cutter-overdrive',
+        'freeze-overdrive',
+        'crystal-overdrive',
+        'flame-overdrive',
+        'electric-overdrive',
+        'space-overdrive',
+        'laser-overdrive'
         )
       );
   }

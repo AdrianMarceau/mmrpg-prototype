@@ -260,7 +260,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       }
 
       // Add the masters info into the omega battle
-      $possible_items = array('item-energy-upgrade', 'item-weapon-upgrade', 'item-target-module', 'item-charge-module', 'item-fortune-module', 'item-energy-booster', 'item-attack-booster', 'item-defense-booster', 'item-speed-booster');
+      $possible_items = array('item-energy-upgrade', 'item-weapon-upgrade', 'item-target-module', 'item-charge-module', 'item-fortune-module', 'item-field-booster', 'item-attack-booster', 'item-defense-booster', 'item-speed-booster');
       foreach ($mmrpg_index['types'] AS $token => $info){
         if (!empty($info['type_class']) && $info['type_class'] == 'special'){ continue; }
         elseif (in_array($token, array('copy', 'empty'))){ continue; }

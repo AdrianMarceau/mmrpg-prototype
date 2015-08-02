@@ -111,14 +111,23 @@ function mmrpg_prototype_mission_bonus($this_prototype_data, $this_robot_count =
   $temp_battle_omega['battle_turns'] = 0;
   $temp_battle_omega['battle_robot_limit'] = 0;
 
+  // Define the possible items for bonus mission robot masters
+  $possible_master_items = array('item-energy-upgrade', 'item-weapon-upgrade', 'item-target-module', 'item-charge-module', 'item-fortune-module', 'item-field-booster', 'item-attack-booster', 'item-defense-booster', 'item-speed-booster');
+  foreach ($mmrpg_index['types'] AS $token => $info){
+    if (!empty($info['type_class']) && $info['type_class'] == 'special'){ continue; }
+    elseif (in_array($token, array('copy', 'empty'))){ continue; }
+    $possible_master_items[] = 'item-core-'.$token;
+  }
+  $possible_master_items_last_key = count($possible_master_items) - 1;
+
   // Loop through each of the bonus robots and update their levels
   foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
     $robot['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
     $index = mmrpg_robot::parse_index_info($this_robot_index[$robot['robot_token']]);
-    if ($this_robot_class != 'mecha'){
-      $robot['robot_item'] = isset($robot['robot_item']) ? $robot['robot_item'] : '';
-      $robot['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $robot['robot_level'], 8, $robot['robot_item']);
-    }
+    if ($this_robot_class != 'mecha'){ $robot['robot_item'] = $possible_master_items[mt_rand(0, $possible_master_items_last_key)]; }
+    else { $robot['robot_item'] = ''; }
+    $robot['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $robot['robot_level'], 8, $robot['robot_item']);
+
 
     // Increment the battle's turn limit based on the class of target robot
     if ($index['robot_class'] == 'master'){ $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERROBOT; }

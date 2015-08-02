@@ -1,16 +1,18 @@
 <?
+// Collect the temp item index
+$temp_items_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+
 // Define all the available player items in a handy index array
 $temp_player_items = $this_player->player_items;
 //echo print_r($temp_player_items, true);
 foreach ($temp_player_items AS $key => $token){
-  if (preg_match('/^item-screw-/i', $token)){ unset($temp_player_items[$key]); }
-  elseif (preg_match('/^item-shard-/i', $token)){ unset($temp_player_items[$key]); }
-  //elseif (preg_match('/^item-core-/i', $token)){ unset($temp_player_items[$key]); }
-  elseif (preg_match('/^item-star-/i', $token)){ unset($temp_player_items[$key]); }
+  $info = !empty($temp_items_index[$token]) ? $temp_items_index[$token] : false;
+  if (empty($info) || $info['ability_subclass'] != 'consumable'){ unset($temp_player_items[$key]); }
 }
 //echo print_r($temp_player_items, true);
 $temp_player_items_count = count($temp_player_items);
 $temp_player_items_pages = $temp_player_items_count <= 8 ? 1 : ceil($temp_player_items_count / 8);
+
 // Require the item database page for sorting purposes
 require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
 // Generate the markup for the action item panel
@@ -51,8 +53,6 @@ ob_start();
       $item_direction = $this_player->player_side == 'left' ? 'right' : 'left';
       // Define the item display counter
       $equipped_items_count = 0;
-      // Collect the temp item index
-      $temp_items_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
       // DEBUG
       //echo('$current_player_items:<pre>'.preg_replace('/\s+/', ' ', print_r($current_player_items, true)).'</pre>');
@@ -92,6 +92,7 @@ ob_start();
           //$temp_iteminfo = array('ability_token' => $item_token);
           $temp_iteminfo = $temp_items_index[$item_token];
           $temp_iteminfo = mmrpg_ability::parse_index_info($temp_iteminfo);
+
           //$temp_iteminfo['ability_id'] = $this_player->player_id.str_pad($temp_iteminfo['ability_id'], 3, '0', STR_PAD_LEFT);
           $temp_item = new mmrpg_ability($this_battle, $this_player, $this_robot, $temp_iteminfo);
           $temp_type = $temp_item->ability_type;

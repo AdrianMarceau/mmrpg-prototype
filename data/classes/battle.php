@@ -459,7 +459,7 @@ class mmrpg_battle {
 
     // Clone or define the event objects
     $this_battle = $this;
-    $this_field = $this->battle_field; //array_slice($this->values['fields'];
+    $this->field = $this->battle_field; //array_slice($this->values['fields'];
     $this_player = false;
     $this_robot = !empty($this_robot) ? $this_robot : false;
     if (!empty($this_robot)){ $this_player = new mmrpg_player($this, $this->values['players'][$this_robot->player_id]); }
@@ -474,7 +474,7 @@ class mmrpg_battle {
     // Generate the event markup and add it to the array
     $this->events[] = $this->events_markup_generate(array(
       'this_battle' => $this_battle,
-      'this_field' => $this_field,
+      'this_field' => $this->field,
       'this_player' => $this_player,
       'this_robot' => $this_robot,
       'target_player' => $target_player,
@@ -948,29 +948,60 @@ class mmrpg_battle {
 
       // If this robot has an item attached, process actions
       if (!empty($temp_robot->robot_item)){
-        //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has item');
+        if (MMRPG_CONFIG_DEBUG_MODE){ $this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has item '.str_replace('item-', '', $temp_robot->robot_item)); }
 
-        // If the robot is holding an Energy Booster item, apply recovery
-        if ($temp_robot->robot_item == 'item-energy-booster'){
+        // If the robot is holding a Field Booster item, increase multiplier
+        if ($temp_robot->robot_item == 'item-field-booster'){
 
           // Define the item object and trigger info
-          $temp_item_info = array('ability_token' => 'item-energy-booster');
+          if (empty($temp_robot->robot_core)){ $temp_boost_type = 'recovery'; }
+          elseif ($temp_robot->robot_core == 'copy'){ $temp_boost_type = 'damage'; }
+          elseif ($temp_robot->robot_core == 'empty'){ $temp_boost_type = 'damage'; }
+          else { $temp_boost_type = $temp_robot->robot_core; }
+          $temp_item_info = array('ability_token' => 'item-field-booster');
           $temp_item_object = new mmrpg_ability($this_battle, $this_player, $temp_robot, $temp_item_info);
-          $temp_recovery_amount = ceil($temp_robot->robot_base_energy * ($temp_item_object->ability_recovery2 / 100));
-          if (($temp_robot->robot_energy + $temp_recovery_amount) > $temp_robot->robot_base_energy){ $temp_recovery_amount = $temp_robot->robot_base_energy - $temp_robot->robot_energy; }
-          $temp_item_object->recovery_options_update(array(
-            'kind' => 'energy',
-            'frame' => 'taunt',
-            'percent' => true,
-            'modifiers' => false,
-            'kickback' => array(0, 0, 0),
-            'success' => array(9, -10, -10, -10, 'The '.$temp_item_object->print_ability_name().' repaired '.$temp_robot->print_robot_name().'&#39;s systems!'),
-            'failure' => array(9, -10, -10, -10, '')
-            ));
+          if (!isset($this_battle->field->field_multipliers[$temp_boost_type]) || $this_battle->field->field_multipliers[$temp_boost_type] < MMRPG_SETTINGS_MULTIPLIER_MAX){
 
-          // Trigger stat recovery for the holding robot
-          if (!empty($temp_recovery_amount)){ $temp_robot->trigger_recovery($temp_robot, $temp_item_object, $temp_recovery_amount); }
+            // Define this ability's attachment token
+            $this_star_index = mmrpg_prototype_star_image(!empty($temp_boost_type) ? $temp_boost_type : 'none');
+            $this_sprite_sheet = 'field-support';
+            $this_attachment_token = 'ability_'.$this_sprite_sheet;
+            $this_attachment_info = array(
+              'class' => 'ability',
+              'ability_token' => $this_sprite_sheet,
+              'ability_image' => $this_sprite_sheet.($this_star_index['sheet'] > 1 ? '-'.$this_star_index['sheet'] : ''),
+              'ability_frame' => $this_star_index['frame'],
+              'ability_frame_animate' => array($this_star_index['frame']),
+              'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
+              );
 
+            // Attach this ability attachment to this robot temporarily
+            $temp_robot->robot_frame = 'taunt';
+            $temp_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
+            $temp_robot->update_session();
+
+            // Create or increase the elemental booster for this field
+            $temp_change_percent = round($temp_item_object->ability_recovery2 / 100, 1);
+            if (!isset($this_battle->field->field_multipliers[$temp_boost_type])){ $this_battle->field->field_multipliers[$temp_boost_type] = 1.0 + $temp_change_percent; }
+            else { $this_battle->field->field_multipliers[$temp_boost_type] = $this_battle->field->field_multipliers[$temp_boost_type] + $temp_change_percent; }
+            if ($this_battle->field->field_multipliers[$temp_boost_type] >= MMRPG_SETTINGS_MULTIPLIER_MAX){
+              $temp_change_percent = MMRPG_SETTINGS_MULTIPLIER_MAX - $this_battle->field->field_multipliers[$temp_boost_type];
+              $this_battle->field->field_multipliers[$temp_boost_type] = MMRPG_SETTINGS_MULTIPLIER_MAX;
+            }
+            $this_battle->field->update_session();
+
+            // Create the event to show this element boost
+            $this_battle->events_create($temp_robot, false, $this_battle->field->field_name.' Multipliers',
+            	mmrpg_battle::random_positive_word().' <span class="ability_name ability_type ability_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).' Effects</span> were boosted by '.ceil($temp_change_percent * 100).'%!<br />'.
+              'The multiplier is now at <span class="ability_name ability_type ability_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).' x '.number_format($this_battle->field->field_multipliers[$temp_boost_type], 1).'</span>!',
+              array('canvas_show_this_ability_overlay' => true)
+              );
+
+            // Remove this ability attachment from this robot
+            unset($temp_robot->robot_attachments[$this_attachment_token]);
+            $temp_robot->update_session();
+
+          }
 
         }
         // Else the robot is holding an Attack Booster item, apply boosts

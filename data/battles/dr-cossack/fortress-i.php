@@ -12,7 +12,7 @@ $battle = array(
     'player_switch' => 1.5,
     'player_robots' => array(
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'mega-man', 'robot_level' => 30,'robot_item' => 'item-defense-booster',  'robot_abilities' => array('mega-buster', 'mega-ball', 'mega-slide', 'buster-shot', 'rolling-cutter', 'super-throw', 'time-arrow', 'thunder-strike', 'oil-shooter', 'fire-storm', 'ice-breath', 'hyper-bomb')),
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'roll', 'robot_level' => 30,'robot_item' => 'item-energy-booster',  'robot_abilities' => array('roll-buster', 'buster-shot', 'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost'))
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'roll', 'robot_level' => 30,'robot_item' => 'item-defense-booster',  'robot_abilities' => array('roll-buster', 'buster-shot', 'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost'))
       )
     ),
   'battle_rewards' => array(
