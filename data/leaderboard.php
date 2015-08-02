@@ -217,10 +217,12 @@ if (true){
     $points_counter = 0;
     foreach ($this_leaderboard_index AS $board_key => $board_info){
       $place_counter += 1;
-      if ($board_key >= $this_start_key && $board_key < ($this_start_key + $this_display_limit)){
+      if (defined('MMRPG_SHOW_MARKUP_'.$board_info['user_id'])){
+        $this_leaderboard_markup[] = mmrpg_leaderboard_parse_index($board_key, $board_info);
+      } elseif ($board_key >= $this_start_key && $board_key < ($this_start_key + $this_display_limit)){
         $this_leaderboard_markup[] = mmrpg_leaderboard_parse_index($board_key, $board_info);
       } else {
-        $this_leaderboard_markup[] = '';
+        $this_leaderboard_markup[] = "&lt;({$board_key} >= {$this_start_key} && {$board_key} < ({$this_start_key} + {$this_display_limit}))&gt;";
       }
     }
   }
@@ -228,7 +230,8 @@ if (true){
 
 /*
 die(
-'$this_leaderboard_index = <pre>'.print_r($this_leaderboard_index, true).'</pre>'.
+'$_REQUEST = <pre>'.print_r($_REQUEST, true).'</pre>'.
+//'$this_leaderboard_index = <pre>'.print_r($this_leaderboard_index, true).'</pre>'.
 '$this_leaderboard_markup = <pre>'.print_r($this_leaderboard_markup, true).'</pre>'
 );
 */
