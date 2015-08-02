@@ -6,7 +6,7 @@ $this_display_limit = !empty($_GET['limit']) ? trim($_GET['limit']) : $this_disp
 $this_start_key = !empty($_GET['start']) ? trim($_GET['start']) : 0;
 
 // Define a function for parsing the leaderboard data
-function mmrpg_leaderboard_parse_index($board_key, $board_info){
+function mmrpg_leaderboard_parse_index($board_key, $board_info, $quick_parse = false){
   global $mmrpg_index;
   global $this_cache_stamp, $this_cache_filename, $this_cache_filedir;
   global $this_leaderboard_count, $this_leaderboard_online_count;
@@ -16,41 +16,7 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info){
   global $this_display_limit, $this_display_limit_default, $this_num_offset;
   global $this_time, $this_online_timeout, $place_counter, $points_counter, $this_start_key;
 
-  // Start the output buffer
-  ob_start();
-
-  // Collect the points and increment the counter if necessary
-  $this_points = $board_info['board_points'];
-  if ($this_points != $points_counter){
-    $points_counter = $this_points;
-  }
-
-  // Define the awards strong and default to empty
-  $this_user_awards = ' ';
-
-  // Break apart the battle and battle values into arrays
-  $temp_battles = !empty($board_info['board_battles']) ? explode(',', $board_info['board_battles']) : array();
-  $board_info['board_battles'] = $temp_battles;
-
-  // Loop through the available players
-  foreach ($mmrpg_index['players'] AS $ptoken => $pinfo){
-    $ptoken2 = str_replace('-', '_', $ptoken);
-    $temp_battles = !empty($board_info['board_battles_'.$ptoken2]) ? explode(',', $board_info['board_battles_'.$ptoken2]) : array();
-    $board_info['board_battles_'.$ptoken2] = $temp_battles;
-  }
-
-  // Break apart the robot and battle values into arrays
-  $temp_robots = !empty($board_info['board_robots']) ? $board_info['board_robots'] : array();
-  if (!empty($temp_robots)){
-    $temp_robots = explode(',', $temp_robots);
-    foreach ($temp_robots AS $key => $string){
-      list($token, $level) = explode(':', substr($string, 1, -1));
-      $temp_info = array('robot_token' => $token, 'robot_level' => $level);
-      $temp_robots[$key] = $temp_info;
-    }
-  }
-  // Collect this player's robots
-  $this_robots = $temp_robots;
+  // Collect this player's base info
   $this_stars = !empty($board_info['board_stars']) ? $board_info['board_stars'] : 0;
   $this_abilities = !empty($board_info['board_abilities']) ? $board_info['board_abilities'] : 0;
   //$this_battles = !empty($board_info['board_battles']) ? $board_info['board_battles'] : 0;
@@ -86,6 +52,44 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info){
     //$this_leaderboard_online_pages[] = $board_key;
     if (!in_array($this_current_page_number, $this_leaderboard_online_pages)){ $this_leaderboard_online_pages[] = $this_current_page_number; }
   }
+
+  // If quick parse was requested, return now
+  if ($quick_parse){ return ''; }
+
+  // Collect the points and increment the counter if necessary
+  $this_points = $board_info['board_points'];
+  if ($this_points != $points_counter){
+    $points_counter = $this_points;
+  }
+
+  // Define the awards strong and default to empty
+  $this_user_awards = ' ';
+
+  // Break apart the battle and battle values into arrays
+  $temp_battles = !empty($board_info['board_battles']) ? explode(',', $board_info['board_battles']) : array();
+  $board_info['board_battles'] = $temp_battles;
+
+  // Loop through the available players
+  foreach ($mmrpg_index['players'] AS $ptoken => $pinfo){
+    $ptoken2 = str_replace('-', '_', $ptoken);
+    $temp_battles = !empty($board_info['board_battles_'.$ptoken2]) ? explode(',', $board_info['board_battles_'.$ptoken2]) : array();
+    $board_info['board_battles_'.$ptoken2] = $temp_battles;
+  }
+
+  // Break apart the robot and battle values into arrays
+  $temp_robots = !empty($board_info['board_robots']) ? $board_info['board_robots'] : array();
+  if (!empty($temp_robots)){
+    $temp_robots = explode(',', $temp_robots);
+    foreach ($temp_robots AS $key => $string){
+      list($token, $level) = explode(':', substr($string, 1, -1));
+      $temp_info = array('robot_token' => $token, 'robot_level' => $level);
+      $temp_robots[$key] = $temp_info;
+    }
+  }
+  $this_robots = $temp_robots;
+
+  // Start the output buffer
+  ob_start();
 
   // Only continue if markup is special constants have not been defined
   if (!defined('MMRPG_SKIP_MARKUP') || defined('MMRPG_SHOW_MARKUP_'.$this_user_id)){
@@ -217,13 +221,10 @@ if (true){
     $points_counter = 0;
     foreach ($this_leaderboard_index AS $board_key => $board_info){
       $place_counter += 1;
-      if (defined('MMRPG_SHOW_MARKUP_'.$board_info['user_id'])){
-        $this_leaderboard_markup[] = mmrpg_leaderboard_parse_index($board_key, $board_info);
-      } elseif ($board_key >= $this_start_key && $board_key < ($this_start_key + $this_display_limit)){
-        $this_leaderboard_markup[] = mmrpg_leaderboard_parse_index($board_key, $board_info);
-      } else {
-        $this_leaderboard_markup[] = "&lt;({$board_key} >= {$this_start_key} && {$board_key} < ({$this_start_key} + {$this_display_limit}))&gt;";
-      }
+      $quick_parse = true;
+      if (defined('MMRPG_SHOW_MARKUP_'.$board_info['user_id'])){ $quick_parse = false; }
+      elseif ($board_key >= $this_start_key && $board_key < ($this_start_key + $this_display_limit)){ $quick_parse = false; }
+      $this_leaderboard_markup[] = mmrpg_leaderboard_parse_index($board_key, $board_info, $quick_parse);
     }
   }
 }
