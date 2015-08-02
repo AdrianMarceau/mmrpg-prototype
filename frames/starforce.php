@@ -6,7 +6,6 @@ require_once('../top.php');
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Require the remote top in case we're in viewer mode
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 define('MMRPG_REMOTE_SKIP_INDEX', true);
 define('MMRPG_REMOTE_SKIP_COMPLETE', true);
 define('MMRPG_REMOTE_SKIP_FAILURE', true);
@@ -16,7 +15,6 @@ define('MMRPG_REMOTE_SKIP_DATABASE', true);
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 
 // Collect the session token
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $session_token = mmrpg_game_token();
 
 // Require the prototype data file

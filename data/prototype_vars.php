@@ -1,6 +1,5 @@
 <?
 // Define a reference to the game's session flag variable
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (empty($_SESSION[$session_token]['flags'])){ $_SESSION[$session_token]['flags'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags'];
 
@@ -8,8 +7,6 @@ $temp_game_flags = &$_SESSION[$session_token]['flags'];
  * DEMO MISSION SELECT
  */
 if (!empty($_SESSION[$session_token]['DEMO'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Collect the counters and flags for Dr. Light
   $unlock_flag_light = mmrpg_prototype_player_unlocked('dr-light');
   $point_counter_light = $unlock_flag_light ? mmrpg_prototype_player_points('dr-light') : 0;
@@ -29,10 +26,7 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
  * NORMAL MISSION SELECT
  */
 else {
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Collect the counters and flags for Dr. Light
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $unlock_flag_light = mmrpg_prototype_player_unlocked('dr-light');
   $point_counter_light = $unlock_flag_light ? mmrpg_prototype_player_points('dr-light') : 0;
   $robot_counter_light = $unlock_flag_light ? mmrpg_prototype_robots_unlocked('dr-light') : 0;
@@ -49,7 +43,6 @@ else {
   if ($unlock_flag_light && !$prototype_complete_flag_light && $battle_complete_counter_light >= 17){ $_SESSION[$session_token]['flags']['prototype_events']['dr-light']['prototype_complete'] = $prototype_complete_flag_light = true; }
 
   // Collect the counters and flags for Dr. Wily
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $unlock_flag_wily = mmrpg_prototype_player_unlocked('dr-wily');
   $point_counter_wily = $unlock_flag_wily ? mmrpg_prototype_player_points('dr-wily') : 0;
   $robot_counter_wily = $unlock_flag_wily ? mmrpg_prototype_robots_unlocked('dr-wily') : 0;
@@ -66,7 +59,6 @@ else {
   if ($unlock_flag_wily && !$prototype_complete_flag_wily && $battle_complete_counter_wily >= 17){ $_SESSION[$session_token]['flags']['prototype_events']['dr-wily']['prototype_complete'] = $prototype_complete_flag_wily = true; }
 
   // Collect the counters and flags for Dr. Cossack
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $unlock_flag_cossack = mmrpg_prototype_player_unlocked('dr-cossack');
   $point_counter_cossack = $unlock_flag_cossack ? mmrpg_prototype_player_points('dr-cossack') : 0;
   $robot_counter_cossack = $unlock_flag_cossack ? mmrpg_prototype_robots_unlocked('dr-cossack') : 0;
@@ -104,7 +96,6 @@ else {
   $chapter_mission_count_totals['five'] = $chapter_mission_count_totals['four'] + $chapter_mission_counts['five'];
 
   // Define the chapter levels for missions to be progressively harder as you move forward
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $chapters_levels_common = array();
   $chapters_levels_common['one'] = 1;          // Met
   $chapters_levels_common['one-2'] = 2;        // Joe
@@ -142,7 +133,6 @@ else {
   $chapters_complete_light['five'] = $battle_complete_counter_light >= $chapter_mission_count_totals['five'] ? true : false;
 
   // Define which chapters should be unlocked for Dr. Light based on missions complete
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $chapters_unlocked_light = array();
   $chapters_unlocked_light['one'] = $battle_complete_counter_light >= $chapter_mission_count_totals['zero'] ? true : false;
   $chapters_unlocked_light['one-2'] = $battle_complete_counter_light >= $chapter_mission_count_totals['zero'] + 1 ? true : false;
@@ -191,7 +181,6 @@ else {
   $chapters_complete_wily['five'] = $battle_complete_counter_wily >= $chapter_mission_count_totals['five'] ? true : false;
 
   // Define which chapters should be unlocked for Dr. Wily based on missions complete
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $chapters_unlocked_wily = array();
   $chapters_unlocked_wily['one'] = $battle_complete_counter_wily >= $chapter_mission_count_totals['zero'] ? true : false;
   $chapters_unlocked_wily['one-2'] = $battle_complete_counter_wily >= $chapter_mission_count_totals['zero'] + 1 ? true : false;
@@ -240,7 +229,6 @@ else {
   $chapters_complete_cossack['five'] = $battle_complete_counter_cossack >= $chapter_mission_count_totals['five'] ? true : false;
 
   // Define which chapters should be unlocked for Dr. Cossack based on missions complete
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $chapters_unlocked_cossack = array();
   $chapters_unlocked_cossack['one'] = $battle_complete_counter_cossack >= $chapter_mission_count_totals['zero'] ? true : false;
   $chapters_unlocked_cossack['one-2'] = $battle_complete_counter_cossack >= $chapter_mission_count_totals['zero'] + 1 ? true : false;
@@ -283,21 +271,18 @@ else {
 }
 
 // Count the number of players unlocked
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $unlock_count_players = 0;
 if (!empty($unlock_flag_light)){ $unlock_count_players++; }
 if (!empty($unlock_flag_wily)){ $unlock_count_players++; }
 if (!empty($unlock_flag_cossack)){ $unlock_count_players++; }
 
 // Count the number of stars collected in total
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $unlock_count_stars = 0;
 if (!empty($star_counter_light)){ $unlock_count_stars++; }
 if (!empty($star_counter_wily)){ $unlock_count_stars++; }
 if (!empty($star_counter_cossack)){ $unlock_count_stars++; }
 
 // Count the number of cores collected in total
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $unlock_count_cores = 0;
 if (!empty($core_counter_light)){ $unlock_count_cores++; }
 if (!empty($core_counter_wily)){ $unlock_count_cores++; }

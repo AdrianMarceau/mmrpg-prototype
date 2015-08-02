@@ -1,6 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 /*
  * COMMUNITY THREAD VIEW
  */
@@ -11,30 +9,25 @@ $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
 
 // If this is a PERSONAL thread, we have to do some security
 if ($this_category_info['category_token'] == 'personal'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Ensure the user is logged in, else redirect to login
   if ($_SESSION['GAME']['USER']['userid'] == MMRPG_SETTINGS_GUEST_ID){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     header('Location: '.MMRPG_CONFIG_ROOTURL.'file/load/');
     exit();
   }
   // Ensure the user is actually part of the thread, else redirect to community index
   elseif ($_SESSION['GAME']['USER']['userid'] != $this_thread_info['user_id']
     && $_SESSION['GAME']['USER']['userid'] != $this_thread_info['thread_target']){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     header('Location: '.MMRPG_CONFIG_ROOTURL.'community/personal/');
     exit();
   }
 }
 
 // Update the SEO variables for this page
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_seo_title = $this_thread_info['thread_name'].' | '.$this_category_info['category_name'].' | '.$this_seo_title;
 $this_seo_description = strip_tags(mmrpg_formatting_decode($this_thread_info['thread_body']));
 if (strlen($this_seo_description) > 200){ $this_seo_description = substr($this_seo_description, 0, 200).'...'; }
 
 // Define the Open Graph variables for this page
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_graph_data['title'] = $this_category_info['category_name'].' Discussions | '.$this_thread_info['thread_name'];
 $this_graph_data['description'] = strip_tags(mmrpg_formatting_decode($this_thread_info['thread_body']));
 if (strlen($this_graph_data['description']) > 200){ $this_graph_data['description'] = substr($this_graph_data['description'], 0, 200).'...'; }
@@ -59,7 +52,6 @@ article:tag - string array - Tag words associated with this article.
 //$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
 
 // Define this thread's session tracker token
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $thread_session_token = $this_thread_info['thread_id'].'_';
 $thread_session_token .= !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date'];
 // Check if this thread has already been viewed this session
@@ -103,7 +95,6 @@ if ($this_posts_count >= $this_thread_info['thread_views']){
 }
 
 // Collect the thread counts for all users in an index
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_user_countindex = $DB->get_array_list('SELECT
   mmrpg_users.user_id,
   mmrpg_leaderboard.board_points,
@@ -478,5 +469,4 @@ if (!in_array($thread_session_token, $_SESSION['COMMUNITY']['threads_viewed'])){
   $_SESSION['COMMUNITY']['threads_viewed'][] = $thread_session_token;
 }
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

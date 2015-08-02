@@ -6,7 +6,6 @@ require_once('../top.php');
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Require the remote top in case we're in viewer mode
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 define('MMRPG_REMOTE_SKIP_INDEX', true);
 //define('MMRPG_REMOTE_SKIP_DATABASE', true);
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
@@ -15,7 +14,6 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 //require_once('../data/database.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
@@ -34,9 +32,7 @@ $global_allow_editing = isset($_REQUEST['edit']) && $_REQUEST['edit'] == 'false'
 
 // If we're NOT in script mode, let's loop through all the robots and make sure
 if ((empty($_REQUEST['action']) || $_REQUEST['action'] == 'robots') && !defined('MMRPG_REMOTE_GAME')){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-	// Include the robot update file if necessary
+  // Include the robot update file if necessary
 	if ($global_allow_editing){
 	  require('edit_robots_updates.php');
 	}
@@ -47,7 +43,6 @@ if ((empty($_REQUEST['action']) || $_REQUEST['action'] == 'robots') && !defined(
 // -- COLLECT SETTINGS DATA -- //
 
 // Define the editor indexes and count variables
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $allowed_edit_players = array();
 $allowed_edit_robots = array();
 $allowed_edit_data = array();
@@ -67,28 +62,20 @@ if (empty($player_robot_database)){ $player_robot_database = array(); }
 require('edit_robots_functions.php');
 
 // Trigger parsing of relevant editor indexes
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 parse_editor_indexes(
   $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities,
   $allowed_edit_players, $allowed_edit_robots, $allowed_edit_data
   );
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Manually refresh all the editor arrays
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 refresh_editor_arrays(
   $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities,
   $allowed_edit_players, $allowed_edit_robots, $allowed_edit_data,
   $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count
   );
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-
 // -- PROCESS PLAYER ACTION -- //
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_action_player.php');
 }
 
@@ -96,7 +83,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
 
 // Check if an action request has been sent with an ability type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'ability'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_action_ability.php');
 }
 
@@ -104,7 +90,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'ability'){
 
 // Check if an action request has been sent with an item type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'item'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_action_item.php');
 }
 
@@ -113,7 +98,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'item'){
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'altimage'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_action_altimage.php');
 }
 
@@ -121,7 +105,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'altimage'){
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'favourite'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_action_favourite.php');
 }
 
@@ -129,7 +112,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'favourite'){
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sort'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_action_sort.php');
 }
 
@@ -138,22 +120,17 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sort'){
 // -- RECOLLECT SETTINGS DATA -- //
 
 // Manually refresh all the editor arrays
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 refresh_editor_arrays(
   $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities,
   $allowed_edit_players, $allowed_edit_robots, $allowed_edit_data,
   $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count
   );
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-
 // -- GENERATE EDITOR MARKUP
 
 // CANVAS ROBOTS MARKUP
 
 // Generate the canvas robots markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_markup'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_canvas_robots_markup.php');
 }
 
@@ -161,7 +138,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_markup'){
 
 // Generate the canvas abilities markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_abilities_markup'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_canvas_abilities_markup.php');
 }
 
@@ -169,7 +145,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_abilities_mark
 
 // Generate the canvas items markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_items_markup'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_canvas_items_markup.php');
 }
 
@@ -177,15 +152,12 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_items_markup')
 
 // Generate the console markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'console_markup'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require('edit_robots_console_robots_markup.php');
 }
 
 // Determine the token for the very first robot in the edit
 $first_robot_token = $allowed_edit_robots[0];
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>
 <!DOCTYPE html>
 <html>

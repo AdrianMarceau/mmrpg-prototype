@@ -1,6 +1,5 @@
 <?
 // Define the global variables
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 global $mmrpg_index, $this_current_uri, $this_current_url, $DB;
 global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
 global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;

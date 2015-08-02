@@ -5,7 +5,6 @@
  */
 
 // Define the variable to hold the console robot data
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_data = array();
 $this_target_options = !empty($options['this_ability']->target_options) ? $options['this_ability']->target_options : array();
 $this_damage_options = !empty($options['this_ability']->damage_options) ? $options['this_ability']->damage_options : array();

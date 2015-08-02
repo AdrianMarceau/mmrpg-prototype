@@ -2,14 +2,10 @@
 // Count the number of completed battle options for this group and update the variable
 $battle_options_reversed = $battle_options; //array_reverse($battle_options);
 foreach ($battle_options_reversed AS $this_key => $this_info){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Define the chapter if not set
   if (!isset($this_info['option_chapter'])){ $this_info['option_chapter'] = '0'; }
   // If this is an event message type option, simply display the text/images
   if (!empty($this_info['option_type']) && $this_info['option_type'] == 'message'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Generate the option markup for the event message
     $temp_optiontitle = $this_info['option_maintext'];
     $temp_optionimages = !empty($this_info['option_images']) ? $this_info['option_images'] : '';
@@ -19,8 +15,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
   }
   // Otherwise, if this is a normal battle option
   else {
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // If the skip flag is set, continue to the next index
     //if (isset($this_info['flag_skip']) && $this_info['flag_skip'] == true){ continue; }
     // Collect the current battle and field info from the index
@@ -34,7 +28,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
     $this_battleinfo['flags'] = !empty($this_battleinfo['flags']) ? array_merge($this_battleinfo['flags'], $temp_flags) : $temp_flags;
     $this_battleinfo['values'] = !empty($this_battleinfo['values']) ? array_merge($this_battleinfo['values'], $temp_values) : $temp_values;
     $this_battleinfo['counters'] = !empty($this_battleinfo['counters']) ? array_merge($this_battleinfo['counters'], $temp_counters) : $temp_counters;
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_battleinfo[\'battle_field_base\'] = <pre>'.print_r($this_battleinfo['battle_field_base'], true).'</pre>');  }
     //if (!is_array($this_battleinfo['battle_field_base'])){ echo('Key '.$this_key.' in $battle_options_reversed = <pre>'.print_r($battle_options_reversed, true).'</pre>'); }
     //if (!is_array($this_battleinfo['battle_field_base'])){ echo('$this_battleinfo[\'battle_field_base\'] = <pre>'.print_r($this_battleinfo, true).'</pre>'); }
     //if (!is_array($this_battleinfo['battle_field_base'])){ echo('$DB->INDEX[\'BATTLES\']['.$this_info['battle_token'].'] = <pre>'.print_r($DB->INDEX['BATTLES'][$this_info['battle_token']], true).'</pre>'); }
@@ -46,7 +39,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
     $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
 
     // Collect the robot index for calculation purposes
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
     // Check the GAME session to see if this battle has been completed, increment the counter if it was
@@ -94,7 +86,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
     if (!empty($this_targetinfo['player_robots'])){
 
       // Count the number of masters in this battle
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_master_count = 0;
       $this_mecha_count = 0;
       $temp_robot_tokens = array();
@@ -116,7 +107,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
 
       // Create a list of the different robot tokens in this battle
       // Now loop through robots again and display 'em
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($this_targetinfo['player_robots'] AS $this_robotinfo){
 
         // HIDE MECHAS
@@ -152,7 +142,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
 
     // Add the field/fusion star sprite if one has been added
     if ($this_has_field_star){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       //$this_option_complete = false;
       $this_option_disabled = false;
       // Check if this is a field star or fusion star
@@ -182,7 +171,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
 
     // Add the dark tower sprite if one has been added
     if ($this_has_dark_tower){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       //$this_option_complete = false;
       $this_option_disabled = false;
       // Add the dark tower sprite to the mission select
@@ -192,7 +180,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
 
     // Loop through the battle sprites and display them
     if (!empty($this_battleinfo['battle_sprite'])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_right = false;
       $temp_layer = 100;
       $temp_count = count($this_battleinfo['battle_sprite']);
@@ -266,7 +253,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
       }
     }
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     //if ($this_battleinfo['battle_token'] == 'base-spark-man') die('<pre>'.print_r(htmlentities($this_option_label), true).'</pre>');
     //$this_option_button_text = !empty($this_battleinfo['battle_button']) ? $this_battleinfo['battle_button'] : '';
     //$this_option_button_text = !empty($this_fieldinfo['field_name']) ? $this_fieldinfo['field_name'] : '';
@@ -304,7 +290,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
 
     /*
     if (!empty($this_option_complete) || !empty($this_option_failure) || !empty($this_has_field_star)){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_option_title .= ' <hr />&laquo; Battle Records &raquo;';
       $this_option_title .= ' <br />Cleared : '.(!empty($this_option_complete['battle_count']) ? ($this_option_complete['battle_count'] == 1 ? '1 Time' : $this_option_complete['battle_count'].' Times') : '0 Times');
       $this_option_title .= ' | Failed : '.(!empty($this_option_failure['battle_count']) ? ($this_option_failure['battle_count'] == 1 ? '1 Time' : $this_option_failure['battle_count'].' Times') : '0 Times');
@@ -330,7 +315,6 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
     // Define the field multipliers
     $temp_field_multipliers = array();
     if (!empty($this_fieldinfo['field_multipliers'])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_multiplier_list = $this_fieldinfo['field_multipliers'];
       asort($temp_multiplier_list);
       $temp_multiplier_list = array_reverse($temp_multiplier_list, true);

@@ -1,6 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 /*
  * BOSS DATABASE AJAX
  */
@@ -187,5 +185,4 @@ if (empty($this_current_token)){
   }
 }
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

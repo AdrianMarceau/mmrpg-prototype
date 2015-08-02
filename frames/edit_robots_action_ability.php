@@ -1,7 +1,4 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Collect the ability variables from the request header, if they exist
 $temp_key = !empty($_REQUEST['key']) ? $_REQUEST['key'] : 0;
 $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
@@ -9,8 +6,6 @@ $temp_robot = !empty($_REQUEST['robot']) ? $_REQUEST['robot'] : '';
 $temp_ability = !empty($_REQUEST['ability']) ? $_REQUEST['ability']: '';
 // If key variables are not provided, kill the script in error
 if (empty($temp_player) || empty($temp_robot)){ die('error|request-error|'.preg_replace('/\s+/', ' ', print_r($_REQUEST, true))); }
-
-//die(print_r($_REQUEST, true));
 
 // Collect the current settings for the requested robot
 $temp_settings = mmrpg_prototype_robot_settings($temp_player, $temp_robot);

@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Generate the markup for the action option panel
 ob_start();
   // Define the markup for the option buttons
@@ -12,6 +11,9 @@ ob_start();
   //$temp_options[] = '<a class="button action_option block_3" type="button" data-panel="settings"><label><span class="multi">Settings<br />Menu</span></label></a>';
   $temp_options[] = '<a data-order="3" class="button action_option block_3 ability_type_space" type="button" data-panel="settings_eventTimeout"><label><span class="multi">Message<br />Speed</span></label></a>';
   $temp_options[] = '<a data-order="4" class="button action_option block_4 ability_type_space" type="button" onclick="parent.mmrpg_music_load(\'fields/'.$this_field->field_music.'/battle-field_background_music\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
+  // Display the toggle options for debug mode and stuff
+  $current_debug_value = !empty($_SESSION['GAME']['debug_mode']) ? 1 : 0;
+  $temp_options[] = '<a data-order="5" class="button action_option block_5 ability_type_space" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Toggle Debug</span><br /><span class="value type '.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
   /*
   if (empty($_SESSION['GAME']['DEMO'])
     && $this_battle->battle_status != 'complete'
@@ -27,8 +29,8 @@ ob_start();
     //$temp_options[] = '<a class="button action_option block_3" type="button" data-panel="settings_autoScan"><label><span class="multi">Auto<br />Scan</span></label></a>';
   }
   */
-  
-  
+
+
   // Display container for the main actions
   ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Option</span><?
   // Ensure there are options to display

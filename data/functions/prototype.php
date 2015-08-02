@@ -52,7 +52,6 @@ function mmrpg_prototype_calculate_level_by_experience($this_experience, $max_le
 
 // Define a function for checking a player has completed the prototype
 function mmrpg_prototype_complete($player_token = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_complete('{$player_token}')");  }
   // Pull in global variables
   //global $mmrpg_index;
   $mmrpg_index_players = $GLOBALS['mmrpg_index']['players'];
@@ -81,7 +80,6 @@ function mmrpg_prototype_complete($player_token = ''){
 
 // Define a function for checking the battle's prototype points total
 function mmrpg_prototype_event_complete($event_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_event_complete('.$event_token.')');  }
   // Return the current point total for thisgame
   $session_token = mmrpg_game_token();
   if (!empty($_SESSION[$session_token]['flags']['events'][$event_token])){ return 1; }
@@ -90,7 +88,6 @@ function mmrpg_prototype_event_complete($event_token){
 
 // Define a function for checking the battle's prototype points total
 function mmrpg_prototype_battle_points(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_battle_points()');  }
   // Return the current point total for thisgame
   $session_token = mmrpg_game_token();
   if (!empty($_SESSION[$session_token]['counters']['battle_points'])){ return $_SESSION[$session_token]['counters']['battle_points']; }
@@ -98,7 +95,6 @@ function mmrpg_prototype_battle_points(){
 }
 // Define a function for checking a player's prototype points total
 function mmrpg_prototype_player_points($player_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_player_points('{$player_token}')");  }
   // Return the current point total for this player
   $session_token = mmrpg_game_token();
   if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_points'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_points']; }
@@ -106,7 +102,6 @@ function mmrpg_prototype_player_points($player_token){
 }
 // Define a function for checking a player's prototype rewards array
 function mmrpg_prototype_player_rewards($player_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_player_rewards('{$player_token}')");  }
   // Return the current rewards array for this player
   $session_token = mmrpg_game_token();
   if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]; }
@@ -114,7 +109,6 @@ function mmrpg_prototype_player_rewards($player_token){
 }
 // Define a function for checking a player's prototype settings array
 function mmrpg_prototype_player_settings($player_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_player_settings('{$player_token}')");  }
   // Return the current rewards array for this player
   $session_token = mmrpg_game_token();
   if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]; }
@@ -122,7 +116,6 @@ function mmrpg_prototype_player_settings($player_token){
 }
 // Define a function for checking a player's prototype settings array
 function mmrpg_prototype_player_stars_available($player_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_stars_available('{$player_token}')");  }
   // Return the current rewards array for this player
   $session_token = mmrpg_game_token();
 
@@ -177,7 +170,6 @@ function mmrpg_prototype_player_stars_available($player_token){
 }
 // Define a function for checking a robot's prototype experience total
 function mmrpg_prototype_robot_experience($player_token, $robot_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_experience('{$player_token}', '{$robot_token}')");  }
   // Return the current point total for this robot
   $session_token = mmrpg_game_token();
   if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience']; }
@@ -186,7 +178,6 @@ function mmrpg_prototype_robot_experience($player_token, $robot_token){
 }
 // Define a function for checking a robot's prototype current level
 function mmrpg_prototype_robot_level($player_token, $robot_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_level('{$player_token}', '{$robot_token}')");  }
   // Return the current level total for this robot
   $session_token = mmrpg_game_token();
   if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level']; }
@@ -194,7 +185,6 @@ function mmrpg_prototype_robot_level($player_token, $robot_token){
 }
 // Define a function for checking a robot's prototype current level
 function mmrpg_prototype_robot_original_player($player_token, $robot_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_original_player('{$player_token}', '{$robot_token}')");  }
   // Return the current level total for this robot
   $session_token = mmrpg_game_token();
   if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player']; }
@@ -202,7 +192,6 @@ function mmrpg_prototype_robot_original_player($player_token, $robot_token){
 }
 // Define a function for checking a robot's prototype reward array
 function mmrpg_prototype_robot_rewards($player_token = '', $robot_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_rewards('{$player_token}', '{$robot_token}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // Return the current reward array for this robot
@@ -221,7 +210,6 @@ function mmrpg_prototype_robot_rewards($player_token = '', $robot_token){
 }
 // Define a function for checking a robot's prototype settings array
 function mmrpg_prototype_robot_settings($player_token = '', $robot_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_settings('{$player_token}', '{$robot_token}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // Return the current setting array for this robot
@@ -240,7 +228,6 @@ function mmrpg_prototype_robot_settings($player_token = '', $robot_token){
 }
 // Define a function for checking a player's robot database array
 function mmrpg_prototype_robot_database(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_database()");  }
   // Return the current rewards array for this player
   $session_token = mmrpg_game_token();
   //die('<pre style="color: white;">session_values('.$session_token.')! '.print_r($_SESSION[$session_token]['values'], true).'</pre>');
@@ -249,7 +236,6 @@ function mmrpg_prototype_robot_database(){
 }
 // Define a function for checking a player's robot favourites array
 function mmrpg_prototype_robot_favourites(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_favourites()");  }
   // Return the current rewards array for this player
   $session_token = mmrpg_game_token();
   if (!empty($_SESSION[$session_token]['values']['robot_favourites'])){ return $_SESSION[$session_token]['values']['robot_favourites']; }
@@ -257,7 +243,6 @@ function mmrpg_prototype_robot_favourites(){
 }
 // Define a function for checking a player's prototype rewards array
 function mmrpg_prototype_robot_favourite($robot_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_favourites()");  }
   // Return the current rewards array for this player
   $session_token = mmrpg_game_token();
   if (!isset($_SESSION[$session_token]['values']['robot_favourites'])){ $_SESSION[$session_token]['values']['robot_favourites'] = array(); }
@@ -265,7 +250,6 @@ function mmrpg_prototype_robot_favourite($robot_token){
 }
 // Define a function for checking if a prototype battle has been completed
 function mmrpg_prototype_battle_complete($player_token, $battle_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_battle_complete('{$player_token}', '{$battle_token}')");  }
   // Check if this battle has been completed and return true is it was
   $session_token = mmrpg_game_token();
   if (!empty($player_token)){
@@ -282,21 +266,18 @@ function mmrpg_prototype_battle_complete($player_token, $battle_token){
 }
 // Define a function for checking if a prototype battle has been failured
 function mmrpg_prototype_battle_failure($player_token, $battle_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_battle_failure('{$player_token}', '{$battle_token}')");  }
   // Check if this battle has been failured and return true is it was
   $session_token = mmrpg_game_token();
   return isset($_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token]) ? $_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token] : false;
 }
 // Define a function for checking is a prototype player has been unlocked
 function mmrpg_prototype_player_unlocked($player_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_player_unlocked('{$player_token}')");  }
   // Check if this battle has been completed and return true is it was
   $session_token = mmrpg_game_token();
   return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]) ? true : false;
 }
 // Define a function for checking is a prototype robot has been unlocked
 function mmrpg_prototype_robot_unlocked($player_token = '', $robot_token = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_unlocked('{$player_token}', '{$robot_token}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // If the player token was not false, check to see if that particular player has unlocked
@@ -327,7 +308,6 @@ function mmrpg_prototype_robot_unlocked($player_token = '', $robot_token = ''){
 }
 // Define a function for collecting all abilities unlocked by player or all
 function mmrpg_prototype_ability_tokens_unlocked($player_token = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_ability_unlocked('{$player_token}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // Define the temp ability and return arrays
@@ -364,7 +344,6 @@ function mmrpg_prototype_ability_tokens_unlocked($player_token = ''){
 }
 // Define a function for collecting all robots unlocked by player or all
 function mmrpg_prototype_robot_tokens_unlocked($player_token = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_unlocked('{$player_token}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // Define the temp robot and return arrays
@@ -404,7 +383,6 @@ function mmrpg_prototype_robot_tokens_unlocked($player_token = ''){
 }
 // Define a function for collecting all robots unlocked by player or all
 function mmrpg_prototype_robots_unlocked_info($player_token = '', $merge_arrays = true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_unlocked('{$player_token}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // Define the temp robot and return arrays
@@ -452,7 +430,6 @@ function mmrpg_prototype_robots_unlocked_info($player_token = '', $merge_arrays 
 }
 // Define a function for checking if a prototype ability has been unlocked
 function mmrpg_prototype_ability_unlocked($player_token = '', $robot_token = '', $ability_token = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_ability_unlocked('{$player_token}', '{$robot_token}', '{$ability_token}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // If the combined array exists and we're not being specific, check that first
@@ -479,13 +456,11 @@ function mmrpg_prototype_ability_unlocked($player_token = '', $robot_token = '',
       }
       // Return false if nothing found
       return false;
-      //return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities'][$ability_token]) ? true : false;
     }
   }
 }
 // Define a function for checking if a prototype skin has been unlocked
 function mmrpg_prototype_skin_unlocked($robot_token = '', $skin_token = 'alt'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_alt_unlocked('{$player_token}', '{$robot_token}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
 
@@ -519,7 +494,6 @@ function mmrpg_prototype_skin_unlocked($robot_token = '', $skin_token = 'alt'){
 
 // Define a function for counting the number of completed prototype battles
 function mmrpg_prototype_battles_complete($player_token = '', $unique = true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_battles_complete('{$player_token}', ".($unique ? 'true' : 'false').")");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // Collect the battle complete count from the session if set
@@ -547,7 +521,6 @@ function mmrpg_prototype_battles_complete($player_token = '', $unique = true){
 }
 // Define a function for counting the number of failured prototype battles
 function mmrpg_prototype_battles_failure($player_token, $unique = true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_battles_failure('{$player_token}', ".($unique ? 'true' : 'false').")");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // Collect the battle failure count from the session if set
@@ -564,14 +537,12 @@ function mmrpg_prototype_battles_failure($player_token, $unique = true){
 }
 // Define a function for checking is a prototype player has been unlocked
 function mmrpg_prototype_players_unlocked(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_players_unlocked()');  }
   // Check if this battle has been completed and return true is it was
   $session_token = mmrpg_game_token();
   return isset($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
 }
 // Define a function for checking is a prototype robot has been unlocked
 function mmrpg_prototype_robots_unlocked($player_token = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robots_unlocked('{$player_token}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   if (!empty($player_token)){
@@ -588,7 +559,6 @@ function mmrpg_prototype_robots_unlocked($player_token = ''){
 }
 // Define a function for checking how many items have been unlocked by a player
 function mmrpg_prototype_items_unlocked(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_cores_unlocked()");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   $temp_counter = 0;
@@ -601,7 +571,6 @@ function mmrpg_prototype_items_unlocked(){
 }
 // Define a function for checking how many cores have been unlocked by a player
 function mmrpg_prototype_cores_unlocked(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_cores_unlocked()");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   $temp_counter = 0;
@@ -614,7 +583,6 @@ function mmrpg_prototype_cores_unlocked(){
 }
 // Define a function for checking how many screws have been unlocked by a player
 function mmrpg_prototype_screws_unlocked($size = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_screws_unlocked()");  }
   // If neither screw type has ever been created, return a hard false
   $session_token = mmrpg_game_token();
   if (!isset($_SESSION[$session_token]['values']['battle_items']['item-screw-small'])
@@ -629,7 +597,6 @@ function mmrpg_prototype_screws_unlocked($size = ''){
 }
 // Define a function for checking how much zenny has been unlocked by all players
 function mmrpg_prototype_zenny_unlocked(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_zenny_unlocked()");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // Collect the zenny count and return it
@@ -638,7 +605,6 @@ function mmrpg_prototype_zenny_unlocked(){
 }
 // Define a function for checking how many database pages have been unlocked by all players
 function mmrpg_prototype_database_unlocked(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_database_unlocked()");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   // Collect the database count and return it
@@ -647,7 +613,6 @@ function mmrpg_prototype_database_unlocked(){
 }
 // Define a function for checking is a prototype star has been unlocked
 function mmrpg_prototype_star_unlocked($star_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_star_unlocked('{$star_token}')");  }
   $session_token = mmrpg_game_token();
   if (empty($_SESSION[$session_token]['values']['battle_stars'])){ return false; }
   elseif (empty($_SESSION[$session_token]['values']['battle_stars'][$star_token])){ return false; }
@@ -655,7 +620,6 @@ function mmrpg_prototype_star_unlocked($star_token){
 }
 // Define a function for checking is a prototype star has been unlocked
 function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_stars_unlocked('{$player_token}', '{$star_kind}')");  }
   // Define the game session helper var
   $session_token = mmrpg_game_token();
   if (empty($_SESSION[$session_token]['values']['battle_stars'])){ return 0; }
@@ -671,7 +635,6 @@ function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
 }
 // Define a function for checking if a prototype ability has been unlocked
 function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_abilities_unlocked('{$player_token}', '{$robot_token}')");  }
   // Pull in global variables
   //global $mmrpg_index;
   $mmrpg_index_players = $GLOBALS['mmrpg_index']['players'];
@@ -710,7 +673,6 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
 
 // Define a function for displaying prototype battle option markup
 function mmrpg_prototype_options_markup(&$battle_options, $player_token){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_options_markup(&\$battle_options, '{$player_token}')");  }
   // Refence the global config and index objects for easy access
   global $mmrpg_index, $DB;
   $mmrpg_index_fields = mmrpg_field::get_index();
@@ -724,7 +686,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
 // Define a function for generating option message markup
 function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone, $linetwo, $sprites = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_option_message_markup('{$player_token}', '{$subject}', '{$lineone}', '{$linetwo}', '{$sprites}')");  }
   $temp_optiontext = '<span class="multi"><span class="maintext">'.$subject.'</span><span class="subtext">'.$lineone.'</span><span class="subtext2">'.$linetwo.'</span></span>';
   return '<a class="option option_1x4 option_this-'.$player_token.'-select option_message "><div class="chrome"><div class="inset"><label class="'.(!empty($sprites) ? 'has_image' : '').'">'.$sprites.$temp_optiontext.'</label></div></div></a>'."\n";
 }
@@ -734,85 +695,33 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
  * MISSION GENERATION
  */
 
+
 // Define a function for generating an ability set for a given robot
-function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $ability_num = 1, $robot_item = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_generate_abilities(\$robot_info, {$robot_level}, {$ability_num})");  }
-  global $DB;
-  // Require the actual code file
-  require('prototype_generate-abilities.php');
-  // Return the ability array, whatever it was
-  return $this_robot_abilities;
-}
+require('prototype_generate-abilities.php');
 
 // Define a function for generating the STARTER missions
-function mmrpg_prototype_mission_starter($this_prototype_data, $this_robot_token = 'met', $this_start_level = 1, $this_rescue_token = 'roll', $this_field_token = 'intro-field', $this_start_count = 1, $this_target_class = 'mecha'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_mission_starter(\$this_prototype_data, '{$this_robot_token}', {$this_start_level}, '{$this_rescue_token}')");  }
-  // Pull in global variables for this function
-  global $mmrpg_index, $DB;
-  // Require the definition file
-  require('prototype_mission-starter.php');
-  // Return the generated omega battle data
-  return $temp_battle_omega;
-}
+require('prototype_mission-starter.php');
 
 // Define a function for generating the SINGLES missions
-function mmrpg_prototype_mission_single($this_prototype_data, $this_robot_token, $this_field_token, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true, $this_addon_abilities = 0){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_mission_single(\$this_prototype_data, '{$this_robot_token}', '{$this_field_token}', {$this_start_level}, ".($this_unlock_robots ? 'true' : 'false').", ".($this_unlock_abilities ? 'true' : 'false').", {$this_addon_abilities})");  }
-  // Pull in global variables for this function
-  global $mmrpg_index, $DB, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
-  // Require the actual code file
-  require('prototype_mission-single.php');
-  // Return the generated battle data
-  return $temp_battle_omega;
-}
+require('prototype_mission-single.php');
 
 // Define a function for generating the DOUBLES missions
-function mmrpg_prototype_mission_double($this_prototype_data, $this_robot_tokens, $this_field_tokens, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_mission_double(\$this_prototype_data, '".implode(',', $this_robot_tokens)."', '".implode(',', $this_field_tokens)."', {$this_start_level}, ".($this_unlock_robots ? 'true' : 'false').", ".($this_unlock_abilities ? 'true' : 'false').")");  }
-  // Pull in global variables for this function
-  global $mmrpg_index, $DB, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
-  // Require the actual code file
-  require('prototype_mission-double.php');
-  // Return the generated battle data
-  return $temp_battle_omega;
-}
+require('prototype_mission-double.php');
 
 // Define a function for generating the PLAYER missions
-function mmrpg_prototype_mission_player($this_prototype_data, $this_user_info, $this_max_robots, &$field_factors_one, &$field_factors_two, &$field_factors_three){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_mission_player(\$this_prototype_data, \$this_user_info, {$this_max_robots}, &\$field_factors_one, &\$field_factors_two, &\$field_factors_three)");  }
-  // Pull in global variables for this function
-  global $mmrpg_index, $DB, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
-  // Require the actual code file
-  require('prototype_mission-player.php');
-  // Return the generated battle data
-  return $temp_battle_omega;
-}
+require('prototype_mission-player.php');
 
 // Define a function for generating the BONUS missions
-function mmrpg_prototype_mission_bonus($this_prototype_data, $this_robot_count = 8, $this_robot_class = 'master'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_mission_bonus(\$this_prototype_data, {$this_robot_count}, '{$this_robot_class}')");  }
-  // Pull in global variables for this function
-  global $mmrpg_index, $DB;
-  // Require the actual code file
-  require('prototype_mission-bonus.php');
-  // Return the generated battle data
-  return $temp_battle_omega;
-}
+require('prototype_mission-bonus.php');
 
 // Define a function for generating the FORTRESS missions
-function mmrpg_prototype_mission_fortress($this_prototype_data, $temp_battle_level, $temp_index_token, $temp_battle_token, $temp_robot_masters = array(), $temp_support_mechas = array()){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_mission_starter(\$this_prototype_data, {$temp_battle_level}, '{$temp_index_token}', '{$temp_battle_token}')");  }
-  // Pull in global variables for this function
-  global $mmrpg_index, $DB;
-  // Require the definition file
-  require('prototype_mission-fortress.php');
-  // Return the generated omega battle data
-  return $temp_battle_omega;
-}
+require('prototype_mission-fortress.php');
+
+// Define a function for generating robot SELECT markup
+require('prototype_robot-select-markup.php');
 
 // Define a function for sorting the omega player robots
 function mmrpg_prototype_sort_player_robots($info1, $info2){
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_sort_player_robots(\$info1, \$info2)");  }
   $info1_robot_level = $info1['robot_level'];
   $info2_robot_level = $info2['robot_level'];
   $info1_robot_favourite = isset($info1['values']['flag_favourite']) ? $info1['values']['flag_favourite'] : 0;
@@ -826,7 +735,6 @@ function mmrpg_prototype_sort_player_robots($info1, $info2){
 
 // Define a function to sort prototype robots based on their current level / experience points
 function mmrpg_prototype_sort_robots_experience($info1, $info2){
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_sort_robots_experience(\$info1, \$info2)");  }
   global $this_prototype_data;
   $info1_robot_level = mmrpg_prototype_robot_level($this_prototype_data['this_player_token'], $info1['robot_token']);
   $info1_robot_experience = mmrpg_prototype_robot_experience($this_prototype_data['this_player_token'], $info1['robot_token']);
@@ -842,7 +750,6 @@ function mmrpg_prototype_sort_robots_experience($info1, $info2){
 
 // Define a function to sort prototype robots based on their current level / experience points
 function mmrpg_prototype_sort_robots_position($info1, $info2){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_sort_robots_position(\$info1, \$info2)");  }
   global $this_prototype_data;
   static $this_robot_favourites;
   if (empty($this_robot_favourites)){ $this_robot_favourites = mmrpg_prototype_robot_favourites(); }
@@ -858,24 +765,8 @@ function mmrpg_prototype_sort_robots_position($info1, $info2){
   else { return 0; }
 }
 
-
-// Define a function for displaying prototype robot button markup on the select screen
-function mmrpg_prototype_robot_select_markup($this_prototype_data){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_robot_select_markup($this_prototype_data)');  }
-  // Refence the global config and index objects for easy access
-  global $DB;
-  // Define the temporary robot markup string
-  $this_robots_markup = '';
-  // Require the actual code file
-  require('prototype_robot-select-markup.php');
-  // Return the generated markup
-  return $this_robots_markup;
-}
-
-
 // Define the field star image function for use in other parts of the game
 function mmrpg_prototype_star_image($type){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_star_image('{$type}')");  }
   static $type_order = array('none', 'copy', 'crystal', 'cutter', 'earth',
     'electric', 'explode', 'flame', 'freeze', 'impact',
     'laser', 'missile', 'nature', 'shadow', 'shield',
@@ -890,20 +781,16 @@ function mmrpg_prototype_star_image($type){
     $type_frame = 0;
   }
   $temp_array = array('sheet' => $type_sheet, 'frame' => $type_frame);
-  //echo('type:'.$type.'; '.print_r($temp_array, true).'<br />');
   return $temp_array;
 }
 
 // Define a function for pulling the leaderboard players index
 function mmrpg_prototype_leaderboard_index(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_leaderboard_index()');  }
   global $DB;
   // Check to see if the leaderboard index has already been pulled or not
   if (!empty($DB->INDEX['LEADERBOARD']['index'])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_leaderboard_index = json_decode($DB->INDEX['LEADERBOARD']['index'], true);
   } else {
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Define the array for pulling all the leaderboard data
     $temp_leaderboard_query = 'SELECT
       mmrpg_users.user_id,
@@ -919,18 +806,14 @@ function mmrpg_prototype_leaderboard_index(){
     // Query the database and collect the array list of all online players
     $this_leaderboard_index = $DB->get_array_list($temp_leaderboard_query);
     // Update the database index cache
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $DB->INDEX['LEADERBOARD']['index'] = json_encode($this_leaderboard_index);
   }
   // Return the collected leaderboard index
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'return <pre>'.print_r($this_leaderboard_index, true).'</pre>;');  }
   return $this_leaderboard_index;
 }
 
 // Define a function for collecting the requested player's board ranking
 function mmrpg_prototype_leaderboard_rank($user_id){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_leaderboard_rank({$user_id})");  }
-
   // Query the database and collect the array list of all non-bogus players
   $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
   $this_leaderboard_points = 0;
@@ -950,28 +833,26 @@ function mmrpg_prototype_leaderboard_rank($user_id){
   } else {
     $this_leaderboard_rank = 0;
   }
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "\$this_leaderboard_rank = {$this_leaderboard_rank}; \$this_leaderboard_points = {$this_leaderboard_points}; \$this_leaderboard_list = <pre>".print_r($this_leaderboard_list, true)."</pre>");  }
-
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "return {$this_leaderboard_rank};");  }
   return $this_leaderboard_rank;
 
 }
 
 // Define a function for pulling the leaderboard online player
 function mmrpg_prototype_leaderboard_online(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_leaderboard_online()');  }
   global $DB;
   // Check to see if the leaderboard online has already been pulled or not
   if (!empty($DB->INDEX['LEADERBOARD']['online'])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_leaderboard_online = json_decode($DB->INDEX['LEADERBOARD']['online'], true);
   } else {
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Collect the leaderboard index for ranking
     $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
     // Generate the points index and then break it down to unique for ranks
     $this_points_index = array();
-    foreach ($this_leaderboard_index AS $info){ $this_points_index[] = $info['board_points']; }
+    if (!empty($this_leaderboard_index)){
+      foreach ($this_leaderboard_index AS $info){
+        $this_points_index[] = $info['board_points'];
+      }
+    }
     $this_points_index = array_unique($this_points_index);
     // Define the vars for finding the online players
     $this_time = time();
@@ -991,27 +872,20 @@ function mmrpg_prototype_leaderboard_online(){
         }
       }
     }
-    //die('<pre>$this_leaderboard_online = '.print_r($this_leaderboard_online, true).'</pre>');
     // Update the database index cache
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $DB->INDEX['LEADERBOARD']['online'] = json_encode($this_leaderboard_online);
   }
   // Return the collected online players if any
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'return <pre>'.print_r($this_leaderboard_online, true).'</pre>');  }
   return $this_leaderboard_online;
 }
 
 // Define a function for pulling the leaderboard custom player options
 function mmrpg_prototype_leaderboard_custom($player_token = '', $this_userid = 0){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_leaderboard_custom('.$player_token.')');  }
   global $DB;
   // Check to see if the leaderboard online has already been pulled or not
   if (!empty($DB->INDEX['LEADERBOARD']['custom'])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_leaderboard_custom = json_decode($DB->INDEX['LEADERBOARD']['custom'], true);
   } else {
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Collect the leaderboard index for ranking
     $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
     if (!empty($player_token)){
@@ -1045,20 +919,15 @@ function mmrpg_prototype_leaderboard_custom($player_token = '', $this_userid = 0
         }
       }
     }
-    //die('<pre>$this_leaderboard_custom = '.print_r($this_leaderboard_custom, true).'</pre>');
     // Update the database index cache
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $DB->INDEX['LEADERBOARD']['custom'] = json_encode($this_leaderboard_custom);
   }
   // Return the collected online players if any
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'return <pre>'.print_r($this_leaderboard_custom, true).'</pre>');  }
   return $this_leaderboard_custom;
 }
 
 // Define a function for pulling the leaderboard rival targets
 function mmrpg_prototype_leaderboard_rivals($this_leaderboard_index, $this_userid, $offset = 10){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_leaderboard_targets({$this_userid})");  }
   global $DB;
 
   // Collect the position of the current player in the leaderboard list
@@ -1086,14 +955,14 @@ function mmrpg_prototype_leaderboard_rivals($this_leaderboard_index, $this_useri
 
 // Define a function for pulling the leaderboard targets
 function mmrpg_prototype_leaderboard_targets($this_userid, $player_limit = 12, $player_sort = '', $player_campaign = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_leaderboard_targets({$this_userid})");  }
   global $DB;
+
   // Check to see if the leaderboard targets have already been pulled or not
   if (!empty($DB->INDEX['LEADERBOARD']['targets'])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    $this_leaderboard_target_players = json_decode($DB->INDEX['LEADERBOARD']['targets'], true);
+
+    $this_leaderboard_target_players = $DB->INDEX['LEADERBOARD']['targets'];
+
   } else {
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Collect the leaderboard index and online players for ranking
     $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
@@ -1124,10 +993,8 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_limit = 12, $
 
     // Add the include data to the raw array
     if (!empty($this_leaderboard_targets)){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($this_leaderboard_targets AS $kind => $players){
         if (!empty($players)){
-          if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           if (!isset($this_leaderboard_targets_ids[$kind])){ $this_leaderboard_targets_ids[$kind] = array(); }
           foreach ($players AS $key => $info){
             $id = isset($info['user_id']) ? $info['user_id'] : $info['id'];
@@ -1145,12 +1012,10 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_limit = 12, $
     //die('<pre>$this_leaderboard_targets_ids(this:'.$player_campaign.'/target:'.$player_sort.') = '.print_r($this_leaderboard_targets_ids, true).'</pre>');
 
     // Re-key the array to prevent looping errors
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_include_raw = array_values($temp_include_raw);
 
     // Loop thrugh the raw array and collect filter variables
     if (!empty($temp_include_raw)){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($temp_include_raw AS $info){
         if (isset($info['id']) && $info['id'] != $this_userid){
           $temp_include_usernames[] = $info['token'];
@@ -1162,22 +1027,18 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_limit = 12, $
       }
       $temp_include_usernames_count = count($temp_include_usernames);
       if (!empty($temp_include_usernames)){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         foreach ($temp_include_usernames AS $token){ $temp_include_usernames_string[] = "'{$token}'"; }
         $temp_include_usernames_string = implode(',', $temp_include_usernames_string);
       } else {
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_include_usernames_string = '';
       }
     } else {
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_include_usernames_string = '';
     }
 
     //die('<pre>$temp_include_raw(this:'.$player_campaign.'/target:'.$player_sort.') = '.print_r($temp_include_raw, true).'</pre>');
 
     // Define the array for pulling all the leaderboard data
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_leaderboard_query = 'SELECT
         mmrpg_leaderboard.user_id,
         mmrpg_leaderboard.board_points,
@@ -1203,7 +1064,6 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_limit = 12, $
 
     // Query the database and collect the array list of all online players
     //die('<pre>$temp_leaderboard_query(this:'.$player_campaign.'/target:'.$player_sort.') = '.print_r($temp_leaderboard_query, true).'</pre>');
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_leaderboard_query = '.$temp_leaderboard_query);  }
     $this_leaderboard_target_players = $DB->get_array_list($temp_leaderboard_query);
 
     //die('<pre>$this_leaderboard_target_players(this:'.$player_campaign.'/target:'.$player_sort.') = '.print_r($this_leaderboard_target_players, true).'</pre>');
@@ -1221,12 +1081,10 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_limit = 12, $
 
     //die('<pre>$this_leaderboard_target_players(this:'.$player_campaign.'/target:'.$player_sort.') = '.print_r($this_leaderboard_target_players, true).'</pre>');
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     //die('<pre>(this:'.$player_campaign.'/target:'.$player_sort.')'."\n\n".'$temp_leaderboard_query = '.print_r($temp_leaderboard_query, true).''."\n\n".'$this_leaderboard_target_players = '.print_r($this_leaderboard_target_players, true).'</pre>');
 
     // Loop through and decode any fields that require it
     if (!empty($this_leaderboard_target_players)){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($this_leaderboard_target_players AS $key => $player){
         $player['player_rewards'] = !empty($player['player_rewards']) ? json_decode($player['player_rewards'], true) : array();
         $player['player_settings'] = !empty($player['player_settings']) ? json_decode($player['player_settings'], true) : array();
@@ -1243,17 +1101,14 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_limit = 12, $
         $this_leaderboard_target_players[$key] = $player;
       }
     }
+
     // Update the database index cache
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     //if (!empty($player_sort)){ uasort($this_leaderboard_target_players, 'mmrpg_prototype_leaderboard_targets_sort'); }
-    $DB->INDEX['LEADERBOARD']['targets'] = json_encode($this_leaderboard_target_players);
+    $DB->INDEX['LEADERBOARD']['targets'] = $this_leaderboard_target_players;
     //die($temp_leaderboard_query);
+
   }
   // Return the collected online players if any
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  //die('<pre>$this_leaderboard_target_players : '.print_r($this_leaderboard_target_players, true).'</pre>');
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_leaderboard_target_players : '.print_r($this_leaderboard_target_players, true).'');  }
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_leaderboard_target_players(count) : '.count($this_leaderboard_target_players));  }
   return $this_leaderboard_target_players;
 }
 
@@ -1279,7 +1134,6 @@ function mmrpg_prototype_leaderboard_targets_sort_online($player1, $player2){
 
 // Define a function for determining a player's battle music
 function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   global $mmrpg_index, $DB;
 
   $temp_session_key = $player_token.'_target-robot-omega_prototype';
@@ -1329,7 +1183,6 @@ function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'
 
 // Define a function for determining a player's battle music
 function mmrpg_prototype_get_player_mission_music($player_token, $session_token = 'GAME'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $most_key = mmrpg_prototype_get_player_music($player_token, $session_token);
   return 'stage-select-'.$most_key;
 }
@@ -1337,16 +1190,12 @@ function mmrpg_prototype_get_player_mission_music($player_token, $session_token 
 
 // Define a function for determining a player's boss music
 function mmrpg_prototype_get_player_boss_music($player_token, $session_token = 'GAME'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $most_key = mmrpg_prototype_get_player_music($player_token, $session_token);
   return 'boss-theme-'.$most_key;
-  //$most_key_int = preg_replace('/^mm0?/i', '', $most_key);
-  //return 'boss-theme'.($most_key_int > 1 ? '-'.$most_key_int : '');
 }
 
 // Define a function for checking the battle's prototype points total
 function mmrpg_prototype_database_summoned($robot_token = ''){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_battle_points()');  }
   // Define static variables amd populate if necessary
   static $this_count_array;
   // Return the current point total for thisgame
@@ -1379,7 +1228,6 @@ function mmrpg_prototype_database_summoned($robot_token = ''){
 
 // Define a function for collecting robot sprite markup
 function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token = 'GAME'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   global $mmrpg_index, $DB;
   $temp_offset_x = 14;
   $temp_offset_z = 50;

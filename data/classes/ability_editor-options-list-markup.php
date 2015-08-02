@@ -1,6 +1,5 @@
 <?
 // Define the global variables
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 global $mmrpg_index, $this_current_uri, $this_current_url, $DB;
 global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
 global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
@@ -72,6 +71,4 @@ $this_options_markup .= $player_ability_support_options;
 $this_options_markup .= '<optgroup label="Ability Actions">';
 $this_options_markup .= '<option value="" title="">- Remove Ability -</option>';
 $this_options_markup .= '</optgroup>';
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $this_options_markup = '.htmlentities($this_options_markup, ENT_QUOTES, 'UTF-8', true));  }
-
 ?>

@@ -1,8 +1,6 @@
 <?php
 // Include the TOP file
 require_once('top.php');
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 /*
 // MAINTENANCE
 if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.226.238.61'))){
@@ -12,35 +10,20 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.
 }
 */
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Require the robot database for... stuff?
 //require_once('data/database.php');
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Collect the game's session token
 $session_token = mmrpg_game_token();
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Automatically empty all temporary battle variables
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $_SESSION['BATTLES'] = array();
 $_SESSION['FIELDS'] = array();
 $_SESSION['PLAYERS'] = array();
 $_SESSION['ROBOTS'] = array();
 $_SESSION['ABILITIES'] = array();
 $_SESSION['PROTOTYPE_TEMP'] = array();
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-// MAINTENANCE
-//if ($_SERVER['REMOTE_ADDR'] != '99.255.218.123'){ die('Emergency Maintainence.'); }
+unset($_SESSION['GAME']['debug_mode']);
 
 // Collect the prototype start link if provided
 $prototype_start_link = !empty($_GET['start']) ? $_GET['start'] : 'home';
@@ -49,35 +32,20 @@ $prototype_start_link = !empty($_GET['start']) ? $_GET['start'] : 'home';
 $prototype_window_event_canvas = array();
 $prototype_window_event_messages = array();
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Check if a reset request has been placed
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Reset the game session and reload the page
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_reset_game_session($this_save_filepath);
   // Update the appropriate session variables
   $_SESSION['GAME']['USER'] = $this_user;
   $_SESSION['GAME']['FILE'] = $this_file;
   // Load the save file into memory and overwrite the session
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_save_game_session($this_save_filepath);
-
-  // DEBUG DEBUG DEBUG
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-  //header('Location: prototype.php');
   unset($DB);
   exit('success');
-
 }
 // Check if a reset request has been placed
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !empty($_REQUEST['player'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Reset the appropriate session variables
   if (!empty($mmrpg_index['players'][$_REQUEST['player']])){
     $temp_session_key = $_REQUEST['player'].'_target-robot-omega_prototype';
@@ -85,23 +53,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
     $_SESSION['GAME']['values']['battle_failure'][$_REQUEST['player']] = array();
     $_SESSION['GAME']['values'][$temp_session_key] = array();
   }
-
   // Load the save file into memory and overwrite the session
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_save_game_session($this_save_filepath);
-
-  // DEBUG DEBUG DEBUG
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-  //header('Location: prototype.php');
   unset($DB);
   exit('success');
-
 }
 // Check if a exit request has been placed
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Auto-generate the user and file info based on their IP
   $this_user = array();
   $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
@@ -123,79 +81,48 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
   // Update the global save path variable
   $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
   // Reset the game session and reload the page
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_reset_game_session($this_save_filepath);
-
-  // DEBUG DEBUG DEBUG
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Exit on success
   unset($DB);
   exit('success');
-
 }
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 
 // Cache the currently online players
 if (!isset($_SESSION['LEADERBOARD']['online_timestamp'])
   || (time() - $_SESSION['LEADERBOARD']['online_timestamp']) > 1){ // 600sec = 10min
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $_SESSION['LEADERBOARD']['online_players'] = mmrpg_prototype_leaderboard_online();
   $_SESSION['LEADERBOARD']['online_timestamp'] = time();
 }
 
 
 // Require the prototype data file
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require_once('data/prototype.php');
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-
 
 /*
  * PASSWORD PROCESSING
  */
 
 // Collect the game flags for easier password processing
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_flags = !empty($_SESSION['GAME']['flags']) ? $_SESSION['GAME']['flags'] : array();
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-//die('wtf1-'.time());
-//die('$temp_flags = <pre>'.print_r($temp_flags, true).'</pre>');
-
+/*
 // Only proceed if there are actually flags to check
 if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // DEBUG PLAYERS / ABILITIES
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $mmrpg_index_players = $mmrpg_index['players'];
 
   // Collect the robot index for calculation purposes
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
   // Collect the ability index for calculation purposes
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
   // DEBUG PLAYERS / ABILITIES
   foreach ($mmrpg_index_players AS $player_token => $player_info){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    //$player_info = mmrpg_player::parse_index_info($player_info);
     $player_string = str_replace('-', '', $player_token);
 
     // DEBUG ABILITY UNLOCKS
     foreach ($this_ability_index AS $ability_token => $ability_info){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       if (mmrpg_prototype_ability_unlocked($player_token, false, $ability_token)){ continue; }
       $ability_info = mmrpg_ability::parse_index_info($ability_info);
       $ability_string = str_replace('-', '', $ability_token);
@@ -211,7 +138,6 @@ if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
 
     // DEBUG ROBOT UNLOCKS
     foreach ($this_robot_index AS $robot_token => $robot_info){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       if (mmrpg_prototype_robot_unlocked(false, $robot_token)){ continue; }
       $robot_info = mmrpg_robot::parse_index_info($robot_info);
       $robot_string = str_replace('-', '', $robot_token);
@@ -227,15 +153,11 @@ if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
 
   }
 
-  // DEBUG DEBUG DEBUG
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Unset temporary indexes
   unset($this_robot_index, $this_ability_index);
 
 }
-
-//die('wtf2-'.time().'<br />');
+*/
 
 // Include the prototype awards file to check stuff
 require('prototype_awards.php');
@@ -243,26 +165,8 @@ require('prototype_awards.php');
 
 // If possible, attempt to save the game to the session
 if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
-  // Save the game session
-  //die($this_save_filepath);
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_save_game_session($this_save_filepath);
 }
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-//die('wtf3-'.time().'<br />');
-
-/*
-// MAINTENANCE
-if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1'))){
-  die('Prototype under maintenance.  Please stand by. <br />We\'ll try to come back as soon as we can, but no promises on when.  <br />Thank you for your patience.  :(');
-}
-*/
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 ?>
 <!DOCTYPE html>
@@ -295,7 +199,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
       <?
       // Define tooltips for the game options
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       // Define the menu options array to be populated
       $this_menu_tooltips = array();
       $this_menu_tooltips['leaderboard'] = '&laquo; Battle Points Leaderboard &raquo; &lt;br /&gt;Live leaderboards rank all players by their total Battle Point scores from highest to lowest. Keep an eye on your Battle Points by checking here at the top-right of the main menu and try to work your way up to the first page!';
@@ -390,7 +293,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     <?
     // Check if the prototype has been completed before continuing
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_prototype_complete = mmrpg_prototype_complete();
     ?>
     <div class="options options_fullmenu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -447,12 +349,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     </span>
     <?
     // Require the prototype players display file
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_players.php');
-
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     ?>
   </div>
 
@@ -463,11 +360,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     <?
 
     // Require the prototype missions display file
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_missions.php');
-
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // If we're NOT in demo mode, maybe add a back button
     if (empty($_SESSION['GAME']['DEMO'])){
@@ -476,9 +369,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         echo '<a class="option option_back block_1" data-back="1">&#9668; Back</a>'."\n";
       }
     }
-
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     ?>
   </div>
@@ -497,7 +387,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         echo '<span class="header block_1"><span class="count">Robot Select</span></span>'."\n";
 
         // Require the prototype robots display file
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_robots.php');
 
         // Print out the back button for going back to player select
@@ -507,9 +396,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         echo '</div>'."\n";
 
       }
-
-      // DEBUG DEBUG DEBUG
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     }
     /*
@@ -522,7 +408,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       echo '<span class="header block_1"><span class="count">Robot Select</span></span>'."\n";
 
       // Require the prototype robots display file
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_robots.php');
 
       // Print out the back button for going back to player select
@@ -530,9 +415,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
       // Print out the closing tags for the robot select container
       echo '</div>'."\n";
-
-      // DEBUG DEBUG DEBUG
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     }
   ?>
@@ -569,11 +451,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 </div>
 
 <div id="falloff" class="falloff_bottom">&nbsp;</div>
-<?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-?>
 <script type="text/javascript" src="scripts/jquery.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
@@ -637,22 +514,11 @@ $(document).ready(function(){
 </script>
 <?
 // Require the remote bottom in case we're in viewer mode
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require(MMRPG_CONFIG_ROOTDIR.'/data/analytics.php');
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>
 </body>
 </html>
 <?
-// If we're NOT in demo mode, automatically update the date-accessed for their database entry
-/*
-if (empty($_SESSION['GAME']['DEMO'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  $temp_query = 'UPDATE mmrpg_users SET user_date_accessed = '.time().' WHERE user_id = '.$_SESSION['GAME']['USER']['userid'];
-  $temp_result = $DB->query($temp_query);
-}
-*/
 // If there were any events in the session, automatically add remove them from the session
 if (!empty($_SESSION['GAME']['EVENTS'])){ $_SESSION['GAME']['EVENTS'] = array(); }
 // Unset the database variable

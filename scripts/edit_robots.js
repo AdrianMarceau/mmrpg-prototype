@@ -541,9 +541,6 @@ $(document).ready(function(){
     if (!gameSettings.allowEditing){ return false; }
     //console.log('gameConsole > a.item_name clicked');
     
-    // NOT READY YET!!!
-    //return false;
-    
     var thisLink = $(this);
     var thisContainer = thisLink.parent();
     var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
@@ -772,8 +769,6 @@ $(document).ready(function(){
                 thisLink.removeAttr('data-type');
                 thisLink.removeAttr('data-type2');
                 thisLink.html('<label>-</label>');
-                
-                //return true;
                                 
                 } else { 
                 //console.log('Ability ID '+thisID+' is totally compatible');
@@ -1583,7 +1578,6 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
           //$('#edit_overlay', thisPrototype).css({display:'none'});
           thisBody.removeClass('loading');
           return onComplete();
-          //return true;
           
           } else {
             

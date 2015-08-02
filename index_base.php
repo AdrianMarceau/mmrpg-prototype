@@ -1,8 +1,6 @@
 <?php
 // Include the TOP file
 require_once('top.php');
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Only process session updates if we're NOT in critical error mode
 if (!defined('MMRPG_CRITICAL_ERROR')){
 
@@ -55,7 +53,6 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     );
 
   // Collect the recently updated posts for this player / guest
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID && !empty($this_userinfo['user_backup_login'])){ $temp_last_login = $this_userinfo['user_backup_login']; }
   else { $temp_last_login = time() - MMRPG_SETTINGS_UPDATE_TIMEOUT; }
   $temp_new_threads = $DB->get_array_list("SELECT category_id, CONCAT(thread_id, '_', thread_mod_date) AS thread_session_token FROM mmrpg_threads WHERE thread_locked = 0 AND (thread_target = 0 OR thread_target = {$this_userinfo['user_id']} OR user_id = {$this_userinfo['user_id']}) AND thread_mod_date > {$temp_last_login}".($this_userid != MMRPG_SETTINGS_GUEST_ID ? "  AND thread_mod_user <> {$this_userid}" : ''));
@@ -67,7 +64,6 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
   $temp_new_threads_categories = array();
   $temp_new_threads_ids = array();
   if (!empty($temp_new_threads)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     foreach ($temp_new_threads AS $info){
       if (!isset($temp_new_threads_categories[$info['category_id']])){ $temp_new_threads_categories[$info['category_id']] = 0; }
       if (in_array($info['thread_session_token'], $_SESSION['COMMUNITY']['threads_viewed'])){ unset($_SESSION['COMMUNITY']['threads_viewed'][array_search($info['thread_session_token'], $_SESSION['COMMUNITY']['threads_viewed'])]); }
@@ -79,7 +75,6 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
   $_SESSION['COMMUNITY']['threads_new_categories'] = $temp_new_threads_categories;
   //die('<pre>'.print_r($temp_new_threads_categories, true).'</pre>');
   // Collect the online leaderboard data for the currently online players
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_leaderboard_online = mmrpg_prototype_leaderboard_online();
 
   // Collect any members that are currently viewing the community page
@@ -111,10 +106,7 @@ if (empty($this_page_markup)){
 */
 
 // Include the required page logic files
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require_once('pages/page.'.$this_current_page.'.php');
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Start generating the markup for the page
 ob_start();
 ?>
@@ -180,7 +172,6 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
       //$this_userinfo = $DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
       // Define variables based on login status
       if (!defined('MMRPG_CRITICAL_ERROR') && $this_userid != MMRPG_SETTINGS_GUEST_ID){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Define the avatar class and path variables
         $temp_avatar_path = !empty($this_userinfo['user_image_path']) ? $this_userinfo['user_image_path'] : 'robots/mega-man/40';
         $temp_background_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/intro-field';
@@ -195,7 +186,6 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
         $temp_user_name = !empty($this_userinfo['user_name_public']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name'];
         //echo '<div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>';
       } else {
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_background_path = 'fields/intro-field';
         list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
         $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_background_base.gif';
@@ -212,7 +202,6 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
         $class_paths = array('ability' => 'abilities', 'battle' => 'battles', 'field' => 'fields', 'player' => 'players', 'robot' => 'robots', 'object' => 'objects');
         // Loop through and display the markup of any background attachments
         if (!empty($temp_field_data['field_background_attachments']) && !empty($temp_field_data['field_mechas'])){
-          if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           echo '<div class="background_event event clearback sticky" style="z-index: 15; border-color: transparent;">';
           foreach ($temp_field_data['field_background_attachments'] AS $this_key => $this_info){
             $this_class = $this_info['class'];
@@ -464,7 +453,6 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
 <?
 // If we're NOT in demo mode, automatically update the date-accessed for their database entry
 if (empty($_SESSION['GAME']['DEMO'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_query = 'UPDATE mmrpg_users SET user_date_accessed = '.time().' WHERE user_id = '.$_SESSION['GAME']['USER']['userid'];
   $temp_result = $DB->query($temp_query);
 }

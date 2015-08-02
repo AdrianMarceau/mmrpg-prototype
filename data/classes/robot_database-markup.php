@@ -1,6 +1,5 @@
 <?
 // Define the global variables
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 global $mmrpg_index, $this_current_uri, $this_current_url, $DB;
 global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities, $mmrpg_database_types;
 global $mmrpg_stat_base_max_value;

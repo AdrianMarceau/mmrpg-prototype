@@ -4,7 +4,6 @@ $this_markup = '';
 
 // If this robot was not provided or allowed by the function
 if (empty($eventinfo['this_player']) || empty($eventinfo['this_robot']) || $options['canvas_show_this'] == false){
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Set both this player and robot to false
   $eventinfo['this_player'] = false;
   $eventinfo['this_robot'] = false;
@@ -13,7 +12,6 @@ if (empty($eventinfo['this_player']) || empty($eventinfo['this_robot']) || $opti
   // Loop through the players index looking for this player
   foreach ($this->values['players'] AS $this_player_id => $this_playerinfo){
     if (empty($target_player_id) || $target_player_id != $this_player_id){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $eventinfo['this_player'] = new mmrpg_player($this, $this_playerinfo);
       break;
     }
@@ -21,7 +19,6 @@ if (empty($eventinfo['this_player']) || empty($eventinfo['this_robot']) || $opti
   // Now loop through this player's robots looking for an active one
   foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
     if ($this_robotinfo['robot_position'] == 'active' && $this_robotinfo['robot_status'] != 'disabled'){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $eventinfo['this_robot'] = new mmrpg_robot($this, $eventinfo['this_player'], $this_robotinfo);
       break;
     }
@@ -34,14 +31,12 @@ if (!empty($eventinfo['this_robot']) && !empty($eventinfo['target_robot'])){
     || ($eventinfo['this_robot']->robot_id < MMRPG_SETTINGS_TARGET_PLAYERID && $eventinfo['target_robot']->robot_id < MMRPG_SETTINGS_TARGET_PLAYERID)
     || ($eventinfo['this_robot']->robot_id >= MMRPG_SETTINGS_TARGET_PLAYERID && $eventinfo['target_robot']->robot_id >= MMRPG_SETTINGS_TARGET_PLAYERID)
     ){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $eventinfo['target_robot'] = array();
   }
 }
 
 // If the target robot was not provided or allowed by the function
 if (empty($eventinfo['target_player']) || empty($eventinfo['target_robot']) || $options['canvas_show_target'] == false){
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Set both this player and robot to false
   $eventinfo['target_player'] = false;
   $eventinfo['target_robot'] = false;
@@ -50,7 +45,6 @@ if (empty($eventinfo['target_player']) || empty($eventinfo['target_robot']) || $
   // Loop through the players index looking for this player
   foreach ($this->values['players'] AS $target_player_id => $target_playerinfo){
     if (empty($this_player_id) || $this_player_id != $target_player_id){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $eventinfo['target_player'] = new mmrpg_player($this, $target_playerinfo);
       break;
     }
@@ -58,7 +52,6 @@ if (empty($eventinfo['target_player']) || empty($eventinfo['target_robot']) || $
   // Now loop through the target player's robots looking for an active one
   foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
     if ($target_robotinfo['robot_position'] == 'active' && $target_robotinfo['robot_status'] != 'disabled'){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $eventinfo['target_robot'] = new mmrpg_robot($this, $eventinfo['target_player'], $target_robotinfo);
       break;
     }
@@ -66,7 +59,6 @@ if (empty($eventinfo['target_player']) || empty($eventinfo['target_robot']) || $
 }
 
 // Collect this player's markup data
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_player_data = $eventinfo['this_player']->canvas_markup($options);
 // Append this player's markup to the main markup array
 $this_markup .= $this_player_data['player_markup'];
@@ -75,7 +67,6 @@ $this_markup .= $this_player_data['player_markup'];
 if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->player_robots)){
   $num_player_robots = count($eventinfo['this_player']->player_robots);
   foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_robot = new mmrpg_robot($this, $eventinfo['this_player'], $this_robotinfo);
     $this_options = $options;
     //if ($this_robot->robot_status == 'disabled' && $this_robot->robot_position == 'bench'){ continue; }
@@ -97,21 +88,8 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
       $this_markup .= '<div class="ability_overlay overlay3" style="z-index: 100;">&nbsp;</div>';
     }
 
-    /*
-    if ($this_robot_data['robot_position'] != 'bench' && (!empty($this_options['this_ability']) || !empty($this_options['this_ability_results']))){
-        //$temp_z_index = 5000;
-        if (!empty($this_options['this_ability_results']) && $this_options['this_ability_target'] == $this_robot_id_token){
-          $this_markup .= '<div class="ability_overlay" data-target="'.$this_options['this_ability_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: '.(4999 - ($this_robot_data['robot_key'] * 100)).';">&nbsp;</div>';
-        } else {
-          $this_markup .= '<div class="ability_overlay" data-target="'.$this_options['this_ability_target'].'">&nbsp;</div>';
-        }
-    }
-    */
-
     // RESULTS ANIMATION STUFF
     if (!empty($this_options['this_ability_results']) && $this_options['this_ability_target'] == $this_robot_id_token){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       /*
        * ABILITY EFFECT OFFSETS
        * Frame 01 : Energy +
@@ -125,18 +103,11 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
        */
 
       // Define the results data array and populate with basic fields
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_results_data = array();
       $this_results_data['results_amount_markup'] = '';
       $this_results_data['results_effect_markup'] = '';
 
-      /*
-      sprite sprite_80x80 sprite_80x80_right_02 ability_status_active ability_position_active
-      z-index: 92; left: 181px; bottom: 65px; background-image: url("images/abilities/ability_attack-boost_80x80.png?20120107-05");
-      */
-
       // Calculate the results effect canvas offsets
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_results_data['canvas_offset_x'] = ceil($this_robot_data['canvas_offset_x'] - (4 * $this_options['this_ability_results']['total_actions']));
       $this_results_data['canvas_offset_y'] = ceil($this_robot_data['canvas_offset_y'] + 0);
       $this_results_data['canvas_offset_z'] = ceil($this_robot_data['canvas_offset_z'] - 20);
@@ -148,7 +119,6 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
 
 
       // Define the style and class variables for these results
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $base_image_size = 40;
       $this_results_data['ability_size'] = $this_robot_data['robot_position'] == 'active' ? ($base_image_size * 2) : $base_image_size;
       $this_results_data['ability_scale'] = isset($this_robot_data['robot_scale']) ? $this_robot_data['robot_scale'] : ($this_robot_data['robot_position'] == 'active' ? 1 : 0.5 + (((8 - $this_robot_data['robot_key']) / 8) * 0.5));
@@ -191,19 +161,15 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
       // Ensure a damage/recovery trigger has been sent and actual damage/recovery was done
       if (!empty($this_options['this_ability_results']['this_amount'])
         && in_array($this_options['this_ability_results']['trigger_kind'], array('damage', 'recovery'))){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
         // Define the results effect index
         $this_results_data['results_effect_index'] = array();
         // Check if the results effect index was already generated
         if (!empty($this->index['results_effects'])){
-          //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           // Collect the results effect index from the battle index
           $this_results_data['results_effect_index'] = $this->index['results_effects'];
         }
         // Otherwise, generate the results effect index
         else {
-          //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           // Define the results effect index for quick programatic lookups
           $this_results_data['results_effect_index']['recovery']['energy'] = '00';
           $this_results_data['results_effect_index']['damage']['energy'] = '01';
@@ -223,13 +189,8 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
         }
 
 
-        //$this_results_data['results_amount_markup'] .= '<div class="debug">'.preg_replace('#\s+#', ' ', print_r($this_options['this_ability_target'], true)).' = '.($this_robot_data['robot_id'].'_'.$this_robot_data['robot_token']).'</div>';
-        //$this_results_data['results_amount_markup'] .= '<div class="debug">this_ability_target = '.$this_options['this_ability_target'].' | robot-id_robot-token = '.($this_robot_data['robot_id'].'_'.$this_robot_data['robot_token']).'</div>';
-
         // Check if a damage trigger was sent with the ability results
         if ($this_options['this_ability_results']['trigger_kind'] == 'damage'){
-          //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
           // Append the ability damage kind to the class
           $temp_smalltext_class = strlen($this_options['this_ability_results']['this_amount']) > 4 ? 'ability_damage_smalltext' : '';
           $this_results_data['results_amount_class'] .= 'ability_damage '.$temp_smalltext_class.' ability_damage_'.$this_options['this_ability_results']['damage_kind'].' ';
@@ -251,8 +212,6 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
         }
         // Check if a recovery trigger was sent with the ability results
         elseif ($this_options['this_ability_results']['trigger_kind'] == 'recovery'){
-          //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
           // Append the ability recovery kind to the class
           $temp_smalltext_class = strlen($this_options['this_ability_results']['this_amount']) > 4 ? 'ability_recovery_smalltext' : '';
           $this_results_data['results_amount_class'] .= 'ability_recovery '.$temp_smalltext_class.' ability_recovery_'.$this_options['this_ability_results']['recovery_kind'].' ';
@@ -276,7 +235,6 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
       }
 
       // Append this result's markup to the main markup array
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_markup .= $this_results_data['results_amount_markup'];
       $this_markup .= $this_results_data['results_effect_markup'];
 
@@ -287,12 +245,9 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
 
       // Loop through each attachment and process it
       foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
         // If this is an ability attachment
         if ($attachment_info['class'] == 'ability'){
           // Create the temporary ability object using the provided data and generate its markup data
-          //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           $this_ability = new mmrpg_ability($this, $eventinfo['this_player'], $this_robot, $attachment_info);
           // Define this ability data array and generate the markup data
           $this_attachment_options = $this_options;
@@ -313,11 +268,9 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
           $this_attachment_options['ability_frame_offset'] = isset($attachment_info['ability_frame_offset']) ? $attachment_info['ability_frame_offset'] : $this_ability->ability_frame_offset;
           $this_attachment_options['ability_frame_styles'] = isset($attachment_info['ability_frame_styles']) ? $attachment_info['ability_frame_styles'] : $this_ability->ability_frame_styles;
           $this_attachment_options['ability_frame_classes'] = isset($attachment_info['ability_frame_classes']) ? $attachment_info['ability_frame_classes'] : $this_ability->ability_frame_classes;
-          //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           $this_ability_data = $this_ability->canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
           // Append this ability's markup to the main markup array
           if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $this_markup .= $this_ability_data['ability_markup'];
           }
         }
@@ -331,19 +284,15 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
       && $this_robot_data['robot_position'] != 'bench'
       &&*/ !empty($this_options['this_ability'])
       && !empty($options['canvas_show_this_ability'])){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // Define the ability data array and generate markup data
       $attachment_options['data_type'] = 'ability';
       $this_ability_data = $this_options['this_ability']->canvas_markup($this_options, $this_player_data, $this_robot_data);
 
       // Display the ability's mugshot sprite
       if (empty($this_options['this_ability_results']['total_actions'])){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left" style="background-image: url(images/abilities/'.(!empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
         $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right" style="background-image: url(images/abilities/'.(!empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
         if (!empty($eventinfo['this_robot']) && !empty($eventinfo['target_robot']) && ($eventinfo['this_robot']->robot_id != $eventinfo['target_robot']->robot_id)){
-          //$temp_star_markup = '<span class="sprite sprite_40x40 starforce" style="background-image: url(images/abilities/item-star-nature/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
 
           // Check to make sure starforce is enabled right now
           $temp_starforce_enabled = true;
@@ -437,12 +386,6 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
             $this_stat_markup_right = '<span class="robot_stat robot_stat_right type_attack">'.$temp_attack_markup.'</span>';
           }
 
-          // DEBUG
-          //$this_stat_markup_left .= ' trigger:'.$this_options['this_ability_results']['trigger_kind'].':'.$eventinfo['this_robot']->robot_id.'vs'.$this_options['this_ability_results']['trigger_target_id'];
-          //$this_stat_markup_left .= ' star:'.(!empty($eventinfo['this_player']->player_starforce) ? implode(',', array_keys($eventinfo['this_player']->player_starforce)) : '?');
-          //$this_stat_markup_left .= ' this:dark:'.$eventinfo['this_player']->counters['dark_elements'].' | target:dark:'.$eventinfo['target_player']->counters['dark_elements'];
-
-
           // Always show the attack name and type at this point
           $this_markup .=  '<div class="'.$this_ability_data['ability_markup_class'].' canvas_ability_details ability_type ability_type_'.(!empty($this_options['this_ability']->ability_type) ? $this_options['this_ability']->ability_type : 'none').(!empty($this_options['this_ability']->ability_type2) ? '_'.$this_options['this_ability']->ability_type2 : '').'">'.$this_mugshot_markup_left.'<div class="ability_name" style="">'.$this_ability_data['ability_title'].'</div>'.$this_mugshot_markup_right.'</div>';
 
@@ -455,13 +398,11 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
       }
 
       // Append this ability's markup to the main markup array
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_markup .= $this_ability_data['ability_markup'];
 
     }
 
     // Append this robot's markup to the main markup array
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_markup .= $this_robot_data['robot_markup'];
 
   }
@@ -474,17 +415,12 @@ $this_markup .= $target_player_data['player_markup'];
 
 // Loop through and display the target player's robots
 if ($options['canvas_show_target_robots'] && !empty($eventinfo['target_player']->player_robots)){
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Count the number of robots on the target's side of the field
   $num_player_robots = count($eventinfo['target_player']->player_robots);
 
   // Loop through each target robot and generate it's markup
   foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Create the temporary target robot ovject
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $target_robot = new mmrpg_robot($this, $eventinfo['target_player'], $target_robotinfo);
     $target_options = $options;
     //if ($target_robot->robot_status == 'disabled' && $target_robot->robot_position == 'bench'){ continue; }
@@ -492,21 +428,15 @@ if ($options['canvas_show_target_robots'] && !empty($eventinfo['target_player']-
     elseif (!empty($eventinfo['target_robot']->robot_id) && $eventinfo['target_robot']->robot_id != $target_robot->robot_id){ $target_options['this_ability'] = false;  }
     elseif (!empty($eventinfo['target_robot']->robot_id) && $eventinfo['target_robot']->robot_id == $target_robot->robot_id && $options['canvas_show_target'] != false){ $target_robot->robot_frame =  $eventinfo['target_robot']->robot_frame; }
     $target_robot->robot_key = $target_robot->robot_key !== false ? $target_robot->robot_key : ($target_key > 0 ? $target_key : $num_player_robots);
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $target_robot_data = $target_robot->canvas_markup($target_options, $target_player_data);
 
     // ATTACHMENT ANIMATION STUFF
     if (empty($target_robot->flags['apply_disabled_state']) && !empty($target_robot->robot_attachments)){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // Loop through each attachment and process it
       foreach ($target_robot->robot_attachments AS $attachment_token => $attachment_info){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
         // If this is an ability attachment
         if ($attachment_info['class'] == 'ability'){
           // Create the target's temporary ability object using the provided data
-          //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           $target_ability = new mmrpg_ability($this, $eventinfo['target_player'], $target_robot, $attachment_info);
           // Define this ability data array and generate the markup data
           $target_attachment_options = $target_options;
@@ -532,7 +462,6 @@ if ($options['canvas_show_target_robots'] && !empty($eventinfo['target_player']-
           $target_ability_data = $target_ability->canvas_markup($target_attachment_options, $target_player_data, $target_robot_data);
           // Append this target's ability's markup to the main markup array
           if (!preg_match('/display:\s?none;/i', $target_robot->robot_frame_styles)){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $this_markup .= $target_ability_data['ability_markup'];
           }
         }
@@ -575,9 +504,6 @@ if (!empty($this->battle_field->field_multipliers)){
 
 }
 
-
-//die($this_markup);
-
 // If this battle is over, display the mission complete/failed result
 if ($this->battle_status == 'complete'){
   if ($this->battle_result == 'victory'){
@@ -591,7 +517,6 @@ if ($this->battle_status == 'complete'){
   if (!empty($this_markup) && $this->battle_status == 'complete' || $this->battle_result == 'defeat'){
     $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left">&nbsp;</div>';
     $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right">&nbsp;</div>';
-    //$this_markup = '<div>test</div>'.$this_markup;
     $this_markup =  '<div class="sprite canvas_ability_details ability_type ability_type_'.$result_class.'">'.$this_mugshot_markup_left.'<div class="ability_name">'.$result_text.'</div>'.$this_mugshot_markup_right.'</div>'.$this_markup;
   }
 }

@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Generate the markup for the action battle panel
 ob_start();
   // If the current robot is not disabled and is active

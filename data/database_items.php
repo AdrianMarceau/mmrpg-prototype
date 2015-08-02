@@ -1,6 +1,4 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Require the types database
 if (!isset($mmrpg_database_types)){ require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php'); }
 
@@ -39,16 +37,13 @@ foreach ($mmrpg_database_items AS $temp_token => $temp_info){
 
     // Ensure this item's image exists, else default to the placeholder
     $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
-    if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/abilities/'.$temp_image_token.'/')){ $mmrpg_database_items[$temp_token]['ability_image'] = $temp_image_token; }
-    elseif (file_exists(MMRPG_CONFIG_ROOTDIR.'images/abilities/'.$temp_token.'/')){ $mmrpg_database_items[$temp_token]['ability_image'] = $temp_token; }
+    if ($temp_info['ability_flag_complete']){ $mmrpg_database_items[$temp_token]['ability_image'] = $temp_image_token; }
     else { $mmrpg_database_items[$temp_token]['ability_image'] = 'ability'; }
-    // DEBUG DEBUG DEBUG | HIDE INCOMPLETE
+    // HIDE INCOMPLETE
     if (false && $mmrpg_database_items[$temp_token]['ability_image'] == 'ability'){
       unset($mmrpg_database_items[$temp_token]);
       continue;
     }
-    //$mmrpg_database_items[$temp_token]['ability_speed'] = isset($mmrpg_database_items[$temp_token]['ability_speed']) ? $mmrpg_database_items[$temp_token]['ability_speed'] + 3 : 3;
-    //$mmrpg_database_items[$temp_token]['ability_energy'] = isset($mmrpg_database_items[$temp_token]['ability_energy']) ? $mmrpg_database_items[$temp_token]['ability_energy'] : 10;
   }
 }
 
@@ -60,6 +55,7 @@ unset($temp_item_tokens);
 
 // Count the number of items collected and filtered
 $mmrpg_database_items_count = count($mmrpg_database_items);
+$mmrpg_database_items_count_complete = 0;
 
 // Loop through the database and generate the links for these items
 $key_counter = 0;
@@ -88,6 +84,7 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
   }
 
   // Collect the item sprite dimensions
+  $item_flag_complete = !empty($item_info['ability_flag_complete']) ? true : false;
   $item_image_size = !empty($item_info['ability_image_size']) ? $item_info['ability_image_size'] : 40;
   $item_image_size_text = $item_image_size.'x'.$item_image_size;
   $item_image_token = !empty($item_info['ability_image']) ? $item_info['ability_image'] : $item_info['ability_token'];
@@ -120,14 +117,13 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
     </a>
   </div>
   <?
-  $mmrpg_database_items_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
+  if ($item_flag_complete){ $mmrpg_database_items_count_complete++; }
+  $mmrpg_database_items_links .= ob_get_clean();
   $mmrpg_database_items_links_counter++;
   $key_counter++;
 }
 
 // End the groups, however many there were
 $mmrpg_database_items_links .= '</div>';
-
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 ?>

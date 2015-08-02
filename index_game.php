@@ -9,12 +9,6 @@ if (!MMRPG_CONFIG_ADMIN_MODE){
 
 // Include the TOP file
 require_once('top.php');
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-// DEBUG DEBUG DEBUG
-//if ($_SERVER['REMOTE_ADDR'] != '99.255.218.123'){ die('Currently down for maintenance.  Please check back later.'); }
-
-//die('<pre>'.print_r($_GET, true).'</pre>');
 
 // Define the default SEO and MARKUP variables
 $this_seo_title = 'Prototype | Mega Man RPG Prototype | Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE);

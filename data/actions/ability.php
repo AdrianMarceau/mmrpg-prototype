@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Generate the markup for the action ability panel
 ob_start();
   // Define and start the order counter
@@ -26,11 +25,8 @@ ob_start();
     else { $current_robot_item = ''; }
 
   } elseif ($this_robot->robot_class == 'mecha'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "\$this_robot->robot_class == 'mecha'");  }
-
     // Collect the temp ability index
     $temp_index_info = mmrpg_robot::get_index_info($this_robot->robot_token);
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, print_r($temp_index_info, true));  }
     $current_robot_abilities = array();
     foreach ($temp_index_info['robot_abilities'] AS $token){ $current_robot_abilities[$token] = array('ability_token' => $token); }
     $current_robot_item = '';
@@ -182,10 +178,10 @@ ob_start();
         $temp_ability_sprite['image_size_zoom'] = $temp_ability->ability_image_size * 2;
         $temp_ability_sprite['image_size_zoom_text'] = $temp_ability_sprite['image_size'].'x'.$temp_ability_sprite['image_size'];
         $temp_ability_sprite['url'] = 'images/abilities/'.$temp_ability_sprite['image'].'/icon_'.$robot_direction.'_'.$temp_ability_sprite['image_size_text'].'.png';
-        $temp_ability_sprite['class'] = 'sprite sprite_'.$temp_ability_sprite['image_size_text'].' sprite_'.$temp_ability_sprite['image_size_text'].'_base ';
+        $temp_ability_sprite['class'] = 'sprite size'.$temp_ability_sprite['image_size'].' base ';
         $temp_ability_sprite['style'] = 'background-image: url('.$temp_ability_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); top: 5px; left: 5px; ';
-        $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_ability" style="'.$temp_ability_sprite['style'].'">'.$temp_ability_sprite['name'].'</span>';
-        $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_weapons" style="top: 35px; left: 5px; '.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
+        $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' ability" style="'.$temp_ability_sprite['style'].'">'.$temp_ability_sprite['name'].'</span>';
+        $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' weapons" style="top: 35px; left: 5px; '.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
 
       } elseif ($this_robot->robot_class == 'mecha'){
 
@@ -195,10 +191,10 @@ ob_start();
         $temp_ability_sprite['image_size_zoom'] = $this_robot->robot_image_size * 2;
         $temp_ability_sprite['image_size_zoom_text'] = $temp_ability_sprite['image_size'].'x'.$temp_ability_sprite['image_size'];
         $temp_ability_sprite['url'] = 'images/robots/'.$temp_ability_sprite['image'].'/mug_'.$robot_direction.'_'.$temp_ability_sprite['image_size_text'].'.png';
-        $temp_ability_sprite['class'] = 'sprite sprite_'.$temp_ability_sprite['image_size_text'].' sprite_'.$temp_ability_sprite['image_size_text'].'_base ';
+        $temp_ability_sprite['class'] = 'sprite size'.$temp_ability_sprite['image_size'].' base ';
         $temp_ability_sprite['style'] = 'background-image: url('.$temp_ability_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); top: 7px; left: 5px; height: 43px; background-position: center center !important; background-size: 50% 50% !important; ';
-        $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_ability" style="'.$temp_ability_sprite['style'].'">'.$temp_ability_sprite['name'].'</span>';
-        //$temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_weapons" style="top: 35px; left: 5px; '.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
+        $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' ability" style="'.$temp_ability_sprite['style'].'">'.$temp_ability_sprite['name'].'</span>';
+        //$temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' weapons" style="top: 35px; left: 5px; '.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
 
       }
 

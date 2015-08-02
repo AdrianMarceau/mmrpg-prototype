@@ -36,7 +36,6 @@ if ($options['console_show_this'] != false){
   if (!empty($options['this_star'])){
     // Collect the console data for this star
     $this_star_data = $this->star_console_markup($options['this_star'], $this_player_data, $this_robot_data);
-    //die('FINALLY : '.implode(' | ', $this_star_data));
   } else {
     // Define empty console data for this star
     $this_star_data = array();
@@ -134,7 +133,7 @@ if (!empty($eventinfo['event_header']) && !empty($eventinfo['event_body'])){
   if ($options['console_container_height'] == 3){ $event_class .= 'event_triple '; }
   if (!empty($options['console_container_classes'])){ $event_class .= $options['console_container_classes']; }
   if (!empty($options['console_container_styles'])){ $event_style .= $options['console_container_styles']; }
-  
+
   // Generate the opening event tag
   $this_markup .= '<div class="'.$event_class.'" style="'.$event_style.'">';
 
@@ -159,14 +158,6 @@ if (!empty($eventinfo['event_header']) && !empty($eventinfo['event_body'])){
     // Otherwise, append the target ability's markup if allowed
     elseif ($options['console_show_target_ability'] != false){ $this_markup .= $target_ability_data['ability_markup']; }
   }
-
-  /*
-  $eventinfo['event_body'] .= '<div>';
-  $eventinfo['event_body'] .= 'console_show_this_player : '.($options['console_show_this_player'] != false ? 'true : '.$this_player_data['player_markup'] : 'false : -').'<br />';
-  $eventinfo['event_body'] .= 'console_show_this_robot : '.($options['console_show_this_robot'] != false ? 'true : '.$this_robot_data['robot_markup'] : 'false : -').'<br />';
-  $eventinfo['event_body'] .= 'console_show_this_ability : '.($options['console_show_this_ability'] != false ? 'true : '.$this_ability_data['ability_markup'] : 'false : -').'<br />';
-  $eventinfo['event_body'] .= '</div>';
-  */
 
   // Prepend the turn counter to the header if necessary
   if (!empty($this->counters['battle_turn']) && $this->battle_status != 'complete'){ $eventinfo['event_header'] = 'Turn #'.$this->counters['battle_turn'].' : '.$eventinfo['event_header']; }

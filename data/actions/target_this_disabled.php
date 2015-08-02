@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Generate the markup for the action target panel
 ob_start();
   // Define and start the order counter
@@ -107,13 +106,13 @@ ob_start();
         $temp_robot_sprite['image_size_zoom'] = $temp_robot->robot_image_size * 2;
         $temp_robot_sprite['image_size_zoom_text'] = $temp_robot_sprite['image_size'].'x'.$temp_robot_sprite['image_size'];
         $temp_robot_sprite['url'] = 'images/robots/'.$temp_robot_sprite['image'].'/sprite_'.$robot_direction.'_'.$temp_robot_sprite['image_size_text'].'.png';
-        $temp_robot_sprite['class'] = 'sprite sprite_'.$temp_robot_sprite['image_size_text'].' sprite_'.$temp_robot_sprite['image_size_text'].'_'.($temp_robot->robot_energy > 0 ? ($temp_robot->robot_energy > ($temp_robot->robot_base_energy/2) ? 'base' : 'defend') : 'defeat').' ';
+        $temp_robot_sprite['class'] = 'sprite size'.$temp_robot_sprite['image_size'].' '.($temp_robot->robot_energy > 0 ? ($temp_robot->robot_energy > ($temp_robot->robot_base_energy/2) ? 'base' : 'defend') : 'defeat').' ';
         $temp_robot_sprite['style'] = 'background-image: url('.$temp_robot_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.');  top: 6px; left: 5px; ';
         if ($temp_robot->robot_position == 'active'){ $temp_robot_sprite['style'] .= 'border-color: #ababab; '; }
         $temp_energy_percent = ceil(($temp_robot->robot_energy / $temp_robot->robot_base_energy) * 100);
-        if ($temp_energy_percent > 50){ $temp_robot_sprite['class'] .= 'sprite_'.$temp_robot_sprite['image_size_text'].'_energy_high ';  }
-        elseif ($temp_energy_percent > 25){ $temp_robot_sprite['class'] .= 'sprite_'.$temp_robot_sprite['image_size_text'].'_energy_medium ';  }
-        elseif ($temp_energy_percent > 0){ $temp_robot_sprite['class'] .= 'sprite_'.$temp_robot_sprite['image_size_text'].'_energy_low '; }
+        if ($temp_energy_percent > 50){ $temp_robot_sprite['class'] .= 'energy high ';  }
+        elseif ($temp_energy_percent > 25){ $temp_robot_sprite['class'] .= 'energy medium ';  }
+        elseif ($temp_energy_percent > 0){ $temp_robot_sprite['class'] .= 'energy low '; }
         $temp_robot_sprite['markup'] = '<span class="'.$temp_robot_sprite['class'].'" style="'.$temp_robot_sprite['style'].'">'.$temp_robot_sprite['name'].'</span>';
         // Update the order button if necessary
         $order_button_markup = $allow_button ? 'data-order="'.$temp_order_counter.'"' : '';

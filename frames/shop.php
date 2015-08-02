@@ -6,13 +6,11 @@ require_once('../top.php');
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Require the remote top in case we're in viewer mode
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 define('MMRPG_REMOTE_SKIP_INDEX', true);
 define('MMRPG_REMOTE_SKIP_DATABASE', true);
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 
 // Collect the session token
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
@@ -48,7 +46,7 @@ if (!mmrpg_prototype_event_complete('completed-chapter_dr-cossack_one')){ unset(
 $allowed_edit_data_count = count($allowed_edit_data);
 //die('$allowed_edit_data_count = '.$allowed_edit_data_count.'; $allowed_edit_data = <pre>'.print_r($allowed_edit_data, true).'</pre>');
 
-// DEBUG DEBUG DEBUG
+// HARD-CODE ZENNY FOR TESTING
 //$_SESSION[$session_token]['counters']['battle_zenny'] = 500000;
 
 // Define the array to hold all the item quantities
@@ -61,8 +59,6 @@ $global_zenny_counter = !empty($_SESSION[$session_token]['counters']['battle_zen
 
 // Check if an action request has been sent with an sell type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Collect the action variables from the request header, if they exist
   $temp_shop = !empty($_REQUEST['shop']) ? $_REQUEST['shop'] : '';
   $temp_kind = !empty($_REQUEST['kind']) ? $_REQUEST['kind'] : '';
@@ -81,12 +77,8 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
 
   // Check if this is an ITEM based action
   if ($temp_kind == 'item'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Ensure this item exists before continuing
     if (isset($_SESSION[$session_token]['values']['battle_items'][$temp_token])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // Collect a reference to the session variable amount
       $temp_is_shard = preg_match('/^item-shard-/i', $temp_token) ? true : false;
       $temp_is_core = preg_match('/^item-core-/i', $temp_token) ? true : false;
@@ -97,8 +89,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
 
       // Now make sure we actually have enough of this item to sell
       if ($temp_quantity <= $temp_current_quantity){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
         // Remove this item's count from the global variable and recollect
         $_SESSION[$session_token]['values']['battle_items'][$temp_token] = $temp_current_quantity - $temp_quantity;
         $temp_current_quantity = $_SESSION[$session_token]['values']['battle_items'][$temp_token];
@@ -127,7 +117,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
       else {
 
         // Print an error message and kill the script
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         exit('error|insufficient-quantity|'.$temp_quantity);
 
       }
@@ -137,7 +126,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
     else {
 
       // Print an error message and kill the script
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-item|'.$temp_token);
 
     }
@@ -145,15 +133,11 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
   }
   // Check if this is an STAR based action
   elseif ($temp_kind == 'star'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Collect the actual star token from the provided one
     $temp_actual_token = preg_replace('/^star-/i', '', $temp_token);
 
     // Ensure this star exists before continuing
     if (isset($_SESSION[$session_token]['values']['battle_stars'][$temp_actual_token])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // Remove this star's entry from the global arrayand define the new quantity
       unset($_SESSION[$session_token]['values']['battle_stars'][$temp_actual_token]);
       $temp_current_quantity = 0;
@@ -178,7 +162,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
     else {
 
       // Print an error message and kill the script
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-star|'.$temp_actual_token);
 
     }
@@ -188,7 +171,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
   else {
 
     // Print an error message and kill the script
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     exit('error|invalid-kind|'.$temp_kind);
 
   }
@@ -200,8 +182,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
 
 // Check if an action request has been sent with an buy type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Collect the action variables from the request header, if they exist
   $temp_shop = !empty($_REQUEST['shop']) ? $_REQUEST['shop'] : '';
   $temp_kind = !empty($_REQUEST['kind']) ? $_REQUEST['kind'] : '';
@@ -222,12 +202,8 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
 
   // Check if this is an ITEM based action
   if ($temp_kind == 'item'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Ensure this item exists before continuing
     if (isset($mmrpg_database_items[$temp_token])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // Collect a reference to the session variable amount
       $temp_is_shard = preg_match('/^item-shard-/i', $temp_token) ? true : false;
       $temp_is_core = preg_match('/^item-core-/i', $temp_token) ? true : false;
@@ -238,8 +214,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
 
       // Now make sure we actually have enough of this item to buy
       if (($temp_current_quantity + $temp_quantity) <= $temp_max_quantity){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
         // Remove this item's count from the global variable and recollect
         $_SESSION[$session_token]['values']['battle_items'][$temp_token] = $temp_current_quantity + $temp_quantity;
         $temp_current_quantity = $_SESSION[$session_token]['values']['battle_items'][$temp_token];
@@ -263,7 +237,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
       else {
 
         // Print an error message and kill the script
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         exit('error|overkill-quantity|'.$temp_quantity);
 
       }
@@ -273,7 +246,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
     else {
 
       // Print an error message and kill the script
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-item|'.$temp_token);
 
     }
@@ -281,12 +253,8 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
   }
   // Check if this is an ABILITY based action
   elseif ($temp_kind == 'ability'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Ensure this ability exists before continuing
     if (isset($mmrpg_database_abilities[$temp_token])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // Ensure the requested ability token was valid
       if (!empty($mmrpg_database_abilities[$temp_token])){
 
@@ -319,7 +287,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         else {
 
           // Print an error message and kill the script
-          if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           exit('error|unlock-error|'.$temp_token);
 
         }
@@ -329,7 +296,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
       else {
 
         // Print an error message and kill the script
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         exit('error|invalid-player|'.$temp_token);
 
       }
@@ -339,7 +305,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
     else {
 
       // Print an error message and kill the script
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-ability|'.$temp_token);
 
     }
@@ -347,15 +312,11 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
   }
   // Check if this is an FIELD based action
   elseif ($temp_kind == 'field'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Collect the actual field token from the provided one
     $temp_actual_token = preg_replace('/^field-/i', '', $temp_token);
 
     // Ensure this field exists before continuing
     if (isset($mmrpg_database_fields[$temp_actual_token])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // Remove this field's entry from the global arrayand define the new quantity
       $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
       $temp_unlocked_fields[] = $temp_actual_token;
@@ -382,7 +343,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
     else {
 
       // Print an error message and kill the script
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       exit('error|invalid-star|'.$temp_actual_token);
 
     }
@@ -392,7 +352,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
   else {
 
     // Print an error message and kill the script
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     exit('error|invalid-kind|'.$temp_kind);
 
   }
@@ -404,8 +363,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
 
 // Generate the canvas markup for this page
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Start the output buffer
   ob_start();
 
@@ -440,8 +397,6 @@ if (true){
 
 // Generate the console markup for this page
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Start the output buffer
   ob_start();
 
@@ -464,7 +419,6 @@ if (true){
     $shop_buying_tokens = is_array($shop_info['shop_kind_buying']) ? $shop_info['shop_kind_buying'] : array($shop_info['shop_kind_buying']);
 
     // Collect and print the editor markup for this player
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     ?>
     <div class="event event_double event_<?= $shop_key == 0 ? 'visible' : 'hidden' ?>" data-token="<?=$shop_info['shop_token']?>">
       <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/<?=$shop_info['shop_field']?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
@@ -1160,7 +1114,6 @@ if (true){
   }
 
   // Collect the contents of the buffer
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $shop_console_markup = ob_get_clean();
   $shop_console_markup = preg_replace('/\s+/', ' ', trim($shop_console_markup));
 
@@ -1169,8 +1122,6 @@ if (true){
 // Generate the edit markup using the battles settings and rewards
 $this_shop_markup = '';
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Prepare the output buffer
   ob_start();
 
@@ -1181,7 +1132,6 @@ if (true){
   unset($temp_shop_tokens);
 
   // Start generating the edit markup
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   ?>
 
   <span class="header block_1">Item Shop (<span id="zenny_counter"><?= number_format($global_zenny_counter, 0, '.', ',') ?></span> Zenny)</span>
@@ -1216,12 +1166,9 @@ if (true){
   <?
 
   // Collect the output buffer content
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_shop_markup = preg_replace('#\s+#', ' ', trim(ob_get_clean()));
 }
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>
 <!DOCTYPE html>
 <html>

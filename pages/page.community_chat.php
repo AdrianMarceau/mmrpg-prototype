@@ -1,6 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 /*
  * COMMUNITY CATEGORY VIEW
  */
@@ -19,7 +17,6 @@ $this_graph_data['description'] = strip_tags($this_category_info['category_descr
 //$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
 
 // Require the leaderboard data file
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require_once('data/leaderboard.php');
 // Collect all the active sessions for this page
 $temp_viewing_category = mmrpg_website_sessions_active('community/'.$this_category_info['category_token'].'/', 3, true);
@@ -68,5 +65,4 @@ $user_chat_name = preg_replace('/([^-_a-z0-9]+)/i', '', $user_chat_name);
 */?>
 
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

@@ -1,7 +1,4 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // ROBOT DATABASE
 
 // Define the index of counters for robot types
@@ -49,7 +46,7 @@ foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
     $temp_info = mmrpg_robot::parse_index_info($temp_info);
 
     // Ensure this robot's image exists, else default to the placeholder
-    if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$temp_token.'/')){ $temp_info['robot_image'] = $temp_token; }
+    if ($temp_info['robot_flag_complete']){ $temp_info['robot_image'] = $temp_token; }
     else { $temp_info['robot_image'] = 'robot'; }
 
     // Modify the name of this robot if it is of the mecha class
@@ -105,16 +102,6 @@ foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
   }
 }
 
-// DEBUG DEBUG DEBUG
-//die('<pre>$mmrpg_database_robots : '.print_r($mmrpg_database_robots, true).'</pre>');
-
-// Sort the robot type index based on values
-foreach ($mmrpg_database_robots_types AS $token => $array){
-  asort($array);
-  $array = array_reverse($array, true);
-  //$mmrpg_database_robots_types[$token] = $array;
-}
-
 // Determine the token for the very first robot in the database
 $temp_robot_tokens = array_values($mmrpg_database_robots);
 $first_robot_token = array_shift($temp_robot_tokens);
@@ -123,6 +110,7 @@ unset($temp_robot_tokens);
 
 // Count the number of robots collected and filtered
 $mmrpg_database_robots_count = count($mmrpg_database_robots);
+$mmrpg_database_robots_count_complete = 0;
 
 // Define the max stat value before we filter and update
 if (!isset($mmrpg_stat_base_max_value)){ $mmrpg_stat_base_max_value = array(); }
@@ -158,6 +146,7 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
   }
 
   // Collect the robot sprite dimensions
+  $robot_flag_complete = !empty($robot_info['robot_flag_complete']) ? true : false;
   $robot_image_size = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
   $robot_image_size_text = $robot_image_size.'x'.$robot_image_size;
   $robot_image_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
@@ -183,7 +172,8 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
     </a>
   </div>
   <?
-  $mmrpg_database_robots_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
+  if ($robot_flag_complete){ $mmrpg_database_robots_count_complete++; }
+  $mmrpg_database_robots_links .= ob_get_clean();
   $mmrpg_database_robots_links_counter++;
   $key_counter++;
 }

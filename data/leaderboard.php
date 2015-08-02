@@ -1,24 +1,20 @@
 <?
 
 // Collect and define the display limit if set
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (!isset($this_display_limit_default)){ $this_display_limit_default = 50; }
 $this_display_limit = !empty($_GET['limit']) ? trim($_GET['limit']) : $this_display_limit_default;
 $this_start_key = !empty($_GET['start']) ? trim($_GET['start']) : 0;
 
 // Define a function for parsing the leaderboard data
 function mmrpg_leaderboard_parse_index($board_key, $board_info){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_leaderboard_parse_index('.$board_key.', $board_info:'.$board_info['user_name_clean'].')');  }
   global $mmrpg_index;
   global $this_cache_stamp, $this_cache_filename, $this_cache_filedir;
   global $this_leaderboard_count, $this_leaderboard_online_count;
   global $this_leaderboard_online_players, $this_leaderboard_online_pages;
-  global $this_leaderboard_index, $this_leaderboard_markup;
+  global $this_leaderboard_index;
   global $this_userid, $this_userinfo, $this_boardinfo;
   global $this_display_limit, $this_display_limit_default, $this_num_offset;
   global $this_time, $this_online_timeout, $place_counter, $points_counter, $this_start_key;
-
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Start the output buffer
   ob_start();
@@ -27,7 +23,6 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info){
   $this_points = $board_info['board_points'];
   if ($this_points != $points_counter){
     $points_counter = $this_points;
-    $place_counter += 1;
   }
 
   // Define the awards strong and default to empty
@@ -38,7 +33,6 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info){
   $board_info['board_battles'] = $temp_battles;
 
   // Loop through the available players
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   foreach ($mmrpg_index['players'] AS $ptoken => $pinfo){
     $ptoken2 = str_replace('-', '_', $ptoken);
     $temp_battles = !empty($board_info['board_battles_'.$ptoken2]) ? explode(',', $board_info['board_battles_'.$ptoken2]) : array();
@@ -48,7 +42,6 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info){
   // Break apart the robot and battle values into arrays
   $temp_robots = !empty($board_info['board_robots']) ? $board_info['board_robots'] : array();
   if (!empty($temp_robots)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_robots = explode(',', $temp_robots);
     foreach ($temp_robots AS $key => $string){
       list($token, $level) = explode(':', substr($string, 1, -1));
@@ -57,7 +50,6 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info){
     }
   }
   // Collect this player's robots
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_robots = $temp_robots;
   $this_stars = !empty($board_info['board_stars']) ? $board_info['board_stars'] : 0;
   $this_abilities = !empty($board_info['board_abilities']) ? $board_info['board_abilities'] : 0;
@@ -87,7 +79,6 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info){
 
   // If online, add this player to the array
   if ($this_is_online){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_leaderboard_online_count++;
     $this_leaderboard_online_players[] = array('id' => $this_user_id, 'name' => $this_username, 'token' => $board_info['user_name_clean'], 'place' => $this_place, 'placeint' => $place_counter, 'colour' => $board_info['user_colour_token'], 'image' => $board_info['user_image_path']);
     //$this_current_page_number = ceil($board_key / $this_display_limit);
@@ -98,12 +89,8 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info){
 
   // Only continue if markup is special constants have not been defined
   if (!defined('MMRPG_SKIP_MARKUP') || defined('MMRPG_SHOW_MARKUP_'.$this_user_id)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Only generate markup if we're withing the viewing range
     if ($board_key >= $this_start_key && $board_key < $this_display_limit || defined('MMRPG_SHOW_MARKUP_'.$this_user_id)){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       $this_robots_count = (!empty($this_robots) ? count($this_robots) : 0);
       $this_robots_count = $this_robots_count == 1 ? '1 Robot' : $this_robots_count.' Robots';
       $this_stars_count = $this_stars;
@@ -162,43 +149,11 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info){
   }
 
   // Collect the output into the buffer
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  $this_leaderboard_markup[] = preg_replace('/\s+/', ' ', ob_get_clean());
-
-  /*
-  // -- LEADERBOARD XML -- //
-
-  // Start the output buffer
-  ob_start();
-
-  // Display the user's save file listing
-  echo '<player>'."\n";
-    echo '<nickname>'.$this_username.'</nickname>'."\n";
-    echo '<join_date>'.date('Y-m-d H:i:s', $this_first_save).'</join_date>'."\n";
-    echo '<score>'.$this_points.'</score>'."\n";
-  echo '</player>'."\n";
-
-  // Collect the output into the buffer
-  $this_leaderboard_xml[] = trim(ob_get_clean())."\n";
-  */
-
-  /*
-  die(
-  '$this_leaderboard_markup['.$key.'] = <pre style="border-left: 5px solid yellow;">'.htmlentities(print_r($this_leaderboard_markup[$key], true), ENT_QUOTES, 'UTF-8', true).'</pre><hr /><hr />'.
-  '$this_robots = <pre style="border-left: 5px solid green;">'.htmlentities(print_r($this_robots, true), ENT_QUOTES, 'UTF-8', true).'</pre><hr /><hr />'.
-  '$board_info = <pre style="border-left: 5px solid yellow;">'.print_r($board_info, true).'</pre><hr /><hr />'.
-  '$this_leaderboard_index = <pre style="border-left: 5px solid blue;">'.print_r($this_leaderboard_index, true).'</pre><hr /><hr />'.
-  '$this_leaderboard_markup = <pre style="border-left: 5px solid red;">'.print_r($this_leaderboard_markup, true).'</pre><hr /><hr />'
-  );
-  */
-
-  // Return true on success
-  return true;
+  return preg_replace('/\s+/', ' ', ob_get_clean());
 
 }
 
 // Define the array for pulling all the leaderboard data
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_leaderboard_query = 'SELECT
   mmrpg_users.user_id,
   mmrpg_users.user_name,
@@ -242,11 +197,9 @@ $temp_leaderboard_query = 'SELECT
   ORDER BY mmrpg_leaderboard.board_points DESC
   '; //.(!empty($this_display_limit) ? 'LIMIT '.$this_display_limit : '');
 // Query the database and collect the array list of all non-bogus players
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_leaderboard_index = $DB->get_array_list($temp_leaderboard_query);
 
 // Loop through the save file directory and generate an index
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_cache_stamp = MMRPG_CONFIG_CACHE_DATE.'_'.substr(date('YmdHi'), 0, 11); //2013 01 01 23 59 (12 length)
 $this_cache_filename = 'cache.leaderboard.'.$this_cache_stamp.'.php';
 $this_cache_filedir = $this_cache_dir.$this_cache_filename;
@@ -257,14 +210,18 @@ $this_leaderboard_online_pages = array();
 $this_leaderboard_markup = array();
 //$this_leaderboard_xml = array();
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_display_limit = '.$this_display_limit.'; $this_start_key = '.$this_start_key.'; ');  }
   if (!empty($this_leaderboard_index)){
     $this_time = time();
     $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
     $place_counter = 0;
     $points_counter = 0;
     foreach ($this_leaderboard_index AS $board_key => $board_info){
-      mmrpg_leaderboard_parse_index($board_key, $board_info);
+      $place_counter += 1;
+      if ($board_key >= $this_start_key && $board_key < ($this_start_key + $this_display_limit)){
+        $this_leaderboard_markup[] = mmrpg_leaderboard_parse_index($board_key, $board_info);
+      } else {
+        $this_leaderboard_markup[] = '';
+      }
     }
   }
 }
@@ -276,5 +233,4 @@ die(
 );
 */
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

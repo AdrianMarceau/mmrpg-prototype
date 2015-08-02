@@ -58,7 +58,6 @@ die($this_page_markup."\n\n".
 */
 
 // Sort the field index based on field number
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_pattern_first = array();
 $temp_pattern_first[] = '/^(intro-field)$/i';
 $temp_pattern_first[] = '/^light-laboratory$/i';
@@ -156,12 +155,6 @@ if (!empty($mmrpg_index['fields'])){
     $temp_insert_array['field_flag_hidden'] = in_array($temp_insert_array['field_token'], array('field')) ? 1 : 0;
     $temp_insert_array['field_flag_complete'] = $field_data['field_image'] != 'field' ? 1 : 0;
     $temp_insert_array['field_flag_published'] = 1;
-
-    // DEBUG DEBUG DEBUG
-    if ($temp_insert_array['field_token'] == 'arctic-jungle'){
-      //echo('$temp_insert_array['.$temp_insert_array['field_token'].'] = <pre>'.print_r($temp_insert_array, true).'</pre>');
-      //die('$spreadsheet_descriptions = <pre>'.print_r($spreadsheet_descriptions, true).'</pre>');
-    }
 
     // Define the order counter
     if ($temp_insert_array['field_class'] != 'system'){

@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * INDEX PAGE : LEADERBOARD INDEX
  */
@@ -17,25 +16,21 @@ $this_graph_data['description'] = 'The Mega Man RPG Prototype currently has '.(!
 //die('<pre>'.print_r($_GET, true).'</pre>');
 
 // Update the GET variables with the current page num
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_display_limit_default = 50;
 $this_num_offset = $this_current_num - 1;
 $_GET['start'] = 0 + ($this_num_offset * $this_display_limit_default);
 $_GET['limit'] = $this_display_limit_default + ($this_num_offset * $this_display_limit_default);
 
 // Require the leaderboard data file
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require_once('data/leaderboard.php');
 
 //die('<pre>'.print_r($this_leaderboard_online_players, true).'</pre>');
 
 // Define the MARKUP variables for this page
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_markup_header = 'Mega Man RPG Prototype Leaderboard';
 $this_markup_counter = '<span class="count count_header">( '.(!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').($this_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$this_leaderboard_online_count.' Online</span>' : '').' )</span>';
 
 // Start generating the page markup
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ob_start();
 ?>
 <h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Leaderboard Players Index</h2>
@@ -63,12 +58,9 @@ if (!empty($this_leaderboard_online_players)){
   //die('<pre>'.print_r($this_leaderboard_markup, true).'</pre>');
   //die('$this_start_key = '.$this_start_key.'; $this_display_limit = '.$this_display_limit.'; ');
   if (!empty($this_leaderboard_markup)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // COLLECT DATA
 
     // Start the output buffer and start looping
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     ob_start();
     $last_key = 0;
     $this_start_key = $_GET['start'];
@@ -87,7 +79,6 @@ if (!empty($this_leaderboard_online_players)){
     $start_key = $last_key + 1;
 
     // Collect the page listing markup
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $pagelisting_markup = trim(ob_get_clean());
 
     // HEADER PAGE LINKS
@@ -101,7 +92,6 @@ if (!empty($this_leaderboard_online_players)){
 
       // If we're not on the first page, create a link to go back one
       if ($this_display_limit > $this_display_limit_default){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $new_display_limit = $this_display_limit - $this_display_limit_default;
         $new_start_key = $start_key - $this_display_limit_default - $this_display_limit_default;
         if ($new_display_limit < $this_display_limit_default){ $new_display_limit = 0; }
@@ -111,7 +101,6 @@ if (!empty($this_leaderboard_online_players)){
       }
       // If not displaying all players, create a link to show more
       if ($this_display_limit < $this_leaderboard_count){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $new_display_limit = $this_display_limit + $this_display_limit_default;
         if ($new_display_limit > $this_leaderboard_count){ $new_display_limit = $this_leaderboard_count; }
         $next_page_num = $this_current_num + 1;
@@ -119,12 +108,10 @@ if (!empty($this_leaderboard_online_players)){
       }
       // If we're already on the last page, display a link to go to the first
       if ($this_display_limit >= $this_leaderboard_count){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         echo '<a class="more" name="more_link" style="float: right;" href="leaderboard/">First &raquo;</a>';
       }
 
       // Collect the pagelink markup
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $pagelink_markup = trim(ob_get_clean());
       echo $pagelink_markup;
 
@@ -145,7 +132,6 @@ if (!empty($this_leaderboard_online_players)){
 
       // Create links for all the page numbers one by one
       if ($this_leaderboard_count > $this_display_limit_default){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Loop through and generate the page number markup
         for ($this_page_num = $first_page_num; $this_page_num <= $last_page_num; $this_page_num++){
           $show_page_num = false;
@@ -162,12 +148,10 @@ if (!empty($this_leaderboard_online_players)){
       }
 
       // Display the pregenerated pagelisting data
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       echo $pagelisting_markup;
 
       // Create links for all the page numbers one by one
       if ($this_leaderboard_count > $this_display_limit_default){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Loop through and generate the page number markup
         for ($this_page_num = $first_page_num; $this_page_num <= $last_page_num; $this_page_num++){
           $show_page_num = false;
@@ -189,13 +173,10 @@ if (!empty($this_leaderboard_online_players)){
     // FOOTER PAGE LINKS
 
     // Print out the opening tag for the container dig
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     echo '<div class="container" style="overflow: hidden; padding-bottom: 10px;">';
     // Display the pregenerated pagelink markup
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     echo $pagelink_markup;
     // Print out the closing container div
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     echo '</div>';
 
 
@@ -209,5 +190,4 @@ if (!empty($this_leaderboard_online_players)){
 <?
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

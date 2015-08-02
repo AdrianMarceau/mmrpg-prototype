@@ -1,6 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Collect a reference to the password string in session
 if (!isset($_SESSION['GAME']['values']['battle_passwords'])){
   $_SESSION['GAME']['values']['battle_passwords'] = array();

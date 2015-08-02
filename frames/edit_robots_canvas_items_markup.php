@@ -18,7 +18,6 @@ echo '<div class="wrapper">';
       $column_count = ceil(count($mmrpg_database_items) / $row_count);
 
       // Collect this player's item rewards and add them to the dropdown
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       if (!empty($_SESSION[$session_token]['values']['battle_items'])){ $player_item_rewards = $_SESSION[$session_token]['values']['battle_items']; }
       elseif (!empty($player_rewards['player_items'])){ $player_item_rewards = array(); }
 

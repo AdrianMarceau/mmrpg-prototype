@@ -18,7 +18,6 @@ echo '<div class="wrapper">';
       $column_count = ceil(count($mmrpg_database_abilities) / $row_count);
 
       // Collect this player's ability rewards and add them to the dropdown
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       if (!empty($_SESSION[$session_token]['values']['battle_abilities'])){ $player_ability_rewards = $_SESSION[$session_token]['values']['battle_abilities']; }
       elseif (!empty($player_rewards['player_abilities'])){ $player_ability_rewards = array('buster-shot' => array('ability_token' => 'buster-shot')); }
 

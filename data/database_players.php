@@ -1,7 +1,4 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // PLAYER DATABASE
 
 // Define the index of hidden players to not appear in the database
@@ -18,8 +15,7 @@ foreach ($mmrpg_database_players AS $temp_token => $temp_info){
     unset($mmrpg_database_players[$temp_token]);
   } else {
     // Ensure this player's image exists, else default to the placeholder
-    if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/players/'.$temp_token.'/')){ $mmrpg_database_players[$temp_token]['player_image'] = $temp_token; }
-    else { $mmrpg_database_players[$temp_token]['player_image'] = 'player'; }
+    $mmrpg_database_players[$temp_token]['player_image'] = $temp_token;
   }
 }
 
@@ -41,6 +37,7 @@ unset($temp_player_tokens);
 
 // Count the number of players collected and filtered
 $mmrpg_database_players_count = count($mmrpg_database_players);
+$mmrpg_database_players_count_complete = 0;
 
 // Loop through the database and generate the links for these players
 $key_counter = 0;
@@ -48,10 +45,13 @@ $mmrpg_database_players_links = '';
 $mmrpg_database_players_links .= '<div class="float link group" data-game="MM00">';
 $mmrpg_database_players_links_counter = 0;
 foreach ($mmrpg_database_players AS $player_key => $player_info){
+
   // If a type filter has been applied to the player page
   if (isset($this_current_filter) && $this_current_filter == 'none' && $player_info['player_type'] != ''){ $key_counter++; continue; }
   elseif (isset($this_current_filter) && $this_current_filter != 'none' && $player_info['player_type'] != $this_current_filter){ $key_counter++; continue; }
+
   // Collect the player sprite dimensions
+  $player_flag_complete = true; //!empty($player_info['player_flag_complete']) ? true : false;
   $player_image_size = !empty($player_info['player_image_size']) ? $player_info['player_image_size'] : 40;
   $player_image_size_text = $player_image_size.'x'.$player_image_size;
   $player_image_token = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
@@ -76,7 +76,8 @@ foreach ($mmrpg_database_players AS $player_key => $player_info){
     </a>
   </div>
   <?
-  $mmrpg_database_players_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
+  if ($player_flag_complete){ $mmrpg_database_players_count_complete++; }
+  $mmrpg_database_players_links .= ob_get_clean();
   $mmrpg_database_players_links_counter++;
   $key_counter++;
 }

@@ -1,18 +1,13 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Collect the ability variables from the request header, if they exist
 $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
 $temp_robot = !empty($_REQUEST['robot']) ? $_REQUEST['robot'] : '';
 $temp_image = !empty($_REQUEST['image']) ? $_REQUEST['image'] : '';
+
 // If key variables are not provided, kill the script in error
 if (empty($temp_player) || empty($temp_robot) || empty($temp_image)){ die('error|request-error|'.preg_replace('/\s+/', ' ', print_r($_REQUEST, true))); }
 
-//die(print_r($_REQUEST, true));
-
 // Collect the current robot favourites for this user
-//$current_robot_settings = !empty($_SESSION[$session_token]['values']['robot_favourites']) ? $_SESSION[$session_token]['values']['robot_favourites'] : array();
 $temp_player_info = $allowed_edit_data[$temp_player];
 $temp_robot_info = $allowed_edit_data[$temp_player]['player_robots'][$temp_robot];
 

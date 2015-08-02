@@ -1,9 +1,6 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Define a function for updating user save files
 function mmrpg_admin_update_save_file($key, $data){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_admin_update_save_file({$key}, \$data)");  }
   global $DB, $this_save_filepath;
   // Start the markup variable
   $this_page_markup = '';
@@ -149,7 +146,6 @@ function mmrpg_admin_update_save_file($key, $data){
 
 // Define a function for search and replacing typos before re-encoding
 function mmrpg_admin_encode_save_data($data, $cache){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_admin_encode_save_data();');  }
   static $typo_find_replace;
   if (empty($typo_find_replace)){
     $typo_find_replace = array();
@@ -183,18 +179,15 @@ function mmrpg_admin_encode_save_data($data, $cache){
 }
 
 // Prevent updating if logged into a file
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
 
 // Collect any extra request variables for the update
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_cache_date = !empty($_REQUEST['date']) && preg_match('/^([0-9]{8})-([0-9]{2})$/', $_REQUEST['date']) ? $_REQUEST['date'] : MMRPG_CONFIG_CACHE_DATE;
 $this_update_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : 10;
 $this_request_type = !empty($_REQUEST['type']) ? $_REQUEST['type'] : 'index';
 $this_return_markup = '';
 
 // Collect any save files that have a cache date less than the current one // AND mmrpg_saves.user_id = 110
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_update_query = "SELECT mmrpg_saves.*, mmrpg_leaderboard.board_points, mmrpg_users.user_name_clean FROM mmrpg_saves
 	LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_saves.user_id
 	LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_saves.user_id
@@ -212,13 +205,10 @@ $this_total_query = "SELECT mmrpg_saves.user_id, mmrpg_saves.save_cache_date, mm
 	".(!empty($_REQUEST['user_id']) ? "AND mmrpg_users.user_id = {$_REQUEST['user_id']} " : '')."
 	ORDER BY board_points DESC";
 //die($this_update_query);
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_update_list = $DB->get_array_list($this_update_query);
 $this_total_list = $DB->get_array_list($this_total_query);
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_update_count = $this_request_type == 'ajax' && !empty($this_update_list) ? count($this_update_list) : 0;
 $this_total_count = !empty($this_total_list) ? count($this_total_list) : 0;
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_update_list = !empty($this_update_list) ? $this_update_list : array();
 $this_total_list = array();
 //die($this_update_query);
@@ -228,7 +218,6 @@ if ($this_request_type == 'ajax'){ $this_page_markup = ''; }
 
 // Print out the menu header so we know where we are
 if ($this_request_type != 'ajax'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   ob_start();
   ?>
   <div id="menu" style="margin: 0 auto 20px; font-weight: bold;">

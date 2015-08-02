@@ -1,7 +1,4 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // ABILITY DATABASE
 
 // Define the index of counters for robot types
@@ -11,7 +8,6 @@ foreach ($mmrpg_database_types AS $token => $info){
 }
 
 // Define the index of hidden abilities to not appear in the database
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $hidden_database_abilities = array();
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('ability', 'attachment-defeat', 'action-noweapons'));
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'sticky-shot'));
@@ -23,7 +19,6 @@ $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($h
 
 
 // Define the hidden ability query condition
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_condition = '';
 $temp_condition .= "AND ability_class <> 'item' ";
 if (!defined('DATA_DATABASE_SHOW_MECHAS')){
@@ -39,11 +34,9 @@ if (!empty($hidden_database_abilities)){
 }
 
 // Collect the database abilities
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
 
 // Remove unallowed abilities from the database, and increment counters
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
   if (true){
 
@@ -52,10 +45,9 @@ foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
 
     // Ensure this ability's image exists, else default to the placeholder
     $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
-    if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/abilities/'.$temp_image_token.'/')){ $temp_info['ability_image'] = $temp_image_token; }
-    elseif (file_exists(MMRPG_CONFIG_ROOTDIR.'images/abilities/'.$temp_token.'/')){ $temp_info['ability_image'] = $temp_token; }
+    if ($temp_info['ability_flag_complete']){ $temp_info['ability_image'] = $temp_image_token; }
     else { $temp_info['ability_image'] = 'ability'; }
-    // DEBUG DEBUG DEBUG | HIDE INCOMPLETE
+    // HIDE INCOMPLETE
     if (false && $temp_info['ability_image'] == 'ability'){
       unset($mmrpg_database_abilities[$temp_token]);
       continue;
@@ -79,16 +71,14 @@ foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
 }
 
 // Determine the token for the very first ability in the database
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_ability_tokens = array_values($mmrpg_database_abilities);
 $first_ability_token = array_shift($temp_ability_tokens);
 $first_ability_token = $first_ability_token['ability_token'];
 unset($temp_ability_tokens);
 
 // Count the number of abilities collected and filtered
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $mmrpg_database_abilities_count = count($mmrpg_database_abilities);
-
+$mmrpg_database_abilities_count_complete = 0;
 
 // Define database variables we'll be using to generate links
 $key_counter = 0;
@@ -116,6 +106,7 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
   }
 
   // Collect the ability sprite dimensions
+  $ability_flag_complete = !empty($ability_info['ability_flag_complete']) ? true : false;
   $ability_image_size = !empty($ability_info['ability_image_size']) ? $ability_info['ability_image_size'] : 40;
   $ability_image_size_text = $ability_image_size.'x'.$ability_image_size;
   $ability_image_token = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
@@ -154,7 +145,8 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
     </a>
   </div>
   <?
-  $mmrpg_database_abilities_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
+  if ($ability_flag_complete){ $mmrpg_database_abilities_count_complete++; }
+  $mmrpg_database_abilities_links .= ob_get_clean();
   $mmrpg_database_abilities_links_counter++;
   $key_counter++;
 
@@ -162,7 +154,5 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
 
 // End the groups, however many there were
 $mmrpg_database_abilities_links .= '</div>';
-
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 ?>

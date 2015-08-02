@@ -1,6 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 /*
  * COMMUNITY CATEGORY VIEW
  */
@@ -84,7 +82,6 @@ else {
 // Only display the category body if not personal
 if ($this_category_info['category_id'] != 0){
   // Require the leaderboard data file
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require_once('data/leaderboard.php');
   // Collect all the active sessions for this page
   $temp_viewing_category = mmrpg_website_sessions_active('community/'.$this_category_info['category_token'].'/', 3, true);
@@ -327,7 +324,6 @@ $this_time = time();
 $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
 
 // Collect the user post and thread count index plus leaderboard points for display
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_id_includes = !empty($this_user_ids_array) ? 'AND mmrpg_users.user_id IN ('.implode(', ', $this_user_ids_array).')' : '';
 if (!empty($temp_id_includes)){
   $this_user_countindex = $DB->get_array_list('SELECT
@@ -437,5 +433,4 @@ elseif ($this_category_info['category_token'] == 'search' && $temp_filter_data['
 
 
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

@@ -1,9 +1,5 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Define the temporary debug variable
-//define('EDIT_ROBOT_UPDATES_DEBUG', (MMRPG_CONFIG_DEBUG_MODE && MMRPG_CONFIG_ADMIN_MODE ? true : false));
 define('EDIT_ROBOT_UPDATES_DEBUG', false);
 
 // Only print out temporary style info if we're in debug mode
@@ -50,7 +46,6 @@ if (EDIT_ROBOT_UPDATES_DEBUG){
   <?
 }
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_battle_rewards = &$_SESSION[$session_token]['values']['battle_rewards'];
 $temp_battle_settings = &$_SESSION[$session_token]['values']['battle_settings'];
 $temp_stat_tokens = array('energy', 'attack', 'defense', 'speed');
@@ -59,20 +54,16 @@ $temp_stat_tokens = array('energy', 'attack', 'defense', 'speed');
 if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
 
   // Define the player colours for debug purposes
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_player_colours = array('dr-light' => array(0, 0, 200), 'dr-wily' => array(200, 0, 0), 'dr-cossack' => array(100, 0, 100));
   // Collect a robot array to loop through, rewards or settings
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_player_array = !empty($temp_battle_rewards) ? $temp_battle_rewards : $temp_battle_settings;
   // Define the array to hold the total overflow for all doctors
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_total_overflow_value = 0;
 
 
   // -- UPDATE LOOP FUNCTIONS -- //
 
   // Define the first loop function for memory saving
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   function edit_robot_update_loop_one(
     &$mmrpg_database_robots,
     &$temp_battle_rewards, &$temp_battle_settings,
@@ -82,10 +73,7 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
     $temp_robot_token, $temp_robot_info,
     $temp_phase_loop
     ){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "edit_robot_update_loop_one({$temp_player_token}, {$temp_robot_token})");  }
-
     // Collect the robot index, rewards, and settings
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_robot_index = !empty($mmrpg_database_robots[$temp_robot_token]) ? $mmrpg_database_robots[$temp_robot_token] : $temp_robot_info;
     $temp_robot_rewards = !empty($temp_battle_rewards[$temp_player_token]['player_robots'][$temp_robot_token]) ? $temp_battle_rewards[$temp_player_token]['player_robots'][$temp_robot_token] : array();
     $temp_robot_settings = !empty($temp_battle_settings[$temp_player_token]['player_robots'][$temp_robot_token]) ? $temp_battle_settings[$temp_player_token]['player_robots'][$temp_robot_token] : array();
@@ -96,13 +84,11 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
     $temp_robot_info['original_player'] = !empty($temp_battle_settings[$temp_player_token]['player_robots'][$temp_robot_token]['original_player']) ? $temp_battle_settings[$temp_player_token]['player_robots'][$temp_robot_token]['original_player'] : $temp_player_token;
 
     // Check the robots's stats and collect any overflow from the max
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_stat_overflow = 0;
     $temp_stat_total = 0;
     $temp_stat_values = array();
     foreach ($temp_stat_tokens AS $stat_token){
      // Collect the stats for this level
-     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
      $temp_stat_values[$stat_token]['base'] = MMRPG_SETTINGS_STATS_GET_ROBOTMIN($temp_robot_index['robot_'.$stat_token], $temp_robot_info['robot_level']);
      $temp_stat_values[$stat_token]['reward'] = !empty($temp_robot_rewards['robot_'.$stat_token]) ? $temp_robot_rewards['robot_'.$stat_token] : 0;
      $temp_stat_values[$stat_token]['total'] = $temp_stat_values[$stat_token]['base'] + $temp_stat_values[$stat_token]['reward'];
@@ -112,13 +98,11 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
      $temp_stat_total += $temp_stat_values[$stat_token]['total'];
     }
     // Update the array with collected stat values
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_robot_info['robot_stats'] = $temp_stat_values;
     $temp_robot_info['robot_stats_overflow'] = $temp_stat_overflow;
     $temp_robot_info['robot_stats_total'] = $temp_stat_total;
 
     // Print out the robot array for debug purposes
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (EDIT_ROBOT_UPDATES_DEBUG){
       echo '<div class="robot_block">';
       echo '<strong class="robot_title">'.$temp_robot_token.' (phase-'.$temp_phase_loop.') ('.$temp_player_token.') '.($temp_player_token != $temp_robot_info['original_player'] ? '[via-'.$temp_robot_info['original_player'].']' : '').'</strong>';
@@ -130,12 +114,9 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
     }
 
     // Update the parent array with these collected details
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_player_array[$temp_player_token]['player_robots'][$temp_robot_token] = $temp_robot_info;
     $temp_total_overflow_value += $temp_robot_info['robot_stats_overflow'];
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-  }
+    }
 
 
   // -- PROCESS PHASE LOOP 1 -- //
@@ -144,7 +125,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
   $temp_phase_loop = 1;
 
   // Print out the total overflow value
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   if (EDIT_ROBOT_UPDATES_DEBUG){
     echo '<div style="padding: 20px 10px; background-color: yellow; border: 1px solid #292929;">';
     echo '<h1>update-phase-'.$temp_phase_loop.'</h1>';
@@ -155,17 +135,14 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
 
   // Do the first loop through this robot, collecting settings and unlocking abilities
   foreach ($temp_player_array AS $temp_player_token => $temp_player_info){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (EDIT_ROBOT_UPDATES_DEBUG){
       echo '<div style="padding: 20px 10px; background-color: rgba('.implode(', ', $temp_player_colours[$temp_player_token]).', 0.1);">';
       echo '<strong style="font-size: 120%;">'.$temp_player_token.' phase-'.$temp_phase_loop.'</strong><br /><br />';
     }
     if (!empty($temp_player_info['player_robots'])){
 
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($temp_player_info['player_robots'] AS $temp_robot_token => $temp_robot_info){
         if (!isset($mmrpg_database_robots[$temp_robot_token])){ continue; }
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         edit_robot_update_loop_one(
           $mmrpg_database_robots,
           $temp_battle_rewards, $temp_battle_settings,
@@ -175,11 +152,9 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
           $temp_robot_token, $temp_robot_info,
           $temp_phase_loop
           );
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      }
+        }
 
       // Sort the above robots by their stat overflow, then level
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       uasort($temp_player_array[$temp_player_token]['player_robots'], function($r1, $r2){
         //die('$r1 = <pre>'.print_r($r1, true).'</pre>');
         if ($r1['robot_stats_overflow'] > $r2['robot_stats_overflow']){ return -1; }
@@ -188,7 +163,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
         });
 
     }
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (EDIT_ROBOT_UPDATES_DEBUG){ echo '</div>'; }
   }
 
@@ -196,7 +170,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
   $temp_phase_loop++;
 
   // Print out the total overflow value
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   if (EDIT_ROBOT_UPDATES_DEBUG){
     echo '<div style="padding: 20px 10px; background-color: yellow; border: 1px solid #292929;">';
     echo '<h1>update-phase-'.$temp_phase_loop.'</h1>';
@@ -206,9 +179,7 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
   }
 
   // Do the first loop through this robot, collecting settings and unlocking abilities
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   foreach ($temp_player_array AS $temp_player_token => $temp_player_info){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (EDIT_ROBOT_UPDATES_DEBUG){
       echo '<div style="padding: 20px 10px; background-color: rgba('.implode(', ', $temp_player_colours[$temp_player_token]).', 0.1);">';
       echo '<strong style="font-size: 120%;">'.$temp_player_token.' phase-'.$temp_phase_loop.'</strong><br /><br />';
@@ -238,7 +209,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
         }
 
         // Print out the robot array for debug purposes
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if (EDIT_ROBOT_UPDATES_DEBUG){
           echo '<div class="robot_block">';
           echo '<strong class="robot_title">'.$temp_robot_token.' (phase-'.$temp_phase_loop.') ('.$temp_player_token.') '.($temp_player_token != $temp_robot_info['original_player'] ? '[via-'.$temp_robot_info['original_player'].']' : '').'</strong>';
@@ -257,7 +227,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
 
     }
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (EDIT_ROBOT_UPDATES_DEBUG){ echo '</div>'; }
 
   }
@@ -266,7 +235,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
   $temp_phase_loop++;
 
   // Print out the total overflow value
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   if (EDIT_ROBOT_UPDATES_DEBUG){
     echo '<div style="padding: 20px 10px; background-color: yellow; border: 1px solid #292929;">';
     echo '<h1>update-phase-'.$temp_phase_loop.'</h1>';
@@ -277,7 +245,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
 
   // Do the first loop through this robot, collecting settings and unlocking abilities
   foreach ($temp_player_array AS $temp_player_token => $temp_player_info){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (EDIT_ROBOT_UPDATES_DEBUG){
       echo '<div style="padding: 20px 10px; background-color: rgba('.implode(', ', $temp_player_colours[$temp_player_token]).', 0.1);">';
       echo '<strong style="font-size: 120%;">'.$temp_player_token.' phase-'.$temp_phase_loop.'</strong><br /><br />';
@@ -319,7 +286,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
         }
 
         // Print out the robot array for debug purposes
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if (EDIT_ROBOT_UPDATES_DEBUG){
           echo '<div class="robot_block">';
           echo '<strong class="robot_title">'.$temp_robot_token.' (phase-'.$temp_phase_loop.') ('.$temp_player_token.') '.($temp_player_token != $temp_robot_info['original_player'] ? '[via-'.$temp_robot_info['original_player'].']' : '').'</strong>';
@@ -340,7 +306,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
 
     }
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (EDIT_ROBOT_UPDATES_DEBUG){ echo '</div>'; }
 
   }
@@ -349,7 +314,6 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
   $temp_phase_loop++;
 
   // Print out the total overflow value
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   if (EDIT_ROBOT_UPDATES_DEBUG){
     echo '<div style="padding: 20px 10px; background-color: yellow; border: 1px solid #292929;">';
     echo '<h1>update-phase-'.$temp_phase_loop.'</h1>';
@@ -359,9 +323,7 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
   }
 
   // Do the first loop through this robot, collecting settings and unlocking abilities
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   foreach ($temp_player_array AS $temp_player_token => $temp_player_info){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (EDIT_ROBOT_UPDATES_DEBUG){
       echo '<div style="padding: 20px 10px; background-color: rgba('.implode(', ', $temp_player_colours[$temp_player_token]).', 0.1);">';
       echo '<strong>'.$temp_player_token.' phase-'.$temp_phase_loop.'</strong><br /><br />';
@@ -372,27 +334,21 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
         // Collect the original play and prepare the transfer abilities to them
         $temp_robot_info['original_player'] = !empty($temp_battle_settings[$temp_player_token]['player_robots'][$temp_robot_token]['original_player']) ? $temp_battle_settings[$temp_player_token]['player_robots'][$temp_robot_token]['original_player'] : $temp_player_token;
 
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if (EDIT_ROBOT_UPDATES_DEBUG){ echo '-- '.$temp_robot_token.' ('.$temp_robot_info['robot_level'].')  ('.$temp_robot_info['original_player'].') ('.$temp_phase_loop.')<br /><br />'; }
 
         if (!empty($temp_robot_info['robot_abilities'])){
-          if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           foreach ($temp_robot_info['robot_abilities'] AS $temp_ability_token => $temp_ability_info){
-           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
            if (EDIT_ROBOT_UPDATES_DEBUG){ echo '---- '.$temp_ability_token; }
 
            if (mmrpg_prototype_ability_unlocked($temp_robot_info['original_player'], false, $temp_ability_token)){
-             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
              if (EDIT_ROBOT_UPDATES_DEBUG){ echo ' (unlocked!)'; }
            } else {
-             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
              if (EDIT_ROBOT_UPDATES_DEBUG){ echo ' (not unlocked!)'; }
              $temp_original_player_info = array('player_token' => $temp_robot_info['original_player']);
              mmrpg_game_unlock_ability($temp_original_player_info, false, $temp_ability_info);
              if (EDIT_ROBOT_UPDATES_DEBUG){ echo ' (but unlocked now!)'; }
            }
 
-           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
            if (EDIT_ROBOT_UPDATES_DEBUG){ echo '<br />'; }
           }
         }

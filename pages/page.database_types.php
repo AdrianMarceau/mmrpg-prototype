@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * TYPES DATABASE PAGE
  */
@@ -154,5 +153,4 @@ $this_markup_header = 'Mega Man RPG Prototype Type Database <span class="count">
 </div>
 <?
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

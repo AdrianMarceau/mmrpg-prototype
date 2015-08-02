@@ -4,12 +4,8 @@
  * DEMO ROBOT SELECT
  */
 if (!empty($_SESSION[$session_token]['DEMO'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
   // Only show robot select if the player has more than two robots
   if (mmrpg_prototype_robots_unlocked('dr-light') > 3){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
     // Print out the demo mode's robot select screen for Dr. Light
     echo '<div class="option_wrapper option_wrapper_hidden" data-condition="this_player_token=dr-light">'."\n";
     if (defined('MMRPG_SCRIPT_REQUEST')){
@@ -26,15 +22,10 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
  * NORMAL ROBOT SELECT
  */
 else {
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
   // Only print out Light's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-light', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
     // Print out the normal mode's robot select screen for Dr. Light
     if ($unlock_flag_light){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       echo '<div class="option_wrapper option_wrapper_hidden" data-condition="this_player_token=dr-light">'."\n";
       if (defined('MMRPG_SCRIPT_REQUEST')){
         echo $prototype_data['dr-light']['robots_markup']."\n";
@@ -48,11 +39,8 @@ else {
   
   // Only print out Light's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-wily', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
     // Print out the normal mode's robot select screen for Dr. Wily
     if ($unlock_flag_wily){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       echo '<div class="option_wrapper option_wrapper_hidden" data-condition="this_player_token=dr-wily">'."\n";
       if (defined('MMRPG_SCRIPT_REQUEST')){
         echo $prototype_data['dr-wily']['robots_markup']."\n";
@@ -66,11 +54,8 @@ else {
   
   // Only print out Light's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-cossack', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
     // Print out the normal mode's robot select screen for Dr. Cossack
     if ($unlock_flag_cossack){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       echo '<div class="option_wrapper option_wrapper_hidden" data-condition="this_player_token=dr-cossack">'."\n";
       if (defined('MMRPG_SCRIPT_REQUEST')){
         echo $prototype_data['dr-cossack']['robots_markup']."\n";

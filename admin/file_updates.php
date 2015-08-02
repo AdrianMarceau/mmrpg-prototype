@@ -401,9 +401,6 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] < 
 
   }
 
-  // DEBUG DEBUG DEBUG
-  //die('<pre>$new_robot_database : '.print_r($new_robot_database, true).'</pre><hr />');
-
   // Update the session with the new database data
   $_SESSION['GAME']['values']['robot_database'] = $new_robot_database;
 

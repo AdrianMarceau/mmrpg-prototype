@@ -1,6 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 /*
  * COMMUNITY INDEX VIEW
  */
@@ -143,5 +141,4 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
   $this_category_key++;
 }
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

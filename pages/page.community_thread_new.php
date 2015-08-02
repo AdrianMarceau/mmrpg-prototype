@@ -1,6 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 /*
  * COMMUNITY THREAD VIEW
  */
@@ -233,5 +231,4 @@ if (!in_array($thread_session_token, $_SESSION['COMMUNITY']['threads_viewed'])){
   $_SESSION['COMMUNITY']['threads_viewed'][] = $thread_session_token;
 }
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

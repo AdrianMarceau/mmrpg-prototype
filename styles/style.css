@@ -2992,63 +2992,32 @@ body.index #header {
   width: auto;
 }
 
-#actions .actions_option .main_actions,
-#actions .actions_settings .main_actions,
-#actions .actions_settings_eventTimeout .main_actions,
-#actions .actions_settings_volumeControl .main_actions,
-#actions .actions_settings_autoScan .main_actions,
-#actions .actions_switch .main_actions,
-#actions .actions_scan .main_actions,
-#actions .actions_ability .main_actions {
-  
-}
-#actions .actions_option .action_option,
-#actions .actions_settings .action_setting,
-#actions .actions_settings_eventTimeout .action_setting,
-#actions .actions_settings_volumeControl .action_setting,
-#actions .actions_settings_autoScan .action_setting,
-#actions .actions_switch .action_switch,
-#actions .actions_scan .action_scan,
-#actions .actions_target .action_target,
-#actions .actions_ability .action_ability {
+#actions .main_actions_hastitle .button {
   width: 181px;
   height: 68px;
   line-height: 68px;
   margin: 0 3px 3px 0;
 }
-#actions .actions_option .action_option label,
-#actions .actions_settings .action_setting label,
-#actions .actions_settings_eventTimeout .action_setting label,
-#actions .actions_settings_volumeControl .action_setting label,
-#actions .actions_settings_autoScan .action_setting label,
-#actions .actions_switch .action_switch label,
-#actions .actions_scan .action_scan label,
-#actions .actions_target .action_target label,
-#actions .actions_ability .action_ability label {
+#actions .main_actions_hastitle .button label {
   width: auto;
   height: 56px;
   line-height: 56px;
   padding-left: 48px;
 }
-#actions .actions_option .action_option label .multi,
-#actions .actions_settings .action_setting label .multi,
-#actions .actions_settings_eventTimeout .action_setting label .multi,
-#actions .actions_settings_volumeControl .action_setting label .multi,
-#actions .actions_settings_autoScan .action_setting label .multi,
-#actions .actions_switch .action_switch label .multi,
-#actions .actions_scan .action_scan label .multi,
-#actions .actions_target .action_target label .multi,
-#actions .actions_ability .action_ability label .multi {
+#actions .main_actions_hastitle .button label .multi {
   display: block;
   line-height: 14px;
-  margin-top: 13px;
+}
+#actions .main_actions_hastitle .button label .multi .type {
+  display: inline-block;
+  line-height: 14px;
+  padding: 0 6px 0 9px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
 }
 
-#actions .actions_switch .action_switch label .sprite_40x40,
-#actions .actions_scan .action_scan label .sprite_40x40,
-#actions .actions_target .action_target label .sprite_40x40,
-#actions .actions_ability .action_ability label .sprite_40x40,
-#actions .actions .action label .sprite.size40 {
+#actions .main_actions_hastitle .button label .sprite.size40 {
   background-color: #000000 !important;
   border: 1px solid #373737;
   width: 40px;
@@ -3057,22 +3026,15 @@ body.index #header {
   -moz-border-radius: 0.75em;
   -webkit-border-radius: 0.75em;
 }
-#actions .actions_switch .action_switch label .sprite_40x40_ability,
-#actions .actions_scan .action_scan label .sprite_40x40_ability,
-#actions .actions_target .action_target label .sprite_40x40_ability,
-#actions .actions_ability .action_ability label .sprite_40x40_ability,
-#actions .actions .action label .sprite.size40.ability {
+
+#actions .main_actions_hastitle .button label .sprite.size40.ability {
   height: 30px; 
   background-position-y: -5px !important; 
   border-radius: 5px 5px 0 0;   
   -moz-border-radius: 5px 5px 0 0;   
   -webkit-border-radius: 5px 5px 0 0; 
 }
-#actions .actions_switch .action_switch label .sprite_40x40_weapons,
-#actions .actions_scan .action_scan label .sprite_40x40_weapons,
-#actions .actions_target .action_target label .sprite_40x40_weapons,
-#actions .actions_ability .action_ability label .sprite_40x40_weapons,
-#actions .actions .action label .sprite.size40.weapons {
+#actions .main_actions_hastitle .button label .sprite.size40.weapons {
   height: 8px;
   padding-bottom: 4px; 
   border-radius: 0 0 5px 5px;   
@@ -3087,54 +3049,28 @@ body.index #header {
   color: #9C9C9C;
   font-family: Arial; 
 }
-#actions .actions_switch .action_switch label .sprite_40x40_energy_high,
-#actions .actions_scan .action_scan label .sprite_40x40_energy_high,
-#actions .actions_target .action_target label .sprite_40x40_energy_high,
-#actions .actions_ability .action_ability label .sprite_40x40_energy_high,
-#actions .actions .action label .sprite.size40.energy.high {
+
+#actions .main_actions_hastitle .button label .sprite.size40.energy.high {
   background-color: #09210A;
 }
-#actions .actions_switch .action_switch label .sprite_40x40_energy_medium,
-#actions .actions_scan .action_scan label .sprite_40x40_energy_medium,
-#actions .actions_target .action_target label .sprite_40x40_energy_medium,
-#actions .actions_ability .action_ability label .sprite_40x40_energy_medium,
-#actions .actions .action label .sprite.size40.energy.medium {
+#actions .main_actions_hastitle .button label .sprite.size40.energy.medium {
   background-color: #282204;
 }
-#actions .actions_switch .action_switch label .sprite_40x40_energy_low,
-#actions .actions_scan .action_scan label .sprite_40x40_energy_low,
-#actions .actions_target .action_target label .sprite_40x40_energy_low,
-#actions .actions_ability .action_ability label .sprite_40x40_energy_low,
-#actions .actions .action label .sprite.size40.energy.low {
+#actions .main_actions_hastitle .button label .sprite.size40.energy.low {
   background-color: #2B0A0A;
 }
-#actions .actions_switch .action_switch label .sprite_40x40_base,
-#actions .actions_scan .action_scan label .sprite_40x40_base,
-#actions .actions_target .action_target label .sprite_40x40_base,
-#actions .actions_ability .action_ability label .sprite_40x40_base,
-#actions .actions .action label .sprite.size40.base {
+
+#actions .main_actions_hastitle .button label .sprite.size40.base {
   background-position: 0 1px;
 }
-#actions .actions_switch .action_switch label .sprite_40x40_defend,
-#actions .actions_scan .action_scan label .sprite_40x40_defend,
-#actions .actions_target .action_target label .sprite_40x40_defend,
-#actions .actions_ability .action_ability label .sprite_40x40_defend,
-#actions .actions .action label .sprite.size40.defend {
+#actions .main_actions_hastitle .button label .sprite.size40.defend {
   background-position: -320px 1px;
 }
-#actions .actions_switch .action_switch label .sprite_40x40_defeat,
-#actions .actions_scan .action_scan label .sprite_40x40_defeat,
-#actions .actions_target .action_target label .sprite_40x40_defeat,
-#actions .actions_ability .action_ability label .sprite_40x40_defeat,
-#actions .actions .action label .sprite.size40.defeat {
+#actions .main_actions_hastitle .button label .sprite.size40.defeat {
   background-position: -120px 1px;
 }
 
-#actions .actions_switch .action_switch label .sprite_80x80,
-#actions .actions_scan .action_scan label .sprite_80x80,
-#actions .actions_target .action_target label .sprite_80x80,
-#actions .actions_ability .action_ability label .sprite_80x80,
-#actions .actions .action label .sprite.size80 {
+#actions .main_actions_hastitle .button label .sprite.size80 {
   background-color: #000000 !important;
   border: 1px solid #373737;
   width: 40px;
@@ -3143,54 +3079,28 @@ body.index #header {
   -moz-border-radius: 0.75em;
   -webkit-border-radius: 0.75em;
 }
-#actions .actions_switch .action_switch label .sprite_80x80_energy_high,
-#actions .actions_scan .action_scan label .sprite_80x80_energy_high,
-#actions .actions_target .action_target label .sprite_80x80_energy_high,
-#actions .actions_ability .action_ability label .sprite_80x80_energy_high,
-#actions .actions .action label .sprite.size80.energy.high {
+
+#actions .main_actions_hastitle .button label .sprite.size80.energy.high {
   background-color: #09210A;
 }
-#actions .actions_switch .action_switch label .sprite_80x80_energy_medium,
-#actions .actions_scan .action_scan label .sprite_80x80_energy_medium,
-#actions .actions_target .action_target label .sprite_80x80_energy_medium,
-#actions .actions_ability .action_ability label .sprite_80x80_energy_medium,
-#actions .actions .action label .sprite.size80.energy.medium {
+#actions .main_actions_hastitle .button label .sprite.size80.energy.medium {
   background-color: #282204;
 }
-#actions .actions_switch .action_switch label .sprite_80x80_energy_low,
-#actions .actions_scan .action_scan label .sprite_80x80_energy_low,
-#actions .actions_target .action_target label .sprite_80x80_energy_low,
-#actions .actions_ability .action_ability label .sprite_80x80_energy_low,
-#actions .actions .action label .sprite.size80.energy.low {
+#actions .main_actions_hastitle .button label .sprite.size80.energy.low {
   background-color: #2B0A0A;
 }
-#actions .actions_switch .action_switch label .sprite_80x80_base,
-#actions .actions_scan .action_scan label .sprite_80x80_base,
-#actions .actions_target .action_target label .sprite_80x80_base,
-#actions .actions_ability .action_ability label .sprite_80x80_base,
-#actions .actions .action label .sprite.size80.base {
+
+#actions .main_actions_hastitle .button label .sprite.size80.base {
   background-position: -19px -42px;
 }
-#actions .actions_switch .action_switch label .sprite_80x80_defend,
-#actions .actions_scan .action_scan label .sprite_80x80_defend,
-#actions .actions_target .action_target label .sprite_80x80_defend,
-#actions .actions_ability .action_ability label .sprite_80x80_defend,
-#actions .actions .action label .sprite.size80.defend {
+#actions .main_actions_hastitle .button label .sprite.size80.defend {
   background-position: -658px -42px;
 }
-#actions .actions_switch .action_switch label .sprite_80x80_defeat,
-#actions .actions_scan .action_scan label .sprite_80x80_defeat,
-#actions .actions_target .action_target label .sprite_80x80_defeat,
-#actions .actions_ability .action_ability label .sprite_80x80_defeat,
-#actions .actions .action label .sprite.size80.defeat {
+#actions .main_actions_hastitle .button label .sprite.size80.defeat {
   background-position: -260px -42px;
 }
 
-#actions .actions_switch .action_switch label .sprite_160x160,
-#actions .actions_scan .action_scan label .sprite_160x160,
-#actions .actions_target .action_target label .sprite_160x160,
-#actions .actions_ability .action_ability label .sprite_160x160,
-#actions .actions .action label .sprite.size160 {
+#actions .main_actions_hastitle .button label .sprite.size160 {
   background-color: #000000 !important;
   border: 1px solid #373737;
   width: 160px;
@@ -3199,101 +3109,66 @@ body.index #header {
   -moz-border-radius: 0.75em;
   -webkit-border-radius: 0.75em;
 }
-#actions .actions_switch .action_switch label .sprite_160x160_energy_high,
-#actions .actions_scan .action_scan label .sprite_160x160_energy_high,
-#actions .actions_target .action_target label .sprite_160x160_energy_high,
-#actions .actions_ability .action_ability label .sprite_160x160_energy_high,
-#actions .actions .action label .sprite.size160.energy.high {
+
+#actions .main_actions_hastitle .button label .sprite.size160.energy.high {
   background-color: #09210A;
 }
-#actions .actions_switch .action_switch label .sprite_160x160_energy_medium,
-#actions .actions_scan .action_scan label .sprite_160x160_energy_medium,
-#actions .actions_target .action_target label .sprite_160x160_energy_medium,
-#actions .actions_ability .action_ability label .sprite_160x160_energy_medium,
-#actions .actions .action label .sprite.size160.energy.medium {
+#actions .main_actions_hastitle .button label .sprite.size160.energy.medium {
   background-color: #282204;
 }
-#actions .actions_switch .action_switch label .sprite_160x160_energy_low,
-#actions .actions_scan .action_scan label .sprite_160x160_energy_low,
-#actions .actions_target .action_target label .sprite_160x160_energy_low,
-#actions .actions_ability .action_ability label .sprite_160x160_energy_low,
-#actions .actions .action label .sprite.size160.energy.low {
+#actions .main_actions_hastitle .button label .sprite.size160.energy.low {
   background-color: #2B0A0A;
 }
-#actions .actions_switch .action_switch label .sprite_160x160_base,
-#actions .actions_scan .action_scan label .sprite_160x160_base,
-#actions .actions_target .action_target label .sprite_160x160_base,
-#actions .actions_ability .action_ability label .sprite_160x160_base,
-#actions .actions .action label .sprite.size160.base {
+
+#actions .main_actions_hastitle .button label .sprite.size160.base {
   background-position: 0 1px;
 }
-#actions .actions_switch .action_switch label .sprite_160x160_defend,
-#actions .actions_scan .action_scan label .sprite_160x160_defend,
-#actions .actions_target .action_target label .sprite_160x160_defend,
-#actions .actions_ability .action_ability label .sprite_160x160_defend,
-#actions .actions .action label .sprite.size160.defend {
+#actions .main_actions_hastitle .button label .sprite.size160.defend {
   background-position: -1280px 1px;
 }
-#actions .actions_switch .action_switch label .sprite_160x160_defeat,
-#actions .actions_scan .action_scan label .sprite_160x160_defeat,
-#actions .actions_target .action_target label .sprite_160x160_defeat,
-#actions .actions_ability .action_ability label .sprite_160x160_defeat,
-#actions .actions .action label .sprite.size160.defeat {
+#actions .main_actions_hastitle .button label .sprite.size160.defeat {
   background-position: -640px 1px;
 }
 
-#actions .actions_switch .action_switch label .multi,
-#actions .actions_scan .action_scan label .multi,
-#actions .actions_target .action_target label .multi,
-#actions .actions_ability .action_ability label .multi,
-#actions .actions .action label .multi {
+#actions .main_actions_hastitle .button label .multi {
   text-align: left;
   margin: 7px 5px 0 5px;
 }
-#actions .actions_switch .action_switch label .maintext,
-#actions .actions_scan .action_scan label .maintext,
-#actions .actions_target .action_target label .maintext,
-#actions .actions_ability .action_ability label .maintext,
-#actions .actions .action label .maintext,
-#actions .actions_switch .action_switch label .subtext,
-#actions .actions_scan .action_scan label .subtext,
-#actions .actions_target .action_target label .subtext,
-#actions .actions_ability .action_ability label .subtext,
-#actions .actions .action label .subtext {
+
+#actions .main_actions_hastitle .button label .subtext {
   display: block;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-#actions .actions_switch .action_switch label .maintext,
-#actions .actions_scan .action_scan label .maintext,
-#actions .actions_target .action_target label .maintext,
-#actions .actions_ability .action_ability label .maintext,
-#actions .actions .action label .maintext {
+
+#actions .main_actions_hastitle .button label .maintext {
   margin-bottom: 0;
   font-size: 11px;
   line-height: 14px;
   font-weight: bold;
 }
-#actions .actions_switch .action_switch label .subtext,
-#actions .actions_scan .action_scan label .subtext,
-#actions .actions_target .action_target label .subtext,
-#actions .actions_ability .action_ability label .subtext,
-#actions .actions .action label .subtext {
+
+#actions .main_actions_hastitle .button label .subtext {
   margin-bottom: 0;
   font-size: 9px;
   line-height: 13px;
   opacity: 0.8;
 }
+
 #actions .actions_option .action_option label,
-#actions .actions_settings .action_setting label,
-#actions .actions_settings_eventTimeout .action_setting label,
-#actions .actions_settings_volumeControl .action_setting label,
-#actions .actions_settings_autoScan .action_setting label {
+#actions .actions_settings .action_setting label {
   padding-left: 0;
   width: auto;
 }
+#actions .actions_option .action_option label .multi,
+#actions .actions_settings .action_setting label .multi {
+  text-align: center;
+  margin-top: 9px;
+  line-height: 16px;
+}
+
 #actions .block_4,
 #actions .block_8 {
   margin-right: 0 !important;

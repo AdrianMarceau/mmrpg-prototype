@@ -1,6 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 /*
  * COMMUNITY FORM ACTIONS
  */
@@ -436,5 +434,4 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
   break;
 }
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

@@ -372,12 +372,6 @@ $(document).ready(function(){
                 // Collect the new field from this position in the list
                 var newField = newFieldList[key] != undefined ? newFieldList[key]: '';
                 
-                // DEBUG DEBUG DEBUG
-                //if (tempCurrentField == newField){ return true; }
-                
-                // DEBUG
-                //console.log('current field at position '+key+' is ['+tempField+']...');
-                
                 // Update the select box with the new field and recollect it's value
                 tempSelect.val(newField);
                 tempOption = $('option:selected', tempSelect);
@@ -599,12 +593,6 @@ $(document).ready(function(){
                 
                 // Collect the new field from this position in the list
                 var newField = newFieldList[key] != undefined ? newFieldList[key]: '';
-                
-                // DEBUG DEBUG DEBUG
-                //if (tempCurrentField == newField){ return true; }
-                
-                // DEBUG
-                //console.log('current field at position '+key+' is ['+tempField+']...');
                 
                 // Update the select box with the new field and recollect it's value
                 tempSelect.val(newField);

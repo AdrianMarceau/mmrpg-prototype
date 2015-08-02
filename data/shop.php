@@ -1,13 +1,11 @@
 <?
 // If the session token has not been set
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
 
 
 // -- COLLECT ENVIRONMENT VARIABLES -- //
 
 // Collect the field stars from the session variable
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (!isset($_SESSION[$session_token]['values']['battle_shops'])){ $_SESSION[$session_token]['values']['battle_shops'] = array(); }
 $this_battle_shops = !empty($_SESSION[$session_token]['values']['battle_shops']) ? $_SESSION[$session_token]['values']['battle_shops'] : array();
 $this_battle_shops_count = !empty($this_battle_shops) ? count($this_battle_shops) : 0;
@@ -382,7 +380,7 @@ if (!empty($this_shop_index)){
     else {
       // Remove this shop from the index to prevent errors
       unset($this_shop_index[$shop_token]);
-      //// Update this shop's level in the index
+      // Update this shop's level in the index
       //$this_shop_index[$shop_token]['shop_level'] = 0;
     }
 

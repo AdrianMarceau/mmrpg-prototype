@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Define all the available player items in a handy index array
 $temp_player_items = $this_player->player_items;
 //echo print_r($temp_player_items, true);
@@ -224,10 +223,10 @@ ob_start();
           $temp_item_sprite['image_size_zoom_text'] = $temp_item_sprite['image_size'].'x'.$temp_item_sprite['image_size'];
           $temp_item_sprite['url'] = 'images/abilities/'.$temp_item_sprite['image'].'/icon_'.$item_direction.'_'.$temp_item_sprite['image_size_text'].'.png';
           $temp_item_sprite['preload'] = 'images/abilities/'.$temp_item_sprite['image'].'/sprite_'.$item_direction.'_'.$temp_item_sprite['image_size_zoom_text'].'.png';
-          $temp_item_sprite['class'] = 'sprite sprite_'.$temp_item_sprite['image_size_text'].' sprite_'.$temp_item_sprite['image_size_text'].'_base '; // ability_type ability_type_'.(!empty($temp_item->ability_type) ? $temp_item->ability_type : 'none');
+          $temp_item_sprite['class'] = 'sprite size'.$temp_item_sprite['image_size'].' base '; // ability_type ability_type_'.(!empty($temp_item->ability_type) ? $temp_item->ability_type : 'none');
           $temp_item_sprite['style'] = 'background-image: url('.$temp_item_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.');  top: 5px; left: 5px; ';
-          $temp_item_sprite['markup'] = '<span class="'.$temp_item_sprite['class'].' sprite_40x40_ability" style="'.$temp_item_sprite['style'].'">'.$temp_item_sprite['name'].'</span>';
-          $temp_item_sprite['markup'] .= '<span class="'.$temp_item_sprite['class'].' sprite_40x40_weapons" style="top: 35px; left: 5px; '.($temp_item_quantity > 1 ? '' : ($temp_item_quantity > 0 ? 'color: #AA9393; ' : 'color: #A77D7D; ')).'"><sup style="position: relative: bottom: 1px;">x</sup> '.$temp_item_quantity.'</span>';
+          $temp_item_sprite['markup'] = '<span class="'.$temp_item_sprite['class'].' ability" style="'.$temp_item_sprite['style'].'">'.$temp_item_sprite['name'].'</span>';
+          $temp_item_sprite['markup'] .= '<span class="'.$temp_item_sprite['class'].' weapons" style="top: 35px; left: 5px; '.($temp_item_quantity > 1 ? '' : ($temp_item_quantity > 0 ? 'color: #AA9393; ' : 'color: #A77D7D; ')).'"><sup style="position: relative: bottom: 1px;">x</sup> '.$temp_item_quantity.'</span>';
           $temp_type_class = !empty($temp_item->ability_type) ? $temp_item->ability_type : 'none';
           if ($temp_type_class != 'none' && !empty($temp_item->ability_type2)){ $temp_type_class .= '_'.$temp_item->ability_type2; }
           elseif ($temp_type_class == 'none' && !empty($temp_item->ability_type2)){ $temp_type_class = $temp_item->ability_type2; }

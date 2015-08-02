@@ -1,6 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // -- DR. LIGHT PASSWORDS -- //
 
 // Collect the temp battle flags

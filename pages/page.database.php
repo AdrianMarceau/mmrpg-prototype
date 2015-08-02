@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * INDEX PAGE : DATABASE
  */
@@ -38,7 +37,7 @@ ob_start();
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
       <span class="subheader_typewrapper">
         <a class="inline_link" href="database/players/">Player Database </a>
-        <span class="count">( <?= !empty($mmrpg_database_players_count) ? ($mmrpg_database_players_count == 1 ? '1 Player' : $mmrpg_database_players_count.' Players') : '0 Players' ?> )</span>
+        <span class="count">( <?= $mmrpg_database_players_count_complete ?> / <?= !empty($mmrpg_database_players_count) ? ($mmrpg_database_players_count == 1 ? '1 Player' : $mmrpg_database_players_count.' Players') : '0 Players' ?> )</span>
         <a class="float_link" href="database/players/">View the Player Database &raquo;</a>
       </span>
     </h2>
@@ -51,7 +50,7 @@ ob_start();
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
       <span class="subheader_typewrapper">
         <a class="inline_link" href="database/robots/">Robot Database</a>
-        <span class="count">( <?= !empty($mmrpg_database_robots_count) ? ($mmrpg_database_robots_count == 1 ? '1 Robot' : $mmrpg_database_robots_count.' Robots') : '0 Robots' ?> )</span>
+        <span class="count">( <?= $mmrpg_database_robots_count_complete ?> / <?= !empty($mmrpg_database_robots_count) ? ($mmrpg_database_robots_count == 1 ? '1 Robot' : $mmrpg_database_robots_count.' Robots') : '0 Robots' ?> )</span>
         <a class="float_link" href="database/robots/">View the Robot Database &raquo;</a>
       </span>
     </h2>
@@ -64,7 +63,7 @@ ob_start();
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
       <span class="subheader_typewrapper">
         <a class="inline_link" href="database/mechas/">Mecha Database</a>
-        <span class="count">( <?= !empty($mmrpg_database_mechas_count) ? ($mmrpg_database_mechas_count == 1 ? '1 Mecha' : $mmrpg_database_mechas_count.' Mechas') : '0 Mechas' ?> )</span>
+        <span class="count">( <?= $mmrpg_database_mechas_count_complete ?> / <?= !empty($mmrpg_database_mechas_count) ? ($mmrpg_database_mechas_count == 1 ? '1 Mecha' : $mmrpg_database_mechas_count.' Mechas') : '0 Mechas' ?> )</span>
         <a class="float_link" href="database/mechas/">View the Mecha Database &raquo;</a>
       </span>
     </h2>
@@ -77,7 +76,7 @@ ob_start();
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
       <span class="subheader_typewrapper">
         <a class="inline_link" href="database/bosses/">Boss Database</a>
-        <span class="count">( <?= !empty($mmrpg_database_bosses_count) ? ($mmrpg_database_bosses_count == 1 ? '1 Boss' : $mmrpg_database_bosses_count.' Bosses') : '0 Bosses' ?> )</span>
+        <span class="count">( <?= $mmrpg_database_bosses_count_complete ?> / <?= !empty($mmrpg_database_bosses_count) ? ($mmrpg_database_bosses_count == 1 ? '1 Boss' : $mmrpg_database_bosses_count.' Bosses') : '0 Bosses' ?> )</span>
         <a class="float_link" href="database/bosses/">View the Boss Database &raquo;</a>
       </span>
     </h2>
@@ -90,7 +89,7 @@ ob_start();
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
       <span class="subheader_typewrapper">
         <a class="inline_link" href="database/abilities/">Ability Database</a>
-        <span class="count">( <?= !empty($mmrpg_database_abilities_count) ? ($mmrpg_database_abilities_count == 1 ? '1 Ability' : $mmrpg_database_abilities_count.' Abilities') : '0 Abilities' ?> )</span>
+        <span class="count">( <?= $mmrpg_database_abilities_count_complete ?> / <?= !empty($mmrpg_database_abilities_count) ? ($mmrpg_database_abilities_count == 1 ? '1 Ability' : $mmrpg_database_abilities_count.' Abilities') : '0 Abilities' ?> )</span>
         <a class="float_link" href="database/abilities/">View the Ability Database &raquo;</a>
       </span>
     </h2>
@@ -103,7 +102,7 @@ ob_start();
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
       <span class="subheader_typewrapper">
         <a class="inline_link" href="database/items/">Item Database</a>
-        <span class="count">( <?= !empty($mmrpg_database_items_count) ? ($mmrpg_database_items_count == 1 ? '1 Item' : $mmrpg_database_items_count.' Items') : '0 Items' ?> )</span>
+        <span class="count">( <?= $mmrpg_database_items_count_complete ?> / <?= !empty($mmrpg_database_items_count) ? ($mmrpg_database_items_count == 1 ? '1 Item' : $mmrpg_database_items_count.' Items') : '0 Items' ?> )</span>
         <a class="float_link" href="database/items/">View the Item Database &raquo;</a>
       </span>
     </h2>
@@ -116,7 +115,7 @@ ob_start();
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
       <span class="subheader_typewrapper">
         <a class="inline_link" href="database/fields/">Field Database </a>
-        <span class="count">( <?= !empty($mmrpg_database_fields_count) ? ($mmrpg_database_fields_count == 1 ? '1 Field' : $mmrpg_database_fields_count.' Fields') : '0 Fields' ?> )</span>
+        <span class="count">( <?= $mmrpg_database_fields_count_complete ?> / <?= !empty($mmrpg_database_fields_count) ? ($mmrpg_database_fields_count == 1 ? '1 Field' : $mmrpg_database_fields_count.' Fields') : '0 Fields' ?> )</span>
         <a class="float_link" href="database/fields/">View the Field Database &raquo;</a>
       </span>
     </h2>
@@ -215,7 +214,6 @@ ob_start();
 
 
 // Collect the buffer and define the page markup
-$this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
+$this_markup_body = trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 //$this_markup_body = trim(ob_get_clean());
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

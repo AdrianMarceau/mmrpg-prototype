@@ -4,7 +4,6 @@
 ob_start();
 
 // Predefine the player options markup
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $player_options_markup = '';
 foreach($allowed_edit_data AS $player_token => $player_info){
   $temp_player_battles = mmrpg_prototype_battles_complete($player_token);
@@ -13,7 +12,6 @@ foreach($allowed_edit_data AS $player_token => $player_info){
 }
 
 // Predefine the item options markup
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $item_options_markup = '';
 $item_options_markup .= '<option value="" data-label="No Item" title="No Item">- No Item -</option>';
 $item_options_markup .= '<optgroup label="Single-Use Items">';
@@ -50,37 +48,30 @@ foreach($allowed_edit_data AS $player_token => $player_info){
 $key_counter = 0;
 
 // Loop through and count each player's robot totals
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_robot_totals = array();
 foreach($allowed_edit_data AS $player_token => $player_info){
   $temp_robot_totals[$player_token] = !empty($player_info['player_robots']) ? count($player_info['player_robots']) : 0;
 }
 
 // Loop through the players in the ability edit data
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 foreach($allowed_edit_data AS $player_token => $player_info){
 
   // Collect the rewards for this player
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $player_rewards = mmrpg_prototype_player_rewards($player_token);
 
   // Check how many robots this player has and see if they should be able to transfer
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $counter_player_robots = !empty($player_info['player_robots']) ? count($player_info['player_robots']) : false;
   $counter_player_missions = mmrpg_prototype_battles_complete($player_info['player_token']);
   $allow_player_selector = $allowed_edit_player_count > 1 && $counter_player_missions > 0 ? true : false;
 
   // Loop through the player robots and display their edit boxes
   foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Update the robot key to the current counter
     $robot_key = $key_counter;
     // Make a backup of the player selector
     $allow_player_selector_backup = $allow_player_selector;
 
     // Collect this player's ability rewards and add them to the dropdown
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (!empty($_SESSION[$session_token]['values']['battle_abilities'])){ $player_ability_rewards = $_SESSION[$session_token]['values']['battle_abilities']; }
     elseif (!empty($player_rewards['player_abilities'])){ $player_ability_rewards = $player_rewards['player_abilities']; }
     else { $player_ability_rewards = array(); }
@@ -93,12 +84,10 @@ foreach($allowed_edit_data AS $player_token => $player_info){
       !empty($_REQUEST['robot']) && $_REQUEST['robot'] == $robot_info['robot_token']
       ){
 
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_editor_markup = mmrpg_robot::print_editor_markup($player_info, $robot_info);
       echo $temp_editor_markup;
 
       // Collect the contents of the buffer
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $edit_console_markup = ob_get_clean();
       $edit_console_markup = preg_replace('/\s+/', ' ', trim($edit_console_markup));
       exit($edit_console_markup);
@@ -115,7 +104,6 @@ foreach($allowed_edit_data AS $player_token => $player_info){
 }
 
 // Collect the contents of the buffer
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $edit_console_markup = ob_get_clean();
 $edit_console_markup = preg_replace('/\s+/', ' ', trim($edit_console_markup));
 exit($edit_console_markup);

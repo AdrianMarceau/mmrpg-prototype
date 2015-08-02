@@ -5,18 +5,15 @@
  */
 
 // Define the base omega factors for DR. LIGHT (MEGA MAN 1)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_items = array('item-energy-pellet','item-energy-capsule','item-weapon-pellet','item-weapon-capsule', 'item-energy-tank', 'item-weapon-tank', 'item-yashichi', 'item-extra-life');
 
 // Define the base omega factors for SYSTEM (MEGA MAN 0)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_system = array();
 $this_omega_factors_system[] = array('robot' => 'mega-man', 'field' => 'light-laboratory', 'type' => '');
 $this_omega_factors_system[] = array('robot' => 'bass', 'field' => 'wily-castle', 'type' => '');
 $this_omega_factors_system[] = array('robot' => 'proto-man', 'field' => 'cossack-citadel', 'type' => '');
 
 // Define the base omega factors for DR. LIGHT (MEGA MAN 1)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_one = array();
 $this_omega_factors_one[] = array('robot' => 'cut-man', 'field' => 'abandoned-warehouse', 'type' => 'cutter');
 $this_omega_factors_one[] = array('robot' => 'guts-man', 'field' => 'mountain-mines', 'type' => 'impact');
@@ -28,7 +25,6 @@ $this_omega_factors_one[] = array('robot' => 'time-man', 'field' => 'clock-citad
 $this_omega_factors_one[] = array('robot' => 'oil-man', 'field' => 'oil-wells', 'type' => 'earth');
 
 // Define the base omega factors for DR. WILY (MEGA MAN 2)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_two = array();
 $this_omega_factors_two[] = array('robot' => 'air-man', 'field' => 'sky-ridge', 'type' => 'wind');
 $this_omega_factors_two[] = array('robot' => 'bubble-man', 'field' => 'waterfall-institute', 'type' => 'water');
@@ -40,7 +36,6 @@ $this_omega_factors_two[] = array('robot' => 'quick-man', 'field' => 'undergroun
 $this_omega_factors_two[] = array('robot' => 'wood-man', 'field' => 'preserved-forest', 'type' => 'nature');
 
 // Define the base omega factors for DR. COSSACK (MEGA MAN 4)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_three = array();
 $this_omega_factors_three[] = array('robot' => 'bright-man', 'field' => 'lighting-control', 'type' => 'electric');
 $this_omega_factors_three[] = array('robot' => 'toad-man', 'field' => 'rainy-sewers', 'type' => 'water');
@@ -54,7 +49,6 @@ $this_omega_factors_three[] = array('robot' => 'skull-man', 'field' => 'robosaur
 // --- //
 
 // Define the expansion omega factors for DR. LIGHT (MEGA MAN 3)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_four = array();
 $this_omega_factors_four[] = array('robot' => 'needle-man', 'field' => 'construction-site', 'type' => 'cutter');
 $this_omega_factors_four[] = array('robot' => 'magnet-man', 'field' => 'magnetic-generator', 'type' => 'missile');
@@ -66,7 +60,6 @@ $this_omega_factors_four[] = array('robot' => 'spark-man', 'field' => 'power-pla
 $this_omega_factors_four[] = array('robot' => 'shadow-man', 'field' => 'septic-system', 'type' => 'shadow');
 
 // Define the expansion omega factors for DR. WILY (MEGA MAN 5)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_five = array();
 $this_omega_factors_five[] = array('robot' => 'stone-man', 'field' => 'field', 'type' => 'earth');
 $this_omega_factors_five[] = array('robot' => 'gravity-man', 'field' => 'field', 'type' => 'electric');
@@ -78,7 +71,6 @@ $this_omega_factors_five[] = array('robot' => 'napalm-man', 'field' => 'field', 
 $this_omega_factors_five[] = array('robot' => 'crystal-man', 'field' => 'crystal-catacombs', 'type' => 'crystal'); //'crystal'
 
 // Define the expansion omega factors for DR. COSSACK (MEGA MAN 6)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_six = array();
 $this_omega_factors_six[] = array('robot' => 'blizzard-man', 'field' => 'field', 'type' => 'freeze');
 //$this_omega_factors_six[] = array('robot' => 'centaur-man', 'field' => 'field', 'type' => 'time');
@@ -92,7 +84,6 @@ $this_omega_factors_six[] = array('robot' => 'yamato-man', 'field' => 'field', '
 // --- //
 
 // Define the expansion omega factors for DR. LIGHT (MEGA MAN 7)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_seven = array();
 $this_omega_factors_seven[] = array('robot' => 'freeze-man', 'field' => 'field', 'type' => 'freeze');
 //$this_omega_factors_seven[] = array('robot' => 'junk-man', 'field' => 'field', 'type' => 'earth');
@@ -104,7 +95,6 @@ $this_omega_factors_seven[] = array('robot' => 'freeze-man', 'field' => 'field',
 $this_omega_factors_seven[] = array('robot' => 'turbo-man', 'field' => 'field', 'type' => 'swift');
 
 // Define the expansion omega factors for DR. WILY (MEGA MAN 8)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_eight = array();
 //$this_omega_factors_eight[] = array('robot' => 'tengu-man', 'field' => 'field', 'type' => 'wind');
 //$this_omega_factors_eight[] = array('robot' => 'astro-man', 'field' => 'field', 'type' => 'space');
@@ -116,7 +106,6 @@ $this_omega_factors_eight = array();
 //$this_omega_factors_eight[] = array('robot' => 'aqua-man', 'field' => 'field', 'type' => 'water');
 
 // Define the expansion omega factors for DR. COSSACK (MEGA MAN 9)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_nine = array();
 $this_omega_factors_nine[] = array('robot' => 'concrete-man', 'field' => 'field', 'type' => 'earth');
 //$this_omega_factors_nine[] = array('robot' => 'tornado-man', 'field' => 'field', 'type' => 'wind');
@@ -128,7 +117,6 @@ $this_omega_factors_nine[] = array('robot' => 'hornet-man', 'field' => 'field', 
 $this_omega_factors_nine[] = array('robot' => 'galaxy-man', 'field' => 'field', 'type' => 'space');
 
 // Define the expansion omega factors for DR. LIGHT (MEGA MAN 10)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_ten = array();
 //$this_omega_factors_ten[] = array('robot' => 'blade-man', 'field' => 'field', 'type' => 'cutter');
 //$this_omega_factors_ten[] = array('robot' => 'pump-man', 'field' => 'field', 'type' => 'water');

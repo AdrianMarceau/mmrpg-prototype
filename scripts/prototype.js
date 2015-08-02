@@ -315,7 +315,6 @@ function windowResizePrototype(){
   $('.option_wrapper', thisPrototype).each(function(){
     var thisWrapper = $(this);
     thisWrapper.addClass('option_wrapper_full'); //.css({height:'auto',overflow:'hidden'});
-    //return true;
     var totalHeight = thisWrapper.height();
     var tempNewWrapperHeight = newWrapperHeight;
     var excludeElement = $('.option_this-team-select', thisWrapper);
@@ -434,9 +433,6 @@ function prototype_menu_loaded(){
   // If the nextMenu value is not empty, switch to the next menu tab
   if (gameSettings.nextStepName.length 
       && gameSettings.nextSlideDirection.length){    
-    // SWITCH TO NEXT MENU
-    //return false;
-    //alert('SWITCH TO NEXT MENU '+gameSettings.nextStepName);
     var bannerOverlay = $('.banner_overlay', thisPrototype);
     prototype_menu_switch({stepName:gameSettings.nextStepName,slideDirection:gameSettings.nextSlideDirection,onComplete:function(){
       gameSettings.nextStepName = false;

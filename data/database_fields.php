@@ -1,7 +1,4 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // FIELD DATABASE
 
 // Define the index of hidden fields to not appear in the database
@@ -31,7 +28,7 @@ foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
     unset($mmrpg_database_fields[$temp_token]);
   } else {
     // Ensure this field's image exists, else default to the placeholder
-    if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/fields/'.$temp_token.'/')){ $temp_info['field_image'] = $temp_token; }
+    if ($temp_info['field_flag_complete']){ $temp_info['field_image'] = $temp_token; }
     else { $temp_info['field_image'] = 'field'; }
   }
 
@@ -48,6 +45,7 @@ unset($temp_field_tokens);
 
 // Count the number of fields collected and filtered
 $mmrpg_database_fields_count = count($mmrpg_database_fields);
+$mmrpg_database_fields_count_complete = 0;
 
 // Loop through the database and generate the links for these fields
 $key_counter = 0;
@@ -72,6 +70,7 @@ foreach ($mmrpg_database_fields AS $field_key => $field_info){
   }
 
   // Collect the field sprite dimensions
+  $field_flag_complete = !empty($field_info['field_flag_complete']) ? true : false;
   $field_image_size = 50;
   $field_image_token = !empty($field_info['field_image']) ? $field_info['field_image'] : $field_info['field_token'];
   $field_image_incomplete = $field_image_token == 'field' ? true : false;
@@ -94,14 +93,13 @@ foreach ($mmrpg_database_fields AS $field_key => $field_info){
     </a>
   </div>
   <?
-  $mmrpg_database_fields_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
+  if ($field_flag_complete){ $mmrpg_database_fields_count_complete++; }
+  $mmrpg_database_fields_links .= ob_get_clean();
   $mmrpg_database_fields_links_counter++;
   $key_counter++;
 }
 
 // End the groups, however many there were
 $mmrpg_database_fields_links .= '</div>';
-
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 ?>

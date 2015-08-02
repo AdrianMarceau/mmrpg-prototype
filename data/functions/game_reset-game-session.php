@@ -1,7 +1,6 @@
 <?
 // Define a function for resetting the game session
 function mmrpg_reset_game_session($this_save_filepath){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Reference global variables
   global $mmrpg_index, $DB;
   //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
@@ -73,7 +72,6 @@ function mmrpg_reset_game_session($this_save_filepath){
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = 'dr-light';
 
     // Collect the robot index for calculation purposes
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
     // Unlock Mega Man as a playable character

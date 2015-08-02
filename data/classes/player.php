@@ -580,7 +580,6 @@ class mmrpg_player {
 
   // Define a static function for printing out the player's database markup
   public static function print_database_markup($player_info, $print_options = array()){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Define the markup variable
     $this_markup = '';
     // Require the actual data file
@@ -592,8 +591,6 @@ class mmrpg_player {
 
   // Define a static function for printing out the player's editor markup
   public static function print_editor_markup($player_info){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Define the markup variable
     $this_markup = '';
 

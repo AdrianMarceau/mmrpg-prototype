@@ -1,7 +1,4 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // ROBOT DATABASE
 
 // Define the index of counters for boss types
@@ -50,7 +47,7 @@ foreach ($mmrpg_database_bosses AS $temp_token => $temp_info){
     //die('<pre>$temp_info_after = '.print_r($temp_info, true).'</pre>');
 
     // Ensure this boss's image exists, else default to the placeholder
-    if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$temp_token.'/')){ $temp_info['robot_image'] = $temp_token; }
+    if ($temp_info['robot_flag_complete']){ $temp_info['robot_image'] = $temp_token; }
     else { $temp_info['robot_image'] = 'boss'; }
 
     // Modify the name of this boss if it is of the boss class
@@ -103,16 +100,6 @@ foreach ($mmrpg_database_bosses AS $temp_token => $temp_info){
   }
 }
 
-// DEBUG DEBUG DEBUG
-//die('<pre>$mmrpg_database_bosses : '.print_r($mmrpg_database_bosses, true).'</pre>');
-
-// Sort the boss type index based on values
-foreach ($mmrpg_database_bosses_types AS $token => $array){
-  asort($array);
-  $array = array_reverse($array, true);
-  //$mmrpg_database_bosses_types[$token] = $array;
-}
-
 // Determine the token for the very first boss in the database
 $temp_boss_tokens = array_values($mmrpg_database_bosses);
 $first_boss_token = array_shift($temp_boss_tokens);
@@ -121,6 +108,7 @@ unset($temp_boss_tokens);
 
 // Count the number of bosses collected and filtered
 $mmrpg_database_bosses_count = count($mmrpg_database_bosses);
+$mmrpg_database_bosses_count_complete = 0;
 
 // Define the max stat value before we filter and update
 if (!isset($mmrpg_stat_base_max_value)){ $mmrpg_stat_base_max_value = array(); }
@@ -154,6 +142,7 @@ foreach ($mmrpg_database_bosses AS $boss_key => $boss_info){
   }
   */
   // Collect the boss sprite dimensions
+  $boss_flag_complete = !empty($boss_info['robot_flag_complete']) ? true : false;
   $boss_image_size = !empty($boss_info['robot_image_size']) ? $boss_info['robot_image_size'] : 40;
   $boss_image_size_text = $boss_image_size.'x'.$boss_image_size;
   $boss_image_token = !empty($boss_info['robot_image']) ? $boss_info['robot_image'] : $boss_info['robot_token'];
@@ -178,7 +167,8 @@ foreach ($mmrpg_database_bosses AS $boss_key => $boss_info){
     </a>
   </div>
   <?
-  $mmrpg_database_bosses_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
+  if ($boss_flag_complete){ $mmrpg_database_bosses_count_complete++; }
+  $mmrpg_database_bosses_links .= ob_get_clean();
   $mmrpg_database_bosses_links_counter++;
   $key_counter++;
 }

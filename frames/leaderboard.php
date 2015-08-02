@@ -112,8 +112,6 @@ function windowResizeLeaderboard(){
         <?
 
         // Print out the generated leaderboard markup
-        //echo $this_leaderboard_markup;
-        //die('<pre>'.print_r($this_leaderboard_markup, true).'</pre>');
         if (!empty($this_leaderboard_markup)){
           $last_key = 0;
           foreach ($this_leaderboard_markup AS $key => $leaderboard_markup){

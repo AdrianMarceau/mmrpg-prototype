@@ -6,13 +6,11 @@ require_once('../top.php');
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Require the remote top in case we're in viewer mode
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 define('MMRPG_REMOTE_SKIP_INDEX', true);
 define('MMRPG_REMOTE_SKIP_DATABASE', true);
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 
 // Collect the session token
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
@@ -28,7 +26,6 @@ $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false
 
 // Include the prototype data for getting omega factors
 //require_once('../data/prototype.php');
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require_once('../data/prototype_omega.php');
 $temp_omega_factor_options = array();
 if (mmrpg_prototype_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
@@ -60,7 +57,6 @@ foreach ($battle_settings AS $player_token => $player_info){
 // -- COLLECT SETTINGS DATA -- //
 
 // Define the index of allowable players to appear in the edit
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $allowed_edit_players = array();
 $allowed_edit_data = array();
 foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){
@@ -79,8 +75,6 @@ $allowed_edit_player_count = !empty($allowed_edit_players) ? count($allowed_edit
 
 // Check if an action request has been sent with an field type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Collect the field variables from the request header, if they exist
   $temp_key = !empty($_REQUEST['key']) ? $_REQUEST['key'] : 0;
   $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
@@ -91,7 +85,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
   //die(print_r($_REQUEST, true));
 
   // Collect this player's current field selection from the omega session
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_session_key = $temp_player.'_target-robot-omega_prototype';
   $temp_this_item_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
   $temp_fields = array();
@@ -103,7 +96,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
   // If requested new field was an empty string, remove the previous value
   if (empty($temp_field)){
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // If this was the last field, do nothing with this request
     if (count($temp_fields) <= 1){ die('success|remove-last|'.implode(',', $temp_fields)); }
     // Unset the requested key in the array
@@ -123,7 +115,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
   // Otherwise if this was a shuffle request
   elseif ($temp_field == 'shuffle'){
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Shuffle fields, simple as that
     shuffle($temp_fields);
     // Create a new array to hold the full field settings and populate
@@ -157,7 +148,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
   // Otherwise if this was a randomize request
   elseif ($temp_field == 'randomize'){
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Collect a copy of the available fields and then shuffle them
     $temp_available_fields = $temp_omega_factor_options;
     shuffle($temp_available_fields);
@@ -200,7 +190,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
   // Otherwise, if there was a new field provided, update it in the array
   elseif (!in_array($temp_field, $temp_fields)){
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update this position in the array with the new field
     $temp_fields[$temp_key] = $temp_field;
     // Create a new array to hold the full field settings and populate
@@ -233,7 +222,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
   // Otherwise, if this field already exists, swap position in array
   elseif (in_array($temp_field, $temp_fields)){
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update this position in the array with the new field
     $this_slot_key = $temp_key;
     $this_slot_value = $temp_fields[$temp_key];
@@ -271,7 +259,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
 
   } else {
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Collect the available star counts for this player
     $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
     // Produce an error show this field has already been selected
@@ -285,7 +272,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
 // -- RECOLLECT SETTINGS DATA -- //
 
 // Define the index of allowable players to appear in the edit
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $allowed_edit_players = array();
 $allowed_edit_data = array();
 foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){
@@ -305,8 +291,6 @@ $allowed_edit_player_count = !empty($allowed_edit_players) ? count($allowed_edit
 
 // Generate the canvas markup for this page
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Start the output buffer
   ob_start();
 
@@ -340,8 +324,6 @@ if (true){
 
 // Generate the console markup for this page
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Start the output buffer
   ob_start();
 
@@ -354,7 +336,6 @@ if (true){
   }
 
   // Loop through the allowed edit data for all players
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $key_counter = 0;
 
   // Loop through and count each player's player totals
@@ -366,7 +347,6 @@ if (true){
   /*
   // Include the prototype data for getting omega factors
   //require_once('../data/prototype.php');
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require_once('../data/prototype_omega.php');
   $temp_omega_factor_options = array();
   if (mmrpg_prototype_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
@@ -381,12 +361,10 @@ if (true){
   foreach($allowed_edit_data AS $player_token => $player_info){
 
     // Collect the rewards for this player
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $player_rewards = mmrpg_prototype_player_rewards($player_token);
 
     // Auto-populate the player fields array with appropriate values
     if (empty($player_rewards['player_fields'])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       // Define the player fields array and prepare to populate
       $player_rewards['player_fields'] = array();
       // Loop through and add all the MM1 fields
@@ -400,7 +378,6 @@ if (true){
     /*
     // Auto-populate the player items array with appropriate values
     if (!empty($_SESSION[$session_token]['values']['battle_items'])){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$_SESSION[$session_token][\'values\'][\'battle_items\'] = <pre>'.print_r($_SESSION[$session_token]['values']['battle_items'], true).'</pre>');  }
       // Define the player items array and prepare to populate
       $player_rewards['player_items'] = array();
       // Loop through and add all the collected items as options
@@ -415,7 +392,6 @@ if (true){
     */
 
     // Check how many players this player has and see if they should be able to transfer
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $counter_player_players = !empty($player_info['player_players']) ? count($player_info['player_players']) : false;
     $counter_player_missions = mmrpg_prototype_battles_complete($player_info['player_token']);
     $allow_player_selector = $player_counter > 1 && $counter_player_missions > 0 ? true : false; //$counter_player_players > 1 && $player_counter > 1 ? true : false;
@@ -433,17 +409,14 @@ if (true){
     $allow_player_selector_backup = $allow_player_selector;
     // Collect this player's field rewards and add them to the dropdown
     $player_field_rewards = !empty($player_rewards['player_fields']) ? $player_rewards['player_fields'] : array();
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$player_field_rewards = <pre>'.print_r($player_field_rewards, true).'</pre>');  }
     // Collect this player's item rewards and add them to the dropdown
     $player_item_rewards = !empty($player_rewards['player_items']) ? $player_rewards['player_items'] : array();
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$player_item_rewards = <pre>'.print_r($player_item_rewards, true).'</pre>');  }
     //if (!empty($player_field_rewards)){ sort($player_field_rewards); }
 
     // DEBUG
     //die(print_r($player_rewards, true));
 
     // Collect and print the editor markup for this player
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_editor_markup = mmrpg_player::print_editor_markup($player_info);
     echo $temp_editor_markup;
 
@@ -455,7 +428,6 @@ if (true){
   }
 
   // Collect the contents of the buffer
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $edit_console_markup = ob_get_clean();
   $edit_console_markup = preg_replace('/\s+/', ' ', trim($edit_console_markup));
 
@@ -464,8 +436,6 @@ if (true){
 // Generate the edit markup using the battles settings and rewards
 $this_edit_markup = '';
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Prepare the output buffer
   ob_start();
 
@@ -476,7 +446,6 @@ if (true){
   unset($temp_player_tokens);
 
   // Start generating the edit markup
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   ?>
 
   <span class="header block_1">Player <?= $global_allow_editing ? 'Editor' : 'Viewer' ?> (<?= $allowed_edit_player_count == 1 ? '1 Player' : $allowed_edit_player_count.' Players' ?>)</span>
@@ -511,12 +480,9 @@ if (true){
   <?
 
   // Collect the output buffer content
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_edit_markup = preg_replace('#\s+#', ' ', trim(ob_get_clean()));
 }
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>
 <!DOCTYPE html>
 <html>

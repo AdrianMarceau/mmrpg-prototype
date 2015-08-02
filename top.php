@@ -49,9 +49,6 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   }
 }
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Include mandatory class files
 require('data/classes/battle.php');
 require('data/classes/field.php');
@@ -60,34 +57,15 @@ require('data/classes/robot.php');
 require('data/classes/ability.php');
 require('data/classes/item.php');
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Include mandatory function files
 require('data/functions/system.php');
 require('data/functions/website.php');
 require('data/functions/game.php');
 require('data/functions/prototype.php');
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-
-/*
- * GLOBAL OBJECT INITIALIZATION
- */
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-
 /*
  * LIBRARY INDEXES
  */
-
-// Update message script killer
-//die('<pre>'.print_r($_SESSION, true).'</pre>');
-//die('Updating... Please check back in a few minutes. <br />'.date('Y-m-d H:i:s', time()));
 
 // If we're in a file page, prevent userinfo caching
 if (preg_match('/file.php$/i', basename(__FILE__))){
@@ -103,9 +81,6 @@ require('data/players/_index.php');
 //require('data/robots/_index.php');
 //require('data/abilities/_index.php');
 require('data/types/_index.php');
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Turn off magic quotes before it causes and problems
 if (get_magic_quotes_gpc()){
@@ -137,9 +112,6 @@ if (!isset($_SESSION['ROBOTS'])){ $_SESSION['ROBOTS'] = array(); }
 if (!isset($_SESSION['ABILITIES'])){ $_SESSION['ABILITIES'] = array(); }
 // Define the COMMUNITY session trackers if they do not exist
 if (!isset($_SESSION['COMMUNITY'])){ $_SESSION['COMMUNITY']['threads_viewed'] = array(); }
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 /*
  * BROWSER FLAGS
@@ -174,9 +146,6 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
   $this_cache_dir = MMRPG_CONFIG_ROOTDIR.'data/cache/';
   // Define the game save location path
   $this_save_dir = MMRPG_CONFIG_ROOTDIR.'data/saves/';
-
-  // DEBUG DEBUG DEBUG
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // If the user and file details have already been loaded to the session
   if (
@@ -213,15 +182,6 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Update the global save path variable
     $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
   }
-
-  //  DEBUG DEBUG DEBUG
-  //mmrpg_reset_game_session($this_save_filepath);
-
-  // DEBUG DEBUG DEBUG
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-  //die('<pre>$_GET : '.print_r($_GET, true).'</pre>');
-  //die($this_save_filepath);
 
 }
 
@@ -306,10 +266,6 @@ $_GET['this_current_url'] = $this_current_url; //urlencode($this_current_url);
 // Now that all the redirecting is done, if the current page it totally empty, it's ACTUALLY home
 if (empty($this_current_page) || !in_array($this_current_page, $this_allowed_pages)){ $this_current_page = 'home'; }
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-
 /*
  * USERINFO COLLECTION
  */
@@ -329,9 +285,6 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
       $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
     }
 
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     if (!defined('MMRPG_SCRIPT_REQUEST')){
       $this_boardinfo = $DB->get_array("SELECT * FROM mmrpg_leaderboard WHERE user_id = {$this_userid}");
       $this_boardid = $this_boardinfo['board_id'];
@@ -339,9 +292,6 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
       //if (empty($this_boardinfo['board_rank'])){ require('data/leaderboard.php'); $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank']; }
       if (empty($this_boardinfo['board_rank'])){ $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'] = mmrpg_prototype_leaderboard_rank($this_userid); }
     }
-
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   }
   // Otherwise, generate some details user details
@@ -356,22 +306,13 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
       $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
     }
 
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     if (!defined('MMRPG_SCRIPT_REQUEST')){
       $this_boardinfo = array();
       $this_boardinfo['board_rank'] = 0;
       $this_boardid = 0;
     }
 
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   }
-
-  // DEBUG DEBUG DEBUG
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 } else {
   // Create the userinfo array anyway to prevent errors
@@ -401,33 +342,6 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   define('MMRPG_SETTINGS_CURRENT_FIELDMECHA', (!empty($temp_field_data['field_mechas']) ? $temp_field_data['field_mechas'][0] : 'met'));
   //die('$temp_field_type = '.$temp_field_type.'; MMRPG_SETTINGS_CURRENT_FIELDTYPE = '.MMRPG_SETTINGS_CURRENT_FIELDTYPE);
 
-  // DEBUG DEBUG DEBUG
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 }
-
-/*
-
-SELECT user_id, COUNT(thread_id) AS thread_count FROM mmrpg_threads WHERE mmrpg_threads.thread_target = 0 AND thread_published = 1 GROUP BY mmrpg_threads.user_id
-
-// DEBUG DEBUG DEBUG
-$this_user_countindex = $DB->get_array_list('SELECT
-  mmrpg_users.user_id,
-  mmrpg_leaderboard.board_points,
-  mmrpg_threads.thread_count,
-  mmrpg_posts.post_count
-  FROM mmrpg_users
-  LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_users.user_id
-  LEFT JOIN (
-  SELECT user_id, COUNT(thread_id) AS thread_count FROM mmrpg_threads WHERE mmrpg_threads.thread_target = 0 AND thread_published = 1 GROUP BY mmrpg_threads.user_id
-  ) mmrpg_threads ON mmrpg_threads.user_id = mmrpg_users.user_id
-  LEFT JOIN (
-  SELECT user_id, COUNT(post_id) AS post_count FROM mmrpg_posts WHERE mmrpg_posts.post_target = 0 AND post_deleted = 0 GROUP BY mmrpg_posts.user_id
-  ) mmrpg_posts ON mmrpg_posts.user_id = mmrpg_users.user_id
-  WHERE mmrpg_leaderboard.board_points > 0', 'user_id');
-unset($DB);
-exit('<pre>'.print_r($this_user_countindex, true).'</pre>');
-
-*/
 
 ?>

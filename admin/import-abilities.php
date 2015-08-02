@@ -77,7 +77,6 @@ if (!empty($mmrpg_index['abilities'])){
 // -- MMRPG IMPORT ABILTIIES -- //
 
 // Sort the ability index based on ability number
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_pattern_first = array();
 $temp_pattern_first[] = '/^(buster-shot)$/i';
 $temp_pattern_first[] = '/^(buster-charge)$/i';
@@ -158,7 +157,6 @@ $temp_boost_pattern = '/^('.$temp_stat_types.')-('.$temp_boost_types.')$/i';
 $temp_break_pattern = '/^('.$temp_stat_types.')-('.$temp_boost_types.')$/i';
 
 $temp_pattern_last = array_reverse($temp_pattern_last);
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 function mmrpg_index_sort_abilities($ability_one, $ability_two){
   // Pull in global variables
   global $mmrpg_index, $temp_pattern_first, $temp_pattern_last, $temp_element_types, $temp_boost_types, $temp_break_types;

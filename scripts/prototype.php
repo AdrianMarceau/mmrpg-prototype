@@ -5,9 +5,6 @@ define('MMRPG_SCRIPT_REQUEST', true);
 // Require the application top file
 require_once('../top.php');
 
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Collect the request data from the headers
 $this_data_step = !empty($_REQUEST['step']) ? $_REQUEST['step'] : false;
 $this_data_select = !empty($_REQUEST['select']) ? $_REQUEST['select'] : false;
@@ -28,14 +25,8 @@ foreach ($this_data_condition AS $key => $string){
   $this_data_condition[$key] = str_replace('%3d', '=', $string);
 }
 
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Otherwise, require the prototype data file
 require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype.php');
-
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Start the output buffer
 ob_start();
@@ -45,54 +36,35 @@ switch ($this_data_select){
 
   // If this was a PLAYERS request type, print out the players
   case 'this_player_token': {
-    
+
     // Require the prototype players display file
     require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_players.php');
-    
-    // DEBUG
-    //exit('success:players-requested');
-  
-    // DEBUG DEBUG DEBUG
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Break automatically to prevent looping
     break;
-    
+
   }
-  
+
   // If this was a MISSIONS request type, print out the missions
   case 'this_battle_token': {
-    
+
     // Require the prototype missions display file
     require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_missions.php');
-    
-    // DEBUG
-    //exit('missions-requested:'.print_r($this_data_condition, true));
-  
-    // DEBUG DEBUG DEBUG
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Break automatically to prevent looping
     break;
   }
-  
+
   // If this was a ROBOTS request type, print out the robots
   case 'this_player_robots': {
-    
+
     // Require the prototype robots display file
     require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_robots.php');
-    
-    // DEBUG
-    //exit('success:robots-requested');
-  
-    // DEBUG DEBUG DEBUG
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
-    
+
     // Break automatically to prevent looping
     break;
   }
-  
+
 }
 
 // Collect the buffer contents

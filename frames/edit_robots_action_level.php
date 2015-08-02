@@ -1,14 +1,9 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Collect the ability variables from the request header, if they exist
 $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
 $temp_robot = !empty($_REQUEST['robot']) ? $_REQUEST['robot'] : '';
 // If key variables are not provided, kill the script in error
 if (empty($temp_player) || empty($temp_robot)){ die('error|request-error|'.preg_replace('/\s+/', ' ', print_r($_REQUEST, true))); }
-
-//die(print_r($_REQUEST, true));
 
 // Ensure this robot exists in the current game session
 if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot])

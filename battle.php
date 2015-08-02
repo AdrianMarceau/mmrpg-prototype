@@ -4,13 +4,7 @@ require_once('top.php');
 // Require the starforce data files
 require_once('data/starforce.php');
 
-//$GLOBALS['DEBUG']['checkpoint_line'] = 'battle.php : line 5';
-
-// Automatically unset the session variable
-// on index page load (for testing)
-//session_unset();
-
-//// Automatically empty all temporary battle variables
+// Automatically empty all temporary battle variables
 $_SESSION['BATTLES'] = array();
 $_SESSION['FIELDS'] = array();
 $_SESSION['PLAYERS'] = array();
@@ -64,10 +58,7 @@ if (!empty($this_field_token) && isset($mmrpg_index_fields[$this_field_token])){
 elseif (!empty($this_battle_data['battle_field_base']['field_token']) && isset($mmrpg_index_fields[$this_battle_data['battle_field_base']['field_token']])){
   $this_field_data1 = mmrpg_field::parse_index_info($mmrpg_index_fields[$this_battle_data['battle_field_base']['field_token']]);
   $this_field_data2 = $this_battle_data['battle_field_base'];
-  //die('test1 = $this_field_data = <pre>'.print_r($this_field_data, true).'</pre> $this_field_data2 = <pre>'.print_r($this_field_data2, true).'</pre>');
   $this_field_data = array_merge($this_field_data1, $this_field_data2);
-  //$this_field_data = mmrpg_field::parse_index_info($this_field_merged);
-  //die('test2 = $this_field_data = <pre>'.print_r($this_field_data, true).'</pre>');
   if (empty($this_field_data['field_id'])){
     $this_field_id = !empty($this_field_id) ? $this_field_id : 1;
     $this_field_data['field_id'] = $this_field_id;
@@ -101,9 +92,6 @@ if (!empty($this_player_token) && isset($mmrpg_index['players'][$this_player_tok
     }
     $this_player_robots = implode(',', $allowed_robots);
     $this_player_data['player_robots'] = array_values($this_player_data['player_robots']);
-    //die('<pre>'.print_r($this_player_robots, true).'</pre>');
-    //die('<pre>'.print_r($allowed_robots, true).'</pre>');
-    //die('<pre>'.print_r($this_player_data, true).'</pre>');
   }
 }
 else {
@@ -131,12 +119,10 @@ elseif (!empty($this_battle_data['battle_target_player']['player_token']) && iss
     $target_player_data['player_id'] = $target_player_id;
   }
   if (empty($target_player_robots) && !empty($this_battle_data['battle_target_player'])){
-    //die('<pre>'.print_r($this_battle_data, true).'</pre>');
     $target_player_data['player_robots'] = array();
     foreach ($this_battle_data['battle_target_player']['player_robots'] AS $key => $data){
       $target_player_data['player_robots'][] = $data;
     }
-    //die('<pre>'.print_r($target_player_data, true).'</pre>');
   }
 }
 else {
@@ -306,7 +292,6 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
           }
           $foreground_data_animate = count($foreground_animate) > 1 ? implode(',', $foreground_animate) : false;
           // Display the markup of the foreground layer
-          //echo '<div class="animate_fadein foreground_canvas foreground foreground_'.$foreground_animate[0].'" data-frame="'.$foreground_animate['0'].'" '.(!empty($foreground_data_animate) ? 'data-animate="'.$foreground_data_animate.'"' : '').' style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
           echo '<div class="animate_fadein foreground_canvas foreground foreground_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
 
           // Check if this field has a fusion star in it
@@ -325,7 +310,6 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
             $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
 
             // Append the new field star to the foreground attachment array
-            //die('$this_field_data = <pre>'.print_r($this_field_data, true).'</pre>');
             $this_field_data['field_foreground_attachments']['field-star-back'] = array(
               'class' => 'ability',
               'size' => 80,
@@ -354,7 +338,6 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
           }
 
           // Loop through and display the markup of any foreground attachments
-          //die('$this_field_data[field_foreground_attachments] = <pre>'.print_r($this_field_data['field_foreground_attachments'], true).'</pre>');
           if (!empty($this_field_data['field_foreground_attachments'])){
             echo '<div class="animate_fadein foreground_event event clearback sticky" style="z-index: 60; border-color: transparent;">';
             $this_key = -1;
@@ -395,12 +378,6 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
               $this_direction = $this_info[$this_class.'_direction'];
               $this_float = $this_direction == 'left' ? 'right' : 'left';
               echo '<div data-id="foreground_attachment_'.$this_id.'" ';
-              if ($this_id == 'field-star-front' && !empty($temp_star_text)){
-                //$temp_star_title = $temp_star_name.' <hr />'.$temp_star_text;
-                //$temp_star_title_plain = strip_tags(str_replace('<br />', '&#10;', $temp_star_title));
-                //$temp_star_title_tooltip = htmlentities($temp_star_title, ENT_QUOTES, 'UTF-8');
-                //echo 'title="'.$temp_star_title_plain.'" data-tooltip="'.$temp_star_title_tooltip.'" ';
-              }
               echo 'class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" data-type="attachment" data-position="foreground" data-size="'.$this_size.'" data-direction="'.$this_direction.'" data-frame="'.$this_frame.'" '.(!empty($this_animate_enabled) ? 'data-animate="'.$this_animate.'"' : '').' '.(!empty($this_animate_shift) ? 'data-animate-shift="'.$this_animate_shift.'"' : '').' style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_image.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '').'">'.$this_text.'</div>';
             }
             echo '</div>';
@@ -482,21 +459,6 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 
       </div>
 
-      <?/*?>
-      <div class="canvas_overlay_footer canvas_overlay_hidden" style="">
-
-      <?
-      // Print out damage mulitpliers that exist for this field
-      if (!empty($this_field_data['field_multipliers'])){
-        foreach ($this_field_data['field_multipliers'] AS $this_type => $this_multiplier){
-          echo '<span class="field_multiplier field_multiplier_'.$this_type.' field_type field_type_'.$this_type.'" style="">'.ucfirst($this_type).' <span class="cross" style="">x</span> '.number_format($this_multiplier, 1).'</span>';
-        }
-      }
-      ?>
-
-      </div>
-      <?*/?>
-
     </div>
   </div>
 
@@ -512,13 +474,6 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
         <a class="button action_loading button_disabled" type="button"><label>Loading...</label></a>
       </div>
     </div>
-    <?/*
-    <div id="actions_start" class="wrapper">
-      <div class="main_actions">
-        <a class="button action_start" type="button" data-action="start"><label>Start!</label></a>
-      </div>
-    </div>
-    */?>
     <div id="actions_battle" class="actions_battle wrapper"></div>
     <div id="actions_ability" class="actions_ability wrapper"></div>
     <div id="actions_item" class="actions_ability actions_item wrapper"></div>
@@ -555,7 +510,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
       <div class="sub_actions"><a data-order="3" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
     </div>
     <div id="actions_settings_eventTimeout" class="actions_settings actions_settings_eventTimeout wrapper">
-      <div class="main_actions">
+      <div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Speed</span>
         <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_eventTimeout_1600"><label><span class="multi">Super&nbsp;Slow<br />(1f/1600ms)</span></label></a>
         <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_eventTimeout_1250"><label><span class="multi">Medium&nbsp;Slow<br />(1f/1250ms)</span></label></a>
         <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_eventTimeout_1000"><label><span class="multi">Normal&nbsp;Slow<br />(1f/1000ms)</span></label></a>

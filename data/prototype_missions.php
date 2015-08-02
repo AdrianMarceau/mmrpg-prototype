@@ -3,15 +3,11 @@
  * DEMO MISSION SELECT
  */
 if (!empty($_SESSION[$session_token]['DEMO'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // DEBUG
   //echo 'checkpoint_'.__LINE__.'<br />';
 
   // Only print out Light's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-light', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // DEBUG
     //echo 'checkpoint_'.__LINE__.'<br />';
 
@@ -28,22 +24,16 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
  * NORMAL MISSION SELECT
  */
 else {
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // DEBUG
   //echo 'checkpoint_'.__LINE__.'<br />';
 
   // Only print out Light's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-light', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // DEBUG
     //echo 'checkpoint_'.__LINE__.'<br />';
 
     // Print out the normal mode's mission select screen for Dr. Light
     if ($unlock_flag_light){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // DEBUG
       //echo 'checkpoint_'.__LINE__.('$prototype_start_link = '.$prototype_start_link.'').'<br />';
 
@@ -113,15 +103,11 @@ else {
 
   // Only print out Wily's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-wily', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // DEBUG
     //echo 'checkpoint_'.__LINE__.'<br />';
 
     // Print out the normal mode's mission select screen for Dr. Wily
     if ($unlock_flag_wily){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // DEBUG
       //echo 'checkpoint_'.__LINE__.('$prototype_start_link = '.$prototype_start_link.'').'<br />';
 
@@ -186,15 +172,11 @@ else {
 
   // Only print out Cossack's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-cossack', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // DEBUG
     //echo 'checkpoint_'.__LINE__.'<br />';
 
     // Print out the normal mode's mission select screen for Dr. Cossack
     if ($unlock_flag_cossack){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
       // DEBUG
       //echo 'checkpoint_'.__LINE__.('$prototype_start_link = '.$prototype_start_link.'').'<br />';
 

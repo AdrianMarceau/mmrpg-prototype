@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * INDEX PAGE : COMMUNITY
  */
@@ -28,21 +27,17 @@ $this_markup_header = 'Mega Man RPG Prototype Community';
 
 // Collect this player's battle point total
 if (empty($_SESSION[mmrpg_game_token()]['DEMO'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $community_battle_points = mmrpg_prototype_battle_points();
 } else {
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $community_battle_points = 0;
 }
 
 // Collect all the categories from the index
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_categories_index = mmrpg_website_community_index();
 $this_categories_index_tokens = array();
 foreach ($this_categories_index AS $token => $info){ $this_categories_index_tokens[$info['category_id']] = $token; }
 
 // Include the community form actions
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require_once('pages/page.community_actions.php');
 
 
@@ -62,7 +57,6 @@ if ($this_current_id !== false && !empty($this_current_token)){ $this_current_vi
 // If a specific category has been requested, collect its info
 $this_category_info = array();
 if (!empty($this_current_cat) && !empty($this_categories_index[$this_current_cat])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Collect this specific category from the database index
   $this_category_info = $this_categories_index[$this_current_cat];
 }
@@ -71,8 +65,6 @@ if (!empty($this_current_cat) && !empty($this_categories_index[$this_current_cat
 $this_thread_info = array();
 // If this is a new thread, collect default info
 if (empty($this_current_id) && $this_current_token == 'new'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Collect this specific thread from the database
   $this_thread_query = "SELECT threads.*
   	FROM mmrpg_threads AS threads
@@ -87,8 +79,6 @@ if (empty($this_current_id) && $this_current_token == 'new'){
 
 }
 elseif (!empty($this_current_id) && !empty($this_current_token)){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Collect this specific thread from the database
   $this_thread_query = "SELECT threads.*,
     users.user_id,
@@ -118,7 +108,6 @@ elseif (!empty($this_current_id) && !empty($this_current_token)){
   // If this thread has not already been viewed this session, increment the counter
   $temp_session_key = 'mmrpg_thread_viewed_'.$this_thread_info['thread_id'];
   if (empty($_SESSION[$temp_session_key])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_current_views = $this_thread_info['thread_views'];
     $temp_new_views = $temp_current_views + 1;
     $temp_update_session = $DB->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
@@ -140,30 +129,23 @@ echo '<div class="community">';
 
 // If the current view is a specific thread
 if ($this_current_view == 'thread'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Check if we're creating a new thread or not
   if (
   (empty($this_current_id) && $this_current_token == 'new') ||
   (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'edit' && !empty($_REQUEST['thread_id']))
   ){
     // Require the community thread view
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     require_once('page.community_thread_new.php');
   } else {
     // Require the community thread view
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     require_once('page.community_thread.php');
   }
 
 }
 // Else if the current view is the category listing
 elseif ($this_current_view == 'category' && empty($this_current_sub)){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Prevent logged-out users from viewing personal messages
   if ($this_userid == MMRPG_SETTINGS_GUEST_ID && ($this_current_cat == 'personal' || $this_current_cat == 'chat')){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     header('Location: '.MMRPG_CONFIG_ROOTURL.'community/');
     exit();
   }
@@ -174,7 +156,6 @@ elseif ($this_current_view == 'category' && empty($this_current_sub)){
   if ($this_current_cat == 'chat'){
 
     // Require the community chat view
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     require_once('page.community_chat.php');
 
   }
@@ -182,7 +163,6 @@ elseif ($this_current_view == 'category' && empty($this_current_sub)){
   else {
 
     // Require the community category view
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     require_once('page.community_category.php');
 
   }
@@ -192,7 +172,6 @@ elseif ($this_current_view == 'category' && empty($this_current_sub)){
 elseif ($this_current_view == 'category' && $this_current_sub == 'new'){
 
   // Require the community category recent view
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require_once('page.community_category_recent.php');
 
 }
@@ -200,49 +179,14 @@ elseif ($this_current_view == 'category' && $this_current_sub == 'new'){
 elseif ($this_current_view == 'index'){
 
   // Require the community thread view
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   require_once('page.community_index.php');
 
 }
 
 // End the community tags
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 echo '</div>';
 
 // Collect the buffer and define the page markup
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_markup_body = trim(ob_get_clean());
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-//$this_markup_body = str_replace("\n", '\\n', $this_markup_body);
-//$this_markup_body = preg_replace('#\s+#', ' ', $this_markup_body);
-//$this_markup_body = str_replace(' \\n', "\n", $this_markup_body);
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
-// DEBUG
-
-//$this_markup_body = '';
-//$this_markup_body .= '<pre class="debug">$_GET<br />'.htmlentities(print_r($_GET, true), ENT_QUOTES, 'UTF-8', true).'</pre>';
-//$this_markup_body .= '<pre class="debug">$_POST<br />'.htmlentities(print_r($_POST, true), ENT_QUOTES, 'UTF-8', true).'</pre>';
-//$this_markup_body .= '<pre class="debug">'.htmlentities(print_r($insert_threads_array, true), ENT_QUOTES, 'UTF-8', true).'</pre>';
-//$this_markup_body .= '<pre class="debug">'.htmlentities(print_r($this_userinfo, true), ENT_QUOTES, 'UTF-8', true).'</pre>';
-//if (!empty($this_thread_info)){ $this_markup_body .= '<pre class="debug">$this_update_threads<br />'.htmlentities(print_r($this_thread_info, true), ENT_QUOTES, 'UTF-8', true).'</pre>'; }
-//if (!empty($this_update_threads)){ $this_markup_body .= '<pre class="debug">$this_update_threads<br />'.htmlentities(print_r($this_update_threads, true), ENT_QUOTES, 'UTF-8', true).'</pre>'; }
-//return;
-
-/*
-// Start the output buffer again
-ob_start();
-?>
-<script type="text/javascript">
-$(document).ready(function(){
-
-
-  });
-</script>
-<?
-// Collect the buffer and define the page markup
-$this_markup_body .= trim(ob_get_clean());
-*/
-
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>
