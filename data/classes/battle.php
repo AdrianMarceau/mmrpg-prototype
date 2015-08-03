@@ -1070,6 +1070,9 @@ class mmrpg_battle {
 
       }
 
+      // Update just to be sure
+      $temp_robot->update_session();
+
     }
 
     // Return true on success
