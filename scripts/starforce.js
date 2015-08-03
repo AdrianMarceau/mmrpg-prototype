@@ -171,6 +171,8 @@ function windowResizeStarforce(){
   thisPrototype.css({height:windowHeight+'px'});
   
   // Refresh the starforce elements
+  thisPageLinksSide.attr('data-key', 0);
+  thisPageLinksTop.attr('data-key', 0);
   refreshStarforceContainers();
 
 }
