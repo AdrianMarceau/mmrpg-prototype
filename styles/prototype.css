@@ -24,6 +24,7 @@ body.prototype {
   ); 
   background-color: transparent;
   z-index: 20;
+  pointer-events: none;
 }
 #prototype {
   margin: 0 auto;
