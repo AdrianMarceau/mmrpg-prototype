@@ -154,8 +154,13 @@ foreach ($battle_options_reversed AS $this_key => $this_info){
 
       // If this is a field star, we can add sprite normally
       if ($temp_star_kind == 'field'){
-        $temp_star_sprite = array('path' => 'abilities/item-star-'.$temp_field_type_1, 'size' => 40, 'frame' => 0);
-        array_unshift($this_battleinfo['battle_sprite'], $temp_star_sprite);
+
+        $temp_star_back_info = mmrpg_prototype_star_image($temp_field_type_1);
+        $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
+        $temp_star_back = array('path' => 'abilities/item-star-base-'.$temp_star_front_info['sheet'], 'size' => 40, 'frame' => $temp_star_front_info['frame']);
+        $temp_star_front = array('path' => 'abilities/item-star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'], 'size' => 40, 'frame' => $temp_star_back_info['frame']);
+        array_unshift($this_battleinfo['battle_sprite'], $temp_star_back, $temp_star_front);
+
       }
       // Otherwise, if this is a fusion star, add it in layers
       elseif ($temp_star_kind == 'fusion'){
