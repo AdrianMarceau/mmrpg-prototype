@@ -88,18 +88,19 @@ function mmrpg_prototype_mission_double($this_prototype_data, $this_robot_tokens
   // Define both the starforce and darkness battles to false
   $temp_darkness_battle = false;
   $temp_starforce_battle = false;
-  // If this battle has not been completed or the robot not unlocked
-  if (!$temp_prototype_complete || !$temp_battle_complete || !$temp_master_unlocked || !$temp_master_unlocked2){
-    // Prevent mods to this battle until fully complete
-    $temp_darkness_battle = false;
-    $temp_starforce_battle = false;
+
+  // If the prototype is complete, this can be a starforce battle
+  if ($temp_prototype_complete && $temp_field_star_present){
+    $temp_starforce_battle = true;
   }
-  // Otherwise, if the user has both completed the battle and unlocked the master
-  elseif ($temp_prototype_complete && $temp_battle_complete && $temp_master_unlocked && $temp_master_unlocked2){
-    // If a field star is present, this is a starforce battle
-    if ($temp_field_star_present){ $temp_starforce_battle = true; }
-    // Otherwise, after the field star is gone, this must be a darkness battle
-    elseif (!$temp_field_star_present && mt_rand(0, 3) == 0){ $temp_darkness_battle = true; }
+
+  // If the prototype and battle are complete plus robot unlocked, this can be a darkness battle
+  if ($temp_prototype_complete && $temp_battle_complete && $temp_master_unlocked && $temp_master_unlocked2){
+    // Only make this a darkness battle on a random chance and only if there isn't a star present
+    if (!$temp_field_star_present && mt_rand(0, 3) == 0){
+      $temp_darkness_battle = true;
+      $temp_starforce_battle = false;
+    }
   }
 
   // If a fusion star is preent on the field, fill the empty spots with like-typed robots
