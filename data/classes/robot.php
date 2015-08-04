@@ -509,28 +509,28 @@ class mmrpg_robot {
   // Define a function for checking if this robot has a specific weakness
   public function has_weakness($weakness_token){
     if (empty($this->robot_weaknesses) || empty($weakness_token)){ return false; }
-    elseif (in_array($weakness_token, $this->robot_weaknesses)){ return true; }
+    elseif (is_array($this->robot_weaknesses) && in_array($weakness_token, $this->robot_weaknesses)){ return true; }
     else { return false; }
   }
 
   // Define a function for checking if this robot has a specific resistance
   public function has_resistance($resistance_token){
     if (empty($this->robot_resistances) || empty($resistance_token)){ return false; }
-    elseif (in_array($resistance_token, $this->robot_resistances)){ return true; }
+    elseif (is_array($this->robot_resistances) && in_array($resistance_token, $this->robot_resistances)){ return true; }
     else { return false; }
   }
 
   // Define a function for checking if this robot has a specific affinity
   public function has_affinity($affinity_token){
     if (empty($this->robot_affinities) || empty($affinity_token)){ return false; }
-    elseif (in_array($affinity_token, $this->robot_affinities)){ return true; }
+    elseif (is_array($this->robot_affinities) && in_array($affinity_token, $this->robot_affinities)){ return true; }
     else { return false; }
   }
 
   // Define a function for checking if this robot has a specific immunity
   public function has_immunity($immunity_token){
     if (empty($this->robot_immunities) || empty($immunity_token)){ return false; }
-    elseif (in_array($immunity_token, $this->robot_immunities)){ return true; }
+    elseif (is_array($this->robot_immunities) && in_array($immunity_token, $this->robot_immunities)){ return true; }
     else { return false; }
   }
 
