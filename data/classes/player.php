@@ -437,8 +437,8 @@ class mmrpg_player {
           $this->counters['robots_active']++;
           // Add this robot to the active robots array
           $this->values['robots_active'][] = &$this->player_robots[$this_key]; //$this_info;
-          // If this robot is a dark element of some kind
-          if (in_array($temp_robot->robot_token, $dark_element_tokens) || $temp_robot->robot_core == 'empty'){
+          // If this robot is a dark element that absorbs the elements
+          if (in_array($temp_robot->robot_token, $dark_element_tokens)){
             $this->counters['dark_elements']++;
           }
           // Check if this robot is in the active position
