@@ -11,7 +11,6 @@ define('MMRPG_REMOTE_SKIP_COMPLETE', true);
 define('MMRPG_REMOTE_SKIP_FAILURE', true);
 define('MMRPG_REMOTE_SKIP_SETTINGS', true);
 define('MMRPG_REMOTE_SKIP_ITEMS', true);
-define('MMRPG_REMOTE_SKIP_DATABASE', true);
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 
 // Collect the session token
@@ -72,15 +71,9 @@ $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false
 $mmrpg_robots_index = mmrpg_robot::get_index();
 
 // Collect all the robots that have been unlocked by the player
-$mmrpg_robots_unlocked = array();
-if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
-  foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-    if (!empty($player_info['player_robots'])){
-      foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
-        $mmrpg_robots_unlocked[] = $robot_token;
-      }
-    }
-  }
+$mmrpg_robots_encountered = array();
+if (!empty($_SESSION[$session_token]['values']['robot_database'])){
+  $mmrpg_robots_encountered = array_keys($_SESSION[$session_token]['values']['robot_database']);
 }
 
 // Collect the omega factors that we should be printing links for
@@ -93,11 +86,11 @@ $temp_omega_factors_unlocked_total = count($temp_omega_factors_unlocked);
 
 // Define a function for printing out the robot links
 function temp_print_omega_robot_links($info, $key, $kind){
-  global $mmrpg_robots_unlocked, $mmrpg_robots_index;
+  global $mmrpg_robots_encountered, $mmrpg_robots_index;
   $robot = $info['robot'];
   $type = $info['type'];
   $field = $info['field'];
-  if (in_array($robot, $mmrpg_robots_unlocked)){
+  if (in_array($robot, $mmrpg_robots_encountered)){
     $info = $mmrpg_robots_index[$robot];
     $name = $info['robot_name'];
     $size = $info['robot_image_size'] ? $info['robot_image_size'] : 40;
@@ -182,18 +175,12 @@ gameSettings.autoScrollTop = false;
       <?
       $this_battle_stars_boost = 0;
       foreach ($this_star_force AS $force_type => $force_count){ $this_battle_stars_boost += $force_count * MMRPG_SETTINGS_STARS_ATTACKBOOST; }
-      $temp_field_stars_text = $this_battle_stars_field_count == 1 ? '1 Field Star' : $this_battle_stars_field_count.' Field Stars';
-      $temp_fusion_stars_text = $this_battle_stars_fusion_count == 1 ? '1 Fusion Star' : $this_battle_stars_fusion_count.' Fusion Stars';
       $temp_total_stars_label = $this_battle_stars_count; //$this_battle_stars_count == 1 ? '1 Star' : $this_battle_stars_count.' Stars';
       $temp_potential_count = ((temp_combination_number(2, $temp_omega_factors_unlocked_total) * 2) + $temp_omega_factors_unlocked_total);
       $temp_potential_stars_label = $temp_potential_count == 1 ? '1 Star' : $temp_potential_count.' Stars';
       $temp_total_boost_label = '+'.number_format($this_battle_stars_boost, 0, '.', ',').' Boost';
       ?>
       <span class="header block_1">StarForce <span style="opacity: 0.25;">(
-        <? /*
-        <span title="<?= $temp_field_stars_text ?>" data-tooltip-type="field_type field_type_none"><?= $this_battle_stars_field_count ?></span> /
-        <span title="<?= $temp_fusion_stars_text ?>" data-tooltip-type="field_type field_type_none"><?= $this_battle_stars_fusion_count ?></span> /
-        */ ?>
         <span><?= $temp_total_stars_label ?></span> /
         <span><?= $temp_potential_stars_label ?></span> /
         <span><?= $temp_total_boost_label ?></span>
@@ -208,9 +195,6 @@ gameSettings.autoScrollTop = false;
             // Loop through all the field stars and print them out one-by-one
             if (!empty($this_star_force)){
 
-              //echo('[total] => '.$this_star_force_total);
-              //echo('<pre>'.print_r($this_star_force, true).'</pre>');
-
               $temp_max_force = 0;
               $temp_max_padding = 30;
               foreach ($this_star_force AS $force_type => $force_count){
@@ -221,12 +205,10 @@ gameSettings.autoScrollTop = false;
 
 
               foreach ($this_star_force AS $force_type => $force_count){
-                //$temp_padding_amount = 6 + ceil(200 * ($force_count / $this_star_force_total));
-                //if ($temp_padding_amount > 117){ $temp_padding_amount = 117; }
                 $temp_padding_amount = $force_count * 2;
                 $temp_padding_amount = ceil(($force_count / $temp_max_force) * $temp_max_padding);
                 $force_count_strict = $this_star_force_strict[$force_type];
-                echo '<div data-tooltip="'.ucfirst($force_type).' +'.($force_count * MMRPG_SETTINGS_STARS_ATTACKBOOST).'% | '.$force_count_strict.' / '.$this_battle_stars_count.' Stars" class="field_type field_type_'.$force_type.'" style="padding-right: '.$temp_padding_amount.'px;" data-padding="'.$temp_padding_amount.'">'.ucfirst($force_type).' +'.($force_count * MMRPG_SETTINGS_STARS_ATTACKBOOST).'</div>';
+                echo '<div data-tooltip="'.ucfirst($force_type).' +'.($force_count * MMRPG_SETTINGS_STARS_ATTACKBOOST).' Boost | '.$force_count_strict.' / '.$this_battle_stars_count.' Stars" class="field_type field_type_'.$force_type.'" style="padding-right: '.$temp_padding_amount.'px;" data-padding="'.$temp_padding_amount.'">'.ucfirst($force_type).' +'.($force_count * MMRPG_SETTINGS_STARS_ATTACKBOOST).'</div>';
               }
 
 
