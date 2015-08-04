@@ -473,6 +473,14 @@ if ($this_player->player_side == 'left'){
  * BATTLE REWARDS
  */
 
+// Collect or define the player variables
+$this_player_token = $this_player->player_token;
+$this_player_info = $this_player->export_array();
+
+// Collect or define the target player variables
+$target_player_token = $target_player->player_token;
+$target_player_info = $target_player->export_array();
+
 // Check if this player was the human player
 if ($this_player->player_side == 'left'){
 
@@ -519,8 +527,7 @@ if ($this_player->player_side == 'left'){
     $temp_human_rewards['battle_complete'] = $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token]['battle_count'];
   }
 
-  // Collect or define the player variables
-  $this_player_token = $this_player->player_token;
+  // Refresh the player info array
   $this_player_info = $this_player->export_array();
 
   // ROBOT REWARDS
