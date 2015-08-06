@@ -503,6 +503,65 @@ class mmrpg_player {
     return $this_data;
   }
 
+  // Define a public function for getting this player's currently active robot
+  public function get_active_robot(){
+
+    $active_target_robot = false;
+
+    foreach ($this->player_robots AS $temp_robotinfo){
+
+      if (empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
+        $active_target_robot = new mmrpg_robot($this->battle, $this, $temp_robotinfo);
+        if ($active_target_robot->robot_energy < 1){
+          $active_target_robot->flags['apply_disabled_state'] = true;
+          $active_target_robot->flags['hidden'] = true;
+          $active_target_robot->robot_status = 'disabled';
+          $active_target_robot->update_session();
+          $canvas_refresh = true;
+        }
+      } elseif (!empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
+        $temp_target_robot = new mmrpg_robot($this->battle, $this, $temp_robotinfo);
+        $temp_target_robot->robot_position = 'bench';
+        $temp_target_robot->update_session();
+        $canvas_refresh = true;
+        if ($temp_target_robot->robot_energy < 1){
+          $temp_target_robot->flags['apply_disabled_state'] = true;
+          $temp_target_robot->flags['hidden'] = true;
+          $temp_target_robot->robot_status = 'disabled';
+          $temp_target_robot->update_session();
+          $canvas_refresh = true;
+        }
+      }
+
+    }
+    if (empty($active_target_robot)){
+
+      $temp_robots_active_array = $this->values['robots_active'];
+      $temp_robots_disabled_array = $this->values['robots_disabled'];
+      if (!empty($temp_robots_active_array)){
+        $temp_robots_active_info = array_shift($temp_robots_active_array);
+        $active_target_robot = new mmrpg_robot($this->battle, $this, $temp_robots_active_info);
+        $active_target_robot->robot_position = 'active';
+        $active_target_robot->update_session();
+      } elseif (!empty($temp_robots_disabled_array)){
+        $temp_robots_active_info = array_shift($temp_robots_disabled_array);
+        $active_target_robot = new mmrpg_robot($this->battle, $this, $temp_robots_active_info);
+        $active_target_robot->robot_position = 'active';
+        $active_target_robot->update_session();
+      } else {
+        $active_target_robot = $target_robot;
+      }
+
+    }
+
+    // Update this player's session with any changes
+    $this->update_session();
+
+    // Return the collected active robot
+    return $active_target_robot;
+
+  }
+
   // Define a public function for updating this player's session
   public function update_session(){
 

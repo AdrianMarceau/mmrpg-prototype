@@ -4,6 +4,9 @@
  * public function trigger_damage($target_robot, $this_ability, $damage_amount, $trigger_disabled = true){}
  */
 
+// If the battle has already ended, return false
+if ($this->battle->battle_status == 'complete'){ return false; }
+
 // Backup this and the target robot's frames to revert later
 $this_robot_backup_frame = $this->robot_frame;
 $this_player_backup_frame = $this->player->player_frame;

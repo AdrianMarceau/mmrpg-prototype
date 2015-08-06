@@ -663,6 +663,20 @@ if ($this->battle_result == 'victory' && !empty($this->values['field_star'])){
 
 }
 
+// If this robot's image has been changed, reveert it back to what it was
+if ($this_robot->robot_core == 'copy'){
+  unset($this_robot->robot_image_overlay['copy_type1']);
+  unset($this_robot->robot_image_overlay['copy_type2']);
+  $this_robot->update_session();
+}
+
+// If the target robot's image has been changed, reveert it back to what it was
+if ($target_robot->robot_core == 'copy'){
+  unset($target_robot->robot_image_overlay['copy_type1']);
+  unset($target_robot->robot_image_overlay['copy_type2']);
+  $target_robot->update_session();
+}
+
 // Define the first event body markup, regardless of player type
 $first_event_header = $this->battle_name.($this->battle_result == 'victory' ? ' Complete' : ' Failure').' <span class="pipe">|</span> '.$this->battle_field->field_name;
 if ($this->battle_result == 'victory'){ $first_event_body = 'Mission complete! <span class="pipe">|</span> '.($temp_human_rewards['battle_complete'] > 1 ? mmrpg_battle::random_positive_word().' That&#39;s '.$temp_human_rewards['battle_complete'].' times now! ' : '').mmrpg_battle::random_victory_quote(); }

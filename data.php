@@ -1310,7 +1310,7 @@ elseif ($this_action == 'ability'){
 }
 
 // Now execute the stored actions (and any created in the process of executing them!)
-  $this_battle->actions_execute();
+$this_battle->actions_execute();
 
 // Set the hidden flag on this robot if necessary
 if ($this_robot->robot_status == 'disabled' || $this_robot->robot_energy < 1){
@@ -1454,7 +1454,11 @@ if (empty($this_redirect)){
 // Define the canvas refresh flag
 $canvas_refresh = false;
 
-// Search for an active target robot to update the engine with
+// Refresh the active robot on this and the target's side of the field
+$this_robot = $this_player->get_active_robot();
+$target_robot = $target_player->get_active_robot();
+
+/*
 $active_target_robot = false;
 foreach ($target_player->player_robots AS $temp_robotinfo){
   if (empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
@@ -1479,7 +1483,6 @@ foreach ($target_player->player_robots AS $temp_robotinfo){
       $canvas_refresh = true;
     }
   }
-
 }
 if (empty($active_target_robot)){
   $temp_robots_active_array = $target_player->values['robots_active'];
@@ -1498,15 +1501,15 @@ if (empty($active_target_robot)){
     $active_target_robot = $target_robot;
   }
 }
-
 // If the active robot was not the same as the target, update
 if (!empty($active_target_robot) && $active_target_robot->robot_id != $target_robot->robot_id){
   $target_robot = $active_target_robot;
   $canvas_refresh = true;
 }
+*/
 
 // If canvas refresh is needed, create an empty event
-if ($canvas_refresh && $this_battle->battle_status != 'complete'){ $this_battle->events_create(false, false, '', ''); }
+//if ($canvas_refresh && $this_battle->battle_status != 'complete'){ $this_battle->events_create(false, false, '', ''); }
 
 // Stop the output buffer and collect contents
 $output_buffer_contents = trim(ob_get_clean());

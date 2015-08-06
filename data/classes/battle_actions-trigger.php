@@ -114,6 +114,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
   }
   // Else if the player has chosen to use an ability
   elseif ($this_action == 'ability'){
+
     // Combine into the actions index
     $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
@@ -193,6 +194,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
   }
   // Else if the player has chosen to switch
   elseif ($this_action == 'switch'){
+
     // Collect this player's last action if it exists
     if (!empty($this_player->history['actions'])){
       $this_recent_switches = array_slice($this_player->history['actions'], -5, 5, false);

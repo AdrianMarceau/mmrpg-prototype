@@ -126,13 +126,15 @@ function mmrpg_prototype_mission_double($this_prototype_data, $this_robot_tokens
     foreach ($temp_factors_list AS $this_list){
       shuffle($this_list);
       foreach ($this_list AS $this_factor){
-        //$debug_backup .= 'factor = '.implode(',', array_values($this_factor)).' // ';
         if (empty($this_factor['robot'])){ continue; }
-        $bonus_robot_info = mmrpg_robot::parse_index_info($this_robot_index[$this_factor['robot']]);
-        if (!isset($bonus_robot_info['robot_core'])){ $bonus_robot_info['robot_core'] = ''; }
-        if ($bonus_robot_info['robot_core'] == $temp_option_field['field_type'] || $bonus_robot_info['robot_core'] == $temp_option_field2['field_type']){
-          if (!in_array($bonus_robot_info['robot_token'], $temp_robot_tokens)){
+        $bonus_robot_index = $this_robot_index[$this_factor['robot']];
+        if (!isset($bonus_robot_index['robot_core'])){ $bonus_robot_index['robot_core'] = ''; }
+        if ($bonus_robot_index['robot_core'] == $temp_option_field['field_type'] || $bonus_robot_index['robot_core'] == $temp_option_field2['field_type']){
+          if (!in_array($bonus_robot_index['robot_token'], $temp_robot_tokens)){
+            $bonus_robot_info = array();
             $bonus_robot_info['flags']['hide_from_mission_select'] = true;
+            $bonus_robot_info['robot_token'] = $bonus_robot_index['robot_token'];
+            $bonus_robot_info['robot_class'] = $bonus_robot_index['robot_class'];
             $temp_option_battle['battle_target_player']['player_robots'][] = $bonus_robot_info;
             $temp_robot_tokens[] = $bonus_robot_info['robot_token'];
           }
