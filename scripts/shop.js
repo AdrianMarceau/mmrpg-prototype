@@ -42,6 +42,8 @@ $(document).ready(function(){
     //console.log('.sprite[data-token] clicked!', {dataToken:dataToken,dataShop:dataShop,dataSelectorCurrent:dataSelectorCurrent,dataSelectorNext:dataSelectorNext});
     $('.wrapper_active', gameCanvas).removeClass('wrapper_active');
     $('.sprite_shop_current', gameCanvas).removeClass('sprite_shop_current');
+    //console.log('updating perfect scrollbar 1');
+    $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
     dataParent.addClass('wrapper_active').css({display:'block'});
     dataSprite.addClass('sprite_shop_current');
     if ($(dataSelectorCurrent, gameConsole).length){
@@ -76,6 +78,8 @@ $(document).ready(function(){
     var thisConfirmCell = thiContainer.find('.item_cell_confirm');
     thisConfirmCell.attr('data-kind', '').attr('data-action', '').attr('data-token', '').attr('data-price', '').attr('data-quantity', '');
     thisConfirmCell.empty().html('<div class="placeholder">&hellip;</div>');
+    //console.log('updating perfect scrollbar 2');
+    $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
     return true;
     });
   
@@ -419,8 +423,14 @@ $(document).ready(function(){
   // Append the markup after load to prevent halting display and waiting shops
   $('#console #shops').append(shopConsoleMarkup);
   $('#canvas #links').append(shopCanvasMarkup);
+  
+  // Attach the scrollbar to the battle events container
+  $('#console .scroll_wrapper', thisShop).perfectScrollbar({suppressScrollX: true, scrollYMarginOffset: 6});
+  
   // Automatically click the first shop link
   $('#canvas #links .sprite[data-token]').first().trigger('click');  
+  //console.log('updating perfect scrollbar 3');
+  $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
   
   // Update all the item cells automatically
   updateItemCells();
@@ -444,7 +454,9 @@ $(document).ready(function(){
   thisBody.waitForImages(function(){
     var tempTimeout = setTimeout(function(){
       if (gameSettings.fadeIn){ thisBody.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing'); }
-      else { thisBody.removeClass('hidden').css({opacity:1}); }
+      else { thisBody.removeClass('hidden').css({opacity:1}); }  
+      //console.log('updating perfect scrollbar 4');
+      $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
       // Let the parent window know the menu has loaded
       parent.prototype_menu_loaded();
       }, 1000);

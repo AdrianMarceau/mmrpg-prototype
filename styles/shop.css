@@ -375,6 +375,13 @@
   
 }
 
+#shop #console .event .scroll_wrapper {
+  max-height: 230px;
+  overflow: hidden;
+  position: relative;
+  padding-right: 9px;
+}
+
 #shop #console .event .item_cell,
 #shop #console .event .item_confirm {
   
@@ -563,6 +570,28 @@
   padding: 2px 6px;  
   background-color: rgba(0, 0, 0, 0.25) !important;
   border-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+
+#console .ps-container {
+
+}
+#console .ps-container > .ps-scrollbar-y-rail {
+  background-color: #494949;
+  opacity: 0.3;
+  filter: alpha(opacity=30);  
+}
+#console .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+  
+}
+#console .ps-container:hover > .ps-scrollbar-y-rail:hover {
+  background-color: #363636;
+}
+#console .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail {
+  background-color: #696969;
+}
+#console .ps-container:hover > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
+  background-color: #969696;
 }
 
 
