@@ -13,7 +13,7 @@ define('MMRPG_CONFIG_ADMIN_MODE', $is_admin);
 define('MMRPG_CONFIG_DEBUG_MODE', !empty($_SESSION['GAME']['debug_mode']) ? true : false);
 
 // Define the cache date and path on this system
-define('MMRPG_CONFIG_CACHE_DATE', '20150803-02');
+define('MMRPG_CONFIG_CACHE_DATE', '20150808-01');
 define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'data/cache/');
 
 // Define the cache and index paths for battles
