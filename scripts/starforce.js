@@ -97,6 +97,25 @@ $(document).ready(function(){
     refreshStarforceContainers();
     
     });
+  
+  // Add mouse-wheel scrolling to the starforce container for easier browsing
+  thisStarContainer.bind('mousewheel', function(e){
+    e.preventDefault();
+    //console.log('event.originalEvent.wheelDeltaX = '+e.originalEvent.wheelDeltaX+' | event.originalEvent.wheelDeltaY = '+e.originalEvent.wheelDeltaY);
+    if ((e.originalEvent.wheelDeltaY / 120) > 0){
+      //console.log('scrolling up !');
+      $('.arrow[data-scroll="up"]', thisPageLinks).trigger('click');
+      } else if ((e.originalEvent.wheelDeltaY / 120) < 0) {
+      //console.log('scrolling down !');
+      $('.arrow[data-scroll="down"]', thisPageLinks).trigger('click');
+      } else if ((e.originalEvent.wheelDeltaX / 120) > 0){
+      //console.log('scrolling left !');
+      $('.arrow[data-scroll="left"]', thisPageLinks).trigger('click');
+      } else if ((e.originalEvent.wheelDeltaX / 120) < 0) {
+      //console.log('scrolling right !');
+      $('.arrow[data-scroll="right"]', thisPageLinks).trigger('click');
+      }
+    });
     
   // Count the number of stars present and creat page links if necessary
   thisStarSprites = $('.sprite_star', thisStarContainer);
@@ -135,6 +154,18 @@ $(document).ready(function(){
     //console.log(thisStarSettings);
     
     }
+  
+  // Create the hover event for the star sprites
+  thisStarSprites.hover(function(){
+    var thisSprite = $(this);
+    var thisSideKey = thisSprite.attr('data-side-key');
+    var thisTopKey = thisSprite.attr('data-top-key');
+    thisStarSprites.removeClass('highlight');
+    thisStarSprites.filter('[data-side-key='+thisSideKey+']').addClass('highlight');
+    thisStarSprites.filter('[data-top-key='+thisTopKey+']').addClass('highlight');
+    }, function(){
+    thisStarSprites.removeClass('highlight');      
+    });
 
   // Fade in the leaderboard screen slowly
   thisBody.waitForImages(function(){

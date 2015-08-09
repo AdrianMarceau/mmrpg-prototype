@@ -156,6 +156,9 @@
 #prototype .starforce .stars_container .sprite_star.hidden {
   display: none;
 }
+#prototype .starforce .stars_container .sprite_star.highlight {
+  box-shadow: inset 0 0 2px rgb(134, 133, 106);
+}
 #prototype .starforce .stars_container .sprite_star .sprite {
   top: -4px;
   left: -4px;
