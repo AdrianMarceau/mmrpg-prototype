@@ -805,4 +805,7 @@ $event_options['console_show_target'] = false;
 $event_options['console_container_classes'] = 'field_type field_type_event field_type_'.($this->battle_result == 'victory' ? 'nature' : 'flame');
 $this->events_create($target_robot, $this_robot, $first_event_header, $first_event_body, $event_options);
 
+// Add the flag to prevent any further messages from appearing
+$this->flags['battle_complete_message_created'] = true;
+
 ?>
