@@ -176,7 +176,7 @@ function mmrpg_prototype_mission_bonus($this_prototype_data, $this_robot_count =
 
   // Update the field music to a random boss theme from MM1-10 + MM&B
   $temp_music_number = mt_rand(1, 11);
-  $temp_music_name = 'prototype-complete'.($temp_music_number > 1 ? '-'.$temp_music_number : '');
+  $temp_music_name = 'boss-theme-mm'.str_pad($temp_music_number, 2, '0', STR_PAD_LEFT);
   $temp_battle_omega['battle_field_base']['field_music'] = $temp_music_name;
 
   // Add some random item drops to the starter battle
