@@ -2258,6 +2258,7 @@ body.index #header {
   margin: 0;
   width: 100%;
   height: 100%;
+  position: relative;
 }
 #console .event {
   margin: 3px 8px;
@@ -3135,6 +3136,7 @@ body.index #header {
   margin: 7px 5px 0 5px;
 }
 
+#actions .main_actions_hastitle .button label .maintext,
 #actions .main_actions_hastitle .button label .subtext {
   display: block;
   width: 100%;

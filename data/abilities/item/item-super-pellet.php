@@ -9,7 +9,7 @@ $ability = array(
   'ability_subclass' => 'consumable',
   'ability_type' => '',
   'ability_type2' => 'shield',
-  'ability_description' => 'A small energy pellet that boosts the attack, defense, and speed stat of one robot on the user\'s side of the field by {RECOVERY2}% each.',
+  'ability_description' => 'A small energy pellet that boosts the attack, defense, and speed stat of one robot on the user\'s side of the field by {RECOVERY2}% each.  This item appears to have a secondary effect, slightly boosting all stat bonuses during the target\'s next level-up.',
   'ability_energy' => 0,
   'ability_speed' => 10,
   'ability_recovery' => 30,
@@ -68,6 +68,41 @@ $ability = array(
       ));
     $speed_recovery_amount = ceil($target_robot->robot_base_speed * ($this_ability->ability_recovery2 / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $speed_recovery_amount);
+
+    // If this a human player on the left side, also increase their pending defense boost on level-up
+    if ($this_player->player_controller == 'human'){
+      $session_token = mmrpg_game_token();
+
+      // Collect any existing pending attack boosts and then add the ability recovery value
+      if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'])){
+        $session_attack_pending = $_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'];
+        $session_attack_pending += $this_ability->ability_recovery2;
+      } else {
+        $session_attack_pending = $this_ability->ability_recovery2;
+      }
+
+      // Collect any existing pending defense boosts and then add the ability recovery value
+      if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_defense_pending'])){
+        $session_defense_pending = $_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_defense_pending'];
+        $session_defense_pending += $this_ability->ability_recovery2;
+      } else {
+        $session_defense_pending = $this_ability->ability_recovery2;
+      }
+
+      // Collect any existing pending speed boosts and then add the ability recovery value
+      if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_speed_pending'])){
+        $session_speed_pending = $_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_speed_pending'];
+        $session_speed_pending += $this_ability->ability_recovery2;
+      } else {
+        $session_speed_pending = $this_ability->ability_recovery2;
+      }
+
+      // Update this values in the session and ensure the robot gains rewards on level-up
+      $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'] = $session_attack_pending;
+      $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_defense_pending'] = $session_defense_pending;
+      $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_speed_pending'] = $session_speed_pending;
+
+    }
 
     // Return true on success
     return true;

@@ -118,10 +118,10 @@ $this_shop_index['auto'] = array(
       'item-energy-tank' => 800,
       'item-weapon-tank' => 800,
 
-      'item-attack-pellet' => 400,
-      'item-defense-pellet' => 400,
-      'item-speed-pellet' => 400,
-      'item-super-pellet' => 1200,
+      'item-attack-pellet' => 900,
+      'item-defense-pellet' => 900,
+      'item-speed-pellet' => 900,
+      'item-super-pellet' => 2700
 
       ),
     'items_selling5' => array(
@@ -133,14 +133,14 @@ $this_shop_index['auto'] = array(
       'item-energy-tank' => 800,
       'item-weapon-tank' => 800,
 
-      'item-attack-pellet' => 400,
-      'item-defense-pellet' => 400,
-      'item-attack-capsule' => 800,
-      'item-defense-capsule' => 800,
-      'item-speed-pellet' => 400,
-      'item-super-pellet' => 1200,
-      'item-speed-capsule' => 800,
-      'item-super-capsule' => 2400
+      'item-attack-pellet' => 900,
+      'item-defense-pellet' => 900,
+      'item-attack-capsule' => 1800,
+      'item-defense-capsule' => 1800,
+      'item-speed-pellet' => 900,
+      'item-super-pellet' => 2700,
+      'item-speed-capsule' => 1800,
+      'item-super-capsule' => 5400
 
       ),
     'items_selling6' => array(
@@ -152,14 +152,14 @@ $this_shop_index['auto'] = array(
       'item-energy-tank' => 800,
       'item-weapon-tank' => 800,
 
-      'item-attack-pellet' => 400,
-      'item-defense-pellet' => 400,
-      'item-attack-capsule' => 800,
-      'item-defense-capsule' => 800,
-      'item-speed-pellet' => 400,
-      'item-super-pellet' => 1200,
-      'item-speed-capsule' => 800,
-      'item-super-capsule' => 2400,
+      'item-attack-pellet' => 900,
+      'item-defense-pellet' => 900,
+      'item-attack-capsule' => 1800,
+      'item-defense-capsule' => 1800,
+      'item-speed-pellet' => 900,
+      'item-super-pellet' => 2700,
+      'item-speed-capsule' => 1800,
+      'item-super-capsule' => 5400,
 
       'item-extra-life' => 1600,
       'item-yashichi' => 1600
@@ -174,14 +174,14 @@ $this_shop_index['auto'] = array(
       'item-energy-tank' => 800,
       'item-weapon-tank' => 800,
 
-      'item-attack-pellet' => 400,
-      'item-defense-pellet' => 400,
-      'item-attack-capsule' => 800,
-      'item-defense-capsule' => 800,
-      'item-speed-pellet' => 400,
-      'item-super-pellet' => 1200,
-      'item-speed-capsule' => 800,
-      'item-super-capsule' => 2400,
+      'item-attack-pellet' => 900,
+      'item-defense-pellet' => 900,
+      'item-attack-capsule' => 1800,
+      'item-defense-capsule' => 1800,
+      'item-speed-pellet' => 900,
+      'item-super-pellet' => 2700,
+      'item-speed-capsule' => 1800,
+      'item-super-capsule' => 5400,
 
       'item-extra-life' => 1600,
       'item-yashichi' => 1600,
@@ -204,14 +204,14 @@ $this_shop_index['auto'] = array(
       'item-energy-tank' => 400,
       'item-weapon-tank' => 400,
 
-      'item-attack-pellet' => 200,
-      'item-defense-pellet' => 200,
-      'item-attack-capsule' => 400,
-      'item-defense-capsule' => 400,
-      'item-speed-pellet' => 200,
-      'item-super-pellet' => 600,
-      'item-speed-capsule' => 400,
-      'item-super-capsule' => 1200,
+      'item-attack-pellet' => 450,
+      'item-defense-pellet' => 450,
+      'item-attack-capsule' => 900,
+      'item-defense-capsule' => 900,
+      'item-speed-pellet' => 450,
+      'item-super-pellet' => 1350,
+      'item-speed-capsule' => 900,
+      'item-super-capsule' => 2800,
 
       'item-extra-life' => 800,
       'item-yashichi' => 800

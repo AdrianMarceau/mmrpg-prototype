@@ -155,6 +155,10 @@ if ($trigger_options['apply_modifiers'] != false){
 
 }
 
+// Collect the first and second ability type else "none" for multipliers
+$temp_ability_recovery_type = !empty($this_ability->recovery_options['recovery_type']) ? $this_ability->recovery_options['recovery_type'] : 'none';
+$temp_ability_recovery_type2 = !empty($this_ability->recovery_options['recovery_type2']) ? $this_ability->recovery_options['recovery_type2'] : '';
+
 // Apply field multipliers preemtively if there are any
 if ($trigger_options['apply_field_modifiers'] != false && $this_ability->recovery_options['recovery_modifiers'] && !empty($this->field->field_multipliers)){
   // Collect the multipliters for easier
@@ -169,9 +173,6 @@ if ($trigger_options['apply_field_modifiers'] != false && $this_ability->recover
   // Loop through all the other type multipliers one by one if this ability has a type
   $skip_types = array('recovery', 'damage', 'experience');
   if (true){ //!empty($this_ability->recovery_options['recovery_type'])
-    // Collect the first and second ability type else "none" for multipliers
-    $temp_ability_recovery_type = !empty($this_ability->recovery_options['recovery_type']) ? $this_ability->recovery_options['recovery_type'] : 'none';
-    $temp_ability_recovery_type2 = !empty($this_ability->recovery_options['recovery_type2']) ? $this_ability->recovery_options['recovery_type2'] : '';
     // Loop through all the other type multipliers one by one if this ability has a type
     foreach ($field_multipliers AS $temp_type => $temp_multiplier){
       // Skip non-type and special fields for this calculation
@@ -1011,10 +1012,12 @@ if ($this->robot_energy <= 0 && $this_robot_energy_start_max){
 // Generate an event with the collected recovery results based on recovery type
 if ($this->robot_id == $target_robot->robot_id){ //$this_ability->recovery_options['recovery_kind'] == 'energy'
   $event_options['console_show_target'] = false;
+  $event_options['this_ability_user'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
   $event_options['this_ability_target'] = $this->robot_id.'_'.$this->robot_token;
   $this->battle->events_create($target_robot, $this, $this_ability->recovery_options['recovery_header'], $this_ability->ability_results['this_text'], $event_options);
 } else {
   $event_options['console_show_target'] = false;
+  $event_options['this_ability_user'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
   $event_options['this_ability_target'] = $this->robot_id.'_'.$this->robot_token;;
   $this->battle->events_create($this, $target_robot, $this_ability->recovery_options['recovery_header'], $this_ability->ability_results['this_text'], $event_options);
 }

@@ -74,63 +74,38 @@ if (!empty($this->robot_level) || !empty($this->robot_base_level)){
     // If this robot's level is at the max value or greater, set a flag for later
     if ($this->robot_level >= 100){ $this->flags['robot_stat_max_level'] = 1;  }
 
-    /*
-    // If this is a computer controlled robot, calculate energy normally
-    if ($this->player->player_side == 'right'){
-      // Update the robot energy with a small boost based on experience level
-      $this->robot_energy = $this->robot_energy + ceil($temp_level * (0.05 * $this->robot_energy));
-      $this->robot_base_energy = $this->robot_base_energy + ceil($temp_level * (0.05 * $this->robot_base_energy));
-    }
-    // Otherwise, calculate energy boosts based on the player's heart total
-    elseif ($this->player->player_side == 'left'){
-      // Update the robot energy with a small boost based on experience level
-      $temp_player_energy = 0; // zero for now only
-      $this->robot_energy = $this->robot_energy + $temp_player_energy;
-      $this->robot_base_energy = $this->robot_base_energy + $temp_player_energy;
-    }
-    */
-
     // Update the robot energy with a small boost based on experience level
-    $this->robot_energy = $this->robot_energy + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['energy'], $this->robot_level); //$this->robot_energy + ceil($temp_level * (0.05 * $this->robot_energy));
-    $this->robot_base_energy = $this->robot_base_energy + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['base_energy'], $this->robot_level); //ceil($temp_level * (0.05 * $this->robot_base_energy));
+    $this->robot_energy = $this->robot_energy + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['energy'], $this->robot_level);
+    $this->robot_base_energy = $this->robot_base_energy + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['base_energy'], $this->robot_level);
 
     // Update the robot attack with a small boost based on experience level
-    $this->robot_attack = $this->robot_attack + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['attack'], $this->robot_level); //ceil($temp_level * (0.05 * $this->robot_attack));
-    $this->robot_base_attack = $this->robot_base_attack + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['base_attack'], $this->robot_level); //ceil($temp_level * (0.05 * $this->robot_base_attack));
+    $this->robot_attack = $this->robot_attack + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['attack'], $this->robot_level);
+    $this->robot_base_attack = $this->robot_base_attack + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['base_attack'], $this->robot_level);
     // Update the robot defense with a small boost based on experience level
-    $this->robot_defense = $this->robot_defense + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['defense'], $this->robot_level); //ceil($temp_level * (0.05 * $this->robot_defense));
-    $this->robot_base_defense = $this->robot_base_defense + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['base_defense'], $this->robot_level); //ceil($temp_level * (0.05 * $this->robot_base_defense));
+    $this->robot_defense = $this->robot_defense + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['defense'], $this->robot_level);
+    $this->robot_base_defense = $this->robot_base_defense + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['base_defense'], $this->robot_level);
     // Update the robot speed with a small boost based on experience level
-    $this->robot_speed = $this->robot_speed + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['speed'], $this->robot_level); //ceil($temp_level * (0.05 * $this->robot_speed));
-    $this->robot_base_speed = $this->robot_base_speed + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['base_speed'], $this->robot_level); //ceil($temp_level * (0.05 * $this->robot_base_speed));
+    $this->robot_speed = $this->robot_speed + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['speed'], $this->robot_level);
+    $this->robot_base_speed = $this->robot_base_speed + MMRPG_SETTINGS_STATS_GET_LEVELBOOST($index_stats['base_speed'], $this->robot_level);
 
   }
 
 }
 
 // Loop through each of the four stats and collect bonuses
-$four_stats = array('speed', 'defense', 'attack', 'energy'); // In reverse order for more intuitive overflow
-$max_stat_overflow = 0; // If player robot has not been updated, we need to overflow stats
-$max_base_stat_overflow = 0; // If player robot has not been updated, we need to overflow base stats
+$four_stats = array('speed', 'defense', 'attack'); // In reverse order for more intuitive overflow
+$max_stat_overflow = 0; // If player robot has gone over limits, we need to overflow stats
 foreach ($four_stats AS $this_stat){
   // If the robot has earned any stat points, apply them
   if (!isset($this_rewards['robot_'.$this_stat])){ $this_rewards['robot_'.$this_stat] = 0; }
   if (!empty($this_rewards['robot_'.$this_stat]) || $this_stat == 'energy'){
     $this->{'robot_'.$this_stat} += $this_rewards['robot_'.$this_stat];
     $this->{'robot_base_'.$this_stat} += $this_rewards['robot_'.$this_stat];
-    if ($this_stat == 'energy'){
-      $this->{'robot_'.$this_stat} += $max_stat_overflow;
-      $this->{'robot_base_'.$this_stat} += $max_base_stat_overflow;
-    }
     $max_stat = MMRPG_SETTINGS_STATS_GET_ROBOTMAX($index_stats[$this_stat], $this->robot_level);
     if ($this->{'robot_'.$this_stat} > $max_stat){
       $max_stat_overflow += $this->{'robot_'.$this_stat} - $max_stat;
       $this->{'robot_'.$this_stat} = $max_stat;
-    }
-    $max_base_stat = MMRPG_SETTINGS_STATS_GET_ROBOTMAX($index_stats['base_'.$this_stat], $this->robot_level);
-    if ($this->{'robot_base_'.$this_stat} > $max_base_stat){
-      $max_base_stat_overflow += $this->{'robot_base_'.$this_stat} - $max_base_stat;
-      $this->{'robot_base_'.$this_stat} = $max_base_stat;
+      $this->{'robot_base_'.$this_stat} = $max_stat;
     }
   }
 }

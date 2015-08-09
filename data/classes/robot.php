@@ -692,6 +692,9 @@ class mmrpg_robot {
     // Update this robot's history with the triggered ability
     $this->history['triggered_abilities'][] = $this_ability->ability_token;
 
+    // Set the ability active flag in the battle
+    $this->battle->flags['robot_ability_in_progress'] = 1;
+
     // Define a variable to hold the ability results
     $this_ability->ability_results = array();
     $this_ability->ability_results['total_result'] = '';
@@ -843,6 +846,9 @@ class mmrpg_robot {
       }
     }
 
+    // Unset the ability active flag in the battle
+    unset($this->battle->flags['robot_ability_in_progress']);
+
     // Update internal variables
     $target_robot->update_session();
     $this_ability->update_session();
@@ -931,6 +937,7 @@ class mmrpg_robot {
     $event_options = array();
     $event_options['console_container_height'] = 1;
     $event_options['this_ability'] = $this_ability;
+    $event_options['this_ability_user'] = $this->robot_id.'_'.$this->robot_token;
     $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
     $event_options['this_ability_target_key'] = $target_robot->robot_key;
     $event_options['this_ability_target_position'] = $target_robot->robot_position;

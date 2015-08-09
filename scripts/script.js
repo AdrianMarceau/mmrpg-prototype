@@ -72,7 +72,7 @@ function gameEngineSubmitFunction(){
 
 // Initialize document ready events
 $(document).ready(function(){
-
+  
   // Define the MMRPG global context variables
   mmrpgBody = $('#mmrpg');
   gameWindow = $('#window');
@@ -615,7 +615,7 @@ function windowResizeUpdate(updateType){
   if (gameConsole.length && !gameConsole.hasClass('noresize')){ 
     //console.log('gameConsole.length && !gameConsole.hasClass(\'noresize\');\ngameConsole.height('+newConsoleHeight+' - 3); ');
     gameConsole.height(newConsoleHeight - 3); 
-    gameConsole.find('.wrapper').css({overflow:'scroll',width:(gameConsole.width() + 18)+'px',height:(gameConsole.height() + 18)+'px'})
+    gameConsole.find('.wrapper').css({height:(gameConsole.height())+'px'})
     }
     
     // If height reszing is allowed, update the window height
@@ -1436,7 +1436,9 @@ function mmrpg_events(){
   //console.log('mmrpg_events()');
   //clearTimeout(canvasAnimationTimeout);
   clearInterval(canvasAnimationTimeout);
+  
   var thisEvent = false;
+  
   if (mmrpgEvents.length){
     // Switch to the events panel
     mmrpg_action_panel('event');     
@@ -1444,7 +1446,13 @@ function mmrpg_events(){
     thisEvent = mmrpgEvents.shift();
     thisEvent.event_functions();
     }
+  
+  if (gameConsole.length){ 
+    $('.wrapper', gameConsole).perfectScrollbar('update'); 
+    }
+  
   if (mmrpgEvents.length < 1){
+    
     // Switch to the specified "next" action
     var nextAction = $('input[name=next_action]', gameEngine).val();
     if (nextAction.length){ mmrpg_action_panel(nextAction); } 
@@ -1453,7 +1461,9 @@ function mmrpg_events(){
     //$('.robot_details', gameCanvas).css('opacity', 0.9).addClass('robot_details_idle');
     // Start animating the canvas randomly
     mmrpg_canvas_animate();
+    
     } else if (mmrpgEvents.length >= 1){
+      
       if (gameSettings.eventAutoPlay && thisEvent.event_flags.autoplay != false){
         var autoClickTimer = setTimeout(function(){
           mmrpg_events();
@@ -1465,6 +1475,7 @@ function mmrpg_events(){
       $('a[data-action="continue"]').click(function(){
         clearTimeout(autoClickTimer);
         });
+      
     }
   // Collect the current battle status and result
   var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
@@ -1589,7 +1600,7 @@ function mmrpg_console_event(thisMarkup){ //, flagsMarkup
     $('.event:eq(8)', thisContext).animate({opacity:0.45}, 100, 'swing');
     $('.event:gt(9)', thisContext).animate({opacity:0.40}, 100, 'swing');
     // Hide any leftover boxes from previous events over the limit
-    $('.event:gt(50)', thisContext).appendTo('#event_console_backup');
+    //$('.event:gt(50)', thisContext).appendTo('#event_console_backup');
     
     // Remove any leftover boxes from previous events
     //$('.event:gt(10)', thisContext).remove();

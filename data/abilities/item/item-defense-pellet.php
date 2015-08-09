@@ -8,7 +8,7 @@ $ability = array(
   'ability_class' => 'item',
   'ability_subclass' => 'consumable',
   'ability_type' => 'defense',
-  'ability_description' => 'A small shield pellet that boosts the defense stat of one robot on the user\'s side of the field by {RECOVERY}%.',
+  'ability_description' => 'A small shield pellet that boosts the defense stat of one robot on the user\'s side of the field by {RECOVERY}%.  This item appears to have a secondary effect, slightly boosting defense bonuses during the target\'s next level-up.',
   'ability_energy' => 0,
   'ability_speed' => 10,
   'ability_recovery' => 10,
@@ -41,6 +41,20 @@ $ability = array(
       ));
     $defense_recovery_amount = ceil($target_robot->robot_base_defense * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $defense_recovery_amount);
+
+    // If this a human player on the left side, also increase their pending defense boost on level-up
+    if ($this_player->player_controller == 'human'){
+      $session_token = mmrpg_game_token();
+      // Collect any existing pending boosts and then add the ability recovery value
+      if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_defense_pending'])){
+        $session_defense_pending = $_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_defense_pending'];
+        $session_defense_pending += $this_ability->ability_recovery;
+      } else {
+        $session_defense_pending = $this_ability->ability_recovery;
+      }
+      // Update this value in the session and ensure the robot gains rewards on level-up
+      $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_defense_pending'] = $session_defense_pending;
+    }
 
     // Return true on success
     return true;

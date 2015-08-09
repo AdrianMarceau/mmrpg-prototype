@@ -62,6 +62,7 @@ ob_start();
 
   // Make backups of the robot's original stats before rewards
   $robot_info['robot_energy_index'] = $robot_info['robot_energy'];
+  $robot_info['robot_weapons_index'] = $robot_info['robot_weapons'];
   $robot_info['robot_attack_index'] = $robot_info['robot_attack'];
   $robot_info['robot_defense_index'] = $robot_info['robot_defense'];
   $robot_info['robot_speed_index'] = $robot_info['robot_speed'];
@@ -91,10 +92,6 @@ ob_start();
   $robot_info['robot_defense_base'] = $robot_info['robot_defense'];
   $robot_info['robot_speed_base'] = $robot_info['robot_speed'];
 
-  // Apply any stat rewards for the robot's energy
-  if (!empty($robot_rewards['robot_energy'])){
-    $robot_info['robot_energy'] += $robot_rewards['robot_energy'];
-  }
   // Apply any stat rewards for the robot's attack
   if (!empty($robot_rewards['robot_attack'])){
     $robot_info['robot_attack'] += $robot_rewards['robot_attack'];
@@ -109,7 +106,6 @@ ob_start();
   }
 
   // Make backups of the robot's original stats before rewards
-  $robot_info['robot_energy_rewards'] = $robot_info['robot_energy'] - $robot_info['robot_energy_base'];
   $robot_info['robot_attack_rewards'] = $robot_info['robot_attack'] - $robot_info['robot_attack_base'];
   $robot_info['robot_defense_rewards'] = $robot_info['robot_defense'] - $robot_info['robot_defense_base'];
   $robot_info['robot_speed_rewards'] = $robot_info['robot_speed'] - $robot_info['robot_speed_base'];
@@ -120,10 +116,6 @@ ob_start();
   // Apply stat bonuses to this robot based on its current player's own stats
   if (true){
 
-    // Apply any player special for the robot's energy
-    if (!empty($player_info['player_energy'])){
-      $robot_info['robot_energy'] += ceil($robot_info['robot_energy'] * ($player_info['player_energy'] / 100));
-    }
     // Apply any player special for the robot's attack
     if (!empty($player_info['player_attack'])){
       $robot_info['robot_attack'] += ceil($robot_info['robot_attack'] * ($player_info['player_attack'] / 100));
@@ -140,12 +132,11 @@ ob_start();
   }
 
   // Make backups of the robot's original stats before rewards
-  $robot_info['robot_energy_player'] = $robot_info['robot_energy'] - $robot_info['robot_energy_rewards'] - $robot_info['robot_energy_base'];
   $robot_info['robot_attack_player'] = $robot_info['robot_attack'] - $robot_info['robot_attack_rewards'] - $robot_info['robot_attack_base'];
   $robot_info['robot_defense_player'] = $robot_info['robot_defense'] - $robot_info['robot_defense_rewards'] - $robot_info['robot_defense_base'];
   $robot_info['robot_speed_player'] = $robot_info['robot_speed'] - $robot_info['robot_speed_rewards'] - $robot_info['robot_speed_base'];
 
-  // Limit all stats to 9999 for display purposes
+  // Limit stat digits for display purposes
   if ($robot_info['robot_energy'] > MMRPG_SETTINGS_STATS_MAX){ $robot_info['robot_energy'] = MMRPG_SETTINGS_STATS_MAX; }
   if ($robot_info['robot_attack'] > MMRPG_SETTINGS_STATS_MAX){ $robot_info['robot_attack'] = MMRPG_SETTINGS_STATS_MAX; }
   if ($robot_info['robot_defense'] > MMRPG_SETTINGS_STATS_MAX){ $robot_info['robot_defense'] = MMRPG_SETTINGS_STATS_MAX; }
@@ -459,13 +450,12 @@ ob_start();
       ob_start();
       ?>
       <td  class="right">
-        <label style="display: block; float: left;">Exp :</label>
+        <label style="display: block; float: left;">Experience :</label>
         <? if ($robot_info['robot_level'] >= MMRPG_SETTINGS_LEVEL_MAX): ?>
           <span class="robot_stat robot_type_cutter">&#8734; / &#8734;</span>
         <? else: ?>
           <span class="robot_stat"><?= $robot_info['robot_experience'] ?> / <?= mmrpg_prototype_calculate_experience_required($robot_info['robot_level']) ?></span>
         <? endif; ?>
-
       </td>
       <?
       $right_column_markup[] = ob_get_clean();
@@ -476,26 +466,16 @@ ob_start();
       ob_start();
       ?>
       <td class="right">
-        <?
-        // Print out the ENERGY stat
-        $temp_stat = 'energy';
-        $temp_stat_max = MMRPG_SETTINGS_STATS_GET_ROBOTMAX($robot_info['robot_'.$temp_stat.'_index'], $robot_info['robot_level']);
-        $temp_stat_maxed = $robot_info['robot_'.$temp_stat] >= $temp_stat_max ? true : false;
-        $temp_title = $robot_info['robot_level'] >= 100 ? $robot_info['robot_'.$temp_stat].' / '.$temp_stat_max.' Max'.($temp_stat_maxed ? ' &#9733;' : '') : '';
-        $temp_data_type = $temp_stat_maxed ? 'robot_type robot_type_'.$temp_stat : '';
-        ?>
-        <label class="<?= !empty($player_info['player_'.$temp_stat]) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;"><?= ucfirst($temp_stat) ?> :</label>
-        <span class="robot_stat <?= $temp_stat_maxed ? 'robot_type robot_type_'.$temp_stat : '' ?>"><?
-          echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
-            echo '<span title="Base '.ucfirst($temp_stat).'"'.(!empty($temp_data_type) ? ' data-tooltip-type="'.$temp_data_type.'"' : '').'>'.$robot_info['robot_'.$temp_stat.'_base'].'</span> ';
-            echo !empty($robot_info['robot_'.$temp_stat.'_rewards']) ? '+ <span title="Robot Bonuses" class="statboost_robot"'.(!empty($temp_data_type) ? ' data-tooltip-type="'.$temp_data_type.'"' : '').'>'.$robot_info['robot_'.$temp_stat.'_rewards'].'</span> ' : '';
-            echo !empty($robot_info['robot_'.$temp_stat.'_player']) ? '+ <span title="Player Bonuses" class="statboost_player_'.$player_info['player_token'].($temp_stat_maxed ? '2' : '').'"'.(!empty($temp_data_type) ? ' data-tooltip-type="'.$temp_data_type.'"' : '').'>'.$robot_info['robot_'.$temp_stat.'_player'].'</span> ' : '';
-          echo ' = </span>';
-          echo '<span'.(!empty($temp_title) ? ' title="'.$temp_title.'"' : '').(!empty($temp_data_type) ? ' data-tooltip-type="'.$temp_data_type.'"' : '').'>';
-          echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$temp_stat], 4, '0', STR_PAD_LEFT));
-          if ($temp_stat_maxed){ echo '<span>&nbsp;&#9733;</span>'; }
-          echo '</span>';
-        ?></span>
+        <label style="display: block; float: left;">Energy :</label>
+
+        <span class="robot_stat robot_type robot_type_energy" style="padding: 0 6px; margin-right: 3px;"><?
+          echo MMRPG_SETTINGS_STATS_GET_ROBOTMIN($robot_info['robot_energy_index'], $robot_info['robot_level'])
+        ?><span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;"> LE</span></span>
+
+        <span class="robot_stat robot_type robot_type_weapons" style="padding: 0 6px;"><?
+          echo $robot_info['robot_weapons_index']
+        ?><span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;"> WE</span></span>
+
       </td>
       <?
       $right_column_markup[] = ob_get_clean();

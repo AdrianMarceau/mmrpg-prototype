@@ -3029,6 +3029,9 @@ html {
 #window .page .event .stat_container th.energy {
   color: rgb(107, 170, 107);
 }
+#window .page .event .stat_container th.weapons {
+  color: rgb(128, 128, 173);
+}
 #window .page .event .stat_container th.attack {
   color: rgb(170, 102, 102);
 }
@@ -3068,6 +3071,9 @@ html {
 }
 #window .page .event .stat_container td.energy {
   background-color: rgba(107, 170, 107, 0.15);
+}
+#window .page .event .stat_container td.weapons {
+  background-color: rgba(128, 128, 173, 0.15);
 }
 #window .page .event .stat_container td.attack {
   background-color: rgba(170, 102, 102, 0.15);

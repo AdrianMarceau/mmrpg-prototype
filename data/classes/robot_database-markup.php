@@ -981,15 +981,16 @@ ob_start();
           <thead>
             <tr>
               <th class="top left level">Level</th>
-              <th class="top center energy" colspan="2">Energy</th>
+              <th class="top center energy" colspan="1">Energy</th>
+              <th class="top center weapons" colspan="1">Weapons</th>
               <th class="top center attack" colspan="2">Attack</th>
               <th class="top center defense" colspan="2">Defense</th>
               <th class="top center speed" colspan="2">Speed</th>
             </tr>
             <tr>
               <th class="sub left level" >&nbsp;</th>
-              <th class="sub center energy min">Min</th>
-              <th class="sub center energy max">Max</th>
+              <th class="sub center energy max">-</th>
+              <th class="sub center weapons max">-</th>
               <th class="sub center attack min">Min</th>
               <th class="sub center attack max">Max</th>
               <th class="sub center defense min">Min</th>
@@ -1003,6 +1004,7 @@ ob_start();
             // Define or collect the base stats for this robot, ready to be modified
             $base_stats = array();
             $base_stats['energy'] = $robot_info['robot_energy'];
+            $base_stats['weapons'] = $robot_info['robot_weapons'];
             $base_stats['attack'] = $robot_info['robot_attack'];
             $base_stats['defense'] = $robot_info['robot_defense'];
             $base_stats['speed'] = $robot_info['robot_speed'];
@@ -1016,15 +1018,15 @@ ob_start();
               $min_stats['speed'] = MMRPG_SETTINGS_STATS_GET_ROBOTMIN($base_stats['speed'], $level);
               // Calculate the maximum stat values for this robot considering both level and overkill-based stat boosts
               $max_stats = array();
-              $max_stats['energy'] = MMRPG_SETTINGS_STATS_GET_ROBOTMAX($base_stats['energy'], $level);
+              //$max_stats['energy'] = MMRPG_SETTINGS_STATS_GET_ROBOTMAX($base_stats['energy'], $level);
               $max_stats['attack'] = MMRPG_SETTINGS_STATS_GET_ROBOTMAX($base_stats['attack'], $level);
               $max_stats['defense'] = MMRPG_SETTINGS_STATS_GET_ROBOTMAX($base_stats['defense'], $level);
               $max_stats['speed'] = MMRPG_SETTINGS_STATS_GET_ROBOTMAX($base_stats['speed'], $level);
               ?>
               <tr>
                 <td class="left level">Lv <?= $level ?></td>
-                <td class="center energy min"><?= number_format($min_stats['energy'], 0, '.', ',') ?></td>
-                <td class="center energy max"><?= number_format($max_stats['energy'], 0, '.', ',') ?></td>
+                <td class="center energy max"><?= number_format($min_stats['energy'], 0, '.', ',') ?></td>
+                <td class="center weapons max"><?= number_format($base_stats['weapons'], 0, '.', ',') ?></td>
                 <td class="center attack min"><?= number_format($min_stats['attack'], 0, '.', ',') ?></td>
                 <td class="center attack max"><?= number_format($max_stats['attack'], 0, '.', ',') ?></td>
                 <td class="center defense min"><?= number_format($min_stats['defense'], 0, '.', ',') ?></td>

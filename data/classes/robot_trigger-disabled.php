@@ -4,6 +4,9 @@
  * public function trigger_disabled($target_robot, $this_ability){}
  */
 
+// If the battle has already ended, return false
+if (!empty($this->battle->flags['battle_complete_message_created'])){ return false; }
+
 // Create references to save time 'cause I'm tired
 // (rather than replace all target references to this references)
 $this_battle = &$this->battle;
@@ -62,19 +65,7 @@ $event_options['this_ability_results']['total_actions'] = 0;
 
 // Calculate the bonus boosts from defeating the target robot (if NOT player battle)
 if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID && $target_robot->robot_status != 'disabled'){
-  // Boost this robot's energy if a boost is in order
-  if (empty($target_robot->flags['robot_stat_max_energy'])){
-    $this_energy_boost = $this_robot->robot_base_energy / 100; //ceil($this_robot->robot_base_energy / 100);
-    if ($this_robot->robot_class == 'mecha'){ $this_energy_boost = $this_energy_boost / 2; }
-    if ($target_player->player_side == 'left' && $target_robot->robot_class == 'mecha'){ $this_energy_boost = $this_energy_boost * 2; }
-    if ($target_robot->robot_energy + $this_energy_boost > MMRPG_SETTINGS_STATS_MAX){
-      $this_energy_overboost = (MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_energy) * -1;
-      $this_energy_boost = $this_energy_boost - $this_energy_overboost;
-    }
-    $this_energy_boost = round($this_energy_boost);
-  } else {
-    $this_energy_boost = 0;
-  }
+
 
   // Boost this robot's attack if a boost is in order
   if (empty($target_robot->flags['robot_stat_max_attack'])){
@@ -120,7 +111,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
   // If the target robot is holding a Growth Module, double the stat bonuses
   if ($target_robot->robot_item == 'item-growth-module'){
-    if (!$this_energy_boost){ $this_energy_boost = $this_energy_boost * 2; }
     if (!$this_attack_boost){ $this_attack_boost = $this_attack_boost * 2; }
     if (!$this_defense_boost){ $this_defense_boost = $this_defense_boost * 2; }
     if (!$this_speed_boost){ $this_speed_boost = $this_speed_boost * 2; }
@@ -129,63 +119,36 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
   // Define the temporary boost actions counter
   $temp_boost_actions = 1;
 
-  // If the energy boost was not empty, process it
-  if ($this_energy_boost > 0){
-    // If the robot is under level 100, stat boosts are pending
-    if ($target_player->player_side == 'left' && $target_robot->robot_level < 100 && $target_robot->robot_class == 'master'){
-      // Update the session variables with the pending stat boost
-      if (empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_energy_pending'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_energy_pending'] = 0; }
-      $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_energy_pending'] += $this_energy_boost;
-
+  // Increase reward if there are any pending stat boosts and clear session
+  if ($target_player->player_side == 'left' && ($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') && $target_robot->robot_base_attack < MMRPG_SETTINGS_STATS_MAX){
+    if (!empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'])){
+      $this_attack_boost += $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'];
+      $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'] = 0;
     }
-    // If the robot is at level 100 or a mecha, stat boosts are immediately rewarded
-    elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->robot_base_energy < MMRPG_SETTINGS_STATS_MAX){
-      // Define the base energy boost based on robot base stats
-      $temp_energy_boost = ceil($this_energy_boost);
-      $temp_energy_base_boost = $temp_energy_boost;
-      if ($temp_energy_boost + $target_robot->robot_energy > MMRPG_SETTINGS_STATS_MAX){ $temp_energy_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_energy; }
-      if ($temp_energy_base_boost + $target_robot->robot_base_energy > MMRPG_SETTINGS_STATS_MAX){ $temp_energy_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_base_energy; }
+  }
 
-      // Increment this robot's energy by the calculated amount and display an event
-      $target_robot->robot_energy = ceil($target_robot->robot_energy + $temp_energy_boost);
-      $target_robot->robot_base_energy = ceil($target_robot->robot_base_energy + $temp_energy_base_boost);
-      $event_options = array();
-      $event_options['this_ability_results']['trigger_kind'] = 'recovery';
-      $event_options['this_ability_results']['recovery_kind'] = 'energy';
-      $event_options['this_ability_results']['recovery_type'] = '';
-      $event_options['this_ability_results']['flag_affinity'] = true;
-      $event_options['this_ability_results']['flag_critical'] = true;
-      $event_options['this_ability_results']['this_amount'] = $temp_energy_boost;
-      $event_options['this_ability_results']['this_result'] = 'success';
-      $event_options['this_ability_results']['total_actions'] = $temp_boost_actions++;
-      $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
-      $event_options['console_show_target'] = false;
-      $event_body = $target_robot->print_robot_name().' downloads endurance data from the target robot! ';
-      $event_body .= '<br />';
-      $event_body .= $target_robot->print_robot_name().'&#39;s life energy grew by <span class="recovery_amount">'.$temp_energy_boost.'</span>! ';
-      $target_robot->robot_frame = 'shoot';
-      $target_robot->update_session();
-      $target_player->update_session();
-      $this_battle->events_create($target_robot, $this_robot, $event_header, $event_body, $event_options);
-
-      // Update the session variables with the rewarded stat boost if not mecha
-      if ($target_robot->robot_class == 'master'){
-        if (empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_energy'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_energy'] = 0; }
-        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_energy'] = ceil($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_energy']);
-        $temp_energy_session_boost = round($this_energy_boost);
-        if ($temp_energy_session_boost < 1){ $temp_energy_session_boost = 1; }
-        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_energy'] += $temp_energy_session_boost;
-      }
-
-
+  // Increase reward if there are any pending stat boosts and clear session
+  if ($target_player->player_side == 'left' && ($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') && $target_robot->robot_base_defense < MMRPG_SETTINGS_STATS_MAX){
+    if (!empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_defense_pending'])){
+      $this_defense_boost += $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_defense_pending'];
+      $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_defense_pending'] = 0;
     }
+  }
 
+  // Increase reward if there are any pending stat boosts and clear session
+  if ($target_player->player_side == 'left' && ($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') && $target_robot->robot_base_speed < MMRPG_SETTINGS_STATS_MAX){
+    if (!empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_speed_pending'])){
+      $this_speed_boost += $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_speed_pending'];
+      $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_speed_pending'] = 0;
+    }
   }
 
   // If the attack boost was not empty, process it
   if ($this_attack_boost > 0){
+
     // If the robot is under level 100, stat boosts are pending
     if ($target_player->player_side == 'left' && $target_robot->robot_level < 100 && $target_robot->robot_class == 'master'){
+
       // Update the session variables with the pending stat boost
       if (empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'] = 0; }
       $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'] += $this_attack_boost;
@@ -193,15 +156,18 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     }
     // If the robot is at level 100 or a mecha, stat boosts are immediately rewarded
     elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->robot_base_attack < MMRPG_SETTINGS_STATS_MAX){
+
       // Define the base attack boost based on robot base stats
       $temp_attack_boost = ceil($this_attack_boost);
-      $temp_attack_base_boost = $temp_attack_boost;
-      if ($temp_attack_boost + $target_robot->robot_attack > MMRPG_SETTINGS_STATS_MAX){ $temp_attack_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_attack; }
-      if ($temp_attack_base_boost + $target_robot->robot_base_attack > MMRPG_SETTINGS_STATS_MAX){ $temp_attack_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_base_attack; }
+
+      // If this action would boost the robot over their stat limits
+      if ($temp_attack_boost + $target_robot->robot_attack > MMRPG_SETTINGS_STATS_MAX){
+        $temp_attack_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_attack;
+      }
 
       // Increment this robot's attack by the calculated amount and display an event
       $target_robot->robot_attack = ceil($target_robot->robot_attack + $temp_attack_boost);
-      $target_robot->robot_base_attack = ceil($target_robot->robot_base_attack + $temp_attack_base_boost);
+      $target_robot->robot_base_attack = ceil($target_robot->robot_base_attack + $temp_attack_boost);
       $event_options = array();
       $event_options['this_ability_results']['trigger_kind'] = 'recovery';
       $event_options['this_ability_results']['recovery_kind'] = 'attack';
@@ -211,6 +177,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
       $event_options['this_ability_results']['this_amount'] = $temp_attack_boost;
       $event_options['this_ability_results']['this_result'] = 'success';
       $event_options['this_ability_results']['total_actions'] = $temp_boost_actions++;
+      $event_options['this_ability_user'] = $this->robot_id.'_'.$this->robot_token;
       $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
       $event_options['console_show_target'] = false;
       $event_body = $target_robot->print_robot_name().' downloads weapons data from the target robot! ';
@@ -246,15 +213,18 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     }
     // If the robot is at level 100 or a mecha, stat boosts are immediately rewarded
     elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->robot_base_defense < MMRPG_SETTINGS_STATS_MAX){
+
       // Define the base defense boost based on robot base stats
       $temp_defense_boost = ceil($this_defense_boost);
-      $temp_defense_base_boost = $temp_defense_boost;
-      if ($temp_defense_boost + $target_robot->robot_defense > MMRPG_SETTINGS_STATS_MAX){ $temp_defense_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_defense; }
-      if ($temp_defense_base_boost + $target_robot->robot_base_defense > MMRPG_SETTINGS_STATS_MAX){ $temp_defense_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_base_defense; }
+
+      // If this action would boost the robot over their stat limits
+      if ($temp_defense_boost + $target_robot->robot_defense > MMRPG_SETTINGS_STATS_MAX){
+        $temp_defense_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_defense;
+      }
 
       // Increment this robot's defense by the calculated amount and display an event
       $target_robot->robot_defense = ceil($target_robot->robot_defense + $temp_defense_boost);
-      $target_robot->robot_base_defense = ceil($target_robot->robot_base_defense + $temp_defense_base_boost);
+      $target_robot->robot_base_defense = ceil($target_robot->robot_base_defense + $temp_defense_boost);
       $event_options = array();
       $event_options['this_ability_results']['trigger_kind'] = 'recovery';
       $event_options['this_ability_results']['recovery_kind'] = 'defense';
@@ -264,6 +234,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
       $event_options['this_ability_results']['this_amount'] = $temp_defense_boost;
       $event_options['this_ability_results']['this_result'] = 'success';
       $event_options['this_ability_results']['total_actions'] = $temp_boost_actions++;
+      $event_options['this_ability_user'] = $this->robot_id.'_'.$this->robot_token;
       $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
       $event_options['console_show_target'] = false;
       $event_body = $target_robot->print_robot_name().' downloads shield data from the target robot! ';
@@ -298,15 +269,18 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     }
     // If the robot is at level 100 or a mecha, stat boosts are immediately rewarded
     elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->robot_base_speed < MMRPG_SETTINGS_STATS_MAX){
+
       // Define the base speed boost based on robot base stats
       $temp_speed_boost = ceil($this_speed_boost);
-      $temp_speed_base_boost = $temp_speed_boost;
-      if ($temp_speed_boost + $target_robot->robot_speed > MMRPG_SETTINGS_STATS_MAX){ $temp_speed_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_speed; }
-      if ($temp_speed_base_boost + $target_robot->robot_base_speed > MMRPG_SETTINGS_STATS_MAX){ $temp_speed_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_base_speed; }
+
+      // If this action would boost the robot over their stat limits
+      if ($temp_speed_boost + $target_robot->robot_speed > MMRPG_SETTINGS_STATS_MAX){
+        $temp_speed_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->robot_speed;
+      }
 
       // Increment this robot's speed by the calculated amount and display an event
       $target_robot->robot_speed = ceil($target_robot->robot_speed + $temp_speed_boost);
-      $target_robot->robot_base_speed = ceil($target_robot->robot_base_speed + $temp_speed_base_boost);
+      $target_robot->robot_base_speed = ceil($target_robot->robot_base_speed + $temp_speed_boost);
       $event_options = array();
       $event_options['this_ability_results']['trigger_kind'] = 'recovery';
       $event_options['this_ability_results']['recovery_kind'] = 'speed';
@@ -316,6 +290,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
       $event_options['this_ability_results']['this_amount'] = $temp_speed_boost;
       $event_options['this_ability_results']['this_result'] = 'success';
       $event_options['this_ability_results']['total_actions'] = $temp_boost_actions++;
+      $event_options['this_ability_user'] = $this->robot_id.'_'.$this->robot_token;
       $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
       $event_options['console_show_target'] = false;
       $event_body = $target_robot->print_robot_name().' downloads mobility data from the target robot! ';
@@ -659,6 +634,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     $event_options['this_ability_results']['this_result'] = 'success';
     $event_options['this_ability_results']['flag_affinity'] = true;
     $event_options['this_ability_results']['total_actions'] = 1;
+    $event_options['this_ability_user'] = $this->robot_id.'_'.$this->robot_token;
     $event_options['this_ability_target'] = $temp_robot->robot_id.'_'.$temp_robot->robot_token;
 
     // Update player/robot frames and points for the victory
@@ -719,6 +695,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
       $event_options['this_ability_results']['this_amount'] = $temp_new_level - $temp_start_level;
       $event_options['this_ability_results']['this_result'] = 'success';
       $event_options['this_ability_results']['total_actions'] = 2;
+      $event_options['this_ability_user'] = $this->robot_id.'_'.$this->robot_token;
       $event_options['this_ability_target'] = $temp_robot->robot_id.'_'.$temp_robot->robot_token;
 
       // Display the win message for this robot with battle points
@@ -749,6 +726,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
       $event_options['this_ability_results']['this_amount'] = $this_defense_boost;
       $event_options['this_ability_results']['this_result'] = 'success';
       $event_options['this_ability_results']['total_actions'] = 0;
+      $event_options['this_ability_user'] = $this->robot_id.'_'.$this->robot_token;
       $event_options['this_ability_target'] = $temp_robot->robot_id.'_'.$temp_robot->robot_token;
 
       // Update the robot rewards array with any recent info

@@ -70,6 +70,7 @@ class mmrpg_player {
     $this->player_abilities = isset($this_playerinfo['player_abilities']) ? $this_playerinfo['player_abilities'] : array();
     $this->player_items = isset($this_playerinfo['player_items']) ? $this_playerinfo['player_items'] : array();
     $this->player_side = isset($this_playerinfo['player_side']) ? $this_playerinfo['player_side'] : 'left';
+    $this->player_controller = isset($this_playerinfo['player_controller']) ? $this_playerinfo['player_controller'] : ($this->player_side == 'left' ? 'human' : 'computer');
     $this->player_autopilot = isset($this_playerinfo['player_autopilot']) ? $this_playerinfo['player_autopilot'] : false;
     $this->player_quotes = isset($this_playerinfo['player_quotes']) ? $this_playerinfo['player_quotes'] : array();
     $this->player_rewards = isset($this_playerinfo['player_rewards']) ? $this_playerinfo['player_rewards'] : array();

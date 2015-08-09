@@ -369,8 +369,12 @@ ob_start();
       if ($info['robot_position'] == 'active'){ $temp_player_active_robots = true; }
     }
 
-    // Check if this is an active position robot
-    if ($this_data['robot_position'] != 'bench' || ($temp_player_active_robots == false && $this_data['robot_frame'] == 'damage')){
+    // Only show the robot details if active or the target of an attack
+    $show_details = false;
+    if (isset($options['this_ability_target']) && $options['this_ability_target'] == $this_data['robot_id_token']){ $show_details = true; }
+    elseif (!isset($options['this_ability_target']) || $this_data['robot_position'] == 'active'){ $show_details = true; }
+    elseif ($temp_player_active_robots == false && $this_data['robot_frame'] == 'damage'){ $show_details = true; }
+    if ($show_details){
 
       // Define the mugshot and detail variables for the GUI
       $details_data = $this_data;
