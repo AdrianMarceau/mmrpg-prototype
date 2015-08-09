@@ -985,17 +985,19 @@ class mmrpg_battle {
             if (!isset($this_battle->field->field_multipliers[$temp_boost_type])){ $this_battle->field->field_multipliers[$temp_boost_type] = 1.0 + $temp_change_percent; }
             else { $this_battle->field->field_multipliers[$temp_boost_type] = $this_battle->field->field_multipliers[$temp_boost_type] + $temp_change_percent; }
             if ($this_battle->field->field_multipliers[$temp_boost_type] >= MMRPG_SETTINGS_MULTIPLIER_MAX){
-              $temp_change_percent = MMRPG_SETTINGS_MULTIPLIER_MAX - $this_battle->field->field_multipliers[$temp_boost_type];
+              $temp_change_percent = $this_battle->field->field_multipliers[$temp_boost_type] - MMRPG_SETTINGS_MULTIPLIER_MAX;
               $this_battle->field->field_multipliers[$temp_boost_type] = MMRPG_SETTINGS_MULTIPLIER_MAX;
             }
             $this_battle->field->update_session();
 
             // Create the event to show this element boost
-            $this_battle->events_create($temp_robot, false, $this_battle->field->field_name.' Multipliers',
-            	mmrpg_battle::random_positive_word().' <span class="ability_name ability_type ability_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).' Effects</span> were boosted by '.ceil($temp_change_percent * 100).'%!<br />'.
-              'The multiplier is now at <span class="ability_name ability_type ability_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).' x '.number_format($this_battle->field->field_multipliers[$temp_boost_type], 1).'</span>!',
-              array('canvas_show_this_ability_overlay' => true)
-              );
+            if ($temp_change_percent > 0){
+              $this_battle->events_create($temp_robot, false, $this_battle->field->field_name.' Multipliers',
+              	mmrpg_battle::random_positive_word().' <span class="ability_name ability_type ability_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).' Effects</span> were boosted by '.ceil($temp_change_percent * 100).'%!<br />'.
+                'The multiplier is now at <span class="ability_name ability_type ability_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).' x '.number_format($this_battle->field->field_multipliers[$temp_boost_type], 1).'</span>!',
+                array('canvas_show_this_ability_overlay' => true)
+                );
+            }
 
             // Remove this ability attachment from this robot
             unset($temp_robot->robot_attachments[$this_attachment_token]);
