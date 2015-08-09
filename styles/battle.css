@@ -4,3 +4,29 @@
   width: 300px;
   margin-top: 4px;
 }
+#console .wrapper {
+  padding-right: 6px;
+  position: relative;
+  width: 99%;
+  width: calc(100% - 10px);
+}
+#console .ps-container {
+
+}
+#console .ps-container > .ps-scrollbar-y-rail {
+  background-color: #494949;
+  opacity: 0.3;
+  filter: alpha(opacity=30);  
+}
+#console .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+  
+}
+#console .ps-container:hover > .ps-scrollbar-y-rail:hover {
+  background-color: #363636;
+}
+#console .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail {
+  background-color: #696969;
+}
+#console .ps-container:hover > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
+  background-color: #969696;
+}

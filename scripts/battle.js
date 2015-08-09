@@ -1,18 +1,27 @@
+// Define globally accessible variables
+var thisBattle = false;
+
 // Create the document ready events
 $(document).ready(function(){
+  
+  // Collect global object references
+  var thisBattle = $('#battle');
+  
+  // Attach the scrollbar to the battle events container
+  //console.log('adding perfect scrollbar to console wrapper');
+  $('#console .wrapper', thisBattle).perfectScrollbar({suppressScrollX: true});  
   
   // Start playing the appropriate stage music
   parent.mmrpg_music_load(gameSettings.fieldMusic, true, false);
   // Preload battle related image files
   mmrpg_preload_assets();
   // Fade in the battle screen slowly
-  var thisContext = $('#battle');
-  thisContext.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, Math.ceil(gameSettings.eventTimeout * 3), 'swing', function(){
+  thisBattle.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, Math.ceil(gameSettings.eventTimeout * 3), 'swing', function(){
     // Automatically trigger a click on the start button
-    //$('#actions_start a[data-action=start]', thisContext).trigger('click');
+    //$('#actions_start a[data-action=start]', thisBattle).trigger('click');
     // Collect all the elements to be animated
-    var canvasContext = $('#canvas', thisContext);
-    thisContext.waitForImages(function(){
+    var canvasContext = $('#canvas', thisBattle);
+    thisBattle.waitForImages(function(){
       // Fade the battle canvas startup elements into view
       mmrpg_battle_fadein_background(canvasContext, Math.ceil(gameSettings.eventTimeout * 2), function(){
         // Fade in the foreground now so it loads at the same time as the robots
