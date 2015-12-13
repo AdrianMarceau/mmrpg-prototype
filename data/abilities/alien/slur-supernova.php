@@ -12,9 +12,6 @@ $ability = array(
   'ability_energy' => 64,
   'ability_function' => function($objects){
 
-    // Extract all objects into the current scope
-    extract($objects);
-
     // Return true on success
     return true;
 

@@ -9,9 +9,6 @@ $ability = array(
   'ability_accuracy' => 94,
   'ability_function' => function($objects){
 
-    // Extract all objects into the current scope
-    extract($objects);
-    
     // Return true on success
     return true;
 
