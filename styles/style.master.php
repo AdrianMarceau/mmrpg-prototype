@@ -1,7 +1,11 @@
-<?
-// Require the application top
+<?php
+
+// Define the STYLE REQUEST constant for later reference
 define('MMRPG_INDEX_STYLES', true);
-require_once('../top.php');
+
+// Include the application TOP file
+$temp_path = str_replace('\\', '/', dirname(dirname(__FILE__)));
+require($temp_path.'/_top.php');
 
 // Change the content header to that of CSS
 $cache_time = 60 * 60 * 24;
@@ -11,6 +15,8 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s", (time()+$cache_time)) . " GM
 header("Cache-control: public, max-age={$cache_time}, must-revalidate");
 header("Pragma: cache");
 
+// Collect the types index for looping
+$mmrpg_index_types = rpg_type::get_index();
 
 // Define a function for saving the style cache
 function mmrpg_save_style_markup($this_cache_filedir, $temp_css_markup){
@@ -51,7 +57,7 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
 
   // Require the master CSS file without any of the dynamic additions
   ob_start();
-  require_once('style.css');
+  require_once('style.master.css');
   $temp_css_markup .= ob_get_clean();
 
   /* -- TYPE STYLES -- */
@@ -65,7 +71,7 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
   $u_safari = preg_match('/Safari/i',$u_agent) ? 1 : 0;
   $u_opera = preg_match('/Opera/i',$u_agent) ? 1 : 0;
 
-  foreach ($mmrpg_index['types'] AS $type_token => $type_info){
+  foreach ($mmrpg_index_types AS $type_token => $type_info){
     ?>
     #mmrpg .type.<?= $type_info['type_token'] ?>,
     #mmrpg .type_<?= $type_info['type_token'] ?>,
@@ -80,9 +86,9 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
     #mmrpg .tooltip .typelist .type_<?= $type_info['type_token'] ?>:before {
       content: "<?= $type_info['type_name'] ?> ";
     }
-    <?
+    <?php
     // Loop through all the types again for the dual-type ability styles
-    foreach ($mmrpg_index['types'] AS $type2_token => $type2_info){
+    foreach ($mmrpg_index_types AS $type2_token => $type2_info){
       if ($type_token == $type2_token){ continue; }
       ?>
       #mmrpg .type.<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
@@ -94,11 +100,11 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
       #mmrpg .robot_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?> {
         border-color: rgb(<?= implode(',', $type_info['type_colour_dark']) ?>) !important;
         background-color: rgb(<?= implode(',', $type_info['type_colour_light']) ?>) !important;
-        <? if($u_opera): ?>
+        <?php if($u_opera): ?>
           background-image: -o-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
-        <? elseif($u_firefox): ?>
+        <?php elseif($u_firefox): ?>
           background-image: -moz-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
-        <? elseif($u_chrome || $u_safari): ?>
+        <?php elseif($u_chrome || $u_safari): ?>
           background-image: -webkit-gradient(
             linear,
             left top,
@@ -107,12 +113,12 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
             color-stop(1, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>))
           ) !important;
           background-image: -webkit-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
-        <? elseif($u_explorer): ?>
+        <?php elseif($u_explorer): ?>
           background-image: -ms-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
-        <? endif; ?>
+        <?php endif; ?>
         background-image: linear-gradient(to right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
       }
-      <?
+      <?php
       /*
       ?>
       #mmrpg .ability_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
@@ -135,7 +141,7 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
           color-stop(0.8, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>))
         ) !important;
       }
-      <?
+      <?php
       */
     }
   }
