@@ -10,7 +10,7 @@ $ability = array(
   'ability_speed' => 10,
   'ability_accuracy' => 100,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
     
@@ -23,16 +23,16 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'defend',
       'success' => array(9, 0, 0, -10,
-        $this_robot->print_robot_name().' has does not have enough weapon energy to use abilities&hellip;<br />'.
-        $this_robot->print_robot_name().' waits for '.$temp_pronoun.' power to recharge.'
+        $this_robot->print_name().' has does not have enough weapon energy to use abilities&hellip;<br />'.
+        $this_robot->print_name().' waits for '.$temp_pronoun.' power to recharge.'
         )
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
     */
-    
+
     // Return true on success
     return true;
-      
+
     }
   );
 ?>
