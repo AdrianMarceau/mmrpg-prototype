@@ -12,7 +12,7 @@ ExpiresByType audio/ogg "access plus 1 months"
 ExpiresByType application/ogg "access plus 1 months"
 ExpiresByType text/javascript "access plus 1 months"
 ExpiresByType text/css "access plus 1 months"
-</IfModule> 
+</IfModule>
 
 # Increase memory limit
 #php_value memory_limit 128M
@@ -44,10 +44,10 @@ RewriteCond %{HTTP_HOST} ^rpg.megamanpoweredup.net$ [NC]
 RewriteRule ^rpg2k11/(.*)$ http://rpg.megamanpoweredup.net/$1 [R=301,L]
 
 # Redirect the XML requests to their dynamic counterparts
-RewriteRule ^mmrpg-info\.xml$ mmrpg-info.php [L]
-RewriteRule ^mmrpg-ranking\.xml$ mmrpg-ranking.php [L]
+RewriteRule ^mmrpg-info\.xml$ external/external.mmrpg-info.php [L]
+RewriteRule ^mmrpg-ranking\.xml$ external/external.mmrpg-ranking.php [L]
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
-RewriteRule ^styles/style\.css$ styles/style.php [L]
+RewriteRule ^styles/style\.master\.css$ styles/style.master.php [L]
 
 # Redirect the non-existant pages to better places
 RewriteRule ^home/?$ / [R,L]
@@ -60,12 +60,10 @@ RewriteRule ^images/fields/guts-field/(.*)?$ /images/fields/mountain-mines/$1 [R
 RewriteRule ^images/robots/([a-z]+)man/(.*)?$ /images/robots/$1-man/$2 [R,L]
 
 # Define the rewrite conditions
-RewriteCond %{REQUEST_FILENAME} -d [OR]
 RewriteCond %{REQUEST_FILENAME} -f
-#RewriteRule (.*) - [S=15]
-RewriteRule (.*) - [S=100]
+RewriteRule (.*) - [S=45]
 
-# Define the redirect rules for the player image asset quick-paths
+# Define the redirect rules for the player image asset quick-paths (8)
 RewriteRule ^i/a/([-_a-z0-9]+)/il([0-9]+).png(.*)?$ images/abilities/$1/icon_left_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/a/([-_a-z0-9]+)/ir([0-9]+).png(.*)?$ images/abilities/$1/icon_right_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/as/([-_a-z0-9]+)/il([0-9]+).png(.*)?$ images/abilities_shadows/$1/icon_left_$2x$2.png?$3 [QSA,L]
@@ -75,7 +73,7 @@ RewriteRule ^i/a/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/abilities/$1/sprite_r
 RewriteRule ^i/as/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/abilities_shadows/$1/sprite_left_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/as/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/abilities_shadows/$1/sprite_right_$2x$2.png?$3 [QSA,L]
 
-# Define the redirect rules for the player image asset quick-paths
+# Define the redirect rules for the player image asset quick-paths (8)
 RewriteRule ^i/p/([-_a-z0-9]+)/ml([0-9]+).png(.*)?$ images/players/$1/mug_left_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/p/([-_a-z0-9]+)/mr([0-9]+).png(.*)?$ images/players/$1/mug_right_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/ps/([-_a-z0-9]+)/ml([0-9]+).png(.*)?$ images/players_shadows/$1/mug_left_$2x$2.png?$3 [QSA,L]
@@ -85,7 +83,7 @@ RewriteRule ^i/p/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/players/$1/sprite_rig
 RewriteRule ^i/ps/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/players_shadows/$1/sprite_left_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/ps/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/players_shadows/$1/sprite_right_$2x$2.png?$3 [QSA,L]
 
-# Define the redirect rules for the robot image asset quick-paths
+# Define the redirect rules for the robot image asset quick-paths (8)
 RewriteRule ^i/r/([-_a-z0-9]+)/ml([0-9]+).png(.*)?$ images/robots/$1/mug_left_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/r/([-_a-z0-9]+)/mr([0-9]+).png(.*)?$ images/robots/$1/mug_right_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/rs/([-_a-z0-9]+)/ml([0-9]+).png(.*)?$ images/robots_shadows/$1/mug_left_$2x$2.png?$3 [QSA,L]
@@ -95,14 +93,14 @@ RewriteRule ^i/r/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/robots/$1/sprite_righ
 RewriteRule ^i/rs/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/robots_shadows/$1/sprite_left_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/rs/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/robots_shadows/$1/sprite_right_$2x$2.png?$3 [QSA,L]
 
-# Define the redirect rules for the field image asset quick-paths
+# Define the redirect rules for the field image asset quick-paths (5)
 RewriteRule ^i/f/([-_a-z0-9]+)/bfa.png(.*)?$ images/fields/$1/battle-field_avatar.png?$3 [QSA,L]
 RewriteRule ^i/f/([-_a-z0-9]+)/bfbb.gif(.*)?$ images/fields/$1/battle-field_background_base.gif?$3 [QSA,L]
 RewriteRule ^i/f/([-_a-z0-9]+)/bfbb.png(.*)?$ images/fields/$1/battle-field_background_base.png?$3 [QSA,L]
 RewriteRule ^i/f/([-_a-z0-9]+)/bffb.png(.*)?$ images/fields/$1/battle-field_foreground_base.png?$3 [QSA,L]
 RewriteRule ^i/f/([-_a-z0-9]+)/bfp.png(.*)?$ images/fields/$1/battle-field_preview.png?$3 [QSA,L]
 
-# Define the redirect rules for specific pages
+# Define the redirect rules for specific pages (16)
 RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/?([0-9]+)/?$ index.php?page=community&cat=$1&id=$2&token=$3&num=$4 [QSA,L]
 RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/?([0-9]+)/(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&num=$4&$5 [QSA,L]
 RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&target=$4&$5 [QSA,L]
