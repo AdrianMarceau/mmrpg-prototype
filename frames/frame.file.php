@@ -1,6 +1,6 @@
-<?
+<?php
 // Require the application top file
-require_once('../top.php');
+require_once('../_top.php');
 
 // Include the database index array files
 require('../data/database_types.php');
@@ -25,7 +25,7 @@ $html_form_messages = '';
 
 // Create the has updated flag and default to false
 $file_has_updated = false;
-$session_token = mmrpg_game_token();
+$session_token = rpg_game::session_token();
 
 // If the SAVE action was requested
 while ($this_action == 'save'){
@@ -74,8 +74,8 @@ while ($this_action == 'save'){
     }
 
     // Save the current game session into the file
-    mmrpg_save_game_session($this_save_filepath);
-    $this_userinfo = $DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+    rpg_game::save_session($this_save_filepath);
+    $this_userinfo = $this_database->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
     $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
     // If a game session's info was backup up for deletion
     if (!empty($backup_save_filepath) && $backup_save_filepath != $this_save_filepath){
@@ -91,7 +91,7 @@ while ($this_action == 'save'){
   }
 
   // Sort the robot index based on robot number
-  //$mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
+  //$mmrpg_database_robots = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
   //uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
   //die('<pre>$mmrpg_database_robots = '.print_r($mmrpg_database_robots, true).'</pre>');
 
@@ -163,8 +163,8 @@ while ($this_action == 'save'){
       elseif (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){ continue; }
       elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
       elseif (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
-      if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
-      //$info = mmrpg_robot::parse_index_info($info);
+      if (!rpg_game::robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
+      //$info = rpg_robot::parse_index_info($info);
 
       // If the game has changed print the new optgroup
       if ($info['robot_game'] != $temp_optgroup_token){
@@ -180,7 +180,7 @@ while ($this_action == 'save'){
       $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
 
       // Collect the summon count for this robot
-      $temp_summon_count = mmrpg_prototype_database_summoned($token);
+      $temp_summon_count = rpg_prototype::database_summoned($token);
 
       // If this is a copy core, add it's type alts
       if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
@@ -226,28 +226,28 @@ while ($this_action == 'save'){
   $html_form_buttons .= '<div class="extra_options">';
 
     // Ensure the player is unlocked
-    if (mmrpg_prototype_player_unlocked('dr-light')){
+    if (rpg_game::player_unlocked('dr-light')){
       $html_form_buttons .= '<div class="reset_wrapper wrapper_dr-light">';
-        $html_form_buttons .= '<div class="wrapper_header">Dr. Light'.(mmrpg_prototype_complete('dr-light') ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! :D">&hearts;</span>' : '').'</div>';
-        if (mmrpg_prototype_battles_complete('dr-light') > 0){ $html_form_buttons .= '<input class="button button_reset button_reset_missions" type="button" value="Reset Missions" onclick="javascript:parent.window.mmrpg_trigger_reset_missions(\'dr-light\', \'Dr. Light\');" />'; }
+        $html_form_buttons .= '<div class="wrapper_header">Dr. Light'.(rpg_prototype::campaign_complete('dr-light') ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! :D">&hearts;</span>' : '').'</div>';
+        if (rpg_prototype::battles_complete('dr-light') > 0){ $html_form_buttons .= '<input class="button button_reset button_reset_missions" type="button" value="Reset Missions" onclick="javascript:parent.window.mmrpg_trigger_reset_missions(\'dr-light\', \'Dr. Light\');" />'; }
         else { $html_form_buttons .= '<input class="button button_reset button_reset_missions" type="button" value="Reset Missions" style="text-decoration: line-through;" />'; }
       $html_form_buttons .= '</div>';
     }
 
     // Ensure the player is unlocked
-    if (mmrpg_prototype_player_unlocked('dr-wily')){
+    if (rpg_game::player_unlocked('dr-wily')){
       $html_form_buttons .= '<div class="reset_wrapper wrapper_dr-wily">';
-        $html_form_buttons .= '<div class="wrapper_header">Dr. Wily'.(mmrpg_prototype_complete('dr-light') ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! >:D">&clubs;</span>' : '').'</div>';
-        if (mmrpg_prototype_battles_complete('dr-wily') > 0){ $html_form_buttons .= '<input class="button button_reset button_reset_missions" type="button" value="Reset Missions" onclick="javascript:parent.window.mmrpg_trigger_reset_missions(\'dr-wily\', \'Dr. Wily\');" />'; }
+        $html_form_buttons .= '<div class="wrapper_header">Dr. Wily'.(rpg_prototype::campaign_complete('dr-light') ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! >:D">&clubs;</span>' : '').'</div>';
+        if (rpg_prototype::battles_complete('dr-wily') > 0){ $html_form_buttons .= '<input class="button button_reset button_reset_missions" type="button" value="Reset Missions" onclick="javascript:parent.window.mmrpg_trigger_reset_missions(\'dr-wily\', \'Dr. Wily\');" />'; }
         else { $html_form_buttons .= '<input class="button button_reset button_reset_missions" type="button" value="Reset Missions" style="text-decoration: line-through;" />'; }
       $html_form_buttons .= '</div>';
     }
 
     // Ensure the player is unlocked
-    if (mmrpg_prototype_player_unlocked('dr-cossack')){
+    if (rpg_game::player_unlocked('dr-cossack')){
       $html_form_buttons .= '<div class="reset_wrapper wrapper_dr-cossack">';
-        $html_form_buttons .= '<div class="wrapper_header">Dr. Cossack'.(mmrpg_prototype_complete('dr-light') ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! >:D">&diams;</span>' : '').'</div>';
-        if (mmrpg_prototype_battles_complete('dr-cossack') > 0){ $html_form_buttons .= '<input class="button button_reset button_reset_missions" type="button" value="Reset Missions" onclick="javascript:parent.window.mmrpg_trigger_reset_missions(\'dr-cossack\', \'Dr. Cossack\');" />'; }
+        $html_form_buttons .= '<div class="wrapper_header">Dr. Cossack'.(rpg_prototype::campaign_complete('dr-light') ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! >:D">&diams;</span>' : '').'</div>';
+        if (rpg_prototype::battles_complete('dr-cossack') > 0){ $html_form_buttons .= '<input class="button button_reset button_reset_missions" type="button" value="Reset Missions" onclick="javascript:parent.window.mmrpg_trigger_reset_missions(\'dr-cossack\', \'Dr. Cossack\');" />'; }
         else { $html_form_buttons .= '<input class="button button_reset button_reset_missions" type="button" value="Reset Missions" style="text-decoration: line-through;" />'; }
       $html_form_buttons .= '</div>';
     }
@@ -361,11 +361,11 @@ while ($this_action == 'new'){
     $_SESSION[$session_token]['USER'] = $this_user;
     $_SESSION[$session_token]['FILE'] = $this_file;
     // Reset the game session to start fresh
-    mmrpg_reset_game_session($this_save_filepath);
+    rpg_game::reset_session($this_save_filepath);
     // Save this new game session into the file
-    mmrpg_save_game_session($this_save_filepath);
+    rpg_game::save_session($this_save_filepath);
     // Load the save file back into memory and overwrite the session
-    mmrpg_load_game_session($this_save_filepath);
+    rpg_game::load_session($this_save_filepath);
     // Update the form markup, then break from the loop
     $file_has_updated = true;
 
@@ -482,7 +482,7 @@ while ($this_action == 'load'){
     if (file_exists($temp_save_filepath) && is_dir($temp_save_filepath)){
 
       // The file exists, so let's collect this user's info from teh database
-      $temp_database_user = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
+      $temp_database_user = $this_database->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
 
       // The file exists, so let's check the password
       $temp_save_filepath .= $this_file['name'];
@@ -497,12 +497,12 @@ while ($this_action == 'load'){
           $_SESSION['GAME']['FILE'] = $this_file;
           // Load the save file into memory and overwrite the session
           $this_save_filepath = $temp_save_filepath;
-          mmrpg_load_game_session($this_save_filepath);
+          rpg_game::load_session($this_save_filepath);
           if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
             //die('battle points are empty 2');
-            mmrpg_reset_game_session($this_save_filepath);
+            rpg_game::reset_session($this_save_filepath);
           }
-          mmrpg_save_game_session($this_save_filepath);
+          rpg_game::save_session($this_save_filepath);
           // Update the form markup, then break from the loop
           $file_has_updated = true;
           break;
@@ -553,16 +553,16 @@ while ($this_action == 'load'){
           $_SESSION['GAME']['FILE'] = $this_file;
           // Load the save file into memory and overwrite the session
           $this_save_filepath = $temp_save_filepath;
-          mmrpg_load_game_session($this_save_filepath);
+          rpg_game::load_session($this_save_filepath);
           if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
             //die('battle points are empty 1');
-            mmrpg_reset_game_session($this_save_filepath);
+            rpg_game::reset_session($this_save_filepath);
           }
           // Update the file with the coppa approval flag and birthdate
           $_SESSION['GAME']['USER']['dateofbirth'] = strtotime($_REQUEST['dateofbirth']);
           $_SESSION['GAME']['USER']['approved'] = 1;
           //die('<pre>$_SESSION[GAME][USER] = '.print_r($_SESSION['GAME']['USER'], true).'</pre>');
-          mmrpg_save_game_session($this_save_filepath);
+          rpg_game::save_session($this_save_filepath);
           // Update the form markup, then break from the loop
           $file_has_updated = true;
           break;
@@ -647,24 +647,24 @@ if (empty($_SESSION[$session_token]['DEMO'])){
 <head>
 <meta charset="UTF-8" />
 <title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?><?= ucfirst($this_action) ?> Game | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
-<base href="<?=MMRPG_CONFIG_ROOTURL?>" />
+<base href="<?= MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
-<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/file.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.master.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.file.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
-<link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype_mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 <script type="text/javascript" src="scripts/jquery.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.master.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.prototype.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
 gameSettings.fadeIn = false;
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE?>';
 // Create the reload parent flag for later
 var reloadIndex = false;
 var reloadParent = false;
@@ -714,11 +714,11 @@ $(document).ready(function(){
   // Fade in the leaderboard screen slowly
   thisBody.waitForImages(function(){
     var tempTimeout = setTimeout(function(){
-      <? if ($allow_fadein): ?>
+      <?php if ($allow_fadein): ?>
       thisBody.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing');
-      <? else: ?>
+      <?php else: ?>
       thisBody.css({opacity:1}).removeClass('hidden');
-      <? endif; ?>
+      <?php endif; ?>
       // Let the parent window know the menu has loaded
       parent.prototype_menu_loaded();
       }, 1000);
@@ -762,39 +762,39 @@ function windowResizeFrame(){
 
     <form class="menu" action="frames/file.php?action=<?= $this_action ?>" method="post" autocomplete="on">
 
-      <? if(!empty($html_header_text)): ?>
+      <?php if(!empty($html_header_text)): ?>
       <span class="header block_1"><?= $html_header_title ?></span>
-      <? endif; ?>
+      <?php endif; ?>
 
       <div class="wrapper">
-        <? if(!empty($html_header_text)): ?>
+        <?php if(!empty($html_header_text)): ?>
           <p class="intro intro_new"><?= $html_header_text ?></p>
-        <? endif; ?>
-        <? if(!empty($html_form_messages)): ?>
+        <?php endif; ?>
+        <?php if(!empty($html_form_messages)): ?>
           <div class="messages_wrapper">
             <?= $html_form_messages ?>
           </div>
-        <? endif; ?>
+        <?php endif; ?>
         <div class="fields_wrapper">
           <input type="hidden" name="submit" value="true" />
           <input type="hidden" name="action" value="<?= $this_action ?>" />
           <?= !empty($html_form_fields) ? $html_form_fields : '' ?>
         </div>
-        <? if(!empty($html_form_buttons)): ?>
+        <?php if(!empty($html_form_buttons)): ?>
           <div class="buttons_wrapper">
             <?= $html_form_buttons ?>
           </div>
-        <? endif; ?>
+        <?php endif; ?>
       </div>
 
     </form>
 
   </div>
-<?
+<?php
 // Google Analytics
-if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
+if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
 // Unset the database variable
-unset($DB);
+unset($this_database);
 ?>
 </body>
 </html>

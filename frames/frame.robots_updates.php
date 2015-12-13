@@ -1,4 +1,4 @@
-<?
+<?php
 // Define the temporary debug variable
 define('EDIT_ROBOT_UPDATES_DEBUG', false);
 
@@ -43,7 +43,7 @@ if (EDIT_ROBOT_UPDATES_DEBUG){
     background-color: rgba(0, 0, 0, 0.6);
   }
   </style>
-  <?
+  <?php
 }
 
 $temp_battle_rewards = &$_SESSION[$session_token]['values']['battle_rewards'];
@@ -106,10 +106,10 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
     if (EDIT_ROBOT_UPDATES_DEBUG){
       echo '<div class="robot_block">';
       echo '<strong class="robot_title">'.$temp_robot_token.' (phase-'.$temp_phase_loop.') ('.$temp_player_token.') '.($temp_player_token != $temp_robot_info['original_player'] ? '[via-'.$temp_robot_info['original_player'].']' : '').'</strong>';
-      echo array2table(array('robot_level' => $temp_robot_info['robot_level']), true);
-      echo array2table(array('robot_stats' => $temp_robot_info['robot_stats']), true);
-      echo array2table(array('robot_stats_total' => $temp_robot_info['robot_stats_total']), true);
-      echo array2table(array('robot_stats_overflow' => $temp_robot_info['robot_stats_overflow']), true);
+      echo rpg_website::array_to_table(array('robot_level' => $temp_robot_info['robot_level']), true);
+      echo rpg_website::array_to_table(array('robot_stats' => $temp_robot_info['robot_stats']), true);
+      echo rpg_website::array_to_table(array('robot_stats_total' => $temp_robot_info['robot_stats_total']), true);
+      echo rpg_website::array_to_table(array('robot_stats_overflow' => $temp_robot_info['robot_stats_overflow']), true);
       echo '</div>';
     }
 
@@ -212,10 +212,10 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
         if (EDIT_ROBOT_UPDATES_DEBUG){
           echo '<div class="robot_block">';
           echo '<strong class="robot_title">'.$temp_robot_token.' (phase-'.$temp_phase_loop.') ('.$temp_player_token.') '.($temp_player_token != $temp_robot_info['original_player'] ? '[via-'.$temp_robot_info['original_player'].']' : '').'</strong>';
-          echo array2table(array('robot_level' => $temp_robot_info['robot_level']), true);
-          echo array2table(array('robot_stats' => $temp_robot_info['robot_stats']), true);
-          echo array2table(array('robot_stats_total' => $temp_robot_info['robot_stats_total']), true);
-          echo array2table(array('robot_stats_overflow' => $temp_robot_info['robot_stats_overflow']), true);
+          echo rpg_website::array_to_table(array('robot_level' => $temp_robot_info['robot_level']), true);
+          echo rpg_website::array_to_table(array('robot_stats' => $temp_robot_info['robot_stats']), true);
+          echo rpg_website::array_to_table(array('robot_stats_total' => $temp_robot_info['robot_stats_total']), true);
+          echo rpg_website::array_to_table(array('robot_stats_overflow' => $temp_robot_info['robot_stats_overflow']), true);
           echo '</div>';
         }
 
@@ -289,12 +289,12 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
         if (EDIT_ROBOT_UPDATES_DEBUG){
           echo '<div class="robot_block">';
           echo '<strong class="robot_title">'.$temp_robot_token.' (phase-'.$temp_phase_loop.') ('.$temp_player_token.') '.($temp_player_token != $temp_robot_info['original_player'] ? '[via-'.$temp_robot_info['original_player'].']' : '').'</strong>';
-          echo array2table(array('robot_level' => $temp_robot_info['robot_level']), true);
-          echo array2table(array('robot_stats' => $temp_robot_info['robot_stats']), true);
-          echo array2table(array('robot_stats_total' => $temp_robot_info['robot_stats_total']), true);
-          echo array2table(array('robot_stats_overflow' => $temp_robot_info['robot_stats_overflow']), true);
-          if ($temp_stat_maxed_flag){ echo array2table(array('robot_stats_maxed' => 'true'), true); }
-          echo array2table(array('remaining_overflow_value' => $temp_total_overflow_value), true);
+          echo rpg_website::array_to_table(array('robot_level' => $temp_robot_info['robot_level']), true);
+          echo rpg_website::array_to_table(array('robot_stats' => $temp_robot_info['robot_stats']), true);
+          echo rpg_website::array_to_table(array('robot_stats_total' => $temp_robot_info['robot_stats_total']), true);
+          echo rpg_website::array_to_table(array('robot_stats_overflow' => $temp_robot_info['robot_stats_overflow']), true);
+          if ($temp_stat_maxed_flag){ echo rpg_website::array_to_table(array('robot_stats_maxed' => 'true'), true); }
+          echo rpg_website::array_to_table(array('remaining_overflow_value' => $temp_total_overflow_value), true);
           echo '</div>';
         }
 
@@ -340,12 +340,12 @@ if (!empty($temp_battle_rewards) || !empty($temp_battle_settings)){
           foreach ($temp_robot_info['robot_abilities'] AS $temp_ability_token => $temp_ability_info){
            if (EDIT_ROBOT_UPDATES_DEBUG){ echo '---- '.$temp_ability_token; }
 
-           if (mmrpg_prototype_ability_unlocked($temp_robot_info['original_player'], false, $temp_ability_token)){
+           if (rpg_game::ability_unlocked($temp_robot_info['original_player'], false, $temp_ability_token)){
              if (EDIT_ROBOT_UPDATES_DEBUG){ echo ' (unlocked!)'; }
            } else {
              if (EDIT_ROBOT_UPDATES_DEBUG){ echo ' (not unlocked!)'; }
              $temp_original_player_info = array('player_token' => $temp_robot_info['original_player']);
-             mmrpg_game_unlock_ability($temp_original_player_info, false, $temp_ability_info);
+             rpg_game::unlock_ability($temp_original_player_info, false, $temp_ability_info);
              if (EDIT_ROBOT_UPDATES_DEBUG){ echo ' (but unlocked now!)'; }
            }
 

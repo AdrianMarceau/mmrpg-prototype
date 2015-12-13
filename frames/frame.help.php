@@ -1,6 +1,6 @@
-<?
+<?php
 // Require the application top file
-require_once('../top.php');
+require_once('../_top.php');
 
 // Require the tooltip data file
 //require_once('../data/prototype.php');
@@ -32,7 +32,7 @@ $prototype_tooltip_index[] = 'Elemental abilities are powerful but can damage th
 //$prototype_tooltip_index[] = '';
 //$prototype_tooltip_index[] = '';
 
-if (!empty($_SESSION[mmrpg_game_token()]['DEMO'])){
+if (!empty($_SESSION[rpg_game::session_token()]['DEMO'])){
 
   // Define the demo-mode specific player tooltips
   $prototype_tooltip_index[] = 'Progress cannot be saved in the demo mode, but creating a new save file will let you start your adventure with any points earned thus far.';
@@ -40,7 +40,7 @@ if (!empty($_SESSION[mmrpg_game_token()]['DEMO'])){
 } else {
 
   // Define the normal mode tooltips
-  $unlock_count_players = mmrpg_prototype_players_unlocked();
+  $unlock_count_players = rpg_game::players_unlocked();
   $prototype_tooltip_index[] = 'Benched robots take reduced damage based on their distance from the attacker. Use this to your advantage and put your weakest in the back!';
   $prototype_tooltip_index[] = 'Equip as many abilities as you can - there is no penalty for having multiple weapons and it\'s always better to be prepared for battle.';
   $prototype_tooltip_index[] = 'The enemy robots that appear in battle grow in level as you progress through the game, so replay old missions if you\'re having a hard time.';
@@ -64,19 +64,19 @@ $this_tooltip_count = !empty($prototype_tooltip_index) ? count($prototype_toolti
 <head>
 <meta charset="UTF-8" />
 <title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?>View Help | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
-<base href="<?=MMRPG_CONFIG_ROOTURL?>" />
+<base href="<?= MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
-<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/help.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.master.css??<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.help.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
-<link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype_mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 <script type="text/javascript" src="scripts/jquery.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.master.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.prototype.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
 gameSettings.fadeIn = <?= empty($this_start_key) ? 'true' : 'false' ?>;
@@ -113,13 +113,13 @@ $(document).ready(function(){
   // Wait for this page's images to finish loading
   thisBody.waitForImages(function(){
     var tempTimeout = setTimeout(function(){
-      <? if(empty($this_start_key)): ?>
+      <?php if(empty($this_start_key)): ?>
       // Fade in the tooltip screen slowly
       thisBody.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing');
-      <? else: ?>
+      <?php else: ?>
       // Unhide the leadboard screen quickly
       thisBody.css({opacity:1}).removeClass('hidden');
-      <? endif; ?>
+      <?php endif; ?>
       // Let the parent window know the menu has loaded
       parent.prototype_menu_loaded();
       }, 1000);
@@ -162,7 +162,7 @@ function windowResizeLeaderboard(){
 
       <div class="help">
         <div class="wrapper" style="<?= $flag_wap ? 'margin-right: 0;' : '' ?>">
-        <?
+        <?php
 
         // Print out the generated tooltip markup
         //echo $this_tooltip_markup;
@@ -200,11 +200,11 @@ function windowResizeLeaderboard(){
 
   </div>
 
-<?
+<?php
 // Google Analytics
-if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
+if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
 // Unset the database variable
-unset($DB);
+unset($this_database);
 ?>
 </body>
 </html>

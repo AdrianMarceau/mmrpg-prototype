@@ -1,4 +1,4 @@
-<?
+<?php
 // Collect the ability variables from the request header, if they exist
 $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
 $temp_robot = !empty($_REQUEST['robot']) ? $_REQUEST['robot'] : '';
@@ -22,14 +22,14 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
   if ($temp_backup_level >= 100){ $_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'][$temp_robot]['robot_experience'] = 0; }
 
   // Save, produce the success message with the new ability order
-  mmrpg_save_game_session($this_save_filepath);
+  rpg_game::save_session($this_save_filepath);
   $key_counter = 0;
   $player_counter = 1;
   $temp_robot_totals = array();
   $player_options_markup = '';
   foreach($allowed_edit_data AS $ptoken => $pinfo){
     $temp_robot_totals[$ptoken] = !empty($pinfo['player_robots']) ? count($pinfo['player_robots']) : 0;
-    $temp_player_battles = mmrpg_prototype_battles_complete($ptoken);
+    $temp_player_battles = rpg_prototype::battles_complete($ptoken);
     $temp_player_transfer = $temp_player_battles >= 1 ? true : false;
     $player_options_markup .= '<option value="'.$pinfo['player_token'].'" data-label="'.$pinfo['player_token'].'" title="'.$pinfo['player_name'].'" '.(!$temp_player_transfer ? 'disabled="disabled"' : '').'>'.$pinfo['player_name'].'</option>';
     $player_counter++;
@@ -40,7 +40,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
       $debug_robot_tokens = array();
       foreach ($temp_player_info['player_robots'] AS $rtoken => $rinfo){ $debug_robot_tokens[] = $rtoken; }
 
-      $player_rewards = mmrpg_prototype_player_rewards($temp_player_token);
+      $player_rewards = rpg_game::player_rewards($temp_player_token);
       $player_ability_rewards = !empty($player_rewards['player_abilities']) ? $player_rewards['player_abilities'] : array();
       if (!empty($player_ability_rewards)){ asort($player_ability_rewards); }
 
@@ -49,7 +49,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
       $temp_robot_info['robot_settings'] = $temp_robot_settings;
       $temp_robot_info['robot_rewards'] = $temp_robot_rewards;
       $first_robot_token = $temp_robot_info['robot_token'];
-      exit('success|level-reset|'.mmrpg_robot::print_editor_markup($temp_player_info, $temp_robot_info));
+      exit('success|level-reset|'.rpg_robot::print_editor_markup($temp_player_info, $temp_robot_info));
     }
   }
 

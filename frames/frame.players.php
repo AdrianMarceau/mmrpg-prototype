@@ -1,6 +1,6 @@
 <?php
 // Include the TOP file
-require_once('../top.php');
+require_once('../_top.php');
 
 // Unset the prototype temp variable
 $_SESSION['PROTOTYPE_TEMP'] = array();
@@ -8,19 +8,19 @@ $_SESSION['PROTOTYPE_TEMP'] = array();
 // Require the remote top in case we're in viewer mode
 define('MMRPG_REMOTE_SKIP_INDEX', true);
 define('MMRPG_REMOTE_SKIP_DATABASE', true);
-require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
+require(MMRPG_CONFIG_ROOTDIR.'frames/frame.remote_top.php');
 
 // Collect the session token
-$session_token = mmrpg_game_token();
+$session_token = rpg_game::session_token();
 
 // Include the DATABASE file
 //require_once('../data/database.php');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_fields.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database.types.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database.players.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database.robots.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database.abilities.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database.fields.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database.items.php');
 // Collect the editor flag if set
 $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
 
@@ -28,9 +28,9 @@ $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false
 //require_once('../data/prototype.php');
 require_once('../data/prototype_omega.php');
 $temp_omega_factor_options = array();
-if (mmrpg_prototype_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
-if (mmrpg_prototype_complete('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
-if (mmrpg_prototype_complete('dr-cossack')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); }
+if (rpg_prototype::campaign_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
+if (rpg_prototype::campaign_complete('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
+if (rpg_prototype::campaign_complete('dr-cossack')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); }
 $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
 // Loop through unlockable system fields with no type
 foreach ($this_omega_factors_system AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_omega_factor_options[] = $factor; } }
@@ -39,7 +39,7 @@ foreach ($this_omega_factors_four AS $key => $factor){ if (in_array($factor['fie
 
 /*
 // Collect all the unlocked players for all players
-$battle_settings = $_SESSION[mmrpg_game_token()]['values']['battle_settings'];
+$battle_settings = $_SESSION[rpg_game::session_token()]['values']['battle_settings'];
 foreach ($battle_settings AS $player_token => $player_info){
   $player_info = array_merge($mmrpg_index['players'][$player_token], $player_info);
   $player_players = $player_info['player_players'];
@@ -106,9 +106,9 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Update the new field settings in the session variable
     $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_fields'] = $temp_fields_new;
     // Collect the available star counts for this player
-    $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
+    $temp_star_counts = rpg_game::stars_available($temp_player);
     // Save, produce the success message with the new field order
-    mmrpg_save_game_session($this_save_filepath);
+    rpg_game::save_session($this_save_filepath);
     exit('success|field-removed|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
   }
@@ -127,7 +127,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     $new_target_robot_omega = array();
     foreach ($temp_fields_new AS $token => $info){
       if (!isset($mmrpg_database_fields[$token])){ continue; }
-      $info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+      $info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
       $new_target_robot_omega[] = array(
         'robot' => $info['field_master'],
         'field' => $info['field_token'],
@@ -138,9 +138,9 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     //$new_target_robot_omega = array_reverse($new_target_robot_omega);
     $_SESSION[$session_token]['values'][$temp_session_key] = $new_target_robot_omega;
     // Collect the available star counts for this player
-    $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
+    $temp_star_counts = rpg_game::stars_available($temp_player);
     // Save, produce the success message with the new field order
-    mmrpg_save_game_session($this_save_filepath);
+    rpg_game::save_session($this_save_filepath);
     exit('success|field-shuffled|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
 
@@ -169,7 +169,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     $new_target_robot_omega = array();
     foreach ($temp_fields_new AS $token => $info){
       if (!isset($mmrpg_database_fields[$token])){ continue; }
-      $info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+      $info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
       $new_target_robot_omega[] = array(
         'robot' => $info['field_master'],
         'field' => $info['field_token'],
@@ -180,9 +180,9 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     //$new_target_robot_omega = array_reverse($new_target_robot_omega);
     $_SESSION[$session_token]['values'][$temp_session_key] = $new_target_robot_omega;
     // Collect the available star counts for this player
-    $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
+    $temp_star_counts = rpg_game::stars_available($temp_player);
     // Save, produce the success message with the new field order
-    mmrpg_save_game_session($this_save_filepath);
+    rpg_game::save_session($this_save_filepath);
     exit('success|field-randomize|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
 
@@ -202,7 +202,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     $new_target_robot_omega = array();
     foreach ($temp_fields_new AS $token => $info){
       if (!isset($mmrpg_database_fields[$token])){ continue; }
-      $info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+      $info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
       $new_target_robot_omega[] = array(
         'robot' => $info['field_master'],
         'field' => $info['field_token'],
@@ -213,9 +213,9 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     //$new_target_robot_omega = array_reverse($new_target_robot_omega);
     $_SESSION[$session_token]['values'][$temp_session_key] = $new_target_robot_omega;
     // Collect the available star counts for this player
-    $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
+    $temp_star_counts = rpg_game::stars_available($temp_player);
     // Save, produce the success message with the new field order
-    mmrpg_save_game_session($this_save_filepath);
+    rpg_game::save_session($this_save_filepath);
     exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
   }
@@ -241,7 +241,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     $new_target_robot_omega = array();
     foreach ($temp_fields_new AS $token => $info){
       if (!isset($mmrpg_database_fields[$token])){ continue; }
-      $info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+      $info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
       $new_target_robot_omega[] = array(
         'robot' => $info['field_master'],
         'field' => $info['field_token'],
@@ -252,15 +252,15 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     //$new_target_robot_omega = array_reverse($new_target_robot_omega);
     $_SESSION[$session_token]['values'][$temp_session_key] = $new_target_robot_omega;
     // Collect the available star counts for this player
-    $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
+    $temp_star_counts = rpg_game::stars_available($temp_player);
     // Save, produce the success message with the new field order
-    mmrpg_save_game_session($this_save_filepath);
+    rpg_game::save_session($this_save_filepath);
     exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
   } else {
 
     // Collect the available star counts for this player
-    $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
+    $temp_star_counts = rpg_game::stars_available($temp_player);
     // Produce an error show this field has already been selected
     exit('error|field-exists|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
@@ -330,7 +330,7 @@ if (true){
   // Predefine the player options markup
   $player_options_markup = '';
   foreach($allowed_edit_data AS $player_token => $player_info){
-    $temp_player_battles = mmrpg_prototype_battles_complete($player_token);
+    $temp_player_battles = rpg_prototype::battles_complete($player_token);
     $temp_player_transfer = $temp_player_battles >= 1 ? true : false;
     $player_options_markup .= '<option value="'.$player_info['player_token'].'" data-label="'.$player_info['player_token'].'" title="'.$player_info['player_name'].'" '.(!$temp_player_transfer ? 'disabled="disabled"' : '').'>'.$player_info['player_name'].'</option>';
   }
@@ -349,9 +349,9 @@ if (true){
   //require_once('../data/prototype.php');
   require_once('../data/prototype_omega.php');
   $temp_omega_factor_options = array();
-  if (mmrpg_prototype_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
-  if (mmrpg_prototype_complete('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
-  if (mmrpg_prototype_complete('dr-cossack')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); }
+  if (rpg_prototype::campaign_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
+  if (rpg_prototype::campaign_complete('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
+  if (rpg_prototype::campaign_complete('dr-cossack')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); }
   $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
   // Loop through the unlockable MM3 fields (from omega factor four)
   foreach ($this_omega_factors_four AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_omega_factor_options[] = $factor; } }
@@ -361,7 +361,7 @@ if (true){
   foreach($allowed_edit_data AS $player_token => $player_info){
 
     // Collect the rewards for this player
-    $player_rewards = mmrpg_prototype_player_rewards($player_token);
+    $player_rewards = rpg_game::player_rewards($player_token);
 
     // Auto-populate the player fields array with appropriate values
     if (empty($player_rewards['player_fields'])){
@@ -370,7 +370,7 @@ if (true){
       // Loop through and add all the MM1 fields
       foreach ($temp_omega_factor_options AS $omega_key => $omega_info){
         if (empty($mmrpg_database_fields[$omega_info['field']])){ continue; }
-        $field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$omega_info['field']]);
+        $field_info = rpg_field::parse_index_info($mmrpg_database_fields[$omega_info['field']]);
         $player_rewards['player_fields'][] = $field_info;
       }
     }
@@ -393,7 +393,7 @@ if (true){
 
     // Check how many players this player has and see if they should be able to transfer
     $counter_player_players = !empty($player_info['player_players']) ? count($player_info['player_players']) : false;
-    $counter_player_missions = mmrpg_prototype_battles_complete($player_info['player_token']);
+    $counter_player_missions = rpg_prototype::battles_complete($player_info['player_token']);
     $allow_player_selector = $player_counter > 1 && $counter_player_missions > 0 ? true : false; //$counter_player_players > 1 && $player_counter > 1 ? true : false;
 
     // If this player has fewer players than any other player
@@ -417,7 +417,7 @@ if (true){
     //die(print_r($player_rewards, true));
 
     // Collect and print the editor markup for this player
-    $temp_editor_markup = mmrpg_player::print_editor_markup($player_info);
+    $temp_editor_markup = rpg_player::print_editor_markup($player_info);
     echo $temp_editor_markup;
 
     $key_counter++;
@@ -477,7 +477,7 @@ if (true){
   </table>
   </div>
 
-  <?
+  <?php
 
   // Collect the output buffer content
   $this_edit_markup = preg_replace('#\s+#', ' ', trim(ob_get_clean()));
@@ -489,15 +489,15 @@ if (true){
 <head>
 <meta charset="UTF-8" />
 <title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?><?= $global_allow_editing ? 'Edit' : 'View' ?> Players | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
-<base href="<?=MMRPG_CONFIG_ROOTURL?>" />
+<base href="<?= MMRPG_CONFIG_ROOTURL?>" />
 <meta name="players" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
-<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/edit_players.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.master.css??<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.players.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
-<link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype_mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
 <body id="mmrpg" class="iframe" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
@@ -511,14 +511,14 @@ if (true){
 
   </div>
 <script type="text/javascript" src="scripts/jquery.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/edit_players.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.master.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.prototype.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.players.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
 gameSettings.fadeIn = <?= isset($_GET['fadein']) ? $_GET['fadein'] : 'true' ?>;
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE?>';
 gameSettings.autoScrollTop = false;
 gameSettings.userNumber = <?= MMRPG_REMOTE_GAME_ID ?>;
 gameSettings.allowEditing = <?= isset($_GET['edit']) ? $_GET['edit'] : 'true' ?>;
@@ -532,7 +532,7 @@ $(document).ready(function(){
   thisEditorData.playerTotal = $('#canvas .sprite[data-player]', thisEditor).length;
   //console.log(thisEditorData);
   //resizePlayerWrapper();
-<?
+<?php
 // Define a reference to the game's session flag variable
 if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
@@ -557,20 +557,20 @@ if (empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
     ];
   // Push this event to the parent window and display to the user
   top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-  <?
+  <?php
 }
 ?>
 });
 </script>
-<?
+<?php
 // Google Analytics
-if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
+if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
 ?>
 </body>
 </html>
-<?
+<?php
 // Require the remote bottom in case we're in viewer mode
-require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_bottom.php');
+require(MMRPG_CONFIG_ROOTDIR.'frames/frame.remote_bottom.php');
 // Unset the database variable
-unset($DB);
+unset($this_database);
 ?>

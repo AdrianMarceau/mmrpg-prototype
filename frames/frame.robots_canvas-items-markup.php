@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Start the output buffer
 ob_start();
@@ -22,16 +22,16 @@ echo '<div class="wrapper">';
       elseif (!empty($player_rewards['player_items'])){ $player_item_rewards = array(); }
 
       // Create a fake player and robot to pass the info check
-      $player_info = $mmrpg_index['players']['player']; //mmrpg_player::get_index_info('player'); //array('player_token' => 'player', 'player_name' => 'Player');
-      $robot_info = mmrpg_robot::get_index_info('robot'); //array('robot_token' => 'robot', 'robot_name' => 'Robot');
+      $player_info = $mmrpg_index['players']['player']; //rpg_player::get_index_info('player'); //array('player_token' => 'player', 'player_name' => 'Player');
+      $robot_info = rpg_robot::get_index_info('robot'); //array('robot_token' => 'robot', 'robot_name' => 'Robot');
 
       // Sort the item rewards based on item number and such
-      uasort($player_item_rewards, array('mmrpg_player', 'abilities_sort_for_editor'));
+      uasort($player_item_rewards, array('rpg_functions', 'abilities_sort_for_editor'));
 
       //die(print_r($player_item_rewards, true));
 
       // Collect the item reward options to be used on all selects
-      $item_rewards_options = $global_allow_editing ? mmrpg_item::print_editor_options_list_markup($player_item_rewards, null, $player_info, $robot_info) : '';
+      $item_rewards_options = $global_allow_editing ? rpg_item::print_editor_options_list_markup($player_item_rewards, null, $player_info, $robot_info) : '';
 
       foreach ($mmrpg_database_items AS $item_token => $item_info){
         if (!isset($player_item_rewards[$item_token])){ continue; }
@@ -39,7 +39,7 @@ echo '<div class="wrapper">';
         //if ($key_counter > 0 && $key_counter % 5 == 0){ echo '</tr><tr>'; }
         //echo '<td>';
 
-        $temp_select_markup = mmrpg_item::print_editor_select_markup($item_rewards_options, $player_info, $robot_info, $item_info, $key_counter);
+        $temp_select_markup = rpg_item::print_editor_select_markup($item_rewards_options, $player_info, $robot_info, $item_info, $key_counter);
 
         //echo $item_token.'<br />';
         //echo $item_info['ability_subclass'].'<br />';
@@ -61,7 +61,7 @@ echo '<div class="wrapper">';
       <a class="sort sort_number" data-sort="number" data-order="asc">number</a>
       <a class="sort sort_core" data-sort="type" data-order="asc">type</a>
     </div>
-    <?
+    <?php
   }
 echo '</div>';
 

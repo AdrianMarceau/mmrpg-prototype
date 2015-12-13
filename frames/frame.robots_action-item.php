@@ -1,4 +1,4 @@
-<?
+<?php
 // Collect the ability variables from the request header, if they exist
 $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
 $temp_robot = !empty($_REQUEST['robot']) ? $_REQUEST['robot'] : '';
@@ -37,7 +37,7 @@ if (!empty($player_ability_rewards)){
     elseif ($ability_info['ability_token'] == '*'){ continue; }
     elseif ($ability_info['ability_token'] == 'ability'){ continue; }
     elseif (!isset($mmrpg_database_abilities[$ability_info['ability_token']])){ continue; }
-    elseif (!mmrpg_robot::has_ability_compatibility($temp_robot_info['robot_token'], $ability_token, $temp_item)){
+    elseif (!rpg_robot::has_ability_compatibility($temp_robot_info['robot_token'], $ability_token, $temp_item)){
       if (isset($robot_ability_settings[$ability_token])){ unset($robot_ability_settings[$ability_token]); }
       continue;
     }
@@ -50,7 +50,7 @@ if (empty($robot_ability_settings)){ $robot_ability_settings['buster-shot'] = ar
 $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] = $robot_ability_settings;
 
 // Regardless of what happened before, update this robot's item in the session and save
-mmrpg_save_game_session($this_save_filepath);
+rpg_game::save_session($this_save_filepath);
 exit('success|item-updated|'.$temp_item.'|'.$allowed_ability_ids);
 //exit('success|item-updated|'.$temp_item);
 

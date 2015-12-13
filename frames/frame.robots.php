@@ -1,6 +1,6 @@
 <?php
 // Include the TOP file
-require_once('../top.php');
+require_once('../_top.php');
 
 // Unset the prototype temp variable
 $_SESSION['PROTOTYPE_TEMP'] = array();
@@ -8,21 +8,21 @@ $_SESSION['PROTOTYPE_TEMP'] = array();
 // Require the remote top in case we're in viewer mode
 define('MMRPG_REMOTE_SKIP_INDEX', true);
 //define('MMRPG_REMOTE_SKIP_DATABASE', true);
-require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
+require(MMRPG_CONFIG_ROOTDIR.'frames/frame.remote_top.php');
 
 // Collect the session token
-$session_token = mmrpg_game_token();
+$session_token = rpg_game::session_token();
 
 // Include the DATABASE file
 //require_once('../data/database.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
-$mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 ORDER BY robot_order ASC;", 'robot_token');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
-$mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'master' ORDER BY ability_order ASC;", 'ability_token');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
-$mmrpg_database_items = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'item' ORDER BY ability_order ASC;", 'ability_token');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database.types.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database.players.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database.robots.php');
+//$mmrpg_database_robots = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 ORDER BY robot_order ASC;", 'robot_token');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database.abilities.php');
+//$mmrpg_database_abilities = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'master' ORDER BY ability_order ASC;", 'ability_token');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database.items.php');
+//$mmrpg_database_items = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'item' ORDER BY ability_order ASC;", 'ability_token');
 // Collect the editor flag if set
 $global_allow_editing = isset($_REQUEST['edit']) && $_REQUEST['edit'] == 'false' ? false : true;
 
@@ -51,46 +51,42 @@ $allowed_edit_player_count = 0;
 $allowed_edit_robot_count = 0;
 
 // Collect the player's robot favourites
-$player_robot_favourites = mmrpg_prototype_robot_favourites();
+$player_robot_favourites = rpg_game::robot_favourites();
 if (empty($player_robot_favourites)){ $player_robot_favourites = array(); }
 
 // Collect the player's robot database
-$player_robot_database = mmrpg_prototype_robot_database();
+$player_robot_database = rpg_game::robot_database();
 if (empty($player_robot_database)){ $player_robot_database = array(); }
 
 // Include the functions file for the editor
-require('edit_robots_functions.php');
+require('frame.robots_functions.php');
 
-// Trigger parsing of relevant editor indexes
-parse_editor_indexes(
-  $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities,
-  $allowed_edit_players, $allowed_edit_robots, $allowed_edit_data
-  );
 // Manually refresh all the editor arrays
 refresh_editor_arrays(
-  $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities,
   $allowed_edit_players, $allowed_edit_robots, $allowed_edit_data,
   $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count
   );
+
+
 // -- PROCESS PLAYER ACTION -- //
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
-  require('edit_robots_action_player.php');
+  require('frame.robots_action-player.php');
 }
 
 // -- PROCESS ABILITY ACTION -- //
 
 // Check if an action request has been sent with an ability type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'ability'){
-  require('edit_robots_action_ability.php');
+  require('frame.robots_action-ability.php');
 }
 
 // -- PROCESS ITEM ACTION -- //
 
 // Check if an action request has been sent with an item type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'item'){
-  require('edit_robots_action_item.php');
+  require('frame.robots_action-item.php');
 }
 
 
@@ -98,21 +94,21 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'item'){
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'altimage'){
-  require('edit_robots_action_altimage.php');
+  require('frame.robots_action-altimage.php');
 }
 
 // -- PROCESS FAVOURITE ACTION -- //
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'favourite'){
-  require('edit_robots_action_favourite.php');
+  require('frame.robots_action-favourite.php');
 }
 
 // -- PROCESS SORT ACTION -- //
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sort'){
-  require('edit_robots_action_sort.php');
+  require('frame.robots_action-sort.php');
 }
 
 
@@ -125,34 +121,36 @@ refresh_editor_arrays(
   $allowed_edit_players, $allowed_edit_robots, $allowed_edit_data,
   $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count
   );
+
+
 // -- GENERATE EDITOR MARKUP
 
 // CANVAS ROBOTS MARKUP
 
 // Generate the canvas robots markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_markup'){
-  require('edit_robots_canvas_robots_markup.php');
+  require('frame.robots_canvas-robots-markup.php');
 }
 
 // CANVAS ABILITIES MARKUP
 
 // Generate the canvas abilities markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_abilities_markup'){
-  require('edit_robots_canvas_abilities_markup.php');
+  require('frame.robots_canvas-abilities-markup.php');
 }
 
 // CANVAS ITEMS MARKUP
 
 // Generate the canvas items markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_items_markup'){
-  require('edit_robots_canvas_items_markup.php');
+  require('frame.robots_canvas-items-markup.php');
 }
 
 // CONSOLE ROBOTS MARKUP
 
 // Generate the console markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'console_markup'){
-  require('edit_robots_console_robots_markup.php');
+  require('frame.robots_console-robots-markup.php');
 }
 
 // Determine the token for the very first robot in the edit
@@ -164,17 +162,17 @@ $first_robot_token = $allowed_edit_robots[0];
 <head>
 <meta charset="UTF-8" />
 <title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?><?= $global_allow_editing ? 'Edit' : 'View' ?> Robots | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
-<base href="<?=MMRPG_CONFIG_ROOTURL?>" />
+<base href="<?= MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
-<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/jquery.scrollbar.min.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/edit_robots.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.master.css??<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/jquery.scrollbar.min.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.robots.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
-<link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype_mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
 <body id="mmrpg" class="iframe" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
@@ -200,7 +198,7 @@ $first_robot_token = $allowed_edit_robots[0];
                 <td class="canvas">
                   <div id="canvas">
                     <div class="robot_canvas" data-canvas="robots">
-                      <table class="links"><tr></tr></table>
+                      <div class="links"></div>
                     </div>
                     <div class="ability_canvas" data-canvas="abilities">
                       <div class="links"></div>
@@ -219,14 +217,14 @@ $first_robot_token = $allowed_edit_robots[0];
 <script type="text/javascript" src="scripts/jquery.js"></script>
 <script type="text/javascript" src="scripts/jquery.sortable.min.js"></script>
 <script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/edit_robots.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.master.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.prototype.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.robots.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
 gameSettings.fadeIn = <?= isset($_GET['fadein']) ? $_GET['fadein'] : 'true' ?>;
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE?>';
 gameSettings.autoScrollTop = false;
 gameSettings.userNumber = <?= MMRPG_REMOTE_GAME_ID ?>;
 gameSettings.allowEditing = <?= $global_allow_editing ? 'true' : 'false' ?>;
@@ -234,7 +232,7 @@ var countRobotLinks = false;
 var countRobotsTriggered = 0;
 var countRobotsLoaded = 0;
 var countWrapperLoop = 0;
-<?
+<?php
 // Define a reference to the game's session flag variable
 if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
@@ -264,19 +262,19 @@ $(document).ready(function(){
   // Push this event to the parent window and display to the user
   top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
 });
-  <?
+  <?php
 }
 ?>
 </script>
-<?
+<?php
 // Google Analytics
-if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
+if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
 ?>
 </body>
 </html>
-<?
+<?php
 // Require the remote bottom in case we're in viewer mode
-require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_bottom.php');
+require(MMRPG_CONFIG_ROOTDIR.'frames/frame.remote_bottom.php');
 // Unset the database variable
-unset($DB);
+unset($this_database);
 ?>

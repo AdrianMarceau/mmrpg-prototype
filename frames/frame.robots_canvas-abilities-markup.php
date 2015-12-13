@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Start the output buffer
 ob_start();
@@ -22,22 +22,22 @@ echo '<div class="wrapper">';
       elseif (!empty($player_rewards['player_abilities'])){ $player_ability_rewards = array('buster-shot' => array('ability_token' => 'buster-shot')); }
 
       // Create a fake player and robot to pass the info check
-      $player_info = $mmrpg_index['players']['player']; //mmrpg_player::get_index_info('player'); //array('player_token' => 'player', 'player_name' => 'Player');
-      $robot_info = mmrpg_robot::get_index_info('robot'); //array('robot_token' => 'robot', 'robot_name' => 'Robot');
+      $player_info = $mmrpg_index['players']['player']; //rpg_player::get_index_info('player'); //array('player_token' => 'player', 'player_name' => 'Player');
+      $robot_info = rpg_robot::get_index_info('robot'); //array('robot_token' => 'robot', 'robot_name' => 'Robot');
 
       // Sort the ability rewards based on ability number and such
-      uasort($player_ability_rewards, array('mmrpg_player', 'abilities_sort_for_editor'));
+      uasort($player_ability_rewards, array('rpg_functions', 'abilities_sort_for_editor'));
       $robot_ability_rewards = array();
 
       // Collect the ability reward options to be used on all selects
-      $ability_rewards_options = $global_allow_editing ? mmrpg_ability::print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info) : '';
+      $ability_rewards_options = $global_allow_editing ? rpg_ability::print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info) : '';
 
       foreach ($mmrpg_database_abilities AS $ability_token => $ability_info){
-        if (!mmrpg_prototype_ability_unlocked('', '', $ability_token)){ continue; }
+        if (!rpg_game::ability_unlocked('', '', $ability_token)){ continue; }
         //if ($key_counter > 0 && $key_counter % 5 == 0){ echo '</tr><tr>'; }
         //echo '<td>';
 
-        $temp_select_markup = mmrpg_ability::print_editor_select_markup($ability_rewards_options, $player_info, $robot_info, $ability_info, $key_counter);
+        $temp_select_markup = rpg_ability::print_editor_select_markup($ability_rewards_options, $player_info, $robot_info, $ability_info, $key_counter);
 
         //echo $ability_token.'<br />';
         echo $temp_select_markup.' ';
@@ -58,7 +58,7 @@ echo '<div class="wrapper">';
       <a class="sort sort_number" data-sort="number" data-order="asc">number</a>
       <a class="sort sort_core" data-sort="type" data-order="asc">type</a>
     </div>
-    <?
+    <?php
   }
 echo '</div>';
 

@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Start the output buffer
 ob_start();
@@ -6,7 +6,7 @@ ob_start();
 // Predefine the player options markup
 $player_options_markup = '';
 foreach($allowed_edit_data AS $player_token => $player_info){
-  $temp_player_battles = mmrpg_prototype_battles_complete($player_token);
+  $temp_player_battles = rpg_prototype::battles_complete($player_token);
   $temp_player_transfer = $temp_player_battles >= 1 ? true : false;
   $player_options_markup .= '<option value="'.$player_info['player_token'].'" data-label="'.$player_info['player_token'].'" title="'.$player_info['player_name'].'" '.(!$temp_player_transfer ? 'disabled="disabled"' : '').'>'.$player_info['player_name'].'</option>';
 }
@@ -38,7 +38,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_items'])){
 $item_options_markup .= '</optgroup>';
 /*
 foreach($allowed_edit_data AS $player_token => $player_info){
-  $temp_player_battles = mmrpg_prototype_battles_complete($player_token);
+  $temp_player_battles = rpg_prototype::battles_complete($player_token);
   $temp_player_transfer = $temp_player_battles >= 1 ? true : false;
   $item_options_markup .= '<option value="'.$player_info['player_token'].'" data-label="'.$player_info['player_token'].'" title="'.$player_info['player_name'].'" '.(!$temp_player_transfer ? 'disabled="disabled"' : '').'>'.$player_info['player_name'].'</option>';
 }
@@ -57,11 +57,11 @@ foreach($allowed_edit_data AS $player_token => $player_info){
 foreach($allowed_edit_data AS $player_token => $player_info){
 
   // Collect the rewards for this player
-  $player_rewards = mmrpg_prototype_player_rewards($player_token);
+  $player_rewards = rpg_game::player_rewards($player_token);
 
   // Check how many robots this player has and see if they should be able to transfer
   $counter_player_robots = !empty($player_info['player_robots']) ? count($player_info['player_robots']) : false;
-  $counter_player_missions = mmrpg_prototype_battles_complete($player_info['player_token']);
+  $counter_player_missions = rpg_prototype::battles_complete($player_info['player_token']);
   $allow_player_selector = $allowed_edit_player_count > 1 && $counter_player_missions > 0 ? true : false;
 
   // Loop through the player robots and display their edit boxes
@@ -84,7 +84,7 @@ foreach($allowed_edit_data AS $player_token => $player_info){
       !empty($_REQUEST['robot']) && $_REQUEST['robot'] == $robot_info['robot_token']
       ){
 
-      $temp_editor_markup = mmrpg_robot::print_editor_markup($player_info, $robot_info);
+      $temp_editor_markup = rpg_robot::print_editor_markup($player_info, $robot_info);
       echo $temp_editor_markup;
 
       // Collect the contents of the buffer

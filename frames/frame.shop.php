@@ -1,6 +1,6 @@
 <?php
 // Include the TOP file
-require_once('../top.php');
+require_once('../_top.php');
 
 // Unset the prototype temp variable
 $_SESSION['PROTOTYPE_TEMP'] = array();
@@ -8,21 +8,20 @@ $_SESSION['PROTOTYPE_TEMP'] = array();
 // Require the remote top in case we're in viewer mode
 define('MMRPG_REMOTE_SKIP_INDEX', true);
 define('MMRPG_REMOTE_SKIP_DATABASE', true);
-require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
+require(MMRPG_CONFIG_ROOTDIR.'frames/frame.remote_top.php');
 
 // Collect the session token
-$session_token = mmrpg_game_token();
+$session_token = rpg_game::session_token();
 
 // Include the DATABASE file
-//require_once('../data/database.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/prototype_omega.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_fields.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/starforce.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/include.omega.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database.types.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database.players.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database.robots.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database.abilities.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database.fields.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database.items.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/include.starforce.php');
 // Collect the editor flag if set
 $global_allow_editing = true;
 
@@ -30,16 +29,16 @@ $global_allow_editing = true;
 // -- GENERATE EDITOR MARKUP
 
 // Require the shop index so we can use it's data
-require(MMRPG_CONFIG_ROOTDIR.'data/shop.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/include.shop.php');
 
 // Define which shops we're allowed to see
 $allowed_edit_data = $this_shop_index;
 //$prototype_player_counter = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
-//$prototype_complete_counter = mmrpg_prototype_complete();
-//$prototype_battle_counter = mmrpg_prototype_battles_complete('dr-light');
-if (!mmrpg_prototype_event_complete('completed-chapter_dr-light_one')){ unset($allowed_edit_data['auto']); }
-if (!mmrpg_prototype_event_complete('completed-chapter_dr-wily_one')){ unset($allowed_edit_data['reggae']); }
-if (!mmrpg_prototype_event_complete('completed-chapter_dr-cossack_one')){ unset($allowed_edit_data['kalinka']); }
+//$prototype_complete_counter = rpg_prototype::campaign_complete();
+//$prototype_battle_counter = rpg_prototype::battles_complete('dr-light');
+if (!rpg_prototype::event_complete('completed-chapter_dr-light_one')){ unset($allowed_edit_data['auto']); }
+if (!rpg_prototype::event_complete('completed-chapter_dr-wily_one')){ unset($allowed_edit_data['reggae']); }
+if (!rpg_prototype::event_complete('completed-chapter_dr-cossack_one')){ unset($allowed_edit_data['kalinka']); }
 //if ($prototype_complete_counter < 3){ unset($allowed_edit_data['kalinka']); }
 //if ($prototype_player_counter < 3){ unset($allowed_edit_data['reggae']); }
 //if ($prototype_battle_counter < 1){ unset($allowed_edit_data['auto']); }
@@ -109,7 +108,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
         $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price + (($temp_quantity - 1) * ($temp_quantity - 1));
 
         // Save, produce the success message with the new field order
-        mmrpg_save_game_session($this_save_filepath);
+        rpg_game::save_session($this_save_filepath);
         exit('success|item-sold|'.$temp_current_quantity.'|'.$global_zenny_counter);
 
       }
@@ -154,7 +153,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
       $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price - (($temp_new_quantity - 1) * ($temp_new_quantity - 1));
 
       // Save, produce the success message with the new field order
-      mmrpg_save_game_session($this_save_filepath);
+      rpg_game::save_session($this_save_filepath);
       exit('success|star-sold|'.$temp_current_quantity.'|'.$global_zenny_counter);
 
     }
@@ -229,7 +228,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price + (($temp_quantity - 1) * ($temp_quantity - 1));
 
         // Save, produce the success message with the new field order
-        mmrpg_save_game_session($this_save_filepath);
+        rpg_game::save_session($this_save_filepath);
         exit('success|item-bought|'.$temp_current_quantity.'|'.$global_zenny_counter);
 
       }
@@ -259,14 +258,14 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
       if (!empty($mmrpg_database_abilities[$temp_token])){
 
         // Collect the current ability's info from the database
-        $ability_info = array('ability_token' => $temp_token); //mmrpg_ability::parse_index_info($mmrpg_database_abilities[$temp_token]);
+        $ability_info = array('ability_token' => $temp_token); //rpg_ability::parse_index_info($mmrpg_database_abilities[$temp_token]);
 
         // Unlock this ability for all playable characters
-        mmrpg_game_unlock_ability(false, false, $ability_info);
+        rpg_game::unlock_ability(false, false, $ability_info);
         $temp_current_quantity = 1;
 
         // If the unlock was successful
-        if (mmrpg_prototype_ability_unlocked('', '', $temp_token)){
+        if (rpg_game::ability_unlocked('', '', $temp_token)){
 
           // Increment the player's zenny count based on the provided price
           $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
@@ -279,7 +278,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
           $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
 
           // Save, produce the success message with the new ability order
-          mmrpg_save_game_session($this_save_filepath);
+          rpg_game::save_session($this_save_filepath);
           exit('success|ability-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
 
         }
@@ -335,7 +334,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
       $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
 
     // Save, produce the success message with the new field order
-      mmrpg_save_game_session($this_save_filepath);
+      rpg_game::save_session($this_save_filepath);
       exit('success|field-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
 
     }
@@ -410,9 +409,9 @@ if (true){
 
     // Collect a temp robot object for printing items
     $player_info = $mmrpg_index['players'][$shop_info['shop_player']];
-    if ($shop_info['shop_player'] == 'dr-light'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['mega-man']); }
-    elseif ($shop_info['shop_player'] == 'dr-wily'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['bass']); }
-    elseif ($shop_info['shop_player'] == 'dr-cossack'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['proto-man']); }
+    if ($shop_info['shop_player'] == 'dr-light'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['mega-man']); }
+    elseif ($shop_info['shop_player'] == 'dr-wily'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['bass']); }
+    elseif ($shop_info['shop_player'] == 'dr-cossack'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['proto-man']); }
 
     // Collect the tokens for all this shop's selling and buying tabs
     $shop_selling_tokens = is_array($shop_info['shop_kind_selling']) ? $shop_info['shop_kind_selling'] : array($shop_info['shop_kind_selling']);
@@ -420,19 +419,19 @@ if (true){
 
     // Collect and print the editor markup for this player
     ?>
-    <div class="event event_double event_<?= $shop_key == 0 ? 'visible' : 'hidden' ?>" data-token="<?=$shop_info['shop_token']?>">
-      <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/<?=$shop_info['shop_field']?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
-        <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/shops/<?= !empty($shop_info['shop_image']) ? $shop_info['shop_image'] : $shop_info['shop_token'] ?>/sprite_right_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); "><?=$shop_info['shop_name']?></div>
+    <div class="event event_double event_<?= $shop_key == 0 ? 'visible' : 'hidden' ?>" data-token="<?= $shop_info['shop_token']?>">
+      <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/<?= $shop_info['shop_field']?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
+        <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/shops/<?= !empty($shop_info['shop_image']) ? $shop_info['shop_image'] : $shop_info['shop_token'] ?>/sprite_right_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "><?= $shop_info['shop_name']?></div>
       </div>
       <div class="header header_left player_type player_type_<?= $shop_info['shop_colour'] ?>" style="margin-right: 0;">
-        <?=$shop_info['shop_name']?>
+        <?= $shop_info['shop_name']?>
         <span class="player_type"><?= ucfirst(rtrim($shop_info['shop_seeking'], 's')) ?> Seeker</span>
       </div>
       <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
 
         <div class="shop_tabs_links" style="margin: 0 auto; color: #FFFFFF; ">
           <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
-          <?
+          <?php
           // Define a counter for the number of tabs
           $tab_counter = 0;
           // Loop through the selling tokens and display tabs for them
@@ -440,7 +439,7 @@ if (true){
             ?>
             <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
             <a class="tab_link tab_link_selling" href="#" data-tab="selling" data-tab-type="<?= $selling_token ?>"><span class="inset">Buy <?= ucfirst($selling_token) ?></span></a>
-            <?
+            <?php
             $tab_counter++;
           }
           // Loop through the buying tokens and display tabs for them
@@ -448,7 +447,7 @@ if (true){
             ?>
             <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
             <a class="tab_link tab_link_buying" href="#" data-tab="buying" data-tab-type="<?= $buying_token ?>"><span class="inset">Sell <?= ucfirst($buying_token) ?></span></a>
-            <?
+            <?php
             $tab_counter++;
           }
           // Define the tab width total
@@ -461,7 +460,7 @@ if (true){
 
         <div class="shop_tabs_containers" style="margin: 0 auto 10px;">
 
-          <?
+          <?php
           // Loop through the selling tokens and display tabs for them
           foreach ($shop_selling_tokens AS $selling_token){
 
@@ -470,7 +469,7 @@ if (true){
 
               <div class="shop_quote shop_quote_selling">&quot;<?= isset($shop_info['shop_quote_selling'][$selling_token]) ? $shop_info['shop_quote_selling'][$selling_token] : $shop_info['shop_quote_selling']  ?>&quot;</div>
 
-              <?
+              <?php
               // -- SHOP SELLING ITEMS -- //
               // If this shop has items to selling, print them out
               if (in_array($selling_token, array('items', 'cores')) && !empty($shop_info['shop_items']['items_selling'])){
@@ -503,7 +502,7 @@ if (true){
                     </colgroup>
                     <tbody>
                       <tr>
-                      <?
+                      <?php
                       // Collect the items for buying and slice/shuffle if nessary
                       $item_list_array = $shop_info['shop_items']['items_selling'];
                       /*
@@ -534,7 +533,7 @@ if (true){
                         $global_item_quantities[$item_info_token] = $item_info_quantity;
                         $global_item_prices['buy'][$item_info_token] = $item_info_price;
                         $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
-                        $temp_info_tooltip = mmrpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
+                        $temp_info_tooltip = rpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                         $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                         ?>
@@ -544,7 +543,7 @@ if (true){
                           <label class="item_quantity" data-quantity="0">x 0</label>
                           <label class="item_price" data-price="<?= $item_info_price ?>">&hellip; <?= $item_info_price ?>z</label>
                         </td>
-                        <?
+                        <?php
                         if ($item_cell_float == 'right' && $item_counter < $item_counter_total){ echo '</tr><tr>'; }
                       }
                       if ($item_counter % 2 != 0){
@@ -552,14 +551,14 @@ if (true){
                         <td class="right item_cell item_cell_disabled">
                           &nbsp;
                         </td>
-                        <?
+                        <?php
                       }
                       ?>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <?
+                <?php
               }
               // -- SHOP SELLING ABILITIES -- //
               // If this shop has abilities to selling, print them out
@@ -593,7 +592,7 @@ if (true){
                     </colgroup>
                     <tbody>
                       <tr>
-                      <?
+                      <?php
                       // Collect the abilities for buying and slice/shuffle if nessary
                       if ($selling_token == 'abilities'){ $ability_list_array = $shop_info['shop_abilities']['abilities_selling']; }
                       elseif ($selling_token == 'weapons'){ $ability_list_array = $shop_info['shop_weapons']['weapons_selling']; }
@@ -635,7 +634,7 @@ if (true){
                       $ability_list_unlocked_completely = 0;
                       foreach ($ability_list_array AS $token => $price){
                         if (!isset($mmrpg_database_abilities[$token])){ unset($ability_list_array[$token]); continue; }
-                        if (empty($mmrpg_database_abilities[$token]['ability_flag_complete']) || mmrpg_prototype_ability_unlocked('', '', $token)){
+                        if (empty($mmrpg_database_abilities[$token]['ability_flag_complete']) || rpg_game::ability_unlocked('', '', $token)){
                           $ability_list_unlocked_completely += 1;
                           //$backup_unlocked_abilities[$token] = $price;
                           //unset($ability_list_array[$token]);
@@ -688,7 +687,7 @@ if (true){
                           elseif ($ability_info_type == 'none' && !empty($ability_info['ability_type2'])){ $ability_info_type = $ability_info['ability_type2']; }
                           $ability_info_quantity = 0;
                           $ability_info_unlocked = array();
-                          if (mmrpg_prototype_ability_unlocked('', '', $token)){
+                          if (rpg_game::ability_unlocked('', '', $token)){
                             $ability_info_quantity = 3;
                             $ability_info_unlocked = array('dr-light', 'dr-wily', 'dr-cossack');
                             $ability_info_price = 0;
@@ -702,7 +701,7 @@ if (true){
                           }
                           $global_item_quantities[$ability_info_token] = $ability_info_quantity;
                           $global_item_prices['buy'][$ability_info_token] = $ability_info_price;
-                          $temp_info_tooltip = !empty($ability_info['ability_flag_complete']) ? mmrpg_ability::print_editor_title_markup($robot_info, $ability_info) : 'Coming Soon! <br /> <span style="font-size:80%;">This ability is still in development and cannot be purchased yet. <br /> Apologies for the inconveinece, and please check back later!</span>';
+                          $temp_info_tooltip = !empty($ability_info['ability_flag_complete']) ? rpg_ability::print_editor_title_markup($robot_info, $ability_info) : 'Coming Soon! <br /> <span style="font-size:80%;">This ability is still in development and cannot be purchased yet. <br /> Apologies for the inconveinece, and please check back later!</span>';
                           $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                           //if ($ability_info_quantity >= 3){ continue; }
                           //if ($ability_counter >= $ability_list_max){ break; }
@@ -715,7 +714,7 @@ if (true){
                             <label class="item_quantity" data-quantity="0"><?= !empty($ability_info_quantity) ? '&#10004;' : '-' ?></label>
                             <label class="item_price" data-price="<?= $ability_info_price ?>">&hellip; <?= $ability_info_price ?>z</label>
                           </td>
-                          <?
+                          <?php
                           if ($ability_cell_float == 'right'){ echo '</tr><tr>'; }
                         }
                         if ($ability_counter % 2 != 0){
@@ -723,14 +722,14 @@ if (true){
                           <td class="right item_cell item_cell_disabled">
                             &nbsp;
                           </td>
-                          <?
+                          <?php
                         }
                       } else {
                         ?>
                         <td class="right item_cell item_cell_disabled" colspan="2" style="text-align: center">
                           <span class="item_name ability_type ability_type_empty" style="float: none; width: 100px; margin: 6px auto; text-align: center;">Sold Out!</span>
                         </td>
-                        <?
+                        <?php
                       }
 
                       /*
@@ -745,7 +744,7 @@ if (true){
                     </tbody>
                   </table>
                 </div>
-                <?
+                <?php
               }
               // -- SHOP SELLING FIELDS -- //
               // If this shop has fields to selling, print them out
@@ -777,7 +776,7 @@ if (true){
                     </colgroup>
                     <tbody>
                       <tr>
-                      <?
+                      <?php
                       // Collect the abilities for buying and slice/shuffle if nessary
                       $field_list_array = $shop_info['shop_fields']['fields_selling'];
                       // Collect the unlocked fields for this game file
@@ -786,7 +785,7 @@ if (true){
                       // Loop through the items and print them one by one
                       $field_counter = 0;
                       foreach ($field_list_array AS $token => $price){
-                        if (isset($mmrpg_database_fields[$token])){ $field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]); }
+                        if (isset($mmrpg_database_fields[$token])){ $field_info = rpg_field::parse_index_info($mmrpg_database_fields[$token]); }
                         else { continue; }
                         $field_info_token = $token;
                         $field_info_price = $price;
@@ -808,7 +807,7 @@ if (true){
                         } else {
                           $global_item_quantities['field-'.$field_info_token] = $field_info_unlocked ? 1 : 0;
                           $global_item_prices['buy']['field-'.$field_info_token] = $field_info_unlocked ? 0 : $field_info_price;
-                          $temp_info_tooltip = mmrpg_field::print_editor_title_markup($player_info, $field_info);
+                          $temp_info_tooltip = rpg_field::print_editor_title_markup($field_info);
                           $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                         }
                         if ($field_info_unlocked){ $field_info_price = 0; }
@@ -824,7 +823,7 @@ if (true){
                           <label class="item_quantity" data-quantity="0" style="display: none;">x 0</label>
                           <label class="item_price" data-price="<?= $field_info_price ?>">&hellip; <?= $field_info_price ?>z</label>
                         </td>
-                        <?
+                        <?php
                         if ($field_cell_float == 'right'){ echo '</tr><tr>'; }
                       }
                       if ($field_counter % 2 != 0){
@@ -832,14 +831,14 @@ if (true){
                         <td class="right item_cell item_cell_disabled">
                           &nbsp;
                         </td>
-                        <?
+                        <?php
                       }
                       ?>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <?
+                <?php
               }
               ?>
               <table class="full" style="margin-bottom: 5px;">
@@ -856,7 +855,7 @@ if (true){
               </table>
 
             </div>
-            <?
+            <?php
 
           }
           // Loop through the buying tokens and display tabs for them
@@ -866,7 +865,7 @@ if (true){
             <div class="tab_container tab_container_buying" data-tab="buying" data-tab-type="<?= $buying_token ?>">
 
               <div class="shop_quote shop_quote_buying">&quot;<?= isset($shop_info['shop_quote_buying'][$buying_token]) ? $shop_info['shop_quote_buying'][$buying_token] : $shop_info['shop_quote_buying'] ?>&quot;</div>
-              <?
+              <?php
               // -- SHOP BUYING ITEMS -- //
               // If this shop has items to buying, print them out
               if (in_array($buying_token, array('items', 'cores')) && !empty($shop_info['shop_items']['items_buying'])){
@@ -899,7 +898,7 @@ if (true){
                     </colgroup>
                     <tbody>
                       <tr>
-                      <?
+                      <?php
                       // Collect the items for buying and slice/shuffle if nessary
                       $item_list_array = $shop_info['shop_items']['items_buying'];
                       /*
@@ -931,7 +930,7 @@ if (true){
                         $global_item_prices['sell'][$item_info_token] = $item_info_price;
 
                         $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
-                        $temp_info_tooltip = mmrpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
+                        $temp_info_tooltip = rpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                         $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                         ?>
@@ -941,7 +940,7 @@ if (true){
                           <label class="item_quantity" data-quantity="0">x 0</label>
                           <label class="item_price" data-price="<?= $item_info_price ?>">&hellip; <?= $item_info_price ?>z</label>
                         </td>
-                        <?
+                        <?php
                         if ($item_cell_float == 'right'){ echo '</tr><tr>'; }
                       }
                       if ($item_counter % 2 != 0){
@@ -949,14 +948,14 @@ if (true){
                         <td class="right item_cell item_cell_disabled">
                           &nbsp;
                         </td>
-                        <?
+                        <?php
                       }
                       ?>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <?
+                <?php
               }
               // -- SHOP BUYING STARS -- //
               // If this shop has items to buying, print them out
@@ -988,7 +987,7 @@ if (true){
                     </colgroup>
                     <tbody>
                       <tr>
-                      <?
+                      <?php
                       // Collect the stars for buying and slice/shuffle if nessary
                       //$star_list_array = $shop_info['shop_stars']['stars_buying'];
                       //$star_list_array = array_keys($_SESSION[$session_token]['values']['battle_stars']);
@@ -1028,7 +1027,7 @@ if (true){
                         foreach ($temp_field_star_tokens AS $key => $token){
 
                           // Collect the info for this base field and create the star
-                          $field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+                          $field_info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
                           if (isset($_SESSION[$session_token]['values']['battle_stars'][$token])){ $star_info = $_SESSION[$session_token]['values']['battle_stars'][$token]; }
                           else { $star_info = array('star_token' => $token, 'star_name' => $field_info['field_name'], 'star_kind' => 'field', 'star_type' => $field_info['field_type'], 'star_type2' => '', 'star_player' => '', 'star_date' => ''); }
                           $star_list_array_raw['today'][$star_info['star_token']] = $star_info;
@@ -1039,8 +1038,8 @@ if (true){
                           $key3 = $key2 + $temp_star_counter;
                           $token2 = isset($temp_base_tokens[$key2]) ? $temp_base_tokens[$key2] : $temp_base_tokens[$key2 % count($temp_base_tokens)];
                           $token3 = isset($temp_base_tokens[$key3]) ? $temp_base_tokens[$key3] : $temp_base_tokens[$key3 % count($temp_base_tokens)];
-                          $field_info2 = mmrpg_field::parse_index_info($mmrpg_database_fields[$token2]);
-                          $field_info3 = mmrpg_field::parse_index_info($mmrpg_database_fields[$token3]);
+                          $field_info2 = rpg_field::parse_index_info($mmrpg_database_fields[$token2]);
+                          $field_info3 = rpg_field::parse_index_info($mmrpg_database_fields[$token3]);
                           $fusion_token = preg_replace('/-([a-z0-9]+)$/i', '', $token2).'-'.preg_replace('/^([a-z0-9]+)-/i', '', $token3);
                           $fusion_name = preg_replace('/\s+([a-z0-9]+)$/i', '', $field_info2['field_name']).' '.preg_replace('/^([a-z0-9]+)\s+/i', '', $field_info3['field_name']);
                           $fusion_type = !empty($field_info2['field_type']) ? $field_info2['field_type'] : '';
@@ -1124,7 +1123,7 @@ if (true){
                           <label class="item_quantity" data-quantity="1" style="display: none;">x 1</label>
                           <label class="item_price" data-price="<?= $star_info_price ?>">&hellip; <?= $star_info_price ?>z</label>
                         </td>
-                        <?
+                        <?php
                         if ($star_cell_float == 'right'){ echo '</tr><tr>'; }
                       }
                       if ($star_counter % 2 != 0){
@@ -1132,14 +1131,14 @@ if (true){
                         <td class="right item_cell item_cell_disabled">
                           &nbsp;
                         </td>
-                        <?
+                        <?php
                       }
                       ?>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <?
+                <?php
               }
               ?>
               <table class="full" style="margin-bottom: 5px;">
@@ -1156,7 +1155,7 @@ if (true){
               </table>
 
             </div>
-            <?
+            <?php
 
           }
           ?>
@@ -1165,7 +1164,7 @@ if (true){
 
       </div>
     </div>
-    <?
+    <?php
 
     // Increment the key counter
     $key_counter++;
@@ -1222,7 +1221,7 @@ if (true){
   </table>
   </div>
 
-  <?
+  <?php
 
   // Collect the output buffer content
   $this_shop_markup = preg_replace('#\s+#', ' ', trim(ob_get_clean()));
@@ -1234,17 +1233,17 @@ if (true){
 <head>
 <meta charset="UTF-8" />
 <title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?>View Shops | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
-<base href="<?=MMRPG_CONFIG_ROOTURL?>" />
+<base href="<?= MMRPG_CONFIG_ROOTURL?>" />
 <meta name="shops" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
-<link type="text/css" href="styles/jquery.scrollbar.min.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/shop.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/jquery.scrollbar.min.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.master.css??<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.shop.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
-<link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype_mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
 <body id="mmrpg" class="iframe" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
@@ -1256,14 +1255,14 @@ if (true){
   </div>
 <script type="text/javascript" src="scripts/jquery.js"></script>
 <script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/shop.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.master.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.prototype.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.shop.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
 gameSettings.fadeIn = <?= isset($_GET['fadein']) ? $_GET['fadein'] : 'true' ?>;
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE?>';
 gameSettings.autoScrollTop = false;
 gameSettings.allowShopping = true;
 // Update the player and player count by counting elements
@@ -1274,7 +1273,7 @@ thisShopData.itemQuantities = <?= json_encode($global_item_quantities) ?>;
 // Define the global arrays to hold the shop console and canvas markup
 var shopCanvasMarkup = '<?= str_replace("'", "\'", $shop_canvas_markup) ?>';
 var shopConsoleMarkup = '<?= str_replace("'", "\'", $shop_console_markup) ?>';
-<?
+<?php
 // Define a reference to the game's session flag variable
 if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
@@ -1294,14 +1293,14 @@ if (!$temp_event_shown && !empty($allowed_edit_data['auto']) && empty($temp_game
     ];
   // Generate a first-time event message that explains how the editor works
   gameSettings.windowEventsMessages = [
-    '<p>Congratulations! <strong>Auto\'s Shop</strong> has been unlocked! Items can be purchased and sold in Auto\'s Shop using a digital currency called Zenny, and the only ways to earn Zenny are by selling items you find in battle or by scoring overkill bonuses at the end of a mission.</p>'+
+    '<p>Congratulations! <strong>Auto\'s Shop</strong> has been unlocked! Items can be purchased and sold in Auto\'s Shop using a digital currency called Zenny.  While Zenny is typically earned by completing missions, certain items fetch a high price in the shop and are worth seeking out.</p>'+
     '<p>Use the Buy or Sell tabs to switch between modes, and then click any of the Buy or Sell buttons to make your selection.  A confirmation box will appear below to finalize your request.  Clicking a button multiple times will increase the quantity, helpful for bulk transactions.</p>'+
     '<p>Auto has made himself available to our players out of devotion to his creator Dr. Light, but he\'s also on a secret mission to find more of his favourite thing - screws.  Bring him any screws you find and he\'ll likely pay a premium price.</p>'+
     ''
     ];
   // Push this event to the parent window and display to the user
   top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-  <?
+  <?php
 }
 // If this is the first time using the editor, display the introductory area
 $temp_event_flag = 'unlocked-tooltip_reggae-auto-intro';
@@ -1324,7 +1323,7 @@ if (!$temp_event_shown && !empty($allowed_edit_data['reggae']) && empty($temp_ga
     ];
   // Push this event to the parent window and display to the user
   top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-  <?
+  <?php
 }
 // If this is the first time using the editor, display the introductory area
 $temp_event_flag = 'unlocked-tooltip_kalinka-shop-intro';
@@ -1347,19 +1346,19 @@ if (!$temp_event_shown && !empty($allowed_edit_data['kalinka']) && empty($temp_g
     ];
   // Push this event to the parent window and display to the user
   top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-  <?
+  <?php
 }
 ?>
 </script>
-<?
+<?php
 // Google Analytics
-if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
+if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
 ?>
 </body>
 </html>
-<?
+<?php
 // Require the remote bottom in case we're in viewer mode
-require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_bottom.php');
+require(MMRPG_CONFIG_ROOTDIR.'frames/frame.remote_bottom.php');
 // Unset the database variable
-unset($DB);
+unset($this_database);
 ?>

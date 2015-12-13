@@ -1,12 +1,12 @@
-<?
+<?php
 // Require the application top file
-require_once('../top.php');
+require_once('../_top.php');
 
 // Require the leaderboard data file
 require_once('../data/leaderboard.php');
 
 // Collect the session token
-$session_token = mmrpg_game_token();
+$session_token = rpg_game::session_token();
 
 ?>
 <!DOCTYPE html>
@@ -14,24 +14,24 @@ $session_token = mmrpg_game_token();
 <head>
 <meta charset="UTF-8" />
 <title><?= !MMRPG_CONFIG_IS_LIVE ? '@ ' : '' ?>View Leaderboard | Mega Man RPG Prototype Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
-<base href="<?=MMRPG_CONFIG_ROOTURL?>" />
+<base href="<?= MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
-<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/leaderboard.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.master.css??<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.leaderboard.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
-<link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.prototype_mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 <script type="text/javascript" src="scripts/jquery.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.master.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.prototype.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
 gameSettings.fadeIn = <?= $this_start_key == 0 ? 'true' : 'false' ?>;
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE?>';
 // Generate the document ready events for this page
 var thisBody = false;
 var thisPrototype = false;
@@ -63,13 +63,13 @@ $(document).ready(function(){
   // Wait for this page's images to finish loading
   thisBody.waitForImages(function(){
     var tempTimeout = setTimeout(function(){
-      <? if($this_start_key == 0): ?>
+      <?php if($this_start_key == 0): ?>
       // Fade in the leaderboard screen slowly
       thisBody.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing');
-      <? else: ?>
+      <?php else: ?>
       // Unhide the leadboard screen quickly
       thisBody.css({opacity:1}).removeClass('hidden');
-      <? endif; ?>
+      <?php endif; ?>
       // Let the parent window know the menu has loaded
       parent.prototype_menu_loaded();
       }, 1000);
@@ -109,7 +109,7 @@ function windowResizeLeaderboard(){
 
       <div class="leaderboard">
         <div class="wrapper" style="<?= $flag_wap ? 'margin-right: 0;' : '' ?>">
-        <?
+        <?php
 
         // Print out the generated leaderboard markup
         if (!empty($this_leaderboard_markup)){
@@ -139,15 +139,15 @@ function windowResizeLeaderboard(){
             $new_start_key = $start_key - $this_display_limit_default - $this_display_limit_default;
             if ($new_display_limit < $this_display_limit_default){ $new_display_limit = 0; }
             if ($new_start_key < 0){ $new_start_key = 0; }
-            echo '<a class="more" name="more_link" href="frames/leaderboard.php?'.(!empty($new_start_key) ? 'start='.$new_start_key.'&amp;' : '').(!empty($new_start_key) ? 'limit='.$new_display_limit : '').'" >&laquo; Previous Page</a>';
+            echo '<a class="more" name="more_link" href="frames/frame.leaderboard.php?'.(!empty($new_start_key) ? 'start='.$new_start_key.'&amp;' : '').(!empty($new_start_key) ? 'limit='.$new_display_limit : '').'" >&laquo; Previous Page</a>';
           }
           if ($this_display_limit < $this_leaderboard_count){
             $new_display_limit = $this_display_limit + $this_display_limit_default;
             if ($new_display_limit > $this_leaderboard_count){ $new_display_limit = $this_leaderboard_count; }
-            echo '<a class="more" name="more_link" href="frames/leaderboard.php?start='.$start_key.'&amp;limit='.$new_display_limit.'" >Next Page &raquo;</a>';
+            echo '<a class="more" name="more_link" href="frames/frame.leaderboard.php?start='.$start_key.'&amp;limit='.$new_display_limit.'" >Next Page &raquo;</a>';
           }
           if ($this_display_limit >= $this_leaderboard_count){
-            echo '<a class="more" name="more_link" href="frames/leaderboard.php?start=0&amp;limit='.$this_display_limit_default.'">&laquo; First Page</a>';
+            echo '<a class="more" name="more_link" href="frames/frame.leaderboard.php?start=0&amp;limit='.$this_display_limit_default.'">&laquo; First Page</a>';
           }
 
           // Print out the scroll padding
@@ -169,7 +169,7 @@ function windowResizeLeaderboard(){
   </div>
 <script type="text/javascript">
 $(document).ready(function(){
-<?
+<?php
 // Define a reference to the game's session flag variable
 if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
@@ -195,16 +195,16 @@ if (empty($_SESSION[$session_token]['DEMO']) && empty($temp_game_flags[$temp_eve
     ];
   // Push this event to the parent window and display to the user
   top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-  <?
+  <?php
 }
 ?>
 });
 </script>
-<?
+<?php
 // Google Analytics
-if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
+if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
 // Unset the database variable
-unset($DB);
+unset($this_database);
 ?>
 </body>
 </html>
