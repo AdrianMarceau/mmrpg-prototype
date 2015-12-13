@@ -1,4 +1,8 @@
-<?php
+<?
+
+// If this file has already been included, return
+if (defined('MMRPG_TOP_INCLUDED')){ return; }
+else { define('MMRPG_TOP_INCLUDED', true); }
 
 /*
 // MAINTENANCE
@@ -23,9 +27,8 @@ session_start();
 // Include mandatory config files
 define('MMRPG_BUILD', 'mmrpg2k15');
 define('MMRPG_VERSION', '3.0.0');
-require('data/config.php');
-require('data/settings.php');
-require('data/debug.php');
+require('includes/config.php');
+require('includes/include.settings.php');
 
 // Turn on error reporting
 if (MMRPG_CONFIG_ADMIN_MODE){
@@ -35,13 +38,14 @@ if (MMRPG_CONFIG_ADMIN_MODE){
 }
 
 // Include the database class first and foremost
-require('data/classes/database.php');
+require('classes/class.database.php');
+
 // Create the global database object
 if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG'] = array(); }
-  $DB = new plutocms_database();
+  $this_database = new cms_database();
   // If the database could not be created, critical error mode!
-  if ($DB->CONNECT === false){
+  if ($this_database->CONNECT === false){
     define('MMRPG_CRITICAL_ERROR', true);
     $_GET = array();
     $_GET['page'] = 'error';
@@ -49,19 +53,26 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   }
 }
 
-// Include mandatory class files
-require('data/classes/battle.php');
-require('data/classes/field.php');
-require('data/classes/player.php');
-require('data/classes/robot.php');
-require('data/classes/ability.php');
-require('data/classes/item.php');
+// Include mandatory game class files
+require('classes/class.game.php');
+require('classes/class.prototype.php');
+require('classes/class.mission.php');
 
-// Include mandatory function files
-require('data/functions/system.php');
-require('data/functions/website.php');
-require('data/functions/game.php');
-require('data/functions/prototype.php');
+// Include mandatory function class files
+require('classes/class.functions.php');
+require('classes/class.website.php');
+
+// Include mandatory object class files
+require('classes/class.type.php');
+require('classes/class.object.php');
+require('classes/class.battle.php');
+require('classes/class.field.php');
+require('classes/class.player.php');
+require('classes/class.robot.php');
+require('classes/class.ability.php');
+require('classes/class.attachment.php');
+require('classes/class.item.php');
+
 
 /*
  * LIBRARY INDEXES
@@ -72,15 +83,6 @@ if (preg_match('/file.php$/i', basename(__FILE__))){
   // Prevent userinfo caching for this page
   unset($_SESSION['GAME']['USER']['userinfo']);
 }
-
-// Include mandatory library files
-$mmrpg_index = array();
-//require('data/battles/_index.php');
-//require('data/fields/_index.php');
-require('data/players/_index.php');
-//require('data/robots/_index.php');
-//require('data/abilities/_index.php');
-require('data/types/_index.php');
 
 // Turn off magic quotes before it causes and problems
 if (get_magic_quotes_gpc()){
@@ -110,8 +112,10 @@ if (!isset($_SESSION['FIELDS'])){ $_SESSION['FIELDS'] = array(); }
 if (!isset($_SESSION['PLAYERS'])){ $_SESSION['PLAYERS'] = array(); }
 if (!isset($_SESSION['ROBOTS'])){ $_SESSION['ROBOTS'] = array(); }
 if (!isset($_SESSION['ABILITIES'])){ $_SESSION['ABILITIES'] = array(); }
+
 // Define the COMMUNITY session trackers if they do not exist
 if (!isset($_SESSION['COMMUNITY'])){ $_SESSION['COMMUNITY']['threads_viewed'] = array(); }
+
 
 /*
  * BROWSER FLAGS
@@ -129,6 +133,7 @@ elseif (!empty($_GET['iphone']) || strpos($user_agent, 'iPhone') !== FALSE){ $fl
 elseif (!empty($_GET['ipad']) || strpos($user_agent, 'iPad')){	$flag_ipad = $flag_wap = true; }
 unset($user_agent);
 
+
 /*
  * GAME SAVING AND LOADING
  */
@@ -143,9 +148,9 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
   // Define the first load boolean variable
   $this_first_load = false;
   // Define the game cache location path
-  $this_cache_dir = MMRPG_CONFIG_ROOTDIR.'data/cache/';
+  $this_cache_dir = MMRPG_CONFIG_ROOTDIR.'_cache/';
   // Define the game save location path
-  $this_save_dir = MMRPG_CONFIG_ROOTDIR.'data/saves/';
+  $this_save_dir = MMRPG_CONFIG_ROOTDIR.'_saves/';
 
   // If the user and file details have already been loaded to the session
   if (
@@ -184,6 +189,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
   }
 
 }
+
 
 /*
  * PAGE REQUESTS
@@ -239,7 +245,8 @@ if (isset($_GET['home']) || $this_current_sub == 'home' || $this_current_page ==
   }
 } elseif ($this_current_page == 'database'){
   $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
-  if (!empty($this_current_token) && isset($mmrpg_index['types'][$this_current_token]) || in_array($this_current_token, array('multi', 'bonus'))){
+  $temp_type_token = rpg_type::get_index_info($this_current_token);
+  if (!empty($this_current_token) && !empty($temp_type_token) || in_array($this_current_token, array('multi', 'bonus'))){
     $this_current_filter = $_GET['filter'] = $this_current_token;
     $this_current_filter_name = $this_current_filter == 'none' ? 'Neutral' : ucfirst($this_current_filter);
     $this_current_uri .= $this_current_filter.'/';
@@ -266,6 +273,7 @@ $_GET['this_current_url'] = $this_current_url; //urlencode($this_current_url);
 // Now that all the redirecting is done, if the current page it totally empty, it's ACTUALLY home
 if (empty($this_current_page) || !in_array($this_current_page, $this_allowed_pages)){ $this_current_page = 'home'; }
 
+
 /*
  * USERINFO COLLECTION
  */
@@ -279,18 +287,18 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
     // Collect this userinfo from the database
     $this_userid = (int)($_SESSION['GAME']['USER']['userid']);
     if (empty($_SESSION['GAME']['USER']['userinfo'])){
-      $this_userinfo = $DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+      $this_userinfo = $this_database->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
       $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
     } else {
       $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
     }
 
     if (!defined('MMRPG_SCRIPT_REQUEST')){
-      $this_boardinfo = $DB->get_array("SELECT * FROM mmrpg_leaderboard WHERE user_id = {$this_userid}");
+      $this_boardinfo = $this_database->get_array("SELECT * FROM mmrpg_leaderboard WHERE user_id = {$this_userid}");
       $this_boardid = $this_boardinfo['board_id'];
       $this_boardinfo['board_rank'] = !empty($_SESSION['GAME']['BOARD']['boardrank']) ? $_SESSION['GAME']['BOARD']['boardrank'] : 0;
-      //if (empty($this_boardinfo['board_rank'])){ require('data/leaderboard.php'); $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank']; }
-      if (empty($this_boardinfo['board_rank'])){ $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'] = mmrpg_prototype_leaderboard_rank($this_userid); }
+      //if (empty($this_boardinfo['board_rank'])){ require('includes/include.leaderboard.php'); $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank']; }
+      if (empty($this_boardinfo['board_rank'])){ $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'] = rpg_prototype::leaderboard_rank($this_userid); }
     }
 
   }
@@ -300,7 +308,7 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
     // Collect the guest userinfo from the database
     $this_userid = MMRPG_SETTINGS_GUEST_ID;
     if (empty($_SESSION['GAME']['USER']['userinfo'])){
-      $this_userinfo = $DB->get_array("SELECT users.* FROM mmrpg_users AS users WHERE users.user_id = '{$this_userid}' LIMIT 1");
+      $this_userinfo = $this_database->get_array("SELECT users.* FROM mmrpg_users AS users WHERE users.user_id = '{$this_userid}' LIMIT 1");
       $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
     } else {
       $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
@@ -319,6 +327,7 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
   $this_userinfo = array();
 }
 
+
 /*
  * WEBSITE THEME GENERATION
  */
@@ -332,7 +341,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
 
   // Collect the info for the chosen temp field
-  $temp_field_data = mmrpg_field::get_index_info($temp_field_token);
+  $temp_field_data = rpg_field::get_index_info($temp_field_token);
   //die('<pre>'.print_r($temp_field_data, true).'</pre>');
   //die('<pre>'.print_r($this_userinfo, true).'</pre>');
   // Define the current field token for the index
