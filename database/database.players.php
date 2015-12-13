@@ -1,4 +1,4 @@
-<?
+<?php
 // PLAYER DATABASE
 
 // Define the index of hidden players to not appear in the database
@@ -7,7 +7,7 @@ $hidden_database_players = array_merge($hidden_database_players, array('player')
 $hidden_database_players_count = !empty($hidden_database_players) ? count($hidden_database_players) : 0;
 
 // Collect the database players
-$mmrpg_database_players = $mmrpg_index['players'];
+$mmrpg_database_players = rpg_player::get_index();
 
 // Remove unallowed players from the database
 foreach ($mmrpg_database_players AS $temp_token => $temp_info){
@@ -67,15 +67,15 @@ foreach ($mmrpg_database_players AS $player_key => $player_info){
   ob_start();
   ?>
   <div title="<?= $player_title_text ?>" data-token="<?= $player_info['player_token'] ?>" class="float left link type <?= ($player_image_incomplete ? 'inactive ' : '').($player_type_token) ?>">
-    <a class="sprite player link mugshot size40 <?= $player_key == $first_player_token ? ' current' : '' ?>" href="<?='database/players/'.$player_info['player_token'].'/'?>" rel="<?= $player_image_incomplete ? 'nofollow' : 'follow' ?>">
-      <? if($player_image_token != 'player'): ?>
+    <a class="sprite player link mugshot size40 <?= $player_key == $first_player_token ? ' current' : '' ?>" href="<?= 'database/players/'.$player_info['player_token'].'/'?>" rel="<?= $player_image_incomplete ? 'nofollow' : 'follow' ?>">
+      <?php if($player_image_token != 'player'): ?>
         <img src="<?= $player_image_path ?>" width="<?= $player_image_size ?>" height="<?= $player_image_size ?>" alt="<?= $player_title_text ?>" />
-      <? else: ?>
+      <?php else: ?>
         <span><?= $player_info['player_name'] ?></span>
-      <? endif; ?>
+      <?php endif; ?>
     </a>
   </div>
-  <?
+  <?php
   if ($player_flag_complete){ $mmrpg_database_players_count_complete++; }
   $mmrpg_database_players_links .= ob_get_clean();
   $mmrpg_database_players_links_counter++;

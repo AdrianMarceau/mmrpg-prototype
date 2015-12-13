@@ -1,4 +1,4 @@
-<?
+<?php
 // ROBOT DATABASE
 
 // Define the index of counters for boss types
@@ -32,8 +32,8 @@ if (!empty($hidden_database_bosses)){
 
 
 // Collect the database bosses and fields
-$mmrpg_database_fields = $DB->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
-$mmrpg_database_bosses = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition} ORDER BY robot_order ASC;", 'robot_token');
+$mmrpg_database_fields = $this_database->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
+$mmrpg_database_bosses = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition} ORDER BY robot_order ASC;", 'robot_token');
 
 // Remove unallowed bosses from the database, and increment type counters
 foreach ($mmrpg_database_bosses AS $temp_token => $temp_info){
@@ -43,7 +43,7 @@ foreach ($mmrpg_database_bosses AS $temp_token => $temp_info){
 
     // Send this data through the boss index parser
     //echo('<pre>$temp_info_before = '.print_r($temp_info, true).'</pre>');
-    $temp_info = mmrpg_robot::parse_index_info($temp_info);
+    $temp_info = rpg_robot::parse_index_info($temp_info);
     //die('<pre>$temp_info_after = '.print_r($temp_info, true).'</pre>');
 
     // Ensure this boss's image exists, else default to the placeholder
@@ -55,7 +55,7 @@ foreach ($mmrpg_database_bosses AS $temp_token => $temp_info){
       // Collect this boss's field token, then boss master token, then boss master number
       $temp_field_token = !is_string($temp_info['robot_field']) ? array_shift($temp_info['robot_field']) : $temp_info['robot_field'];
       //echo($temp_info['robot_token'].' $temp_field_token = '.print_r($temp_field_token, true).' | ');
-      $temp_field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$temp_field_token]);
+      $temp_field_info = rpg_field::parse_index_info($mmrpg_database_fields[$temp_field_token]);
       //echo($temp_info['robot_token'].' $temp_field_token = '.print_r($temp_field_token, true).' | ');
       $temp_master_token = !empty($temp_field_info['field_master']) ? $temp_field_info['field_master'] : 'met';
       $temp_master_number = !empty($mmrpg_database_robots[$temp_master_token]) ? $mmrpg_database_robots[$temp_master_token]['robot_number'] : $temp_info['robot_number'];
@@ -158,15 +158,15 @@ foreach ($mmrpg_database_bosses AS $boss_key => $boss_info){
   ob_start();
   ?>
   <div title="<?= $boss_title_text ?>" data-token="<?= $boss_info['robot_token'] ?>" class="float left link type <?= ($boss_image_incomplete  ? 'inactive ' : '').(!empty($boss_info['robot_core']) ? $boss_info['robot_core'] : 'none').(!empty($boss_info['robot_core2']) ? '_'.$boss_info['robot_core2'] : '') ?>">
-    <a class="sprite robot link mugshot size<?= $boss_image_size.($boss_key == $first_boss_token ? ' current' : '') ?>" href="<?='database/bosses/'.$boss_info['robot_token']?>/" rel="<?= $boss_image_incomplete ? 'nofollow' : 'follow' ?>">
-      <? if($boss_image_token != 'boss'): ?>
+    <a class="sprite robot link mugshot size<?= $boss_image_size.($boss_key == $first_boss_token ? ' current' : '') ?>" href="<?= 'database/bosses/'.$boss_info['robot_token']?>/" rel="<?= $boss_image_incomplete ? 'nofollow' : 'follow' ?>">
+      <?php if($boss_image_token != 'boss'): ?>
         <img src="<?= $boss_image_path ?>" width="<?= $boss_image_size ?>" height="<?= $boss_image_size ?>" alt="<?= $boss_title_text ?>" />
-      <? else: ?>
+      <?php else: ?>
         <span><?= $boss_info['robot_name'].$boss_info['robot_name_append'] ?></span>
-      <? endif; ?>
+      <?php endif; ?>
     </a>
   </div>
-  <?
+  <?php
   if ($boss_flag_complete){ $mmrpg_database_bosses_count_complete++; }
   $mmrpg_database_bosses_links .= ob_get_clean();
   $mmrpg_database_bosses_links_counter++;

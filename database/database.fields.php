@@ -1,4 +1,4 @@
-<?
+<?php
 // FIELD DATABASE
 
 // Define the index of hidden fields to not appear in the database
@@ -16,13 +16,13 @@ if (!empty($hidden_database_fields)){
 }
 
 // Collect the database fields
-$mmrpg_database_fields = $DB->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1 {$temp_condition} ORDER BY field_order ASC;", 'field_token');
+$mmrpg_database_fields = $this_database->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1 {$temp_condition} ORDER BY field_order ASC;", 'field_token');
 
 // Remove unallowed fields from the database
 foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
 
   // Send this data through the field index parser
-  $temp_info = mmrpg_field::parse_index_info($temp_info);
+  $temp_info = rpg_field::parse_index_info($temp_info);
 
   if (in_array($temp_token, $hidden_database_fields)){
     unset($mmrpg_database_fields[$temp_token]);
@@ -84,15 +84,15 @@ foreach ($mmrpg_database_fields AS $field_key => $field_info){
   ob_start();
   ?>
   <div title="<?= $field_title_text ?>" data-token="<?= $field_info['field_token'] ?>" class="float left link type <?= ($field_image_incomplete  ? 'inactive ' : '').($field_type_token) ?>">
-    <a class="sprite field link mugshot size40 <?= ($field_key == $first_field_token ? ' current' : '') ?>" href="<?='database/fields/'.$field_info['field_token'].'/'?>" rel="<?= $field_image_incomplete ? 'nofollow' : 'follow' ?>">
-      <? if($field_image_token != 'field'): ?>
+    <a class="sprite field link mugshot size40 <?= ($field_key == $first_field_token ? ' current' : '') ?>" href="<?= 'database/fields/'.$field_info['field_token'].'/'?>" rel="<?= $field_image_incomplete ? 'nofollow' : 'follow' ?>">
+      <?php if($field_image_token != 'field'): ?>
         <img src="<?= $field_image_path ?>" width="<?= $field_image_size ?>" height="<?= $field_image_size ?>" alt="<?= $field_title_text ?>" />
-      <? else: ?>
+      <?php else: ?>
         <span><?= $field_info['field_name'] ?></span>
-      <? endif; ?>
+      <?php endif; ?>
     </a>
   </div>
-  <?
+  <?php
   if ($field_flag_complete){ $mmrpg_database_fields_count_complete++; }
   $mmrpg_database_fields_links .= ob_get_clean();
   $mmrpg_database_fields_links_counter++;

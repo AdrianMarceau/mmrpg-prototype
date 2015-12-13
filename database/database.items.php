@@ -1,6 +1,6 @@
-<?
+<?php
 // Require the types database
-if (!isset($mmrpg_database_types)){ require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php'); }
+if (!isset($mmrpg_database_types)){ require(MMRPG_CONFIG_ROOTDIR.'database/database.types.php'); }
 
 // ITEM DATABASE
 
@@ -26,14 +26,14 @@ if (!empty($hidden_database_items)){
 }
 
 // Collect the database items
-$mmrpg_database_items = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
+$mmrpg_database_items = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
 
 // Remove unallowed items from the database, and increment counters
 foreach ($mmrpg_database_items AS $temp_token => $temp_info){
   if (true){
 
     // Send this data through the item index parser
-    $temp_info = mmrpg_ability::parse_index_info($temp_info);
+    $temp_info = rpg_ability::parse_index_info($temp_info);
 
     // Ensure this item's image exists, else default to the placeholder
     $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
@@ -109,14 +109,14 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
   ?>
   <div title="<?= $item_title_text ?>" data-token="<?= $item_info['ability_token'] ?>" class="float left link type <?= ($item_image_incomplete ? 'inactive ' : '').($item_type_class) ?>">
     <a class="sprite ability link mugshot size<?= $item_image_size.($item_key == $first_item_token ? ' current' : '') ?>" href="<?= 'database/items/'.preg_replace('/^item-/i', '', $item_info['ability_token']) ?>/" rel="<?= $item_image_incomplete ? 'nofollow' : 'follow' ?>">
-      <? if($item_image_token != 'ability'): ?>
+      <?php if($item_image_token != 'ability'): ?>
         <img src="<?= $item_image_path ?>" width="<?= $item_image_size ?>" height="<?= $item_image_size ?>" alt="<?= $item_title_text ?>" />
-      <? else: ?>
+      <?php else: ?>
         <span><?= $item_info['ability_name'] ?></span>
-      <? endif; ?>
+      <?php endif; ?>
     </a>
   </div>
-  <?
+  <?php
   if ($item_flag_complete){ $mmrpg_database_items_count_complete++; }
   $mmrpg_database_items_links .= ob_get_clean();
   $mmrpg_database_items_links_counter++;

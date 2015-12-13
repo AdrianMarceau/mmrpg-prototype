@@ -1,4 +1,4 @@
-<?
+<?php
 // ROBOT DATABASE
 
 // Define the index of counters for mecha types
@@ -31,8 +31,8 @@ if (!empty($hidden_database_mechas)){
 
 
 // Collect the database mechas and fields
-$mmrpg_database_fields = $DB->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
-$mmrpg_database_mechas = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition} ORDER BY robot_order ASC;", 'robot_token');
+$mmrpg_database_fields = $this_database->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
+$mmrpg_database_mechas = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition} ORDER BY robot_order ASC;", 'robot_token');
 
 // Remove unallowed mechas from the database, and increment type counters
 foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){
@@ -41,7 +41,7 @@ foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){
   if (true){
 
     // Send this data through the mecha index parser
-    $temp_info = mmrpg_robot::parse_index_info($temp_info);
+    $temp_info = rpg_robot::parse_index_info($temp_info);
 
     // Ensure this mecha's image exists, else default to the placeholder
     if ($temp_info['robot_flag_complete']){ $temp_info['robot_image'] = $temp_token; }
@@ -52,7 +52,7 @@ foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){
       // Collect this mecha's field token, then mecha master token, then mecha master number
       $temp_field_token = !is_string($temp_info['robot_field']) ? array_shift($temp_info['robot_field']) : $temp_info['robot_field'];
       //echo($temp_info['robot_token'].' $temp_field_token = '.print_r($temp_field_token, true).' | ');
-      $temp_field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$temp_field_token]);
+      $temp_field_info = rpg_field::parse_index_info($mmrpg_database_fields[$temp_field_token]);
       //echo($temp_info['robot_token'].' $temp_field_token = '.print_r($temp_field_token, true).' | ');
       $temp_master_token = !empty($temp_field_info['field_master']) ? $temp_field_info['field_master'] : 'met';
       $temp_master_number = !empty($mmrpg_database_robots[$temp_master_token]) ? $mmrpg_database_robots[$temp_master_token]['robot_number'] : $temp_info['robot_number'];
@@ -158,15 +158,15 @@ foreach ($mmrpg_database_mechas AS $mecha_key => $mecha_info){
   ob_start();
   ?>
   <div title="<?= $mecha_title_text ?>" data-token="<?= $mecha_info['robot_token'] ?>" class="float left link type <?= ($mecha_image_incomplete  ? 'inactive ' : '').(!empty($mecha_info['robot_core']) ? $mecha_info['robot_core'] : 'none') ?>">
-    <a class="sprite robot link mugshot size<?= $mecha_image_size.($mecha_key == $first_mecha_token ? ' current' : '') ?>" href="<?='database/mechas/'.$mecha_info['robot_token']?>/" rel="<?= $mecha_image_incomplete ? 'nofollow' : 'follow' ?>">
-      <? if($mecha_image_token != 'mecha'): ?>
+    <a class="sprite robot link mugshot size<?= $mecha_image_size.($mecha_key == $first_mecha_token ? ' current' : '') ?>" href="<?= 'database/mechas/'.$mecha_info['robot_token']?>/" rel="<?= $mecha_image_incomplete ? 'nofollow' : 'follow' ?>">
+      <?php if($mecha_image_token != 'mecha'): ?>
         <img src="<?= $mecha_image_path ?>" width="<?= $mecha_image_size ?>" height="<?= $mecha_image_size ?>" alt="<?= $mecha_title_text ?>" />
-      <? else: ?>
+      <?php else: ?>
         <span><?= $mecha_info['robot_name'].$mecha_info['robot_name_append'] ?></span>
-      <? endif; ?>
+      <?php endif; ?>
     </a>
   </div>
-  <?
+  <?php
   if ($mecha_flag_complete){ $mmrpg_database_mechas_count_complete++; }
   $mmrpg_database_mechas_links .= ob_get_clean();
   $mmrpg_database_mechas_links_counter++;

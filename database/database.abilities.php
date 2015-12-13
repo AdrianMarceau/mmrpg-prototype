@@ -1,4 +1,4 @@
-<?
+<?php
 // ABILITY DATABASE
 
 // Define the index of counters for robot types
@@ -34,14 +34,14 @@ if (!empty($hidden_database_abilities)){
 }
 
 // Collect the database abilities
-$mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
+$mmrpg_database_abilities = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
 
 // Remove unallowed abilities from the database, and increment counters
 foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
   if (true){
 
     // Send this data through the ability index parser
-    $temp_info = mmrpg_ability::parse_index_info($temp_info);
+    $temp_info = rpg_ability::parse_index_info($temp_info);
 
     // Ensure this ability's image exists, else default to the placeholder
     $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
@@ -136,15 +136,15 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
   ob_start();
   ?>
   <div title="<?= $ability_title_text ?>" data-token="<?= $ability_info['ability_token'] ?>" class="float left link type <?= ($ability_image_incomplete ? 'inactive ' : '').(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '') ?>">
-    <a class="sprite ability link mugshot size<?= $ability_image_size.($ability_key == $first_ability_token ? ' current' : '') ?>" href="<?='database/abilities/'.$ability_info['ability_token']?>/" rel="<?= $ability_image_incomplete ? 'nofollow' : 'follow' ?>">
-      <? if($ability_image_token != 'ability'): ?>
+    <a class="sprite ability link mugshot size<?= $ability_image_size.($ability_key == $first_ability_token ? ' current' : '') ?>" href="<?= 'database/abilities/'.$ability_info['ability_token']?>/" rel="<?= $ability_image_incomplete ? 'nofollow' : 'follow' ?>">
+      <?php if($ability_image_token != 'ability'): ?>
         <img src="<?= $ability_image_path ?>" width="<?= $ability_image_size ?>" height="<?= $ability_image_size ?>" alt="<?= $ability_title_text ?>" />
-      <? else: ?>
+      <?php else: ?>
         <span><?= $ability_info['ability_name'] ?></span>
-      <? endif; ?>
+      <?php endif; ?>
     </a>
   </div>
-  <?
+  <?php
   if ($ability_flag_complete){ $mmrpg_database_abilities_count_complete++; }
   $mmrpg_database_abilities_links .= ob_get_clean();
   $mmrpg_database_abilities_links_counter++;
