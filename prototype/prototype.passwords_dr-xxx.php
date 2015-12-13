@@ -1,4 +1,4 @@
-<?
+<?php
 // Collect a reference to the password string in session
 if (!isset($_SESSION['GAME']['values']['battle_passwords'])){
   $_SESSION['GAME']['values']['battle_passwords'] = array();
@@ -67,14 +67,14 @@ foreach ($battle_password_arrays AS $player_token => $password_array){
           //die('<pre>$ability_token = '.print_r($ability_token, true).'</pre>');
 
           // Only unlock the ability if it's not already unlocked
-          if (!mmrpg_prototype_ability_unlocked($player_token, false, $ability_token)){
-            //die('<pre>mmrpg_prototype_ability_unlocked('.$player_token.', false, '.$ability_token.')</pre>');
+          if (!rpg_game::ability_unlocked($player_token, false, $ability_token)){
+            //die('<pre>rpg_game::ability_unlocked('.$player_token.', false, '.$ability_token.')</pre>');
 
             // Collect info about this ability
-            $ability_info = mmrpg_ability::get_index_info($ability_token);
+            $ability_info = rpg_ability::get_index_info($ability_token);
 
             // Unlock it as an equippable ability
-            mmrpg_game_unlock_ability($player_info, false, $ability_info, true);
+            rpg_game::unlock_ability($player_info, false, $ability_info, true);
             //exit('ability unlocked');
 
           }
@@ -127,14 +127,14 @@ foreach ($battle_password_arrays AS $player_token => $password_array){
           //die('<pre>$robot_token = '.print_r($robot_token, true).'</pre>');
 
           // Only unlock the robot if it's not already unlocked
-          if (!mmrpg_prototype_robot_unlocked(false, $robot_token)){
-            //die('<pre>mmrpg_prototype_robot_unlocked('.$player_token.', false, '.$robot_token.')</pre>');
+          if (!rpg_game::robot_unlocked(false, $robot_token)){
+            //die('<pre>rpg_game::robot_unlocked('.$player_token.', false, '.$robot_token.')</pre>');
 
             // Collect info about this robot
-            $robot_info = mmrpg_robot::get_index_info($robot_token);
+            $robot_info = rpg_robot::get_index_info($robot_token);
 
             // Unlock Bubble Bomb as an equippable robot
-            mmrpg_game_unlock_robot($player_info, $robot_info, true, true);
+            rpg_game::unlock_robot($player_info, $robot_info, true, true);
             //exit('robot unlocked');
 
           }
@@ -258,7 +258,7 @@ foreach ($battle_password_arrays AS $player_token => $password_array){
           //die('<pre>$item_token = '.print_r($item_token, true).'</pre>');
 
           // Collect info about this item
-          $item_info = mmrpg_ability::get_index_info($item_token);
+          $item_info = rpg_ability::get_index_info($item_token);
 
           // Only unlock the item if it exists
           if (!empty($item_info) && !isset($_SESSION['GAME']['flags']['events']['password-item_'.$password_token])){
@@ -279,7 +279,7 @@ foreach ($battle_password_arrays AS $player_token => $password_array){
             $this_description = !empty($item_info['ability_description']) && $item_info['ability_description'] != '...' ? $item_info['ability_description'] : '';
             $this_find = array('{this_player}', '{this_ability}', '{target_player}', '{target_ability}');
             $this_replace = array($player_info['player_name'], $item_info['ability_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
-            $this_field = array('field_token' => 'intro-field', 'field_name' => 'Intro Field'); //mmrpg_field::get_index_info('field'); //mmrpg_field::get_index_info(!empty($item_info['ability_field']) ? $item_info['ability_field'] : 'intro-field');
+            $this_field = array('field_token' => 'intro-field', 'field_name' => 'Intro Field'); //rpg_field::get_index_info('field'); //rpg_field::get_index_info(!empty($item_info['ability_field']) ? $item_info['ability_field'] : 'intro-field');
 
             // Generate the window event's canvas and message markup then append to the global array
             $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
@@ -322,7 +322,7 @@ foreach ($battle_password_arrays AS $player_token => $password_array){
               ">'.$item_info['ability_name'].'</div></div>';
 
             $temp_console_markup = '<p>Congratulations! <strong>'.$player_info['player_name'].'</strong> found '.($item_quantity == 1 ? (preg_match('/^(a|e|i|o|u)/i', $this_name) ? 'an' : 'a') : $item_quantity).' <strong>'.$this_name.($item_quantity > 1 ? 's' : '').'</strong>! The '.($is_new ? 'new ' : '').($item_quantity > 1 ? 'items were' : 'item was').' added to the inventory.</p>'; //<strong>'.$this_name.'</strong> is '.(!empty($item_info['ability_type']) ? (preg_match('/^(a|e|i|o|u|y)/i', $item_info['ability_type']) ? 'an ' : 'a ').'<strong data-class="ability_type ability_type_'.$item_info['ability_type'].(!empty($item_info['ability_type2']) ? '_'.$item_info['ability_type2'] : '').'">'.ucfirst($item_info['ability_type']).(!empty($item_info['ability_type2']) ? ' and '.ucfirst($item_info['ability_type2']) : '').' Type</strong> ' : '<strong data-class="ability_type ability_type_none">Neutral Type</strong> ').'ability. <strong>'.$this_name.'</strong>&#39;s data was '.($temp_data_existed ? 'updated in ' : 'added to ' ).' the <strong>Robot Database</strong>.
-            $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', mmrpg_ability::print_database_markup($item_info, array('layout_style' => 'event'))).'</div></div></div>';
+            $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', rpg_ability::print_database_markup($item_info, array('layout_style' => 'event'))).'</div></div></div>';
             //die(''.$this_ability_token.': '.$temp_console_markup);
 
             $_SESSION[$session_token]['EVENTS'][] = array(
@@ -385,7 +385,7 @@ foreach ($battle_password_arrays AS $player_token => $password_array){
         //die('<pre>$password_token = '.print_r($password_token, true).', $token = '.$token.'</pre>');
 
         // Vs Player Battle
-        if (!empty($token)){ $user_array = $DB->get_array("SELECT user_id, user_name_clean FROM mmrpg_users WHERE (Replace(user_name, '-', '') LIKE '{$token}') OR (Replace(user_name_public, '-', '') LIKE '{$token}') LIMIT 1"); }
+        if (!empty($token)){ $user_array = $this_database->get_array("SELECT user_id, user_name_clean FROM mmrpg_users WHERE (Replace(user_name, '-', '') LIKE '{$token}') OR (Replace(user_name_public, '-', '') LIKE '{$token}') LIMIT 1"); }
 
         // If the user token was not empty, let's unlock it
         if (!empty($user_array) && $user_array['user_id'] != $this_userid){

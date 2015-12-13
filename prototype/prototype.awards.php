@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Collect the prototype awards from the session if they are available
 $this_prototype_awards = !empty($_SESSION[$session_token]['values']['prototype_awards']) ? $_SESSION[$session_token]['values']['prototype_awards'] : array();
@@ -45,19 +45,19 @@ if (empty($_SESSION[$session_token]['DEMO'])){
   
   // -- LIGHT COMPLETE!!! -- //
   // If this user has completed Dr. Light's campaign, make sure there's a flag to remember it
-  if (!isset($this_prototype_awards['prototype_complete_light']) && mmrpg_prototype_complete('dr-light')){
+  if (!isset($this_prototype_awards['prototype_complete_light']) && rpg_prototype::campaign_complete('dr-light')){
     $this_prototype_awards['prototype_complete_light'] = time();
   }
   
   // -- WILY COMPLETE!!! -- //
   // If this user has completed Dr. Wily's campaign, make sure there's a flag to remember it
-  if (!isset($this_prototype_awards['prototype_complete_wily']) && mmrpg_prototype_complete('dr-wily')){
+  if (!isset($this_prototype_awards['prototype_complete_wily']) && rpg_prototype::campaign_complete('dr-wily')){
     $this_prototype_awards['prototype_complete_wily'] = time();
   }
   
   // -- COSSACK COMPLETE!!! -- //
   // If this user has completed Dr. Cossack's campaign, make sure there's a flag to remember it
-  if (!isset($this_prototype_awards['prototype_complete_cossack']) && mmrpg_prototype_complete('dr-cossack')){
+  if (!isset($this_prototype_awards['prototype_complete_cossack']) && rpg_prototype::campaign_complete('dr-cossack')){
     $this_prototype_awards['prototype_complete_cossack'] = time();
   }
   

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * PLAYER MISSION SELECT
  * Only re-generate missions if it is approriate to do
@@ -26,16 +26,17 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     // Generate the battle option with the starter data
     $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'];
     if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
-      $temp_battle_omega = mmrpg_prototype_mission_starter($this_prototype_data, 'met', $chapters_levels_common['one'], $this_prototype_data['this_support_robot'], 'intro-field', 1, 'mecha');
+      $temp_battle_omega = rpg_mission::generate_starter($this_prototype_data, 'met', $chapters_levels_common['one'], $this_prototype_data['this_support_robot'], 'intro-field', 1, 'mecha');
       $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-      mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+      rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
       $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
     } else {
       $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-      $temp_battle_omega = mmrpg_battle::get_index_info($temp_battle_token);
+      $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
     }
 
     // Add the omega battle to the options, index, and session
+    if (!isset($temp_battle_omega['battle_token'])){ echo "We have a problem here...{$temp_session_token}\n"; }
     $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
   }
@@ -46,13 +47,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     // Generate the battle option with the starter data
     $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'-2';
     if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
-      $temp_battle_omega = mmrpg_prototype_mission_starter($this_prototype_data, 'sniper-joe', ($chapters_levels_common['one-2']), $this_prototype_data['this_support_robot'], $this_prototype_data['this_player_field'], 1, 'mecha');
+      $temp_battle_omega = rpg_mission::generate_starter($this_prototype_data, 'sniper-joe', ($chapters_levels_common['one-2']), $this_prototype_data['this_support_robot'], $this_prototype_data['this_player_field'], 1, 'mecha');
       $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-      mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+      rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
       $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
     } else {
       $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-      $temp_battle_omega = mmrpg_battle::get_index_info($temp_battle_token);
+      $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
     }
 
     // Add the omega battle to the options, index, and session
@@ -66,13 +67,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     // Generate the battle option with the starter data
     $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'-3';
     if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
-      $temp_battle_omega = mmrpg_prototype_mission_starter($this_prototype_data, 'trill', ($chapters_levels_common['one-3']), '', 'prototype-subspace', 1, 'boss');
+      $temp_battle_omega = rpg_mission::generate_starter($this_prototype_data, 'trill', ($chapters_levels_common['one-3']), '', 'prototype-subspace', 1, 'boss');
       $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-      mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+      rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
       $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
     } else {
       $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-      $temp_battle_omega = mmrpg_battle::get_index_info($temp_battle_token);
+      $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
     }
 
     // Add the omega battle to the options, index, and session
@@ -88,6 +89,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
   // Only continue if the player has unlocked the required chapters
   if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['two'])){
+
     // EVENT MESSAGE : CHAPTER TWO
     $this_prototype_data['battle_options'][] = array(
       'option_type' => 'message',
@@ -106,19 +108,84 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       // Generate the battle option with the starter data
       $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'_'.$key;
       if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
-        $temp_battle_omega = mmrpg_prototype_mission_single($this_prototype_data, $info['robot'], $info['field'], $chapters_levels_common['two']);
+        $temp_battle_omega = rpg_mission::generate_single($this_prototype_data, $info['robot'], $info['field'], $chapters_levels_common['two']);
         $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-        mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
         $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
       } else {
         $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-        $temp_battle_omega = mmrpg_battle::get_index_info($temp_battle_token);
+        $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
       }
 
       // Add the omega battle to the options, index, and session
       $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
     }
+
+    // -- DOC ROBOT BATTLE -- //
+
+    // Collect the robot index for quick use
+    $temp_robots_index = rpg_robot::get_index();
+    $temp_fields_index = rpg_field::get_index();
+
+    // Create the player info override array
+    $temp_player_info = array('player_token' => 'player');
+
+    // Collect and define the robot masters and support mechas to appear on this field
+    $temp_robot_masters = array();
+    $temp_support_mechas = array();
+    if (isset($this_prototype_data['target_robot_omega'][1][0])){ $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1]; }
+    foreach ($this_prototype_data['target_robot_omega'] AS $key => $info){
+      $temp_field_info = rpg_field::parse_index_info($temp_fields_index[$info['field']]);
+      if (!empty($temp_field_info['field_master'])){ $temp_robot_masters[] = $temp_field_info['field_master']; }
+      if (!empty($temp_field_info['field_mechas'])){ $temp_support_mechas[] = array_pop($temp_field_info['field_mechas']); }
+    }
+
+    // Define the base Doc Robot object
+    $temp_robot = array();
+    $temp_robot['robot_id'] = (MMRPG_SETTINGS_TARGET_PLAYERID + 1);
+    $temp_robot['robot_token'] = 'doc-robot';
+    $temp_robot['robot_level'] = $chapters_levels_common['two-2'];
+    $temp_robot['robot_item'] = 'item-weapon-upgrade';
+    $temp_robot['robot_abilities'] = array();
+
+    // Add the masters info into the omega battle
+    $temp_robot_masters_tokens = $temp_robot_masters;
+    $temp_robot_masters = array();
+    foreach ($temp_robot_masters_tokens AS $key => $token){
+      $index = rpg_robot::parse_index_info($temp_robots_index[$token]);
+      $ability = array_pop($index['robot_rewards']['abilities']);
+      $temp_robot['robot_abilities'][] = $ability['token'];
+    }
+
+    // Add the robot to the robot masters array
+    $temp_robot_masters[] = $temp_robot;
+
+    /*
+    // Add random support mechas to the battle
+    for ($i = 0; $i < 3; $i++){
+      $token = $temp_support_mechas[mt_rand(0, (count($temp_support_mechas) - 1))];
+      $index = rpg_robot::parse_index_info($temp_robots_index[$token]);
+      $temp_mecha = array();
+      $temp_mecha['flags']['hide_from_mission_select'] = true;
+      $temp_mecha['robot_id'] = (MMRPG_SETTINGS_TARGET_PLAYERID + 2 + $i);
+      $temp_mecha['robot_token'] = $token;
+      $temp_mecha['robot_level'] = mt_rand(ceil($chapters_levels_common['two-2'] * 0.30), floor($chapters_levels_common['two-2'] * 0.90));
+      $temp_mecha['robot_abilities'] = rpg_prototype::generate_abilities($index, $temp_mecha['robot_level'], 2);
+      $temp_robot_masters[] = $temp_mecha;
+    }
+    */
+
+    // Unlock the first of the final destination battles (doc-robot)
+    $temp_index_token = $this_prototype_data['this_player_token'].'-fortress-i';
+    $temp_battle_token = $this_prototype_data['this_player_token'].'-phase'.$this_prototype_data['battle_phase'].'-doc-robot';
+    $temp_battle_omega = rpg_mission::generate_fortress($this_prototype_data, $chapters_levels_common['two-2'], $temp_index_token, $temp_battle_token, $temp_robot_masters, $temp_support_mechas, $temp_player_info);
+    $temp_battle_omega['battle_name'] = 'Chapter Two Boss Battle';
+    $temp_battle_omega['battle_description'] = 'Defeat the resurrected Doc Robot!';
+
+    // Add the omega battle to the battle options
+    $this_prototype_data['battle_options'][] = $temp_battle_omega;
+    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
   }
 
@@ -130,6 +197,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
   // If the first 1 + 8 battles are complete, unlock the ninth and recollect markup
   if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['three'])){
+
     // EVENT MESSAGE : CHAPTER THREE
     $this_prototype_data['battle_options'][] = array(
       'option_type' => 'message',
@@ -140,11 +208,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     // Unlock the rival fortress battle (fortress-i)
     $temp_index_token = $this_prototype_data['this_player_token'].'-fortress-i';
     $temp_battle_token = $this_prototype_data['this_player_token'].'-phase'.$this_prototype_data['battle_phase'].'-fortress-i';
-    $temp_battle_omega = mmrpg_prototype_mission_fortress($this_prototype_data, $chapters_levels_common['three'], $temp_index_token, $temp_battle_token);
+    $temp_battle_omega = rpg_mission::generate_fortress($this_prototype_data, $chapters_levels_common['three'], $temp_index_token, $temp_battle_token);
 
     // Add the omega battle to the battle options
     $this_prototype_data['battle_options'][] = $temp_battle_omega;
-    mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
     //exit('$temp_battle_omega = <pre>'.print_r($temp_battle_omega, true).'</pre>');
 
   }
@@ -178,13 +246,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'_'.$key;
       if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
         $info2 = $this_prototype_data['target_robot_omega'][$key + 1];
-        $temp_battle_omega = mmrpg_prototype_mission_double($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $chapters_levels_common['four'], true, true);
+        $temp_battle_omega = rpg_mission::generate_double($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $chapters_levels_common['four'], true, true);
         $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-        mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
         $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
       } else {
         $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-        $temp_battle_omega = mmrpg_battle::get_index_info($temp_battle_token);
+        $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
       }
 
       // Add the omega battle to the options, index, and session
@@ -219,11 +287,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       // Unlock the first of the final destination battles (fortress-ii)
       $temp_index_token = $this_prototype_data['this_player_token'].'-fortress-ii';
       $temp_battle_token = $this_prototype_data['this_player_token'].'-phase'.$this_prototype_data['battle_phase'].'-fortress-ii';
-      $temp_battle_omega = mmrpg_prototype_mission_fortress($this_prototype_data, $chapters_levels_common['five'], $temp_index_token, $temp_battle_token);
+      $temp_battle_omega = rpg_mission::generate_fortress($this_prototype_data, $chapters_levels_common['five'], $temp_index_token, $temp_battle_token);
 
       // Add the omega battle to the battle options
       $this_prototype_data['battle_options'][] = $temp_battle_omega;
-      mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+      rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
     }
 
@@ -234,27 +302,28 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       // Unlock the second of the final destination battles (fortress-iii)
       $temp_index_token = $this_prototype_data['this_player_token'].'-fortress-iii';
       $temp_battle_token = $this_prototype_data['this_player_token'].'-phase'.$this_prototype_data['battle_phase'].'-fortress-iii';
-      $temp_battle_omega = mmrpg_prototype_mission_fortress($this_prototype_data, $chapters_levels_common['five-2'], $temp_index_token, $temp_battle_token);
+      $temp_battle_omega = rpg_mission::generate_fortress($this_prototype_data, $chapters_levels_common['five-2'], $temp_index_token, $temp_battle_token);
 
       // Add the omega battle to the battle options
       $this_prototype_data['battle_options'][] = $temp_battle_omega;
-      mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+      rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
     }
 
     // Final Destination III
     // Only continue if the player has unlocked the required chapters
     if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['five-3'])){
+
       // Collect the robot index for quick use
-      $temp_robots_index = mmrpg_robot::get_index(); //$DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-      $temp_fields_index = mmrpg_field::get_index();
+      $temp_robots_index = rpg_robot::get_index();
+      $temp_fields_index = rpg_field::get_index();
 
       // Collect and define the robot masters and support mechas to appear on this field
       $temp_robot_masters = array();
       $temp_support_mechas = array();
       if (isset($this_prototype_data['target_robot_omega'][1][0])){ $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1]; }
       foreach ($this_prototype_data['target_robot_omega'] AS $key => $info){
-        $temp_field_info = mmrpg_field::parse_index_info($temp_fields_index[$info['field']]);
+        $temp_field_info = rpg_field::parse_index_info($temp_fields_index[$info['field']]);
         if (!empty($temp_field_info['field_master'])){ $temp_robot_masters[] = $temp_field_info['field_master']; }
         if (!empty($temp_field_info['field_mechas'])){ $temp_support_mechas[] = array_pop($temp_field_info['field_mechas']); }
       }
@@ -270,14 +339,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       $temp_robot_masters_tokens = $temp_robot_masters;
       $temp_robot_masters = array();
       foreach ($temp_robot_masters_tokens AS $key => $token){
-        $index = mmrpg_robot::parse_index_info($temp_robots_index[$token]);
+        $index = rpg_robot::parse_index_info($temp_robots_index[$token]);
         $info = array();
         $info['robot_id'] = (MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1);
         $info['robot_token'] = $token;
         $info['robot_level'] = $chapters_levels_common['five-3'] + mt_rand(-5, 5);
         $info['robot_item'] = $possible_items[mt_rand(0, $possible_items_last_key)];
         $info['robot_abilities'] = array();
-        $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8, $info['robot_item']);
+        $info['robot_abilities'] = rpg_prototype::generate_abilities($index, $info['robot_level'], 8, $info['robot_item']);
         $temp_robot_masters[] = $info;
       }
       shuffle($temp_robot_masters);
@@ -285,11 +354,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       // Unlock the first of the final destination battles (fortress-iv)
       $temp_index_token = $this_prototype_data['this_player_token'].'-fortress-iv';
       $temp_battle_token = $this_prototype_data['this_player_token'].'-phase'.$this_prototype_data['battle_phase'].'-fortress-iv';
-      $temp_battle_omega = mmrpg_prototype_mission_fortress($this_prototype_data, $chapters_levels_common['five-3'], $temp_index_token, $temp_battle_token, $temp_robot_masters, $temp_support_mechas);
+      $temp_battle_omega = rpg_mission::generate_fortress($this_prototype_data, $chapters_levels_common['five-3'], $temp_index_token, $temp_battle_token, $temp_robot_masters, $temp_support_mechas);
 
       // Add the omega battle to the battle options
       $this_prototype_data['battle_options'][] = $temp_battle_omega;
-      mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+      rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
     }
 
@@ -311,18 +380,18 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       );
 
     // Generate the bonus battle and using the prototype data
-    $temp_battle_omega = mmrpg_prototype_mission_bonus($this_prototype_data, 3, 'mecha');
+    $temp_battle_omega = rpg_mission::generate_bonus($this_prototype_data, 3, 'mecha');
     $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
     // Add the omega battle to the options, index, and session
     $this_prototype_data['battle_options'][] = $temp_battle_omega;
-    mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
     // Generate the bonus battle and using the prototype data
-    $temp_battle_omega = mmrpg_prototype_mission_bonus($this_prototype_data, 6, 'master');
+    $temp_battle_omega = rpg_mission::generate_bonus($this_prototype_data, 6, 'master');
     $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
     // Add the omega battle to the options, index, and session
     $this_prototype_data['battle_options'][] = $temp_battle_omega;
-    mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
   }
 
@@ -347,15 +416,15 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         );
 
       // Include the leaderboard data for pruning
-      $this_leaderboard_online_players = mmrpg_prototype_leaderboard_online();
+      $this_leaderboard_online_players = rpg_prototype::leaderboard_online();
       $temp_include_usernames = array();
       if (!empty($this_leaderboard_online_players)){
         foreach ($this_leaderboard_online_players AS $info){ $temp_include_usernames[] = $info['token']; }
       }
 
       // Pull a random set of players from the database with similar point levels
-      $temp_player_list = mmrpg_prototype_leaderboard_targets($this_userid, 9, $this_prototype_data['target_player_token'], $this_prototype_data['this_player_token']);
-      if (empty($temp_player_list)){ $temp_player_list = mmrpg_prototype_leaderboard_targets($this_userid, 9, $this_prototype_data['this_player_token'], $this_prototype_data['this_player_token']); }
+      $temp_player_list = rpg_prototype::leaderboard_targets($this_userid, 9, $this_prototype_data['target_player_token'], $this_prototype_data['this_player_token']);
+      if (empty($temp_player_list)){ $temp_player_list = rpg_prototype::leaderboard_targets($this_userid, 9, $this_prototype_data['this_player_token'], $this_prototype_data['this_player_token']); }
 
       // If player data was actuall pulled, continue
       if (!empty($temp_player_list)){
@@ -398,7 +467,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
           if ($i >= 2 && $this_prototype_data['robots_unlocked'] >= 4){ $temp_max_robots = 4; }
           if ($i >= 4 && $this_prototype_data['robots_unlocked'] >= 8){ $temp_max_robots = 8; }
           $temp_player_array = array_shift($temp_player_list);
-          $temp_battle_omega = mmrpg_prototype_mission_player($this_prototype_data, $temp_player_array, $temp_max_robots, $temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three);
+          $temp_battle_omega = rpg_mission::generate_player($this_prototype_data, $temp_player_array, $temp_max_robots, $temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three);
 
           // If the collected omega battle was empty, continue gracefully
           if (empty($temp_battle_omega) || empty($temp_battle_omega['battle_token'])){
@@ -423,7 +492,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
           // Add the omega battle to the options, index, and session
           $this_prototype_data['battle_options'][] = $temp_battle_omega;
-          mmrpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+          rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
           unset($temp_battle_omega);
 
         }
