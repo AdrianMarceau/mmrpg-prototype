@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * COMMUNITY FORM ACTIONS
  */
@@ -6,8 +6,8 @@
 // If an action has been submit, process it
 $this_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : false;
 while ($this_action == 'delete' && !empty($_REQUEST['post_id'])){
-  $temp_postinfo = $DB->get_array("SELECT * FROM mmrpg_posts WHERE post_id = '{$_REQUEST['post_id']}' ".(!COMMUNITY_VIEW_MODERATOR ? " AND mmrpg_posts.user_id = {$this_userid}" : ''));
-  if (!empty($temp_postinfo)){ $DB->update('mmrpg_posts', array('post_deleted' => 1), "post_id = '{$_REQUEST['post_id']}'"); }
+  $temp_postinfo = $this_database->get_array("SELECT * FROM mmrpg_posts WHERE post_id = '{$_REQUEST['post_id']}' ".(!COMMUNITY_VIEW_MODERATOR ? " AND mmrpg_posts.user_id = {$this_userid}" : ''));
+  if (!empty($temp_postinfo)){ $this_database->update('mmrpg_posts', array('post_deleted' => 1), "post_id = '{$_REQUEST['post_id']}'"); }
   header('Location: '.$_GET['this_current_url'].'#comment-listing');
   exit();
   break;
@@ -56,7 +56,7 @@ while ($this_formaction == 'post'){
     $verified = false;
   }
   elseif ($formdata['post_id'] != 0){
-    $temp_postinfo = $DB->get_array("SELECT * FROM mmrpg_posts WHERE post_id = '{$formdata['post_id']}'");
+    $temp_postinfo = $this_database->get_array("SELECT * FROM mmrpg_posts WHERE post_id = '{$formdata['post_id']}'");
     if (empty($temp_postinfo) && !COMMUNITY_VIEW_MODERATOR){
       $this_formerrors[] = "The provided Post ID belongs to another player.";
       $verified = false;
@@ -92,7 +92,7 @@ while ($this_formaction == 'post'){
   }
 
   if (!empty($formdata['post_time']) && $formdata['post_id'] == 0){
-    $temp_postinfo = $DB->get_array("SELECT * FROM mmrpg_posts WHERE post_date = '{$formdata['post_time']}' AND user_id = '{$formdata['user_id']}'");
+    $temp_postinfo = $this_database->get_array("SELECT * FROM mmrpg_posts WHERE post_date = '{$formdata['post_time']}' AND user_id = '{$formdata['user_id']}'");
     if (!empty($temp_postinfo)){
       // Create the error flag to change markup
       //$this_formerrors[] = "This post has already been submit&hellip;";
@@ -114,7 +114,7 @@ while ($this_formaction == 'post'){
 
   // Define the is newpost flag variable
   $temp_flag_newpost = empty($formdata['post_id']) || empty($temp_postinfo) ? true : false;
-  if ($temp_flag_newpost){ $formdata['post_id'] = $DB->get_value('SELECT MAX(post_id) AS max_id FROM mmrpg_posts', 'max_id') + 1; }
+  if ($temp_flag_newpost){ $formdata['post_id'] = $this_database->get_value('SELECT MAX(post_id) AS max_id FROM mmrpg_posts', 'max_id') + 1; }
 
   // Check to see if this is a new post we're working with
   if ($temp_flag_newpost){
@@ -133,7 +133,7 @@ while ($this_formaction == 'post'){
     $insert_array['post_target'] = $formdata['post_target'];
 
     // Insert this new post into the database
-    $DB->insert('mmrpg_posts', $insert_array);
+    $this_database->insert('mmrpg_posts', $insert_array);
 
   }
   // Otherwise, if we're editing an existing post
@@ -147,7 +147,7 @@ while ($this_formaction == 'post'){
     $update_array['post_mod'] = $formdata['post_time'];
 
     // Insert this new post into the database
-    $DB->update('mmrpg_posts', $update_array, "post_id = {$formdata['post_id']}");
+    $this_database->update('mmrpg_posts', $update_array, "post_id = {$formdata['post_id']}");
 
   }
 
@@ -161,7 +161,7 @@ while ($this_formaction == 'post'){
     $update_array['thread_mod_user'] = $this_userinfo['user_id'];
 
     // Update the parent thread in the database
-    $DB->update('mmrpg_threads', $update_array, "thread_id = {$formdata['thread_id']}");
+    $this_database->update('mmrpg_threads', $update_array, "thread_id = {$formdata['thread_id']}");
 
   }
 
@@ -169,7 +169,7 @@ while ($this_formaction == 'post'){
   define('COMMENT_POST_SUCCESSFUL', true);
   // If this was a personal message, automatically reload the thread
   if (isset($update_array) || $formdata['post_target'] != 0){
-    $temp_threadinfo = $DB->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = {$formdata['thread_id']} LIMIT 1");
+    $temp_threadinfo = $this_database->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = {$formdata['thread_id']} LIMIT 1");
     header('Location: '.$this_current_url.'#post-'.$formdata['post_id']);
     exit();
   }
@@ -228,7 +228,7 @@ while ($this_formaction == 'thread'){
     $verified = false;
   }
   elseif ($formdata['thread_id'] != 0){
-    $temp_threadinfo = $DB->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = '{$formdata['thread_id']}'");
+    $temp_threadinfo = $this_database->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = '{$formdata['thread_id']}'");
     if (empty($temp_threadinfo) && !COMMUNITY_VIEW_MODERATOR){
       if ($formdata['category_id'] != 0){ $this_formerrors[] = "The provided Thread ID belongs to another player."; }
       else { $this_formerrors[] = "The provided Message ID belongs to another player."; }
@@ -292,7 +292,7 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
   }
 
   if (!empty($formdata['thread_time']) && $formdata['thread_id'] == 0){
-    $temp_threadinfo = $DB->get_array("SELECT * FROM mmrpg_threads WHERE thread_date = '{$formdata['thread_time']}' AND user_id = '{$formdata['user_id']}'");
+    $temp_threadinfo = $this_database->get_array("SELECT * FROM mmrpg_threads WHERE thread_date = '{$formdata['thread_time']}' AND user_id = '{$formdata['user_id']}'");
     if (!empty($temp_threadinfo)){
       // Create the error flag to change markup
       //$this_formerrors[] = "This thread has already been submit&hellip;";
@@ -304,7 +304,7 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
       break;
     }
   } elseif (!empty($formdata['thread_id'])){
-    $temp_threadinfo = $DB->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = '{$formdata['thread_id']}'");
+    $temp_threadinfo = $this_database->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = '{$formdata['thread_id']}'");
   }
 
   // DEBUG
@@ -336,7 +336,7 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
 
     // Define the insert array based on provided data
     $insert_array = array();
-    $insert_array['thread_id'] = $DB->get_value('SELECT MAX(thread_id) AS max_id FROM mmrpg_threads', 'max_id') + 1;
+    $insert_array['thread_id'] = $this_database->get_value('SELECT MAX(thread_id) AS max_id FROM mmrpg_threads', 'max_id') + 1;
     $insert_array['category_id'] = $formdata['category_id'];
     $insert_array['user_id'] = $formdata['user_id'];
     $insert_array['user_ip'] = $formdata['user_ip'];
@@ -366,7 +366,7 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
 
     // Insert this new thread into the database
     //die('<pre>$insert_array:'.print_r($insert_array, true).'</pre>');
-    $DB->insert('mmrpg_threads', $insert_array);
+    $this_database->insert('mmrpg_threads', $insert_array);
     $formdata['thread_id'] = $insert_array['thread_id'];
 
   }
@@ -397,7 +397,7 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
 
     // Insert this new thread into the database
     //die('<pre>$update_array:'.print_r($update_array, true).'</pre>');
-    $DB->update('mmrpg_threads', $update_array, "thread_id = {$formdata['thread_id']}");
+    $this_database->update('mmrpg_threads', $update_array, "thread_id = {$formdata['thread_id']}");
 
   }
 
@@ -418,8 +418,8 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
         '$this_categories_index_tokens = <pre>'.print_r($this_categories_index_tokens, true).'</pre>'
         );
       */
-      $DB->update('mmrpg_posts', array('category_id' => $formdata['new_category_id']), "thread_id = {$formdata['thread_id']}");
-      $DB->update('mmrpg_threads', array('category_id' => $formdata['new_category_id']), "thread_id = {$formdata['thread_id']}");
+      $this_database->update('mmrpg_posts', array('category_id' => $formdata['new_category_id']), "thread_id = {$formdata['thread_id']}");
+      $this_database->update('mmrpg_threads', array('category_id' => $formdata['new_category_id']), "thread_id = {$formdata['thread_id']}");
       $formdata['category_token'] = $this_categories_index_tokens[$formdata['new_category_id']];
     }
 

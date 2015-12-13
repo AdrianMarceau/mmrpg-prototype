@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * COMMUNITY CATEGORY VIEW
  */
@@ -17,7 +17,7 @@ $this_graph_data['description'] = strip_tags($this_category_info['category_descr
 //$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
 
 // Collect the current user's info from the database
-//$this_userinfo = $DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+//$this_userinfo = $this_database->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
 
 // If this is a SEARCH request, we run a special query
 if ($this_category_info['category_token'] == 'search'){
@@ -45,7 +45,7 @@ else {
     GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
     WHERE threads.category_id = {$this_category_info['category_id']} AND threads.thread_published = 1 AND (threads.thread_target = 0 OR threads.thread_target = {$this_userinfo['user_id']} OR threads.user_id = {$this_userinfo['user_id']})
     ORDER BY {$temp_order_by}";
-  $this_threads_array = $DB->get_array_list($this_threads_query);
+  $this_threads_array = $this_database->get_array_list($this_threads_query);
   $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
   //die('<pre>'.print_r($this_threads_array, true).'</pre>');
 
@@ -55,43 +55,43 @@ else {
 <h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
   <a class="link" style="display: inline;" href="<?= str_replace($this_category_info['category_token'].'/', '', $_GET['this_current_url']) ?>">Community</a> <span class="raquo">&nbsp;&raquo;&nbsp;</span>
   <a class="link" style="display: inline;" href="<?= $_GET['this_current_url'] ?>"><?= $this_category_info['category_name'] ?></a>
-  <? if(!in_array($this_category_info['category_token'], array('chat', 'search'))): ?>
+  <?php if(!in_array($this_category_info['category_token'], array('chat', 'search'))): ?>
     <span style="float: right;">
       <?= $this_threads_count == '1' ? '1 '.($this_category_info['category_id'] != 0 ? 'Discussion' : 'Message') : $this_threads_count.' '.($this_category_info['category_id'] != 0 ? 'Discussions' : 'Messages')  ?>
-      <?
+      <?php
         // Add the new threads option if there are new threads to view
         $this_threads_count_new = !empty($_SESSION['COMMUNITY']['threads_new_categories'][$this_category_info['category_id']]) ? $_SESSION['COMMUNITY']['threads_new_categories'][$this_category_info['category_id']] : 0;
         if ($this_threads_count_new > 0){
           ?>
           <span class="pipe">&nbsp;|&nbsp;</span>
           <a class="link" style="display: inline;" href="community/<?= $this_category_info['category_token'] ?>/new/" style="margin-top: 0;"><?= $this_threads_count_new == 1 ? 'View 1 Updated Thread' : 'View '.$this_threads_count_new.' Updated Threads' ?> &raquo;</a>
-          <?
+          <?php
         }
         // Add a new thread option to the end of the list if allowed
         if($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_userinfo['role_level'] >= $this_category_info['category_level'] && $community_battle_points >= 10000){
           ?>
           <span class="pipe">&nbsp;|&nbsp;</span>
           <a class="link" style="display: inline;" href="community/<?= $this_category_info['category_token'] ?>/0/new/" style="margin-top: 0;">Create New Discussion &raquo;</a>
-          <?
+          <?php
         }
         ?>
     </span>
-  <? endif; ?>
+  <?php endif; ?>
 </h2>
-<?
+<?php
 // Only display the category body if not personal
 if ($this_category_info['category_id'] != 0){
   // Require the leaderboard data file
-  require_once('data/leaderboard.php');
+  require_once('includes/include.leaderboard.php');
   // Collect all the active sessions for this page
-  $temp_viewing_category = mmrpg_website_sessions_active('community/'.$this_category_info['category_token'].'/', 3, true);
+  $temp_viewing_category = rpg_website::sessions_active('community/'.$this_category_info['category_token'].'/', 3, true);
   $temp_viewing_userids = array();
   foreach ($temp_viewing_category AS $session){ $temp_viewing_userids[] = $session['user_id']; }
   ?>
   <div class="subbody">
     <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_0<?= mt_rand(0, 2) ?>" style="background-image: url(images/robots/<?= MMRPG_SETTINGS_CURRENT_FIELDMECHA ?>/sprite_left_80x80.png);"><?= MMRPG_SETTINGS_CURRENT_FIELDMECHA ?></div></div>
     <p class="text"><?= $this_category_info['category_description'] ?></p>
-    <?
+    <?php
     // If this is the SEARCH discussion category, print a form
     if ($this_category_info['category_token'] == 'search'){
       // Define the display text for the online player section
@@ -141,7 +141,7 @@ if ($this_category_info['category_id'] != 0){
             <select class="select" name="category" size="9">
               <option value="" <?= empty($temp_filter_data['category']) ? 'selected="selected"' : '' ?>>Any Category</option>
               <option value="">----------</option>
-              <?
+              <?php
               // Loop through and display categories as options
               if (!empty($this_categories_index)){
                 foreach ($this_categories_index AS $token => $info){
@@ -207,7 +207,7 @@ if ($this_category_info['category_id'] != 0){
           </div>
         </div>
 
-        <?
+        <?php
         // Collect the current page num for the search results, and define min/max keys
         $search_page_num =  !empty($_REQUEST['pg']) && is_numeric($_REQUEST['pg']) ? $_REQUEST['pg'] : 1;
         $search_page_result_count = $temp_filter_data['display'] == 'threads' ? $this_threads_count : $this_posts_count;
@@ -221,9 +221,9 @@ if ($this_category_info['category_id'] != 0){
           <input class="button submit" type="submit" value="Search" style="font-size: 120%;" />
         </div>
 
-        <? if($this_category_info['category_token'] == 'search' && !empty($search_page_result_count)): ?>
+        <?php if($this_category_info['category_token'] == 'search' && !empty($search_page_result_count)): ?>
           <div class="results" style="font-size: 120%; ">
-            <div class="count"><?
+            <div class="count"><?php
               echo 'Found ';
               if ($temp_filter_data['limit'] == 'threads'){ echo $thread_search_count.' Threads'; }
               elseif ($temp_filter_data['limit'] == 'posts'){ echo $post_search_count.' Posts'; }
@@ -234,10 +234,10 @@ if ($this_category_info['category_id'] != 0){
               }
               echo ' <span class="total">'.$search_page_result_count.' Results Total</span>';
             ?></div>
-            <? if($search_page_link_count > 1): ?>
+            <?php if($search_page_link_count > 1): ?>
               <div class="pages">
                 <span class="label">Pages</span>
-                <?
+                <?php
                 // Gather all the other fields into a single query string
                 $temp_query_string = array();
                 if (isset($temp_filter_data['text'])){ $temp_query_string[] = 'text='.$temp_filter_data['text']; }
@@ -256,13 +256,13 @@ if ($this_category_info['category_id'] != 0){
                 }
                 ?>
               </div>
-            <? endif; ?>
+            <?php endif; ?>
           </div>
-        <? endif; ?>
+        <?php endif; ?>
 
       </form>
 
-      <?
+      <?php
     }
     // Otherwise, if this just a regular discussion category, print normally
     else {
@@ -272,10 +272,10 @@ if ($this_category_info['category_id'] != 0){
     }
     ?>
   </div>
-  <?
+  <?php
 
   // Print out any online viewers if they exist
-  $temp_markup = !empty($temp_viewing_userids) ? mmrpg_website_print_online($this_leaderboard_online_players, $temp_viewing_userids) : '';
+  $temp_markup = !empty($temp_viewing_userids) ? rpg_website::print_online($this_leaderboard_online_players, $temp_viewing_userids) : '';
   if (!empty($temp_markup)){
     ?>
     <div class="subbody online_players">
@@ -283,7 +283,7 @@ if ($this_category_info['category_id'] != 0){
       <div class="text event players"><?= $temp_markup ?></div>
       <strong class="text label"><?= (count($temp_viewing_userids) == 1 ? '1 Player' : count($temp_viewing_userids).' Players').' '.$this_online_label ?></strong>
     </div>
-    <?
+    <?php
   }
 
 }
@@ -292,8 +292,7 @@ if ($this_category_info['category_id'] != 0){
 if (true){
   ?>
   <div class="field_type field_type_empty" style="padding: 10px; font-size: 12px; font-family: Courier New; color: white;">
-    <?=
-    '<hr /> '.
+    <?=     '<hr /> '.
     '$post_search_array = '.count($post_search_array).'<br /><small>('.implode(',', array_keys($post_search_array)).')</small><br /> '.
     '$thread_search_array = '.count($thread_search_array).'<br /><small>('.implode(',', array_keys($thread_search_array)).')</small><br /> '.
     '<hr /> '.
@@ -311,7 +310,7 @@ if (true){
     ?>
     <?= false && !empty($_REQUEST) ? '<pre>$_REQUEST = '.print_r($_REQUEST, true).'</pre>' : '' ?>
   </div>
-  <?
+  <?php
 }
 */
 
@@ -326,7 +325,7 @@ $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
 // Collect the user post and thread count index plus leaderboard points for display
 $temp_id_includes = !empty($this_user_ids_array) ? 'AND mmrpg_users.user_id IN ('.implode(', ', $this_user_ids_array).')' : '';
 if (!empty($temp_id_includes)){
-  $this_user_countindex = $DB->get_array_list('SELECT
+  $this_user_countindex = $this_database->get_array_list('SELECT
     mmrpg_users.user_id,
     mmrpg_leaderboard.board_points,
     mmrpg_threads.thread_count,
@@ -352,7 +351,7 @@ if ($this_category_info['category_token'] != 'search'){
     foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
 
       // Collect markup for this thread from the function
-      $temp_markup = mmrpg_website_community_thread_linkblock($this_thread_info, $this_category_info);
+      $temp_markup = rpg_website::community_thread_linkblock($this_thread_info, $this_category_info);
       echo $temp_markup."\n";
 
     }
@@ -361,7 +360,7 @@ if ($this_category_info['category_token'] != 'search'){
     <div class="subbody">
       <p class="text">- there are no <?= $this_category_info['category_id'] != 0 ? 'threads' : 'messages' ?> to display -</p>
     </div>
-    <?
+    <?php
   }
 
 }
@@ -379,22 +378,22 @@ elseif ($this_category_info['category_token'] == 'search' && $temp_filter_data['
 
 
       // Collect markup for this thread from the function
-      $temp_markup = mmrpg_website_community_thread_linkblock($this_thread_info, $this_category_info);
+      $temp_markup = rpg_website::community_thread_linkblock($this_thread_info, $this_category_info);
       echo $temp_markup."\n";
 
     }
   } else {
     ?>
     <div class="subbody">
-      <? if (!empty($temp_filter_data['limit']) && $temp_filter_data['limit'] == 'posts'): ?>
+      <?php if (!empty($temp_filter_data['limit']) && $temp_filter_data['limit'] == 'posts'): ?>
         <p class="text">- there are no posts to display -</p>
-      <? elseif (!empty($temp_filter_data['limit']) && $temp_filter_data['limit'] == 'threads'): ?>
+      <?php elseif (!empty($temp_filter_data['limit']) && $temp_filter_data['limit'] == 'threads'): ?>
         <p class="text">- there are no threads to display -</p>
-      <? else : ?>
+      <?php else : ?>
         <p class="text">- there are no results to display -</p>
-      <? endif; ?>
+      <?php endif; ?>
     </div>
-    <?
+    <?php
   }
 
 }
@@ -411,22 +410,22 @@ elseif ($this_category_info['category_token'] == 'search' && $temp_filter_data['
 
       // Collect markup for this post from the function
       $temp_thread_info = $thread_index_array[$this_post_info['thread_id']];
-      $temp_markup = mmrpg_website_community_postblock($temp_thread_info, $this_post_info, $this_category_info);
+      $temp_markup = rpg_website::community_postblock($temp_thread_info, $this_post_info, $this_category_info);
       echo $temp_markup."\n";
 
     }
   } else {
     ?>
     <div class="subbody">
-      <? if (!empty($temp_filter_data['limit']) && $temp_filter_data['limit'] == 'posts'): ?>
+      <?php if (!empty($temp_filter_data['limit']) && $temp_filter_data['limit'] == 'posts'): ?>
         <p class="text">- there are no posts to display -</p>
-      <? elseif (!empty($temp_filter_data['limit']) && $temp_filter_data['limit'] == 'threads'): ?>
+      <?php elseif (!empty($temp_filter_data['limit']) && $temp_filter_data['limit'] == 'threads'): ?>
         <p class="text">- there are no threads to display -</p>
-      <? else : ?>
+      <?php else : ?>
         <p class="text">- there are no results to display -</p>
-      <? endif; ?>
+      <?php endif; ?>
     </div>
-    <?
+    <?php
   }
 
 }

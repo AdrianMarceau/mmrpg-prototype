@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * INDEX PAGE : HOME
  */
@@ -61,10 +61,10 @@ ob_start();
   */?>
 </div>
 
-<?
+<?php
 // Require the leaderboard data for display
 $this_display_limit_default = 3;
-require('data/leaderboard.php');
+require('includes/include.leaderboard.php');
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
   <span class="subheader_typewrapper">
@@ -75,7 +75,7 @@ require('data/leaderboard.php');
 </h2>
 <div class="leaderboard" style="margin-bottom: 12px; overflow: visible;">
   <div class="wrapper" style="margin-bottom: 0; overflow: visible;">
-  <?
+  <?php
 
   // Define the leaderboard displauy limit
   $leaderboard_display_limit = $this_display_limit_default;
@@ -94,9 +94,9 @@ require('data/leaderboard.php');
   </div>
 </div>
 
-<?
+<?php
 // Require the gallery data for display
-require_once('data/gallery.php');
+require_once('includes/include.gallery.php');
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
   <span class="subheader_typewrapper">
@@ -107,7 +107,7 @@ require_once('data/gallery.php');
 </h2>
 <div class="gallery" style="margin-bottom: 12px;">
   <div class="wrapper" style="margin-bottom: 0;">
-  <?
+  <?php
 
   // Define the gallery displauy limit
   $gallery_display_limit = 16;
@@ -126,7 +126,7 @@ require_once('data/gallery.php');
   </div>
 </div>
 
-<?
+<?php
 
 // Collect all the threads for this category from the database
 $this_category_id = 1; // News
@@ -141,9 +141,9 @@ $this_threads_query = "SELECT threads.*, users.*, users2.*, users3.*, categories
   GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
   WHERE threads.category_id = {$this_category_id} AND threads.thread_published = 1
   ORDER BY threads.thread_sticky DESC, threads.thread_date DESC";
-$this_threads_array = $DB->get_array_list($this_threads_query);
+$this_threads_array = $this_database->get_array_list($this_threads_query);
 $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
-$this_category_info = $DB->get_array("SELECT * FROM mmrpg_categories WHERE category_id = {$this_category_id}");
+$this_category_info = $this_database->get_array("SELECT * FROM mmrpg_categories WHERE category_id = {$this_category_id}");
 
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -154,7 +154,7 @@ $this_category_info = $DB->get_array("SELECT * FROM mmrpg_categories WHERE categ
   </span>
 </h2>
 <div class="community" style="margin-bottom: 12px;">
-  <?
+  <?php
 
   // Define the current date group
   $this_date_group = '';
@@ -172,7 +172,7 @@ $this_category_info = $DB->get_array("SELECT * FROM mmrpg_categories WHERE categ
       if ($this_thread_key >= MMRPG_SETTINGS_THREADS_RECENT){ break; }
 
       // Collect markup for this thread from the function
-      $temp_markup = mmrpg_website_community_thread_linkblock($this_thread_info, $this_category_info, 'compact');
+      $temp_markup = rpg_website::community_thread_linkblock($this_thread_info, $this_category_info, 'compact');
       echo $temp_markup."\n";
 
     }
@@ -180,7 +180,7 @@ $this_category_info = $DB->get_array("SELECT * FROM mmrpg_categories WHERE categ
 
   ?>
 </div>
-<?
+<?php
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
 ?>

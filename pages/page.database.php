@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * INDEX PAGE : DATABASE
  */
@@ -6,7 +6,7 @@
 // Require the database top include file
 if ($this_current_sub == 'mechas' || $this_current_sub == 'fields'){ define('DATA_DATABASE_SHOW_MECHAS', true); }
 if ($this_current_sub == 'bosses' || $this_current_sub == 'fields'){ define('DATA_DATABASE_SHOW_BOSSES', true); }
-require_once('data/database.php');
+require_once('includes/include.database.php');
 
 //die('<pre>'.print_r($_REQUEST, true).'</pre>');
 
@@ -135,7 +135,7 @@ ob_start();
     <div class="subbody">
       <p class="text">The type database contains a detailed breakdown of the elemental type distribution in the prototype, including ability counts, robot counts, and more.</p>
       <ul class="iconwrap" style="padding: 4px 0 6px;">
-        <?
+        <?php
         // Loop through and display all the types to the user
         echo '<li><strong class="type_block ability_type ability_type_none">Neutral</strong></li>';
         foreach ($mmrpg_database_types AS $type_token => $type_array){
@@ -146,7 +146,7 @@ ob_start();
       </ul>
     </div>
 
-    <?
+    <?php
 
   }
   // Otherwise, if we're viewing the PLAYER DATABASE
@@ -210,7 +210,7 @@ ob_start();
   <div class="subbody" style="margin-top: 8px;">
     <p class="text" style="font-size: 11px; line-height: 16px; color: #747474;">(!) Please note that the names, stats, types, and descriptions of any playable characters, robots, or abilities that appear in this database are <em>not finalized</em> and are subject to change without notice as development progresses on the game itself.  That being said, the data on this page is pulled directly from the prototype's internal variables and will therefore always be in sync with the prototype itself. Database pages that do not have sprites represent incomplete but planned, future content and do not currently appear in-game.</p>
   </div>
-<?
+<?php
 
 
 // Collect the buffer and define the page markup

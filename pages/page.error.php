@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * INDEX PAGE : ERROR
  */
@@ -26,7 +26,7 @@ ob_start();
   </p>
   
 </div>
-<?
+<?php
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
 ?>

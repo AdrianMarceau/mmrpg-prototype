@@ -1,10 +1,10 @@
-<?
+<?php
 /*
  * COMMUNITY THREAD VIEW
  */
 
 // Return to loging if a guest
-if (!empty($_SESSION[mmrpg_game_token()]['DEMO'])){
+if (!empty($_SESSION[rpg_game::session_token()]['DEMO'])){
   header('Location: '.MMRPG_CONFIG_ROOTURL.'file/load/return='.$_GET['this_current_uri']);
   exit();
 }
@@ -55,10 +55,10 @@ if (!empty($this_current_target) && $this_category_info['category_id'] != 0){
 // If the target is not empty, collect the user info
 if (!empty($this_current_target)){
   $temp_user_name = strtolower(trim($this_current_target));
-  $target_user_info = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$temp_user_name}' LIMIT 1");
+  $target_user_info = $this_database->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$temp_user_name}' LIMIT 1");
 } elseif (!empty($this_thread_info['thread_target'])){
   $temp_user_id = (int)($this_thread_info['thread_target']);
-  $target_user_info = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id} LIMIT 1");
+  $target_user_info = $this_database->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id} LIMIT 1");
 }
 // Ensure it's an array, even if it was empty (redirect if personal messsage, userinfo is required)
 if (empty($target_user_info)){
@@ -82,15 +82,15 @@ if (empty($target_user_info)){
 <div id="discussion-form" class="posts_body">
   <div class="subbody thread_threads_form thread_subbody">
     <form class="form" action="<?= $_GET['this_current_url'].(!empty($this_current_target) ? $this_current_target.'/' : '' ).(!empty($_REQUEST['thread_id']) ? '&amp;action=edit&amp;thread_id='.$_REQUEST['thread_id'] : '') ?>" method="post">
-      <? if (defined('DISCUSSION_POST_SUCCESSFUL') && DISCUSSION_POST_SUCCESSFUL === true): ?>
+      <?php if (defined('DISCUSSION_POST_SUCCESSFUL') && DISCUSSION_POST_SUCCESSFUL === true): ?>
         <p class="text" style="color: #65C054; margin: 0;">(!) Thank you, your discussion has been <?= !empty($_REQUEST['thread_id']) ? 'edited' : 'created' ?>!<br />Would you like to <a style="color: #65C054;" href="community/<?= $this_category_info['category_token'].'/'.DISCUSSION_POST_SUCCESSFUL_URL ?>"><?= !empty($_REQUEST['thread_id']) ? 'reload the' : 'view the new' ?> thread</a>?</p>
-        <? if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%; margin: 0;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
-      <? elseif (defined('DISCUSSION_POST_SUCCESSFUL') && DISCUSSION_POST_SUCCESSFUL === false): ?>
+        <?php if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%; margin: 0;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
+      <?php elseif (defined('DISCUSSION_POST_SUCCESSFUL') && DISCUSSION_POST_SUCCESSFUL === false): ?>
         <p class="text" style="color: #E43131; margin: 0;">(!) <?= $formdata['category_id'] != 0 ? 'Your discussion could not be created.' : 'Your message could not be sent.' ?> Please review and correct the errors below.</p>
-        <? if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%; margin: 0;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
-      <? endif;?>
-      <? if (!defined('DISCUSSION_POST_SUCCESSFUL') || (defined('DISCUSSION_POST_SUCCESSFUL') && DISCUSSION_POST_SUCCESSFUL === false)): ?>
-        <?
+        <?php if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%; margin: 0;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
+      <?php endif;?>
+      <?php if (!defined('DISCUSSION_POST_SUCCESSFUL') || (defined('DISCUSSION_POST_SUCCESSFUL') && DISCUSSION_POST_SUCCESSFUL === false)): ?>
+        <?php
         // Define and display the avatar variables
         $temp_avatar_guest = $this_userid == MMRPG_SETTINGS_GUEST_ID ? true : false;
         $temp_avatar_name = (!empty($this_userinfo['user_name_public']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']);
@@ -114,9 +114,9 @@ if (empty($target_user_info)){
         $temp_thread_locked = false;
         $temp_thread_sticky = false;
         if (!empty($temp_thread_id)){
-          $temp_thread_info = $DB->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = {$temp_thread_id}");
+          $temp_thread_info = $this_database->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = {$temp_thread_id}");
           $temp_user_id = !empty($temp_thread_info['user_id']) ? $temp_thread_info['user_id'] : $this_userinfo['user_id'];
-          $temp_user_info = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id}");
+          $temp_user_info = $this_database->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id}");
           $temp_thread_name = !empty($temp_thread_info['thread_name']) ? htmlentities($temp_thread_info['thread_name'], ENT_QUOTES, 'UTF-8', true) : '';
           $temp_thread_body = !empty($temp_thread_info['thread_body']) ? htmlentities($temp_thread_info['thread_body'], ENT_QUOTES, 'UTF-8', true) : '';
           $temp_avatar_frame = !empty($temp_thread_info['thread_frame']) ? $temp_thread_info['thread_frame'] : $temp_avatar_frame;
@@ -145,21 +145,21 @@ if (empty($target_user_info)){
         <input type="hidden" class="hidden" name="user_ip" value="<?= !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0' ?>" />
         <input type="hidden" class="hidden" name="thread_frame" value="<?= $temp_avatar_frame ?>" />
         <input type="hidden" class="hidden" name="thread_time" value="<?= time() ?>" />
-        <? if(!empty($target_user_info)): ?>
+        <?php if(!empty($target_user_info)): ?>
           <input type="hidden" class="hidden" name="thread_target" value="<?= $target_user_info['user_id'] ?>" />
-        <? endif; ?>
+        <?php endif; ?>
         <div class="field field_thread_info" style="overflow: hidden; font-size: 11px;">
           <label class="label" style="float: left;"><?= !empty($target_user_info) ? 'Sending as ' : 'Posting as' ?> <strong><?= $temp_avatar_name ?></strong> :</label>
         </div>
         <div class="field field_thread_body">
           <div class="<?= $temp_avatar_class ?>" style="margin-top: 0;">
-            <div class="<?= $temp_sprite_class ?>" data-frames="<?=$temp_avatar_frames?>" style="background-image: url(<?= $temp_sprite_path ?>); "><?= $temp_avatar_title ?></div>
+            <div class="<?= $temp_sprite_class ?>" data-frames="<?= $temp_avatar_frames?>" style="background-image: url(<?= $temp_sprite_path ?>); "><?= $temp_avatar_title ?></div>
             <a class="back">&#9668;</a>
             <a class="next">&#9658;</a>
             <div class="colour" style="">
-              <? if(COMMUNITY_VIEW_MODERATOR && empty($target_user_info)): ?>
+              <?php if(COMMUNITY_VIEW_MODERATOR && empty($target_user_info)): ?>
                 <select class="select" name="thread_colour">
-                  <option value="">- none -</option><?
+                  <option value="">- none -</option><?php
                   // Collect the types from the index and append a few more
                   $temp_types_index = $mmrpg_index['types'];
                   if (COMMUNITY_VIEW_MODERATOR){
@@ -183,17 +183,17 @@ if (empty($target_user_info)){
                   <input class="input" type="checkbox" name="thread_sticky" value="true" <?= $temp_thread_sticky ? 'checked="checked"' : '' ?> />
                   <label class="label" for="thread_sticky">Sticky</label>
                 </div>
-              <? else: ?>
+              <?php else: ?>
                 <input type="hidden" class="hidden" name="thread_colour" value="<?= $temp_thread_colour ?>" />
                 <input type="hidden" class="hidden" name="thread_published" value="<?= $temp_thread_published ? 'true' : 'false' ?>" />
                 <input type="hidden" class="hidden" name="thread_locked" value="<?= $temp_thread_locked ? 'true' : 'false' ?>" />
                 <input type="hidden" class="hidden" name="thread_sticky" value="<?= $temp_thread_sticky ? 'true' : 'false' ?>" />
-              <? endif; ?>
+              <?php endif; ?>
             </div>
           </div>
-          <? if(!empty($temp_thread_id) && COMMUNITY_VIEW_MODERATOR && empty($target_user_info)): ?>
+          <?php if(!empty($temp_thread_id) && COMMUNITY_VIEW_MODERATOR && empty($target_user_info)): ?>
             <select class="select select2" name="new_category_id">
-              <?
+              <?php
               // Collect the categories from the index
               foreach ($this_categories_index AS $cat_id => $cat_info){
                 if ($cat_info['category_token'] == 'personal' || $cat_info['category_token'] == 'chat'){ continue; }
@@ -201,17 +201,17 @@ if (empty($target_user_info)){
               }
               ?>
             </select>
-          <? else: ?>
+          <?php else: ?>
             <input type="hidden" class="hidden" name="new_category_id" value="<?= $this_category_info['category_id'] ?>" />
-          <? endif; ?>
+          <?php endif; ?>
           <input type="text" class="text" name="thread_name" value="<?= $temp_thread_name ?>" />
           <?/*<textarea class="textarea" name="thread_body" rows="15"><?= str_replace("\n", '\\n', $temp_thread_body) ?></textarea>*/?>
           <textarea class="textarea" name="thread_body" rows="15"><?= str_replace('\n', "\n", $temp_thread_body) ?></textarea>
         </div>
         <div class="field field_thread_info" style="clear: left; overflow: hidden; font-size: 11px;">
-          <?= mmrpg_formatting_help() ?>
+          <?= rpg_website::formatting_help() ?>
         </div>
-        <?
+        <?php
         // Define the current maxlength based on board points
         $temp_maxlength = MMRPG_SETTINGS_DISCUSSION_MAXLENGTH;
         if (!empty($this_boardinfo['board_points']) && ceil($this_boardinfo['board_points'] / 1000) > MMRPG_SETTINGS_DISCUSSION_MAXLENGTH){ $temp_maxlength = ceil($this_boardinfo['board_points'] / 1000); }
@@ -219,12 +219,12 @@ if (empty($target_user_info)){
         <div class="buttons buttons_active" data-submit="<?= !empty($_REQUEST['thread_id']) ? 'Edit' : 'Create' ?> Discussion">
           <label class="counter"><span class="current">0</span> / <span class="maximum"><?= $temp_maxlength ?></span> Characters</label>
         </div>
-      <? endif; ?>
+      <?php endif; ?>
     </form>
   </div>
 
 </div>
-<?
+<?php
 
 // Add this thread to the community session tracker array
 if (!in_array($thread_session_token, $_SESSION['COMMUNITY']['threads_viewed'])){

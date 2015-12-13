@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * COMMUNITY INDEX VIEW
  */
@@ -10,7 +10,7 @@
 //$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
 
 // Collect the current user's info from the database
-//$this_userinfo = $DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+//$this_userinfo = $this_database->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
 
 
 
@@ -26,7 +26,7 @@ $index_threads_query = "SELECT threads.*, users.*, users2.*, users3.*, categorie
   GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
   WHERE threads.thread_published = 1
   ORDER BY threads.thread_sticky DESC, threads.thread_date DESC";
-$index_threads_array = $DB->get_array_list($index_threads_query);
+$index_threads_array = $this_database->get_array_list($index_threads_query);
 $index_threads_count = !empty($index_threads_array) ? count($index_threads_array) : 0;
 if (empty($index_threads_array)){ $index_threads_array = array(); }
 
@@ -95,7 +95,7 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
     <?= !empty($temp_header_links) ? implode("\n", $temp_header_links) : '' ?>
   </h2>
   <div style="overflow: hidden; margin-bottom: 25px;">
-  <?
+  <?php
 
   // Define the current date group
   $this_date_group = '';
@@ -112,7 +112,7 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
       if ($this_thread_key >= MMRPG_SETTINGS_THREADS_RECENT){ break; }
 
       // Collect markup for this thread from the function
-      $temp_markup = mmrpg_website_community_thread_linkblock($this_thread_info, $this_category_info, 'compact');
+      $temp_markup = rpg_website::community_thread_linkblock($this_thread_info, $this_category_info, 'compact');
       echo $temp_markup."\n";
 
     }
@@ -121,23 +121,23 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
   // Close the container tag
   ?>
   </div>
-  <? if(false){ ?>
+  <?php if(false){ ?>
     <div class="subbody" style="margin-bottom: 6px; background-color: transparent; padding-right: 0;">
       <?/*<div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_0<?= mt_rand(0, 2) ?>" style="background-image: url(images/robots/<?= MMRPG_SETTINGS_CURRENT_FIELDMECHA ?>/sprite_left_80x80.png);">Met</div></div>*/?>
       <?/*<p class="text"><?= $this_category_info['category_description'] ?></p>*/?>
-      <?
+      <?php
       // Add a new thread option to the end of the list if allowed
       if($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_userinfo['role_level'] >= $this_category_info['category_level'] && $community_battle_points > 10000){
         ?>
         <div class="subheader thread_name" style="float: right; margin: 0; overflow: hidden; text-align: center; border: 1px solid rgba(0, 0, 0, 0.30); ">
           <a class="link" href="community/<?= $this_category_info['category_token'] ?>/0/new/" style="margin-top: 0;">Create New <?= $this_category_info['category_id'] != 0 ? 'Discussion' : 'Message' ?> &raquo;</a>
         </div>
-        <?
+        <?php
       }
       ?>
     </div>
-  <? } ?>
-  <?
+  <?php } ?>
+  <?php
   $this_category_key++;
 }
 

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * COMMUNITY CATEGORY VIEW
  */
@@ -27,7 +27,7 @@ if ($this_category_info['category_token'] != 'news'){ $temp_order_by = 'threads.
 else { $temp_order_by = 'threads.thread_sticky DESC, threads.thread_date DESC'; }
 
 // Collect the current user's info from the database
-//$this_userinfo = $DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+//$this_userinfo = $this_database->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
 
 // Collect the recently updated posts for this player / guest
 if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $temp_last_login = $this_userinfo['user_backup_login']; }
@@ -69,7 +69,7 @@ $this_threads_query = "SELECT threads.*, users.*, users2.*, users3.*, roles.*, c
     GROUP BY posts2.thread_id) AS posts_new ON threads.thread_id = posts_new.thread_id
   WHERE threads.category_id = {$this_category_info['category_id']} AND threads.thread_published = 1 AND threads.thread_locked = 0 {$temp_exclude_string} AND threads.thread_mod_date > {$temp_last_login}".($this_userid != MMRPG_SETTINGS_GUEST_ID ? "  AND threads.thread_mod_user <> {$this_userid}" : '')."
   ORDER BY {$temp_order_by}";
-$this_threads_array = $DB->get_array_list($this_threads_query);
+$this_threads_array = $this_database->get_array_list($this_threads_query);
 $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
 //die('<pre>'.print_r($this_threads_array, true).'</pre>');
 
@@ -85,7 +85,7 @@ $this_posts_query = "SELECT mmrpg_posts.*, mmrpg_users.*, mmrpg_roles.*
 	LEFT JOIN mmrpg_roles ON mmrpg_roles.role_id = mmrpg_users.role_id
 	WHERE mmrpg_posts.thread_id IN ({$temp_thread_ids})
 	ORDER BY mmrpg_posts.post_date ASC";
-$temp_posts_array = $DB->get_array_list($this_posts_query);
+$temp_posts_array = $this_database->get_array_list($this_posts_query);
 $this_posts_array = array();
 if (!empty($temp_posts_array)){
   foreach ($temp_posts_array AS $key => $array){
@@ -95,7 +95,7 @@ if (!empty($temp_posts_array)){
 }
 
 // Collect the thread counts for all users in an index
-$this_user_countindex = $DB->get_array_list('SELECT
+$this_user_countindex = $this_database->get_array_list('SELECT
   mmrpg_users.user_id,
   mmrpg_leaderboard.board_points,
   mmrpg_threads.thread_count,
@@ -111,7 +111,7 @@ $this_user_countindex = $DB->get_array_list('SELECT
   WHERE mmrpg_leaderboard.board_points > 0 AND (post_count > 0 OR thread_count > 0)', 'user_id');
 
 // Check if the thread creator is currently online
-$temp_leaderboard_online = mmrpg_prototype_leaderboard_online();
+$temp_leaderboard_online = rpg_prototype::leaderboard_online();
 
 ?>
 <h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -123,18 +123,18 @@ $temp_leaderboard_online = mmrpg_prototype_leaderboard_online();
 <div class="subbody">
   <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_0<?= mt_rand(0, 2) ?>" style="background-image: url(images/robots/<?= MMRPG_SETTINGS_CURRENT_FIELDMECHA ?>/sprite_left_80x80.png);">Met</div></div>
   <p class="text"><?= $this_category_info['category_description'] ?></p>
-  <?
+  <?php
   // Add a new thread option to the end of the list if allowed
   if($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_userinfo['role_level'] >= $this_category_info['category_level'] && $community_battle_points >= 10000){
     ?>
     <div class="subheader thread_name" style="float: right; clear: right; margin: 0; overflow: hidden; text-align: center; border: 1px solid rgba(0, 0, 0, 0.30); ">
       <a class="link" href="community/<?= $this_category_info['category_token'] ?>/0/new/" style="margin-top: 0;">Create New Discussion &raquo;</a>
     </div>
-    <?
+    <?php
   }
   ?>
 </div>
-<?
+<?php
 
 // Define the current date group
 $this_date_group = '';
@@ -158,7 +158,7 @@ if (!empty($this_threads_array)){
     if (!MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['COMMUNITY']['threads_viewed'][] = $temp_session_token; }
     $temp_current_views = $this_thread_info['thread_views'];
     $temp_new_views = $temp_current_views + 1;
-    //$temp_update_session = $DB->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
+    //$temp_update_session = $this_database->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
     $temp_update_session_ids[] = $this_thread_info['thread_id'];
 
     // Update the temp date group if necessary
@@ -235,7 +235,7 @@ if (!empty($this_threads_array)){
 
     ?>
     <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" class="subbody thread_subbody thread_subbody_small thread_subbody_small_nohover thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>" style="text-align: left; <?= $this_thread_key == 0 ? 'margin: 2px 0 4px; ' : 'margin: 30px 0 4px; ' ?>">
-      <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 60px 60px;">
+      <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?= MMRPG_CONFIG_CACHE_DATE?>); background-size: 60px 60px;">
         &nbsp;
       </div>
       <div class="<?= $temp_avatar_class ?> avatar_userimage avatar_userimage_left">
@@ -256,7 +256,7 @@ if (!empty($this_threads_array)){
         </div>
       </div>
     </div>
-    <?
+    <?php
 
     /*
     // Collect any posts for this specific thread from the database
@@ -265,9 +265,9 @@ if (!empty($this_threads_array)){
     	LEFT JOIN mmrpg_users AS users ON posts.user_id = users.user_id
     	WHERE posts.thread_id = '{$this_thread_info['thread_id']}'
     	ORDER BY posts.post_date ASC";
-    $this_posts_array = $DB->get_array_list($this_posts_query);
+    $this_posts_array = $this_database->get_array_list($this_posts_query);
     //$this_posts_count = !empty($this_posts_array) ? count($this_posts_array) : 0;
-    $this_posts_count = $DB->get_value("SELECT COUNT(1) AS post_count FROM mmrpg_posts AS posts WHERE posts.thread_id = '{$this_thread_info['thread_id']}' AND posts.post_deleted = 0", 'post_count');
+    $this_posts_count = $this_database->get_value("SELECT COUNT(1) AS post_count FROM mmrpg_posts AS posts WHERE posts.thread_id = '{$this_thread_info['thread_id']}' AND posts.post_deleted = 0", 'post_count');
     */
 
     // Collect all the posts for this specific thread from the global array
@@ -277,7 +277,7 @@ if (!empty($this_threads_array)){
     if (!empty($this_thread_posts_array)){
       ?>
       <div class="posts_body">
-      <?
+      <?php
       // Define the temporary timeout variables
       $this_time = time();
       $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
@@ -363,28 +363,28 @@ if (!empty($this_threads_array)){
 
         ?>
         <div id="post-<?= $this_post_info['post_id'] ?>" data-key="<?= $this_post_key ?>" title="<?= !empty($this_post_info['post_deleted']) ? ($temp_post_author.' on '.str_replace(' ', '&nbsp;', $temp_post_date)) : '' ?>" class="subbody post_subbody post_subbody_left <?= !empty($this_post_info['post_deleted']) ? 'post_subbody_deleted' : '' ?> post_left" style="<?= !empty($this_post_info['post_deleted']) ? 'margin-top: 0; padding: 0 10px; background-color: transparent; float: left; ' : 'clear: left; ' ?>">
-          <? if(empty($this_post_info['post_deleted'])): ?>
+          <?php if(empty($this_post_info['post_deleted'])): ?>
             <div class="userblock player_type_<?= !empty($this_post_info['user_colour_token']) ? $this_post_info['user_colour_token'] : 'none' ?>">
               <div class="name">
                 <?= !$temp_post_guest ? '<a href="leaderboard/'.$this_post_info['user_name_clean'].'/">' : '' ?>
                 <strong title="<?= $temp_post_author.($temp_is_contributor ? ' | '.$temp_item_title : ' | Player').($temp_is_online ? ' | Online' : '') ?>" style="<?= $temp_is_online ? 'text-shadow: 0 0 2px rgba(0, 255, 0, 0.20); ' : '' ?>"><?= $temp_post_author ?></strong>
                 <?= !$temp_post_guest ? '</a>' : '' ?>
               </div>
-              <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 100px 100px;">
+              <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?= MMRPG_CONFIG_CACHE_DATE?>); background-size: 100px 100px;">
                 &nbsp;
               </div>
               <div class="<?= $temp_avatar_class ?> avatar_userimage avatar_userinfo_left" style="">
                 <?/*<div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/mega-man/sprite_left_40x40.png);"><?= $temp_thread_author ?></div>*/?>
-                <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -10px; <?= $this_post_float ?>: -14px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
+                <?php if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -10px; <?= $this_post_float ?>: -14px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><?php endif; ?>
                 <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_thread_author ?></div>
               </div>
 
-              <? $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['board_points']) ? $this_user_countindex[$this_post_info['user_id']]['board_points'] : 0; ?>
+              <?php $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['board_points']) ? $this_user_countindex[$this_post_info['user_id']]['board_points'] : 0; ?>
               <div class="counter points_counter"><?= number_format($temp_stat, 0, '.', ',').' BP' ?></div>
               <div class="counter community_counters">
-                <? $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['thread_count']) ? $this_user_countindex[$this_post_info['user_id']]['thread_count'] : 0; ?>
+                <?php $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['thread_count']) ? $this_user_countindex[$this_post_info['user_id']]['thread_count'] : 0; ?>
                 <span class="thread_counter"><?= $temp_stat.' TP' ?></span> <span class="pipe">|</span>
-                <? $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['post_count']) ? $this_user_countindex[$this_post_info['user_id']]['post_count'] : 0; ?>
+                <?php $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['post_count']) ? $this_user_countindex[$this_post_info['user_id']]['post_count'] : 0; ?>
                 <span class="post_counter"><?= $temp_stat.' PP' ?></span>
               </div>
 
@@ -394,25 +394,25 @@ if (!empty($this_threads_array)){
                 <strong>Posted on <?= $temp_post_date ?></strong> <span style="float: right; color: #565656; padding-left: 6px;">#<?= $this_post_key + 1 ?></span>
                 <?= !empty($temp_post_mod) ? '<span style="padding-left: 20px; color: rgb(119, 119, 119); letter-spacing: 1px; font-size: 10px;">'.$temp_post_mod.'</span>' : '' ?>
                 <?= $temp_is_new ? '<strong style="padding-left: 10px; color: rgb(187, 184, 115); letter-spacing: 1px;">(New!)</strong>' : '' ?>
-                <? if(!$temp_post_guest && $this_userinfo['user_id'] == $this_post_info['user_id']): ?>
+                <?php if(!$temp_post_guest && $this_userinfo['user_id'] == $this_post_info['user_id']): ?>
                   <span class="options">[ <a class="edit" rel="noindex,nofollow" href="<?= $_GET['this_current_url'].'action=edit&amp;post_id='.$this_post_info['post_id'].'#comment-form' ?>">edit</a> | <a class="delete" rel="noindex,nofollow" href="<?= $_GET['this_current_url'] ?>" data-href="<?= $_GET['this_current_url'].'action=delete&amp;post_id='.$this_post_info['post_id'].'#comment-form' ?>">delete</a> ]</span>
-                <? endif; ?>
+                <?php endif; ?>
               </div>
-              <div class="bodytext"><?= mmrpg_formatting_decode($temp_post_body) ?></div>
+              <div class="bodytext"><?= rpg_website::formatting_decode($temp_post_body) ?></div>
             </div>
-            <? if($this_userid != MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked']) && $community_battle_points > 5000): ?>
+            <?php if($this_userid != MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked']) && $community_battle_points > 5000): ?>
               <a class="postreply" rel="nofollow" href="<?= 'community/'.$this_category_info['category_token'].'/'.$this_thread_info['thread_id'].'/'.$this_thread_info['thread_token'].'/#comment-form:'.$temp_reply_name.':'.$temp_reply_colour ?>" style="right: 46px;">@ Reply</a>
-            <? endif; ?>
+            <?php endif; ?>
             <a class="postscroll" href="#top" style="right: 12px;">^ Top</a>
-          <? else: ?>
+          <?php else: ?>
             <span style="color: #464646;">- deleted -</span>
-          <? endif; ?>
+          <?php endif; ?>
         </div>
-        <?
+        <?php
       }
       ?>
       </div>
-      <?
+      <?php
 
       // Increment the posts show counter
       $temp_posts_shown++;
@@ -427,7 +427,7 @@ if (!empty($this_threads_array)){
   // Update all the threads that require it with a view count
   if (!MMRPG_CONFIG_DEBUG_MODE){
     $temp_update_session_ids = implode(', ', $temp_update_session_ids);
-    $temp_update_session = $DB->query("UPDATE mmrpg_threads SET thread_views = (thread_views + 1) WHERE thread_id IN ({$temp_update_session_ids});");
+    $temp_update_session = $this_database->query("UPDATE mmrpg_threads SET thread_views = (thread_views + 1) WHERE thread_id IN ({$temp_update_session_ids});");
   }
 
 
@@ -439,7 +439,7 @@ if (($temp_posts_shown + $temp_threads_shown) < 1){
   <div id="post-0" data-key="0" class="subbody post_subbody post_subbody_deleted post_left" style="clear: left; ">
   - no new comments to display -
   </div>
-  <?
+  <?php
 }
 
 ?>

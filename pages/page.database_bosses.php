@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * BOSS DATABASE AJAX
  */
@@ -115,7 +115,7 @@ if (!empty($this_current_token)){
 
     // Collect the markup for this boss and print it to the browser
     //die('<pre>$boss_info = '.print_r($boss_info, true).'</pre>');
-    $temp_boss_markup = mmrpg_robot::print_database_markup($boss_info, array('show_key' => $key_counter));
+    $temp_boss_markup = rpg_robot::print_database_markup($boss_info, array('show_key' => $key_counter));
     echo $temp_boss_markup;
     $key_counter++;
     break;
@@ -131,31 +131,31 @@ if (empty($this_current_token)){
     Boss Index
     <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
   </h2>
-  <?
+  <?php
 }
 
 ?>
 
 <div class="subbody subbody_databaselinks <?= empty($this_current_token) ? 'subbody_databaselinks_noajax' : '' ?>" data-class="bosses" data-class-single="boss" data-basetitle="<?= isset($this_seo_title_backup) ? $this_seo_title_backup : $this_seo_title ?>" data-current="<?= !empty($this_current_token) ? $this_current_token : '' ?>">
   <div class="<?= !empty($this_current_token) ? 'toggle_body' : '' ?>" style="<?= !empty($this_current_token) ? 'display: none;' : '' ?>">
-    <? if(empty($this_current_token)): ?>
+    <?php if(empty($this_current_token)): ?>
       <p class="text" style="clear: both;">
         The boss database contains detailed information on <?= $mmrpg_database_bosses_links_counter == 1 ? 'the' : 'all' ?> <?= isset($this_current_filter) ? $mmrpg_database_bosses_links_counter.' <span class="type_span robot_type robot_type_'.$this_current_filter.'">'.$this_current_filter_name.' Type</span> ' : $mmrpg_database_bosses_links_counter.' ' ?><?= $mmrpg_database_bosses_links_counter == 1 ? 'fortress boss that appears ' : 'fortress bosses that appear ' ?> or will appear in the prototype, including <?= $mmrpg_database_bosses_links_counter == 1 ? 'its' : 'each boss\'s' ?> base stats, weaknesses, resistances, affinities, immunities, signature abilities, battle quotes, sprite sheets, and more.
         Click <?= $mmrpg_database_bosses_links_counter == 1 ? 'the mugshot below to scroll to the' : 'any of the mugshots below to scroll to a' ?> boss's summarized database entry and click the more link to see its full page with sprites and extended info. <?= isset($this_current_filter) ? 'If you wish to reset the boss type filter, <a href="database/bosses/">please click here</a>.' : '' ?>
       </p>
       <div class="text iconwrap"><?= preg_replace('/data-token="([-_a-z0-9]+)"/', 'data-anchor="$1"', $mmrpg_database_bosses_links) ?></div>
-    <? else: ?>
+    <?php else: ?>
       <div class="text iconwrap"><?= $mmrpg_database_bosses_links ?></div>
-    <? endif; ?>
+    <?php endif; ?>
   </div>
-  <? if(!empty($this_current_token)): ?>
+  <?php if(!empty($this_current_token)): ?>
     <a class="link link_toggle" data-state="collapsed">- Show Boss Index -</a>
-  <? else: ?>
+  <?php else: ?>
     <div style="clear: both;">&nbsp;</div>
-  <? endif; ?>
+  <?php endif; ?>
 </div>
 
-<?
+<?php
 
 // Only show the header if a specific boss has not been selected
 if (empty($this_current_token)){
@@ -164,7 +164,7 @@ if (empty($this_current_token)){
     Boss Listing
     <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
   </h2>
-  <?
+  <?php
 }
 
 // If we're in the index view, loop through and display all bosses
@@ -179,7 +179,7 @@ if (empty($this_current_token)){
     $this_robot_image = !empty($boss_info['robot_image']) ? $boss_info['robot_image'] : $boss_info['robot_token'];
     if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
     // Collect the markup for this robot and print it to the browser
-    $temp_boss_markup = mmrpg_robot::print_database_markup($boss_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+    $temp_boss_markup = rpg_robot::print_database_markup($boss_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
     echo $temp_boss_markup;
     $key_counter++;
   }

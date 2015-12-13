@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * ITEMS DATABASE AJAX
  */
@@ -75,7 +75,7 @@ if (!empty($this_current_token)){
     }
 
     // Collect the markup for this ability and print it to the browser
-    $temp_ability_markup = mmrpg_ability::print_database_markup($ability_info, array('show_key' => $key_counter));
+    $temp_ability_markup = rpg_ability::print_database_markup($ability_info, array('show_key' => $key_counter));
     echo $temp_ability_markup;
     $key_counter++;
     break;
@@ -91,31 +91,31 @@ if (empty($this_current_token)){
     Item Index
     <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
   </h2>
-  <?
+  <?php
 }
 
 ?>
 
 <div class="subbody subbody_databaselinks <?= empty($this_current_token) ? 'subbody_databaselinks_noajax' : '' ?>" data-class="items" data-class-single="item" data-basetitle="<?= isset($this_seo_title_backup) ? $this_seo_title_backup : $this_seo_title ?>" data-current="<?= !empty($this_current_token) ? $this_current_token : '' ?>">
   <div class="<?= !empty($this_current_token) ? 'toggle_body' : '' ?>" style="<?= !empty($this_current_token) ? 'display: none;' : '' ?>">
-    <? if(empty($this_current_token)): ?>
+    <?php if(empty($this_current_token)): ?>
       <p class="text" style="clear: both;">
         The item database contains detailed information on <?= $mmrpg_database_items_links_counter == 1 ? 'the' : 'all' ?> <?= isset($this_current_filter) ? $mmrpg_database_items_links_counter.' <span class="type_span robot_type robot_type_'.($this_current_filter == 'multi' ? 'shield' : ($this_current_filter == 'bonus' ? 'laser' : $this_current_filter)).'">'.$this_current_filter_name.' Type</span> ' : $mmrpg_database_items_links_counter.' ' ?><?= $mmrpg_database_items_links_counter == 1 ? 'collectable item that appears ' : 'collectable items that appear ' ?> or will appear in the prototype, including <?= $mmrpg_database_items_links_counter == 1 ? 'its' : 'each item\'s' ?> stats, description, and sprite sheets.
         Click <?= $mmrpg_database_items_links_counter == 1 ? 'the icon below to scroll to the' : 'any of the icons below to scroll to an' ?> item's summarized database entry and click the more link to see its full page with sprites and extended info. <?= isset($this_current_filter) ? 'If you wish to reset the item type filter, <a href="database/items/">please click here</a>.' : '' ?>
       </p>
       <div class="text iconwrap"><?= preg_replace('/data-token="([-_a-z0-9]+)"/', 'data-anchor="$1"', $mmrpg_database_items_links) ?></div>
-    <? else: ?>
+    <?php else: ?>
       <div class="text iconwrap"><?= $mmrpg_database_items_links ?></div>
-    <? endif; ?>
+    <?php endif; ?>
   </div>
-  <? if(!empty($this_current_token)): ?>
+  <?php if(!empty($this_current_token)): ?>
     <a class="link link_toggle" data-state="collapsed">- Show Item Index -</a>
-  <? else: ?>
+  <?php else: ?>
     <div style="clear: both;">&nbsp;</div>
-  <? endif; ?>
+  <?php endif; ?>
 </div>
 
-<?
+<?php
 
 // Only show the header if a specific item has not been selected
 if (empty($this_current_token)){
@@ -124,7 +124,7 @@ if (empty($this_current_token)){
     Item Listing
     <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
   </h2>
-  <?
+  <?php
 }
 
 // If we're in the index view, loop through and display all abilities
@@ -144,7 +144,7 @@ if (empty($this_current_token)){
     $this_ability_image = !empty($item_info['ability_image']) ? $item_info['ability_image'] : $item_info['ability_token'];
     if ($this_ability_image == 'ability'){ $this_seo_abilities = 'noindex'; }
     // Collect the markup for this ability and print it to the browser
-    $temp_item_markup = mmrpg_ability::print_database_markup($item_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+    $temp_item_markup = rpg_ability::print_database_markup($item_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
     echo $temp_item_markup;
     $key_counter++;
   }

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * INDEX PAGE : LEADERBOARD INDEX
  */
@@ -22,7 +22,7 @@ $_GET['start'] = 0 + ($this_num_offset * $this_display_limit_default);
 $_GET['limit'] = $this_display_limit_default + ($this_num_offset * $this_display_limit_default);
 
 // Require the leaderboard data file
-require_once('data/leaderboard.php');
+require_once('includes/include.leaderboard.php');
 
 //die('<pre>'.print_r($this_leaderboard_online_players, true).'</pre>');
 
@@ -37,21 +37,21 @@ ob_start();
 <div class="subbody">
   <p class="text">The <strong>Mega Man RPG Prototype</strong> currently has <?= !empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 player' : $this_leaderboard_count.' players') : 0 ?> and that number is growing all the time.  Throughout the course of the game, players collect Battle Points on completion of missions and those points build up to unlock new abilities and other new content.  Not all players are created equal, however, and some clearly stand above the rest in terms of their commitment to the game and their skill at exploiting the battle system's mechanics.  In the spirit of competition, all players have been ranked by their total Battle Point scores and listed from highest to lowest.  Use the numbered links at the top and bottom of the page to navigate and <a href="contact/">contact me</a> if you have any questions or concerns.</p>
 </div>
-<?
+<?php
 // Print out any online players if they exist
 if (!empty($this_leaderboard_online_players)){
   ?>
   <div class="subbody online_players">
-    <div class="text event players"><?= mmrpg_website_print_online($this_leaderboard_online_players) ?></div>
+    <div class="text event players"><?= rpg_website::print_online($this_leaderboard_online_players) ?></div>
     <strong class="text label"><?= (count($this_leaderboard_online_players) == 1 ? '1 Player' : count($this_leaderboard_online_players).' Players').' Online' ?></strong>
   </div>
-  <?
+  <?php
 }
 ?>
 
 <div class="leaderboard">
   <div class="wrapper">
-  <?
+  <?php
 
   // Print out the generated leaderboard markup
   //echo $this_leaderboard_markup;
@@ -187,7 +187,7 @@ if (!empty($this_leaderboard_online_players)){
   </div>
 </div>
 
-<?
+<?php
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
 ?>

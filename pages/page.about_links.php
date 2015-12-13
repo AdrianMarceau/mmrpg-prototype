@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * INDEX PAGE : RESOURCES
  */
@@ -22,7 +22,7 @@ ob_start();
 
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Links Overview</h2>
 <div class="subbody">
-  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_<?= mmrpg_battle::random_robot_frame() ?>" style="background-image: url(images/robots/cut-man/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Cut Man</div></div>
+  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_<?= rpg_robot::random_frame() ?>" style="background-image: url(images/robots/cut-man/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Cut Man</div></div>
   <p class="text">The <strong>Mega Man RPG Prototype</strong> was not created by person, or even by any one piece of software.  Many different tools and resources were necessary for the game to get to where it is today, and you can find a list of the most notable here on this page. If there are any other items that you think I've forgotten and should be added to the list, please <a href="contact/">let me know</a> using the contact page.</p>
 </div>
 
@@ -78,7 +78,7 @@ ob_start();
   </a>
 </div>
 
-<?
+<?php
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
 ?>

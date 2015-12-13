@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * PLAYERS DATABASE AJAX
  */
@@ -64,7 +64,7 @@ if (!empty($this_current_token)){
     }
 
     // Collect the markup for this player and print it to the browser
-    $temp_player_markup = mmrpg_player::print_database_markup($player_info, array('show_key' => $key_counter));
+    $temp_player_markup = rpg_player::print_database_markup($player_info, array('show_key' => $key_counter));
     echo $temp_player_markup;
     $key_counter++;
     break;
@@ -80,31 +80,31 @@ if (empty($this_current_token)){
     Player Index
     <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
   </h2>
-  <?
+  <?php
 }
 
 ?>
 
 <div class="subbody subbody_databaselinks <?= empty($this_current_token) ? 'subbody_databaselinks_noajax' : '' ?>" data-class="players" data-class-single="player" data-basetitle="<?= isset($this_seo_title_backup) ? $this_seo_title_backup : $this_seo_title ?>" data-current="<?= !empty($this_current_token) ? $this_current_token : '' ?>">
   <div class="<?= !empty($this_current_token) ? 'toggle_body' : '' ?>" style="<?= !empty($this_current_token) ? 'display: none;' : '' ?>">
-    <? if(empty($this_current_token)): ?>
+    <?php if(empty($this_current_token)): ?>
       <p class="text" style="clear: both;">
         The player database contains detailed information on <?= $mmrpg_database_players_links_counter == 1 ? 'the' : 'all' ?> <?= isset($this_current_filter) ? $mmrpg_database_players_links_counter.' <span class="type_span player_type player_type_'.$this_current_filter.'">'.$this_current_filter_name.' Type</span> ' : $mmrpg_database_players_links_counter.' ' ?><?= $mmrpg_database_players_links_counter == 1 ? 'playable character that appears ' : 'playable characters that appear ' ?> in the prototype, including <?= $mmrpg_database_players_links_counter == 1 ? 'its' : 'each player\'s' ?> unlockable abilities, battle quotes, sprite sheets, and more.
         Click <?= $mmrpg_database_players_links_counter == 1 ? 'the mugshot below to scroll to the' : 'any of the mugshots below to scroll to a' ?> player's summarized database entry and click the more link to see its full page with sprites and extended info. <?= isset($this_current_filter) ? 'If you wish to reset the player type filter, <a href="database/players/">please click here</a>.' : '' ?>
       </p>
       <div class="text iconwrap"><?= preg_replace('/data-token="([-_a-z0-9]+)"/', 'data-anchor="$1"', $mmrpg_database_players_links) ?></div>
-    <? else: ?>
+    <?php else: ?>
       <div class="text iconwrap"><?= $mmrpg_database_players_links ?></div>
-    <? endif; ?>
+    <?php endif; ?>
   </div>
-  <? if(!empty($this_current_token)): ?>
+  <?php if(!empty($this_current_token)): ?>
     <a class="link link_toggle" data-state="collapsed">- Show Player Index -</a>
-  <? else: ?>
+  <?php else: ?>
     <div style="clear: both;">&nbsp;</div>
-  <? endif; ?>
+  <?php endif; ?>
 </div>
 
-<?
+<?php
 
 // Only show the header if a specific player has not been selected
 if (empty($this_current_token)){
@@ -113,7 +113,7 @@ if (empty($this_current_token)){
     Player Listing
     <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
   </h2>
-  <?
+  <?php
 }
 
 // If we're in the index view, loop through and display all players
@@ -128,7 +128,7 @@ if (empty($this_current_token)){
     $this_player_image = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
     if ($this_player_image == 'player'){ $this_seo_robots = 'noindex'; }
     // Collect the markup for this player and print it to the browser
-    $temp_player_markup = mmrpg_player::print_database_markup($player_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+    $temp_player_markup = rpg_player::print_database_markup($player_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
     echo $temp_player_markup;
     $key_counter++;
   }

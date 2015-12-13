@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * COMMUNITY THREAD VIEW
  */
@@ -24,12 +24,12 @@ if ($this_category_info['category_token'] == 'personal'){
 
 // Update the SEO variables for this page
 $this_seo_title = $this_thread_info['thread_name'].' | '.$this_category_info['category_name'].' | '.$this_seo_title;
-$this_seo_description = strip_tags(mmrpg_formatting_decode($this_thread_info['thread_body']));
+$this_seo_description = strip_tags(rpg_website::formatting_decode($this_thread_info['thread_body']));
 if (strlen($this_seo_description) > 200){ $this_seo_description = substr($this_seo_description, 0, 200).'...'; }
 
 // Define the Open Graph variables for this page
 $this_graph_data['title'] = $this_category_info['category_name'].' Discussions | '.$this_thread_info['thread_name'];
-$this_graph_data['description'] = strip_tags(mmrpg_formatting_decode($this_thread_info['thread_body']));
+$this_graph_data['description'] = strip_tags(rpg_website::formatting_decode($this_thread_info['thread_body']));
 if (strlen($this_graph_data['description']) > 200){ $this_graph_data['description'] = substr($this_graph_data['description'], 0, 200).'...'; }
 //$this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo.png?'.MMRPG_CONFIG_CACHE_DATE;
 $this_graph_data['type'] = 'article';
@@ -70,10 +70,10 @@ $this_posts_query = "SELECT posts.*,
 	LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
 	WHERE posts.thread_id = '{$this_thread_info['thread_id']}'
 	ORDER BY posts.post_date ASC";
-$this_posts_array = $DB->get_array_list($this_posts_query);
+$this_posts_array = $this_database->get_array_list($this_posts_query);
 if (empty($this_posts_array)){ $this_posts_array = array(); }
 $this_posts_count = !empty($this_posts_array) ? count($this_posts_array) : 0;
-//$this_posts_count = $DB->get_value("SELECT COUNT(1) AS post_count FROM mmrpg_posts AS posts WHERE posts.thread_id = '{$this_thread_info['thread_id']}' AND posts.post_deleted = 0", 'post_count');
+//$this_posts_count = $this_database->get_value("SELECT COUNT(1) AS post_count FROM mmrpg_posts AS posts WHERE posts.thread_id = '{$this_thread_info['thread_id']}' AND posts.post_deleted = 0", 'post_count');
 
 // Define the array of user ids to collect information for
 $temp_user_ids = array();
@@ -91,11 +91,11 @@ $this_posts_count = !empty($this_posts_array) ? count($this_posts_array) : 0;
 // If the current post count is somehow higher than the view count, fix it up
 if ($this_posts_count >= $this_thread_info['thread_views']){
   $this_thread_info['thread_views'] += $this_posts_count;
-  $DB->query("UPDATE mmrpg_threads SET thread_views = {$this_thread_info['thread_views']} WHERE thread_id = {$this_thread_info['thread_id']}");
+  $this_database->query("UPDATE mmrpg_threads SET thread_views = {$this_thread_info['thread_views']} WHERE thread_id = {$this_thread_info['thread_id']}");
 }
 
 // Collect the thread counts for all users in an index
-$this_user_countindex = $DB->get_array_list('SELECT
+$this_user_countindex = $this_database->get_array_list('SELECT
   mmrpg_users.user_id,
   mmrpg_leaderboard.board_points,
   mmrpg_threads.thread_count,
@@ -121,7 +121,7 @@ $temp_thread_views = !empty($this_thread_info['thread_views']) ? $this_thread_in
 
 // If this is a PM, collect the target's info
 if ($is_personal_message){
-  $temp_thread_targetinfo = $DB->get_array("SELECT user_id, user_name, user_name_public, user_name_clean FROM mmrpg_users WHERE user_id = {$this_thread_info['thread_target']} LIMIT 1");
+  $temp_thread_targetinfo = $this_database->get_array("SELECT user_id, user_name, user_name_public, user_name_clean FROM mmrpg_users WHERE user_id = {$this_thread_info['thread_target']} LIMIT 1");
   $temp_thread_target = !empty($temp_thread_targetinfo['user_name_public']) ? $temp_thread_targetinfo['user_name_public'] : $temp_thread_targetinfo['user_name'];
 }
 
@@ -146,7 +146,7 @@ if ($temp_is_contributor){
 
 // Check if the thread creator is currently online
 $temp_is_online = false;
-$temp_leaderboard_online = mmrpg_prototype_leaderboard_online();
+$temp_leaderboard_online = rpg_prototype::leaderboard_online();
 foreach ($temp_leaderboard_online AS $key => $info){ if ($info['id'] == $this_thread_info['user_id']){ $temp_is_online = true; break; } }
 
 // Collect the thread count for this user
@@ -180,74 +180,74 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
   </span>
   <span style="float: right; opacity: 0.50;"><?= $temp_thread_date ?></span>
 </h2>
-<? if ($this_page_current == 1){ ?>
+<?php if ($this_page_current == 1){ ?>
   <div class="subbody thread_subbody thread_subbody_full thread_subbody_full_<?= $is_personal_message_creator ? 'left' : 'right' ?> thread_<?= $is_personal_message_creator ? 'left' : 'right' ?>" style="text-align: left; position: relative; padding-bottom: 60px;">
 
-    <? if($is_personal_message_creator): ?>
+    <?php if($is_personal_message_creator): ?>
 
       <div data-user="<?= $this_thread_info['user_id'] ?>" class="<?= $temp_avatar_class ?> avatar_fieldback player_type_<?= $temp_avatar_colour ?>" style="border-width: 1px;">
-        <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 100px 100px;">
+        <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?= MMRPG_CONFIG_CACHE_DATE?>); background-size: 100px 100px;">
           &nbsp;
         </div>
       </div>
       <div class="<?= $temp_avatar_class ?> avatar_userimage">
         <?/*<div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/mega-man/sprite_left_40x40.png);"><?= $temp_thread_author ?></div>*/?>
-        <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -22px; left: -30px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
+        <?php if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -22px; left: -30px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><?php endif; ?>
         <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_thread_author ?></div>
         <div class="userblock">
           <?= !$temp_thread_guest ? '<a href="leaderboard/'.$this_thread_info['user_name_clean'].'/">' : '' ?>
           <strong data-tooltip-type="player_type player_type_<?= $temp_avatar_colour ?>" title="<?= $temp_thread_author.($temp_is_contributor ? ' | '.$temp_item_title : ' | Player').($temp_is_online ? ' | Online' : '') ?>" class="name thread_username"><?= $temp_thread_author ?></strong>
           <?= !$temp_thread_guest ? '</a>' : '' ?>
-          <? $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['board_points']) ? $this_user_countindex[$this_thread_info['user_id']]['board_points'] : 0; ?>
+          <?php $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['board_points']) ? $this_user_countindex[$this_thread_info['user_id']]['board_points'] : 0; ?>
           <div class="counter points_counter"><?= number_format($temp_stat, 0, '.', ',').' BP' ?></div>
           <div class="counter community_counters">
-            <? $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['thread_count']) ? $this_user_countindex[$this_thread_info['user_id']]['thread_count'] : 0; ?>
+            <?php $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['thread_count']) ? $this_user_countindex[$this_thread_info['user_id']]['thread_count'] : 0; ?>
             <span class="thread_counter"><?= $temp_stat.' TP' ?></span> <span class="pipe">|</span>
-            <? $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['post_count']) ? $this_user_countindex[$this_thread_info['user_id']]['post_count'] : 0; ?>
+            <?php $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['post_count']) ? $this_user_countindex[$this_thread_info['user_id']]['post_count'] : 0; ?>
             <span class="post_counter"><?= $temp_stat.' PP' ?></span>
           </div>
         </div>
       </div>
 
-    <? else: ?>
+    <?php else: ?>
 
       <div data-user="<?= $this_thread_info['user_id'] ?>" class="<?= $temp_avatar_class ?> avatar_fieldback player_type_<?= $temp_avatar_colour ?>" style="border-width: 1px;">
-        <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 100px 100px;">
+        <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_avatar.png' ?>?<?= MMRPG_CONFIG_CACHE_DATE?>); background-size: 100px 100px;">
           &nbsp;
         </div>
       </div>
       <div class="<?= $temp_avatar_class ?> avatar_userimage">
         <?/*<div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/mega-man/sprite_left_40x40.png);"><?= $temp_thread_author ?></div>*/?>
-        <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -22px; right: -30px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
+        <?php if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -22px; right: -30px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><?php endif; ?>
         <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_thread_author ?></div>
         <div class="userblock">
           <?= !$temp_thread_guest ? '<a href="leaderboard/'.$this_thread_info['user_name_clean'].'/">' : '' ?>
           <strong data-tooltip-type="player_type player_type_<?= $temp_avatar_colour ?>" title="<?= $temp_thread_author.($temp_is_contributor ? ' | '.$temp_item_title : ' | Player').($temp_is_online ? ' | Online' : '') ?>" class="name thread_username"><?= $temp_thread_author ?></strong>
           <?= !$temp_thread_guest ? '</a>' : '' ?>
-          <? $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['board_points']) ? $this_user_countindex[$this_thread_info['user_id']]['board_points'] : 0; ?>
+          <?php $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['board_points']) ? $this_user_countindex[$this_thread_info['user_id']]['board_points'] : 0; ?>
           <div class="counter points_counter"><?= number_format($temp_stat, 0, '.', ',').' BP' ?></div>
           <div class="counter community_counters">
-            <? $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['thread_count']) ? $this_user_countindex[$this_thread_info['user_id']]['thread_count'] : 0; ?>
+            <?php $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['thread_count']) ? $this_user_countindex[$this_thread_info['user_id']]['thread_count'] : 0; ?>
             <span class="thread_counter"><?= $temp_stat.' TP' ?></span> <span class="pipe">|</span>
-            <? $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['post_count']) ? $this_user_countindex[$this_thread_info['user_id']]['post_count'] : 0; ?>
+            <?php $temp_stat = !empty($this_user_countindex[$this_thread_info['user_id']]['post_count']) ? $this_user_countindex[$this_thread_info['user_id']]['post_count'] : 0; ?>
             <span class="post_counter"><?= $temp_stat.' PP' ?></span>
           </div>
         </div>
       </div>
 
-    <? endif; ?>
+    <?php endif; ?>
 
-    <div class="bodytext"><?= mmrpg_formatting_decode($temp_thread_body) ?></div>
-    <? if((COMMUNITY_VIEW_MODERATOR || $this_userinfo['user_id'] == $this_thread_info['user_id']) && $this_thread_info['category_id'] != 0): ?>
-      <? if($this_thread_info['thread_target'] == 0): ?>
+    <div class="bodytext"><?= rpg_website::formatting_decode($temp_thread_body) ?></div>
+    <?php if((COMMUNITY_VIEW_MODERATOR || $this_userinfo['user_id'] == $this_thread_info['user_id']) && $this_thread_info['category_id'] != 0): ?>
+      <?php if($this_thread_info['thread_target'] == 0): ?>
       <div class="published" style="position: absolute; bottom: 10px; right: 10px;">
         <?/*<strong><?= $temp_thread_author ?></strong> on <strong><?= $temp_thread_date ?></strong>*/?>
           <span class="options">[ <a class="edit" rel="noindex,nofollow" href="<?= $_GET['this_current_url'].'action=edit&amp;thread_id='.$this_thread_info['thread_id'].'#discussion-form' ?>">edit</a> ]</span>
       </div>
-      <? endif; ?>
-    <? endif; ?>
+      <?php endif; ?>
+    <?php endif; ?>
     <div class="viewed" style="position: absolute; bottom: 12px; left: 14px; right: 14px; font-size: 10px; line-height: 13px; color: #565656; text-shadow: 0 0 0 transparent; border-top: 1px solid #252424; padding-top: 6px; width: 90%; ">
-      <?
+      <?php
       // If this is a personal message, only display the time
       if ($this_category_info['category_id'] == 0){ echo 'Sent by '.$temp_thread_author.' to '.$temp_thread_target.' on '.$temp_thread_date; }
       // Otherwise display extended details about the post
@@ -256,24 +256,24 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
     </div>
 
   </div>
-<? } else { ?>
+<?php } else { ?>
   <div class="subbody thread_subbody thread_subbody_full thread_subbody_full_<?= $is_personal_message_creator ? 'left' : 'right' ?> thread_<?= $is_personal_message_creator ? 'left' : 'right' ?>" style="text-align: left; position: relative; padding-bottom: 60px; min-height: 10px;">
     <div class="bodytext" style="padding-right: 0;">
       <em>
-      <?= substr(strip_tags(preg_replace('/(<br\s?\/?>)/i', ' ', mmrpg_formatting_decode($temp_thread_body))), 0, 300).'&hellip;' ?>
+      <?= substr(strip_tags(preg_replace('/(<br\s?\/?>)/i', ' ', rpg_website::formatting_decode($temp_thread_body))), 0, 300).'&hellip;' ?>
       <a class="link_inline" href="<?= $this_thread_url ?>">Read More</a>
       </em>
     </div>
-    <? if((COMMUNITY_VIEW_MODERATOR || $this_userinfo['user_id'] == $this_thread_info['user_id']) && $this_thread_info['category_id'] != 0): ?>
-      <? if($this_thread_info['thread_target'] == 0): ?>
+    <?php if((COMMUNITY_VIEW_MODERATOR || $this_userinfo['user_id'] == $this_thread_info['user_id']) && $this_thread_info['category_id'] != 0): ?>
+      <?php if($this_thread_info['thread_target'] == 0): ?>
       <div class="published" style="position: absolute; bottom: 10px; right: 10px;">
         <?/*<strong><?= $temp_thread_author ?></strong> on <strong><?= $temp_thread_date ?></strong>*/?>
           <span class="options">[ <a class="edit" rel="noindex,nofollow" href="<?= $_GET['this_current_url'].'action=edit&amp;thread_id='.$this_thread_info['thread_id'].'#discussion-form' ?>">edit</a> ]</span>
       </div>
-      <? endif; ?>
-    <? endif; ?>
+      <?php endif; ?>
+    <?php endif; ?>
     <div class="viewed" style="position: absolute; bottom: 12px; left: 14px; right: 14px; font-size: 10px; line-height: 13px; color: #565656; text-shadow: 0 0 0 transparent; border-top: 1px solid #252424; padding-top: 6px; width: 100%; ">
-      <?
+      <?php
       // If this is a personal message, only display the time
       if ($this_category_info['category_id'] == 0){ echo 'Sent by '.$temp_thread_author.' to '.$temp_thread_target.' on '.$temp_thread_date; }
       // Otherwise display extended details about the post
@@ -281,11 +281,11 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
       ?>
     </div>
   </div>
-<? } ?>
+<?php } ?>
 
 <div class="posts_body">
 
-  <?
+  <?php
 
   // Define whether or not we should show the comment section
   $show_comment_section = ($this_userid != MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked']) && $community_battle_points >= MMRPG_SETTINGS_POST_MINPOINTS) || $this_category_info['category_token'] == 'personal' ? true : false;
@@ -302,7 +302,7 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
       ?>
       <div class="thread_posts_pages">
         <strong>Page</strong> :
-        <?
+        <?php
         // Loop through the pages and print them on the page
         for ($page_num = 1; $page_num <= $this_pages_count; $page_num++){
           $temp_active = $page_num == $this_page_current ? true : false;
@@ -312,7 +312,7 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
 
         } ?>
       </div>
-      <?
+      <?php
     }
     $this_comment_page_links = ob_get_clean();
 
@@ -324,14 +324,14 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
           <h2 class="inner_subheader"><?= $this_posts_count == 1 ? '1 Comment' : $this_posts_count.' Comments' ?></h2>
           <?= $this_comment_page_links ?>
         </div>
-        <?
+        <?php
       } else {
         ?>
         <div id="comment-listing" class="subheader thread_posts_count field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
           <h2 class="inner_subheader"><?= $this_posts_count == 1 ? '1 Reply' : $this_posts_count.' Replies' ?></h2>
           <?= $this_comment_page_links ?>
         </div>
-        <?
+        <?php
       }
     $this_comment_page_header = ob_get_clean();
 
@@ -342,7 +342,7 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
         <div id="comment-listing-2" class="subheader thread_posts_count field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
           <?= $this_comment_page_links ?>
         </div>
-        <?
+        <?php
       }
     $this_comment_page_footer = ob_get_clean();
 
@@ -357,7 +357,7 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
       elseif ($this_post_key > $this_page_maxpost_key){ break; }
 
       // Collect markup for this post from the function
-      $temp_markup = mmrpg_website_community_postblock($this_thread_info, $this_post_info, $this_category_info);
+      $temp_markup = rpg_website::community_postblock($this_thread_info, $this_post_info, $this_category_info);
       echo $temp_markup."\n";
 
     }
@@ -367,24 +367,39 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
   // Print out the comment header again at the bottom of the page
   if (!$show_comment_section){ echo $this_comment_page_footer."\n"; }
 
+  // If we are to show the comment section, define the form action path
+  if ($show_comment_section){
+    $comment_form_action = $_GET['this_current_url'];
+    $temp_num_regex = '/(\/[0-9]+\/)$/i';
+    if (preg_match($temp_num_regex, $comment_form_action)){ $comment_form_action = preg_replace($temp_num_regex, '/', $comment_form_action); }
+    $comment_form_action .= $this_pages_count.'/';
+    if (!empty($_REQUEST['post_id'])){
+      $comment_form_action .= 'post_id='.$_REQUEST['post_id'];
+      $comment_form_action .= '#post-'.$_REQUEST['post_id'];
+    } else {
+      $comment_form_action .= '#comment-listing';
+    }
+    //.(!empty($_REQUEST['post_id']) ? 'post_id='.$_REQUEST['post_id'] : '').(!empty($_REQUEST['post_id']) ? '#post-'.$_REQUEST['post_id'] : '#comment-listing');
+  }
+
   ?>
 
-  <? if($show_comment_section): ?>
+  <?php if($show_comment_section): ?>
     <div id="comment-form" class="subheader thread_posts_count field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
       <h2 class="inner_subheader"><?= !empty($_REQUEST['post_id']) ? 'Edit' : 'Post' ?> Comment</h2>
       <?= !empty($_REQUEST['post_id']) ? '<a class="link" style="float: right; color: rgb(146, 146, 146); " href="'.$_GET['this_current_url'].'#comment-listing">Cancel</a>' : $this_comment_page_links ?>
     </div>
     <div class="subbody thread_posts_form post_subbody">
-      <form class="form" action="<?= $_GET['this_current_url'].(!empty($_REQUEST['post_id']) ? 'post_id='.$_REQUEST['post_id'] : '').(!empty($_REQUEST['post_id']) ? '#post-'.$_REQUEST['post_id'] : '#comment-listing') ?>" method="post">
-        <? if (defined('COMMENT_POST_SUCCESSFUL') && COMMENT_POST_SUCCESSFUL === true): ?>
+      <form class="form" action="<?= $comment_form_action ?>" method="post">
+        <?php if (defined('COMMENT_POST_SUCCESSFUL') && COMMENT_POST_SUCCESSFUL === true): ?>
           <p class="text" style="color: #65C054; margin: 0;">(!) Thank you, your comment has been <?= !empty($_REQUEST['post_id']) ? 'edited' : 'posted' ?>!<br />Would you like to <a style="color: #65C054;" href="<?= $_GET['this_current_url'] ?>">reload the page</a>?</p>
-          <? if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%; margin: 0;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
-        <? elseif (defined('COMMENT_POST_SUCCESSFUL') && COMMENT_POST_SUCCESSFUL === false): ?>
+          <?php if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%; margin: 0;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
+        <?php elseif (defined('COMMENT_POST_SUCCESSFUL') && COMMENT_POST_SUCCESSFUL === false): ?>
           <p class="text" style="color: #E43131; margin: 0;">(!) Your comment could not be posted. Please review and correct the errors below.</p>
-          <? if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%; margin: 0;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
-        <? endif;?>
-        <? if (!defined('COMMENT_POST_SUCCESSFUL') || (defined('COMMENT_POST_SUCCESSFUL') && COMMENT_POST_SUCCESSFUL === false)): ?>
-          <?
+          <?php if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%; margin: 0;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
+        <?php endif;?>
+        <?php if (!defined('COMMENT_POST_SUCCESSFUL') || (defined('COMMENT_POST_SUCCESSFUL') && COMMENT_POST_SUCCESSFUL === false)): ?>
+          <?php
           // Define and display the avatar variables
           $temp_avatar_guest = $this_userid == MMRPG_SETTINGS_GUEST_ID ? true : false;
           $temp_avatar_name = (!empty($this_userinfo['user_name_public']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']);
@@ -396,7 +411,7 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
           $temp_post_body = isset($_POST['post_body']) ? htmlentities($_POST['post_body'], ENT_QUOTES, 'UTF-8', true) : '';
           $temp_avatar_frame = isset($_REQUEST['post_frame']) ? $_REQUEST['post_frame'] : '00';
           if (!empty($temp_post_id)){
-            $temp_post_info = $DB->get_array("SELECT mmrpg_posts.*, mmrpg_users.user_image_path FROM mmrpg_posts LEFT JOIN mmrpg_users on mmrpg_users.user_id = mmrpg_posts.user_id WHERE post_id = {$temp_post_id} ".(!COMMUNITY_VIEW_MODERATOR ? " AND mmrpg_posts.user_id = {$this_userid}" : ''));
+            $temp_post_info = $this_database->get_array("SELECT mmrpg_posts.*, mmrpg_users.user_image_path FROM mmrpg_posts LEFT JOIN mmrpg_users on mmrpg_users.user_id = mmrpg_posts.user_id WHERE post_id = {$temp_post_id} ".(!COMMUNITY_VIEW_MODERATOR ? " AND mmrpg_posts.user_id = {$this_userid}" : ''));
             //die('$temp_post_info = <pre>'.print_r($temp_post_info, true).'</pre>');
             $temp_post_body = !empty($temp_post_info['post_body']) ? htmlentities($temp_post_info['post_body'], ENT_QUOTES, 'UTF-8', true) : '';
             $temp_avatar_path = !empty($temp_post_info['user_image_path']) ? $temp_post_info['user_image_path'] : $temp_avatar_path;
@@ -432,17 +447,16 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
           </div>
           <div class="field field_post_body">
             <div class="<?= $temp_avatar_class ?>" style="">
-              <div class="<?= $temp_sprite_class ?>" data-frames="<?=$temp_avatar_frames?>" style="background-image: url(<?= $temp_sprite_path ?>); "><?= $temp_avatar_title ?></div>
+              <div class="<?= $temp_sprite_class ?>" data-frames="<?= $temp_avatar_frames?>" style="background-image: url(<?= $temp_sprite_path ?>); "><?= $temp_avatar_title ?></div>
               <a class="back">&#9668;</a>
               <a class="next">&#9658;</a>
             </div>
-            <? /*<textarea class="textarea" name="post_body" rows="10"><?= str_replace("\n", '\\n', $temp_post_body) ?></textarea>*/ ?>
             <textarea class="textarea" name="post_body" rows="10"><?= $temp_post_body ?></textarea>
           </div>
           <div class="field field_post_info" style="clear: left; overflow: hidden; font-size: 11px;">
-            <?= mmrpg_formatting_help() ?>
+            <?= rpg_website::formatting_help() ?>
           </div>
-          <?
+          <?php
           // Define the current maxlength based on board points
           $temp_maxlength = MMRPG_SETTINGS_DISCUSSION_MAXLENGTH;
           if (!empty($this_boardinfo['board_points']) && ceil($this_boardinfo['board_points'] / 1000) > MMRPG_SETTINGS_DISCUSSION_MAXLENGTH){ $temp_maxlength = ceil($this_boardinfo['board_points'] / 1000); }
@@ -450,19 +464,19 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
           <div class="buttons buttons_active" data-submit="<?= !empty($_REQUEST['post_id']) ? 'Edit' : 'Post' ?> Comment">
             <label class="counter"><span class="current">0</span> / <span class="maximum"><?= $temp_maxlength ?></span> Characters</label>
           </div>
-        <? endif; ?>
+        <?php endif; ?>
       </form>
     </div>
-  <? elseif($this_userid != MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked']) && $community_battle_points < MMRPG_SETTINGS_POST_MINPOINTS && $this_category_info['category_token'] != 'personal'): ?>
+  <?php elseif($this_userid != MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked']) && $community_battle_points < MMRPG_SETTINGS_POST_MINPOINTS && $this_category_info['category_token'] != 'personal'): ?>
     <h2 id="comment-form" class="subheader thread_posts_count" style="opacity: 0.5; filter: alpha(opacity = 50);">- you need at least <?= number_format(MMRPG_SETTINGS_POST_MINPOINTS, 0, '.', ',') ?> battle points to post a comment -</h2>
-  <? elseif($this_userid == MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked'])): ?>
+  <?php elseif($this_userid == MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked'])): ?>
     <h2 id="comment-form" class="subheader thread_posts_count" style="opacity: 0.5; filter: alpha(opacity = 50);">- <a href="file/load/return=<?= htmlentities($this_current_uri.(!empty($_REQUEST['post_id']) ? 'post_id='.$_REQUEST['post_id'] : '').(!empty($_REQUEST['post_id']) ? '#comment-listing' : '')) ?>" rel="noindex,nofollow" style="color: #FFFFFF;">login to comment</a> -</h2>
-  <? else: ?>
+  <?php else: ?>
     <h2 id="comment-form" class="subheader thread_posts_count" style="opacity: 0.5; filter: alpha(opacity = 50);">- comments disabled -</h2>
-  <? endif; ?>
+  <?php endif; ?>
 
 </div>
-<?
+<?php
 
 // Add this thread to the community session tracker array
 if (!in_array($thread_session_token, $_SESSION['COMMUNITY']['threads_viewed'])){

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * INDEX PAGE : CONTACT
  */
@@ -136,9 +136,9 @@ while ($this_formaction == 'contact'){
   </p>
   <?if(!empty($formdata['contact_message'])):?>
   <strong style="display: block; margin: 0 auto 4px; text-align: left;">Message : </strong>
-  <p style="margin: 0 auto 5px;"><?=nl2br(htmlentities($formdata['contact_message'], ENT_QUOTES, 'UTF-8', true))?></p>
+  <p style="margin: 0 auto 5px;"><?= nl2br(htmlentities($formdata['contact_message'], ENT_QUOTES, 'UTF-8', true))?></p>
   <?endif;?>
-  <?
+  <?php
   $emailinfo['email_body'] = ob_get_clean();
 
   // And now to send the actual email
@@ -185,14 +185,14 @@ ob_start();
     <?/*
     <p class="text" style="color: #E43131;">(!) The contact form is currently undergoing maintenance.  Please email me at the address above.</p>
     */?>
-    <? if (defined('EMAIL_SENT_SUCCESSFULLY') && EMAIL_SENT_SUCCESSFULLY === true): ?>
+    <?php if (defined('EMAIL_SENT_SUCCESSFULLY') && EMAIL_SENT_SUCCESSFULLY === true): ?>
       <p class="text" style="color: #65C054;">(!) Thank you, your message has been sent!</p>
-      <? if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
-    <? elseif (defined('EMAIL_SENT_SUCCESSFULLY') && EMAIL_SENT_SUCCESSFULLY === false): ?>
+      <?php if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
+    <?php elseif (defined('EMAIL_SENT_SUCCESSFULLY') && EMAIL_SENT_SUCCESSFULLY === false): ?>
       <p class="text" style="color: #E43131;">(!) Your message could not be sent. Please review and correct the errors below.</p>
-      <? if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
-    <? endif;?>
-    <? if (!defined('EMAIL_SENT_SUCCESSFULLY') || (defined('EMAIL_SENT_SUCCESSFULLY') && EMAIL_SENT_SUCCESSFULLY === false)): ?>
+      <?php if (!empty($this_formerrors)){ foreach ($this_formerrors AS $error_text){ echo '<p class="text" style="color: #969696; font-size: 90%;">- '.$error_text.'</p>'; } } echo '<br />'; ?>
+    <?php endif;?>
+    <?php if (!defined('EMAIL_SENT_SUCCESSFULLY') || (defined('EMAIL_SENT_SUCCESSFULLY') && EMAIL_SENT_SUCCESSFULLY === false)): ?>
       <input type="hidden" class="hidden" name="formaction" value="contact" />
       <div class="field field_contact_name">
         <label class="label" for="contact_name">Your Name : <span class="mandatory">*</span></label>
@@ -211,12 +211,12 @@ ob_start();
         <textarea class="textarea" name="contact_combee" rows="10"><?= isset($_POST['contact_combee']) ? htmlentities($_POST['contact_combee'], ENT_QUOTES, 'UTF-8', true) : '' ?></textarea>
       </div>
       <div class="buttons"></div>
-    <? endif; ?>
+    <?php endif; ?>
   </form>
 </div>
 
 
-<?
+<?php
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
 ?>

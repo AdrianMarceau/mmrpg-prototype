@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * INDEX PAGE : CREDITS
  */
@@ -32,7 +32,7 @@ $contributor_ids = array(
   1330, // TheDoc (Moderator)
   );
   // 484 Ephnee
-$contributor_index = $DB->get_array_list("SELECT * FROM mmrpg_users LEFT JOIN mmrpg_roles ON mmrpg_users.role_id = mmrpg_roles.role_id WHERE user_id IN (".implode(', ', $contributor_ids).")", 'user_id');
+$contributor_index = $this_database->get_array_list("SELECT * FROM mmrpg_users LEFT JOIN mmrpg_roles ON mmrpg_users.role_id = mmrpg_roles.role_id WHERE user_id IN (".implode(', ', $contributor_ids).")", 'user_id');
 //die(print_r($contributor_index, true));
 function temp_sort_by_date($u1, $u2){
   global $contributor_ids;
@@ -56,10 +56,10 @@ ob_start();
 
 <div class="subbody">
 
-  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_<?= mmrpg_battle::random_robot_frame() ?>" style="background-image: url(images/robots/bomb-man/sprite_left_80x80.png);"></div></div>
+  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_<?= rpg_robot::random_frame() ?>" style="background-image: url(images/robots/bomb-man/sprite_left_80x80.png);"></div></div>
   <p class="text">The <strong>Mega Man RPG Prototype</strong> was created and is continually developed and maintained by Adrian Marceau / Ageman20XX, though the project would not have been possible without a great deal of inspiration and contributions from multiple outside sources.  Being a Mega Man fan-game, this project obviously owes most of it's thanks to <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> and of course, Keiji Inafune.  Most of the assets used throughout this website and game were created by Capcom for use in the original games, so their role in this project is far from minor and greatly influential. In addition, their generally positive attitude about fan-games and other types of fan-tribute have been very admirable over the years, and both this game and the Mega Man community owe them much gratitude.</p>
 
-  <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_<?= mmrpg_battle::random_robot_frame() ?>" style="background-image: url(images/robots/metal-man/sprite_right_80x80.png);"></div></div>
+  <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_<?= rpg_robot::random_frame() ?>" style="background-image: url(images/robots/metal-man/sprite_right_80x80.png);"></div></div>
   <p class="text">Capcom are not the only ones to thank, however, as many others have contributed to this project over the years.  Though most of the actual design and development has been done by Adrian thus far, hours of play-testing, tons of feature ideas, mechanics discussions, and even additional sprite editing has been provided by talented and generous outside sources over the years.  New members are being added to the team all the time, and even the smallest amount of effort is appreciated.  If you would like to help with sprite editing, bug testing, feature ideas, or anything please <a href="contact/">contact me</a> and we'll discuss the details.  You'll be credited appropriately on this page, with a link back to your home page and a custom description if you want them.</p>
 
 </div>
@@ -67,7 +67,7 @@ ob_start();
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Contributors Index</h2>
 
 
-<?
+<?php
 // -- CONTRIBUTOR INDEX -- //
 foreach ($contributor_ids AS $id){
   $temp_userinfo = $contributor_index[$id];
@@ -93,13 +93,13 @@ foreach ($contributor_ids AS $id){
     <div class="text">
       <div>
         <a class="type_span type type_<?= $temp_playertype ?>" style="padding: 1px 6px 2px 22px; background: transparent url(images/abilities/item-<?= $temp_itemkind ?>/icon_left_40x40.png) scroll no-repeat -10px -11px; text-decoration: none; " href="leaderboard/<?= $temp_userinfo['user_name_clean'] ?>/"><strong><?= $temp_displayname ?></strong></a>
-        <? if(!empty($temp_websitelink)): ?><span class="pipe">|</span> <a style="font-size: 10px;" href="<?= $temp_websitelink ?>" target="_blank" rel="contributor"><?= $temp_websitelink ?></a><? endif;?>
+        <?php if(!empty($temp_websitelink)): ?><span class="pipe">|</span> <a style="font-size: 10px;" href="<?= $temp_websitelink ?>" target="_blank" rel="contributor"><?= $temp_websitelink ?></a><?php endif;?>
       </div>
       <div><span><?= $temp_userinfo['role_name'] ?></span> <span class="pipe">|</span> <span><?= date('F Y', $temp_userinfo['user_date_created']) ?></span> <span class="pipe">|</span> <em><?= $temp_displayline ?></em></div>
-      <?= mmrpg_formatting_decode($temp_displaytext) ?>
+      <?= rpg_website::formatting_decode($temp_displaytext) ?>
     </div>
   </div>
-  <?
+  <?php
 }
 ?>
 <div class="subbody" style="margin-bottom: 2px; ">
@@ -124,7 +124,7 @@ foreach ($contributor_ids AS $id){
 </div>
 */?>
 
-<?
+<?php
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
 ?>

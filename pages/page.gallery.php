@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * INDEX PAGE : GALLERY
  */
@@ -14,7 +14,7 @@ $this_graph_data['description'] = 'The Mega Man RPG Prototype has gone through m
 //$this_graph_data['type'] = 'website';
 
 // Require the gallery data file
-require_once('data/gallery.php');
+require_once('includes/include.gallery.php');
 
 // Define the MARKUP variables for this page
 $this_markup_header = 'Mega Man RPG Prototype Gallery <span class="count">( '.(!empty($this_file_count) ? ($this_file_count == 1 ? '1 Image' : $this_file_count.' Images') : '0 Images').' )</span>';
@@ -32,7 +32,7 @@ ob_start();
 
 <div class="gallery">
   <div class="wrapper">
-  <?
+  <?php
   
   // Print out the generated gallery markup
   //echo $this_gallery_markup;
@@ -49,7 +49,7 @@ ob_start();
   </div>
 </div>
 
-<?
+<?php
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
 ?>
