@@ -1,8 +1,8 @@
 <?php
 // Include the TOP file
-require_once('top.php');
+require_once('_top.php');
 // Require the starforce data files
-require_once('data/starforce.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'includes/include.starforce.php');
 
 // Automatically empty all temporary battle variables
 $_SESSION['BATTLES'] = array();
@@ -31,9 +31,12 @@ $this_player_robots = isset($_GET['this_player_robots']) ? $_GET['this_player_ro
 $target_player_id = isset($_GET['target_player_id']) ? $_GET['target_player_id'] : 0;
 $target_player_token = isset($_GET['target_player_token']) ? $_GET['target_player_token'] : '';
 
+
+// -- COLLECT BATLE INFO -- //
+
 // Collect the battle index data if available
 if (!empty($this_battle_token)){
-  $this_battle_data = mmrpg_battle::get_index_info($this_battle_token);
+  $this_battle_data = rpg_battle::get_index_info($this_battle_token);
   if (empty($this_battle_data['battle_id'])){
     $this_battle_id = !empty($this_battle_id) ? $this_battle_id : 1;
     $this_battle_data['battle_id'] = $this_battle_id;
@@ -45,39 +48,43 @@ else {
   $this_battle_data = array();
 }
 
-// Collect the field index if available
-$mmrpg_index_fields = mmrpg_field::get_index();
-// Collect the field index data if available
-if (!empty($this_field_token) && isset($mmrpg_index_fields[$this_field_token])){
-  $this_field_data = mmrpg_field::parse_index_info($mmrpg_index_fields[$this_field_token]);
-  if (empty($this_field_data['field_id'])){
-    $this_field_id = !empty($this_field_id) ? $this_field_id : 1;
-    $this_field_data['field_id'] = $this_field_id;
-  }
+
+// -- COLLECT FIELD INFO -- //
+
+// Define the field data object as empty
+$this_field_data = array();
+
+// Collect the field data object values if available
+if (!empty($this_field_token)){
+
+  // Collect the field data from the index directly
+  $this_field_data = rpg_field::get_index_info($this_field_token);
+  $this_field_data['field_id'] = !empty($this_field_id) ? $this_field_id : 1;
+
+} elseif (!empty($this_battle_data['battle_field_info']['field_token'])) {
+
+  // Collect the field token and index plus custom info from the battle
+  $this_field_token = $this_battle_data['battle_field_info']['field_token'];
+  $temp_index_info = rpg_field::get_index_info($this_field_token);
+  $temp_custom_info = $this_battle_data['battle_field_info'];
+
+  // Merge the index and custom info together to form field data
+  $this_field_data = array_merge($temp_index_info, $temp_custom_info);
+  $this_field_data['field_id'] = !empty($this_field_id) ? $this_field_id : 1;
+
 }
-elseif (!empty($this_battle_data['battle_field_base']['field_token']) && isset($mmrpg_index_fields[$this_battle_data['battle_field_base']['field_token']])){
-  $this_field_data1 = mmrpg_field::parse_index_info($mmrpg_index_fields[$this_battle_data['battle_field_base']['field_token']]);
-  $this_field_data2 = $this_battle_data['battle_field_base'];
-  $this_field_data = array_merge($this_field_data1, $this_field_data2);
-  if (empty($this_field_data['field_id'])){
-    $this_field_id = !empty($this_field_id) ? $this_field_id : 1;
-    $this_field_data['field_id'] = $this_field_id;
-  }
-}
-else {
-  $this_field_id = 0;
-  $this_field_token = '';
-  $this_field_data = array();
-}
+
+
+// -- COLLECT PLAYER INFO -- //
 
 // Collect this player's index data if available
 if (!empty($this_player_token) && isset($mmrpg_index['players'][$this_player_token])){
   $this_player_data = $mmrpg_index['players'][$this_player_token];
   if (empty($this_player_data['user_id'])){
-    $this_player_data['user_id'] = 1;
+    $this_player_data['user_id'] = $this_userid;
   }
   if (empty($this_player_data['player_id'])){
-    $this_player_id = !empty($this_player_id) ? $this_player_id : 1;
+    $this_player_id = !empty($this_player_id) ? $this_player_id : $this_userid;
     $this_player_data['player_id'] = $this_player_id;
   }
   if (!empty($this_player_robots)){
@@ -85,7 +92,7 @@ if (!empty($this_player_token) && isset($mmrpg_index['players'][$this_player_tok
     foreach ($this_player_data['player_robots'] AS $key => $data){
       if (!in_array($data['robot_id'].'_'.$data['robot_token'], $allowed_robots)){
         unset($this_player_data['player_robots'][$key]);
-      } elseif (!mmrpg_prototype_robot_unlocked($this_player_token, $data['robot_token'])){
+      } elseif (!rpg_game::robot_unlocked($this_player_token, $data['robot_token'])){
         unset($allowed_robots[array_search($data['robot_id'].'_'.$data['robot_token'], $allowed_robots)]);
         unset($this_player_data['player_robots'][$key]);
       }
@@ -102,27 +109,30 @@ else {
 if (!empty($target_player_token) && isset($mmrpg_index['players'][$target_player_token])){
   $target_player_data = $mmrpg_index['players'][$target_player_token];
   if (empty($target_player_data['user_id'])){
-    $target_player_data['user_id'] = 2;
+    $target_player_data['user_id'] = MMRPG_SETTINGS_TARGET_PLAYERID;
   }
   if (empty($target_player_data['player_id'])){
-    $target_player_id = !empty($target_player_id) ? $target_player_id : 2;
+    $target_player_id = !empty($target_player_id) ? $target_player_id : MMRPG_SETTINGS_TARGET_PLAYERID;
     $target_player_data['player_id'] = $target_player_id;
   }
 }
 elseif (!empty($this_battle_data['battle_target_player']['player_token']) && isset($mmrpg_index['players'][$this_battle_data['battle_target_player']['player_token']])){
   $target_player_data = array_merge($mmrpg_index['players'][$this_battle_data['battle_target_player']['player_token']], $this_battle_data['battle_target_player']);
   if (empty($target_player_data['user_id'])){
-    $target_player_data['user_id'] = 2;
+    $target_player_data['user_id'] = MMRPG_SETTINGS_TARGET_PLAYERID;
   }
   if (empty($target_player_data['player_id'])){
-    $target_player_id = !empty($target_player_id) ? $target_player_id : 2;
+    $target_player_id = !empty($target_player_id) ? $target_player_id : MMRPG_SETTINGS_TARGET_PLAYERID;
     $target_player_data['player_id'] = $target_player_id;
   }
   if (empty($target_player_robots) && !empty($this_battle_data['battle_target_player'])){
     $target_player_data['player_robots'] = array();
+    $target_player_robots = array();
     foreach ($this_battle_data['battle_target_player']['player_robots'] AS $key => $data){
       $target_player_data['player_robots'][] = $data;
+      $target_player_robots[] = $data['robot_id'].'_'.$data['robot_token'];
     }
+    $target_player_robots = implode(',', $target_player_robots);
   }
 }
 else {
@@ -131,43 +141,44 @@ else {
   $target_player_data = array();
 }
 
+
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8" />
 <title>Mega Man RPG Prototype | Battle Engine | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
-<base href="<?=MMRPG_CONFIG_ROOTURL?>" />
+<base href="<?= MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
 <link type="text/css" href="styles/reset.css" rel="stylesheet" />
 <link type="text/css" href="styles/jquery.scrollbar.min.css" rel="stylesheet" />
-<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/battle.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.master.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.battle.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
-<link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/style.mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
-<script type="text/javascript" src="scripts/jquery.js"></script>
+<script type="text/javascript" src="scripts/script.jquery.js"></script>
 <script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/battle.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.master.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/script.battle.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game setting flags
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
 gameSettings.eventTimeout = <?= $flag_wap ? 700 : 900 ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE?>';
 gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
-gameSettings.fieldMusic = 'fields/<?=$this_field_data['field_music']?>';
+gameSettings.fieldMusic = 'fields/<?= $this_field_data['field_music']?>';
 //gameSettings.eventCrossFade = true;
-<?
+<?php
 // Update the event timeout setting if set
 $event_timeout = !empty($_SESSION['GAME']['battle_settings']['eventTimeout']) ? $_SESSION['GAME']['battle_settings']['eventTimeout'] : 0;
 if (!empty($event_timeout)){ echo 'gameSettings.eventTimeout ='.$event_timeout.";\n"; }
 ?>
 // Create the document ready events
 $(document).ready(function(){
-<?
+<?php
 // Preload battle related image files
 if (!empty($this_battle_data)){
   echo "  mmrpg_preload_field_sprites('background', '{$this_field_data['field_background']}');\n";
@@ -193,29 +204,30 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 <body id="mmrpg" class="battle">
 <div id="battle" class="hidden">
 
-  <form id="engine" action="data.php<?= $flag_wap ? '?wap=true' : '' ?>" target="connect" method="post">
+  <form id="engine" action="scripts/script.battle.php<?= $flag_wap ? '?wap=true' : '' ?>" target="connect" method="post">
 
     <input type="hidden" name="this_action" value="" />
     <input type="hidden" name="next_action" value="loading" />
 
-    <input type="hidden" name="this_battle_id" value="<?=$this_battle_data['battle_id']?>" />
-    <input type="hidden" name="this_battle_token" value="<?=$this_battle_data['battle_token']?>" />
+    <input type="hidden" name="this_battle_id" value="<?= $this_battle_data['battle_id']?>" />
+    <input type="hidden" name="this_battle_token" value="<?= $this_battle_data['battle_token']?>" />
     <input type="hidden" name="this_battle_status" value="active" />
     <input type="hidden" name="this_battle_result" value="pending" />
 
-    <input type="hidden" name="this_field_id" value="<?=$this_field_data['field_id']?>" />
-    <input type="hidden" name="this_field_token" value="<?=$this_field_data['field_token']?>" />
+    <input type="hidden" name="this_field_id" value="<?= $this_field_data['field_id']?>" />
+    <input type="hidden" name="this_field_token" value="<?= $this_field_data['field_token']?>" />
 
-    <input type="hidden" name="this_user_id" value="<?=$this_player_data['user_id']?>" />
-    <input type="hidden" name="this_player_id" value="<?=$this_player_data['player_id']?>" />
-    <input type="hidden" name="this_player_token" value="<?=$this_player_data['player_token']?>" />
-    <input type="hidden" name="this_player_robots" value="<?=$this_player_robots?>" />
+    <input type="hidden" name="this_user_id" value="<?= $this_player_data['user_id']?>" />
+    <input type="hidden" name="this_player_id" value="<?= $this_player_data['player_id']?>" />
+    <input type="hidden" name="this_player_token" value="<?= $this_player_data['player_token']?>" />
+    <input type="hidden" name="this_player_robots" value="<?= $this_player_robots?>" />
     <input type="hidden" name="this_robot_id" value="auto" />
     <input type="hidden" name="this_robot_token" value="auto" />
 
-    <input type="hidden" name="target_user_id" value="<?=$target_player_data['user_id']?>" />
-    <input type="hidden" name="target_player_id" value="<?=$target_player_data['player_id']?>" />
-    <input type="hidden" name="target_player_token" value="<?=$target_player_data['player_token']?>" />
+    <input type="hidden" name="target_user_id" value="<?= $target_player_data['user_id']?>" />
+    <input type="hidden" name="target_player_id" value="<?= $target_player_data['player_id']?>" />
+    <input type="hidden" name="target_player_token" value="<?= $target_player_data['player_token']?>" />
+    <input type="hidden" name="target_player_robots" value="<?= $target_player_robots?>" />
     <input type="hidden" name="target_robot_id" value="auto" />
     <input type="hidden" name="target_robot_token" value="auto" />
 
@@ -228,7 +240,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 
       <div id="animate" style="opacity: 0;"><a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a></div>
       <div class="event sticky" style="z-index: 1;">
-        <?
+        <?php
 
         // If field data was provided, preload the background/foreground
         if (!empty($this_field_data)){
@@ -308,8 +320,8 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
             else { $temp_star_text = ucfirst($temp_field_type_1).' / '.ucfirst($temp_field_type_1).' Type | '; }
             $temp_star_text .= ucfirst($temp_star_kind).' Class';
             // Collect the star image info from the index based on type
-            $temp_star_back_info = mmrpg_prototype_star_image($temp_field_type_2);
-            $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
+            $temp_star_back_info = rpg_prototype::star_image($temp_field_type_2);
+            $temp_star_front_info = rpg_prototype::star_image($temp_field_type_1);
 
             // Append the new field star to the foreground attachment array
             $this_field_data['field_foreground_attachments']['field-star-back'] = array(
@@ -394,7 +406,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
       </div>
 
       <div class="event event_details clearback sticky" style="">
-        <?
+        <?php
         // Display the scanline layer if enabled
         if ($debug_flag_scanlines){ echo '<div class="foreground scanlines" style="background-image: url(images/gui/canvas-scanlines.png?'.MMRPG_CONFIG_CACHE_DATE.'); opacity: 1;">&nbsp;</div>'; }
         ?>
@@ -538,11 +550,11 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
   </div>
 
 </div>
-<?
+<?php
 // Require the remote bottom in case we're in viewer mode
-require(MMRPG_CONFIG_ROOTDIR.'/data/analytics.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/include.analytics.php');
 // Unset the database variable
-unset($DB);
+unset($this_database);
 ?>
 </body>
 </html>
