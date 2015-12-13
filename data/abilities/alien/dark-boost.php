@@ -27,7 +27,7 @@ $ability = array(
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(0, 75, 0, 10, $this_ability->print_ability_name().' increases the user&#39;s '.$temp_stat_boost.'...')
+      'success' => array(0, 75, 0, 10, $this_ability->print_name().' increases the user&#39;s '.$temp_stat_boost.'...')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -41,8 +41,8 @@ $ability = array(
           'percent' => true,
           'modifiers' => false,
           'frame' => 'taunt',
-          'success' => array(0, -2, 0, -10, $this_robot->print_robot_name().'&#39;s energy was restored!'),
-          'failure' => array(9, -2, 0, -10, $this_robot->print_robot_name().'&#39;s energy was not affected&hellip;')
+          'success' => array(0, -2, 0, -10, $this_robot->print_name().'&#39;s energy was restored!'),
+          'failure' => array(9, -2, 0, -10, $this_robot->print_name().'&#39;s energy was not affected&hellip;')
           ));
         $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery2 / 100));
         $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
@@ -58,8 +58,8 @@ $ability = array(
         'percent' => true,
         'modifiers' => false,
         'frame' => 'defend',
-        'success' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s weapons powered up!'),
-        'failure' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s weapons were not affected&hellip;')
+        'success' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s weapons powered up!'),
+        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s weapons were not affected&hellip;')
         ));
       $attack_recovery_amount = ceil($this_robot->robot_base_attack * ($this_ability->ability_recovery2 / 100));
       $this_robot->trigger_recovery($this_robot, $this_ability, $attack_recovery_amount);
@@ -74,8 +74,8 @@ $ability = array(
         'percent' => true,
         'modifiers' => false,
         'frame' => 'defend',
-        'success' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s shields powered up!'),
-        'failure' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s shields were not affected&hellip;')
+        'success' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s shields powered up!'),
+        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s shields were not affected&hellip;')
         ));
       $defense_recovery_amount = ceil($this_robot->robot_base_defense * ($this_ability->ability_recovery2 / 100));
       $this_robot->trigger_recovery($this_robot, $this_ability, $defense_recovery_amount);
@@ -90,8 +90,8 @@ $ability = array(
         'percent' => true,
         'modifiers' => false,
         'frame' => 'defend',
-        'success' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s mobility improved!'),
-        'failure' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s mobility was not affected&hellip;')
+        'success' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s mobility improved!'),
+        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s mobility was not affected&hellip;')
         ));
       $speed_recovery_amount = ceil($this_robot->robot_base_speed * ($this_ability->ability_recovery2 / 100));
       $this_robot->trigger_recovery($this_robot, $this_ability, $speed_recovery_amount);
