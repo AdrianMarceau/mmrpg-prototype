@@ -1,4 +1,4 @@
-<?
+<?php
 
 /*
  * DEFINE OMEGA FACTORS

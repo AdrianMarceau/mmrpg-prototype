@@ -6,15 +6,15 @@ define('MMRPG_CONFIG_DOMAIN', (isset($THIS_DOMAIN[0]) ? $THIS_DOMAIN[0] : false)
 unset($THIS_DOMAIN);
 
 // Define whether or not we're being viewed by an admin
-$is_admin = in_array($_SERVER['REMOTE_ADDR'], explode(',', MMRPG_CONFIG_ADMIN_LIST)) ? true : false;
+$is_admin = !empty($_SERVER['REMOTE_ADDR']) && in_array($_SERVER['REMOTE_ADDR'], explode(',', MMRPG_CONFIG_ADMIN_LIST)) ? true : false;
 define('MMRPG_CONFIG_ADMIN_MODE', $is_admin);
 
 // Define the global cache date and settings
 define('MMRPG_CONFIG_DEBUG_MODE', !empty($_SESSION['GAME']['debug_mode']) ? true : false);
 
 // Define the cache date and path on this system
-define('MMRPG_CONFIG_CACHE_DATE', '20150808-01');
-define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'data/cache/');
+define('MMRPG_CONFIG_CACHE_DATE', '20150814-01');
+define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'_cache/');
 
 // Define the cache and index paths for battles
 define('MMRPG_CONFIG_BATTLES_INDEX_PATH', MMRPG_CONFIG_ROOTDIR.'data/battles/');
@@ -35,6 +35,10 @@ define('MMRPG_CONFIG_ABILITIES_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.abili
 // Define the cache and index paths for fields
 define('MMRPG_CONFIG_FIELDS_INDEX_PATH', MMRPG_CONFIG_ROOTDIR.'data/fields/');
 define('MMRPG_CONFIG_FIELDS_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.fields.'.MMRPG_CONFIG_CACHE_DATE.'.php');
+
+// Define the cache and index paths for fields
+define('MMRPG_CONFIG_TYPES_INDEX_PATH', MMRPG_CONFIG_ROOTDIR.'data/types/');
+define('MMRPG_CONFIG_TYPES_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.types.'.MMRPG_CONFIG_CACHE_DATE.'.php');
 
 // Define the global timeout variables for online and new status
 define('MMRPG_SETTINGS_ONLINE_TIMEOUT', (60 * 30)); // In seconds (60sec x 60min = 1/2 Hour)
@@ -107,6 +111,9 @@ define('MMRPG_SETTINGS_SHARDS_PERCORE', 4); // Define the number of shards requi
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MIN', 1); // The minimum number of robots required for battle per side
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX', 8); // The maximum number of robots allowed for battle per side
 
+// Define the global variables for the total number of abilities allower per robot
+define('MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX', 8); // The maximum number of abilities a given robot can have
+
 // Define the global multiplier for battle points per level
 define('MMRPG_SETTINGS_BATTLEPOINTS_MINREWARD', 1); // The minimum point reward value for a given mission
 define('MMRPG_SETTINGS_BATTLEPOINTS_MAXREWARD', 999999999); // The maximum point reward value for a given mission
@@ -114,6 +121,10 @@ define('MMRPG_SETTINGS_BATTLETURNS_MINAMOUNT', 1); // The minimum target turn va
 define('MMRPG_SETTINGS_BATTLETURNS_MAXAMOUNT', 99); // The maximum target turn value for a given mission
 define('MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER', 2.0); // The point rate per robot level multiplier for player battles
 define('MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER', 0.5); // The point rate per target robot multiplier for player battles
+
+// Define the global variables for the total number of abilities allower per robot
+define('MMRPG_SETTINGS_ROBOT_ABILITYID_SYSTEM_START', 20); // The starting ID for a robot's attachment objects
+define('MMRPG_SETTINGS_ABILITYID_ATTACHMENT_START', 40); // The starting ID for a robot's attachment objects
 
 
 // -- CHALLENGE SETTINGS -- //

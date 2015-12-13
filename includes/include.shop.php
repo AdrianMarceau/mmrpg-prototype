@@ -1,6 +1,6 @@
-<?
+<?php
 // If the session token has not been set
-if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
+if (!isset($session_token)){ $session_token = rpg_game::session_token(); }
 
 
 // -- COLLECT ENVIRONMENT VARIABLES -- //
@@ -17,10 +17,12 @@ $global_zenny_counter = !empty($_SESSION[$session_token]['counters']['battle_zen
 $global_points_counter = !empty($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
 
 // Define the global counters for unlocked robot cores and ability types
-$global_unlocked_robots = mmrpg_prototype_robot_tokens_unlocked();
-$global_unlocked_abilities = mmrpg_prototype_ability_tokens_unlocked();
+$global_unlocked_robots = rpg_game::robot_tokens_unlocked();
+$global_unlocked_abilities = rpg_game::ability_tokens_unlocked();
+$global_unlocked_items = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items'] : array();
 $global_unlocked_robots_cores = array();
 $global_unlocked_abilities_types = array();
+$global_unlocked_items_tokens = !empty($global_unlocked_items) ? array_keys($global_unlocked_items) : 0;
 
 // Create type counters for each element
 if (!empty($mmrpg_database_types)){
@@ -87,134 +89,77 @@ $this_shop_index['auto'] = array(
   'shop_items' => array(
     'items_selling' => array(
 
-      'item-energy-pellet' => 200,
-      'item-weapon-pellet' => 200
+      'item-energy-pellet' => 200, 'item-weapon-pellet' => 200,
+      'item-energy-capsule' => 400, 'item-weapon-capsule' => 400,
+      'item-energy-tank' => 800, 'item-weapon-tank' => 800
 
       ),
     'items_selling2' => array(
 
-      'item-energy-pellet' => 200,
-      'item-weapon-pellet' => 200,
-      'item-energy-capsule' => 400,
-      'item-weapon-capsule' => 400
+      'item-energy-pellet' => 200, 'item-weapon-pellet' => 200,
+      'item-energy-capsule' => 400, 'item-weapon-capsule' => 400,
+      'item-energy-tank' => 800, 'item-weapon-tank' => 800,
+
+      'item-attack-pellet' => 900, 'item-defense-pellet' => 900,
+      'item-attack-capsule' => 1800, 'item-defense-capsule' => 1800,
+      'item-speed-pellet' => 900, 'item-super-pellet' => 2700,
+      'item-speed-capsule' => 1800, 'item-super-capsule' => 5400
 
       ),
     'items_selling3' => array(
 
-      'item-energy-pellet' => 200,
-      'item-weapon-pellet' => 200,
-      'item-energy-capsule' => 400,
-      'item-weapon-capsule' => 400,
-      'item-energy-tank' => 800,
-      'item-weapon-tank' => 800
+      'item-energy-pellet' => 200, 'item-weapon-pellet' => 200,
+      'item-energy-capsule' => 400, 'item-weapon-capsule' => 400,
+      'item-energy-tank' => 800, 'item-weapon-tank' => 800,
+
+      'item-attack-pellet' => 900, 'item-defense-pellet' => 900,
+      'item-attack-capsule' => 1800, 'item-defense-capsule' => 1800,
+      'item-speed-pellet' => 900, 'item-super-pellet' => 2700,
+      'item-speed-capsule' => 1800, 'item-super-capsule' => 5400,
+
+      'item-extra-life' => 1600, 'item-yashichi' => 1600
 
       ),
     'items_selling4' => array(
 
-      'item-energy-pellet' => 200,
-      'item-weapon-pellet' => 200,
-      'item-energy-capsule' => 400,
-      'item-weapon-capsule' => 400,
-      'item-energy-tank' => 800,
-      'item-weapon-tank' => 800,
+      'item-energy-pellet' => 200, 'item-weapon-pellet' => 200,
+      'item-energy-capsule' => 400, 'item-weapon-capsule' => 400,
+      'item-energy-tank' => 800, 'item-weapon-tank' => 800,
 
-      'item-attack-pellet' => 900,
-      'item-defense-pellet' => 900,
-      'item-speed-pellet' => 900,
-      'item-super-pellet' => 2700
+      'item-attack-pellet' => 900, 'item-defense-pellet' => 900,
+      'item-attack-capsule' => 1800, 'item-defense-capsule' => 1800,
+      'item-speed-pellet' => 900, 'item-super-pellet' => 2700,
+      'item-speed-capsule' => 1800, 'item-super-capsule' => 5400,
 
-      ),
-    'items_selling5' => array(
+      'item-extra-life' => 1600, 'item-yashichi' => 1600,
 
-      'item-energy-pellet' => 200,
-      'item-weapon-pellet' => 200,
-      'item-energy-capsule' => 400,
-      'item-weapon-capsule' => 400,
-      'item-energy-tank' => 800,
-      'item-weapon-tank' => 800,
-
-      'item-attack-pellet' => 900,
-      'item-defense-pellet' => 900,
-      'item-attack-capsule' => 1800,
-      'item-defense-capsule' => 1800,
-      'item-speed-pellet' => 900,
-      'item-super-pellet' => 2700,
-      'item-speed-capsule' => 1800,
-      'item-super-capsule' => 5400
-
-      ),
-    'items_selling6' => array(
-
-      'item-energy-pellet' => 200,
-      'item-weapon-pellet' => 200,
-      'item-energy-capsule' => 400,
-      'item-weapon-capsule' => 400,
-      'item-energy-tank' => 800,
-      'item-weapon-tank' => 800,
-
-      'item-attack-pellet' => 900,
-      'item-defense-pellet' => 900,
-      'item-attack-capsule' => 1800,
-      'item-defense-capsule' => 1800,
-      'item-speed-pellet' => 900,
-      'item-super-pellet' => 2700,
-      'item-speed-capsule' => 1800,
-      'item-super-capsule' => 5400,
-
-      'item-extra-life' => 1600,
-      'item-yashichi' => 1600
-
-      ),
-    'items_selling7' => array(
-
-      'item-energy-pellet' => 200,
-      'item-weapon-pellet' => 200,
-      'item-energy-capsule' => 400,
-      'item-weapon-capsule' => 400,
-      'item-energy-tank' => 800,
-      'item-weapon-tank' => 800,
-
-      'item-attack-pellet' => 900,
-      'item-defense-pellet' => 900,
-      'item-attack-capsule' => 1800,
-      'item-defense-capsule' => 1800,
-      'item-speed-pellet' => 900,
-      'item-super-pellet' => 2700,
-      'item-speed-capsule' => 1800,
-      'item-super-capsule' => 5400,
-
-      'item-extra-life' => 1600,
-      'item-yashichi' => 1600,
-
-      'item-score-ball-red' => 5000,
-      'item-score-ball-blue' => 10000,
-      'item-score-ball-green' => 5000,
-      'item-score-ball-purple' => 10000
+      'item-score-ball-red' => 5000, 'item-score-ball-blue' => 10000,
+      'item-score-ball-green' => 5000, 'item-score-ball-purple' => 10000
 
       ),
     'items_buying' => array(
 
-      'item-screw-small' => 100,
-      'item-screw-large' => 1000,
+      'item-screw-small' => 100, 'item-screw-large' => 1000,
 
-      'item-energy-pellet' => 100,
-      'item-weapon-pellet' => 100,
-      'item-energy-capsule' => 200,
-      'item-weapon-capsule' => 200,
-      'item-energy-tank' => 400,
-      'item-weapon-tank' => 400,
+      'item-energy-pellet' => 100, 'item-weapon-pellet' => 100,
+      'item-energy-capsule' => 200, 'item-weapon-capsule' => 200,
+      'item-energy-tank' => 400, 'item-weapon-tank' => 400,
 
-      'item-attack-pellet' => 450,
-      'item-defense-pellet' => 450,
-      'item-attack-capsule' => 900,
-      'item-defense-capsule' => 900,
-      'item-speed-pellet' => 450,
-      'item-super-pellet' => 1350,
-      'item-speed-capsule' => 900,
-      'item-super-capsule' => 2800,
+      'item-attack-pellet' => 450, 'item-defense-pellet' => 450,
+      'item-attack-capsule' => 900, 'item-defense-capsule' => 900,
+      'item-speed-pellet' => 450, 'item-super-pellet' => 1350,
+      'item-speed-capsule' => 900, 'item-super-capsule' => 2800,
 
-      'item-extra-life' => 800,
-      'item-yashichi' => 800
+      'item-extra-life' => 800, 'item-yashichi' => 800,
+
+      'item-score-ball-red' => 1750, 'item-score-ball-blue' => 2500,
+      'item-score-ball-green' => 1750, 'item-score-ball-purple' => 2500,
+
+      'item-energy-upgrade' => 4000, 'item-weapon-upgrade' => 4000,
+      'item-attack-booster' => 4000, 'item-defense-booster' => 4000,
+      'item-speed-booster' => 4000, 'item-field-booster' => 4000,
+      'item-target-module' => 4000, 'item-charge-module' => 4000,
+      'item-growth-module' => 4000, 'item-fortune-module' => 4000
 
       )
     )
@@ -238,44 +183,35 @@ $this_shop_index['reggae'] = array(
   'shop_abilities' => array(
     'abilities_selling' => array(
       'buster-charge' => 3000, 'buster-relay' => 3000,
-      'energy-boost' => 6000, 'attack-boost' => 6000, 'defense-boost' => 6000, 'speed-boost' => 6000,
-      'energy-break' => 6000, 'attack-break' => 6000, 'defense-break' => 6000, 'speed-break' => 6000
+      'energy-boost' => 6000, 'attack-boost' => 6000,
+      'defense-boost' => 6000, 'speed-boost' => 6000,
+      'energy-break' => 9000, 'attack-break' => 9000,
+      'defense-break' => 9000, 'speed-break' => 9000
       ),
     'abilities_selling2' => array(
       'buster-charge' => 3000, 'buster-relay' => 3000,
-      'energy-boost' => 6000, 'attack-boost' => 6000, 'defense-boost' => 6000, 'speed-boost' => 6000,
-      'energy-break' => 6000, 'attack-break' => 6000, 'defense-break' => 6000, 'speed-break' => 6000,
-      'energy-swap' => 9000, 'attack-swap' => 9000, 'defense-swap' => 9000, 'speed-swap' => 9000,
-      'attack-mode' => 9000, 'defense-mode' => 9000, 'speed-mode' => 9000, 'repair-mode' => 9000
+      'energy-boost' => 6000, 'attack-boost' => 6000,
+      'defense-boost' => 6000, 'speed-boost' => 6000,
+      'energy-break' => 9000, 'attack-break' => 9000,
+      'defense-break' => 9000, 'speed-break' => 9000,
+      'energy-swap' => 12000, 'attack-swap' => 12000,
+      'defense-swap' => 12000, 'speed-swap' => 12000,
+      'attack-mode' => 15000, 'defense-mode' => 15000,
+      'speed-mode' => 15000, 'repair-mode' => 15000
       ),
     'abilities_selling3' => array(
       'buster-charge' => 3000, 'buster-relay' => 3000,
-      'energy-boost' => 6000, 'attack-boost' => 6000, 'defense-boost' => 6000, 'speed-boost' => 6000,
-      'energy-break' => 6000, 'attack-break' => 6000, 'defense-break' => 6000, 'speed-break' => 6000,
-      'energy-swap' => 9000, 'attack-swap' => 9000, 'defense-swap' => 9000, 'speed-swap' => 9000,
-      'attack-mode' => 9000, 'defense-mode' => 9000, 'speed-mode' => 9000, 'repair-mode' => 9000,
-      'experience-booster' => 12000, 'experience-breaker' => 12000
-      ),
-    'abilities_selling4' => array(
-      'buster-charge' => 3000, 'buster-relay' => 3000,
-      'energy-boost' => 6000, 'attack-boost' => 6000, 'defense-boost' => 6000, 'speed-boost' => 6000,
-      'energy-break' => 6000, 'attack-break' => 6000, 'defense-break' => 6000, 'speed-break' => 6000,
-      'energy-swap' => 6000, 'attack-boost' => 6000, 'defense-boost' => 6000, 'speed-boost' => 6000,
-      'attack-mode' => 9000, 'defense-mode' => 9000, 'speed-mode' => 9000, 'repair-mode' => 9000,
-      'experience-booster' => 12000, 'experience-breaker' => 12000,
-      'recovery-booster' => 12000, 'recovery-breaker' => 12000,
-      'damage-booster' => 12000, 'damage-breaker' => 12000,
-      'field-support' => 16000, 'mecha-support' => 16000
-      ),
-    'abilities_selling5' => array(
-      'buster-charge' => 3000, 'buster-relay' => 3000,
-      'energy-boost' => 6000, 'attack-boost' => 6000, 'defense-boost' => 6000, 'speed-boost' => 6000,
-      'energy-break' => 6000, 'attack-break' => 6000, 'defense-break' => 6000, 'speed-break' => 6000,
-      'energy-swap' => 6000, 'attack-boost' => 6000, 'defense-boost' => 6000, 'speed-boost' => 6000,
-      'attack-mode' => 9000, 'defense-mode' => 9000, 'speed-mode' => 9000, 'repair-mode' => 9000,
-      'experience-booster' => 12000, 'experience-breaker' => 12000,
-      'damage-booster' => 12000, 'damage-breaker' => 12000,
-      'recovery-booster' => 12000, 'recovery-breaker' => 12000,
+      'energy-boost' => 6000, 'attack-boost' => 6000,
+      'defense-boost' => 6000, 'speed-boost' => 6000,
+      'energy-break' => 9000, 'attack-break' => 9000,
+      'defense-break' => 9000, 'speed-break' => 9000,
+      'energy-swap' => 12000, 'attack-swap' => 12000,
+      'defense-swap' => 12000, 'speed-swap' => 12000,
+      'attack-mode' => 15000, 'defense-mode' => 15000,
+      'speed-mode' => 15000, 'repair-mode' => 15000,
+      'experience-booster' => 18000, 'experience-breaker' => 18000,
+      'recovery-booster' => 18000, 'recovery-breaker' => 18000,
+      'damage-booster' => 18000, 'damage-breaker' => 18000,
       'field-support' => 16000, 'mecha-support' => 16000
       )
     ),
@@ -316,14 +252,11 @@ $this_shop_index['kalinka'] = array(
   'shop_quote_buying' => array('stars' => 'Do you have any field or fusion stars? I\'m studying the effects of starforce and need some samples.'),
   'shop_items' => array(
     'items_selling' => array(
-      'item-energy-upgrade' => 32000, 'item-weapon-upgrade' => 32000
-      ),
-    'items_selling2' => array(
       'item-energy-upgrade' => 32000, 'item-weapon-upgrade' => 32000,
       'item-attack-booster' => 32000, 'item-defense-booster' => 32000,
-      'item-speed-booster' => 32000, 'item-field-booster' => 32000
+      'item-target-module' => 32000, 'item-growth-module' => 32000
       ),
-    'items_selling3' => array(
+    'items_selling2' => array(
       'item-energy-upgrade' => 32000, 'item-weapon-upgrade' => 32000,
       'item-attack-booster' => 32000, 'item-defense-booster' => 32000,
       'item-speed-booster' => 32000, 'item-field-booster' => 32000,
@@ -349,7 +282,7 @@ if (!empty($this_shop_index)){
     $shop_player = $shop_info['shop_player'];
     $shop_selling = $shop_info['shop_kind_selling'];
     $shop_buying = $shop_info['shop_kind_buying'];
-    if (mmrpg_prototype_event_complete('completed-chapter_'.$shop_player.'_one')){
+    if (rpg_prototype::event_complete('completed-chapter_'.$shop_player.'_one')){
       // If the shop has not been created, define its defaults
       if (!isset($this_battle_shops[$shop_token])){
         $shop_array = array();
@@ -367,7 +300,7 @@ if (!empty($this_shop_index)){
       else {
         $shop_array = $this_battle_shops[$shop_token];
         $temp_experience = !empty($shop_array['shop_experience']) ? $shop_array['shop_experience'] : 1;
-        $temp_level = mmrpg_prototype_calculate_level_by_experience($temp_experience);
+        $temp_level = rpg_prototype::calculate_level_by_experience($temp_experience);
         $temp_level = floor($temp_level);
         if ($temp_level > 100){ $temp_level = 100; }
         $shop_array['shop_level'] = $temp_level;
@@ -394,24 +327,18 @@ if (!empty($this_shop_index)){
 if (!empty($this_shop_index['auto'])){
 
   // If Auto's Shop has reached sufficient levels, expand the inventory
-  if ($this_shop_index['auto']['shop_level'] >= 2){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling2']; }
-  if ($this_shop_index['auto']['shop_level'] >= 4){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling3']; }
-  if ($this_shop_index['auto']['shop_level'] >= 8){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling4']; }
-  if ($this_shop_index['auto']['shop_level'] >= 16){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling5']; }
-  if ($this_shop_index['auto']['shop_level'] >= 32){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling6']; }
-  if ($this_shop_index['auto']['shop_level'] >= 64){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling7']; }
+  if ($this_shop_index['auto']['shop_level'] >= 10){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling2']; }
+  if ($this_shop_index['auto']['shop_level'] >= 20){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling3']; }
+  if ($this_shop_index['auto']['shop_level'] >= 30){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling4']; }
   unset($this_shop_index['auto']['shop_items']['items_selling2']);
   unset($this_shop_index['auto']['shop_items']['items_selling3']);
   unset($this_shop_index['auto']['shop_items']['items_selling4']);
-  unset($this_shop_index['auto']['shop_items']['items_selling5']);
-  unset($this_shop_index['auto']['shop_items']['items_selling6']);
-  unset($this_shop_index['auto']['shop_items']['items_selling7']);
 
   // Loop through Auto's shop and remove items you do not yet own from the buying list
   $key_items = array('item-screw-small', 'item-screw-large');
   if (!empty($this_shop_index['auto']['shop_items']['items_buying'])){
     foreach ($this_shop_index['auto']['shop_items']['items_buying'] AS $token => $price){
-      if (!isset($this_shop_index['auto']['shop_items']['items_selling'][$token]) && !in_array($token, $key_items)){
+      if (!in_array($token, $key_items) && !in_array($token, $global_unlocked_items_tokens)){
         unset($this_shop_index['auto']['shop_items']['items_buying'][$token]);
       }
     }
@@ -426,14 +353,10 @@ if (!empty($this_shop_index['auto'])){
 if (!empty($this_shop_index['reggae'])){
 
   // If Reggae's Shop has reached sufficient levels, expand the inventory
-  if ($this_shop_index['reggae']['shop_level'] >= 4){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling2']; }
-  if ($this_shop_index['reggae']['shop_level'] >= 8){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling3']; }
-  if ($this_shop_index['reggae']['shop_level'] >= 16){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling4']; }
-  if ($this_shop_index['reggae']['shop_level'] >= 32){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling5']; }
+  if ($this_shop_index['reggae']['shop_level'] >= 20){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling2']; }
+  if ($this_shop_index['reggae']['shop_level'] >= 30){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling3']; }
   unset($this_shop_index['reggae']['shop_abilities']['abilities_selling2']);
   unset($this_shop_index['reggae']['shop_abilities']['abilities_selling3']);
-  unset($this_shop_index['reggae']['shop_abilities']['abilities_selling4']);
-  unset($this_shop_index['reggae']['shop_abilities']['abilities_selling5']);
 
   // If the player has X, Reggae's Shop also sells weapons
   if (!empty($this_battle_shops['reggae']['cores_bought'])){
@@ -510,24 +433,18 @@ if (!empty($this_shop_index['reggae'])){
 if (!empty($this_shop_index['kalinka'])){
 
   // If Kalinka's Shop has reached sufficient levels, expand the inventory
-  if ($this_shop_index['kalinka']['shop_level'] >= 8){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
-  if ($this_shop_index['kalinka']['shop_level'] >= 16){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling3']; }
+  if ($this_shop_index['kalinka']['shop_level'] >= 30){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
   unset($this_shop_index['kalinka']['shop_items']['items_selling2']);
-  unset($this_shop_index['kalinka']['shop_items']['items_selling3']);
 
   // If the player has completed the prototype, Kalinka's Shop also sells fields
-  if (mmrpg_prototype_complete()){
+  if (rpg_prototype::campaign_complete()){
     $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
     $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I think I\'ve discoved a way to generate new starforce, but it\'ll require additional research. Interested?';
     $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
-      'construction-site' => 48000,
-      'magnetic-generator' => 48000,
-      'reflection-chamber' => 48000,
-      'rocky-plateau' => 48000,
-      'spinning-greenhouse' => 48000,
-      'serpent-column' => 48000,
-      'power-plant' => 48000,
-      'septic-system' => 48000
+      'construction-site' => 48000, 'magnetic-generator' => 48000,
+      'reflection-chamber' => 48000, 'rocky-plateau' => 48000,
+      'spinning-greenhouse' => 48000, 'serpent-column' => 48000,
+      'power-plant' => 48000, 'septic-system' => 48000
       );
   }
 

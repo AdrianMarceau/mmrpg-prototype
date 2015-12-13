@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Collect and define the display limit if set
 if (!isset($this_display_limit_default)){ $this_display_limit_default = 50; }
@@ -28,7 +28,7 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info, $quick_parse = f
   $this_is_online = !empty($this_last_access) && (($this_time - $this_last_access) <= $this_online_timeout) ? true : false;
   $this_last_save = !empty($this_last_save) ? date('Y/m/d @ H:i', $this_last_save) : '????-??-?? ??:??';
   $this_style = $this_is_online ? 'border-color: green; ' : '';
-  $this_place = mmrpg_number_suffix($place_counter, true, true); //str_pad(($place_counter), 2, '0', STR_PAD_LEFT);
+  $this_place = rpg_website::number_suffix($place_counter, true, true); //str_pad(($place_counter), 2, '0', STR_PAD_LEFT);
   $this_username = !empty($board_info['user_name_public']) ? $board_info['user_name_public'] : $board_info['user_name'];
   $this_username = htmlentities($this_username, ENT_QUOTES, 'UTF-8', true);
   $this_user_id = !empty($board_info['user_id']) ? $board_info['user_id'] : 0;
@@ -70,7 +70,8 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info, $quick_parse = f
   $board_info['board_battles'] = $temp_battles;
 
   // Loop through the available players
-  foreach ($mmrpg_index['players'] AS $ptoken => $pinfo){
+  $mmrpg_index_players = rpg_player::get_index();
+  foreach ($mmrpg_index_players AS $ptoken => $pinfo){
     $ptoken2 = str_replace('-', '_', $ptoken);
     $temp_battles = !empty($board_info['board_battles_'.$ptoken2]) ? explode(',', $board_info['board_battles_'.$ptoken2]) : array();
     $board_info['board_battles_'.$ptoken2] = $temp_battles;
@@ -201,7 +202,7 @@ $temp_leaderboard_query = 'SELECT
   ORDER BY mmrpg_leaderboard.board_points DESC
   '; //.(!empty($this_display_limit) ? 'LIMIT '.$this_display_limit : '');
 // Query the database and collect the array list of all non-bogus players
-$this_leaderboard_index = $DB->get_array_list($temp_leaderboard_query);
+$this_leaderboard_index = $this_database->get_array_list($temp_leaderboard_query);
 
 // Loop through the save file directory and generate an index
 $this_cache_stamp = MMRPG_CONFIG_CACHE_DATE.'_'.substr(date('YmdHi'), 0, 11); //2013 01 01 23 59 (12 length)

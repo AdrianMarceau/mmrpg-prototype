@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Define the album link for the screenshots
 $mmrpg_screenshots_album = 'http://imgur.com/a/MJCVi';

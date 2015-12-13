@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Collect and define the display limit if set
 $this_display_limit_default = 50;

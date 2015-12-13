@@ -1,6 +1,6 @@
-<?
+<?php
 // If the session token has not been set
-if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
+if (!isset($session_token)){ $session_token = rpg_game::session_token(); }
 
 // Collect the field stars from the session variable
 if (!isset($_SESSION[$session_token]['values']['battle_stars'])){ $_SESSION[$session_token]['values']['battle_stars'] = array(); }
