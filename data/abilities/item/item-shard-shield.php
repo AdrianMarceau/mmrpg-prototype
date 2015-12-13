@@ -14,7 +14,7 @@ $ability = array(
   'ability_accuracy' => 100,
   'ability_target' => 'auto',
   'ability_function' => function($objects){
-    return mmrpg_ability::item_function_shard($objects);
+    return rpg_ability::item_function_shard($objects);
   }
   );
 ?>
