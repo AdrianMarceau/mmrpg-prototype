@@ -1,14 +1,14 @@
-<?
+<?php
 // Generate the markup for the action ability panel
 ob_start();
   // Define and start the order counter
   $temp_order_counter = 1;
   // Display container for the main actions
-  ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Ability</span><?
+  ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Ability</span><?php
   // Collect the abilities for this robot, by whatever means
   if ($this_robot->robot_class == 'master'){
 
-    $this_robot_settings = mmrpg_prototype_robot_settings($this_player->player_token, $this_robot->robot_token);
+    $this_robot_settings = rpg_game::robot_settings($this_player->player_token, $this_robot->robot_token);
 
     if (!empty($this_robot_settings['robot_abilities'])){ $current_robot_abilities = $this_robot_settings['robot_abilities']; }
     //elseif (!empty($this_robot->robot_abilities)){ $current_robot_abilities = $this_robot->robot_abilities; }
@@ -26,7 +26,7 @@ ob_start();
 
   } elseif ($this_robot->robot_class == 'mecha'){
     // Collect the temp ability index
-    $temp_index_info = mmrpg_robot::get_index_info($this_robot->robot_token);
+    $temp_index_info = rpg_robot::get_index_info($this_robot->robot_token);
     $current_robot_abilities = array();
     foreach ($temp_index_info['robot_abilities'] AS $token){ $current_robot_abilities[$token] = array('ability_token' => $token); }
     $current_robot_item = '';
@@ -40,10 +40,10 @@ ob_start();
     // Define the ability display counter
     $unlocked_abilities_count = 0;
     // Collect the temp ability index
-    $temp_robots_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-    $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $temp_robots_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
     $temp_robotinfo = $temp_robots_index[$this_robot->robot_token];
-    $temp_robotinfo = mmrpg_robot::parse_index_info($temp_robotinfo);
+    $temp_robotinfo = rpg_robot::parse_index_info($temp_robotinfo);
     if ($temp_robotinfo['robot_core'] != $this_robot->robot_core){ $temp_robotinfo['robot_core'] = $this_robot->robot_core; }
     $temp_robotinfo['robot_core2'] = preg_match('/^item-core-/i', $current_robot_item) ? preg_replace('/^item-core-/i', '', $current_robot_item) : '';
     if ($temp_robotinfo['robot_core2'] == 'none'){ $temp_robotinfo['robot_core2'] = ''; }
@@ -61,9 +61,9 @@ ob_start();
 
       // Create the ability object using the session/index data
       $temp_abilityinfo = $temp_abilities_index[$ability_token];
-      $temp_abilityinfo = mmrpg_ability::parse_index_info($temp_abilityinfo);
+      $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilityinfo);
       $temp_abilityinfo['ability_id'] = $this_robot->robot_id.str_pad($temp_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
-      $temp_ability = new mmrpg_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
+      $temp_ability = new rpg_ability($this_player, $this_robot, $temp_abilityinfo);
       $temp_type = $temp_ability->ability_type;
       $temp_type2 = $temp_ability->ability_type2;
       $temp_damage = $temp_ability->ability_damage;
@@ -112,10 +112,14 @@ ob_start();
       $temp_robot_weapons = $this_robot->robot_weapons;
       $temp_ability_energy = $this_robot->calculate_weapon_energy($temp_ability, $temp_ability_energy_base, $temp_ability_energy_mods);
 
+      // Collect the type info for this ability if it exists
+      $temp_type_info = !empty($temp_ability->ability_type) ? rpg_type::get_index_info($temp_ability->ability_type) : false;
+      $temp_type_info2 = !empty($temp_ability->ability_type2) ? rpg_type::get_index_info($temp_ability->ability_type2) : false;
+
       // Define the ability title details text
       $temp_ability_details = $temp_ability->ability_name;
-      $temp_ability_details .= ' ('.(!empty($temp_ability->ability_type) ? $mmrpg_index['types'][$temp_ability->ability_type]['type_name'] : 'Neutral');
-      if (!empty($temp_ability->ability_type2)){ $temp_ability_details .= ' / '.$mmrpg_index['types'][$temp_ability->ability_type2]['type_name']; }
+      $temp_ability_details .= ' ('.(!empty($temp_type_info) ? $temp_type_info['type_name'] : 'Neutral');
+      if (!empty($temp_type_info2)){ $temp_ability_details .= ' / '.$temp_type_info2['type_name']; }
       else { $temp_ability_details .= ' Type'; }
       $temp_ability_details .= ') <br />';
       //if ($temp_kind == 'damage'){ $temp_ability_details .= ($temp_multiplier != 1 ? '<del>'.$temp_ability->ability_damage.'</del> ' : '').$temp_damage.$temp_damage_unit.' Damage'; }
@@ -144,8 +148,8 @@ ob_start();
       $temp_ability_label = '<span class="multi">';
       $temp_ability_label .= '<span class="maintext">'.$temp_ability->ability_name.'</span>';
       $temp_ability_label .= '<span class="subtext">';
-        $temp_ability_label .= (!empty($temp_type) ? $mmrpg_index['types'][$temp_ability->ability_type]['type_name'].' ' : 'Neutral ');
-        if (!empty($temp_type2)){ $temp_ability_label .= ' / '.$mmrpg_index['types'][$temp_ability->ability_type2]['type_name']; }
+        $temp_ability_label .= (!empty($temp_type_info) ? $temp_type_info['type_name'].' ' : 'Neutral ');
+        if (!empty($temp_type_info2)){ $temp_ability_label .= ' / '.$temp_type_info2['type_name']; }
         else { $temp_ability_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
       $temp_ability_label .= '</span>';
       $temp_ability_label .= '<span class="subtext">';
@@ -161,7 +165,7 @@ ob_start();
       // If the ability is not actually compatible with this robot, disable it
       //$temp_robot_array = $this_robot->export_array();
       $temp_ability_array = $temp_ability->export_array();
-      $temp_button_compatible = mmrpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo, $current_robot_item);
+      $temp_button_compatible = rpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo, $current_robot_item);
       if (!$temp_button_compatible){ $temp_button_enabled = false; }
 
       // If this button is enabled, add it to the global ability options array
@@ -201,8 +205,8 @@ ob_start();
       $temp_ability_sprite['preload'] = 'images/abilities/'.$temp_ability_sprite['image'].'/sprite_'.$robot_direction.'_'.$temp_ability_sprite['image_size_zoom_text'].'.png';
 
       // Now use the new object to generate a snapshot of this ability button
-      if ($temp_button_enabled){ ?><a data-order="<?=$temp_order_counter?>" class="button action_ability ability_<?= $temp_ability->ability_token ?> ability_type ability_type_<?= (!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '') ?> block_<?= $unlocked_abilities_count ?>" type="button" data-action="ability_<?= $temp_ability->ability_id.'_'.$temp_ability->ability_token ?>" data-tooltip="<?= $temp_ability_details_tooltip ?>" data-target="<?= $temp_target ?>"><label class=""><?= $temp_ability_sprite['markup'] ?><?= $temp_ability_label ?></label></a><? }
-      else { ?><a data-order="<?=$temp_order_counter?>" class="button button_disabled action_ability ability_<?= $temp_ability->ability_token ?> ability_type ability_type_<?= (!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '') ?> block_<?= $unlocked_abilities_count ?>" type="button"><label class=""><?= $temp_ability_sprite['markup'] ?><?= $temp_ability_label ?></label></a><? }
+      if ($temp_button_enabled){ ?><a data-order="<?= $temp_order_counter?>" class="button action_ability ability_<?= $temp_ability->ability_token ?> ability_type ability_type_<?= (!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '') ?> block_<?= $unlocked_abilities_count ?>" type="button" data-action="ability_<?= $temp_ability->ability_id.'_'.$temp_ability->ability_token ?>" data-tooltip="<?= $temp_ability_details_tooltip ?>" data-target="<?= $temp_target ?>"><label class=""><?= $temp_ability_sprite['markup'] ?><?= $temp_ability_label ?></label></a><?php }
+      else { ?><a data-order="<?= $temp_order_counter?>" class="button button_disabled action_ability ability_<?= $temp_ability->ability_token ?> ability_type ability_type_<?= (!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '') ?> block_<?= $unlocked_abilities_count ?>" type="button"><label class=""><?= $temp_ability_sprite['markup'] ?><?= $temp_ability_label ?></label></a><?php }
       // Increment the order counter
       $temp_order_counter++;
 
@@ -213,7 +217,7 @@ ob_start();
     if ($unlocked_abilities_count < 8){
       for ($i = $unlocked_abilities_count; $i < 8; $i++){
         // Display an empty button placeholder
-        ?><a class="button action_ability button_disabled block_<?= $i + 1 ?>" type="button">&nbsp;</a><?
+        ?><a class="button action_ability button_disabled block_<?= $i + 1 ?>" type="button">&nbsp;</a><?php
       }
     }
 
@@ -224,9 +228,9 @@ ob_start();
   // End the main action container tag
   //echo 'Abilities : ['.print_r($this_robot->robot_abilities, true).']';
   //echo preg_replace('#\s+#', ' ', print_r($this_robot_settings, true));
-  ?></div><?
+  ?></div><?php
   // Display the back button by default
-  ?><div data-debug="<?= $temp_robot_weapons ?>" class="sub_actions"><a data-order="<?=$temp_order_counter?>" class="button action_back" type="button" data-panel="battle"><label>Back</label></a></div><?
+  ?><div class="sub_actions"><a data-order="<?= $temp_order_counter?>" class="button action_back" type="button" data-panel="battle"><label>Back</label></a></div><?php
   // Increment the order counter
   $temp_order_counter++;
 $actions_markup['ability'] = trim(ob_get_clean());

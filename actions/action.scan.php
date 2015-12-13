@@ -1,10 +1,10 @@
-<?
+<?php
 // Generate the markup for the action scan panel
 ob_start();
   // Define and start the order counter
   $temp_order_counter = 1;
   // Display container for the main actions
-  ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Scan Target</span><?
+  ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Scan Target</span><?php
   // Ensure there are robots to display
   if (!empty($target_player->player_robots)){
     // Count the total number of robots
@@ -28,8 +28,7 @@ ob_start();
       // Ensure this is an actual switch in the index
       if (!empty($switch_robotinfo['robot_token'])){
         // Create the scan object using the session/index data
-        //$GLOBALS['DEBUG']['checkpoint_line'] = 'data.php : line 655';
-        $temp_robot = new mmrpg_robot($this_battle, $target_player, $scan_robotinfo);
+        $temp_robot = new rpg_robot($target_player, $scan_robotinfo);
         // Default the allow button flag to true
         $allow_button = true;
         // If this robot is disabled, disable the button
@@ -45,7 +44,7 @@ ob_start();
         // Display the robot's life and weapon energy current and base
         $temp_robot_title .= ' <br />'.$temp_robot->robot_energy.' / '.$temp_robot->robot_base_energy.' LE';
         $temp_robot_title .= ' | '.$temp_robot->robot_weapons.' / '.$temp_robot->robot_base_weapons.' WE';
-        $temp_required_experience = mmrpg_prototype_calculate_experience_required($temp_robot->robot_level);
+        $temp_required_experience = rpg_prototype::calculate_experience_required($temp_robot->robot_level);
         if ($robot_direction == 'right' && $temp_robot->robot_class != 'mecha'){
           $temp_robot_title .= ' | '.$temp_robot->robot_experience.' / '.$temp_required_experience.' EXP';
         } elseif ($temp_robot->robot_class == 'mecha'){
@@ -107,22 +106,22 @@ ob_start();
         $order_button_markup = $allow_button ? 'data-order="'.$temp_order_counter.'"' : '';
         $temp_order_counter += $allow_button ? 1 : 0;
         // Now use the new object to generate a snapshot of this switch button
-        /*?><a <?=$order_button_markup?> title="<?=$temp_robot_title_plain?>" data-tooltip="<?=$temp_robot_title_tooltip?>" class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_scan scan_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= !empty($temp_robot->robot_core) ? $temp_robot->robot_core : 'none' ?> block_<?= $robot_key + 1 ?>" type="button" <?if($allow_button):?>data-action="scan_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?*/
-        ?><a class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_scan scan_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= $temp_robot_core_type.(!empty($temp_robot_core2_type) ? '_'.$temp_robot_core2_type : '') ?> block_<?= $robot_key + 1 ?>" type="button" data-tooltip="<?=$temp_robot_title_tooltip?>" <?=$order_button_markup?> <?if($allow_button):?>data-action="scan_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?
+        /*?><a <?= $order_button_markup?> title="<?= $temp_robot_title_plain?>" data-tooltip="<?= $temp_robot_title_tooltip?>" class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_scan scan_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= !empty($temp_robot->robot_core) ? $temp_robot->robot_core : 'none' ?> block_<?= $robot_key + 1 ?>" type="button" <?if($allow_button):?>data-action="scan_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?*/
+        ?><a class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_scan scan_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= $temp_robot_core_type.(!empty($temp_robot_core2_type) ? '_'.$temp_robot_core2_type : '') ?> block_<?= $robot_key + 1 ?>" type="button" data-tooltip="<?= $temp_robot_title_tooltip?>" <?= $order_button_markup?> <?if($allow_button):?>data-action="scan_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?php
       }
     }
     // If there were less than 8 robots, fill in the empty spaces
     if ($num_robots < 8){
       for ($i = $num_robots; $i < 8; $i++){
         // Display an empty button placeholder
-        ?><a class="button action_scan button_disabled block_<?= $i + 1 ?>" type="button">&nbsp;</a><?
+        ?><a class="button action_scan button_disabled block_<?= $i + 1 ?>" type="button">&nbsp;</a><?php
       }
     }
   }
   // End the main action container tag
-  ?></div><?
+  ?></div><?php
   // Display the back button by default
-  ?><div class="sub_actions"><a data-order="<?=$temp_order_counter?>" class="button action_back" type="button" data-panel="battle"><label>Back</label></a></div><?
+  ?><div class="sub_actions"><a data-order="<?= $temp_order_counter?>" class="button action_back" type="button" data-panel="battle"><label>Back</label></a></div><?php
   // Increment the order counter
   $temp_order_counter++;
 $actions_markup['scan'] = trim(ob_get_clean());

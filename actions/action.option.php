@@ -1,4 +1,4 @@
-<?
+<?php
 // Generate the markup for the action option panel
 ob_start();
   // Define the markup for the option buttons
@@ -15,7 +15,7 @@ ob_start();
   $current_debug_value = !empty($_SESSION['GAME']['debug_mode']) ? 1 : 0;
   $temp_options[] = '<a data-order="5" class="button action_option block_5 ability_type_space" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Toggle Debug</span><br /><span class="value type '.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
   /*
-  if (empty($_SESSION['GAME']['DEMO'])
+  if (rpg_game::is_user()
     && $this_battle->battle_status != 'complete'
     && $target_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID
     && isset($_SESSION['GAME']['values']['battle_items'])
@@ -32,7 +32,7 @@ ob_start();
 
 
   // Display container for the main actions
-  ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Option</span><?
+  ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Option</span><?php
   // Ensure there are options to display
   if (!empty($temp_options)){
     // Count the total number of options
@@ -46,14 +46,14 @@ ob_start();
     if ($num_options < 8){
       for ($i = $num_options; $i < 8; $i++){
         // Display an empty button placeholder
-        ?><a class="button action_option button_disabled block_<?= $i + 1 ?>" type="button">&nbsp;</a><?
+        ?><a class="button action_option button_disabled block_<?= $i + 1 ?>" type="button">&nbsp;</a><?php
       }
     }
   }
   // End the main action container tag
-  ?></div><?
+  ?></div><?php
   // Display the back button by default
-  ?><div class="sub_actions"><a data-order="7" class="button action_back" type="button" data-panel="battle"><label>Back</label></a></div><?
+  ?><div class="sub_actions"><a data-order="7" class="button action_back" type="button" data-panel="battle"><label>Back</label></a></div><?php
 $actions_markup['option'] = trim(ob_get_clean());
 $actions_markup['option'] = preg_replace('#\s+#', ' ', $actions_markup['option']);
 ?>
