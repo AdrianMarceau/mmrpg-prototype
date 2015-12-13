@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
@@ -10,7 +10,7 @@ ob_start();
 <a href="admin.php">Admin Panel</a> &raquo;
 <a href="admin.php?action=delete_cache">Delete Cached Files</a> &raquo;
 </div>
-<?
+<?php
 $this_page_markup .= ob_get_clean();
 
 // Empty the cache, simple as that

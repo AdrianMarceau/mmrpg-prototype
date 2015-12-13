@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while importing!');  }
@@ -11,9 +11,9 @@ ob_start();
 ?>
 <div style="margin: 0 auto 20px; font-weight: bold;">
 <a href="admin.php">Admin Panel</a> &raquo;
-<a href="admin.php?action=import-abilities&limit=<?=$this_import_limit?>">Update Ability Database</a> &raquo;
+<a href="admin.php?action=import-abilities&limit=<?= $this_import_limit?>">Update Ability Database</a> &raquo;
 </div>
-<?
+<?php
 $this_page_markup .= ob_get_clean();
 
 
@@ -21,12 +21,12 @@ $this_page_markup .= ob_get_clean();
 //define('DATA_DATABASE_SHOW_MECHAS', true);
 //define('DATA_DATABASE_SHOW_CACHE', true);
 //define('DATA_DATABASE_SHOW_HIDDEN', true);
-//require_once('data/database.php');
+//require_once('includes/include.database.php');
 
 // TYPES DATABASE
 
 // Define the index of types for the game
-$mmrpg_database_types = $mmrpg_index['types'];
+$mmrpg_database_types = rpg_type::get_index();
 $temp_remove_types = array('attack', 'defense', 'speed', 'energy', 'weapons', 'empty', 'light', 'wily', 'cossack', 'damage', 'recovery', 'experience', 'level');
 foreach ($temp_remove_types AS $token){ unset($mmrpg_database_types[$token]); }
 uasort($mmrpg_database_types, function($t1, $t2){
@@ -36,7 +36,7 @@ uasort($mmrpg_database_types, function($t1, $t2){
 });
 
 // Truncate any robots currently in the database
-$DB->query('TRUNCATE TABLE mmrpg_index_abilities');
+$this_database->query('TRUNCATE TABLE mmrpg_index_abilities');
 
 // Require the abilities index file
 //$mmrpg_index = array();
@@ -325,34 +325,8 @@ if (!empty($mmrpg_index['abilities'])){
     $temp_insert_array['ability_frame_animate'] = json_encode(!empty($ability_data['ability_frame_animate']) ? $ability_data['ability_frame_animate'] : array());
     $temp_insert_array['ability_frame_index'] = json_encode(!empty($ability_data['ability_frame_index']) ? $ability_data['ability_frame_index'] : array());
     $temp_insert_array['ability_frame_offset'] = json_encode(!empty($ability_data['ability_frame_offset']) ? $ability_data['ability_frame_offset'] : array());
-    //$temp_insert_array['ability_frame_animate'] = array();
-    //if (!empty($ability_data['ability_frame_animate'])){ foreach ($ability_data['ability_frame_animate'] AS $key => $token){ $temp_insert_array['ability_frame_animate'][] = '['.$token.']'; } }
-    //$temp_insert_array['ability_frame_animate'] = implode(',', $temp_insert_array['ability_frame_animate']);
-    //$temp_insert_array['ability_frame_index'] = array();
-    //if (!empty($ability_data['ability_frame_index'])){ foreach ($ability_data['ability_frame_index'] AS $key => $token){ $temp_insert_array['ability_frame_index'][] = '['.$token.']'; } }
-    //$temp_insert_array['ability_frame_index'] = implode(',', $temp_insert_array['ability_frame_index']);
-    //$temp_insert_array['ability_frame_offset'] = array();
-    //if (!empty($ability_data['ability_frame_offset'])){ foreach ($ability_data['ability_frame_offset'] AS $key => $token){ $temp_insert_array['ability_frame_offset'][] = '['.$key.':'.$token.']'; } }
-    //$temp_insert_array['ability_frame_offset'] = implode(',', $temp_insert_array['ability_frame_offset']);
     $temp_insert_array['ability_frame_styles'] = !empty($ability_data['ability_frame_styles']) ? $ability_data['ability_frame_styles'] : '';
     $temp_insert_array['ability_frame_classes'] = !empty($ability_data['ability_frame_classes']) ? $ability_data['ability_frame_classes'] : '';
-
-    // Define the ability frame properties
-    $temp_insert_array['attachment_frame'] = !empty($ability_data['attachment_frame']) ? $ability_data['attachment_frame'] : 'base';
-    $temp_insert_array['attachment_frame_animate'] = json_encode(!empty($ability_data['attachment_frame_animate']) ? $ability_data['attachment_frame_animate'] : array());
-    $temp_insert_array['attachment_frame_index'] = json_encode(!empty($ability_data['attachment_frame_index']) ? $ability_data['attachment_frame_index'] : array());
-    $temp_insert_array['attachment_frame_offset'] = json_encode(!empty($ability_data['attachment_frame_offset']) ? $ability_data['attachment_frame_offset'] : array());
-    //$temp_insert_array['attachment_frame_animate'] = array();
-    //if (!empty($ability_data['attachment_frame_animate'])){ foreach ($ability_data['attachment_frame_animate'] AS $key => $token){ $temp_insert_array['attachment_frame_animate'][] = '['.$token.']'; } }
-    //$temp_insert_array['attachment_frame_animate'] = implode(',', $temp_insert_array['attachment_frame_animate']);
-    //$temp_insert_array['attachment_frame_index'] = array();
-    //if (!empty($ability_data['attachment_frame_index'])){ foreach ($ability_data['attachment_frame_index'] AS $key => $token){ $temp_insert_array['attachment_frame_index'][] = '['.$token.']'; } }
-    //$temp_insert_array['attachment_frame_index'] = implode(',', $temp_insert_array['attachment_frame_index']);
-    //$temp_insert_array['attachment_frame_offset'] = array();
-    //if (!empty($ability_data['attachment_frame_offset'])){ foreach ($ability_data['attachment_frame_offset'] AS $key => $token){ $temp_insert_array['attachment_frame_offset'][] = '['.$key.':'.$token.']'; } }
-    //$temp_insert_array['attachment_frame_offset'] = implode(',', $temp_insert_array['attachment_frame_offset']);
-    $temp_insert_array['attachment_frame_styles'] = !empty($ability_data['attachment_frame_styles']) ? $ability_data['attachment_frame_styles'] : '';
-    $temp_insert_array['attachment_frame_classes'] = !empty($ability_data['attachment_frame_classes']) ? $ability_data['attachment_frame_classes'] : '';
 
     // Define the flags
     $temp_insert_array['ability_flag_hidden'] = $temp_insert_array['ability_class'] != 'master' || in_array($temp_insert_array['ability_token'], array('ability', 'attachment-defeat')) ? 1 : 0;
@@ -369,16 +343,16 @@ if (!empty($mmrpg_index['abilities'])){
 
     // Check if this ability already exists in the database
     $temp_success = true;
-    $temp_exists = $DB->get_array("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_token LIKE '{$temp_insert_array['ability_token']}' LIMIT 1") ? true : false;
-    if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_abilities', $temp_insert_array); }
-    else { $temp_success = $DB->update('mmrpg_index_abilities', $temp_insert_array, array('ability_token' => $temp_insert_array['ability_token'])); }
+    $temp_exists = $this_database->get_array("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_token LIKE '{$temp_insert_array['ability_token']}' LIMIT 1") ? true : false;
+    if (!$temp_exists){ $temp_success = $this_database->insert('mmrpg_index_abilities', $temp_insert_array); }
+    else { $temp_success = $this_database->update('mmrpg_index_abilities', $temp_insert_array, array('ability_token' => $temp_insert_array['ability_token'])); }
 
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
     $this_page_markup .= '<strong>$mmrpg_database_abilities['.$ability_token.']</strong><br />';
     //$this_page_markup .= '<pre>'.print_r($ability_data, true).'</pre><br /><hr /><br />';
     $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-    //$this_page_markup .= '<pre>'.print_r(mmrpg_ability::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
+    //$this_page_markup .= '<pre>'.print_r(rpg_ability::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
     $this_page_markup .= '</p><hr />';
 
     $ability_key++;
@@ -534,34 +508,8 @@ if (!empty($mmrpg_index['items'])){
     $temp_insert_array['ability_frame_animate'] = json_encode(!empty($item_data['ability_frame_animate']) ? $item_data['ability_frame_animate'] : array());
     $temp_insert_array['ability_frame_index'] = json_encode(!empty($item_data['ability_frame_index']) ? $item_data['ability_frame_index'] : array());
     $temp_insert_array['ability_frame_offset'] = json_encode(!empty($item_data['ability_frame_offset']) ? $item_data['ability_frame_offset'] : array());
-    //$temp_insert_array['ability_frame_animate'] = array();
-    //if (!empty($item_data['ability_frame_animate'])){ foreach ($item_data['ability_frame_animate'] AS $key => $token){ $temp_insert_array['ability_frame_animate'][] = '['.$token.']'; } }
-    //$temp_insert_array['ability_frame_animate'] = implode(',', $temp_insert_array['ability_frame_animate']);
-    //$temp_insert_array['ability_frame_index'] = array();
-    //if (!empty($item_data['ability_frame_index'])){ foreach ($item_data['ability_frame_index'] AS $key => $token){ $temp_insert_array['ability_frame_index'][] = '['.$token.']'; } }
-    //$temp_insert_array['ability_frame_index'] = implode(',', $temp_insert_array['ability_frame_index']);
-    //$temp_insert_array['ability_frame_offset'] = array();
-    //if (!empty($item_data['ability_frame_offset'])){ foreach ($item_data['ability_frame_offset'] AS $key => $token){ $temp_insert_array['ability_frame_offset'][] = '['.$key.':'.$token.']'; } }
-    //$temp_insert_array['ability_frame_offset'] = implode(',', $temp_insert_array['ability_frame_offset']);
     $temp_insert_array['ability_frame_styles'] = !empty($item_data['ability_frame_styles']) ? $item_data['ability_frame_styles'] : '';
     $temp_insert_array['ability_frame_classes'] = !empty($item_data['ability_frame_classes']) ? $item_data['ability_frame_classes'] : '';
-
-    // Define the ability frame properties
-    $temp_insert_array['attachment_frame'] = !empty($item_data['attachment_frame']) ? $item_data['attachment_frame'] : 'base';
-    $temp_insert_array['attachment_frame_animate'] = json_encode(!empty($item_data['attachment_frame_animate']) ? $item_data['attachment_frame_animate'] : array());
-    $temp_insert_array['attachment_frame_index'] = json_encode(!empty($item_data['attachment_frame_index']) ? $item_data['attachment_frame_index'] : array());
-    $temp_insert_array['attachment_frame_offset'] = json_encode(!empty($item_data['attachment_frame_offset']) ? $item_data['attachment_frame_offset'] : array());
-    //$temp_insert_array['attachment_frame_animate'] = array();
-    //if (!empty($item_data['attachment_frame_animate'])){ foreach ($item_data['attachment_frame_animate'] AS $key => $token){ $temp_insert_array['attachment_frame_animate'][] = '['.$token.']'; } }
-    //$temp_insert_array['attachment_frame_animate'] = implode(',', $temp_insert_array['attachment_frame_animate']);
-    //$temp_insert_array['attachment_frame_index'] = array();
-    //if (!empty($item_data['attachment_frame_index'])){ foreach ($item_data['attachment_frame_index'] AS $key => $token){ $temp_insert_array['attachment_frame_index'][] = '['.$token.']'; } }
-    //$temp_insert_array['attachment_frame_index'] = implode(',', $temp_insert_array['attachment_frame_index']);
-    //$temp_insert_array['attachment_frame_offset'] = array();
-    //if (!empty($item_data['attachment_frame_offset'])){ foreach ($item_data['attachment_frame_offset'] AS $key => $token){ $temp_insert_array['attachment_frame_offset'][] = '['.$key.':'.$token.']'; } }
-    //$temp_insert_array['attachment_frame_offset'] = implode(',', $temp_insert_array['attachment_frame_offset']);
-    $temp_insert_array['attachment_frame_styles'] = !empty($item_data['attachment_frame_styles']) ? $item_data['attachment_frame_styles'] : '';
-    $temp_insert_array['attachment_frame_classes'] = !empty($item_data['attachment_frame_classes']) ? $item_data['attachment_frame_classes'] : '';
 
     // Define the flags
     $temp_insert_array['ability_flag_hidden'] = $temp_insert_array['ability_class'] != 'master' || in_array($temp_insert_array['ability_token'], array('ability', 'attachment-defeat')) ? 1 : 0;
@@ -578,16 +526,16 @@ if (!empty($mmrpg_index['items'])){
 
     // Check if this ability already exists in the database
     $temp_success = true;
-    $temp_exists = $DB->get_array("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_token LIKE '{$temp_insert_array['ability_token']}' LIMIT 1") ? true : false;
-    if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_abilities', $temp_insert_array); }
-    else { $temp_success = $DB->update('mmrpg_index_abilities', $temp_insert_array, array('ability_token' => $temp_insert_array['ability_token'])); }
+    $temp_exists = $this_database->get_array("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_token LIKE '{$temp_insert_array['ability_token']}' LIMIT 1") ? true : false;
+    if (!$temp_exists){ $temp_success = $this_database->insert('mmrpg_index_abilities', $temp_insert_array); }
+    else { $temp_success = $this_database->update('mmrpg_index_abilities', $temp_insert_array, array('ability_token' => $temp_insert_array['ability_token'])); }
 
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
     $this_page_markup .= '<strong>$mmrpg_database_items['.$item_token.']</strong><br />';
     //$this_page_markup .= '<pre>'.print_r($item_data, true).'</pre><br /><hr /><br />';
     $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-    //$this_page_markup .= '<pre>'.print_r(mmrpg_ability::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
+    //$this_page_markup .= '<pre>'.print_r(rpg_ability::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
     $this_page_markup .= '</p><hr />';
 
     $item_key++;

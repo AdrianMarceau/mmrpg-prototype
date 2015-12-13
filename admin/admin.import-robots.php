@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while importing!');  }
@@ -11,21 +11,21 @@ ob_start();
 ?>
 <div style="margin: 0 auto 20px; font-weight: bold;">
 <a href="admin.php">Admin Panel</a> &raquo;
-<a href="admin.php?action=import-robots&limit=<?=$this_import_limit?>">Update Robot Database</a> &raquo;
+<a href="admin.php?action=import-robots&limit=<?= $this_import_limit?>">Update Robot Database</a> &raquo;
 </div>
-<?
+<?php
 $this_page_markup .= ob_get_clean();
 
 // Require the MMRPG database file
 //define('DATA_DATABASE_SHOW_MECHAS', true);
 //define('DATA_DATABASE_SHOW_CACHE', true);
 //define('DATA_DATABASE_SHOW_HIDDEN', true);
-//require_once('data/database.php');
+//require_once('includes/include.database.php');
 
 // TYPES DATABASE
 
 // Define the index of types for the game
-$mmrpg_database_types = $mmrpg_index['types'];
+$mmrpg_database_types = rpg_type::get_index();
 $temp_remove_types = array('attack', 'defense', 'speed', 'energy', 'weapons', 'empty', 'light', 'wily', 'cossack', 'damage', 'recovery', 'experience', 'level');
 foreach ($temp_remove_types AS $token){ unset($mmrpg_database_types[$token]); }
 uasort($mmrpg_database_types, function($t1, $t2){
@@ -35,7 +35,7 @@ uasort($mmrpg_database_types, function($t1, $t2){
 });
 
 // Truncate any robots currently in the database
-$DB->query('TRUNCATE TABLE mmrpg_index_robots');
+$this_database->query('TRUNCATE TABLE mmrpg_index_robots');
 
 // Require the robots index file
 require(MMRPG_CONFIG_ROOTDIR.'data/fields/_index.php');
@@ -324,16 +324,16 @@ if (!empty($mmrpg_index['robots'])){
 
     // Check if this robot already exists in the database
     $temp_success = true;
-    $temp_exists = $DB->get_array("SELECT robot_token FROM mmrpg_index_robots WHERE robot_token LIKE '{$temp_insert_array['robot_token']}' LIMIT 1") ? true : false;
-    if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_robots', $temp_insert_array); }
-    else { $temp_success = $DB->update('mmrpg_index_robots', $temp_insert_array, array('robot_token' => $temp_insert_array['robot_token'])); }
+    $temp_exists = $this_database->get_array("SELECT robot_token FROM mmrpg_index_robots WHERE robot_token LIKE '{$temp_insert_array['robot_token']}' LIMIT 1") ? true : false;
+    if (!$temp_exists){ $temp_success = $this_database->insert('mmrpg_index_robots', $temp_insert_array); }
+    else { $temp_success = $this_database->update('mmrpg_index_robots', $temp_insert_array, array('robot_token' => $temp_insert_array['robot_token'])); }
 
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
     $this_page_markup .= '<strong>$mmrpg_database_robots['.$robot_token.']</strong><br />';
     //$this_page_markup .= '<pre>'.print_r($robot_data, true).'</pre><br /><hr /><br />';
     $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-    //$this_page_markup .= '<pre>'.print_r(mmrpg_robot::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
+    //$this_page_markup .= '<pre>'.print_r(rpg_robot::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
     $this_page_markup .= '</p><hr />';
 
     $robot_key++;
@@ -554,16 +554,16 @@ if (!empty($mmrpg_index['mechas'])){
 
     // Check if this robot already exists in the database
     $temp_success = true;
-    $temp_exists = $DB->get_array("SELECT robot_token FROM mmrpg_index_robots WHERE robot_token LIKE '{$temp_insert_array['robot_token']}' LIMIT 1") ? true : false;
-    if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_robots', $temp_insert_array); }
-    else { $temp_success = $DB->update('mmrpg_index_robots', $temp_insert_array, array('robot_token' => $temp_insert_array['robot_token'])); }
+    $temp_exists = $this_database->get_array("SELECT robot_token FROM mmrpg_index_robots WHERE robot_token LIKE '{$temp_insert_array['robot_token']}' LIMIT 1") ? true : false;
+    if (!$temp_exists){ $temp_success = $this_database->insert('mmrpg_index_robots', $temp_insert_array); }
+    else { $temp_success = $this_database->update('mmrpg_index_robots', $temp_insert_array, array('robot_token' => $temp_insert_array['robot_token'])); }
 
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
     $this_page_markup .= '<strong>$mmrpg_database_mechas['.$mecha_token.']</strong><br />';
     //$this_page_markup .= '<pre>'.print_r($mecha_data, true).'</pre><br /><hr /><br />';
     $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-    //$this_page_markup .= '<pre>'.print_r(mmrpg_robot::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
+    //$this_page_markup .= '<pre>'.print_r(rpg_robot::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
     $this_page_markup .= '</p><hr />';
 
     $mecha_key++;
@@ -785,16 +785,16 @@ if (!empty($mmrpg_index['bosses'])){
 
     // Check if this robot already exists in the database
     $temp_success = true;
-    $temp_exists = $DB->get_array("SELECT robot_token FROM mmrpg_index_robots WHERE robot_token LIKE '{$temp_insert_array['robot_token']}' LIMIT 1") ? true : false;
-    if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_robots', $temp_insert_array); }
-    else { $temp_success = $DB->update('mmrpg_index_robots', $temp_insert_array, array('robot_token' => $temp_insert_array['robot_token'])); }
+    $temp_exists = $this_database->get_array("SELECT robot_token FROM mmrpg_index_robots WHERE robot_token LIKE '{$temp_insert_array['robot_token']}' LIMIT 1") ? true : false;
+    if (!$temp_exists){ $temp_success = $this_database->insert('mmrpg_index_robots', $temp_insert_array); }
+    else { $temp_success = $this_database->update('mmrpg_index_robots', $temp_insert_array, array('robot_token' => $temp_insert_array['robot_token'])); }
 
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
     $this_page_markup .= '<strong>$mmrpg_database_bosses['.$boss_token.']</strong><br />';
     //$this_page_markup .= '<pre>'.print_r($boss_data, true).'</pre><br /><hr /><br />';
     $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-    //$this_page_markup .= '<pre>'.print_r(mmrpg_robot::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
+    //$this_page_markup .= '<pre>'.print_r(rpg_robot::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
     $this_page_markup .= '</p><hr />';
 
     $boss_key++;

@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
@@ -12,14 +12,14 @@ ob_start();
 ?>
 <div style="margin: 0 auto 20px; font-weight: bold;">
 <a href="admin.php">Admin Panel</a> &raquo;
-<a href="admin.php?action=purge&date=<?=$this_cache_date?>&limit=<?=$this_purge_limit?>">Purge Inactive Members</a> &raquo;
+<a href="admin.php?action=purge&date=<?= $this_cache_date?>&limit=<?= $this_purge_limit?>">Purge Inactive Members</a> &raquo;
 </div>
-<?
+<?php
 $this_page_markup .= ob_get_clean();
 
 // Collect any save files that have a cache date less than the current one
 $this_purge_query = "SELECT mmrpg_users.*, mmrpg_saves.save_file_path, mmrpg_saves.save_file_name, mmrpg_leaderboard.board_points FROM mmrpg_users LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id INNER JOIN mmrpg_leaderboard ON mmrpg_users.user_id = mmrpg_leaderboard.user_id WHERE mmrpg_users.user_date_created = mmrpg_users.user_date_modified AND mmrpg_users.user_name_clean <> 'guest' LIMIT {$this_purge_limit}";
-$this_purge_list = $DB->get_array_list($this_purge_query);
+$this_purge_list = $this_database->get_array_list($this_purge_query);
 //die($this_purge_query);
 
 // DEBUG
@@ -36,13 +36,13 @@ if (!empty($this_purge_list)){
     $temp_success = true;
     $delete_databases = array('mmrpg_users', 'mmrpg_saves', 'mmrpg_leaderboard');
     foreach ($delete_databases AS $dbname){
-      $temp_success = $DB->query("DELETE FROM {$dbname} WHERE user_id = {$data['user_id']}");
+      $temp_success = $this_database->query("DELETE FROM {$dbname} WHERE user_id = {$data['user_id']}");
       if (!$temp_success){ break; }
     }
     
     // Delete any files for this user
     if (file_exists($this_save_dir.$data['save_file_path'].$data['save_file_name'])){ @unlink($this_save_dir.$data['save_file_path'].$data['save_file_name']); }
-    if (file_exists($this_save_dir.$data['save_file_path'])){ @deleteDir($this_save_dir.$data['save_file_path']); }
+    if (file_exists($this_save_dir.$data['save_file_path'])){ @rpg_website::delete_directory($this_save_dir.$data['save_file_path']); }
     
     // DEBUG
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
@@ -58,7 +58,7 @@ if (!empty($this_purge_list)){
     $this_page_markup .= '</p><hr />';
     
     // Reset everything back to default
-    mmrpg_reset_game_session($this_save_filepath);
+    rpg_game::reset_session($this_save_filepath);
     
   }
 

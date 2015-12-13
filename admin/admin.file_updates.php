@@ -1,9 +1,9 @@
-<?
+<?php
 
 //die('$_SESSION[\'GAME\'][\'CACHE_DATE\'] = '.$_SESSION['GAME']['CACHE_DATE']);
 
-//die('battle_rewards(before) = '.mmrpg_print_r($_SESSION['GAME']['values']['battle_rewards']['dr-cossack']));
-//die('battle_settings(before) = '.mmrpg_print_r($_SESSION['GAME']['values']['battle_settings']['dr-cossack']));
+//die('battle_rewards(before) = '.rpg_functions::print_r($_SESSION['GAME']['values']['battle_rewards']['dr-cossack']));
+//die('battle_settings(before) = '.rpg_functions::print_r($_SESSION['GAME']['values']['battle_settings']['dr-cossack']));
 
 // Check the loaded game's CACHE DATE to see if it needs to be updated from 2012/12/14
 if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] <= '20121214-03'){
@@ -15,7 +15,7 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] <=
         foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
           $robot_info['robot_experience'] = 0;
           $robot_info['robot_level'] = 1;
-          $required_experience = mmrpg_prototype_calculate_experience_required($robot_info['robot_level']);
+          $required_experience = rpg_prototype::calculate_experience_required($robot_info['robot_level']);
           if ($robot_info['robot_points'] >= $required_experience){
             $level_boost = floor($robot_info['robot_points'] / $required_experience);
             $robot_info['robot_experience'] = $robot_info['robot_points'] - ($level_boost * $required_experience);
@@ -51,7 +51,7 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] < 
     foreach ($_SESSION['GAME']['values']['battle_rewards'] AS $player_token => $player_info){
       $this_setting = array('player_token' => $player_token, 'player_robots' => $player_info['player_robots']);
       $_SESSION['GAME']['values']['battle_settings'][$player_token] = $this_setting;
-      mmrpg_game_unlock_ability($player_info, false, array('ability_token' => 'buster-shot'));
+      rpg_game::unlock_ability($player_info, false, array('ability_token' => 'buster-shot'));
       if (!empty($player_info['player_robots'])){
         foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
           $this_setting = array('robot_token' => $robot_token, 'robot_abilities' => $robot_info['robot_abilities']);
@@ -184,7 +184,7 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] < 
       $temp_robot_settings = $temp_battle_settings[$temp_player_token]['player_robots'][$temp_robot_token];
       $temp_robot_rewards = $temp_battle_rewards[$temp_player_token]['player_robots'][$temp_robot_token];
       // Ensure this robot exists in the index before continuing
-      $temp_robot_index = mmrpg_robot::get_index_info($temp_robot_token);
+      $temp_robot_index = rpg_robot::get_index_info($temp_robot_token);
       if (!empty($temp_robot_index)){
         if (!isset($temp_robot_index['robot_class'])){ $temp_robot_index['robot_class'] = 'master'; }
 
@@ -204,7 +204,7 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] < 
           unset($_SESSION['GAME']['values']['battle_settings'][$temp_player_token]['player_robots'][$temp_robot_token]);
           unset($_SESSION['GAME']['values']['battle_rewards'][$temp_player_token]['player_robots'][$temp_robot_token]);
           // Unlock the mecha support ability early(?) as a consolation for removing their robot
-          mmrpg_game_unlock_ability($mmrpg_index['players'][$temp_player_token], false, array('ability_token' => 'mecha-support'));
+          rpg_game::unlock_ability($mmrpg_index['players'][$temp_player_token], false, array('ability_token' => 'mecha-support'));
           // DEBUG
           //echo $temp_player_token.':'.$temp_robot_token.'<br /> ';
           //echo __LINE__.' : <pre>UNSET :'.print_r($temp_robot_index['robot_class'], true).' ROBOT $_SESSION[\'GAME\'][\'values\'][\'battle_settings\']['.$temp_player_token.']['.$temp_robot_token.']</pre><br />';
@@ -229,10 +229,10 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] < 
 
         // Loop through abilities and remove bogus ones
         if (!empty($temp_robot_settings['robot_abilities'])){
-          $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+          $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
           foreach ($temp_robot_settings['robot_abilities'] AS $token => $info){
             // Ensure the ability exists in the index, otherwise remove
-            $index = mmrpg_ability::parse_index_info($temp_abilities_index[$token]);
+            $index = rpg_ability::parse_index_info($temp_abilities_index[$token]);
             if (empty($index)){
               // Remove this ability from the settings and rewards array
               unset($_SESSION['GAME']['values']['battle_settings'][$temp_player_token]['player_robots'][$temp_robot_token]['robot_abilities'][$token]);
@@ -385,8 +385,8 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] < 
     $new_robot_info['robot_encountered'] = 1;
     $new_robot_info['robot_defeated'] = !empty($robot_info['robot_defeated']) ? $robot_info['robot_defeated'] : 0;
     if ($new_robot_info['robot_defeated'] > $new_robot_info['robot_encountered']){ $new_robot_info['robot_encountered'] = $new_robot_info['robot_defeated']; }
-    if (mmrpg_prototype_robot_unlocked(false, $robot_token)){
-      $temp_rewards = mmrpg_prototype_robot_rewards(false, $robot_token);
+    if (rpg_game::robot_unlocked(false, $robot_token)){
+      $temp_rewards = rpg_game::robot_rewards(false, $robot_token);
       $temp_rewards_level = !empty($temp_rewards['robot_level']) ? round(($temp_rewards['robot_level'] - 1) * 1.5) + 1 : 1;
       $new_robot_info['robot_unlocked'] = 1;
       $new_robot_info['robot_summoned'] = !empty($robot_info['robot_summoned']) ? $robot_info['robot_summoned'] : $temp_rewards_level;
@@ -414,7 +414,7 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] < 
     foreach ($temp_indexed_data AS $temp_player => $temp_player_info){
       if (!empty($temp_player_info['player_robots'])){
         foreach ($temp_player_info['player_robots'] AS $temp_robot => $temp_robot_info){
-          $temp_index_robot = mmrpg_robot::get_index_info($temp_robot);
+          $temp_index_robot = rpg_robot::get_index_info($temp_robot);
           if (empty($temp_index_robot) || (!empty($temp_index_robot['robot_class']) && $temp_index_robot['robot_class'] == 'mecha')){
             unset($_SESSION['GAME']['values']['battle_rewards'][$temp_player]['player_robots'][$temp_robot]);
             unset($_SESSION['GAME']['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]);
@@ -486,7 +486,7 @@ if (false && empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_
 
 
   // Update the leaderboard with the star changes
-  $DB->update('mmrpg_leaderboard', $temp_board_update, array('user_id' => $_SESSION['TEMP']['temp_update_user_id']));
+  $this_database->update('mmrpg_leaderboard', $temp_board_update, array('user_id' => $_SESSION['TEMP']['temp_update_user_id']));
 
 
   //die('COMPLETE');
@@ -506,7 +506,7 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] <=
   // -- COLLECT THE ROBOT INDEX FOR REFEREENCE -- //
 
   // Collect the robot index for later reference
-  $temp_robot_index = mmrpg_robot::get_index();
+  $temp_robot_index = rpg_robot::get_index();
 
   // Create zenny counter if it doesn't already exist
   if (!isset($_SESSION['GAME']['counters']['battle_zenny'])){ $_SESSION['GAME']['counters']['battle_zenny'] = 0; }
@@ -570,11 +570,11 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] <=
           // Collect robot settings to go along with the rewards array
           $robot_settings = !empty($player_settings['player_robots'][$robot_token]) ? $player_settings['player_robots'][$robot_token] : array();
 
-          //die('robot_rewards = '.mmrpg_print_r($robot_rewards));
-          //die('robot_settings = '.mmrpg_print_r($robot_settings));
+          //die('robot_rewards = '.rpg_functions::print_r($robot_rewards));
+          //die('robot_settings = '.rpg_functions::print_r($robot_settings));
 
-          //die('battle_rewards = '.mmrpg_print_r($_SESSION['GAME']['values']['battle_rewards'][$player_token]));
-          //die('battle_settings = '.mmrpg_print_r($_SESSION['GAME']['values']['battle_settings'][$player_token]));
+          //die('battle_rewards = '.rpg_functions::print_r($_SESSION['GAME']['values']['battle_rewards'][$player_token]));
+          //die('battle_settings = '.rpg_functions::print_r($_SESSION['GAME']['values']['battle_settings'][$player_token]));
 
           // Create the player abilities array in the rewards if it doesn't exist
           if (!isset($player_rewards['player_abilities'])){ $player_rewards['player_abilities'] = array(); }
@@ -649,7 +649,7 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] <=
 
           }
 
-          //if ($robot_token == 'rhythm'){ die('$temp_robot = '.mmrpg_print_r($temp_robot)); }
+          //if ($robot_token == 'rhythm'){ die('$temp_robot = '.rpg_functions::print_r($temp_robot)); }
 
           // Collect the total overflow/underflow for the robot
           $temp_overflow_total = array_sum($temp_overflow);
@@ -663,9 +663,9 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] <=
             $SHOW_DEBUG = false;
             $temp_overflow['total'] = $temp_overflow_total;
             $temp_underflow['total'] = $temp_underflow_total;
-            $DEBUG_MARKUP .= ('DEBUG : $temp_robot = '.mmrpg_print_r($temp_robot).'<br /> '.
-              '$temp_overflow = '.mmrpg_print_r($temp_overflow).'<br /> '.
-              '$temp_underflow = '.mmrpg_print_r($temp_underflow).'<br /> '.
+            $DEBUG_MARKUP .= ('DEBUG : $temp_robot = '.rpg_functions::print_r($temp_robot).'<br /> '.
+              '$temp_overflow = '.rpg_functions::print_r($temp_overflow).'<br /> '.
+              '$temp_underflow = '.rpg_functions::print_r($temp_underflow).'<br /> '.
               '$temp_zenny_bonus = '.number_format($temp_zenny_bonus, 0, '.', ',').'z<br /> '.
               '');
 
@@ -739,11 +739,11 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] <=
           // SHOW DEBUG INFORMATION!!!!
           if ($SHOW_DEBUG){
 
-            //die('$temp_robot = '.mmrpg_print_r($temp_robot));
+            //die('$temp_robot = '.rpg_functions::print_r($temp_robot));
             $DEBUG_MARKUP .= ('<br /><br />-----------------------------<br />---- FINAL RESULTS -------------------<br />'.
-              '$temp_robot = '.mmrpg_print_r($temp_robot).'<br /> '.
-              '$temp_overflow = '.mmrpg_print_r($temp_overflow).'<br /> '.
-              '$temp_underflow = '.mmrpg_print_r($temp_underflow).'<br /> '.
+              '$temp_robot = '.rpg_functions::print_r($temp_robot).'<br /> '.
+              '$temp_overflow = '.rpg_functions::print_r($temp_overflow).'<br /> '.
+              '$temp_underflow = '.rpg_functions::print_r($temp_underflow).'<br /> '.
               '$temp_zenny_bonus = '.number_format($temp_zenny_bonus, 0, '.', ',').'z<br /> '.
               '');
 
@@ -762,7 +762,7 @@ if (empty($_SESSION['GAME']['CACHE_DATE']) || $_SESSION['GAME']['CACHE_DATE'] <=
 
   //$_SESSION['GAME']['CACHE_DATE'] = '20150405-01'; //MMRPG_CONFIG_CACHE_DATE;
 
-  //$DEBUG_MARKUP .= '<br /><br /> $_SESSION[GAME] = '.mmrpg_print_r($_SESSION['GAME'], '/GAME/');
+  //$DEBUG_MARKUP .= '<br /><br /> $_SESSION[GAME] = '.rpg_functions::print_r($_SESSION['GAME'], '/GAME/');
 
   //die('Your game has been updated. '.$_SESSION['TEMP']['temp_update_user_id'].':'.$_SESSION['TEMP']['temp_update_user_name_clean'].'! '.$DEBUG_MARKUP);
 

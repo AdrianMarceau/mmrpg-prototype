@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while importing!');  }
@@ -11,14 +11,14 @@ ob_start();
 ?>
 <div style="margin: 0 auto 20px; font-weight: bold;">
 <a href="admin.php">Admin Panel</a> &raquo;
-<a href="admin.php?action=import-fields&limit=<?=$this_import_limit?>">Update Field Database</a> &raquo;
+<a href="admin.php?action=import-fields&limit=<?= $this_import_limit?>">Update Field Database</a> &raquo;
 </div>
-<?
+<?php
 $this_page_markup .= ob_get_clean();
 
 
 // Truncate any robots currently in the database
-$DB->query('TRUNCATE TABLE mmrpg_index_fields');
+$this_database->query('TRUNCATE TABLE mmrpg_index_fields');
 
 // Require the fields index file
 if (empty($mmrpg_index['fields'])){ require(MMRPG_CONFIG_ROOTDIR.'data/fields/_index.php'); }
@@ -167,16 +167,16 @@ if (!empty($mmrpg_index['fields'])){
 
     // Check if this field already exists in the database
     $temp_success = true;
-    $temp_exists = $DB->get_array("SELECT field_token FROM mmrpg_index_fields WHERE field_token LIKE '{$temp_insert_array['field_token']}' LIMIT 1") ? true : false;
-    if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_fields', $temp_insert_array); }
-    else { $temp_success = $DB->update('mmrpg_index_fields', $temp_insert_array, array('field_token' => $temp_insert_array['field_token'])); }
+    $temp_exists = $this_database->get_array("SELECT field_token FROM mmrpg_index_fields WHERE field_token LIKE '{$temp_insert_array['field_token']}' LIMIT 1") ? true : false;
+    if (!$temp_exists){ $temp_success = $this_database->insert('mmrpg_index_fields', $temp_insert_array); }
+    else { $temp_success = $this_database->update('mmrpg_index_fields', $temp_insert_array, array('field_token' => $temp_insert_array['field_token'])); }
 
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
     $this_page_markup .= '<strong>$mmrpg_database_fields['.$field_token.']</strong><br />';
     //$this_page_markup .= '<pre>'.print_r($field_data, true).'</pre><br /><hr /><br />';
     $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-    //$this_page_markup .= '<pre>'.print_r(mmrpg_field::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
+    //$this_page_markup .= '<pre>'.print_r(rpg_field::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
     $this_page_markup .= '</p><hr />';
 
     $field_key++;

@@ -1,7 +1,7 @@
-<?
+<?php
 // Define a function for updating user save files
 function mmrpg_admin_update_save_file($key, $data){
-  global $DB, $this_save_filepath;
+  global $this_database, $this_save_filepath;
   // Start the markup variable
   $this_page_markup = '';
   // Expand this save files data into full arrays and update the session
@@ -107,7 +107,7 @@ function mmrpg_admin_update_save_file($key, $data){
   //die('$update_array[\'save_values\'] : '.$update_array['save_values']);
 
   // Update the database with the recent changes
-  $temp_success = $DB->update('mmrpg_saves', $update_array, "save_id = {$data['save_id']}");
+  $temp_success = $this_database->update('mmrpg_saves', $update_array, "save_id = {$data['save_id']}");
   // If there was an error, print it, else continue
 
   // DEBUG
@@ -138,7 +138,7 @@ function mmrpg_admin_update_save_file($key, $data){
   $this_page_markup .= '</p><hr />';
 
   // Reset everything back to default
-  mmrpg_reset_game_session($this_save_filepath);
+  rpg_game::reset_session($this_save_filepath);
 
   // Return generated page markup
   return $this_page_markup;
@@ -205,8 +205,8 @@ $this_total_query = "SELECT mmrpg_saves.user_id, mmrpg_saves.save_cache_date, mm
 	".(!empty($_REQUEST['user_id']) ? "AND mmrpg_users.user_id = {$_REQUEST['user_id']} " : '')."
 	ORDER BY board_points DESC";
 //die($this_update_query);
-$this_update_list = $DB->get_array_list($this_update_query);
-$this_total_list = $DB->get_array_list($this_total_query);
+$this_update_list = $this_database->get_array_list($this_update_query);
+$this_total_list = $this_database->get_array_list($this_total_query);
 $this_update_count = $this_request_type == 'ajax' && !empty($this_update_list) ? count($this_update_list) : 0;
 $this_total_count = !empty($this_total_list) ? count($this_total_list) : 0;
 $this_update_list = !empty($this_update_list) ? $this_update_list : array();
@@ -222,17 +222,17 @@ if ($this_request_type != 'ajax'){
   ?>
   <div id="menu" style="margin: 0 auto 20px; font-weight: bold;">
     <a href="admin.php">Admin Panel</a> &raquo;
-    <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=<?=$this_update_limit?>">Update Save Files</a> &raquo;
+    <a href="admin.php?action=update&date=<?= $this_cache_date?>&limit=<?= $this_update_limit?>">Update Save Files</a> &raquo;
     <br />
-    <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=1" data-limit="1">x1</a>
-    | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=10" data-limit="10">x10</a>
-    | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=50" data-limit="50">x50</a>
-    | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=100" data-limit="100">x100</a>
-    | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=200" data-limit="200">x200</a>
-    | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=500" data-limit="500">x500</a>
-    | <a href="admin.php?action=update&date=<?=$this_cache_date?>&limit=1000" data-limit="1000">x1000</a>
+    <a href="admin.php?action=update&date=<?= $this_cache_date?>&limit=1" data-limit="1">x1</a>
+    | <a href="admin.php?action=update&date=<?= $this_cache_date?>&limit=10" data-limit="10">x10</a>
+    | <a href="admin.php?action=update&date=<?= $this_cache_date?>&limit=50" data-limit="50">x50</a>
+    | <a href="admin.php?action=update&date=<?= $this_cache_date?>&limit=100" data-limit="100">x100</a>
+    | <a href="admin.php?action=update&date=<?= $this_cache_date?>&limit=200" data-limit="200">x200</a>
+    | <a href="admin.php?action=update&date=<?= $this_cache_date?>&limit=500" data-limit="500">x500</a>
+    | <a href="admin.php?action=update&date=<?= $this_cache_date?>&limit=1000" data-limit="1000">x1000</a>
   </div>
-  <?
+  <?php
   $this_page_markup .= ob_get_clean();
 }
 
@@ -366,7 +366,7 @@ function admin_trigger_update(){
 }
 
 </script>
-  <?
+  <?php
   $this_page_markup .= ob_get_clean();
 }
 
