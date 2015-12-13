@@ -1,6 +1,6 @@
-<?
+<?php
 // Include the TOP file
-require_once('top.php');
+require_once('_top.php');
 
 // Change the header type for this file
 header('Content-Type: text/cache-manifest');
@@ -21,10 +21,10 @@ $asset_base_url = MMRPG_CONFIG_ROOTURL;
 
 // Define script and style cache files
 //echo "{$asset_base_url}styles/reset.css\r\n";
-echo "{$asset_base_url}styles/style.css?{MMRPG_CONFIG_CACHE_DATE}\r\n";
-echo "{$asset_base_url}styles/mobile.css?{MMRPG_CONFIG_CACHE_DATE}\r\n";
+echo "{$asset_base_url}styles/style.master.css??{MMRPG_CONFIG_CACHE_DATE}\r\n";
+echo "{$asset_base_url}styles/style.mobile.css?{MMRPG_CONFIG_CACHE_DATE}\r\n";
 echo "{$asset_base_url}scripts/jquery.js\r\n";
-echo "{$asset_base_url}scripts/script.js?{MMRPG_CONFIG_CACHE_DATE}\r\n";
+echo "{$asset_base_url}scripts/script.master.js?{MMRPG_CONFIG_CACHE_DATE}\r\n";
 
 // Define any GUI images for caching
 echo "{$asset_base_url}images/ajax-loader.gif\r\n";
@@ -36,7 +36,7 @@ echo "{$asset_base_url}images/tiles/vertical-gradient_energy-bar.gif\r\n";
 // Define the robot sprite variables
 $robot_sprite_sizes = array(40, 80);
 // Loop through the entire robot index
-$mmrpg_index_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 ORDER BY robot_token ASC", 'robot_token');
+$mmrpg_index_robots = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 ORDER BY robot_token ASC", 'robot_token');
 if (!empty($mmrpg_index_robots)){
   foreach ($mmrpg_index_robots AS $robot_token => $this_robot){
     if ($robot_token == 'robot'){ continue; }
@@ -54,7 +54,7 @@ echo "NETWORK:\r\n";
 echo "{$asset_base_url}index.php\r\n";
 echo "{$asset_base_url}prototype.php\r\n";
 echo "{$asset_base_url}battle.php\r\n";
-echo "{$asset_base_url}data.php\r\n";
+echo "{$asset_base_url}scripts/script.battle.php\r\n";
 //echo "{$asset_base_url}manifest.php\r\n";
 
 ?>
