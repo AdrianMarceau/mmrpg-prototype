@@ -1,6 +1,6 @@
 <?php
 // Require the application top to access files
-require_once('top.php');
+require_once('_top.php');
 // Update the document to to XML and print the header
 header("Content-type: text/xml; charset=utf-8");
 echo '<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
@@ -20,7 +20,7 @@ foreach ($iterator as $fileinfo){
   }
 }
 // Include the global database include file
-require_once('data/database.php');
+require_once('includes/include.database.php');
 ?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
@@ -53,7 +53,7 @@ require_once('data/database.php');
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
-  <?
+  <?php
   // Loop through the database players
   foreach ($mmrpg_database_players AS $player_key => $player_info){
     ?>
@@ -63,7 +63,7 @@ require_once('data/database.php');
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
     </url>
-    <?
+    <?php
   }
   ?>
   <url>
@@ -72,7 +72,7 @@ require_once('data/database.php');
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
-  <?
+  <?php
   // Loop through the database robots
   foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
     ?>
@@ -82,7 +82,7 @@ require_once('data/database.php');
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
     </url>
-    <?
+    <?php
   }
   ?>
   <url>
@@ -91,7 +91,7 @@ require_once('data/database.php');
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
-  <?
+  <?php
   // Loop through the database abilities
   foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
     ?>
@@ -101,7 +101,7 @@ require_once('data/database.php');
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
     </url>
-    <?
+    <?php
   }
   ?>
   <url>
