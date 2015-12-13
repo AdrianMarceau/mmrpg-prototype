@@ -1,14 +1,14 @@
 <?php
 // Require the application top to access files
-require_once('top.php');
+require_once('../_top.php');
 // Update the document to to XML and print the header
 header("Content-type: text/xml; charset=utf-8");
 echo '<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
 ?>
 <browsergameshub version="0.1">
   <name>Mega Man RPG Prototype</name>
-  <site_url>http://megamanpoweredup.net/rpg2k11/</site_url>
-  <logo_url>http://megamanpoweredup.net/rpg2k11/images/assets/ipad-icon_72x72.png</logo_url>
+  <site_url><?= MMRPG_CONFIG_ROOTURL ?></site_url>
+  <logo_url><?= MMRPG_CONFIG_ROOTURL ?>images/assets/ipad-icon_72x72.png</logo_url>
   <genre>rpg</genre>
   <setting>future</setting>
   <effort>average</effort>
@@ -29,11 +29,11 @@ echo '<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
         // Print the version number
         echo preg_replace('/([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})/', '$1.$2.$3', MMRPG_CONFIG_CACHE_DATE);
         ?></version>
-      <game_url>http://megamanpoweredup.net/rpg2k11/prototype/</game_url>
-      <ranking_url>http://megamanpoweredup.net/rpg2k11/mmrpg-ranking.xml</ranking_url>
+      <game_url><?= MMRPG_CONFIG_ROOTURL ?>prototype/</game_url>
+      <ranking_url><?= MMRPG_CONFIG_ROOTURL ?>mmrpg-ranking.xml</ranking_url>
       <players><?php
         // Require the gallery data for display
-        require_once('data/leaderboard.php');
+        require_once(MMRPG_CONFIG_ROOTDIR.'includes/include.leaderboard.php');
         echo !empty($this_leaderboard_count) ? $this_leaderboard_count : 0;
         ?></players>
       <status>open</status>
@@ -44,7 +44,7 @@ echo '<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
   </servers>
   <screenshots><?php
     // Require the gallery data for display
-    require_once('data/gallery.php');
+    require_once(MMRPG_CONFIG_ROOTDIR.'includes/include.gallery.php');
     foreach ($this_gallery_xml AS $key => $xml){
       if ($key >= 10){ break; }
       echo $xml."\n";
