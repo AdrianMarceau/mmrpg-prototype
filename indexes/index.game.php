@@ -8,7 +8,7 @@ if (!MMRPG_CONFIG_ADMIN_MODE){
 */
 
 // Include the TOP file
-require_once('top.php');
+require_once('_top.php');
 
 // Define the default SEO and MARKUP variables
 $this_seo_title = 'Prototype | Mega Man RPG Prototype | Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE);
@@ -26,37 +26,37 @@ $this_graph_data = array(
   );
 
 // If a reset was intentionally called
-if (!empty($_GET['reset']) || (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE)){
+if (!empty($_GET['reset']) || (rpg_game::is_demo() && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE)){
   // Reset the game session
-  mmrpg_reset_game_session($this_save_filepath);
+  rpg_game::reset_session($this_save_filepath);
 }
 // Else if this is an out-of-sync demo
-elseif (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE){
+elseif (rpg_game::is_demo() && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE){
   // Reset the game session
-  mmrpg_reset_game_session($this_save_filepath);
+  rpg_game::reset_session($this_save_filepath);
 }
 // Check if the session has not been created or the cache date has changed
 elseif (
   !empty($_GET['reload']) || // if a reload was specifically requested
   !isset($_SESSION['GAME']['CACHE_DATE']) || // if there is no session created yet
-  (!empty($_SESSION['GAME']['DEMO']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE) // if we're in demo mode and the cache date is out of sync
+  (rpg_game::is_demo() && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE) // if we're in demo mode and the cache date is out of sync
   ){
 
   // Ensure there is a save file to load
   if (!empty($this_save_filepath) && file_exists($this_save_filepath)){
     // Load the save file into memory and overwrite the session
-    mmrpg_load_game_session($this_save_filepath);
+    rpg_game::load_session($this_save_filepath);
   }
   // Otherwise, simply reset the game
   else {
     // Reset the game session
-    mmrpg_reset_game_session($this_save_filepath);
+    rpg_game::reset_session($this_save_filepath);
   }
 
   // Update the cache date to reflect the reload
   $_SESSION['GAME']['CACHE_DATE'] = MMRPG_CONFIG_CACHE_DATE;
   // Save the updated file back to the system
-  mmrpg_save_game_session($this_save_filepath);
+  rpg_game::save_session($this_save_filepath);
 
 }
 // Automatically empty all temporary battle variables
@@ -90,7 +90,7 @@ if (count($matches)>1){
 
 ?>
 <!DOCTYPE html>
-<html<?/* not-manifest="manifest.php?<?=MMRPG_CONFIG_CACHE_DATE?>" */?> lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
+<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
 <head>
 <meta charset="UTF-8" />
 <title><?= (!MMRPG_CONFIG_IS_LIVE ? '@ ' : '').$this_seo_title ?></title>
@@ -100,26 +100,26 @@ if (count($matches)>1){
 <link rel="sitemap" type="application/xml" title="Sitemap" href="<?= MMRPG_CONFIG_ROOTURL ?>sitemap.xml" />
 <meta name="format-detection" content="telephone=no" />
 <base href="<?= MMRPG_CONFIG_ROOTURL ?>">
-<? foreach ($this_graph_data AS $token => $value){ echo '<meta property="og:'.str_replace('__', ':', $token).'" content="'.$value.'"/>'."\n"; } ?>
+<?php foreach ($this_graph_data AS $token => $value){ echo '<meta property="og:'.str_replace('__', ':', $token).'" content="'.$value.'"/>'."\n"; } ?>
 <link rel="browser-game-info" href="<?= MMRPG_CONFIG_ROOTURL ?>mmrpg-info.xml" />
 <link rel="shortcut icon" type="image/x-icon" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
 <link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/reset.css" rel="stylesheet" />
-<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/style.master.css??<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, width=768, height=1004">
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="format-detection" content="telephone=no">
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <link rel="apple-touch-icon" sizes="72x72" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/ipad-icon_72x72.png" />
-<link rel="apple-touch-startup-image" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/ipad-startup_768x1004_portrait.png?<?=MMRPG_CONFIG_CACHE_DATE?>" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)" />
-<link rel="apple-touch-startup-image" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/ipad-startup_748x1024_landscape.png?<?=MMRPG_CONFIG_CACHE_DATE?>" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)" />
-<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link rel="apple-touch-startup-image" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/ipad-startup_768x1004_portrait.png?<?= MMRPG_CONFIG_CACHE_DATE?>" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)" />
+<link rel="apple-touch-startup-image" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/ipad-startup_748x1024_landscape.png?<?= MMRPG_CONFIG_CACHE_DATE?>" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)" />
+<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/style.mobile.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?elseif($flag_iphone):?>
 <meta name="viewport" content="user-scalable=yes, width=768, height=1004">
-<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/style-mobile-iphone.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/style.mobile_iphone.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
-<? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
+<?php $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
 <body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?>">
 <?/*
 <div style="margin: 0; padding: 10px 25%; background-color: rgb(122, 0, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
@@ -131,9 +131,9 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
 
   <?if($this_online_flag && $this_browser_flag):?>
     <?if(!$flag_wap):?>
-      <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=false" width="768" height="1004" frameborder="1" scrolling="no"></iframe>
+      <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=false" width="768" height="1004" <?= 'frameborder="1" scrolling="no"' ?>></iframe>
     <?else:?>
-      <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" frameborder="0" scrolling="no"></iframe>
+      <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" <?= 'frameborder="1" scrolling="no"' ?>></iframe>
     <?endif;?>
     <div id="music" class="onload">
       <a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
@@ -173,11 +173,11 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
 </div>
 <?endif;?>
 <script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/jquery.js"></script>
-<script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/script.master.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Define the key client variables
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE?>';
 </script>
 <script type="text/javascript">
 // When the document is ready for event binding
@@ -247,7 +247,7 @@ function windowEventDestroy(){
   //alert(eventMarkup);
 }
 </script>
-<?
+<?php
 // Require the remote bottom in case we're in viewer mode
 require(MMRPG_CONFIG_ROOTDIR.'/data/analytics.php');
 ?>
