@@ -43,7 +43,7 @@ websiteSettings.currentCat = ''; // default to empty
 websiteSettings.currentToken = ''; // default to empty
 websiteSettings.currentNum = 0; // default to zero
 websiteSettings.currentId = 0; // default to zero
-    
+
 // Create the game engine submit timer
 var gameEngineSubmitTimeout = false;
 var gameEngineSubmitReturn = false;
@@ -61,18 +61,18 @@ function gameEngineSubmitFunction(){
       gameEngine.submit();
       } else {
       //console.log('Resetting timeout.');
-      gameEngineSubmitTimeout = setTimeout(gameEngineSubmitFunction, 120000);    
-      }    
+      gameEngineSubmitTimeout = setTimeout(gameEngineSubmitFunction, 120000);
+      }
     return false;
     } else {
     //console.log('...and everything seems to have worked out. We\'re all good.');
     return true;
-    }      
+    }
 }
 
 // Initialize document ready events
 $(document).ready(function(){
-  
+
   // Define the MMRPG global context variables
   mmrpgBody = $('#mmrpg');
   gameWindow = $('#window');
@@ -85,11 +85,11 @@ $(document).ready(function(){
   gameAnimate = $('#animate');
   gameBattle = $('#battle');
   gamePrototype = $('#prototype');
-  
+
   // Check if iPhone or iPad detected
   gameSettings.wapFlagIphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ? true : false;
   gameSettings.wapFlagIpad = navigator.userAgent.match(/iPad/i) ? true : false;
-  
+
   // Update the decompressed array values
   decompressActionArray = [
     'sprite_right', 'sprite_left', 'player_right', 'player_left', 'ability_right', 'ability_left', 'attachment_right', 'attachment_left',
@@ -111,70 +111,70 @@ $(document).ready(function(){
     'Active Position', 'Bench Position', 'Abilities', ' Accuracy', ' Weapons', ' Attack', ' Defense', ' Recovery', ' Experience', ' Support', 'Buster Shot', 'Dr. Light', 'Dr. Wily', 'Dr. Cossack', 'Light Buster', 'Wily Buster', 'Cossack Buster', 'Neutral ', ' Capsule',
     ' title="', ' class="', ' style="', 'sprite_40x40_', 'sprite_80x80_', 'sprite_160x160_', '_left_40x40', '_left_80x80', '_left_160x160',  '_right_40x40', '_right_80x80', '_right_160x160',
     '.png?'+gameSettings.cacheTime+');',
-    ];   
-  
+    ];
+
   /*
    * INDEX EVENTS
    */
-  
+
   if (mmrpgBody.length){
 
     // Update the dimensions
     gameSettings.currentBodyWidth = $(document).width(); //mmrpgBody.outerWidth();
     gameSettings.currentBodyHeight = $(document).height(); //mmrpgBody.outerHeight();
-    
+
     // Tooltip only Text
     //console.log('assigning event for '+document.URL+';\n gameSettings.currentBodyWidth = '+gameSettings.currentBodyWidth+';\n gameSettings.currentBodyHeight = '+gameSettings.currentBodyHeight+'; ');
 
     // Only attach hover tooltips if NOT in mobile mode
     if (!gameSettings.wapFlag && !gameSettings.wapFlagIphone && !gameSettings.wapFlagIpad){
-    
+
       // Define the function for showing the tooltip
-      var showTooltipFunction = function(e){        
+      var showTooltipFunction = function(e){
         var thisElement = $(this);
         $('.tooltip', mmrpgBody).empty();
-        var thisDate = new Date();        
+        var thisDate = new Date();
         var thisTime = thisDate.getTime();
-        //console.log('starting the tooltip at '+thisTime);         
-        var thisClassList = thisElement.attr('class') != undefined ? thisElement.attr('class').split(/\s+/) : '';        
+        //console.log('starting the tooltip at '+thisTime);
+        var thisClassList = thisElement.attr('class') != undefined ? thisElement.attr('class').split(/\s+/) : '';
         var thisTitle = thisElement.attr('data-backup-title') != undefined ? thisElement.attr('data-backup-title') : (thisElement.attr('title') != undefined ? thisElement.attr('title') : '');
-        var thisTooltip = thisElement.attr('data-tooltip') != undefined ? thisElement.attr('data-tooltip') : '';  
+        var thisTooltip = thisElement.attr('data-tooltip') != undefined ? thisElement.attr('data-tooltip') : '';
         if (!thisTitle.length && !thisTooltip.length){ return false; }
         else if (thisTitle.length && !thisTooltip.length){ thisTooltip = thisTitle; }
-        thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\|/g, '<span class="pipe">|</span>').replace(/\s?\/\/\s?/g, '<br />').replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');   
+        thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\|/g, '<span class="pipe">|</span>').replace(/\s?\/\/\s?/g, '<br />').replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');
         var thisTooltipAlign = thisElement.attr('data-tooltip-align') != undefined ? thisElement.attr('data-tooltip-align') : 'left';
         var thisTooltipType = thisElement.attr('data-tooltip-type') != undefined ? thisElement.attr('data-tooltip-type') : '';
-        if (!thisTooltipType.length){        
+        if (!thisTooltipType.length){
           for (i in thisClassList){
             var tempClass = thisClassList[i] != undefined ? thisClassList[i].toString() : '';
             //console.log('tempClass = '+tempClass);
-            if (tempClass.match(/^(field_|player_|robot_|ability_)?type$/) || tempClass.match(/^(field_|player_|robot_|ability_)?type_/) || tempClass.match(/^(energy|weapons|attack|defense|speed|light|cossack|wily|experience|level|damage|recovery|none|cutter|impact|freeze|explode|flame|electric|time|earth|wind|water|swift|nature|missile|crystal|shadow|space|shield|laser|copy)(_|$)/)){ 
+            if (tempClass.match(/^(field_|player_|robot_|ability_)?type$/) || tempClass.match(/^(field_|player_|robot_|ability_)?type_/) || tempClass.match(/^(energy|weapons|attack|defense|speed|light|cossack|wily|experience|level|damage|recovery|none|cutter|impact|freeze|explode|flame|electric|time|earth|wind|water|swift|nature|missile|crystal|shadow|space|shield|laser|copy)(_|$)/)){
               //console.log('tempClass match!');
-              thisTooltipType += tempClass+' '; 
+              thisTooltipType += tempClass+' ';
               }
             //console.log('thisTooltipType = '+thisTooltipType);
             }
           }
-        if (!thisTooltipType.length){ 
-          thisTooltipType = 'type none'; 
-          }        
+        if (!thisTooltipType.length){
+          thisTooltipType = 'type none';
+          }
         //console.log('thisTitle : '+thisTitle);
-        //console.log('append and trigger animation at '+thisTime);        
-        thisElement.attr('data-backup-title', thisTitle).removeAttr('title');  
+        //console.log('append and trigger animation at '+thisTime);
+        thisElement.attr('data-backup-title', thisTitle).removeAttr('title');
         if (!$('.tooltip', mmrpgBody).length){ $('<p class="tooltip '+thisTooltipType+'"></p>').html('<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>').appendTo(mmrpgBody).fadeIn('fast'); }
         else { $('.tooltip', mmrpgBody).removeClass().addClass('tooltip').addClass(thisTooltipType).html('<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>').fadeIn('fast'); }
         //$('.tooltip', mmrpgBody).css({width:''});
         //var toolwidth = $('.tooltip', mmrpgBody).outerWidth();
         //$('.tooltip', mmrpgBody).css({width:toolwidth+'px'});
-        var thisDate = new Date();        
+        var thisDate = new Date();
         var thisTime = thisDate.getTime();
         //console.log('animation should be done at '+thisTime);
-        alignTooltipFunction.call(this, e);        
+        alignTooltipFunction.call(this, e);
         };
-        
+
       // Define the function for positioning the tooltip
       var alignTooltipFunction = function(e){
-        var thisDate = new Date();        
+        var thisDate = new Date();
         var thisTime = thisDate.getTime();
         //console.log('trigger the align function at '+thisTime);
         var mousex = e.pageX + 10;
@@ -191,9 +191,9 @@ $(document).ready(function(){
         //  'gameSettings.currentBodyWidth = '+gameSettings.currentBodyWidth+'; mousex = '+mousex+'; toolwidth = '+toolwidth+'; \n'+
         //  'gameSettings.currentBodyHeight = '+gameSettings.currentBodyHeight+'; mousey = '+mousex+'; toolheight = '+toolheight+'; \n'
         //  );
-        $('.tooltip', mmrpgBody).css({ top: mousey, left: mousex });      
+        $('.tooltip', mmrpgBody).css({ top: mousey, left: mousex });
         };
-      
+
       // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
       var tooltipDelay = 1200; //600;
       var tooltipTimeout = false;
@@ -202,52 +202,52 @@ $(document).ready(function(){
       $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
         e.preventDefault();
         if (tooltipTimeout == false){
-          var thisDate = new Date();        
+          var thisDate = new Date();
           var thisTime = thisDate.getTime();
           var thisObject = this;
           //console.log('set tooltip timeout for '+tooltipDelay+' at '+thisTime);
           tooltipTimeout = setTimeout(function(){
             tooltipShowing = true;
             showTooltipFunction.call(thisObject, e);
-            }, tooltipDelay); 
+            }, tooltipDelay);
           var thisElement = $(this);
-          if (thisElement.attr('title')){ 
-            thisElement.attr('data-backup-title', thisElement.attr('title')); 
+          if (thisElement.attr('title')){
+            thisElement.attr('data-backup-title', thisElement.attr('title'));
             thisElement.removeAttr('title');
             }
           }
         });
-      
+
       // Define the live MOUSEMOVE events for any elements with a title tag (which should be many)
       $(tooltipSelector, mmrpgBody).live('mousemove', function(e){
-        if (!tooltipShowing){ return false; }        
+        if (!tooltipShowing){ return false; }
         alignTooltipFunction.call(this, e);
         });
-      
+
       // Define the live MOUSELEAVE events for any elements with a title tag (which should be many)
       $(tooltipSelector, mmrpgBody).live('mouseleave', function(e){
         e.preventDefault();
         var thisElement = $(this);
         $('.tooltip', mmrpgBody).empty();
         //thisElement.attr('title', thisElement.attr('data-backup-title'));
-        var thisDate = new Date();        
+        var thisDate = new Date();
         var thisTime = thisDate.getTime();
         //console.log('clear tooltip timeout at '+thisTime);
         clearTimeout(tooltipTimeout);
         tooltipTimeout = false;
         tooltipShowing = false;
         });
-      
+
         //$('*', mmrpgBody).click(function(e){ $('.tooltip', mmrpgBody).remove(); });
         $('*', mmrpgBody).click(function(e){ $('.tooltip', mmrpgBody).empty(); });
-      
+
       }
-    
+
   }
-  
+
   // Ensure this is the battle document
   if (gameWindow.length){
-    
+
     // Add click-events to the debug panel links
     $('a.battle', gamePrototype).live('click', function(e){
       var windowFrame = $('iframe', gameWindow);
@@ -255,45 +255,45 @@ $(document).ready(function(){
       if (windowFrame.attr('src') != 'about:blank'){
         e.preventDefault();
         var thisConfirm = 'Are you sure you want to switch battles?  Progress will be lost and all robots will be reset.';
-        if (confirm(thisConfirm)){ 
-        //if (true){ 
+        if (confirm(thisConfirm)){
+        //if (true){
           windowFrame.attr('src', thisLink);
-          return true; 
-          }        
-        } else { 
+          return true;
+          }
+        } else {
         windowFrame.attr('src', thisLink);
-        return false; 
+        return false;
         }
       });
-    
+
     // Set up the game music options
-    if (true){     
-               
-      // Add the click-events to the music toggle button      
+    if (true){
+
+      // Add the click-events to the music toggle button
       $('a.toggle', gameMusic).bind('click touch', function(e){
         e.preventDefault();
         if (gameSettings.indexLoaded){
           //$('body').prepend('<div style="background-color: red;">WTF</div>'); // DEBUG
           if ($('iframe', gameWindow).hasClass('loading')){ $('iframe', gameWindow).css({opacity:0}).removeClass('loading').animate({opacity:1}, 1000, 'swing'); } // DEBUG
-          if (gameMusic.hasClass('onload')){ 
+          if (gameMusic.hasClass('onload')){
             gameMusic.removeClass('onload');
             gameMusic.find('.start').remove();
-            if (gameSettings.wapFlag){ 
-              mmrpg_music_toggle(); 
-              } 
+            if (gameSettings.wapFlag){
+              mmrpg_music_toggle();
+              }
             } else {
-            mmrpg_music_toggle();  
-            }      
-          return true;          
+            mmrpg_music_toggle();
+            }
+          return true;
           } else {
-          return false;  
-          }        
+          return false;
+          }
         });
       // Automatically load the title screen music
       mmrpg_music_load('misc/player-select');
-      
+
       }
-        
+
     /*
     $('a.toggle span', gameMusic).css({opacity:0}).html('PLAY');
     var musicTimeout = setTimeout(function(){
@@ -302,17 +302,17 @@ $(document).ready(function(){
     */
     // Automatically start playing the music on load
     //mmrpg_music_play();
-    
-  } 
-  
-  
+
+  }
+
+
   /*
    * BATTLE EVENTS
    */
-  
+
   // Ensure this is the battle document
   if (gameEngine.length){
-    
+
     // Attach a submit event for tracking timestaps
     gameEngine.submit(function(){
       //console.log('gameEngine.submit() triggered, setting timeout');
@@ -320,7 +320,7 @@ $(document).ready(function(){
       gameEngineSubmitTimeout = false;
       gameEngineSubmitTimeout = setTimeout(gameEngineSubmitFunction, 120000);
       });
-    
+
     // Add click-events to the hidden resend command
     $('#actions .actions_resend', mmrpgBody).live('click', function(e){
       e.preventDefault();
@@ -328,35 +328,35 @@ $(document).ready(function(){
       var loadingDisplay = $('#actions_loading', mmrpgBody).css('display');
       if (loadingDisplay == 'none'){ return false; }
       var confirmText = 'Would you like to resubmit your last action?\nThis can have unpredicable results on your battle...\nResend anyway?';
-      if (confirm(confirmText)){                
+      if (confirm(confirmText)){
         // Switch to the loading screen
         //console.log('switch to loading panel');
         mmrpg_action_panel('loading');
         //console.log('Resubmitting form.');
         gameEngine.submit();
-        }      
+        }
       });
-    
+
     // Set up rge game animate options
     if (true){
-               
-      // Add the click-events to the animate toggle button      
+
+      // Add the click-events to the animate toggle button
       $('a.toggle', gameAnimate).bind('click touch', function(e){
         e.preventDefault();
-        mmrpg_toggle_animation();     
-        return true;        
+        mmrpg_toggle_animation();
+        return true;
         });
       // Automatically start the animation sequences
       //mmrpg_start_animation();
-      
-      }    
-    
+
+      }
+
     // Add a click event to the gameActions panel buttons
     $('a[data-panel]', gameActions).live('click', function(e){
       var thisPanel = $(this).attr('data-panel');
       mmrpg_action_panel(thisPanel);
       });
-    
+
     // Add a click event to the gameActions action buttons
     $('a[data-action]', gameActions).live('click', function(e){
       // Collect the action and preload, if set
@@ -369,7 +369,7 @@ $(document).ready(function(){
       // Trigger the requested action and return the result
       return mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel);
       });
-    
+
     // Add a hover event to all the gameAction sprites
     $('.sprite[data-action]', gameCanvas)
       .live('mouseenter', function(){
@@ -383,7 +383,7 @@ $(document).ready(function(){
           $('.event', gameCanvas).append('<div class="scan_overlay" style="z-index: '+(thisOffset-1)+';">&nbsp;</div>');
           } else {
           $(this).css({cursor:'default'});
-          return false; 
+          return false;
           }
         })
       .live('mouseleave', function(){
@@ -407,55 +407,55 @@ $(document).ready(function(){
         else if ($(this).hasClass('sprite_160x160')){ var thisSize = 160; }
         $(this).removeClass('sprite_'+thisSize+'x'+thisSize+'_focus');
         // Trigger the requested action and return the result
-        return mmrpg_action_trigger(thisAction, thisPreload, thisTarget);      
+        return mmrpg_action_trigger(thisAction, thisPreload, thisTarget);
         } else {
         $(this).css({cursor:'default'});
         return false;
         }
       });
-    
+
     // Add a specialized click event for the gameActions continue button
     $('a[data-action=continue]', gameActions).live('click', function(e){
       mmrpg_events();
       });
-    
+
     // Start animating the canvas randomly
     //mmrpg_canvas_animate();
-    
+
     // Trigger the panel switch to the "next" action
     var nextAction = $('input[name=next_action]', gameEngine).val();
     if (nextAction.length){ mmrpg_action_panel(nextAction); }
-    
+
   }
-  
+
   /*
    * WINDOW RESIZE EVENTS
    */
-  
+
   if (!gameSettings.wapFlag){
-    
+
     // Remove the hard-coded heights for the main iframe
     $('iframe', gameWindow).removeAttr('width').removeAttr('height');
-    
+
     // Trigger the windowResizeUpdate function automatically
     windowResizeUpdate('startup');
     window.onresize = function(){ return windowResizeUpdate('onresize'); }
-    
+
   }
-  
-  
+
+
   /*
    * MOBILE EVENTS
    */
-  
+
   // Check if we're running the game in mobile mode
-  if (gameSettings.wapFlag){    
-    
+  if (gameSettings.wapFlag){
+
     //alert('wapFlag');
-    
+
     // Remove the hard-coded heights for the main iframe
     $('iframe', gameWindow).removeAttr('width').removeAttr('height');
-    
+
     // Let the user know about the full-screen option for mobile browsers
     if (('standalone' in window.navigator) && !window.navigator.standalone){
       //alert('Please use "Add to Home Screen" option for best view! :)');
@@ -464,8 +464,8 @@ $(document).ready(function(){
       $('body').addClass('mobileFlag_fullScreen');
       } else {
       //alert('launched from a regular old browser...');
-      }    
-    
+      }
+
     // Prevent scrolling as long as the exclusion class isn't present
     if (false){
       /*
@@ -478,20 +478,20 @@ $(document).ready(function(){
       $('*').live('touchstart', function(e) {
         //alert('touchstart etarget : '.$(e.target).attr('class'));
         this.onclick = this.onclick || function () { };
-        });      
+        });
       */
     }
-    
 
-    
+
+
     // Change the body's orientation flag classes
     orientationModeUpdate('startup');
     window.onorientationchange = function(){ return orientationModeUpdate('onorientationchange'); }
     window.onresize = function(){ return orientationModeUpdate('onresize'); }
     if (gameSettings.autoScrollTop === true){ window.onscroll = function(){ return orientationModeUpdate('onscroll'); } }
-        
+
   }
-  
+
   // Create the variable functions for Pausing/Unpausing the game
   var mmrpgPauseFunction = function(){
     //gameSettings.eventAutoPlay = false;
@@ -504,22 +504,22 @@ $(document).ready(function(){
     if (gameSettings.eventAutoPlay && !mmrpgEvents.length){ mmrpg_canvas_animate(); }
     //mmrpg_music_play();
     };
-  
+
   // Attach blur/focus events to the window to automatically pause/play
   if (gameBattle.length){
     //console.log('gameBattle.length = '+gameBattle.length+';');
-    $(window).blur(function(){  
+    $(window).blur(function(){
       //console.log('mmrpgPauseFunction();');
       mmrpgPauseFunction();
       }).focus(function(){
-      //console.log('mmrpgPlayFunction();');  
-      mmrpgPlayFunction();  
+      //console.log('mmrpgPlayFunction();');
+      mmrpgPlayFunction();
       });
   }
-        
+
   // If the auto keep alive has been set, trigger it
-  if (gameSettings.autoKeepAlive){ pingWebsite(); }  
-  
+  if (gameSettings.autoKeepAlive){ pingWebsite(); }
+
 });
 
 // Define a function for sending a pink to the website and keeping the session alive
@@ -564,7 +564,7 @@ function windowResizeUpdate(updateType){
   var consoleMessageHeight = 64;
   var actionsHeight = 225;
   //console.log('windowResizeUpdate('+updateType+');\n', {canvasHeight:canvasHeight,consoleHeight:consoleHeight,consoleMessageHeight:consoleMessageHeight,actionsHeight:actionsHeight});
-  
+
   // Check if this is the main window or if it's a child
   if (window === window.top){
     // Collect this window's width and height
@@ -577,28 +577,27 @@ function windowResizeUpdate(updateType){
     var windowWidth = $(parent.window).width();
     var windowHeight = $(parent.window).height();
     var gameWidth = parent.gameWindow.width();
-    var gameHeight = parent.gameWindow.height();        
+    var gameHeight = parent.gameWindow.height();
     }
-  
+
   // Update the dimensions
   gameSettings.currentBodyWidth = $(window).width(); //$(document).width(); //mmrpgBody.outerWidth();
   gameSettings.currentBodyHeight = $(window).height(); //$(document).height(); //mmrpgBody.outerHeight();
   //console.log({windowWidth:windowWidth,windowHeight:windowHeight,gameWidth:gameWidth,gameHeight:gameHeight,gameSettings:gameSettings});
-  
+
   // Check if the window is in landscape mode and update the session
   var thisRequestType = 'session';
-  var thisRequestData = 'index_settings,windowFlag,';  
-  if (windowWidth >= (1024 + 12)){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; } 
+  var thisRequestData = 'index_settings,windowFlag,';
+  if (windowWidth >= (1024 + 12)){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
   else { $('body').removeClass('windowFlag_landscapeMode'); thisRequestData += 'portraitMode'; }
-  $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
-  //console.log('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
-  
+  //$.post('scripts/script.ajax.php',{requestType:thisRequestType,requestData:thisRequestData});
+
   // Calculate the new game and console height values
   var newGameHeight = windowHeight - 25; //15;
   if (gameSettings.wapFlagIphone && newGameHeight > 924){ newGameHeight = 924; }
   var newConsoleHeight = newGameHeight - (canvasHeight + actionsHeight);
   //console.log({windowHeight:windowHeight,newGameHeight:newGameHeight,newConsoleHeight:newConsoleHeight});
-  
+
   if ((newConsoleHeight - 3) < (consoleMessageHeight * 2)){
     var thisMinimum = consoleMessageHeight * 2;
     newGameHeight = newGameHeight + (thisMinimum - newConsoleHeight);
@@ -610,34 +609,34 @@ function windowResizeUpdate(updateType){
     newConsoleHeight = newConsoleHeight - thisRemainer;
     //console.log({thisRemainer:thisRemainer,newGameHeight:newGameHeight,newConsoleHeight:newConsoleHeight});
     }
-  
+
   // If the console exists, resize it
-  if (gameConsole.length && !gameConsole.hasClass('noresize')){ 
+  if (gameConsole.length && !gameConsole.hasClass('noresize')){
     //console.log('gameConsole.length && !gameConsole.hasClass(\'noresize\');\ngameConsole.height('+newConsoleHeight+' - 3); ');
-    gameConsole.height(newConsoleHeight - 3); 
+    gameConsole.height(newConsoleHeight - 3);
     gameConsole.find('.wrapper').css({height:(gameConsole.height())+'px'})
     }
-    
+
     // If height reszing is allowed, update the window height
-    if (gameSettings.autoResizeHeight != false){  
+    if (gameSettings.autoResizeHeight != false){
       //console.log('gameSettings.autoResizeHeight != false;\ngameWindow.height('+newGameHeight+');');
       gameWindow.height(newGameHeight);
-      $('iframe', gameWindow).height(newGameHeight - 6);    
-      }    
+      $('iframe', gameWindow).height(newGameHeight - 6);
+      }
 
   // Reset the window scroll to center elements properly
   if (gameSettings.autoScrollTop == true){
     //console.log('gameSettings.autoScrollTop == true;\nwindow.scrollTo(0, 1);');
     window.scrollTo(0, 1);
-    if (window !== window.top){ parent.window.scrollTo(0, 1); }    
+    if (window !== window.top){ parent.window.scrollTo(0, 1); }
     }
-  
+
 
   // Tooltip only Text
-  //console.log('resizing event for '+document.URL+';\n gameSettings.currentBodyWidth = '+gameSettings.currentBodyWidth+';\n gameSettings.currentBodyHeight = '+gameSettings.currentBodyHeight+'; ');  
-  
+  //console.log('resizing event for '+document.URL+';\n gameSettings.currentBodyWidth = '+gameSettings.currentBodyWidth+';\n gameSettings.currentBodyHeight = '+gameSettings.currentBodyHeight+'; ');
+
   // Return true on success
-  return true;  
+  return true;
 }
 
 
@@ -648,39 +647,39 @@ function orientationModeUpdate(updateType){
   // Check if this is the main window or if it's a child
   if (window === window.top){
     // If this is the main window, collect it's orientation variable
-    if (!isNaN(window.orientation)){ var orientationMode = (window.orientation == 0 || window.orientation == 180) ? 'portrait' : 'landscape'; } 
-    else { var orientationMode = ($(window).width() < 980) ? 'portrait' : 'landscape'; }    
+    if (!isNaN(window.orientation)){ var orientationMode = (window.orientation == 0 || window.orientation == 180) ? 'portrait' : 'landscape'; }
+    else { var orientationMode = ($(window).width() < 980) ? 'portrait' : 'landscape'; }
     } else {
     // Otherwise, check the parent window's orientation variable
     window.top.testValue = true;
-    if (!isNaN(window.top.orientation)){ var orientationMode = (window.top.orientation == 0 || window.top.orientation == 180) ? 'portrait' : 'landscape'; } 
-    else { var orientationMode = ($(window.top).width() < 980) ? 'portrait' : 'landscape'; }      
+    if (!isNaN(window.top.orientation)){ var orientationMode = (window.top.orientation == 0 || window.top.orientation == 180) ? 'portrait' : 'landscape'; }
+    else { var orientationMode = ($(window.top).width() < 980) ? 'portrait' : 'landscape'; }
     }
   // Determine if this user is running is non-fullscreen mode
   var notFullscreenMode = ('standalone' in window.navigator) && !window.navigator.standalone ? true : false;
   // Update the orientation variables on this window's body elements
-  if (orientationMode == 'portrait'){ 
-    $('body').removeClass('mobileFlag_landscapeMode').addClass('mobileFlag_portraitMode'); 
-    if (notFullscreenMode){ $('body').removeClass('mobileFlag_landscapeMode_notFullscreen').addClass('mobileFlag_portraitMode_notFullscreen');  } 
-    } else { 
-    $('body').removeClass('mobileFlag_portraitMode').addClass('mobileFlag_landscapeMode'); 
+  if (orientationMode == 'portrait'){
+    $('body').removeClass('mobileFlag_landscapeMode').addClass('mobileFlag_portraitMode');
+    if (notFullscreenMode){ $('body').removeClass('mobileFlag_landscapeMode_notFullscreen').addClass('mobileFlag_portraitMode_notFullscreen');  }
+    } else {
+    $('body').removeClass('mobileFlag_portraitMode').addClass('mobileFlag_landscapeMode');
     if (notFullscreenMode){ $('body').removeClass('mobileFlag_portraitMode_notFullscreen').addClass('mobileFlag_landscapeMode_notFullscreen');   }
     }
   // Reset the window scroll to center elements properly
   window.scrollTo(0, 1);
-  if (window !== window.top){ parent.window.scrollTo(0, 1); }  
+  if (window !== window.top){ parent.window.scrollTo(0, 1); }
   //$('body').css('border', '10px solid red').animate({borderWidth : '0'}, 1000, 'swing');
   // DEBUG
   //alert('<body class="'+$('body').attr('class')+'">\n'+updateType+'\n</body>');
   // Check if this is a child frame and this is not a startup call
-  if (window !== window.top){ 
+  if (window !== window.top){
     // Alert the user of the orientation change (used to fix a bug with iframe not updating)
     parent.window.location.hash = '#'+orientationMode;
-    //alert('Screen orientation changed...\nGame display updated!'); 
-    }  
+    //alert('Screen orientation changed...\nGame display updated!');
+    }
   // Return the final orientation mode
   //console.log({orientationMode:orientationMode,notFullscreenMode:notFullscreenMode,bodyClass:$('body').attr('class')});
-  return orientationMode;  
+  return orientationMode;
 }
 
 function localFunction(myMessage){
@@ -704,7 +703,7 @@ function mmrpg_canvas_animate(){
     var thisField = $(this);
     mmrpg_canvas_field_frame(thisField, '');
     });
-  
+
   // Loop through all field sprites on the canvas
   $('.sprite[data-animate]', gameCanvas).each(function(){
     // Trigger an animation frame change for this field
@@ -712,13 +711,13 @@ function mmrpg_canvas_animate(){
     var thisType = thisSprite.attr('data-type');
     // Call the animation function based on sprite type
     if (thisType == 'attachment'){
-          
+
       if (thisSprite.attr('data-status') != 'disabled' || thisSprite.attr('data-direction') == 'right'){
         mmrpg_canvas_attachment_frame(thisSprite, '');
       } else {
-      //alert('sprite is disabled');  
+      //alert('sprite is disabled');
       // Fade this sprite off-screen
-      //thisSprite.animate({opacity:0},1000,'linear',function(){ $(this).remove(); });       
+      //thisSprite.animate({opacity:0},1000,'linear',function(){ $(this).remove(); });
       var spriteKind = thisSprite.attr('data-type');
       var spriteID = thisSprite.attr('data-'+spriteKind+'id');
       //alert('sprite kind is '+spriteKind+' and its ID is '+spriteID);
@@ -726,21 +725,21 @@ function mmrpg_canvas_animate(){
       //var detailsSprite = $('.sprite[data-detailsid='+spriteID+']', gameCanvas);
       //var mugshotSprite = $('.sprite[data-mugshotid='+spriteID+']', gameCanvas);
       //alert('Shadowsprite '+(shadowSprite.length ? 'exists' : 'does not exist')+'!');
-      thisSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ 
-        $(this).remove(); 
+      thisSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){
+        $(this).remove();
         if (shadowSprite.length){ shadowSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
         //if (detailsSprite.length){ detailsSprite.animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
         //if (mugshotSprite.length){ mugshotSprite.animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
-        });      
+        });
       }
     }
-        
-    });  
-  
-  
+
+    });
+
+
   // Loop through all players on the field
   $('.sprite[data-type=player]', gameCanvas).each(function(){
-    
+
     // Collect a reference to the current player
     var thisPlayer = $(this);
     // Generate a random number
@@ -749,61 +748,61 @@ function mmrpg_canvas_animate(){
     var newFrame = 'base';
     // Define the relative battle result
     var relativeResult = 'pending';
-    if (battleStatus == 'complete'){ 
-      relativeResult = thisPlayer.attr('data-direction') == 'right' ? (battleResult) : (battleResult == 'victory' ? 'defeat' : 'victory'); 
-      }    
+    if (battleStatus == 'complete'){
+      relativeResult = thisPlayer.attr('data-direction') == 'right' ? (battleResult) : (battleResult == 'victory' ? 'defeat' : 'victory');
+      }
     // If the there are no more events to display
     if (!mmrpgEvents.length){
       // If the player has been defeated, only show one frame, otherwise randomize
       if (relativeResult == 'defeat'){
         // Defeault to the defeat frame
-        newFrame = 'defeat'; 
+        newFrame = 'defeat';
         } else {
         // Higher animation freqency if not active
         if (thisPlayer.attr('data-position') != 'active'){
-          if (battleStatus == 'complete' && thisRandom >= 60){ 
+          if (battleStatus == 'complete' && thisRandom >= 60){
             newFrame = relativeResult;
-            } else if (thisRandom >= 30){ 
-            newFrame = 'taunt'; 
+            } else if (thisRandom >= 30){
+            newFrame = 'taunt';
             }
           } else {
           if (battleStatus == 'complete' && thisRandom >= 60){
             newFrame = relativeResult;
-            } else if (thisRandom >= 30){ 
-            newFrame = 'taunt'; 
-            } 
-          }       
-        }      
+            } else if (thisRandom >= 30){
+            newFrame = 'taunt';
+            }
+          }
+        }
       }
     // Trigger the player frame advancement
     mmrpg_canvas_player_frame(thisPlayer, newFrame);
-    
-    });   
-  
-  
+
+    });
+
+
   // Loop through all robots on the field
-  $('.sprite[data-type=robot]', gameCanvas).each(function(){    
-    
+  $('.sprite[data-type=robot]', gameCanvas).each(function(){
+
     // Collect a reference to the current robot
-    var thisRobot = $(this);    
+    var thisRobot = $(this);
     // Ensure the robot has not been disabled
     if (thisRobot.attr('data-status') != 'disabled'){
       // Generate a random number
       var thisRandom = Math.floor(Math.random() * 100);
       // Default the new frame to base
-      var newFrame = 'base';   
+      var newFrame = 'base';
       var currentFrame = thisRobot.attr('data-frame');
       // Define the relative battle result
       var relativeResult = 'pending';
-      if (battleStatus == 'complete'){ 
-        relativeResult = thisRobot.attr('data-direction') == 'right' ? (battleResult) : (battleResult == 'victory' ? 'defeat' : 'victory'); 
-        }           
+      if (battleStatus == 'complete'){
+        relativeResult = thisRobot.attr('data-direction') == 'right' ? (battleResult) : (battleResult == 'victory' ? 'defeat' : 'victory');
+        }
       // If the there are no more events to display
       if (!mmrpgEvents.length){
         // If the player has been defeated, only show one frame, otherwise randomize
         if (relativeResult == 'defeat'){
           // Defeault to the defeat frame
-          newFrame = 'defeat'; 
+          newFrame = 'defeat';
           } else {
           // Only change to an action frame if currently base
           if (currentFrame == 'base'){
@@ -811,40 +810,40 @@ function mmrpg_canvas_animate(){
             if (thisRobot.attr('data-position') != 'active'){
               // Higher animation freqency if not active (BENCH)
               if (battleStatus == 'complete' && thisRandom >= 60){
-                newFrame = relativeResult; 
-                } else if (thisRandom >= 50){ 
-                newFrame = 'taunt'; 
-                } else if (thisRandom >= 40){ 
-                newFrame = 'defend'; 
+                newFrame = relativeResult;
+                } else if (thisRandom >= 50){
+                newFrame = 'taunt';
+                } else if (thisRandom >= 40){
+                newFrame = 'defend';
                 }
               } else {
               // Lower animation freqency if active (ACTIVE)
               if (battleStatus == 'complete' && thisRandom >= 50){
-                newFrame = relativeResult; 
-                } else if (thisRandom >= 30){ 
-                newFrame = 'defend'; 
-                } else if (thisRandom >= 20){ 
-                newFrame = 'taunt'; 
-                } 
-              }            
+                newFrame = relativeResult;
+                } else if (thisRandom >= 30){
+                newFrame = 'defend';
+                } else if (thisRandom >= 20){
+                newFrame = 'taunt';
+                }
+              }
             }
-          }         
-        }    
+          }
+        }
       // Trigger the robot frame advancement
-      mmrpg_canvas_robot_frame(thisRobot, newFrame); 
+      mmrpg_canvas_robot_frame(thisRobot, newFrame);
       var spriteKind = thisRobot.attr('data-type');
       var spriteID = thisRobot.attr('data-'+spriteKind+'id');
       var shadowSprite = $('.sprite[data-shadowid='+spriteID+']', gameCanvas);
       if (shadowSprite.length){ mmrpg_canvas_robot_frame(shadowSprite, newFrame);  }
-      
+
       } else if (thisRobot.attr('data-status') == 'disabled' && thisRobot.attr('data-direction') == 'right'){
       // Default the new frame to base
-      //var newFrame = 'base';  
+      //var newFrame = 'base';
       // Trigger the robot frame advancement
-      //mmrpg_canvas_robot_frame(thisRobot, newFrame);            
-      } else {      
-      //alert('robot is disabled');  
-      // Fade this robot off-screen       
+      //mmrpg_canvas_robot_frame(thisRobot, newFrame);
+      } else {
+      //alert('robot is disabled');
+      // Fade this robot off-screen
       var spriteKind = thisRobot.attr('data-type');
       var spriteID = thisRobot.attr('data-'+spriteKind+'id');
       //alert('sprite kind is '+spriteKind+' and its ID is '+spriteID);
@@ -852,25 +851,25 @@ function mmrpg_canvas_animate(){
       var detailsSprite = $('.sprite[data-detailsid='+spriteID+']', gameCanvas);
       var mugshotSprite = $('.sprite[data-mugshotid='+spriteID+']', gameCanvas);
       //alert('Shadowsprite '+(shadowSprite.length ? 'exists' : 'does not exist')+'!');
-      thisRobot.stop(true, true).animate({opacity:0},1000,'linear',function(){ 
-        $(this).remove(); 
+      thisRobot.stop(true, true).animate({opacity:0},1000,'linear',function(){
+        $(this).remove();
         if (shadowSprite.length){ shadowSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
         if (detailsSprite.length){ detailsSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
         if (mugshotSprite.length){ mugshotSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
-        });  
-      
-      
+        });
+
+
       }
-    
-    });   
-  
+
+    });
+
   // Reset the timeout event for another animation round
   //canvasAnimationTimeout = setTimeout(function(){
   //  mmrpg_canvas_animate(); // DEBUG PAUSE
   //  }, gameSettings.eventTimeout);
   // Reset the timeout event for another animation round
   if (canvasAnimationTimeout != false){ window.clearTimeout(canvasAnimationTimeout); }
-  if (!canvasAnimationTimeout.length){    
+  if (!canvasAnimationTimeout.length){
     canvasAnimationTimeout = window.setTimeout(function(){
       //console.log('mmrpg_canvas_animate');
       mmrpg_canvas_animate(); // DEBUG PAUSE
@@ -892,20 +891,20 @@ function mmrpg_canvas_field_frame(thisField, newFrame){
     if (thisAnimateFrameCount > 1){
       var thisIndex = thisAnimateFrame.indexOf(thisFieldFrame);
       if ((thisIndex + 1) < thisAnimateFrameCount){
-        var newFrame = thisAnimateFrame[thisIndex + 1]; 
-        } else { 
-        var newFrame = thisAnimateFrame[0]; 
-        }      
+        var newFrame = thisAnimateFrame[thisIndex + 1];
+        } else {
+        var newFrame = thisAnimateFrame[0];
+        }
     } else {
       var newFrame = thisAnimateFrame[0];
-    }    
+    }
   }
   // Collect this field's data fields (hehe)
   var thisFrame = thisField.attr('data-frame');
   // If the new frame is the same as the current, return
   if (thisFrame == newFrame || thisField.is(':animated')){ return false; }
   // Define the current class (based on data) and the new class
-  var fieldLayer = thisField.hasClass('background') ? 'background' : 'foreground'; 
+  var fieldLayer = thisField.hasClass('background') ? 'background' : 'foreground';
   var currentClass = fieldLayer+'_'+thisFrame;
   var newClass = fieldLayer+'_'+newFrame;
   // Check to make sure event crossfade is enabled
@@ -914,7 +913,7 @@ function mmrpg_canvas_field_frame(thisField, newFrame){
     var cloneField = thisField.clone().css('z-index', '10').appendTo(thisField.parent());
     thisField.stop(true, true).css({opacity:0}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
     thisField.stop(true, true).animate({opacity:1}, {duration:Math.ceil(gameSettings.eventTimeout * 0.5),easing:'swing',queue:false});
-    cloneField.stop(true, true).animate({opacity:1}, {duration:Math.ceil(gameSettings.eventTimeout * 0.5),easing:'swing',queue:false,complete:function(){ $(this).remove(); }});        
+    cloneField.stop(true, true).animate({opacity:1}, {duration:Math.ceil(gameSettings.eventTimeout * 0.5),easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
     } else {
     // Update the existing sprite's frame without crossfade by swapping the classsa
     thisField.attr('data-frame', newFrame).stop(true, true).removeClass(currentClass).addClass(newClass);
@@ -940,9 +939,9 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
   // If the new frame is the same as the current, return
   if (thisFrame == newFrame){ return false; }
   // If this robot is disabled, do not animate
-  if (thisStatus == 'disabled'){ 
+  if (thisStatus == 'disabled'){
     //thisRobot.animate({opacity:0},1000,'swing',function(){ $(this).remove(); });
-    return false; 
+    return false;
     }
   // Define the current class (based on data) and the new class
   var currentClass = 'sprite_'+thisSize+'x'+thisSize+'_'+thisFrame;
@@ -958,11 +957,11 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
     var cloneRobot = thisRobot.clone().css('z-index', '-=1').appendTo(thisRobot.parent());
     thisRobot.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
     thisRobot.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
-    cloneRobot.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});      
+    cloneRobot.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
     } else {
     // Update the existing sprite's frame without crossfade by swapping the classsa
     thisRobot.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
-    }    
+    }
   // Return true on success
   return true;
 }
@@ -996,11 +995,11 @@ function mmrpg_canvas_player_frame(thisPlayer, newFrame){
     var clonePlayer = thisPlayer.clone().css('z-index', '-=1').appendTo(thisPlayer.parent());
     thisPlayer.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
     thisPlayer.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
-    clonePlayer.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});        
+    clonePlayer.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
     } else {
     // Update the existing sprite's frame without crossfade by swapping the classsa
     thisPlayer.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
-    }     
+    }
   // Return true on success
   return true;
 }
@@ -1020,8 +1019,8 @@ function mmrpg_canvas_attachment_frame(thisAttachment, newFrame){
     // Default the new frame to base
     var newIndex = 0;
     var newFrame = thisAnimateFrame[newIndex];
-    if (thisAnimateFrameCount > 1 && (thisAnimateFrameIndex + 1) < thisAnimateFrameCount){ 
-      newIndex = thisAnimateFrameIndex + 1; 
+    if (thisAnimateFrameCount > 1 && (thisAnimateFrameIndex + 1) < thisAnimateFrameCount){
+      newIndex = thisAnimateFrameIndex + 1;
       newFrame = thisAnimateFrame[newIndex];
       }
     var newFrameShift = thisAnimateFrameShift.length ? thisAnimateFrameShift[newIndex] : thisAttachment.css(thisAttachmentFloat)+','+thisAttachment.css('bottom');
@@ -1029,26 +1028,26 @@ function mmrpg_canvas_attachment_frame(thisAttachment, newFrame){
     var newFrameShiftX = newFrameShift[0]+'px';
     var newFrameShiftY = newFrameShift[1]+'px';
     }
-  
+
   // DEBUG
   // If there was a frame shift defined
-  if (false && thisAnimateFrameShift){  
+  if (false && thisAnimateFrameShift){
     // DEBUG
     //console.log('ID = '+thisAttachment.attr('data-id'));
     //console.log('newIndex = '+newIndex);
     //console.log('newFrame = '+newFrame);
     //console.log('newFrameShiftX = '+newFrameShiftX);
-    //console.log('newFrameShiftY = '+newFrameShiftY);    
+    //console.log('newFrameShiftY = '+newFrameShiftY);
     }
-  
-  
+
+
   // Collect this robot's data fields
   var thisSize = thisAttachment.attr('data-size');
   //var thisPosition = thisAttachment.attr('data-position');
   var thisDirection = thisAttachment.attr('data-direction');
   var thisFloat = thisDirection == 'left' ? 'right' : 'left';
   var thisFrame = thisAttachment.attr('data-frame');
-  var thisPosition = thisAttachment.attr('data-position');  
+  var thisPosition = thisAttachment.attr('data-position');
   var thisIndex = thisAttachment.attr('data-animate-index');
   //console.log('checkpoint1');
   // If the new frame is the same as the current, return
@@ -1073,13 +1072,13 @@ function mmrpg_canvas_attachment_frame(thisAttachment, newFrame){
       if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
       // Fade this attachment back into view and fade the cloned attachment in the old frame out
       thisAttachment.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
-      cloneAttachment.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});        
+      cloneAttachment.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
       } else {
       // If the frame's offsets have changed, update the css offsets
       if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
       // Update the existing sprite's frame without crossfade by swapping the classsa
       thisAttachment.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).attr('data-animate-index', newIndex).removeClass(currentClass).addClass(newClass);
-      }         
+      }
   }  else {
     // If the frame's offsets have changed, update the css offsets
     if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
@@ -1102,18 +1101,18 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
   var nextPanel = false;
   // Switch to the loading screen
   mmrpg_action_panel('loading');
-  
+
   // If the target was set to auto, pull the data from the engine
   if (thisTarget == 'auto'){
     //var autoTargetID = $('target_robot_id', gameEngine).val();
     //var autoTargetToken = $('target_robot_token', gameEngine).val();
     //thisTarget = autoTargetID+'_'+autoTargetToken;
-    }  
-  
+    }
+
   // Parse any actions with subtokens in their string
-  if (thisAction.match(/^ability_([-a-z0-9_]+)$/i)){    
+  if (thisAction.match(/^ability_([-a-z0-9_]+)$/i)){
     // Parse the ability token and clean the main action token
-    var thisAbility = thisAction.replace(/^ability_([-a-z0-9_]+)$/i, '$1');    
+    var thisAbility = thisAction.replace(/^ability_([-a-z0-9_]+)$/i, '$1');
     // If this ability's target is not set to auto
     if (thisTarget == 'select_this'){
       // Make sure the engine is not submit yet
@@ -1124,15 +1123,15 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
       // Make sure the engine is not submit yet
       submitEngine = false;
       // Make sure the next panel is the target
-      nextPanel = 'target_this_disabled';      
+      nextPanel = 'target_this_disabled';
     } else if (thisTarget == 'select_target'){
       // Make sure the engine is not submit yet
       submitEngine = false;
       // Make sure the next panel is the target
-      nextPanel = 'target_target';      
+      nextPanel = 'target_target';
     }
     mmrpg_engine_update({this_action_token:thisAbility});
-    thisAction = 'ability';    
+    thisAction = 'ability';
     } else if (thisAction.match(/^switch_([-a-z0-9_]+)$/i)){
     // Parse the switch token and clean the main action token
     var thisSwitch = thisAction.replace(/^switch_([-a-z0-9_]+)$/i, '$1');
@@ -1158,10 +1157,10 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
     gameSettings[thisSettingToken] = thisSettingValue;
     var thisRequestType = 'session';
     var thisRequestData = 'battle_settings,'+thisSettingToken+','+thisSettingValue;
-    $.post('scripts/script.php',{requestType: 'session',requestData: 'battle_settings,'+thisSettingToken+','+thisSettingValue});
+    $.post('scripts/script.ajax.php',{requestType: 'session',requestData: 'battle_settings,'+thisSettingToken+','+thisSettingValue});
     thisAction = 'settings';
     var nextAction = $('input[name=next_action]', gameEngine).val();
-    if (nextAction.length){ mmrpg_action_panel(nextAction, thisPanel); } 
+    if (nextAction.length){ mmrpg_action_panel(nextAction, thisPanel); }
     return true;
     }
   // Check if image preloading was requested
@@ -1182,7 +1181,7 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
       if (submitEngine == true){ gameEngine.submit(); }
       if (nextPanel != false){ mmrpg_action_panel(nextPanel, thisPanel); }
       return true;
-      }  
+      }
 }
 
 // Define a function for preloading assets
@@ -1261,7 +1260,7 @@ function mmrpg_preload_robot_sprites(thisRobotToken, thisRobotDirection, thisRob
       var thisCacheImage = document.createElement('img');
       thisCacheImage.src = robotSpritePath+thisSpriteFilename;
       robotSpriteCache[thisCacheToken].push(thisCacheImage);
-      //alert('thisCacheImage.src = '+robotSpritePath+thisSpriteFilename+';');      
+      //alert('thisCacheImage.src = '+robotSpritePath+thisSpriteFilename+';');
       //alert(robotSpritePath+thisSpriteFilename);
     }
   }
@@ -1275,9 +1274,9 @@ function mmrpg_engine_update(newValues){
     for (var thisName in newValues){
       var thisValue = newValues[thisName];
       if ($('input[name='+thisName+']', gameEngine).length){
-        $('input[name='+thisName+']', gameEngine).val(thisValue);  
+        $('input[name='+thisName+']', gameEngine).val(thisValue);
         } else {
-        gameEngine.append('<input type="hidden" class="hidden" name="'+thisName+'" value="'+thisValue+'" />');  
+        gameEngine.append('<input type="hidden" class="hidden" name="'+thisName+'" value="'+thisValue+'" />');
         }
       }
     }
@@ -1295,7 +1294,7 @@ function mmrpg_action_panel(thisPanel, currentPanel){
     //alert('thisPanel = '+thisPanel+'; currentPanel = '+currentPanel);
     }
   // Unhide the new wrapper
-  newWrapper.css({display:''});    
+  newWrapper.css({display:''});
   // If the new action panel has numbered links in the title
   var mainActionsTitle = $('.main_actions_title', newWrapper);
   var floatLinkContainer = $('.float_links', mainActionsTitle);
@@ -1303,12 +1302,12 @@ function mmrpg_action_panel(thisPanel, currentPanel){
     //console.log('We\'ve got links, batman!');
     // Assign events to any of the page links here
     $('.num', floatLinkContainer).click(function(e){
-      e.preventDefault();      
+      e.preventDefault();
       // Collect references to this link and number
       var thisLink = $(this);
       var thisNum = parseInt(thisLink.attr('href').replace(/^#/, ''));
       // If this this panel is disabled, prevent clicking but only the first link
-      if (thisNum > 1 && mainActionsTitle.hasClass('main_actions_title_disabled')){ return false; }      
+      if (thisNum > 1 && mainActionsTitle.hasClass('main_actions_title_disabled')){ return false; }
       //console.log('num link '+thisNum+' clicked!');
       // Remove the active class from other links and add to this one
       $('.num', floatLinkContainer).removeClass('active');
@@ -1319,26 +1318,26 @@ function mmrpg_action_panel(thisPanel, currentPanel){
       //console.log('first key should be '+firstElementKey+' and last should be '+lastElementKey+'!');
       // Hide all item buttons in the current view and then show only relevant
       $('.action_ability', newWrapper).css({display:'none'});
-      var activeButtons = $('.action_ability', newWrapper).slice(firstElementKey, lastElementKey); 
+      var activeButtons = $('.action_ability', newWrapper).slice(firstElementKey, lastElementKey);
       //console.log('we have selected a total of '+activeButtons.length+' elements');
       activeButtons.css({display:'block'});
       // Loop through the active buttons and update their order values
       var tempOrder = 1;
       activeButtons.each(function(){ $(this).attr('data-order', tempOrder); tempOrder++; });
       $('.action_back', newWrapper).attr('data-order', tempOrder);
-      // Update the session with the last page click      
+      // Update the session with the last page click
       var thisRequestType = 'session';
       var thisRequestData = 'battle_settings,action_ability_page_num,'+thisNum;
-      $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+      $.post('scripts/script.ajax.php',{requestType:thisRequestType,requestData:thisRequestData});
       // Return true on success
       return true;
-      }); 
-    
+      });
+
     var activeLink = $('.active', floatLinkContainer);
     var firstLink = $('.num', floatLinkContainer).first();
     if (activeLink.length){ activeLink.trigger('click'); }
     else if (firstLink.length){ firstLink.trigger('click'); }
-     
+
     }
   // If there are buttons in the new wrapper
   var hoverButton = $('.button_hover', newWrapper);
@@ -1349,7 +1348,7 @@ function mmrpg_action_panel(thisPanel, currentPanel){
     var firstButtonOrder = firstButton.attr('data-order') != undefined ? parseInt(firstButton.attr('data-order')) : 0;
     if (firstButton.length){ firstButton.addClass('button_hover'); }
   }
-  
+
 }
 
 // Define an extension of the string prototype to handle replace all
@@ -1369,7 +1368,7 @@ function decompress_action_markup(thisMarkup){
   for (var i = 0; i < arrayLength; i++){
     var thisSearch = '!'+i.toString(16)+'¡';
     var thisReplace = decompressActionArray[i];
-    thisMarkup = thisMarkup.replaceAll(thisSearch, thisReplace);  
+    thisMarkup = thisMarkup.replaceAll(thisSearch, thisReplace);
     //thisMarkup = thisMarkup.split(thisSearch).join(thisReplace);
   }
   //console.log('decompress_action_markup(thisMarkup:after)', thisMarkup);
@@ -1392,7 +1391,7 @@ function mmrpg_action_panel_update(thisPanel, thisMarkup){
       var cacheImage = document.createElement('img');
       cacheImage.src = thisBackground;
       actionPanelCache.push(cacheImage)
-      }    
+      }
     });
 }
 
@@ -1407,27 +1406,27 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
   mmrpgEvents.push({
     'event_functions' : function(){
       if (dataMarkup.length){
-        //dataMarkup = $.parseJSON(dataMarkup); 
+        //dataMarkup = $.parseJSON(dataMarkup);
         /*
         mmrpg_canvas_update(
-          dataMarkup.this_battle, 
-          dataMarkup.this_field, 
-          dataMarkup.this_player, 
-          dataMarkup.this_robot, 
-          dataMarkup.target_player, 
+          dataMarkup.this_battle,
+          dataMarkup.this_field,
+          dataMarkup.this_player,
+          dataMarkup.this_robot,
+          dataMarkup.target_player,
           dataMarkup.target_robot
           );
         */
         }
-      if (canvasMarkup.length){ 
-        //mmrpg_canvas_event(decompress_action_markup(canvasMarkup)); //, flagsMarkup 
+      if (canvasMarkup.length){
+        //mmrpg_canvas_event(decompress_action_markup(canvasMarkup)); //, flagsMarkup
         mmrpg_canvas_event(canvasMarkup);
         }
-      if (consoleMarkup.length){ 
-        //mmrpg_console_event(decompress_action_markup(consoleMarkup));  //, flagsMarkup 
+      if (consoleMarkup.length){
+        //mmrpg_console_event(decompress_action_markup(consoleMarkup));  //, flagsMarkup
         mmrpg_console_event(consoleMarkup);
         }
-      }, 
+      },
     'event_flags' : flagsMarkup //$.parseJSON(flagsMarkup)
       });
 }
@@ -1436,34 +1435,34 @@ function mmrpg_events(){
   //console.log('mmrpg_events()');
   //clearTimeout(canvasAnimationTimeout);
   clearInterval(canvasAnimationTimeout);
-  
+
   var thisEvent = false;
-  
+
   if (mmrpgEvents.length){
     // Switch to the events panel
-    mmrpg_action_panel('event');     
+    mmrpg_action_panel('event');
     // Collect the topmost event and execute it
     thisEvent = mmrpgEvents.shift();
     thisEvent.event_functions();
     }
-  
-  if (gameConsole.length){ 
-    $('.wrapper', gameConsole).perfectScrollbar('update'); 
+
+  if (gameConsole.length){
+    $('.wrapper', gameConsole).perfectScrollbar('update');
     }
-  
+
   if (mmrpgEvents.length < 1){
-    
+
     // Switch to the specified "next" action
     var nextAction = $('input[name=next_action]', gameEngine).val();
-    if (nextAction.length){ mmrpg_action_panel(nextAction); } 
+    if (nextAction.length){ mmrpg_action_panel(nextAction); }
     // Add the idle class to the robot details on-screen
     //console.log('adding robot details class....1');
     //$('.robot_details', gameCanvas).css('opacity', 0.9).addClass('robot_details_idle');
     // Start animating the canvas randomly
     mmrpg_canvas_animate();
-    
+
     } else if (mmrpgEvents.length >= 1){
-      
+
       if (gameSettings.eventAutoPlay && thisEvent.event_flags.autoplay != false){
         var autoClickTimer = setTimeout(function(){
           mmrpg_events();
@@ -1475,7 +1474,7 @@ function mmrpg_events(){
       $('a[data-action="continue"]').click(function(){
         clearTimeout(autoClickTimer);
         });
-      
+
     }
   // Collect the current battle status and result
   var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
@@ -1538,10 +1537,10 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
         var thisPosition = thisAttachment.attr('data-position');
         if (thisPosition == 'background' || thisPosition == 'foreground'){
           //console.log('mmrpg_canvas_attachment_frame('+thisAttachment.attr('data-id')+')');
-          mmrpg_canvas_attachment_frame(thisAttachment, '');  
-          }        
-        });      
-      // Find all the details in this event markup and move them to the sticky      
+          mmrpg_canvas_attachment_frame(thisAttachment, '');
+          }
+        });
+      // Find all the details in this event markup and move them to the sticky
       $(this).find('.details').addClass('hidden').css({opacity:0}).appendTo('.event_details', gameCanvas);
       // Animate a fade in, and the remove the old images
       $(this).animate({opacity:1.0}, {
@@ -1557,7 +1556,7 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
           $(this).css({zIndex:500});
           },
         queue: false
-        });       
+        });
       });
     }
 }
@@ -1569,7 +1568,7 @@ function mmrpg_canvas_update(thisBattle, thisPlayer, thisRobot, targetPlayer, ta
   if (thisPlayer.player_side && thisRobot.robot_token){
     var thisRobotToken = thisRobot.robot_token;
     var thisRobotSide = thisPlayer.player_side == 'right' ? 'left' : 'right';
-    mmrpg_preload_robot_sprites(thisRobotToken, thisRobotSide);  
+    mmrpg_preload_robot_sprites(thisRobotToken, thisRobotSide);
     }
   // Preload all the target robot's sprite image files if not already
   if (targetPlayer.player_side && targetRobot.robot_token){
@@ -1601,7 +1600,7 @@ function mmrpg_console_event(thisMarkup){ //, flagsMarkup
     $('.event:gt(9)', thisContext).animate({opacity:0.40}, 100, 'swing');
     // Hide any leftover boxes from previous events over the limit
     //$('.event:gt(50)', thisContext).appendTo('#event_console_backup');
-    
+
     // Remove any leftover boxes from previous events
     //$('.event:gt(10)', thisContext).remove();
     }
@@ -1632,7 +1631,7 @@ function mmrpg_stop_animation(){
   animateToggle.removeClass('playing').addClass('paused');
   gameSettings.idleAnimation = false;
   gameSettings.eventAutoPlay = false;
-  mmrpg_canvas_animate();  
+  mmrpg_canvas_animate();
   return gameSettings.idleAnimation;
 }
 
@@ -1642,7 +1641,7 @@ var musicStreamObject = false;
 var mmrpgMusicEndedDefault = function(){ /*console.log('default music ended event triggered, this.play()!');*/ musicStreamObject.play(); return false; };
 var mmrpgMusicEnded = mmrpgMusicEndedDefault;
 function mmrpg_music_toggle(){
-  //alert('clicked');  
+  //alert('clicked');
   var musicToggle = $('a.toggle', gameMusic);
   var musicStream = $('audio.stream', gameMusic);
   musicStreamObject = musicStream.get(0);
@@ -1665,7 +1664,7 @@ function mmrpg_music_toggle(){
     //console.log('first music toggle!  init the music with the function caller');
     musicStreamObject.addEventListener('ended', function(){ return mmrpgMusicEnded(); }, true);
     mmrpgMusicInit = true;
-  }  
+  }
 }
 
 // Define a function for playing the current music
@@ -1681,7 +1680,7 @@ function mmrpg_music_play(){
     musicStream.get(0).addEventListener('canplay', function(){
       musicStream.get(0).play();
       musicToggle.html('&#9658;');
-      musicToggle.removeClass('paused').addClass('playing');  
+      musicToggle.removeClass('paused').addClass('playing');
       this.removeEventListener('canplay', arguments.callee, false);
       });
     }
@@ -1720,19 +1719,19 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce){
   var isPaused = musicStreamObject == undefined || musicStreamObject.paused ? true : false;
   var isRestart = resartTrack === true ? true : false;
   var isPlayOnce = playOnce == true ? true : false;
-  if (newTrack == 'last-track'){ 
-    var lastTrack = musicStream.attr('data-last-track'); 
+  if (newTrack == 'last-track'){
+    var lastTrack = musicStream.attr('data-last-track');
     if (lastTrack != 'misc/battle-victory' && lastTrack != 'misc/battle-defeat'){ newTrack = lastTrack; }
     else { return false; }
     }
   if (isRestart == false && newTrack == thisTrack){ return false; }
   if (thisTrack != newTrack || isRestart){
-    if (thisTrack != newTrack){ 
-      //console.log('loading new track '+newTrack); 
-      } else if (isRestart){ 
-      //console.log('restarting track '+newTrack);  
+    if (thisTrack != newTrack){
+      //console.log('loading new track '+newTrack);
+      } else if (isRestart){
+      //console.log('restarting track '+newTrack);
       }
-    mmrpg_music_stop();  
+    mmrpg_music_stop();
     var newSourceMP3 = '<source src="sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime+'" type="audio/mp3" />';
     var newSourceOGG = '<source src="sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime+'" type="audio/ogg" />';
     musicStream.empty();
@@ -1740,19 +1739,19 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce){
     else if (isChrome || isFirefox){ musicStream.append(newSourceOGG); }
     else { musicStream.append(newSourceMP3); }
     musicStream.attr('data-track', newTrack);
-    if (musicStreamObject != undefined){ musicStreamObject.load(); }    
-    if (!isPaused){ mmrpg_music_play(); }   
-    musicStream.attr('data-last-track', thisTrack);  
+    if (musicStreamObject != undefined){ musicStreamObject.load(); }
+    if (!isPaused){ mmrpg_music_play(); }
+    musicStream.attr('data-last-track', thisTrack);
     }
-  
+
   // Only continue if the media stream object is not undefined
   if (musicStreamObject != undefined){
 
     // If the user requested this track to only play once, otherwise just repeat
     if (isPlayOnce == true){
-      
+
       //console.log('isPlayOnce is true, creating new onended event to prevent from replaying');
-      
+
       // Update the event listener that will prevent this from replaying
       mmrpgMusicEnded = function(){
         //console.log('onended event called...');
@@ -1760,28 +1759,28 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce){
         // Decide what to do based on the requested music or sound effect
         if (newTrack == 'misc/battle-victory' || newTrack == 'misc/battle-defeat'){
           //console.log('new track was '+newTrack+' so we\'re going to leaderboard now that complete');
-          mmrpg_music_load('misc/leader-board', true, false);        
-          } else {       
+          mmrpg_music_load(newTrack+'-loop', true, false);
+          } else {
           //console.log('new track was '+newTrack+' so we\'re simply playing last track now that complete');
-          mmrpg_music_load('last-track', true, false);      
+          mmrpg_music_load('last-track', true, false);
           }
-        
+
         return false;
-        
+
         };
-      
+
       } else {
-      
+
       //console.log('isPlayOnce is false, resetting onended event to default and replay track');
-      
+
       // Create the event listener that will ensure this continues replaying
       //console.log('Update the event listener function with the default');
       mmrpgMusicEnded = mmrpgMusicEndedDefault;
-      
+
       }
-    
+
     }
-    
+
 }
 
 // Define a function for preloading music files
@@ -1790,13 +1789,13 @@ var cacheList = [];
 function mmrpg_music_preload(newTrack){
   // Ensure the new track is not alrady in the list
   if (cacheList.indexOf(newTrack) === -1){
-    // Define the two audio objects based on the track  
+    // Define the two audio objects based on the track
     var newAudioMP3 = '<audio src="sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime+'" preload></audio>';
     var newAudioOGG = '<audio src="sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime+'" preload></audio>';
-    cacheList.push(newTrack);       
+    cacheList.push(newTrack);
     if (isIE || isOpera || isSafari){ musicCache.push($(newAudioMP3));  }
     else if (isChrome || isFirefox){ musicCache.push($(newAudioOGG)); }
-    else { musicCache.push($(newAudioMP3)); }        
+    else { musicCache.push($(newAudioMP3)); }
     return true;
     } else {
     // Does not need to be preloaded
@@ -1816,8 +1815,8 @@ function mmrpg_toggle_index_loaded(toggleValue){
         // Set the toggle loader flag to true
         gameSettings.indexLoaded = true;
         });
-      });            
-    }          
+      });
+    }
 }
 
 // Define a function for updating the loaded status of the main index page
@@ -1838,7 +1837,7 @@ function mmrpg_toggle_debug_mode(element){
   // Send the new value to the server to update the session
   var thisRequestType = 'session';
   var thisRequestData = 'debug_mode,'+newValue;
-  $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+  $.post('scripts/script.ajax.php',{requestType:thisRequestType,requestData:thisRequestData});
   return true;
 }
 
@@ -1859,15 +1858,15 @@ function mmrpg_toggle_debug_mode(element){
 function dump(arr,level) {
   var dumped_text = "";
   if(!level) level = 0;
-  
+
   //The padding given at the beginning of the line.
   var level_padding = "";
   for(var j=0;j<level+1;j++) level_padding += "    ";
-  
-  if(typeof(arr) == 'object') { //Array/Hashes/Objects 
+
+  if(typeof(arr) == 'object') { //Array/Hashes/Objects
     for(var item in arr) {
       var value = arr[item];
-      
+
       if(typeof(value) == 'object') { //If it is an array,
         dumped_text += level_padding + "'" + item + "' ...\n";
         dumped_text += dump(value,level+1);
@@ -1900,7 +1899,7 @@ function dump(arr,level) {
     // Namespace all events.
     var eventNamespace = 'waitForImages';
 
-    // CSS properties which contain references to images. 
+    // CSS properties which contain references to images.
     $.waitForImages = {
         hasImageProperties: [
         'backgroundImage',
@@ -1909,7 +1908,7 @@ function dump(arr,level) {
         'borderCornerImage'
         ]
     };
-    
+
     // Custom selector to find `img` elements that have a valid `src` attribute and have not already loaded.
     $.expr[':'].uncached = function(obj) {
         // Ensure we are dealing with an `img` element with a valid `src` attribute.
@@ -1954,7 +1953,7 @@ function dump(arr,level) {
                 // CSS properties which may contain an image.
                 var hasImgProperties = $.waitForImages.hasImageProperties || [],
                     matchUrl = /url\((['"]?)(.*?)\1\)/g;
-                
+
                 // Get all elements, as any one of them could have a background image.
                 obj.find('*').each(function() {
                     var element = $(this);
@@ -2005,21 +2004,21 @@ function dump(arr,level) {
             };
 
             $.each(allImgs, function(i, img) {
-                
+
                 var image = new Image;
-                
+
                 // Handle the image loading and error with the same callback.
                 $(image).bind('load.' + eventNamespace + ' error.' + eventNamespace, function(event) {
                     allImgsLoaded++;
-                    
+
                     // If an error occurred with loading the image, set the third argument accordingly.
                     eachCallback.call(img.element, allImgsLoaded, allImgsLength, event.type == 'load');
-                    
+
                     if (allImgsLoaded == allImgsLength) {
                         finishedCallback.call(obj[0]);
                         return false;
                     };
-                    
+
                 });
 
                 image.src = img.src;

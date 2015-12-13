@@ -1,5 +1,12 @@
 <?php
 
+// Define the SCRIPT REQUEST constant for later reference
+define('MMRPG_SCRIPT_REQUEST', true);
+
+// Include the application TOP file
+$temp_path = str_replace('\\', '/', dirname(dirname(__FILE__)));
+require($temp_path.'/_top.php');
+
 // Collect the POST header type
 $request_type = !empty($_POST['requestType']) ? $_POST['requestType'] : false;
 // Collect the POST header data

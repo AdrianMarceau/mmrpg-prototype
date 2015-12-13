@@ -1,9 +1,11 @@
-<?
+<?php
+
 // Define the SCRIPT REQUEST constant for later reference
 define('MMRPG_SCRIPT_REQUEST', true);
 
-// Require the application top file
-require_once('../top.php');
+// Include the application TOP file
+$temp_path = str_replace('\\', '/', dirname(dirname(__FILE__)));
+require($temp_path.'/_top.php');
 
 // Collect the request data from the headers
 $this_data_step = !empty($_REQUEST['step']) ? $_REQUEST['step'] : false;
@@ -26,7 +28,7 @@ foreach ($this_data_condition AS $key => $string){
 }
 
 // Otherwise, require the prototype data file
-require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'includes/include.prototype.php');
 
 // Start the output buffer
 ob_start();
@@ -38,7 +40,7 @@ switch ($this_data_select){
   case 'this_player_token': {
 
     // Require the prototype players display file
-    require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_players.php');
+    require_once(MMRPG_CONFIG_ROOTDIR.'prototype/prototype.players.php');
 
     // Break automatically to prevent looping
     break;
@@ -49,7 +51,7 @@ switch ($this_data_select){
   case 'this_battle_token': {
 
     // Require the prototype missions display file
-    require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_missions.php');
+    require_once(MMRPG_CONFIG_ROOTDIR.'prototype/prototype.missions.php');
 
     // Break automatically to prevent looping
     break;
@@ -59,7 +61,7 @@ switch ($this_data_select){
   case 'this_player_robots': {
 
     // Require the prototype robots display file
-    require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_robots.php');
+    require_once(MMRPG_CONFIG_ROOTDIR.'prototype/prototype.robots.php');
 
     // Break automatically to prevent looping
     break;
@@ -71,7 +73,7 @@ switch ($this_data_select){
 $temp_markup = ob_get_clean();
 
 // Unset the database variable
-unset($DB);
+unset($this_database);
 
 // If the user made it this far, exit gracefully
 exit(!empty($temp_markup) ? $temp_markup : '');

@@ -1,8 +1,11 @@
-<?
-// Require the application top file
-require_once('../top.php');
+<?php
+
+// Include the application TOP file
+$temp_path = str_replace('\\', '/', dirname(dirname(__FILE__)));
+require($temp_path.'/_top.php');
+
 // Unset the database variable
-unset($DB);
+unset($this_database);
 
 // Collect the password string from the URL, if set
 $password_string = !empty($_REQUEST['password']) ? $_REQUEST['password'] : false;
@@ -20,8 +23,8 @@ if (!empty($password_string) && preg_match($valid_passwords, $password_string)){
       // UNLOCK ROBOTS
       list($player_token, $robot_token) = explode('_', $password_string);
       $unlock_player_info = $mmrpg_index['players'][$player_token];
-      $unlock_robot_info = mmrpg_robot::get_index_info($robot_token);
-      mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info);
+      $unlock_robot_info = rpg_robot::get_index_info($robot_token);
+      rpg_game::unlock_robot($unlock_player_info, $unlock_robot_info);
       exit('success:unlock_'.$player_token.'_'.$robot_token);
       
     } else {

@@ -23,9 +23,9 @@ $(document).ready(function(){
     var canvasContext = $('#canvas', thisBattle);
     thisBattle.waitForImages(function(){
       // Fade the battle canvas startup elements into view
-      mmrpg_battle_fadein_background(canvasContext, Math.ceil(gameSettings.eventTimeout * 2), function(){
+      battle_fadein_background(canvasContext, Math.ceil(gameSettings.eventTimeout * 2), function(){
         // Fade in the foreground now so it loads at the same time as the robots
-        mmrpg_battle_fadein_foreground(canvasContext, Math.ceil(gameSettings.eventTimeout * 1), function(){
+        battle_fadein_foreground(canvasContext, Math.ceil(gameSettings.eventTimeout * 1), function(){
           // Automatically send the start action to the data api
           $('#animate').css({opacity:1});
           $('#canvas .canvas_overlay_header').animate({opacity:1}, Math.ceil(gameSettings.eventTimeout * 2), 'swing', function(){ $(this).removeClass('canvas_overlay_hidden'); });
@@ -178,7 +178,7 @@ $(document).ready(function(){
 });
 
 // Define a function for animation the canvas background startup elements
-function mmrpg_battle_fadein_background(animateCanvas, animateDuration, onComplete){
+function battle_fadein_background(animateCanvas, animateDuration, onComplete){
   // Collect or define the onComplete function
   var onComplete = onComplete != undefined ? onComplete : function(){};
   // Collect the background canvas and event elements
@@ -200,7 +200,7 @@ function mmrpg_battle_fadein_background(animateCanvas, animateDuration, onComple
 }
 
 // Define a function for animation the canvas foreground startup elements
-function mmrpg_battle_fadein_foreground(animateCanvas, animateDuration, onComplete){
+function battle_fadein_foreground(animateCanvas, animateDuration, onComplete){
   // Collect or define the onComplete function
   var onComplete = onComplete != undefined ? onComplete : function(){};
   // Collect the foreground canvas and event elements
