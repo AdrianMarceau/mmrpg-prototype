@@ -27,6 +27,7 @@ $ability = array(
     $this_attachment_info = array(
       'class' => 'ability',
       'sticky' => true,
+      'ability_id' => $this_ability->ability_id,
       'ability_token' => $this_ability->ability_token,
       'ability_frame' => $temp_ability_frames['summon'],
       'ability_frame_animate' => array($temp_ability_frames['summon']),
@@ -36,7 +37,7 @@ $ability = array(
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array($temp_ability_frames['target'], 105, 0, 10, $this_robot->print_robot_name().' fires a '.$this_ability->print_ability_name().'!')
+      'success' => array($temp_ability_frames['target'], 105, 0, 10, $this_robot->print_name().' fires a '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -44,8 +45,8 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(10, 0, 0),
-      'success' => array($temp_ability_frames['damage'], -70, 0, 10, 'The '.$this_ability->print_ability_name().' hit the target!'),
-      'failure' => array($temp_ability_frames['damage'], -70, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array($temp_ability_frames['damage'], -70, 0, 10, 'The '.$this_ability->print_name().' hit the target!'),
+      'failure' => array($temp_ability_frames['damage'], -70, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $target_robot->trigger_damage($this_robot, $this_ability, $this_ability->ability_damage);
 
@@ -61,7 +62,7 @@ $ability = array(
         // Loop through the opponent's ability history in reverse
         $num_triggered_abilities = count($target_robot->history['triggered_abilities']);
         $new_ability_token = $target_robot->history['triggered_abilities'][$num_triggered_abilities - 1];
-        $new_ability_info = mmrpg_ability::get_index_info($new_ability_token);
+        $new_ability_info = rpg_ability::get_index_info($new_ability_token);
 
         // Skip these abilities as they cannot be copied
 
@@ -72,24 +73,20 @@ $ability = array(
           && (empty($new_ability_info['ability_class']) || $new_ability_info['ability_class'] == 'master')){
 
           // Attach the ability to this robot
-          $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-          $this_robot->update_session();
+          $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
           // Copy the current ability to this robot's list, and update
-          $this_robot->robot_frame = 'taunt';
-          $this_robot->robot_abilities[$this_ability_key] = $new_ability_token;
-          $this_robot->update_session();
-          $this_player->player_frame = 'victory';
-          $this_player->update_session();
+          $this_robot->set_frame('taunt');
+          $this_robot->set_ability($this_ability_key, $new_ability_token);
+          $this_player->set_frame('victory');
           // Create the ability object to trigger data loading
-          $this_new_ability = new mmrpg_ability($this_battle, $this_player, $this_robot, $new_ability_info);
-          $this_new_ability->update_session();
+          $this_new_ability = new rpg_ability($this_player, $this_robot, $new_ability_info);
           // Create an event displaying the new copied ability
           //$event_header = $this_robot->robot_name.'&#39;s '.$this_ability->ability_name;
           $event_header = $this_new_ability->ability_name.' Unlocked';
-          $event_body = $this_ability->print_ability_name().' downloads the target&#39;s battle data&hellip;<br />';
-          //$event_body .= $this_robot->print_robot_name().' learned how to use '.$this_new_ability->print_ability_name().'!';
-          $event_body .= $this_new_ability->print_ability_name().' can now be used in battle!';
+          $event_body = $this_ability->print_name().' downloads the target&#39;s battle data&hellip;<br />';
+          //$event_body .= $this_robot->print_name().' learned how to use '.$this_new_ability->print_name().'!';
+          $event_body .= $this_new_ability->print_name().' can now be used in battle!';
           $event_options = array();
           $event_options['console_show_target'] = false;
           $event_options['this_ability'] = $this_new_ability;
@@ -123,12 +120,12 @@ $ability = array(
             }
 
             // Unlock this ability for the player permanently
-            $show_event = !mmrpg_prototype_ability_unlocked('', '', $this_new_ability->ability_token) ? true : false;
+            $show_event = !rpg_game::ability_unlocked('', '', $this_new_ability->ability_token) ? true : false;
             $temp_player_info = array('player_token' => $this_player->player_token);
             $temp_robot_info = array('robot_token' => $this_robot->robot_token);
             $temp_ability_info = array('ability_token' => $this_new_ability->ability_token);
-            //mmrpg_game_unlock_ability($temp_player_info, $temp_robot_info, $temp_ability_info);
-            mmrpg_game_unlock_ability($temp_player_info, false, $temp_ability_info, $show_event);
+            //rpg_game::unlock_ability($temp_player_info, $temp_robot_info, $temp_ability_info);
+            rpg_game::unlock_ability($temp_player_info, false, $temp_ability_info, $show_event);
 
           }
 
@@ -145,18 +142,12 @@ $ability = array(
     },
   'ability_function_onload' => function($objects){
 
-    // Extract all objects into the current scope
-    extract($objects);
-
     // If this robot is holding a Target Module, allow target selection
     if ($this_robot->robot_item == 'item-target-module'){
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_target');
     } else {
-      $this_ability->ability_target = $this_ability->ability_base_target;
+      $this_ability->set_target($this_ability->ability_base_target);
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;
