@@ -404,7 +404,7 @@ while ($this_action == 'new'){
   $html_form_fields .= '<div class="field" style="float: left; width: 50%; overflow: hidden; ">';
     $html_form_fields .= '<label class="label label_captcha">Security : *</label>';
     $html_form_fields .= '<div class="field" style="float: left; width: 230px; overflow: hidden; ">';
-      $html_form_fields .= '<img class="captcha captcha_image" src="_ext/captcha/captcha.php?'.time().'" width="200" height="70" alt="Security Code" />';
+      $html_form_fields .= '<img class="captcha captcha_image" src="images/captcha/captcha.php?'.time().'" width="200" height="70" alt="Security Code" />';
       $html_form_fields .= '<input class="text text_captcha" type="text" name="captcha" style="width: 125px; " value="'.(!empty($_REQUEST['captcha']) ? htmlentities(trim($_REQUEST['captcha']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
     $html_form_fields .= '</div>';
   $html_form_fields .= '</div>';
