@@ -8,7 +8,7 @@ $battle = array(
   'battle_status' => 'disabled',
   'battle_class' => 'system',
   'battle_description' => 'Default battle object.',
-  'battle_field_base' => array('field_id' => 100, 'field_token' => 'field'),
+  'battle_field_info' => array('field_id' => 100, 'field_token' => 'field'),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',

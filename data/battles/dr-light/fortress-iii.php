@@ -5,7 +5,7 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat the powered up copies of Mega Man, Bass, and Proto Man!',
-  'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination-2', 'field_name' => 'Final Destination II', 'field_music' => 'final-destination-2', 'field_mechas' => array('beak', 'spine')),
+  'battle_field_info' => array('field_id' => 100, 'field_token' => 'final-destination-2', 'field_name' => 'Final Destination II', 'field_music' => 'final-destination-2', 'field_mechas' => array('beak', 'spine')),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',
@@ -15,14 +15,10 @@ $battle = array(
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'proto-man-ds', 'robot_level' => 40, 'robot_item' => 'item-speed-booster', 'robot_abilities' => array('drill-blitz', 'rain-flush', 'bright-burst', 'pharaoh-soul', 'ring-boomerang', 'dust-crusher', 'skull-barrier', 'dive-missile'))
       )
     ),
-  'battle_rewards' => array(
-    'abilities' => array(
-      ),
-    'items' => array(
-      array('chance' => 40, 'token' => 'item-energy-tank'),
-      array('chance' => 40, 'token' => 'item-weapon-tank'),
-      array('chance' => 20, 'token' => 'item-extra-life')
-      )
+  'battle_rewards_items' => array(
+    array('chance' => 40, 'token' => 'item-energy-tank'),
+    array('chance' => 40, 'token' => 'item-weapon-tank'),
+    array('chance' => 20, 'token' => 'item-extra-life')
     )
   );
 ?>

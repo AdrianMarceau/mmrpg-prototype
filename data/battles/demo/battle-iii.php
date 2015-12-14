@@ -5,9 +5,10 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat Dr. Wily\'s team of reprogrammed robot masters!',
-  'battle_turns' => 6,
+  'battle_turns_limit' => 6,
+  'battle_robots_limit' => 4,
   'battle_points' => 400,
-  'battle_field_base' => array('field_id' => 100, 'field_token' => 'orb-city'),
+  'battle_field_info' => array('field_id' => 100, 'field_token' => 'orb-city'),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'dr-wily',
@@ -18,8 +19,6 @@ $battle = array(
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'bomb-man', 'robot_level' => 3, 'robot_abilities' => array('hyper-bomb', 'speed-boost', 'buster-shot')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 4), 'robot_token' => 'wood-man', 'robot_level' => 3, 'robot_abilities' => array('leaf-shield', 'attack-boost', 'buster-shot'))
       )
-    ),
-  'battle_rewards' => array(
     )
   );
 ?>

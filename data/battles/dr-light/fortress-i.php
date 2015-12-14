@@ -5,9 +5,8 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat Dr. Wily\'s Bass and Disco!',
-  'battle_turns' => 1,
   'battle_points' => 1,
-  'battle_field_base' => array('field_id' => 100, 'field_token' => 'wily-castle', 'field_name' => 'Wily Castle', 'field_music' => 'wily-castle'),
+  'battle_field_info' => array('field_id' => 100, 'field_token' => 'wily-castle', 'field_name' => 'Wily Castle', 'field_music' => 'wily-castle'),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'dr-wily',
@@ -17,16 +16,10 @@ $battle = array(
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'disco', 'robot_level' => 1, 'robot_item' => 'item-attack-booster', 'robot_abilities' => array('disco-buster', 'buster-shot', 'attack-break', 'defense-break', 'speed-break', 'energy-break'))
       )
     ),
-  'battle_rewards' => array(
-    'robots' => array(
-      ),
-    'abilities' => array(
-      ),
-    'items' => array(
-      array('chance' => 10, 'token' => 'item-energy-tank'),
-      array('chance' => 10, 'token' => 'item-weapon-tank'),
-      array('chance' => 5, 'token' => 'item-extra-life')
-      )
+  'battle_rewards_items' => array(
+    array('chance' => 10, 'token' => 'item-energy-tank'),
+    array('chance' => 10, 'token' => 'item-weapon-tank'),
+    array('chance' => 5, 'token' => 'item-extra-life')
     )
   );
 ?>

@@ -5,7 +5,7 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat the army of powered up Robot Master copies and download their data!',
-  'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination-3', 'field_name' => 'Final Destination III', 'field_music' => 'final-destination', 'field_mechas' => array('batton-3', 'crazy-cannon-3', 'fan-fiend-3', 'killer-bullet-3', 'pierrobot-3', 'snapper-3', 'spring-head-3', 'telly-3')),
+  'battle_field_info' => array('field_id' => 100, 'field_token' => 'final-destination-3', 'field_name' => 'Final Destination III', 'field_music' => 'final-destination', 'field_mechas' => array('batton-3', 'crazy-cannon-3', 'fan-fiend-3', 'killer-bullet-3', 'pierrobot-3', 'snapper-3', 'spring-head-3', 'telly-3')),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',
@@ -20,14 +20,10 @@ $battle = array(
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 8), 'robot_token' => 'flash-man', 'robot_level' => 50, 'robot_abilities' => array('flash-stopper'))
       )
     ),
-  'battle_rewards' => array(
-    'abilities' => array(
-      ),
-    'items' => array(
-      array('chance' => 80, 'token' => 'item-energy-tank'),
-      array('chance' => 80, 'token' => 'item-weapon-tank'),
-      array('chance' => 40, 'token' => 'item-extra-life')
-      )
+  'battle_rewards_items' => array(
+    array('chance' => 80, 'token' => 'item-energy-tank'),
+    array('chance' => 80, 'token' => 'item-weapon-tank'),
+    array('chance' => 40, 'token' => 'item-extra-life')
     )
   );
 ?>

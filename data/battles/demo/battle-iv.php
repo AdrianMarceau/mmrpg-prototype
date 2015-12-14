@@ -5,9 +5,10 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat Dr. Wily\'s team of reprogrammed robot masters!',
-  'battle_turns' => 12,
+  'battle_turns_limit' => 12,
+  'battle_robots_limit' => 6,
   'battle_points' => 600,
-  'battle_field_base' => array('field_id' => 100, 'field_token' => 'oil-wells'),
+  'battle_field_info' => array('field_id' => 100, 'field_token' => 'oil-wells'),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'dr-wily',
@@ -20,8 +21,6 @@ $battle = array(
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 5), 'robot_token' => 'heat-man', 'robot_level' => 4, 'robot_abilities' => array('atomic-fire', 'attack-boost', 'defense-break', 'buster-shot')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 6), 'robot_token' => 'wood-man', 'robot_level' => 4, 'robot_abilities' => array('leaf-shield', 'speed-boost', 'speed-break', 'buster-shot'))
       )
-    ),
-  'battle_rewards' => array(
     )
   );
 ?>

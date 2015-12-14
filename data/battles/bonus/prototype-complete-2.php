@@ -1,15 +1,14 @@
 <?
 // PROTOTYPE BATTLE 5 : VS BONUS FIELD 2
 $battle = array(
+  'flags' => array('save_records' => false),
   'battle_name' => 'Robot Master Bonus Battle',
   'battle_size' => '1x4',
   'battle_encore' => true,
-  'battle_counts' => false,
   'battle_description' => 'You\'ve completed the MMRPG Prototype! Here\'s a bonus robot master battle as thanks for playing to the end! :D',
   'battle_level' => 30,
-  'battle_turns' => 24,
   'battle_points' => 60000,
-  'battle_field_base' => array('field_id' => 1000, 'field_token' => 'prototype-complete'),
+  'battle_field_info' => array('field_id' => 1000, 'field_token' => 'prototype-complete'),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',
@@ -114,10 +113,8 @@ $battle = array(
       'battle_defeat' => 'I have nothing left to fight with...'
       )
     ),
-  'battle_rewards' => array(
-    'abilities' => array(
-      array('token' => 'field-support')
-      )
+  'battle_rewards_abilities' => array(
+    array('token' => 'field-support')
     )
   );
 ?>

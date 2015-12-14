@@ -5,9 +5,10 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat Dr. Wily\'s team of reprogrammed Robot Masters!',
-  'battle_turns' => 24,
+  'battle_turns_limit' => 24,
+  'battle_robots_limit' => 8,
   'battle_points' => 800,
-  'battle_field_base' => array('field_id' => 100, 'field_token' => 'wily-castle', 'field_multipliers' => array('damage' => 2.0, 'recovery' => 0.5)),
+  'battle_field_info' => array('field_id' => 100, 'field_token' => 'wily-castle', 'field_multipliers' => array('damage' => 2.0, 'recovery' => 0.5)),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'dr-wily',
@@ -23,8 +24,6 @@ $battle = array(
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 8), 'robot_token' => 'flash-man', 'robot_level' => 5, 'robot_abilities' => array('flash-stopper', 'speed-boost', 'speed-break', 'speed-mode')),
 
       )
-    ),
-  'battle_rewards' => array(
     )
   );
 ?>

@@ -1,20 +1,24 @@
 <?
+
+// THIS FILE IS ONLY USED DURING THE IMPORT PROCESS
+exit('BATTLES DATA _INDEX IS NOT USED...OR IS IT?!')
+
 // Default the battles index to an empty array
 $mmrpg_index['battles'] = array();
 
 // Define the cache and index paths for battles
 define('MMRPG_CONFIG_BATTLES_INDEX_PATH', MMRPG_CONFIG_ROOTDIR.'data/battles/');
-define('MMRPG_CONFIG_BATTLES_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'data/cache/'.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.php');
+define('MMRPG_CONFIG_BATTLES_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'_cache/'.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.php');
 
 // If caching is turned OFF, or a cache has not been created
 if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists(MMRPG_CONFIG_BATTLES_CACHE_PATH)){
 
   // Start indexing the battle data files
-  $battles_cache_markup = mmrpg_battle::index_battle_data();
+  $battles_cache_markup = rpg_battle::index_battle_data();
 
   // Implode the markup into a single string and enclose in PHP tags
   $battles_cache_markup = implode('', $battles_cache_markup);
-  $battles_cache_markup = "<?\n".$battles_cache_markup."\n?>";
+  $battles_cache_markup = "<?\n what \n ".$battles_cache_markup."\n?>";
 
   // Write the index to a cache file, if caching is enabled
   $battles_cache_file = @fopen(MMRPG_CONFIG_BATTLES_CACHE_PATH, 'w');
