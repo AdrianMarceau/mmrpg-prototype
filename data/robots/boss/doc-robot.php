@@ -5,6 +5,8 @@ $robot = array(
   'robot_game' => 'MMRPG',
   'robot_name' => 'Doc Robot',
   'robot_token' => 'doc-robot',
+  'robot_image_editor' => 3842,
+  'robot_image_size' => 80,
   'robot_class' => 'boss',
   'robot_image_editor' => 412,
   'robot_core' => 'copy',
@@ -41,6 +43,28 @@ $robot = array(
     'battle_taunt' => '',
     'battle_victory' => '',
     'battle_defeat' => ''
-    )
-  );
+    ),
+  'robot_function_onload' => function($objects){
+
+    // Extract all objects into the current scope
+    extract($objects);
+
+    // If Doc Robot used an ability the previous turn, change weaknesses
+    if (!empty($this_robot->history['triggered_abilities'])){
+      global $this_database;
+      $triggered_abilities = $this_robot->history['triggered_abilities'];
+      while (!empty($triggered_abilities)){
+        $last_ability = array_pop($triggered_abilities);
+        $last_ability_master = $this_database->get_array("SELECT robot_token, robot_weaknesses, robot_resistances, robot_affinities, robot_immunities FROM mmrpg_index_robots WHERE robot_abilities_rewards LIKE '%\"{$last_ability}\"%' AND robot_id <> 0 LIMIT 1;");
+        if (!empty($last_ability_master)){
+          $this_robot->set_weaknesses(!empty($last_ability_master['robot_weaknesses']) ? json_decode($last_ability_master['robot_weaknesses'], true) : array());
+          $this_robot->set_resistances(!empty($last_ability_master['robot_resistances']) ? json_decode($last_ability_master['robot_resistances'], true) : array());
+          $this_robot->set_affinities(!empty($last_ability_master['robot_affinities']) ? json_decode($last_ability_master['robot_affinities'], true) : array());
+          $this_robot->set_immunities(!empty($last_ability_master['robot_immunities']) ? json_decode($last_ability_master['robot_immunities'], true) : array());
+          break;
+        }
+      }
+    }
+  }
+);
 ?>
