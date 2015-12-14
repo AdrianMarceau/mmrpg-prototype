@@ -26,6 +26,7 @@ $ability = array(
     $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
     $this_attachment_info = array(
     	'class' => 'ability',
+      'ability_id' => $this_ability->ability_id,
     	'ability_token' => $this_ability->ability_token,
     	'attachment_duration' => 0,
       'attachment_damage_breaker' => 0.0,
@@ -42,8 +43,8 @@ $ability = array(
         'modifiers' => false,
         'frame' => 'taunt',
         'rates' => array(100, 0, 0),
-        'success' => array(9, 0, -9999, 0,  'The '.$this_ability->print_ability_name().'&#39;s power faded away&hellip;<br /> '.$target_robot->print_robot_name().' is no longer protected!'),
-        'failure' => array(9, 0, -9999, 0, 'The '.$this_ability->print_ability_name().'&#39;s power faded away&hellip;<br /> '.$target_robot->print_robot_name().' is no longer protected!')
+        'success' => array(9, 0, -9999, 0,  'The '.$this_ability->print_name().'&#39;s power faded away&hellip;<br /> '.$target_robot->print_name().' is no longer protected!'),
+        'failure' => array(9, 0, -9999, 0, 'The '.$this_ability->print_name().'&#39;s power faded away&hellip;<br /> '.$target_robot->print_name().' is no longer protected!')
         ),
       );
     */
@@ -52,17 +53,11 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'summon',
       'success' => array(0, 40, -2, 99,
-        $this_player->print_player_name().' uses an item from the inventory&hellip; <br />'.
-        $target_robot->print_robot_name().' is given the '.$this_ability->print_ability_name().'!'
+        $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
+        $target_robot->print_name().' is given the '.$this_ability->print_name().'!'
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);
-
-    /*
-    // Attach this ability attachment to the robot using it
-    $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-    $target_robot->update_session();
-    */
 
     // Increase this robot's life energy stat
     $this_ability->recovery_options_update(array(
@@ -70,8 +65,8 @@ $ability = array(
       'percent' => true,
       'modifiers' => false,
       'frame' => 'taunt',
-      'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s life energy was fully restored!'),
-      'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s life energy was not affected&hellip;')
+      'success' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s life energy was fully restored!'),
+      'failure' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s life energy was not affected&hellip;')
       ));
     $energy_recovery_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $energy_recovery_amount);
@@ -81,8 +76,8 @@ $ability = array(
       'kind' => 'weapons',
       'percent' => true,
       'frame' => 'taunt',
-      'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s weapon energy was fully restored!'),
-      'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s weapon energy was not affected&hellip;')
+      'success' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s weapon energy was fully restored!'),
+      'failure' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s weapon energy was not affected&hellip;')
       ));
     $weapons_recovery_amount = ceil($target_robot->robot_base_weapons * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $weapons_recovery_amount);
@@ -92,8 +87,8 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'taunt',
       'success' => array(9, 0, 0, -9999,
-        $target_robot->print_robot_name().'&#39;s power levels are in overdrive!<br /> '.
-        $target_robot->print_robot_name().' is protected from all damage!'
+        $target_robot->print_name().'&#39;s power levels are in overdrive!<br /> '.
+        $target_robot->print_name().' is protected from all damage!'
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);

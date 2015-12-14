@@ -24,8 +24,8 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'summon',
       'success' => array(0, 40, -2, 99,
-        $this_player->print_player_name().' uses an item from the inventory&hellip; <br />'.
-        $target_robot->print_robot_name().' is given the '.$this_ability->print_ability_name().'!'
+        $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
+        $target_robot->print_name().' is given the '.$this_ability->print_name().'!'
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);
@@ -36,15 +36,15 @@ $ability = array(
       'percent' => true,
       'modifiers' => false,
       'frame' => 'taunt',
-      'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s mobility improved!'),
-      'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s mobility was not affected&hellip;')
+      'success' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s mobility improved!'),
+      'failure' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s mobility was not affected&hellip;')
       ));
     $speed_recovery_amount = ceil($target_robot->robot_base_speed * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $speed_recovery_amount);
 
     // If this a human player on the left side, also increase their pending speed boost on level-up
     if ($this_player->player_controller == 'human'){
-      $session_token = mmrpg_game_token();
+      $session_token = rpg_game::session_token();
       // Collect any existing pending boosts and then add the ability recovery value
       if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_speed_pending'])){
         $session_speed_pending = $_SESSION[$session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$target_robot->robot_token]['robot_speed_pending'];

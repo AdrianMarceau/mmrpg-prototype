@@ -22,42 +22,40 @@ $ability = array(
     extract($objects);
 
     // Automatically change this ability's image based on player
-    if ($this_player->player_token == 'dr-light'){ $this_ability->ability_image = 'item-extra-life'; }
-    elseif ($this_player->player_token == 'dr-wily'){ $this_ability->ability_image = 'item-extra-life-2'; }
-    elseif ($this_player->player_token == 'dr-cossack'){ $this_ability->ability_image = 'item-extra-life-3'; }
+    if ($this_player->player_token == 'dr-light'){ $this_ability->set_image('item-extra-life'); }
+    elseif ($this_player->player_token == 'dr-wily'){ $this_ability->set_image('item-extra-life-2'); }
+    elseif ($this_player->player_token == 'dr-cossack'){ $this_ability->set_image('item-extra-life-3'); }
 
     // Allow this robot to show on the canvas again so we can revive it
-    unset($target_robot->flags['apply_disabled_state']);
-    unset($target_robot->flags['hidden']);
-    unset($target_robot->robot_attachments['ability_attachment-defeat']);
-    $target_robot->robot_frame = 'defeat';
-    $target_robot->update_session();
+    $target_robot->unset_attachment('ability_attachment-defeat');
+    $target_robot->unset_flag('apply_disabled_state');
+    $target_robot->unset_flag('hidden');
+    $target_robot->set_frame('defeat');
 
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'defeat',
       'success' => array(0, 40, -2, 99,
-        $this_player->print_player_name().' uses an item from the inventory&hellip; <br />'.
-        $target_robot->print_robot_name().' is given the '.$this_ability->print_ability_name().'!'
+        $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
+        $target_robot->print_name().' is given the '.$this_ability->print_name().'!'
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);
 
     // Restore the target robot's health and weapons back to their full amounts
-    $target_robot->robot_status = 'active';
-    $target_robot->robot_energy = 0; //$target_robot->robot_base_energy;
-    $target_robot->robot_weapons = 0; //$target_robot->robot_base_weapons;
-    $target_robot->robot_attack = $target_robot->robot_base_attack;
-    $target_robot->robot_defense = $target_robot->robot_base_defense;
-    $target_robot->robot_speed = $target_robot->robot_base_speed;
-    $target_robot->update_session();
+    $target_robot->set_status('active');
+    $target_robot->set_energy(0);
+    $target_robot->set_weapons(0);
+    $target_robot->set_attack($target_robot->robot_base_attack);
+    $target_robot->set_defense($target_robot->robot_base_defense);
+    $target_robot->set_speed($target_robot->robot_base_speed);
 
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'defend',
       'success' => array(0, 40, -2, 10,
-        $target_robot->print_robot_name().'&#39;s battle data was restored!<br />'.
-        $target_robot->print_robot_name().'&#39;s is no longer disabled!'
+        $target_robot->print_name().'&#39;s battle data was restored!<br />'.
+        $target_robot->print_name().'&#39;s is no longer disabled!'
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);
@@ -68,8 +66,8 @@ $ability = array(
       'percent' => true,
       'modifiers' => false,
       'frame' => 'taunt',
-      'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s life energy was fully restored!'),
-      'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s life energy was not affected&hellip;')
+      'success' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s life energy was fully restored!'),
+      'failure' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s life energy was not affected&hellip;')
       ));
     $energy_recovery_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $energy_recovery_amount);
@@ -80,8 +78,8 @@ $ability = array(
       'percent' => true,
       'modifiers' => false,
       'frame' => 'taunt',
-      'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s weapon energy was fully restored!'),
-      'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s weapon energy was not affected&hellip;')
+      'success' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s weapon energy was fully restored!'),
+      'failure' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s weapon energy was not affected&hellip;')
       ));
     $weapons_recovery_amount = ceil($target_robot->robot_base_weapons * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $weapons_recovery_amount);
@@ -92,8 +90,8 @@ $ability = array(
       'kind' => 'energy',
       'percent' => true,
       'frame' => 'taunt',
-      'success' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s life energy was restored!'),
-      'failure' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s life energy was not affected&hellip;')
+      'success' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s life energy was restored!'),
+      'failure' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s life energy was not affected&hellip;')
       ));
     $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
     $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
