@@ -13,13 +13,13 @@ $ability = array(
   'ability_function' => function($objects){
 
     // Call the common overdrive function from here
-    return mmrpg_ability::ability_function_overdrive($objects, 'beam', 'scorched', 'energized');
+    return rpg_ability::ability_function_overdrive($objects, 'beam', 'scorched', 'energized');
 
     },
   'ability_function_onload' => function($objects){
 
     // Call the common overdrive onload function from here
-    return mmrpg_ability::ability_function_onload_overdrive($objects);
+    return rpg_ability::ability_function_onload_overdrive($objects);
 
     }
   );

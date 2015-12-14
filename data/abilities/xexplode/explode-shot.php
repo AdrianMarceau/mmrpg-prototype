@@ -13,13 +13,13 @@ $ability = array(
   'ability_function' => function($objects){
 
     // Call the common shot function from here
-    return mmrpg_ability::ability_function_shot($objects, 'explosive', 'blasted', 'refreshed');
+    return rpg_ability::ability_function_shot($objects, 'explosive', 'blasted', 'refreshed');
 
     },
   'ability_function_onload' => function($objects){
 
     // Call the common shot onload function from here
-    return mmrpg_ability::ability_function_onload_shot($objects);
+    return rpg_ability::ability_function_onload_shot($objects);
 
     }
   );

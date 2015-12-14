@@ -16,13 +16,13 @@ $ability = array(
   'ability_function' => function($objects){
 
     // Call the common buster function from here
-    return mmrpg_ability::ability_function_buster($objects, 'shade', 'horrified', 'enchanted');
+    return rpg_ability::ability_function_buster($objects, 'shade', 'horrified', 'enchanted');
 
     },
   'ability_function_onload' => function($objects){
 
     // Call the common buster onload function from here
-    return mmrpg_ability::ability_function_onload_buster($objects);
+    return rpg_ability::ability_function_onload_buster($objects);
 
     }
   );

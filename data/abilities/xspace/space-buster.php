@@ -16,13 +16,13 @@ $ability = array(
   'ability_function' => function($objects){
 
     // Call the common buster function from here
-    return mmrpg_ability::ability_function_buster($objects, 'cosmic', 'discorded', 'harmonized');
+    return rpg_ability::ability_function_buster($objects, 'cosmic', 'discorded', 'harmonized');
 
     },
   'ability_function_onload' => function($objects){
 
     // Call the common buster onload function from here
-    return mmrpg_ability::ability_function_onload_buster($objects);
+    return rpg_ability::ability_function_onload_buster($objects);
 
     }
   );
