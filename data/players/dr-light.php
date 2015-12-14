@@ -129,8 +129,7 @@ $player = array(
       array('points' => 0, 'token' => 'mega-man', 'level' => 1)
       ),
     'abilities' => array(
-      array('points' => 0, 'token' => 'buster-shot'),
-      array('points' => 0, 'token' => 'light-buster')
+      array('points' => 0, 'token' => 'buster-shot')
       )
     ),
   'player_quotes' => array(
