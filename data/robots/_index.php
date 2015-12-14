@@ -83,9 +83,10 @@ if (true){ // !MMRPG_CONFIG_CACHE_INDEXES || !file_exists($robots_cache_path) ro
 require_once($robots_cache_path);
 
 // Additionally, include any dynamic session-based robots
-if (!empty($_SESSION[mmrpg_game_token()]['values']['robot_index'])){
+$session_token = rpg_game::session_token();
+if (!empty($_SESSION[$session_token]['values']['robot_index'])){
   // The session-based robots exist, so merge them with the index
-  $mmrpg_index['robots'] = array_merge($mmrpg_index['robots'], $_SESSION[mmrpg_game_token()]['values']['robot_index']);
+  $mmrpg_index['robots'] = array_merge($mmrpg_index['robots'], $_SESSION[$session_token]['values']['robot_index']);
 }
 
 // If debug is requested, print the cache data
