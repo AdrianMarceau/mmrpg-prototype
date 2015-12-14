@@ -35,9 +35,9 @@ $robot = array(
   'robot_rewards' => array(
     'abilities' => array(
       array('level' => 0, 'token' => 'buster-shot'), // = 10
-      array('level' => 12, 'token' => 'bass-buster'), // +2
-      array('level' => 16, 'token' => 'bass-crush'), // +4
-      array('level' => 22, 'token' => 'bass-baroque') // +6
+      array('level' => 2, 'token' => 'bass-buster'), // +2
+      array('level' => 6, 'token' => 'bass-crush'), // +4
+      array('level' => 12, 'token' => 'bass-baroque') // +6
       )
     ),
   'robot_quotes' => array(

@@ -25,7 +25,8 @@ $robot = array(
   'robot_weaknesses' => array('laser', 'crystal'),
   'robot_resistances' => array('space'),
   'robot_abilities' => array(
-    'buster-shot', 'buster-charge', 'buster-relay', 'rhythm-buster',
+    'buster-shot', 'buster-charge', 'buster-relay',
+    'rhythm-buster', 'rhythm-heaven', 'rhythm-shuffle',
     'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
     'attack-break', 'defense-break', 'speed-break', 'energy-break',
     'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',
@@ -42,15 +43,9 @@ $robot = array(
   'robot_rewards' => array(
     'abilities' => array(
       array('level' => 0, 'token' => 'buster-shot'),
-      array('level' => 22, 'token' => 'rhythm-buster'),
-      array('level' => 24, 'token' => 'attack-swap'),
-      array('level' => 26, 'token' => 'defense-swap'),
-      array('level' => 28, 'token' => 'speed-swap'),
-      array('level' => 30, 'token' => 'energy-swap'),
-      array('level' => 32, 'token' => 'attack-shuffle'),
-      array('level' => 34, 'token' => 'defense-shuffle'),
-      array('level' => 36, 'token' => 'speed-shuffle'),
-      array('level' => 38, 'token' => 'energy-shuffle')
+      array('level' => 2, 'token' => 'rhythm-buster'),
+      array('level' => 4, 'token' => 'rhythm-heaven'),
+      array('level' => 6, 'token' => 'rhythm-shuffle')
       )
     ),
   'robot_quotes' => array(

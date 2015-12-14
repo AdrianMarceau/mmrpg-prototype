@@ -25,7 +25,8 @@ $robot = array(
   'robot_weaknesses' => array('cutter', 'swift'),
   'robot_resistances' => array('shadow'),
   'robot_abilities' => array(
-    'buster-shot', 'buster-charge', 'buster-relay', 'disco-buster',
+    'buster-shot', 'buster-charge', 'buster-relay',
+    'disco-buster', 'disco-fever', 'disco-assault',
     'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
     'attack-break', 'defense-break', 'speed-break', 'energy-break',
     'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',
@@ -42,15 +43,9 @@ $robot = array(
   'robot_rewards' => array(
     'abilities' => array(
       array('level' => 0, 'token' => 'buster-shot'),
-      array('level' => 12, 'token' => 'disco-buster'),
-      array('level' => 14, 'token' => 'attack-break'),
-      array('level' => 16, 'token' => 'defense-break'),
-      array('level' => 18, 'token' => 'speed-break'),
-      array('level' => 20, 'token' => 'energy-break'),
-      array('level' => 22, 'token' => 'attack-assault'),
-      array('level' => 24, 'token' => 'defense-assault'),
-      array('level' => 26, 'token' => 'speed-assault'),
-      array('level' => 28, 'token' => 'energy-assault')
+      array('level' => 2, 'token' => 'disco-buster'),
+      array('level' => 4, 'token' => 'disco-fever'),
+      array('level' => 6, 'token' => 'disco-assault')
       )
     ),
   'robot_quotes' => array(

@@ -25,7 +25,8 @@ $robot = array(
   'robot_weaknesses' => array('freeze', 'nature'),
   'robot_resistances' => array('wind'),
   'robot_abilities' => array(
-    'buster-shot', 'buster-charge', 'buster-relay', 'roll-buster',
+    'buster-shot', 'buster-charge', 'buster-relay',
+    'roll-buster', 'roll-swing', 'roll-support',
     'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
     'attack-break', 'defense-break', 'speed-break', 'energy-break',
     'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',
@@ -43,14 +44,8 @@ $robot = array(
     'abilities' => array(
       array('level' => 0, 'token' => 'buster-shot'),
       array('level' => 2, 'token' => 'roll-buster'),
-      array('level' => 4, 'token' => 'attack-boost'),
-      array('level' => 6, 'token' => 'defense-boost'),
-      array('level' => 8, 'token' => 'speed-boost'),
-      array('level' => 10, 'token' => 'energy-boost'),
-      array('level' => 12, 'token' => 'attack-support'),
-      array('level' => 14, 'token' => 'defense-support'),
-      array('level' => 16, 'token' => 'speed-support'),
-      array('level' => 18, 'token' => 'energy-support')
+      array('level' => 4, 'token' => 'roll-swing'),
+      array('level' => 6, 'token' => 'roll-support')
       )
     ),
   'robot_quotes' => array(
