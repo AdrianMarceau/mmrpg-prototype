@@ -74,7 +74,11 @@ $robot = array(
     elseif ($this_battle->counters['battle_turn'] >= 2){
       if ($robot_energy_percent <= 30){ return 'space-overdrive'; }
       elseif ($robot_energy_percent <= 60){ return 'space-buster'; }
-      else { return 'space-shot'; }
+      elseif ($robot_energy_percent <= 90){ return 'space-shot'; }
+      elseif ($this_robot->robot_base_attack > $this_robot->robot_base_defense){ return 'attack-boost'; }
+      elseif ($this_robot->robot_base_defense > $this_robot->robot_base_speed){ return 'defense-boost'; }
+      elseif ($this_robot->robot_base_speed > $this_robot->robot_base_attack){ return 'speed-boost'; }
+      else { return 'buster-charge'; }
     }
 
     }
