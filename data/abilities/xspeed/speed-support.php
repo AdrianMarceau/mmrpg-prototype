@@ -19,7 +19,7 @@ $ability = array(
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(9, 0, 0, -10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
+      'success' => array(9, 0, 0, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -28,8 +28,8 @@ $ability = array(
       'kind' => 'speed',
       'percent' => true,
       'frame' => 'taunt',
-      'success' => array(0, -2, 0, -10, $this_robot->print_robot_name().'&#39;s mobility improved!'),
-      'failure' => array(9, -2, 0, -10, $this_robot->print_robot_name().'&#39;s mobility was not affected&hellip;')
+      'success' => array(0, -2, 0, -10, $this_robot->print_name().'&#39;s mobility improved!'),
+      'failure' => array(9, -2, 0, -10, $this_robot->print_name().'&#39;s mobility was not affected&hellip;')
       ));
     $speed_recovery_amount = ceil($this_robot->robot_base_speed * ($this_ability->ability_recovery / 100));
     $this_robot->trigger_recovery($this_robot, $this_ability, $speed_recovery_amount);
@@ -42,14 +42,14 @@ $ability = array(
       $this_key = 0;
       foreach ($backup_robots_active AS $key => $info){
         if ($info['robot_id'] == $this_robot->robot_id){ continue; }
-        $temp_this_robot = new mmrpg_robot($this_battle, $this_player, $info);
+        $temp_this_robot = new rpg_robot($this_player, $info);
         // Increase this robot's speed stat
         $this_ability->recovery_options_update(array(
           'kind' => 'speed',
           'percent' => true,
           'frame' => 'taunt',
-          'success' => array(0, -2, 0, -10, $temp_this_robot->print_robot_name().'&#39;s mobility improved!'),
-          'failure' => array(9, -2, 0, -10, $temp_this_robot->print_robot_name().'&#39;s mobility was not affected&hellip;')
+          'success' => array(0, -2, 0, -10, $temp_this_robot->print_name().'&#39;s mobility improved!'),
+          'failure' => array(9, -2, 0, -10, $temp_this_robot->print_name().'&#39;s mobility was not affected&hellip;')
           ));
         $speed_recovery_amount = ceil($temp_this_robot->robot_base_speed * ($this_ability->ability_recovery / 100));
         $temp_this_robot->trigger_recovery($temp_this_robot, $this_ability, $speed_recovery_amount);
