@@ -17,25 +17,24 @@ $ability = array(
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
       'class' => 'ability',
+      'ability_id' => $this_ability->ability_id,
       'ability_token' => $this_ability->ability_token,
       'ability_frame' => 0,
       'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
       );
 
     // Attach this ability to the target temporarily
-    $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-    $target_robot->update_session();
+    $target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(0, 0, 10, -10, $this_robot->print_robot_name().' triggered an '.$this_ability->print_ability_name().' with '.$target_robot->print_robot_name().'!')
+      'success' => array(0, 0, 10, -10, $this_robot->print_name().' triggered an '.$this_ability->print_name().' with '.$target_robot->print_name().'!')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
     // Remove this ability from the target
-    unset($target_robot->robot_attachments[$this_attachment_token]);
-    $target_robot->update_session();
+    $target_robot->unset_attachment($this_attachment_token);
 
     // Create a function that increases or decreases a robot's energy to target
     $temp_energy_function = function($this_robot, $this_ability, $temp_this_energy, $temp_target_energy){
@@ -53,16 +52,15 @@ $ability = array(
         list($temp_energy, $temp_base_energy) = explode('/', $temp_target_energy);
 
         // Update this robot's values with the random data
-        $this_robot->robot_energy = $temp_energy;
-        $this_robot->robot_base_energy = $temp_base_energy;
-        $this_robot->update_session();
+        $this_robot->set_energy($temp_energy);
+        $this_robot->set_base_energy($temp_base_energy);
 
         // Target this robot's self
         $is_her = in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm', 'splash-woman')) ? true : false;
         $is_mecha = $this_robot->robot_class == 'mecha' ? true : false;
         $this_ability->target_options_update(array(
           'frame' => 'defend',
-          'success' => array(9, 0, 10, -10, $this_robot->print_robot_name().'&#39;s life energy was modified&hellip;<br /> '.($is_her ? 'Her' : ($is_mecha ? 'Its' : 'His')).' new energy stats are '.$this_robot->print_robot_energy().' / '.$this_robot->print_robot_base_energy().'!')
+          'success' => array(9, 0, 10, -10, $this_robot->print_name().'&#39;s life energy was modified&hellip;<br /> '.($is_her ? 'Her' : ($is_mecha ? 'Its' : 'His')).' new energy stats are '.$this_robot->print_energy().' / '.$this_robot->print_robot_base_energy().'!')
           ));
         $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
@@ -73,7 +71,7 @@ $ability = array(
         // Target this robot's self and show the ability failing
         $this_ability->target_options_update(array(
           'frame' => 'defend',
-          'success' => array(9, 0, 0, -10, $this_robot->print_robot_name().'&#39;s life energy was not affected&hellip;')
+          'success' => array(9, 0, 0, -10, $this_robot->print_name().'&#39;s life energy was not affected&hellip;')
           ));
         $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
@@ -116,16 +114,13 @@ $ability = array(
     // If this ability targeting is allowed
     if ($temp_allow_targeting){
       // Update this ability's targetting setting
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_target');
     }
     // Else if the ability attachment is not there, change the target back to auto
     else {
       // Update this ability's targetting setting
-      $this_ability->ability_target = 'auto';
+      $this_ability->set_target('auto');
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;

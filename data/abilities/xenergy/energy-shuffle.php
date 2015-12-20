@@ -18,6 +18,7 @@ $ability = array(
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
       'class' => 'ability',
+      'ability_id' => $this_ability->ability_id,
       'ability_token' => $this_ability->ability_token,
       'ability_frame' => 0,
       'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
@@ -30,7 +31,7 @@ $ability = array(
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(9, 0, 10, -10, $this_robot->print_robot_name().' triggered an '.$this_ability->print_ability_name().'!')
+      'success' => array(9, 0, 10, -10, $this_robot->print_name().' triggered an '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -50,16 +51,15 @@ $ability = array(
         list($temp_energy, $temp_base_energy) = explode('/', $temp_target_energy);
 
         // Update this robot's values with the random data
-        $this_robot->robot_energy = $temp_energy;
-        $this_robot->robot_base_energy = $temp_base_energy;
-        $this_robot->update_session();
+        $this_robot->set_energy($temp_energy);
+        $this_robot->set_base_energy($temp_base_energy);
 
         // Target this robot's self
         $is_her = in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm', 'splash-woman')) ? true : false;
         $is_mecha = $this_robot->robot_class == 'mecha' ? true : false;
         $this_ability->target_options_update(array(
           'frame' => 'defend',
-          'success' => array(9, 0, 10, -10, $this_robot->print_robot_name().'&#39;s life energy was modified&hellip;<br /> '.($is_her ? 'Her' : ($is_mecha ? 'Its' : 'His')).' new energy stats are '.$this_robot->print_robot_energy().' / '.$this_robot->print_robot_base_energy().'!')
+          'success' => array(9, 0, 10, -10, $this_robot->print_name().'&#39;s life energy was modified&hellip;<br /> '.($is_her ? 'Her' : ($is_mecha ? 'Its' : 'His')).' new energy stats are '.$this_robot->print_energy().' / '.$this_robot->print_robot_base_energy().'!')
           ));
         $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
@@ -70,7 +70,7 @@ $ability = array(
         // Target this robot's self and show the ability failing
         $this_ability->target_options_update(array(
           'frame' => 'defend',
-          'success' => array(9, 0, 0, -10, $this_robot->print_robot_name().'&#39;s life energy was not affected&hellip;')
+          'success' => array(9, 0, 0, -10, $this_robot->print_name().'&#39;s life energy was not affected&hellip;')
           ));
         $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
@@ -105,61 +105,48 @@ $ability = array(
       if ($i == 0){
 
         // Attach this ability attachment to this robot temporarily
-        $this_robot->robot_frame = 'taunt';
-        $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-        $this_robot->update_session();
+        $this_robot->set_frame('taunt');
+        $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
         // Attach this ability attachment to this robot temporarily
-        $target_robot->robot_frame = 'defend';
-        $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-        $target_robot->update_session();
+        $target_robot->set_frame('defend');
+        $target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
         // Increase or decrease this robot's energy to a value on the opposite side
         $temp_energy_function($this_robot, $this_ability, $temp_this_energy, $temp_target_energy);
-        $this_robot->update_session();
         // Increase or decrease the target robot's energy to a value on the opposite side
         $temp_energy_function($target_robot, $this_ability, $temp_target_energy, $temp_this_energy);
-        $target_robot->update_session();
 
         // Remove the ability attachment from this robot
-        $this_robot->robot_frame = 'base';
-        unset($this_robot->robot_attachments[$this_attachment_token]);
-        $this_robot->update_session();
+        $this_robot->set_frame('base');
+        $this_robot->unset_attachment($this_attachment_token);
         // Remove the ability attachment from the target robot
-        $target_robot->robot_frame = 'base';
-        unset($target_robot->robot_attachments[$this_attachment_token]);
-        $target_robot->update_session();
-
+        $target_robot->set_frame('base');
+        $target_robot->unset_attachment($this_attachment_token);
 
       } else {
 
         // Collect references to this and the target robot
-        $temp_this_robot = new mmrpg_robot($this_battle, $this_player, $this_player->values['robots_active'][$i]);
-        $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $target_player->values['robots_active'][$i]);
+        $temp_this_robot = new rpg_robot($this_player, $this_player->values['robots_active'][$i]);
+        $temp_target_robot = new rpg_robot($target_player, $target_player->values['robots_active'][$i]);
 
         // Attach this ability attachment to this robot temporarily
-        $temp_this_robot->robot_frame = 'defend';
-        $temp_this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-        $temp_this_robot->update_session();
+        $temp_this_robot->set_frame('defend');
+        $temp_this_robot->set_attachment($this_attachment_token, $this_attachment_info);
         // Attach this ability attachment to this robot temporarily
-        $temp_target_robot->robot_frame = 'defend';
-        $temp_target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-        $temp_target_robot->update_session();
+        $temp_target_robot->set_frame('defend');
+        $temp_target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
         // Increase or decrease this robot's energy to a value on the opposite side
         $temp_energy_function($temp_this_robot, $this_ability, $temp_this_energy, $temp_target_energy);
-        $temp_this_robot->update_session();
         // Increase or decrease the target robot's energy to a value on the opposite side
         $temp_energy_function($temp_target_robot, $this_ability, $temp_target_energy, $temp_this_energy);
-        $temp_target_robot->update_session();
 
         // Remove the ability attachment from this robot
-        $temp_this_robot->robot_frame = 'base';
-        unset($temp_this_robot->robot_attachments[$this_attachment_token]);
-        $temp_this_robot->update_session();
+        $temp_this_robot->set_frame('base');
+        $temp_this_robot->unset_attachment($this_attachment_token);
         // Remove the ability attachment from the target robot
-        $temp_target_robot->robot_frame = 'base';
-        unset($temp_target_robot->robot_attachments[$this_attachment_token]);
-        $temp_target_robot->update_session();
+        $temp_target_robot->set_frame('base');
+        $temp_target_robot->unset_attachment($this_attachment_token);
 
       }
 
