@@ -23,7 +23,7 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
       'kickback' => array(-10, 0, 0),
-      'success' => array(0, 75, 0, 10, $this_robot->print_robot_name().' fires a '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 75, 0, 10, $this_robot->print_name().' fires a '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -31,15 +31,15 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(30, 0, 0),
-      'success' => array(1, 20, 0, 10, 'The '.$this_ability->print_ability_name().' collided with the target!'),
-      'failure' => array(0, -75, 0, -10, 'The '.$this_ability->print_ability_name().' <em>just</em> missed the target&hellip;')
+      'success' => array(1, 20, 0, 10, 'The '.$this_ability->print_name().' collided with the target!'),
+      'failure' => array(0, -75, 0, -10, 'The '.$this_ability->print_name().' <em>just</em> missed the target&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(10, 0, 0),
-      'success' => array(1, 20, 0, 10, 'The '.$this_ability->print_ability_name().'&#39;s energy was absorbed by the target!'),
-      'failure' => array(0, -75, 0, -10, 'The '.$this_ability->print_ability_name().' was ignored by the target&hellip;')
+      'success' => array(1, 20, 0, 10, 'The '.$this_ability->print_name().'&#39;s energy was absorbed by the target!'),
+      'failure' => array(0, -75, 0, -10, 'The '.$this_ability->print_name().' was ignored by the target&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     if ($target_robot->robot_core == 'water' || $target_robot->robot_core2 == 'water'){ $energy_damage_amount = $energy_damage_amount * 2.0; }

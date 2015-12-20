@@ -22,36 +22,40 @@ $ability = array(
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
       'class' => 'ability',
+      'ability_id' => $this_ability->ability_id,
       'ability_token' => $this_ability->ability_token,
       'ability_frame' => 0,
       'ability_frame_animate' => array(0),
       'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => 0)
       );
-    $this_robot->robot_attachments[$this_attachment_token.'_1'] = $this_attachment_info;
-    $this_robot->robot_attachments[$this_attachment_token.'_2'] = $this_attachment_info;
-    $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame_offset'] = array('x' => 75, 'y' => -25, 'z' => 10);
-    $this_robot->robot_attachments[$this_attachment_token.'_2']['ability_frame_offset'] = array('x' => 95, 'y' => 25, 'z' => 10);
-    $this_robot->update_session();
+    $this_attachment_info1 = $this_attachment_info;
+    $this_attachment_info2 = $this_attachment_info;
+    $this_attachment_info1['ability_frame_offset'] = array('x' => 75, 'y' => -25, 'z' => 10);
+    $this_attachment_info2['ability_frame_offset'] = array('x' => 95, 'y' => 25, 'z' => 10);
+    $this_robot->set_attachment($this_attachment_token.'_1', $this_attachment_info1);
+    $this_robot->set_attachment($this_attachment_token.'_2', $this_attachment_info2);
 
     // Backup the target robot's earth weakness, if it has one
     $temp_target_immunities_backup = array();
     if ($target_robot->has_immunity($this_ability->ability_type)){
       $temp_target_immunities_backup = $target_robot->robot_immunities;
-      unset($target_robot->robot_immunities[array_search($this_ability->ability_type, $target_robot->robot_immunities)]);
-      $target_robot->update_session();
+      $temp_target_immunities_new = $temp_target_immunities_backup;
+      unset($temp_target_immunities_new[array_search($this_ability->ability_type, $target_robot->robot_immunities)]);
+      $target_robot->set_immunities($temp_target_immunities_new);
     }
 
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array(0, 115, -25, 10, 'The '.$this_ability->print_ability_name().' summoned a triad of drills!')
+      'success' => array(0, 115, -25, 10, 'The '.$this_ability->print_name().' summoned a triad of drills!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
     // Update the two whirlwind's animation frames
-    $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame'] = 0;
-    $this_robot->robot_attachments[$this_attachment_token.'_2']['ability_frame'] = 0;
-    $this_robot->update_session();
+    $this_attachment_info1['ability_frame'] = 0;
+    $this_attachment_info2['ability_frame'] = 0;
+    $this_robot->set_attachment($this_attachment_token.'_1', $this_attachment_info1);
+    $this_robot->set_attachment($this_attachment_token.'_2', $this_attachment_info2);
 
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
@@ -96,8 +100,8 @@ $ability = array(
       }
 
       // Update the remaining whirlwind's animation frame
-      $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame'] = 0;
-      $this_robot->update_session();
+      $this_attachment_info1['ability_frame'] = 0;
+      $this_robot->set_attachment($this_attachment_token.'_1', $this_attachment_info1);
 
       // Attempt to trigger damage to the target robot again
       $this_ability->damage_options_update(array(
@@ -126,8 +130,7 @@ $ability = array(
 
         // Remove the first extra whirlwind
         if (isset($this_robot->robot_attachments[$this_attachment_token.'_1'])){
-          unset($this_robot->robot_attachments[$this_attachment_token.'_1']);
-          $this_robot->update_session();
+          $this_robot->unset_attachment($this_attachment_token.'_1');
         }
 
         // Attempt to trigger damage to the target robot a third time
@@ -152,20 +155,17 @@ $ability = array(
 
     // Remove the second whirlwind
     if (isset($this_robot->robot_attachments[$this_attachment_token.'_2'])){
-      unset($this_robot->robot_attachments[$this_attachment_token.'_2']);
-      $this_robot->update_session();
+      $this_robot->unset_attachment($this_attachment_token.'_2');
     }
 
     // Remove the third whirlwind
     if (isset($this_robot->robot_attachments[$this_attachment_token.'_1'])){
-      unset($this_robot->robot_attachments[$this_attachment_token.'_1']);
-      $this_robot->update_session();
+      $this_robot->unset_attachment($this_attachment_token.'_1');
     }
 
     // If this robot has an immunity removed, re-add it and update session
     if (!empty($temp_target_immunities_backup)){
-      $target_robot->robot_immunities = $temp_target_immunities_backup;
-      $target_robot->update_session();
+      $target_robot->set_immunities($temp_target_immunities_backup);
     }
 
     // Return true on success

@@ -21,6 +21,7 @@ $ability = array(
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
     	'class' => 'ability',
+      'ability_id' => $this_ability->ability_id,
     	'ability_token' => $this_ability->ability_token,
     	'attachment_weaknesses' => array('space', 'time'),
       'ability_frame' => 0,
@@ -39,27 +40,25 @@ $ability = array(
       // Target this robot's self
       $this_ability->target_options_update(array(
         'frame' => 'summon',
-        'success' => array(1, 4, 50, 12, $this_robot->print_robot_name().' charges the '.$this_ability->print_ability_name().'&hellip;')
+        'success' => array(1, 4, 50, 12, $this_robot->print_name().' charges the '.$this_ability->print_name().'&hellip;')
         ));
       $this_robot->trigger_target($this_robot, $this_ability);
 
       // Attach this ability attachment to the robot using it
-      $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-      $this_robot->update_session();
+      $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
     }
     // Else if the ability flag was set, the ability is released at the target
     else {
 
       // Remove this ability attachment to the robot using it
-      unset($this_robot->robot_attachments[$this_attachment_token]);
-      $this_robot->update_session();
+      $this_robot->unset_attachment($this_attachment_token);
 
       // Update this ability's target options and trigger
       $this_ability->target_options_update(array(
         'frame' => 'throw',
         'kickback' => array(-5, 0, 0),
-        'success' => array(5, 100, 25, 12, $this_robot->print_robot_name().' releases the '.$this_ability->print_ability_name().'!'),
+        'success' => array(5, 100, 25, 12, $this_robot->print_name().' releases the '.$this_ability->print_name().'!'),
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -68,7 +67,7 @@ $ability = array(
         'kind' => 'energy',
         'kickback' => array(20, 0, 0),
         'success' => array(6, -110, 25, 12, 'A massive energy shot hit the target!'),
-        'failure' => array(6, -110, 25, -12, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+        'failure' => array(6, -110, 25, -12, 'The '.$this_ability->print_name().' missed&hellip;')
         ));
       $energy_damage_amount = $this_ability->ability_damage;
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
@@ -88,27 +87,25 @@ $ability = array(
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
     // If the ability flag had already been set, reduce the weapon energy to zero
-    if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->ability_energy = 0; }
+    if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->set_energy(0); }
     // Otherwise, return the weapon energy back to default
-    else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
+    else { $this_ability->reset_energy(); }
 
     // If this robot is holding a Charge Module, reduce the power of the ability
     if ($this_robot->robot_item == 'item-charge-module'){
-      $temp_item_info = mmrpg_ability::get_index_info($this_robot->robot_item);
-      $this_ability->ability_damage = ceil($this_ability->ability_base_damage * ($temp_item_info['ability_damage2'] / $temp_item_info['ability_recovery2']));
+      $temp_item_info = rpg_ability::get_index_info($this_robot->robot_item);
+      $this_ability->set_damage(ceil($this_ability->ability_base_damage * ($temp_item_info['ability_damage2'] / $temp_item_info['ability_recovery2'])));
     } else {
-      $this_ability->ability_damage = $this_ability->ability_base_damage;
+      $this_ability->reset_damage();
     }
 
     // If this robot is holding a Target Module, allow target selection
     if ($this_robot->robot_item == 'item-target-module'){
-      $this_ability->ability_target = !$this_charge_required ? 'select_target' : $this_ability->ability_base_target;
+      if (!$this_charge_required){ $this_ability->set_target('select_target'); }
+      else { $this_ability->reset_target(); }
     } else {
-      $this_ability->ability_target = $this_ability->ability_base_target;
+      $this_ability->reset_target();
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;

@@ -22,6 +22,7 @@ $ability = array(
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
     	'class' => 'ability',
+      'ability_id' => $this_ability->ability_id,
     	'ability_token' => $this_ability->ability_token,
     	'attachment_duration' => 1,
       'attachment_damage_breaker' => 0.0,
@@ -32,8 +33,8 @@ $ability = array(
         'percent' => true,
         'frame' => 'taunt',
         'rates' => array(100, 0, 0),
-        'success' => array(1, -10, 0, -10, 'The '.$this_ability->print_ability_name().' attached itself to '.$this_robot->print_robot_name().'!<br /> '.$this_robot->print_robot_name().'&#39;s defenses were bolstered!'),
-        'failure' => array(1, -10, 0, -10, 'The '.$this_ability->print_ability_name().' attached itself to '.$this_robot->print_robot_name().'!<br /> '.$this_robot->print_robot_name().'&#39;s defenses were bolstered!')
+        'success' => array(1, -10, 0, -10, 'The '.$this_ability->print_name().' attached itself to '.$this_robot->print_name().'!<br /> '.$this_robot->print_name().'&#39;s defenses were bolstered!'),
+        'failure' => array(1, -10, 0, -10, 'The '.$this_ability->print_name().' attached itself to '.$this_robot->print_name().'!<br /> '.$this_robot->print_name().'&#39;s defenses were bolstered!')
         ),
     	'attachment_destroy' => array(
         'trigger' => 'special',
@@ -43,8 +44,8 @@ $ability = array(
         'modifiers' => false,
         'frame' => 'defend',
         'rates' => array(100, 0, 0),
-        'success' => array(9, -10, 0, -10,  'The '.$this_ability->print_ability_name().' faded away!<br /> '.$this_robot->print_robot_name().' is no longer protected&hellip;'),
-        'failure' => array(9, -10, 0, -10, 'The '.$this_ability->print_ability_name().' faded away!<br /> '.$this_robot->print_robot_name().' is no longer protected&hellip;')
+        'success' => array(9, -10, 0, -10,  'The '.$this_ability->print_name().' faded away!<br /> '.$this_robot->print_name().' is no longer protected&hellip;'),
+        'failure' => array(9, -10, 0, -10, 'The '.$this_ability->print_name().' faded away!<br /> '.$this_robot->print_name().' is no longer protected&hellip;')
         ),
       'ability_frame' => 0,
       'ability_frame_animate' => array(2, 3, 4, 5, 0, 1),
@@ -62,7 +63,7 @@ $ability = array(
       // Target this robot's self
       $this_ability->target_options_update(array(
         'frame' => 'summon',
-        'success' => array(0, -10, 0, -10, $this_robot->print_robot_name().' raises a '.$this_ability->print_ability_name().'!')
+        'success' => array(0, -10, 0, -10, $this_robot->print_name().' raises a '.$this_ability->print_name().'!')
         ));
       $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -71,7 +72,7 @@ $ability = array(
       $this_robot->trigger_target($this_robot, $this_ability);
 
       // Attach this ability attachment to the robot using it
-      $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
+      $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
       $this_robot->update_session();
 
     }
@@ -81,13 +82,12 @@ $ability = array(
       // Collect the attachment from the robot to back up its info
       $this_attachment_info = isset($this_robot->robot_attachments[$this_attachment_token]) ? $this_robot->robot_attachments[$this_attachment_token] : $this_attachment_info;
       // Remove this ability attachment to the robot using it
-      unset($this_robot->robot_attachments[$this_attachment_token]);
-      $this_robot->update_session();
+      $this_robot->unset_attachment($this_attachment_token);
 
       // Target the opposing robot
       $this_ability->target_options_update(array(
         'frame' => 'summon',
-        'success' => array(0, 85, -10, -10, $this_robot->print_robot_name().' releases the '.$this_ability->print_ability_name().'!')
+        'success' => array(0, 85, -10, -10, $this_robot->print_name().' releases the '.$this_ability->print_name().'!')
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -95,15 +95,15 @@ $ability = array(
       $this_ability->damage_options_update(array(
         'kind' => 'energy',
         'kickback' => array(5, 0, 0),
-        'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
-        'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target&hellip;')
+        'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_name().' crashed into the target!'),
+        'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
         ));
       $this_ability->recovery_options_update(array(
         'kind' => 'energy',
         'frame' => 'taunt',
         'kickback' => array(0, 0, 0),
-        'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
-        'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target&hellip;')
+        'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_name().' crashed into the target!'),
+        'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
         ));
       $energy_damage_amount = $this_ability->ability_damage;
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
@@ -115,10 +115,8 @@ $ability = array(
     }
 
     // Either way, update this ability's settings to prevent recovery
-    $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
-    $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
-    $this_ability->update_session();
-
+    $this_ability->damage_options_update($this_attachment_info['attachment_destroy']);
+    $this_ability->recovery_options_update($this_attachment_info['attachment_destroy']);
 
     // Return true on success
     return true;
@@ -136,17 +134,17 @@ $ability = array(
     $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
 
     // If the ability flag had already been set, reduce the weapon energy to zero
-    if (!$this_charge_required){ $this_ability->ability_energy = 0; }
+    if (!$this_charge_required){ $this_ability->set_energy(0); }
     // Otherwise, return the weapon energy back to default
-    else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
+    else { $this_ability->reset_energy(); }
 
     // If this robot is holding a Charge Module, bypass changing but reduce the power of the ability
     if ($this_robot->robot_item == 'item-charge-module'){
       $this_charge_required = false;
-      $temp_item_info = mmrpg_ability::get_index_info($this_robot->robot_item);
-      $this_ability->ability_damage = ceil($this_ability->ability_base_damage * ($temp_item_info['ability_damage2'] / $temp_item_info['ability_recovery2']));
+      $temp_item_info = rpg_ability::get_index_info($this_robot->robot_item);
+      $this_ability->set_damage(ceil($this_ability->ability_base_damage * ($temp_item_info['ability_damage2'] / $temp_item_info['ability_recovery2'])));
     } else {
-      $this_ability->ability_damage = $this_ability->ability_base_damage;
+      $this_ability->reset_damage();
     }
 
     // Define the allow targetting flag based on if the user's type matches the ability
@@ -157,23 +155,14 @@ $ability = array(
 
     // If this ability is being used by a robot with the same core type AND it's already summoned, allow targetting
     if (!$this_charge_required && $this_allow_target_select){
-
       // Update this ability's targetting setting
-      $this_ability->ability_target = 'select_target';
-      $this_ability->update_session();
-
+      $this_ability->set_target('select_target');
     }
     // Else if the ability attachment is not there, change the target back to auto
     else {
-
       // Update this ability's targetting setting
-      $this_ability->ability_target = 'auto';
-      $this_ability->update_session();
-
+      $this_ability->set_target('auto');
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;
