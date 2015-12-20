@@ -18,7 +18,7 @@ $ability = array(
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(0, -2, 0, -10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
+      'success' => array(0, -2, 0, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -27,8 +27,8 @@ $ability = array(
       'kind' => 'attack',
       'percent' => true,
       'kickback' => array(10, 0, 0),
-      'success' => array(0, -2, 0, -10, $target_robot->print_robot_name().'&#39;s weapons were damaged!'),
-      'failure' => array(9, -2, 0, -10, 'It had no effect on '.$target_robot->print_robot_name().'&hellip;')
+      'success' => array(0, -2, 0, -10, $target_robot->print_name().'&#39;s weapons were damaged!'),
+      'failure' => array(9, -2, 0, -10, 'It had no effect on '.$target_robot->print_name().'&hellip;')
       ));
     $attack_damage_amount = ceil($target_robot->robot_attack * ($this_ability->ability_damage / 100));
     $target_robot->trigger_damage($this_robot, $this_ability, $attack_damage_amount);
@@ -55,16 +55,13 @@ $ability = array(
     // If this ability targeting is allowed
     if ($temp_allow_targeting){
       // Update this ability's targetting setting
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_this');
     }
     // Else if the ability attachment is not there, change the target back to auto
     else {
       // Update this ability's targetting setting
-      $this_ability->ability_target = 'auto';
+      $this_ability->set_target('auto');
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;

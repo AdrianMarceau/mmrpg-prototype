@@ -17,34 +17,28 @@ $ability = array(
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
       'class' => 'ability',
+      'ability_id' => $this_ability->ability_id,
       'ability_token' => $this_ability->ability_token,
       'ability_frame' => 0,
       'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
       );
 
     // Attach this ability to the target temporarily
-    $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-    $target_robot->update_session();
+    $target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(0, 0, 10, -10, $this_robot->print_robot_name().' triggered an '.$this_ability->print_ability_name().' with '.$target_robot->print_robot_name().'!')
+      'success' => array(0, 0, 10, -10, $this_robot->print_name().' triggered an '.$this_ability->print_name().' with '.$target_robot->print_name().'!')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
     // Remove this ability from the target
-    unset($target_robot->robot_attachments[$this_attachment_token]);
-    $target_robot->update_session();
+    $target_robot->unset_attachment($this_attachment_token);
 
     // Create a function that increases or decreases a robot's attack to target
     $temp_attack_function = function($this_robot, $this_ability, $temp_this_attack, $temp_target_attack){
       global $this_battle;
-
-      // Collect the target's current attack amount
-      //$temp_this_attack = $this_robot->robot_attack.'/'.$this_robot->robot_base_attack;
-
-      //$this_battle->events_create(false, false, 'DEBUG '.__LINE__, '$temp_this_attack = '.$temp_this_attack.', $temp_target_attack = '.$temp_target_attack);
 
       // Only continue if this robot and the target's attack are not equal
       if ($temp_this_attack != $temp_target_attack){
@@ -53,16 +47,15 @@ $ability = array(
         list($temp_attack, $temp_base_attack) = explode('/', $temp_target_attack);
 
         // Update this robot's values with the random data
-        $this_robot->robot_attack = $temp_attack;
-        $this_robot->robot_base_attack = $temp_base_attack;
-        $this_robot->update_session();
+        $this_robot->set_attack($temp_attack);
+        $this_robot->set_base_attack($temp_base_attack);
 
         // Target this robot's self
         $is_her = in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm', 'splash-woman')) ? true : false;
         $is_mecha = $this_robot->robot_class == 'mecha' ? true : false;
         $this_ability->target_options_update(array(
           'frame' => 'defend',
-          'success' => array(9, 0, 10, -10, $this_robot->print_robot_name().'&#39;s attack stats were modified&hellip;<br /> '.($is_her ? 'Her' : ($is_mecha ? 'Its' : 'His')).' new attack stats are '.$this_robot->print_robot_attack().' / '.$this_robot->print_robot_base_attack().'!')
+          'success' => array(9, 0, 10, -10, $this_robot->print_name().'&#39;s attack stats were modified&hellip;<br /> '.($is_her ? 'Her' : ($is_mecha ? 'Its' : 'His')).' new attack stats are '.$this_robot->print_attack().' / '.$this_robot->print_robot_base_attack().'!')
           ));
         $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
@@ -73,7 +66,7 @@ $ability = array(
         // Target this robot's self and show the ability failing
         $this_ability->target_options_update(array(
           'frame' => 'defend',
-          'success' => array(9, 0, 0, -10, $this_robot->print_robot_name().'&#39;s attack stats were not affected&hellip;')
+          'success' => array(9, 0, 0, -10, $this_robot->print_name().'&#39;s attack stats were not affected&hellip;')
           ));
         $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
@@ -116,16 +109,13 @@ $ability = array(
     // If this ability targeting is allowed
     if ($temp_allow_targeting){
       // Update this ability's targetting setting
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_this');
     }
     // Else if the ability attachment is not there, change the target back to auto
     else {
       // Update this ability's targetting setting
-      $this_ability->ability_target = 'auto';
+      $this_ability->set_target('auto');
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;
