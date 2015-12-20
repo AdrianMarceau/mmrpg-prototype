@@ -30,7 +30,7 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'throw',
       'kickback' => array(0, 0, 0),
-      'success' => array(0, 85, 35, 10, $this_robot->print_robot_name().' thows a '.$this_ability->print_ability_name().'!'),
+      'success' => array(0, 85, 35, 10, $this_robot->print_name().' thows a '.$this_ability->print_name().'!'),
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -39,15 +39,15 @@ $ability = array(
       'kind' => 'energy',
       'frame' => 'damage',
       'kickback' => array(10, 5, 0),
-      'success' => array(2, 30, 0, 10, 'The '.$this_ability->print_ability_name().' exploded on contact!'),
-      'failure' => array(1, -65, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array(2, 30, 0, 10, 'The '.$this_ability->print_name().' exploded on contact!'),
+      'failure' => array(1, -65, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(0, 0, 0),
-      'success' => array(2, 30, 0, 10, 'The '.$this_ability->print_ability_name().' exploded on contact!'),
-      'failure' => array(1, -65, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array(2, 30, 0, 10, 'The '.$this_ability->print_name().' exploded on contact!'),
+      'failure' => array(1, -65, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
@@ -60,16 +60,16 @@ $ability = array(
       // Loop through the target's benched robots, inflicting 10% base damage to each
       foreach ($backup_robots_active AS $key => $info){
         if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-        if (!$this_battle->critical_chance(ceil((9 - $info['robot_key']) * 10))){ break; }
+        if (!rpg_functions::critical_chance(ceil((9 - $info['robot_key']) * 10))){ break; }
         $this_ability->ability_results_reset();
-        $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+        $temp_target_robot = new rpg_robot($target_player, $info);
         // Update the ability options text
         $this_ability->damage_options_update(array(
-          'success' => array(2, -20, -5, -5, $temp_target_robot->print_robot_name().' was damaged by the blast!'),
+          'success' => array(2, -20, -5, -5, $temp_target_robot->print_name().' was damaged by the blast!'),
           'failure' => array(3, 0, 0, -9999, '')
           ));
         $this_ability->recovery_options_update(array(
-          'success' => array(2, -20, -5, -5, $temp_target_robot->print_robot_name().' was refreshed by the blast!'),
+          'success' => array(2, -20, -5, -5, $temp_target_robot->print_name().' was refreshed by the blast!'),
           'failure' => array(3, 0, 0, -9999, '')
           ));
         $energy_damage_amount = ceil($this_ability->ability_damage * 0.20); //ceil($this_ability->ability_damage / $backup_robots_active_count);
@@ -83,14 +83,13 @@ $ability = array(
     if ($target_robot->robot_energy < 1 || $target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot, $this_ability); }
     foreach ($backup_robots_active AS $key => $info){
       if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-      $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+      $temp_target_robot = new rpg_robot($target_player, $info);
       if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){ $temp_target_robot->trigger_disabled($this_robot, $this_ability); }
     }
 
     // If there was a removed attachment, put it back
     if (!empty($this_attachment_backup)){
-      $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_backup;
-      $this_robot->update_session();
+      $this_robot->set_attachment($this_attachment_token, $this_attachment_backup);
     }
 
     // Return true on success
@@ -104,13 +103,10 @@ $ability = array(
 
     // If this robot is holding a Target Module, allow target selection
     if ($this_robot->robot_item == 'item-target-module'){
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_target');
     } else {
-      $this_ability->ability_target = $this_ability->ability_base_target;
+      $this_ability->reset_target();
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;

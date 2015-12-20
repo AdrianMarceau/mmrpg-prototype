@@ -22,6 +22,7 @@ $ability = array(
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
     	'class' => 'ability',
+      'ability_id' => $this_ability->ability_id,
     	'ability_token' => $this_ability->ability_token,
       'ability_frame' => 0,
       'ability_frame_animate' => array(1, 0),
@@ -39,33 +40,32 @@ $ability = array(
       // Target this robot's self
       $this_ability->target_options_update(array(
         'frame' => 'defend',
-        'success' => array(1, -10, 0, -10, $this_robot->print_robot_name().' charges the '.$this_ability->print_ability_name().'&hellip;')
+        'success' => array(1, -10, 0, -10, $this_robot->print_name().' charges the '.$this_ability->print_name().'&hellip;')
         ));
       $this_robot->trigger_target($this_robot, $this_ability);
 
       // Attach this ability attachment to the robot using it
-      $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-      $this_robot->update_session();
+      $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
     }
     // Else if the ability flag was set, the ability is released at the target
     else {
 
       // Remove this ability attachment to the robot using it
-      unset($this_robot->robot_attachments[$this_attachment_token]);
-      $this_robot->update_session();
+      $this_robot->unset_attachment($this_attachment_token);
 
       // Update this ability's target options and trigger
       $this_ability->target_options_update(array(
         'frame' => 'summon',
         'kickback' => array(0, 0, 0),
-        'success' => array(5, 5, 70, 10, $this_robot->print_robot_name().' releases the '.$this_ability->print_ability_name().'!'),
+        'success' => array(5, 5, 70, 10, $this_robot->print_name().' releases the '.$this_ability->print_name().'!'),
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
 
       // Define this ability's attachment token
       $this_attachment_info = array(
       	'class' => 'ability',
+        'ability_id' => $this_ability->ability_id,
       	'ability_token' => $this_ability->ability_token,
       	'attachment_duration' => 0,
         'attachment_speed' => 0,
@@ -76,8 +76,8 @@ $ability = array(
           'percent' => true,
           'frame' => 'defend',
           'rates' => array(100, 0, 0),
-          'success' => array(5, 5, 70, -10, $target_robot->print_robot_name().'&#39;s mobility was slowed!'),
-          'failure' => array(5, 5, 70, -10, $target_robot->print_robot_name().'&#39;s mobility was not affected&hellip;')
+          'success' => array(5, 5, 70, -10, $target_robot->print_name().'&#39;s mobility was slowed!'),
+          'failure' => array(5, 5, 70, -10, $target_robot->print_name().'&#39;s mobility was not affected&hellip;')
           ),
       	'attachment_destroy' => array(
           'kind' => 'speed',
@@ -88,8 +88,8 @@ $ability = array(
           'modifiers' => false,
           'frame' => 'taunt',
           'rates' => array(100, 0, 0),
-          'success' => array(0, 0, -9999, 0,  $target_robot->print_robot_name().'&#39;s mobility returned to normal!'),
-          'failure' => array(0, 0, -9999, 0, $target_robot->print_robot_name().'&#39;s mobility was not affected&hellip;')
+          'success' => array(0, 0, -9999, 0,  $target_robot->print_name().'&#39;s mobility returned to normal!'),
+          'failure' => array(0, 0, -9999, 0, $target_robot->print_name().'&#39;s mobility was not affected&hellip;')
           ),
         'ability_frame' => 5,
         'ability_frame_animate' => array(5, 4, 3, 2),
@@ -115,16 +115,16 @@ $ability = array(
         $this_ability->damage_options_update($this_attachment_info['attachment_destroy']);
         $this_ability->recovery_options_update($this_attachment_info['attachment_destroy']);
         $this_attachment_info['attachment_speed'] = $this_ability->ability_results['this_amount'];
-        $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-        $target_robot->update_session();
+        $target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
       }
       // Otherwise, if the attachment already exists
       else {
 
         // Simply reset the timer on this ability
-        $target_robot->robot_attachments[$this_attachment_token]['attachment_duration'] = $this_attachment_info['attachment_duration'] + 1;
-        $target_robot->update_session();
+        $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
+        $this_attachment_info['attachment_duration'] = $this_attachment_info['attachment_duration'] + 1;
+        $target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
       }
 
@@ -138,7 +138,7 @@ $ability = array(
         foreach ($backup_robots_active AS $key => $info){
           if ($info['robot_id'] == $target_robot->robot_id){ continue; }
           $this_ability->ability_results_reset();
-          $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+          $temp_target_robot = new rpg_robot($target_player, $info);
 
           // Define the speed mod amount for this ability
           $this_attachment_info['attachment_duration'] += 1;
@@ -159,16 +159,16 @@ $ability = array(
             $this_ability->damage_options_update($this_attachment_info['attachment_destroy']);
             $this_ability->recovery_options_update($this_attachment_info['attachment_destroy']);
             $this_attachment_info['attachment_speed'] = $this_ability->ability_results['this_amount'];
-            $temp_target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-            $temp_target_robot->update_session();
+            $temp_target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
           }
           // Otherwise, if the attachment already exists
           else {
 
             // Simply reset the timer on this ability
-            $temp_target_robot->robot_attachments[$this_attachment_token]['attachment_duration'] = $this_attachment_info['attachment_duration'] + 1;
-            $temp_target_robot->update_session();
+            $this_attachment_info = $temp_target_robot->robot_attachments[$this_attachment_token];
+            $this_attachment_info['attachment_duration'] = $this_attachment_info['attachment_duration'] + 1;
+            $temp_target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
           }
 
@@ -179,9 +179,8 @@ $ability = array(
       }
 
       // Either way, update this ability's settings to prevent recovery
-      $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
-      $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
-      $this_ability->update_session();
+      $this_ability->damage_options_update($this_attachment_info['attachment_destroy']);
+      $this_ability->recovery_options_update($this_attachment_info['attachment_destroy']);
 
     }
 
@@ -201,21 +200,18 @@ $ability = array(
     $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
 
     // If the ability flag had already been set, reduce the weapon energy to zero
-    if (!$this_charge_required){ $this_ability->ability_energy = 0; }
+    if (!$this_charge_required){ $this_ability->set_energy(0); }
     // Otherwise, return the weapon energy back to default
-    else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
+    else { $this_ability->reset_energy(); }
 
     // If this robot is holding a Charge Module, bypass changing but reduce the power of the ability
     if ($this_robot->robot_item == 'item-charge-module'){
       $this_charge_required = false;
-      $temp_item_info = mmrpg_ability::get_index_info($this_robot->robot_item);
-      $this_ability->ability_damage = ceil($this_ability->ability_base_damage * ($temp_item_info['ability_damage2'] / $temp_item_info['ability_recovery2']));
+      $temp_item_info = rpg_ability::get_index_info($this_robot->robot_item);
+      $this_ability->set_damage(ceil($this_ability->ability_base_damage * ($temp_item_info['ability_damage2'] / $temp_item_info['ability_recovery2'])));
     } else {
-      $this_ability->ability_damage = $this_ability->ability_base_damage;
+      $this_ability->reset_damage();
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;

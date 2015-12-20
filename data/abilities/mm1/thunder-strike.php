@@ -23,6 +23,7 @@ $ability = array(
     $this_attachment_info = array(
     	'class' => 'ability',
       'sticky' => true,
+      'ability_id' => $this_ability->ability_id,
     	'ability_token' => $this_ability->ability_token,
       'ability_frame' => 4,
       'ability_frame_animate' => array(4, 3),
@@ -32,39 +33,34 @@ $ability = array(
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(3, 0, 60, -10, $this_robot->print_robot_name().' summons a '.$this_ability->print_ability_name().'!')
+      'success' => array(3, 0, 60, -10, $this_robot->print_name().' summons a '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    $this_robot->robot_frame = 'summon';
-    $this_robot->update_session();
+    $this_robot->set_frame('summon');
 
     // Attach this ability to the target
-    $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-    $target_robot->update_session();
+    $target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(15, 0, 0),
-      'success' => array(0, 0, 10, 10, 'The '.$this_ability->print_ability_name().' zapped the target!'),
-      'failure' => array(1, 0, 10, -10, 'The '.$this_ability->print_ability_name().' missed the target&hellip;')
+      'success' => array(0, 0, 10, 10, 'The '.$this_ability->print_name().' zapped the target!'),
+      'failure' => array(1, 0, 10, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(0, 0, 0),
-      'success' => array(0, 0, 10, 10, 'The '.$this_ability->print_ability_name().' charged by the target!'),
-      'failure' => array(1, 0, 10, -10, 'The '.$this_ability->print_ability_name().' missed the target&hellip;')
+      'success' => array(0, 0, 10, 10, 'The '.$this_ability->print_name().' charged by the target!'),
+      'failure' => array(1, 0, 10, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-    $this_robot->robot_frame = 'base';
-    $this_robot->update_session();
+    $this_robot->set_frame('base');
 
     // Remove this ability from the target
-    unset($target_robot->robot_attachments[$this_attachment_token]);
-    $target_robot->update_session();
-
+    $target_robot->unset_attachment($this_attachment_token);
 
     // Return true on success
     return true;

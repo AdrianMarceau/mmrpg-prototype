@@ -22,7 +22,7 @@ $ability = array(
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'defend',
-      'success' => array(0, 430, 0, 10, $this_robot->print_robot_name().' summons the '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 430, 0, 10, $this_robot->print_name().' summons the '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -30,8 +30,8 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(0, 15, 0),
-      'success' => array(1, 0, 30, 10, 'The '.$this_ability->print_ability_name().' sliced through the target!'),
-      'failure' => array(1, 0, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target&hellip;'),
+      'success' => array(1, 0, 30, 10, 'The '.$this_ability->print_name().' sliced through the target!'),
+      'failure' => array(1, 0, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;'),
       'options' => array(
         'apply_resistance_modifiers' => false,
         'apply_immunity_modifiers' => false,
@@ -41,19 +41,17 @@ $ability = array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(0, 0, 0),
-      'success' => array(1, 0, 30, 10, 'The '.$this_ability->print_ability_name().' sliced through the target!'),
-      'failure' => array(1, 0, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target&hellip;'),
+      'success' => array(1, 0, 30, 10, 'The '.$this_ability->print_name().' sliced through the target!'),
+      'failure' => array(1, 0, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;'),
       'options' => array(
         'apply_resistance_modifiers' => false,
         'apply_immunity_modifiers' => false,
         )
       ));
     $energy_damage_amount = $this_ability->ability_damage;
-    $this_robot->robot_frame = 'summon';
-    $this_robot->update_session();
+    $this_robot->set_frame('summon');
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-    $this_robot->robot_frame = 'base';
-    $this_robot->update_session();
+    $this_robot->set_frame('base');
 
     // Randomly trigger a defense break if the ability was successful
     if ($target_robot->robot_status != 'disabled'
@@ -66,7 +64,7 @@ $ability = array(
         'percent' => true,
         'frame' => 'defend',
         'kickback' => array(10, 0, 0),
-        'success' => array(8, 0, -6, 10, $target_robot->print_robot_name().'&#39;s shields were damaged!'),
+        'success' => array(8, 0, -6, 10, $target_robot->print_name().'&#39;s shields were damaged!'),
         'failure' => array(8, 0, -6, -10, '')
         ));
       $this_ability->recovery_options_update(array(
@@ -74,7 +72,7 @@ $ability = array(
         'percent' => true,
         'frame' => 'taunt',
         'kickback' => array(0, 0, 0),
-        'success' => array(8, 0, -6, 10, $target_robot->print_robot_name().'&#39;s shields improved!'),
+        'success' => array(8, 0, -6, 10, $target_robot->print_name().'&#39;s shields improved!'),
         'failure' => array(8, 0, -6, -9999, '')
         ));
       $defense_damage_amount = ceil($target_robot->robot_defense * ($this_ability->ability_damage2 / 100));
@@ -92,13 +90,10 @@ $ability = array(
 
     // If this robot is holding a Target Module, allow target selection
     if ($this_robot->robot_item == 'item-target-module'){
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_target');
     } else {
-      $this_ability->ability_target = $this_ability->ability_base_target;
+      $this_ability->reset_target();
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;

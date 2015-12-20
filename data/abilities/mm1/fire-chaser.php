@@ -21,7 +21,7 @@ $ability = array(
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array(0, 100, 0, 10, $this_robot->print_robot_name().' unleashes a '.$this_ability->print_ability_name().'!'),
+      'success' => array(0, 100, 0, 10, $this_robot->print_name().' unleashes a '.$this_ability->print_name().'!'),
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -29,15 +29,15 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(15, 0, 0),
-      'success' => array(1, -75, 0, 10, 'The '.$this_ability->print_ability_name().' chased the target!'),
-      'failure' => array(1, -100, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array(1, -75, 0, 10, 'The '.$this_ability->print_name().' chased the target!'),
+      'failure' => array(1, -100, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(0, 0, 0),
-      'success' => array(1, -75, 0, 10, 'The '.$this_ability->print_ability_name().' ignited the target!'),
-      'failure' => array(1, -100, 0, -10, 'The '.$this_ability->print_ability_name().' had no effect&hellip;')
+      'success' => array(1, -75, 0, 10, 'The '.$this_ability->print_name().' ignited the target!'),
+      'failure' => array(1, -100, 0, -10, 'The '.$this_ability->print_name().' had no effect&hellip;')
       ));
     if ($target_robot->robot_speed > $this_robot->robot_speed){ $speed_multiplier = $target_robot->robot_speed / $this_robot->robot_speed; }
     elseif ($this_robot->robot_speed > $target_robot->robot_speed){ $speed_multiplier = $this_robot->robot_speed / $target_robot->robot_speed; }
@@ -55,13 +55,10 @@ $ability = array(
 
     // If this robot is holding a Target Module, allow target selection
     if ($this_robot->robot_item == 'item-target-module'){
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_target');
     } else {
-      $this_ability->ability_target = $this_ability->ability_base_target;
+      $this_ability->reset_target();
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;
