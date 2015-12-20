@@ -943,7 +943,7 @@ class rpg_website {
     $temp_reply_colour = !empty($this_post_info['user_colour_token']) ? $this_post_info['user_colour_token'] : 'none';
 
     ?>
-    <div id="post-<?= $this_post_info['post_id'] ?>" data-key="<?= $this_post_key ?>" data-user="<?= $this_post_info['user_id'] ?>" title="<?= !empty($this_post_info['post_deleted']) ? ($temp_post_author.' on '.str_replace(' ', '&nbsp;', $temp_post_date)) : '' ?>" class="subbody post_subbody post_subbody_<?= $this_post_float ?> <?= !empty($this_post_info['post_deleted']) ? 'post_subbody_deleted' : '' ?> post_<?= $this_post_float ?>" style="<?= !empty($this_post_info['post_deleted']) ? 'margin-top: 0; padding: 0 10px; background-color: transparent; float: '.$this_post_float.'; ' : 'clear: '.$this_post_float.'; ' ?>">
+    <div id="post-<?= $this_post_info['post_id'] ?>" data-key="<?= $this_post_key ?>" data-user="<?= $this_post_info['user_id'] ?>" title="<?= !empty($this_post_info['post_deleted']) ? ($temp_post_author.' on '.str_replace(' ', '&nbsp;', $temp_post_date)) : '' ?>" class="subbody post_subbody post_subbody_<?= $this_post_float ?> <?= !empty($this_post_info['post_deleted']) ? 'post_subbody_deleted' : '' ?> post_<?= $this_post_float ?>" style="<?= !empty($this_post_info['post_deleted']) ? 'margin-top: 0; padding: 0 10px; background-color: transparent; float: '.$this_post_float.'; ' : '' ?>">
 
       <?php if(empty($this_post_info['post_deleted'])): ?>
         <div class="userblock player_type_<?= $temp_avatar_colour ?>">

@@ -668,9 +668,9 @@ ob_start();
     if (!empty($this_posts_array)){
       ?>
       <div class="subbody posts_body post_left event event_triple event_visible" style="margin-top: -6px;">
-        <p class="text" style="font-size: 110%; padding: 6px 3px 0;">
+        <div class="text" style="font-size: 110%; padding: 6px 3px 0;">
           <strong><?= $temp_display_name ?></strong> has created a total of <strong><?= $this_playerinfo['post_count'] == 1 ? '1 Post' : $this_playerinfo['post_count'].' Posts' ?></strong>
-          <span style="font-size: 80%; float: right; margin-left: 20px; text-align: right; ">
+          <div class="post_header_links">
             <strong>Limit To</strong><br />
             <?php if($this_posts_count > 10): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=10' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 10 ? 'underline' : 'none' ?>;">10</a> <span class="pipe">|</span><?php endif; ?>
             <?php if($this_posts_count > 50): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=50' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 50 ? 'underline' : 'none' ?>;">50</a> <span class="pipe">|</span><?php endif; ?>
@@ -678,13 +678,13 @@ ob_start();
             <?php if($this_posts_count > 200): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=200' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 200 ? 'underline' : 'none' ?>;">200</a> <span class="pipe">|</span><?php endif; ?>
             <?php if($this_posts_count > 500): ?><a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=100' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 500 ? 'underline' : 'none' ?>;">500</a> <span class="pipe">|</span><?php endif; ?>
             <a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort='.$temp_post_sort.'&amp;show=all' ?>" rel="nofollow" style="text-decoration: <?= $temp_post_show == 'all' ? 'underline' : 'none' ?>;">All</a>
-          </span>
-          <span style="font-size: 80%; float: right; margin-left: 20px; text-align: right; ">
+          </div>
+          <div class="post_header_links">
             <strong>Sort By</strong><br />
             <a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort=desc&amp;show='.$temp_post_show ?>" rel="nofollow" style="text-decoration: <?= $temp_post_sort == 'desc' ? 'underline' : 'none' ?>;">New</a> <span class="pipe">|</span>
             <a href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/posts/?sort=asc&amp;show='.$temp_post_show ?>" rel="nofollow" style="text-decoration: <?= $temp_post_sort == 'asc' ? 'underline' : 'none' ?>;">Old</a>
-          </span>
-        </p>
+          </div>
+        </div>
         <?php if(!empty($this_posts_count)): ?>
           <p class="text" style="margin-top: -4px;">
             <?= $temp_post_show != 'all' && $temp_post_show < $this_posts_count ? 'Showing '.$temp_post_show.' '.($temp_post_sort == 'desc' ? 'Newest' : 'Oldest').' Posts' : 'Showing All Posts' ?>
