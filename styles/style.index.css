@@ -1969,13 +1969,16 @@ html {
   content: "";
   display: none;
 }
+#window .page .leaderboard .subbody .text .thread_header_links,
 #window .page .leaderboard .subbody .text .post_header_links {
   display: inline-block;
   font-size: 80%;
   float: right;
   margin-left: 20px;
+  padding-left: 20px;
   text-align: right;
   min-width: 75px;
+  white-space: nowrap;
 }
 
 
