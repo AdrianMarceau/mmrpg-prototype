@@ -21,7 +21,7 @@ $ability = array(
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array(0, 150, 0, 10, $this_robot->print_robot_name().' fires the '.$this_ability->print_ability_name().'!'),
+      'success' => array(0, 150, 0, 10, $this_robot->print_name().' fires the '.$this_ability->print_name().'!'),
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -30,16 +30,16 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(15, 5, 0),
-      'success' => array(0, $temp_offset, 0, 10, 'The '.$this_ability->print_ability_name().' burned through the target!'),
-      'failure' => array(0, ($temp_offset - 50), 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array(0, $temp_offset, 0, 10, 'The '.$this_ability->print_name().' burned through the target!'),
+      'failure' => array(0, ($temp_offset - 50), 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'frame' => 'taunt',
       'kickback' => array(5, 0, 0),
-      'success' => array(0, $temp_offset, 0, 10, 'The '.$this_ability->print_ability_name().' energy was absorbed by the target!'),
-      'failure' => array(0, ($temp_offset - 50), 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array(0, $temp_offset, 0, 10, 'The '.$this_ability->print_name().' energy was absorbed by the target!'),
+      'failure' => array(0, ($temp_offset - 50), 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => true, 'apply_position_modifiers' => false);
@@ -54,9 +54,9 @@ $ability = array(
       $target_key = 0;
       foreach ($backup_robots_active AS $key => $info){
         if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-        if (!$this_battle->critical_chance($this_ability->ability_accuracy)){ continue; }
+        if (!rpg_functions::critical_chance($this_ability->ability_accuracy)){ continue; }
         $this_ability->ability_results_reset();
-        $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+        $temp_target_robot = new rpg_robot($target_player, $info);
         // Update the ability options text
         $temp_frame = $target_key == 0 || $target_key % 2 == 0 ? 1 : 0;
         $temp_kickback = ($target_key == 0 || $target_key % 2 == 0 ? -1 : 1) * (10 + (5 * $target_key));
@@ -64,12 +64,12 @@ $ability = array(
         $temp_offset = $temp_frame == 0 ? $temp_offset * -1 : ceil($temp_offset * 0.75);
         $this_ability->damage_options_update(array(
           'kickback' => array($temp_kickback, 0, 0),
-          'success' => array($temp_frame, $temp_offset, 0, 10, 'The '.$this_ability->print_ability_name().' burned through the target!'),
+          'success' => array($temp_frame, $temp_offset, 0, 10, 'The '.$this_ability->print_name().' burned through the target!'),
           'failure' => array($temp_frame, ($temp_offset * 2), 0, 10, '')
           ));
         $this_ability->recovery_options_update(array(
           'kickback' => array($temp_kickback, 0, 0),
-          'success' => array($temp_frame, $temp_offset, 0, 10, 'The '.$this_ability->print_ability_name().'&#39;s energy was absorbed by the target!'),
+          'success' => array($temp_frame, $temp_offset, 0, 10, 'The '.$this_ability->print_name().'&#39;s energy was absorbed by the target!'),
           'failure' => array($temp_frame, $temp_offset * 2, 0, 10, '')
           ));
         //$energy_damage_amount = ceil($this_ability->ability_damage / ($key + 2));
@@ -84,7 +84,7 @@ $ability = array(
     if ($target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot, $this_ability); }
     foreach ($backup_robots_active AS $key => $info){
       if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-      $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+      $temp_target_robot = new rpg_robot($target_player, $info);
       if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){ $temp_target_robot->trigger_disabled($this_robot, $this_ability); }
     }
 

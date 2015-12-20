@@ -20,7 +20,7 @@ $ability = array(
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'throw',
-      'success' => array(0, 100, 0, 10, $this_robot->print_robot_name().' throws a '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 100, 0, 10, $this_robot->print_name().' throws a '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -28,15 +28,15 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(mt_rand(5, 10), 0, 0),
-      'success' => array(1, -20, 0, 10, 'The '.$this_ability->print_ability_name().' hit the target!'),
-      'failure' => array(1, -80, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array(1, -20, 0, 10, 'The '.$this_ability->print_name().' hit the target!'),
+      'failure' => array(1, -80, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(0, 0, 0),
-      'success' => array(1, -20, 0, 10, 'The '.$this_ability->print_ability_name().' hit the target!'),
-      'failure' => array(1, -80, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array(1, -20, 0, 10, 'The '.$this_ability->print_name().' hit the target!'),
+      'failure' => array(1, -80, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
@@ -55,8 +55,7 @@ $ability = array(
       $temp_offset = $temp_frame == 0 ? $temp_offset * -1 : ceil($temp_offset * 0.75);
       $temp_accuracy = $this_ability->ability_base_accuracy - $temp_hit_counter;
       if ($temp_accuracy < 1){ $temp_accuracy = 1; }
-      $this_ability->ability_accuracy = $temp_accuracy;
-      $this_ability->update_session();
+      $this_ability->set_accuracy($temp_accuracy);
 
       // Inflict damage on the opposing robot
       $this_ability->damage_options_update(array(
@@ -81,8 +80,7 @@ $ability = array(
     }
 
     // Reset the accuracy back to base values
-    $this_ability->ability_accuracy = $this_ability->ability_base_accuracy;
-    $this_ability->update_session();
+    $this_ability->reset_accuracy();
 
     // Return true on success
     return true;
@@ -95,13 +93,10 @@ $ability = array(
 
     // If this robot is holding a Target Module, allow target selection
     if ($this_robot->robot_item == 'item-target-module'){
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_target');
     } else {
-      $this_ability->ability_target = $this_ability->ability_base_target;
+      $this_ability->reset_target();
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;
