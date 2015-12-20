@@ -23,6 +23,7 @@ $ability = array(
     $this_attachment_info = array(
     	'class' => 'ability',
       'sticky' => true,
+      'ability_id' => $this_ability->ability_id,
     	'ability_token' => $this_ability->ability_token,
       'ability_image' => $this_ability->ability_token.'-2',
       'ability_frame' => 0,
@@ -38,54 +39,49 @@ $ability = array(
     $this_ability->target_options_update(array(
       'kickback' => array(-5, 0, 0),
       'frame' => 'summon',
-      'success' => array(0, -10, 0, -10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
+      'success' => array(0, -10, 0, -10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
     // Add the black background attachment
-    $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-    $target_robot->update_session();
+    $target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(5, 0, 0),
-      'success' => array(1, -5, 0, -8, 'The '.$this_ability->print_ability_name().' freezes time around the target!'),
-      'failure' => array(2, -5, 0, -8, $this_ability->print_ability_name().' had no effect&hellip;')
+      'success' => array(1, -5, 0, -8, 'The '.$this_ability->print_name().' freezes time around the target!'),
+      'failure' => array(2, -5, 0, -8, $this_ability->print_name().' had no effect&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(0, 0, 0),
-      'success' => array(1, -5, 0, -8, 'The '.$this_ability->print_ability_name().' freezes time around the target!'),
-      'failure' => array(2, -5, 0, -8, $this_ability->print_ability_name().' had no effect&hellip;')
+      'success' => array(1, -5, 0, -8, 'The '.$this_ability->print_name().' freezes time around the target!'),
+      'failure' => array(2, -5, 0, -8, $this_ability->print_name().' had no effect&hellip;')
       ));
     $energy_damage_amount = ceil($this_ability->ability_damage / $target_robots_active);
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
 
     // Remove the black background attachment
-    unset($target_robot->robot_attachments[$this_attachment_token]);
-    $target_robot->update_session();
+    $target_robot->unset_attachment($this_attachment_token);
 
     // Loop through the target's benched robots, inflicting half base damage to each
     $backup_robots_active = $target_player->values['robots_active'];
     foreach ($backup_robots_active AS $key => $info){
       if ($info['robot_id'] == $target_robot->robot_id){ continue; }
       $this_ability->ability_results_reset();
-      $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
-      $temp_target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-      $temp_target_robot->update_session();
-      //$energy_damage_amount = ceil($this_ability->ability_damage / $target_robots_active);
+      $temp_target_robot = new rpg_robot($target_player, $info);
+      $temp_target_robot->set_attachment($this_attachment_token, $this_attachment_info);
       $energy_damage_amount = $this_ability->ability_damage;
       $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
-      unset($temp_target_robot->robot_attachments[$this_attachment_token]);
-      $temp_target_robot->update_session();
+      $temp_target_robot->unset_attachment($this_attachment_token);
     }
     // Trigger the disabled event on the targets now if necessary
     if ($target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot, $this_ability); }
     foreach ($backup_robots_active AS $key => $info){
       if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-      $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+      $temp_target_robot = new rpg_robot($target_player, $info);
       if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){ $temp_target_robot->trigger_disabled($this_robot, $this_ability); }
     }
 
@@ -104,8 +100,7 @@ $ability = array(
     if ($temp_new_damage_amount < 1){ $temp_new_damage_amount = 1; }
 
     // Update this ability's base damage with the new amount and save
-    $this_ability->ability_damage = $temp_new_damage_amount;
-    $this_ability->update_session();
+    $this_ability->set_damage($temp_new_damage_amount);
 
     // Return true on success
     return true;

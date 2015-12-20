@@ -19,24 +19,34 @@ $ability = array(
 
     // Attach three whirlwind attachments to the robot
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
-    $this_attachment_info = array('class' => 'ability', 'ability_token' => $this_ability->ability_token, 'ability_frame' => 0, 'ability_frame_animate' => array(1, 2));
-    $this_robot->robot_attachments[$this_attachment_token.'_1'] = $this_attachment_info;
-    $this_robot->robot_attachments[$this_attachment_token.'_2'] = $this_attachment_info;
-    $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame_offset'] = array('x' => 75, 'y' => -25, 'z' => 10);
-    $this_robot->robot_attachments[$this_attachment_token.'_2']['ability_frame_offset'] = array('x' => 95, 'y' => 25, 'z' => 10);
-    $this_robot->update_session();
+    $this_attachment_info = array(
+      'class' => 'ability',
+      'ability_id' => $this_ability->ability_id,
+      'ability_token' => $this_ability->ability_token,
+      'ability_frame' => 0,
+      'ability_frame_animate' => array(1, 2)
+      );
+    $this_attachment_info1 = $this_attachment_info;
+    $this_attachment_info1['ability_id'] .= '01';
+    $this_attachment_info1['ability_frame_offset'] = array('x' => 75, 'y' => -25, 'z' => 10);
+    $this_attachment_info2 = $this_attachment_info;
+    $this_attachment_info2['ability_id'] .= '02';
+    $this_attachment_info2['ability_frame_offset'] = array('x' => 95, 'y' => 25, 'z' => 10);
+    $this_robot->set_attachment($this_attachment_token.'_1', $this_attachment_info1);
+    $this_robot->set_attachment($this_attachment_token.'_2', $this_attachment_info2);
 
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array(0, 115, -25, 10, $this_ability->print_ability_name().' fires whirlwinds!')
+      'success' => array(0, 115, -25, 10, $this_ability->print_name().' fires whirlwinds!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
     // Update the two whirlwind's animation frames
-    $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame'] = 1;
-    $this_robot->robot_attachments[$this_attachment_token.'_2']['ability_frame'] = 1;
-    $this_robot->update_session();
+    $this_attachment_info1['ability_frame'] = 1;
+    $this_attachment_info2['ability_frame'] = 1;
+    $this_robot->set_attachment($this_attachment_token.'_1', $this_attachment_info1);
+    $this_robot->set_attachment($this_attachment_token.'_2', $this_attachment_info2);
 
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
@@ -73,8 +83,8 @@ $ability = array(
       }
 
       // Update the remaining whirlwind's animation frame
-      $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame'] = 2;
-      $this_robot->update_session();
+      $this_attachment_info1['ability_frame'] = 2;
+      $this_robot->set_attachment($this_attachment_token.'_1', $this_attachment_info1);
 
       // Attempt to trigger damage to the target robot again
       $this_ability->damage_options_update(array(
@@ -103,8 +113,7 @@ $ability = array(
 
         // Remove the first extra whirlwind
         if (isset($this_robot->robot_attachments[$this_attachment_token.'_1'])){
-          unset($this_robot->robot_attachments[$this_attachment_token.'_1']);
-          $this_robot->update_session();
+          $this_robot->unset_attachment($this_attachment_token.'_1');
         }
 
         // Attempt to trigger damage to the target robot a third time
@@ -129,14 +138,12 @@ $ability = array(
 
     // Remove the second whirlwind
     if (isset($this_robot->robot_attachments[$this_attachment_token.'_2'])){
-      unset($this_robot->robot_attachments[$this_attachment_token.'_2']);
-      $this_robot->update_session();
+      $this_robot->unset_attachment($this_attachment_token.'_2');
     }
 
     // Remove the third whirlwind
     if (isset($this_robot->robot_attachments[$this_attachment_token.'_1'])){
-      unset($this_robot->robot_attachments[$this_attachment_token.'_1']);
-      $this_robot->update_session();
+      $this_robot->unset_attachment($this_attachment_token.'_1');
     }
 
     // Return true on success
@@ -150,13 +157,10 @@ $ability = array(
 
     // If this robot is holding a Target Module, allow target selection
     if ($this_robot->robot_item == 'item-target-module'){
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_target');
     } else {
-      $this_ability->ability_target = $this_ability->ability_base_target;
+      $this_ability->reset_target();
     }
-
-    // Update the ability session
-    $this_ability->update_session();
 
     // Return true on success
     return true;

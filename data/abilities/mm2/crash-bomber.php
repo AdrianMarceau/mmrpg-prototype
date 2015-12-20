@@ -73,14 +73,14 @@ $ability = array(
     else { $temp_y_offset = 5; }
 
     // Update this ability's attachment frame offset
-    $this_ability->ability_frame_offset['y'] = $temp_y_offset;
-    $this_ability->update_session();
+    $this_ability->set_frame_offset('y', $temp_y_offset);
 
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
     	'class' => 'ability',
       'sticky' => false,
+      'ability_id' => $this_ability->ability_id,
     	'ability_token' => $this_ability->ability_token,
     	'ability_frame' => 1,
     	'ability_frame_animate' => array(1, 2),
@@ -94,8 +94,8 @@ $ability = array(
         'type' => '',
         'percent' => false,
         'frame' => 'defend',
-        'success' => array(1, 2, $temp_y_offset, 10, 'The '.$this_ability->print_ability_name().' attached itself to '.$this_robot->print_robot_name().'!'),
-        'failure' => array(4, 2, $temp_y_offset, -10, 'The '.$this_ability->print_ability_name().' flew past the target&hellip;')
+        'success' => array(1, 2, $temp_y_offset, 10, 'The '.$this_ability->print_name().' attached itself to '.$this_robot->print_name().'!'),
+        'failure' => array(4, 2, $temp_y_offset, -10, 'The '.$this_ability->print_name().' flew past the target&hellip;')
         ),
     	'attachment_destroy' => array(
         'kind' => 'energy',
@@ -105,8 +105,8 @@ $ability = array(
         'modifiers' => true,
         'frame' => 'damage',
         'rates' => array(100, 0, 0),
-        'success' => array(3, 2, $temp_y_offset, 10, 'The '.$this_ability->print_ability_name().' suddenly exploded!'),
-        'failure' => array(0, 2, -9999, 0, 'The '.$this_ability->print_ability_name().' fizzled and faded away&hellip;'),
+        'success' => array(3, 2, $temp_y_offset, 10, 'The '.$this_ability->print_name().' suddenly exploded!'),
+        'failure' => array(0, 2, -9999, 0, 'The '.$this_ability->print_name().' fizzled and faded away&hellip;'),
         'options' => array(
           'apply_modifiers' => true,
           'apply_type_modifiers' => true,
@@ -132,7 +132,7 @@ $ability = array(
       // Target the opposing robot
       $this_ability->target_options_update(array(
         'frame' => 'shoot',
-        'success' => array(0, 95, 0, 10, $this_robot->print_robot_name().' fires a '.$this_ability->print_ability_name().'!')
+        'success' => array(0, 95, 0, 10, $this_robot->print_name().' fires a '.$this_ability->print_name().'!')
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -144,43 +144,40 @@ $ability = array(
       $this_ability->update_session();
 
       // Attach this ability attachment to the robot using it
-      $target_robot->robot_frame = !$target_robot->has_immunity($this_ability->ability_type) ? 'damage' : 'defend';
-      $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-      $target_robot->update_session();
+      $target_robot->set_frame(!$target_robot->has_immunity($this_ability->ability_type) ? 'damage' : 'defend');
+      $target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
       // Create the attachment event manually as no damage/recovery occurs
       $temp_console_header = $this_robot->robot_name.'&#39;s '.$this_ability->ability_name;
-      $temp_console_content = 'The '.$this_ability->print_ability_name().' attached itself to '.$target_robot->print_robot_name().'!<br />';
-      if ($target_player->player_token != 'player'){ $temp_console_content .= $target_player->print_player_name().'&#39;s robot started ticking&hellip;'; }
+      $temp_console_content = 'The '.$this_ability->print_name().' attached itself to '.$target_robot->print_name().'!<br />';
+      if ($target_player->player_token != 'player'){ $temp_console_content .= $target_player->print_name().'&#39;s robot started ticking&hellip;'; }
       else { $temp_console_content .= 'The target robot started ticking&hellip;'; }
       $this_battle->events_create($target_robot, false, $temp_console_header, $temp_console_content, array('console_show_target' => false));
-      $target_robot->robot_frame = 'base';
-      $target_robot->update_session();
+      $target_robot->set_frame('base');
 
       // If the target robot has an IMMUNITY to the ability
       if ($target_robot->has_immunity($this_ability->ability_type)){
 
         // Attach this ability attachment to the robot using it
-        $target_robot->robot_frame = 'taunt';
-        unset($target_robot->robot_attachments[$this_attachment_token]);
-        $target_robot->update_session();
+        $target_robot->set_frame('taunt');
+        $target_robot->unset_attachment($this_attachment_token);
 
         // Create the attachment event manually as no damage/recovery occurs
         $temp_console_header = $this_robot->robot_name.'&#39;s '.$this_ability->ability_name;
-        $temp_console_content = $target_robot->print_robot_name().'&#39;s immunity kicked in!<br />';
-        $temp_console_content .= 'The '.$this_ability->print_ability_name().' fizzled and faded away&hellip;';
+        $temp_console_content = $target_robot->print_name().'&#39;s immunity kicked in!<br />';
+        $temp_console_content .= 'The '.$this_ability->print_name().' fizzled and faded away&hellip;';
         $this_battle->events_create($target_robot, false, $temp_console_header, $temp_console_content, array('console_show_target' => false));
-        $target_robot->robot_frame = 'base';
-        $target_robot->update_session();
+        $target_robot->set_frame('base');
 
       }
       // Else if the target robot has an AFFINITY to the ability
       elseif ($target_robot->has_affinity($this_ability->ability_type)){
 
         // Attach this ability attachment to the robot using it
-        $target_robot->robot_attachments[$this_attachment_token]['attachment_destroy']['trigger'] = 'recovery';
-        $target_robot->robot_attachments[$this_attachment_token]['attachment_destroy']['frame'] = 'taunt';
-        $target_robot->update_session();
+        $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
+        $this_attachment_info['attachment_destroy']['trigger'] = 'recovery';
+        $this_attachment_info['attachment_destroy']['frame'] = 'taunt';
+        $target_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
       }
 
@@ -191,7 +188,7 @@ $ability = array(
       // Target the opposing robot
       $this_ability->target_options_update(array(
         'frame' => 'summon',
-        'success' => array(0, 0, -9999, 0, $this_robot->print_robot_name().' triggered the '.$this_ability->print_ability_name().' early!')
+        'success' => array(0, 0, -9999, 0, $this_robot->print_name().' triggered the '.$this_ability->print_name().' early!')
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -199,18 +196,13 @@ $ability = array(
       $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
 
       // Attach this ability attachment to the robot using it
-      unset($target_robot->robot_attachments[$this_attachment_token]);
-      $target_robot->update_session();
+      $target_robot->unset_attachment($this_attachment_token);
 
       // Update this ability with the attachment destroy data
       $this_ability->damage_options_update($this_attachment_info['attachment_destroy']);
-      $this_ability->update_session();
 
       // Collect the energy damage amount and reduce it for triggering early
       $energy_damage_amount = $this_attachment_info['attachment_duration'] > 0 ? round($this_attachment_info['attachment_energy'] / $this_attachment_info['attachment_duration']) : $this_attachment_info['attachment_energy'];
-
-      // Update the attachment options for the destroy and remove referred flag
-      // $this_attachment_info['attachment_destroy']['options']['referred_damage'] = false;
 
       // Now that we have the new amount, we can trigger the reduced damage
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, true, $this_attachment_info['attachment_destroy']['options']);
