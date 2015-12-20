@@ -1,11 +1,9 @@
 <?php
 
-/*
 // MAINTENANCE
-if (!MMRPG_CONFIG_ADMIN_MODE){
-  die('<strong style="text-decoration: underline;">Prototype Offline</strong><br /> The prototype has been taken offline <em>temporarily</em> while we move to a new host.<br /> The transition may take several days, but the wait will be worth it with more memory, more bandwidth, and more time to fix <em>other</em> more important bugs.<br /> Thank you for your continued patience through these frustrating times and as always, thanks for playing!<br /> -Adrian ');
+if (true){ //!MMRPG_CONFIG_ADMIN_MODE
+  die('<strong style="text-decoration: underline;">Prototype Offline</strong><br /> The prototype has been taken offline <em>temporarily</em> while we refactor code to work with the new system.<br /> The transition may take several months, but the wait will be hopefully be worth it with more flexibility and support for user generated content.<br /> Thank you for your continued patience through these long and tedious delays and as always, thanks for playing!<br /> -Adrian ');
 }
-*/
 
 // Include the TOP file
 require_once('_top.php');
