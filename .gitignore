@@ -30,3 +30,8 @@
 .project
 .htaccess-current
 *.orig
+_saves/
+_todo.php
+_cache/
+test/
+test.php
