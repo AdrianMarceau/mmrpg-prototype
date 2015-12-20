@@ -19,7 +19,7 @@ $ability = array(
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'defend',
-      'success' => array(0, 0, 0, -10, $this_robot->print_robot_name().' starts charging weapon energy&hellip;')
+      'success' => array(0, 0, 0, -10, $this_robot->print_name().' starts charging weapon energy&hellip;')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -28,8 +28,8 @@ $ability = array(
       'kind' => 'weapons',
       'percent' => true,
       'kickback' => array(10, 0, 0),
-      'success' => array(0, 0, 0, -10, 'The '.$this_ability->print_ability_name().' restored depleted power!'),
-      'failure' => array(0, 0, 0, -10, 'The '.$this_ability->print_ability_name().' had no effect&hellip;')
+      'success' => array(0, 0, 0, -10, 'The '.$this_ability->print_name().' restored depleted power!'),
+      'failure' => array(0, 0, 0, -10, 'The '.$this_ability->print_name().' had no effect&hellip;')
       ));
     $weapons_recovery_amount = ceil($this_robot->robot_base_weapons * ($this_ability->ability_recovery / 100));
     $this_robot->trigger_recovery($this_robot, $this_ability, $weapons_recovery_amount);

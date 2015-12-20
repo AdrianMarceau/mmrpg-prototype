@@ -18,7 +18,7 @@ $ability = array(
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(0, 0, 0, 10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 0, 0, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -63,7 +63,7 @@ $ability = array(
           // Collect the information for this buster ability
           $relay_buster_token = $attachment_token;
           $relay_buster_info = $attachment_info;
-          $relay_buster_object = new mmrpg_ability($this_battle, $this_player, $this_robot, $relay_buster_info);
+          $relay_buster_object = new rpg_ability($this_player, $this_robot, $relay_buster_info);
 
           // Remove this attachment from the source robot
           unset($this_robot->robot_attachments[$relay_buster_token]);
@@ -86,24 +86,22 @@ $ability = array(
 
           // Append this attachment to the new target robot
           $temp_buster_exists = isset($target_robot->robot_attachments[$relay_buster_token]) ? true : false;
-          $target_robot->robot_frame = $attachment_key % 2 == 0 ? 'defend' : 'taunt';
-          $target_robot->robot_attachments[$relay_buster_token] = $relay_buster_info;
-          $target_robot->update_session();
+          $target_robot->set_frame($attachment_key % 2 == 0 ? 'defend' : 'taunt');
+          $target_robot->set_attachment($relay_buster_token, $relay_buster_info);
 
           // Trigger the robot target and show the buster charge moving
           $this_ability->target_options_update(array(
             'frame' => $attachment_key % 2 == 0 ? 'taunt' : 'summon',
             'success' => array(9, 0, 0, -10,
-              'The '.$relay_buster_object->print_ability_name().' charge was '.
-              (!$temp_buster_exists ? 'transferred to '.$target_robot->print_robot_name().'!' : 'merged with '.$target_robot->print_robot_name().'&#39;s!').
+              'The '.$relay_buster_object->print_name().' charge was '.
+              (!$temp_buster_exists ? 'transferred to '.$target_robot->print_name().'!' : 'merged with '.$target_robot->print_name().'&#39;s!').
               '<br />'
               )
             ));
           $this_robot->trigger_target($target_robot, $this_ability);
 
           // Reset the target robot's frame
-          $target_robot->robot_frame = 'base';
-          $target_robot->update_session();
+          $target_robot->set_frame('base');
 
           // Increment the attachment key
           $attachment_key++;

@@ -12,13 +12,13 @@ $ability = array(
   'ability_accuracy' => 100,
   'ability_function' => function($objects){
 
-    // Extract all objects into the current scope
+    // Extract provided objects into local scope
     extract($objects);
 
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array(0, 105, 0, 10, $this_robot->print_robot_name().' fires a '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 105, 0, 10, $this_robot->print_name().' fires a '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -26,8 +26,8 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(10, 0, 0),
-      'success' => array(0, -60, 0, 10, 'The '.$this_ability->print_ability_name().' hit the target!'),
-      'failure' => array(0, -60, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array(0, -60, 0, 10, 'The '.$this_ability->print_name().' hit the target!'),
+      'failure' => array(0, -60, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
@@ -38,7 +38,7 @@ $ability = array(
     },
   'ability_function_onload' => function($objects){
 
-    // Extract all objects into the current scope
+    // Extract provided objects into local scope
     extract($objects);
 
     // Loop through any attachments and boost power for each buster charge
@@ -49,13 +49,13 @@ $ability = array(
       }
     }
     // Update the ability's damage with the new amount
-    $this_ability->ability_damage = $temp_new_damage;
+    $this_ability->set_damage($temp_new_damage);
 
     // If this robot is holding a Target Module, allow target selection
     if ($this_robot->robot_item == 'item-target-module'){
-      $this_ability->ability_target = 'select_target';
+      $this_ability->set_target('select_target');
     } else {
-      $this_ability->ability_target = $this_ability->ability_base_target;
+      $this_ability->reset_target();
     }
 
     // Update the ability session
