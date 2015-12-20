@@ -12,35 +12,25 @@ $ability = array(
 
     // Extract all objects into the current scope
     extract($objects);
-    $mmrpg_index_fields = mmrpg_field::get_index();
+
+    $mmrpg_index_fields = rpg_field::get_index();
 
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(0, 0, 0, 10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 0, 0, 10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
-
-    /*
-    // Create the entry message for this new mecha added to the field
-    $this_robot->robot_frame = 'summon';
-    $this_robot->update_session();
-    $event_header = $this_robot->robot_name.'&#39;s '.$this_ability->ability_name;
-    $event_body = $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!';
-    $this_battle->events_create($this_robot, false, $event_header, $event_body);
-    */
 
     // Only continue with the ability if player has less than 8 robots
     if (count($this_player->player_robots) < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){
       // Place the current robot back on the bench
       $this_original_robot_id = $this_robot->robot_id;
-      $this_robot->robot_frame = 'taunt';
-      $this_robot->robot_position = 'bench';
-      $this_player->player_frame = 'base';
-      $this_player->values['current_robot'] = false;
-      $this_player->values['current_robot_enter'] = false;
-      $this_robot->update_session();
-      $this_player->update_session();
+      $this_robot->set_frame('taunt');
+      $this_robot->set_position('bench');
+      $this_player->set_frame('base');
+      $this_player->set_value('current_robot', false);
+      $this_player->set_value('current_robot_enter', false);
 
       // Collect the current robot level for this field
       $this_robot_level = !empty($this_robot->robot_level) ? $this_robot->robot_level : 1;
@@ -58,7 +48,7 @@ $ability = array(
           // Collect the current robots available for this robot's home field
           // Collect the current mechas available for this robot's home field
           $temp_field = !empty($mmrpg_index_fields[$this_robot->robot_field]) ? $mmrpg_index_fields[$this_robot->robot_field] : array();
-          $this_field_info = mmrpg_field::parse_index_info($temp_field);
+          $this_field_info = rpg_field::parse_index_info($temp_field);
           $this_field_mechas = !empty($this_field_info['field_mechas']) ? $this_field_info['field_mechas'] : array();
         }
       }
@@ -105,9 +95,9 @@ $ability = array(
       $this_robot->update_session();
 
       // Collect database info for this mecha
-      global $DB;
-      $this_mecha_info = mmrpg_robot::get_index_info($this_mecha_token);
-      $this_mecha_info = mmrpg_robot::parse_index_info($this_mecha_info);
+      global $this_database;
+      $this_mecha_info = rpg_robot::get_index_info($this_mecha_token);
+      $this_mecha_info = rpg_robot::parse_index_info($this_mecha_info);
 
       // Update or create the mecha letter token
       if (!isset($this_player->counters['player_mechas'][$this_mecha_name_token])){ $this_player->counters['player_mechas'][$this_mecha_name_token] = 0; }
@@ -124,7 +114,6 @@ $ability = array(
       $this_letter_options = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H');
       $this_mecha_letter = $this_letter_options[$this_player->counters['player_mechas'][$this_mecha_name_token]];
 
-      // DEBUG
       // Generate the new robot and add it to this player's team
       $this_key = $this_player->counters['robots_active'] + $this_player->counters['robots_disabled'];
       $this_id = $this_player->player_id + 2 + $this_key;
@@ -137,27 +126,23 @@ $ability = array(
       //if (preg_match('/-2$/', $this_mecha_token)){ $this_mecha_info['robot_name'] .= '²'; }
       //elseif (preg_match('/-3$/', $this_mecha_token)){ $this_mecha_info['robot_name'] .= '³'; }
       $this_mecha_info['robot_name'] .= ' '.$this_mecha_letter;
-      $temp_mecha = new mmrpg_robot($this_battle, $this_player, $this_mecha_info);
+      $temp_mecha = new rpg_robot($this_player, $this_mecha_info);
       $temp_mecha->apply_stat_bonuses();
       foreach ($temp_mecha->robot_abilities AS $this_key2 => $this_token){
         $temp_abilityinfo = array('ability_token' => $this_token);
-        $temp_ability = new mmrpg_ability($this_battle, $this_player, $temp_mecha, $temp_abilityinfo);
-        $temp_ability->update_session();
+        $temp_ability = new rpg_ability($this_player, $temp_mecha, $temp_abilityinfo);
       }
       $temp_mecha->flags['ability_startup'] = true;
       $temp_mecha->update_session();
       $this_mecha_info = $temp_mecha->export_array();
-      $this_player->load_robot($this_mecha_info, $this_key);
+      $this_player->add_robot($this_mecha_info, $this_key);
       $this_player->update_session();
 
       // Automatically trigger a switch action to the new mecha support robot
-      $this_battle->actions_trigger($this_player, $this_robot, $target_player, $target_robot, 'switch', $this_id_token);
-
-      // DEBUG
-      //$this_battle->events_create(false, false, 'DEBUG '.__LINE__, 'this_mecha_token = '.$this_mecha_token);
+      $this_battle->trigger_action($this_player, $this_robot, $target_player, $target_robot, 'switch', $this_id_token);
 
       // Refresh the current robot's frame back to normal (manually because reference confusion)
-      mmrpg_robot::set_session_field($this_original_robot_id, 'robot_frame', 'base');
+      rpg_robot::set_session_field($this_original_robot_id, 'robot_frame', 'base');
 
     }
     // Otherwise print a nothing happened message
