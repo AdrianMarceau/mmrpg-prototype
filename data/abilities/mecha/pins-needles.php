@@ -11,17 +11,17 @@ $ability = array(
   'ability_damage' => 10,
   'ability_accuracy' => 90,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array(0, -50, 70, 10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!', 2),
+      'success' => array(0, -50, 70, 10, $this_robot->print_name().' uses '.$this_ability->print_name().'!', 2),
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Inflict damage on the opposing robot
     $temp_offset = 0;
     $this_ability->damage_options_update(array(
@@ -40,20 +40,20 @@ $ability = array(
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
-    
+
     // Randomly trigger a bench damage if the ability was successful
     $backup_robots_active = $target_player->values['robots_active'];
     $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
     $last_ability_result = $this_ability->ability_results['this_result'];
     if (true){ //$this_ability->ability_results['this_result'] != 'failure'
-        
+
       // Loop through the target's benched robots, inflicting les and less damage to each
       $target_key = 0;
       foreach ($backup_robots_active AS $key => $info){
         if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-        if (!$this_battle->critical_chance(ceil($this_ability->ability_accuracy))){ continue; }
+        if (!rpg_functions::critical_chance(ceil($this_ability->ability_accuracy))){ continue; }
         $this_ability->ability_results_reset();
-        $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+        $temp_target_robot = new rpg_robot($target_player, $info);
         // Update the ability options text
         $temp_frame = 2;
         $temp_offset = 0;
@@ -73,20 +73,20 @@ $ability = array(
         $last_ability_result = $this_ability->ability_results['this_result'];
         $target_key++;
       }
-      
+
     }
-    
+
     // Trigger the disabled event on the targets now if necessary
     if ($target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot, $this_ability); }
     foreach ($backup_robots_active AS $key => $info){
       if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-      $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+      $temp_target_robot = new rpg_robot($target_player, $info);
       if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){ $temp_target_robot->trigger_disabled($this_robot, $this_ability); }
     }
-    
+
     // Return true on success
     return true;
-        
+
   }
   );
 ?>
