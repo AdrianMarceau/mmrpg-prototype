@@ -50,6 +50,9 @@
     border: 1px solid #262626;
     background-color: #191919;
     color: #FFFFFF;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
 }
 
 #mmrpg .page_admin .body form.search .results {
@@ -77,10 +80,11 @@
 }
 #mmrpg .page_admin .body form.search .results .head {
     font-weight: bold;
-    background-color: #1B1B1B;
+    background-color: #1C1C1C;
 }
 #mmrpg .page_admin .body form.search .results .link {
     border-top: 0 none transparent;
+    background-color: #202020;
 }
 #mmrpg .page_admin .body form.search .results .link:hover {
     text-decoration: none;
