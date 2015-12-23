@@ -24,6 +24,19 @@ class rpg_type {
   }
 
   /**
+   * Get the tokens for all types in the global index
+   * @param bool $session
+   * @return array
+   */
+  public static function get_index_tokens($session = true){
+    // Load the type index if not
+    self::load_type_index();
+    $this_index = self::$database_index;
+    $this_tokens = array_keys($this_index);
+    return $this_tokens;
+  }
+
+  /**
    * Request type info from the global index via type token
    * @param string $type_token
    * @return array

@@ -112,16 +112,19 @@ $this_page_markup = ob_get_clean();
 <meta name="robots" content="<?= !defined('MMRPG_CRITICAL_ERROR') && empty($_REQUEST['action']) && !empty($this_seo_robots) ? $this_seo_robots : 'noindex,nofollow' ?>,noodp" />
 <base href="<?= MMRPG_CONFIG_ROOTURL ?>">
 <link rel="sitemap" type="application/xml" title="Sitemap" href="<?= MMRPG_CONFIG_ROOTURL ?>sitemap.xml" />
-<?php if(!defined('MMRPG_CRITICAL_ERROR')){  foreach ($this_graph_data AS $token => $value){ echo '<meta property="og:'.str_replace('__', ':', $token).'" content="'.$value.'"/>'."\n"; } } ?>
+<? if (!defined('MMRPG_CRITICAL_ERROR')){  foreach ($this_graph_data AS $token => $value){ echo '<meta property="og:'.str_replace('__', ':', $token).'" content="'.$value.'"/>'."\n"; } } ?>
 <link rel="browser-game-info" href="<?= MMRPG_CONFIG_ROOTURL ?>mmrpg-info.xml" />
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
 <link type="text/css" href="styles/reset.css" rel="stylesheet" />
 <style type="text/css"> html, body { background-color: #262626; } </style>
 <link type="text/css" href="styles/style.index.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/style.master.css??<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<?php if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
-<link type="text/css" href="_ext/colorbox/jquery.colorbox.css" rel="stylesheet" />
-<?php endif; ?>
+<? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
+  <link type="text/css" href="_ext/colorbox/jquery.colorbox.css" rel="stylesheet" />
+<? endif; ?>
+<? if ($this_current_page == 'admin'): ?>
+  <link type="text/css" href="styles/style.admin.css??<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<? endif; ?>
 <meta name="format-detection" content="telephone=no">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <?php /*if($flag_wap):?>
@@ -215,8 +218,8 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
       <div class="sprite credits banner_credits" style="background-image: url(images/menus/menu-banner_credits.png?<?= MMRPG_CONFIG_CACHE_DATE?>);">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
       <div class="sprite overlay banner_overlay" style=""></div>
 
-      <?php if(!defined('MMRPG_CRITICAL_ERROR') && MMRPG_CONFIG_IS_LIVE): ?>
-        <?php if($this_current_page != 'file'): ?>
+      <? if(!defined('MMRPG_CRITICAL_ERROR') && MMRPG_CONFIG_IS_LIVE): ?>
+        <? if($this_current_page != 'file'): ?>
 
         <!-- FACEBOOK -->
         <div id="header_social_facebook" class="sprite" style="width: 75px; height: 24px; overflow: visible; line-height: 24px; top: 12px; right: 10px; text-indent: 0; z-index: 9999;">
@@ -229,38 +232,15 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
           <?/*<div class="g-plusone" data-annotation="none" data-href="<?= MMRPG_CONFIG_ROOTURL ?>"></div>*/?>
         </div>
 
-        <?php endif; ?>
-      <?php endif; ?>
+        <? endif; ?>
+      <? endif; ?>
 
-      <?php if(!defined('MMRPG_CRITICAL_ERROR')): ?>
+      <? if(!defined('MMRPG_CRITICAL_ERROR')): ?>
         <div class="userinfo" style="">
           <a class="expand" href="#" rel="nofollow"><span>+</span></a>
           <div class="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style=""></div>
-          <?/*
-          <?php if($this_userid == MMRPG_SETTINGS_GUEST_ID || !MMRPG_CONFIG_ADMIN_MODE): ?>
-            <div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>
-            <div class="info" style="">
-              <strong class="username" style="">Welcome, Guest</strong>
-              <?php if(MMRPG_CONFIG_ADMIN_MODE): ?>
-                <a class="file file_new <?= $this_current_page == 'file' && $this_current_sub == 'new' ? 'file_active ' : '' ?>" href="file/new/" rel="nofollow" style="">new game</a> <span class="pipe">|</span>
-                <a class="file file_load <?= $this_current_page == 'file' && $this_current_sub == 'load' ? 'file_active ' : '' ?>" href="file/load/" rel="nofollow" style="">load game</a>
-              <?php else: ?>
-                <a class="file file_new <?= $this_current_page == 'file' && $this_current_sub == 'new' ? 'file_active ' : '' ?>" style="text-decoration: line-through;">new game</a> <span class="pipe">|</span>
-                <a class="file file_load <?= $this_current_page == 'file' && $this_current_sub == 'load' ? 'file_active ' : '' ?>" style="text-decoration: line-through;">load game</a>
-              <?php endif; ?>
-            </div>
-          <?php else: ?>
-            <div class="<?= $temp_avatar_class ?>" style=""><div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_user_name ?></div></div>
-            <div class="info" style="">
-              <strong class="username" style="">Welcome, <?= $temp_user_name ?> <span class="pipe">|</span> <a class="place <?= $this_current_page == 'leaderboard' && $this_current_sub == $this_userinfo['user_name_clean'] ? 'place_active ' : '' ?>" href="leaderboard/<?= $this_userinfo['user_name_clean'] ?>/" rel="nofollow"><?= rpg_website::number_suffix($this_boardinfo['board_rank']) ?> Place</a></strong>
-              <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'game' ? 'file_active ' : '' ?>" href="file/game/" rel="nofollow" style="">view game</a> <span class="pipe">|</span>
-              <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'profile' ? 'file_active ' : '' ?>" href="file/profile/" rel="nofollow" style="">edit profile</a> <span class="pipe">|</span>
-              <a class="file file_exit <?= $this_current_page == 'file' && $this_current_sub == 'exit' ? 'file_active ' : '' ?>" href="file/exit/" rel="nofollow" style="">exit game</a>
-            </div>
-          <?php endif; ?>
-          */?>
 
-          <?php if($this_userid == MMRPG_SETTINGS_GUEST_ID): ?>
+          <? if($this_userid == MMRPG_SETTINGS_GUEST_ID): ?>
             <div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>
             <div class="info" style="">
               <strong class="username" style="">Welcome, Guest</strong>
@@ -271,20 +251,23 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
             <div class="<?= $temp_avatar_class ?>" style=""><div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_user_name ?></div></div>
             <div class="info" style="">
               <strong class="username" style="">Welcome, <?= $temp_user_name ?> <span class="pipe">|</span> <a class="place <?= $this_current_page == 'leaderboard' && $this_current_sub == $this_userinfo['user_name_clean'] ? 'place_active ' : '' ?>" href="leaderboard/<?= $this_userinfo['user_name_clean'] ?>/" rel="nofollow"><?= rpg_website::number_suffix($this_boardinfo['board_rank']) ?><span> Place</span></a></strong>
+              <? if(isset($this_userinfo['role_level']) && $this_userinfo['role_level'] >= 5): ?>
+                <a class="file file_admin <?= $this_current_page == 'admin' ? 'file_active ' : '' ?>" href="admin/" rel="nofollow" style="">admin</a> <span class="pipe">|</span>
+              <? endif; ?>
               <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'game' ? 'file_active ' : '' ?>" href="file/game/" rel="nofollow" style="">view game</a> <span class="pipe">|</span>
               <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'profile' ? 'file_active ' : '' ?>" href="file/profile/" rel="nofollow" style="">edit profile</a> <span class="pipe">|</span>
               <a class="file file_exit <?= $this_current_page == 'file' && $this_current_sub == 'exit' ? 'file_active ' : '' ?>" href="file/exit/" rel="nofollow" style="">exit game</a>
             </div>
-          <?php endif; ?>
+          <? endif; ?>
 
         </div>
-      <?php endif; ?>
+      <? endif; ?>
 
     </div>
     <?php
     ?>
     <div class="menu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-      <?php if(!defined('MMRPG_CRITICAL_ERROR')): ?>
+      <? if(!defined('MMRPG_CRITICAL_ERROR')): ?>
         <div class="main">
           <a href="<?= MMRPG_CONFIG_ROOTURL ?>" class="link <?= $this_current_page == 'home' ? 'link_active field_type_empty' : '' ?>"><span>Home</span></a>
           <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/" class="link <?= $this_current_page == 'about' ? 'link_active field_type_empty' : '' ?>"><span>About</span></a>
@@ -305,7 +288,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/resources/" class="link <?= $this_current_sub == 'resources' ? 'link_active field_type_empty' : '' ?>"><span>Resources</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/credits/" class="link <?= $this_current_sub == 'credits' ? 'link_active field_type_empty' : '' ?>"><span>Credits</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/links/" class="link <?= $this_current_sub == 'links' ? 'link_active field_type_empty' : '' ?>"><span>Links</span></a>
-          <?php endif; ?>
+          <? endif; ?>
           <?php if ($this_current_page == 'database'): ?>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/players/" class="link <?= $this_current_sub == 'players' ? 'link_active field_type_empty' : '' ?>"><span>Players</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/robots/" class="link <?= $this_current_sub == 'robots' ? 'link_active field_type_empty' : '' ?>"><span>Robots</span></a>
@@ -315,7 +298,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/items/" class="link <?= $this_current_sub == 'items' ? 'link_active field_type_empty' : '' ?>"><span>Items</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/fields/" class="link <?= $this_current_sub == 'fields' ? 'link_active field_type_empty' : '' ?>"><span>Fields</span></a>
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/types/" class="link <?= $this_current_sub == 'types' ? 'link_active field_type_empty' : '' ?>"><span>Types</span></a>
-          <?php endif; ?>
+          <? endif; ?>
           <?php
           // Print out the community links if applicable
           if ($this_current_page == 'community'){
@@ -340,10 +323,10 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
           }
           ?>
         </div>
-        <?php endif; ?>
+        <? endif; ?>
       <?php else: ?>
         &hellip;&gt;_&lt;&hellip;
-      <?php endif; ?>
+      <? endif; ?>
     </div>
 
     <?php if (!MMRPG_CONFIG_IS_LIVE){ ?>
@@ -378,9 +361,12 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
   <script type="text/javascript" src="scripts/jquery.js"></script>
   <script type="text/javascript" src="scripts/script.master.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
   <script type="text/javascript" src="scripts/script.index.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
-  <?php if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
-  <script type="text/javascript" src="_ext/colorbox/jquery.colorbox.js"></script>
-  <?php endif; ?>
+  <? if ($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
+    <script type="text/javascript" src="_ext/colorbox/jquery.colorbox.js"></script>
+  <? endif; ?>
+  <? if ($this_current_page == 'admin'): ?>
+    <script type="text/javascript" src="scripts/script.admin.js?<?= MMRPG_CONFIG_CACHE_DATE?>"></script>
+  <? endif; ?>
   <script type="text/javascript">
   // Define the key client variables
   gameSettings.baseHref = '<?= MMRPG_CONFIG_ROOTURL ?>';
@@ -388,9 +374,9 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
   gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE?>';
   gameSettings.autoScrollTop = false;
   gameSettings.autoResizeHeight = false;
-  <?php if($this_current_page == 'community' && $this_current_cat == 'chat'): ?>
+  <? if($this_current_page == 'community' && $this_current_cat == 'chat'): ?>
   gameSettings.autoKeepAlive = true;
-  <?php endif; ?>
+  <? endif; ?>
   websiteSettings.currentHref = '<?= $this_current_uri ?>';
   websiteSettings.currentPage = '<?= $this_current_page ?>';
   websiteSettings.currentSub = '<?= $this_current_sub ?>';
@@ -402,10 +388,10 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
   <script type="text/javascript">
   // When the document is ready for event binding
   $(document).ready(function(){
-    <?php if($this_current_page == 'contact'): ?>
+    <? if($this_current_page == 'contact'): ?>
       $('.form .buttons').append('<input class="button button_submit" type="submit" value="Submit" />');
-    <?php endif; ?>
-    <?php if(MMRPG_CONFIG_IS_LIVE): ?>
+    <? endif; ?>
+    <? if(MMRPG_CONFIG_IS_LIVE): ?>
       // Add the Facebook like and page buttons to the predefined areas
       $('#header_social_facebook').append('<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmegamanpoweredup.net%2Frpg2k11%2F&amp;send=false&amp;layout=button_count&amp;width=100&amp;show_faces=false&amp;font&amp;colorscheme=light&amp;action=like&amp;height=21&amp;appId=409819409099131" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:21px;" allowTransparency="true"></iframe>');
       $('#header_social_google').append('<div class="g-plusone" data-annotation="none" data-href="<?= MMRPG_CONFIG_ROOTURL ?>"></div>');
@@ -415,10 +401,10 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
         po.src = 'https://apis.google.com/js/plusone.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
         })();
-    <?php endif; ?>
-    <?php if(!empty($this_markup_jsready)): ?>
+    <? endif; ?>
+    <? if(!empty($this_markup_jsready)): ?>
       <?= $this_markup_jsready."\n" ?>
-    <?php endif; ?>
+    <? endif; ?>
   });
   </script>
   <?php

@@ -1,0 +1,110 @@
+#mmrpg .page_admin {
+
+}
+
+#mmrpg .page_admin .body form.search {
+    display: block;
+    float: left;
+    margin: 0 auto 10px 0;
+    min-width: 75%;
+    min-width: calc(100% - 100px);
+}
+
+#mmrpg .page_admin .body form.search .inputs,
+#mmrpg .page_admin .body form.search .results {
+    display: block;
+    float: none;
+    clear: both;
+    margin: 0 auto 10px;
+    overflow: hidden;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+#mmrpg .page_admin .body form.search .inputs {
+
+}
+#mmrpg .page_admin .body form.search .inputs .field {
+    display: block;
+    float: left;
+    width: 32%;
+    margin: 0 1% 0 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+#mmrpg .page_admin .body form.search .inputs .field.text {
+    width: 100%;
+}
+#mmrpg .page_admin .body form.search .inputs .field .label {
+    display: block;
+    width: 100%;
+    margin: 0 auto 10px 0;
+    box-sizing: border-box;
+}
+#mmrpg .page_admin .body form.search .inputs .field input.text {
+    display: block;
+    width: 100%;
+    margin: 0 auto 0 0;
+    padding: 6px;
+    box-sizing: border-box;
+    border: 1px solid #262626;
+    background-color: #191919;
+    color: #FFFFFF;
+}
+
+#mmrpg .page_admin .body form.search .results {
+    margin-top: 10px;
+    padding-top: 5px;
+    border-top: 1px solid #262626;
+}
+#mmrpg .page_admin .body form.search .results:empty {
+    display: none;
+}
+
+#mmrpg .page_admin .body form.search .results .head,
+#mmrpg .page_admin .body form.search .results .link {
+    display: block;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #262626;
+    overflow: hidden;
+    text-decoration: none;
+    font-weight: normal;
+    color: #EFEFEF;
+}
+#mmrpg .page_admin .body form.search .results .head {
+    font-weight: bold;
+    background-color: #1B1B1B;
+}
+#mmrpg .page_admin .body form.search .results .link {
+    border-top: 0 none transparent;
+}
+#mmrpg .page_admin .body form.search .results .link:hover {
+    text-decoration: none;
+    background-color: #2A2A2A;
+    color: #FFFFFF;
+}
+
+#mmrpg .page_admin .body form.search .results .id,
+#mmrpg .page_admin .body form.search .results .name,
+#mmrpg .page_admin .body form.search .results .extra {
+    display: block;
+    float: left;
+    padding: 3px 12px 3px 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+#mmrpg .page_admin .body form.search .results .id {
+    width: 14%;
+}
+#mmrpg .page_admin .body form.search .results .name {
+    width: 38%;
+}
+#mmrpg .page_admin .body form.search .results .extra {
+    width: 48%;
+}

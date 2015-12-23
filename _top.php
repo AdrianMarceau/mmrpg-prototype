@@ -196,7 +196,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
  */
 
 // Collect the current page from the header if set
-$this_allowed_pages = array('home', 'about', 'gallery', 'database', 'leaderboard', 'community', 'prototype', 'credits', 'contact', 'file', 'error');
+$this_allowed_pages = array('home', 'about', 'gallery', 'database', 'leaderboard', 'community', 'prototype', 'credits', 'contact', 'file', 'admin', 'error');
 $this_current_page = !empty($_GET['page']) ? strtolower($_GET['page']) : false;
 $this_current_sub = !empty($_GET['sub']) ? strtolower($_GET['sub']) : false;
 $this_current_num = !empty($_GET['num']) ? $_GET['num'] : 1;
@@ -215,6 +215,11 @@ if (isset($_GET['home']) || $this_current_sub == 'home' || $this_current_page ==
   header('Location: '.$this_current_url);
   exit();
 } elseif ($this_current_page == 'about'){
+  $this_current_sub = !empty($_GET['sub']) ? strtolower($_GET['sub']) : '';
+  if (!empty($this_current_sub)){
+    $this_current_uri .= $this_current_sub.'/';
+  }
+} elseif ($this_current_page == 'admin'){
   $this_current_sub = !empty($_GET['sub']) ? strtolower($_GET['sub']) : '';
   if (!empty($this_current_sub)){
     $this_current_uri .= $this_current_sub.'/';
