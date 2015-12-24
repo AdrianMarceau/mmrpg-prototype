@@ -1,6 +1,24 @@
 #mmrpg .page_admin {
 
 }
+#mmrpg .page_admin .body_wrapper {
+    overflow: hidden;
+}
+
+#mmrpg .page_admin .body .section {
+    float: left;
+    width: 50%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    box-sizing: border-box;
+}
+#mmrpg .page_admin .body .section:nth-child(odd) {
+  padding-right: 5px;
+}
+#mmrpg .page_admin .body .section:nth-child(even) {
+  padding-left: 5px;
+}
 
 #mmrpg .page_admin .body form.search {
     display: block;
@@ -11,7 +29,8 @@
 }
 
 #mmrpg .page_admin .body form.search .inputs,
-#mmrpg .page_admin .body form.search .results {
+#mmrpg .page_admin .body form.search .results,
+#mmrpg .results {
     display: block;
     float: none;
     clear: both;
@@ -55,17 +74,51 @@
     border-radius: 6px;
 }
 
-#mmrpg .page_admin .body form.search .results {
-    margin-top: 10px;
-    padding-top: 5px;
-    border-top: 1px solid #262626;
+#mmrpg .page_admin .body form.search .results,
+#mmrpg .search_results {
+    position: absolute;
+    z-index: 1000;
+    left: 4px;
+    right: 4px;
+    margin: 0;
+    padding: 0 10px 10px;
+    border: 0 none transparent;
+    background-color: #1E1E1E;
+    -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    -moz-border-radius: 0 0 6px 6px;
+    -webkit-border-radius: 0 0 6px 6px;
+    border-radius: 0 0 6px 6px;
+    font-size: 12px;
+    line-height: 18px;
 }
-#mmrpg .page_admin .body form.search .results:empty {
+#mmrpg .search_results {
+    margin-bottom: 20px;
+}
+#mmrpg .page_admin .body form.search .results:empty,
+#mmrpg .search_results:empty {
     display: none;
+}
+#mmrpg .page_admin .body .section:nth-child(odd) .results {
+    right: 10px;
+}
+#mmrpg .page_admin .body .section:nth-child(even) .results {
+    left: 10px;
+}
+
+#mmrpg .page_admin .body form.search .results .message,
+#mmrpg .search_results .message {
+    display: block;
+    color: #FFFFFF;
+    text-align: left;
+    margin-bottom: 6px;
 }
 
 #mmrpg .page_admin .body form.search .results .head,
-#mmrpg .page_admin .body form.search .results .link {
+#mmrpg .page_admin .body form.search .results .link,
+#mmrpg .search_results .head,
+#mmrpg .search_results .link {
     display: block;
     margin: 0;
     padding: 0;
@@ -78,15 +131,20 @@
     font-weight: normal;
     color: #EFEFEF;
 }
-#mmrpg .page_admin .body form.search .results .head {
+#mmrpg .page_admin .body form.search .results .head,
+#mmrpg .search_results .head {
     font-weight: bold;
     background-color: #1C1C1C;
+    color: #FFFFFF;
+    text-align: left;
 }
-#mmrpg .page_admin .body form.search .results .link {
+#mmrpg .page_admin .body form.search .results .link,
+#mmrpg .search_results .link {
     border-top: 0 none transparent;
     background-color: #202020;
 }
-#mmrpg .page_admin .body form.search .results .link:hover {
+#mmrpg .page_admin .body form.search .results .link:hover,
+#mmrpg .search_results .link:hover {
     text-decoration: none;
     background-color: #2A2A2A;
     color: #FFFFFF;
@@ -94,21 +152,106 @@
 
 #mmrpg .page_admin .body form.search .results .id,
 #mmrpg .page_admin .body form.search .results .name,
-#mmrpg .page_admin .body form.search .results .extra {
+#mmrpg .page_admin .body form.search .results .extra,
+#mmrpg .page_admin .body form.search .results .arrow,
+#mmrpg .search_results .id,
+#mmrpg .search_results .name,
+#mmrpg .search_results .extra,
+#mmrpg .search_results .arrow {
     display: block;
     float: left;
+    margin: 0;
     padding: 3px 12px 3px 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     box-sizing: border-box;
+    text-align: left;
 }
-#mmrpg .page_admin .body form.search .results .id {
+#mmrpg .page_admin .body form.search .results .id,
+#mmrpg .search_results .id {
     width: 14%;
 }
-#mmrpg .page_admin .body form.search .results .name {
+#mmrpg .page_admin .body form.search .results .name,
+#mmrpg .search_results .name {
     width: 38%;
 }
-#mmrpg .page_admin .body form.search .results .extra {
-    width: 48%;
+#mmrpg .page_admin .body form.search .results .extra,
+#mmrpg .search_results .extra {
+    width: 42%;
+}
+#mmrpg .page_admin .body form.search .results .arrow,
+#mmrpg .search_results .arrow {
+    width: 4%;
+    text-align: right;
+}
+
+
+
+
+
+
+/*
+ * MOBILE OVERRIDE STYLES
+ */
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+
+}
+
+/* -- Portrait Mode -- */
+@media (max-width: 1060px){
+
+    #mmrpg .page_admin .body form.search {
+
+    }
+
+}
+
+/* -- Less than Portrait Mode -- */
+@media (max-width: 970px){
+
+    #mmrpg .page_admin .body form.search {
+        clear: both;
+        margin-top: 5px;
+        width: 99%;
+    }
+
+}
+
+/* -- Even Less than Portrait Mode -- */
+@media (max-width: 760px){
+
+    #mmrpg .page_admin .body .section {
+        width: auto;
+        float: none;
+        clear: both;
+        padding: 0;
+    }
+
+    #mmrpg .page_admin .body form.search {
+        clear: none;
+        width: auto;
+        margin-top: 0;
+    }
+
+}
+
+/* -- Almost iPhone Portrait Mode -- */
+@media (max-width: 490px){
+
+    #mmrpg .page_admin .body form.search {
+        clear: both;
+        width: 99%;
+        margin-top: 5px;
+    }
+
+}
+
+
+/* -- iPhone Portrait Mode -- */
+@media (max-width: 350px){
+
+
 }

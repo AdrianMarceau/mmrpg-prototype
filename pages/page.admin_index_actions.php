@@ -10,7 +10,7 @@ if ($this_current_sub == 'search'){
     // Collect the search parameters from the request header
     $this_search_type = !empty($_REQUEST['type']) ? trim(strtolower($_REQUEST['type'])) : '';
     $this_search_text = !empty($_REQUEST['text']) ? $_REQUEST['text'] : '';
-    $this_search_limit = 50;
+    $this_search_limit = 10;
     $this_search_data = array(
         'type' => $this_search_type,
         'text' => $this_search_text,
@@ -106,7 +106,8 @@ if ($this_current_sub == 'search'){
                     <div class="head">
                         <span class="id">ID</span>
                         <span class="name">Name</span>
-                        <span class="email">Email</span>
+                        <span class="extra">Email</span>
+                        <span class="arrow"></span>
                     </div>
                 <?
                 // And append the markup to the parent var
@@ -126,7 +127,8 @@ if ($this_current_sub == 'search'){
                         <a class="link result" href="admin/<?= $this_search_type ?>/<?= $id ?>/" title="<?= $id.' | '.$name.' | '.$email ?>" target="_<?= $this_search_type ?>Editor">
                             <span class="id"><?= $id ?></span>
                             <span class="name"><?= $name ?></span>
-                            <span class="email"><?= $email ?></span>
+                            <span class="extra"><?= $email ?></span>
+                            <span class="arrow">&raquo;</span>
                         </a>
                     <?
                     // And append the markup to the parent var
@@ -259,6 +261,7 @@ if ($this_current_sub == 'search'){
                         <span class="id">ID</span>
                         <span class="name">Name</span>
                         <span class="extra"><?= $this_search_field == 'number' ? 'Number' : 'Types' ?></span>
+                        <span class="arrow"></span>
                     </div>
                 <?
                 // And append the markup to the parent var
@@ -285,6 +288,7 @@ if ($this_current_sub == 'search'){
                             <span class="id"><?= $id ?></span>
                             <span class="name"><?= $name ?></span>
                             <span class="extra"><?= $extra ?></span>
+                            <span class="arrow">&raquo;</span>
                         </a>
                     <?
                     // And append the markup to the parent var
@@ -405,6 +409,7 @@ if ($this_current_sub == 'search'){
                         <span class="id">ID</span>
                         <span class="name">Name</span>
                         <span class="extra">Types</span>
+                        <span class="arrow"></span>
                     </div>
                 <?
                 // And append the markup to the parent var
@@ -418,7 +423,7 @@ if ($this_current_sub == 'search'){
                     $name = $info['name'];
                     $type = !empty($info['type']) && !empty($mmrpg_types[$info['type']]) ? $mmrpg_types[$info['type']] : $mmrpg_types['none'];
                     $type2 = !empty($info['type2']) && !empty($mmrpg_types[$info['type2']]) ? $mmrpg_types[$info['type2']] : false;
-                    $extra = $type['type_name'].(!empty($type2) ? ' / '.$type2['type_name'] : '');
+                    $extra = $type['type_name'].(!empty($info['type']) && !empty($type2) ? ' / '.$type2['type_name'] : '');
                     // Create the markup for this search result
                     ob_start();
                     ?>
@@ -426,6 +431,7 @@ if ($this_current_sub == 'search'){
                             <span class="id"><?= $id ?></span>
                             <span class="name"><?= $name ?></span>
                             <span class="extra"><?= $extra ?></span>
+                            <span class="arrow">&raquo;</span>
                         </a>
                     <?
                     // And append the markup to the parent var

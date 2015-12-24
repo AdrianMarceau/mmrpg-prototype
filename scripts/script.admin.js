@@ -23,6 +23,10 @@ $(document).ready(function(){
         newSearchData['type']  = searchForm.attr('data-search');
         newSearchData['text'] = searchInput.val();
 
+        var otherForms = searchForms.filter('form[data-search!='+newSearchData['type']+']');
+        otherForms.find('.results').empty();
+        $('#mmrpg .search_results').remove();
+
         if (newSearchData['text'] == ''){ searchResults.empty(); }
 
         if (searchTimeout != false){
@@ -68,6 +72,24 @@ $(document).ready(function(){
 
                     searchResults.append('<div class="message">'+message+'</div>');
                     searchResults.append(markup);
+
+                    if (searchResults.is(':visible')){
+                        var resultsOffset = searchResults.offset();
+                        var cloneResults = searchResults.clone();
+                        cloneResults
+                            .removeClass('results')
+                            .addClass('search_results').css({
+                                top:resultsOffset.top,
+                                right:resultsOffset.right,
+                                bottom:resultsOffset.bottom,
+                                left:resultsOffset.left,
+                                width:searchResults.width()
+                                });
+
+                        $('#mmrpg .search_results').remove();
+                        cloneResults.appendTo('#mmrpg');
+                        searchResults.empty();
+                    }
 
                     }
                 });
