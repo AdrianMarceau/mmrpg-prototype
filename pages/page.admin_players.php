@@ -138,9 +138,7 @@ else {
     $player_count = !empty($player_index) ? count($player_index) : 0;
 
     // Collect a list of completed player sprite tokens
-    $sprite_tokens = $this_database->get_array_list("SELECT player_image FROM mmrpg_index_players WHERE player_image <> 'player' AND player_image_size = 40 AND player_flag_complete = 1 ORDER BY player_image ASC;", 'player_image');
-    $sprite_tokens = !empty($sprite_tokens) ? array_keys($sprite_tokens) : array('player');
-    $random_sprite = $sprite_tokens[mt_rand(0, (count($sprite_tokens) - 1))];
+    $random_sprite = $this_database->get_value("SELECT player_image FROM mmrpg_index_players WHERE player_image <> 'player' AND player_image_size = 40 AND player_flag_complete = 1 ORDER BY RAND() LIMIT 1;", 'player_image');
 
     // Start generating the page markup
     ob_start();
