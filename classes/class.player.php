@@ -1347,9 +1347,6 @@ class rpg_player extends rpg_object {
     }
 
 
-
-
-
     // -- INDEX FUNCTIONS -- //
 
     /**
@@ -1409,14 +1406,19 @@ class rpg_player extends rpg_object {
      * @param bool $parse_data
      * @return array
      */
-    public static function get_index(){
+    public static function get_index($include_hidden = false, $include_unpublished = false){
 
         // Pull in global variables
         $this_database = cms_database::get_database();
 
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND player_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND player_flag_published = 1 '; }
+
         // Collect every type's info from the database index
         $player_fields = self::get_index_fields(true);
-        $player_index = $this_database->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_flag_published = 1 AND player_flag_hidden = 0;", 'player_token');
+        $player_index = $this_database->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($player_index)){
@@ -1432,13 +1434,18 @@ class rpg_player extends rpg_object {
      * Get the tokens for all players in the global index
      * @return array
      */
-    public static function get_index_tokens(){
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
 
         // Pull in global variables
         $this_database = cms_database::get_database();
 
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND player_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND player_flag_published = 1 '; }
+
         // Collect an array of player tokens from the database
-        $player_index = $this_database->get_array_list("SELECT player_token FROM mmrpg_index_players WHERE player_flag_published = 1 AND player_flag_hidden <> 0;", 'player_token');
+        $player_index = $this_database->get_array_list("SELECT player_token FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
 
         // Return the tokens if not empty, else nothing
         if (!empty($player_index)){
@@ -1531,7 +1538,7 @@ class rpg_player extends rpg_object {
     }
 
 
-    // -- PRINT FUNCTIONS -- /
+    // -- PRINT FUNCTIONS -- //
 
     /**
      * Get the formatted name of this player object

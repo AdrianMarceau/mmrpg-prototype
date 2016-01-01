@@ -12,6 +12,34 @@ class rpg_type {
     // -- INDEX FUNCTIONS -- //
 
     /**
+     * Get a list of all type index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_index_fields($implode = false){
+
+        // Define the various index fields for type objects
+        $index_fields = array(
+            'type_id',
+            'type_token',
+            'type_name',
+            'type_class',
+            'type_colour_dark',
+            'type_colour_light',
+            'type_order'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $index_fields = implode(', ', $index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $index_fields;
+
+    }
+
+    /**
      * Get the entire type index array with parsed info
      * @param bool $parse_data
      * @return array
@@ -27,18 +55,8 @@ class rpg_type {
         if (!$include_unpublished){ $temp_where .= 'AND type_flag_published = 1 '; }
 
         // Collect every type's info from the database index
-        $type_index = $this_database->get_array_list("SELECT
-            type_id,
-            type_token,
-            type_name,
-            type_class,
-            type_colour_dark,
-            type_colour_light,
-            type_order
-            FROM mmrpg_index_types
-            WHERE type_id <> 0 {$temp_where};",
-            'type_token'
-            );
+        $type_fields = self::get_index_fields(true);
+        $type_index = $this_database->get_array_list("SELECT {$type_fields} FROM mmrpg_index_types WHERE type_id <> 0 {$temp_where};", 'type_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($type_index)){
@@ -65,12 +83,7 @@ class rpg_type {
         if (!$include_unpublished){ $temp_where .= 'AND type_flag_published = 1 '; }
 
         // Collect an array of type tokens from the database
-        $type_index = $this_database->get_array_list("SELECT
-            type_token
-            FROM mmrpg_index_types
-            WHERE type_id <> 0 {$temp_where};",
-            'type_token'
-            );
+        $type_index = $this_database->get_array_list("SELECT type_token FROM mmrpg_index_types WHERE type_id <> 0 {$temp_where};", 'type_token');
 
         // Return the tokens if not empty, else nothing
         if (!empty($type_index)){
@@ -94,18 +107,8 @@ class rpg_type {
         $type_tokens_string = implode(', ', $type_tokens_string);
 
         // Collect the requested type's info from the database index
-        $type_index = $this_database->get_array_list("SELECT
-            type_id,
-            type_token,
-            type_name,
-            type_class,
-            type_colour_dark,
-            type_colour_light,
-            type_order
-            FROM mmrpg_index_types
-            WHERE type_token IN ({$type_tokens_string});",
-            'type_token'
-            );
+        $type_fields = self::get_index_fields(true);
+        $type_index = $this_database->get_array_list("SELECT {$type_fields} FROM mmrpg_index_types WHERE type_token IN ({$type_tokens_string});", 'type_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($type_index)){
@@ -124,18 +127,8 @@ class rpg_type {
         $this_database = cms_database::get_database();
 
         // Collect this type's info from the database index
-        $type_index = $this_database->get_array_list("SELECT
-            type_id,
-            type_token,
-            type_name,
-            type_class,
-            type_colour_dark,
-            type_colour_light,
-            type_order
-            FROM mmrpg_index_types
-            WHERE type_token = '{$type_token}';",
-            'type_token'
-            );
+        $type_fields = self::get_index_fields(true);
+        $type_index = $this_database->get_array_list("SELECT {$type_fields} FROM mmrpg_index_types WHERE type_token = '{$type_token}';", 'type_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($type_index)){

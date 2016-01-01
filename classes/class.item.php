@@ -1026,54 +1026,195 @@ class rpg_item extends rpg_object {
 
     }
 
-    // Define a function for pulling the full item index
-    public static function get_index($parse_data = false){
-        global $this_database;
-        $item_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_flag_complete = 1 OR item_token = 'item';", 'item_token');
+
+    // -- INDEX FUNCTIONS -- //
+
+    /**
+     * Get a list of all item index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_index_fields($implode = false){
+
+        // Define the various index fields for item objects
+        $index_fields = array(
+            'item_id',
+            'item_token',
+            'item_name',
+            'item_game',
+            'item_group',
+            'item_class',
+            'item_subclass',
+            'item_master',
+            'item_number',
+            'item_image',
+            'item_image_sheets',
+            'item_image_size',
+            'item_image_editor',
+            'item_type',
+            'item_type2',
+            'item_description',
+            'item_description2',
+            'item_speed',
+            'item_energy',
+            'item_energy_percent',
+            'item_damage',
+            'item_damage_percent',
+            'item_damage2',
+            'item_damage2_percent',
+            'item_recovery',
+            'item_recovery_percent',
+            'item_recovery2',
+            'item_recovery2_percent',
+            'item_accuracy',
+            'item_price',
+            'item_target',
+            'item_frame',
+            'item_frame_animate',
+            'item_frame_index',
+            'item_frame_offset',
+            'item_frame_styles',
+            'item_frame_classes',
+            'attachment_frame',
+            'attachment_frame_animate',
+            'attachment_frame_index',
+            'attachment_frame_offset',
+            'attachment_frame_styles',
+            'attachment_frame_classes',
+            'item_functions',
+            'item_flag_hidden',
+            'item_flag_complete',
+            'item_flag_published',
+            'item_order'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $index_fields = implode(', ', $index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $index_fields;
+
+    }
+
+    /**
+     * Get the entire item index array with parsed info
+     * @param bool $parse_data
+     * @return array
+     */
+    public static function get_index($include_hidden = false, $include_unpublished = false){
+
+        // Pull in global variables
+        $this_database = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND item_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND item_flag_published = 1 '; }
+
+        // Collect every type's info from the database index
+        $item_fields = self::get_index_fields(true);
+        $item_index = $this_database->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_id <> 0 {$temp_where};", 'item_token');
+
+        // Parse and return the data if not empty, else nothing
         if (!empty($item_index)){
-            if ($parse_data){ $item_index = self::parse_index($item_index); }
+            $item_index = self::parse_index($item_index);
             return $item_index;
         } else {
             return array();
         }
+
+    }
+
+    /**
+     * Get the tokens for all items in the global index
+     * @return array
+     */
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
+
+        // Pull in global variables
+        $this_database = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND item_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND item_flag_published = 1 '; }
+
+        // Collect an array of item tokens from the database
+        $item_index = $this_database->get_array_list("SELECT item_token FROM mmrpg_index_items WHERE item_id <> 0 {$temp_where};", 'item_token');
+
+        // Return the tokens if not empty, else nothing
+        if (!empty($item_index)){
+            $item_tokens = array_keys($item_index);
+            return $item_tokens;
+        } else {
+            return array();
+        }
+
     }
 
     // Define a function for pulling a custom item index
-    public static function get_index_custom($item_tokens = array(), $parse_data = false){
-        global $this_database;
+    public static function get_index_custom($item_tokens = array()){
+
+        // Pull in global variables
+        $this_database = cms_database::get_database();
+
+        // Generate a token string for the database query
         $item_tokens_string = array();
         foreach ($item_tokens AS $item_token){ $item_tokens_string[] = "'{$item_token}'"; }
         $item_tokens_string = implode(', ', $item_tokens_string);
-        $item_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_token IN ({$item_tokens_string});", 'item_token');
+
+        // Collect the requested item's info from the database index
+        $item_fields = self::get_index_fields(true);
+        $item_index = $this_database->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_token IN ({$item_tokens_string});", 'item_token');
+
+        // Parse and return the data if not empty, else nothing
         if (!empty($item_index)){
-            if ($parse_data){ $item_index = self::parse_index($item_index); }
+            $item_index = self::parse_index($item_index);
             return $item_index;
         } else {
             return array();
         }
+
     }
 
     // Define a public function for collecting index data from the database
-    public static function get_index_info($item_token, $parse_data = true){
-        global $this_database;
-        $item_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_token LIKE '{$item_token}';", 'item_token');
+    public static function get_index_info($item_token){
+
+        // Pull in global variables
+        $this_database = cms_database::get_database();
+
+        // Collect this item's info from the database index
+        $lookup = !is_numeric($item_token) ? "item_token = '{$item_token}'" : "item_id = {$item_token}";
+        $item_fields = self::get_index_fields(true);
+        $item_index = $this_database->get_array("SELECT {$item_fields} FROM mmrpg_index_items WHERE {$lookup};", 'item_token');
+
+        // Parse and return the data if not empty, else nothing
         if (!empty($item_index)){
-            if ($parse_data){ $item_index = self::parse_index_info($item_index); }
+            $item_index = self::parse_index_info($item_index);
             return $item_index;
         } else {
             return array();
         }
+
     }
 
     // Define a public function for parsing a item index array in bulk
     public static function parse_index($item_index){
-        foreach ($item_index AS $token => $info){ $item_index[$token] = self::parse_index_info($info); }
+
+        // Loop through each entry and parse its data
+        foreach ($item_index AS $token => $info){
+            $item_index[$token] = self::parse_index_info($info);
+        }
+
+        // Return the parsed index
         return $item_index;
+
     }
 
     // Define a public function for reformatting database data into proper arrays
     public static function parse_index_info($item_info){
-        global $this_database;
 
         // Return false if empty
         if (empty($item_info)){ return false; }
@@ -1094,7 +1235,7 @@ class rpg_item extends rpg_object {
     }
 
 
-
+    // -- PRINT FUNCTIONS -- /
 
     // Define a static function for printing out the item's title markup
     public static function print_editor_title_markup($robot_info, $item_info, $print_options = array()){
