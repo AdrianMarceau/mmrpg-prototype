@@ -260,9 +260,6 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
                         <div class="<?= $temp_avatar_class ?>" style=""><div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_user_name ?></div></div>
                         <div class="info" style="">
                             <strong class="username" style="">Welcome, <?= $temp_user_name ?> <span class="pipe">|</span> <a class="place <?= $this_current_page == 'leaderboard' && $this_current_sub == $this_userinfo['user_name_clean'] ? 'place_active ' : '' ?>" href="leaderboard/<?= $this_userinfo['user_name_clean'] ?>/" rel="nofollow"><?= rpg_website::number_suffix($this_boardinfo['board_rank']) ?><span> Place</span></a></strong>
-                            <? if(isset($this_userinfo['role_level']) && $this_userinfo['role_level'] >= 5): ?>
-                                <a class="file file_admin <?= $this_current_page == 'admin' ? 'file_active ' : '' ?>" href="admin/" rel="nofollow" style="">admin</a> <span class="pipe">|</span>
-                            <? endif; ?>
                             <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'game' ? 'file_active ' : '' ?>" href="file/game/" rel="nofollow" style="">view game</a> <span class="pipe">|</span>
                             <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'profile' ? 'file_active ' : '' ?>" href="file/profile/" rel="nofollow" style="">edit profile</a> <span class="pipe">|</span>
                             <a class="file file_exit <?= $this_current_page == 'file' && $this_current_sub == 'exit' ? 'file_active ' : '' ?>" href="file/exit/" rel="nofollow" style="">exit game</a>
@@ -278,6 +275,9 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
         <div class="menu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <? if(!defined('MMRPG_CRITICAL_ERROR')): ?>
                 <div class="main">
+                    <? if(isset($this_userinfo['role_level']) && $this_userinfo['role_level'] >= 5): ?>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/" class="link <?= $this_current_page == 'admin' ? 'link_active field_type_empty' : '' ?>"><span>Admin</span></a>
+                    <? endif; ?>
                     <a href="<?= MMRPG_CONFIG_ROOTURL ?>" class="link <?= $this_current_page == 'home' ? 'link_active field_type_empty' : '' ?>"><span>Home</span></a>
                     <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/" class="link <?= $this_current_page == 'about' ? 'link_active field_type_empty' : '' ?>"><span>About</span></a>
                     <?/*<a href="<?= MMRPG_CONFIG_ROOTURL ?>updates/" class="link <?= $this_current_page == 'updates' ? 'link_active field_type_empty' : '' ?>"><span>Updates</span></a>*/?>
@@ -289,8 +289,19 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
                     <?/* <a href="<?= MMRPG_CONFIG_ROOTURL ?>credits/" class="link <?= $this_current_page == 'credits' ? 'link_active field_type_empty' : '' ?>"><span>Credits</span></a> */?>
                     <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/" class="link <?= $this_current_page == 'contact' ? 'link_active field_type_empty' : '' ?>"><span>Contact</span></a>
                 </div>
-                <?php if (in_array($this_current_page, array('about', 'database', 'community'))): ?>
+                <?php if (in_array($this_current_page, array('admin', 'about', 'database', 'community'))): ?>
                 <div class="sub">
+                    <?php if ($this_current_page == 'admin'): ?>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/users/" class="link <?= $this_current_sub == 'users' ? 'link_active field_type_empty' : '' ?>"><span>Users</span></a>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/players/" class="link <?= $this_current_sub == 'players' ? 'link_active field_type_empty' : '' ?>"><span>Players</span></a>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/robots/" class="link <?= $this_current_sub == 'robots' ? 'link_active field_type_empty' : '' ?>"><span>Robots</span></a>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/mechas/" class="link <?= $this_current_sub == 'mechas' ? 'link_active field_type_empty' : '' ?>"><span>Mechas</span></a>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/bosses/" class="link <?= $this_current_sub == 'bosses' ? 'link_active field_type_empty' : '' ?>"><span>Bosses</span></a>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/abilities/" class="link <?= $this_current_sub == 'abilities' ? 'link_active field_type_empty' : '' ?>"><span>Abilities</span></a>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/items/" class="link <?= $this_current_sub == 'items' ? 'link_active field_type_empty' : '' ?>"><span>Items</span></a>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/fields/" class="link <?= $this_current_sub == 'fields' ? 'link_active field_type_empty' : '' ?>"><span>Fields</span></a>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/types/" class="link <?= $this_current_sub == 'types' ? 'link_active field_type_empty' : '' ?>"><span>Types</span></a>
+                    <? endif; ?>
                     <?php if ($this_current_page == 'about'): ?>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/story/" class="link <?= $this_current_sub == 'story' ? 'link_active field_type_empty' : '' ?>"><span>Story</span></a>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/mechanics/" class="link <?= $this_current_sub == 'mechanics' ? 'link_active field_type_empty' : '' ?>"><span>Mechanics</span></a>
