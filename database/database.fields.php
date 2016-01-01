@@ -14,9 +14,16 @@ if (!empty($hidden_database_fields)){
   foreach ($hidden_database_fields AS $token){ $temp_tokens[] = "'".$token."'"; }
   $temp_condition .= 'AND field_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
+// If additional database filters were provided
+$temp_condition_unfiltered = $temp_condition;
+if (isset($mmrpg_database_fields_filter)){
+  if (!preg_match('/^\s?(AND|OR)\s+/i', $mmrpg_database_fields_filter)){ $temp_condition .= 'AND ';  }
+  $temp_condition .= $mmrpg_database_fields_filter;
+}
 
 // Collect the database fields
 $mmrpg_database_fields = $this_database->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1 {$temp_condition} ORDER BY field_order ASC;", 'field_token');
+$mmrpg_database_fields_count = $this_database->get_value("SELECT COUNT(field_id) AS field_count FROM mmrpg_index_fields WHERE field_flag_published = 1 {$temp_condition_unfiltered};", 'field_count');
 
 // Remove unallowed fields from the database
 foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
@@ -44,7 +51,7 @@ $first_field_token = $first_field_token['field_token'];
 unset($temp_field_tokens);
 
 // Count the number of fields collected and filtered
-$mmrpg_database_fields_count = count($mmrpg_database_fields);
+//$mmrpg_database_fields_count = count($mmrpg_database_fields);
 $mmrpg_database_fields_count_complete = 0;
 
 // Loop through the database and generate the links for these fields

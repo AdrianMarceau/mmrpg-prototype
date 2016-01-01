@@ -16,11 +16,11 @@ if (!empty($_REQUEST['return']) && $_REQUEST['return'] == 'index'){
  */
 
 // Define the SEO variables for this page
-$this_seo_title = 'Mechas '.(!empty($this_current_filter) ? '('.$this_current_filter_name.' Type) ' : '').'| Database | '.$this_seo_title;
+$this_seo_title = 'Mechas '.(!empty($this_current_filter) ? '('.$this_current_filter_name.' Core) ' : '').'| Database | '.$this_seo_title;
 $this_seo_description = 'The mecha database contains detailed information about the Mega Man RPG Prototype\'s unlockable mechas including their equippable abilities, battle quotes, base stats, weaknesses, resistances, affinities, immunities, and sprite sheets. The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster.';
 
 // Define the Open Graph variables for this page
-$this_graph_data['title'] = 'Mecha Database'.(!empty($this_current_filter) ? ' ('.$this_current_filter_name.' Type) ' : '');
+$this_graph_data['title'] = 'Mecha Database'.(!empty($this_current_filter) ? ' ('.$this_current_filter_name.' Core) ' : '');
 $this_graph_data['description'] = 'The mecha database contains detailed information about the Mega Man RPG Prototype\'s unlockable mechas including their equippable abilities, battle quotes, base stats, weaknesses, resistances, affinities, immunities, and sprite sheets.';
 //$this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo.png';
 //$this_graph_data['type'] = 'website';
@@ -124,9 +124,12 @@ if (!empty($this_current_token)){
 // Only show the header if a specific mecha has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
-    Mecha Index
-    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+    <span class="subheader_typewrapper">
+      <a class="inline_link" href="database/mechas/">Mecha Database</a>
+      <span class="count">( <?= $mmrpg_database_mechas_count_complete ?> / <?= $mmrpg_database_mechas_count == 1 ? '1 Mecha' : $mmrpg_database_mechas_count.' Mechas' ?> )</span>
+      <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Core )</span>' : '' ?>
+    </span>
   </h2>
   <?php
 }

@@ -10,7 +10,7 @@ foreach ($mmrpg_database_types AS $token => $info){
 // Define the index of hidden abilities to not appear in the database
 $hidden_database_abilities = array();
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('ability', 'attachment-defeat', 'action-noweapons'));
-$hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'sticky-shot'));
+$hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'volt-tackle'));
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('crash-driller', 'dive-blitzkrieg', 'pharaoh-wave', 'sakugarne-bounce'));
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('meteor-knuckle', 'comet-attack'));
 //$hidden_database_abilities = array_merge($hidden_database_abilities, array('air-man', 'bubble-man', 'crash-man', 'flash-man', 'heat-man', 'metal-man', 'quick-man', 'wood-man'));
@@ -20,7 +20,7 @@ $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($h
 
 // Define the hidden ability query condition
 $temp_condition = '';
-$temp_condition .= "AND ability_class <> 'item' ";
+$temp_condition .= "AND ability_class <> 'system' ";
 if (!defined('DATA_DATABASE_SHOW_MECHAS')){
   $temp_condition .= "AND ability_class <> 'mecha' ";
 }
@@ -32,9 +32,16 @@ if (!empty($hidden_database_abilities)){
   foreach ($hidden_database_abilities AS $token){ $temp_tokens[] = "'".$token."'"; }
   $temp_condition .= 'AND ability_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
+// If additional database filters were provided
+$temp_condition_unfiltered = $temp_condition;
+if (isset($mmrpg_database_abilities_filter)){
+  if (!preg_match('/^\s?(AND|OR)\s+/i', $mmrpg_database_abilities_filter)){ $temp_condition .= 'AND ';  }
+  $temp_condition .= $mmrpg_database_abilities_filter;
+}
 
 // Collect the database abilities
 $mmrpg_database_abilities = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
+$mmrpg_database_abilities_count = $this_database->get_value("SELECT COUNT(ability_id) AS ability_count FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition_unfiltered};", 'ability_count');
 
 // Remove unallowed abilities from the database, and increment counters
 foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
@@ -77,7 +84,7 @@ $first_ability_token = $first_ability_token['ability_token'];
 unset($temp_ability_tokens);
 
 // Count the number of abilities collected and filtered
-$mmrpg_database_abilities_count = count($mmrpg_database_abilities);
+//$mmrpg_database_abilities_count = count($mmrpg_database_abilities);
 $mmrpg_database_abilities_count_complete = 0;
 
 // Define database variables we'll be using to generate links
@@ -98,9 +105,13 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
 
   // If this is the first in a new group
   $game_code = !empty($ability_info['ability_group']) ? $ability_info['ability_group'] : (!empty($ability_info['ability_game']) ? $ability_info['ability_game'] : 'MMRPG');
+  if (empty($this_current_sub)){
+    $game_code = str_replace('MM00/Weapons/T0', 'MMRPG/Weapons/T0', $game_code);
+    $game_code = preg_replace('/^([a-z0-9]+)\/Weapons\/([a-z0-9]+)$/i', '$1/Weapons', $game_code);
+  }
   if ($game_code != $last_game_code){
     if ($key_counter != 0){ $mmrpg_database_abilities_links .= '</div>'; }
-    if ($game_code == 'MM01/Weapons/003'){ $mmrpg_database_abilities_links .= '<span class="break"></span>'; }
+    if (!empty($this_current_sub) && $game_code == 'MM01/Weapons/003'){ $mmrpg_database_abilities_links .= '<span class="break"></span>'; }
     $mmrpg_database_abilities_links .= '<div class="float link group" data-game="'.$game_code.'">';
     $last_game_code = $game_code;
   }

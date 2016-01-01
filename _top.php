@@ -84,7 +84,7 @@ if (preg_match('/file.php$/i', basename(__FILE__))){
   unset($_SESSION['GAME']['USER']['userinfo']);
 }
 
-// Turn off magic quotes before it causes and problems
+// Turn off magic quotes before it causes any problems
 if (get_magic_quotes_gpc()){
   $process = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
   while (list($key, $val) = each($process)) {

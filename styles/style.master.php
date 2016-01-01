@@ -16,7 +16,7 @@ header("Cache-control: public, max-age={$cache_time}, must-revalidate");
 header("Pragma: cache");
 
 // Collect the types index for looping
-$mmrpg_index_types = rpg_type::get_index();
+$mmrpg_index_types = rpg_type::get_index(true);
 
 // Define a function for saving the style cache
 function mmrpg_save_style_markup($this_cache_filedir, $temp_css_markup){
@@ -73,8 +73,10 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
 
   foreach ($mmrpg_index_types AS $type_token => $type_info){
     ?>
+    .type.<?= $type_info['type_token'] ?>,
     #mmrpg .type.<?= $type_info['type_token'] ?>,
     #mmrpg .type_<?= $type_info['type_token'] ?>,
+    #mmrpg .item_type_<?= $type_info['type_token'] ?>,
     #mmrpg .ability_type_<?= $type_info['type_token'] ?>,
     #mmrpg .battle_type_<?= $type_info['type_token'] ?>,
     #mmrpg .field_type_<?= $type_info['type_token'] ?>,
@@ -91,8 +93,10 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
     foreach ($mmrpg_index_types AS $type2_token => $type2_info){
       if ($type_token == $type2_token){ continue; }
       ?>
+      .type.<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .type.<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
+      #mmrpg .item_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .ability_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .battle_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .field_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,

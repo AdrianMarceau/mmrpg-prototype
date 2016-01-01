@@ -127,9 +127,12 @@ if (!empty($this_current_token)){
 // Only show the header if a specific boss has not been selected
 if (empty($this_current_token)){
   ?>
-  <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
-    Boss Index
-    <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+  <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+    <span class="subheader_typewrapper">
+      <a class="inline_link" href="database/bosses/">Boss Database</a>
+      <span class="count">( <?= $mmrpg_database_bosses_count_complete ?> / <?= $mmrpg_database_bosses_count == 1 ? '1 Boss' : $mmrpg_database_bosses_count.' Bosses' ?> )</span>
+      <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Core )</span>' : '' ?>
+    </span>
   </h2>
   <?php
 }

@@ -58,7 +58,10 @@ class cms_database {
    * @return cms_database
    */
   public static function get_database(){
-    $this_database = isset($GLOBALS['DB']) ? $GLOBALS['DB'] : new cms_database();
+    if (isset($GLOBALS['DB'])){ $this_database = $GLOBALS['DB'];  }
+    if (isset($GLOBALS['this_database'])){ $this_database = $GLOBALS['this_database'];  }
+    else { $this_database = false; }
+    if (empty($this_database)){ $this_database = new cms_database(); }
     return $this_database;
   }
 
@@ -135,7 +138,7 @@ class cms_database {
     $this->MYSQL_RESULT = mysqli_query($this->LINK, $query_string);
     // If a result was not found, produce an error message and return false
     if ($this->MYSQL_RESULT === false){
-      if (MMRPG_CONFIG_DEBUG_MODE || MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;."); }
+      if (MMRPG_CONFIG_DEBUG_MODE || MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;. ".mysqli_errno($this->LINK)."."); }
       else { $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK)."."); }
       return false;
     }

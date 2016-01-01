@@ -27,7 +27,7 @@ $this_markup_header = 'Mega Man RPG Prototype Type Database <span class="count">
       echo '<li><strong class="type_block ability_type ability_type_none">Neutral</strong></li>';
       foreach ($mmrpg_database_types AS $type_token => $type_array){
         if ($type_token == 'none'){ continue; }
-        echo '<li><strong class="type_block ability_type ability_type_'.$type_token.'">'.ucfirst($type_token).'</strong></li>';
+        echo '<li><strong class="type_block ability_type ability_type_'.$type_token.'">'.$type_array['type_name'].'</strong></li>';
       }
       ?>
     </ul>

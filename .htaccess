@@ -61,9 +61,9 @@ RewriteRule ^images/robots/([a-z]+)man/(.*)?$ /images/robots/$1-man/$2 [R,L]
 
 # Define the rewrite conditions
 RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule (.*) - [S=45]
+RewriteRule (.*) - [S=53]
 
-# Define the redirect rules for the player image asset quick-paths (8)
+# Define the redirect rules for the ability image asset quick-paths (8)
 RewriteRule ^i/a/([-_a-z0-9]+)/il([0-9]+).png(.*)?$ images/abilities/$1/icon_left_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/a/([-_a-z0-9]+)/ir([0-9]+).png(.*)?$ images/abilities/$1/icon_right_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/as/([-_a-z0-9]+)/il([0-9]+).png(.*)?$ images/abilities_shadows/$1/icon_left_$2x$2.png?$3 [QSA,L]
@@ -72,6 +72,16 @@ RewriteRule ^i/a/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/abilities/$1/sprite_l
 RewriteRule ^i/a/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/abilities/$1/sprite_right_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/as/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/abilities_shadows/$1/sprite_left_$2x$2.png?$3 [QSA,L]
 RewriteRule ^i/as/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/abilities_shadows/$1/sprite_right_$2x$2.png?$3 [QSA,L]
+
+# Define the redirect rules for the item image asset quick-paths (8)
+RewriteRule ^i/i/([-_a-z0-9]+)/il([0-9]+).png(.*)?$ images/items/$1/icon_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/i/([-_a-z0-9]+)/ir([0-9]+).png(.*)?$ images/items/$1/icon_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/is/([-_a-z0-9]+)/il([0-9]+).png(.*)?$ images/items_shadows/$1/icon_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/is/([-_a-z0-9]+)/ir([0-9]+).png(.*)?$ images/items_shadows/$1/icon_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/i/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/items/$1/sprite_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/i/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/items/$1/sprite_right_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/is/([-_a-z0-9]+)/sl([0-9]+).png(.*)?$ images/items_shadows/$1/sprite_left_$2x$2.png?$3 [QSA,L]
+RewriteRule ^i/is/([-_a-z0-9]+)/sr([0-9]+).png(.*)?$ images/items_shadows/$1/sprite_right_$2x$2.png?$3 [QSA,L]
 
 # Define the redirect rules for the player image asset quick-paths (8)
 RewriteRule ^i/p/([-_a-z0-9]+)/ml([0-9]+).png(.*)?$ images/players/$1/mug_left_$2x$2.png?$3 [QSA,L]

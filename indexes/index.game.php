@@ -88,10 +88,10 @@ if (count($matches)>1){
 
 ?>
 <!DOCTYPE html>
-<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
+<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/" class="type <?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
 <head>
 <meta charset="UTF-8" />
-<title><?= (!MMRPG_CONFIG_IS_LIVE ? '@ ' : '').$this_seo_title ?></title>
+<title><?= $this_seo_title ?></title>
 <meta name="keywords" content="<?= $this_seo_keywords ?>" />
 <meta name="description" content="<?= $this_seo_description ?>" />
 <meta name="robots" content="<?= MMRPG_CONFIG_IS_LIVE ? 'index,follow' : 'noindex,nofollow' ?>" />
@@ -118,7 +118,7 @@ if (count($matches)>1){
 <?endif;?>
 </head>
 <?php $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
-<body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?>">
+<body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?> type <?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
 <?/*
 <div style="margin: 0; padding: 10px 25%; background-color: rgb(122, 0, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
 ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please, please log off from your accounts as soon as possible and stand by until further notice.  Several parts of the website will be taken offline during this process and any progress made during or directly before will likely be lost.  Thank you and look forward to lots of new stuff!<br /> - Adrian

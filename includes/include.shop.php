@@ -276,8 +276,11 @@ $this_shop_index['kalinka'] = array(
 // -- UPDATE SHOP INVENTORY/PRICES -- //
 
 // Loop through the shop index and prepare to create history arrays where necessary
+$this_shop_index_raw = $this_shop_index;
 if (!empty($this_shop_index)){
   foreach ($this_shop_index AS $shop_token => $shop_info){
+    // Default this shop's level to zero for later
+    $this_shop_index[$shop_token]['shop_level'] = 0;
     // Unlock the shop if the associated doctor has completed chapter one
     $shop_player = $shop_info['shop_player'];
     $shop_selling = $shop_info['shop_kind_selling'];

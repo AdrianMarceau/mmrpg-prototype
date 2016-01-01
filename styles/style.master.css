@@ -21,6 +21,9 @@ body {
 body.index {
   background: #000000 url(../images/assets/index-background.gif) scroll repeat 0 0;
 }
+body.index.type {
+  background-image: url(../images/assets/index-background.png);
+}
 body.loading,
 body.loading a {
   cursor: wait !important;
@@ -31,8 +34,8 @@ body.loading > * {
 #window,
 #window iframe,
 body.battle {
-  background-color: #262626;   
-  border-color: #262626; 
+  background-color: #262626;
+  border-color: #262626;
 }
 #window iframe {
   background-color: transparent;
@@ -182,11 +185,11 @@ body.index #header {
   right: -126px !important;
   top: 0 !important;
   bottom: 0 !important;
-  background-repeat: repeat !important;  
+  background-repeat: repeat !important;
 }
 #mmrpg .sprite_fullscreen_translucent,
 #mmrpg .sprite.fullscreen.translucent {
-  opacity: 0.5 !important; 
+  opacity: 0.5 !important;
   filter: alpha(opacity=50) !important;
 }
 #mmrpg a.sprite {
@@ -645,7 +648,6 @@ body.index #header {
   cursor: pointer;
 }
 
-
 #mmrpg .type,
 #mmrpg .ability_type,
 #mmrpg .battle_type,
@@ -654,14 +656,14 @@ body.index #header {
 #mmrpg .robot_type,
 #mmrpg .robot_stat {
   border-color: #464646 !important;
-  background-color: #414141 !important;  
+  background-color: #414141 !important;
   background-image: -moz-linear-gradient(top,  rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.05) 100%); /* FF3.6+ */
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.05)), color-stop(100%,rgba(0,0,0,0.05))); /* Chrome,Safari4+ */
   background-image: -webkit-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* Chrome10+,Safari5.1+ */
   background-image: -o-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* Opera 11.10+ */
   background-image: -ms-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* IE10+ */
   background-image: linear-gradient(to bottom,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ); /* IE6-9 */  
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ); /* IE6-9 */
   position: relative;
   background-repeat: no-repeat !important;
 }
@@ -704,7 +706,7 @@ body.index #header {
 }
 
 #mmrpg .robot_details {
-  z-index: 9000; 
+  z-index: 9000;
   border: 0 none transparent;
   background: transparent none scroll no-repeat 0 0;
   width: 271px;
@@ -726,14 +728,14 @@ body.index #header {
 }
 */
 
-#mmrpg .robot_details_left { 
+#mmrpg .robot_details_left {
   background-image: url(../images/assets/battle-scene_robot-details.png?20130908-01);
   background-position: 0 0;
   text-align: left;
   top: 4px;
   left: 4px;
 }
-#mmrpg .robot_details_right { 
+#mmrpg .robot_details_right {
   background-image: url(../images/assets/battle-scene_robot-details.png?20130908-01);
   background-position: -271px 0;
   text-align: right;
@@ -744,11 +746,11 @@ body.index #header {
 #mmrpg .robot_details_right .container {
   position: relative;
   width: 271px;
-  height: 120px;  
+  height: 120px;
 }
 
 #mmrpg .robot_details_extended {
-  z-index: 8000; 
+  z-index: 8000;
   border: 0 none transparent;
   background: transparent none scroll no-repeat 0 0;
   width: 55px;
@@ -759,10 +761,10 @@ body.index #header {
   line-height: 1px;
   top: 122px;
 }
-#mmrpg .robot_details_extended_right { 
+#mmrpg .robot_details_extended_right {
   right: -4px;
 }
-#mmrpg .robot_details_extended_left { 
+#mmrpg .robot_details_extended_left {
   left: -4px;
 }
 #mmrpg .robot_details_extended_left .container,
@@ -773,7 +775,7 @@ body.index #header {
 }
 
 #mmrpg .robot_details_extended .overlay {
-  z-index: 100; 
+  z-index: 100;
   border: 0 none transparent;
   pointer-events: none;
   background: transparent none scroll no-repeat 0 0;
@@ -788,11 +790,11 @@ body.index #header {
 #mmrpg .robot_details_extended .overlay .container {
 
 }
-#mmrpg .robot_details_extended .overlay.cores { 
+#mmrpg .robot_details_extended .overlay.cores {
   background-position: 0 0;
   height: 52px;
 }
-#mmrpg .robot_details_extended .overlay.stars { 
+#mmrpg .robot_details_extended .overlay.stars {
   background-position: -55px 0;
   height: 52px;
 }
@@ -826,7 +828,7 @@ body.index #header {
 */
 
 #mmrpg .robot_details_extended .starforce {
-  top: 48px;  
+  top: 48px;
   width: 27px;
   height: 27px;
   background-color: lime;
@@ -850,32 +852,32 @@ body.index #header {
   border: 0 none transparent !important;
   background: transparent none scroll no-repeat 0 0;
   height: 100%;
-  width: 100%;  
+  width: 100%;
 }
 
 
 #mmrpg #canvas .robot_mugshot_type {
-  z-index: 9100; 
+  z-index: 9100;
   border-radius: 2px;
   -moz-border-radius: 2px;
-  -webkit-border-radius: 2px; 
-  width: 38px; 
-  height: 38px; 
-  top: 12px; 
-  border: 1px solid #000000; 
+  -webkit-border-radius: 2px;
+  width: 38px;
+  height: 38px;
+  top: 12px;
+  border: 1px solid #000000;
   position: absolute;
 }
 #mmrpg #canvas .robot_mugshot_type .sprite {
   position: relative;
-  border: 1px solid #000000; 
-  border-radius: 3px; 
+  border: 1px solid #000000;
+  border-radius: 3px;
   background-color: rgb(0, 0, 0);
-  background-color: rgba(0, 0, 0, .5); 
-  top: 2px; 
-  left: 2px; 
-  right: 2px; 
-  width: 32px; 
-  height: 32px; 
+  background-color: rgba(0, 0, 0, .5);
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  width: 32px;
+  height: 32px;
 }
 #mmrpg #canvas .robot_mugshot .robot_mugshot {
   pointer-events: none;
@@ -931,12 +933,12 @@ body.index #header {
 }
 #mmrpg .robot_details .robot_attack_break,
 #mmrpg .robot_details .robot_defense_break,
-#mmrpg .robot_details .robot_speed_break { 
+#mmrpg .robot_details .robot_speed_break {
   color: red;
 }
 #mmrpg .robot_details .robot_attack_break_chance,
 #mmrpg .robot_details .robot_defense_break_chance,
-#mmrpg .robot_details .robot_speed_break_chance { 
+#mmrpg .robot_details .robot_speed_break_chance {
   color: yellow;
 }
 #mmrpg .robot_details .robot_name {
@@ -945,7 +947,7 @@ body.index #header {
   line-height: 19px;
   text-transform: none;
   overflow: hidden;
-  text-overflow: ellipsis;  
+  text-overflow: ellipsis;
   width: 144px;
   top: 7px;
   letter-spacing: 2px;
@@ -954,10 +956,10 @@ body.index #header {
   height: 12px;
   font-size: 9px;
   line-height: 12px;
-  text-transform: none; 
+  text-transform: none;
   width: 50px;
   top: 9px;
-  padding: 0 5px;  
+  padding: 0 5px;
   border-radius: 0.3em;
   -moz-border-radius: 0.3em;
   -webkit-border-radius: 0.3em;
@@ -965,9 +967,9 @@ body.index #header {
 #mmrpg .robot_details .robot_attack,
 #mmrpg .robot_details .robot_defense,
 #mmrpg .robot_details .robot_speed,
-#mmrpg .robot_details .robot_item { 
+#mmrpg .robot_details .robot_item {
   height: 10px;
-  width: 43px; 
+  width: 43px;
   text-align: center;
   font-family: "Courier New";
 }
@@ -1014,18 +1016,18 @@ body.index #header {
   background-color: rgba(0, 0, 0, 0.3);
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
-  border-radius: 2px;  
+  border-radius: 2px;
 }
-#mmrpg .robot_details .robot_attack { 
+#mmrpg .robot_details .robot_attack {
   top: 63px;
 }
-#mmrpg .robot_details .robot_defense { 
+#mmrpg .robot_details .robot_defense {
   top: 87px;
 }
-#mmrpg .robot_details .robot_speed { 
+#mmrpg .robot_details .robot_speed {
   top: 111px;
 }
-#mmrpg .robot_details .robot_item { 
+#mmrpg .robot_details .robot_item {
   top: 127px;
 }
 #mmrpg .robot_details_left .robot_name {
@@ -1037,8 +1039,8 @@ body.index #header {
 #mmrpg .robot_details_left .robot_attack,
 #mmrpg .robot_details_left .robot_defense,
 #mmrpg .robot_details_left .robot_speed,
-#mmrpg .robot_details_left .robot_item { 
-  left: 7px;  
+#mmrpg .robot_details_left .robot_item {
+  left: 7px;
 }
 #mmrpg .robot_details_right .robot_name {
   right: 60px;
@@ -1049,8 +1051,8 @@ body.index #header {
 #mmrpg .robot_details_right .robot_attack,
 #mmrpg .robot_details_right .robot_defense,
 #mmrpg .robot_details_right .robot_speed,
-#mmrpg .robot_details_right .robot_item { 
-  right: 6px;  
+#mmrpg .robot_details_right .robot_item {
+  right: 6px;
 }
 
 #mmrpg .robot_details_left .robot_name {
@@ -1237,7 +1239,7 @@ body.index #header {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 5000; 
+  z-index: 5000;
   border: 0 none transparent;
   background: #000000 none scroll no-repeat 0 0;
   width: 100%;
@@ -1277,17 +1279,18 @@ body.index #header {
   background-color: transparent;
 }
 #credits {
-  margin: 0 auto 10px;
+  margin: 0 auto;
+  padding-bottom: 10px;
   font-size: 10px;
-  color: #414141;
+  color: #A9A9A9;
 }
 #credits a {
   padding: 0;
-  color: #464646;
+  color: #A3A3A3;
   text-decoration: none;
 }
 #credits a:hover {
-  color: #494949;
+  color: #A9A9A9;
   text-decoration: underline;
 }
 
@@ -1364,7 +1367,7 @@ body.index #header {
   height: auto;
   border: 0 none transparent;
   background-color: rgb(13,13,13);
-  background-color: rgba(13,13,13,1.00);  
+  background-color: rgba(13,13,13,1.00);
   background-image: -webkit-gradient(
       linear,
       left bottom,
@@ -1376,7 +1379,7 @@ body.index #header {
       center bottom,
       rgba(13,13,13,0.75) 15%,
       rgba(09,09,09,0.75) 75%
-  );   
+  );
 }
 #music.onload a {
   position: absolute;
@@ -1390,7 +1393,7 @@ body.index #header {
   padding: 0;
   border: 0 none transparent;
   background: transparent none scroll no-repeat 0 0;
-  background-image: url(../images/menus/menu-banner_credits.png?20131019-01);  
+  background-image: url(../images/menus/menu-banner_credits.png?20131019-01);
   background-repeat: no-repeat;
   background-position: center 75px;
   font-size: 78px;
@@ -1438,7 +1441,7 @@ body.index #header {
   margin-top: 5px;
   text-align: left;
   opacity: 0.75;
-  filter: alpha(opacity=75);    
+  filter: alpha(opacity=75);
 }
 #music.onload a .start .icon {
   float: left;
@@ -1462,37 +1465,37 @@ body.index #header {
   text-indent: -9999px;
   overflow: hidden;
   opacity: 0.75;
-  filter: alpha(opacity=75);    
+  filter: alpha(opacity=75);
 }
 
 #mmrpg .canvas_overlay_header {
-  position: absolute; 
-  top: 11px; 
-  height: 22px; 
-  left: 0; 
-  right: 0; 
+  position: absolute;
+  top: 11px;
+  height: 22px;
+  left: 0;
+  right: 0;
   background-color: transparent;
-  background-color: rgba(0, 0, 0, 0.5); 
+  background-color: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(0, 0, 0, 0.5);
   border-width: 1px 0;
   z-index: 100;
 }
 #mmrpg .canvas_overlay_footer {
   display: block;
-  position: absolute; 
-  bottom: 0; 
-  left: 0; 
-  right: 0; 
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   height: 14px;
   line-height: 15px;
   text-transform: none;
-  text-align: center; 
+  text-align: center;
   background-color: transparent;
-  background-color: rgba(0, 0, 0, 0.6); 
+  background-color: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(0, 0, 0, 0.6);
   border-width: 1px 0 0;
-  padding: 10px; color: #FFFFFF; 
-  text-indent: 0; 
+  padding: 10px; color: #FFFFFF;
+  text-indent: 0;
   z-index: 999999;
 }
 #mmrpg .canvas_overlay_hidden {
@@ -1511,16 +1514,16 @@ body.index #header {
   -webkit-border-radius: 0.5em;
 }
 #mmrpg .canvas_overlay_footer .field_multiplier {
-  margin: 0 5px; 
-  border-style: solid; 
-  border-width: 1px; 
-  border-radius: 0.5em; 
+  margin: 0 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 0.5em;
   -moz-border-radius: 0.5em;
   -webkit-border-radius: 0.5em;
-  padding: 0 6px; 
-  box-shadow: 1px 1px 1px #000000; 
+  padding: 0 6px;
+  box-shadow: 1px 1px 1px #000000;
   letter-spacing: 1px;
-  white-space: nowrap;  
+  white-space: nowrap;
   font-family: Arial;
   font-size: 9px;
   line-height: 9px;
@@ -1529,9 +1532,9 @@ body.index #header {
 
 }
 #mmrpg .canvas_overlay_footer .field_multiplier .cross {
-  position: relative; 
-  bottom: 1px; 
-  font-size: 10px; 
+  position: relative;
+  bottom: 1px;
+  font-size: 10px;
   padding: 0;
 }
 /*
@@ -1570,16 +1573,16 @@ body.index #header {
 }
 
 #mmrpg .sprite.canvas_ability_details {
-  text-indent: 0; 
+  text-indent: 0;
   left: 250px;
-  right: 250px; 
-  top: 42px; 
-  background-color: rgba(41, 41, 41, 0.75); 
-  border: 1px solid rgba(255, 255, 255, 0.15); 
+  right: 250px;
+  top: 42px;
+  background-color: rgba(41, 41, 41, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-color: #000000 !important;
-  height: 44px; 
-  padding: 0 36px; 
-  width: 202px; 
+  height: 44px;
+  padding: 0 36px;
+  width: 202px;
   border-radius: 5px;
   white-space: nowrap;
   overflow: hidden;
@@ -1587,11 +1590,11 @@ body.index #header {
   z-index: 5100;
 }
 #canvas .canvas_ability_details .ability_icon {
-  top: 5px; 
-  left: 5px; 
-  width: 30px; 
-  height: 30px; 
-  border: 1px solid #000000; 
+  top: 5px;
+  left: 5px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #000000;
   border-radius: 5px 0 0 5px;
   -moz-border-radius: 5px 0 0 5px;
   -webkit-border-radius: 5px 0 0 5px;
@@ -1605,28 +1608,28 @@ body.index #header {
   -webkit-border-radius: 0 5px 5px 0;
 }
 #canvas .canvas_ability_details .ability_name {
-  text-indent: 0; 
-  color: #FFFFFF; 
-  font-size: 12px; 
+  text-indent: 0;
+  color: #FFFFFF;
+  font-size: 12px;
   font-weight: bold;
   text-align: center;
-  margin: 5px 0; 
-  line-height: 30px;  
+  margin: 5px 0;
+  line-height: 30px;
   border-radius: 0;
-  border: 1px solid #000000; 
+  border: 1px solid #000000;
   background-color: #000000;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 #mmrpg .sprite.canvas_ability_stats {
-  text-indent: 0; 
+  text-indent: 0;
   left: 230px;
-  right: 230px; 
-  top: 92px; 
-  background-color: transparent; 
-  border: 0 none transparent; 
-  height: 9px; 
+  right: 230px;
+  top: 92px;
+  background-color: transparent;
+  border: 0 none transparent;
+  height: 9px;
   width: 316px;
   white-space: nowrap;
   overflow: visible;
@@ -1639,9 +1642,9 @@ body.index #header {
   -moz-border-radius: 0.6em;
   -webkit-border-radius: 0.6em;
   border-radius: 0.6em;
-  font-size: 9px; 
+  font-size: 9px;
   line-height: 9px;
-  
+
 }
 #mmrpg .canvas_ability_stats .wrap {
   position: absolute;
@@ -1653,17 +1656,17 @@ body.index #header {
 }
 #canvas .canvas_ability_stats .robot_stat,
 #canvas .canvas_ability_stats .vs {
-  text-indent: 0; 
-  color: #FFFFFF; 
-  font-size: 10px; 
+  text-indent: 0;
+  color: #FFFFFF;
+  font-size: 10px;
   line-height: 13px;
   font-weight: bold;
   text-align: center;
-  margin: 0 auto; 
+  margin: 0 auto;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border: 1px solid #000000; 
+  border: 1px solid #000000;
 }
 #canvas .canvas_ability_stats .vs {
   position: relative;
@@ -1708,7 +1711,7 @@ body.index #header {
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;  
+  bottom: 0;
   width: auto;
   height: auto;
   z-index: 9985;
@@ -1716,7 +1719,7 @@ body.index #header {
   -moz-border-radius: 0.5em;
   -webkit-border-radius: 0.5em;
   border: 2px solid #1A1A1A;
-  background-color: rgba(0, 0, 0, 0.75);  
+  background-color: rgba(0, 0, 0, 0.75);
 }
 #events.hidden {
   display: none;
@@ -1726,7 +1729,7 @@ body.index #header {
   top: 60px;
   left: 85px;
   right: auto;
-  bottom: auto;  
+  bottom: auto;
   height: auto;
   min-height: 300px;
   width: 600px;
@@ -1736,7 +1739,7 @@ body.index #header {
   -moz-border-radius: 0.5em;
   -webkit-border-radius: 0.5em;
   border: 2px solid #1A1A1A;
-  background-color: #222222;  
+  background-color: #222222;
   background-image: -webkit-gradient(
       linear,
       left bottom,
@@ -1748,16 +1751,16 @@ body.index #header {
       center bottom,
       rgba(0, 0, 0, 0.05) 15%,
       rgba(255, 255, 255, 0.05) 75%
-  ); 
+  );
   text-shadow: 1px 1px 4px #333333;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -o-user-select: none;
-  user-select: none;    
+  user-select: none;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-  -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);  
+  -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
 #events .event_container {
   padding: 10px;
@@ -1780,14 +1783,14 @@ body.index #header {
   border: 2px solid #000000;
   border-radius: 0.5em;
   -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;  
-  overflow: auto;   
+  -webkit-border-radius: 0.5em;
+  overflow: auto;
 }
 #events #canvas {
   overflow: hidden;
   margin: 0 0 5px;
   background-color: rgb(13,13,13);
-  background-color: rgba(13,13,13,0.85);  
+  background-color: rgba(13,13,13,0.85);
   background-image: -webkit-gradient(
       linear,
       left bottom,
@@ -1799,7 +1802,7 @@ body.index #header {
       center bottom,
       rgba(13,13,13,0.75) 15%,
       rgba(09,09,09,0.75) 75%
-  );   
+  );
 }
 #events #messages {
   margin: 5px 0 0;
@@ -1810,7 +1813,7 @@ body.index #header {
   width: 576px;
   height: auto;
   min-height: 71px;
-  max-height: 290px;  
+  max-height: 290px;
 }
 #events #buttons {
   margin: 10px 0 0;
@@ -1891,7 +1894,7 @@ body.index #header {
   );
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-  -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);    
+  -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
 #events #messages .event .fullsize {
   margin: 0 auto;
@@ -1935,15 +1938,15 @@ body.index #header {
 }
 #events #messages .database_container .subbody table td.right .stat,
 #events #messages .database_container .subbody table td.left .stat {
-  display: inline-block; 
+  display: inline-block;
 }
 #events #messages .database_container .subbody table td.right .stat .robot_stat.type_empty,
 #events #messages .database_container .subbody table td.left .stat .robot_stat.type_empty {
-  display: inline-block;  
-  -moz-box-sizing: border-box; 
+  display: inline-block;
+  -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  width: 100%; 
+  width: 100%;
   line-height: 124%;
 }
 #events #messages .database_container .subbody table td.right .stat .robot_stat .robot_stat,
@@ -1954,21 +1957,21 @@ body.index #header {
 }
 #events #messages .database_container .subbody table td.right .stat .robot_stat span,
 #events #messages .database_container .subbody table td.left .stat .robot_stat span {
-  display: inline-block; 
+  display: inline-block;
   width: 35px;
 }
 
 #events #messages .database_container .subbody .body_left {
-  margin-right: 0; 
-  margin-bottom: 5px; 
-  padding: 2px 0; 
-  min-height: 10px; 
+  margin-right: 0;
+  margin-bottom: 5px;
+  padding: 2px 0;
+  min-height: 10px;
 }
 #events #messages .database_container .subbody .body_left.fullsize {
   margin-left: 0;
 }
 #events #messages .database_container.layout_event .subbody .body_left {
-  font-size: 10px; 
+  font-size: 10px;
   min-height: 150px;
 }
 #events #messages .database_container .subbody .body_left table.full {
@@ -1998,7 +2001,7 @@ body.index #header {
   font-size: 10px;
   line-height: 15px;
   margin: 3px 0 0;
-  padding: 0 6px;  
+  padding: 0 6px;
 }
 #events #messages .event .header_left .header_core {
   float: right;
@@ -2020,9 +2023,9 @@ body.index #header {
   border: 2px solid #000000;
   border-radius: 0.5em;
   -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;  
+  -webkit-border-radius: 0.5em;
   background-color: rgb(13,13,13);
-  background-color: rgba(13,13,13,1.0);  
+  background-color: rgba(13,13,13,1.0);
   background-image: -webkit-gradient(
       linear,
       left bottom,
@@ -2034,12 +2037,12 @@ body.index #header {
       center bottom,
       rgba(13,13,13,0.75) 15%,
       rgba(09,09,09,0.75) 75%
-  );   
+  );
   cursor: pointer;
 }
 #events #buttons input:hover {
   background-color: rgb(33,33,33);
-  background-color: rgba(33,33,33,1.0); 
+  background-color: rgba(33,33,33,1.0);
 }
 
 
@@ -2115,7 +2118,7 @@ body.index #header {
   -moz-border-radius: 0.75em;
   -webkit-border-radius: 0.75em;
   color: #696969;
-  background-color: rgb(43,43,43);  
+  background-color: rgb(43,43,43);
   background-image: -webkit-gradient(
       linear,
       left bottom,
@@ -2127,31 +2130,31 @@ body.index #header {
       center bottom,
       rgb(43,43,43) 15%,
       rgb(41,41,41) 75%
-  ); 
+  );
   text-shadow: 1px 1px 4px #333333;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -o-user-select: none;
-  user-select: none;    
+  user-select: none;
   box-shadow: 0 1px 5px #000000;
   -moz-box-shadow: 0 1px 5px #000000;
-  -webkit-box-shadow: 0 1px 5px #000000;  
+  -webkit-box-shadow: 0 1px 5px #000000;
   overflow: hidden;
-  
+
 }
 #canvas .clearback {
   background: transparent none scroll no-repeat 0 0;
   left: -2px;
 }
 #canvas .event_details {
-  z-index: 1000; 
-  /*pointer-events: none;*/ 
+  z-index: 1000;
+  /*pointer-events: none;*/
   height: 10px;
-  overflow: visible; 
+  overflow: visible;
   border-color: transparent;
-  box-shadow: 0 0 0 transparent; 
-  -webkit-box-shadow: 0 0 0 transparent; 
+  box-shadow: 0 0 0 transparent;
+  -webkit-box-shadow: 0 0 0 transparent;
   -moz-box-shadow: 0 0 0 transparent;
 }
 #canvas .event .background,
@@ -2179,9 +2182,9 @@ body.index #header {
   z-index: 50;
 }
 #canvas .event .scanlines {
-  z-index: 100; 
-  width: auto; 
-  left: -300px; 
+  z-index: 100;
+  width: auto;
+  left: -300px;
   right: -300px;
   height: 250px;
 }
@@ -2250,8 +2253,8 @@ body.index #header {
   border: 0 none transparent;
   border-top-style: none;
   border-bottom-style: none;
-  overflow: hidden;  
-  background-color: transparent; 
+  overflow: hidden;
+  background-color: transparent;
 }
 #console .wrapper {
   padding: 0;
@@ -2267,7 +2270,7 @@ body.index #header {
   vertical-align: top;
   color: #FAFAFA;
   border: 1px solid #1A1A1A;
-  background-color: #222222;  
+  background-color: #222222;
   background-image: -webkit-gradient(
       linear,
       left bottom,
@@ -2279,7 +2282,7 @@ body.index #header {
       center bottom,
       rgba(0, 0, 0, 0.05) 15%,
       rgba(255, 255, 255, 0.05) 75%
-  );  
+  );
   padding: 2px;
   font-size: 10px;
   line-height: 13px;
@@ -2289,7 +2292,7 @@ body.index #header {
   position: relative;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);  
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 #console .event:first-child {
   margin-top: 0;
@@ -2339,7 +2342,7 @@ body.index #header {
   margin: 0 47px;
   padding: 2px 10px;
   text-align: center;
-  background-color: rgba(255, 255, 255, 0.025);  
+  background-color: rgba(255, 255, 255, 0.025);
   color: #FFFFFF;
   font-size: 12px;
   line-height: 20px;
@@ -2455,7 +2458,7 @@ body.index #header {
   margin: 0;
   padding: 2px 2px 4px;
   text-align: left;
-  background-color: rgb(60,60,60);  
+  background-color: rgb(60,60,60);
   border: 0 none transparent;
   border-radius: 0.5em;
   -moz-border-radius: 0.5em;
@@ -2472,7 +2475,7 @@ body.index #header {
   right: 2px;
 }
 #console .event .this_sprite {
-  background-color: rgba(255, 255, 255, 0.025);  
+  background-color: rgba(255, 255, 255, 0.025);
   /*
   background-image: -webkit-gradient(
       linear,
@@ -2489,7 +2492,7 @@ body.index #header {
   */
 }
 #console .event .target_sprite {
-  
+
 }
 #console .event .sprite_left .energy,
 #console .event .sprite_right .energy,
@@ -2679,7 +2682,7 @@ body.index #header {
   -webkit-border-radius: 0.75em;
   cursor: pointer;
   color: #FFFFFF;
-  background-color: #222222;  
+  background-color: #222222;
   background-image: -webkit-gradient(
       linear,
       left bottom,
@@ -2691,12 +2694,12 @@ body.index #header {
       center bottom,
       rgba(0, 0, 0, 0.05) 15%,
       rgba(255, 255, 255, 0.05) 75%
-  );  
+  );
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -o-user-select: none;
-  user-select: none;    
+  user-select: none;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
@@ -2704,7 +2707,7 @@ body.index #header {
 }
 #actions .button:hover {
   color: #FFFFFF;
-  background-color: #222222;  
+  background-color: #222222;
   background-image: -webkit-gradient(
       linear,
       left bottom,
@@ -2716,19 +2719,19 @@ body.index #header {
       center bottom,
       rgba(0, 0, 0, 0.075) 15%,
       rgba(255, 255, 255, 0.075) 75%
-  );  
+  );
 }
 #actions .button_hover,
 #actions .button_hover:hover {
-  border-color: rgba(255, 255, 255, 0.20) !important; 
+  border-color: rgba(255, 255, 255, 0.20) !important;
   animation: border-pulsate 2s infinite;
 }
 #actions .button_disabled {
   opacity: 0.45;
   cursor: default;
   background-image: none;
-  border-color: #1A1A1A !important;  
-  color: #CACACA;  
+  border-color: #1A1A1A !important;
+  color: #CACACA;
 }
 #actions .button_disabled:hover {
   color: #CACACA;
@@ -2747,7 +2750,7 @@ body.index #header {
   border-color: #1A1A1A !important;
   border-radius: 0.75em;
   -moz-border-radius: 0.75em;
-  -webkit-border-radius: 0.75em; 
+  -webkit-border-radius: 0.75em;
   cursor: pointer;
   position: relative;
 }
@@ -2785,7 +2788,7 @@ body.index #header {
   background: -o-linear-gradient(top,  rgba(0,0,0,0.33) 0%,rgba(0,0,0,0.33) 1%,rgba(0,0,0,0) 75%); /* Opera 11.10+ */
   background: -ms-linear-gradient(top,  rgba(0,0,0,0.33) 0%,rgba(0,0,0,0.33) 1%,rgba(0,0,0,0) 75%); /* IE10+ */
   background: linear-gradient(to bottom,  rgba(0,0,0,0.33) 0%,rgba(0,0,0,0.33) 1%,rgba(0,0,0,0) 75%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#54000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */  
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#54000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
 }
 #actions .main_actions_hastitle .main_actions_title {
   position: absolute;
@@ -2799,7 +2802,7 @@ body.index #header {
   text-transform: uppercase;
   color: #696969;
   background-color: #191919;
-  letter-spacing: 2px;  
+  letter-spacing: 2px;
   border-radius: 10px 10px 0 0;
 }
 #actions .main_actions_hastitle .main_actions_title .float_title {
@@ -2814,7 +2817,7 @@ body.index #header {
   width: 49%;
   text-align: left;
 }
-#actions .main_actions_hastitle .main_actions_title .float_links .page {  
+#actions .main_actions_hastitle .main_actions_title .float_links .page {
   color: #696969;
 }
 #actions .main_actions_hastitle .main_actions_title .float_links .num {
@@ -2878,8 +2881,8 @@ body.index #header {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   background-color: rgba(0, 0, 0, 0.3);
-  background-image: none;  
-  cursor: pointer;  
+  background-image: none;
+  cursor: pointer;
   z-index: 9999;
   opacity: 0;
   filter: alpha(opacity=0);
@@ -3029,26 +3032,26 @@ body.index #header {
 }
 
 #actions .main_actions_hastitle .button label .sprite.size40.ability {
-  height: 30px; 
-  background-position-y: -5px !important; 
-  border-radius: 5px 5px 0 0;   
-  -moz-border-radius: 5px 5px 0 0;   
-  -webkit-border-radius: 5px 5px 0 0; 
+  height: 30px;
+  background-position-y: -5px !important;
+  border-radius: 5px 5px 0 0;
+  -moz-border-radius: 5px 5px 0 0;
+  -webkit-border-radius: 5px 5px 0 0;
 }
 #actions .main_actions_hastitle .button label .sprite.size40.weapons {
   height: 8px;
-  padding-bottom: 4px; 
-  border-radius: 0 0 5px 5px;   
-  -moz-border-radius: 0 0 5px 5px;   
-  -webkit-border-radius: 0 0 5px 5px; 
+  padding-bottom: 4px;
+  border-radius: 0 0 5px 5px;
+  -moz-border-radius: 0 0 5px 5px;
+  -webkit-border-radius: 0 0 5px 5px;
   border-top-style: none;
   font-size: 8px;
   line-height: 8px;
   letter-spacing: 0;
   text-indent: 0;
-  text-align: center; 
+  text-align: center;
   color: #9C9C9C;
-  font-family: Arial; 
+  font-family: Arial;
 }
 
 #actions .main_actions_hastitle .button label .sprite.size40.energy.high {
@@ -3209,7 +3212,7 @@ body.index #header {
   #window,
   #window iframe,
   #battle {
-    width: 1024px;  
+    width: 1024px;
   }
   #prototype .banner {
     width: 1004px;
@@ -3267,7 +3270,7 @@ body.index #header {
   #canvas .clearback .sprite_160x160_mugshot_right {
     right: -163px;
   }
-  #canvas .clearback .ability_overlay, 
+  #canvas .clearback .ability_overlay,
   #canvas .clearback .scan_overlay {
     width: auto;
     left: -130px;
@@ -3277,7 +3280,7 @@ body.index #header {
     width: 1024px;
   }
   #actions {
-    width: 1024px;  
+    width: 1024px;
   }
   #actions .action_back label {
     width: auto;
@@ -3292,15 +3295,15 @@ body.index #header {
     width: auto;
   }
   #actions .actions_battle .action_scan,
-  #actions .actions_battle .action_item, 
-  #actions .actions_battle .action_target, 
-  #actions .actions_battle .action_option, 
+  #actions .actions_battle .action_item,
+  #actions .actions_battle .action_target,
+  #actions .actions_battle .action_option,
   #actions .actions_battle .action_switch {
     width: 245px;
   }
-  #actions .actions_battle .action_scan label, 
-  #actions .actions_battle .action_target label, 
-  #actions .actions_battle .action_option label, 
+  #actions .actions_battle .action_scan label,
+  #actions .actions_battle .action_target label,
+  #actions .actions_battle .action_option label,
   #actions .actions_battle .action_switch label {
     width: auto;
   }
@@ -3308,13 +3311,13 @@ body.index #header {
     width: auto;
   }
   #actions .actions_option .action_option,
-  #actions .actions_settings .action_setting, 
+  #actions .actions_settings .action_setting,
   #actions .actions_settings_eventTimeout .action_setting,
   #actions .actions_settings_volumeControl .action_setting,
   #actions .actions_settings_autoScan .action_setting,
-  #actions .actions_switch .action_switch, 
-  #actions .actions_scan .action_scan, 
-  #actions .actions_target .action_target, 
+  #actions .actions_switch .action_switch,
+  #actions .actions_scan .action_scan,
+  #actions .actions_target .action_target,
   #actions .actions_ability .action_ability {
     width: 245px;
   }
@@ -3322,7 +3325,7 @@ body.index #header {
   #actions .actions_settings .action_setting label,
   #actions .actions_settings_eventTimeout .action_setting label,
   #actions .actions_settings_volumeControl .action_setting label,
-  #actions .actions_settings_autoScan .action_setting label,  
+  #actions .actions_settings_autoScan .action_setting label,
   #actions .actions_scan .action_scan label,
   #actions .actions_target .action_target label {
     width: auto;
@@ -3333,14 +3336,14 @@ body.index #header {
   #actions .actions_battle .action_ability label {
     width: auto;
   }
-  #actions .actions_option .action_option label, 
-  #actions .actions_option .action_option label, 
-  #actions .actions_settings .action_setting label, 
+  #actions .actions_option .action_option label,
+  #actions .actions_option .action_option label,
+  #actions .actions_settings .action_setting label,
   #actions .actions_settings_eventTimeout .action_setting label,
   #actions .actions_settings_volumeControl .action_setting label,
-  #actions .actions_settings_autoScan .action_setting label,  
-  #actions .actions_scan .action_scan label, 
-  #actions .actions_target .action_target label, 
+  #actions .actions_settings_autoScan .action_setting label,
+  #actions .actions_scan .action_scan label,
+  #actions .actions_target .action_target label,
   #actions .actions_ability .action_ability label,
   #actions .actions_switch .action_switch label {
     width: auto;
@@ -3352,11 +3355,11 @@ body.index #header {
   #actions .actions_settings_autoScan .action_setting label {
     width: auto;
   }
-  #actions .block_4, 
+  #actions .block_4,
   #actions .block_8 {
     width: 248px !important;
-  }  
-  
+  }
+
   #battle .canvas_overlay_header,
   #battle .canvas_overlay_footer {
     left: 2;
@@ -3377,7 +3380,7 @@ body.index #header {
 
 /* -- Portrait Mode -- */
 @media (max-width: 1060px){
-  
+
   #window {
     margin: 0 auto;
     border-left: 0 none transparent;
@@ -3392,7 +3395,7 @@ body.index #header {
   #window .banner {
     width: auto;
   }
-  
+
 }
 
 

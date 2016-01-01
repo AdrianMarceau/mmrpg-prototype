@@ -30,11 +30,17 @@ if (!empty($hidden_database_robots)){
   foreach ($hidden_database_robots AS $token){ $temp_tokens[] = "'".$token."'"; }
   $temp_condition .= 'AND robot_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
-
+// If additional database filters were provided
+$temp_condition_unfiltered = $temp_condition;
+if (isset($mmrpg_database_robots_filter)){
+  if (!preg_match('/^\s?(AND|OR)\s+/i', $mmrpg_database_robots_filter)){ $temp_condition .= 'AND ';  }
+  $temp_condition .= $mmrpg_database_robots_filter;
+}
 
 // Collect the database robots and fields
 $mmrpg_database_fields = $this_database->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
 $mmrpg_database_robots = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition} ORDER BY robot_order ASC;", 'robot_token');
+$mmrpg_database_robots_count = $this_database->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition_unfiltered};", 'robot_count');
 
 // Remove unallowed robots from the database, and increment type counters
 foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
@@ -53,7 +59,7 @@ foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
     if ($temp_info['robot_class'] == 'mecha' && defined('DATA_DATABASE_SHOW_MECHAS')){
       // Collect this mecha's field token, then robot master token, then robot master number
       $temp_field_token = $temp_info['robot_field'];
-      $temp_field_info = rpg_field::parse_index_info($mmrpg_database_fields[$temp_field_token]);
+      $temp_field_info = !empty($mmrpg_database_fields[$temp_field_token]) ? rpg_field::parse_index_info($mmrpg_database_fields[$temp_field_token]) : array();
       $temp_master_token = !empty($temp_field_info['field_master']) ? $temp_field_info['field_master'] : 'met';
       $temp_master_number = $mmrpg_database_robots[$temp_master_token]['robot_number'];
       $temp_info['robot_master_number'] = $temp_master_number;
@@ -109,7 +115,7 @@ $first_robot_token = $first_robot_token['robot_token'];
 unset($temp_robot_tokens);
 
 // Count the number of robots collected and filtered
-$mmrpg_database_robots_count = count($mmrpg_database_robots);
+//$mmrpg_database_robots_count = count($mmrpg_database_robots);
 $mmrpg_database_robots_count_complete = 0;
 
 // Define the max stat value before we filter and update
