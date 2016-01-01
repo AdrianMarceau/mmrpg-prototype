@@ -11,23 +11,43 @@ $(document).ready(function(){
     searchPage = $('.page_admin');
     searchForms = $('form[data-search]', searchPage);
 
+    $('input[name=text]', searchForms).each(function(){
+
+        var thisInput = $(this);
+        var thisParent = thisInput.parent();
+        var thisClear = $('<a class="clear disabled">&#x2717;</a>');
+        thisClear.appendTo(thisParent);
+        thisClear.bind('click', function(){
+            thisClear.addClass('disabled');
+            thisInput.val('').trigger('keyup');
+            });
+
+        });
+
     $('input[name=text]', searchForms).bind('keyup', function(){
 
         //console.log('collect search params!');
 
         var searchInput = $(this);
+        var searchInputParent = searchInput.parent();
         var searchForm = searchInput.parents('form[data-search]');
         var searchResults = searchForm.find('.results');
+        var clearButton = searchInputParent.find('a.clear');
+        clearButton.removeClass('disabled');
 
         var newSearchData = {};
         newSearchData['type']  = searchForm.attr('data-search');
         newSearchData['text'] = searchInput.val();
+        newSearchData['text'] = newSearchData['text'].replace(/\s+$/, '*').replace(/^\s+/, '*');
 
         var otherForms = searchForms.filter('form[data-search!='+newSearchData['type']+']');
         otherForms.find('.results').empty();
         $('#mmrpg .search_results').remove();
 
-        if (newSearchData['text'] == ''){ searchResults.empty(); }
+        if (newSearchData['text'] == ''){
+            searchResults.empty();
+            clearButton.addClass('disabled');
+            }
 
         if (searchTimeout != false){
             //console.log('kill search timeout!');
@@ -36,7 +56,7 @@ $(document).ready(function(){
             }
 
         if (!newSearchData['type'].length){ return false; }
-        else if (!newSearchData['text'].length || newSearchData['text'].length < 2){ return false; }
+        else if (!newSearchData['text'].length || newSearchData['text'].length < 1){ return false; }
 
         //console.log('create search timeout!');
 
@@ -88,6 +108,10 @@ $(document).ready(function(){
 
                         $('#mmrpg .search_results').remove();
                         cloneResults.appendTo('#mmrpg');
+                        var rList = cloneResults.find('.list');
+                        var rHead = cloneResults.find('.head');
+                        rList.perfectScrollbar();
+                        if (rList.hasClass('ps-active-y')){ rHead.addClass('ps-active-y'); }
                         searchResults.empty();
                     }
 

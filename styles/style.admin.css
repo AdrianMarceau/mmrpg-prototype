@@ -19,6 +19,12 @@
 #mmrpg .page_admin .body .section:nth-child(even) {
   padding-left: 5px;
 }
+#mmrpg .page_admin .body .section.full {
+    float: none;
+    clear: both;
+    width: auto;
+    padding: 0;
+}
 
 #mmrpg .page_admin .body form.search {
     display: block;
@@ -50,6 +56,7 @@
     margin: 0 1% 0 0;
     padding: 0;
     box-sizing: border-box;
+    position: relative;
 }
 #mmrpg .page_admin .body form.search .inputs .field.text {
     width: 100%;
@@ -72,6 +79,18 @@
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
+}
+#mmrpg .page_admin .body form.search .inputs .field a.clear {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    cursor: pointer;
+    text-decoration: none;
+}
+#mmrpg .page_admin .body form.search .inputs .field a.clear.disabled {
+    cursor: disabled;
+    opacity: 0.10;
+    filter: alpha(opacity=10);
 }
 
 #mmrpg .page_admin .body form.search .results,
@@ -138,6 +157,41 @@
     color: #FFFFFF;
     text-align: left;
 }
+#mmrpg .page_admin .body form.search .results .list,
+#mmrpg .search_results .list {
+    display: block;
+    overflow: auto;
+    max-height: 100px;
+}
+#mmrpg .page_admin .body form.search .results .head.ps-active-y,
+#mmrpg .search_results .head.ps-active-y {
+    padding-right: 16px;
+}
+#mmrpg .page_admin .body form.search .results .list.ps-active-y,
+#mmrpg .search_results .list.ps-active-y {
+    overflow: hidden;
+    position: relative;
+    padding-right: 16px;
+}
+
+#mmrpg .ps-container >.ps-scrollbar-y-rail {
+    width: 10px;
+}
+#mmrpg .ps-container >.ps-scrollbar-y-rail,
+#mmrpg .ps-container:hover > .ps-scrollbar-y-rail:hover {
+  background-color: #363636;
+  opacity: 0.6;
+}
+.ps-container>.ps-scrollbar-y-rail>.ps-scrollbar-y {
+    width: 10px;
+}
+#mmrpg .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail {
+  background-color: #696969;
+}
+#mmrpg .ps-container:hover>.ps-scrollbar-y-rail:hover>.ps-scrollbar-y {
+  background-color: #969696;
+}
+
 #mmrpg .page_admin .body form.search .results .link,
 #mmrpg .search_results .link {
     border-top: 0 none transparent;
@@ -149,15 +203,18 @@
     background-color: #2A2A2A;
     color: #FFFFFF;
 }
+#mmrpg .page_admin .body form.search .results .link.incomplete,
+#mmrpg .search_results .link.incomplete {
+    opacity: 0.33;
+    filter: alpha(opacity=33);
+}
 
 #mmrpg .page_admin .body form.search .results .id,
 #mmrpg .page_admin .body form.search .results .name,
 #mmrpg .page_admin .body form.search .results .extra,
-#mmrpg .page_admin .body form.search .results .arrow,
 #mmrpg .search_results .id,
 #mmrpg .search_results .name,
-#mmrpg .search_results .extra,
-#mmrpg .search_results .arrow {
+#mmrpg .search_results .extra {
     display: block;
     float: left;
     margin: 0;
@@ -174,19 +231,97 @@
 }
 #mmrpg .page_admin .body form.search .results .name,
 #mmrpg .search_results .name {
-    width: 38%;
+    width: 40%;
+}
+#mmrpg .page_admin .body form.search .results .link:hover .name,
+#mmrpg .search_results .link:hover .name {
+    text-decoration: underline;
 }
 #mmrpg .page_admin .body form.search .results .extra,
 #mmrpg .search_results .extra {
-    width: 42%;
+    width: 44%;
 }
-#mmrpg .page_admin .body form.search .results .arrow,
-#mmrpg .search_results .arrow {
-    width: 4%;
+#mmrpg .page_admin .body form.search .results .type,
+#mmrpg .search_results .type {
+    display: inline-block;
+    padding: 2px 3px;
+    line-height: 100%;
+    border: 1px solid #464646;
+    background-color: #646464;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+
+#mmrpg .page_admin .body .section table {
+    margin: 0 auto;
+}
+#mmrpg .page_admin .body .section table.full {
+    margin: 0;
+    width: 100%;
+}
+#mmrpg .page_admin .body .section tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.025);
+}
+#mmrpg .page_admin .body .section tr:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+#mmrpg .page_admin .body .section table th,
+#mmrpg .page_admin .body .section table td {
+    padding: 3px 6px;
+    text-align: left;
+}
+#mmrpg .page_admin .body .section table th {
+    font-weight: bold;
+    background-color: #191919;
+}
+#mmrpg .page_admin .body .section table td {
+
+}
+#mmrpg .page_admin .body .section table td:first-child {
+    padding-left: 10px;
+}
+#mmrpg .page_admin .body .section table td:last-child {
+    padding-right: 10px;
+}
+#mmrpg .page_admin .body .section table td.left {
+    text-align: left;
+}
+#mmrpg .page_admin .body .section table td.right {
+    text-align: right;
+}
+#mmrpg .page_admin .body .section table .incomplete td {
+    opacity: 0.33;
+    filter: alpha(opacity=33);
+}
+
+#mmrpg .page_admin .body .section table th.flags,
+#mmrpg .page_admin .body .section table td.flags {
+    text-align: center;
+    padding-left: 9px;
+    padding-right: 9px;
+}
+
+#mmrpg .page_admin .body .section table th.actions,
+#mmrpg .page_admin .body .section table td.actions {
     text-align: right;
 }
 
+#mmrpg .page_admin .body .section table td span.type {
+    display: inline-block;
+    padding: 1px 3px;
+    line-height: 100%;
+    border: 1px solid #464646;
+    background-color: #646464;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
 
+#mmrpg .page_admin .body .section table td.actions .link_inline {
+    margin-left: 10px;
+}
 
 
 
