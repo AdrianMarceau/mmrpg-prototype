@@ -2835,19 +2835,24 @@ html.type {
     margin: 0 0 0;
     position: relative;
 }
-#window .page .event .ability_container .ability_class_mecha {
+#window .page .event .ability_container .ability_class_mecha,
+#window .page .event .ability_container .ability_class_boss {
     float: none;
     width: auto !important;
 }
 #window .page .event .ability_container .ability_class_mecha,
-#window .page .event .ability_container .ability_class_mecha * {
+#window .page .event .ability_container .ability_class_mecha *,
+#window .page .event .ability_container .ability_class_boss,
+#window .page .event .ability_container .ability_class_boss * {
     cursor: default;
     _cursor: default;
 }
-#window .page .event .ability_container .ability_class_mecha .icon {
+#window .page .event .ability_container .ability_class_mecha .icon,
+#window .page .event .ability_container .ability_class_boss .icon {
     display: none;
 }
-#window .page .event .ability_container .ability_class_mecha .label {
+#window .page .event .ability_container .ability_class_mecha .label,
+#window .page .event .ability_container .ability_class_boss .label {
     width: 98%;
 }
 

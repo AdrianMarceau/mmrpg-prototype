@@ -824,7 +824,7 @@ class rpg_field extends rpg_object {
                 <?php if($print_options['show_icon']): ?>
                     <div class="this_sprite sprite_left" style="height: 40px;">
                         <?php if($print_options['show_key'] !== false): ?>
-                            <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.($print_options['show_key'] + 1) ?></div>
+                            <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$field_info['field_key'] ?></div>
                         <?php endif; ?>
                         <?php if ($field_image_token != 'field'){ ?>
                             <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><div style="background-image: url(i/f/<?= $field_image_token ?>/bfa.png?<?= MMRPG_CONFIG_CACHE_DATE?>); background-size: 50px 50px; background-position: -5px -5px;" class="sprite sprite_field sprite_40x40 sprite_40x40_mug sprite_size_<?= $field_image_size_text ?> sprite_size_<?= $field_image_size_text ?>_mug field_status_active field_position_active"><?= $field_info['field_name']?>'s Avatar</div></div>

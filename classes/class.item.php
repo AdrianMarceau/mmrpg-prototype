@@ -1730,7 +1730,7 @@ class rpg_item extends rpg_object {
                     <div class="this_sprite sprite_left" style="height: 40px;">
                         <?php if($print_options['show_icon']): ?>
                             <?php if($print_options['show_key'] !== false): ?>
-                                <div class="icon item_type <?= $item_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.($print_options['show_key'] + 1) ?></div>
+                                <div class="icon item_type <?= $item_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$item_info['item_key'] ?></div>
                             <?php endif; ?>
                             <?php if ($item_image_token != 'item'){ ?>
                                 <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: url(i/i/<?= $item_image_token ?>/ir<?= $item_image_size ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon"><?= $item_info['item_name']?>'s Mugshot</div></div>

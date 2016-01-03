@@ -1533,6 +1533,13 @@ class rpg_player extends rpg_object {
             else { $player_info[$field_name] = array(); }
         }
 
+        // Collect the quotes into the proper arrays
+        $quote_types = array('start', 'taunt', 'victory', 'defeat');
+        foreach ($quote_types AS $type){
+            $player_info['player_quotes']['battle_'.$type] = !empty($player_info['player_quotes_'.$type]) ? $player_info['player_quotes_'.$type]: '';
+            unset($player_info['player_quotes_'.$type]);
+        }
+
         // Return the parsed player info
         return $player_info;
     }
@@ -1987,7 +1994,6 @@ class rpg_player extends rpg_object {
             if (!isset($print_options['show_quotes'])){ $print_options['show_quotes'] = true; }
             if (!isset($print_options['show_description'])){ $print_options['show_description'] = true; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = true; }
-            if (!isset($print_options['show_abilities'])){ $print_options['show_abilities'] = true; }
             if (!isset($print_options['show_records'])){ $print_options['show_records'] = true; }
             if (!isset($print_options['show_footer'])){ $print_options['show_footer'] = true; }
             if (!isset($print_options['show_key'])){ $print_options['show_key'] = false; }
@@ -1997,7 +2003,6 @@ class rpg_player extends rpg_object {
             if (!isset($print_options['show_quotes'])){ $print_options['show_quotes'] = true; }
             if (!isset($print_options['show_description'])){ $print_options['show_description'] = false; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = false; }
-            if (!isset($print_options['show_abilities'])){ $print_options['show_abilities'] = false; }
             if (!isset($print_options['show_records'])){ $print_options['show_records'] = false; }
             if (!isset($print_options['show_footer'])){ $print_options['show_footer'] = true; }
             if (!isset($print_options['show_key'])){ $print_options['show_key'] = false; }
@@ -2032,7 +2037,7 @@ class rpg_player extends rpg_object {
                 <?php if($print_options['show_mugshot']): ?>
                     <div class="this_sprite sprite_left" style="height: 40px;">
                         <?php if($print_options['show_key'] !== false): ?>
-                            <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.($print_options['show_key'] + 1) ?></div>
+                            <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$player_info['player_key'] ?></div>
                         <?php endif; ?>
                         <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>"><div style="background-image: url(i/p/<?= $player_image_token ?>/mr<?= $player_image_size ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_player sprite_40x40 sprite_40x40_mug sprite_size_<?= $player_image_size_text ?> sprite_size_<?= $player_image_size_text ?>_mug player_status_active player_position_active"><?= $player_info['player_name']?>'s Mugshot</div></div>
                     </div>
@@ -2264,136 +2269,6 @@ class rpg_player extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <div class="player_description" style="text-align: justify; padding: 0 4px;"><?= $player_info['player_description2'] ?></div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                <?php endif; ?>
-
-                <?php if($print_options['show_abilities']): ?>
-                    <h2 id="abilities" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left;">
-                        <?= $player_info['player_name']?>&#39;s Abilities
-                    </h2>
-                    <div class="body body_full" style="margin: 0; padding: 2px 3px;">
-                        <table class="full" style="margin: 5px auto 10px;">
-                            <colgroup>
-                                <col width="100%" />
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <td class="right">
-                                        <div class="ability_container">
-                                        <?php
-                                        $index_player = $mmrpg_index['players'][$player_info['player_token']];
-                                        $player_ability_core = !empty($index_player['player_type']) ? $index_player['player_type'] : false;
-                                        $player_ability_list = !empty($index_player['player_abilities']) ? $index_player['player_abilities'] : array();
-                                        $player_ability_rewards = !empty($player_info['player_rewards']['abilities']) ? $player_info['player_rewards']['abilities'] : array();
-                                        $new_ability_rewards = array();
-                                        foreach ($player_ability_rewards AS $this_info){
-                                            $new_ability_rewards[$this_info['token']] = $this_info;
-                                        }
-                                        $player_copy_program = $player_ability_core == 'copy' ? true : false;
-                                        //if ($player_copy_program){ $player_ability_list = $temp_all_ability_tokens; }
-                                        $player_ability_core_list = array();
-                                        if (!empty($player_ability_core)){
-                                            foreach ($mmrpg_database_abilities AS $token => $info){
-                                                if (!empty($info['ability_type']) && ($player_copy_program || $info['ability_type'] == $player_ability_core)){
-                                                    $player_ability_list[] = $info['ability_token'];
-                                                    $player_ability_core_list[] = $info['ability_token'];
-                                                }
-                                            }
-                                        }
-                                        foreach ($player_ability_list AS $this_token){
-                                            if ($this_token == '*'){ continue; }
-                                            if (!isset($new_ability_rewards[$this_token])){
-                                                if (in_array($this_token, $player_ability_core_list)){ $new_ability_rewards[$this_token] = array('level' => 'Player', 'token' => $this_token); }
-                                                else { $new_ability_rewards[$this_token] = array('level' => 'Player', 'token' => $this_token); }
-
-                                            }
-                                        }
-                                        $player_ability_rewards = $new_ability_rewards;
-
-                                        //die('<pre>'.print_r($player_ability_rewards, true).'</pre>');
-
-                                        if (!empty($player_ability_rewards)){
-                                            $temp_string = array();
-                                            $ability_key = 0;
-                                            $ability_method_key = 0;
-                                            $ability_method = '';
-                                            $temp_robot_info = rpg_robot::get_index_info('mega-man');
-                                            $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-                                            foreach ($player_ability_rewards AS $this_info){
-                                                $this_points = $this_info['points'];
-                                                $this_ability = rpg_ability::parse_index_info($temp_abilities_index[$this_info['token']]);
-                                                $this_ability_token = $this_ability['ability_token'];
-                                                $this_ability_name = $this_ability['ability_name'];
-                                                $this_ability_image = !empty($this_ability['ability_image']) ? $this_ability['ability_image']: $this_ability['ability_token'];
-                                                $this_ability_type = !empty($this_ability['ability_type']) ? $this_ability['ability_type'] : false;
-                                                if (!empty($this_ability_type) && !empty($mmrpg_index['types'][$this_ability_type])){ $this_ability_type = $mmrpg_index['types'][$this_ability_type]['type_name'].' Type'; }
-                                                else { $this_ability_type = ''; }
-                                                $this_ability_damage = !empty($this_ability['ability_damage']) ? $this_ability['ability_damage'] : 0;
-                                                $this_ability_damage2 = !empty($this_ability['ability_damage2']) ? $this_ability['ability_damage2'] : 0;
-                                                $this_ability_damage_percent = !empty($this_ability['ability_damage_percent']) ? true : false;
-                                                $this_ability_damage2_percent = !empty($this_ability['ability_damage2_percent']) ? true : false;
-                                                if ($this_ability_damage_percent && $this_ability_damage > 100){ $this_ability_damage = 100; }
-                                                if ($this_ability_damage2_percent && $this_ability_damage2 > 100){ $this_ability_damage2 = 100; }
-                                                $this_ability_recovery = !empty($this_ability['ability_recovery']) ? $this_ability['ability_recovery'] : 0;
-                                                $this_ability_recovery2 = !empty($this_ability['ability_recovery2']) ? $this_ability['ability_recovery2'] : 0;
-                                                $this_ability_recovery_percent = !empty($this_ability['ability_recovery_percent']) ? true : false;
-                                                $this_ability_recovery2_percent = !empty($this_ability['ability_recovery2_percent']) ? true : false;
-                                                if ($this_ability_recovery_percent && $this_ability_recovery > 100){ $this_ability_recovery = 100; }
-                                                if ($this_ability_recovery2_percent && $this_ability_recovery2 > 100){ $this_ability_recovery2 = 100; }
-                                                $this_ability_accuracy = !empty($this_ability['ability_accuracy']) ? $this_ability['ability_accuracy'] : 0;
-                                                $this_ability_description = !empty($this_ability['ability_description']) ? $this_ability['ability_description'] : '';
-                                                $this_ability_description = str_replace('{DAMAGE}', $this_ability_damage, $this_ability_description);
-                                                $this_ability_description = str_replace('{RECOVERY}', $this_ability_recovery, $this_ability_description);
-                                                $this_ability_description = str_replace('{DAMAGE2}', $this_ability_damage2, $this_ability_description);
-                                                $this_ability_description = str_replace('{RECOVERY2}', $this_ability_recovery2, $this_ability_description);
-                                                //$this_ability_title_plain = $this_ability_name;
-                                                //if (!empty($this_ability_type)){ $this_ability_title_plain .= ' | '.$this_ability_type; }
-                                                //if (!empty($this_ability_damage)){ $this_ability_title_plain .= ' | '.$this_ability_damage.' Damage'; }
-                                                //if (!empty($this_ability_recovery)){ $this_ability_title_plain .= ' | '.$this_ability_recovery.' Recovery'; }
-                                                //if (!empty($this_ability_accuracy)){ $this_ability_title_plain .= ' | '.$this_ability_accuracy.'% Accuracy'; }
-                                                //if (!empty($this_ability_description)){ $this_ability_title_plain .= ' | '.$this_ability_description; }
-                                                $this_ability_title_plain = rpg_ability::print_editor_title_markup($temp_robot_info, $this_ability);
-
-                                                $this_ability_method = 'points';
-                                                $this_ability_method_text = 'Battle Points';
-                                                $this_ability_title_html = '<strong class="name">'.$this_ability_name.'</strong>';
-                                                if ($this_points > 1){ $this_ability_title_html .= '<span class="points">'.str_pad($this_points, 2, '0', STR_PAD_LEFT).' BP</span>'; }
-                                                else { $this_ability_title_html .= '<span class="points">Start</span>'; }
-                                                if (!empty($this_ability_type)){ $this_ability_title_html .= '<span class="type">'.$this_ability_type.'</span>'; }
-                                                if (!empty($this_ability_damage)){ $this_ability_title_html .= '<span class="damage">'.$this_ability_damage.(!empty($this_ability_damage_percent) ? '%' : '').' '.($this_ability_damage && $this_ability_recovery ? 'D' : 'Damage').'</span>'; }
-                                                if (!empty($this_ability_recovery)){ $this_ability_title_html .= '<span class="recovery">'.$this_ability_recovery.(!empty($this_ability_recovery_percent) ? '%' : '').' '.($this_ability_damage && $this_ability_recovery ? 'R' : 'Recovery').'</span>'; }
-                                                if (!empty($this_ability_accuracy)){ $this_ability_title_html .= '<span class="accuracy">'.$this_ability_accuracy.'% Accuracy</span>'; }
-                                                $this_ability_sprite_path = 'i/a/'.$this_ability_image.'/il40.png';
-                                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.$this_ability_sprite_path)){ $this_ability_sprite_path = 'i/a/ability/il40.png'; }
-                                                $this_ability_sprite_html = '<span class="icon"><img src="'.$this_ability_sprite_path.'?'.MMRPG_CONFIG_CACHE_DATE.'" alt="'.$this_ability_name.' Icon" /></span>';
-                                                $this_ability_title_html = '<span class="label">'.$this_ability_title_html.'</span>';
-                                                //$this_ability_title_html = (is_numeric($this_points) && $this_points > 1 ? 'Lv '.str_pad($this_points, 2, '0', STR_PAD_LEFT).' : ' : $this_points.' : ').$this_ability_title_html;
-                                                if ($ability_method != $this_ability_method){
-                                                    $temp_separator = '<div class="ability_separator">'.$this_ability_method_text.'</div>';
-                                                    $temp_string[] = $temp_separator;
-                                                    $ability_method = $this_ability_method;
-                                                    $ability_method_key++;
-                                                }
-                                                if ($this_points >= 0 || !$player_copy_program){
-                                                    $temp_markup = '<a href="'.MMRPG_CONFIG_ROOTURL.'database/abilities/'.$this_ability['ability_token'].'/"  class="ability_name ability_type ability_type_'.(!empty($this_ability['ability_type']) ? $this_ability['ability_type'] : 'none').'" title="'.$this_ability_title_plain.'" style="">';
-                                                    $temp_markup .= '<span class="chrome">'.$this_ability_sprite_html.$this_ability_title_html.'</span>';
-                                                    $temp_markup .= '</a>';
-                                                    $temp_string[] = $temp_markup;
-                                                    $ability_key++;
-                                                    continue;
-                                                }
-                                            }
-                                            echo implode(' ', $temp_string);
-                                        } else {
-                                            echo '<span class="player_ability player_type_none"><span class="chrome">None</span></span>';
-                                        }
-                                        ?>
-                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

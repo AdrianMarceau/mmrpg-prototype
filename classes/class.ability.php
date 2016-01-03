@@ -1103,7 +1103,7 @@ class rpg_ability extends rpg_object {
      * @param bool $parse_data
      * @return array
      */
-    public static function get_index($include_hidden = false, $include_unpublished = false){
+    public static function get_index($include_hidden = false, $include_unpublished = false, $filter_class = '', $include_tokens = array()){
 
         // Pull in global variables
         $this_database = cms_database::get_database();
@@ -1112,6 +1112,13 @@ class rpg_ability extends rpg_object {
         $temp_where = '';
         if (!$include_hidden){ $temp_where .= 'AND ability_flag_hidden = 0 '; }
         if (!$include_unpublished){ $temp_where .= 'AND ability_flag_published = 1 '; }
+        if (!empty($filter_class)){ $temp_where .= "AND ability_class = '{$filter_class}' "; }
+        if (!empty($include_tokens)){
+            $include_string = $include_tokens;
+            array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
+            $include_tokens = implode(', ', $include_string);
+            $temp_where .= 'OR ability_token IN ('.$include_tokens.') ';
+        }
 
         // Collect every type's info from the database index
         $ability_fields = self::get_index_fields(true);
@@ -1627,7 +1634,7 @@ class rpg_ability extends rpg_object {
 
         // Define the global variables
         global $mmrpg_index, $this_current_uri, $this_current_url;
-        global $mmrpg_database_abilities, $mmrpg_database_robots, $mmrpg_database_abilities, $mmrpg_database_types;
+        global $mmrpg_database_abilities, $mmrpg_database_abilities, $mmrpg_database_types;
         global $this_database;
 
         // Collect global indexes for easier search
@@ -1710,7 +1717,7 @@ class rpg_ability extends rpg_object {
                     <div class="this_sprite sprite_left" style="height: 40px;">
                         <?php if($print_options['show_icon']): ?>
                             <?php if($print_options['show_key'] !== false): ?>
-                                <div class="icon ability_type <?= $ability_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.($print_options['show_key'] + 1) ?></div>
+                                <div class="icon ability_type <?= $ability_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$ability_info['ability_key'] ?></div>
                             <?php endif; ?>
                             <?php if ($ability_image_token != 'ability'){ ?>
                                 <div class="icon ability_type <?= $ability_header_types ?>"><div style="background-image: url(i/a/<?= $ability_image_token ?>/ir<?= $ability_image_size ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_ability sprite_40x40 sprite_40x40_icon sprite_size_<?= $ability_image_size_text ?> sprite_size_<?= $ability_image_size_text ?>_icon"><?= $ability_info['ability_name']?>'s Mugshot</div></div>
@@ -2043,6 +2050,8 @@ class rpg_ability extends rpg_object {
                                     <td class="right">
                                         <div class="robot_container">
                                         <?php
+
+                                        // Collect the full robot index to loop through
                                         $ability_type_one = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : false;
                                         $ability_type_two = !empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : false;
                                         $ability_robot_rewards = array();
@@ -2050,8 +2059,13 @@ class rpg_ability extends rpg_object {
                                         $ability_robot_rewards_core = array();
                                         $ability_robot_rewards_player = array();
 
+                                        // Collect a FULL list of abilities for display
+                                        $temp_required = array();
+                                        if (!empty($ability_info['ability_master'])){ $temp_required[] = $ability_info['ability_master']; }
+                                        $temp_robots_index = rpg_robot::get_index(false, false, 'master', $temp_required);
+
                                         // Loop through and remove any robots that do not learn the ability
-                                        foreach ($mmrpg_database_robots AS $robot_token => $robot_info){
+                                        foreach ($temp_robots_index AS $robot_token => $robot_info){
 
                                             // Define the match flah to prevent doubling up
                                             $temp_match_flag = false;
@@ -2115,7 +2129,7 @@ class rpg_ability extends rpg_object {
                                             $temp_global_abilities = self::get_global_abilities();
                                             foreach ($ability_robot_rewards AS $this_info){
                                                 $this_level = $this_info['level'];
-                                                $this_robot = $mmrpg_database_robots[$this_info['token']];
+                                                $this_robot = $temp_robots_index[$this_info['token']];
                                                 $this_robot_token = $this_robot['robot_token'];
                                                 $this_robot_name = $this_robot['robot_name'];
                                                 $this_robot_image = !empty($this_robot['robot_image']) ? $this_robot['robot_image']: $this_robot['robot_token'];
