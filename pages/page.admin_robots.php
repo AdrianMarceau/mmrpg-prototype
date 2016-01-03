@@ -1,15 +1,39 @@
 <?php
 /*
- * INDEX PAGE : ROBOTS
+ * INDEX PAGE : MECHAS/ROBOTS/BOSSES
  */
+
+// Define object class tokens for MECHAS
+if ($this_current_sub == 'mechas'){
+    $object_class_token = 'mecha';
+    $object_single_token = 'mecha';
+    $object_multi_token = 'mechas';
+}
+// Define object class tokens for ROBOTS
+elseif ($this_current_sub == 'robots'){
+    $object_class_token = 'master';
+    $object_single_token = 'robot';
+    $object_multi_token = 'robots';
+}
+// Define object class tokens for BOSSES
+elseif ($this_current_sub == 'bosses'){
+    $object_class_token = 'boss';
+    $object_single_token = 'boss';
+    $object_multi_token = 'bosses';
+}
+
+// Define the object names based on tokens
+$object_single_name = ucfirst($object_single_token);
+$object_multi_name = ucfirst($object_multi_token);
 
 
 // Collect the robot ID from the request header
 $robot_id = isset($_GET['num']) && is_numeric($_GET['num']) ? (int)($_GET['num']) : false;
 
 // Collect robot info based on the ID if available
-if (!empty($robot_id)){ $robot_info = $this_database->get_array("SELECT * FROM mmrpg_index_robots WHERE robot_id = {$robot_id};"); }
-elseif ($robot_id === 0){ $robot_info = $this_database->get_array("SELECT * FROM mmrpg_index_robots WHERE robot_token = 'robot';"); }
+$robot_fields = rpg_robot::get_index_fields(true);
+if (!empty($robot_id)){ $robot_info = $this_database->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id = {$robot_id} AND robot_class = '{$object_class_token}';"); }
+elseif ($robot_id === 0){ $robot_info = $this_database->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_token = 'robot';"); }
 else { $robot_info = array(); }
 
 // Parse the robot info if it was collected
@@ -31,6 +55,15 @@ foreach ($type_tokens AS $type_token){
     $type_index_options .= '<option value="'.$type_token.'">'.$type_info['type_name'].'</option>'.PHP_EOL;
 }
 
+// Generate form select options for the elemental sub-index
+$elemental_index_options = '';
+$elemental_index_options .= '<option value="">Neutral</option>'.PHP_EOL; // Manually add 'none' up top
+foreach ($type_tokens AS $type_token){
+    $type_info = $type_index[$type_token];
+    if ($type_info['type_class'] == 'special'){ continue; }
+    $elemental_index_options .= '<option value="'.$type_token.'">'.$type_info['type_name'].'</option>'.PHP_EOL;
+}
+
 // Generate form select options for the stat sub-index
 $stat_tokens = array('energy', 'weapons', 'attack', 'defense', 'speed');
 $stat_index_options = '';
@@ -44,21 +77,19 @@ foreach ($stat_tokens AS $type_token){
 // Require actions file for form processing
 require_once(MMRPG_CONFIG_ROOTDIR.'pages/page.admin_robots_actions.php');
 
+
 // -- ROBOT EDITOR -- //
 
 // If a robot ID was provided, we should show the editor
 if ($robot_id !== false && !empty($robot_info)){
 
     // Define the SEO variables for this page
-    $this_seo_title = $robot_info['robot_name'].' | Robot Index | Admin Panel | '.$this_seo_title;
-    $this_seo_description = 'Admin robot editor for the Mega Man RPG Prototype.';
+    $this_seo_title = $robot_info['robot_name'].' | '.$object_single_name.' Index | Admin Panel | '.$this_seo_title;
+    $this_seo_description = 'Admin '.$object_single_token.' editor for the Mega Man RPG Prototype.';
     $this_seo_robots = '';
 
     // Define the MARKUP variables for this page
     $this_markup_header = '';
-
-    // Count the numer of users in the database
-    $mmrpg_user_count = $this_database->get_value("SELECT COUNT(user_id) AS user_count FROM mmrpg_users WHERE user_id <> 0;", 'user_count');
 
     // Start generating the page markup
     ob_start();
@@ -66,34 +97,34 @@ if ($robot_id !== false && !empty($robot_info)){
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <a class="inline_link" href="admin/">Admin Panel</a> <span class="crumb">&raquo;</span>
-        <a class="inline_link" href="admin/robots/">Robot Index</a> <span class="crumb">&raquo;</span>
-        <a class="inline_link" href="admin/robots/<?= $robot_id ?>/"><?= 'ID '.$robot_info['robot_id'] ?> : <?= $robot_info['robot_name'] ?></a>
+        <a class="inline_link" href="admin/<?= $this_current_sub ?>/"><?= $object_single_name ?> Index</a> <span class="crumb">&raquo;</span>
+        <a class="inline_link" href="admin/<?= $this_current_sub ?>/<?= $robot_id ?>/"><?= 'ID '.$robot_info['robot_id'] ?> : <?= $robot_info['robot_name'] ?></a>
     </h2>
     <div class="subbody">
-        <p class="text">Use the <strong>Robot Editor</strong> to update the details and stats of playable characters in the Mega Man RPG Prototype.  Please be careful and don't forget to save your work.</p>
+        <p class="text">Use the <strong><?= $object_single_name ?> Editor</strong> to update the details and stats of <?= $object_multi_token == 'robots' ? 'unlockable '.$object_multi_token : 'fightable '.$object_multi_token ?> in the Mega Man RPG Prototype.  Please be careful and don't forget to save your work.</p>
     </div>
 
-    <form class="editor robots" action="admin/robots/<?= $robot_id ?>/" method="post" enctype="multipart/form-data">
+    <form class="editor robots" action="admin/<?= $this_current_sub ?>/<?= $robot_id ?>/" method="post" enctype="multipart/form-data">
         <div class="subbody">
 
             <div class="section inputs">
                 <div class="field field_robot_id">
-                    <label class="label">Robot ID</label>
+                    <label class="label"><?= $object_single_name ?> ID</label>
                     <input class="text" type="text" name="robot_id" value="<?= $robot_info['robot_id'] ?>" disabled="disabled" />
                     <input class="hidden" type="hidden" name="robot_id" value="<?= $robot_info['robot_id'] ?>" />
                 </div>
                 <div class="field field_robot_token">
-                    <label class="label">Robot Token</label>
+                    <label class="label"><?= $object_single_name ?> Token</label>
                     <input class="text" type="text" name="robot_token" value="<?= $robot_info['robot_token'] ?>" maxlength="64" />
                 </div>
                 <div class="field field_robot_name">
-                    <label class="label">Robot Name</label>
+                    <label class="label"><?= $object_single_name ?> Name</label>
                     <input class="text" type="text" name="robot_name" value="<?= $robot_info['robot_name'] ?>" maxlength="64" />
                 </div>
                 <div class="field field_robot_type">
-                    <label class="label">Robot Type</label>
+                    <label class="label"><?= $object_single_name ?> Type</label>
                     <select class="select" name="robot_type">
-                        <?= str_replace('value="'.$robot_info['robot_type'].'"', 'value="'.$robot_info['robot_type'].'" selected="selected"', $stat_index_options) ?>
+                        <?= str_replace('value="'.$robot_info['robot_type'].'"', 'value="'.$robot_info['robot_type'].'" selected="selected"', $elemental_index_options) ?>
                     </select>
                 </div>
             </div>
@@ -101,7 +132,7 @@ if ($robot_id !== false && !empty($robot_info)){
             <div class="section actions">
                 <div class="buttons">
                     <input type="submit" class="save" name="save" value="Save Changes" />
-                    <input type="button" class="delete" name="delete" value="Delete Robot" />
+                    <input type="button" class="delete" name="delete" value="Delete <?= $object_single_name ?>" />
                 </div>
             </div>
 
@@ -125,8 +156,8 @@ if ($robot_id !== false && !empty($robot_info)){
 else {
 
     // Define the SEO variables for this page
-    $this_seo_title = 'Robot Index | Admin Panel | '.$this_seo_title;
-    $this_seo_description = 'Admin robot editor index for the Mega Man RPG Prototype.';
+    $this_seo_title = $object_single_name.' Index | Admin Panel | '.$this_seo_title;
+    $this_seo_description = 'Admin '.$object_single_token.' editor index for the Mega Man RPG Prototype.';
     $this_seo_robots = '';
 
     // Define the MARKUP variables for this page
@@ -134,11 +165,11 @@ else {
 
     // Collect a list of all users in the database
     $robot_fields = rpg_robot::get_index_fields(true);
-    $robot_index = $this_database->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_token <> 'robot' AND robot_class = 'master' ORDER BY robot_id ASC", 'robot_id');
+    $robot_index = $this_database->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_token <> 'robot' AND robot_class = '{$object_class_token}' ORDER BY robot_id ASC", 'robot_id');
     $robot_count = !empty($robot_index) ? count($robot_index) : 0;
 
     // Collect a list of completed robot sprite tokens
-    $random_sprite = $this_database->get_value("SELECT robot_image FROM mmrpg_index_robots WHERE robot_image <> 'robot' AND robot_class = 'master' AND robot_image_size = 40 AND robot_flag_complete = 1 ORDER BY RAND() LIMIT 1;", 'robot_image');
+    $random_sprite = $this_database->get_value("SELECT robot_image FROM mmrpg_index_robots WHERE robot_image <> 'robot' AND robot_class = '{$object_class_token}' AND robot_image_size = 40 AND robot_flag_complete = 1 ORDER BY RAND() LIMIT 1;", 'robot_image');
 
     // Start generating the page markup
     ob_start();
@@ -146,19 +177,19 @@ else {
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <a class="inline_link" href="admin/">Admin Panel</a> <span class="crumb">&raquo;</span>
-        <a class="inline_link" href="admin/robots/">Robot Index</a>
+        <a class="inline_link" href="admin/<?= $this_current_sub ?>/"><?= $object_single_name ?> Index</a>
         <span class="count">( <?= $robot_count != 1 ? $robot_count.' Robots' : '1 Robot' ?> )</span>
     </h2>
 
     <div class="section full">
         <div class="subbody">
             <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/robots/<?= $random_sprite ?>/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
-                <p class="text">Use the robot index below to search and filter through all the unlockable robots in the game and either view, edit, or delete using the provided links.</p>            <div class="text">
-                <p class="text">You can also jump to specific robots by typing their name or identification number into the input field below and clicking their link in the dropdown.</p>
-                <form class="search" data-search="robots">
+                <p class="text">Use the robot index below to search and filter through all the <?= $object_multi_token == 'robots' ? 'unlockable '.$object_multi_token : 'fightable '.$object_multi_token ?> in the game and either view, edit, or delete using the provided links.</p>            <div class="text">
+                <p class="text">You can also jump to specific <?= $object_multi_token ?> by typing their name or identification number into the search field below and clicking their link in the dropdown.</p>
+                <form class="search" data-search="<?= $object_multi_token ?>">
                     <div class="inputs">
                         <div class="field text">
-                            <input class="text" type="text" name="text" value="" placeholder="Robot Name or ID" />
+                            <input class="text" type="text" name="text" value="" placeholder="<?= $object_single_name ?> Name or ID" />
                         </div>
                     </div>
                     <div class="results"></div>
@@ -182,8 +213,8 @@ else {
                 <thead>
                     <tr class="head">
                         <th class="id">ID</th>
-                        <th class="name">Robot Name</th>
-                        <th class="types">Robot Type</th>
+                        <th class="name"><?= $object_single_name ?> Name</th>
+                        <th class="types"><?= $object_single_name ?> Types</th>
                         <th class="flags complete">Complete</th>
                         <th class="flags published">Published</th>
                         <th class="flags hidden">Hidden</th>
@@ -201,9 +232,11 @@ else {
                             $robot_token = $robot_info['robot_token'];
                             $robot_name = $robot_info['robot_name'];
                             $robot_type1 = !empty($robot_info['robot_core']) && !empty($type_index[$robot_info['robot_core']]) ? $type_index[$robot_info['robot_core']] : $type_index['none'];
+                            $robot_type2 = !empty($robot_info['robot_core2']) && !empty($type_index[$robot_info['robot_core2']]) ? $type_index[$robot_info['robot_core2']] : '';
                             $type_string = '<span class="type '.$robot_type1['type_token'].'">'.$robot_type1['type_name'].'</span>';
-                            $edit_link = 'admin/robots/'.$robot_id.'/';
-                            $view_link = 'database/robots/'.$robot_token.'/';
+                            if (!empty($robot_type2)){ $type_string .= ' / <span class="type '.$robot_type2['type_token'].'">'.$robot_type2['type_name'].'</span>'; }
+                            $edit_link = 'admin/'.$object_multi_token.'/'.$robot_id.'/';
+                            $view_link = 'database/'.$object_multi_token.'/'.$robot_token.'/';
                             $complete = $robot_info['robot_flag_complete'] ? true : false;
                             $published = $robot_info['robot_flag_published'] ? true : false;
                             $hidden = $robot_info['robot_flag_hidden'] ? true : false;

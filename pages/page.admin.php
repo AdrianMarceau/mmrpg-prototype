@@ -29,8 +29,13 @@ elseif ($this_current_sub == 'mechas' || $this_current_sub == 'robots' || $this_
   // Require the admin robots file
   require('page.admin_robots.php');
 }
-//  If this is a ABILITIES/ITEMS editor request, include the appropriate file
-elseif ($this_current_sub == 'abilities' || $this_current_sub == 'items'){
+//  If this is a ABILITIES editor request, include the appropriate file
+elseif ($this_current_sub == 'abilities'){
+  // Require the admin abilities file
+  require('page.admin_players.php');
+}
+//  If this is a ITEMS editor request, include the appropriate file
+elseif ($this_current_sub == 'items'){
   // Require the admin abilities file
   require('page.admin_players.php');
 }

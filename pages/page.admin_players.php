@@ -8,8 +8,9 @@
 $player_id = isset($_GET['num']) && is_numeric($_GET['num']) ? (int)($_GET['num']) : false;
 
 // Collect player info based on the ID if available
-if (!empty($player_id)){ $player_info = $this_database->get_array("SELECT * FROM mmrpg_index_players WHERE player_id = {$player_id};"); }
-elseif ($player_id === 0){ $player_info = $this_database->get_array("SELECT * FROM mmrpg_index_players WHERE player_token = 'player';"); }
+$player_fields = rpg_player::get_index_fields(true);
+if (!empty($player_id)){ $player_info = $this_database->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id = {$player_id};"); }
+elseif ($player_id === 0){ $player_info = $this_database->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_token = 'player';"); }
 else { $player_info = array(); }
 
 // Parse the player info if it was collected
@@ -57,23 +58,20 @@ if ($player_id !== false && !empty($player_info)){
     // Define the MARKUP variables for this page
     $this_markup_header = '';
 
-    // Count the numer of users in the database
-    $mmrpg_user_count = $this_database->get_value("SELECT COUNT(user_id) AS user_count FROM mmrpg_users WHERE user_id <> 0;", 'user_count');
-
     // Start generating the page markup
     ob_start();
     ?>
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <a class="inline_link" href="admin/">Admin Panel</a> <span class="crumb">&raquo;</span>
-        <a class="inline_link" href="admin/players/">Player Index</a> <span class="crumb">&raquo;</span>
-        <a class="inline_link" href="admin/players/<?= $player_id ?>/"><?= 'ID '.$player_info['player_id'] ?> : <?= $player_info['player_name'] ?></a>
+        <a class="inline_link" href="admin/<?= $this_current_sub ?>/">Player Index</a> <span class="crumb">&raquo;</span>
+        <a class="inline_link" href="admin/<?= $this_current_sub ?>/<?= $player_id ?>/"><?= 'ID '.$player_info['player_id'] ?> : <?= $player_info['player_name'] ?></a>
     </h2>
     <div class="subbody">
         <p class="text">Use the <strong>Player Editor</strong> to update the details and stats of playable characters in the Mega Man RPG Prototype.  Please be careful and don't forget to save your work.</p>
     </div>
 
-    <form class="editor players" action="admin/players/<?= $player_id ?>/" method="post" enctype="multipart/form-data">
+    <form class="editor players" action="admin/<?= $this_current_sub ?>/<?= $player_id ?>/" method="post" enctype="multipart/form-data">
         <div class="subbody">
 
             <div class="section inputs">
