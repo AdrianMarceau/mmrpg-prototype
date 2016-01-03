@@ -1106,7 +1106,7 @@ class rpg_item extends rpg_object {
     public static function get_index($include_hidden = false, $include_unpublished = false){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
@@ -1115,7 +1115,7 @@ class rpg_item extends rpg_object {
 
         // Collect every type's info from the database index
         $item_fields = self::get_index_fields(true);
-        $item_index = $this_database->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_id <> 0 {$temp_where};", 'item_token');
+        $item_index = $db->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_id <> 0 {$temp_where};", 'item_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($item_index)){
@@ -1134,7 +1134,7 @@ class rpg_item extends rpg_object {
     public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
@@ -1142,7 +1142,7 @@ class rpg_item extends rpg_object {
         if (!$include_unpublished){ $temp_where .= 'AND item_flag_published = 1 '; }
 
         // Collect an array of item tokens from the database
-        $item_index = $this_database->get_array_list("SELECT item_token FROM mmrpg_index_items WHERE item_id <> 0 {$temp_where};", 'item_token');
+        $item_index = $db->get_array_list("SELECT item_token FROM mmrpg_index_items WHERE item_id <> 0 {$temp_where};", 'item_token');
 
         // Return the tokens if not empty, else nothing
         if (!empty($item_index)){
@@ -1158,7 +1158,7 @@ class rpg_item extends rpg_object {
     public static function get_index_custom($item_tokens = array()){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Generate a token string for the database query
         $item_tokens_string = array();
@@ -1167,7 +1167,7 @@ class rpg_item extends rpg_object {
 
         // Collect the requested item's info from the database index
         $item_fields = self::get_index_fields(true);
-        $item_index = $this_database->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_token IN ({$item_tokens_string});", 'item_token');
+        $item_index = $db->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_token IN ({$item_tokens_string});", 'item_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($item_index)){
@@ -1183,12 +1183,12 @@ class rpg_item extends rpg_object {
     public static function get_index_info($item_token){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Collect this item's info from the database index
         $lookup = !is_numeric($item_token) ? "item_token = '{$item_token}'" : "item_id = {$item_token}";
         $item_fields = self::get_index_fields(true);
-        $item_index = $this_database->get_array("SELECT {$item_fields} FROM mmrpg_index_items WHERE {$lookup};", 'item_token');
+        $item_index = $db->get_array("SELECT {$item_fields} FROM mmrpg_index_items WHERE {$lookup};", 'item_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($item_index)){
@@ -1391,7 +1391,7 @@ class rpg_item extends rpg_object {
     public static function print_editor_options_list_markup($player_item_rewards, $robot_item_rewards, $player_info, $robot_info){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $this_database;
+        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_items;
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
@@ -1474,7 +1474,7 @@ class rpg_item extends rpg_object {
     public static function print_editor_select_markup($item_rewards_options, $player_info, $robot_info, $item_info, $item_key = 0){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $this_database;
+        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_items;
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_rewards, $player_item_rewards, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
@@ -1648,7 +1648,7 @@ class rpg_item extends rpg_object {
         // Define the global variables
         global $mmrpg_index, $this_current_uri, $this_current_url;
         global $mmrpg_database_items, $mmrpg_database_robots, $mmrpg_database_items, $mmrpg_database_types;
-        global $this_database;
+        global $db;
 
         // Collect global indexes for easier search
         $mmrpg_types = rpg_type::get_index(true);

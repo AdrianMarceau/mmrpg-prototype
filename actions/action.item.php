@@ -1,6 +1,6 @@
 <?php
 // Collect the temp item index
-$temp_items_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+$temp_items_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
 // Define all the available player items in a handy index array
 $temp_player_items = $this_player->player_items;

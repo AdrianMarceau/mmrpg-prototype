@@ -385,7 +385,7 @@ foreach ($battle_password_arrays AS $player_token => $password_array){
         //die('<pre>$password_token = '.print_r($password_token, true).', $token = '.$token.'</pre>');
 
         // Vs Player Battle
-        if (!empty($token)){ $user_array = $this_database->get_array("SELECT user_id, user_name_clean FROM mmrpg_users WHERE (Replace(user_name, '-', '') LIKE '{$token}') OR (Replace(user_name_public, '-', '') LIKE '{$token}') LIMIT 1"); }
+        if (!empty($token)){ $user_array = $db->get_array("SELECT user_id, user_name_clean FROM mmrpg_users WHERE (Replace(user_name, '-', '') LIKE '{$token}') OR (Replace(user_name_public, '-', '') LIKE '{$token}') LIMIT 1"); }
 
         // If the user token was not empty, let's unlock it
         if (!empty($user_array) && $user_array['user_id'] != $this_userid){

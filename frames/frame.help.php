@@ -204,7 +204,7 @@ function windowResizeLeaderboard(){
 // Google Analytics
 if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
 // Unset the database variable
-unset($this_database);
+unset($db);
 ?>
 </body>
 </html>

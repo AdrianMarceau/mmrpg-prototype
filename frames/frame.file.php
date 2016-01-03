@@ -75,7 +75,7 @@ while ($this_action == 'save'){
 
     // Save the current game session into the file
     rpg_game::save_session($this_save_filepath);
-    $this_userinfo = $this_database->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+    $this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
     $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
     // If a game session's info was backup up for deletion
     if (!empty($backup_save_filepath) && $backup_save_filepath != $this_save_filepath){
@@ -91,7 +91,7 @@ while ($this_action == 'save'){
   }
 
   // Sort the robot index based on robot number
-  //$mmrpg_database_robots = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
+  //$mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
   //uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
   //die('<pre>$mmrpg_database_robots = '.print_r($mmrpg_database_robots, true).'</pre>');
 
@@ -482,7 +482,7 @@ while ($this_action == 'load'){
     if (file_exists($temp_save_filepath) && is_dir($temp_save_filepath)){
 
       // The file exists, so let's collect this user's info from teh database
-      $temp_database_user = $this_database->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
+      $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
 
       // The file exists, so let's check the password
       $temp_save_filepath .= $this_file['name'];
@@ -794,7 +794,7 @@ function windowResizeFrame(){
 // Google Analytics
 if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
 // Unset the database variable
-unset($this_database);
+unset($db);
 ?>
 </body>
 </html>

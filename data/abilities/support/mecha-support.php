@@ -95,7 +95,7 @@ $ability = array(
       $this_robot->update_session();
 
       // Collect database info for this mecha
-      global $this_database;
+      global $db;
       $this_mecha_info = rpg_robot::get_index_info($this_mecha_token);
       $this_mecha_info = rpg_robot::parse_index_info($this_mecha_info);
 

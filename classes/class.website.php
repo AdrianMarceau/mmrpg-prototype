@@ -19,7 +19,7 @@ class rpg_website {
     if (empty($mmrpg_formatting_array)){
 
       // Pull in global variables
-      global $this_database;
+      global $db;
       $mmrpg_types = rpg_type::get_index();
 
       // Collect the types array from the index
@@ -29,8 +29,8 @@ class rpg_website {
       //die($mmrpg_types_array_string);
 
       // Collect the robot and ability index from the database
-      $temp_robots_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-      $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+      $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+      $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       // Define the array to hold the images of larger size than default
       $mmrpg_large_robot_images = array();
       $mmrpg_large_ability_images = array();
@@ -561,7 +561,7 @@ class rpg_website {
   // Define a function for collecting active sessions, optionally filtered by page
   public static function sessions_active($session_href = '', $session_timeout = 3, $strict_filtering = false){
     // Import required global variables
-    global $this_database, $this_userid;
+    global $db, $this_userid;
     // Define the timeouts for active sessions
     $this_time = time();
     $min_time = strtotime('-'.$session_timeout.' minutes', $this_time);
@@ -569,12 +569,12 @@ class rpg_website {
     if (!$strict_filtering){
       // Collect any sessions that are active and match the query
       $inner_href_query = !empty($session_href) ? "AND session_href LIKE '{$session_href}%'" : '';
-      $active_sessions = $this_database->get_array_list("SELECT DISTINCT user_id, session_href FROM mmrpg_sessions WHERE session_access >= {$min_time} {$inner_href_query} ORDER BY session_access DESC", 'user_id');
+      $active_sessions = $db->get_array_list("SELECT DISTINCT user_id, session_href FROM mmrpg_sessions WHERE session_access >= {$min_time} {$inner_href_query} ORDER BY session_access DESC", 'user_id');
     }
     // Otherwise, we have to excluce users who have since visited other pages
     else {
       // Collect any sessions that are active and match the query
-      $active_sessions = $this_database->get_array_list("SELECT DISTINCT user_id, session_href FROM mmrpg_sessions WHERE session_access >= {$min_time} ORDER BY session_access ASC", 'user_id');
+      $active_sessions = $db->get_array_list("SELECT DISTINCT user_id, session_href FROM mmrpg_sessions WHERE session_access >= {$min_time} ORDER BY session_access ASC", 'user_id');
       if (!empty($active_sessions) && !empty($session_href)){
         foreach ($active_sessions AS $key => $session){
           if (!preg_match('/^'.str_replace("/", "\/", $session_href).'/i', $session['session_href'])){
@@ -590,18 +590,18 @@ class rpg_website {
   // Define a function for updating a user's session in the database
   public static function session_update($session_href){
     // Import required global variables
-    global $this_database, $this_userid;
+    global $db, $this_userid;
     // Collect the session ID from the system
     $session_key = session_id();
     // Attempt to collect the current database row if it exists
-    $temp_session = $this_database->get_array("SELECT * FROM mmrpg_sessions WHERE user_id = '{$this_userid}' AND session_key = '{$session_key}' AND session_href = '{$session_href}' LIMIT 1");
+    $temp_session = $db->get_array("SELECT * FROM mmrpg_sessions WHERE user_id = '{$this_userid}' AND session_key = '{$session_key}' AND session_href = '{$session_href}' LIMIT 1");
     // If an existing session for this page was found, update it
     if (!empty($temp_session['session_id'])){
       $update_array = array();
       $update_array['session_href'] = $session_href;
       $update_array['session_access'] = time();
       $update_array['session_ip'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
-      $this_database->update('mmrpg_sessions', $update_array, array('session_id' => $temp_session['session_id']));
+      $db->update('mmrpg_sessions', $update_array, array('session_id' => $temp_session['session_id']));
     }
     // Else if first visit to this page during this session, insert it
     else {
@@ -612,7 +612,7 @@ class rpg_website {
       $insert_array['session_start'] = time();
       $insert_array['session_access'] = time();
       $insert_array['session_ip'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
-      $this_database->insert('mmrpg_sessions', $insert_array);
+      $db->insert('mmrpg_sessions', $insert_array);
     }
     // Return true on success
     return true;
@@ -620,7 +620,7 @@ class rpg_website {
 
   // Define a function for collecting (and storing) data about the website categories
   public static function community_index(){
-    global $this_database;
+    global $db;
     // Check to see if the community category has already been pulled or not
     if (false && !empty($_SESSION['COMMUNITY']['categories'])){
       $this_categories_index = json_decode($_SESSION['COMMUNITY']['categories'], true);
@@ -628,7 +628,7 @@ class rpg_website {
       // Collect the community catetories from the database
       // Collect all the categories from the index
       $this_categories_query = "SELECT * FROM mmrpg_categories AS categories WHERE categories.category_published = 1 ORDER BY categories.category_order ASC";
-      $this_categories_index = $this_database->get_array_list($this_categories_query, 'category_token');
+      $this_categories_index = $db->get_array_list($this_categories_query, 'category_token');
       // Update the database index cache
       $_SESSION['COMMUNITY']['categories'] = json_encode($this_categories_index);
     }

@@ -5,5 +5,5 @@ if (defined('MMRPG_REMOTE_GAME')){
   unset($_SESSION[$temp_session_key]);
 }
 // Unset the database variable
-unset($this_database);
+unset($db);
 ?>

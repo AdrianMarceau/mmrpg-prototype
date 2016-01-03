@@ -1409,7 +1409,7 @@ class rpg_player extends rpg_object {
     public static function get_index($include_hidden = false, $include_unpublished = false){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
@@ -1418,7 +1418,7 @@ class rpg_player extends rpg_object {
 
         // Collect every type's info from the database index
         $player_fields = self::get_index_fields(true);
-        $player_index = $this_database->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
+        $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($player_index)){
@@ -1437,7 +1437,7 @@ class rpg_player extends rpg_object {
     public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
@@ -1445,7 +1445,7 @@ class rpg_player extends rpg_object {
         if (!$include_unpublished){ $temp_where .= 'AND player_flag_published = 1 '; }
 
         // Collect an array of player tokens from the database
-        $player_index = $this_database->get_array_list("SELECT player_token FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
+        $player_index = $db->get_array_list("SELECT player_token FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
 
         // Return the tokens if not empty, else nothing
         if (!empty($player_index)){
@@ -1461,7 +1461,7 @@ class rpg_player extends rpg_object {
     public static function get_index_custom($player_tokens = array()){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Generate a token string for the database query
         $player_tokens_string = array();
@@ -1470,7 +1470,7 @@ class rpg_player extends rpg_object {
 
         // Collect the requested player's info from the database index
         $player_fields = self::get_index_fields(true);
-        $player_index = $this_database->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_token IN ({$player_tokens_string});", 'player_token');
+        $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_token IN ({$player_tokens_string});", 'player_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($player_index)){
@@ -1486,12 +1486,12 @@ class rpg_player extends rpg_object {
     public static function get_index_info($player_token){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Collect this player's info from the database index
         $lookup = !is_numeric($player_token) ? "player_token = '{$player_token}'" : "player_id = {$player_token}";
         $player_fields = self::get_index_fields(true);
-        $player_index = $this_database->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE {$lookup};", 'player_token');
+        $player_index = $db->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE {$lookup};", 'player_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($player_index)){
@@ -1982,7 +1982,7 @@ class rpg_player extends rpg_object {
     public static function print_database_markup($player_info, $print_options = array()){
 
         // Define the global variables
-        global $this_database;
+        global $db;
         global $mmrpg_index, $this_current_uri, $this_current_url;
         global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities, $mmrpg_database_types;
 
@@ -2302,7 +2302,7 @@ class rpg_player extends rpg_object {
     // Define a static function for printing out the player's editor markup
     public static function print_editor_markup($player_info){
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $this_database;
+        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_fields, $global_allow_editing;
         global $allowed_edit_data_count, $allowed_edit_player_count, $first_player_token;
         global $key_counter, $player_key, $player_counter, $player_rewards, $player_field_rewards, $player_item_rewards, $temp_player_totals, $player_options_markup;
@@ -2313,8 +2313,8 @@ class rpg_player extends rpg_object {
         if (empty($player_info)){ return 'error:player-empty'; }
 
         // Collect the approriate database indexes
-        if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token'); }
-        if (empty($mmrpg_database_items)){ $mmrpg_database_items = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_class = 'item' AND ability_flag_complete = 1;", 'ability_token'); }
+        if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token'); }
+        if (empty($mmrpg_database_items)){ $mmrpg_database_items = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_class = 'item' AND ability_flag_complete = 1;", 'ability_token'); }
 
         // Define the quick-access variables for later use
         $player_token = $player_info['player_token'];

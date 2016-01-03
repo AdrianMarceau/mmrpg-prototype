@@ -1176,7 +1176,7 @@ class rpg_battle extends rpg_object {
   public static function update_index_info($battle_token, $battle_info){
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
 
     // Add the updated, customized info to the session index
     $_SESSION['GAME']['values']['battle_index'][$battle_token] = json_encode($battle_info);
@@ -1204,7 +1204,7 @@ class rpg_battle extends rpg_object {
   public static function get_index_info($battle_token, $session = true){
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
     $this_index = self::get_index($session);
 
     // If the requested battle is in the index, return the entry
@@ -1233,7 +1233,7 @@ class rpg_battle extends rpg_object {
   public static function load_battle_index($include_session = true){
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
     $this_index = array();
 
     // Default the battles index to an empty array
@@ -1428,7 +1428,7 @@ class rpg_battle extends rpg_object {
   public function actions_execute(){
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
     $this_battle = self::get_battle();
     $this_field = rpg_field::get_field();
 
@@ -1500,7 +1500,7 @@ class rpg_battle extends rpg_object {
     $this_return = false;
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
     $this_battle = self::get_battle();
     $this_field = rpg_field::get_field();
 
@@ -1559,7 +1559,7 @@ class rpg_battle extends rpg_object {
         // Ensure this robot has abilities to loop through
         if (!$this_robot->has_flag('ability_startup') && $this_robot->has_abilities()){
           // Loop through each of this robot's abilities and trigger the start event
-          $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+          $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
           $temp_robot_abilities = $this_robot->get_abilities();
           foreach ($temp_robot_abilities AS $temp_key => $temp_token){
             // Define the current ability object using the loaded ability data
@@ -1582,7 +1582,7 @@ class rpg_battle extends rpg_object {
       elseif ($action_type == 'ability'){
 
         // Combine into the actions index
-        $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
         // DEFINE ABILITY TOKEN
 
@@ -1795,7 +1795,7 @@ class rpg_battle extends rpg_object {
         // Ensure this robot has abilities to loop through
         if (!isset($this_robot->flags['ability_startup']) && !empty($this_robot->robot_abilities)){
           // Loop through each of this robot's abilities and trigger the start event
-          $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+          $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
           foreach ($this_robot->robot_abilities AS $key => $token){
             if (!isset($temp_abilities_index[$token])){ continue; }
             // Define the current ability object using the loaded ability data
@@ -1916,7 +1916,7 @@ class rpg_battle extends rpg_object {
   public function trigger_complete(rpg_player $this_player, rpg_robot $this_robot, rpg_player $target_player, rpg_robot $target_robot){
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
     $this_battle = self::get_battle();
     $this_field = rpg_field::get_field();
 
@@ -2147,7 +2147,7 @@ class rpg_battle extends rpg_object {
 
         // Loop through the ability rewards for this robot if set
         if (!empty($temp_player_rewards['abilities']) && rpg_game::is_user()){
-          $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+          $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
           foreach ($temp_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
 
             // If this ability is already unlocked, continue
@@ -2263,7 +2263,7 @@ class rpg_battle extends rpg_object {
 
         // Loop through the ability rewards for this player if set
         if (!empty($temp_player_rewards['abilities']) && rpg_game::is_user()){
-          $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+          $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
           foreach ($temp_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
 
             // If this ability is already unlocked, continue
@@ -2422,7 +2422,7 @@ class rpg_battle extends rpg_object {
       // Loop through any ability rewards for this battle
       $this_ability_rewards = $this_battle->get_ability_rewards();
       if (!empty($this_ability_rewards) && rpg_game::is_user()){
-        $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         foreach ($this_ability_rewards AS $ability_reward_key => $ability_reward_info){
 
           // Collect the ability info from the index
@@ -2688,7 +2688,7 @@ class rpg_battle extends rpg_object {
   public function events_create($this_object = false, $target_object = false, $event_header = '', $event_body = '', $event_options = array()){
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
     $this_battle = self::get_battle();
     $this_field = rpg_field::get_field();
 
@@ -2736,7 +2736,7 @@ class rpg_battle extends rpg_object {
   public function generate_markup($event_info){
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
     $this_battle = self::get_battle();
     $this_field = rpg_field::get_field();
 
@@ -2820,7 +2820,7 @@ class rpg_battle extends rpg_object {
   public function get_canvas_markup($eventinfo, $options = array()){
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
     $this_battle = self::get_battle();
     $this_field = rpg_field::get_field();
 
@@ -3359,7 +3359,7 @@ class rpg_battle extends rpg_object {
   public function get_console_markup($eventinfo, $options = array()){
 
     // Collect references to global objects
-    $this_database = cms_database::get_database();
+    $db = cms_database::get_database();
     $this_battle = self::get_battle();
     $this_field = rpg_field::get_field();
 

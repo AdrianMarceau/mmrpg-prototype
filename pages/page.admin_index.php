@@ -15,29 +15,29 @@ $this_seo_robots = '';
 $this_markup_header = '';
 
 // Count the numer of users in the database
-$mmrpg_user_count = $this_database->get_value("SELECT COUNT(user_id) AS user_count FROM mmrpg_users WHERE user_id <> 0;", 'user_count');
+$mmrpg_user_count = $db->get_value("SELECT COUNT(user_id) AS user_count FROM mmrpg_users WHERE user_id <> 0;", 'user_count');
 
 // Count the numer of players in the database
 $mmrpg_players = rpg_player::get_index();
 $mmrpg_player_count = count($mmrpg_players);
 
 // Count the numer of mechas in the database
-$mmrpg_mecha_count = $this_database->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_class IN ('mecha');", 'robot_count');
+$mmrpg_mecha_count = $db->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_class IN ('mecha');", 'robot_count');
 
 // Count the numer of robots in the database
-$mmrpg_robot_count = $this_database->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_class IN ('master');", 'robot_count');
+$mmrpg_robot_count = $db->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_class IN ('master');", 'robot_count');
 
 // Count the numer of bosses in the database
-$mmrpg_boss_count = $this_database->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_class IN ('boss');", 'robot_count');
+$mmrpg_boss_count = $db->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_class IN ('boss');", 'robot_count');
 
 // Count the numer of abilities in the database
-$mmrpg_ability_count = $this_database->get_value("SELECT COUNT(ability_id) AS ability_count FROM mmrpg_index_abilities WHERE ability_id <> 0;", 'ability_count');
+$mmrpg_ability_count = $db->get_value("SELECT COUNT(ability_id) AS ability_count FROM mmrpg_index_abilities WHERE ability_id <> 0;", 'ability_count');
 
 // Count the numer of items in the database
-$mmrpg_item_count = $this_database->get_value("SELECT COUNT(item_id) AS item_count FROM mmrpg_index_items WHERE item_id <> 0;", 'item_count');
+$mmrpg_item_count = $db->get_value("SELECT COUNT(item_id) AS item_count FROM mmrpg_index_items WHERE item_id <> 0;", 'item_count');
 
 // Count the numer of fields in the database
-$mmrpg_field_count = $this_database->get_value("SELECT COUNT(field_id) AS field_count FROM mmrpg_index_fields WHERE field_id <> 0;", 'field_count');
+$mmrpg_field_count = $db->get_value("SELECT COUNT(field_id) AS field_count FROM mmrpg_index_fields WHERE field_id <> 0;", 'field_count');
 
 // Start generating the page markup
 ob_start();

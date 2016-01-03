@@ -41,7 +41,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
   $_SESSION['GAME']['FILE'] = $this_file;
   // Load the save file into memory and overwrite the session
   rpg_game::save_session($this_save_filepath);
-  unset($this_database);
+  unset($db);
   exit('success');
 }
 // Check if a reset request has been placed
@@ -55,7 +55,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
   }
   // Load the save file into memory and overwrite the session
   rpg_game::save_session($this_save_filepath);
-  unset($this_database);
+  unset($db);
   exit('success');
 }
 // Check if a exit request has been placed
@@ -83,7 +83,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
   // Reset the game session and reload the page
   rpg_game::reset_session($this_save_filepath);
   // Exit on success
-  unset($this_database);
+  unset($db);
   exit('success');
 }
 
@@ -112,10 +112,10 @@ if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
   $mmrpg_index_players = $mmrpg_index['players'];
 
   // Collect the robot index for calculation purposes
-  $this_robot_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+  $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
   // Collect the ability index for calculation purposes
-  $this_ability_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+  $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
   // DEBUG PLAYERS / ABILITIES
   foreach ($mmrpg_index_players AS $player_token => $player_info){
@@ -524,5 +524,5 @@ require(MMRPG_CONFIG_ROOTDIR.'/data/analytics.php');
 // If there were any events in the session, automatically add remove them from the session
 if (!empty($_SESSION['GAME']['EVENTS'])){ $_SESSION['GAME']['EVENTS'] = array(); }
 // Unset the database variable
-unset($this_database);
+unset($db);
 ?>

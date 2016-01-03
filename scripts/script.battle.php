@@ -783,7 +783,7 @@ elseif ($this_action == 'ability'){
   //$this_battle->actions_append($target_player->get_id(), $target_robot->get_id(), $this_player->get_id(), $this_robot->get_id(), $target_action, $target_action_token);
 
   // Collect the abilities index for the current robot
-  $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+  $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
   // Create the temporary ability object for this player's robot
   list($temp_id, $temp_token) = explode('_', $this_action_token); //array('ability_token' => $this_action_token);
@@ -807,7 +807,7 @@ elseif ($this_action == 'ability'){
   $temp_active_target_robot_abilities = $active_target_robot->robot_abilities;
 
   // Loop through the target robot's current abilities and check weapon energy
-  $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+  $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
   $temp_abilities_backup = $active_target_robot->robot_abilities;
   foreach ($active_target_robot->robot_abilities AS $key => $token){
     // Collect the data for this ability from the index
@@ -1398,7 +1398,7 @@ if (!MMRPG_CONFIG_IS_LIVE || MMRPG_CONFIG_ADMIN_MODE){
 <body>
 <?php
 // Unset the database variable
-unset($this_database);
+unset($db);
 ?>
 </body>
 </html>

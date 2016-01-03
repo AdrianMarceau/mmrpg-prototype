@@ -32,7 +32,7 @@ $contributor_ids = array(
   1330, // TheDoc (Moderator)
   );
   // 484 Ephnee
-$contributor_index = $this_database->get_array_list("SELECT * FROM mmrpg_users LEFT JOIN mmrpg_roles ON mmrpg_users.role_id = mmrpg_roles.role_id WHERE user_id IN (".implode(', ', $contributor_ids).")", 'user_id');
+$contributor_index = $db->get_array_list("SELECT * FROM mmrpg_users LEFT JOIN mmrpg_roles ON mmrpg_users.role_id = mmrpg_roles.role_id WHERE user_id IN (".implode(', ', $contributor_ids).")", 'user_id');
 //die(print_r($contributor_index, true));
 function temp_sort_by_date($u1, $u2){
   global $contributor_ids;

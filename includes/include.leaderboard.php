@@ -202,7 +202,7 @@ $temp_leaderboard_query = 'SELECT
   ORDER BY mmrpg_leaderboard.board_points DESC
   '; //.(!empty($this_display_limit) ? 'LIMIT '.$this_display_limit : '');
 // Query the database and collect the array list of all non-bogus players
-$this_leaderboard_index = $this_database->get_array_list($temp_leaderboard_query);
+$this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
 
 // Loop through the save file directory and generate an index
 $this_cache_stamp = MMRPG_CONFIG_CACHE_DATE.'_'.substr(date('YmdHi'), 0, 11); //2013 01 01 23 59 (12 length)

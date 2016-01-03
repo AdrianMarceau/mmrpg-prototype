@@ -18,11 +18,11 @@ $session_token = rpg_game::session_token();
 //require(MMRPG_CONFIG_ROOTDIR.'database/database.types.php');
 //require(MMRPG_CONFIG_ROOTDIR.'database/database.players.php');
 //require(MMRPG_CONFIG_ROOTDIR.'database/database.robots.php');
-//$mmrpg_database_robots = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 ORDER BY robot_order ASC;", 'robot_token');
+//$mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 ORDER BY robot_order ASC;", 'robot_token');
 //require(MMRPG_CONFIG_ROOTDIR.'database/database.abilities.php');
-//$mmrpg_database_abilities = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'master' ORDER BY ability_order ASC;", 'ability_token');
+//$mmrpg_database_abilities = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'master' ORDER BY ability_order ASC;", 'ability_token');
 //require(MMRPG_CONFIG_ROOTDIR.'database/database.items.php');
-//$mmrpg_database_items = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'item' ORDER BY ability_order ASC;", 'ability_token');
+//$mmrpg_database_items = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'item' ORDER BY ability_order ASC;", 'ability_token');
 // Collect the editor flag if set
 $global_allow_editing = isset($_REQUEST['edit']) && $_REQUEST['edit'] == 'false' ? false : true;
 
@@ -276,5 +276,5 @@ if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php')
 // Require the remote bottom in case we're in viewer mode
 require(MMRPG_CONFIG_ROOTDIR.'frames/frame.remote_bottom.php');
 // Unset the database variable
-unset($this_database);
+unset($db);
 ?>

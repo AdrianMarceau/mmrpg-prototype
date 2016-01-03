@@ -41,7 +41,7 @@ elseif ($temp_display_points > 0 && $temp_last_login_diff < MMRPG_SETTINGS_ACTIV
 // Collect the robot index for later use
 $hidden_database_robots = array('robot', 'mega-man-ds', 'proto-man-ds', 'bass-ds', 'rock', 'cache', 'bond-man', 'fake-man');
 foreach ($hidden_database_robots AS $key => $token){ $hidden_database_robots[$key] = "'".$token."'"; }
-$temp_robots_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 AND robot_token NOT IN (".implode(',', $hidden_database_robots).");", 'robot_token');
+$temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 AND robot_token NOT IN (".implode(',', $hidden_database_robots).");", 'robot_token');
 
 // Generate this player's record numbers
 $temp_counter_players = array('total' => 0);
@@ -516,7 +516,7 @@ ob_start();
       GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
       WHERE threads.category_id <> 0 && threads.thread_published = 1 AND users.user_id = {$this_playerinfo['user_id']}
       ORDER BY threads.thread_date {$temp_thread_sort_string} ";
-    $this_threads_array = $this_database->get_array_list($this_threads_query);
+    $this_threads_array = $db->get_array_list($this_threads_query);
     $this_threads_index = array();
     $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
     if ($temp_thread_show > $this_threads_count){ $temp_thread_show = $this_threads_count; }
@@ -597,7 +597,7 @@ ob_start();
       LEFT JOIN mmrpg_categories AS categories ON posts.category_id = categories.category_id
       WHERE threads.category_id <> 0 AND posts.post_deleted = 0 AND users.user_id = {$this_playerinfo['user_id']}
       ORDER BY posts.post_date {$temp_post_sort_string}"; //WHERE posts.post_deleted = 0
-    $this_posts_array = $this_database->get_array_list($this_posts_query);
+    $this_posts_array = $db->get_array_list($this_posts_query);
     $this_posts_count = !empty($this_posts_array) ? count($this_posts_array) : 0;
 
     // Loop through the posts and collect all referenced thread IDs for the index
@@ -624,7 +624,7 @@ ob_start();
         GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
         WHERE threads.category_id <> 0 && threads.thread_published = 1 AND threads.thread_id IN ({$temp_include_ids})
         ORDER BY threads.thread_date ASC";
-      $this_threads_index = $this_database->get_array_list($this_threads_query, 'thread_id');
+      $this_threads_index = $db->get_array_list($this_threads_query, 'thread_id');
       $this_threads_count = !empty($this_threads_index) ? count($this_threads_index) : 0;
     } else {
       $this_threads_query = '';
@@ -635,7 +635,7 @@ ob_start();
     // Collect the user post and thread count index plus leaderboard points for display
     $temp_id_includes = !empty($this_user_ids_array) ? 'AND mmrpg_users.user_id IN ('.implode(', ', $this_user_ids_array).')' : '';
     if (!empty($temp_id_includes)){
-      $this_user_countindex = $this_database->get_array_list('SELECT
+      $this_user_countindex = $db->get_array_list('SELECT
         mmrpg_users.user_id,
         mmrpg_leaderboard.board_points,
         mmrpg_threads.thread_count,

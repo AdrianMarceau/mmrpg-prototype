@@ -55,7 +55,7 @@ class rpg_game {
   // Define a function for unlocking a game player for use in battle
   public static function unlock_player($player_info, $unlock_robots = true, $unlock_abilities = true){
     // Reference the global variables
-    global $mmrpg_index, $this_database;
+    global $mmrpg_index, $db;
 
     //$GAME_SESSION = &$_SESSION[self::session_token()];
     $session_token = self::session_token();
@@ -84,7 +84,7 @@ class rpg_game {
     }
     // Loop through the robot rewards for this player if set
     if ($unlock_robots && !empty($this_player_rewards['robots'])){
-      $temp_robots_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+      $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
       foreach ($this_player_rewards['robots'] AS $robot_reward_key => $robot_reward_info){
         // Check if the required amount of points have been met by this player
         if ($this_player_points >= $robot_reward_info['points']){
@@ -99,7 +99,7 @@ class rpg_game {
     // Loop through the ability rewards for this player if set
     if ($unlock_abilities && !empty($this_player_rewards['abilities'])){
       // Collect the ability index for calculation purposes
-      $this_ability_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+      $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       foreach ($this_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
         // Check if the required amount of points have been met by this player
         if ($this_player_points >= $ability_reward_info['points']){
@@ -253,7 +253,7 @@ class rpg_game {
   // Define a function for unlocking a game robot for use in battle
   public static function unlock_robot($player_info, $robot_info, $unlock_abilities = true, $events_create = true){
     // Reference the global variables
-    global $mmrpg_index, $this_database;
+    global $mmrpg_index, $db;
 
     //$_SESSION[$session_token] = &$_SESSION[self::session_token()];
     $session_token = self::session_token();
@@ -363,7 +363,7 @@ class rpg_game {
       $this_count_abilities = count($robot_info['robot_rewards']['abilities']);
       //die('<pre>'.print_r($robot_info['robot_rewards']['abilities'], true).'</pre>');
       foreach ($robot_info['robot_rewards']['abilities'] AS $temp_key => $temp_reward){ if ($temp_reward['token'] != 'buster-shot' && $temp_reward['level'] > 0){ $this_first_ability = $temp_reward; break; } }
-      $temp_ability_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+      $temp_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       $this_first_ability_name = $temp_ability_index[$this_first_ability['token']]['ability_name'];
       //die('<pre>'.print_r($this_first_ability, true).'</pre>');
       if ($robot_info['robot_token'] == 'oil-man' || $robot_info['robot_token'] == 'time-man'){ $this_first_appearance = 'that first appeared in <em>Mega Man Powered Up</em> for the Sony PlayStation Portable'; }
@@ -423,7 +423,7 @@ class rpg_game {
     // Loop through the ability rewards for this robot if set
     if ($unlock_abilities && !empty($this_robot_rewards['abilities'])){
       // Collect the ability index for calculation purposes
-      $this_ability_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+      $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       foreach ($this_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
         // Check if the required amount of points have been met by this robot
         if ($this_robot_level >= $ability_reward_info['level']){
@@ -749,7 +749,7 @@ class rpg_game {
     if ($events_create != false){
 
       // Generate the attributes and text variables for this ability unlock
-      global $this_database;
+      global $db;
       $this_player_token = $player_info['player_token'];
       $ability_info_size = isset($ability_info['ability_image_size']) ? $ability_info['ability_image_size'] * 2 : 40 * 2;
       $ability_info_size_token = $ability_info_size.'x'.$ability_info_size;
@@ -761,7 +761,7 @@ class rpg_game {
       $this_find = array('{this_player}', '{this_ability}', '{target_player}', '{target_ability}');
       $this_replace = array($player_info['player_name'], $ability_info['ability_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
       $this_field = array('field_token' => 'intro-field', 'field_name' => 'Intro Field'); //rpg_field::get_index_info('field'); //rpg_field::get_index_info(!empty($ability_info['ability_field']) ? $ability_info['ability_field'] : 'intro-field');
-      $temp_ability_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+      $temp_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       // Generate the window event's canvas and message markup then append to the global array
       $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
       $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
@@ -1046,7 +1046,7 @@ class rpg_game {
   // Define a function for resetting the game session
   public static function reset_session($this_save_filepath){
     // Reference global variables
-    global $mmrpg_index, $this_database;
+    global $mmrpg_index, $db;
     //$GAME_SESSION = &$_SESSION[self::session_token()];
     $session_token = self::session_token();
 
@@ -1116,7 +1116,7 @@ class rpg_game {
       $_SESSION[$session_token]['battle_settings']['this_player_token'] = 'dr-light';
 
       // Collect the robot index for calculation purposes
-      $this_robot_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+      $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
       // Unlock Mega Man as a playable character
       $unlock_robot_info = $this_robot_index['mega-man'];
@@ -1198,7 +1198,7 @@ class rpg_game {
   // Define a function for saving the game session
   public static function save_session($this_save_filepath){
     // Reference global variables
-    global $this_database;
+    global $db;
     $session_token = self::session_token();
     $mmrpg_index_players = rpg_player::get_index();
 
@@ -1226,7 +1226,7 @@ class rpg_game {
       if (!isset($this_user['userid'])){
         // Attempt to collect the user ID from the database
         $temp_query = "SELECT user_id FROM mmrpg_users WHERE user_name_clean = '{$this_user['username_clean']}' LIMIT 1";
-        $temp_value = $this_database->get_value($temp_query, 'user_id');
+        $temp_value = $db->get_value($temp_query, 'user_id');
         // If the user ID was found, collect it and proceed as normal
         if (!empty($temp_value)){
           // Update the ID in the user array and continue
@@ -1236,9 +1236,9 @@ class rpg_game {
         // Otherwise, create database rows for this new file
         else {
           // Generate new user, save, and board IDs for this listing
-          $temp_user_id = $this_database->get_value('SELECT MAX(user_id) AS user_id FROM mmrpg_users WHERE user_id < '.MMRPG_SETTINGS_GUEST_ID, 'user_id') + 1;
-          $temp_save_id = $this_database->get_value('SELECT MAX(save_id) AS save_id FROM mmrpg_saves', 'save_id') + 1;
-          $temp_board_id = $this_database->get_value('SELECT MAX(board_id) AS board_id FROM mmrpg_leaderboard', 'board_id') + 1;
+          $temp_user_id = $db->get_value('SELECT MAX(user_id) AS user_id FROM mmrpg_users WHERE user_id < '.MMRPG_SETTINGS_GUEST_ID, 'user_id') + 1;
+          $temp_save_id = $db->get_value('SELECT MAX(save_id) AS save_id FROM mmrpg_saves', 'save_id') + 1;
+          $temp_board_id = $db->get_value('SELECT MAX(board_id) AS board_id FROM mmrpg_leaderboard', 'board_id') + 1;
           // Generate the USER details for import
           $temp_user_array = array();
           $temp_user_array['user_id'] = $temp_user_id;
@@ -1408,9 +1408,9 @@ class rpg_game {
           $temp_save_array['save_date_modified'] = $temp_user_array['user_date_modified'];
 
           // Insert these users into the database
-          $temp_user_array_return = $this_database->insert('mmrpg_users', $temp_user_array);
-          $temp_save_array_return = $this_database->insert('mmrpg_saves', $temp_save_array);
-          $temp_board_array_return = $this_database->insert('mmrpg_leaderboard', $temp_board_array);
+          $temp_user_array_return = $db->insert('mmrpg_users', $temp_user_array);
+          $temp_save_array_return = $db->insert('mmrpg_saves', $temp_save_array);
+          $temp_board_array_return = $db->insert('mmrpg_leaderboard', $temp_board_array);
           unset($temp_user_array, $temp_save_array, $temp_board_array);
           // Update the ID in the user array and continue
           $this_user['userid'] = $temp_user_id;
@@ -1442,10 +1442,10 @@ class rpg_game {
       $temp_user_array['user_date_birth'] = !empty($this_user['dateofbirth']) ? $this_user['dateofbirth'] : 0;
       $temp_user_array['user_flag_approved'] = !empty($this_user['approved']) ? 1 : 0;
       // Update this user's info in the database
-      $this_database->update('mmrpg_users', $temp_user_array, 'user_id = '.$this_user['userid']);
+      $db->update('mmrpg_users', $temp_user_array, 'user_id = '.$this_user['userid']);
       unset($temp_user_array);
       // DEBUG
-      //$DEBUG .= '$this_database->update(\'mmrpg_users\', $temp_user_array, \'user_id = \'.$this_user[\'userid\']);';
+      //$DEBUG .= '$db->update(\'mmrpg_users\', $temp_user_array, \'user_id = \'.$this_user[\'userid\']);';
       //$DEBUG .= '<pre>$temp_user_array = '.print_r($temp_user_array, true).'</pre>';
       //$DEBUG .= '<pre>$this_user = '.print_r($this_user, true).'</pre>';
 
@@ -1535,7 +1535,7 @@ class rpg_game {
       $temp_board_array['board_date_modified'] = time();
 
       // Update this board's info in the database
-      $this_database->update('mmrpg_leaderboard', $temp_board_array, 'user_id = '.$this_user['userid']);
+      $db->update('mmrpg_leaderboard', $temp_board_array, 'user_id = '.$this_user['userid']);
       unset($temp_board_array);
 
       // Clear any leaderboard data that exists in the session, forcing it to recache
@@ -1602,15 +1602,15 @@ class rpg_game {
       $temp_save_array['save_file_path'] = $this_file['path'];
       $temp_save_array['save_date_modified'] = time();
       // Update this save's info in the database
-      $this_database->update('mmrpg_saves', $temp_save_array, 'user_id = '.$this_user['userid']);
+      $db->update('mmrpg_saves', $temp_save_array, 'user_id = '.$this_user['userid']);
       unset($temp_save_array);
       // DEBUG
-      //$DEBUG .= '$this_database->update(\'mmrpg_saves\', $temp_save_array, \'user_id = \'.$this_user[\'userid\']);';
+      //$DEBUG .= '$db->update(\'mmrpg_saves\', $temp_save_array, \'user_id = \'.$this_user[\'userid\']);';
       //$DEBUG .= '<pre>$temp_save_array = '.print_r($temp_save_array, true).'</pre>';
       //$DEBUG .= '<pre>$this_user = '.print_r($this_user, true).'</pre>';
 
       // DEBUG
-      //$DEBUG .= '$this_database->update(\'mmrpg_leaderboard\', $temp_board_array, \'user_id = \'.$this_user[\'userid\']);';
+      //$DEBUG .= '$db->update(\'mmrpg_leaderboard\', $temp_board_array, \'user_id = \'.$this_user[\'userid\']);';
       //$DEBUG .= '<pre>$temp_board_array = '.print_r($temp_board_array, true).'</pre>';
       //$DEBUG .= '<pre>$this_user = '.print_r($this_user, true).'</pre>';
 
@@ -1644,7 +1644,7 @@ class rpg_game {
   // Define a function for loading the game session
   public static function load_session($this_save_filepath){
     // Reference global variables
-    global $this_database;
+    global $db;
     //$GAME_SESSION = &$_SESSION[self::session_token()];
     $session_token = self::session_token();
 
@@ -1663,75 +1663,75 @@ class rpg_game {
       //$this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
       $temp_matches = array();
       preg_match('#/([-_a-z0-9]+/)([-_a-z0-9]+.sav)$#i', $this_save_filepath, $temp_matches);
-      $this_database_save = $this_database->get_array("SELECT * FROM mmrpg_saves WHERE save_file_name = '{$temp_matches[2]}' AND save_file_path = '{$temp_matches[1]}' LIMIT 1");
-      $this_database_user =   $this_database->get_array("SELECT * FROM mmrpg_users WHERE user_id = '{$this_database_save['user_id']}' LIMIT 1");
+      $db_save = $db->get_array("SELECT * FROM mmrpg_saves WHERE save_file_name = '{$temp_matches[2]}' AND save_file_path = '{$temp_matches[1]}' LIMIT 1");
+      $db_user =   $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = '{$db_save['user_id']}' LIMIT 1");
 
       // Update the game session with database extracted variables
       $new_game_data = array();
 
-      $new_game_data['CACHE_DATE'] = $this_database_save['save_cache_date'];
+      $new_game_data['CACHE_DATE'] = $db_save['save_cache_date'];
 
-      $new_game_data['USER']['userid'] = $this_database_user['user_id'];
-      $new_game_data['USER']['roleid'] = $this_database_user['role_id'];
-      $new_game_data['USER']['username'] = $this_database_user['user_name'];
-      $new_game_data['USER']['username_clean'] = $this_database_user['user_name_clean'];
-      $new_game_data['USER']['password'] = $this_database_user['user_password'];
-      $new_game_data['USER']['password_encoded'] = $this_database_user['user_password_encoded'];
-      $new_game_data['USER']['profiletext'] = $this_database_user['user_profile_text'];
-      $new_game_data['USER']['creditstext'] = $this_database_user['user_credit_text'];
-      $new_game_data['USER']['creditsline'] = $this_database_user['user_credit_line'];
-      $new_game_data['USER']['imagepath'] = $this_database_user['user_image_path'];
-      $new_game_data['USER']['backgroundpath'] = $this_database_user['user_background_path'];
-      $new_game_data['USER']['colourtoken'] = $this_database_user['user_colour_token'];
-      $new_game_data['USER']['gender'] = $this_database_user['user_gender'];
-      $new_game_data['USER']['displayname'] = $this_database_user['user_name_public'];
-      $new_game_data['USER']['emailaddress'] = $this_database_user['user_email_address'];
-      $new_game_data['USER']['websiteaddress'] = $this_database_user['user_website_address'];
-      $new_game_data['USER']['dateofbirth'] = $this_database_user['user_date_birth'];
-      $new_game_data['USER']['approved'] = $this_database_user['user_flag_approved'];
+      $new_game_data['USER']['userid'] = $db_user['user_id'];
+      $new_game_data['USER']['roleid'] = $db_user['role_id'];
+      $new_game_data['USER']['username'] = $db_user['user_name'];
+      $new_game_data['USER']['username_clean'] = $db_user['user_name_clean'];
+      $new_game_data['USER']['password'] = $db_user['user_password'];
+      $new_game_data['USER']['password_encoded'] = $db_user['user_password_encoded'];
+      $new_game_data['USER']['profiletext'] = $db_user['user_profile_text'];
+      $new_game_data['USER']['creditstext'] = $db_user['user_credit_text'];
+      $new_game_data['USER']['creditsline'] = $db_user['user_credit_line'];
+      $new_game_data['USER']['imagepath'] = $db_user['user_image_path'];
+      $new_game_data['USER']['backgroundpath'] = $db_user['user_background_path'];
+      $new_game_data['USER']['colourtoken'] = $db_user['user_colour_token'];
+      $new_game_data['USER']['gender'] = $db_user['user_gender'];
+      $new_game_data['USER']['displayname'] = $db_user['user_name_public'];
+      $new_game_data['USER']['emailaddress'] = $db_user['user_email_address'];
+      $new_game_data['USER']['websiteaddress'] = $db_user['user_website_address'];
+      $new_game_data['USER']['dateofbirth'] = $db_user['user_date_birth'];
+      $new_game_data['USER']['approved'] = $db_user['user_flag_approved'];
 
-      $new_game_data['FILE']['path'] = $this_database_save['save_file_path'];
-      $new_game_data['FILE']['name'] = $this_database_save['save_file_name'];
+      $new_game_data['FILE']['path'] = $db_save['save_file_path'];
+      $new_game_data['FILE']['name'] = $db_save['save_file_name'];
 
-      $new_game_data['counters'] = !empty($this_database_save['save_counters']) ? json_decode($this_database_save['save_counters'], true) : array();
-      $new_game_data['values'] = !empty($this_database_save['save_values']) ? json_decode($this_database_save['save_values'], true) : array();
-      if (!empty($this_database_save['save_values_battle_index'])){
-        //$new_game_data['values']['battle_index'] = json_decode($this_database_save['save_values_battle_index'], true);
+      $new_game_data['counters'] = !empty($db_save['save_counters']) ? json_decode($db_save['save_counters'], true) : array();
+      $new_game_data['values'] = !empty($db_save['save_values']) ? json_decode($db_save['save_values'], true) : array();
+      if (!empty($db_save['save_values_battle_index'])){
+        //$new_game_data['values']['battle_index'] = json_decode($db_save['save_values_battle_index'], true);
         //foreach ($new_game_data['values']['battle_index'] AS $token => $array){ $new_game_data['values']['battle_index'][$token] = json_encode($array); }
-        //$new_game_data['values']['battle_index_hash'] = md5($this_database_save['save_values_battle_index']);
+        //$new_game_data['values']['battle_index_hash'] = md5($db_save['save_values_battle_index']);
         $new_game_data['values']['battle_index'] = array();
       }
-      if (!empty($this_database_save['save_values_battle_complete'])){
-        $new_game_data['values']['battle_complete'] = json_decode($this_database_save['save_values_battle_complete'], true);
-        $new_game_data['values']['battle_complete_hash'] = md5($this_database_save['save_values_battle_complete']);
+      if (!empty($db_save['save_values_battle_complete'])){
+        $new_game_data['values']['battle_complete'] = json_decode($db_save['save_values_battle_complete'], true);
+        $new_game_data['values']['battle_complete_hash'] = md5($db_save['save_values_battle_complete']);
       }
-      if (!empty($this_database_save['save_values_battle_failure'])){
-        $new_game_data['values']['battle_failure'] = json_decode($this_database_save['save_values_battle_failure'], true);
-        $new_game_data['values']['battle_failure_hash'] = md5($this_database_save['save_values_battle_failure']);
+      if (!empty($db_save['save_values_battle_failure'])){
+        $new_game_data['values']['battle_failure'] = json_decode($db_save['save_values_battle_failure'], true);
+        $new_game_data['values']['battle_failure_hash'] = md5($db_save['save_values_battle_failure']);
       }
-      if (!empty($this_database_save['save_values_battle_rewards'])){
-        $new_game_data['values']['battle_rewards'] = json_decode($this_database_save['save_values_battle_rewards'], true);
-        $new_game_data['values']['battle_rewards_hash'] = md5($this_database_save['save_values_battle_rewards']);
+      if (!empty($db_save['save_values_battle_rewards'])){
+        $new_game_data['values']['battle_rewards'] = json_decode($db_save['save_values_battle_rewards'], true);
+        $new_game_data['values']['battle_rewards_hash'] = md5($db_save['save_values_battle_rewards']);
       }
-      if (!empty($this_database_save['save_values_battle_settings'])){
-        $new_game_data['values']['battle_settings'] = json_decode($this_database_save['save_values_battle_settings'], true);
-        $new_game_data['values']['battle_settings_hash'] = md5($this_database_save['save_values_battle_settings']);
+      if (!empty($db_save['save_values_battle_settings'])){
+        $new_game_data['values']['battle_settings'] = json_decode($db_save['save_values_battle_settings'], true);
+        $new_game_data['values']['battle_settings_hash'] = md5($db_save['save_values_battle_settings']);
       }
-      if (!empty($this_database_save['save_values_battle_items'])){
-        $new_game_data['values']['battle_items'] = json_decode($this_database_save['save_values_battle_items'], true);
-        $new_game_data['values']['battle_items_hash'] = md5($this_database_save['save_values_battle_items']);
+      if (!empty($db_save['save_values_battle_items'])){
+        $new_game_data['values']['battle_items'] = json_decode($db_save['save_values_battle_items'], true);
+        $new_game_data['values']['battle_items_hash'] = md5($db_save['save_values_battle_items']);
       }
-      if (!empty($this_database_save['save_values_battle_stars'])){
-        $new_game_data['values']['battle_stars'] = json_decode($this_database_save['save_values_battle_stars'], true);
-        $new_game_data['values']['battle_stars_hash'] = md5($this_database_save['save_values_battle_stars']);
+      if (!empty($db_save['save_values_battle_stars'])){
+        $new_game_data['values']['battle_stars'] = json_decode($db_save['save_values_battle_stars'], true);
+        $new_game_data['values']['battle_stars_hash'] = md5($db_save['save_values_battle_stars']);
       }
-      if (!empty($this_database_save['save_values_robot_database'])){
-        $new_game_data['values']['robot_database'] = json_decode($this_database_save['save_values_robot_database'], true);
-        $new_game_data['values']['robot_database_hash'] = md5($this_database_save['save_values_robot_database']);
+      if (!empty($db_save['save_values_robot_database'])){
+        $new_game_data['values']['robot_database'] = json_decode($db_save['save_values_robot_database'], true);
+        $new_game_data['values']['robot_database_hash'] = md5($db_save['save_values_robot_database']);
       }
-      $new_game_data['flags'] = !empty($this_database_save['save_flags']) ? json_decode($this_database_save['save_flags'], true) : array();
+      $new_game_data['flags'] = !empty($db_save['save_flags']) ? json_decode($db_save['save_flags'], true) : array();
 
-      $new_game_data['battle_settings'] = !empty($this_database_save['save_settings']) ? json_decode($this_database_save['save_settings'], true) : array();
+      $new_game_data['battle_settings'] = !empty($db_save['save_settings']) ? json_decode($db_save['save_settings'], true) : array();
 
       // Update the session with the new save info
       $_SESSION[$session_token] = array_merge($_SESSION[$session_token], $new_game_data);
@@ -1784,10 +1784,10 @@ class rpg_game {
 
     // Update the user table in the database if not done already
     if (empty($_SESSION[$session_token]['DEMO'])){
-      $this_database->update('mmrpg_users', array(
+      $db->update('mmrpg_users', array(
       	'user_last_login' => time(),
-        'user_backup_login' => $this_database_user['user_last_login'],
-        ), "user_id = {$this_database_user['user_id']}");
+        'user_backup_login' => $db_user['user_last_login'],
+        ), "user_id = {$db_user['user_id']}");
     }
 
     //exit();

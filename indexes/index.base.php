@@ -57,7 +57,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Collect the recently updated posts for this player / guest
     if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID && !empty($this_userinfo['user_backup_login'])){ $temp_last_login = $this_userinfo['user_backup_login']; }
     else { $temp_last_login = time() - MMRPG_SETTINGS_UPDATE_TIMEOUT; }
-    $temp_new_threads = $this_database->get_array_list("SELECT category_id, CONCAT(thread_id, '_', thread_mod_date) AS thread_session_token FROM mmrpg_threads WHERE thread_locked = 0 AND (thread_target = 0 OR thread_target = {$this_userinfo['user_id']} OR user_id = {$this_userinfo['user_id']}) AND thread_mod_date > {$temp_last_login}".($this_userid != MMRPG_SETTINGS_GUEST_ID ? "  AND thread_mod_user <> {$this_userid}" : ''));
+    $temp_new_threads = $db->get_array_list("SELECT category_id, CONCAT(thread_id, '_', thread_mod_date) AS thread_session_token FROM mmrpg_threads WHERE thread_locked = 0 AND (thread_target = 0 OR thread_target = {$this_userinfo['user_id']} OR user_id = {$this_userinfo['user_id']}) AND thread_mod_date > {$temp_last_login}".($this_userid != MMRPG_SETTINGS_GUEST_ID ? "  AND thread_mod_user <> {$this_userid}" : ''));
     if (empty($_SESSION['COMMUNITY']['threads_viewed'])){ $_SESSION['COMMUNITY']['threads_viewed'] = array(); }
     if (!empty($temp_new_threads)){ foreach ($temp_new_threads AS $key => $array){
         if (in_array($array['thread_session_token'], $_SESSION['COMMUNITY']['threads_viewed'])){ unset($temp_new_threads[$key]); }  }
@@ -154,7 +154,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
         <div class="banner">
             <?php
             // Collect the current user's info from the database
-            //$this_userinfo = $this_database->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+            //$this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
             // Define variables based on login status
             if (!defined('MMRPG_CRITICAL_ERROR') && $this_userid != MMRPG_SETTINGS_GUEST_ID){
                 // Define the avatar class and path variables
@@ -438,6 +438,6 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
 // If we're NOT in demo mode, automatically update the date-accessed for their database entry
 if (rpg_game::is_user()){
     $temp_query = 'UPDATE mmrpg_users SET user_date_accessed = '.time().' WHERE user_id = '.$_SESSION['GAME']['USER']['userid'];
-    $temp_result = $this_database->query($temp_query);
+    $temp_result = $db->query($temp_query);
 }
 ?>

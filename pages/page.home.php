@@ -141,9 +141,9 @@ $this_threads_query = "SELECT threads.*, users.*, users2.*, users3.*, categories
   GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
   WHERE threads.category_id = {$this_category_id} AND threads.thread_published = 1
   ORDER BY threads.thread_sticky DESC, threads.thread_date DESC";
-$this_threads_array = $this_database->get_array_list($this_threads_query);
+$this_threads_array = $db->get_array_list($this_threads_query);
 $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
-$this_category_info = $this_database->get_array("SELECT * FROM mmrpg_categories WHERE category_id = {$this_category_id}");
+$this_category_info = $db->get_array("SELECT * FROM mmrpg_categories WHERE category_id = {$this_category_id}");
 
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">

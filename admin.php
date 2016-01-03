@@ -69,7 +69,7 @@ else {
 }
 
 // Unset the database variable
-unset($this_database);
+unset($db);
 
 
 ?>

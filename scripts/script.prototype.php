@@ -73,7 +73,7 @@ switch ($this_data_select){
 $temp_markup = ob_get_clean();
 
 // Unset the database variable
-unset($this_database);
+unset($db);
 
 // If the user made it this far, exit gracefully
 exit(!empty($temp_markup) ? $temp_markup : '');

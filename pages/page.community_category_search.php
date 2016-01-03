@@ -125,7 +125,7 @@ if (true){
       {$temp_filter_by}
       AND 1 = 1
       ORDER BY {$temp_order_by}";
-    $post_search_array = $this_database->get_array_list($post_search_query);
+    $post_search_array = $db->get_array_list($post_search_query);
     $post_search_count = !empty($post_search_array) ? count($post_search_array) : 0;
   }
 
@@ -213,7 +213,7 @@ if (true){
       {$temp_filter_by}
       AND 1 = 1
       ORDER BY {$temp_order_by}";
-    $thread_search_array = $this_database->get_array_list($thread_search_query);
+    $thread_search_array = $db->get_array_list($thread_search_query);
     $thread_search_count = !empty($thread_search_array) ? count($thread_search_array) : 0;
   }
 
@@ -252,7 +252,7 @@ if (count($thread_index_array) < count($thread_index_array_required)){
     {$temp_filter_by}
     AND 1 = 1
     ORDER BY {$temp_order_by}";
-  $temp_index_array = $this_database->get_array_list($temp_index_query);
+  $temp_index_array = $db->get_array_list($temp_index_query);
   $temp_index_count = !empty($temp_index_array) ? count($temp_index_array) : 0;
 
   // If the thread indexes were found, add to main index

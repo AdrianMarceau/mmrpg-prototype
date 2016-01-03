@@ -17,7 +17,7 @@ $this_graph_data['description'] = strip_tags($this_category_info['category_descr
 //$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
 
 // Collect the current user's info from the database
-//$this_userinfo = $this_database->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+//$this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
 
 // If this is a SEARCH request, we run a special query
 if ($this_category_info['category_token'] == 'search'){
@@ -45,7 +45,7 @@ else {
     GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
     WHERE threads.category_id = {$this_category_info['category_id']} AND threads.thread_published = 1 AND (threads.thread_target = 0 OR threads.thread_target = {$this_userinfo['user_id']} OR threads.user_id = {$this_userinfo['user_id']})
     ORDER BY {$temp_order_by}";
-  $this_threads_array = $this_database->get_array_list($this_threads_query);
+  $this_threads_array = $db->get_array_list($this_threads_query);
   $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
   //die('<pre>'.print_r($this_threads_array, true).'</pre>');
 
@@ -325,7 +325,7 @@ $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
 // Collect the user post and thread count index plus leaderboard points for display
 $temp_id_includes = !empty($this_user_ids_array) ? 'AND mmrpg_users.user_id IN ('.implode(', ', $this_user_ids_array).')' : '';
 if (!empty($temp_id_includes)){
-  $this_user_countindex = $this_database->get_array_list('SELECT
+  $this_user_countindex = $db->get_array_list('SELECT
     mmrpg_users.user_id,
     mmrpg_leaderboard.board_points,
     mmrpg_threads.thread_count,

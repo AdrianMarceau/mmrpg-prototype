@@ -52,7 +52,7 @@ if ($this_current_id !== false && !empty($this_current_token)){ $this_current_vi
 
 // Collect all the users from the index (MAYBE DELETE)
 //$this_users_query = "SELECT * FROM mmrpg_users ORDER BY user_id ASC";
-//$this_users_index = $this_database->get_array_list($this_users_query, 'user_id');
+//$this_users_index = $db->get_array_list($this_users_query, 'user_id');
 
 // If a specific category has been requested, collect its info
 $this_category_info = array();
@@ -70,7 +70,7 @@ if (empty($this_current_id) && $this_current_token == 'new'){
   	FROM mmrpg_threads AS threads
   	LIMIT 1";
     //WHERE threads.thread_id = '0'";
-  $this_thread_info = $this_database->get_array($this_thread_query);
+  $this_thread_info = $db->get_array($this_thread_query);
   foreach ($this_thread_info AS $key => $info){ $this_thread_info[$key] = is_numeric($info) ? 0 : ''; }
   $this_thread_info['user_id'] = $this_userinfo['user_id'];
   $this_thread_info['user_name'] = $this_userinfo['user_name'];
@@ -103,14 +103,14 @@ elseif (!empty($this_current_id) && !empty($this_current_token)){
   	LEFT JOIN mmrpg_users AS users ON threads.user_id = users.user_id
   	LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
   	WHERE threads.thread_id = '{$this_current_id}' AND threads.thread_token = '{$this_current_token}'";
-  $this_thread_info = $this_database->get_array($this_thread_query);
+  $this_thread_info = $db->get_array($this_thread_query);
 
   // If this thread has not already been viewed this session, increment the counter
   $temp_session_key = 'mmrpg_thread_viewed_'.$this_thread_info['thread_id'];
   if (empty($_SESSION[$temp_session_key])){
     $temp_current_views = $this_thread_info['thread_views'];
     $temp_new_views = $temp_current_views + 1;
-    $temp_update_session = $this_database->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
+    $temp_update_session = $db->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
     if (!empty($temp_update_session)){ $this_thread_info['thread_views'] = $temp_new_views; }
     $_SESSION[$temp_session_key] = true;
   }

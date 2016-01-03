@@ -88,7 +88,7 @@ if ($this_current_sub == 'search'){
             $this_search_query .= "LIMIT {$overflow_limit}; ";
 
             // Collect any results from the database
-            $this_search_results = $this_database->get_array_list($this_search_query);
+            $this_search_results = $db->get_array_list($this_search_query);
             $this_search_count = !empty($this_search_results) ? count($this_search_results) : 0;
 
             // Limit the result count if over the limit
@@ -224,7 +224,7 @@ if ($this_current_sub == 'search'){
             //exit($this_search_query);
 
             // Collect any results from the database
-            $this_search_results = $this_database->get_array_list($this_search_query);
+            $this_search_results = $db->get_array_list($this_search_query);
             $this_search_count = !empty($this_search_results) ? count($this_search_results) : 0;
 
             // Limit the result count if over the limit
@@ -397,7 +397,7 @@ if ($this_current_sub == 'search'){
             //exit($this_search_query);
 
             // Collect any results from the database
-            $this_search_results = $this_database->get_array_list($this_search_query);
+            $this_search_results = $db->get_array_list($this_search_query);
             $this_search_count = !empty($this_search_results) ? count($this_search_results) : 0;
 
             // Limit the result count if over the limit
@@ -543,7 +543,7 @@ if ($this_current_sub == 'search'){
             //exit($this_search_query);
 
             // Collect any results from the database
-            $this_search_results = $this_database->get_array_list($this_search_query);
+            $this_search_results = $db->get_array_list($this_search_query);
             $this_search_count = !empty($this_search_results) ? count($this_search_results) : 0;
 
             // Limit the result count if over the limit
@@ -685,7 +685,7 @@ if ($this_current_sub == 'search'){
             //exit($this_search_query);
 
             // Collect any results from the database
-            $this_search_results = $this_database->get_array_list($this_search_query);
+            $this_search_results = $db->get_array_list($this_search_query);
             $this_search_count = !empty($this_search_results) ? count($this_search_results) : 0;
 
             // Limit the result count if over the limit
@@ -823,7 +823,7 @@ if ($this_current_sub == 'search'){
             //exit($this_search_query);
 
             // Collect any results from the database
-            $this_search_results = $this_database->get_array_list($this_search_query);
+            $this_search_results = $db->get_array_list($this_search_query);
             $this_search_count = !empty($this_search_results) ? count($this_search_results) : 0;
 
             // Limit the result count if over the limit

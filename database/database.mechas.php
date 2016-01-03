@@ -34,11 +34,11 @@ if (isset($mmrpg_database_mechas_filter)){
 // Collect the database mechas and fields
 $field_fields = rpg_field::get_index_fields(true);
 $robot_fields = rpg_robot::get_index_fields(true);
-$this_database->query("SET @robot_row_number = 0;");
-$mmrpg_database_fields = $this_database->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
-$mmrpg_database_mechas = $this_database->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND (robot_flag_hidden = 0 OR robot_token = '{$this_current_token}') {$temp_condition} ORDER BY robot_order ASC;", 'robot_token');
-$mmrpg_database_mechas_count = $this_database->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_hidden = 0 {$temp_condition_unfiltered};", 'robot_count');
-$mmrpg_database_mechas_numbers = $this_database->get_array_list("SELECT robot_token, (@robot_row_number:=@robot_row_number + 1) AS robot_key FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition_unfiltered} ORDER BY robot_flag_hidden ASC, robot_order ASC;", 'robot_token');
+$db->query("SET @robot_row_number = 0;");
+$mmrpg_database_fields = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
+$mmrpg_database_mechas = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND (robot_flag_hidden = 0 OR robot_token = '{$this_current_token}') {$temp_condition} ORDER BY robot_order ASC;", 'robot_token');
+$mmrpg_database_mechas_count = $db->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_hidden = 0 {$temp_condition_unfiltered};", 'robot_count');
+$mmrpg_database_mechas_numbers = $db->get_array_list("SELECT robot_token, (@robot_row_number:=@robot_row_number + 1) AS robot_key FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition_unfiltered} ORDER BY robot_flag_hidden ASC, robot_order ASC;", 'robot_token');
 
 // Remove unallowed mechas from the database, and increment type counters
 foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){

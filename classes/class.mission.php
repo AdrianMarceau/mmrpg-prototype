@@ -19,10 +19,10 @@ class rpg_mission {
   // Define a function for generating the STARTER missions
   public static function generate_starter($this_prototype_data, $this_robot_token = 'met', $this_start_level = 1, $this_rescue_token = 'roll', $this_field_token = 'intro-field', $this_start_count = 1, $this_target_class = 'mecha'){
     // Pull in global variables for this function
-    global $mmrpg_index, $this_database;
+    global $mmrpg_index, $db;
 
     // Collect data on this robot and the rescue robot
-    $this_robot_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
     $this_robot_data = rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
     $this_robot_name = $this_robot_data['robot_name'];
     // Populate the battle options with the starter battle option
@@ -376,7 +376,7 @@ class rpg_mission {
   // Define a function for generating the SINGLES missions
   public static function generate_single($this_prototype_data, $this_robot_token, $this_field_token, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true, $this_addon_abilities = 0){
     // Pull in global variables for this function
-    global $mmrpg_index, $this_database, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
+    global $mmrpg_index, $db, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
 
     // Collect the robot index for calculation purposes
     $this_robot_index = rpg_robot::get_index();
@@ -868,7 +868,7 @@ class rpg_mission {
   // Define a function for generating the DOUBLES missions
   public static function generate_double($this_prototype_data, $this_robot_tokens, $this_field_tokens, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true){
     // Pull in global variables for this function
-    global $mmrpg_index, $this_database, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
+    global $mmrpg_index, $db, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
 
     // Collect the robot index for calculation purposes
     $this_robot_index = rpg_robot::get_index();
@@ -1423,7 +1423,7 @@ class rpg_mission {
   // Define a function for generating the PLAYER missions
   function generate_player($this_prototype_data, $this_user_info, $this_max_robots, &$field_factors_one, &$field_factors_two, &$field_factors_three){
     // Pull in global variables for this function
-    global $mmrpg_index, $this_database, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
+    global $mmrpg_index, $db, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
 
     $this_field_index = rpg_field::get_index();
     // Define the omega battle and default to empty
@@ -1442,7 +1442,7 @@ class rpg_mission {
     //die('<pre>'.print_r($temp_player_array, true).'</pre>');
 
     // Pull and random player from the list and collect their full data
-    $temp_player_array = $this_user_info; /* $temp_player_array = $this_database->get_array("SELECT users.*, saves.*, boards.* FROM mmrpg_users AS users
+    $temp_player_array = $this_user_info; /* $temp_player_array = $db->get_array("SELECT users.*, saves.*, boards.* FROM mmrpg_users AS users
       LEFT JOIN mmrpg_saves AS saves ON saves.user_id = users.user_id
       LEFT JOIN mmrpg_leaderboard AS boards ON boards.user_id = users.user_id
     	WHERE users.user_id = {$this_user_id}
@@ -1680,10 +1680,10 @@ class rpg_mission {
   // Define a function for generating the BONUS missions
   public static function generate_bonus($this_prototype_data, $this_robot_count = 8, $this_robot_class = 'master'){
     // Pull in global variables for this function
-    global $mmrpg_index, $this_database;
+    global $mmrpg_index, $db;
 
     // Collect the robot index for calculation purposes
-    $this_robot_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
     // Populate the battle options with the starter battle option
     $temp_rand_num = $this_robot_count;
     $temp_battle_token = $this_prototype_data['phase_battle_token'].'-prototype-bonus-'.$this_robot_class;
@@ -1874,7 +1874,7 @@ class rpg_mission {
   // Define a function for generating the FORTRESS missions
   public static function generate_fortress($this_prototype_data, $temp_battle_level, $temp_index_token, $temp_battle_token, $temp_robot_masters = array(), $temp_support_mechas = array(), $temp_player_info = array()){
     // Pull in global variables for this function
-    global $mmrpg_index, $this_database;
+    global $mmrpg_index, $db;
 
     // Collect the battle index for this foress battle
     $temp_battle_index = rpg_battle::get_index_info($temp_index_token);

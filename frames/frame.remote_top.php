@@ -4,7 +4,7 @@ if (!defined('MMRPG_REMOTE_GAME_ID')){ define('MMRPG_REMOTE_GAME_ID', (!empty($_
 if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER']['userid']){
 
   // Attempt to collect data for this player from the database
-  $this_playerinfo = $this_database->get_array("SELECT
+  $this_playerinfo = $db->get_array("SELECT
   	mmrpg_users.*,
   	mmrpg_saves.*
   	FROM mmrpg_users

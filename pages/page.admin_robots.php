@@ -32,8 +32,8 @@ $robot_id = isset($_GET['num']) && is_numeric($_GET['num']) ? (int)($_GET['num']
 
 // Collect robot info based on the ID if available
 $robot_fields = rpg_robot::get_index_fields(true);
-if (!empty($robot_id)){ $robot_info = $this_database->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id = {$robot_id} AND robot_class = '{$object_class_token}';"); }
-elseif ($robot_id === 0){ $robot_info = $this_database->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_token = 'robot';"); }
+if (!empty($robot_id)){ $robot_info = $db->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id = {$robot_id} AND robot_class = '{$object_class_token}';"); }
+elseif ($robot_id === 0){ $robot_info = $db->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_token = 'robot';"); }
 else { $robot_info = array(); }
 
 // Parse the robot info if it was collected
@@ -165,11 +165,11 @@ else {
 
     // Collect a list of all users in the database
     $robot_fields = rpg_robot::get_index_fields(true);
-    $robot_index = $this_database->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_token <> 'robot' AND robot_class = '{$object_class_token}' ORDER BY robot_id ASC", 'robot_id');
+    $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_token <> 'robot' AND robot_class = '{$object_class_token}' ORDER BY robot_id ASC", 'robot_id');
     $robot_count = !empty($robot_index) ? count($robot_index) : 0;
 
     // Collect a list of completed robot sprite tokens
-    $random_sprite = $this_database->get_value("SELECT robot_image FROM mmrpg_index_robots WHERE robot_image <> 'robot' AND robot_class = '{$object_class_token}' AND robot_image_size = 40 AND robot_flag_complete = 1 ORDER BY RAND() LIMIT 1;", 'robot_image');
+    $random_sprite = $db->get_value("SELECT robot_image FROM mmrpg_index_robots WHERE robot_image <> 'robot' AND robot_class = '{$object_class_token}' AND robot_image_size = 40 AND robot_flag_complete = 1 ORDER BY RAND() LIMIT 1;", 'robot_image');
 
     // Start generating the page markup
     ob_start();

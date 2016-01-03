@@ -166,7 +166,7 @@ foreach ($database_page_groups AS $page_key => $group_array){
 
 // Collect the database markup from the session if set, otherwise generate it
 $this_cache_stamp = MMRPG_CONFIG_CACHE_DATE.'_'.$allowed_database_robots_count;
-$this_database_markup = '';
+$db_markup = '';
 if (true){
 
   // Prepare the output buffer
@@ -612,7 +612,7 @@ if (true){
                           $temp_string = array();
                           $ability_key = 0;
 
-                          //$temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                          //$temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
                           foreach ($robot_ability_rewards AS $this_info){
                             $this_level = $this_info['level'];
@@ -692,10 +692,10 @@ if (true){
   <?php
 
   // Collect the output buffer content
-  $this_database_markup = preg_replace('#\s+#', ' ', trim(ob_get_clean()));
+  $db_markup = preg_replace('#\s+#', ' ', trim(ob_get_clean()));
 
   // Update the session cache
-  //$_SESSION['DATABASE'][$this_cache_stamp] = $this_database_markup;
+  //$_SESSION['DATABASE'][$this_cache_stamp] = $db_markup;
 }
 
 
@@ -887,7 +887,7 @@ function windowResizeFrame(){
   <div id="prototype" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
     <div id="database" class="menu">
 
-      <?= $this_database_markup ?>
+      <?= $db_markup ?>
 
     </div>
 
@@ -936,5 +936,5 @@ if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php')
 // Require the remote bottom in case we're in viewer mode
 require(MMRPG_CONFIG_ROOTDIR.'frames/frame.remote_bottom.php');
 // Unset the database variable
-unset($this_database);
+unset($db);
 ?>

@@ -10,7 +10,7 @@
 //$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
 
 // Collect the current user's info from the database
-//$this_userinfo = $this_database->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+//$this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
 
 
 
@@ -26,7 +26,7 @@ $index_threads_query = "SELECT threads.*, users.*, users2.*, users3.*, categorie
   GROUP BY posts.thread_id) AS posts ON threads.thread_id = posts.thread_id
   WHERE threads.thread_published = 1
   ORDER BY threads.thread_sticky DESC, threads.thread_date DESC";
-$index_threads_array = $this_database->get_array_list($index_threads_query);
+$index_threads_array = $db->get_array_list($index_threads_query);
 $index_threads_count = !empty($index_threads_array) ? count($index_threads_array) : 0;
 if (empty($index_threads_array)){ $index_threads_array = array(); }
 

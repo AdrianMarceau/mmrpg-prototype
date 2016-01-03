@@ -742,7 +742,7 @@ class rpg_field extends rpg_object {
         global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_mechas, $mmrpg_database_abilities, $mmrpg_database_types;
 
         // Collect references to global objects
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Collect references to global indexes
         $mmrpg_types = rpg_type::get_index();
@@ -1076,7 +1076,7 @@ class rpg_field extends rpg_object {
     public static function print_editor_option_markup($field_info){
 
         // Collect references to global objects
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Collect references to global indexes
         $mmrpg_types = rpg_type::get_index();
@@ -1115,7 +1115,7 @@ class rpg_field extends rpg_object {
     public static function print_editor_title_markup($field_info){
 
         // Collect references to global objects
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Collect references to global indexes
         $mmrpg_types = rpg_type::get_index();
@@ -1212,7 +1212,7 @@ class rpg_field extends rpg_object {
     public static function get_index($include_hidden = false, $include_unpublished = false){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
@@ -1221,7 +1221,7 @@ class rpg_field extends rpg_object {
 
         // Collect every type's info from the database index
         $field_fields = self::get_index_fields(true);
-        $field_index = $this_database->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
+        $field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($field_index)){
@@ -1240,7 +1240,7 @@ class rpg_field extends rpg_object {
     public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
@@ -1248,7 +1248,7 @@ class rpg_field extends rpg_object {
         if (!$include_unpublished){ $temp_where .= 'AND field_flag_published = 1 '; }
 
         // Collect an array of field tokens from the database
-        $field_index = $this_database->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
+        $field_index = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
 
         // Return the tokens if not empty, else nothing
         if (!empty($field_index)){
@@ -1264,7 +1264,7 @@ class rpg_field extends rpg_object {
     public static function get_index_custom($field_tokens = array()){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Generate a token string for the database query
         $field_tokens_string = array();
@@ -1273,7 +1273,7 @@ class rpg_field extends rpg_object {
 
         // Collect the requested field's info from the database index
         $field_fields = self::get_index_fields(true);
-        $field_index = $this_database->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_token IN ({$field_tokens_string});", 'field_token');
+        $field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_token IN ({$field_tokens_string});", 'field_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($field_index)){
@@ -1289,12 +1289,12 @@ class rpg_field extends rpg_object {
     public static function get_index_info($field_token){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Collect this field's info from the database index
         $lookup = !is_numeric($field_token) ? "field_token = '{$field_token}'" : "field_id = {$field_token}";
         $field_fields = self::get_index_fields(true);
-        $field_index = $this_database->get_array("SELECT {$field_fields} FROM mmrpg_index_fields WHERE {$lookup};", 'field_token');
+        $field_index = $db->get_array("SELECT {$field_fields} FROM mmrpg_index_fields WHERE {$lookup};", 'field_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($field_index)){

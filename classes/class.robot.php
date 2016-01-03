@@ -1083,7 +1083,7 @@ class rpg_robot extends rpg_object {
     public function print_scan_markup(){
 
         // Collect references to global objects
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
 
@@ -1219,7 +1219,7 @@ class rpg_robot extends rpg_object {
         $this_markup = '';
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $this_database;
+        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
         global $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_fields, $mmrpg_database_types;
         global $mmrpg_stat_base_max_value;
 
@@ -1359,9 +1359,9 @@ class rpg_robot extends rpg_object {
         // Collect the database records for this robot
         if ($print_options['show_records']){
 
-            global $this_database;
+            global $db;
             $temp_robot_records = array('robot_encountered' => 0, 'robot_defeated' => 0, 'robot_unlocked' => 0, 'robot_summoned' => 0, 'robot_scanned' => 0);
-            //$temp_robot_records['player_count'] = $this_database->get_value("SELECT COUNT(board_id) AS player_count  FROM mmrpg_leaderboard WHERE board_robots LIKE '%[".$robot_info['robot_token'].":%' AND board_points > 0", 'player_count');
+            //$temp_robot_records['player_count'] = $db->get_value("SELECT COUNT(board_id) AS player_count  FROM mmrpg_leaderboard WHERE board_robots LIKE '%[".$robot_info['robot_token'].":%' AND board_points > 0", 'player_count');
             $temp_player_query = "SELECT
                 mmrpg_saves.user_id,
                 mmrpg_saves.save_values_robot_database,
@@ -1369,7 +1369,7 @@ class rpg_robot extends rpg_object {
                 FROM mmrpg_saves
                 LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_saves.user_id
                 WHERE mmrpg_saves.save_values_robot_database LIKE '%\"{$robot_info['robot_token']}\"%' AND mmrpg_leaderboard.board_points > 0;";
-            $temp_player_list = $this_database->get_array_list($temp_player_query);
+            $temp_player_list = $db->get_array_list($temp_player_query);
             if (!empty($temp_player_list)){
                 foreach ($temp_player_list AS $temp_data){
                     $temp_values = !empty($temp_data['save_values_robot_database']) ? json_decode($temp_data['save_values_robot_database'], true) : array();
@@ -2385,7 +2385,7 @@ class rpg_robot extends rpg_object {
     public static function print_editor_markup($player_info, $robot_info){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $this_database;
+        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_rewards, $player_ability_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
@@ -3173,7 +3173,7 @@ class rpg_robot extends rpg_object {
     public static function print_editor_option_markup($field_info){
 
         // Collect references to global objects
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Collect references to global indexes
         $mmrpg_types = rpg_type::get_index();
@@ -3212,7 +3212,7 @@ class rpg_robot extends rpg_object {
     public static function print_editor_title_markup($field_info){
 
         // Collect references to global objects
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Collect references to global indexes
         $mmrpg_types = rpg_type::get_index();
@@ -3443,7 +3443,7 @@ class rpg_robot extends rpg_object {
     public function robot_choices_abilities($target_player, $target_robot){
 
         // Extract all objects into the current scope
-        global $this_database;
+        global $db;
         $this_battle = $this->battle;
         $this_field = $this->field;
         $this_player = $this->player;
@@ -3515,7 +3515,7 @@ class rpg_robot extends rpg_object {
         if ($this_robot->has_ability('super-throw')){ $options[] = 'super-throw'; $weights[] = 1;  }
 
         // Loop through any leftover abilities and add them to the weighted ability options
-        $temp_ability_index = $this_database->get_array_list("SELECT ability_id, ability_token, ability_name, ability_type, ability_type2 FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $temp_ability_index = $db->get_array_list("SELECT ability_id, ability_token, ability_name, ability_type, ability_type2 FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         $temp_boost_pattern = 'boost|hone|temper|cool|blast|blaze|charge|haste|harden|breeze|douse|surge|growth|rocket|polish|charm|cosmos|guard|glow';
         $temp_break_pattern = 'break|blunt|hammer|chill|burst|burn|shock|slow|crumble|squall|drench|stall|decay|torpedo|tarnish|curse|chaos|block|fade';
         foreach ($this_robot->robot_abilities AS $key => $token){
@@ -3561,7 +3561,7 @@ class rpg_robot extends rpg_object {
     public function trigger_ability(rpg_player $target_player, rpg_robot $target_robot, rpg_ability $this_ability){
 
         // Extract all objects into the current scope
-        global $this_database;
+        global $db;
         $this_battle = $this->battle;
         $this_field = $this->field;
         $this_player = $this->player;
@@ -3730,7 +3730,7 @@ class rpg_robot extends rpg_object {
     public function trigger_target($target_robot, $this_ability, $trigger_options = array()){
 
         // Pull in the global objects
-        global $this_database;
+        global $db;
         // Collect references to assumed variables
         $this_battle = $this->battle;
         $this_field = $this->field;
@@ -3843,7 +3843,7 @@ class rpg_robot extends rpg_object {
     public function trigger_damage($target_robot, $this_ability, $damage_amount, $trigger_disabled = true, $trigger_options = array()){
 
         // Import global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
 
@@ -5036,7 +5036,7 @@ class rpg_robot extends rpg_object {
     public function trigger_recovery($target_robot, $this_ability, $recovery_amount, $trigger_disabled = true, $trigger_options = array()){
 
         // Import global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
 
@@ -6227,7 +6227,7 @@ class rpg_robot extends rpg_object {
         global $mmrpg_index;
 
         // Import global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
 
@@ -7094,7 +7094,7 @@ class rpg_robot extends rpg_object {
 
                 // Loop through the ability rewards for this robot if set
                 if ($temp_robot->robot_class != 'mecha' && ($temp_start_level == 100 || ($temp_start_level != $temp_new_level && !empty($index_robot_rewards['abilities'])))){
-                    $temp_abilities_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                    $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
                     foreach ($index_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
                         // If the ability does not exist or is otherwise incomplete, continue
                         if (!isset($temp_abilities_index[$ability_reward_info['token']])){ continue; }
@@ -7407,7 +7407,7 @@ class rpg_robot extends rpg_object {
 
             // Loop through the ability rewards for this robot if set and NOT demo mode
             if (rpg_game::is_user() && !empty($target_player_rewards['items']) && $this->player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
-                $temp_items_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                $temp_items_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
                 // Define the default success rate and multiply by the modifier
                 $temp_success_value = $this_robot->robot_class == 'master' ? 50 : 25;
                 $temp_success_value = ceil($temp_success_value * $temp_chance_multiplier);
@@ -8381,7 +8381,7 @@ class rpg_robot extends rpg_object {
     public static function get_index($include_hidden = false, $include_unpublished = false, $filter_class = '', $include_tokens = array()){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
@@ -8397,7 +8397,7 @@ class rpg_robot extends rpg_object {
 
         // Collect every type's info from the database index
         $robot_fields = self::get_index_fields(true);
-        $robot_index = $this_database->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
+        $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($robot_index)){
@@ -8416,7 +8416,7 @@ class rpg_robot extends rpg_object {
     public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $filter_class = ''){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
@@ -8425,7 +8425,7 @@ class rpg_robot extends rpg_object {
         if (!empty($filter_class)){ $temp_where .= "AND robot_class = '{$filter_class}' "; }
 
         // Collect an array of robot tokens from the database
-        $robot_index = $this_database->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
+        $robot_index = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
 
         // Return the tokens if not empty, else nothing
         if (!empty($robot_index)){
@@ -8441,7 +8441,7 @@ class rpg_robot extends rpg_object {
     public static function get_index_custom($robot_tokens = array()){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Generate a token string for the database query
         $robot_tokens_string = array();
@@ -8450,7 +8450,7 @@ class rpg_robot extends rpg_object {
 
         // Collect the requested robot's info from the database index
         $robot_fields = self::get_index_fields(true);
-        $robot_index = $this_database->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_token IN ({$robot_tokens_string});", 'robot_token');
+        $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_token IN ({$robot_tokens_string});", 'robot_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($robot_index)){
@@ -8466,12 +8466,12 @@ class rpg_robot extends rpg_object {
     public static function get_index_info($robot_token){
 
         // Pull in global variables
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
 
         // Collect this robot's info from the database index
         $lookup = !is_numeric($robot_token) ? "robot_token = '{$robot_token}'" : "robot_id = {$robot_token}";
         $robot_fields = self::get_index_fields(true);
-        $robot_index = $this_database->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE {$lookup};", 'robot_token');
+        $robot_index = $db->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE {$lookup};", 'robot_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($robot_index)){
@@ -8695,7 +8695,7 @@ class rpg_robot extends rpg_object {
     public function check_attachments(rpg_player $target_player, rpg_robot $target_robot){
 
         // Collect references to global objects
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
 
@@ -9024,7 +9024,7 @@ class rpg_robot extends rpg_object {
     public function check_items(rpg_player $target_player, rpg_robot $target_robot){
 
         // Collect references to global objects
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
 
@@ -9172,7 +9172,7 @@ class rpg_robot extends rpg_object {
     public function check_weapons(rpg_player $target_player, rpg_robot $target_robot, $regen_weapons = true){
 
         // Collect references to global objects
-        $this_database = cms_database::get_database();
+        $db = cms_database::get_database();
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
 

@@ -70,10 +70,10 @@ $this_posts_query = "SELECT posts.*,
 	LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
 	WHERE posts.thread_id = '{$this_thread_info['thread_id']}'
 	ORDER BY posts.post_date ASC";
-$this_posts_array = $this_database->get_array_list($this_posts_query);
+$this_posts_array = $db->get_array_list($this_posts_query);
 if (empty($this_posts_array)){ $this_posts_array = array(); }
 $this_posts_count = !empty($this_posts_array) ? count($this_posts_array) : 0;
-//$this_posts_count = $this_database->get_value("SELECT COUNT(1) AS post_count FROM mmrpg_posts AS posts WHERE posts.thread_id = '{$this_thread_info['thread_id']}' AND posts.post_deleted = 0", 'post_count');
+//$this_posts_count = $db->get_value("SELECT COUNT(1) AS post_count FROM mmrpg_posts AS posts WHERE posts.thread_id = '{$this_thread_info['thread_id']}' AND posts.post_deleted = 0", 'post_count');
 
 // Define the array of user ids to collect information for
 $temp_user_ids = array();
@@ -91,11 +91,11 @@ $this_posts_count = !empty($this_posts_array) ? count($this_posts_array) : 0;
 // If the current post count is somehow higher than the view count, fix it up
 if ($this_posts_count >= $this_thread_info['thread_views']){
   $this_thread_info['thread_views'] += $this_posts_count;
-  $this_database->query("UPDATE mmrpg_threads SET thread_views = {$this_thread_info['thread_views']} WHERE thread_id = {$this_thread_info['thread_id']}");
+  $db->query("UPDATE mmrpg_threads SET thread_views = {$this_thread_info['thread_views']} WHERE thread_id = {$this_thread_info['thread_id']}");
 }
 
 // Collect the thread counts for all users in an index
-$this_user_countindex = $this_database->get_array_list('SELECT
+$this_user_countindex = $db->get_array_list('SELECT
   mmrpg_users.user_id,
   mmrpg_leaderboard.board_points,
   mmrpg_threads.thread_count,
@@ -121,7 +121,7 @@ $temp_thread_views = !empty($this_thread_info['thread_views']) ? $this_thread_in
 
 // If this is a PM, collect the target's info
 if ($is_personal_message){
-  $temp_thread_targetinfo = $this_database->get_array("SELECT user_id, user_name, user_name_public, user_name_clean FROM mmrpg_users WHERE user_id = {$this_thread_info['thread_target']} LIMIT 1");
+  $temp_thread_targetinfo = $db->get_array("SELECT user_id, user_name, user_name_public, user_name_clean FROM mmrpg_users WHERE user_id = {$this_thread_info['thread_target']} LIMIT 1");
   $temp_thread_target = !empty($temp_thread_targetinfo['user_name_public']) ? $temp_thread_targetinfo['user_name_public'] : $temp_thread_targetinfo['user_name'];
 }
 
@@ -411,7 +411,7 @@ $this_page_minpost_key = $this_page_maxpost_key - ($this_posts_perpage - 1);
           $temp_post_body = isset($_POST['post_body']) ? htmlentities($_POST['post_body'], ENT_QUOTES, 'UTF-8', true) : '';
           $temp_avatar_frame = isset($_REQUEST['post_frame']) ? $_REQUEST['post_frame'] : '00';
           if (!empty($temp_post_id)){
-            $temp_post_info = $this_database->get_array("SELECT mmrpg_posts.*, mmrpg_users.user_image_path FROM mmrpg_posts LEFT JOIN mmrpg_users on mmrpg_users.user_id = mmrpg_posts.user_id WHERE post_id = {$temp_post_id} ".(!COMMUNITY_VIEW_MODERATOR ? " AND mmrpg_posts.user_id = {$this_userid}" : ''));
+            $temp_post_info = $db->get_array("SELECT mmrpg_posts.*, mmrpg_users.user_image_path FROM mmrpg_posts LEFT JOIN mmrpg_users on mmrpg_users.user_id = mmrpg_posts.user_id WHERE post_id = {$temp_post_id} ".(!COMMUNITY_VIEW_MODERATOR ? " AND mmrpg_posts.user_id = {$this_userid}" : ''));
             //die('$temp_post_info = <pre>'.print_r($temp_post_info, true).'</pre>');
             $temp_post_body = !empty($temp_post_info['post_body']) ? htmlentities($temp_post_info['post_body'], ENT_QUOTES, 'UTF-8', true) : '';
             $temp_avatar_path = !empty($temp_post_info['user_image_path']) ? $temp_post_info['user_image_path'] : $temp_avatar_path;

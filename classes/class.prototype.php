@@ -142,7 +142,7 @@ class rpg_prototype {
   // Define a function for displaying prototype battle option markup
   public static function options_markup(&$battle_options, $player_token){
     // Refence the global config and index objects for easy access
-    global $mmrpg_index, $this_database;
+    global $mmrpg_index, $db;
     $mmrpg_index_fields = rpg_field::get_index();
 
     // Define the variable to collect option markup
@@ -178,7 +178,7 @@ class rpg_prototype {
         $this_battleinfo['counters'] = !empty($this_battleinfo['counters']) ? array_merge($this_battleinfo['counters'], $temp_counters) : $temp_counters;
         //if (!is_array($this_battleinfo['battle_field_info'])){ echo('Key '.$this_key.' in $battle_options_reversed = <pre>'.print_r($battle_options_reversed, true).'</pre>'); }
         //if (!is_array($this_battleinfo['battle_field_info'])){ echo('$this_battleinfo[\'battle_field_info\'] = <pre>'.print_r($this_battleinfo, true).'</pre>'); }
-        //if (!is_array($this_battleinfo['battle_field_info'])){ echo('$this_database->INDEX[\'BATTLES\']['.$this_info['battle_token'].'] = <pre>'.print_r($this_database->INDEX['BATTLES'][$this_info['battle_token']], true).'</pre>'); }
+        //if (!is_array($this_battleinfo['battle_field_info'])){ echo('$db->INDEX[\'BATTLES\']['.$this_info['battle_token'].'] = <pre>'.print_r($db->INDEX['BATTLES'][$this_info['battle_token']], true).'</pre>'); }
         if (!isset($this_battleinfo['battle_field_info'])){ echo print_r($this_battleinfo, true); }
         $this_fieldtoken = $this_battleinfo['battle_field_info']['field_token'];
         $this_fieldinfo =
@@ -188,7 +188,7 @@ class rpg_prototype {
         $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
 
         // Collect the robot index for calculation purposes
-        $this_robot_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
         // Check the GAME session to see if this battle has been completed, increment the counter if it was
         $this_battleinfo['battle_option_complete'] = rpg_prototype::battle_complete($player_token, $this_info['battle_token']);
@@ -502,7 +502,7 @@ class rpg_prototype {
 
   // Define a function for generating an ability set for a given robot
   public static function generate_abilities($robot_info, $robot_level = 1, $ability_num = 1, $robot_item = ''){
-    global $this_database;
+    global $db;
     // Define the static variables for the ability lists
     static $mmrpg_prototype_core_abilities;
     static $mmrpg_prototype_master_support_abilities;
@@ -634,7 +634,7 @@ class rpg_prototype {
 
       // Collect the ability index for calculation purposes
       static $this_ability_index;
-      if (empty($this_ability_index)){ $this_ability_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token'); }
+      if (empty($this_ability_index)){ $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token'); }
 
       // Check if this robot is holding a core
       $robot_item_core = !empty($robot_item) && preg_match('/^item-core-/i', $robot_item) ? preg_replace('/^item-core-/i', '', $robot_item) : '';
@@ -850,10 +850,10 @@ class rpg_prototype {
 
   // Define a function for pulling the leaderboard players index
   public static function leaderboard_index(){
-    global $this_database;
+    global $db;
     // Check to see if the leaderboard index has already been pulled or not
-    if (!empty($this_database->INDEX['LEADERBOARD']['index'])){
-      $this_leaderboard_index = json_decode($this_database->INDEX['LEADERBOARD']['index'], true);
+    if (!empty($db->INDEX['LEADERBOARD']['index'])){
+      $this_leaderboard_index = json_decode($db->INDEX['LEADERBOARD']['index'], true);
     } else {
       // Define the array for pulling all the leaderboard data
       $temp_leaderboard_query = 'SELECT
@@ -868,9 +868,9 @@ class rpg_prototype {
         WHERE mmrpg_leaderboard.board_points > 0 ORDER BY mmrpg_leaderboard.board_points DESC
         ';
       // Query the database and collect the array list of all online players
-      $this_leaderboard_index = $this_database->get_array_list($temp_leaderboard_query);
+      $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
       // Update the database index cache
-      $this_database->INDEX['LEADERBOARD']['index'] = json_encode($this_leaderboard_index);
+      $db->INDEX['LEADERBOARD']['index'] = json_encode($this_leaderboard_index);
     }
     // Return the collected leaderboard index
     return $this_leaderboard_index;
@@ -903,10 +903,10 @@ class rpg_prototype {
 
   // Define a function for pulling the leaderboard online player
   public static function leaderboard_online(){
-    global $this_database;
+    global $db;
     // Check to see if the leaderboard online has already been pulled or not
-    if (!empty($this_database->INDEX['LEADERBOARD']['online'])){
-      $this_leaderboard_online = json_decode($this_database->INDEX['LEADERBOARD']['online'], true);
+    if (!empty($db->INDEX['LEADERBOARD']['online'])){
+      $this_leaderboard_online = json_decode($db->INDEX['LEADERBOARD']['online'], true);
     } else {
       // Collect the leaderboard index for ranking
       $this_leaderboard_index = rpg_prototype::leaderboard_index();
@@ -937,7 +937,7 @@ class rpg_prototype {
         }
       }
       // Update the database index cache
-      $this_database->INDEX['LEADERBOARD']['online'] = json_encode($this_leaderboard_online);
+      $db->INDEX['LEADERBOARD']['online'] = json_encode($this_leaderboard_online);
     }
     // Return the collected online players if any
     return $this_leaderboard_online;
@@ -945,10 +945,10 @@ class rpg_prototype {
 
   // Define a function for pulling the leaderboard custom player options
   public static function leaderboard_custom($player_token = '', $this_userid = 0){
-    global $this_database;
+    global $db;
     // Check to see if the leaderboard online has already been pulled or not
-    if (!empty($this_database->INDEX['LEADERBOARD']['custom'])){
-      $this_leaderboard_custom = json_decode($this_database->INDEX['LEADERBOARD']['custom'], true);
+    if (!empty($db->INDEX['LEADERBOARD']['custom'])){
+      $this_leaderboard_custom = json_decode($db->INDEX['LEADERBOARD']['custom'], true);
     } else {
       // Collect the leaderboard index for ranking
       $this_leaderboard_index = rpg_prototype::leaderboard_index();
@@ -984,7 +984,7 @@ class rpg_prototype {
         }
       }
       // Update the database index cache
-      $this_database->INDEX['LEADERBOARD']['custom'] = json_encode($this_leaderboard_custom);
+      $db->INDEX['LEADERBOARD']['custom'] = json_encode($this_leaderboard_custom);
     }
     // Return the collected online players if any
     return $this_leaderboard_custom;
@@ -992,7 +992,7 @@ class rpg_prototype {
 
   // Define a function for pulling the leaderboard rival targets
   public static function leaderboard_rivals($this_leaderboard_index, $this_userid, $offset = 10){
-    global $this_database;
+    global $db;
 
     // Collect the position of the current player in the leaderboard list
     $this_leaderboard_index_position = 0;
@@ -1019,12 +1019,12 @@ class rpg_prototype {
 
   // Define a function for pulling the leaderboard targets
   public static function leaderboard_targets($this_userid, $player_limit = 12, $player_sort = '', $player_campaign = ''){
-    global $this_database;
+    global $db;
 
     // Check to see if the leaderboard targets have already been pulled or not
-    if (!empty($this_database->INDEX['LEADERBOARD']['targets'])){
+    if (!empty($db->INDEX['LEADERBOARD']['targets'])){
 
-      $this_leaderboard_target_players = $this_database->INDEX['LEADERBOARD']['targets'];
+      $this_leaderboard_target_players = $db->INDEX['LEADERBOARD']['targets'];
 
     } else {
 
@@ -1128,7 +1128,7 @@ class rpg_prototype {
 
       // Query the database and collect the array list of all online players
       //die('<pre>$temp_leaderboard_query(this:'.$player_campaign.'/target:'.$player_sort.') = '.print_r($temp_leaderboard_query, true).'</pre>');
-      $this_leaderboard_target_players = $this_database->get_array_list($temp_leaderboard_query);
+      $this_leaderboard_target_players = $db->get_array_list($temp_leaderboard_query);
 
       //die('<pre>$this_leaderboard_target_players(this:'.$player_campaign.'/target:'.$player_sort.') = '.print_r($this_leaderboard_target_players, true).'</pre>');
 
@@ -1168,7 +1168,7 @@ class rpg_prototype {
 
       // Update the database index cache
       //if (!empty($player_sort)){ uasort($this_leaderboard_target_players, 'mmrpg_prototype_leaderboard_targets_sort'); }
-      $this_database->INDEX['LEADERBOARD']['targets'] = $this_leaderboard_target_players;
+      $db->INDEX['LEADERBOARD']['targets'] = $this_leaderboard_target_players;
       //die($temp_leaderboard_query);
 
     }
@@ -1198,11 +1198,11 @@ class rpg_prototype {
 
   // Define a function for determining a player's battle music
   public static function get_player_music($player_token, $session_token = 'GAME'){
-    global $mmrpg_index, $this_database;
+    global $mmrpg_index, $db;
 
     $temp_session_key = $player_token.'_target-robot-omega_prototype';
     $temp_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
-    $temp_robot_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $temp_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
     // Count the games representaed and order by count
     $temp_game_counters = array();
@@ -1292,7 +1292,7 @@ class rpg_prototype {
 
   // Define a function for collecting robot sprite markup
   public static function player_select_markup($prototype_data, $player_token, $this_button_size = '1x4'){
-    global $mmrpg_index, $this_database;
+    global $mmrpg_index, $db;
     $session_token = rpg_game::session_token();
 
     // Collect the player info
@@ -1318,7 +1318,7 @@ class rpg_prototype {
     $temp_token_string = array();
     foreach ($temp_player_robots AS $token){ $temp_token_string[] = "'{$token}'"; }
     $temp_token_string = implode(', ', $temp_token_string);
-    $temp_robot_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_token IN ({$temp_token_string}) AND robot_flag_complete = 1;", 'robot_token');
+    $temp_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_token IN ({$temp_token_string}) AND robot_flag_complete = 1;", 'robot_token');
 
     foreach ($temp_player_robots AS $key => $robot_token){
       $index = rpg_robot::parse_index_info($temp_robot_index[$robot_token]);
@@ -1383,16 +1383,16 @@ class rpg_prototype {
   // Define a function for displaying prototype robot button markup on the select screen
   public static function robot_select_markup($this_prototype_data){
     // Refence the global config and index objects for easy access
-    global $this_database;
+    global $db;
 
     // Define the temporary robot markup string
     $this_robots_markup = '';
 
     // Collect the robot index for calculation purposes
-    $this_robot_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
     // Collect the ability index for calculation purposes
-    $this_ability_index = $this_database->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
     // Loop through and display the available robot options for this player
     $temp_robot_option_count = count($this_prototype_data['robot_options']);

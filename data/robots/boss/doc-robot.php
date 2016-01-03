@@ -51,11 +51,11 @@ $robot = array(
 
     // If Doc Robot used an ability the previous turn, change weaknesses
     if (!empty($this_robot->history['triggered_abilities'])){
-      global $this_database;
+      global $db;
       $triggered_abilities = $this_robot->history['triggered_abilities'];
       while (!empty($triggered_abilities)){
         $last_ability = array_pop($triggered_abilities);
-        $last_ability_master = $this_database->get_array("SELECT robot_token, robot_weaknesses, robot_resistances, robot_affinities, robot_immunities FROM mmrpg_index_robots WHERE robot_abilities_rewards LIKE '%\"{$last_ability}\"%' AND robot_id <> 0 LIMIT 1;");
+        $last_ability_master = $db->get_array("SELECT robot_token, robot_weaknesses, robot_resistances, robot_affinities, robot_immunities FROM mmrpg_index_robots WHERE robot_abilities_rewards LIKE '%\"{$last_ability}\"%' AND robot_id <> 0 LIMIT 1;");
         if (!empty($last_ability_master)){
           $this_robot->set_weaknesses(!empty($last_ability_master['robot_weaknesses']) ? json_decode($last_ability_master['robot_weaknesses'], true) : array());
           $this_robot->set_resistances(!empty($last_ability_master['robot_resistances']) ? json_decode($last_ability_master['robot_resistances'], true) : array());

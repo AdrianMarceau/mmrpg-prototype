@@ -41,10 +41,10 @@ if (isset($mmrpg_database_abilities_filter)){
 
 // Collect the database abilities
 $ability_fields = rpg_ability::get_index_fields(true);
-$this_database->query("SET @ability_row_number = 0;");
-$mmrpg_database_abilities = $this_database->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_published = 1 AND (ability_flag_hidden = 0 OR ability_token = '{$this_current_token}')  {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
-$mmrpg_database_abilities_count = $this_database->get_value("SELECT COUNT(ability_id) AS ability_count FROM mmrpg_index_abilities WHERE ability_flag_published = 1 AND ability_flag_hidden = 0 {$temp_condition_unfiltered};", 'ability_count');
-$mmrpg_database_abilities_numbers = $this_database->get_array_list("SELECT ability_token, (@ability_row_number:=@ability_row_number + 1) AS ability_key FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition_unfiltered} ORDER BY ability_flag_hidden ASC, ability_order ASC;", 'ability_token');
+$db->query("SET @ability_row_number = 0;");
+$mmrpg_database_abilities = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_published = 1 AND (ability_flag_hidden = 0 OR ability_token = '{$this_current_token}')  {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
+$mmrpg_database_abilities_count = $db->get_value("SELECT COUNT(ability_id) AS ability_count FROM mmrpg_index_abilities WHERE ability_flag_published = 1 AND ability_flag_hidden = 0 {$temp_condition_unfiltered};", 'ability_count');
+$mmrpg_database_abilities_numbers = $db->get_array_list("SELECT ability_token, (@ability_row_number:=@ability_row_number + 1) AS ability_key FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition_unfiltered} ORDER BY ability_flag_hidden ASC, ability_order ASC;", 'ability_token');
 
 // Remove unallowed abilities from the database, and increment counters
 foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){

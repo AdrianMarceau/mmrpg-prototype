@@ -58,11 +58,11 @@ class cms_database {
    * @return cms_database
    */
   public static function get_database(){
-    if (isset($GLOBALS['DB'])){ $this_database = $GLOBALS['DB'];  }
-    if (isset($GLOBALS['this_database'])){ $this_database = $GLOBALS['this_database'];  }
-    else { $this_database = false; }
-    if (empty($this_database)){ $this_database = new cms_database(); }
-    return $this_database;
+    if (isset($GLOBALS['DB'])){ $db = $GLOBALS['DB'];  }
+    elseif (isset($GLOBALS['db'])){ $db = $GLOBALS['db'];  }
+    else { $db = false; }
+    if (empty($db)){ $db = new cms_database(); }
+    return $db;
   }
 
   /*

@@ -9,8 +9,8 @@ $player_id = isset($_GET['num']) && is_numeric($_GET['num']) ? (int)($_GET['num'
 
 // Collect player info based on the ID if available
 $player_fields = rpg_player::get_index_fields(true);
-if (!empty($player_id)){ $player_info = $this_database->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id = {$player_id};"); }
-elseif ($player_id === 0){ $player_info = $this_database->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_token = 'player';"); }
+if (!empty($player_id)){ $player_info = $db->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id = {$player_id};"); }
+elseif ($player_id === 0){ $player_info = $db->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_token = 'player';"); }
 else { $player_info = array(); }
 
 // Parse the player info if it was collected
@@ -132,11 +132,11 @@ else {
 
     // Collect a list of all users in the database
     $player_fields = rpg_player::get_index_fields(true);
-    $player_index = $this_database->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 AND player_token <> 'player' ORDER BY player_id ASC", 'player_id');
+    $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 AND player_token <> 'player' ORDER BY player_id ASC", 'player_id');
     $player_count = !empty($player_index) ? count($player_index) : 0;
 
     // Collect a list of completed player sprite tokens
-    $random_sprite = $this_database->get_value("SELECT player_image FROM mmrpg_index_players WHERE player_image <> 'player' AND player_image_size = 40 AND player_flag_complete = 1 ORDER BY RAND() LIMIT 1;", 'player_image');
+    $random_sprite = $db->get_value("SELECT player_image FROM mmrpg_index_players WHERE player_image <> 'player' AND player_image_size = 40 AND player_flag_complete = 1 ORDER BY RAND() LIMIT 1;", 'player_image');
 
     // Start generating the page markup
     ob_start();
