@@ -1756,10 +1756,13 @@ class rpg_robot extends rpg_object {
                     elseif ($robot_info['robot_class'] == 'boss'){ $temp_url .= 'bosses/'; }
                     $temp_url .= $robot_info['robot_token'].'/';
                     ?>
+
                     <div class="section_tabs">
-                        <?php foreach($section_tabs AS $tab){
-                            echo '<a class="link_inline link_'.$tab[0].' '.($tab[2] ? 'active' : '').'" href="'.$temp_url.'#'.$tab[0].'" data-tab="'.$tab[0].'"><span class="wrap">'.$tab[1].'</span></a>';
-                            } ?>
+                        <?php
+                        foreach($section_tabs AS $tab){
+                            echo '<a class="link_inline link_'.$tab[0].' '.($tab[2] ? 'active' : '').'" href="'.$temp_url.'#'.$tab[0].'" data-anchor="#'.$tab[0].'"><span class="wrap">'.$tab[1].'</span></a>';
+                        }
+                        ?>
                     </div>
 
                 <?php endif; ?>
@@ -1923,7 +1926,7 @@ class rpg_robot extends rpg_object {
                     <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
                         <div class="link_wrapper">
                             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#sprites" rel="permalink">+ Permalink</a>
+                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#sprites" rel="permalink">#Sprites</a>
                         </div>
                     <?php endif; ?>
 
@@ -1976,7 +1979,7 @@ class rpg_robot extends rpg_object {
                     <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
                         <div class="link_wrapper">
                             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#quotes" rel="permalink">+ Permalink</a>
+                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#quotes" rel="permalink">#Quotes</a>
                         </div>
                     <?php endif; ?>
 
@@ -2005,7 +2008,7 @@ class rpg_robot extends rpg_object {
                     <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
                         <div class="link_wrapper">
                             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#description" rel="permalink">+ Permalink</a>
+                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#description" rel="permalink">#Description</a>
                         </div>
                     <?php endif; ?>
 
@@ -2183,7 +2186,7 @@ class rpg_robot extends rpg_object {
                     <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
                         <div class="link_wrapper">
                             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#abilities" rel="permalink">+ Permalink</a>
+                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#abilities" rel="permalink">#Abilities</a>
                         </div>
                     <?php endif; ?>
 
@@ -2291,7 +2294,7 @@ class rpg_robot extends rpg_object {
                     <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
                         <div class="link_wrapper">
                             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#stats" rel="permalink">+ Permalink</a>
+                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#stats" rel="permalink">#Stats</a>
                         </div>
                     <?php endif; ?>
 
@@ -2347,27 +2350,24 @@ class rpg_robot extends rpg_object {
                     <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
                         <div class="link_wrapper">
                             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#records" rel="permalink">+ Permalink</a>
+                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#records" rel="permalink">#Records</a>
                         </div>
                     <?php endif; ?>
 
                 <?php endif; ?>
 
-                <?php if(false && $print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <div class="link_wrapper">
                         <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                        <a class="link link_permalink" href="<?= $database_category_robot_url ?>" rel="permalink">+ Permalink</a>
+                        <a class="link link_permalink" href="<?= $database_category_robot_url ?>" rel="permalink">+ View More</a>
                     </div>
-
-                <?php elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
-
-
-                    <div class="link_wrapper"><a class="link link_top" data-href="#top" rel="nofollow">^ Top</a></div>
-                    <span class="link_container"><?= !empty($compact_footer_link_markup) ? implode("\n", $compact_footer_link_markup) : ''  ?></span>
-                    <?= false ? '<pre>$compact_footer_link_markup = '.print_r($compact_footer_link_markup, true).'</pre>' : '' ?>
+                    <span class="link_container">
+                        <?= !empty($compact_footer_link_markup) ? implode("\n", $compact_footer_link_markup) : ''  ?>
+                    </span>
 
                 <?php endif; ?>
+
             </div>
         </div>
         <?php
