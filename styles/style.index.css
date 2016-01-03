@@ -1095,7 +1095,7 @@ html.type {
 }
 #window .page .event .header a:hover {
     color: #FFFFFF;
-    text-decoration: none;
+    text-decoration: underline;
 }
 
 #window .page .event .header_links {

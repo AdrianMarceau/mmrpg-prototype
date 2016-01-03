@@ -1403,12 +1403,12 @@ class rpg_robot extends rpg_object {
         //$compact_footer_link_markup[] = '<a class="link link_permalink" href="'.$database_category_robot_url.'">+ Huh?</a>';
 
         // Add a link to the sprites in the compact footer markup
-        if (!in_array($robot_image_token, $default_robot_class_tokens)){ $compact_footer_link_markup[] = '<a class="link '.$robot_header_types.'" href="'.$database_category_robot_url.'#sprites">#Sprites</a>'; }
-        if (!empty($robot_info['robot_quotes']['battle_start'])){ $compact_footer_link_markup[] = '<a class="link '.$robot_header_types.'" href="'.$database_category_robot_url.'#quotes">#Quotes</a>'; }
-        if (!empty($robot_info['robot_description2'])){ $compact_footer_link_markup[] = '<a class="link '.$robot_header_types.'" href="'.$database_category_robot_url.'#description">#Description</a>'; }
-        if (!empty($robot_info['robot_abilities'])){ $compact_footer_link_markup[] = '<a class="link '.$robot_header_types.'" href="'.$database_category_robot_url.'#abilities">#Abilities</a>'; }
-        $compact_footer_link_markup[] = '<a class="link '.$robot_header_types.'" href="'.$database_category_robot_url.'#stats">#Stats</a>';
-        $compact_footer_link_markup[] = '<a class="link '.$robot_header_types.'" href="'.$database_category_robot_url.'#records">#Records</a>';
+        if (!in_array($robot_image_token, $default_robot_class_tokens)){ $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#sprites">#Sprites</a>'; }
+        if (!empty($robot_info['robot_quotes']['battle_start'])){ $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#quotes">#Quotes</a>'; }
+        if (!empty($robot_info['robot_description2'])){ $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#description">#Description</a>'; }
+        if (!empty($robot_info['robot_abilities'])){ $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#abilities">#Abilities</a>'; }
+        $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#stats">#Stats</a>';
+        $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#records">#Records</a>';
 
         /*
         $compact_footer_link_markup[] = '<a class="link '.$robot_header_types.'" href="'.$database_category_robot_url.'">View More</a>';
