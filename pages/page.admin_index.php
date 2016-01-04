@@ -59,7 +59,7 @@ ob_start();
         </span>
     </h3>
     <div class="subbody">
-        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/shops/kalinka/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Robot</div></div>
+        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/shops/kalinka/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
         <p class="text">Search for users by typing their user name, email address, or identification number into the input field below.</p>
         <div class="text">
             <form class="search" data-search="users">
@@ -83,7 +83,7 @@ ob_start();
         </span>
     </h3>
     <div class="subbody">
-        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/players/dr-light/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Dr. Light</div></div>
+        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/players/dr-light/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
         <p class="text">Search for player characters by typing their name or identification number into the input field below.</p>
         <div class="text">
             <form class="search" data-search="players">
@@ -107,7 +107,7 @@ ob_start();
         </span>
     </h3>
     <div class="subbody">
-        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/met/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Met</div></div>
+        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/met/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
         <p class="text">Search for support mechas by typing their name, core, serial, or identification number into the input field below.</p>
         <div class="text">
             <form class="search" data-search="mechas">
@@ -131,7 +131,7 @@ ob_start();
         </span>
     </h3>
     <div class="subbody">
-        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_victory" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Mega Man</div></div>
+        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_victory" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
         <p class="text">Search for robots masters by typing their name, core, serial, or identification number into the input field below.</p>
         <div class="text">
             <form class="search" data-search="robots">
@@ -155,7 +155,7 @@ ob_start();
         </span>
     </h3>
     <div class="subbody">
-        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_summon" style="background-image: url(images/robots/trill/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Trill</div></div>
+        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_summon" style="background-image: url(images/robots/trill/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
         <p class="text">Search for fortress bosses by typing their name, core, serial, or identification number into the input field below.</p>
         <div class="text">
             <form class="search" data-search="bosses">
@@ -179,7 +179,7 @@ ob_start();
         </span>
     </h3>
     <div class="subbody">
-        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/abilities/rolling-cutter/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); margin: -8px 0 -6px;">Rolling Cutter</div></div>
+        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/abilities/rolling-cutter/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); margin: -8px 0 -6px;"></div></div>
         <p class="text">Search for abilities by typing their name, type, or identification number into the input field below.</p>
         <div class="text">
             <form class="search" data-search="abilities">
@@ -203,7 +203,7 @@ ob_start();
         </span>
     </h3>
     <div class="subbody">
-        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/items/energy-capsule/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); margin: -8px 0 -6px;">Energy Capsule</div></div>
+        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/items/energy-capsule/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); margin: -8px 0 -6px;"></div></div>
         <p class="text">Search for items by typing their name, type, or identification number into the input field below.</p>
         <div class="text">
             <form class="search" data-search="items">
@@ -227,7 +227,7 @@ ob_start();
         </span>
     </h3>
     <div class="subbody">
-        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/fields/intro-field/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); margin: -8px 0 -6px; background-size: 45px 45px; background-position: center center;">Intro Field</div></div>
+        <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/fields/intro-field/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); margin: -8px 0 -6px; background-size: 45px 45px; background-position: center center;"></div></div>
         <p class="text">Search for fields by typing their name, type, or identification number into the input field below.</p>
         <div class="text">
             <form class="search" data-search="fields">
