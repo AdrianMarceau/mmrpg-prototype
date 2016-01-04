@@ -745,7 +745,8 @@ class rpg_field extends rpg_object {
         $db = cms_database::get_database();
 
         // Collect references to global indexes
-        $mmrpg_types = rpg_type::get_index();
+        static $mmrpg_types;
+        if (empty($mmrpg_types)){ $mmrpg_types = rpg_type::get_index(true); }
 
         // Define the print style defaults
         if (!isset($print_options['layout_style'])){ $print_options['layout_style'] = 'website'; }
@@ -1174,6 +1175,7 @@ class rpg_field extends rpg_object {
             'field_master2',
             'field_mechas',
             'field_editor',
+            'field_image',
             'field_type',
             'field_type2',
             'field_multipliers',
