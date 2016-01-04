@@ -52,12 +52,12 @@ elseif ($this_current_sub == 'mechas' || $this_current_sub == 'robots' || $this_
 //  If this is a ABILITIES editor request, include the appropriate file
 elseif ($this_current_sub == 'abilities'){
   // Require the admin abilities file
-  require('page.admin_players.php');
+  require('page.admin_abilities.php');
 }
 //  If this is a ITEMS editor request, include the appropriate file
 elseif ($this_current_sub == 'items'){
   // Require the admin abilities file
-  require('page.admin_players.php');
+  require('page.admin_items.php');
 }
 //  If this is a FIELDS editor request, include the appropriate file
 elseif ($this_current_sub == 'fields'){
