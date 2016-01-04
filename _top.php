@@ -53,6 +53,10 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
   }
 }
 
+// Include mandatory user class files
+require('classes/class.user.php');
+require('classes/class.user_role.php');
+
 // Include mandatory game class files
 require('classes/class.game.php');
 require('classes/class.prototype.php');
