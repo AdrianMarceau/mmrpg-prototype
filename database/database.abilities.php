@@ -9,14 +9,7 @@ foreach ($mmrpg_database_types AS $token => $info){
 
 // Define the index of hidden abilities to not appear in the database
 $hidden_database_abilities = array();
-$hidden_database_abilities = array_merge($hidden_database_abilities, array('ability', 'attachment-defeat', 'action-noweapons'));
-$hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'volt-tackle'));
-$hidden_database_abilities = array_merge($hidden_database_abilities, array('crash-driller', 'dive-blitzkrieg', 'pharaoh-wave', 'sakugarne-bounce'));
-$hidden_database_abilities = array_merge($hidden_database_abilities, array('meteor-knuckle', 'comet-attack'));
-//$hidden_database_abilities = array_merge($hidden_database_abilities, array('air-man', 'bubble-man', 'crash-man', 'flash-man', 'heat-man', 'metal-man', 'quick-man', 'wood-man'));
-//$hidden_database_abilities = array_merge($hidden_database_abilities, array('needle-man', 'magnet-man', 'gemini-man', 'hard-man', 'top-man', 'snake-man', 'spark-man', 'shadow-man'));
 $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($hidden_database_abilities) : 0;
-
 
 // Define the hidden ability query condition
 $temp_condition = '';

@@ -3,7 +3,6 @@
 
 // Define the index of hidden fields to not appear in the database
 $hidden_database_fields = array();
-$hidden_database_fields = array_merge($hidden_database_fields, array('field', 'prototype-subspace')); //'prototype-complete'
 $hidden_database_fields_count = !empty($hidden_database_fields) ? count($hidden_database_fields) : 0;
 
 // Define the hidden field query condition
@@ -24,8 +23,8 @@ if (isset($mmrpg_database_fields_filter)){
 // Collect the database fields
 $field_fields = rpg_field::get_index_fields(true);
 $db->query("SET @field_row_number = 0;");
-$mmrpg_database_fields = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_flag_published = 1 {$temp_condition} ORDER BY field_order ASC;", 'field_token');
-$mmrpg_database_fields_count = $db->get_value("SELECT COUNT(field_id) AS field_count FROM mmrpg_index_fields WHERE field_flag_published = 1 {$temp_condition_unfiltered};", 'field_count');
+$mmrpg_database_fields = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_flag_published = 1 AND (field_flag_hidden = 0 OR field_token = '{$this_current_token}') {$temp_condition} ORDER BY field_flag_hidden ASC, field_order ASC;", 'field_token');
+$mmrpg_database_fields_count = $db->get_value("SELECT COUNT(field_id) AS field_count FROM mmrpg_index_fields WHERE field_flag_published = 1 AND field_flag_hidden = 0 {$temp_condition_unfiltered};", 'field_count');
 $mmrpg_database_fields_numbers = $db->get_array_list("SELECT field_token, (@field_row_number:=@field_row_number + 1) AS field_key FROM mmrpg_index_fields WHERE field_flag_published = 1 {$temp_condition_unfiltered} ORDER BY field_flag_hidden ASC, field_order ASC;", 'field_token');
 
 // Remove unallowed fields from the database
