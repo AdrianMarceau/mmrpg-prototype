@@ -851,6 +851,7 @@ class rpg_prototype {
   // Define a function for pulling the leaderboard players index
   public static function leaderboard_index(){
     global $db;
+
     // Check to see if the leaderboard index has already been pulled or not
     if (!empty($db->INDEX['LEADERBOARD']['index'])){
       $this_leaderboard_index = json_decode($db->INDEX['LEADERBOARD']['index'], true);
@@ -872,12 +873,32 @@ class rpg_prototype {
       // Update the database index cache
       $db->INDEX['LEADERBOARD']['index'] = json_encode($this_leaderboard_index);
     }
+
     // Return the collected leaderboard index
     return $this_leaderboard_index;
+
+  }
+
+  // Define a function for pulling the leaderboard players index
+  public static function leaderboard_index_tokens(){
+    global $db;
+
+    // Check to see if the leaderboard index has already been pulled or not
+    if (!empty($db->INDEX['LEADERBOARD']['index'])){ $this_leaderboard_index = json_decode($db->INDEX['LEADERBOARD']['index'], true); }
+    else { $this_leaderboard_index = self::leaderboard_index(); }
+
+    // Collect all the leaderboard tokens and add to array
+    $this_leaderboard_tokens = array();
+    foreach ($this_leaderboard_index AS $key => $info){ $this_leaderboard_tokens[] = $info['user_name_clean']; }
+
+    // Return the collected leaderboard tokens
+    return $this_leaderboard_tokens;
+
   }
 
   // Define a function for collecting the requested player's board ranking
   public static function leaderboard_rank($user_id){
+
     // Query the database and collect the array list of all non-bogus players
     $this_leaderboard_index = rpg_prototype::leaderboard_index();
     $this_leaderboard_points = 0;
