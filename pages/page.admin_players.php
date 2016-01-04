@@ -163,8 +163,7 @@ else {
     <div class="section full">
         <div class="subbody">
             <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/players/<?= $random_sprite ?>/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
-                <p class="text">Use the player index below to search and filter through all the playable characters in the game and either view or edit using the provided links.</p>
-            </div>
+            <p class="text">Use the player index below to search and filter through all the playable characters in the game and either view or edit using the provided links.</p>
         </div>
     </div>
 
@@ -234,7 +233,9 @@ else {
                                 <td class="flags published"><?= $published ? '<span class="type nature">Yes</span>' : '<span class="type flame">No</span>' ?></td>
                                 <td class="actions">
                                     <a class="link_inline edit" href="<?= $edit_link ?>" target="_editPlayer<?= $player_id ?>">Edit</a>
-                                    <a class="link_inline view" href="<?= $view_link ?>" target="_viewPlayer<?= $player_token ?>">View</a>
+                                    <? if ($published): ?>
+                                        <a class="link_inline view" href="<?= $view_link ?>" target="_viewPlayer<?= $player_token ?>">View</a>
+                                    <? endif; ?>
                                 </td>
                             </tr>
                             <?

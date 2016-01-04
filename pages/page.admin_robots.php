@@ -196,8 +196,7 @@ else {
     <div class="section full">
         <div class="subbody">
             <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/robots/<?= $random_sprite ?>/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
-                <p class="text">Use the robot index below to search and filter through all the <?= $object_multi_token == 'robots' ? 'unlockable '.$object_multi_token : 'fightable '.$object_multi_token ?> in the game and either view or edit using the provided links.</p>
-            </div>
+            <p class="text">Use the robot index below to search and filter through all the <?= $object_multi_token == 'robots' ? 'unlockable '.$object_multi_token : 'fightable '.$object_multi_token ?> in the game and either view or edit using the provided links.</p>
         </div>
     </div>
 
@@ -249,9 +248,9 @@ else {
                             $robot_name = $robot_info['robot_name'];
                             $robot_group = '<span class="token">'.$robot_info['robot_group'].'</span>';
                             $robot_type1 = !empty($robot_info['robot_core']) && !empty($type_index[$robot_info['robot_core']]) ? $type_index[$robot_info['robot_core']] : $type_index['none'];
-                            $robot_type2 = !empty($robot_info['robot_core2']) && !empty($type_index[$robot_info['robot_core2']]) ? $type_index[$robot_info['robot_core2']] : '';
-                            $type_string = '<span class="type '.$robot_type1['type_token'].'">'.$robot_type1['type_name'].'</span>';
-                            if (!empty($robot_type2)){ $type_string .= ' / <span class="type '.$robot_type2['type_token'].'">'.$robot_type2['type_name'].'</span>'; }
+                            $robot_type2 = !empty($robot_info['robot_core2']) && !empty($type_index[$robot_info['robot_core2']]) ? $type_index[$robot_info['robot_core2']] : false;
+                            if (!empty($robot_type2)){ $type_string = '<span class="type '.$robot_type1['type_token'].'_'.$robot_type2['type_token'].'">'.$robot_type1['type_name'].' / '.$robot_type2['type_name'].'</span>'; }
+                            else { $type_string = '<span class="type '.$robot_type1['type_token'].'">'.$robot_type1['type_name'].'</span>'; }
                             $edit_link = 'admin/'.$object_multi_token.'/'.$robot_id.'/';
                             $view_link = 'database/'.$object_multi_token.'/'.$robot_token.'/';
                             $complete = $robot_info['robot_flag_complete'] ? true : false;
@@ -269,7 +268,9 @@ else {
                                 <td class="flags published"><?= $published ? '<span class="type nature">Yes</span>' : '<span class="type flame">No</span>' ?></td>
                                 <td class="actions">
                                     <a class="link_inline edit" href="<?= $edit_link ?>" target="_editRobot<?= $robot_id ?>">Edit</a>
-                                    <a class="link_inline view" href="<?= $view_link ?>" target="_viewRobot<?= $robot_token ?>">View</a>
+                                    <? if ($published): ?>
+                                        <a class="link_inline view" href="<?= $view_link ?>" target="_viewRobot<?= $robot_token ?>">View</a>
+                                    <? endif; ?>
                                 </td>
                             </tr>
                             <?
