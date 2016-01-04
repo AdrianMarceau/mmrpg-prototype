@@ -130,9 +130,21 @@ else {
     // Define the MARKUP variables for this page
     $this_markup_header = '';
 
+    // Define the robot header columns for looping through
+    // token => array(name, class, width, directions)
+    $table_columns['id'] = array('ID', 'id', '75', 'asc/desc');
+    $table_columns['name'] = array('Player Name', 'name', '', 'asc/desc');
+    $table_columns['group'] = array('Group', 'group', '', 'asc/desc');
+    $table_columns['type'] = array('Type', 'types', '100', 'asc/desc');
+    $table_columns['hidden'] = array('Hidden', 'flags hidden', '90', 'desc/asc');
+    $table_columns['complete'] = array('Complete', 'flags complete', '90', 'desc/asc');
+    $table_columns['published'] = array('Published', 'flags published', '100', 'desc/asc');
+    $table_columns['actions'] = array('', 'actions', '120', '');
+
     // Collect a list of all users in the database
     $player_fields = rpg_player::get_index_fields(true);
-    $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 AND player_token <> 'player' ORDER BY player_id ASC", 'player_id');
+    $player_query = "SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 AND player_token <> 'player' ORDER BY {$query_sort};";
+    $player_index = $db->get_array_list($player_query, 'player_id');
     $player_count = !empty($player_index) ? count($player_index) : 0;
 
     // Collect a list of completed player sprite tokens
@@ -151,16 +163,7 @@ else {
     <div class="section full">
         <div class="subbody">
             <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/players/<?= $random_sprite ?>/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
-                <p class="text">Use the player index below to search and filter through all the playable characters in the game and either view, edit, or delete using the provided links.</p>            <div class="text">
-                <p class="text">You can also jump to specific players by typing their name or identification number into the input field below and clicking their link in the dropdown.</p>
-                <form class="search" data-search="players">
-                    <div class="inputs">
-                        <div class="field text">
-                            <input class="text" type="text" name="text" value="" placeholder="Player Name or ID" />
-                        </div>
-                    </div>
-                    <div class="results"></div>
-                </form>
+                <p class="text">Use the player index below to search and filter through all the playable characters in the game and either view or edit using the provided links.</p>
             </div>
         </div>
     </div>
@@ -169,23 +172,36 @@ else {
         <div class="subbody">
             <table data-table="players" class="full">
                 <colgroup>
-                    <col width="10%" />
-                    <col width="" />
-                    <col width="20%" />
-                    <col width="3%" />
-                    <col width="3%" />
-                    <col width="3%" />
-                    <col width="15%" />
+                    <?
+                    // Loop through and display column widths
+                    foreach ($table_columns AS $token => $info){
+                        list($name, $class, $width, $directions) = $info;
+                        echo '<col width="'.$width.'" />'.PHP_EOL;
+                    }
+                    ?>
                 </colgroup>
                 <thead>
                     <tr class="head">
-                        <th class="id">ID</th>
-                        <th class="name">Player Name</th>
-                        <th class="types">Player Type</th>
-                        <th class="flags complete">Complete</th>
-                        <th class="flags published">Published</th>
-                        <th class="flags hidden">Hidden</th>
-                        <th class="actions">&nbsp;</th>
+                        <?
+                        // Loop through and display column headers
+                        foreach ($table_columns AS $token => $info){
+                            list($name, $class, $width, $directions) = $info;
+                            if (!empty($name)){
+                                $active = $sort_column == $token ? true : false;
+                                $directions = explode('/', $directions);
+                                $class .= $active ? ' active' : '';
+                                $link = 'admin/players/sort='.$token.'-';
+                                $link .= ($active && $sort_direction == $directions[0]) ? $directions[1] : $directions[0];
+                                echo '<th class="'.$class.'">';
+                                    echo '<a class="link_inline" href="'.$link.'">'.$name.'</a>';
+                                    if ($active && $sort_direction == 'asc'){ echo ' <sup>&#8595;</sup>'; }
+                                    elseif ($active && $sort_direction == 'desc'){ echo ' <sup>&#8593;</sup>'; }
+                                echo '</th>'.PHP_EOL;
+                            } else {
+                                echo '<th class="'.$class.'">&nbsp;</th>'.PHP_EOL;
+                            }
+                        }
+                        ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -198,6 +214,7 @@ else {
                             // Collect the display fields from the array
                             $player_token = $player_info['player_token'];
                             $player_name = $player_info['player_name'];
+                            $player_group = '<span class="token">'.$player_info['player_group'].'</span>';
                             $player_type1 = !empty($player_info['player_type']) && !empty($type_index[$player_info['player_type']]) ? $type_index[$player_info['player_type']] : $type_index['none'];
                             $type_string = '<span class="type '.$player_type1['type_token'].'">'.$player_type1['type_name'].'</span>';
                             $edit_link = 'admin/players/'.$player_id.'/';
@@ -207,17 +224,17 @@ else {
                             $hidden = $player_info['player_flag_hidden'] ? true : false;
                             // Print out the player info as a table row
                             ?>
-                            <tr class="object <?= !$complete ? 'incomplete' : '' ?>">
+                            <tr class="object<?= !$published ? ' unpublished' : '' ?><?= !$complete ? ' incomplete' : '' ?>">
                                 <td class="id"><?= $player_id ?></td>
                                 <td class="name"><a class="link_inline" href="<?= $edit_link ?>" title="Edit <?= $player_name ?>" target="_editPlayer<?= $player_id ?>"><?= $player_name ?></a></td>
+                                <td class="group"><?= $player_group ?></td>
                                 <td class="types"><?= $type_string ?></td>
-                                <td class="flags complete"><?= $complete ? '&#x2713;' : '&#x2717;' ?></td>
-                                <td class="flags published"><?= $published ? '&#9745;' : '&#9744;' ?></td>
-                                <td class="flags hidden"><?= $hidden ? '&#9745;' : '&#9744;' ?></td>
+                                <td class="flags hidden"><?= $hidden ? '<span class="true">&#9745;</span>' : '<span class="false">&#9744;</span>' ?></td>
+                                <td class="flags complete"><?= $complete ? '<span class="true">&#x2713;</span>' : '<span class="false">&#x2717;</span>' ?></td>
+                                <td class="flags published"><?= $published ? '<span class="type nature">Yes</span>' : '<span class="type flame">No</span>' ?></td>
                                 <td class="actions">
                                     <a class="link_inline edit" href="<?= $edit_link ?>" target="_editPlayer<?= $player_id ?>">Edit</a>
                                     <a class="link_inline view" href="<?= $view_link ?>" target="_viewPlayer<?= $player_token ?>">View</a>
-                                    <a class="link_inline delete" target="_blank">Delete</a>
                                 </td>
                             </tr>
                             <?

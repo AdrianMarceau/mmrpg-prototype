@@ -260,6 +260,7 @@
 #mmrpg .page_admin .body .section table.full {
     margin: 0;
     width: 100%;
+    table-layout: fixed;
 }
 #mmrpg .page_admin .body .section tr:nth-child(even) {
     background-color: rgba(255, 255, 255, 0.025);
@@ -275,13 +276,16 @@
 #mmrpg .page_admin .body .section table th {
     font-weight: bold;
     background-color: #191919;
+    vertical-align: middle;
 }
 #mmrpg .page_admin .body .section table td {
-
+    vertical-align: middle;
 }
+#mmrpg .page_admin .body .section table th:first-child,
 #mmrpg .page_admin .body .section table td:first-child {
     padding-left: 10px;
 }
+#mmrpg .page_admin .body .section table th:last-child,
 #mmrpg .page_admin .body .section table td:last-child {
     padding-right: 10px;
 }
@@ -291,13 +295,16 @@
 #mmrpg .page_admin .body .section table td.right {
     text-align: right;
 }
-#mmrpg .page_admin .body .section table .incomplete td {
+#mmrpg .page_admin .body .section table .incomplete td,
+#mmrpg .page_admin .body .section table .unpublished td {
     opacity: 0.33;
     filter: alpha(opacity=33);
 }
 
 #mmrpg .page_admin .body .section table th.flags,
-#mmrpg .page_admin .body .section table td.flags {
+#mmrpg .page_admin .body .section table td.flags,
+#mmrpg .page_admin .body .section table th.order,
+#mmrpg .page_admin .body .section table td.order {
     text-align: center;
     padding-left: 9px;
     padding-right: 9px;
@@ -306,6 +313,27 @@
 #mmrpg .page_admin .body .section table th.actions,
 #mmrpg .page_admin .body .section table td.actions {
     text-align: right;
+}
+
+#mmrpg .page_admin .body .section table .unpublished td.name a {
+    text-decoration: none;
+}
+#mmrpg .page_admin .body .section table .unpublished td.name a:hover {
+    text-decoration: underline;
+}
+
+#mmrpg .page_admin .body .section table th sup {
+    position: relative;
+    bottom: 2px;
+    font-size: 10px;
+}
+
+#mmrpg .page_admin .body .section table th a {
+    text-decoration: none;
+}
+#mmrpg .page_admin .body .section table th.active a,
+#mmrpg .page_admin .body .section table th a:hover {
+    text-decoration: underline;
 }
 
 #mmrpg .page_admin .body .section table td span.type {
@@ -321,6 +349,33 @@
 
 #mmrpg .page_admin .body .section table td.actions .link_inline {
     margin-left: 10px;
+}
+
+#mmrpg .page_admin .body .section table td.complete span.true {
+    color: #259B33;
+}
+#mmrpg .page_admin .body .section table td.complete span.false {
+    color: #C03926;
+}
+#mmrpg .page_admin .body .section table td.published span.type {
+    min-width: 30px;
+}
+#mmrpg .page_admin .body .section table td.group span.token {
+    font-size: 11px;
+}
+
+#mmrpg .page_admin .body .section table td.order input {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 4px 6px;
+    width: 30px;
+    border: 1px solid #262626;
+    background-color: #191919;
+    color: #EFEFEF;
+    text-align: center;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
 }
 
 

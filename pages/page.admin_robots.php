@@ -163,9 +163,21 @@ else {
     // Define the MARKUP variables for this page
     $this_markup_header = '';
 
+    // Define the robot header columns for looping through
+    // token => array(name, class, width, directions)
+    $table_columns['id'] = array('ID', 'id', '75', 'asc/desc');
+    $table_columns['name'] = array($object_single_name.' Name', 'name', '', 'asc/desc');
+    $table_columns['group'] = array('Group', 'group', '', 'asc/desc');
+    $table_columns['core'] = array('Core', 'cores', '140', 'asc/desc');
+    $table_columns['hidden'] = array('Hidden', 'flags hidden', '90', 'desc/asc');
+    $table_columns['complete'] = array('Complete', 'flags complete', '90', 'desc/asc');
+    $table_columns['published'] = array('Published', 'flags published', '100', 'desc/asc');
+    $table_columns['actions'] = array('', 'actions', '120', '');
+
     // Collect a list of all users in the database
     $robot_fields = rpg_robot::get_index_fields(true);
-    $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_token <> 'robot' AND robot_class = '{$object_class_token}' ORDER BY robot_id ASC", 'robot_id');
+    $robot_query = "SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 AND robot_token <> 'robot' AND robot_class = '{$object_class_token}' ORDER BY {$query_sort};";
+    $robot_index = $db->get_array_list($robot_query, 'robot_id');
     $robot_count = !empty($robot_index) ? count($robot_index) : 0;
 
     // Collect a list of completed robot sprite tokens
@@ -184,16 +196,7 @@ else {
     <div class="section full">
         <div class="subbody">
             <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/robots/<?= $random_sprite ?>/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
-                <p class="text">Use the robot index below to search and filter through all the <?= $object_multi_token == 'robots' ? 'unlockable '.$object_multi_token : 'fightable '.$object_multi_token ?> in the game and either view, edit, or delete using the provided links.</p>            <div class="text">
-                <p class="text">You can also jump to specific <?= $object_multi_token ?> by typing their name or identification number into the search field below and clicking their link in the dropdown.</p>
-                <form class="search" data-search="<?= $object_multi_token ?>">
-                    <div class="inputs">
-                        <div class="field text">
-                            <input class="text" type="text" name="text" value="" placeholder="<?= $object_single_name ?> Name or ID" />
-                        </div>
-                    </div>
-                    <div class="results"></div>
-                </form>
+                <p class="text">Use the robot index below to search and filter through all the <?= $object_multi_token == 'robots' ? 'unlockable '.$object_multi_token : 'fightable '.$object_multi_token ?> in the game and either view or edit using the provided links.</p>
             </div>
         </div>
     </div>
@@ -202,23 +205,36 @@ else {
         <div class="subbody">
             <table data-table="robots" class="full">
                 <colgroup>
-                    <col width="10%" />
-                    <col width="" />
-                    <col width="20%" />
-                    <col width="3%" />
-                    <col width="3%" />
-                    <col width="3%" />
-                    <col width="15%" />
+                    <?
+                    // Loop through and display column widths
+                    foreach ($table_columns AS $token => $info){
+                        list($name, $class, $width, $directions) = $info;
+                        echo '<col width="'.$width.'" />'.PHP_EOL;
+                    }
+                    ?>
                 </colgroup>
                 <thead>
                     <tr class="head">
-                        <th class="id">ID</th>
-                        <th class="name"><?= $object_single_name ?> Name</th>
-                        <th class="types"><?= $object_single_name ?> Types</th>
-                        <th class="flags complete">Complete</th>
-                        <th class="flags published">Published</th>
-                        <th class="flags hidden">Hidden</th>
-                        <th class="actions">&nbsp;</th>
+                        <?
+                        // Loop through and display column headers
+                        foreach ($table_columns AS $token => $info){
+                            list($name, $class, $width, $directions) = $info;
+                            if (!empty($name)){
+                                $active = $sort_column == $token ? true : false;
+                                $directions = explode('/', $directions);
+                                $class .= $active ? ' active' : '';
+                                $link = 'admin/'.$object_multi_token.'/sort='.$token.'-';
+                                $link .= ($active && $sort_direction == $directions[0]) ? $directions[1] : $directions[0];
+                                echo '<th class="'.$class.'">';
+                                    echo '<a class="link_inline" href="'.$link.'">'.$name.'</a>';
+                                    if ($active && $sort_direction == 'asc'){ echo ' <sup>&#8595;</sup>'; }
+                                    elseif ($active && $sort_direction == 'desc'){ echo ' <sup>&#8593;</sup>'; }
+                                echo '</th>'.PHP_EOL;
+                            } else {
+                                echo '<th class="'.$class.'">&nbsp;</th>'.PHP_EOL;
+                            }
+                        }
+                        ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -231,6 +247,7 @@ else {
                             // Collect the display fields from the array
                             $robot_token = $robot_info['robot_token'];
                             $robot_name = $robot_info['robot_name'];
+                            $robot_group = '<span class="token">'.$robot_info['robot_group'].'</span>';
                             $robot_type1 = !empty($robot_info['robot_core']) && !empty($type_index[$robot_info['robot_core']]) ? $type_index[$robot_info['robot_core']] : $type_index['none'];
                             $robot_type2 = !empty($robot_info['robot_core2']) && !empty($type_index[$robot_info['robot_core2']]) ? $type_index[$robot_info['robot_core2']] : '';
                             $type_string = '<span class="type '.$robot_type1['type_token'].'">'.$robot_type1['type_name'].'</span>';
@@ -242,17 +259,17 @@ else {
                             $hidden = $robot_info['robot_flag_hidden'] ? true : false;
                             // Print out the robot info as a table row
                             ?>
-                            <tr class="object <?= !$complete ? 'incomplete' : '' ?>">
+                            <tr class="object<?= !$published ? ' unpublished' : '' ?><?= !$complete ? ' incomplete' : '' ?>">
                                 <td class="id"><?= $robot_id ?></td>
                                 <td class="name"><a class="link_inline" href="<?= $edit_link ?>" title="Edit <?= $robot_name ?>" target="_editRobot<?= $robot_id ?>"><?= $robot_name ?></a></td>
-                                <td class="types"><?= $type_string ?></td>
-                                <td class="flags complete"><?= $complete ? '&#x2713;' : '&#x2717;' ?></td>
-                                <td class="flags published"><?= $published ? '&#9745;' : '&#9744;' ?></td>
-                                <td class="flags hidden"><?= $hidden ? '&#9745;' : '&#9744;' ?></td>
+                                <td class="group"><?= $robot_group ?></td>
+                                <td class="cores"><?= $type_string ?></td>
+                                <td class="flags hidden"><?= $hidden ? '<span class="true">&#9745;</span>' : '<span class="false">&#9744;</span>' ?></td>
+                                <td class="flags complete"><?= $complete ? '<span class="true">&#x2713;</span>' : '<span class="false">&#x2717;</span>' ?></td>
+                                <td class="flags published"><?= $published ? '<span class="type nature">Yes</span>' : '<span class="type flame">No</span>' ?></td>
                                 <td class="actions">
                                     <a class="link_inline edit" href="<?= $edit_link ?>" target="_editRobot<?= $robot_id ?>">Edit</a>
                                     <a class="link_inline view" href="<?= $view_link ?>" target="_viewRobot<?= $robot_token ?>">View</a>
-                                    <a class="link_inline delete" target="_blank">Delete</a>
                                 </td>
                             </tr>
                             <?
@@ -265,7 +282,7 @@ else {
                             <tr class="object incomplete">
                                 <td class="id">-</td>
                                 <td class="name">-</td>
-                                <td class="types">-</td>
+                                <td class="core">-</td>
                                 <td class="flags" colspan="3">-</td>
                                 <td class="actions">-</td>
                             </tr>

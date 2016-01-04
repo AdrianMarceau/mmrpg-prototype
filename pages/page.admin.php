@@ -9,6 +9,26 @@ if (!isset($this_userinfo['role_level']) || $this_userinfo['role_level'] < 5){
   exit();
 }
 
+// If we're NOT in the index, collect common data parameters
+if (!empty($this_current_sub)){
+
+    // Define the robot header column array for looping through
+    // token => array(name, class, width, directions)
+    $table_columns = array();
+
+    // Collect the sort properties from the URL if they exist
+    $raw_sort = !empty($_GET['sort']) && preg_match('/^([a-z0-9]+)-([a-z0-9]+)$/i', $_GET['sort']) ? $_GET['sort'] : 'id-asc';
+    list($sort_column, $sort_direction) = explode('-', strtolower($raw_sort));
+    $sort_flags = array('hidden', 'complete', 'published');
+    if ($this_current_sub == 'abilities'){ $sort_object = 'ability'; }
+    elseif (in_array($this_current_sub, array('mechas', 'robots', 'bosses'))){ $sort_object = 'robot'; }
+    else { $sort_object = preg_replace('/e?s$/i', '', $this_current_sub); }
+    if (in_array($sort_column, $sort_flags)){ $query_sort = $sort_object.'_flag_'.$sort_column.' '.strtoupper($sort_direction); }
+    else { $query_sort = $sort_object.'_'.$sort_column.' '.strtoupper($sort_direction); }
+    if ($sort_column == 'core' || $sort_column == 'type'){ $query_sort .= ', '.$sort_object.'_'.$sort_column.'2 '.strtoupper($sort_direction); }
+
+}
+
 //  If this is a USER editor request, include the appropriate file
 if ($this_current_sub == 'users'){
   // Require the admin users file
