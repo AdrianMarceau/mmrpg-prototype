@@ -371,7 +371,7 @@ if ($this_current_sub == 'search'){
                 case 'name': {
                     // Limit the search query based on robot name
                     $name = $this_search_text;
-                    if (preg_match('/^([a-z0-9]+)(man|woman)$/i', $name)){ $name = preg_replace('/^([a-z0-9]+)(man|woman)$/i', '$1%$2', $name); }
+                    if (preg_match('/^([a-z0-9]{3,})(man)$/i', $name)){ $name = preg_replace('/^([a-z0-9]{3,})(man)$/i', '$1%$2', $name); }
                     $this_search_query .= "AND name LIKE '%{$name}%' ";
                     $this_search_query .= "ORDER BY complete DESC, name LIKE '{$name}%' DESC, name ASC ";
                     break;
