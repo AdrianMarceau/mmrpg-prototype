@@ -18,19 +18,20 @@ CREATE TABLE IF NOT EXISTS `mmrpg_roles` (
   `role_token` varchar(100) NOT NULL COMMENT 'Role Token',
   `role_level` mediumint(8) NOT NULL COMMENT 'Role Level',
   `role_icon` varchar(32) DEFAULT NULL COMMENT 'Role Icon',
+  `role_colour` varchar(32) DEFAULT NULL COMMENT 'Role Colour',
   PRIMARY KEY (`role_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
 -- Dumping data for table pluto1_mmrpg2k15.mmrpg_roles: 6 rows
 DELETE FROM `mmrpg_roles`;
 /*!40000 ALTER TABLE `mmrpg_roles` DISABLE KEYS */;
-INSERT INTO `mmrpg_roles` (`role_id`, `role_name`, `role_token`, `role_level`, `role_icon`) VALUES
-	(1, 'Developer', 'developer', 5, 'yashichi'),
-	(2, 'Contributor', 'contributor', 4, 'energy-tank'),
-	(3, 'Member', 'member', 3, 'energy-pellet'),
-	(5, 'Guest', 'guest', 0, 'weapon-pellet'),
-	(6, 'Administrator', 'administrator', 5, 'extra-life'),
-	(7, 'Moderator', 'moderator', 4, 'weapon-tank');
+INSERT INTO `mmrpg_roles` (`role_id`, `role_name`, `role_token`, `role_level`, `role_icon`, `role_colour`) VALUES
+	(1, 'Developer', 'developer', 5, 'yashichi', 'flame'),
+	(2, 'Contributor', 'contributor', 4, 'energy-tank', 'nature'),
+	(3, 'Member', 'member', 3, 'energy-pellet', 'shield'),
+	(5, 'Guest', 'guest', 0, 'weapon-pellet', 'purple'),
+	(6, 'Administrator', 'administrator', 5, 'extra-life', 'water'),
+	(7, 'Moderator', 'moderator', 4, 'weapon-tank', 'electric');
 /*!40000 ALTER TABLE `mmrpg_roles` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
