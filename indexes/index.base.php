@@ -300,7 +300,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/abilities/" class="link <?= $this_current_sub == 'abilities' ? 'link_active field_type_empty' : '' ?>"><span>Abilities</span></a>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/items/" class="link <?= $this_current_sub == 'items' ? 'link_active field_type_empty' : '' ?>"><span>Items</span></a>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/fields/" class="link <?= $this_current_sub == 'fields' ? 'link_active field_type_empty' : '' ?>"><span>Fields</span></a>
-                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>admin/types/" class="link <?= $this_current_sub == 'types' ? 'link_active field_type_empty' : '' ?>"><span>Types</span></a>
+                        <a data-href="<?= MMRPG_CONFIG_ROOTURL ?>admin/types/" class="link <?= $this_current_sub == 'types' ? 'link_active field_type_empty' : '' ?>"><span><del>Types</del></span></a>
                     <? endif; ?>
                     <?php if ($this_current_page == 'about'): ?>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/story/" class="link <?= $this_current_sub == 'story' ? 'link_active field_type_empty' : '' ?>"><span>Story</span></a>
