@@ -1168,6 +1168,7 @@ class rpg_field extends rpg_object {
             'field_number',
             'field_name',
             'field_game',
+            'field_group',
             'field_class',
             'field_master',
             'field_master2',
