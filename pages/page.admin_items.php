@@ -153,7 +153,7 @@ else {
 
     <div class="section full">
         <div class="subbody">
-            <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/items/<?= $random_sprite ?>/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div></div>
+            <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/items/<?= $random_sprite ?>/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 16px;"></div></div>
             <p class="text">Use the item index below to search and filter through all the playable characters in the game and either view or edit using the provided links.</p>
         </div>
     </div>
