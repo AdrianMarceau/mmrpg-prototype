@@ -16,9 +16,6 @@ else { $user_info = array(); }
 // Parse the user info if it was collected
 if (!empty($user_info)){ $user_info = rpg_user::parse_info($user_info); }
 
-//echo('$user_info['.$user_id.'] = <pre>'.print_r($user_info, true).'</pre><hr />');
-//exit();
-
 // Collect the type index for display and looping
 $type_index = rpg_type::get_index(true);
 
@@ -191,7 +188,7 @@ else {
     // Define a function for generating user sheet links
     $gen_page_link = function($i, $show_active = true, $show_text = false) use ($sort_column, $sort_direction, $show_limit, $sheet_number, $num_sheets){
         $active = $show_active && $i == $sheet_number ? true : false;
-        $visible = $i == 1 || $i == $num_sheets || abs($i - $sheet_number) <= 5 ? true : false;
+        $visible = $i == 1 || $i == $num_sheets || abs($i - $sheet_number) < 5 ? true : false;
         $link = 'admin/users/sort='.$sort_column.'-'.$sort_direction.'&amp;show='.$show_limit.'&amp;sheet='.$i;
         $class = 'link_inline'.($active ? ' active' : '').(!$visible ? ' compact' : '');
         $text = !empty($show_text) ? $show_text : ($visible ? $i : '.');
@@ -251,7 +248,7 @@ else {
                     // Loop through and display column widths
                     foreach ($table_columns AS $token => $info){
                         list($name, $class, $width, $directions) = $info;
-                        echo '<col width="'.$width.'" />'.PHP_EOL;
+                        echo '<col class="'.$class.'" width="'.$width.'" />'.PHP_EOL;
                     }
                     ?>
                 </colgroup>
@@ -312,7 +309,7 @@ else {
                                 <td class="flags played"><?= $played ? '<span class="type nature">Yes</span>' : '<span class="type flame">No</span>' ?></td>
                                 <td class="actions">
                                     <a class="link_inline edit" href="<?= $edit_link ?>" target="_editUser<?= $user_id ?>">Edit</a>
-                                    <? if ($active): ?>
+                                    <? if ($played): ?>
                                         <a class="link_inline view" href="<?= $view_link ?>" target="_viewUser<?= $user_token ?>">View</a>
                                     <? endif; ?>
                                 </td>
@@ -325,11 +322,7 @@ else {
                         // Print an empty table row
                         ?>
                             <tr class="object incomplete">
-                                <td class="id">-</td>
-                                <td class="name">-</td>
-                                <td class="types">-</td>
-                                <td class="flags" colspan="3">-</td>
-                                <td class="actions">-</td>
+                                <td class="name" colspan="<?= count($table_columns) ?>">-</td>
                             </tr>
                         <?
                     }
