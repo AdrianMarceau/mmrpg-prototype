@@ -344,17 +344,17 @@
     text-align: right;
 }
 
-#mmrpg .page_admin .body .section table td.name a,
-#mmrpg .page_admin .body .section table td.email a {
-    display: inline-block;
-    max-width: 99%;
+#mmrpg .page_admin .body .section table th a,
+#mmrpg .page_admin .body .section table td a {
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-#mmrpg .page_admin .body .section table td.name a:hover,
-#mmrpg .page_admin .body .section table td.email a:hover {
+#mmrpg .page_admin .body .section table th.active a,
+#mmrpg .page_admin .body .section table th a:hover,
+#mmrpg .page_admin .body .section table td.active a,
+#mmrpg .page_admin .body .section table td a:hover {
     text-decoration: underline;
 }
 
@@ -362,14 +362,6 @@
     position: relative;
     bottom: 2px;
     font-size: 10px;
-}
-
-#mmrpg .page_admin .body .section table th a {
-    text-decoration: none;
-}
-#mmrpg .page_admin .body .section table th.active a,
-#mmrpg .page_admin .body .section table th a:hover {
-    text-decoration: underline;
 }
 
 #mmrpg .page_admin .body .section table td span.type {
@@ -384,19 +376,19 @@
     border-radius: 3px;
 }
 
-#mmrpg .page_admin .body .section table td.actions .link_inline {
-    margin-left: 10px;
+#mmrpg .page_admin .body .section table td.name,
+#mmrpg .page_admin .body .section table td.email,
+#mmrpg .page_admin .body .section table td.group {
+    line-height: 0;
 }
-
-#mmrpg .page_admin .body .section table td.complete span.true {
-    color: #259B33;
+#mmrpg .page_admin .body .section table td.name a.link_inline,
+#mmrpg .page_admin .body .section table td.email a.link_inline,
+#mmrpg .page_admin .body .section table td.group span.token {
+    display: inline-block;
+    max-width: 96%;
+    line-height: 120%;
 }
-#mmrpg .page_admin .body .section table td.complete span.false {
-    color: #C03926;
-}
-#mmrpg .page_admin .body .section table td.published span.type {
-    min-width: 30px;
-}
+#mmrpg .page_admin .body .section table td.email a.link_inline,
 #mmrpg .page_admin .body .section table td.group span.token {
     font-size: 11px;
 }
@@ -413,6 +405,20 @@
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
+}
+
+#mmrpg .page_admin .body .section table td.actions .link_inline {
+    margin-left: 10px;
+}
+
+#mmrpg .page_admin .body .section table td.complete span.true {
+    color: #259B33;
+}
+#mmrpg .page_admin .body .section table td.complete span.false {
+    color: #C03926;
+}
+#mmrpg .page_admin .body .section table td.published span.type {
+    min-width: 30px;
 }
 
 

@@ -10,7 +10,7 @@ $user_id = isset($_GET['num']) && is_numeric($_GET['num']) ? (int)($_GET['num'])
 // Collect user info based on the ID if available
 $user_fields = rpg_user::get_fields(true);
 if (!empty($user_id)){ $user_info = $db->get_array("SELECT {$user_fields} FROM mmrpg_users WHERE user_id = {$user_id};"); }
-elseif ($user_id === 0){ $user_info = $db->get_array("SELECT {$user_fields} FROM mmrpg_users WHERE user_id = 0;"); }
+elseif ($user_id === 0){ $user_info = $db->get_array("SELECT {$user_fields} FROM mmrpg_users WHERE user_name_clean = 'guest';"); }
 else { $user_info = array(); }
 
 // Parse the user info if it was collected
@@ -212,6 +212,7 @@ else {
         <a class="inline_link" href="admin/">Admin Panel</a> <span class="crumb">&raquo;</span>
         <a class="inline_link" href="admin/users/">User Index</a>
         <span class="count">( <?= $user_total_count != 1 ? $user_total_count.' Users' : '1 User' ?> )</span>
+        <a class="float_link float_link2" href="admin/users/0/" target="_blank">Add New User &raquo;</a>
     </h2>
 
     <div class="section full">
