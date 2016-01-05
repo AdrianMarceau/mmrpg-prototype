@@ -1032,9 +1032,10 @@ class rpg_ability extends rpg_object {
     /**
      * Get a list of all ability index fields as an array or, optionally, imploded into a string
      * @param bool $implode
+     * @param string $table (optional)
      * @return mixed
      */
-    public static function get_index_fields($implode = false){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various index fields for ability objects
         $index_fields = array(
@@ -1087,6 +1088,13 @@ class rpg_ability extends rpg_object {
             'ability_flag_published',
             'ability_order'
             );
+
+        // Add table name to each field string if requested
+        if (!empty($table)){
+            foreach ($index_fields AS $key => $field){
+                $index_fields[$key] = $table.'.'.$field;
+            }
+        }
 
         // Implode the index fields into a string if requested
         if ($implode){

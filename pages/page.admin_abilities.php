@@ -121,6 +121,13 @@ else {
     // Define the MARKUP variables for this page
     $this_markup_header = '';
 
+    // Collect the sort, show, and page properties from the URL if they exist
+    $raw_sort = !empty($_GET['sort']) && preg_match('/^([a-z0-9]+)-([a-z0-9]+)$/i', $_GET['sort']) ? $_GET['sort'] : 'id-asc';
+    list($sort_column, $sort_direction) = explode('-', strtolower($raw_sort));
+    $show_limit = !empty($_GET['show']) && is_numeric($_GET['show']) ? $_GET['show'] : 50;
+    $sheet_number = !empty($_GET['sheet']) && is_numeric($_GET['sheet']) ? $_GET['sheet'] : 1;
+    $row_offset = $show_limit * ($sheet_number - 1);
+
     // Define the robot header columns for looping through
     // token => array(name, class, width, directions)
     $table_columns['id'] = array('ID', 'id', '75', 'asc/desc');
@@ -132,14 +139,54 @@ else {
     $table_columns['published'] = array('Published', 'flags published', '100', 'desc/asc');
     $table_columns['actions'] = array('', 'actions', '120', '');
 
+    // Collect the sort properties from the URL if they exist
+    $sort_flags = array('hidden', 'complete', 'published');
+    $sort_direction_upper = strtoupper($sort_direction);
+    $other_direction_upper = $sort_direction_upper != 'ASC' ? 'ASC' : 'DESC';
+    if (in_array($sort_column, $sort_flags)){ $query_sort = 'abilities.ability_flag_'.$sort_column.' '.$sort_direction_upper; }
+    else { $query_sort = 'abilities.ability_'.$sort_column.' '.$sort_direction_upper; }
+
+    // Count the total number of users first
+    $ability_total_count = $db->get_value("SELECT count(ability_id) AS total FROM mmrpg_index_abilities AS abilities WHERE abilities.ability_id <> 0 AND abilities.ability_token <> 'ability';", 'total');
+
+    // If the requested page would go over the limit, floor it
+    if (ceil($show_limit * $sheet_number) > $ability_total_count){
+        $sheet_number = ceil($ability_total_count / $show_limit);
+        $row_offset = $show_limit * ($sheet_number - 1);
+    }
+
     // Collect a list of all users in the database
     $ability_fields = rpg_ability::get_index_fields(true);
-    $ability_query = "SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_id <> 0 AND ability_token <> 'ability' ORDER BY {$query_sort};";
+    $ability_query = "SELECT
+        {$ability_fields}
+        FROM mmrpg_index_abilities AS abilities
+        WHERE abilities.ability_id <> 0 AND abilities.ability_token <> 'ability'
+        ORDER BY {$query_sort}
+        LIMIT {$row_offset}, {$show_limit}
+        ;";
     $ability_index = $db->get_array_list($ability_query, 'ability_id');
-    $ability_count = !empty($ability_index) ? count($ability_index) : 0;
+    $ability_index_count = !empty($ability_index) ? count($ability_index) : 0;
 
     // Collect a list of completed ability sprite tokens
     $random_sprite = $db->get_value("SELECT ability_image FROM mmrpg_index_abilities WHERE ability_image <> 'ability' AND ability_class = 'master' AND ability_image_size = 40 AND ability_flag_complete = 1 ORDER BY RAND() LIMIT 1;", 'ability_image');
+
+    // Calculate the number of sheets to display
+    $num_sheets = ceil($ability_total_count / $show_limit);
+    // Define a function for generating user sheet links
+    $gen_page_link = function($i, $show_active = true, $show_text = false) use ($sort_column, $sort_direction, $show_limit, $sheet_number, $num_sheets){
+        $active = $show_active && $i == $sheet_number ? true : false;
+        $visible = $i == 1 || $i == $num_sheets || abs($i - $sheet_number) < 5 ? true : false;
+        $link = 'admin/abilities/sort='.$sort_column.'-'.$sort_direction.'&amp;show='.$show_limit.'&amp;sheet='.$i;
+        $class = 'link_inline'.($active ? ' active' : '').(!$visible ? ' compact' : '');
+        $text = !empty($show_text) ? $show_text : ($visible ? $i : '.');
+        return '<a class="'.$class.'" href="'.$link.'">'.$text.'</a>'.PHP_EOL;
+        };
+
+    // Generate links for prev, next, and any pages in between
+    $sheet_link_markup = '';
+    if ($sheet_number > 1){ $sheet_link_markup .= $gen_page_link($sheet_number - 1, false, '&laquo Prev'); }
+    for ($i = 1; $i <= $num_sheets; $i++){ $sheet_link_markup .= $gen_page_link($i); }
+    if ($sheet_number < $num_sheets){ $sheet_link_markup .= $gen_page_link($sheet_number + 1, false, 'Next &raquo;'); }
 
     // Start generating the page markup
     ob_start();
@@ -148,14 +195,36 @@ else {
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <a class="inline_link" href="admin/">Admin Panel</a> <span class="crumb">&raquo;</span>
         <a class="inline_link" href="admin/abilities/">Ability Index</a>
-        <span class="count">( <?= $ability_count != 1 ? $ability_count.' Abilities' : '1 Ability' ?> )</span>
+        <span class="count">( <?= $ability_total_count != 1 ? $ability_total_count.' Abilities' : '1 Ability' ?> )</span>
+        <a class="float_link float_link2" href="admin/abilities/0/" target="_blank">Add New Ability &raquo;</a>
     </h2>
 
     <div class="section full">
         <div class="subbody">
             <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_command" style="background-image: url(images/abilities/<?= $random_sprite ?>/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 16px;"></div></div>
             <p class="text">Use the ability index below to search and filter through all the playable characters in the game and either view or edit using the provided links.</p>
+            <p class="text">You can also search for abilities by typing their name, type, or identification number into the input field below.</p>
+            <div class="text">
+                <form class="search" data-search="abilities">
+                    <div class="inputs">
+                        <div class="field text">
+                            <input class="text" type="text" name="text" value="" placeholder="Ability Name, Type, or ID" />
+                        </div>
+                    </div>
+                    <div class="results"></div>
+                </form>
+            </div>
         </div>
+    </div>
+
+    <div class="subbody dataheader">
+        <p class="text left counts">
+            <?= $ability_index_count != $ability_total_count ? 'Showing '.$ability_index_count.' of ' : '' ?>
+            <?= $ability_total_count != 1 ? $ability_total_count.' Abilities' : '1 Ability' ?> Total
+        </p>
+        <p class="text right sheets">
+            <?= $sheet_link_markup ?>
+        </p>
     </div>
 
     <div class="section full">
@@ -166,7 +235,7 @@ else {
                     // Loop through and display column widths
                     foreach ($table_columns AS $token => $info){
                         list($name, $class, $width, $directions) = $info;
-                        echo '<col width="'.$width.'" />'.PHP_EOL;
+                        echo '<col class="'.$class.'" width="'.$width.'" />'.PHP_EOL;
                     }
                     ?>
                 </colgroup>
@@ -239,11 +308,7 @@ else {
                         // Print an empty table row
                         ?>
                             <tr class="object incomplete">
-                                <td class="id">-</td>
-                                <td class="name">-</td>
-                                <td class="types">-</td>
-                                <td class="flags" colspan="3">-</td>
-                                <td class="actions">-</td>
+                                <td class="name" colspan="<?= count($table_columns) ?>">-</td>
                             </tr>
                         <?
                     }
@@ -253,8 +318,14 @@ else {
         </div>
     </div>
 
-    <div class="subbody">
-        <p class="text right"><?= $ability_count != 1 ? $ability_count.' Abilities' : '1 Ability' ?> Total</p>
+    <div class="subbody dataheader">
+        <p class="text left counts">
+            <?= $ability_index_count != $ability_total_count ? 'Showing '.$ability_index_count.' of ' : '' ?>
+            <?= $ability_total_count != 1 ? $ability_total_count.' Abilities' : '1 Ability' ?> Total
+        </p>
+        <p class="text right sheets">
+            <?= $sheet_link_markup ?>
+        </p>
     </div>
 
 
