@@ -85,25 +85,25 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
     $this_robot->robot_key = $this_robot->robot_key !== false ? $this_robot->robot_key : ($this_key > 0 ? $this_key : $num_player_robots);
     $this_robot_data = $this_robot->canvas_markup($this_options, $this_player_data);
     $this_robot_id_token = $this_robot_data['robot_id'].'_'.$this_robot_data['robot_token'];
-    
+
     // ABILITY OVERLAY STUFF
     if (!empty($this_options['this_ability_results']) && $this_options['this_ability_target'] == $this_robot_id_token){
-      
+
       $this_markup .= '<div class="ability_overlay overlay1" data-target="'.$this_options['this_ability_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: '.(($this_robot_data['robot_position'] == 'active' ? 5050 : (4900 - ($this_robot_data['robot_key'] * 100)))).';">&nbsp;</div>';
-      
-      
+
+
     }
     elseif ($this_robot_data['robot_position'] != 'bench' && !empty($this_options['this_ability']) && !empty($options['canvas_show_this_ability'])){
-      
+
       $this_markup .= '<div class="ability_overlay overlay2" data-target="'.$this_options['this_ability_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: 5050;">&nbsp;</div>';
-      
+
     }
     elseif ($this_robot_data['robot_position'] != 'bench' && !empty($options['canvas_show_this_ability_overlay'])){
-      
+
       $this_markup .= '<div class="ability_overlay overlay3" style="z-index: 100;">&nbsp;</div>';
-      
+
     }
-    
+
     /*
     if ($this_robot_data['robot_position'] != 'bench' && (!empty($this_options['this_ability']) || !empty($this_options['this_ability_results']))){
         //$temp_z_index = 5000;
@@ -118,7 +118,7 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
     // RESULTS ANIMATION STUFF
     if (!empty($this_options['this_ability_results']) && $this_options['this_ability_target'] == $this_robot_id_token){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
       /*
        * ABILITY EFFECT OFFSETS
        * Frame 01 : Energy +
@@ -137,11 +137,6 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
       $this_results_data['results_amount_markup'] = '';
       $this_results_data['results_effect_markup'] = '';
 
-      /*
-      sprite sprite_80x80 sprite_80x80_right_02 ability_status_active ability_position_active
-      z-index: 92; left: 181px; bottom: 65px; background-image: url("images/abilities/ability_attack-boost_80x80.png?20120107-05");
-      */
-
       // Calculate the results effect canvas offsets
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_results_data['canvas_offset_x'] = ceil($this_robot_data['canvas_offset_x'] - (4 * $this_options['this_ability_results']['total_actions']));
@@ -152,7 +147,7 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
       if ($this_robot_data['robot_position'] == 'bench' && $this_robot_data['robot_size'] >= 80){
         $this_results_data['canvas_offset_x'] += ceil($this_robot_data['robot_size'] / 2);
       }
-      
+
 
       // Define the style and class variables for these results
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -232,7 +227,7 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
 
         //$this_results_data['results_amount_markup'] .= '<div class="debug">'.preg_replace('#\s+#', ' ', print_r($this_options['this_ability_target'], true)).' = '.($this_robot_data['robot_id'].'_'.$this_robot_data['robot_token']).'</div>';
         //$this_results_data['results_amount_markup'] .= '<div class="debug">this_ability_target = '.$this_options['this_ability_target'].' | robot-id_robot-token = '.($this_robot_data['robot_id'].'_'.$this_robot_data['robot_token']).'</div>';
-        
+
         // Check if a damage trigger was sent with the ability results
         if ($this_options['this_ability_results']['trigger_kind'] == 'damage'){
           //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -341,7 +336,7 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
       // Define the ability data array and generate markup data
       $attachment_options['data_type'] = 'ability';
       $this_ability_data = $this_options['this_ability']->canvas_markup($this_options, $this_player_data, $this_robot_data);
-      
+
       // Display the ability's mugshot sprite
       if (empty($this_options['this_ability_results']['total_actions'])){
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -349,7 +344,7 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
         $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right" style="background-image: url(images/abilities/'.(!empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_ability']->ability_name.'</div>';
         $this_markup .=  '<div class="'.$this_ability_data['ability_markup_class'].' canvas_ability_details ability_type ability_type_'.(!empty($this_options['this_ability']->ability_type) ? $this_options['this_ability']->ability_type : 'none').(!empty($this_options['this_ability']->ability_type2) ? '_'.$this_options['this_ability']->ability_type2 : '').'" style="">'.$this_mugshot_markup_left.'<div class="ability_name" style="">'.$this_ability_data['ability_title'].'</div>'.$this_mugshot_markup_right.'</div>';
       }
-      
+
       // Append this ability's markup to the main markup array
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_markup .= $this_ability_data['ability_markup'];
@@ -468,7 +463,7 @@ if (!empty($this->battle_field->field_multipliers)){
   if (!empty($multiplier_markup_left) || !empty($multiplier_markup_right)){
     $this_markup .= '<div class="canvas_overlay_footer"><strong class="overlay_label">Field Multipliers</strong><span class="overlay_multiplier_count_'.$temp_multipliers_count.'">'.$multiplier_markup_left.$multiplier_markup_right.'</div></div>';
   }
-  
+
 }
 
 
