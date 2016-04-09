@@ -85,15 +85,15 @@ if ($temp_robot_fields){
 ob_start();
 ?>
 <div class="database_container database_<?= $robot_info['robot_class'] == 'mecha' ? 'mecha' : 'robot' ?>_container" data-token="<?=$robot_info['robot_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
-  
+
   <? if($print_options['layout_style'] == 'website' || $print_options['layout_style'] == 'website_compact'): ?>
     <a class="anchor" id="<?=$robot_info['robot_token']?>">&nbsp;</a>
   <? endif; ?>
-  
+
   <div class="subbody event event_triple event_visible" data-token="<?=$robot_info['robot_token']?>" style="<?= ($print_options['layout_style'] == 'event' ? 'margin: 0 !important; ' : '').($print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important; ' : '') ?>">
 
     <? if($print_options['show_mugshot']): ?>
-      
+
       <div class="this_sprite sprite_left" style="height: 40px;">
         <? if($print_options['show_mugshot']): ?>
           <? if($print_options['show_key'] !== false): ?>
@@ -106,11 +106,11 @@ ob_start();
           <? } ?>
         <? endif; ?>
       </div>
-    
+
     <? endif; ?>
 
     <? if($print_options['show_basics']): ?>
-    
+
       <h2 class="header header_left <?= $robot_header_types ?>" style="margin-right: 0; <?= (!$print_options['show_mugshot']) ? 'margin-left: 0;' : '' ?>">
         <? if($print_options['layout_style'] == 'website_compact'): ?>
           <a href="database/<?= $robot_info['robot_class'] == 'mecha' ? 'mechas' : 'robots' ?>/<?= $robot_info['robot_token'] ?>/"><?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?></a>
@@ -215,14 +215,14 @@ ob_start();
                 /*
 
                 <? if($print_options['layout_style'] != 'event'): ?>
-                
+
                 <? else: ?>
-                
+
                 <? endif; ?>
 
 
                  */
-                
+
                 // Loop through the robots fields if available
                 if (!empty($field_info_array)){
                   foreach ($field_info_array AS $key => $field_info){
@@ -332,9 +332,9 @@ ob_start();
                 ?>
               </td>
             </tr>
-            
+
             <? if($print_options['layout_style'] == 'event'): ?>
-              
+
               <?
               // Define the search and replace arrays for the robot quotes
               $temp_find = array('{this_player}', '{this_robot}', '{target_player}', '{target_robot}');
@@ -345,17 +345,17 @@ ob_start();
                   <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_taunt']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_taunt']) : '&hellip;' ?>&quot;</span>
                 </td>
               </tr>
-              
+
             <? endif; ?>
-            
+
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
 
     <? if($print_options['show_quotes']): ?>
-      
+
       <h2 id="quotes" class="header header_left <?= $robot_header_types ?>" style="margin-right: 0;">
         <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>&#39;s Quotes
       </h2>
@@ -397,11 +397,11 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
 
     <? if($print_options['show_description'] && !empty($robot_info['robot_description2'])): ?>
-      
+
       <h2 class="header header_left <?= $robot_header_types ?>" style="margin-right: 0;">
         <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>&#39;s Description
       </h2>
@@ -419,7 +419,7 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
 
     <? if($print_options['show_sprites'] && (!isset($robot_info['robot_image_sheets']) || $robot_info['robot_image_sheets'] !== 0) && $robot_image_token != 'robot' ): ?>
@@ -472,7 +472,9 @@ ob_start();
           if ($robot_info['robot_image_editor'] == 412){ $temp_editor_title = 'Adrian Marceau / Ageman20XX'; }
           elseif ($robot_info['robot_image_editor'] == 110){ $temp_break = true; $temp_editor_title = 'MetalMarioX100 / EliteP1</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
           elseif ($robot_info['robot_image_editor'] == 18){ $temp_break = true; $temp_editor_title = 'Sean Adamson / MetalMan</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
+          elseif ($robot_info['robot_image_editor'] == 4117 && in_array($robot_info['robot_token'], array('splash-woman'))){ $temp_break = true; $temp_editor_title = 'Jonathan Backstrom / Rhythm_BCA</strong> <span style="color: #565656;"> | </span> Assembly by <strong>MegaBossMan / milansaponja'; }
           elseif ($robot_info['robot_image_editor'] == 4117){ $temp_break = true; $temp_editor_title = 'Jonathan Backstrom / Rhythm_BCA</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
+          elseif ($robot_info['robot_image_editor'] == 3842){ $temp_break = true; $temp_editor_title = 'MegaBossMan / milansaponja'; }
           if ($temp_break){ $temp_final_divider = '<br />'; }
         }
         $temp_is_capcom = true;
@@ -639,11 +641,11 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
-    
+
     <? if($print_options['show_records']): ?>
-      
+
       <h2 id="records" class="header header_full <?= $robot_header_types ?>" style="margin: 10px 0 0; text-align: left;">
         <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>&#39;s Records
       </h2>
@@ -713,14 +715,14 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
 
     <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
       <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
       <a class="link link_permalink permalink" href="database/<?= $robot_info['robot_class'] == 'mecha' ? 'mechas' : 'robots' ?>/<?= $robot_info['robot_token'] ?>/" rel="permalink">+ Permalink</a>
-    
+
     <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
       <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>

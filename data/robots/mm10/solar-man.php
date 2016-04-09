@@ -5,6 +5,7 @@ $robot = array(
   'robot_game' => 'MM10',
   'robot_name' => 'Solar Man',
   'robot_token' => 'solar-man',
+  'robot_image_editor' => 3842,
   'robot_core' => 'flame',
   'robot_description' => 'Titanic Fireball Robot',
   'robot_energy' => 100,
