@@ -124,7 +124,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 <?endif;?>
 </head>
 <? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
-<body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?>">
+<body id="mmrpg" data-page="<?= trim(str_replace('/', '_', $this_current_uri), '_') ?>" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?>">
 <?/*
 <div style="margin: 0; padding: 10px 25%; background-color: rgb(122, 0, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
 ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please, please log off from your accounts as soon as possible and stand by until further notice.  Several parts of the website will be taken offline during this process and any progress made during or directly before will likely be lost.  Thank you and look forward to lots of new stuff!<br /> - Adrian

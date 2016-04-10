@@ -23,10 +23,10 @@ $mmrpg_database_fields = $DB->get_array_list("SELECT * FROM mmrpg_index_fields W
 
 // Remove unallowed fields from the database
 foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
-    
+
   // Send this data through the field index parser
   $temp_info = mmrpg_field::parse_index_info($temp_info);
-  
+
   if (in_array($temp_token, $hidden_database_fields)){
     unset($mmrpg_database_fields[$temp_token]);
   } else {
@@ -34,10 +34,10 @@ foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/fields/'.$temp_token.'/')){ $temp_info['field_image'] = $temp_token; }
     else { $temp_info['field_image'] = 'field'; }
   }
-  
+
   // Update the data in the fields index array
   $mmrpg_database_fields[$temp_token] = $temp_info;
-  
+
 }
 
 // Sort the ability index based on field number
@@ -91,6 +91,7 @@ $mmrpg_database_fields_count = count($mmrpg_database_fields);
 $key_counter = 0;
 $mmrpg_database_fields_links = '';
 $mmrpg_database_fields_links_counter = 0;
+$mmrpg_database_fields_links_counter_incomplete = 0;
 foreach ($mmrpg_database_fields AS $field_key => $field_info){
   // If a type filter has been applied to the field page
   $temp_field_types = array();
@@ -110,8 +111,8 @@ foreach ($mmrpg_database_fields AS $field_key => $field_info){
   // Start the output buffer and collect the generated markup
   ob_start();
   ?>
-  <div title="<?= $field_title_text ?>" data-token="<?= $field_info['field_token'] ?>" class="float float_left float_link field_type field_type_<?= $field_type_token ?>" style="<?= $field_image_incomplete  ? 'opacity: 0.25; ' : '' ?>">
-    <a class="sprite sprite_field_link sprite_field sprite_field_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_40x40 field_status_active field_position_active <?= $field_key == $first_field_token ? 'sprite_field_current ' : '' ?>" href="<?='database/fields/'.$field_info['field_token'].'/'?>" style="<?= $field_image_incomplete  ? 'opacity: 0.50; ' : '' ?>" rel="<?= $field_image_incomplete ? 'nofollow' : 'follow' ?>">
+  <div title="<?= $field_title_text ?>" data-token="<?= $field_info['field_token'] ?>" class="float float_left float_link field_type field_type_<?= $field_type_token ?><?= $field_image_incomplete  ? ' incomplete' : '' ?>">
+    <a class="sprite sprite_field_link sprite_field sprite_field_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_40x40 field_status_active field_position_active <?= $field_key == $first_field_token ? 'sprite_field_current ' : '' ?>" href="<?='database/fields/'.$field_info['field_token'].'/'?>" rel="<?= $field_image_incomplete ? 'nofollow' : 'follow' ?>">
       <? if($field_image_token != 'field'): ?>
         <img src="<?= $field_image_path ?>" width="<?= $field_image_size ?>" height="<?= $field_image_size ?>" alt="<?= $field_title_text ?>" />
       <? else: ?>
@@ -122,6 +123,7 @@ foreach ($mmrpg_database_fields AS $field_key => $field_info){
   <?
   $mmrpg_database_fields_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
   $mmrpg_database_fields_links_counter++;
+  if ($field_image_incomplete){ $mmrpg_database_fields_links_counter_incomplete++; }
   $key_counter++;
 }
 

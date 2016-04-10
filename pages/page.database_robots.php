@@ -17,7 +17,10 @@ $this_graph_data['description'] = 'The robot database contains detailed informat
 // Define the MARKUP variables for this page
 //$this_markup_header = 'Mega Man RPG Prototype Robot Database <span class="count">( '.(!empty($mmrpg_database_robots_count) ? ($mmrpg_database_robots_count == 1 ? '1 Robot' : $mmrpg_database_robots_count.' Robots') : '0 Robots').' )';
 $this_markup_header = 'Mega Man RPG Prototype Robot Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_robots_links_counter) ? ($mmrpg_database_robots_links_counter == 1 ? '1 Robot' : $mmrpg_database_robots_links_counter.' Robots') : '0 Robots').' )</span>';
+$this_markup_counter = '<span class="count count_header">( ';
+$this_markup_counter .= ($mmrpg_database_robots_links_counter_incomplete > 0 ? ($mmrpg_database_robots_count - $mmrpg_database_robots_links_counter_incomplete).' / ' : '');
+$this_markup_counter .= (!empty($mmrpg_database_robots_links_counter) ? ($mmrpg_database_robots_links_counter == 1 ? '1 Robot' : $mmrpg_database_robots_links_counter.' Robots') : '0 Robots');
+$this_markup_counter .= ' )</span>';
 
 // If a specific robot has NOT been defined, show the quick-switcher
 reset($mmrpg_database_robots);
@@ -68,14 +71,14 @@ if (!empty($this_current_token)){
   // Loop through the robot database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_robots AS $robot_key => $robot_info){
-    
+
     // If a specific robot has been requested and it's not this one
     if (!empty($this_current_token) && $this_current_token != $robot_info['robot_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
-    
+
     // If this is THE specific robot requested (and one was specified)
     if (!empty($this_current_token) && $this_current_token == $robot_info['robot_token']){
-      
+
       $this_robot_image = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
       $this_robot_image_size = (!empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40) * 2;
       $this_robot_image_size_text = $this_robot_image_size.'x'.$this_robot_image_size;
@@ -97,17 +100,17 @@ if (!empty($this_current_token)){
       $this_graph_data['title'] .= ' | '.$robot_info['robot_name'];
       $this_graph_data['description'] = $robot_info['robot_number'].' '.$robot_info['robot_name'].', a '.(!empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')).' core' : 'special').' robot master in the Mega Man RPG Prototype. '.$this_graph_data['description'];
       $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$robot_info['robot_token'].'/mug_right_'.$this_robot_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
-      
+
     }
-    
+
     // Collect the markup for this robot and print it to the browser
     $temp_robot_markup = mmrpg_robot::print_database_markup($robot_info, array('show_key' => $key_counter));
     echo $temp_robot_markup;
     $key_counter++;
     break;
-    
+
   }
-  
+
 }
 
 // Only show the header if a specific robot has not been selected

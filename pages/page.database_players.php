@@ -16,7 +16,10 @@ $this_graph_data['description'] = 'The player database contains detailed informa
 
 // Define the MARKUP variables for this page
 $this_markup_header = 'Mega Man RPG Prototype Player Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_players_links_counter) ? ($mmrpg_database_players_links_counter == 1 ? '1 Player' : $mmrpg_database_players_links_counter.' Players') : '0 Players').' )</span>';
+$this_markup_counter = '<span class="count count_header">( ';
+$this_markup_counter .= ($mmrpg_database_players_links_counter_incomplete > 0 ? ($mmrpg_database_players_count - $mmrpg_database_players_links_counter_incomplete).' / ' : '');
+$this_markup_counter .= (!empty($mmrpg_database_players_links_counter) ? ($mmrpg_database_players_links_counter == 1 ? '1 Player' : $mmrpg_database_players_links_counter.' Players') : '0 Players');
+$this_markup_counter .= ' )</span>';
 
 // If a specific player has NOT been defined, show the quick-switcher
 reset($mmrpg_database_players);
@@ -29,14 +32,14 @@ if (!empty($this_current_token)){
   // Loop through the player database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_players AS $player_key => $player_info){
-    
+
     // If a specific player has been requested and it's not this one
     if (!empty($this_current_token) && $this_current_token != $player_info['player_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
-    
+
     // If this is THE specific player requested (and one was specified)
     if (!empty($this_current_token) && $this_current_token == $player_info['player_token']){
-      
+
       $this_player_image = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
       if ($this_player_image == 'player'){ $this_seo_robots = 'noindex'; }
       // Define the SEO variables for this page
@@ -49,17 +52,17 @@ if (!empty($this_current_token)){
       $this_graph_data['title'] .= ' | '.$player_info['player_name'];
       $this_graph_data['description'] = $player_info['player_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_graph_data['description'];
       $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/players/'.$player_info['player_token'].'/mug_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
-      
+
     }
-    
+
     // Collect the markup for this player and print it to the browser
     $temp_player_markup = mmrpg_player::print_database_markup($player_info, array('show_key' => $key_counter));
     echo $temp_player_markup;
     $key_counter++;
     break;
-    
+
   }
-  
+
 }
 
 // Only show the header if a specific player has not been selected
