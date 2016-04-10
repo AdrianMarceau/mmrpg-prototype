@@ -41,10 +41,10 @@ $mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abili
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
   if (true){
-    
+
     // Send this data through the ability index parser
     $temp_info = mmrpg_ability::parse_index_info($temp_info);
-    
+
     // Ensure this ability's image exists, else default to the placeholder
     $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/abilities/'.$temp_image_token.'/')){ $temp_info['ability_image'] = $temp_image_token; }
@@ -62,10 +62,10 @@ foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
     else { $mmrpg_database_abilities_types['none']++; }
     if (!empty($temp_info['ability_type2'])){ $mmrpg_database_abilities_types[$temp_info['ability_type2']]++; }
     //else { $mmrpg_database_abilities_types['none']++; }
-    
+
     // Update the main database array with the changes
     $mmrpg_database_abilities[$temp_token] = $temp_info;
-    
+
   }
 }
 
@@ -184,6 +184,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $key_counter = 0;
 $mmrpg_database_abilities_links = '';
 $mmrpg_database_abilities_links_counter = 0;
+$mmrpg_database_abilities_links_counter_incomplete = 0;
 foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
   // If a type filter has been applied to the ability page
   $temp_ability_types = array();
@@ -203,8 +204,8 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
   // Start the output buffer and collect the generated markup
   ob_start();
   ?>
-  <div title="<?= $ability_title_text ?>" data-token="<?= $ability_info['ability_token'] ?>" class="float float_left float_link ability_type ability_type_<?= (!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '') ?>" style="<?= $ability_image_incomplete  ? 'opacity: 0.25; ' : '' ?>" rel="<?= $ability_image_incomplete ? 'nofollow' : 'follow' ?>">
-    <a class="sprite sprite_ability_link sprite_ability sprite_ability_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_<?= $ability_image_size_text ?>  ability_status_active ability_position_active <?= $ability_key == $first_ability_token ? 'sprite_ability_current ' : '' ?>" href="<?='database/abilities/'.$ability_info['ability_token']?>/" style="<?= $ability_image_incomplete  ? 'opacity: 0.50; ' : '' ?>">
+  <div title="<?= $ability_title_text ?>" data-token="<?= $ability_info['ability_token'] ?>" class="float float_left float_link ability_type ability_type_<?= (!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '') ?><?= $ability_image_incomplete  ? ' incomplete' : '' ?>">
+    <a class="sprite sprite_ability_link sprite_ability sprite_ability_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_<?= $ability_image_size_text ?>  ability_status_active ability_position_active <?= $ability_key == $first_ability_token ? 'sprite_ability_current ' : '' ?>" href="<?='database/abilities/'.$ability_info['ability_token']?>/" rel="<?= $ability_image_incomplete ? 'nofollow' : 'follow' ?>">
       <? if($ability_image_token != 'ability'): ?>
         <img src="<?= $ability_image_path ?>" width="<?= $ability_image_size ?>" height="<?= $ability_image_size ?>" alt="<?= $ability_title_text ?>" />
       <? else: ?>
@@ -215,6 +216,7 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
   <?
   $mmrpg_database_abilities_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
   $mmrpg_database_abilities_links_counter++;
+  if ($ability_image_incomplete){ $mmrpg_database_abilities_links_counter_incomplete++; }
   $key_counter++;
 }
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }

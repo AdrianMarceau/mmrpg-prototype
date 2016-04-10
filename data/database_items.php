@@ -24,10 +24,10 @@ $mmrpg_database_items = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities
 // Remove unallowed items from the database, and increment counters
 foreach ($mmrpg_database_items AS $temp_token => $temp_info){
   if (true){
-    
+
     // Send this data through the item index parser
     $temp_info = mmrpg_ability::parse_index_info($temp_info);
-    
+
     // Ensure this item's image exists, else default to the placeholder
     $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/abilities/'.$temp_image_token.'/')){ $mmrpg_database_items[$temp_token]['ability_image'] = $temp_image_token; }
@@ -112,6 +112,7 @@ $mmrpg_database_items_count = count($mmrpg_database_items);
 $key_counter = 0;
 $mmrpg_database_items_links = '';
 $mmrpg_database_items_links_counter = 0;
+$mmrpg_database_items_links_counter_incomplete = 0;
 foreach ($mmrpg_database_items AS $item_key => $item_info){
   // If a type filter has been applied to the ability page
   $temp_item_types = array();
@@ -130,8 +131,8 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
   // Start the output buffer and collect the generated markup
   ob_start();
   ?>
-  <div title="<?= $item_title_text ?>" data-token="<?= $item_info['ability_token'] ?>" class="float float_left float_link ability_type ability_type_<?= (!empty($item_info['ability_type']) ? $item_info['ability_type'] : 'none').(!empty($item_info['ability_type2']) ? '_'.$item_info['ability_type2'] : '') ?>" style="<?= $item_image_incomplete  ? 'opacity: 0.25; ' : '' ?>" rel="<?= $item_image_incomplete ? 'nofollow' : 'follow' ?>">
-    <a class="sprite sprite_ability_link sprite_ability sprite_ability_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_<?= $item_image_size_text ?>  item_status_active item_position_active <?= $item_key == $first_item_token ? 'sprite_ability_current ' : '' ?>" href="<?= 'database/items/'.preg_replace('/^item-/i', '', $item_info['ability_token']) ?>/" style="<?= $item_image_incomplete  ? 'opacity: 0.50; ' : '' ?>">
+  <div title="<?= $item_title_text ?>" data-token="<?= $item_info['ability_token'] ?>" class="float float_left float_link ability_type ability_type_<?= (!empty($item_info['ability_type']) ? $item_info['ability_type'] : 'none').(!empty($item_info['ability_type2']) ? '_'.$item_info['ability_type2'] : '') ?><?= $ability_image_incomplete  ? ' incomplete' : '' ?>">
+    <a class="sprite sprite_ability_link sprite_ability sprite_ability_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_<?= $item_image_size_text ?>  item_status_active item_position_active <?= $item_key == $first_item_token ? 'sprite_ability_current ' : '' ?>" href="<?= 'database/items/'.preg_replace('/^item-/i', '', $item_info['ability_token']) ?>/" rel="<?= $item_image_incomplete ? 'nofollow' : 'follow' ?>">
       <? if($item_image_token != 'item'): ?>
         <img src="<?= $item_image_path ?>" width="<?= $item_image_size ?>" height="<?= $item_image_size ?>" alt="<?= $item_title_text ?>" />
       <? else: ?>
@@ -142,6 +143,7 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
   <?
   $mmrpg_database_items_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
   $mmrpg_database_items_links_counter++;
+  if ($item_image_incomplete){ $mmrpg_database_items_links_counter_incomplete++; }
   $key_counter++;
 }
 

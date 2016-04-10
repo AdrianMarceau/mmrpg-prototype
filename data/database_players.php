@@ -46,6 +46,7 @@ $mmrpg_database_players_count = count($mmrpg_database_players);
 $key_counter = 0;
 $mmrpg_database_players_links = '';
 $mmrpg_database_players_links_counter = 0;
+$mmrpg_database_players_links_counter_incomplete = 0;
 foreach ($mmrpg_database_players AS $player_key => $player_info){
   // If a type filter has been applied to the player page
   if (isset($this_current_filter) && $this_current_filter == 'none' && $player_info['player_type'] != ''){ $key_counter++; continue; }
@@ -59,12 +60,12 @@ foreach ($mmrpg_database_players AS $player_key => $player_info){
   $player_title_text = $player_info['player_name'].' | '.(!empty($player_info['player_type']) ? ucfirst($player_info['player_type']).' Type' : 'Neutral Type');
   $player_image_path = 'images/players/'.$player_image_token.'/mug_right_'.$player_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
   $player_type_token = $player_info['player_type'];
-  
+
   // Start the output buffer and collect the generated markup
   ob_start();
   ?>
-  <div title="<?= $player_title_text ?>" data-token="<?= $player_info['player_token'] ?>" class="float float_left float_link player_type player_type_<?= $player_type_token ?>" style="<?= $player_image_incomplete  ? 'opacity: 0.25; ' : '' ?>">
-    <a class="sprite sprite_player_link sprite_player sprite_player_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_40x40 player_status_active player_position_active <?= $player_key == $first_player_token ? 'sprite_player_current ' : '' ?>" href="<?='database/players/'.$player_info['player_token'].'/'?>" style="<?= $player_image_incomplete  ? 'opacity: 0.50; ' : '' ?>" rel="<?= $player_image_incomplete ? 'nofollow' : 'follow' ?>">
+  <div title="<?= $player_title_text ?>" data-token="<?= $player_info['player_token'] ?>" class="float float_left float_link player_type player_type_<?= $player_type_token ?><?= $player_image_incomplete  ? ' incomplete' : '' ?>">
+    <a class="sprite sprite_player_link sprite_player sprite_player_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_40x40 player_status_active player_position_active <?= $player_key == $first_player_token ? 'sprite_player_current ' : '' ?>" href="<?='database/players/'.$player_info['player_token'].'/'?>" rel="<?= $player_image_incomplete ? 'nofollow' : 'follow' ?>">
       <? if($player_image_token != 'player'): ?>
         <img src="<?= $player_image_path ?>" width="<?= $player_image_size ?>" height="<?= $player_image_size ?>" alt="<?= $player_title_text ?>" />
       <? else: ?>
@@ -75,6 +76,7 @@ foreach ($mmrpg_database_players AS $player_key => $player_info){
   <?
   $mmrpg_database_players_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
   $mmrpg_database_players_links_counter++;
+  if ($player_image_incomplete){ $mmrpg_database_players_links_counter_incomplete++; }
   $key_counter++;
 }
 

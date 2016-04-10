@@ -642,6 +642,17 @@ html {
 #window .page .body .subbody_databaselinks {
   margin-bottom: 4px;
 }
+#window .page .body .subbody_databaselinks .float_link.incomplete {
+  opacity: 0.25;
+  filter: opacity(alpha = 25);
+}
+#window .page .body .subbody_databaselinks .float_link.incomplete .sprite {
+  opacity: 0.50;
+  filter: opacity(alpha = 50);
+}
+[data-page="database"] #window .page .body .subbody_databaselinks .float_link.incomplete {
+  display: none;
+}
 #window .page .body .subbody .text {
   display: block;
   margin: 0 0 6px;

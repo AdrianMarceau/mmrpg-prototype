@@ -17,7 +17,10 @@ $this_graph_data['description'] = 'The mecha database contains detailed informat
 // Define the MARKUP variables for this page
 //$this_markup_header = 'Mega Man RPG Prototype Mecha Database <span class="count">( '.(!empty($mmrpg_database_mechas_count) ? ($mmrpg_database_mechas_count == 1 ? '1 Mecha' : $mmrpg_database_mechas_count.' Mechas') : '0 Mechas').' )';
 $this_markup_header = 'Mega Man RPG Prototype Mecha Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_mechas_links_counter) ? ($mmrpg_database_mechas_links_counter == 1 ? '1 Mecha' : $mmrpg_database_mechas_links_counter.' Mechas') : '0 Mechas').' )</span>';
+$this_markup_counter = '<span class="count count_header">( ';
+$this_markup_counter .= ($mmrpg_database_mechas_links_counter_incomplete > 0 ? ($mmrpg_database_mechas_count - $mmrpg_database_mechas_links_counter_incomplete).' / ' : '');
+$this_markup_counter .= (!empty($mmrpg_database_mechas_links_counter) ? ($mmrpg_database_mechas_links_counter == 1 ? '1 Mecha' : $mmrpg_database_mechas_links_counter.' Mechas') : '0 Mechas');
+$this_markup_counter .= ' )</span>';
 
 // If a specific mecha has NOT been defined, show the quick-switcher
 reset($mmrpg_database_mechas);
@@ -68,14 +71,14 @@ if (!empty($this_current_token)){
   // Loop through the mecha database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_mechas AS $mecha_key => $mecha_info){
-    
+
     // If a specific mecha has been requested and it's not this one
     if (!empty($this_current_token) && $this_current_token != $mecha_info['robot_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
-    
+
     // If this is THE specific mecha requested (and one was specified)
     if (!empty($this_current_token) && $this_current_token == $mecha_info['robot_token']){
-      
+
       $this_mecha_image = !empty($mecha_info['robot_image']) ? $mecha_info['robot_image'] : $mecha_info['robot_token'];
       $this_mecha_image_size = (!empty($mecha_info['robot_image_size']) ? $mecha_info['robot_image_size'] : 40) * 2;
       $this_mecha_image_size_text = $this_mecha_image_size.'x'.$this_mecha_image_size;
@@ -97,17 +100,17 @@ if (!empty($this_current_token)){
       $this_graph_data['title'] .= ' | '.$mecha_info['robot_name'];
       $this_graph_data['description'] = $mecha_info['robot_number'].' '.$mecha_info['robot_name'].', a '.(!empty($mecha_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')).' core' : 'special').' support mecha in the Mega Man RPG Prototype. '.$this_graph_data['description'];
       $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$mecha_info['robot_token'].'/mug_right_'.$this_mecha_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
-      
+
     }
-    
+
     // Collect the markup for this mecha and print it to the browser
     $temp_mecha_markup = mmrpg_robot::print_database_markup($mecha_info, array('show_key' => $key_counter));
     echo $temp_mecha_markup;
     $key_counter++;
     break;
-    
+
   }
-  
+
 }
 
 // Only show the header if a specific mecha has not been selected

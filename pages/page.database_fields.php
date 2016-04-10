@@ -16,7 +16,10 @@ $this_graph_data['description'] = 'The field database contains detailed informat
 
 // Define the MARKUP variables for this page
 $this_markup_header = 'Mega Man RPG Prototype Field Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_fields_links_counter) ? ($mmrpg_database_fields_links_counter == 1 ? '1 Field' : $mmrpg_database_fields_links_counter.' Fields') : '0 Fields').' )</span>';
+$this_markup_counter = '<span class="count count_header">( ';
+$this_markup_counter .= ($mmrpg_database_fields_links_counter_incomplete > 0 ? ($mmrpg_database_fields_count - $mmrpg_database_fields_links_counter_incomplete).' / ' : '');
+$this_markup_counter .= (!empty($mmrpg_database_fields_links_counter) ? ($mmrpg_database_fields_links_counter == 1 ? '1 Field' : $mmrpg_database_fields_links_counter.' Fields') : '0 Fields');
+$this_markup_counter .= ' )</span>';
 
 // If a specific field has NOT been defined, show the quick-switcher
 reset($mmrpg_database_fields);
@@ -29,14 +32,14 @@ if (!empty($this_current_token)){
   // Loop through the field database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_fields AS $field_key => $field_info){
-    
+
     // If a specific field has been requested and it's not this one
     if (!empty($this_current_token) && $this_current_token != $field_info['field_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
-    
+
     // If this is THE specific field requested (and one was specified)
     if (!empty($this_current_token) && $this_current_token == $field_info['field_token']){
-      
+
       $this_field_image = !empty($field_info['field_image']) ? $field_info['field_image'] : $field_info['field_token'];
       if ($this_field_image == 'field'){ $this_seo_robots = 'noindex'; }
       // Define the SEO variables for this page
@@ -49,17 +52,17 @@ if (!empty($this_current_token)){
       $this_graph_data['title'] .= ' | '.$field_info['field_name'];
       $this_graph_data['description'] = $field_info['field_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_graph_data['description'];
       $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/fields/'.$field_info['field_token'].'/mug_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
-      
+
     }
-    
+
     // Collect the markup for this field and print it to the browser
     $temp_field_markup = mmrpg_field::print_database_markup($field_info, array('show_key' => $key_counter));
     echo $temp_field_markup;
     $key_counter++;
     break;
-    
+
   }
-  
+
 }
 
 // Only show the header if a specific field has not been selected

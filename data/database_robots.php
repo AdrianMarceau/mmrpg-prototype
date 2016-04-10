@@ -41,17 +41,17 @@ $mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots W
 
 // Remove unallowed robots from the database, and increment type counters
 foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
-  
+
   // Remove hidden robots from the the array (assuming they're still here)
   if (true){
-    
+
     // Send this data through the robot index parser
     $temp_info = mmrpg_robot::parse_index_info($temp_info);
-    
+
     // Ensure this robot's image exists, else default to the placeholder
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$temp_token.'/')){ $temp_info['robot_image'] = $temp_token; }
     else { $temp_info['robot_image'] = 'robot'; }
-    
+
     // Modify the name of this robot if it is of the mecha class
     if ($temp_info['robot_class'] == 'mecha' && defined('DATA_DATABASE_SHOW_MECHAS')){
       // Collect this mecha's field token, then robot master token, then robot master number
@@ -63,15 +63,15 @@ foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
     } elseif ($temp_info['robot_class'] == 'master'){
       $temp_info['robot_master_number'] = $temp_info['robot_number'];
     }
-    
-    
+
+
     // Increment the robot core counter if not empty
     if (!empty($temp_info['robot_core'])){ $mmrpg_database_robots_types['cores'][$temp_info['robot_core']]++; }
     else { $mmrpg_database_robots_types['cores']['none']++; }
     if (!empty($temp_info['robot_core2'])){ $mmrpg_database_robots_types['cores'][$temp_info['robot_core2']]++; }
     //else { $mmrpg_database_robots_types['cores']['none']++; }
-    
-    
+
+
     // Loop through the robot weaknesses if there are any to loop through
     if (!empty($temp_info['robot_weaknesses'])){
       foreach ($temp_info['robot_weaknesses'] AS $weakness){ $mmrpg_database_robots_types['weaknesses'][$weakness]++; }
@@ -96,10 +96,10 @@ foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
     } else {
       $mmrpg_database_robots_types['immunities']['none']++;
     }
-    
+
     // Update the main database array with the changes
     $mmrpg_database_robots[$temp_token] = $temp_info;
-    
+
   }
 }
 
@@ -167,6 +167,7 @@ $mmrpg_database_robots_count = count($mmrpg_database_robots);
 $key_counter = 0;
 $mmrpg_database_robots_links = '';
 $mmrpg_database_robots_links_counter = 0;
+$mmrpg_database_robots_links_counter_incomplete = 0;
 foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
   // If a type filter has been applied to the robot page
   if (isset($this_current_filter) && $this_current_filter == 'none' && $robot_info['robot_core'] != ''){ $key_counter++; continue; }
@@ -189,8 +190,8 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
   // Start the output buffer and collect the generated markup
   ob_start();
   ?>
-  <div title="<?= $robot_title_text ?>" data-token="<?= $robot_info['robot_token'] ?>" class="float float_left float_link robot_type robot_type_<?= (!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') ?>" style="<?= $robot_image_incomplete  ? 'opacity: 0.25; ' : '' ?>">
-    <a class="sprite sprite_robot_link sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_<?= $robot_image_size_text ?>  robot_status_active robot_position_active <?= $robot_key == $first_robot_token ? 'sprite_robot_current ' : '' ?>" href="<?='database/robots/'.$robot_info['robot_token']?>/" style="<?= $robot_image_incomplete  ? 'opacity: 0.50; ' : '' ?>" rel="<?= $robot_image_incomplete ? 'nofollow' : 'follow' ?>">
+  <div title="<?= $robot_title_text ?>" data-token="<?= $robot_info['robot_token'] ?>" class="float float_left float_link robot_type robot_type_<?= (!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') ?><?= $robot_image_incomplete  ? ' incomplete' : '' ?>">
+    <a class="sprite sprite_robot_link sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_<?= $robot_image_size_text ?>  robot_status_active robot_position_active <?= $robot_key == $first_robot_token ? 'sprite_robot_current ' : '' ?>" href="<?='database/robots/'.$robot_info['robot_token']?>/" rel="<?= $robot_image_incomplete ? 'nofollow' : 'follow' ?>">
       <? if($robot_image_token != 'robot'): ?>
         <img src="<?= $robot_image_path ?>" width="<?= $robot_image_size ?>" height="<?= $robot_image_size ?>" alt="<?= $robot_title_text ?>" />
       <? else: ?>
@@ -201,6 +202,7 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
   <?
   $mmrpg_database_robots_links .= preg_replace('/\s+/', ' ', trim(ob_get_clean()))."\n";
   $mmrpg_database_robots_links_counter++;
+  if ($robot_image_incomplete){ $mmrpg_database_robots_links_counter_incomplete++; }
   $key_counter++;
 }
 
