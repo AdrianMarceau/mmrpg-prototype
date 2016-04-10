@@ -1016,6 +1016,7 @@ class mmrpg_robot {
     if (!isset($trigger_options['apply_core_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_core_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_starforce_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_starforce_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['referred_damage'])){ $trigger_options['referred_damage'] = false; }
     // Require the external function for triggering damage
@@ -1033,6 +1034,7 @@ class mmrpg_robot {
     if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_core_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_core_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
+    if (!isset($trigger_options['apply_starforce_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_starforce_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
     if (!isset($trigger_options['referred_recovery'])){ $trigger_options['referred_recovery'] = false; }
