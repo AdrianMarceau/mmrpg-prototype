@@ -8,28 +8,28 @@
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if ($this->player->player_autopilot != true && $this->robot_class != 'mecha'){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Collect this robot's rewards and settings
   $this_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
   $this_rewards = mmrpg_prototype_robot_rewards($this->player_token, $this->robot_token);
 
   // Update this robot's original player with any session settings
   $this->robot_original_player = mmrpg_prototype_robot_original_player($this->player_token, $this->robot_token);
-  
+
   // Update this robot's level with any session rewards
   $this->robot_base_experience = $this->robot_experience = mmrpg_prototype_robot_experience($this->player_token, $this->robot_token);
   $this->robot_base_level = $this->robot_level = mmrpg_prototype_robot_level($this->player_token, $this->robot_token);
-  
+
 }
 // Otherwise, if this player is on autopilot
 else {
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Create an empty reward array to prevent errors
   $this_rewards = !empty($this->values['robot_rewards']) ? $this->values['robot_rewards'] : array();
-  
+
 }
-    
+
 // If the robot experience is over 1000 points, level up and reset
 if ($this->robot_experience > 1000){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -51,10 +51,10 @@ if (!empty($this->robot_level) || !empty($this->robot_base_level)){
 
   // Define the ytemp level for later calculations
   $temp_level = $this->robot_level - 1;
-  
+
   // If the robot's level is greater than one, increase stats
   if (!empty($temp_level)){
-    
+
     /*
     // If this is a computer controlled robot, calculate energy normally
     if ($this->player->player_side == 'right'){
@@ -72,12 +72,12 @@ if (!empty($this->robot_level) || !empty($this->robot_base_level)){
       $this->robot_base_energy = $this->robot_base_energy + $temp_player_energy;
     }
     */
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update the robot energy with a small boost based on experience level
     $this->robot_energy = $this->robot_energy + ceil($temp_level * (0.05 * $this->robot_energy));
     $this->robot_base_energy = $this->robot_base_energy + ceil($temp_level * (0.05 * $this->robot_base_energy));
-  
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update the robot attack with a small boost based on experience level
     $this->robot_attack = $this->robot_attack + ceil($temp_level * (0.05 * $this->robot_attack));
@@ -96,8 +96,8 @@ if (!empty($this->robot_level) || !empty($this->robot_base_level)){
 // If the robot has earned any energy stat points, apply them
 if (!empty($this_rewards['robot_energy'])){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  $this->robot_energy += $this['robot_energy'];
-  $this->robot_base_energy += $this['robot_energy'];
+  $this->robot_energy += $this_rewards['robot_energy'];
+  $this->robot_base_energy += $this_rewards['robot_energy'];
 }
 // If the robot has earned any attack stat points, apply them
 if (!empty($this_rewards['robot_attack'])){
@@ -124,7 +124,7 @@ if (!empty($this_rewards['robot_speed'])){
 // Apply stat bonuses to this robot based on its current player and their own stats
 if (true){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // If this robot's player has any stat bonuses, apply them as well
   if (!empty($this->player->player_energy)){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -150,7 +150,7 @@ if (true){
     $this->robot_speed += $temp_boost;
     $this->robot_base_speed += $temp_boost;
   }
-  
+
 }
 
 // Limit all stats to 9999 for display purposes

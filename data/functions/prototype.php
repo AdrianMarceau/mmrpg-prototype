@@ -886,7 +886,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
       $this_option_title .= ' <hr />'; // <hr />-- Abilities ------------------------------- <br />';
       $temp_counter = 1;
       foreach ($this_robot_abilities_current AS $token){
-        if (empty($token)){ continue; }
+        if (empty($token) || !isset($this_ability_index[$token])){ continue; }
         $temp_info = mmrpg_ability::parse_index_info($this_ability_index[$token]);
         $this_option_title .= $temp_info['ability_name'];
         if ($temp_counter % 4 == 0){ $this_option_title .= ' <br />'; }
