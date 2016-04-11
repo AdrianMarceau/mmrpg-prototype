@@ -37,17 +37,17 @@ $temp_field_star_present = $this_prototype_data['prototype_complete'] && empty($
 
 // If a field star is present on the field, fill the empty spots with like-typed robots
 if ($temp_field_star_present){
-  
+
   $temp_battle_omega['battle_target_player']['player_switch'] = 1.5;
   $temp_robot_tokens = array();
   $temp_robot_tokens[] = $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_token'];
   // Collect factors based on player
   if ($this_prototype_data['this_player_token'] == 'dr-light'){
-    $temp_factors_list = array($this_omega_factors_one, array_merge($this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine));
+    $temp_factors_list = array($this_omega_factors_one, array_merge($this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_ten));
   } elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){
-    $temp_factors_list = array($this_omega_factors_two, array_merge($this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_one));
+    $temp_factors_list = array($this_omega_factors_two, array_merge($this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_ten, $this_omega_factors_one));
   } elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){
-    $temp_factors_list = array($this_omega_factors_three, array_merge($this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_one, $this_omega_factors_two));
+    $temp_factors_list = array($this_omega_factors_three, array_merge($this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_ten, $this_omega_factors_one, $this_omega_factors_two));
   }
   // Shuffle the bonus robots section of the list
   shuffle($temp_factors_list[1]);
@@ -77,10 +77,10 @@ if ($temp_field_star_present){
   $temp_battle_omega['battle_target_player']['player_robots'] = array_slice($temp_battle_omega['battle_target_player']['player_robots'], 0, $temp_slice_limit);
   shuffle($temp_battle_omega['battle_target_player']['player_robots']);
   //$debug_backup .= 'after:count = '.count($temp_battle_omega['battle_target_player']['player_robots']).' // ';
-  
+
 }
 
-    
+
 // Define the omega variables for level, points, turns, and random encounter rate
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $omega_robot_level_max = $this_start_level + 7;
@@ -188,7 +188,7 @@ if (!empty($temp_battle_omega['battle_complete'])){
   // DEBUG
   //echo('battle is complete '.$temp_battle_omega['battle_token'].' | omega robot level'.$temp_omega_robot_level.' | battle_level '.$temp_battle_omega['battle_complete']['battle_level'].' | battle_count '.$temp_battle_omega['battle_complete']['battle_count'].'<br />');
 } else {
-  
+
 }
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Define the battle difficulty level (0 - 8) based on level and completed count
@@ -257,7 +257,7 @@ if (!empty($temp_battle_omega['battle_rewards']['abilities'])){
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if ($temp_field_star_present){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // Generate the necessary field star variables and add them to the battle data
   $temp_field_star = array();
   $temp_field_star['star_name'] = $temp_option_field['field_name'];
@@ -272,14 +272,14 @@ if ($temp_field_star_present){
   $temp_battle_omega['values']['field_star'] = $temp_field_star;
   $temp_battle_omega['battle_target_player']['player_starforce'] = array();
   $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] = 1;
-  
+
   // Increase the power of the robot masters by 100 bonus points in each field
   foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update the robot rewards array by adding 100 points to each of the three main stats
     $temp_battle_omega['battle_target_player']['player_robots'][$key]['values']['robot_rewards'] = array('robot_attack' => 100, 'robot_defense' => 100, 'robot_speed' => 100);
   }
-  
+
 }
 
 // Update the battle description based on what we've calculated

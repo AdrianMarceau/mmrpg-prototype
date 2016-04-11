@@ -719,7 +719,7 @@ function mmrpg_prototype_mission_starter($this_prototype_data, $this_robot_token
 function mmrpg_prototype_mission_single($this_prototype_data, $this_robot_token, $this_field_token, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true, $this_addon_abilities = 0){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_mission_single(\$this_prototype_data, '{$this_robot_token}', '{$this_field_token}', {$this_start_level}, ".($this_unlock_robots ? 'true' : 'false').", ".($this_unlock_abilities ? 'true' : 'false').", {$this_addon_abilities})");  }
   // Pull in global variables for this function
-  global $mmrpg_index, $DB, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
+  global $mmrpg_index, $DB, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_ten;
   // Require the actual code file
   require('prototype_mission-single.php');
   // Return the generated battle data
@@ -730,7 +730,7 @@ function mmrpg_prototype_mission_single($this_prototype_data, $this_robot_token,
 function mmrpg_prototype_mission_double($this_prototype_data, $this_robot_tokens, $this_field_tokens, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_mission_double(\$this_prototype_data, '".implode(',', $this_robot_tokens)."', '".implode(',', $this_field_tokens)."', {$this_start_level}, ".($this_unlock_robots ? 'true' : 'false').", ".($this_unlock_abilities ? 'true' : 'false').")");  }
   // Pull in global variables for this function
-  global $mmrpg_index, $DB, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
+  global $mmrpg_index, $DB, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_ten;
   // Require the actual code file
   require('prototype_mission-double.php');
   // Return the generated battle data
@@ -742,7 +742,7 @@ function mmrpg_prototype_mission_double($this_prototype_data, $this_robot_tokens
 function mmrpg_prototype_mission_player($this_prototype_data, $this_user_info, $this_max_robots, &$field_factors_one, &$field_factors_two, &$field_factors_three){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_mission_player(\$this_prototype_data, \$this_user_info, {$this_max_robots}, &\$field_factors_one, &\$field_factors_two, &\$field_factors_three)");  }
   // Pull in global variables for this function
-  global $mmrpg_index, $DB, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine;
+  global $mmrpg_index, $DB, $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_ten;
   // Require the actual code file
   require('prototype_mission-player.php');
   // Return the generated battle data
