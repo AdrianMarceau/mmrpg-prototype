@@ -46,17 +46,17 @@ ob_start();
       $equipped_items_count = 0;
       // Collect the temp item index
       $temp_items_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-      
+
       // DEBUG
       //echo('$current_player_items:<pre>'.preg_replace('/\s+/', ' ', print_r($current_player_items, true)).'</pre>');
-      
+
       // Define the default button enabled option
       //if (!empty($_SESSION['GAME']['DEMO']) || $target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID || !isset($_SESSION['GAME']['values']['battle_items'])){ $temp_button_enabled_base = false; }
       if ($target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){ $temp_button_enabled_base = false; }
       else { $temp_button_enabled_base = true; }
       // If this player has already used an item this turn
       if (!empty($this_player->flags['item_used_this_turn'])){ $temp_button_enabled_base = false; }
-      
+
       // Loop through each ability and display its button
       $item_key = 0;
       $item_token_list = array_keys($mmrpg_database_items);
@@ -64,24 +64,24 @@ ob_start();
       foreach ($item_token_list AS $item_key => $item_token){
         // Ensure this is an actual ability in the index
         if (!empty($item_token) && !in_array($item_token, $item_token_skip)){
-            
+
           // DEBUG
           //echo('$item_token:<pre>'.preg_replace('/\s+/', ' ', print_r($item_token, true)).'</pre>');
-  
+
           // Define the amount of weapon energy for this ability
           $temp_item_quantity = !empty($_SESSION['GAME']['values']['battle_items'][$item_token]) ? $_SESSION['GAME']['values']['battle_items'][$item_token] : 0; // CHANGEME to zero!!! mt_rand(0, 10)
           $temp_item_cost = 1;
-          
+
           // If this player has never aquired this item, do not display it
           if (!isset($_SESSION['GAME']['values']['battle_items'][$item_token])){ continue; }
           //$temp_item_quantity = 99; // CHANGEME! COMMENT ME OUT! ALSO UNCOMMENT ABOVE?
-          
+
           // Increment the equipped items count
           $equipped_items_count++;
-          
+
           // Define the button enabled flag
           $temp_button_enabled = $temp_button_enabled_base;
-  
+
           // Create the ability object using the session/index data
           //$temp_iteminfo = array('ability_token' => $item_token);
           $temp_iteminfo = $temp_items_index[$item_token];
@@ -100,7 +100,7 @@ ob_start();
           $temp_recovery2_unit = $temp_item->ability_recovery2_percent ? '%' : '';
           $temp_accuracy = $temp_item->ability_accuracy;
           $temp_kind = !empty($temp_damage) && empty($temp_recovery) ? 'damage' : (!empty($temp_recovery) && empty($temp_damage) ? 'recovery' : (!empty($temp_damage) && !empty($temp_recovery) ? 'multi' : ''));
-          $temp_target = 'select_this';
+          $temp_target = 'auto';
           if ($temp_item->ability_target == 'select_target' && $target_player->counters['robots_active'] > 1){ $temp_target = 'select_target'; }
           elseif ($temp_item->ability_target == 'select_this' && $this_player->counters['robots_active'] > 1){ $temp_target = 'select_this'; }
           elseif ($temp_item->ability_target == 'select_this_disabled'){ $temp_target = 'select_this_disabled'; }
@@ -108,12 +108,12 @@ ob_start();
           //elseif ($temp_item->ability_target == 'select_this_disabled' && $this_player->counters['robots_disabled'] >= 1){ $temp_target = 'select_this_disabled'; }
           //elseif ($temp_item->ability_target == 'select_this_disabled' && $this_player->counters['robots_disabled'] < 1){ $temp_button_enabled = false; }
           //$temp_target = $target_player->counters['robots_active'] > 1 ? $temp_item->ability_target : 'auto';
-  
+
           $temp_multiplier = 1;
           //if (!empty($this_robot->robot_core) && ($this_robot->robot_core == $temp_type || $this_robot->robot_core == $temp_type2)){ $temp_multiplier = $temp_multiplier * 1.5; }
           //if (!empty($this_battle->battle_field->field_multipliers[$temp_type])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$temp_type]; }
           //if (!empty($this_battle->battle_field->field_multipliers[$temp_type2])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$temp_type2]; }
-  
+
           /*
           $temp_damage = ceil($temp_damage * $temp_multiplier);
           if ($item_token != 'experience-booster' && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage = ceil($temp_damage * $this_battle->battle_field->field_multipliers['damage']); }
@@ -121,7 +121,7 @@ ob_start();
           $temp_damage2 = ceil($temp_damage2 * $temp_multiplier);
           if ($item_token != 'experience-booster' && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage2 = ceil($temp_damage2 * $this_battle->battle_field->field_multipliers['damage']); }
           if ($temp_damage2_unit == '%' && $temp_damage2 > 100){ $temp_damage2 = 100; }
-          
+
           $temp_recovery = ceil($temp_recovery * $temp_multiplier);
           if ($item_token != 'experience-booster' && !empty($this_battle->battle_field->field_multipliers['recovery'])){ $temp_recovery = ceil($temp_recovery * $this_battle->battle_field->field_multipliers['recovery']); }
           if ($temp_recovery_unit == '%' && $temp_recovery > 100){ $temp_recovery = 100; }
@@ -129,7 +129,7 @@ ob_start();
           if ($item_token != 'experience-booster' && !empty($this_battle->battle_field->field_multipliers['recovery'])){ $temp_recovery2 = ceil($temp_recovery2 * $this_battle->battle_field->field_multipliers['recovery']); }
           if ($temp_recovery2_unit == '%' && $temp_recovery2 > 100){ $temp_recovery2 = 100; }
           */
-  
+
           // Define the ability title details text
           $temp_item_details = $temp_item->ability_name.' <br />';
           //$temp_item_details .= ' ('.(!empty($temp_item->ability_type) ? $mmrpg_index['types'][$temp_item->ability_type]['type_name'] : 'Neutral');
@@ -153,9 +153,9 @@ ob_start();
           $temp_item_details .= ' <br />'.$temp_item_description;
           $temp_item_details_plain = strip_tags(str_replace('<br />', '&#10;', $temp_item_details));
           $temp_item_details_tooltip = htmlentities($temp_item_details, ENT_QUOTES, 'UTF-8');
-  
+
           //$temp_item_details .= ' | x'.$temp_multiplier.' '.$this_robot->robot_core.' '.count($this_battle->battle_field->field_multipliers);
-  
+
           // Define the ability button text variables
           $temp_item_label = '<span class="multi">';
           $temp_item_label .= '<span class="maintext">'.$temp_item->ability_name.'</span>';
@@ -170,17 +170,17 @@ ob_start();
             //$temp_item_label .= 'A:'.$temp_accuracy.'%';
           $temp_item_label .= '</span>';
           $temp_item_label .= '</span>';
-          
+
           // Define whether or not this ability button should be enabled
           if ($temp_item_quantity < $temp_item_cost){ $temp_button_enabled = false; }
           //$temp_button_enabled = $temp_item_quantity >= $temp_item_cost ? true : false;
           // If this button is enabled, add it to the global ability options array
           //if ($temp_button_enabled){ $temp_player_ability_actions[] = $temp_item->ability_token; }
-          
+
           // All items appear in YELLOW
           //$temp_item_type_backup = $temp_item->ability_type;
           //$temp_item->ability_type = 'electric';
-          
+
           // Define the ability sprite variables
           $temp_item_sprite = array();
           $temp_item_sprite['name'] = $temp_item->ability_name;
@@ -209,10 +209,10 @@ ob_start();
           else { ?><a data-order="<?=$temp_order_counter?>" class="button button_disabled action_ability action_item ability_<?= $temp_item->ability_token ?> ability_type ability_type_<?= (!empty($temp_item->ability_type) ? $temp_item->ability_type : 'none').(!empty($temp_item->ability_type2) ? '_'.$temp_item->ability_type2 : '') ?> block_<?= $equipped_items_count ?>" type="button"><label class=""><?= $temp_item_sprite['markup'] ?><?= $temp_item_label ?></label></a><? }
           // Increment the order counter
           $temp_order_counter++;
-          
+
           // All items appear in YELLOW
           //$temp_item->ability_type = $temp_item_type_backup;
-          
+
         }
         $item_key++;
       }
