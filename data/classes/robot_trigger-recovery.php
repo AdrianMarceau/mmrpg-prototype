@@ -186,7 +186,7 @@ if ($trigger_options['apply_field_modifiers'] != false && $this_ability->recover
 }
 
 // Apply starforce multipliers preemtively if there are any
-if ($trigger_options['apply_starforce_modifiers'] != false && $this_ability->recovery_options['recovery_modifiers'] && !empty($target_robot->player->player_starforce)){
+if ($trigger_options['apply_starforce_modifiers'] != false && $this_ability->recovery_options['recovery_modifiers'] && !empty($target_robot->player->player_starforce) && $this->robot_id != $target_robot->robot_id){
 
     // Collect this and the target player's starforce levels
     $this_starforce = $this->player->player_starforce;
@@ -194,13 +194,11 @@ if ($trigger_options['apply_starforce_modifiers'] != false && $this_ability->rec
 
     // Loop through and neutralize target starforce levels if possible
     $target_starforce_modified = $target_starforce;
-    if ($this->player->player_id != $target_robot->player->player_id){
-        foreach ($target_starforce_modified AS $type => $target_value){
-            if (!isset($this_starforce[$type])){ $this_starforce[$type] = 0; }
-            $target_value -= $this_starforce[$type];
-            if ($target_value < 0){ $target_value = 0; }
-            $target_starforce_modified[$type] = $target_value;
-        }
+    foreach ($target_starforce_modified AS $type => $target_value){
+        if (!isset($this_starforce[$type])){ $this_starforce[$type] = 0; }
+        $target_value -= $this_starforce[$type];
+        if ($target_value < 0){ $target_value = 0; }
+        $target_starforce_modified[$type] = $target_value;
     }
 
     // Collect the ability types else "none" for multipliers
