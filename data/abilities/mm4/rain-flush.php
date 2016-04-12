@@ -135,7 +135,7 @@ $ability = array(
             ));
         $energy_damage_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_damage / 100));
         $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => false, 'apply_starforce_modifiers' => false);
-        $this_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
+        //$this_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
 
         // Loop through this player's benched robots, inflicting damage to each
         $backup_this_robots_active = $this_player->values['robots_active'];
