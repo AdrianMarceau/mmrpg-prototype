@@ -50,6 +50,7 @@ $ability = array(
         'kind' => 'defense',
         'frame' => 'defend',
         'percent' => true,
+        'modifiers' => false,
         'kickback' => array(10, 0, 0),
         'success' => array(2, 0, -6, 10, $target_robot->print_robot_name().'&#39;s shields were damaged!'),
         'failure' => array(2, 0, -6, -10, '')
@@ -58,12 +59,13 @@ $ability = array(
         'kind' => 'defense',
         'frame' => 'taunt',
         'percent' => true,
+        'modifiers' => false,
         'kickback' => array(0, 0, 0),
         'success' => array(2, 0, -6, 10, $target_robot->print_robot_name().'&#39;s shields improved!'),
         'failure' => array(2, 0, -6, -9999, '')
         ));
       $defense_damage_amount = ceil($target_robot->robot_defense * ($this_ability->ability_damage2 / 100));
-      $target_robot->trigger_damage($this_robot, $this_ability, $defense_damage_amount);
+      $target_robot->trigger_damage($this_robot, $this_ability, $defense_damage_amount, true, array('apply_modifiers' => false));
     }
 
     // Return true on success

@@ -13,10 +13,10 @@ $ability = array(
   'ability_recovery_percent2' => true,
   'ability_accuracy' => 95,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     $this_attachment_info = array(
@@ -28,6 +28,7 @@ $ability = array(
     	'attachment_create' => array(
         'kind' => 'defense',
         'percent' => true,
+        'modifiers' => false,
         'frame' => 'taunt',
         'rates' => array(100, 0, 0),
         'success' => array(1, -10, 0, -10, $this_robot->print_robot_name().'&#39;s shields were bolstered!'),
@@ -47,27 +48,27 @@ $ability = array(
       'ability_frame_animate' => array(0, 1),
       'ability_frame_offset' => array('x' => -10, 'y' => 0, 'z' => -10)
       );
-    
+
     // If the ability flag was not set, leaf shield raises defense by 30%
     if (!isset($this_robot->robot_attachments[$this_attachment_token])){
-      
+
       // Define the defense mod amount for this ability
       $this_attachment_info['attachment_defense'] = ceil($this_robot->robot_defense * ($this_ability->ability_recovery2 / 100));
       if (($this_robot->robot_defense + $this_attachment_info['attachment_defense']) > MMRPG_SETTINGS_STATS_MAX){ $this_attachment_info['attachment_defense'] = 9999 - $this_robot->robot_defense; }
-      
+
       // Target this robot's self
       $this_ability->target_options_update(array(
         'frame' => 'summon',
         'success' => array(0, -10, 0, -10, $this_robot->print_robot_name().' raises a '.$this_ability->print_ability_name().'!')
         ));
       $this_robot->trigger_target($this_robot, $this_ability);
-      
+
       // Increase this robot's defense stat
       $this_ability->damage_options_update($this_attachment_info['attachment_create'], true);
       $this_ability->recovery_options_update($this_attachment_info['attachment_create'], true);
       $defense_recovery_amount = $this_attachment_info['attachment_defense']; //ceil($this_robot->robot_defense * ($this_ability->ability_recovery / 100));
-      $this_robot->trigger_recovery($this_robot, $this_ability, $defense_recovery_amount);
-      
+      $this_robot->trigger_recovery($this_robot, $this_ability, $defense_recovery_amount, true, array('apply_modifiers' => false));
+
       // Attach this ability attachment to the robot using it
       $this_attachment_info['attachment_defense'] = $this_ability->ability_results['this_amount'];
       $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
@@ -76,20 +77,20 @@ $ability = array(
     }
     // Else if the ability flag was set, leaf shield is thrown and defense is lowered by 30%
     else {
-      
+
       // Collect the attachment from the robot to back up its info
       $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
       // Remove this ability attachment to the robot using it
       unset($this_robot->robot_attachments[$this_attachment_token]);
       $this_robot->update_session();
-      
+
       // Target the opposing robot
       $this_ability->target_options_update(array(
         'frame' => 'summon',
         'success' => array(0, 85, -10, -10, $this_robot->print_robot_name().' releases the '.$this_ability->print_ability_name().'!')
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
-      
+
       // Inflict damage on the opposing robot
       $this_ability->damage_options_update(array(
         'kind' => 'energy',
@@ -106,44 +107,44 @@ $ability = array(
         ));
       $energy_damage_amount = $this_ability->ability_damage;
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-      
+
       // Decrease this robot's defense stat
       $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
       $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
       $defense_damage_amount = $this_attachment_info['attachment_defense']; //ceil($this_robot->robot_defense * ($this_ability->ability_recovery / 100));
       $trigger_options = array('apply_modifiers' => false);
       $this_robot->trigger_damage($this_robot, $this_ability, $defense_damage_amount, true, $trigger_options);
-      
+
     }
-    
+
     // Either way, update this ability's settings to prevent recovery
     $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->update_session();
-    
-    
+
+
     // Return true on success
     return true;
-        
+
   },
   'ability_function_onload' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
-    
+
     // If the ability flag had already been set, reduce the weapon energy to zero
     if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->ability_energy = 0; }
     // Otherwise, return the weapon energy back to default
     else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
     // Update the ability session
     $this_ability->update_session();
-    
+
     // Return true on success
     return true;
-      
+
     }
   );
 ?>
