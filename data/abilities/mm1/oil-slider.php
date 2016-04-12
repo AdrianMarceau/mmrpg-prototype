@@ -50,6 +50,8 @@ $ability = array(
       $this_ability->recovery_options_update(array(
         'kind' => 'speed',
         'frame' => 'taunt',
+        'percent' => true,
+        'modifiers' => false,
         'kickback' => array(0, 0, 0),
         'success' => array(2, -15, 10, -10, $this_robot->print_robot_name().'&#39;s mobility improved!'),
         'failure' => array(2, 0, 0, -9999, '')
@@ -57,12 +59,14 @@ $ability = array(
       $this_ability->damage_options_update(array(
         'kind' => 'speed',
         'frame' => 'damage',
+        'percent' => true,
+        'modifiers' => false,
         'kickback' => array(0, 0, 0),
         'success' => array(2, -15, 10, -10, $this_robot->print_robot_name().'&#39;s mobility worsened!'),
         'failure' => array(2, 0, 0, -9999, '')
         ));
       $speed_damage_amount = ceil($this_robot->robot_speed * ($this_ability->ability_recovery2 / 100));
-      $this_robot->trigger_recovery($this_robot, $this_ability, $speed_damage_amount);
+      $this_robot->trigger_recovery($this_robot, $this_ability, $speed_damage_amount, true, array('apply_modifiers' => false));
     }
 
     // Return true on success

@@ -49,22 +49,23 @@ $ability = array(
       // Decrease the target robot's speed stat
       $this_ability->damage_options_update(array(
         'kind' => 'speed',
-        'percent' => true,
         'frame' => 'defend',
+        'percent' => true,
         'kickback' => array(10, 0, 0),
         'success' => array(8, 0, -6, 10, $target_robot->print_robot_name().'&#39;s mobility was damaged!'),
         'failure' => array(8, 0, -6, -10, '')
         ));
       $this_ability->recovery_options_update(array(
         'kind' => 'speed',
-        'percent' => true,
         'frame' => 'taunt',
+        'percent' => true,
         'kickback' => array(0, 0, 0),
         'success' => array(8, 0, -6, 10, $target_robot->print_robot_name().'&#39;s mobility improved!'),
         'failure' => array(8, 0, -6, -9999, '')
         ));
       $speed_damage_amount = ceil($target_robot->robot_speed * ($this_ability->ability_damage2 / 100));
-      $target_robot->trigger_damage($this_robot, $this_ability, $speed_damage_amount);
+      $trigger_options = array('apply_modifiers' => false);
+      $target_robot->trigger_damage($this_robot, $this_ability, $speed_damage_amount, true, $trigger_options);
     }
 
     // Return true on success

@@ -25,22 +25,22 @@ $ability = array(
       'ability_frame' => 0,
       'ability_frame_offset' => array('x' => 120, 'y' => 0, 'z' => 10)
       );
-    
+
     // Attach this ability attachment to the robot using it
     $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
     $this_robot->update_session();
-    
+
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => ($this_robot->robot_token == 'hard-man' ? 'throw' : 'shoot'),
       'success' => array(2, 60, ($this_robot->robot_token == 'hard-man' ? 10 : 0), -10, $this_robot->print_robot_name().' fires the '.$this_ability->print_ability_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Attach this ability attachment to the robot using it
     unset($this_robot->robot_attachments[$this_attachment_token]);
     $this_robot->update_session();
-    
+
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
@@ -57,7 +57,7 @@ $ability = array(
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-    
+
     // Trigger a defense break if the ability was successful
     if ($target_robot->robot_status != 'disabled'
       && $target_robot->robot_defense > 0
@@ -67,6 +67,7 @@ $ability = array(
         'kind' => 'defense',
         'frame' => 'defend',
         'percent' => true,
+        'modifiers' => flase,
         'kickback' => array(10, 0, 0),
         'success' => array(1, 0, -6, -10, $target_robot->print_robot_name().'&#39;s shields were damaged!'),
         'failure' => array(1, 0, -6, -10, '')
@@ -75,14 +76,15 @@ $ability = array(
         'kind' => 'defense',
         'frame' => 'taunt',
         'percent' => true,
+        'modifiers' => flase,
         'kickback' => array(0, 0, 0),
         'success' => array(1, 0, -6, -10, $target_robot->print_robot_name().'&#39;s shields were tempered!'),
         'failure' => array(1, 0, -6, -9999, '')
         ));
       $defense_damage_amount = ceil($target_robot->robot_defense * ($this_ability->ability_damage2 / 100));
-      $target_robot->trigger_damage($this_robot, $this_ability, $defense_damage_amount);
+      $target_robot->trigger_damage($this_robot, $this_ability, $defense_damage_amount, true, array('apply_modifiers' => false));
     }
-    
+
     // Return true on success
     return true;
 

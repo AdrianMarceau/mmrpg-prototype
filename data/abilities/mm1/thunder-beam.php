@@ -50,22 +50,23 @@ $ability = array(
       // Decrease the target robot's attack stat
       $this_ability->damage_options_update(array(
         'kind' => 'attack',
-        'percent' => true,
         'frame' => 'defend',
+        'percent' => true,
         'kickback' => array(0, 0, 0),
         'success' => array(2, -5, -5, -10, $this_robot->print_robot_name().'&#39;s weapons were damaged!'),
         'failure' => array(3, 0, 0, -9999, '')
         ));
       $this_ability->recovery_options_update(array(
         'kind' => 'attack',
-        'percent' => true,
         'frame' => 'taunt',
+        'percent' => true,
         'kickback' => array(0, 0, 0),
         'success' => array(2, -5, -5, -10, $this_robot->print_robot_name().'&#39;s weapons improved!'),
         'failure' => array(3, 0, 0, -9999, '')
         ));
       $attack_recovery_amount = ceil($this_robot->robot_attack * ($this_ability->ability_recovery2 / 100));
-      $this_robot->trigger_recovery($this_robot, $this_ability, $attack_recovery_amount);
+      $trigger_options = array('apply_modifiers' => false);
+      $this_robot->trigger_recovery($this_robot, $this_ability, $attack_recovery_amount, true, $trigger_options);
     }
 
     // Return true on success

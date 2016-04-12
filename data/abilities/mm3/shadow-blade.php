@@ -60,6 +60,7 @@ $ability = array(
         'type2' => '',
         'frame' => 'defend',
         'percent' => true,
+        'modifiers' => false,
         'kickback' => array(0, 0, 0),
         'success' => array(9, 65, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$temp_break_options_index[$this_break_option].' '.($this_break_option == 'speed' ? 'was' : 'were').' damaged by the blade!'),
         'failure' => array(9, 85, 0, -9999, '')
@@ -70,6 +71,7 @@ $ability = array(
         'type2' => '',
         'frame' => 'taunt',
         'percent' => true,
+        'modifiers' => false,
         'kickback' => array(0, 0, 0),
         'success' => array(9, 65, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$temp_break_options_index[$this_break_option].' '.($this_break_option == 'speed' ? 'was' : 'were').' improved by the blade!'),
         'failure' => array(9, 85, 0, -9999, '')
@@ -77,9 +79,9 @@ $ability = array(
       if ($this_break_option == 'attack'){ $temp_damage_amount = ceil($target_robot->robot_attack * 0.10); }
       elseif ($this_break_option == 'defense'){ $temp_damage_amount = ceil($target_robot->robot_defense * 0.10); }
       elseif ($this_break_option == 'speed'){ $temp_damage_amount = ceil($target_robot->robot_speed * 0.10); }
-      $target_robot->trigger_damage($this_robot, $this_ability, $temp_damage_amount);
+      $target_robot->trigger_damage($this_robot, $this_ability, $temp_damage_amount, true, array('apply_modifiers' => false));
     }
-    
+
     // Return true on success
     return true;
 

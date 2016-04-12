@@ -12,10 +12,10 @@ $ability = array(
   'ability_recovery2_percent' => true,
   'ability_accuracy' => 95,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token;
     if (!isset($this_robot->robot_attachments[$this_attachment_token])){
@@ -55,7 +55,7 @@ $ability = array(
       $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
       $this_robot->update_session();
     }
-    
+
     /*
     // If this ability is attached, remove it
     $this_attachment_backup = false;
@@ -66,7 +66,7 @@ $ability = array(
       $this_attachment_info['attachment_defense'] = $this_attachment_backup['attachment_defense'];
     }
     */
-    
+
     // Collect the shot power counter if set, otherwise default to level one
     $shot_power = !empty($this_attachment_info['attachment_power']) ? $this_attachment_info['attachment_power'] : 0;
     // Reward successive uses of this ability with boosts in power
@@ -82,13 +82,13 @@ $ability = array(
     }
     // Update this ability's internal shot power counter
     $this_attachment_info['attachment_power'] = $shot_power;
-    
+
     // Update the text and animation frames
     $shot_power_text = 'A flare ';
     $shot_power_frame = 0;
     if ($shot_power == 2){ $shot_power_text = 'A powerful flare '; $shot_power_frame = 1; }
     elseif ($shot_power == 3){ $shot_power_text = 'A massive flare '; $shot_power_frame = 2; }
-    
+
     // If the shot power is charging, attach this ability to the robot
     if ($shot_power < 3){
       if ($shot_power == 1){ $this_attachment_info['ability_frame_animate'] = array(3, 4, 5, 6); }
@@ -103,14 +103,14 @@ $ability = array(
     }
     // Update the robot either way
     $this_robot->update_session();
-    
+
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
       'success' => array($shot_power_frame, 100 + (30 * $shot_power), 0, 10, $this_robot->print_robot_name().' throws an '.$this_ability->print_ability_name().'!') // [shot_power='.$shot_power.'|attachment_defense='.$this_attachment_info['attachment_defense'].']
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
@@ -127,11 +127,11 @@ $ability = array(
       ));
     $energy_damage_amount = ceil($this_ability->ability_damage * $shot_power);
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-    
+
     // Decrease the target robot's defense stat
     $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->recovery_options_update($this_attachment_info['attachment_create'], true);
-    
+
     // If the shot power has reached its limit, reset
     if ($shot_power >= 3){
       //unset($this_ability->counters['shot_power']);
@@ -146,7 +146,7 @@ $ability = array(
         && $this_robot->robot_defense < 9999
         && $this_ability->ability_results['this_result'] == 'success'){
         $defense_recovery_amount = ceil($this_robot->robot_defense * ($this_ability->ability_recovery2 / 100));
-        $trigger_options = array('apply_type_modifiers' => false);
+        $trigger_options = array('apply_modifiers' => false);
         $this_robot->trigger_recovery($this_robot, $this_ability, $defense_recovery_amount, true, $trigger_options);
         // Define the defense mod amount for this ability
         $this_attachment_info['attachment_defense'] += $this_ability->ability_results['this_amount']; //$defense_recovery_amount;
@@ -158,15 +158,15 @@ $ability = array(
         $this_robot->update_session();
       }
     }
-    
+
     // Either way, update this ability's settings to prevent recovery
     $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->update_session();
-    
+
     // Return true on success
     return true;
-      
+
     }
   );
 ?>
