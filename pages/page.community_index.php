@@ -13,7 +13,7 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
     if ($this_category_info['category_id'] == 0 || $this_category_info['category_token'] == 'chat'){ continue; }
 
     // Collect a list of recent threads for this category
-    $this_threads_array = mmrpg_website_community_category_threads($this_category_info, true);
+    $this_threads_array = mmrpg_website_community_category_threads($this_category_info, true, false, MMRPG_SETTINGS_THREADS_RECENT);
     $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
     $this_threads_count_more = $this_threads_count - MMRPG_SETTINGS_THREADS_RECENT;
 
@@ -81,9 +81,6 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
     // Loop through the thread array and display its contents
     if (!empty($this_threads_array)){
         foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
-
-            // If this thread is over the display limit, break from the loop
-            if ($this_thread_key >= MMRPG_SETTINGS_THREADS_RECENT){ break; }
 
             // Print out the thread link block
             echo mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread_info, true, true);
