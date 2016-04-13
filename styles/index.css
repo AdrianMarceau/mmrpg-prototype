@@ -2958,9 +2958,14 @@ body.windowFlag_landscapeMode #window .page .type_block {
 }
 
 #window .page .body .community .thread_subbody_small {
+  text-align: left;
   padding: 5px;
   opacity: 0.50;
   cursor: pointer;
+  margin: 2px 0;
+}
+#window .page .body .community .thread_subbody_small_nohover {
+  margin: 30px 0 4px;
 }
 #window .page .body .community .thread_subbody_small_nohover,
 #window .page .body .community .thread_subbody_small:hover {
@@ -3478,23 +3483,53 @@ body.windowFlag_landscapeMode #window .page .body .community .thread_name .threa
 #window .page .body .community .thread_subbody .thread_linkblock .comments {
   text-decoration: none;
 }
+#window .page .body .community .thread_subbody .thread_linkblock .comments:hover {
+  text-decoration: underline;
+}
 #window .page .body .community .thread_subbody .thread_linkblock .newpost {
   margin-left: 6px;
   color: rgb(255, 251, 158);
   color: #FFFFFF;
   letter-spacing: 1px;
 }
+
+#window .page .body .community .thread_posts_count {
+
+}
+#window .page .body .community .thread_posts_count .thread_posts_total {
+  float: left;
+  text-align: left;
+  margin-right: 6px;
+  font-weight: normal;
+}
+#window .page .body .community .thread_posts_count.haslinks .thread_posts_total:after {
+  content: "|";
+  padding-left: 6px;
+  opacity: 0.3;
+  filter: alpha(opacity = 33);
+  font-size: 10px;
+  position: relative;
+  bottom: 2px;
+}
 #window .page .body .community .thread_posts_count .thread_posts_pages {
-  float: right;
+  float: none;
+  text-align: left;
   font-size: 11px;
   letter-spacing: 2px;
 }
 #window .page .body .community .thread_posts_count .thread_posts_pages a {
+  color: #EFEFEF;
   cursor: pointer;
+  text-decoration: none;
+  opacity: 0.6;
+  filter: alpha(opacity = 66);
 }
 #window .page .body .community .thread_posts_count .thread_posts_pages a:hover,
 #window .page .body .community .thread_posts_count .thread_posts_pages a.active {
+  color: #FFFFFF;
   text-decoration: underline;
+  opacity: 1.0;
+  filter: alpha(opacity = 100);
 }
 
 
