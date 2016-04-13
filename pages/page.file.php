@@ -429,6 +429,10 @@ while ($this_action == 'new'){
       $min_dateofbirth = date('Y/m/d', strtotime('13 years ago'));
       $bypass_dateofbirth = false;
 
+      // Allow bypassing date-of-birth if pre-approved via email
+      $bypass_emails = strstr(MMRPG_CONFIG_COPPA_PERMISSIONS, ',') ? explode(',', MMRPG_CONFIG_COPPA_PERMISSIONS) : array(MMRPG_CONFIG_COPPA_PERMISSIONS);
+      if (in_array(strtolower($_REQUEST['emailaddress']), $bypass_emails)){ $bypass_dateofbirth = true; }
+
       // Ensure the dateofbirth is valid
       //die('$min_dateofbirth = '.$min_dateofbirth);
       if (empty($_REQUEST['dateofbirth'])){
@@ -664,6 +668,11 @@ while ($this_action == 'load'){
           // Define the data of birth checking variables
           $min_dateofbirth = date('Y/m/d', strtotime('13 years ago'));
           $bypass_dateofbirth = false;
+
+          // Allow bypassing date-of-birth if pre-approved via email
+          $bypass_emails = strstr(MMRPG_CONFIG_COPPA_PERMISSIONS, ',') ? explode(',', MMRPG_CONFIG_COPPA_PERMISSIONS) : array(MMRPG_CONFIG_COPPA_PERMISSIONS);
+          if (in_array(strtolower($temp_database_user['user_email_address']), $bypass_emails)){ $bypass_dateofbirth = true; }
+          elseif (!empty($temp_database_user['user_flag_approved'])){ $bypass_dateofbirth = true; }
 
           // Ensure the dateofbirth is valid
           //die('$min_dateofbirth = '.$min_dateofbirth);
