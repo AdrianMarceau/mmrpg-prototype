@@ -370,7 +370,7 @@ function mmrpg_website_community_index(){
 }
 
 // Define a function for selecting a list of threads in a category
-function mmrpg_website_community_category_threads($this_category_info, $filter_locked = false, $filter_recent = false, $filter_ids = array()){
+function mmrpg_website_community_category_threads($this_category_info, $filter_locked = false, $filter_recent = false, $row_limit = false, $filter_ids = array()){
 
     // Pull in global variables
     global $DB, $this_userinfo;
@@ -387,9 +387,13 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
     $temp_where_filter = array();
     if ($filter_locked == true){ $temp_where_filter[] = "threads.thread_locked = 0"; }
     if ($filter_recent == true){ $temp_where_filter[] = "threads.thread_mod_date > {$temp_last_login}"; }
-    //if (!empty($filter_ids)){ $temp_where_filter[] = "threads.thread_id NOT IN(".implode(',', $filter_ids).")"; }
+    if (!empty($filter_ids)){ $temp_where_filter[] = "threads.thread_id NOT IN(".implode(',', $filter_ids).")"; }
     if (empty($temp_where_filter)){ $temp_where_filter[] = "1 = 1"; }
     $temp_where_filter = implode(" AND \n", $temp_where_filter)."\n";
+
+    // If a row limit has been defined, generate the string for it
+    if (!empty($row_limit) && is_numeric($row_limit)){ $temp_limit_string = "LIMIT {$row_limit} "; }
+    else { $temp_limit_string = ''; }
 
     // Generate the query for collecting discussion threads for a given category
     $this_threads_query = "SELECT
@@ -520,6 +524,8 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
         ORDER BY
             threads.thread_locked ASC,
             {$temp_order_by}
+
+        {$temp_limit_string}
 
             ;";
 
