@@ -385,10 +385,26 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
 
     // Define the extra WHERE string based on arguments
     $temp_where_filter = array();
-    if ($filter_locked == true){ $temp_where_filter[] = "threads.thread_locked = 0"; }
-    if ($filter_recent == true){ $temp_where_filter[] = "threads.thread_mod_date > {$temp_last_login}"; }
-    if (!empty($filter_ids)){ $temp_where_filter[] = "threads.thread_id NOT IN(".implode(',', $filter_ids).")"; }
-    if (empty($temp_where_filter)){ $temp_where_filter[] = "1 = 1"; }
+
+    // Append to where query if locked threads should be excluded
+    if ($filter_locked == true){
+        $temp_where_filter[] = "threads.thread_locked = 0";
+    }
+    // Append to where query if filtering by recent threads only
+    if ($filter_recent == true){
+        $temp_where_filter[] = "threads.thread_mod_date > {$temp_last_login}";
+        $temp_where_filter[] = "threads.thread_mod_user <> {$this_userinfo['user_id']}";
+    }
+    // Append to where query if a list of filter IDs has been provided
+    if (!empty($filter_ids)){
+        $temp_where_filter[] = "threads.thread_id NOT IN(".implode(',', $filter_ids).")";
+    }
+    // Append a default to the where query if empty
+    if (empty($temp_where_filter)){
+        $temp_where_filter[] = "1 = 1";
+    }
+
+    // Implode generated where query into a string
     $temp_where_filter = implode(" AND \n", $temp_where_filter)."\n";
 
     // If a row limit has been defined, generate the string for it
@@ -514,7 +530,6 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
         WHERE
             threads.category_id = {$this_category_info['category_id']} AND
             threads.thread_published = 1 AND
-            threads.thread_mod_user <> {$this_userinfo['user_id']} AND
             (threads.thread_target = 0 OR
                 threads.thread_target = {$this_userinfo['user_id']} OR
                 threads.user_id = {$this_userinfo['user_id']}
