@@ -102,4 +102,9 @@ define('MMRPG_SETTINGS_THREADS_RECENT', 10); // How many threads should be liste
 define('MMRPG_SETTINGS_POSTS_PERPAGE', 20); // How many discussion threads should be displayed per page
 define('MMRPG_SETTINGS_THREADS_PERPAGE', 50); // How many comment posts should be displayed per page
 
+// Back-up definiation in case COPPA is not defined
+if (!defined('MMRPG_CONFIG_COPPA_PERMISSIONS')){
+    define(MMRPG_CONFIG_COPPA_PERMISSIONS, '');
+}
+
 ?>
