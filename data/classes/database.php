@@ -382,14 +382,14 @@ class plutocms_database {
     	// Add this preformatted value to the insert string
       $insert_string = $insert_data;
     }
+
     // Create the insert query to run against the database
     $insert_query = "INSERT INTO {$table_name} {$insert_string}";
+
     // Execute the insert query against the database
     $affected_rows = 0;
-    $this->query($insert_query, $affected_rows);
-    // If success, return the affected number of rows
-    if ($this->MYSQL_RESULT !== false){ $this->clear(); return $affected_rows; }
-    else { $this->clear(); return false; }
+    return $this->query($insert_query, $affected_rows);
+
   }
 
   // Define a function for updating a record in the database

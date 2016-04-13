@@ -12,7 +12,7 @@ ExpiresByType audio/ogg "access plus 1 months"
 ExpiresByType application/ogg "access plus 1 months"
 ExpiresByType text/javascript "access plus 1 months"
 ExpiresByType text/css "access plus 1 months"
-</IfModule> 
+</IfModule>
 
 # Increase memory limit
 #php_value memory_limit 128M
@@ -62,11 +62,13 @@ RewriteRule ^images/robots/([a-z]+)man/(.*)?$ /images/robots/$1-man/$2 [R,L]
 # Define the rewrite conditions
 RewriteCond %{REQUEST_FILENAME} -d [OR]
 RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule (.*) - [S=14]
+RewriteRule (.*) - [S=17]
 
 # Define the redirect rules for specific pages
-RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&target=$4&$5 [L]
+RewriteRule ^community/personal/([0-9]+)/([-_a-z0-9]+)/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=personal&id=$1&token=$2&target=$3&$4 [L]
+RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&num=$4&$5 [L]
 RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&$4 [L]
+RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/?\??(.*)$ index.php?page=community&cat=$1&num=$2&$3 [L]
 RewriteRule ^community/([-_a-z0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=community&cat=$1&sub=$2&$3 [L]
 RewriteRule ^community/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&$2 [L]
 

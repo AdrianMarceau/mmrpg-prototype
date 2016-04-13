@@ -24,10 +24,10 @@ $this_formerrors = array();
 
 // POST ACTIONS
 while ($this_formaction == 'post'){
-  
+
   // Define the verified flag
   $verified = true;
-  
+
   // Collect all submitted form data
   $formdata = array();
   $formdata['category_id'] = isset($_POST['category_id']) ? $_POST['category_id'] : false;
@@ -39,7 +39,7 @@ while ($this_formaction == 'post'){
   $formdata['post_frame'] = isset($_POST['post_frame']) ? $_POST['post_frame'] : false;
   $formdata['post_time'] = isset($_POST['post_time']) ? $_POST['post_time'] : false;
   $formdata['post_target'] = !empty($_POST['post_target']) ? $_POST['post_target'] : 0;
-  
+
   // Check to ensure mandatory fields are not left blank
   if ($formdata['category_id'] === false || $formdata['category_id'] === ''){
     $this_formerrors[] = "The Category ID was not provided.";
@@ -92,7 +92,7 @@ while ($this_formaction == 'post'){
     $this_formerrors[] = "You need at least ".number_format(MMRPG_SETTINGS_POST_MINPOINTS, 0, '.', ',')." battle points to post a new comment!.";
     $verified = false;
   }
-  
+
   if (!empty($formdata['post_time']) && $formdata['post_id'] == 0){
     $temp_postinfo = $DB->get_array("SELECT * FROM mmrpg_posts WHERE post_date = '{$formdata['post_time']}' AND user_id = '{$formdata['user_id']}'");
     if (!empty($temp_postinfo)){
@@ -102,25 +102,25 @@ while ($this_formaction == 'post'){
       break;
     }
   }
-  
+
   // If there are any errors, break
   if (!$verified){
     // Create the error flag to change markup
     define('COMMENT_POST_SUCCESSFUL', false);
     break;
   }
-  
+
   // Sanitize the post's body and frame values to prevent corruption
   $formdata['post_body'] = strip_tags($formdata['post_body']); //preg_replace('/\s+/', ' ', strip_tags($formdata['post_body']));
   $formdata['post_frame'] = preg_match('/^[0-9]{2}$/', $formdata['post_frame']) ? $formdata['post_frame'] : '';
-  
+
   // Define the is newpost flag variable
   $temp_flag_newpost = empty($formdata['post_id']) || empty($temp_postinfo) ? true : false;
   if ($temp_flag_newpost){ $formdata['post_id'] = $DB->get_value('SELECT MAX(post_id) AS max_id FROM mmrpg_posts', 'max_id') + 1; }
-  
+
   // Check to see if this is a new post we're working with
   if ($temp_flag_newpost){
-    
+
     // Define the insert array based on provided data
     $insert_array = array();
     $insert_array['post_id'] = $formdata['post_id'];
@@ -133,59 +133,71 @@ while ($this_formaction == 'post'){
     $insert_array['post_date'] = $formdata['post_time'];
     $insert_array['post_mod'] = $formdata['post_time'];
     $insert_array['post_target'] = $formdata['post_target'];
-    
+
     // Insert this new post into the database
-    $DB->insert('mmrpg_posts', $insert_array);
-    
+    $formdata['post_id'] = $DB->insert('mmrpg_posts', $insert_array);
+
   }
   // Otherwise, if we're editing an existing post
   elseif (!$temp_flag_newpost){
-    
+
     // Define the update array based on provided data
     $temp_flag_newpost = false;
     $update_array = array();
     $update_array['post_body'] = $formdata['post_body'];
     $update_array['post_frame'] = $formdata['post_frame'];
     $update_array['post_mod'] = $formdata['post_time'];
-    
+
     // Insert this new post into the database
     $DB->update('mmrpg_posts', $update_array, "post_id = {$formdata['post_id']}");
-    
+
   }
-  
-    
+
+
   // Only update the main thread date if this is a new post
   if ($temp_flag_newpost){
-  
+
     // Define the update array based on provided data
     $update_array = array();
     $update_array['thread_mod_date'] = $formdata['post_time'];
     $update_array['thread_mod_user'] = $this_userinfo['user_id'];
-    
+
     // Update the parent thread in the database
     $DB->update('mmrpg_threads', $update_array, "thread_id = {$formdata['thread_id']}");
-    
+
   }
-  
+
   // Create the success flag to change markup
   define('COMMENT_POST_SUCCESSFUL', true);
   // If this was a personal message, automatically reload the thread
   if (isset($update_array) || $formdata['post_target'] != 0){
-    $temp_threadinfo = $DB->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = {$formdata['thread_id']} LIMIT 1");
-    header('Location: '.$this_current_url.'#post-'.$formdata['post_id']);
+    $temp_post_count = $DB->get_value("SELECT
+      COUNT(*) as post_count
+      FROM mmrpg_posts AS posts
+      LEFT JOIN mmrpg_users AS users ON posts.user_id = users.user_id
+      LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+      WHERE
+      posts.post_id <= {$formdata['post_id']} AND
+      posts.thread_id = '{$formdata['thread_id']}'
+      ORDER BY posts.post_date ASC
+      ;", 'post_count');
+    $temp_post_pages_count = ceil($temp_post_count / MMRPG_SETTINGS_POSTS_PERPAGE);
+    $temp_redirect_url = preg_replace('/\/[0-9]+\/$/', '/', $this_current_url);
+    if ($temp_post_pages_count > 1){ $temp_redirect_url .= $temp_post_pages_count.'/'; }
+    header('Location: '.$temp_redirect_url.'#post-'.$formdata['post_id']);
     exit();
   }
-  
+
   // Break out of the email loop
   break;
 }
 
 // THREAD ACTIONS
 while ($this_formaction == 'thread'){
-  
+
   // Define the verified flag
   $verified = true;
-  
+
   // Collect all submitted form data
   $formdata = array();
   $formdata['category_id'] = isset($_POST['category_id']) && $_POST['category_id'] !== '' ? $_POST['category_id'] : false;
@@ -203,7 +215,7 @@ while ($this_formaction == 'thread'){
   $formdata['thread_locked'] = isset($_POST['thread_locked']) && $_POST['thread_locked'] == 'true' ? true : false;
   $formdata['thread_sticky'] = isset($_POST['thread_sticky']) && $_POST['thread_sticky'] == 'true' ? true : false;
   $formdata['thread_target'] = !empty($_POST['thread_target']) ? $_POST['thread_target'] : 0;
-  
+
   // Check to ensure mandatory fields are not left blank
   if (empty($formdata['category_id']) && $formdata['category_id'] !== '0'){
     $this_formerrors[] = "The Category ID was not provided.";
@@ -288,7 +300,7 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
     else { $this_formerrors[] = "You need at least ".number_format(MMRPG_SETTINGS_THREAD_MINPOINTS, 0, '.', ',')." battle points to send a new message!."; }
     $verified = false;
   }
-  
+
   if (!empty($formdata['thread_time']) && $formdata['thread_id'] == 0){
     $temp_threadinfo = $DB->get_array("SELECT * FROM mmrpg_threads WHERE thread_date = '{$formdata['thread_time']}' AND user_id = '{$formdata['user_id']}'");
     if (!empty($temp_threadinfo)){
@@ -304,7 +316,7 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
   } elseif (!empty($formdata['thread_id'])){
     $temp_threadinfo = $DB->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = '{$formdata['thread_id']}'");
   }
-  
+
   // DEBUG
   /*
   die('<pre>'.
@@ -320,18 +332,18 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
     define('DISCUSSION_POST_SUCCESSFUL', false);
     break;
   }
-  
+
   // Sanitize the thread's body and frame values to prevent corruption
   $formdata['thread_body'] = strip_tags($formdata['thread_body']); //preg_replace('/\s+/', ' ', strip_tags($formdata['thread_body']));
   $formdata['thread_frame'] = preg_match('/^[0-9]{2}$/', $formdata['thread_frame']) ? $formdata['thread_frame'] : '';
   $formdata['thread_colour'] = preg_match('/^[a-z0-9]+$/', $formdata['thread_colour']) ? $formdata['thread_colour'] : '';
-  
+
   $formdata['thread_name'] = preg_replace('/\s+/', ' ', strip_tags($formdata['thread_name']));
   $formdata['thread_token'] = trim(preg_replace('/([^a-z0-9]+)/i', '-', strtolower($formdata['thread_name'])), '-');
-  
+
   // Check to see if this is a new thread we're working with
   if (empty($formdata['thread_id'])){
-    
+
     // Define the insert array based on provided data
     $insert_array = array();
     $insert_array['thread_id'] = $DB->get_value('SELECT MAX(thread_id) AS max_id FROM mmrpg_threads', 'max_id') + 1;
@@ -350,7 +362,7 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
     $insert_array['thread_locked'] = $formdata['thread_locked'];
     $insert_array['thread_sticky'] = $formdata['thread_sticky'];
     $insert_array['thread_target'] = $formdata['thread_target'];
-  
+
     /*
     // DEBUG
     die('<pre>'.
@@ -359,18 +371,18 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
       '$insert_array: '.print_r($insert_array, true)."\n\n".
       '</pre>');
     */
-      
+
     //die('<pre>'.print_r($insert_array, true).'</pre>');
-    
+
     // Insert this new thread into the database
     //die('<pre>$insert_array:'.print_r($insert_array, true).'</pre>');
     $DB->insert('mmrpg_threads', $insert_array);
     $formdata['thread_id'] = $insert_array['thread_id'];
-    
+
   }
   // Otherwise, if we're editing an existing thread
   elseif (!empty($formdata['thread_id']) && !empty($temp_threadinfo)){
-    
+
     // Define the update array based on provided data
     $update_array = array();
     $update_array['thread_name'] = preg_replace('/\s+/', ' ', strip_tags($formdata['thread_name']));
@@ -383,7 +395,7 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
     $update_array['thread_published'] = $formdata['thread_published'];
     $update_array['thread_locked'] = $formdata['thread_locked'];
     $update_array['thread_sticky'] = $formdata['thread_sticky'];
-  
+
     // DEBUG
     /*
     die('<pre>'.
@@ -392,21 +404,21 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
       '$update_array: '.print_r($update_array, true)."\n\n".
       '</pre>');
     */
-    
+
     // Insert this new thread into the database
     //die('<pre>$update_array:'.print_r($update_array, true).'</pre>');
     $DB->update('mmrpg_threads', $update_array, "thread_id = {$formdata['thread_id']}");
-    
+
   }
-  
+
   // Create the success flag to change markup
   define('DISCUSSION_POST_SUCCESSFUL', true);
   // Define the new thread URL
   define('DISCUSSION_POST_SUCCESSFUL_URL', $formdata['thread_id'].'/'.$formdata['thread_token'].'/');
-  
+
   // Redirect to the edited thread if this is an update
   if (isset($update_array) || $formdata['thread_target'] != 0){
-  
+
     // If the category id changed for this thread upon edit
     if ($formdata['category_id'] != $formdata['new_category_id']){
       /*
@@ -420,14 +432,14 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
       $DB->update('mmrpg_threads', array('category_id' => $formdata['new_category_id']), "thread_id = {$formdata['thread_id']}");
       $formdata['category_token'] = $this_categories_index_tokens[$formdata['new_category_id']];
     }
-    
+
     // Redirect to the edited thread directly instead of confirming
     header('Location: '.MMRPG_CONFIG_ROOTURL.'community/'.$formdata['category_token'].'/'.DISCUSSION_POST_SUCCESSFUL_URL);
     exit();
-    
+
   }
-    
-  
+
+
   // Break out of the email loop
   break;
 }

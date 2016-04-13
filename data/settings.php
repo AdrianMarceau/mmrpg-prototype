@@ -98,6 +98,8 @@ define('MMRPG_SETTINGS_THREAD_MINPOINTS', 5000); // Prevent spam comments
 define('MMRPG_SETTINGS_POST_MINPOINTS', 1000); // Prevent wordy comments
 
 // Define the global thread display limit for community
-define('MMRPG_SETTINGS_THREADS_RECENT', 10); // Only display five per category
+define('MMRPG_SETTINGS_THREADS_RECENT', 10); // How many threads should be listed on the home page
+define('MMRPG_SETTINGS_POSTS_PERPAGE', 20); // How many discussion threads should be displayed per page
+define('MMRPG_SETTINGS_THREADS_PERPAGE', 50); // How many comment posts should be displayed per page
 
 ?>
