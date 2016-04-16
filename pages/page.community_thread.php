@@ -87,6 +87,7 @@ if (!is_numeric($this_posts_count)){ $this_posts_count = 0; }
 // Define the post/comment limit, page count, and offset variables
 $comment_post_limit = MMRPG_SETTINGS_POSTS_PERPAGE;
 $comment_post_pages = ceil($this_posts_count / $comment_post_limit);
+if ($comment_post_pages < 1){ $comment_post_pages = 1; }
 $comment_post_offset = $this_current_num > 1 ? ($this_current_num - 1) * $comment_post_limit : 0;
 
 // If the user has somehow requested a page out-of-range, redirect to last
