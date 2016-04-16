@@ -100,9 +100,9 @@ ob_start();
           $temp_recovery2_unit = $temp_item->ability_recovery2_percent ? '%' : '';
           $temp_accuracy = $temp_item->ability_accuracy;
           $temp_kind = !empty($temp_damage) && empty($temp_recovery) ? 'damage' : (!empty($temp_recovery) && empty($temp_damage) ? 'recovery' : (!empty($temp_damage) && !empty($temp_recovery) ? 'multi' : ''));
-          $temp_target = 'auto';
-          if ($temp_item->ability_target == 'select_target' && $target_player->counters['robots_active'] > 1){ $temp_target = 'select_target'; }
-          elseif ($temp_item->ability_target == 'select_this' && $this_player->counters['robots_active'] > 1){ $temp_target = 'select_this'; }
+          $temp_target = 'select_this';
+          if ($temp_item->ability_target == 'select_target' && $target_player->counters['robots_active'] >= 1){ $temp_target = 'select_target'; }
+          elseif ($temp_item->ability_target == 'select_this' && $this_player->counters['robots_active'] >= 1){ $temp_target = 'select_this'; }
           elseif ($temp_item->ability_target == 'select_this_disabled'){ $temp_target = 'select_this_disabled'; }
           elseif ($temp_item->ability_target == 'auto'){ $temp_target = 'auto'; }
           //elseif ($temp_item->ability_target == 'select_this_disabled' && $this_player->counters['robots_disabled'] >= 1){ $temp_target = 'select_this_disabled'; }
