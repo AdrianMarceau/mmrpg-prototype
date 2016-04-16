@@ -62,9 +62,10 @@ RewriteRule ^images/robots/([a-z]+)man/(.*)?$ /images/robots/$1-man/$2 [R,L]
 # Define the rewrite conditions
 RewriteCond %{REQUEST_FILENAME} -d [OR]
 RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule (.*) - [S=17]
+RewriteRule (.*) - [S=18]
 
 # Define the redirect rules for specific pages
+RewriteRule ^community/personal/([0-9]+)/([-_a-z0-9]+)/([0-9]+)/\??(.*)$ index.php?page=community&cat=personal&id=$1&token=$2&num=$3&$4 [L]
 RewriteRule ^community/personal/([0-9]+)/([-_a-z0-9]+)/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=personal&id=$1&token=$2&target=$3&$4 [L]
 RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&num=$4&$5 [L]
 RewriteRule ^community/([-_a-z0-9]+)/([0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=community&cat=$1&id=$2&token=$3&$4 [L]
