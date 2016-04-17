@@ -6,8 +6,10 @@
 
 // Define a function for parsing formatting code from a string
 function mmrpg_formatting_decode($string){
+
     // Define the static formatting array variable
     static $mmrpg_formatting_array = array();
+
     // If the formatting array has not been populated, do so
     if (empty($mmrpg_formatting_array)){
 
@@ -45,26 +47,32 @@ function mmrpg_formatting_decode($string){
             );
         $mmrpg_formatting_array += array(
             // left/right/center formatting
-            '/\s{2,}\[size-large\]\s?(.*?)\s?\[\/size-large\]\s{2,}/is' => '<div class="size_large">$1</div>',
-            '/\s{2,}\[size-medium\]\s?(.*?)\s?\[\/size-medium\]\s{2,}/is' => '<div class="size_medium">$1</div>',
-            '/\s{2,}\[size-small\]\s?(.*?)\s?\[\/size-small\]\s{2,}/is' => '<div class="size_small">$1</div>',
-            '/\s?\[size-large\]\s?(.*?)\s?\[\/size-large\]/is' => '<span class="size_large">$1</span>',
-            '/\s?\[size-medium\]\s?(.*?)\s?\[\/size-medium\]/is' => '<span class="size_medium">$1</span>',
-            '/\s?\[size-small\]\s?(.*?)\s?\[\/size-small\]/is' => '<span class="size_small">$1</span>',
+            '/\s{2,}\[size-large\]\s?(.*?)\s?\[\/size(?:-large)?\]\s{2,}/ism' => '<div class="size_large">$1</div>',
+            '/\s{2,}\[size-medium\]\s?(.*?)\s?\[\/size(?:-medium)?\]\s{2,}/ism' => '<div class="size_medium">$1</div>',
+            '/\s{2,}\[size-small\]\s?(.*?)\s?\[\/size(?:-small)?\]\s{2,}/ism' => '<div class="size_small">$1</div>',
+            '/\s?\[size-large\]\s?(.*?)\s?\[\/size(?:-large)?\]/ism' => '<span class="size_large">$1</span>',
+            '/\s?\[size-medium\]\s?(.*?)\s?\[\/size(?:-medium)?\]/ism' => '<span class="size_medium">$1</span>',
+            '/\s?\[size-small\]\s?(.*?)\s?\[\/size(?:-small)?\]/ism' => '<span class="size_small">$1</span>',
             // colour block formatting
-            '/\s{2,}\[color=#([a-f0-9]{6})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]\s{2,}/is' => '<div class="color_block" style="color: #$1;">$2</div>',
-            '/\s{2,}\[color=([0-9]{1,3}),\s?([0-9]{1,3}),\s?([0-9]{1,3})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]\s{2,}/is' => '<div class="color_block" style="color: rgb($1, $2, $3);">$4</div>',
-            '/\s?\[color=#([a-f0-9]{6})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]/is' => '<span class="color_inline" style="color: #$1;">$2</span>',
-            '/\s?\[color=([0-9]{1,3}),\s?([0-9]{1,3}),\s?([0-9]{1,3})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]/is' => '<span class="color_inline" style="color: rgb($1, $2, $3);">$4</span>',
+            '/\s{2,}\[color=#([a-f0-9]{6})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]\s{2,}/ism' => '<div class="color_block" style="color: #$1;">$2</div>',
+            '/\s{2,}\[color=([0-9]{1,3}),\s?([0-9]{1,3}),\s?([0-9]{1,3})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]\s{2,}/ism' => '<div class="color_block" style="color: rgb($1, $2, $3);">$4</div>',
+            '/\s?\[color=#([a-f0-9]{6})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]/ism' => '<span class="color_inline" style="color: #$1;">$2</span>',
+            '/\s?\[color=([0-9]{1,3}),\s?([0-9]{1,3}),\s?([0-9]{1,3})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]/ism' => '<span class="color_inline" style="color: rgb($1, $2, $3);">$4</span>',
             //'/\s?\[size-(large|medium|small)\]\s?(.*?)\s?\[\/size-\1\]/is' => '<span class="size_$1">$2</span>',
+            // font block formatting
+            '/\s{2,}\[font="?([-_a-z0-9\s]+)"?\](?:\s+)?(.*?)(?:\s+)?\[\/font\]\s{2,}/ism' => '<div class="font_block" style="font-family: \'$1\';">$2</div>',
+            '/\s?\[font="?([-_a-z0-9\s]+)"?\](?:\s+)?(.*?)(?:\s+)?\[\/font\]/ism' => '<span class="font_inline" style="font-family: \'$1\';">$2</span>',
+            // system block formatting
+            '/\s{2,}\[system\](?:\s+)?(.*?)(?:\s+)?\[\/system\]\s{2,}/ism' => '<div class="code">$1</div>',
+            '/\s?\[system\](?:\s+)?(.*?)(?:\s+)?\[\/system\]/ism' => '<span class="code">$1</span>',
             );
         $mmrpg_formatting_array += array(
-            '/\s?\[align-left\]\s?(.*?)\s?\[\/align-left\]/is' => '<div class="align_left">$1</div>',
-            '/\s?\[align-right\]\s?(.*?)\s?\[\/align-right\]/is' => '<div class="align_right">$1</div>',
-            '/\s?\[align-center\]\s?(.*?)\s?\[\/align-center\]/is' => '<div class="align_center">$1</div>',
-            '/\s?\[float-left\]\s?(.*?)\s?\[\/float-left\]/is' => '<div class="float_left">$1</div>',
-            '/\s?\[float-right\]\s?(.*?)\s?\[\/float-right\]/is' => '<div class="float_right">$1</div>',
-            '/\s?\[float-none\]\s?(.*?)\s?\[\/float-none\]/is' => '<div class="float_none">$1</div>',
+            '/\s?\[align-left\]\s?(.*?)\s?\[\/align(?:-left)?\]/is' => '<div class="align_left">$1</div>',
+            '/\s?\[align-right\]\s?(.*?)\s?\[\/align(?:-right)?\]/is' => '<div class="align_right">$1</div>',
+            '/\s?\[align-center\]\s?(.*?)\s?\[\/align(?:-center)?\]/is' => '<div class="align_center">$1</div>',
+            '/\s?\[float-left\]\s?(.*?)\s?\[\/float(?:-left)?\]/is' => '<div class="float_left">$1</div>',
+            '/\s?\[float-right\]\s?(.*?)\s?\[\/float(?:-right)?\]/is' => '<div class="float_right">$1</div>',
+            '/\s?\[float-none\]\s?(.*?)\s?\[\/float(?:-none)?\]/is' => '<div class="float_none">$1</div>',
             //'/\s?\[align-(left|right|center)\]\s?(.*?)\s?\[\/align-\1\]/is' => '<span class="align_$1">$2</span>',
             );
         /*
@@ -143,7 +151,6 @@ function mmrpg_formatting_decode($string){
             );
         $mmrpg_formatting_array += array(
 
-
             // spoiler tags
             '/\[([^\[\]]+)\]\{spoiler\}/i' => '<span class="type type_span ability_type ability_type_space" style="background-image: none; color: rgb(54,57,90);">$1</span>',
 
@@ -169,6 +176,7 @@ function mmrpg_formatting_decode($string){
     $string = strip_tags($string);
     $string = preg_replace('/\[\/code\]\[\/code\]/i', '[&#47;code][/code]', $string);
     //$string = preg_replace('/\s+/', ' ', $string);
+
     // Loop through each find, and replace with the appropriate replacement
     $code_matches = array();
     $has_code = preg_match_all('/\[code\]\s?(.*?)\s?\[\/code\]/is', $string, $code_matches);
@@ -177,12 +185,16 @@ function mmrpg_formatting_decode($string){
     //if ($has_code){ echo('<pre style="background-color: white; clear: both; width: 100%; white-space: normal; color: #000000; margin: 0 auto 20px;">$string = '.print_r($string, true).'</pre>'); }
     foreach ($mmrpg_formatting_array AS $find_pattern => $replace_pattern){ $string = preg_replace($find_pattern, $replace_pattern, $string); }
     if ($has_code){ foreach ($code_matches[1] AS $key => $match){ $string = str_replace('##CODE'.$key.'##', '<span class="code">'.$match.'</span>', $string); } }
+
     // Change line breaks to actual breaks by grouping into paragraphs
-    $string = str_replace("\r\n", '<br />', $string);
+    $string = str_replace("\r\n", "\n", $string);
+    $string = str_replace("\n", '<br />', $string);
     //$string = '<p>'.preg_replace('/(<br\s?\/>\s?){2,}/i', '</p><p>', $string).'</p>';
     $string = '<div>'.$string.'</div>';
+
     // Return the decoded string
     return $string;
+
 }
 // Define a function for encoding and HTML string with formatting code
 function mmrpg_formatting_encode($string){
