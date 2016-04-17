@@ -829,12 +829,6 @@ while ($this_action == 'exit'){
   break;
 }
 
-// Ensure this is not a demo build before doing updates
-if ($_SESSION['GAME']['DEMO'] == 0){
-  // Require the updates file
-  require_once('file_updates.php');
-}
-
 
 // If the file has been changed and there's a return, redirect to it
 if ($file_has_updated && !empty($_POST['return'])){
