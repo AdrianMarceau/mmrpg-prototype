@@ -622,12 +622,6 @@ while ($this_action == 'load'){
   break;
 }
 
-// Ensure this is not a demo build before doing updates
-if ($_SESSION[$session_token]['DEMO'] == 0){
-  // Require the updates file
-  require_once('../file_updates.php');
-}
-
 ?>
 <!DOCTYPE html>
 <html>

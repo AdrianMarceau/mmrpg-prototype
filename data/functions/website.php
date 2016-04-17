@@ -656,6 +656,16 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
             }
         }
 
+        // Check if this is a system thread
+        if ($temp_category_token == 'personal' && empty($this_thread_info['user_id'])){ $is_system_thread = true; }
+        else { $is_system_thread = false; }
+
+        // If this was a system thread, alter values
+        if ($is_system_thread){
+            $temp_thread_author = 'System Bot';
+            $temp_thread_author_colour = 'empty';
+        }
+
         ?>
         <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" class="subbody thread_subbody thread_subbody_small <?= $header_mode ? 'thread_subbody_small_nohover' : '' ?> <?= $compact_mode ? 'thread_subbody_compact' : '' ?> thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>">
             <?
@@ -668,6 +678,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                 $temp_avatar_frame = $this_thread_info['user_id'] != $this_thread_info['thread_target'] && !empty($this_thread_info['thread_frame']) ? $this_thread_info['thread_frame'] : '00';
                 $temp_avatar_path = !empty($this_thread_info['user_image_path']) ? $this_thread_info['user_image_path'] : 'robots/mega-man/40';
                 $temp_background_path = !empty($this_thread_info['user_background_path']) ? $this_thread_info['user_background_path'] : 'fields/intro-field';
+                if ($is_system_thread){ $temp_avatar_path = 'robots/robot/40'; $temp_background_path = 'fields/field'; }
                 list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
                 $temp_avatar_class = 'avatar avatar_40x40 float float_'.$temp_avatar_float.' ';
@@ -687,6 +698,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                 $temp_avatar_frame =  $this_thread_info['user_id'] == $this_thread_info['thread_target'] && !empty($this_thread_info['thread_frame']) ? $this_thread_info['thread_frame'] : '00';
                 $temp_avatar_path = !empty($this_thread_info['target_user_image_path']) ? $this_thread_info['target_user_image_path'] : 'robots/mega-man/40';
                 $temp_background_path = !empty($this_thread_info['target_user_background_path']) ? $this_thread_info['target_user_background_path'] : 'fields/intro-field';
+                //if ($is_system_thread){ $temp_avatar_path = 'robots/robot/40'; $temp_background_path = 'fields/field'; }
                 list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
                 $temp_avatar_class = 'avatar avatar_40x40 float float_'.$temp_avatar_float.' ';
