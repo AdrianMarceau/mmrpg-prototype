@@ -1393,7 +1393,7 @@ class mmrpg_robot {
             $robot_stats[$stat]['base'] = $base_stats['robot_'.$stat];
             $robot_stats[$stat]['base_max'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level_max']);
             $robot_stats[$stat]['bonus'] = isset($bonus_stats['robot_'.$stat]) ? $bonus_stats['robot_'.$stat] : 0;
-            $robot_stats[$stat]['bonus_max'] = ceil($robot_stats[$stat]['base_max'] * MMRPG_SETTINGS_STATS_BONUS_MAX);
+            $robot_stats[$stat]['bonus_max'] = $stat != 'energy' ? ceil($robot_stats[$stat]['base_max'] * MMRPG_SETTINGS_STATS_BONUS_MAX) : 0;
             $robot_stats[$stat]['current'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level']) + $robot_stats[$stat]['bonus'];
             $robot_stats[$stat]['max'] = $robot_stats[$stat]['base_max'] + $robot_stats[$stat]['bonus_max'];
             if ($robot_stats[$stat]['current'] > $robot_stats[$stat]['max']){
