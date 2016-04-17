@@ -105,7 +105,7 @@ $this_omega_factors_eight = array();
 //$this_omega_factors_eight[] = array('robot' => 'clown-man', 'field' => 'field', 'type' => 'electric');
 //$this_omega_factors_eight[] = array('robot' => 'search-man', 'field' => 'field', 'type' => 'missile');
 //$this_omega_factors_eight[] = array('robot' => 'frost-man', 'field' => 'field', 'type' => 'freeze');
-//$this_omega_factors_eight[] = array('robot' => 'grenade-man', 'field' => 'field', 'type' => 'explode');
+$this_omega_factors_eight[] = array('robot' => 'grenade-man', 'field' => 'field', 'type' => 'explode');
 //$this_omega_factors_eight[] = array('robot' => 'aqua-man', 'field' => 'field', 'type' => 'water');
 
 // Define the expansion omega factors for DR. COSSACK (MEGA MAN 9)
