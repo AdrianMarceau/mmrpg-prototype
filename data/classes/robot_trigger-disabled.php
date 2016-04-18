@@ -153,7 +153,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
                 $event_options['console_show_target'] = false;
                 $event_body = $target_robot->print_robot_name().' downloads '.$stat_system[$stat].' data from the target robot! ';
                 $event_body .= '<br />';
-                $event_body .= $target_robot->print_robot_name().'&#39;s '.$prop_stat.' grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
+                $event_body .= $target_robot->print_robot_name().'&#39;s '.$stat.' grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
                 $target_robot->robot_frame = 'shoot';
                 $target_robot->update_session();
                 $target_player->update_session();
