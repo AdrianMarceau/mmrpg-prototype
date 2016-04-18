@@ -31,7 +31,7 @@ $contributor_ids = array(
   //4831,  // ThatGuyNamedMikey (Moderator)
   4307,  // Reisrat (Moderator)
   1330, // TheDoc (Moderator)
-  ); 
+  );
   // 484 Ephnee
 $contributor_index = $DB->get_array_list("SELECT * FROM mmrpg_users LEFT JOIN mmrpg_roles ON mmrpg_users.role_id = mmrpg_roles.role_id WHERE user_id IN (".implode(', ', $contributor_ids).")", 'user_id');
 //die(print_r($contributor_index, true));
@@ -56,13 +56,13 @@ ob_start();
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Credits Overview</h2>
 
 <div class="subbody">
-  
+
   <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/bomb-man/sprite_left_80x80.png);">Adrian Marceau</div></div>
   <p class="text">The <strong>Mega Man RPG Prototype</strong> was created and is continually developed and maintained by Adrian Marceau / Ageman20XX, though the project would not have been possible without a great deal of inspiration and contributions from multiple outside sources.  Being a Mega Man fan-game, this project obviously owes most of it's thanks to <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> and of course, Keiji Inafune.  Most of the assets used throughout this website and game were created by Capcom for use in the original games, so their role in this project is far from minor and greatly influential. In addition, their generally positive attitude about fan-games and other types of fan-tribute have been very admirable over the years, and both this game and the Mega Man community owe them much gratitude.</p>
-  
+
   <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/metal-man/sprite_right_80x80.png);">Metal Man</div></div>
   <p class="text">Capcom are not the only ones to thank, however, as many others have contributed to this project over the years.  Though most of the actual design and development has been done by Adrian thus far, hours of play-testing, tons of feature ideas, mechanics discussions, and even additional sprite editing has been provided by talented and generous outside sources over the years.  New members are being added to the team all the time, and even the smallest amount of effort is appreciated.  If you would like to help with sprite editing, bug testing, feature ideas, or anything please <a href="contact/">contact me</a> and we'll discuss the details.  You'll be credited appropriately on this page, with a link back to your home page and a custom description if you want them.</p>
-  
+
 </div>
 
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Contributors Index</h2>
@@ -109,6 +109,12 @@ foreach ($contributor_ids AS $id){
     <a href="http://www.youtube.com/user/TheLegendOfRenegade/" target="_blank"><strong>TheLegendOfRenegade</strong></a> <span class="pipe">|</span> <span>Contributor</span> <span class="pipe">|</span> <em>Mega Man 1, 2, 7, and R&amp;F Sega Genesis Remixes</em><br />
     YouTube user TheLegendOfRenegade is responsible for any and all music and sound effects in the prototype and graciously agreed to let us use his work in July 2013.  All tracks come from his massive, multiple-game-spanning Sega Genesis / MD Remix project and they are really, really incredible.  All field music thus far has come from his <a href="http://www.youtube.com/playlist?list=PL0jbwTITrHXaBy3etRm-nmkx-f-QaPOwQ" target="_blank">Mega Man 1 &amp; 2</a> collection with various menu and special battle themes coming from the <a href="http://www.youtube.com/playlist?list=PL0jbwTITrHXZfMogt7ll1ThTlpND_5KZH" target="_blank">Rockman &amp; Forte</a> and <a href="http://www.youtube.com/playlist?list=PL0jbwTITrHXbA31nYgKs863E4UgLxUJkh" target="_blank">Mega Man 7</a> collections in addition to the former.  The level of quality and polish these remixes bring to the game is beyond words, and I am so grateful that we're able to showcase them in our prototype.  TheLegendOfRenegade has done some truly great work, and I think I speak for everyone on the team when I say &quot;thank you&quot;.  ^_^
     <span style="display: block; font-size: 10px; line-height: 12px; margin-top: 2px;">* Because TheLegendOfRenegade has not created remixes for Time Man and Oil Man's stages in Powered Up, the R&amp;F themes for Astro Man and Tengu Man are currently being used in their place. The game will be updated if/when he ever creates them, but please enjoy the current selection until then. :)</span>
+  </p>
+</div>
+<div class="subbody" style="margin-bottom: 2px; ">
+  <p class="text">
+    <strong>MegaBoyX7</strong> <span class="pipe">|</span> <span>Contributor</span> <span class="pipe">|</span> <em>Chat Room Emoticons</em><br />
+    MegaBoyX7 starting playing in November 2014 but didn't start contributing until April 2016 when he created a fantastic set of Mega Man themed icons for our chat room! Minor edits were implemented by myself and MegaBossMan, but the base sprites and the idea to change them came entirely from MegaBoyX7.  Thank you! <img src="chat/img/emoticons/smile-big.png" alt="Big Smile" />
   </p>
 </div>
 <div class="subbody">
