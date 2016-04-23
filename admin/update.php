@@ -96,6 +96,8 @@ if ($this_request_type != 'ajax'){
             | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=200&amp;patch=<?=$this_request_patch?>" data-limit="200">x200</a>
             | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=500&amp;patch=<?=$this_request_patch?>" data-limit="500">x500</a>
             | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=1000&amp;patch=<?=$this_request_patch?>" data-limit="1000">x1000</a>
+            | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=2500&amp;patch=<?=$this_request_patch?>" data-limit="2500">x2500</a>
+            | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=5000&amp;patch=<?=$this_request_patch?>" data-limit="5000">x5000</a>
         <? } ?>
     </div>
     <?
