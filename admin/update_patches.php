@@ -246,7 +246,7 @@ function mmrpg_patch_battle_point_reboot_2k16($_GAME){
     }
 
     // Increment the player's zenny total with the compensation reward
-    $_GAME['counters']['battle_points'] += $reward_battle_zenny;
+    $_GAME['counters']['battle_zenny'] += $reward_battle_zenny;
 
     // Return the updated game array
     return $_GAME;
