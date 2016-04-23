@@ -62,9 +62,14 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             ob_start();
             $patch_name = $update_patch_names[$patch_token];
             $patch_details = $update_patch_details[$patch_token];
-            $_GAME = call_user_func('mmrpg_patch_'.$patch_token, $_GAME);
+            $patch_function = 'mmrpg_patch_'.$patch_token;
+            if (!function_exists($patch_function)){ exit('The patch function "'.$patch_function.'" doesn\'t exist...'); }
+            $_GAME = call_user_func($patch_function, $_GAME);
             $patch_notes = trim(ob_get_clean());
         }
+
+        // If the any key fields were empty, abort mission!
+        if (empty($_GAME['user_id'])){ die('Something happened to the user ID..'); }
 
         // If a patch was found and applied, update save file and generate notes
         if (!empty($patch_name) && !empty($patch_details) && !empty($patch_notes)){
