@@ -128,6 +128,132 @@ function mmrpg_patch_stat_max_limit_update($_GAME){
 }
 
 
+// -- BATTLE POINT REBOOT 2k16 -- //
+
+// Define a patch function for applying the max robot stats update
+$token = 'battle_point_reboot_2k16';
+$update_patch_tokens[] = $token;
+$update_patch_names[$token] = 'Battle Point Reboot of 2016';
+$update_patch_details[$token] = "Battle points are no longer some arbituary number you can grind for all eternity.";
+$update_patch_details[$token] .= "\nFrom now on, battle points will be equal to the total sum of all your *best* mission scores combined.";
+$update_patch_details[$token] .= "\nWhile replaying missions for better scores is abolutely encouraged, it is no longer necessary to return over and over simply to grind points.";
+function mmrpg_patch_battle_point_reboot_2k16($_GAME){
+
+    // Pull in global variables
+    global $DB;
+
+    // Define the variable to hold the current battle point totals
+    $new_battle_points = 0;
+    $new_player_battle_points = array();
+
+    echo("Recalculating battle point totals...\n");
+
+    // Define search and replace variables for later display
+    $numerals_find = array('Iv', 'Iii', 'Ii');
+    $numerals_replace = array('IV', 'III', 'II');
+
+    // If the player has completed battles, loop through them and add up points
+    if (!empty($_GAME['values']['battle_complete'])){
+        $player_tokens = array('dr-light', 'dr-wily', 'dr-cossack');
+        foreach ($player_tokens AS $key => $player_token){
+            $new_player_battle_points[$player_token] = 0;
+            if (empty($_GAME['values']['battle_complete'][$player_token])){ continue; }
+            else { $player_battles = $_GAME['values']['battle_complete'][$player_token]; }
+            if (!empty($player_battles)){
+                $last_player = '';
+                //asort($player_battles);
+                foreach ($player_battles AS $battle_token => $battle_records){
+                    $corrupt_mission = false;
+                    if (!empty($battle_records['battle_max_points'])){
+                        $max_points = $battle_records['battle_max_points'];
+                        $battle_name = array_slice(explode('-', $battle_token), 1);
+                        $player_name = array_shift($battle_name);
+                        if ('dr-'.$player_name != $player_token){ $corrupt_mission = true; }
+                        $player_name = 'Dr. '.ucfirst($player_name);
+                        $phase_name = ucwords(array_shift($battle_name));
+                        $battle_name = implode(' / ', $battle_name);
+                        $battle_name = ucwords($battle_name);
+                        $battle_name = str_replace($numerals_find, $numerals_replace, $battle_name);
+                        if ($last_player != $player_name){ echo("\n"); }
+                        if (!$corrupt_mission){
+                            $new_battle_points += $max_points;
+                            $new_player_battle_points[$player_token] += $max_points;
+                            echo("+".print_r(number_format($max_points, 0, '.', ','), true)." | {$player_name} | {$phase_name} | {$battle_name} \n");
+                        } else {
+                            echo("[s]+0 | {$player_name} | {$phase_name} | {$battle_name}[/s] (?????) \n");
+                            unset($_GAME['values']['battle_complete'][$player_token][$battle_token]);
+                        }
+                        $last_player = $player_name;
+                    }
+                }
+            }
+        }
+        echo("\n");
+    } else {
+        echo("No battles have been completed...\n");
+    }
+
+
+    echo("----------------------------------------\n\n");
+
+    // Define the variable to hold the current battle point totals
+    $reward_battle_zenny = 0;
+    $reward_player_battle_points = array();
+
+    // Loop through the players and calculate their new battles points and rewards
+    foreach ($new_player_battle_points AS $player => $points){
+        $player_name = ucwords(str_replace('dr-', 'Dr. ', $player));
+        $old_points = $_GAME['values']['battle_rewards'][$player]['player_points'];
+        $new_points = $points;
+        $points_diff = $old_points - $new_points;
+        $zenny_reward = ceil($points_diff / 1000);
+        echo("[b]{$player_name}[/b]\n");
+        echo("Old battle points : ".print_r(number_format($old_points, 0, '.', ','), true)."\n");
+        echo("New battle points : ".print_r(number_format($new_points, 0, '.', ','), true)."\n");
+        echo("Difference : -".print_r(number_format($points_diff, 0, '.', ','), true)."\n");
+        echo("Compensation : ".print_r(number_format($zenny_reward, 0, '.', ','), true)."z\n");
+        echo("\n");
+        $reward_player_battle_points[$player] = $zenny_reward;
+        $reward_battle_zenny += $zenny_reward;
+    }
+
+    echo("[b]Battle Point Totals[/b]\n");
+    $old_points = $_GAME['counters']['battle_points'];
+    $new_points = $new_battle_points;
+    $points_diff = $old_points - $new_points;
+    echo("Old battle point total : ".print_r(number_format($old_points, 0, '.', ','), true)."\n");
+    echo("New battle point total : ".print_r(number_format($new_points, 0, '.', ','), true)."\n");
+    echo("Difference total : -".print_r(number_format($points_diff, 0, '.', ','), true)."\n");
+    echo("Compensation total : [b]".print_r(number_format($reward_battle_zenny, 0, '.', ','), true)."z[/b]\n");
+    echo("\n");
+
+    echo("----------------------------------------\n\n");
+
+    //echo("\$_GAME['counters'] = ".print_r($_GAME['counters'], true)."\n");
+    //echo("\$_GAME['values']['battle_complete'] = ".print_r($_GAME['values']['battle_complete'], true)."\n");
+
+    //echo("----------------------------------------\n");
+
+    // Update the game file and leadboard with these new changes
+    $old_battle_points = $_GAME['counters']['battle_points'];
+    $_GAME['counters']['battle_points'] = $new_battle_points;
+    $DB->query("UPDATE mmrpg_leaderboard SET board_points_legacy = {$old_battle_points}, board_points = {$new_battle_points} WHERE user_id = {$_GAME['user_id']};");
+    foreach ($new_player_battle_points AS $player => $new_points){
+        $dbplayer = str_replace('-', '_', $player);
+        $old_points = $_GAME['values']['battle_rewards'][$player]['player_points'];
+        $_GAME['values']['battle_rewards'][$player]['player_points'] = $new_points;
+        $DB->query("UPDATE mmrpg_leaderboard SET board_points_{$dbplayer}_legacy = {$old_points}, board_points_{$dbplayer} = {$new_points} WHERE user_id = {$_GAME['user_id']};");
+    }
+
+    // Increment the player's zenny total with the compensation reward
+    $_GAME['counters']['battle_points'] += $reward_battle_zenny;
+
+    // Return the updated game array
+    return $_GAME;
+
+}
+
+
 /*
 
 // -- PATCH FUNCTION TEMPLATE -- //
