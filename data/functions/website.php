@@ -629,10 +629,21 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
         $temp_thread_timestamp = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date'];
         $temp_thread_link = 'community/'.$temp_category_token.'/'.$temp_thread_id.'/'.$temp_thread_token.'/';
 
+        // Check if this is a system thread
+        if ($temp_category_token == 'personal' && empty($this_thread_info['user_id'])){ $is_system_thread = true; }
+        else { $is_system_thread = false; }
+
+        // If this was a system thread, alter values
+        if ($is_system_thread){
+            $temp_thread_author = 'System Bot';
+            $temp_thread_author_colour = 'empty';
+        }
+
         // If there are comments, update link to point to last page
+        $temp_comments_perpage = $is_system_thread ? 1 : MMRPG_SETTINGS_POSTS_PERPAGE;
         $temp_thread_link_comments = $temp_thread_link;
-        if ($temp_posts_count >= MMRPG_SETTINGS_POSTS_PERPAGE){
-            $temp_posts_pages_max = ceil($temp_posts_count / MMRPG_SETTINGS_POSTS_PERPAGE);
+        if ($temp_posts_count >= $temp_comments_perpage){
+            $temp_posts_pages_max = ceil($temp_posts_count / $temp_comments_perpage);
             $temp_thread_link_comments .= $temp_posts_pages_max.'/';
         }
         $temp_thread_link_comments .= !empty($temp_posts_count) ? '#comment-listing' : '#comment-form';
@@ -654,16 +665,6 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                 && (($this_time - $temp_thread_timestamp) <= MMRPG_SETTINGS_UPDATE_TIMEOUT)){
                 $temp_is_new = true;
             }
-        }
-
-        // Check if this is a system thread
-        if ($temp_category_token == 'personal' && empty($this_thread_info['user_id'])){ $is_system_thread = true; }
-        else { $is_system_thread = false; }
-
-        // If this was a system thread, alter values
-        if ($is_system_thread){
-            $temp_thread_author = 'System Bot';
-            $temp_thread_author_colour = 'empty';
         }
 
         ?>
