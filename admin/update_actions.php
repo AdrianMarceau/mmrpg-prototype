@@ -156,7 +156,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
                 'thread_body' => $update_thread_data['thread_body'],
                 'thread_mod_date' => time(),
                 'thread_mod_user' => MMRPG_SETTINGS_TARGET_PLAYERID
-                ), array('thread_id' => $update_thread_id));
+                ), array('thread_id' => $update_thread_data['thread_id']));
 
             // Append a new comment on this player's update thread
             $update_post_data = array();
