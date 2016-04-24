@@ -49,7 +49,6 @@ function mmrpg_prototype_calculate_battle_points(){
     }
 
     // Return the collected battle points
-    //$_SESSION[$session_token]['counters']['battle_points'] = $total_battle_points;
     return $total_battle_points;
 }
 
@@ -71,7 +70,6 @@ function mmrpg_prototype_calculate_player_points($player_token){
     }
 
     // Return the collected battle points
-    //$_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_points'] = $player_battle_points;
     return $player_battle_points;
 }
 
