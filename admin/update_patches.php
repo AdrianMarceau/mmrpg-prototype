@@ -153,8 +153,8 @@ function mmrpg_patch_battle_point_reboot_2k16($_GAME){
     $numerals_replace = array('IV', 'III', 'II');
 
     // If the player has completed battles, loop through them and add up points
+    $player_tokens = array('dr-light', 'dr-wily', 'dr-cossack');
     if (!empty($_GAME['values']['battle_complete'])){
-        $player_tokens = array('dr-light', 'dr-wily', 'dr-cossack');
         foreach ($player_tokens AS $key => $player_token){
             $new_player_battle_points[$player_token] = 0;
             if (empty($_GAME['values']['battle_complete'][$player_token])){ continue; }
@@ -419,15 +419,19 @@ function mmrpg_patch_battle_point_reboot_2k16($_GAME){
     $board_updates[] = "board_robots = '{$board_robots_string}'";
     $board_updates[] = "board_abilities = {$board_abilities_count}";
     $board_updates[] = "board_missions = {$board_missions_count}";
-    foreach ($new_player_battle_points AS $player => $new_points){
-        $dbplayer = str_replace('-', '_', $player);
-        $old_points = $_GAME['values']['battle_rewards'][$player]['player_points'];
-        $_GAME['values']['battle_rewards'][$player]['player_points'] = $new_points;
+    foreach ($player_tokens AS $key => $player_token){
+        $old_points = $_GAME['values']['battle_rewards'][$player_token]['player_points'];
+        $new_points = isset($new_player_battle_points[$player_token]) ? $new_player_battle_points[$player_token] : 0;
+        $new_robots = isset($board_player_robots_string[$player_token]) ? $board_player_robots_string[$player_token] : '';
+        $new_abilities = isset($board_player_abilities_count[$player_token]) ? $board_player_abilities_count[$player_token] : 0;
+        $new_missions = isset($board_player_missions_count[$player_token]) ? $board_player_missions_count[$player_token] : 0;
+        $dbplayer = str_replace('-', '_', $player_token);
+        $_GAME['values']['battle_rewards'][$player_token]['player_points'] = $new_points;
         $board_updates[] = "board_points_{$dbplayer}_legacy = {$old_points}";
         $board_updates[] = "board_points_{$dbplayer} = {$new_points}";
-        $board_updates[] = "board_robots_{$dbplayer} = '{$board_player_robots_string[$player_token]}'";
-        $board_updates[] = "board_abilities_{$dbplayer} = {$board_player_abilities_count[$player_token]}";
-        $board_updates[] = "board_missions_{$dbplayer} = {$board_player_missions_count[$player_token]}";
+        $board_updates[] = "board_robots_{$dbplayer} = '{$new_robots}'";
+        $board_updates[] = "board_abilities_{$dbplayer} = {$new_abilities}";
+        $board_updates[] = "board_missions_{$dbplayer} = {$new_missions}";
     }
     $DB->query("UPDATE mmrpg_leaderboard SET
         ".implode(",\n", $board_updates)."
