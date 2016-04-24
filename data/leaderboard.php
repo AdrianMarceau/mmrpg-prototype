@@ -9,7 +9,7 @@ $this_start_key = !empty($_GET['start']) ? trim($_GET['start']) : 0;
 // Define a function for parsing the leaderboard data
 function mmrpg_leaderboard_parse_index($key, $board){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_leaderboard_parse_index('.$key.', $board:'.$board['user_name_clean'].')');  }
-  global $mmrpg_index;
+  global $DB, $mmrpg_index;
   global $this_cache_stamp, $this_cache_filename, $this_cache_filedir;
   global $this_leaderboard_count, $this_leaderboard_online_count;
   global $this_leaderboard_online_players, $this_leaderboard_online_pages;
@@ -19,26 +19,26 @@ function mmrpg_leaderboard_parse_index($key, $board){
   global $this_time, $this_online_timeout, $place_counter, $points_counter, $this_start_key;
 
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   $board_key = $key;
-  
+
   // Start the output buffer
   ob_start();
-  
+
   // Collect the points and increment the counter if necessary
   $this_points = $board['board_points'];
   if ($this_points != $points_counter){
     $points_counter = $this_points;
     $place_counter += 1;
   }
-  
+
   // Define the awards strong and default to empty
   $this_user_awards = ' ';
-  
+
   // Break apart the battle and battle values into arrays
   $temp_battles = !empty($board['board_battles']) ? explode(',', $board['board_battles']) : array();
   $board['board_battles'] = $temp_battles;
-  
+
   // Loop through the available players
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   foreach ($mmrpg_index['players'] AS $ptoken => $pinfo){
@@ -46,7 +46,7 @@ function mmrpg_leaderboard_parse_index($key, $board){
     $temp_battles = !empty($board['board_battles_'.$ptoken2]) ? explode(',', $board['board_battles_'.$ptoken2]) : array();
     $board['board_battles_'.$ptoken2] = $temp_battles;
   }
-  
+
   // Break apart the robot and battle values into arrays
   $temp_robots = !empty($board['board_robots']) ? $board['board_robots'] : array();
   if (!empty($temp_robots)){
@@ -79,7 +79,7 @@ function mmrpg_leaderboard_parse_index($key, $board){
     $this_boardinfo['board_rank'] = $place_counter;
     $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'];
   }
-  
+
   // If online, add this player to the array
   if ($this_is_online){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -89,25 +89,25 @@ function mmrpg_leaderboard_parse_index($key, $board){
     //$this_leaderboard_online_pages[] = $board_key;
     if (!in_array($this_current_page_number, $this_leaderboard_online_pages)){ $this_leaderboard_online_pages[] = $this_current_page_number; }
   }
-          
+
   // Only continue if markup is special constants have not been defined
   if (!defined('MMRPG_SKIP_MARKUP') || defined('MMRPG_SHOW_MARKUP_'.$this_user_id)){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Only generate markup if we're withing the viewing range
     if ($board_key >= $this_start_key && $board_key < $this_display_limit || defined('MMRPG_SHOW_MARKUP_'.$this_user_id)){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       $this_robots_count = (!empty($this_robots) ? count($this_robots) : 0);
       $this_robots_count = $this_robots_count == 1 ? '1 Robot' : $this_robots_count.' Robots';
       $this_stars_count = $this_stars;
       $this_abilities_count = $this_abilities;
       $this_missions_count = $this_missions;
-      
+
       $this_stars_count = $this_stars_count == 1 ? '1 Star' : $this_stars_count.' Stars';
       $this_abilities_count = $this_abilities_count == 1 ? '1 Ability' : $this_abilities_count.' Abilities';
       $this_missions_count = $this_missions_count == 1 ? '1 Mission' : $this_missions_count.' Missions';
-      
+
       //$this_points_html = preg_replace('#^([0]+)([0-9]+)$#', '<span class="padding">$1</span><span class="value">$2</span>', str_pad((!empty($this_points) ? $this_points : 0), 13, '0', STR_PAD_LEFT)).' BP';
       $this_records_html = '<span class="count">'.$this_missions_count.'</span>';
       $this_records_html .= ' <span class="pipe">|</span> <span class="count">'.$this_robots_count.'</span>';
@@ -115,19 +115,38 @@ function mmrpg_leaderboard_parse_index($key, $board){
       $this_records_html .= ' <span class="pipe">|</span> <span class="count">'.$this_stars_count.'</span>';
       $this_points_html = '<span class="value">'.(!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0).'</span>'.' BP';
       $this_points_plain = (!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0).' BP';
-            
+
       $this_details = ''.$this_last_save;
-    
+
+      // If this player is in first/second/third place but hasn't received the award...
+      $this_awards_string = '';
+      if ($this_place == 1 && !in_array('ranking_first_place', $this_awards)){
+        // FIRST PLACE
+        $this_awards[] = 'ranking_first_place';
+        $this_awards_string = implode(',', $this_awards);
+      } elseif ($this_place == 2 && !in_array('ranking_second_place', $this_awards)){
+        // SECOND PLACE
+        $this_awards[] = 'ranking_second_place';
+        $this_awards_string = implode(',', $this_awards);
+      } elseif ($this_place == 3 && !in_array('ranking_third_place', $this_awards)){
+        // THIRD PLACE
+        $this_awards[] = 'ranking_third_place';
+        $this_awards_string = implode(',', $this_awards);
+      }
+      if (!empty($this_awards_string)){
+        $DB->query("UPDATE mmrpg_leaderboard SET board_awards = '{$this_awards_string}' WHERE user_id = {$board['user_id']};");
+      }
+
       // -- LEADERBOARD MARKUP -- //
-      
+
       // Add the prototype complete flags if applicable
       if (count($board['board_battles_dr_light']) >= 17){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-light" data-tooltip="Completed Dr. Light\'s Game" data-tooltip-type="player_type player_type_defense">&hearts;</span>'; }
       if (count($board['board_battles_dr_wily']) >= 17){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-wily" data-tooltip="Completed Dr. Wily\'s Game" data-tooltip-type="player_type player_type_attack">&clubs;</span>'; }
       if (count($board['board_battles_dr_cossack']) >= 17){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-cossack" data-tooltip="Completed Dr. Cossack\'s Game" data-tooltip-type="player_type player_type_speed">&diams;</span>'; }
       if (in_array('ranking_first_place', $this_awards)){ $this_user_awards .= '<span class="prototype_complete prototype_complete_firstplace" data-tooltip="Reached First Place" data-tooltip-type="player_type player_type_level">&#9733;</span>'; }
-      
+
       //die('$this_awards = '.print_r($this_awards, true));
-      
+
       // Display the user's save file listing
       //echo '<a data-id="'.$board['user_id'].'" data-player="'.$board['user_name_clean'].'" class="file file_'.$this_place.'" name="file_'.$key.'" style="'.$this_style.'" title="'.$this_title.'" href="leaderboard/'.$board['user_name_clean'].'/">'."\n";
       echo '<a data-id="'.$board['user_id'].'" data-player="'.$board['user_name_clean'].'" class="file file_'.strip_tags($this_place).'" name="file_'.$key.'" style="'.$this_style.'" href="leaderboard/'.$board['user_name_clean'].'/">'."\n";
@@ -147,18 +166,18 @@ function mmrpg_leaderboard_parse_index($key, $board){
         echo '<span class="sprite sprite_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.($place_counter > 3 ? 'base' : 'victory').'" style="background-image: url(images/'.$avatar_class.'/'.$avatar_token.'/sprite_left_'.$avatar_size.'x'.$avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_username.'</span>';
         echo '</span></span>'."\n";
       echo '</a>'."\n";
-      
+
     }
-    
+
   }
-    
+
   // Collect the output into the buffer
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_leaderboard_markup[] = preg_replace('/\s+/', ' ', ob_get_clean());
-    
+
   /*
   // -- LEADERBOARD XML -- //
-  
+
   // Start the output buffer
   ob_start();
 
@@ -168,11 +187,11 @@ function mmrpg_leaderboard_parse_index($key, $board){
     echo '<join_date>'.date('Y-m-d H:i:s', $this_first_save).'</join_date>'."\n";
     echo '<score>'.$this_points.'</score>'."\n";
   echo '</player>'."\n";
-  
+
   // Collect the output into the buffer
   $this_leaderboard_xml[] = trim(ob_get_clean())."\n";
   */
-  
+
   /*
   die(
   '$this_leaderboard_markup['.$key.'] = <pre style="border-left: 5px solid yellow;">'.htmlentities(print_r($this_leaderboard_markup[$key], true), ENT_QUOTES, 'UTF-8', true).'</pre><hr /><hr />'.
@@ -182,10 +201,10 @@ function mmrpg_leaderboard_parse_index($key, $board){
   '$this_leaderboard_markup = <pre style="border-left: 5px solid red;">'.print_r($this_leaderboard_markup, true).'</pre><hr /><hr />'
   );
   */
-  
+
   // Return true on success
   return true;
-  
+
 }
 
 // Define the array for pulling all the leaderboard data
