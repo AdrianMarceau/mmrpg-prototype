@@ -24,10 +24,9 @@ if (!empty($temp_flags['drlight_password_robotgetletsrocknroll'])){
 if (!empty($temp_flags['drlight_password_abilitygetdemocompletebonus'])){
   // Only process if the Mega Buster has not yet been unlocked
   if ($_SESSION['GAME']['values']['battle_rewards']['dr-light']['player_points'] <= 0){
-    // Increase this player's score by 10,000 points
-    $temp_bonus_points = 10000;
-    $_SESSION['GAME']['counters']['battle_points'] += $temp_bonus_points;
-    $_SESSION['GAME']['values']['battle_rewards']['dr-light']['player_points'] += $temp_bonus_points;
+    // Increase this player's zenny by 10,000
+    $temp_bonus_zenny = 10000;
+    $_SESSION['GAME']['counters']['battle_zenny'] += $temp_bonus_zenny;
     // Unlock the Copy Shot for use in battle early
     mmrpg_game_unlock_ability($mmrpg_index['players']['dr-light'], false, array('ability_token' => 'copy-shot'));
     // Reset and return to the main menu
