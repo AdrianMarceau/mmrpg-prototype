@@ -70,6 +70,10 @@ $is_personal_message = $this_thread_info['thread_target'] != 0 ? true : false;
 $is_personal_message_creator = $is_personal_message && $this_thread_info['user_id'] == $this_userinfo['user_id'] ? true : false;
 $is_personal_query_condition = $is_personal_message ? "AND (posts.user_id = {$this_userinfo['user_id']} OR posts.post_target = {$this_userinfo['user_id']}) " : '';
 
+// Check if this is a system message
+if ($this_category_info['category_token'] == 'personal' && empty($this_thread_info['user_id'])){ $is_system_thread = true; }
+else { $is_system_thread = false; }
+
 // Count the number of posts for this specific thread in the database
 $this_posts_query = "SELECT
     COUNT(*) as post_count
@@ -85,7 +89,7 @@ $this_posts_count = $DB->get_value($this_posts_query, 'post_count');
 if (!is_numeric($this_posts_count)){ $this_posts_count = 0; }
 
 // Define the post/comment limit, page count, and offset variables
-$comment_post_limit = MMRPG_SETTINGS_POSTS_PERPAGE;
+$comment_post_limit = $is_system_thread ? 1 : MMRPG_SETTINGS_POSTS_PERPAGE;
 $comment_post_pages = ceil($this_posts_count / $comment_post_limit);
 if ($comment_post_pages < 1){ $comment_post_pages = 1; }
 $comment_post_offset = $this_current_num > 1 ? ($this_current_num - 1) * $comment_post_limit : 0;
@@ -232,10 +236,6 @@ else { $this_thread_info['thread_count'] = false; }
 // Collect the thread count for this user
 if ($this_thread_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_thread_info['post_count'] = !empty($this_user_countindex[$this_thread_info['user_id']]['post_count']) ? $this_user_countindex[$this_thread_info['user_id']]['post_count'] : 0; }
 else { $this_thread_info['post_count'] = false; }
-
-// Check if this is a system message
-if ($this_category_info['category_token'] == 'personal' && empty($this_thread_info['user_id'])){ $is_system_thread = true; }
-else { $is_system_thread = false; }
 
 //die('<pre>'.print_r($this_thread_info, true).'</pre>');
 
