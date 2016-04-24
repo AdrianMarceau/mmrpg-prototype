@@ -408,7 +408,7 @@ function mmrpg_patch_battle_point_reboot_2k16($_GAME){
     //echo("\$board_robots_string = ".print_r($board_robots_string, true)."\n");
     //echo("\$board_player_robots_string = ".print_r($board_player_robots_string, true)."\n");
 
-    echo("----------------------------------------\n\n");
+    //echo("----------------------------------------\n\n");
 
     // Update the game file and leadboard with these new changes
     $old_battle_points = $_GAME['counters']['battle_points'];
@@ -433,7 +433,6 @@ function mmrpg_patch_battle_point_reboot_2k16($_GAME){
         ".implode(",\n", $board_updates)."
         WHERE user_id = {$_GAME['user_id']}
         ;");
-
 
     // Increment the player's zenny total with the compensation reward
     $_GAME['counters']['battle_zenny'] += $reward_battle_zenny;
