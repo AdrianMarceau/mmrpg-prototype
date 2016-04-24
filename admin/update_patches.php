@@ -234,16 +234,206 @@ function mmrpg_patch_battle_point_reboot_2k16($_GAME){
 
     //echo("----------------------------------------\n");
 
+    // Let's also fix other cached leaderboard values while we're here
+    echo("Refreshing cached leaderboard values...\n\n");
+
+    // Calculate the board robots for each player
+    $board_robots = array();
+    $board_robots_tokens = array();
+
+    // Calculate the board abilities for each player
+    $board_abilities = array();
+    $board_abilities_tokens = array();
+
+    // Loop through battle rewards and collect unique robot details
+    if (!empty($_GAME['values']['battle_rewards'])){
+        $battle_rewards = $_GAME['values']['battle_rewards'];
+        foreach ($battle_rewards AS $player_token => $player_rewards){
+
+            // Remove empty player data from the game arrays
+            if (empty($player_token)){
+                unset($_GAME['values']['battle_rewards'][$player_token]);
+                unset($_GAME['values']['battle_settings'][$player_token]);
+                unset($battle_rewards[$player_token]);
+                continue;
+            }
+
+            // -- PLAYER ROBOT REWARDS -- //
+
+            // Loop through player robots collecting unique robot details
+            if (!empty($player_rewards['player_robots'])){
+                $player_robots = $player_rewards['player_robots'];
+                foreach ($player_robots AS $robot_token => $robot_rewards){
+
+                    // Remove empty robot data from the game arrays
+                    if (empty($robot_token)){
+                        unset($_GAME['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]);
+                        unset($_GAME['values']['battle_settings'][$player_token]['player_robots'][$robot_token]);
+                        unset($player_robots[$robot_token]);
+                        continue;
+                    }
+
+                    // Collect this robot's current level if set
+                    $robot_level = !empty($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
+
+                    // Add this robot's token to the global array if not already there
+                    if (!in_array($robot_token, $board_robots_tokens)){ $board_robots_tokens[] = $robot_token; }
+
+                    // If this robot is not yet added or is a duplicate at a higher level, use its data
+                    if (!isset($board_robots[$robot_token]) || $robot_level > $board_robots[$robot_token]['robot_level']){
+
+                        // Update the parent board robots array with this data
+                        $board_robots[$robot_token] = array(
+                            'player_token' => $player_token,
+                            'robot_token' => $robot_token,
+                            'robot_level' => $robot_level
+                            );
+
+                    }
+
+                    // If this robot's data already exists but this player is not the owner...
+                    if (isset($board_robots[$robot_token]) && $player_token != $board_robots[$robot_token]['player_token']){
+
+                        // Remove this robot from the current player's arrays
+                        unset($_GAME['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]);
+                        unset($_GAME['values']['battle_settings'][$player_token]['player_robots'][$robot_token]);
+                        unset($player_robots[$robot_token]);
+                        continue;
+
+                    }
+
+                }
+            }
+
+            // -- PLAYER ABILITY REWARDS -- //
+
+            // Loop through player abilities collecting unique ability details
+            if (!empty($player_rewards['player_abilities'])){
+                $player_abilities = $player_rewards['player_abilities'];
+                foreach ($player_abilities AS $ability_token => $ability_rewards){
+
+                    // Remove empty ability data from the game arrays
+                    if (empty($ability_token)){
+                        unset($_GAME['values']['battle_rewards'][$player_token]['player_abilities'][$ability_token]);
+                        unset($_GAME['values']['battle_settings'][$player_token]['player_abilities'][$ability_token]);
+                        unset($player_abilities[$ability_token]);
+                        continue;
+                    }
+
+                    // Add this ability's token to the global array if not already there
+                    if (!in_array($ability_token, $board_abilities_tokens)){ $board_abilities_tokens[] = $ability_token; }
+
+                    // If this ability is not yet added use this data, else add this player token
+                    if (!isset($board_abilities[$ability_token])){
+
+                        // Update the parent board abilities array with this data
+                        $board_abilities[$ability_token] = array(
+                            'player_tokens' => array($player_token),
+                            'ability_token' => $ability_token
+                            );
+
+                    } else {
+
+                        // Update the parent board abilities array with this data
+                        $board_abilities[$ability_token]['player_tokens'][] = $player_token;
+
+                    }
+
+                }
+            }
+
+        }
+    }
+
+    //echo("\$board_robots = ".print_r($board_robots, true)."\n");
+    //echo("\$board_robots_tokens = ".print_r($board_robots_tokens, true)."\n");
+
+    //echo("\$board_abilities = ".print_r($board_abilities, true)."\n");
+    //echo("\$board_abilities_tokens = ".print_r($board_abilities_tokens, true)."\n");
+
+    // Loop through robot values again and generate database strings
+    $board_robots_array = array();
+    $board_player_robots_array = array();
+    foreach ($board_robots AS $robot_token => $robot_info){
+        $robot_string = "[{$robot_token}:{$robot_info['robot_level']}]";
+        $board_robots_array[] = $robot_string;
+        $board_player_robots_array[$robot_info['player_token']][] = $robot_string;
+    }
+
+    // Loop through ability values again and generate database strings
+    $board_abilities_count = 0;
+    $board_player_abilities_count = array();
+    foreach ($board_abilities AS $ability_token => $ability_info){
+        $board_abilities_count += 1;
+        foreach ($ability_info['player_tokens'] AS $player_token){
+            if (!isset($board_player_abilities_count[$player_token])){ $board_player_abilities_count[$player_token] = 0; }
+            $board_player_abilities_count[$player_token] += 1;
+        }
+    }
+
+    //echo("\$board_robots_array = ".print_r($board_robots_array, true)."\n");
+    //echo("\$board_player_robots_array = ".print_r($board_player_robots_array, true)."\n");
+
+    //echo("\$board_abilities_count = ".print_r($board_abilities_count, true)."\n");
+    //echo("\$board_player_abilities_count = ".print_r($board_player_abilities_count, true)."\n");
+
+    // Compress the strings into comma-separated lists
+    $board_robots_string = implode(',', $board_robots_array);
+    $board_player_robots_string = array();
+    foreach ($board_player_robots_array AS $player_token => $robots_array){
+        $player_name = ucwords(str_replace('dr-', 'dr. ', $player_token));
+        $board_player_robots_string[$player_token] = implode(',', $robots_array);
+        echo("{$player_name} Robots : ".count($robots_array)."\n");
+    }
+    echo("Total Leaderboard Robots : [b]".count($board_robots_array)."[/b]\n\n");
+
+
+    foreach ($board_player_abilities_count AS $player_token => $ability_count){
+        $player_name = ucwords(str_replace('dr-', 'dr. ', $player_token));
+        echo("{$player_name} Abilities : ".$ability_count."\n");
+    }
+    echo("Total Leaderboard Abilities : [b]".$board_abilities_count."[/b]\n\n");
+
+    $board_missions_count = 0;
+    $board_player_missions_count = array();
+    foreach ($_GAME['values']['battle_complete'] AS $player_token => $battle_complete){
+        $player_name = ucwords(str_replace('dr-', 'dr. ', $player_token));
+        $mission_count = count($battle_complete);
+        echo("{$player_name} Missions : ".$mission_count."\n");
+        $board_player_missions_count[$player_token] = $mission_count;
+        $board_missions_count += $mission_count;
+    }
+    echo("Total Leaderboard Missions : [b]".$board_missions_count."[/b]\n\n");
+
+    //echo("\$board_robots_string = ".print_r($board_robots_string, true)."\n");
+    //echo("\$board_player_robots_string = ".print_r($board_player_robots_string, true)."\n");
+
+    echo("----------------------------------------\n\n");
+
     // Update the game file and leadboard with these new changes
     $old_battle_points = $_GAME['counters']['battle_points'];
     $_GAME['counters']['battle_points'] = $new_battle_points;
-    $DB->query("UPDATE mmrpg_leaderboard SET board_points_legacy = {$old_battle_points}, board_points = {$new_battle_points} WHERE user_id = {$_GAME['user_id']};");
+    $board_updates = array();
+    $board_updates[] = "board_points_legacy = {$old_battle_points}";
+    $board_updates[] = "board_points = {$new_battle_points}";
+    $board_updates[] = "board_robots = '{$board_robots_string}'";
+    $board_updates[] = "board_abilities = {$board_abilities_count}";
+    $board_updates[] = "board_missions = {$board_missions_count}";
     foreach ($new_player_battle_points AS $player => $new_points){
         $dbplayer = str_replace('-', '_', $player);
         $old_points = $_GAME['values']['battle_rewards'][$player]['player_points'];
         $_GAME['values']['battle_rewards'][$player]['player_points'] = $new_points;
-        $DB->query("UPDATE mmrpg_leaderboard SET board_points_{$dbplayer}_legacy = {$old_points}, board_points_{$dbplayer} = {$new_points} WHERE user_id = {$_GAME['user_id']};");
+        $board_updates[] = "board_points_{$dbplayer}_legacy = {$old_points}";
+        $board_updates[] = "board_points_{$dbplayer} = {$new_points}";
+        $board_updates[] = "board_robots_{$dbplayer} = '{$board_player_robots_string[$player_token]}'";
+        $board_updates[] = "board_abilities_{$dbplayer} = {$board_player_abilities_count[$player_token]}";
+        $board_updates[] = "board_missions_{$dbplayer} = {$board_player_missions_count[$player_token]}";
     }
+    $DB->query("UPDATE mmrpg_leaderboard SET
+        ".implode(",\n", $board_updates)."
+        WHERE user_id = {$_GAME['user_id']}
+        ;");
+
 
     // Increment the player's zenny total with the compensation reward
     $_GAME['counters']['battle_zenny'] += $reward_battle_zenny;
