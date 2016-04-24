@@ -112,7 +112,7 @@ $this_omega_factors_eight[] = array('robot' => 'grenade-man', 'field' => 'field'
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_omega_factors_nine = array();
 $this_omega_factors_nine[] = array('robot' => 'concrete-man', 'field' => 'field', 'type' => 'earth');
-//$this_omega_factors_nine[] = array('robot' => 'tornado-man', 'field' => 'field', 'type' => 'wind');
+$this_omega_factors_nine[] = array('robot' => 'tornado-man', 'field' => 'field', 'type' => 'wind');
 //$this_omega_factors_nine[] = array('robot' => 'splash-man', 'field' => 'field', 'type' => 'water');
 $this_omega_factors_nine[] = array('robot' => 'plug-man', 'field' => 'field', 'type' => 'electric');
 $this_omega_factors_nine[] = array('robot' => 'jewel-man', 'field' => 'gemstone-cavern', 'type' => 'crystal');
