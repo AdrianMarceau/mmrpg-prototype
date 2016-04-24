@@ -108,7 +108,7 @@ if ($this_request_type != 'ajax'){
 if ($this_request_type == 'index' && !empty($this_request_patch)){
     $this_page_markup .= '<p style="margin-bottom: 10px;"><strong>$this_update_list</strong><br />';
     $this_page_markup .= 'Query: <span>'.$this_update_query.'</span><br />';
-    $this_page_markup .= '<strong>Count: <span id="count_pending" style="color: #9C9C9C;">0</span> / <span id="count_completed">'.$this_update_count.'</span> / <span id="count_total">'.$this_total_count.'</span></strong><br />';
+    $this_page_markup .= '<strong>Count: <span id="count_pending" style="color: #9C9C9C;">0</span> / <span id="count_completed">'.$this_update_count.'</span> / <span id="count_total">'.$this_total_count.'</span> / <span id="count_percent">0%</span></strong><br />';
     $this_page_markup .= '</p>';
     $this_page_markup .= '<div id="results"></div>';
 }
@@ -151,12 +151,14 @@ elseif ($this_request_type == 'index'){
 var totalUpdates = <?= $this_total_count ?>;
 var pendingUpdates = 0;
 var completedUpdates = 0;
+var updatePercent = 0;
 var thisCacheDate = '<?= $this_cache_date ?>';
 var thisContent = false;
 var thisMenu = false;
 var thisResults = false;
 var thisPendingCounter = false;
 var thisCompletedCounter = false;
+var thisPercentCounter = false;
 
 $(document).ready(function(){
 
@@ -165,6 +167,7 @@ $(document).ready(function(){
     thisResults = $('#results', thisContent);
     thisPendingCounter = $('#count_pending', thisContent);
     thisCompletedCounter = $('#count_completed', thisContent);
+    thisPercentCounter = $('#count_percent', thisContent);
 
     $('a[data-limit]', thisMenu).click(function(e){
         e.preventDefault();
@@ -211,8 +214,14 @@ function admin_trigger_update(thisHref){
 
                         pendingUpdates--;
                         completedUpdates++;
+                        updatePercent = ((completedUpdates / totalUpdates) * 100).toFixed(2);
+                        var updatePercentColour = 'red';
+                        if (updatePercent > 33.33){ updatePercentColour = 'orange'; }
+                        if (updatePercent > 66.66){ updatePercentColour = 'green'; }
                         thisPendingCounter.html(pendingUpdates);
                         thisCompletedCounter.html(completedUpdates);
+                        thisPercentCounter.html(updatePercent+'%').css({color:updatePercentColour});
+
 
                         if (pendingUpdates > 0){
                             var thisTimeout = setTimeout(function(){ return admin_trigger_update(thisHref); }, 500);
