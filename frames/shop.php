@@ -875,9 +875,7 @@ if (true){
                                             // Loop through omega factors and collect base fields
                                             foreach ($temp_target_robot_omega AS $key => $factor){
                                                 $base = $factor['field'];
-                                                if (!in_array($base, $temp_base_tokens)){
-                                                    $temp_base_tokens[] = $base;
-                                                }
+                                                $temp_base_tokens[] = $base;
                                             }
 
                                             // Loop through again and collect fusion fields
@@ -898,9 +896,15 @@ if (true){
                                         shuffle($temp_base_tokens);
                                         shuffle($temp_fusion_tokens);
 
+                                        //echo("\$temp_base_tokens =<br /> ".print_r($temp_base_tokens, true)."<br /><br />");
+                                        //echo("\$temp_fusion_tokens =<br /> ".print_r($temp_fusion_tokens, true)."<br /><br />");
+
                                         // Define the first eight field and fusion star tokens
-                                        $temp_field_star_tokens = array_slice($temp_base_tokens, 0, 10);
                                         $temp_fusion_star_tokens = array_slice($temp_fusion_tokens, 0, 10);
+                                        $temp_field_star_tokens = array_slice($temp_base_tokens, 0, count($temp_fusion_star_tokens));
+
+                                        //echo("\$temp_field_star_tokens =<br /> ".print_r($temp_field_star_tokens, true)."<br /><br />");
+                                        //echo("\$temp_fusion_star_tokens =<br /> ".print_r($temp_fusion_star_tokens, true)."<br /><br />");
 
                                         // Loop through and index collected field star info
                                         foreach ($temp_field_star_tokens AS $key => $token){
