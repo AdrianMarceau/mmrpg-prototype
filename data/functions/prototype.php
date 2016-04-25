@@ -44,7 +44,7 @@ function mmrpg_prototype_calculate_battle_points(){
     $total_battle_points = 0;
     if (!empty($_SESSION[$session_token]['values']['battle_complete'])){
         foreach ($_SESSION[$session_token]['values']['battle_complete'] AS $player_token => $player_battles){
-            $total_battle_points = mmrpg_prototype_player_points($player_token);
+            $total_battle_points += mmrpg_prototype_player_points($player_token);
         }
     }
 
