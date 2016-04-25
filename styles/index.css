@@ -1746,6 +1746,113 @@ html {
     content: "";
     display: none;
 }
+
+#window .page .leaderboard .subbody .bodytext.player_links,
+#window .page .leaderboard .subbody .bodytext.player_missions {
+    display: block;
+    margin: 0 auto 6px;
+    overflow: hidden;
+    clear: both;
+    width: 100%;
+    float: none;
+}
+#window .page .leaderboard .subbody .bodytext .player_float {
+    display: block;
+    float: left;
+    width: 33%;
+    margin: 0 0.3% 3px 0;
+    box-sizing: border-box;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 13px;
+    line-height: 16px;
+    overflow: hidden;
+    color: #FFFFFF;
+    cusor: pointer;
+}
+#window .page .leaderboard .subbody .bodytext .player_float:not(.active):not(:hover) {
+    background-color: #464646 !important;
+    text-shadow: 0 0 0 transparent;
+}
+#window .page .leaderboard .subbody .bodytext .player_float.active,
+#window .page .leaderboard .subbody .bodytext .player_float:hover {
+    text-decoration: none;
+}
+#window .page .leaderboard .subbody .bodytext .player_float.active .label,
+#window .page .leaderboard .subbody .bodytext .player_float:hover .label {
+    text-decoration: underline;
+}
+#window .page .leaderboard .subbody .bodytext .player_float .label {
+    float: left;
+    color: #FFFFFF;
+}
+#window .page .leaderboard .subbody .bodytext .player_float .count {
+    float: right;
+    color: #EFEFEF;
+    color: rgba(255, 255, 255, 0.6);
+}
+#window .page .leaderboard .subbody .bodytext .player_float .count:before {
+    content: "(";
+}
+#window .page .leaderboard .subbody .bodytext .player_float .count:after {
+    content: ")";
+}
+
+#window .page .leaderboard .subbody .bodytext .player_stats.mission {
+    width: 49.5%;
+    margin: 0 0.5% 5px 0;
+    box-sizing: border-box;
+}
+#window .page .leaderboard .subbody .player_stats.mission .records {
+    display: table;
+    width: 100%;
+    margin: 0 auto;
+    table-layout: fixed;
+}
+#window .page .leaderboard .subbody .player_stats.mission strong.label {
+    display: block;
+    -webkit-border-radius: 3px 3px 0 0;
+    -moz-border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;
+    padding: 2px 6px;
+}
+#window .page .leaderboard .subbody .player_stats.mission .label {
+
+}
+#window .page .leaderboard .subbody .player_stats.mission .stat {
+    display: table-cell;
+    text-align: left;
+    margin: 0;
+    padding: 2px 6px;
+}
+#window .page .leaderboard .subbody .player_stats.mission .stat:after {
+    content: "";
+    display: none;
+}
+#window .page .leaderboard .subbody .player_stats.mission .stat span.label,
+#window .page .leaderboard .subbody .player_stats.mission .stat span.counter {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#window .page .leaderboard .subbody .player_stats.mission .stat span.label {
+
+}
+#window .page .leaderboard .subbody .player_stats.mission .stat span.counter {
+    text-align: right;
+}
+#window .page .leaderboard .subbody .player_stats.mission .stat .counter.defeat_count {
+    color: rgb(171, 50, 50);
+}
+#window .page .leaderboard .subbody .player_stats.mission .stat .counter.victory_count {
+    color: rgb(92, 193, 69);
+}
+
 #window .page .leaderboard .subbody .text .thread_header_links,
 #window .page .leaderboard .subbody .text .post_header_links {
     display: inline-block;

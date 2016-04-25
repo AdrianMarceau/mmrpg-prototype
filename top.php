@@ -296,6 +296,10 @@ elseif ($this_current_page == 'leaderboard'){
     $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
     if (!empty($this_current_token)){
         $this_current_uri .= $this_current_token.'/';
+        $this_current_player = !empty($_GET['player']) ? $_GET['player'] : '';
+        if (!empty($this_current_player)){
+            $this_current_uri .= $this_current_player.'/';
+        }
     }
 }
 // Trigger specific actions if we're on the FILE page
