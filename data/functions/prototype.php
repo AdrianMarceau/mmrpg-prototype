@@ -457,13 +457,11 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     // Count the number of completed battle options for this group and update the variable
     $battle_options_reversed = $battle_options; //array_reverse($battle_options);
     foreach ($battle_options_reversed AS $this_key => $this_info){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
         // Define the chapter if not set
         if (!isset($this_info['option_chapter'])){ $this_info['option_chapter'] = '0'; }
         // If this is an event message type option, simply display the text/images
         if (!empty($this_info['option_type']) && $this_info['option_type'] == 'message'){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
             // Generate the option markup for the event message
             $temp_optiontitle = $this_info['option_maintext'];
@@ -474,27 +472,20 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
         }
         // Otherwise, if this is a normal battle option
         else {
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
-            // If the skip flag is set, continue to the next index
-            //if (isset($this_info['flag_skip']) && $this_info['flag_skip'] == true){ continue; }
             // Collect the current battle and field info from the index
             $this_battleinfo = mmrpg_battle::get_index_info($this_info['battle_token']);
             if (!empty($this_battleinfo)){ $this_battleinfo = array_replace($this_battleinfo, $this_info); }
             else { $this_battleinfo = $this_info; }
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_battleinfo[\'battle_field_base\'] = <pre>'.print_r($this_battleinfo['battle_field_base'], true).'</pre>');  }
-            //if (!is_array($this_battleinfo['battle_field_base'])){ echo('Key '.$this_key.' in $battle_options_reversed = <pre>'.print_r($battle_options_reversed, true).'</pre>'); }
-            //if (!is_array($this_battleinfo['battle_field_base'])){ echo('$this_battleinfo[\'battle_field_base\'] = <pre>'.print_r($this_battleinfo, true).'</pre>'); }
-            //if (!is_array($this_battleinfo['battle_field_base'])){ echo('$DB->INDEX[\'BATTLES\']['.$this_info['battle_token'].'] = <pre>'.print_r($DB->INDEX['BATTLES'][$this_info['battle_token']], true).'</pre>'); }
             $this_fieldtoken = $this_battleinfo['battle_field_base']['field_token'];
             $this_fieldinfo =
                 !empty($mmrpg_index_fields[$this_fieldtoken])
                 ? array_replace(mmrpg_field::parse_index_info($mmrpg_index_fields[$this_fieldtoken]), $this_battleinfo['battle_field_base'])
                 : $this_battleinfo['battle_field_base'];
             $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
+            $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
 
             // Collect the robot index for calculation purposes
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
             // Check the GAME session to see if this battle has been completed, increment the counter if it was
@@ -520,6 +511,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             } else {
                 $this_has_field_star = false;
             }
+
             //$this_option_class = 'option option_fieldback option_this-'.$player_token.'-battle-select option_'.$this_battleinfo['battle_size'].' option_'.$this_battleinfo['battle_token'].' option_'.$this_option_status.' block_'.($this_key + 1).' '.($this_option_complete && !$this_has_field_star ? 'option_complete ' : '').($this_option_disabled ? 'option_disabled '.($this_option_encore ? 'option_disabled_clickable ' : '') : '');
             $this_option_class = 'option option_fieldback option_this-'.$player_token.'-battle-select option_'.$this_battleinfo['battle_size'].' option_'.$this_option_status.' block_'.($this_key + 1).' '.($this_option_complete && !$this_has_field_star ? 'option_complete ' : '').($this_option_disabled ? 'option_disabled '.($this_option_encore ? 'option_disabled_clickable ' : '') : '');
             $this_option_style = 'background-position: -'.mt_rand(5, 50).'px -'.mt_rand(5, 50).'px; ';
@@ -551,7 +543,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             if (!empty($this_targetinfo['player_robots'])){
 
                 // Count the number of masters in this battle
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $this_master_count = 0;
                 $this_mecha_count = 0;
                 $temp_robot_tokens = array();
@@ -573,7 +564,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
                 // Create a list of the different robot tokens in this battle
                 // Now loop through robots again and display 'em
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 foreach ($this_targetinfo['player_robots'] AS $this_robotinfo){
 
                     // HIDE MECHAS
@@ -599,7 +589,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             // Add the fusion star sprite if one has been added
             $this_has_field_star = false;
             if (!empty($this_battleinfo['values']['field_star'])){
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $this_has_field_star = true;
                 //$this_option_complete = false;
                 $this_option_disabled = false;
@@ -620,7 +609,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             }
             // Loop through the battle sprites and display them
             if (!empty($this_battleinfo['battle_sprite'])){
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $temp_right = false;
                 $temp_layer = 100;
                 $temp_count = count($this_battleinfo['battle_sprite']);
@@ -667,7 +655,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $temp_last_size = $temp_size;
                 }
             }
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             //if ($this_battleinfo['battle_token'] == 'base-spark-man') die('<pre>'.print_r(htmlentities($this_option_label), true).'</pre>');
             //$this_option_button_text = !empty($this_battleinfo['battle_button']) ? $this_battleinfo['battle_button'] : '';
             //$this_option_button_text = !empty($this_fieldinfo['field_name']) ? $this_fieldinfo['field_name'] : '';
@@ -678,7 +665,11 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             if ($this_option_max_level > 100){ $this_option_max_level = 100; }
             $this_option_level_range = $this_option_min_level == $this_option_max_level ? 'Level '.$this_option_min_level : 'Levels '.$this_option_min_level.'-'.$this_option_max_level;
             $this_option_star_force = !empty($this_targetinfo['player_starforce']) ? ' | +'.number_format(($this_option_star_boost * 10), 0, '.', ',').'% Boost' : '';
-            $this_option_point_amount = number_format($this_option_points, 0, '.', ',').' Point'.($this_option_points != 1 ? 's' : '');
+            if (!$is_player_battle){
+                $this_option_point_amount = number_format($this_option_points, 0, '.', ',').' Point'.($this_option_points != 1 ? 's' : '');
+            } else {
+                $this_option_point_amount = number_format($this_option_points, 0, '.', ',').' Zenny';
+            }
             $this_option_label .= (!empty($this_option_button_text) ? '<span class="multi"><span class="maintext">'.$this_option_button_text.'</span><span class="subtext">'.$this_option_level_range.str_replace('|', '<span class="pipe">|</span>', $this_option_star_force).'</span><span class="subtext2">'.$this_option_point_amount.'</span></span>'.(!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore)) ? '<span class="arrow"> &#9658;</span>' : '') : '<span class="single">???</span>');
             // Generate this options hover tooltip details
             $this_option_title = ''; //$this_battleinfo['battle_button'];
@@ -691,11 +682,14 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 else { $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' Type'; }
             }
             $this_option_title .= ' <br />'.$this_option_level_range.$this_option_star_force;
-            $this_option_title .= ' | '.($this_battleinfo['battle_points'] == 1 ? '1 Point' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Points');
+            if (!$is_player_battle){
+                $this_option_title .= ' | '.($this_battleinfo['battle_points'] == 1 ? '1 Point' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Points');
+            } else {
+                $this_option_title .= ' | '.($this_battleinfo['battle_points'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Zenny');
+            }
             $this_option_title .= ' | '.($this_battleinfo['battle_turns'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns'].' Turns');
             $this_option_title .= ' <br />'.$this_battleinfo['battle_description'].(!empty($this_battleinfo['battle_description2']) ? ' '.$this_battleinfo['battle_description2'] : '');
             if (!empty($this_option_complete) || !empty($this_option_failure) || !empty($this_has_field_star)){
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $this_option_title .= ' <hr />&laquo; Battle Records &raquo;';
                 $this_option_title .= ' <br />Cleared : '.(!empty($this_option_complete['battle_count']) ? ($this_option_complete['battle_count'] == 1 ? '1 Time' : $this_option_complete['battle_count'].' Times') : '0 Times');
                 $this_option_title .= ' | Failed : '.(!empty($this_option_failure['battle_count']) ? ($this_option_failure['battle_count'] == 1 ? '1 Time' : $this_option_failure['battle_count'].' Times') : '0 Times');
@@ -726,7 +720,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             // Define the field multipliers
             $temp_field_multipliers = array();
             if (!empty($this_fieldinfo['field_multipliers'])){
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $temp_multiplier_list = $this_fieldinfo['field_multipliers'];
                 asort($temp_multiplier_list);
                 $temp_multiplier_list = array_reverse($temp_multiplier_list, true);
@@ -908,18 +901,15 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
     $this_robots_markup = '';
 
     // Collect the robot index for calculation purposes
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
     // Collect the ability index for calculation purposes
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
     // Loop through and display the available robot options for this player
     $temp_robot_option_count = count($this_prototype_data['robot_options']);
     $temp_player_favourites = mmrpg_prototype_robot_favourites();
     foreach ($this_prototype_data['robot_options'] AS $key => $info){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $info = array_merge($this_robot_index[$info['robot_token']], $info);
         if (!isset($info['original_player'])){ $info['original_player'] = $this_prototype_data['this_player_token']; }
         $this_option_class = 'option option_this-robot-select option_this-'.$info['original_player'].'-robot-select option_'.($temp_robot_option_count == 1 ? '1x4' : ($this_prototype_data['robots_unlocked'] <= 2 ? '1x2' : '1x1')).' option_'.$info['robot_token'].' block_'.($key + 1);
@@ -972,7 +962,6 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_title .= ' <br />Level '.$this_robot_level.' | '.$this_robot_experience_title.'/1000 Exp'.(!empty($this_robot_favourite_title) ? ' '.$this_robot_favourite_title : '');
         $this_option_title .= ' <br />E: '.$this_robot_energy.' | A: '.$this_robot_attack.' | D: '.$this_robot_defense.' | S: '.$this_robot_speed;
         if (!empty($this_robot_abilities_current)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $this_option_title .= ' <hr />'; // <hr />-- Abilities ------------------------------- <br />';
             $temp_counter = 1;
             foreach ($this_robot_abilities_current AS $token){
@@ -1044,10 +1033,8 @@ function mmrpg_prototype_leaderboard_index(){
     global $DB;
     // Check to see if the leaderboard index has already been pulled or not
     if (!empty($DB->INDEX['LEADERBOARD']['index'])){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_leaderboard_index = json_decode($DB->INDEX['LEADERBOARD']['index'], true);
     } else {
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Define the array for pulling all the leaderboard data
         $temp_leaderboard_query = 'SELECT
             mmrpg_users.user_id,
@@ -1063,7 +1050,6 @@ function mmrpg_prototype_leaderboard_index(){
         // Query the database and collect the array list of all online players
         $this_leaderboard_index = $DB->get_array_list($temp_leaderboard_query);
         // Update the database index cache
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $DB->INDEX['LEADERBOARD']['index'] = json_encode($this_leaderboard_index);
     }
     // Return the collected leaderboard index
@@ -1107,10 +1093,8 @@ function mmrpg_prototype_leaderboard_online(){
     global $DB;
     // Check to see if the leaderboard online has already been pulled or not
     if (!empty($DB->INDEX['LEADERBOARD']['online'])){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_leaderboard_online_players = json_decode($DB->INDEX['LEADERBOARD']['online'], true);
     } else {
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Collect the leaderboard index for ranking
         $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
         // Generate the points index and then break it down to unique for ranks
@@ -1136,11 +1120,9 @@ function mmrpg_prototype_leaderboard_online(){
             }
         }
         // Update the database index cache
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $DB->INDEX['LEADERBOARD']['online'] = json_encode($this_leaderboard_online_players);
     }
     // Return the collected online players if any
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'return <pre>'.print_r($this_leaderboard_online_players, true).'</pre>');  }
     return $this_leaderboard_online_players;
 }
@@ -1151,10 +1133,8 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
     global $DB;
     // Check to see if the leaderboard targets have already been pulled or not
     if (!empty($DB->INDEX['LEADERBOARD']['targets'])){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_leaderboard_target_players = json_decode($DB->INDEX['LEADERBOARD']['targets'], true);
     } else {
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Collect the leaderboard index and online players for ranking
         $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
         $this_leaderboard_online_players = mmrpg_prototype_leaderboard_online();
@@ -1165,7 +1145,6 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         $temp_include_usernames_count = 0;
         $temp_include_usernames_string = array();
         if (!empty($this_leaderboard_online_players)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             foreach ($this_leaderboard_online_players AS $info){ if ($info['id'] != $this_userid){ $temp_include_usernames[] = $info['token']; } }
             $temp_include_usernames_count = count($temp_include_usernames);
             if (!empty($temp_include_usernames)){
@@ -1175,7 +1154,6 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 $temp_include_usernames_string = '';
             }
         } else {
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_include_usernames_string = '';
         }
         // Generate the online username tokens for adding to the condition list
@@ -1183,7 +1161,6 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         $temp_exclude_usernames_count = 0;
         $temp_exclude_usernames_string = array();
         if (!empty($this_leaderboard_defeated_players)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_exclude_usernames = $this_leaderboard_defeated_players;
             if (count($temp_exclude_usernames) > 6){ $temp_exclude_usernames = array_slice($temp_exclude_usernames, -6, 6); }
             $temp_exclude_usernames_count = count($temp_exclude_usernames);
@@ -1194,24 +1171,20 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 $temp_exclude_usernames_string = '';
             }
         } else {
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_exclude_usernames_string = '';
         }
         // DEBUG DEBUG DEBUG
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_include_usernames = '.implode(', ', $temp_include_usernames));  }
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_exclude_usernames = '.implode(', ', $temp_exclude_usernames));  }
         // Generate the points index and then break it down to unique for ranks
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_points_index = array();
         foreach ($this_leaderboard_index AS $info){ $this_points_index[] = $info['board_points']; }
         $this_points_index = array_unique($this_points_index);
         // Define the vars for finding the online players
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_player_points = mmrpg_prototype_battle_points();
         $this_player_points_min = ceil($this_player_points * 0.10);
         $this_player_points_max = ceil($this_player_points * 2.10);
         // Define the array for pulling all the leaderboard data
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_leaderboard_query = 'SELECT
                 mmrpg_leaderboard.user_id,
                 mmrpg_leaderboard.board_points,
@@ -1236,10 +1209,8 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         // Query the database and collect the array list of all online players
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_leaderboard_query = '.$temp_leaderboard_query);  }
         $this_leaderboard_target_players = $DB->get_array_list($temp_leaderboard_query);
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Loop through and decode any fields that require it
         if (!empty($this_leaderboard_target_players)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             foreach ($this_leaderboard_target_players AS $key => $player){
                 $player['player_rewards'] = !empty($player['player_rewards']) ? json_decode($player['player_rewards'], true) : array();
                 $player['player_settings'] = !empty($player['player_settings']) ? json_decode($player['player_settings'], true) : array();
@@ -1255,13 +1226,11 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
             }
         }
         // Update the database index cache
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         //if (!empty($player_robot_sort)){ uasort($this_leaderboard_target_players, 'mmrpg_prototype_leaderboard_targets_sort'); }
         $DB->INDEX['LEADERBOARD']['targets'] = json_encode($this_leaderboard_target_players);
         //die($temp_leaderboard_query);
     }
     // Return the collected online players if any
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     //die('<pre>$this_leaderboard_target_players : '.print_r($this_leaderboard_target_players, true).'</pre>');
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_leaderboard_target_players : '.print_r($this_leaderboard_target_players, true).'');  }
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_leaderboard_target_players(count) : '.count($this_leaderboard_target_players));  }
@@ -1288,7 +1257,6 @@ function mmrpg_prototype_leaderboard_targets_sort_online($player1, $player2){
 
 // Define a function for determining a player's battle music
 function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     global $mmrpg_index, $DB;
 
     $temp_session_key = $player_token.'_target-robot-omega_prototype';
@@ -1338,7 +1306,6 @@ function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'
 
 // Define a function for determining a player's battle music
 function mmrpg_prototype_get_player_mission_music($player_token, $session_token = 'GAME'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $most_key = mmrpg_prototype_get_player_music($player_token, $session_token);
     return 'stage-select-'.$most_key;
 }
@@ -1346,7 +1313,6 @@ function mmrpg_prototype_get_player_mission_music($player_token, $session_token 
 
 // Define a function for determining a player's boss music
 function mmrpg_prototype_get_player_boss_music($player_token, $session_token = 'GAME'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $most_key = mmrpg_prototype_get_player_music($player_token, $session_token);
     $most_key_int = preg_replace('/^mm0?/i', '', $most_key);
     return 'prototype-complete'.($most_key_int > 1 ? '-'.$most_key_int : '');
@@ -1355,7 +1321,6 @@ function mmrpg_prototype_get_player_boss_music($player_token, $session_token = '
 
 // Define a function for collecting robot sprite markup
 function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token = 'GAME'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     global $mmrpg_index, $DB;
     $temp_offset_x = 14;
     $temp_offset_z = 50;
