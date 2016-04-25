@@ -62,7 +62,7 @@ RewriteRule ^images/robots/([a-z]+)man/(.*)?$ /images/robots/$1-man/$2 [R,L]
 # Define the rewrite conditions
 RewriteCond %{REQUEST_FILENAME} -d [OR]
 RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule (.*) - [S=18]
+RewriteRule (.*) - [S=19]
 
 # Define the redirect rules for specific pages
 RewriteRule ^community/personal/([0-9]+)/([-_a-z0-9]+)/([0-9]+)/\??(.*)$ index.php?page=community&cat=personal&id=$1&token=$2&num=$3&$4 [L]
@@ -76,6 +76,7 @@ RewriteRule ^community/([-_a-z0-9]+)/\??(.*)$ index.php?page=community&cat=$1&$2
 RewriteRule ^file/game/([-_a-z0-9]+)/?\??(.*)$ index.php?page=file&sub=game&token=$1 [L]
 
 RewriteRule ^leaderboard/([0-9]+)/\??(.*)$ index.php?page=leaderboard&num=$1&$2 [L]
+RewriteRule ^leaderboard/([-_a-z0-9]+)/([-_a-z0-9]+)/(dr-light|dr-wily|dr-cossack)/?\??(.*)$ index.php?page=leaderboard&sub=$1&token=$2&player=$3 [L]
 RewriteRule ^leaderboard/([-_a-z0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=leaderboard&sub=$1&token=$2 [L]
 RewriteRule ^leaderboard/([-_a-z0-9]+)/\??(.*)$ index.php?page=leaderboard&sub=$1&$2 [L]
 
