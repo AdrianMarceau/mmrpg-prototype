@@ -86,7 +86,7 @@ function windowResizeLeaderboard(){
 
   var newBodyHeight = windowHeight;
   var newFrameHeight = newBodyHeight - headerHeight;
-  
+
   if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
   else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 
@@ -118,15 +118,12 @@ function windowResizeLeaderboard(){
           $last_key = 0;
           foreach ($this_leaderboard_markup AS $key => $leaderboard_markup){
             // If this key is below the start limit, don't display
-            if ($key < $this_start_key){ continue; }
+            if (empty($leaderboard_markup)){ continue; }
             // Update the last key variable
             $last_key = $key;
             // Display this save file's markup
-            //$leaderboard_markup = preg_replace('/<span class="username">([^<>]+)?<\/span>/', '<h2 class="username">$1</h2>', $leaderboard_markup);
             $leaderboard_markup = preg_replace('/href="([^<>]+)"/', '', $leaderboard_markup);
             echo $leaderboard_markup;
-            // Only show listings up to the display limit
-            if ($key + 1 >= $this_display_limit){ break; }
           }
 
           // Define the start key for the next batch of players
