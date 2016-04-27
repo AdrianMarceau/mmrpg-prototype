@@ -95,4 +95,7 @@ $temp_battle_omega['battle_rewards']['items'] = array(
   array('chance' => 20, 'token' => 'item-extra-life')
   );
 
+// This battle doesn't count, so let's modify the point value
+$temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
+
 ?>

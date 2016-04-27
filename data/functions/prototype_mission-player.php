@@ -197,6 +197,7 @@ if (!empty($temp_player_robots_rewards)){
             }
         }
     }
+
     //$temp_battle_omega['battle_field_base']['field_music'] = $temp_field_token_three['field'];
     $temp_battle_omega['battle_field_base']['field_type'] = !empty($temp_field_info_one['field_type']) ? $temp_field_info_one['field_type'] : '';
     $temp_battle_omega['battle_field_base']['field_type2'] = !empty($temp_field_info_two['field_type']) ? $temp_field_info_two['field_type'] : '';
@@ -214,6 +215,7 @@ if (!empty($temp_player_robots_rewards)){
     $temp_battle_omega['battle_field_base']['field_foreground_frame'] = $temp_field_info_two['field_foreground_frame'];
     $temp_battle_omega['battle_field_base']['field_background_attachments'] = $temp_field_info_one['field_background_attachments'];
     $temp_battle_omega['battle_field_base']['field_foreground_attachments'] = $temp_field_info_two['field_foreground_attachments'];
+
     // Define the final details for the player
     $temp_battle_omega['battle_target_player']['player_id'] = $temp_battle_userid;
     $temp_battle_omega['battle_target_player']['player_token'] = $target_player_token_backup;
@@ -221,9 +223,14 @@ if (!empty($temp_player_robots_rewards)){
     $temp_battle_omega['battle_target_player']['player_robots'] = $temp_battle_omega_robots;
     $temp_battle_omega['battle_target_player']['player_starforce'] = $temp_player_starforce;
     $temp_battle_omega['battle_robot_limit'] = count($temp_battle_omega_robots);
-    return $temp_battle_omega;
+
+    // This battle doesn't count, so let's modify the point value
+    $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
+
 } else {
+
     return false;
+
 }
 
 ?>
