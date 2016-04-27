@@ -235,7 +235,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
       <div class="wrapper">
         <label class="label">Battle Points</label>
         <span class="amount">
-          <?= preg_replace('#^([0]+)([0-9]+)$#', '<span class="padding">$1</span><span class="value">$2</span>', str_pad((!empty($_SESSION['GAME']['counters']['battle_points']) ? $_SESSION['GAME']['counters']['battle_points'] : 0), 13, '0', STR_PAD_LEFT)) ?>
+          <span class="value"><?= !empty($_SESSION['GAME']['counters']['battle_points']) ? number_format($_SESSION['GAME']['counters']['battle_points'], 0, '.', ',') : 0 ?></span>
           <? if(empty($_SESSION['GAME']['DEMO']) && !empty($this_boardinfo['board_rank'])): ?>
             <span class="pipe">|</span>
             <span class="place"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?></span>
