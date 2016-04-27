@@ -483,7 +483,9 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 ? array_replace(mmrpg_field::parse_index_info($mmrpg_index_fields[$this_fieldtoken]), $this_battleinfo['battle_field_base'])
                 : $this_battleinfo['battle_field_base'];
             $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
+
             $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
+            $is_battle_counts = !empty($this_battleinfo['battle_counts']) ? true : false;
 
             // Collect the robot index for calculation purposes
             $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
@@ -665,11 +667,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             if ($this_option_max_level > 100){ $this_option_max_level = 100; }
             $this_option_level_range = $this_option_min_level == $this_option_max_level ? 'Level '.$this_option_min_level : 'Levels '.$this_option_min_level.'-'.$this_option_max_level;
             $this_option_star_force = !empty($this_targetinfo['player_starforce']) ? ' | +'.number_format(($this_option_star_boost * 10), 0, '.', ',').'% Boost' : '';
-            if (!$is_player_battle){
+
+            if ($is_battle_counts){
                 $this_option_point_amount = number_format($this_option_points, 0, '.', ',').' Point'.($this_option_points != 1 ? 's' : '');
             } else {
                 $this_option_point_amount = number_format($this_option_points, 0, '.', ',').' Zenny';
             }
+
             $this_option_label .= (!empty($this_option_button_text) ? '<span class="multi"><span class="maintext">'.$this_option_button_text.'</span><span class="subtext">'.$this_option_level_range.str_replace('|', '<span class="pipe">|</span>', $this_option_star_force).'</span><span class="subtext2">'.$this_option_point_amount.'</span></span>'.(!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore)) ? '<span class="arrow"> &#9658;</span>' : '') : '<span class="single">???</span>');
             // Generate this options hover tooltip details
             $this_option_title = ''; //$this_battleinfo['battle_button'];
@@ -682,11 +686,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 else { $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' Type'; }
             }
             $this_option_title .= ' <br />'.$this_option_level_range.$this_option_star_force;
-            if (!$is_player_battle){
+
+            if ($is_battle_counts){
                 $this_option_title .= ' | '.($this_battleinfo['battle_points'] == 1 ? '1 Point' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Points');
             } else {
                 $this_option_title .= ' | '.($this_battleinfo['battle_points'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Zenny');
             }
+
             $this_option_title .= ' | '.($this_battleinfo['battle_turns'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns'].' Turns');
             $this_option_title .= ' <br />'.$this_battleinfo['battle_description'].(!empty($this_battleinfo['battle_description2']) ? ' '.$this_battleinfo['battle_description2'] : '');
             if (!empty($this_option_complete) || !empty($this_option_failure) || !empty($this_has_field_star)){

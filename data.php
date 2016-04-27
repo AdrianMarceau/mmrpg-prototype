@@ -462,18 +462,27 @@ elseif ($this_action == 'start'){
     $this_battle->counters['battle_turn'] = 0;
     $this_battle->update_session();
 
+    // Check if this is a player battle
+    $flag_player_battle = $target_player_id != MMRPG_SETTINGS_TARGET_PLAYERID ? true : false;
+
+    // Check if this battle's points count
+    $flag_battle_counts = $this_battle->battle_counts ? true : false;
+
     // Define the first event body markup, regardless of player type
     $first_event_header = $this_battle->battle_name.' <span style="opacity:0.25;">|</span> '.$this_battle->battle_field->field_name;
     $first_event_body = $this_battle->battle_description.'<br />';
-    // If this is a player battle
-    //if ($target_player_id != MMRPG_SETTINGS_TARGET_PLAYERID){ $first_event_body .= '| player battle | target_player_id : '.$target_player_id.' '; }
+
+    // Print out the goals for this mission
     $first_event_body .= 'Goal : '.$this_battle->battle_turns.($this_battle->battle_turns > 1 ? ' Turns' : ' Turn').' ';
     $first_event_body .= '<span style="opacity:0.25;">|</span> ';
-    if ($target_player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
+
+    // Print out the rewards for this mission
+    if ($flag_battle_counts){
         $first_event_body .= 'Reward : '.($this_battle->battle_points == 1 ? '1 Battle Points' :  number_format($this_battle->battle_points, 0, '.', ',').' Points').' ';
     } else {
         $first_event_body .= 'Reward : '.number_format($this_battle->battle_points, 0, '.', ',').' Zenny ';
     }
+
     $first_event_body .= '<br />';
 
     // Update the summon counts for all this player's robots
