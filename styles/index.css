@@ -1846,11 +1846,39 @@ html {
 #window .page .leaderboard .subbody .player_stats.mission .stat span.counter {
     text-align: right;
 }
+#window .page .leaderboard .subbody .player_stats.mission .stat .counter.max_points {
+    font-weight: bold;
+}
+#window .page .leaderboard .subbody .player_stats.mission .stat .counter.max_points:before {
+    content: "+";
+}
 #window .page .leaderboard .subbody .player_stats.mission .stat .counter.defeat_count {
     color: rgb(171, 50, 50);
 }
 #window .page .leaderboard .subbody .player_stats.mission .stat .counter.victory_count {
     color: rgb(92, 193, 69);
+}
+
+#window .page .leaderboard .subbody .mission_points {
+    display: block;
+    float: none;
+    clear: both;
+    font-size: 13px;
+    line-height: 19px;
+    padding: 6px 12px;
+    background-color: #191919;
+    text-align: right;
+    letter-spacing: 0.5px;
+    color: #A0A0A0;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+#window .page .leaderboard .subbody .mission_points .player {
+    color: #E0E0E0;
+}
+#window .page .leaderboard .subbody .mission_points .overall {
+    color: #C0C0C0;
 }
 
 #window .page .leaderboard .subbody .text .thread_header_links,

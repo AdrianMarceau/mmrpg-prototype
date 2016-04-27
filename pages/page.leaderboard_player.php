@@ -301,18 +301,6 @@ ob_start();
         <div class="<?= $temp_avatar_class ?> avatar_userimage" style="margin-top: 0;"  title="<?= isset($temp_item_title) ? $temp_item_title : 'Member' ?>" data-tooltip-type="type player_type_<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>">
             <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -22px; right: -30px;" alt="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
             <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_display_name ?></div>
-            <?/*
-            <div class="userblock" style="margin-top: 5px;" title="Community Forum Stats">
-                <strong class="counter">Community Stats</strong>
-                <div class="counter thread_counter" style=""><?= $this_playerinfo['thread_count'] == 1 ? '1 Thread' : $this_playerinfo['thread_count'].' Threads' ?></div>
-                <div class="counter post_counter"><?= $this_playerinfo['post_count'] == 1 ? '1 Post' : $this_playerinfo['post_count'].' Posts' ?></div>
-            </div>
-            <div class="userblock" style="margin-top: 5px;" title="Player Battle Stats">
-                <strong class="counter">Battle Stats</strong>
-                <div class="counter victory_counter"><?= $this_playerinfo['victory_count'] == 1 ? '1 Victory' : $this_playerinfo['victory_count'].' Victories' ?></div>
-                <div class="counter defeat_counter"><?= $this_playerinfo['defeat_count'] == 1 ? '1 Defeat' : $this_playerinfo['defeat_count'].' Defeats' ?></div>
-            </div>
-            */?>
         </div>
         <div class="bodytext">
             <p class="text" style="color: rgb(157, 220, 255);">
@@ -543,6 +531,8 @@ ob_start();
                     }
 
                     // Loop through this player's rewards and
+                    $battle_key = 0;
+                    $battle_points = 0;
                     $battles_complete = !empty($this_playerinfo['save_values_battle_complete']) ? $this_playerinfo['save_values_battle_complete'] : array();
                     $battles_failure = !empty($this_playerinfo['save_values_battle_failure']) ? $this_playerinfo['save_values_battle_failure'] : array();
                     if (!empty($battles_complete)){
@@ -550,13 +540,14 @@ ob_start();
                             if ($player_token != $this_current_player){ continue; }
                             $player_token_short = str_replace('dr-', '', $player_token);
                             if (!empty($player_battles)){
-                                $battle_key = 0;
                                 foreach ($player_battles AS $battle_token => $victory_records){
                                     $defeat_records = isset($battles_failure[$player_token][$battle_token]) ? $battles_failure[$player_token][$battle_token] : array();
                                     $battle_num = $battle_key + 1;
                                     $battle_name = mission_name_from_token($battle_token);
                                     $victory_count = isset($victory_records['battle_count']) ? $victory_records['battle_count'] : 0;
                                     $defeat_count = isset($defeat_records['battle_count']) ? $defeat_records['battle_count'] : 0;
+                                    $max_points = isset($victory_records['battle_max_points']) ? $victory_records['battle_max_points'] : 0;;
+                                    $battle_points += $max_points;
                                     ?>
                                     <div class="text player_stats mission">
                                         <strong class="label player_type player_type_<?= $player_token_short ?>">#<?= $battle_num ?> : <?= $battle_name ?></strong>
@@ -569,17 +560,24 @@ ob_start();
                                             </colgroup>
                                             <tbody>
                                                 <tr>
-                                                <?
-                                                $key = 0;
-                                                foreach ($victory_records AS $record_token => $record_value){
-                                                    if ($record_token == 'battle_token' || $record_token == 'battle_count'){ continue; }
-                                                    $record_name = ucwords(str_replace('_', ' ', str_replace('battle_', '', $record_token)));
-                                                    if ($key % 2 == 0){ echo "\n</tr>\n<tr>\n"; }
-                                                    echo '<td class="stat"><span class="label '.$record_token.'">'.$record_name.' : </span></td>'."\n";
-                                                    echo '<td class="stat"><span class="counter '.$record_token.'">'.number_format($record_value, 0, '.', ',').'</span></td>'."\n";
-                                                    $key++;
-                                                }
-                                                ?>
+                                                    <?
+                                                    // Define the mission stat limits/tokens in order
+                                                    $record_limits = array('min', 'max');
+                                                    $record_stats = array('level', 'turns', 'robots', 'points');
+                                                    // Loop through the stats and print mission records
+                                                    $key = 0;
+                                                    foreach ($record_stats AS $stat){
+                                                        foreach ($record_limits AS $limit){
+                                                            $record_token = 'battle_'.$limit.'_'.$stat;
+                                                            $record_name = ucwords(str_replace('_', ' ', str_replace('battle_', '', $record_token)));
+                                                            $record_value = isset($victory_records[$record_token]) ? $victory_records[$record_token] : 0;
+                                                            if ($key % 2 == 0){ echo "\n</tr>\n<tr>\n"; }
+                                                            echo '<td class="stat"><span class="label '.$limit.'_'.$stat.'">'.$record_name.' : </span></td>'."\n";
+                                                            echo '<td class="stat"><span class="counter '.$limit.'_'.$stat.'">'.number_format($record_value, 0, '.', ',').'</span></td>'."\n";
+                                                            $key++;
+                                                        }
+                                                    }
+                                                    ?>
                                                 </tr>
                                                 <tr>
                                                     <td class="stat"><span class="label defeat_count">Total Defeats :</span></td>
@@ -600,6 +598,16 @@ ob_start();
                     ?>
 
                 </div>
+
+                <?
+                // Print out the total battle points for this player
+                echo '<div class="mission_points">';
+                    echo '<strong class="player">'.number_format($battle_points, 0, '.', ',').'</strong>';
+                    echo ' / ';
+                    echo '<span class="overall">'.number_format($temp_display_points, 0, '.', ',').'</span>';
+                    echo ' Points';
+                echo '</div>'."\n";
+                ?>
 
             </div>
 
