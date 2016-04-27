@@ -96,8 +96,7 @@ if ($target_player->player_side == 'left'){
 elseif ($target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
 
     // Calculate the battle points based on how many turns they lasted
-    if ($this->battle_counts){ $target_battle_points = $this->counters['battle_turn'] * 100 * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
-    else { $target_battle_points = $this->counters['battle_turn'] * 100 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER; }
+    $target_battle_points = ceil($this->counters['battle_turn'] * 100 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
 
 }
 // (COMPUTER) TARGET DEFEATED
@@ -127,8 +126,7 @@ if ($target_player->player_token != 'player'){
         $other_player_points = 0;
         $other_player_turns = $target_player_robots_count * MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
         foreach ($target_player_robots AS $disabled_robotinfo){
-            if ($this->battle_counts){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
-            else { $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER; }
+            $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER;
         }
 
         // Collect the battle points from the function
@@ -183,8 +181,6 @@ if ($target_player->player_token != 'player'){
     }
     $this->events_create($target_robot, $this_robot, $event_header, $event_body, $event_options);
 
-
-
     // (HUMAN) TARGET DEFEATED BY (GHOST/COMPUTER)
     // If this was a player battle and the human user lost against the ghost target (this/computer/victory | target/human/defeat)
     if ($this_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID && $target_player->player_side == 'left'){
@@ -195,8 +191,7 @@ if ($target_player->player_token != 'player'){
         $other_player_points = 0;
         $other_player_turns = $target_player_robots_count * MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
         foreach ($target_player_robots AS $disabled_robotinfo){
-            if ($this->battle_counts){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
-            else { $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER; }
+            $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER;
         }
 
         // Collect the battle points from the function
