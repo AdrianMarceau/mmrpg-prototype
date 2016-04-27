@@ -1,9 +1,9 @@
 <?
 global $DB;
 $this_field_index = mmrpg_field::get_index();
+
 // Define the omega battle and default to empty
 $temp_battle_omega = array();
-$temp_battle_omega['flags']['player_battle'] = true;
 
 // Define the local scope current player
 $this_player_token = $this_prototype_data['this_player_token'];

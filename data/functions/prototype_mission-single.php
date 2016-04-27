@@ -172,7 +172,6 @@ if (empty($temp_battle_omega['battle_token']) || $temp_battle_omega['battle_toke
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Collect the battle token and create an omega clone from the index base
 $temp_battle_token = $temp_battle_omega['battle_token'];
-$temp_battle_omega = $temp_battle_omega;
 // Make copied of the robot level, points, and turns
 $temp_omega_robot_level = $omega_robot_level;
 // If the battle was already complete, collect its details and modify the mission

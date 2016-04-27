@@ -43,8 +43,11 @@ if ($this_player->player_side == 'right' && $this_player->player_id != MMRPG_SET
     $this_is_player_battle = true;
 }
 
+// Check if this battle's points count
+$this_mission_counts = $this->battle_counts ? true : false;
+
 // Ensure the system knows to reward zenny instead of points for player battles
-if ($this_is_player_battle){
+if (!$this_mission_counts){
     $force_zenny_rewards = true;
 }
 
@@ -93,7 +96,8 @@ if ($target_player->player_side == 'left'){
 elseif ($target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
 
     // Calculate the battle points based on how many turns they lasted
-    $target_battle_points = $this->counters['battle_turn'] * 100 * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER;
+    if ($this->battle_counts){ $target_battle_points = $this->counters['battle_turn'] * 100 * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
+    else { $target_battle_points = $this->counters['battle_turn'] * 100 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER; }
 
 }
 // (COMPUTER) TARGET DEFEATED
@@ -122,7 +126,10 @@ if ($target_player->player_token != 'player'){
         $target_player_robots_count = count($target_player_robots);
         $other_player_points = 0;
         $other_player_turns = $target_player_robots_count * MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
-        foreach ($target_player_robots AS $disabled_robotinfo){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
+        foreach ($target_player_robots AS $disabled_robotinfo){
+            if ($this->battle_counts){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
+            else { $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER; }
+        }
 
         // Collect the battle points from the function
         $other_battle_points_modded = $this->calculate_battle_points($target_player, $other_player_points, $other_player_turns);
@@ -187,7 +194,10 @@ if ($target_player->player_token != 'player'){
         $target_player_robots_count = count($target_player_robots);
         $other_player_points = 0;
         $other_player_turns = $target_player_robots_count * MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
-        foreach ($target_player_robots AS $disabled_robotinfo){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
+        foreach ($target_player_robots AS $disabled_robotinfo){
+            if ($this->battle_counts){ $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER; }
+            else { $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER; }
+        }
 
         // Collect the battle points from the function
         $other_battle_points_modded = $this->calculate_battle_points($target_player, $other_player_points, $other_player_turns);
@@ -747,12 +757,19 @@ $first_event_header = $this->battle_name.($this->battle_result == 'victory' ? ' 
 if ($this->battle_result == 'victory'){ $first_event_body = 'Mission complete! '.($temp_human_rewards['battle_complete'] > 1 ? mmrpg_battle::random_positive_word().' That&#39;s '.$temp_human_rewards['battle_complete'].' times now! ' : '').mmrpg_battle::random_victory_quote(); }
 elseif ($this->battle_result == 'defeat'){ $first_event_body = 'Mission failure. '.($temp_human_rewards['battle_failure'] > 1 ? 'That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : '').mmrpg_battle::random_defeat_quote(); }
 $first_event_body .= '<br />';
-// If this is a player battle
-//if ($target_player_id != MMRPG_SETTINGS_TARGET_PLAYERID){ $first_event_body .= '| player battle | target_player_id : '.$target_player_id.' '; }
+
+// Print out the current vs allowed turns for this mission
 $first_event_body .= 'Turns : '.$this->counters['battle_turn'].' / '.$this->battle_turns.' <span style="opacity:0.25;">|</span> ';
+
+// Print out the base reward amount
+$first_event_body .= 'Reward : '.number_format($this->battle_points, 0, '.', ',').' <span style="opacity:0.25;">|</span> ';
+
+// Print out the bonus and rewards based on the above stats
 if ($this->battle_result == 'victory'){
+
+    // If the user was over or under the exact turns, print out bonuses
     if ($this->counters['battle_turn'] != $this->battle_turns){
-        $first_event_body .= 'Reward : '.number_format($this->battle_points, 0, '.', ',').' <span style="opacity:0.25;">|</span> ';
+
         // If the user gets a turn BONUS
         if ($this->counters['battle_turn'] < $this->battle_turns){
             $temp_bonus = round((($this->battle_turns / $this->counters['battle_turn']) - 1) * 100);
@@ -763,14 +780,24 @@ if ($this->battle_result == 'victory'){
             $temp_bonus = round((($this->battle_turns / $this->counters['battle_turn']) - 1) * 100) * -1;
             $first_event_body .= 'Penalty : -'.$temp_bonus.'% <span style="opacity:0.25;">|</span> ';
         }
-    }
-}
 
-if (!$force_zenny_rewards){
-    $first_event_body .= 'Points : '.number_format($temp_human_rewards['battle_points'], 0, '.', ',').' ';
-} else {
-    $first_event_body .= 'Zenny : '.number_format($temp_human_rewards['battle_points'], 0, '.', ',').'z ';
-    $_SESSION['GAME']['counters']['battle_zenny'] += $temp_human_rewards['battle_points'];
+    }
+
+    // Print out the final reward amounts after mods (points or zenny)
+    if (!$force_zenny_rewards){
+        $first_event_body .= 'Points : '.number_format($temp_human_rewards['battle_points'], 0, '.', ',').' ';
+    } else {
+        $first_event_body .= 'Zenny : '.number_format($temp_human_rewards['battle_points'], 0, '.', ',').'z ';
+        $_SESSION['GAME']['counters']['battle_zenny'] += $temp_human_rewards['battle_points'];
+    }
+
+}
+// Otherwise if defeated, do nothing
+else {
+
+    // Do nothing for now
+    $first_event_body .= 'Points : 0 ';
+
 }
 
 // Print the battle complete message
@@ -785,4 +812,5 @@ $this->events_create($target_robot, $this_robot, $first_event_header, $first_eve
 
 // Create one final frame for the blank frame
 //$this->events_create(false, false, '', '');
+
 ?>
