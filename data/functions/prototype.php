@@ -485,7 +485,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
 
             $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
-            $is_battle_counts = !empty($this_battleinfo['battle_counts']) ? true : false;
+            $is_battle_counts = isset($this_battleinfo['battle_counts']) && $this_battleinfo['battle_counts'] == false ? false : true;
 
             // Collect the robot index for calculation purposes
             $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
