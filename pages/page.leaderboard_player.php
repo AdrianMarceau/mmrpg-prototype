@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * INDEX PAGE : LEADERBOARD PLAYER
  */
@@ -141,17 +140,6 @@ if (!empty($this_playerinfo['save_values_robot_database'])){
 
     }
     unset($robot_info);
-
-    /*
-    foreach ($this_playerinfo['save_values_robot_database'] AS $token => $array){
-        $temp_index = mmrpg_robot::parse_index_info($temp_robots_index[$token]);
-        if ($temp_index['robot_class'] == 'master' && !empty($temp_counter_robots[$token])){ $temp_counter_database['unlocked'] += 1; }
-        elseif ($temp_index['robot_class'] == 'mecha' && !empty($array[''])){ $temp_counter_database['unlocked'] += 1; }
-
-        $temp_counter_database['encountered'] += 1;
-        $temp_counter_database['total'] += 1;
-    }
-    */
 }
 // Sort the points array for most-used
 asort($temp_counter_points);
@@ -307,6 +295,9 @@ ob_start();
                 <strong><?= $temp_display_name ?></strong> is <?= $temp_is_contributor ? 'a contributor and ' : '' ?><?= $temp_display_active  ?> of the <strong>Mega Man RPG Prototype</strong> with a current battle point total of <strong><?= number_format($temp_display_points) ?></strong><?= $temp_display_zenny > 0 ? ' and a zenny total of <strong>'.number_format($temp_display_zenny).'</strong>' : '' ?>.
                 <strong><?= $temp_display_name ?></strong> created <?= $temp_gender_pronoun ?> account on <?= ($temp_display_created <= 1357016400 ? 'or before ' : '').date('F jS, Y', $temp_display_created) ?> and has since completed <?= $temp_counter_missions['total_complete'] ?> different missions, unlocked <?= $temp_counter_players['total'] ?> playable characters, <?= $temp_counter_robots['total'] ?> robot fighters, <?= $temp_counter_abilities['total'] ?> special abilities, and <?= count($this_playerinfo['save_values_battle_stars']) == 1 ? '1 field star' : count($this_playerinfo['save_values_battle_stars']).' field stars' ?>.
                 <strong><?= $temp_display_name ?></strong>'s most-used playable character is <?= $temp_top_player ?>, and <?= $temp_gender_pronoun ?> <?= count($temp_top_robots) > 1 ? 'top '.count($temp_top_robots).' '.$temp_top_robots_method.' robots appear' : $temp_top_robots_method.' robot appears' ?> to be <?= implode(', ', array_slice($temp_top_robots, 0, -1)).(count($temp_top_robots) > 1 ? ' and ' : '').$temp_top_robots[count($temp_top_robots) - 1] ?>.
+                <? if (!empty($this_playerinfo['board_points_legacy'])){ ?>
+                    Prior to the game-changing battle point reboot of 2016, <strong><?= $temp_display_name ?></strong> had amassed a grand total of <strong><?= number_format($this_playerinfo['board_points_legacy'], 0, '.', ',') ?></strong> battle points.
+                <? } ?>
             </p>
         </div>
     </div>
@@ -640,5 +631,4 @@ ob_start();
 <?
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

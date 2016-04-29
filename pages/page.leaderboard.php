@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * INDEX PAGE : LEADERBOARD
  */
@@ -37,6 +36,10 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     mmrpg_leaderboard.board_points_dr_light,
     mmrpg_leaderboard.board_points_dr_wily,
     mmrpg_leaderboard.board_points_dr_cossack,
+    mmrpg_leaderboard.board_points_legacy,
+    mmrpg_leaderboard.board_points_dr_light_legacy,
+    mmrpg_leaderboard.board_points_dr_wily_legacy,
+    mmrpg_leaderboard.board_points_dr_cossack_legacy,
     mmrpg_leaderboard.board_robots,
     mmrpg_leaderboard.board_robots_dr_light,
     mmrpg_leaderboard.board_robots_dr_wily,
@@ -104,6 +107,4 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     exit();
   }
 }
-
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>
