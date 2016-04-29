@@ -109,9 +109,9 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
             // -- LEADERBOARD MARKUP -- //
 
             // Add the prototype complete flags if applicable
-            if (count($board['board_battles_dr_light']) >= 17){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-light" data-tooltip="Completed Dr. Light\'s Game" data-tooltip-type="player_type player_type_defense">&hearts;</span>'; }
-            if (count($board['board_battles_dr_wily']) >= 17){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-wily" data-tooltip="Completed Dr. Wily\'s Game" data-tooltip-type="player_type player_type_attack">&clubs;</span>'; }
-            if (count($board['board_battles_dr_cossack']) >= 17){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-cossack" data-tooltip="Completed Dr. Cossack\'s Game" data-tooltip-type="player_type player_type_speed">&diams;</span>'; }
+            if (count($board['board_battles_dr_light']) >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-light" data-tooltip="Completed Dr. Light\'s Game" data-tooltip-type="player_type player_type_defense">&hearts;</span>'; }
+            if (count($board['board_battles_dr_wily']) >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-wily" data-tooltip="Completed Dr. Wily\'s Game" data-tooltip-type="player_type player_type_attack">&clubs;</span>'; }
+            if (count($board['board_battles_dr_cossack']) >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-cossack" data-tooltip="Completed Dr. Cossack\'s Game" data-tooltip-type="player_type player_type_speed">&diams;</span>'; }
             if (in_array('ranking_first_place', $this_awards)){ $this_user_awards .= '<span class="prototype_complete prototype_complete_firstplace" data-tooltip="Reached First Place" data-tooltip-type="player_type player_type_level">&#9733;</span>'; }
 
             // Start the output buffer

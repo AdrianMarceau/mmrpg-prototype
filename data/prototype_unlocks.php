@@ -7,12 +7,10 @@
 
 // If Dr. Light has completed all of his second phase, open Dr. Wily's second
 if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Create the event flag and unset the player select variable to force main menu
   $temp_event_flag = 'dr-light-event-00_phase-zero-complete';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -15px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Intro Field</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/intro-field/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Intro Field</div>';
@@ -48,14 +46,12 @@ if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
 
 // If the player has failured at least one battle, unlock Roll as a playable character
 if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false, 'roll')){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Unlock Roll as a playable character
   $unlock_player_info = $mmrpg_index['players']['dr-light'];
   $unlock_robot_info = mmrpg_robot::get_index_info('roll');
   $unlock_robot_info['robot_level'] = 1;
   $unlock_robot_info['robot_experience'] = 999;
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
@@ -63,13 +59,11 @@ if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false,
 // UNLOCK EVENT : PHASE TWO CHAPTERS (WILY)
 
 // If Dr. Light has completed all of his second phase, open Dr. Wily's second
-if ($battle_complete_counter_light >= 14){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
   // Create the event flag and unset the player select variable to force main menu
   $temp_event_flag = 'dr-light-event-97_phase-one-complete';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
   }
@@ -79,13 +73,11 @@ if ($battle_complete_counter_light >= 14){
 // UNLOCK EVENT : PROTOTYPE COMPLETE (LIGHT)
 
 // If the player has completed the entire prototype campaign, display window event
-if ($battle_complete_counter_light >= 17){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
   // Display the prototype complete message, showing Dr. Light and Mega Man
   $temp_event_flag = 'dr-light-event-99_prototype-complete-new';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
 
     // Define the player's battle points total, battles complete, and other details
@@ -105,7 +97,6 @@ if ($battle_complete_counter_light >= 17){
     // Define the player's experience points total
     $player_info['player_experience'] = 0;
     if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $temp_player => $temp_player_info){
           if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'])){
             $temp_player_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'];
@@ -239,17 +230,14 @@ if ($battle_complete_counter_light >= 17){
 // UNLOCK PLAYER : DR. WILY
 
 // If Dr. Light has completed phase1 of his battles, unlock Dr. Wily
-if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$unlock_flag_wily){
 
   // Unlock Dr. Wily as a playable character
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_game_unlock_player($mmrpg_index['players']['dr-wily'], false, true);
   $_SESSION[$session_token]['values']['battle_rewards']['dr-wily']['player_points'] = 0;
 
   // Ensure Bass hasn't already been unlocked by the player
   if (!mmrpg_prototype_robot_unlocked(false, 'bass')){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Unlock Bass as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-wily'];
     $unlock_robot_info = mmrpg_robot::get_index_info('bass');
@@ -262,7 +250,6 @@ if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
   // If Bass has already been unlocked by another doctor, reassign it to Wily's team
   elseif (mmrpg_prototype_robot_unlocked(false, 'bass') &&
     !mmrpg_prototype_robot_unlocked('dr-wily', 'bass')){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Loop through the player rewards and collect Bass' info
     foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $temp_player => $temp_playerinfo){
       if ($temp_player == 'dr-wily'){ continue; }
@@ -284,19 +271,16 @@ if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
   }
 
   // Redirect back to this page to recalculate menus
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $unlock_flag_wily = true;
   unset($_SESSION[$session_token]['battle_settings']['this_player_token']);
   header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
   exit();
 
 } elseif ($unlock_flag_wily){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Display the first level-up event showing Bass and the Proto Buster
   $temp_event_flag = 'dr-wily-event-00_player-unlocked';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Wily Castle</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Wily Castle</div>';
@@ -314,13 +298,11 @@ if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
 
   // If Wily has been unlocked but somehow Bass was not
   if (!mmrpg_prototype_robot_unlocked(false, 'bass')){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Unlock Bass as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-wily'];
     $unlock_robot_info = mmrpg_robot::get_index_info('bass');
     $unlock_robot_info['robot_level'] = 11;
     $unlock_robot_info['robot_experience'] = 999;
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
   }
 
@@ -330,14 +312,12 @@ if ($battle_complete_counter_light >= 10 && !$unlock_flag_wily){
 
 // If the player has failed at least two battles, unlock Disco as a playable character
 if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 'disco')){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Unlock Disco as a playable character
   $unlock_player_info = $mmrpg_index['players']['dr-wily'];
   $unlock_robot_info = mmrpg_robot::get_index_info('disco');
   $unlock_robot_info['robot_level'] = 11;
   $unlock_robot_info['robot_experience'] = 999;
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
@@ -345,13 +325,11 @@ if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 
 // UNLOCK EVENT : PHASE THREE CHAPTERS (COSSACK)
 
 // If Dr. Wily has completed all of his second phase, open Dr. Cossack's third
-if ($battle_complete_counter_wily >= 14){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT){
 
   // Create the event flag and unset the player select variable to force main menu
   $temp_event_flag = 'dr-wily-event-97_phase-one-complete';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
   }
@@ -361,13 +339,11 @@ if ($battle_complete_counter_wily >= 14){
 // UNLOCK EVENT : PROTOTYPE COMPLETE (WILY)
 
 // If the player completed the first battle and leveled up, display window event
-if ($battle_complete_counter_wily >= 17){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
   // Display the prototype complete message, showing Dr. Wily and Bass
   $temp_event_flag = 'dr-wily-event-99_prototype-complete-new';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
 
     // Define the player's battle points total, battles complete, and other details
@@ -387,7 +363,6 @@ if ($battle_complete_counter_wily >= 17){
     // Define the player's experience points total
     $player_info['player_experience'] = 0;
     if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $temp_player => $temp_player_info){
           if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'])){
             $temp_player_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'];
@@ -520,8 +495,7 @@ if ($battle_complete_counter_wily >= 17){
 // UNLOCK PLAYER : DR. COSSACK
 
 // If Dr. Light has completed phase1 of his battles, unlock Dr. Cossack
-if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$unlock_flag_cossack){
 
   // Unlock Dr. Cossack as a playable character
   mmrpg_game_unlock_player($mmrpg_index['players']['dr-cossack'], false, true);
@@ -529,21 +503,18 @@ if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
 
   // Ensure Proto Man hasn't already been unlocked by the player
   if (!mmrpg_prototype_robot_unlocked(false, 'proto-man')){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Unlock Proto Man as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-cossack'];
     $unlock_robot_info = mmrpg_robot::get_index_info('proto-man');
     $unlock_robot_info['robot_level'] = 21;
     $unlock_robot_info['robot_experience'] = 999;
     //$unlock_robot_info['robot_experience'] = 4000;
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
     //$_SESSION[$session_token]['values']['battle_rewards']['dr-cossack']['player_robots']['proto-man']['robot_experience'] = 4000;
   }
   // If Proto Man has already been unlocked by another doctor, reassign it to Cossack's team
   elseif (mmrpg_prototype_robot_unlocked(false, 'proto-man') &&
     !mmrpg_prototype_robot_unlocked('dr-cossack', 'proto-man')){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Loop through the player rewards and collect Proto Man' info
     foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $temp_player => $temp_playerinfo){
       if ($temp_player == 'dr-cossack'){ continue; }
@@ -571,12 +542,10 @@ if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
   exit();
 
 } elseif ($unlock_flag_cossack){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Display the first level-up event showing Proto Man and the Proto Buster
   $temp_event_flag = 'dr-cossack-event-00_player-unlocked';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
     $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
@@ -594,13 +563,11 @@ if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
 
   // If Cossack has been unlocked but somehow Proto Man was not
   if (!mmrpg_prototype_robot_unlocked(false, 'proto-man')){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Unlock Proto Man as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-cossack'];
     $unlock_robot_info = mmrpg_robot::get_index_info('proto-man');
     $unlock_robot_info['robot_level'] = 21;
     $unlock_robot_info['robot_experience'] = 999;
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
   }
 
@@ -610,14 +577,12 @@ if ($battle_complete_counter_wily >= 10 && !$unlock_flag_cossack){
 
 // If the player has failed at least three battles, unlock Rhythm as a playable character
 if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(false, 'rhythm')){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Unlock Rhythm as a playable character
   $unlock_player_info = $mmrpg_index['players']['dr-cossack'];
   $unlock_robot_info = mmrpg_robot::get_index_info('rhythm');
   $unlock_robot_info['robot_level'] = 21;
   $unlock_robot_info['robot_experience'] = 999;
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
@@ -625,13 +590,11 @@ if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(fals
 // UNLOCK EVENT : PHASE TWO CHAPTERS (LIGHT)
 
 // If Dr. Cossack has completed all of his first phase, open Dr. Light's second
-if ($battle_complete_counter_cossack >= 10){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+if ($battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT){
 
   // Create the event flag and unset the player select variable to force main menu
   $temp_event_flag = 'dr-cossack-event-97_phase-one-complete';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
   }
@@ -641,13 +604,11 @@ if ($battle_complete_counter_cossack >= 10){
 // UNLOCK EVENT : PHASE THREE CHAPTERS (ALL)
 
 // If Dr. Cossack has completed all of his second phase, open all other third
-if ($battle_complete_counter_cossack >= 14){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+if ($battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT){
 
   // Create the event flag and unset the player select variable to force main menu
   $temp_event_flag = 'dr-cossack-event-97_phase-two-complete';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
   }
@@ -657,13 +618,11 @@ if ($battle_complete_counter_cossack >= 14){
 // UNLOCK EVENT : PROTOTYPE COMPLETE (COSSACK)
 
 // If the player completed the first battle and leveled up, display window event
-if ($battle_complete_counter_cossack >= 17){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+if ($battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
   // Display the prototype complete message, showing Dr. Cossack and Proto Man
   $temp_event_flag = 'dr-cossack-event-99_prototype-complete-new';
   if (empty($temp_game_flags['events'][$temp_event_flag])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_game_flags['events'][$temp_event_flag] = true;
 
     // Define the player's battle points total, battles complete, and other details
@@ -683,7 +642,6 @@ if ($battle_complete_counter_cossack >= 17){
     // Define the player's experience points total
     $player_info['player_experience'] = 0;
     if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $temp_player => $temp_player_info){
           if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'])){
             $temp_player_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'];
@@ -814,7 +772,6 @@ if ($battle_complete_counter_cossack >= 17){
  */
 
 // UNLOCK EVENT : PLAYER BATTLE REWARDS
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Collect any outstanding battle rewards from the database
 $temp_battles_query = "SELECT mmrpg_battles.*, mmrpg_users.user_name AS this_user_name, mmrpg_users.user_name_clean AS this_user_name_clean, mmrpg_users.user_name_public AS this_user_name_public FROM mmrpg_battles ";
@@ -825,11 +782,9 @@ $temp_userinfo = $this_userinfo; //$DB->get_array("SELECT users.*, roles.* FROM 
 
 // If the player has pending battle rewards, loop through and display window events
 if (!empty($temp_battles_list)){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Loop through each of the battles and display it to the user
   foreach ($temp_battles_list AS $temp_key => $temp_battleinfo){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Collect temp playerinfo for this and the target
     $temp_this_playerinfo = $mmrpg_index['players'][$temp_battleinfo['this_player_token']];
@@ -884,7 +839,6 @@ if (!empty($temp_battles_list)){
     }
 
     // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Increment this user and player's battle zenny counters
     $_SESSION[$session_token]['counters']['battle_zenny'] += $temp_inc_zenny;
@@ -897,7 +851,5 @@ if (!empty($temp_battles_list)){
   }
 
 }
-
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 ?>
