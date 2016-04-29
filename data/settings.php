@@ -104,6 +104,13 @@ define('MMRPG_SETTINGS_THREADS_RECENT', 10); // How many threads should be liste
 define('MMRPG_SETTINGS_POSTS_PERPAGE', 20); // How many discussion threads should be displayed per page
 define('MMRPG_SETTINGS_THREADS_PERPAGE', 50); // How many comment posts should be displayed per page
 
+// Define the global counters for missions in each campaign
+define('MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT', 1);                                         // 1
+define('MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT + 8);  // 9
+define('MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT + 1);  // 10
+define('MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT + 4);  // 14
+define('MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 3);  // 17
+
 // Back-up definiation in case COPPA is not defined
 if (!defined('MMRPG_CONFIG_COPPA_PERMISSIONS')){
     define(MMRPG_CONFIG_COPPA_PERMISSIONS, '');

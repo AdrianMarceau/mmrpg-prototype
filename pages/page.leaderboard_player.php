@@ -316,9 +316,9 @@ ob_start();
         <?=$temp_display_name?>&#39;s Leaderboard
         <span class="count" style="position: relative; bottom: 1px;"><?
             // Add the prototype complete flags if applicable
-            if (count($this_playerinfo['board_battles_dr_light']) >= 17){ echo '<span class="prototype_complete prototype_complete_dr-light" title="Dr. Light Prototype Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span> '; }
-            if (count($this_playerinfo['board_battles_dr_wily']) >= 17){ echo '<span class="prototype_complete prototype_complete_dr-wily" title="Dr. Wily Prototype Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span> '; }
-            if (count($this_playerinfo['board_battles_dr_cossack']) >= 17){ echo '<span class="prototype_complete prototype_complete_dr-cossack" title="Dr. Cossack Prototype Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span> '; }
+            if (count($this_playerinfo['board_battles_dr_light']) >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){ echo '<span class="prototype_complete prototype_complete_dr-light" title="Dr. Light Prototype Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span> '; }
+            if (count($this_playerinfo['board_battles_dr_wily']) >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){ echo '<span class="prototype_complete prototype_complete_dr-wily" title="Dr. Wily Prototype Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span> '; }
+            if (count($this_playerinfo['board_battles_dr_cossack']) >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){ echo '<span class="prototype_complete prototype_complete_dr-cossack" title="Dr. Cossack Prototype Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span> '; }
         ?></span>
     </h2>
 
