@@ -2,8 +2,10 @@
 
 /*
 // MAINTENANCE
-if (!MMRPG_CONFIG_ADMIN_MODE){
-  die('<strong style="text-decoration: underline;">Prototype Offline</strong><br /> The prototype has been taken offline <em>temporarily</em> while we move to a new host.<br /> The transition may take several days, but the wait will be worth it with more memory, more bandwidth, and more time to fix <em>other</em> more important bugs.<br /> Thank you for your continued patience through these frustrating times and as always, thanks for playing!<br /> -Adrian ');
+if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.226.238.61', '72.137.208.122'))){
+    die('<div style="margin: 0; padding: 10px 25%; background-color: rgb(122, 0, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
+        ATTENTION!<br /> The Mega Man RPG Prototype is currently being updated.  Please stand by until further notice.  Several parts of the website are being taken offline during this process and any progress made during will likely be lost, so please hold tight before trying to log in again.  I apologize for the inconvenience and thank you for your patience.<br /> - Adrian
+        </div>');
 }
 */
 
