@@ -237,7 +237,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
 }
 
 // Define a function for search and replacing typos before re-encoding
-function mmrpg_admin_encode_save_data($data, $cache){
+function mmrpg_admin_encode_save_data($data){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_admin_encode_save_data();');  }
     if (is_array($data)){ $data = json_encode($data); }
     return $data;
