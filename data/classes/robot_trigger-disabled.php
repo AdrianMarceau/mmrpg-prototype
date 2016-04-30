@@ -146,12 +146,11 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
                 // Update the session variables with the rewarded stat boost if not mecha
                 if ($target_robot->robot_class == 'master'){
-                    $temp_robot_rewards = &$_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token];
-                    if (!isset($temp_robot_rewards[$prop_stat])){ $temp_robot_rewards[$prop_stat] = 0; }
-                    $temp_robot_rewards[$prop_stat] = ceil($temp_robot_rewards[$prop_stat]);
+                    if (!isset($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] = 0; }
+                    $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] = ceil($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat]);
                     $temp_stat_session_boost = round($this_stat_boost);
                     if ($temp_stat_session_boost < 1){ $temp_stat_session_boost = 1; }
-                    $temp_robot_rewards[$prop_stat] += $temp_stat_session_boost;
+                    $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] += $temp_stat_session_boost;
                 }
 
 
