@@ -1,24 +1,24 @@
-<?
+<?php
 // If a user ID has been defined, attempt to swap the save session
-if (!defined('MMRPG_REMOTE_GAME_ID')){ define('MMRPG_REMOTE_GAME_ID', (!empty($_GET['user_id']) ? $_GET['user_id'] : 0)); }
+if (!defined('MMRPG_REMOTE_GAME_ID')){ define('MMRPG_REMOTE_GAME_ID', (!empty($_REQUEST['user_id']) ? $_REQUEST['user_id'] : 0)); }
 if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER']['userid']){
-  
+
   // Attempt to collect data for this player from the database
   $this_playerinfo = $DB->get_array("SELECT
-  	mmrpg_users.*,
-  	mmrpg_saves.*
-  	FROM mmrpg_users
-  	LEFT JOIN mmrpg_saves ON mmrpg_saves.user_id = mmrpg_users.user_id
-  	WHERE mmrpg_users.user_id = '".MMRPG_REMOTE_GAME_ID."';");
-  
+    mmrpg_users.*,
+    mmrpg_saves.*
+    FROM mmrpg_users
+    LEFT JOIN mmrpg_saves ON mmrpg_saves.user_id = mmrpg_users.user_id
+    WHERE mmrpg_users.user_id = '".MMRPG_REMOTE_GAME_ID."';");
+
   // If the userinfo exists in the database, display it
   if (!empty($this_playerinfo)){
-  
+
     // Ensure this remote game actually exists
     $temp_session_key = 'REMOTE_GAME_'.MMRPG_REMOTE_GAME_ID;
     // Define the constant that forces remote game checking
     define('MMRPG_REMOTE_GAME', MMRPG_REMOTE_GAME_ID);
-    
+
     // Collect this player's info from the database... all of it
     $this_playerinfo['counters'] = !empty($this_playerinfo['save_counters']) ? json_decode($this_playerinfo['save_counters'], true) : array();
     $this_playerinfo['values'] = !empty($this_playerinfo['save_values']) ? json_decode($this_playerinfo['save_values'], true) : array();
@@ -56,26 +56,16 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
       'imagepath' => $this_playerinfo['user_image_path'],
       'backgroundpath' => $this_playerinfo['user_background_path'],
       'colourtoken' => $this_playerinfo['user_colour_token'],
-      'gender' => $this_playerinfo['user_gender'],
-      'password' => '', //$this_playerinfo['user_id'],
-      'password_encoded' => $this_playerinfo['user_password_encoded'],
-      );
-    $temp_remote_session['FILE'] = array(
-      'path' => $this_playerinfo['user_name_clean'].'/',
-      'name' => $this_playerinfo['user_password_encoded'],
+      'gender' => $this_playerinfo['user_gender']
       );
     $temp_remote_session['counters'] = $this_playerinfo['counters'];
     $temp_remote_session['values'] = $this_playerinfo['values'];
     $temp_remote_session['flags'] = $this_playerinfo['flags'];
     $temp_remote_session['settings'] = $this_playerinfo['settings'];
-    //$temp_remote_session['USER'] = $this_playerinfo['settings'];
-    //$temp_remote_session['FILE'] = $this_playerinfo['settings'];
     $temp_session_key = 'REMOTE_GAME_'.$this_playerinfo['user_id'];
     $_SESSION[$temp_session_key] = $temp_remote_session;
-    //die('<pre>'.$temp_session_key.' : '.print_r($temp_remote_session, true).'</pre>');
-    //die('<pre>'.$temp_session_key.' : '.print_r($_SESSION['REMOTE_GAME_'.$this_playerinfo['user_id']], true).'</pre>');
-    
+
   }
-    
+
 }
 ?>

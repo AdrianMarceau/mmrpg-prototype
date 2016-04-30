@@ -62,6 +62,9 @@ define('MMRPG_SETTINGS_RECHARGE_SPEED', 1); // Recharge one unit of speed power 
 // Define the global values for robot weapon energy values
 define('MMRPG_SETTINGS_ITEMS_MAXQUANTITY', 99); // Recharge one unit of weapon energy each turn
 
+// Define the global values for starforce related values
+define('MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT', 10);  // Base starforce boost percentage for each field star or half of fusion star
+
 // Define the global variables for the total number of robots allower per player
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MIN', 1); // The minimum number of robots required for battle per side
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX', 8); // The maximum number of robots allowed for battle per side
