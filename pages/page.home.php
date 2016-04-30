@@ -75,12 +75,16 @@ require('data/leaderboard.php');
     // Define the leaderboard displauy limit
     $leaderboard_display_limit = $this_display_limit_default;
     // Print out the generated leaderboard markup
+    $displayed = 0;
     if (!empty($this_leaderboard_markup)){
         foreach ($this_leaderboard_markup AS $key => $leaderboard_markup){
-            // If we're over the limit, break
-            if ($key >= $leaderboard_display_limit){ break; }
+            // If there was not markup in this slot, continue
+            if (empty($leaderboard_markup)){ continue; }
             // Display this leaderboard image's markup
             echo $leaderboard_markup;
+            $displayed++;
+            // If over the display limit we can break
+            if ($displayed >= $this_display_limit_default){ break; }
         }
         unset($this_leaderboard_markup);
     }
