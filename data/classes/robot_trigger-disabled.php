@@ -114,7 +114,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
             }
             // If the robot is at level 100 or a mecha, stat boosts are immediately rewarded
-            elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->robot_base_attack < MMRPG_SETTINGS_STATS_MAX){
+            elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->$prop_stat_base < MMRPG_SETTINGS_STATS_MAX){
 
                 // Define the base stat boost based on robot base stats
                 $temp_stat_boost = ceil($this_stat_boost);
@@ -123,8 +123,8 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
                 if ($temp_stat_base_boost + $target_robot->$prop_stat_base > MMRPG_SETTINGS_STATS_MAX){ $temp_stat_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->$prop_stat_base; }
 
                 // Increment this robot's stat by the calculated amount and display an event
-                $target_robot->robot_attack = ceil($target_robot->$prop_stat + $temp_stat_boost);
-                $target_robot->robot_base_attack = ceil($target_robot->$prop_stat_base + $temp_stat_base_boost);
+                $target_robot->$prop_stat = ceil($target_robot->$prop_stat + $temp_stat_boost);
+                $target_robot->$prop_stat_base = ceil($target_robot->$prop_stat_base + $temp_stat_base_boost);
                 $event_options = array();
                 $event_options['this_ability_results']['trigger_kind'] = 'recovery';
                 $event_options['this_ability_results']['recovery_kind'] = $stat;
