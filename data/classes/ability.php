@@ -1031,6 +1031,7 @@ class mmrpg_ability {
             if ($this_ability->ability_results['this_result'] == 'success' && $this_ability->ability_results['total_amount'] > 0){
 
                 // Create the stat boost variable if it doesn't already exist in the session
+                unset($temp_robot_rewards);
                 $temp_robot_rewards = &$_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token];
                 if (!isset($temp_robot_rewards['robot_'.$stat_token])){ $temp_robot_rewards['robot_'.$stat_token] = 0; }
 
