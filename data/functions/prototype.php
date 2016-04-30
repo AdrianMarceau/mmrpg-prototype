@@ -944,22 +944,32 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_attack = $info['robot_attack'];
         $this_robot_defense = $info['robot_defense'];
         $this_robot_speed = $info['robot_speed'];
+        $this_robot_stats = mmrpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards);
         $temp_level = $this_robot_level - 1;
+
         $this_robot_energy += ceil($temp_level * (0.05 * $this_robot_energy));
         $this_robot_attack += ceil($temp_level * (0.05 * $this_robot_attack));
         $this_robot_defense += ceil($temp_level * (0.05 * $this_robot_defense));
         $this_robot_speed += ceil($temp_level * (0.05 * $this_robot_speed));
+
         if (!empty($this_robot_rewards['robot_energy'])){ $this_robot_energy += $this_robot_rewards['robot_energy']; }
         if (!empty($this_robot_rewards['robot_attack'])){ $this_robot_attack += $this_robot_rewards['robot_attack']; }
         if (!empty($this_robot_rewards['robot_defense'])){ $this_robot_defense += $this_robot_rewards['robot_defense']; }
         if (!empty($this_robot_rewards['robot_speed'])){ $this_robot_speed += $this_robot_rewards['robot_speed']; }
+
         if ($this_prototype_data['this_player_token'] == 'dr-light'){ $this_robot_defense += ceil(0.25 * $this_robot_defense); }
         if ($this_prototype_data['this_player_token'] == 'dr-wily'){ $this_robot_attack += ceil(0.25 * $this_robot_attack); }
         if ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $this_robot_speed += ceil(0.25 * $this_robot_speed); }
+
         $this_robot_energy = $this_robot_energy > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_energy;
         $this_robot_attack = $this_robot_attack > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_attack;
         $this_robot_defense = $this_robot_defense > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_defense;
         $this_robot_speed = $this_robot_speed > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_speed;
+
+        if ($this_robot_energy >= $this_robot_stats['energy']['max']){ $this_robot_energy .= ' &#9733;'; }
+        if ($this_robot_attack >= $this_robot_stats['attack']['max']){ $this_robot_attack .= ' &#9733;'; }
+        if ($this_robot_defense >= $this_robot_stats['defense']['max']){ $this_robot_defense .= ' &#9733;'; }
+        if ($this_robot_speed >= $this_robot_stats['speed']['max']){ $this_robot_speed .= ' &#9733;'; }
 
         $this_robot_abilities_current = !empty($info['robot_abilities']) ? array_keys($info['robot_abilities']) : array('buster-shot');
         $this_option_title = ''; //-- Basics -------------------------------  <br />';
