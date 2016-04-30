@@ -1026,23 +1026,29 @@ class mmrpg_ability {
             $stat_recovery_amount = ceil($target_robot->$stat_base_prop * ($this_ability->ability_recovery / 100));
             $target_robot->trigger_recovery($target_robot, $this_ability, $stat_recovery_amount);
 
-            // If this robot is not already over their stat limit, increment pending boosts
-            if ($target_player->player_side == 'left' && $target_robot->$stat_base_prop < $target_robot->$stat_max_prop){
+            // Only update the session of the ability was successful
+            if ($this_ability->ability_results['this_result'] == 'success' && $this_ability->ability_results['total_amount'] > 0){
 
-                // Create the stat boost variable if it doesn't already exist in the session
-                $temp_robot_rewards = &$_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token];
-                if (!isset($temp_robot_rewards['robot_'.$stat_token])){ $temp_robot_rewards['robot_'.$stat_token] = 0; }
+                // If this robot is not already over their stat limit, increment pending boosts
+                if ($target_player->player_side == 'left' && $target_robot->$stat_base_prop < $target_robot->$stat_max_prop){
 
-                // Calculate the actual amount to permanently boost in case it goes over max
-                $stat_boost_amount = $stat_recovery_amount;
-                if (($target_robot->$stat_base_prop + $stat_boost_amount) > $target_robot->$stat_max_prop){
-                    $stat_boost_amount = $target_robot->$stat_max_prop - $target_robot->$stat_base_prop;
-                }
+                    // Create the stat boost variable if it doesn't already exist in the session
+                    $temp_robot_rewards = &$_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token];
+                    if (!isset($temp_robot_rewards['robot_'.$stat_token])){ $temp_robot_rewards['robot_'.$stat_token] = 0; }
 
-                // Update the session variables with the incremented stat boost so long as it's not empty
-                if (!empty($stat_boost_amount)){
-                    $temp_robot_rewards['robot_'.$stat_token] += $stat_boost_amount;
-                    $target_robot->$stat_base_prop += $stat_boost_amount;
+                    // Calculate the actual amount to permanently boost in case it goes over max
+                    $stat_boost_amount = $this_ability->ability_results['total_amount'];
+                    if (($target_robot->$stat_base_prop + $stat_boost_amount) > $target_robot->$stat_max_prop){
+                        $stat_boost_amount = $target_robot->$stat_max_prop - $target_robot->$stat_base_prop;
+                    }
+
+                    // Update the session variables with the incremented stat boost so long as it's not empty
+                    if (!empty($stat_boost_amount)){
+                        $temp_robot_rewards['robot_'.$stat_token] += $stat_boost_amount;
+                        $target_robot->$stat_base_prop += $stat_boost_amount;
+                        $target_robot->update_session();
+                    }
+
                 }
 
             }
