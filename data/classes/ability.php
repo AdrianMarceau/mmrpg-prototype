@@ -976,5 +976,84 @@ class mmrpg_ability {
 
     }
 
+    // Define a static function to use as the common action for all stat pellet and capsule items
+    public static function item_function_stat_booster($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Target this robot's self and print item use text
+        $this_ability->target_options_update(array(
+            'frame' => 'summon',
+            'success' => array(0, 40, -2, 99,
+                $this_player->print_player_name().' uses an item from the inventory&hellip; <br />'.
+                $target_robot->print_robot_name().' is given the '.$this_ability->print_ability_name().'!'
+                )
+            ));
+        $target_robot->trigger_target($target_robot, $this_ability);
+
+        // Define the various object words used for each boost type
+        $stat_boost_subjects = array('attack' => 'weapons', 'defense' => 'shields', 'speed' => 'mobility');
+        $stat_boost_verbs = array('weapons' => 'were', 'shields' => 'were', 'mobility' => 'was');
+
+        // Define the various effect words used for each item size
+        if (strstr($this_ability->ability_token, 'pellet')){ $boost_effect_word = 'a bit'; }
+        elseif (strstr($this_ability->ability_token, 'capsule')){ $boost_effect_word = 'a lot'; }
+
+        // Define the stat(s) this ability will boost (super items boost all)
+        $stat_boost_tokens = array();
+        if (strstr($this_ability->ability_token, 'super')){ $stat_boost_tokens = array('attack', 'defense', 'speed'); }
+        else { $stat_boost_tokens[] = $this_ability->ability_type; }
+
+        // Loop through each stat boost token and raise it
+        foreach ($stat_boost_tokens AS $stat_token){
+
+            // Collect the object word for this stat type
+            $stat_subject = $stat_boost_subjects[$stat_token];
+            $stat_verb = $stat_boost_verbs[$stat_subject];
+            $stat_base_prop = 'robot_base_'.$stat_token;
+            $stat_max_prop = 'robot_max_'.$stat_token;
+
+            // Increase this robot's in-battle stat
+            $this_ability->recovery_options_update(array(
+                'kind' => $stat_token,
+                'percent' => true,
+                'modifiers' => false,
+                'frame' => 'taunt',
+                'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.' powered up '.$boost_effect_word.'! '.mmrpg_battle::random_positive_word()),
+                'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.''.$stat_verb.' not affected&hellip; '.mmrpg_battle::random_negative_word())
+                ));
+            $stat_recovery_amount = ceil($target_robot->$stat_base_prop * ($this_ability->ability_recovery / 100));
+            $target_robot->trigger_recovery($target_robot, $this_ability, $stat_recovery_amount);
+
+            // If this robot is not already over their stat limit, increment pending boosts
+            if ($target_player->player_side == 'left' && $target_robot->$stat_base_prop < $target_robot->$stat_max_prop){
+
+                // Create the stat boost variable if it doesn't already exist in the session
+                $temp_robot_rewards = &$_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token];
+                if (!isset($temp_robot_rewards['robot_'.$stat_token])){ $temp_robot_rewards['robot_'.$stat_token] = 0; }
+
+                // Calculate the actual amount to permanently boost in case it goes over max
+                $stat_boost_amount = $stat_recovery_amount;
+                if (($target_robot->$stat_base_prop + $stat_boost_amount) > $target_robot->$stat_max_prop){
+                    $stat_boost_amount = $target_robot->$stat_max_prop - $target_robot->$stat_base_prop;
+                }
+
+                // Update the session variables with the incremented stat boost so long as it's not empty
+                if (!empty($stat_boost_amount)){
+                    $temp_robot_rewards['robot_'.$stat_token] += $stat_boost_amount;
+                    $target_robot->$stat_base_prop += $stat_boost_amount;
+                }
+
+            }
+
+
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
 }
 ?>
