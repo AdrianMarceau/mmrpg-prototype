@@ -1009,6 +1009,7 @@ class mmrpg_ability {
         foreach ($stat_boost_tokens AS $stat_token){
 
             // Collect the object word for this stat type
+            $stat_name = ucfirst($stat_token);
             $stat_subject = $stat_boost_subjects[$stat_token];
             $stat_verb = $stat_boost_verbs[$stat_subject];
             $stat_base_prop = 'robot_base_'.$stat_token;
@@ -1046,11 +1047,32 @@ class mmrpg_ability {
                         $stat_boost_amount = $robot_stats[$stat_token]['max'] - $robot_stats[$stat_token]['current'];
                     }
 
-                    // Update the session variables with the incremented stat boost so long as it's not empty
+                    // Only update session variables if the boost is not empty
                     if (!empty($stat_boost_amount)){
+
+                        // Update the session variables with the incremented stat boost
                         $temp_robot_rewards['robot_'.$stat_token] += $stat_boost_amount;
                         $target_robot->$stat_base_prop += $stat_boost_amount;
                         $target_robot->update_session();
+
+                        // Recalculate robot stats with new values
+                        $robot_stats = mmrpg_robot::calculate_stat_values($target_robot->robot_level, $robot_info, $temp_robot_rewards);
+
+                        // Check if this robot has now reached max stats
+                        if ($robot_stats[$stat_token]['current'] >= $robot_stats[$stat_token]['max']){
+                            // Print the success message for reaching max stats for this robot
+                            $target_robot->robot_frame = 'victory';
+                            $target_robot->update_session();
+                            $this_battle->events_create($target_robot, false,
+                                "{$target_robot->robot_name}'s {$stat_name} Stat",
+                                $target_robot->print_robot_name().'\'s base '.$stat_token.' stat has been raised to the max of '.
+                                '<span class="robot_type robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['max'].' &#9733;</span>!<br />'.
+                                'Congratulations and '.lcfirst(mmrpg_battle::random_victory_quote()).' '
+                                );
+                            $target_robot->robot_frame = 'base';
+                            $target_robot->update_session();
+                        }
+
                     }
 
                 }
