@@ -1,10 +1,7 @@
 <?php
 
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Define a function for collecting the current GAME token
 function mmrpg_game_token(){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   if (defined('MMRPG_REMOTE_GAME')){ return 'REMOTE_GAME_'.MMRPG_REMOTE_GAME; }
   else { return 'GAME'; }
 }
@@ -18,7 +15,6 @@ function mmrpg_game_demo(){
 
 // Define a function for making a javascript-based alert
 function mmrpg_debug_alert($alert_string, $echo = true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $alert_string = str_replace("\n", '\\n', str_replace('"', '\"', htmlentities($alert_string)));
   $script_string = '<script type="text/javascript">alert("'.$alert_string.'");</script>';
   if ($echo){ echo $script_string;  }
@@ -27,7 +23,6 @@ function mmrpg_debug_alert($alert_string, $echo = true){
 
 // Define a function for unlocking a game player for use in battle
 function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_abilities = true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Reference the global variables
   global $mmrpg_index, $DB;
   //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
@@ -67,7 +62,6 @@ function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_a
   // Loop through the ability rewards for this player if set
   if ($unlock_abilities && !empty($this_player_rewards['abilities'])){
     // Collect the ability index for calculation purposes
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
     foreach ($this_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
       // Check if the required amount of points have been met by this player
@@ -83,7 +77,6 @@ function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_a
 }
 // Define a function for unlocking a game robot for use in battle
 function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = true, $create_event = true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Reference the global variables
   global $mmrpg_index, $DB;
   //$_SESSION[$session_token] = &$_SESSION[mmrpg_game_token()];
@@ -141,7 +134,6 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
   // Loop through the ability rewards for this robot if set
   if ($unlock_abilities && !empty($this_robot_rewards['abilities'])){
     // Collect the ability index for calculation purposes
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
     foreach ($this_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
       // Check if the required amount of points have been met by this robot
@@ -257,7 +249,6 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 }
 // Define a function for unlocking a game ability for use in battle
 function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
   $session_token = mmrpg_game_token();
   // If the ability token does not exist, return false
@@ -288,7 +279,6 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info){
 }
 // Define a function for updating a player setting for use in battle
 function mmrpg_game_player_setting($player_info, $setting_token, $setting_value){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Reference the global variables
   //global $mmrpg_index;
   // Update or create the player setting in the session
@@ -299,7 +289,6 @@ function mmrpg_game_player_setting($player_info, $setting_token, $setting_value)
 }
 // Define a function for updating a player setting for use in battle
 function mmrpg_game_robot_setting($player_info, $robot_info, $setting_token, $setting_value){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Reference the global variables
   //global $mmrpg_index;
   // Update or create the player setting in the session
