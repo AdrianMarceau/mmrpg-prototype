@@ -1,6 +1,5 @@
 <?
 // Define the global variables
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 global $mmrpg_index, $this_current_uri, $this_current_url, $DB;
 global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
 global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
@@ -13,7 +12,6 @@ if (empty($player_info)){ return 'error:player-empty'; }
 if (empty($robot_info)){ return 'error:robot-empty'; }
 
 // Collect the approriate database indexes
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (empty($mmrpg_database_abilities)){ $mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token'); }
 
 // Define the quick-access variables for later use
@@ -139,6 +137,31 @@ ob_start();
     if ($robot_info['robot_defense'] > MMRPG_SETTINGS_STATS_MAX){ $robot_info['robot_defense'] = MMRPG_SETTINGS_STATS_MAX; }
     if ($robot_info['robot_speed'] > MMRPG_SETTINGS_STATS_MAX){ $robot_info['robot_speed'] = MMRPG_SETTINGS_STATS_MAX; }
 
+    // Define a temp function for printing out robot stat blocks
+    $print_robot_stat_function = function($temp_stat) use($robot_info, $robot_stats, $player_info){
+        $is_maxed = $robot_info['robot_level'] >= 100 && $robot_info['robot_'.$temp_stat.'_rewards'] >= $robot_stats[$temp_stat]['bonus_max'] ? true : false;
+        if ($is_maxed){ echo '<span class="robot_stat robot_type_'.$temp_stat.'" title="Max '.ucfirst($temp_stat).'!"><span>&#9733;</span> '; }
+        else { echo '<span class="robot_stat">'; }
+            echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
+
+                $base_text = 'Base '.ucfirst($temp_stat).' <br /> <span style="font-size: 90%">'.number_format($robot_stats[$temp_stat]['base'], 0, '.', ',').' <span style="font-size: 90%">@</span>  Lv.'.$robot_info['robot_level'].' = '.number_format($robot_info['robot_'.$temp_stat.'_base'], 0, '.', ',').'</span>';
+                echo '<span data-tooltip="'.htmlentities($base_text, ENT_QUOTES, 'UTF-8', true).'" data-tooltip-type="robot_type robot_type_none">'.$robot_info['robot_'.$temp_stat.'_base'].'</span> ';
+
+                if (!empty($robot_info['robot_'.$temp_stat.'_rewards'])){
+                    $robot_bonus_text = 'Robot Bonuses <br /> <span style="font-size: 90%">'.number_format($robot_info['robot_'.$temp_stat.'_rewards'], 0, '.', ',').' / '.number_format($robot_stats[$temp_stat]['bonus_max'], 0, '.', ',').' Max</span>';
+                    echo '+ <span title="'.htmlentities($robot_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_shield">'.$robot_info['robot_'.$temp_stat.'_rewards'].'</span> ';
+                }
+
+                if (!empty($robot_info['robot_'.$temp_stat.'_player'])){
+                    $player_bonus_text = 'Player Bonuses <br /> <span style="font-size: 90%">'.number_format(($robot_info['robot_'.$temp_stat] - $robot_info['robot_'.$temp_stat.'_player']), 0, '.', ',').' x '.$player_info['player_'.$temp_stat].'% = '.number_format($robot_info['robot_'.$temp_stat.'_player'], 0, '.', ',').'</span>';
+                    echo '+ <span title="'.htmlentities($player_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$temp_stat.'">'.$robot_info['robot_'.$temp_stat.'_player'].'</span> ';
+                }
+
+            echo ' = </span>';
+            echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$temp_stat], 4, '0', STR_PAD_LEFT));
+        echo '</span>'."\n";
+        };
+
     ?>
     <div class="event event_double event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$robot_info['robot_token']?>">
         <div class="this_sprite sprite_left" style="height: 40px;">
@@ -229,17 +252,8 @@ ob_start();
                         <td class="right">
                             <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Energy :</label>
                             <?
-                            $temp_stat = 'energy';
-                            $is_maxed = $robot_info['robot_level'] >= 100 && $robot_info['robot_'.$temp_stat.'_rewards'] >= $robot_stats[$temp_stat]['bonus_max'] ? true : false;
-                            if ($is_maxed){ echo '<span class="robot_stat robot_type_'.$temp_stat.'" title="Max '.ucfirst($temp_stat).'!"><span>&#9733;</span> '; }
-                            else { echo '<span class="robot_stat">'; }
-                                echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
-                                    echo '<span title="Base '.ucfirst($temp_stat).'">'.$robot_info['robot_'.$temp_stat.'_base'].'</span> ';
-                                    echo !empty($robot_info['robot_'.$temp_stat.'_rewards']) ? '+ <span title="Robot Bonuses" class="statboost_robot">'.$robot_info['robot_'.$temp_stat.'_rewards'].'</span> ' : '';
-                                    echo !empty($robot_info['robot_'.$temp_stat.'_player']) ? '+ <span title="Player Bonuses" class="statboost_player_'.$player_info['player_token'].'">'.$robot_info['robot_'.$temp_stat.'_player'].'</span> ' : '';
-                                echo ' = </span>';
-                                echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$temp_stat], 4, '0', STR_PAD_LEFT));
-                            echo '</span>'."\n";
+                            // Print out the energy stat breakdown
+                            $print_robot_stat_function('energy');
                             ?>
                         </td>
 
@@ -263,17 +277,8 @@ ob_start();
                         <td class="right">
                             <label class="<?= !empty($player_info['player_attack']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Attack :</label>
                             <?
-                            $temp_stat = 'attack';
-                            $is_maxed = $robot_info['robot_level'] >= 100 && $robot_info['robot_'.$temp_stat.'_rewards'] >= $robot_stats[$temp_stat]['bonus_max'] ? true : false;
-                            if ($is_maxed){ echo '<span class="robot_stat robot_type_'.$temp_stat.'" title="Max '.ucfirst($temp_stat).'!"><span>&#9733;</span> '; }
-                            else { echo '<span class="robot_stat">'; }
-                                echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
-                                    echo '<span title="Base '.ucfirst($temp_stat).'">'.$robot_info['robot_'.$temp_stat.'_base'].'</span> ';
-                                    echo !empty($robot_info['robot_'.$temp_stat.'_rewards']) ? '+ <span title="Robot Bonuses" class="statboost_robot">'.$robot_info['robot_'.$temp_stat.'_rewards'].'</span> ' : '';
-                                    echo !empty($robot_info['robot_'.$temp_stat.'_player']) ? '+ <span title="Player Bonuses" class="statboost_player_'.$player_info['player_token'].'">'.$robot_info['robot_'.$temp_stat.'_player'].'</span> ' : '';
-                                echo ' = </span>';
-                                echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$temp_stat], 4, '0', STR_PAD_LEFT));
-                            echo '</span>'."\n";
+                            // Print out the attack stat breakdown
+                            $print_robot_stat_function('attack');
                             ?>
                     </tr>
                     <tr>
@@ -295,17 +300,8 @@ ob_start();
                         <td class="right">
                             <label class="<?= !empty($player_info['player_defense']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Defense :</label>
                             <?
-                            $temp_stat = 'defense';
-                            $is_maxed = $robot_info['robot_level'] >= 100 && $robot_info['robot_'.$temp_stat.'_rewards'] >= $robot_stats[$temp_stat]['bonus_max'] ? true : false;
-                            if ($is_maxed){ echo '<span class="robot_stat robot_type_'.$temp_stat.'" title="Max '.ucfirst($temp_stat).'!"><span>&#9733;</span> '; }
-                            else { echo '<span class="robot_stat">'; }
-                                echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
-                                    echo '<span title="Base '.ucfirst($temp_stat).'">'.$robot_info['robot_'.$temp_stat.'_base'].'</span> ';
-                                    echo !empty($robot_info['robot_'.$temp_stat.'_rewards']) ? '+ <span title="Robot Bonuses" class="statboost_robot">'.$robot_info['robot_'.$temp_stat.'_rewards'].'</span> ' : '';
-                                    echo !empty($robot_info['robot_'.$temp_stat.'_player']) ? '+ <span title="Player Bonuses" class="statboost_player_'.$player_info['player_token'].'">'.$robot_info['robot_'.$temp_stat.'_player'].'</span> ' : '';
-                                echo ' = </span>';
-                                echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$temp_stat], 4, '0', STR_PAD_LEFT));
-                            echo '</span>'."\n";
+                            // Print out the defense stat breakdown
+                            $print_robot_stat_function('defense');
                             ?>
                         </td>
                     </tr>
@@ -328,17 +324,8 @@ ob_start();
                         <td class="right">
                             <label class="<?= !empty($player_info['player_speed']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Speed :</label>
                             <?
-                            $temp_stat = 'speed';
-                            $is_maxed = $robot_info['robot_level'] >= 100 && $robot_info['robot_'.$temp_stat.'_rewards'] >= $robot_stats[$temp_stat]['bonus_max'] ? true : false;
-                            if ($is_maxed){ echo '<span class="robot_stat robot_type_'.$temp_stat.'" title="Max '.ucfirst($temp_stat).'!"><span>&#9733;</span> '; }
-                            else { echo '<span class="robot_stat">'; }
-                                echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
-                                    echo '<span title="Base '.ucfirst($temp_stat).'">'.$robot_info['robot_'.$temp_stat.'_base'].'</span> ';
-                                    echo !empty($robot_info['robot_'.$temp_stat.'_rewards']) ? '+ <span title="Robot Bonuses" class="statboost_robot">'.$robot_info['robot_'.$temp_stat.'_rewards'].'</span> ' : '';
-                                    echo !empty($robot_info['robot_'.$temp_stat.'_player']) ? '+ <span title="Player Bonuses" class="statboost_player_'.$player_info['player_token'].'">'.$robot_info['robot_'.$temp_stat.'_player'].'</span> ' : '';
-                                echo ' = </span>';
-                                echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$temp_stat], 4, '0', STR_PAD_LEFT));
-                            echo '</span>'."\n";
+                            // Print out the speed stat breakdown
+                            $print_robot_stat_function('speed');
                             ?>
                         </td>
                     </tr>
