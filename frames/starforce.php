@@ -11,7 +11,6 @@ define('MMRPG_REMOTE_SKIP_COMPLETE', true);
 define('MMRPG_REMOTE_SKIP_FAILURE', true);
 define('MMRPG_REMOTE_SKIP_SETTINGS', true);
 define('MMRPG_REMOTE_SKIP_ITEMS', true);
-define('MMRPG_REMOTE_SKIP_DATABASE', true);
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 
 // Collect the session token
