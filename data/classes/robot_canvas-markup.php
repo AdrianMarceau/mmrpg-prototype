@@ -212,6 +212,11 @@ if ($this_data['robot_float'] == 'left'){
 // Generate the final markup for the canvas robot
 ob_start();
 
+    // Precalculate this robot's stat for later comparrison
+    $index_info = mmrpg_robot::get_index_info($this->robot_token);
+    $reward_info = mmrpg_prototype_robot_rewards($this->player->player_token, $this->robot_token);
+    $this_stats = mmrpg_robot::calculate_stat_values($this->robot_level, $index_info, $reward_info);
+
     // Define the rest of the display variables
     //$this_data['robot_file'] = 'images/robots/'.$this_data['robot_image'].'/sprite_'.$this_data['robot_direction'].'_'.$this_data['robot_size'].'x'.$this_data['robot_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
     $this_data['robot_file'] = 'images/robots/'.$this_data['robot_image'].'/sprite_'.$this_data['robot_direction'].'_'.$this_data['robot_size_path'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
@@ -239,7 +244,7 @@ ob_start();
     $this_data['weapons_style'] = 'background-position: '.$this_data['weapons_x_position'].'px '.$this_data['weapons_y_position'].'px;';
 
     // Check if this robot's energy has been maxed out
-    $temp_energy_maxed = $this->robot_base_energy >= $this->robot_max_energy ? true : false;
+    $temp_energy_maxed = $this_stats['energy']['current'] >= $this_stats['energy']['max'] ? true : false;
 
     if ($this_data['robot_float'] == 'left'){
 
@@ -384,7 +389,7 @@ ob_start();
             $prop_markup = 'robot_'.$stat.'_markup';
             $temp_stat_break = $this->$prop_stat < 1 ? true : false;
             $temp_stat_break_chance = $this->$prop_stat < ($this->$prop_stat_base / 2) ? true : false;
-            $temp_stat_maxed = $this->$prop_stat_base >= $this->$prop_stat_max ? true : false;
+            $temp_stat_maxed = $this_stats[$stat]['current'] >= $this_stats[$stat]['max'] ? true : false;
             $temp_stat_percent = round(($this->$prop_stat / $this->$prop_stat_base) * 100);
             if ($this_data['robot_float'] == 'left'){ $temp_stat_title = $this->$prop_stat.' / '.$this->$prop_stat_base.' '.$letters.' | '.$temp_stat_percent.'%'.($temp_stat_break ? ' | BREAK!' : '').($temp_stat_maxed ? ' | &#9733;' : ''); }
             elseif ($this_data['robot_float'] == 'right'){ $temp_stat_title = ($temp_stat_maxed ? '&#9733; |' : '').($temp_stat_break ? 'BREAK! | ' : '').$temp_stat_percent.'% | '.$this->$prop_stat.' / '.$this->$prop_stat_base.' '.$letters; }
