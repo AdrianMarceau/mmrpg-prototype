@@ -1,7 +1,7 @@
 <?
 // Define a class for the battles
 class mmrpg_battle {
-  
+
   // Define global class variables
   public $index;
   public $flags;
@@ -14,7 +14,7 @@ class mmrpg_battle {
   // Define the constructor class
   public function mmrpg_battle(){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Collect any provided arguments
     $args = func_get_args();
 
@@ -28,33 +28,33 @@ class mmrpg_battle {
     return true;
 
   }
-  
+
   // Define a public function for updating index info
   public static function update_index_info($battle_token, $battle_info){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "update_index_info('{$battle_token}', \$battle_info)");  }
     global $DB;
-    
+
     // If the internal index has not been created yet, load it into memory
     if (!isset($DB->INDEX['BATTLES'])){ mmrpg_battle::load_battle_index(); }
-    
+
     // Update and/or overwrite the current info in the index
     $DB->INDEX['BATTLES'][$battle_token] = json_encode($battle_info);
     // Update the data in the session as well with provided
     $_SESSION['GAME']['values']['battle_index'][$battle_token] = json_encode($battle_info);
-    
+
     // Return true on success
     return true;
-    
+
   }
-  
+
   // Define a public function requesting a battle index entry
   public static function get_index_info($battle_token){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index_info('{$battle_token}')");  }
     global $DB;
-    
+
     // If the internal index has not been created yet, load it into memory
     if (!isset($DB->INDEX['BATTLES'])){ mmrpg_battle::load_battle_index(); }
-    
+
     // If the requested index is not empty, return the entry
     if (!empty($DB->INDEX['BATTLES'][$battle_token])){
       // Decode the info and return the array
@@ -67,9 +67,9 @@ class mmrpg_battle {
       // Return false on failure
       return array();
     }
-        
+
   }
-  
+
   // Define a function for loading the battle index cache file
   public static function load_battle_index(){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "load_battle_index()");  }
@@ -106,21 +106,21 @@ class mmrpg_battle {
     // Return true on success
     return true;
   }
-  
+
   // Define the function used for scanning the battle directory
   public static function index_battle_data($this_path = ''){
-    
+
     // Default the battles markup index to an empty array
     $battles_cache_markup = array();
-    
+
     // Open the type data directory for scanning
     $data_battles  = opendir(MMRPG_CONFIG_BATTLES_INDEX_PATH.$this_path);
-    
+
     //echo 'Scanning '.MMRPG_CONFIG_BATTLES_INDEX_PATH.$this_path.'<br />';
-    
+
     // Loop through all the files in the directory
     while (false !== ($filename = readdir($data_battles))) {
-      
+
       // If this is a directory, initiate a recusive scan
       if (is_dir(MMRPG_CONFIG_BATTLES_INDEX_PATH.$this_path.$filename.'/') && $filename != '.' && $filename != '..'){
         // Collect the markup from the recursive scan
@@ -133,9 +133,9 @@ class mmrpg_battle {
         // Collect the battle token from the filename
         $this_battle_token = preg_replace('#^([-_a-z0-9]+)\.php$#i', '$1', $filename);
         if (!empty($this_path)){ $this_battle_token = trim(str_replace('/', '-', $this_path), '-').'-'.$this_battle_token; }
-        
+
         //echo '+ Adding battle token '.$this_battle_token.'...<br />';
-        
+
         // Read the file into memory as a string and crop slice out the imporant part
         $this_battle_markup = trim(file_get_contents(MMRPG_CONFIG_BATTLES_INDEX_PATH.$this_path.$filename));
         $this_battle_markup = explode("\n", $this_battle_markup);
@@ -147,24 +147,24 @@ class mmrpg_battle {
         // Copy this battle's data to the markup cache
         $battles_cache_markup[] = $this_battle_markup;
       }
-      
+
     }
-    
+
     // Close the battle data directory
     closedir($data_battles);
-    
+
     // Return the generated cache markup
     return $battles_cache_markup;
-    
+
   }
-  
+
   // Define a public function for manually loading data
   public function battle_load($this_battleinfo){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Pull in the mmrpg index
     global $mmrpg_index;
-    
+
     // Collect current battle data from the session if available
     $this_battleinfo_backup = $this_battleinfo;
     if (isset($_SESSION['BATTLES'][$this_battleinfo['battle_id']])){
@@ -224,11 +224,11 @@ class mmrpg_battle {
 
   // Define a static public function for encouraging battle words
   public static function random_positive_word(){
-    $temp_text_options = array('Awesome!', 'Nice!', 'Fantastic!', 'Yeah!', 'Yay!', 'Yes!', 'Great!', 'Super!', 'Rock on!', 'Amazing!', 'Fabulous!', 'Wild!', 'Sweet!', 'Wow!');
+    $temp_text_options = array('Awesome!', 'Nice!', 'Fantastic!', 'Yeah!', 'Yay!', 'Yes!', 'Great!', 'Super!', 'Rock on!', 'Amazing!', 'Fabulous!', 'Wild!', 'Sweet!', 'Wow!', 'Oh my!');
     $temp_text = $temp_text_options[array_rand($temp_text_options)];
     return $temp_text;
   }
-  
+
 // Define a static public function for encouraging battle victory quotes
   public static function random_victory_quote(){
     $temp_text_options = array('Awesome work!', 'Nice work!', 'Fantastic work!', 'Great work!', 'Super work!', 'Amazing work!', 'Fabulous work!');
@@ -238,21 +238,21 @@ class mmrpg_battle {
 
   // Define a static public function for discouraging battle words
   public static function random_negative_word(){
-    $temp_text_options = array('Yikes!', 'Oh no!', 'Ouch&hellip;', 'Awwwww&hellip;', 'Bummer&hellip', 'Boooo&hellip;', 'Harsh!');
+    $temp_text_options = array('Yikes!', 'Oh no!', 'Ouch...', 'Awwwww...', 'Bummer...', 'Boooo...', 'Harsh!', 'Sorry...');
     $temp_text = $temp_text_options[array_rand($temp_text_options)];
     return $temp_text;
   }
-  
+
   // Define a static public function for discouraging battle defeat quotes
   public static function random_defeat_quote(){
-    $temp_text_options = array('Maybe try again?', 'Bad luck maybe?', 'Maybe try another stage?', 'Better luck next time?', 'At least you tried&hellip; right?');
+    $temp_text_options = array('Maybe try again?', 'Bad luck maybe?', 'Maybe try another stage?', 'Better luck next time?', 'At least you tried... right?');
     $temp_text = $temp_text_options[array_rand($temp_text_options)];
     return $temp_text;
   }
-  
+
   // Define a public function for extracting actions from the queue
   public function actions_extract($filters){
-    
+
     $extracted_actions = array();
     foreach($this->actions AS $action_key => $action_array){
       $is_match = true;
@@ -265,18 +265,18 @@ class mmrpg_battle {
       if ($is_match){ $extracted_actions = array_slice($this->actions, $action_key, 1, false); }
     }
     return $extracted_actions;
-    
+
   }
-  
+
   // Define a public function for inserting actions into the queue
   public function actions_insert($inserted_actions){
-    
+
     if (!empty($inserted_actions)){
       $this->actions = array_merge($this->actions, $inserted_actions);
     }
-    
+
   }
-  
+
   // Define a public function for prepending to the action array
   public function actions_prepend(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_action_token){
 
@@ -298,10 +298,10 @@ class mmrpg_battle {
 
   // Define a public function for appending to the action array
   public function actions_append(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_action_token){
-    
+
     // DEBUG
     //$this->events_create(false, false, 'DEBUG_'.__LINE__.'_BATTLE', ' $this_battle->actions_append('.$this_player->player_id.'_'.$this_player->player_token.', '.$this_robot->robot_id.'_'.$this_robot->robot_token.', '.$target_player->player_id.'_'.$target_player->player_token.', '.$target_robot->robot_id.'_'.$target_robot->robot_token.', '.$this_action.', '.$this_action_token.');');
-    
+
     // Append the new action to the array
     $this->actions[] = array(
       'this_field' => &$this->battle_field,
@@ -335,21 +335,21 @@ class mmrpg_battle {
     // Back up the IDs of this and the target robot in the global space
     $temp_this_robot_backup = array('robot_id' => $GLOBALS['this_robot']->robot_id, 'robot_token' => $GLOBALS['this_robot']->robot_token);
     $temp_target_robot_backup = array('robot_id' => $GLOBALS['target_robot']->robot_id, 'robot_token' => $GLOBALS['target_robot']->robot_token);
-    
+
     // Loop through the non-empty action queue and trigger actions
     while (!empty($this->actions) && $this->battle_status != 'complete'){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
       // Shift and collect the oldest action from the queue
       $current_action = array_shift($this->actions);
-      
+
       // Reload each player and robot from session to prevent bugs
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       if (!empty($current_action['this_player'])){ $current_action['this_player']->player_load(array('player_id' => $current_action['this_player']->player_id, 'player_token' => $current_action['this_player']->player_token)); }
       if (!empty($current_action['target_player'])){ $current_action['target_player']->player_load(array('player_id' => $current_action['target_player']->player_id, 'player_token' => $current_action['target_player']->player_token)); }
       if (!empty($current_action['this_robot'])){ $current_action['this_robot']->robot_load(array('robot_id' => $current_action['this_robot']->robot_id, 'robot_token' => $current_action['this_robot']->robot_token)); }
       if (!empty($current_action['target_robot'])){ $current_action['target_robot']->robot_load(array('robot_id' => $current_action['target_robot']->robot_id, 'robot_token' => $current_action['target_robot']->robot_token)); }
-      
+
       // If the robot's player is on autopilot and the action is empty, automate input
       if (empty($current_action['this_action']) && $current_action['this_player']->player_autopilot == true){
         $current_action['this_action'] = 'ability';
@@ -443,7 +443,7 @@ class mmrpg_battle {
       }
 
     }
-  
+
     // Recreate this and the target robot in the global space with backed up info
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     if (empty($GLOBALS['this_robot'])){ $GLOBALS['this_robot'] = new mmrpg_robot($this, $GLOBALS['this_player'], $temp_this_robot_backup); }
@@ -458,7 +458,7 @@ class mmrpg_battle {
     global $mmrpg_index, $DB;
     require('battle_battle-complete-trigger.php');
   }
-  
+
   // Define a public function for triggering battle actions
   public function actions_trigger(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_token = ''){
     global $DB;
@@ -538,19 +538,19 @@ class mmrpg_battle {
     return $this_markup;
 
   }
-  
+
   // Define a public function for calculating canvas markup offsets
   public function canvas_markup_offset($sprite_key, $sprite_position, $sprite_size){
-    
+
     // Define the data array to be returned later
     $this_data = array();
-    
+
     // Define the base canvas offsets for this sprite
     $this_data['canvas_offset_x'] = 165;
     $this_data['canvas_offset_y'] = 55;
     $this_data['canvas_offset_z'] = $sprite_position == 'active' ? 5100 : 4900;
     $this_data['canvas_scale'] = $sprite_position == 'active' ? 1 : 0.5 + (((8 - $sprite_key) / 8) * 0.5);
-    
+
     // If the robot is on the bench, calculate position offsets based on key
     if ($sprite_position == 'bench'){
       $this_data['canvas_offset_z'] -= 100 * $sprite_key;
@@ -587,7 +587,7 @@ class mmrpg_battle {
 
     // Return the generated canvas data for this robot
     return $this_data;
-    
+
   }
 
   // Define a public function for generating event markup
@@ -596,7 +596,7 @@ class mmrpg_battle {
 
     // Create the frames counter if not exists
     if (!isset($this->counters['event_frames'])){ $this->counters['event_frames'] = 0; }
-    
+
     // Define defaults for event options
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $options = array();
@@ -670,7 +670,7 @@ class mmrpg_battle {
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this->counters['event_frames'] += 1;
     $this->update_session();
-    
+
     // Return the generated event markup
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     return $this_markup;
@@ -684,10 +684,10 @@ class mmrpg_battle {
     return $this->events;
 
   }
-  
+
   // Define a function for calculating the amount of BATTLE POINTS a player gets in battle
   public function calculate_battle_points($this_player, $base_points = 0, $base_turns = 0){
-    
+
     // Calculate the number of turn points for this player using the base amounts
     $this_base_points = $base_points;
     if ($this->counters['battle_turn'] < $base_turns
@@ -696,18 +696,18 @@ class mmrpg_battle {
       //$this_turn_points = ceil($this_half_points * ($base_turns / $this->counters['battle_turn']));
       $this_base_points = ceil($this_base_points * ($base_turns / $this->counters['battle_turn']));
     }
-    
+
     //$this_battle_points = $this_base_points + $this_turn_points + $this_stat_points;
     $this_battle_points = $this_base_points;
-    
+
     // Prevent players from loosing points
     if ($this_battle_points == 0){ $this_battle_points = 1; }
     elseif ($this_battle_points < 0){ $this_battle_points = -1 * $this_battle_points; }
-    
-    
+
+
     // Return the calculated battle points
     return $this_battle_points;
-    
+
   }
 
   // Define a function for returning a weighted random chance
@@ -722,7 +722,7 @@ class mmrpg_battle {
       ''
       ))));
     */
-    
+
     // Count the number of values passed
     $value_amount = count($values);
 
@@ -771,7 +771,7 @@ class mmrpg_battle {
     return ($random_int <= $chance_percent) ? true : false;
 
   }
-  
+
   // Define a function for finding a target player based on field side
   public function find_target_player($target_side){
     // Define the target player variable to start
@@ -789,7 +789,7 @@ class mmrpg_battle {
     // Return the final value of the target player
     return $target_player;
   }
-  
+
   // Define a function for finding a target robot based on field side
   public function find_target_robot($target_side){
     // Define the target robot variable to start
@@ -808,23 +808,23 @@ class mmrpg_battle {
     // Return the final value of the target robot
     return $target_robot;
   }
-  
-  
+
+
   // -- CHECK ATTACHMENTS FUNCTION -- //
-  
+
   // Define a function for checking attachment status
   public static function temp_check_robot_attachments(&$this_battle, &$this_player, &$this_robot, &$target_player, &$target_robot){
-    
+
     // Loop through all the target player's robots and carry out any end-turn events
     $temp_robot = false;
     foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
-      
+
       // Create the temp robot object
       if (empty($temp_robot)){ $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
       else { $temp_robot->robot_load(array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
       //if ($temp_robotinfo['robot_id'] == $this_robot->robot_id){ $temp_robot = &$this_robot; }
       //else { $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
-      
+
       // Hide any disabled robots that have not been hidden yet
       if ($temp_robotinfo['robot_status'] == 'disabled'){
         // Hide robot and update session
@@ -836,7 +836,7 @@ class mmrpg_battle {
         // Continue
         continue;
       }
-      
+
       // If this robot has any attachments, loop through them
       if (!empty($temp_robot->robot_attachments)){
         //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has attachments');
@@ -904,32 +904,32 @@ class mmrpg_battle {
               }
             }
           }
-          
+
         }
       }
-      
+
     }
-    
+
     // Return true on success
     return true;
-    
+
   }
-  
+
   // -- CHECK WEAPONS FUNCTION -- //
-  
+
   // Define a function for checking weapons status
   public static function temp_check_robot_weapons(&$this_battle, &$this_player, &$this_robot, &$target_player, &$target_robot, $regen_weapons = true){
-    
+
     // Loop through all the target player's robots and carry out any end-turn events
     $temp_robot = false;
     foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
-      
+
       // Create the temp robot object
       if (empty($temp_robot)){ $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
       else { $temp_robot->robot_load(array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
       //if ($temp_robotinfo['robot_id'] == $this_robot->robot_id){ $temp_robot = &$this_robot; }
       //else { $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
-      
+
       // Ensure this robot has not been disabled already
       if ($temp_robotinfo['robot_status'] == 'disabled'){
         // Hide robot and update session
@@ -941,7 +941,7 @@ class mmrpg_battle {
         // Continue
         continue;
       }
-      
+
       // If this robot is not at full weapon energy, increase it by one
       if ($temp_robot->robot_weapons < $temp_robot->robot_base_weapons
         || $temp_robot->robot_attack < $temp_robot->robot_base_attack
@@ -968,12 +968,12 @@ class mmrpg_battle {
           //$this_battle->events_create(false, false, '', '');
         }
       }
-      
+
     }
-    
+
     // Return true on success
     return true;
-    
+
   }
 
 
@@ -989,20 +989,20 @@ class mmrpg_battle {
     $temp_field_type_2 = !empty($options['star_type2']) ? $options['star_type2'] : $temp_field_type_1;
     $temp_star_back_info = mmrpg_prototype_star_image($temp_field_type_2);
     $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
-    
+
     // Define and calculate the simpler markup and positioning variables for this star
     $this_data['star_name'] = isset($options['star_name']) ? $options['star_name'] : 'Battle Star';
     $this_data['star_title'] = $this_data['star_name'];
     $this_data['star_token'] = $options['star_token'];
     $this_data['container_class'] = 'this_sprite sprite_left';
     $this_data['container_style'] = '';
-    
+
     // Define the back star's markup
     $this_data['star_image'] = 'images/abilities/item-star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'].'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
     $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.str_pad($temp_star_back_info['frame'], 2, '0', STR_PAD_LEFT).' ';
     $this_data['star_markup_style'] = 'background-image: url('.$this_data['star_image'].'); margin-top: 5px; ';
     $temp_back_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" title="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
-    
+
     // Define the back star's markup
     $this_data['star_image'] = 'images/abilities/item-star-base-'.$temp_star_front_info['sheet'].'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
     $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.str_pad($temp_star_front_info['frame'], 2, '0', STR_PAD_LEFT).' ';
