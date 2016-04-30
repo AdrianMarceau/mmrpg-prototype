@@ -149,12 +149,12 @@ ob_start();
 
                 if (!empty($robot_info['robot_'.$temp_stat.'_rewards'])){
                     $robot_bonus_text = 'Robot Bonuses <br /> <span style="font-size: 90%">'.number_format($robot_info['robot_'.$temp_stat.'_rewards'], 0, '.', ',').' / '.number_format($robot_stats[$temp_stat]['bonus_max'], 0, '.', ',').' Max</span>';
-                    echo '+ <span title="'.htmlentities($robot_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_shield">'.$robot_info['robot_'.$temp_stat.'_rewards'].'</span> ';
+                    echo '+ <span data-tooltip="'.htmlentities($robot_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_shield">'.$robot_info['robot_'.$temp_stat.'_rewards'].'</span> ';
                 }
 
                 if (!empty($robot_info['robot_'.$temp_stat.'_player'])){
                     $player_bonus_text = 'Player Bonuses <br /> <span style="font-size: 90%">'.number_format(($robot_info['robot_'.$temp_stat] - $robot_info['robot_'.$temp_stat.'_player']), 0, '.', ',').' x '.$player_info['player_'.$temp_stat].'% = '.number_format($robot_info['robot_'.$temp_stat.'_player'], 0, '.', ',').'</span>';
-                    echo '+ <span title="'.htmlentities($player_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$temp_stat.'">'.$robot_info['robot_'.$temp_stat.'_player'].'</span> ';
+                    echo '+ <span data-tooltip="'.htmlentities($player_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$temp_stat.'">'.$robot_info['robot_'.$temp_stat.'_player'].'</span> ';
                 }
 
             echo ' = </span>';
