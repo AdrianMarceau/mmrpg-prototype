@@ -41,8 +41,8 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
   // Reset the game session and reload the page
   mmrpg_reset_game_session($this_save_filepath);
   // Update the appropriate session variables
-  $_SESSION['GAME']['USER'] = $this_user;
-  $_SESSION['GAME']['FILE'] = $this_file;
+  $_SESSION[$session_token]['USER'] = $this_user;
+  $_SESSION[$session_token]['FILE'] = $this_file;
 
   // Load the save file into memory and overwrite the session
   mmrpg_save_game_session($this_save_filepath);
@@ -60,9 +60,9 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
   // Reset the appropriate session variables
   if (!empty($mmrpg_index['players'][$_REQUEST['player']])){
     $temp_session_key = $_REQUEST['player'].'_target-robot-omega_prototype';
-    $_SESSION['GAME']['values']['battle_complete'][$_REQUEST['player']] = array();
-    $_SESSION['GAME']['values']['battle_failure'][$_REQUEST['player']] = array();
-    $_SESSION['GAME']['values'][$temp_session_key] = array();
+    $_SESSION[$session_token]['values']['battle_complete'][$_REQUEST['player']] = array();
+    $_SESSION[$session_token]['values']['battle_failure'][$_REQUEST['player']] = array();
+    $_SESSION[$session_token]['values'][$temp_session_key] = array();
   }
 
   // Load the save file into memory and overwrite the session
@@ -92,10 +92,10 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
   $this_file['path'] = $this_user['username_clean'].'/';
   $this_file['name'] = $this_user['password_encoded'].'.sav';
   // Update the session with these demo variables
-  $_SESSION['GAME']['DEMO'] = 1;
-  $_SESSION['GAME']['USER'] = $this_user;
-  $_SESSION['GAME']['FILE'] = $this_file;
-  $_SESSION['GAME']['counters']['battle_points'] = 0;
+  $_SESSION[$session_token]['DEMO'] = 1;
+  $_SESSION[$session_token]['USER'] = $this_user;
+  $_SESSION[$session_token]['FILE'] = $this_file;
+  $_SESSION[$session_token]['counters']['battle_points'] = 0;
   // Update the global save path variable
   $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
   // Reset the game session and reload the page
@@ -126,7 +126,7 @@ require_once('data/prototype.php');
  */
 
 // Collect the game flags for easier password processing
-$temp_flags = !empty($_SESSION['GAME']['flags']) ? $_SESSION['GAME']['flags'] : array();
+$temp_flags = !empty($_SESSION[$session_token]['flags']) ? $_SESSION[$session_token]['flags'] : array();
 
 //die('wtf1-'.time());
 //die('$temp_flags = <pre>'.print_r($temp_flags, true).'</pre>');
@@ -235,8 +235,8 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
       <div class="wrapper">
         <label class="label">Battle Points</label>
         <span class="amount">
-          <span class="value"><?= !empty($_SESSION['GAME']['counters']['battle_points']) ? number_format($_SESSION['GAME']['counters']['battle_points'], 0, '.', ',') : 0 ?></span>
-          <? if(empty($_SESSION['GAME']['DEMO']) && !empty($this_boardinfo['board_rank'])): ?>
+          <span class="value"><?= !empty($_SESSION[$session_token]['counters']['battle_points']) ? number_format($_SESSION[$session_token]['counters']['battle_points'], 0, '.', ',') : 0 ?></span>
+          <? if(empty($_SESSION[$session_token]['DEMO']) && !empty($this_boardinfo['board_rank'])): ?>
             <span class="pipe">|</span>
             <span class="place"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?></span>
           <? endif; ?>
@@ -246,9 +246,9 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 
     <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
       <div class="wrapper">
-        <? if(empty($_SESSION['GAME']['DEMO'])): ?>
+        <? if(empty($_SESSION[$session_token]['DEMO'])): ?>
           <span class="info info_username">
-            <label><?= !empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : $_SESSION['GAME']['USER']['username'] ?></label>
+            <label><?= !empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : $_SESSION[$session_token]['USER']['username'] ?></label>
           </span>
         <? else: ?>
           <span class="info info_username info_demo">
@@ -258,8 +258,8 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
       </div>
       <?
       // Define the avatar class and path variables
-      $temp_avatar_path = !empty($_SESSION['GAME']['USER']['imagepath']) ? $_SESSION['GAME']['USER']['imagepath'] : 'robots/mega-man/40';
-      $temp_colour_token = !empty($_SESSION['GAME']['USER']['colourtoken']) ? $_SESSION['GAME']['USER']['colourtoken'] : '';
+      $temp_avatar_path = !empty($_SESSION[$session_token]['USER']['imagepath']) ? $_SESSION[$session_token]['USER']['imagepath'] : 'robots/mega-man/40';
+      $temp_colour_token = !empty($_SESSION[$session_token]['USER']['colourtoken']) ? $_SESSION[$session_token]['USER']['colourtoken'] : '';
       list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
       $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_00';
       $temp_sprite_offset = $temp_avatar_size == 80 ? 'margin-left: -20px; margin-top: -40px; ' : '';
@@ -299,7 +299,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
       $temp_prototype_complete = mmrpg_prototype_complete();
       $temp_data_index = 0;
       // If we're in the DEMO MODE, define the available options and their attributes
-      if (!empty($_SESSION['GAME']['DEMO'])){
+      if (!empty($_SESSION[$session_token]['DEMO'])){
         ?>
         <a class="link link_home link_active" data-step="2" data-index="<?= $temp_data_index++ ?>" data-music="misc/stage-select-dr-light" data-tooltip="<?= $this_menu_tooltips['demo'] ?>"><label>demo</label></a> <span class="pipe">|</span>
         <a class="link link_data" data-step="database" data-index="<?= $temp_data_index++ ?>" data-source="frames/database.php" data-music="misc/data-base" data-tooltip="<?= $this_menu_tooltips['database'] ?>"><label>database</label></a> <span class="pipe">|</span>
@@ -315,7 +315,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
         ?>
         <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $temp_data_index++ ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>home</label></a> <span class="pipe">|</span>
         <? if (mmrpg_prototype_battles_complete('dr-light') >= 1): ?>
-          <? if(!empty($_SESSION['GAME']['values']['battle_items'])): ?>
+          <? if(!empty($_SESSION[$session_token]['values']['battle_items'])): ?>
             <a class="link link_shop" data-step="shop" data-index="<?= $temp_data_index++ ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>shop</label></a> <span class="pipe">|</span>
           <? endif; ?>
           <a class="link link_robots" data-step="edit_robots" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>robots</label></a> <span class="pipe">|</span>
@@ -336,9 +336,9 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 
   </div>
 
-  <div class="menu select_this_player" data-step="1" data-title="Player Select (<?= !empty($_SESSION['GAME']['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players' ?>)" data-select="this_player_token">
+  <div class="menu select_this_player" data-step="1" data-title="Player Select (<?= !empty($_SESSION[$session_token]['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players' ?>)" data-select="this_player_token">
     <span class="header block_1">
-      <span class="count">Player Select (<?= !empty($_SESSION['GAME']['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players' ?>)</span>
+      <span class="count">Player Select (<?= !empty($_SESSION[$session_token]['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players' ?>)</span>
       <?/*<span class="reload">&#8634;</span>*/?>
     </span>
     <?
@@ -354,7 +354,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 
   <div class="menu menu_hide select_this_battle" data-step="2" data-title="Battle Select" data-select="this_battle_token">
     <span class="header block_1">
-      <span class="count"><?= !empty($_SESSION['GAME']['DEMO']) ? 'Mega Man RPG Prototype' : 'Mission Select' ?></span>
+      <span class="count"><?= !empty($_SESSION[$session_token]['DEMO']) ? 'Mega Man RPG Prototype' : 'Mission Select' ?></span>
     </span>
     <?
 
@@ -366,7 +366,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // If we're NOT in demo mode, maybe add a back button
-    if (empty($_SESSION['GAME']['DEMO'])){
+    if (empty($_SESSION[$session_token]['DEMO'])){
       // Print out the back button for going back to player select
       if ($unlock_count_players > 1){
         echo '<a class="option option_back block_1" data-back="1">&#9668; Back</a>'."\n";
@@ -383,7 +383,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
     /*
      * DEMO ROBOT SELECT
      */
-    if (!empty($_SESSION['GAME']['DEMO'])){
+    if (!empty($_SESSION[$session_token]['DEMO'])){
 
       // Only show robot select if the player has more than two robots
       if (mmrpg_prototype_robots_unlocked('dr-light') > 3){
@@ -477,7 +477,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Define the game WAP and cache flags/values
 gameSettings.passwordUnlocked = 0;
 gameSettings.fadeIn = true;
-gameSettings.demo = <?= $_SESSION['GAME']['DEMO'] ?>;
+gameSettings.demo = <?= $_SESSION[$session_token]['DEMO'] ?>;
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
 gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
 gameSettings.startLink = '<?= $prototype_start_link ?>';
@@ -488,14 +488,14 @@ gameSettings.prototypeBannerKey = 0;
 gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
 // Define any preset menu selections
 battleOptions['this_player_id'] = <?= $this_userid ?>;
-<? if(!empty($_SESSION['GAME']['DEMO'])): ?>
+<? if(!empty($_SESSION[$session_token]['DEMO'])): ?>
   battleOptions['this_player_token'] = 'dr-light';
   <? if(mmrpg_prototype_robots_unlocked('dr-light') == 3): ?>
     battleOptions['this_player_robots'] = '103_mega-man,104_bass,105_proto-man';
   <?endif;?>
 <? else: ?>
-  <? if(!empty($_SESSION['GAME']['battle_settings']['this_player_token'])): ?>
-    battleOptions['this_player_token'] = '<?=$_SESSION['GAME']['battle_settings']['this_player_token']?>';
+  <? if(!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])): ?>
+    battleOptions['this_player_token'] = '<?=$_SESSION[$session_token]['battle_settings']['this_player_token']?>';
   <? elseif($unlock_count_players < 2): ?>
     battleOptions['this_player_token'] = 'dr-light';
   <? endif; ?>
@@ -503,13 +503,13 @@ battleOptions['this_player_id'] = <?= $this_userid ?>;
 // Create the document ready events
 $(document).ready(function(){
 
-  <? if($prototype_start_link == 'home' && empty($_SESSION['GAME']['battle_settings']['this_player_token'])): ?>
+  <? if($prototype_start_link == 'home' && empty($_SESSION[$session_token]['battle_settings']['this_player_token'])): ?>
     // Start playing the title screen music
     parent.mmrpg_music_load('misc/player-select', true, false);
   <? elseif($prototype_start_link != 'home'): ?>
-    <? if(!empty($_SESSION['GAME']['battle_settings']['this_player_token'])): ?>
+    <? if(!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])): ?>
       // Start playing the appropriate stage select music
-      parent.mmrpg_music_load('misc/stage-select-<?= $_SESSION['GAME']['battle_settings']['this_player_token'] ?>', true, false);
+      parent.mmrpg_music_load('misc/stage-select-<?= $_SESSION[$session_token]['battle_settings']['this_player_token'] ?>', true, false);
     <? else: ?>
       // Start playing the title screen music
       parent.mmrpg_music_load('misc/player-select', true, false);
@@ -518,8 +518,8 @@ $(document).ready(function(){
 
   <?
   // If there were any prototype window events created, display them
-  if (!empty($_SESSION['GAME']['EVENTS'])){
-    foreach ($_SESSION['GAME']['EVENTS'] AS $temp_key => $temp_event){
+  if (!empty($_SESSION[$session_token]['EVENTS'])){
+    foreach ($_SESSION[$session_token]['EVENTS'] AS $temp_key => $temp_event){
       $temp_canvas_markup = str_replace('"', '\"', $temp_event['canvas_markup']);
       $temp_messages_markup =  str_replace('"', '\"', $temp_event['console_markup']);
       echo 'gameSettings.windowEventsCanvas.push("'.$temp_canvas_markup.'");'."\n";
@@ -542,14 +542,14 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 <?
 // If we're NOT in demo mode, automatically update the date-accessed for their database entry
 /*
-if (empty($_SESSION['GAME']['DEMO'])){
+if (empty($_SESSION[$session_token]['DEMO'])){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  $temp_query = 'UPDATE mmrpg_users SET user_date_accessed = '.time().' WHERE user_id = '.$_SESSION['GAME']['USER']['userid'];
+  $temp_query = 'UPDATE mmrpg_users SET user_date_accessed = '.time().' WHERE user_id = '.$_SESSION[$session_token]['USER']['userid'];
   $temp_result = $DB->query($temp_query);
 }
 */
 // If there were any events in the session, automatically add remove them from the session
-if (!empty($_SESSION['GAME']['EVENTS'])){ $_SESSION['GAME']['EVENTS'] = array(); }
+if (!empty($_SESSION[$session_token]['EVENTS'])){ $_SESSION[$session_token]['EVENTS'] = array(); }
 // Unset the database variable
 unset($DB);
 ?>
