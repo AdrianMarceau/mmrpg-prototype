@@ -6,7 +6,6 @@
 
 // Create references to save time 'cause I'm tired
 // (rather than replace all target references to this references)
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_battle = &$this->battle;
 $this_player = &$this->player; // the player of the robot being disabled
 $this_robot = &$this; // the robot being disabled
@@ -15,15 +14,11 @@ $target_robot = &$target_robot; // the other robot that isn't this one
 
 // If the target player is the same as the current
 if ($this_player->player_id == $target_player->player_id){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     //$this->battle->events_create(false, false, 'DEBUG', 'It appears the target and the subject player are the same... ('.$this_player->player_id.' == '.$target_player->player_id.')');
     // Collect the actual target player from the battle values
     if (!empty($this->battle->values['players'])){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         foreach ($this->battle->values['players'] AS $id => $info){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             if ($this_player->player_id != $id){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 unset($target_player);
                 $target_player = new mmrpg_player($this_battle, $info);
                 //$this->battle->events_create(false, false, 'DEBUG', 'Assiging $this->battle->values[\'players\']['.$id.'] = '.$info['player_token']);
@@ -32,11 +27,8 @@ if ($this_player->player_id == $target_player->player_id){
     }
     // Collect the actual target robot from the battle values
     if (!empty($target_player->values['robots_active'])){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         foreach ($target_player->values['robots_active'] AS $key => $info){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             if ($info['robot_position'] == 'active'){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $target_robot->robot_load($info);
                 //unset($target_robot);
                 //$target_robot = new mmrpg_robot($this_battle, $target_player, $info);
@@ -48,27 +40,22 @@ if ($this_player->player_id == $target_player->player_id){
 }
 
 // Update the target player's session
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_player->update_session();
 
 // Create the robot disabled event
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
 $event_body = ($this_player->player_token != 'player' ? $this_player->print_player_name().'&#39;s ' : 'The target ').' '.$this_robot->print_robot_name().' was disabled!<br />'; //'.($this_robot->robot_position == 'bench' ? ' and removed from battle' : '').'
 if (isset($this_robot->robot_quotes['battle_defeat'])){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
     $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
     $event_body .= $this_robot->print_robot_quote('battle_defeat', $this_find, $this_replace);
     //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_defeat']);
     //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
 }
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $target_robot->robot_frame = 'base';
 $this_robot->robot_frame = 'defeat';
 $target_robot->update_session();
 $this_robot->update_session();
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, array('console_show_target' => false, 'canvas_show_disabled_bench' => $this_robot->robot_id.'_'.$this_robot->robot_token));
 
 
@@ -82,7 +69,6 @@ $event_options['this_ability_results']['total_actions'] = 0;
 
 // Calculate the bonus boosts from defeating the target robot (if NOT player battle)
 if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Collect this robot's stat details for reference
     $temp_index_info = self::get_index_info($target_robot->robot_token);
@@ -103,7 +89,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
         // Boost this robot's stat if a boost is in order
         $prop_stat = "robot_{$stat}";
         $prop_stat_base = "robot_base_{$stat}";
-        $prop_stat_pending = "robot_base_{$stat}";
+        $prop_stat_pending = "robot_{$stat}_pending";
         $this_stat_boost = $this_robot->$prop_stat_base / 100;
         if ($this_robot->robot_class == 'mecha'){ $this_stat_boost = $this_stat_boost / 2; }
         if ($target_player->player_side == 'left' && $target_robot->robot_class == 'mecha'){ $this_stat_boost = $this_stat_boost * 2; }
@@ -123,13 +109,12 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             if ($target_player->player_side == 'left' && $target_robot->robot_level < 100 && $target_robot->robot_class == 'master'){
 
                 // Update the session variables with the pending stat boost
-                if (empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_attack_pending'] = 0; }
+                if (empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending] = 0; }
                 $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending] += $this_stat_boost;
 
             }
             // If the robot is at level 100 or a mecha, stat boosts are immediately rewarded
             elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->robot_base_attack < MMRPG_SETTINGS_STATS_MAX){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                 // Define the base stat boost based on robot base stats
                 $temp_stat_boost = ceil($this_stat_boost);
@@ -182,7 +167,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 }
 
 // Ensure player and robot variables are updated
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $target_robot->update_session();
 $target_player->update_session();
 $this_robot->update_session();
@@ -202,7 +186,6 @@ $this->battle->events_create(false, false, 'DEBUG', 'we made it past the stat bo
  */
 
 if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID && empty($_SESSION['GAME']['DEMO'])){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // -- EXPERIENCE POINTS / LEVEL UP -- //
 
@@ -276,14 +259,12 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     */
 
     // Increment each of this player's robots
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_robots_active_num = count($temp_robots_active);
     $temp_robots_active_num2 = $temp_robots_active_num; // This will be decremented for each non-experience gaining level 100 robots
     $temp_robots_active = array_reverse($temp_robots_active, true);
     usort($temp_robots_active, array('mmrpg_player', 'robot_sort_by_active'));
     $temp_robot_active_position = false;
     foreach ($temp_robots_active AS $temp_id => $temp_info){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new mmrpg_robot($this, $target_player, $temp_info);
         if ($temp_robot->robot_level >= 100 || $temp_robot->robot_class != 'master'){ $temp_robots_active_num2--; }
         if ($temp_robot->robot_position == 'active'){
@@ -294,7 +275,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     $temp_unshift = array_unshift($temp_robots_active, $temp_robot_active_position);
 
     foreach ($temp_robots_active AS $temp_id => $temp_info){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
         // Collect or define the robot points and robot rewards variables
         $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new mmrpg_robot($this, $target_player, $temp_info);
@@ -313,7 +293,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
         // Continue with experience mods only if under level 100
         if ($temp_robot->robot_level < 100 && $temp_robot->robot_class == 'master'){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
             // Give a proportionate amount of experience based on this and the target robot's levels
             if ($temp_robot->robot_level == $temp_target_experience['level']){
@@ -411,7 +390,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             if ($target_robot_experience < MMRPG_SETTINGS_STATS_MIN){ $target_robot_experience = MMRPG_SETTINGS_STATS_MIN; }
 
             // Collect the robot's current experience and level for reference later
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_start_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_robot_token);
             $temp_start_level = mmrpg_prototype_robot_level($target_player->player_token, $temp_robot_token);
 
@@ -419,7 +397,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_experience'] += $target_robot_experience;
 
             // Define the new experience for this robot
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_new_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);// If the new experience is over 1000, level up the robot
             $level_boost = 0;
             if ($temp_new_experience > 1000){
@@ -433,13 +410,11 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             }
 
             // Define the new level for this robot
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_new_level = mmrpg_prototype_robot_level($target_player->player_token, $temp_robot_token); //floor($temp_new_experience / 1000) + 1;
 
         }
         // Otherwise if this is a level 100 robot already
         else {
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
             // Collect the robot's current experience and level for reference later
             $temp_start_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_robot_token);
@@ -452,7 +427,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
         }
 
         // Define the event options
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $event_options = array();
         $event_options['this_ability_results']['trigger_kind'] = 'recovery';
         $event_options['this_ability_results']['recovery_kind'] = 'experience';
@@ -464,7 +438,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
         $event_options['this_ability_target'] = $temp_robot->robot_id.'_'.$temp_robot->robot_token;
 
         // Update player/robot frames and points for the victory
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_robot->robot_frame = 'victory';
         $temp_robot->robot_level = $temp_new_level;
         $temp_robot->robot_experience = $temp_new_experience;
@@ -474,7 +447,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
         // Only display the event if the player is under level 100
         if ($temp_robot->robot_level < 100 && $temp_robot->robot_class == 'master'){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Display the win message for this robot with battle points
             $temp_robot->robot_frame = 'taunt';
             $temp_robot->robot_level = $temp_new_level;
@@ -501,7 +473,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
         }
 
         // Floor the robot's experience with or without the event
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $target_player->player_frame = 'victory';
         $target_player->update_session();
         $temp_robot->robot_frame = 'base';
@@ -510,7 +481,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
         // If the level has been boosted, display the stat increases
         if ($temp_start_level != $temp_new_level){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
             // Define the event options
             $event_options = array();
@@ -549,7 +519,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             // Define the event options
             $event_options['this_ability_results']['trigger_kind'] = 'recovery';
             $event_options['this_ability_results']['recovery_type'] = '';
-            $event_options['this_ability_results']['this_amount'] = $this_defense_boost;
+            $event_options['this_ability_results']['this_amount'] = $level_boost;
             $event_options['this_ability_results']['this_result'] = 'success';
             $event_options['this_ability_results']['total_actions'] = 0;
             $event_options['this_ability_target'] = $temp_robot->robot_id.'_'.$temp_robot->robot_token;
@@ -574,7 +544,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             }
 
             // Increment this robot's energy by the calculated amount and display an event
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_robot->robot_energy += $temp_energy_boost;
             $temp_base_energy_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_energy']));
             $temp_robot->robot_base_energy += $temp_base_energy_boost;
@@ -603,7 +572,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             }
 
             // Increment this robot's attack by the calculated amount and display an event
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_robot->robot_attack += $temp_stat_boost;
             $temp_base_attack_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_attack']));
             $temp_robot->robot_base_attack += $temp_base_attack_boost;
@@ -632,7 +600,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             }
 
             // Increment this robot's defense by the calculated amount and display an event
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_robot->robot_defense += $temp_defense_boost;
             $temp_base_defense_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_defense']));
             $temp_robot->robot_base_defense += $temp_base_defense_boost;
@@ -661,7 +628,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             }
 
             // Increment this robot's speed by the calculated amount and display an event
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_robot->robot_speed += $temp_speed_boost;
             $event_options['this_ability_results']['recovery_kind'] = 'speed';
             $event_options['this_ability_results']['this_amount'] = $temp_speed_boost;
@@ -683,12 +649,10 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
         }
 
         // Update the experience level for real this time
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_robot->robot_experience = $temp_new_experience;
         $temp_robot->update_session();
 
         // Collect the robot info array
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_robot_info = $temp_robot->export_array();
 
         // Collect the indexed robot rewards for new abilities
@@ -698,10 +662,8 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
         // Loop through the ability rewards for this robot if set
         if ($temp_robot->robot_class != 'mecha' && ($temp_start_level == 100 || ($temp_start_level != $temp_new_level && !empty($index_robot_rewards['abilities'])))){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
             foreach ($index_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                 // If this ability is already unlocked, continue
                 if (mmrpg_prototype_ability_unlocked($target_player->player_token, $temp_robot_token, $ability_reward_info['token'])){ continue; }
@@ -710,7 +672,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
                 // Check if the required level has been met by this robot
                 if ($temp_new_level >= $ability_reward_info['level']){
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                     // Collect the ability info from the index
                     $ability_info = mmrpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
@@ -721,7 +682,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
                     $temp_ability_token = $ability_info['ability_token'];
 
                     // Display the robot reward message markup
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     $event_header = $ability_info['ability_name'].' Unlocked';
                     $event_body = '<span class="robot_name">'.$temp_info['robot_name'].'</span> unlocked new ability data!<br />';
                     $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
@@ -744,7 +704,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
                     $temp_robot->update_session();
 
                     // Automatically unlock this ability for use in battle
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     $this_reward = array('ability_token' => $temp_ability_token);
                     $temp_player_info = $target_player->export_array();
                     mmrpg_game_unlock_ability($temp_player_info, $temp_robot_info, $this_reward);
@@ -813,20 +772,17 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
     // Define a function for dealing with item drops
     if (!function_exists('temp_player_rewards_items')){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         function temp_player_rewards_items($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_info){
             global $mmrpg_index;
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'temp_player_rewards_items('.$item_reward_info['ability_token'].')');  }
 
             // Create the temporary ability object for event creation
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_ability = new mmrpg_ability($this_battle, $target_player, $target_robot, $item_reward_info);
             $temp_ability->ability_name = $item_reward_info['ability_name'];
             $temp_ability->ability_image = $item_reward_info['ability_token'];
             $temp_ability->update_session();
 
             // Collect or define the ability variables
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_item_token = $item_reward_info['ability_token'];
             $temp_item_name = $item_reward_info['ability_name'];
             $temp_item_colour = !empty($item_reward_info['ability_type']) ? $item_reward_info['ability_type'] : 'none';
@@ -842,7 +798,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             }
 
             // Display the robot reward message markup
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $event_header = $temp_item_name.' Item Drop';
             $event_body = mmrpg_battle::random_positive_word().' The disabled '.$this_robot->print_robot_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="ability_name ability_type ability_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
             $event_body .= $target_player->print_player_name().' added the dropped item to the inventory.';
@@ -874,7 +829,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             $temp_key_items = array('item-screw-large', 'item-screw-small', 'item-heart', 'item-star');
             if (!in_array($temp_item_token, $temp_key_items)){
                 // If there is room in this player's current item omega, add the new item
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $temp_session_token = $target_player->player_token.'_this-item-omega_prototype';
                 if (!empty($_SESSION['GAME']['values'][$temp_session_token])){
                     $temp_count = count($_SESSION['GAME']['values'][$temp_session_token]);
@@ -887,7 +841,6 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             }
 
             // Return true on success
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             return true;
 
         }
@@ -926,28 +879,23 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
 // If the player has replacement robots and the knocked-out one was active
 if ($this_player->counters['robots_active'] > 0){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Try to find at least one active POSITION robot before requiring a switch
     $has_active_positon_robot = false;
     foreach ($this_player->values['robots_active'] AS $key => $robot){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if ($robot['robot_position'] == 'active'){ $has_active_positon_robot = true; }
     }
 
     // If the player does NOT have an active position robot, trigger a switch
     if (!$has_active_positon_robot){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
         // If the target player is not on autopilot, require input
         if ($this_player->player_autopilot == false){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Empty the action queue to allow the player switch time
             $this_battle->actions = array();
         }
         // Otherwise, if the target player is on autopilot, automate input
         elseif ($this_player->player_autopilot == true){  // && $this_player->player_next_action != 'switch'
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
             // Empty the action queue to allow the player switch time
             $this_battle->actions = array();
@@ -962,10 +910,8 @@ if ($this_player->counters['robots_active'] > 0){
 
             // If there were any previous switches removed
             if (!empty($backup_switch_actions)){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 // If the target robot was faster, it should attack first
                 if ($this_robot->robot_speed > $target_robot->robot_speed){
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     // Prepend an ability action for this robot
                     $this_battle->actions_prepend(
                         $this_player,
@@ -978,7 +924,6 @@ if ($this_player->counters['robots_active'] > 0){
                 }
                 // Otherwise, if the target was slower, if should attack second
                 else {
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     // Prepend an ability action for this robot
                     $this_battle->actions_append(
                         $this_player,
@@ -992,7 +937,6 @@ if ($this_player->counters['robots_active'] > 0){
             }
 
             // Prepend a switch action for the target robot
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $this_battle->actions_prepend(
                 $this_player,
                 $this_robot,
@@ -1009,7 +953,6 @@ if ($this_player->counters['robots_active'] > 0){
 }
 // Otherwise, if the target is out of robots...
 else {
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Trigger a battle complete action
     //$this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
@@ -1028,7 +971,6 @@ if ($this_robot->robot_class == 'mecha'){
 // Either way, set the hidden flag on the robot
 //if (($this_robot->robot_status == 'disabled' || $this_robot->robot_energy < 1) && $this_robot->robot_position == 'bench'){
 if ($this_robot->robot_status == 'disabled' || $this_robot->robot_energy < 1){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_robot->robot_status == 'disabled';
     $this_robot->flags['apply_disabled_state'] = true;
     if ($this_robot->robot_position == 'bench'){ $this_robot->flags['hidden'] = true; }
@@ -1039,7 +981,6 @@ if ($this_robot->robot_status == 'disabled' || $this_robot->robot_energy < 1){
 
 // Check if this target winner was a HUMAN player and update the robot database counter for defeats
 if ($target_player->player_side == 'left'){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Add this robot to the global robot database array
     if (!isset($_SESSION['GAME']['values']['robot_database'][$this->robot_token])){ $_SESSION['GAME']['values']['robot_database'][$this->robot_token] = array('robot_token' => $this->robot_token); }
     if (!isset($_SESSION['GAME']['values']['robot_database'][$this->robot_token]['robot_defeated'])){ $_SESSION['GAME']['values']['robot_database'][$this->robot_token]['robot_defeated'] = 0; }
@@ -1048,25 +989,20 @@ if ($target_player->player_side == 'left'){
 
 // Check if this battle has any robot rewards to unlock and the winner was a HUMAN player
 if ($target_player->player_side == 'left' && !empty($this->battle->battle_rewards['robots'])){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // DEBUG
     //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this->robot_token.' | trigger_disabled | battle_rewards_robots = '.count($this->battle->battle_rewards['robots']).'');
     foreach ($this->battle->battle_rewards['robots'] AS $temp_reward_key => $temp_reward_info){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // DEBUG
         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this->robot_token.' | trigger_disabled | checking '.$this->robot_token.' == '.preg_replace('/\s+/', ' ', print_r($temp_reward_info, true)).'...');
         // Check if this robot was part of the rewards for this battle
         if (!mmrpg_prototype_robot_unlocked(false, $temp_reward_info['token']) && $this->robot_token == $temp_reward_info['token']){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // DEBUG
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this->robot_token.' | trigger_disabled | '.$this->robot_token.' == '.$temp_reward_info['token'].' is a match!');
             // Check if this robot has been attacked with any elemental moves
             if (!empty($this->history['triggered_damage_types'])){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 // Loop through all the damage types and check if they're not empty
                 foreach ($this->history['triggered_damage_types'] AS $key => $types){
                     if (!empty($types)){
-                        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                         // DEBUG
                         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this->robot_token.' | trigger_disabled | '.$this->robot_token.' was attacked with a '.implode(', ', $types).' type ability!<br />Removing from the battle rewards!');
@@ -1098,20 +1034,17 @@ if ($target_player->player_side == 'left' && !empty($this->battle->battle_reward
             }
             // If this robot is somehow still a reward, print a message showing a good job
             if (!empty($this->battle->battle_rewards['robots'][$temp_reward_key])){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                 // Collect this reward's information
                 $robot_reward_info = $this->battle->battle_rewards['robots'][$temp_reward_key];
 
                 // Collect or define the robot points and robot rewards variables
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $this_robot_token = $robot_reward_info['token'];
                 $this_robot_level = !empty($robot_reward_info['level']) ? $robot_reward_info['level'] : 1;
                 $this_robot_experience = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 0;
                 $this_robot_rewards = !empty($robot_info['robot_rewards']) ? $robot_info['robot_rewards'] : array();
 
                 // Create the temp new robot for the player
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $temp_index_robot = mmrpg_robot::get_index_info($this_robot_token);
                 $temp_index_robot['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID * 2;
                 $temp_index_robot['robot_level'] = $this_robot_level;
@@ -1119,12 +1052,10 @@ if ($target_player->player_side == 'left' && !empty($this->battle->battle_reward
                 $temp_unlocked_robot = new mmrpg_robot($this_battle, $target_player, $temp_index_robot);
 
                 // Automatically unlock this robot for use in battle
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $temp_unlocked_player = $mmrpg_index['players'][$target_player->player_token];
                 mmrpg_game_unlock_robot($temp_unlocked_player, $temp_index_robot, true, true);
 
                 // Display the robot reward message markup
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $event_header = $temp_unlocked_robot->robot_name.' Unlocked';
                 $event_body = mmrpg_battle::random_positive_word().' '.$target_player->print_player_name().' unlocked new robot data!<br />';
                 $event_body .= $temp_unlocked_robot->print_robot_name().' can now be used in battle!';
