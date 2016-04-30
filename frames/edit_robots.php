@@ -6,7 +6,6 @@ require_once('../top.php');
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Require the remote top in case we're in viewer mode
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 define('MMRPG_REMOTE_SKIP_INDEX', true);
 define('MMRPG_REMOTE_SKIP_DATABASE', true);
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
@@ -15,7 +14,6 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 //require_once('../data/database.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
@@ -31,7 +29,6 @@ $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false
 
 // If we're NOT in script mode, let's loop through all the robots and make sure
 if (empty($_REQUEST['action']) && !defined('MMRPG_REMOTE_GAME')){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_battle_rewards = &$_SESSION[$session_token]['values']['battle_rewards'];
   $temp_battle_settings = &$_SESSION[$session_token]['values']['battle_settings'];
   if (!empty($temp_battle_rewards)){
@@ -69,7 +66,6 @@ if (empty($_REQUEST['action']) && !defined('MMRPG_REMOTE_GAME')){
 // -- COLLECT SETTINGS DATA -- //
 
 // Define the index of allowable robots to appear in the edit
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $allowed_edit_players = array();
 $allowed_edit_robots = array();
 $allowed_edit_data = array();
@@ -114,7 +110,6 @@ $temp_tokens = implode('', $temp_tokens);
 //$mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
 // Now to actually loop through and update the allowed players, robots, and abilities arrays
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){
   if (empty($player_token) || empty($player_info['player_robots'])){ continue; }
   $player_info = array_merge($mmrpg_index['players'][$player_token], $player_info);
@@ -145,7 +140,6 @@ $allowed_edit_robot_count = !empty($allowed_edit_robots) ? count($allowed_edit_r
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Collect the player variables from the request header, if they exist
   $temp_robot = !empty($_REQUEST['robot']) ? $_REQUEST['robot'] : '';
@@ -165,7 +159,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
   // Ensure this robot exists in the current game session
   if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_current_player]['player_robots'][$temp_robot])
     && !empty($_SESSION[$session_token]['values']['battle_rewards'][$temp_current_player]['player_robots'][$temp_robot])){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Count the number of robots each player has on their team before doing anything
     $temp_current_player_robot_count = !empty($_SESSION[$session_token]['values']['battle_rewards'][$temp_current_player]['player_robots']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$temp_current_player]['player_robots']) : 0;
@@ -188,7 +181,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
     // Unset the robot settings and rewards in the old player's game session
     if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_new_player]['player_robots'][$temp_robot])
       && !empty($_SESSION[$session_token]['values']['battle_rewards'][$temp_new_player]['player_robots'][$temp_robot])){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
       $_SESSION[$session_token]['values']['battle_settings'][$temp_current_player]['player_robots'][$temp_robot] = false;
       $_SESSION[$session_token]['values']['battle_rewards'][$temp_current_player]['player_robots'][$temp_robot] = false;
@@ -200,14 +192,12 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
     }
 
     // Save, produce the success message with the new ability order
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     mmrpg_save_game_session($this_save_filepath);
     //exit('success|player-swapped|true');
     $key_counter = 0;
     $player_counter = 1;
     $temp_robot_totals = array();
     $player_options_markup = '';
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     foreach($allowed_edit_data AS $ptoken => $pinfo){
       $temp_robot_totals[$ptoken] = !empty($pinfo['player_robots']) ? count($pinfo['player_robots']) : 0;
       $temp_player_battles = mmrpg_prototype_battles_complete($ptoken);
@@ -215,7 +205,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
       $player_options_markup .= '<option value="'.$pinfo['player_token'].'" data-label="'.$pinfo['player_token'].'" title="'.$pinfo['player_name'].'" '.(!$temp_player_transfer ? 'disabled="disabled"' : '').'>'.$pinfo['player_name'].'</option>';
       $player_counter++;
     }
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     foreach($allowed_edit_data AS $temp_player_token => $temp_player_info){
       if ($temp_player_token == $temp_new_player){
 
@@ -231,7 +220,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
         $temp_robot_info['robot_settings'] = $temp_robot_settings;
         $temp_robot_info['robot_rewards'] = $temp_robot_rewards;
         $first_robot_token = $temp_robot_info['robot_token'];
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         exit('success|player-swapped|'.mmrpg_robot::print_editor_markup($temp_player_info, $temp_robot_info));
       }
     }
@@ -241,7 +229,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
   else {
 
     // Produce the error message
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     exit('error|robot-undefined|false');
 
   }
@@ -254,7 +241,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
 
 // Check if an action request has been sent with an ability type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'ability'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Collect the ability variables from the request header, if they exist
   $temp_key = !empty($_REQUEST['key']) ? $_REQUEST['key'] : 0;
@@ -335,7 +321,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'ability'){
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'favourite'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Collect the ability variables from the request header, if they exist
   $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
@@ -349,7 +334,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'favourite'){
   $current_robot_favourites = !empty($_SESSION[$session_token]['values']['robot_favourites']) ? $_SESSION[$session_token]['values']['robot_favourites'] : array();
   $temp_player_info = $allowed_edit_data[$temp_player];
   $temp_robot_info = $allowed_edit_data[$temp_player]['player_robots'][$temp_robot];
-  
+
   // If this robot is not already a favourite, add it
   if (!in_array($temp_robot, $current_robot_favourites)){
     $current_robot_favourites[] = $temp_robot;
@@ -366,7 +351,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'favourite'){
     mmrpg_save_game_session($this_save_filepath);
     exit('success|favourite-removed|removed');
   }
-  
+
   exit('error|request-error|unknown');
 
 }
@@ -378,7 +363,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'favourite'){
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'level'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Collect the ability variables from the request header, if they exist
   $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
@@ -422,7 +406,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'level'){
 
         $debug_robot_tokens = array();
         foreach ($temp_player_info['player_robots'] AS $rtoken => $rinfo){ $debug_robot_tokens[] = $rtoken; }
-        
+
         $player_rewards = mmrpg_prototype_player_rewards($temp_player_token);
         $player_ability_rewards = !empty($player_rewards['player_abilities']) ? $player_rewards['player_abilities'] : array();
         if (!empty($player_ability_rewards)){ asort($player_ability_rewards); }
@@ -454,7 +438,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'level'){
 
 // Check if an action request has been sent with an player type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sort'){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Collect the ability variables from the request header, if they exist
   $temp_token = !empty($_REQUEST['token']) ? $_REQUEST['token'] : '';
@@ -484,10 +467,10 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sort'){
         }
       }
       //die('<pre>'.print_r($temp_player_robots, true).'</pre>');
-      
+
       // Define a temporarily function for sorting the robots
       $mmrpg_database_robots_keys = array_keys($mmrpg_database_robots);
-      
+
       // If the sort token was by number and asc
       if ($temp_token_order == 'number_asc'){
         // Define the sort function that uses these keys
@@ -564,10 +547,10 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sort'){
           else { return 0; }
         }
       }
-      
+
       // Sort the robots and maintain index association
       uasort($temp_player_robots, 'temp_player_robots_sort');
-      
+
       // Ensure nothing went wrong with the array before copying
       if (!empty($temp_player_robots)){
         $temp_robot_tokens = implode(',', array_keys($temp_player_robots));
@@ -597,7 +580,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sort'){
 // -- RECOLLECT SETTINGS DATA -- //
 
 // Define the index of allowable robots to appear in the edit
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $allowed_edit_players = array();
 $allowed_edit_robots = array();
 $allowed_edit_data = array();
@@ -633,7 +615,6 @@ $allowed_edit_robot_count = !empty($allowed_edit_robots) ? count($allowed_edit_r
 
 // Generate the canvas markup for this page
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
  // Start the output buffer
  ob_start();
@@ -655,22 +636,22 @@ if (true){
         $robot_key = $key_counter;
         $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
         $temp_robot_rewards = array();
-        
+
         if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])){
           $temp_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token];
         }
-      
+
         foreach ($player_keys AS $this_player_key){
           if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$this_player_key]['player_robots'][$robot_token])){
             $temp_array = $_SESSION[$session_token]['values']['battle_rewards'][$this_player_key]['player_robots'][$robot_token];
             $temp_robot_rewards = array_merge($temp_robot_rewards, $temp_array);
           }
         }
-        
+
         if (!empty($temp_robot_rewards) && $global_allow_editing){
           $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token] = $temp_robot_rewards;
         }
-        
+
         //$temp_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token];
         $robot_info['robot_level'] = !empty($temp_robot_rewards['robot_level']) ? $temp_robot_rewards['robot_level'] : 1;
         $robot_info['robot_experience'] = !empty($temp_robot_rewards['robot_experience']) ? $temp_robot_rewards['robot_experience'] : 0;
@@ -704,13 +685,11 @@ if (true){
 
 // Generate the console markup for this page
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Start the output buffer
   ob_start();
 
   // Predefine the player options markup
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $player_options_markup = '';
   foreach($allowed_edit_data AS $player_token => $player_info){
     $temp_player_battles = mmrpg_prototype_battles_complete($player_token);
@@ -722,22 +701,18 @@ if (true){
   $key_counter = 0;
 
   // Loop through and count each player's robot totals
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_robot_totals = array();
   foreach($allowed_edit_data AS $player_token => $player_info){
     $temp_robot_totals[$player_token] = !empty($player_info['player_robots']) ? count($player_info['player_robots']) : 0;
   }
 
   // Loop through the players in the ability edit data
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   foreach($allowed_edit_data AS $player_token => $player_info){
 
     // Collect the rewards for this player
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $player_rewards = mmrpg_prototype_player_rewards($player_token);
 
     // Check how many robots this player has and see if they should be able to transfer
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $counter_player_robots = !empty($player_info['player_robots']) ? count($player_info['player_robots']) : false;
     $counter_player_missions = mmrpg_prototype_battles_complete($player_info['player_token']);
     $allow_player_selector = $player_counter > 1 && $counter_player_missions > 0 ? true : false; //$counter_player_robots > 1 && $player_counter > 1 ? true : false;
@@ -751,7 +726,6 @@ if (true){
 
     // Loop through the player robots and display their edit boxes
     foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
       // Update the robot key to the current counter
       $robot_key = $key_counter;
@@ -759,12 +733,10 @@ if (true){
       $allow_player_selector_backup = $allow_player_selector;
 
       // Collect this player's ability rewards and add them to the dropdown
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $player_ability_rewards = !empty($player_rewards['player_abilities']) ? $player_rewards['player_abilities'] : array();
       if (!empty($player_ability_rewards)){ asort($player_ability_rewards); }
 
       // Collect and print the editor markup for this robot
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_editor_markup = mmrpg_robot::print_editor_markup($player_info, $robot_info);
       echo $temp_editor_markup;
 
@@ -778,7 +750,6 @@ if (true){
   }
 
  // Collect the contents of the buffer
- if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
  $edit_console_markup = ob_get_clean();
  $edit_console_markup = preg_replace('/\s+/', ' ', trim($edit_console_markup));
 
@@ -787,7 +758,6 @@ if (true){
 // Generate the edit markup using the battles settings and rewards
 $this_edit_markup = '';
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Prepare the output buffer
   ob_start();
@@ -839,7 +809,6 @@ if (true){
 }
 
 // DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>
 <!DOCTYPE html>
 <html>
