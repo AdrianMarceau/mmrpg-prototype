@@ -362,19 +362,21 @@ ob_start();
                         </ul>
                     </div>
                     <div class="text player_stats">
-                        <strong class="label">Player Battle Stats</strong>
+                        <strong class="label">Robot Database Stats</strong>
                         <ul class="records">
-                            <li class="stat"><span class="counter victory_counter"><?= $this_playerinfo['victory_count'] == 1 ? '1 Victory' : $this_playerinfo['victory_count'].' Victories' ?></span></li>
-                            <li class="stat"><span class="counter defeat_counter"><?= $this_playerinfo['defeat_count'] == 1 ? '1 Defeat' : $this_playerinfo['defeat_count'].' Defeats' ?></span></li>
-                            <? $this_playerinfo['battle_count'] = $this_playerinfo['victory_count'] + $this_playerinfo['defeat_count']; ?>
-                            <? $this_playerinfo['battle_rating'] = round(($this_playerinfo['victory_count'] * 2) - ($this_playerinfo['defeat_count'] / 2)); ?>
-                            <? if($this_playerinfo['battle_rating'] != 0): ?>
-                                <li class="stat"><span class="counter rating_counter"><?= ($this_playerinfo['battle_rating'] > 0 ? '+' : '-').$this_playerinfo['battle_rating'] ?> Rating</span></li>
+                            <? $temp_unlocked_summoned_total = $temp_counter_database['unlocked']['total'] + $temp_counter_database['summoned']['total']; ?>
+                            <? if(!empty($temp_counter_database['total'])): ?>
+                                <li class="stat"><span class="counter summoned_counter"><?= $temp_counter_database['unlocked']['total'] ?> Unlocked</span></li>
+                                <li class="stat"><span class="counter scanned_counter"><?= $temp_counter_database['scanned']['total'] ?> Scanned</span></li>
+                                <li class="stat"><span class="counter encountered_counter"><?= $temp_counter_database['encountered']['total'] ?> Encountered</span></li>
                             <? else: ?>
-                                <li class="stat"><span class="counter rating_counter">0 Rating</span></li>
+                                <li class="stat"><span class="counter summoned_counter">0 Summoned</span></li>
+                                <li class="stat"><span class="counter scanned_counter">0 Scanned</span></li>
+                                <li class="stat"><span class="counter encountered_counter">0 Encountered</span></li>
                             <? endif; ?>
                         </ul>
                     </div>
+                    <? /*
                     <div class="text player_stats">
                         <strong class="label">Star Force Stats</strong>
                         <ul class="records">
@@ -389,21 +391,7 @@ ob_start();
                             <? endif; ?>
                         </ul>
                     </div>
-                    <div class="text player_stats">
-                        <strong class="label">Robot Database Stats</strong>
-                        <ul class="records">
-                            <? $temp_unlocked_summoned_total = $temp_counter_database['unlocked']['total'] + $temp_counter_database['summoned']['total']; ?>
-                            <? if(!empty($temp_counter_database['total'])): ?>
-                                <li class="stat"><span class="counter summoned_counter"><?= $temp_unlocked_summoned_total ?> Summoned</span></li>
-                                <li class="stat"><span class="counter scanned_counter"><?= $temp_counter_database['scanned']['total'] ?> Scanned</span></li>
-                                <li class="stat"><span class="counter encountered_counter"><?= $temp_counter_database['encountered']['total'] ?> Encountered</span></li>
-                            <? else: ?>
-                                <li class="stat"><span class="counter summoned_counter">0 Summoned</span></li>
-                                <li class="stat"><span class="counter scanned_counter">0 Scanned</span></li>
-                                <li class="stat"><span class="counter encountered_counter">0 Encountered</span></li>
-                            <? endif; ?>
-                        </ul>
-                    </div>
+                    */ ?>
                 </div>
 
                 <div class="bodytext" style="margin-top: 15px;">
