@@ -951,14 +951,17 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_speed = $this_robot_stats['speed']['current'];
 
         $starcount = 0;
-        $starstring = '';
-        if ($this_robot_stats['level'] >= $this_robot_stats['level_max']){ $starcount++; }
-        if ($this_robot_stats['energy']['current'] >= $this_robot_stats['energy']['max']){ $this_robot_energy .= ' '.$starstring; $starcount++; }
-        if ($this_robot_stats['attack']['current'] >= $this_robot_stats['attack']['max']){ $this_robot_attack .= ' '.$starstring; $starcount++; }
-        if ($this_robot_stats['defense']['current'] >= $this_robot_stats['defense']['max']){ $this_robot_defense .= ' '.$starstring; $starcount++; }
-        if ($this_robot_stats['speed']['current'] >= $this_robot_stats['speed']['max']){ $this_robot_speed .= ' '.$starstring; $starcount++; }
-        for ($i = 0; $i < $starcount; $i++){ $starstring .= '&#9733;'; }
-        $this_robot_name .= $starcount > 0 ? ' <span style="position: relative; bottom: 2px; font-size: 9px; letter-spacing: 0;">'.$starstring.'</span>' : '';
+        $bullcount = 0;
+        $namestring = '';
+        $level_max = false;
+        if ($this_robot_stats['level'] >= $this_robot_stats['level_max']){ $starcount++; $level_max = true; }
+        //if ($this_robot_stats['energy']['bonus'] >= $this_robot_stats['energy']['bonus_max']){ if ($level_max){ $starcount++; } else { $bullcount++; } }
+        if ($this_robot_stats['attack']['bonus'] >= $this_robot_stats['attack']['bonus_max']){ if ($level_max){ $starcount++; } else { $bullcount++; } }
+        if ($this_robot_stats['defense']['bonus'] >= $this_robot_stats['defense']['bonus_max']){ if ($level_max){ $starcount++; } else { $bullcount++; } }
+        if ($this_robot_stats['speed']['bonus'] >= $this_robot_stats['speed']['bonus_max']){ if ($level_max){ $starcount++; } else { $bullcount++; } }
+        for ($i = 0; $i < $starcount; $i++){ $namestring .= '&#9733;'; }
+        for ($i = 0; $i < $bullcount; $i++){ $namestring .= '&bull;'; }
+        $this_robot_name .= !empty($namestring) ? ' <span style="position: relative; bottom: 2px; font-size: 9px; letter-spacing: 0;">'.$namestring.'</span>' : '';
 
         if (!empty($this_player_info['player_energy'])){ $this_robot_energy += ceil(($this_player_info['player_energy'] / 100) * $this_robot_energy); }
         if (!empty($this_player_info['player_attack'])){ $this_robot_attack += ceil(($this_player_info['player_attack'] / 100) * $this_robot_attack); }
@@ -969,8 +972,12 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_title = ''; //-- Basics -------------------------------  <br />';
         $this_option_title .= $info['robot_name']; //''.$info['robot_number'].' '.$info['robot_name'];
         $this_option_title .= ' ('.(!empty($info['robot_core']) ? ucfirst($info['robot_core']).' Core' : 'Neutral Core').')';
-        $this_option_title .= ' <br />Level '.$this_robot_level.($this_robot_level >= 100 ? ' &#9733;' : '').' | '.$this_robot_experience_title.'/1000 Exp'.(!empty($this_robot_favourite_title) ? ' '.$this_robot_favourite_title : '');
-        $this_option_title .= ' <br />E: '.$this_robot_energy.' | A: '.$this_robot_attack.' | D: '.$this_robot_defense.' | S: '.$this_robot_speed;
+        $this_option_title .= ' <br />Level '.$this_robot_level.($this_robot_level >= 100 ? ' &#9733;' : '');
+        $this_option_title .= ' | '.$this_robot_experience_title.'/1000 Exp'.(!empty($this_robot_favourite_title) ? ' '.$this_robot_favourite_title : '');
+        $this_option_title .= ' <br />E: '.$this_robot_energy; //.($this_robot_stats['energy']['bonus'] >= $this_robot_stats['energy']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
+        $this_option_title .= ' | A: '.$this_robot_attack.($this_robot_stats['attack']['bonus'] >= $this_robot_stats['attack']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
+        $this_option_title .= ' | D: '.$this_robot_defense.($this_robot_stats['defense']['bonus'] >= $this_robot_stats['defense']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
+        $this_option_title .= ' | S: '.$this_robot_speed.($this_robot_stats['speed']['bonus'] >= $this_robot_stats['speed']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
         if (!empty($this_robot_abilities_current)){
             $this_option_title .= ' <hr />'; // <hr />-- Abilities ------------------------------- <br />';
             $temp_counter = 1;

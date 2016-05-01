@@ -73,26 +73,29 @@ ob_start();
 
     // Define a temp function for printing out robot stat blocks
     $print_robot_stat_function = function($stat_token) use($robot_info, $robot_stats, $player_info){
-        $is_maxed = $robot_stats['level'] >= 100 && $robot_stats[$stat_token]['bonus'] >= $robot_stats[$stat_token]['bonus_max'] ? true : false;
-        if ($is_maxed){ echo '<span class="robot_stat robot_type_'.$stat_token.'"><span title="Max '.ucfirst($stat_token).'!">&#9733;</span> '; }
-        else { echo '<span class="robot_stat">'; }
-            echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
 
+        $level_max = $robot_stats['level'] >= 100 ? true : false;
+        $is_maxed = $robot_stats[$stat_token]['bonus'] >= $robot_stats[$stat_token]['bonus_max'] ? true : false;
+
+        echo $level_max && $is_maxed ? '<span class="robot_stat robot_type_'.$stat_token.'"> ' : '<span class="robot_stat"> ';
+
+            echo $is_maxed && $stat_token != 'energy' ? ($level_max ? '<span>&#9733;</span> ' : '<span>&bull;</span> ') : '';
+
+            echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
                 $base_text = 'Base '.ucfirst($stat_token).' <br /> <span style="font-size: 90%">'.number_format($robot_stats[$stat_token]['base'], 0, '.', ',').' <span style="font-size: 90%">@</span>  Lv.'.$robot_stats['level'].' = '.number_format($robot_stats[$stat_token]['current_noboost'], 0, '.', ',').'</span>';
                 echo '<span data-tooltip="'.htmlentities($base_text, ENT_QUOTES, 'UTF-8', true).'" data-tooltip-type="robot_type robot_type_none">'.$robot_stats[$stat_token]['current_noboost'].'</span> ';
-
                 if (!empty($robot_stats[$stat_token]['bonus'])){
                     $robot_bonus_text = 'Robot Bonuses <br /> <span style="font-size: 90%">'.number_format($robot_stats[$stat_token]['bonus'], 0, '.', ',').' / '.number_format($robot_stats[$stat_token]['bonus_max'], 0, '.', ',').' Max</span>';
                     echo '+ <span data-tooltip="'.htmlentities($robot_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_shield">'.$robot_stats[$stat_token]['bonus'].'</span> ';
                 }
-
                 if (!empty($robot_stats[$stat_token]['player'])){
                     $player_bonus_text = 'Player Bonuses <br /> <span style="font-size: 90%">'.number_format(($robot_stats[$stat_token]['current']), 0, '.', ',').' x '.$player_info['player_'.$stat_token].'% = '.number_format($robot_stats[$stat_token]['player'], 0, '.', ',').'</span>';
                     echo '+ <span data-tooltip="'.htmlentities($player_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['player'].'</span> ';
                 }
-
             echo ' = </span>';
+
             echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$stat_token], 4, '0', STR_PAD_LEFT));
+
         echo '</span>'."\n";
         };
 
