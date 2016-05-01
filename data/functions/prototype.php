@@ -1080,30 +1080,60 @@ function mmrpg_prototype_leaderboard_index(){
 // Define a function for collecting the requested player's board ranking
 function mmrpg_prototype_leaderboard_rank($user_id){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_leaderboard_rank({$user_id})");  }
+    global $DB;
 
-    // Query the database and collect the array list of all non-bogus players
-    $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
-    $this_leaderboard_points = 0;
-    $this_leaderboard_list = array();
-    foreach ($this_leaderboard_index AS $array){
-        $this_leaderboard_list[] = $array['board_points'];
-        if ($array['user_id'] == $user_id){ $this_leaderboard_points = $array['board_points']; }
-    }
-    $this_leaderboard_list = array_unique($this_leaderboard_list);
-    sort($this_leaderboard_list);
-    $this_leaderboard_list = array_reverse($this_leaderboard_list);
+    // Generate the query for selecting this user's rank
+    $rank_query = "SELECT
+        uo.user_id,
+        uo.board_points,
+        (SELECT
+            COUNT(DISTINCT ui.board_points)
+           FROM mmrpg_leaderboard AS ui
+           WHERE ui.board_points >= uo.board_points
+           ) AS user_rank
+        FROM mmrpg_leaderboard uo
+        WHERE
+        user_id = {$user_id} AND
+        uo.board_points > 0
+        ;";
 
-    // Now collect the leaderboard rank based on position
-    if (in_array($this_leaderboard_points, $this_leaderboard_list)){
-        $this_leaderboard_rank = array_search($this_leaderboard_points, $this_leaderboard_list);
-        $this_leaderboard_rank = $this_leaderboard_rank !== false ? $this_leaderboard_rank + 1 : 0;
-    } else {
-        $this_leaderboard_rank = 0;
-    }
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "\$this_leaderboard_rank = {$this_leaderboard_rank}; \$this_leaderboard_points = {$this_leaderboard_points}; \$this_leaderboard_list = <pre>".print_r($this_leaderboard_list, true)."</pre>");  }
+    // Query the database for this user's specific ranking
+    $rank_info = $DB->get_array($rank_query);
 
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "return {$this_leaderboard_rank};");  }
-    return $this_leaderboard_rank;
+    // Return the user's rank if not empty
+    if (!empty($rank_info['user_rank'])){ return (int)($rank_info['user_rank']); }
+    // Otherwise, simply return a zero rank
+    else { return 0; }
+
+}
+
+// Define a function for collecting the requested player's legacy oard ranking
+function mmrpg_prototype_leaderboard_rank_legacy($user_id){
+    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_leaderboard_rank({$user_id})");  }
+    global $DB;
+
+    // Generate the query for selecting this user's rank
+    $rank_query = "SELECT
+        uo.user_id,
+        uo.board_points_legacy,
+        (SELECT
+            COUNT(DISTINCT ui.board_points_legacy)
+           FROM mmrpg_leaderboard AS ui
+           WHERE ui.board_points_legacy >= uo.board_points_legacy
+           ) AS user_rank
+        FROM mmrpg_leaderboard uo
+        WHERE
+        user_id = {$user_id} AND
+        uo.board_points_legacy > 0
+        ;";
+
+    // Query the database for this user's specific ranking
+    $rank_info = $DB->get_array($rank_query);
+
+    // Return the user's rank if not empty
+    if (!empty($rank_info['user_rank'])){ return (int)($rank_info['user_rank']); }
+    // Otherwise, simply return a zero rank
+    else { return 0; }
 
 }
 
