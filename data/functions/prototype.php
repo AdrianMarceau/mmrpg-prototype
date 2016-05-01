@@ -939,7 +939,6 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_experience_title = $this_robot_level >= 100 ? '&#8734;' : $this_robot_experience;
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
         $this_robot_name .= $this_robot_favourite ? ' <span style="position: relative; bottom: 2px; font-size: 11px;">&hearts;</span>' : '';
-        $this_robot_name .= $text_robot_special ? ' <span style="position: relative; bottom: 2px; font-size: 9px;" title="Congratulations!!! :D">&#9733;</span>' : '';
         $this_robot_energy = $info['robot_energy'];
         $this_robot_attack = $info['robot_attack'];
         $this_robot_defense = $info['robot_defense'];
@@ -966,15 +965,15 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_defense = $this_robot_defense > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_defense;
         $this_robot_speed = $this_robot_speed > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_speed;
 
-        $maxcount = 0;
-        $star = '&#9733;';
-        $find = $star.'</span>';
-        $replace = $star.$find;
-        if ($this_robot_energy >= $this_robot_stats['energy']['max']){ $this_robot_energy .= ' '.$star; $maxcount++; }
-        if ($this_robot_attack >= $this_robot_stats['attack']['max']){ $this_robot_attack .= ' '.$star; $maxcount++; }
-        if ($this_robot_defense >= $this_robot_stats['defense']['max']){ $this_robot_defense .= ' '.$star; $maxcount++; }
-        if ($this_robot_speed >= $this_robot_stats['speed']['max']){ $this_robot_speed .= ' '.$star; $maxcount++; }
-        for ($i = 0; $i < $maxcount; $i++){ $this_robot_name = str_replace($find, $replace, $this_robot_name); }
+        $starcount = 0;
+        $starstring = '';
+        if ($this_robot_level >= $this_robot_stats['level_max']){ $starcount++; }
+        if ($this_robot_energy >= $this_robot_stats['energy']['max']){ $this_robot_energy .= ' '.$starstring; $starcount++; }
+        if ($this_robot_attack >= $this_robot_stats['attack']['max']){ $this_robot_attack .= ' '.$starstring; $starcount++; }
+        if ($this_robot_defense >= $this_robot_stats['defense']['max']){ $this_robot_defense .= ' '.$starstring; $starcount++; }
+        if ($this_robot_speed >= $this_robot_stats['speed']['max']){ $this_robot_speed .= ' '.$starstring; $starcount++; }
+        for ($i = 0; $i < $starcount; $i++){ $starstring .= '&#9733;'; }
+        $this_robot_name .= $starcount > 0 ? ' <span style="position: relative; bottom: 2px; font-size: 9px; letter-spacing: 0;">'.$starstring.'</span>' : '';
 
         $this_robot_abilities_current = !empty($info['robot_abilities']) ? array_keys($info['robot_abilities']) : array('buster-shot');
         $this_option_title = ''; //-- Basics -------------------------------  <br />';
