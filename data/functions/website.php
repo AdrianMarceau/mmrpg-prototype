@@ -268,7 +268,7 @@ function mmrpg_formatting_help(){
 
 // Define a function for generating the number suffix
 function mmrpg_number_suffix($value, $concatenate = true, $superscript = false){
-    if (!is_numeric($value) || !is_int($value)){ return false; }
+    if (!is_numeric($value) || !is_int($value)){ return $value; }
     if (substr($value, -2, 2) == 11 || substr($value, -2, 2) == 12 || substr($value, -2, 2) == 13){ $suffix = "th"; }
     else if (substr($value, -1, 1) == 1){ $suffix = "st"; }
     else if (substr($value, -1, 1) == 2){ $suffix = "nd"; }
