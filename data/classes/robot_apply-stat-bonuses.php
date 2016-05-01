@@ -43,65 +43,27 @@ if ($this->robot_base_level > 100){ $this->robot_base_level = 100;  }
 
 // Collect this robot's stat values for later reference
 $this_index_info = self::get_index_info($this->robot_token);
-$this_robot_stats = self::calculate_stat_values($this->robot_level, $this_index_info, $this_rewards);
+$this_robot_stats = self::calculate_stat_values($this->robot_level, $this_index_info, $this_rewards, true);
 
 // Update the robot's stat values with calculated totals
 $stat_tokens = array('energy', 'attack', 'defense', 'speed');
 foreach ($stat_tokens AS $stat){
+    // Collect and apply this robot's current stats and max
     $prop_stat = 'robot_'.$stat;
     $prop_stat_base = 'robot_base_'.$stat;
     $prop_stat_max = 'robot_max_'.$stat;
     $this->$prop_stat = $this_robot_stats[$stat]['current'];
     $this->$prop_stat_base = $this_robot_stats[$stat]['current'];
     $this->$prop_stat_max = $this_robot_stats[$stat]['max'];
-
-}
-
-// Ensure this robot is being used by its original player before applying bonuses
-//if (!empty($this->robot_original_player) && $this->robot_original_player == $this->player->player_token){}
-
-// Apply stat bonuses to this robot based on its current player and their own stats
-if (true){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // If this robot's player has any stat bonuses, apply them as well
-    if (!empty($this->player->player_energy)){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $temp_boost = ceil($this->robot_energy * ($this->player->player_energy / 100));
-        $this->robot_energy += $temp_boost;
-        $this->robot_base_energy += $temp_boost;
-    }
-    if (!empty($this->player->player_attack)){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $temp_boost = ceil($this->robot_attack * ($this->player->player_attack / 100));
-        $this->robot_attack += $temp_boost;
-        $this->robot_base_attack += $temp_boost;
-    }
-    if (!empty($this->player->player_defense)){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $temp_boost = ceil($this->robot_defense * ($this->player->player_defense / 100));
-        $this->robot_defense += $temp_boost;
-        $this->robot_base_defense += $temp_boost;
-    }
-    if (!empty($this->player->player_speed)){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $temp_boost = ceil($this->robot_speed * ($this->player->player_speed / 100));
-        $this->robot_speed += $temp_boost;
-        $this->robot_base_speed += $temp_boost;
+    $prop_player_stat = 'player_'.$stat;
+    if (!empty($this->player->$prop_player_stat)){
+        $temp_boost = ceil($this->$prop_stat * ($this->player->$prop_player_stat / 100));
+        $this->$prop_stat += $temp_boost;
+        $this->$prop_stat_base += $temp_boost;
     }
 
 }
-
-// Limit all stats to 9999 for display purposes
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-if ($this->robot_energy > MMRPG_SETTINGS_STATS_MAX){ $this->robot_energy = MMRPG_SETTINGS_STATS_MAX; }
-if ($this->robot_base_energy > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_energy = MMRPG_SETTINGS_STATS_MAX; }
-if ($this->robot_attack > MMRPG_SETTINGS_STATS_MAX){ $this->robot_attack = MMRPG_SETTINGS_STATS_MAX; }
-if ($this->robot_base_attack > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_attack = MMRPG_SETTINGS_STATS_MAX; }
-if ($this->robot_defense > MMRPG_SETTINGS_STATS_MAX){ $this->robot_defense = MMRPG_SETTINGS_STATS_MAX; }
-if ($this->robot_base_defense > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_defense = MMRPG_SETTINGS_STATS_MAX; }
-if ($this->robot_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_speed = MMRPG_SETTINGS_STATS_MAX; }
-if ($this->robot_base_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_speed = MMRPG_SETTINGS_STATS_MAX; }
 
 // Create the stat boost flag
 $this->flags['apply_stat_bonuses'] = true;
