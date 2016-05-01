@@ -980,7 +980,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_title = ''; //-- Basics -------------------------------  <br />';
         $this_option_title .= $info['robot_name']; //''.$info['robot_number'].' '.$info['robot_name'];
         $this_option_title .= ' ('.(!empty($info['robot_core']) ? ucfirst($info['robot_core']).' Core' : 'Neutral Core').')';
-        $this_option_title .= ' <br />Level '.$this_robot_level.' | '.$this_robot_experience_title.'/1000 Exp'.(!empty($this_robot_favourite_title) ? ' '.$this_robot_favourite_title : '');
+        $this_option_title .= ' <br />Level '.$this_robot_level.($this_robot_level >= 100 ? ' &#9733;' : '').' | '.$this_robot_experience_title.'/1000 Exp'.(!empty($this_robot_favourite_title) ? ' '.$this_robot_favourite_title : '');
         $this_option_title .= ' <br />E: '.$this_robot_energy.' | A: '.$this_robot_attack.' | D: '.$this_robot_defense.' | S: '.$this_robot_speed;
         if (!empty($this_robot_abilities_current)){
             $this_option_title .= ' <hr />'; // <hr />-- Abilities ------------------------------- <br />';
