@@ -1044,12 +1044,12 @@ class mmrpg_ability {
                     );
 
                 // If this robot is not already over their stat limit, increment pending boosts
-                if ($target_player->player_side == 'left' && $robot_stats[$stat_token]['current'] < $robot_stats[$stat_token]['max']){
+                if ($target_player->player_side == 'left' && $robot_stats[$stat_token]['bonus'] < $robot_stats[$stat_token]['bonus_max']){
 
                     // Calculate the actual amount to permanently boost in case it goes over max
                     $stat_boost_amount = $this_ability->ability_results['total_amount'];
-                    if (($robot_stats[$stat_token]['current'] + $stat_boost_amount) > $robot_stats[$stat_token]['max']){
-                        $stat_boost_amount = $robot_stats[$stat_token]['max'] - $robot_stats[$stat_token]['current'];
+                    if (($robot_stats[$stat_token]['bonus'] + $stat_boost_amount) > $robot_stats[$stat_token]['bonus_max']){
+                        $stat_boost_amount = $robot_stats[$stat_token]['bonus'] - $robot_stats[$stat_token]['bonus_max'];
                     }
 
                     // Only update session variables if the boost is not empty

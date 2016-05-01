@@ -901,10 +901,13 @@ function mmrpg_prototype_sort_robots_position($info1, $info2){
 // Define a function for displaying prototype robot button markup on the select screen
 function mmrpg_prototype_robot_select_markup($this_prototype_data){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_prototype_robot_select_markup($this_prototype_data)');  }
-    global $DB;
+    global $DB, $mmrpg_index;
 
     // Define the temporary robot markup string
     $this_robots_markup = '';
+
+    // Collect this player's index info
+    $this_player_info = $mmrpg_index['players'][$this_prototype_data['this_player_token']];
 
     // Collect the robot index for calculation purposes
     $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
@@ -937,43 +940,30 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $text_robot_special = $this_robot_level >= 100 || !empty($this_robot_rewards['flags']['reached_max_level']) ? true : false;
         $this_robot_experience = $this_robot_level >= 100 ? '<span style="position: relative; bottom: 0; font-size: 120%;">&#8734;</span>' : $this_robot_experience;
         $this_robot_experience_title = $this_robot_level >= 100 ? '&#8734;' : $this_robot_experience;
+
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
         $this_robot_name .= $this_robot_favourite ? ' <span style="position: relative; bottom: 2px; font-size: 11px;">&hearts;</span>' : '';
-        $this_robot_energy = $info['robot_energy'];
-        $this_robot_attack = $info['robot_attack'];
-        $this_robot_defense = $info['robot_defense'];
-        $this_robot_speed = $info['robot_speed'];
-        $this_robot_stats = mmrpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards);
-        $temp_level = $this_robot_level - 1;
 
-        $this_robot_energy += ceil($temp_level * (0.05 * $this_robot_energy));
-        $this_robot_attack += ceil($temp_level * (0.05 * $this_robot_attack));
-        $this_robot_defense += ceil($temp_level * (0.05 * $this_robot_defense));
-        $this_robot_speed += ceil($temp_level * (0.05 * $this_robot_speed));
-
-        if (!empty($this_robot_rewards['robot_energy'])){ $this_robot_energy += $this_robot_rewards['robot_energy']; }
-        if (!empty($this_robot_rewards['robot_attack'])){ $this_robot_attack += $this_robot_rewards['robot_attack']; }
-        if (!empty($this_robot_rewards['robot_defense'])){ $this_robot_defense += $this_robot_rewards['robot_defense']; }
-        if (!empty($this_robot_rewards['robot_speed'])){ $this_robot_speed += $this_robot_rewards['robot_speed']; }
-
-        if ($this_prototype_data['this_player_token'] == 'dr-light'){ $this_robot_defense += ceil(0.25 * $this_robot_defense); }
-        if ($this_prototype_data['this_player_token'] == 'dr-wily'){ $this_robot_attack += ceil(0.25 * $this_robot_attack); }
-        if ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $this_robot_speed += ceil(0.25 * $this_robot_speed); }
-
-        $this_robot_energy = $this_robot_energy > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_energy;
-        $this_robot_attack = $this_robot_attack > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_attack;
-        $this_robot_defense = $this_robot_defense > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_defense;
-        $this_robot_speed = $this_robot_speed > MMRPG_SETTINGS_STATS_MAX ? MMRPG_SETTINGS_STATS_MAX : $this_robot_speed;
+        $this_robot_stats = mmrpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards, true);
+        $this_robot_energy = $this_robot_stats['energy']['current'];
+        $this_robot_attack = $this_robot_stats['attack']['current'];
+        $this_robot_defense = $this_robot_stats['defense']['current'];
+        $this_robot_speed = $this_robot_stats['speed']['current'];
 
         $starcount = 0;
         $starstring = '';
-        if ($this_robot_level >= $this_robot_stats['level_max']){ $starcount++; }
-        if ($this_robot_energy >= $this_robot_stats['energy']['max']){ $this_robot_energy .= ' '.$starstring; $starcount++; }
-        if ($this_robot_attack >= $this_robot_stats['attack']['max']){ $this_robot_attack .= ' '.$starstring; $starcount++; }
-        if ($this_robot_defense >= $this_robot_stats['defense']['max']){ $this_robot_defense .= ' '.$starstring; $starcount++; }
-        if ($this_robot_speed >= $this_robot_stats['speed']['max']){ $this_robot_speed .= ' '.$starstring; $starcount++; }
+        if ($this_robot_stats['level'] >= $this_robot_stats['level_max']){ $starcount++; }
+        if ($this_robot_stats['energy']['current'] >= $this_robot_stats['energy']['max']){ $this_robot_energy .= ' '.$starstring; $starcount++; }
+        if ($this_robot_stats['attack']['current'] >= $this_robot_stats['attack']['max']){ $this_robot_attack .= ' '.$starstring; $starcount++; }
+        if ($this_robot_stats['defense']['current'] >= $this_robot_stats['defense']['max']){ $this_robot_defense .= ' '.$starstring; $starcount++; }
+        if ($this_robot_stats['speed']['current'] >= $this_robot_stats['speed']['max']){ $this_robot_speed .= ' '.$starstring; $starcount++; }
         for ($i = 0; $i < $starcount; $i++){ $starstring .= '&#9733;'; }
         $this_robot_name .= $starcount > 0 ? ' <span style="position: relative; bottom: 2px; font-size: 9px; letter-spacing: 0;">'.$starstring.'</span>' : '';
+
+        if (!empty($this_player_info['player_energy'])){ $this_robot_energy += ceil(($this_player_info['player_energy'] / 100) * $this_robot_energy); }
+        if (!empty($this_player_info['player_attack'])){ $this_robot_attack += ceil(($this_player_info['player_attack'] / 100) * $this_robot_attack); }
+        if (!empty($this_player_info['player_defense'])){ $this_robot_defense += ceil(($this_player_info['player_defense'] / 100) * $this_robot_defense); }
+        if (!empty($this_player_info['player_speed'])){ $this_robot_speed += ceil(($this_player_info['player_speed'] / 100) * $this_robot_speed); }
 
         $this_robot_abilities_current = !empty($info['robot_abilities']) ? array_keys($info['robot_abilities']) : array('buster-shot');
         $this_option_title = ''; //-- Basics -------------------------------  <br />';
