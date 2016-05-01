@@ -1179,7 +1179,7 @@ class mmrpg_robot {
     public static function get_index_info($robot_token){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index_info('{$robot_token}')");  }
         global $DB;
-        $robot_index = mmrpg_robot::get_index();
+        $robot_index = mmrpg_robot::get_index(array($robot_token));
         if (!empty($robot_index[$robot_token])){ $robot_info = mmrpg_robot::parse_index_info($robot_index[$robot_token]); }
         else { $robot_info = array(); }
         return $robot_info;
