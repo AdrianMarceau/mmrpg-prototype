@@ -1049,7 +1049,7 @@ class mmrpg_ability {
                     // Calculate the actual amount to permanently boost in case it goes over max
                     $stat_boost_amount = $this_ability->ability_results['total_amount'];
                     if (($robot_stats[$stat_token]['bonus'] + $stat_boost_amount) > $robot_stats[$stat_token]['bonus_max']){
-                        $stat_boost_amount = $robot_stats[$stat_token]['bonus'] - $robot_stats[$stat_token]['bonus_max'];
+                        $stat_boost_amount = $robot_stats[$stat_token]['bonus_max'] - $robot_stats[$stat_token]['bonus'];
                     }
 
                     // Only update session variables if the boost is not empty
