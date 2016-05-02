@@ -88,6 +88,32 @@ html {
     -moz-background-clip: padding;
     -webkit-background-clip: padding;
 }
+
+#window #header_social_facebook,
+#window #header_social_google,
+#window #header_social_github {
+    display: block;
+    height: 24px;
+    overflow: visible;
+    line-height: 24px;
+    top: 12px;
+    text-indent: 0px;
+    z-index: 9999;
+}
+#window #header_social_facebook.fadein,
+#window #header_social_google.fadein,
+#window #header_social_github.fadein {
+    display: none;
+}
+#window #header_social_facebook {
+    width: 75px;
+    right: 113px;
+}
+#window #header_social_github {
+    width: 90px;
+    right: 12px;
+}
+
 #window .banner .event {
     display: block;
     margin: 0;
