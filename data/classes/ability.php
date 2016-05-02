@@ -1068,13 +1068,13 @@ class mmrpg_ability {
                             );
 
                         // Check if this robot has now reached max stats
-                        if ($robot_stats[$stat_token]['current'] >= $robot_stats[$stat_token]['max']){
+                        if ($robot_stats[$stat_token]['bonus'] >= $robot_stats[$stat_token]['bonus_max']){
                             // Print the success message for reaching max stats for this robot
                             $target_robot->robot_frame = 'victory';
                             $target_robot->update_session();
                             $this_battle->events_create($target_robot, false,
                                 "{$target_robot->robot_name}'s {$stat_name} Stat",
-                                $target_robot->print_robot_name().'\'s base '.$stat_token.' stat has been raised to the max of '.
+                                $target_robot->print_robot_name().'\'s '.$stat_token.' stat bonuses have been raised to the max of '.
                                 '<span class="robot_type robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['max'].' &#9733;</span>!<br />'.
                                 'Congratulations and '.lcfirst(mmrpg_battle::random_victory_quote()).' '
                                 );
