@@ -9,7 +9,7 @@ $mmrpg_prototype_core_abilities = array(
     ),
   array(
     'rising-cutter', 'super-arm', 'ice-slasher', 'danger-bomb', 'fire-chaser', 'thunder-beam', 'time-slow', 'oil-slider',
-    'bubble-lead', 'bubble-bomb'
+    'bubble-lead', 'bubble-bomb', 'laser-trident'
     )
   );
 $mmrpg_prototype_support_abilities = array(
@@ -73,14 +73,14 @@ if (count($this_robot_abilities) >= $ability_num){
 }
 // Otherwise, if we need more abilities, we generate them dynamically
 else {
-  
+
   // Define the number of additional abilities to add
   $remaining_abilities = $ability_num - count($this_robot_abilities);
-  
+
   // Collect the ability index for calculation purposes
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-    
+
   // Define the number of core and support abilities for the robot
   foreach ($mmrpg_prototype_core_abilities AS $group_key => $group_abilities){
     if ($robot_level < ($group_key * 10)){ break; }
@@ -118,18 +118,18 @@ else {
     }
     unset($ability_info);
   }
-  
+
   // Shuffle the weapons and support arrays
   shuffle($this_robot_abilities_addons['weapons']);
   shuffle($this_robot_abilities_addons['support']);
-  
+
   // If there were no main abilities, give them an addons
   if (empty($this_robot_abilities) && !empty($this_robot_abilities_addons['weapons'])){
     $temp_token = array_shift($this_robot_abilities_addons['weapons']);
     $this_robot_abilities[] = $temp_token;
     $this_robot_abilities_addons['base'][] = $temp_token;
   }
-  
+
   // Define the last addon array which will have alternating values
   $temp_addons_final = array();
   $temp_count_limit = count($this_robot_abilities_addons['weapons']) + count($this_robot_abilities_addons['support']);
@@ -147,7 +147,7 @@ else {
   $this_robot_abilities = array_merge($this_robot_abilities, $temp_addons_final);
   // Crop the array to the requested length
   $this_robot_abilities = array_slice($this_robot_abilities, 0, $ability_num);
-  
+
 }
 
 // Unset temporary variables
