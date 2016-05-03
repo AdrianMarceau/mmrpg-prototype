@@ -1096,5 +1096,217 @@ class mmrpg_ability {
 
     }
 
+
+    // Define a static function to use as the common action for all forward attack type abilities
+    public static function ability_function_forward_attack($objects, $target_options, $damage_options, $recovery_options, $effect_options = array()){
+
+        // Define defaults for undefined target options
+        if (!isset($target_options['stat_kind'])){ $target_options['stat_kind'] = 'energy'; }
+        if (!isset($target_options['robot_frame'])){ $target_options['robot_frame'] = 'shoot'; }
+        if (!isset($target_options['robot_kickback'])){ $target_options['robot_kickback'] = array(0, 0, 0); }
+        if (!isset($target_options['ability_frame'])){ $target_options['ability_frame'] = 0; }
+        if (!isset($target_options['ability_offset'])){ $target_options['ability_offset'] = array(110, 0, 10); }
+        if (!isset($target_options['ability_text'])){ $target_options['ability_text'] = '{this_robot_name} uses the {this_ability_name}!'; }
+
+        // Define defaults for undefined damage options
+        if (!isset($damage_options['robot_frame'])){ $damage_options['robot_frame'] = 'damage'; }
+        if (!isset($damage_options['robot_kickback'])){ $damage_options['robot_kickback'] = array(10, 0, 0); }
+        if (!isset($damage_options['ability_sucess_frame'])){ $damage_options['ability_sucess_frame'] = 4; }
+        if (!isset($damage_options['ability_success_offset'])){ $damage_options['ability_success_offset'] = array(-90, 0, 10); }
+        if (!isset($damage_options['ability_success_text'])){ $damage_options['ability_success_text'] = 'The {this_ability_name} hit the target!'; }
+        if (!isset($damage_options['ability_failure_frame'])){ $damage_options['ability_failure_frame'] = 4; }
+        if (!isset($damage_options['ability_failure_offset'])){ $damage_options['ability_failure_offset'] = array(-100, 0, -10); }
+        if (!isset($damage_options['ability_failure_text'])){ $damage_options['ability_failure_text'] = 'The {this_ability_name} missed...'; }
+
+        // Define defaults for undefined recovery options
+        if (!isset($recovery_options['robot_frame'])){ $recovery_options['robot_frame'] = 'taunt'; }
+        if (!isset($recovery_options['robot_kickback'])){ $recovery_options['robot_kickback'] = array(0, 0, 0); }
+        if (!isset($recovery_options['ability_sucess_frame'])){ $recovery_options['ability_sucess_frame'] = 4; }
+        if (!isset($recovery_options['ability_success_offset'])){ $recovery_options['ability_success_offset'] = array(-45, 0, 10); }
+        if (!isset($recovery_options['ability_success_text'])){ $recovery_options['ability_success_text'] = 'The {this_ability_name} was absorbed by the target!'; }
+        if (!isset($recovery_options['ability_failure_frame'])){ $recovery_options['ability_failure_frame'] = 4; }
+        if (!isset($recovery_options['ability_failure_offset'])){ $recovery_options['ability_failure_offset'] = array(-100, 0, -10); }
+        if (!isset($recovery_options['ability_failure_text'])){ $recovery_options['ability_failure_text'] = 'The {this_ability_name} had no effect on the target...'; }
+
+        // Define defaults for undefined effect options
+        if (!isset($effect_options['stat_kind'])){ $effect_options = false; }
+        else {
+            if (!isset($effect_options['damage_text'])){ $effect_options['damage_text'] = '{this_robot_name}\'s stats were damaged!'; }
+            if (!isset($effect_options['recovery_text'])){ $effect_options['recovery_text'] = '{this_robot_name}\'s stats improved!'; }
+            if (!isset($effect_options['effect_chance'])){ $effect_options['effect_chance'] = 50; }
+        }
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Define Search and replace object strings for replacing
+        $search_replace = array();
+        $search_replace['this_player_name'] = $this_player->print_player_name();
+        $search_replace['this_robot_name'] = $this_robot->print_robot_name();
+        $search_replace['target_player_name'] = $target_player->print_player_name();
+        $search_replace['target_robot_name'] = $target_robot->print_robot_name();
+        $search_replace['this_ability_name'] = $this_robot->print_robot_name();
+
+        // Run the obtion arrays through the parsing function
+        $target_options = self::parse_string_variables($search_replace, $target_options);
+        $damage_options = self::parse_string_variables($search_replace, $damage_options);
+        $recovery_options = self::parse_string_variables($search_replace, $recovery_options);
+        if (!empty($effect_options)){
+            $effect_options = self::parse_string_variables($search_replace, $effect_options);
+        }
+
+        // Update target options for this ability
+        $this_ability->target_options_update(array(
+            'frame' => $target_options['robot_frame'],
+            'kickback' => $target_options['robot_kickback'],
+            'success' => array(
+                $target_options['ability_frame'],
+                $target_options['ability_offset'][0],
+                $target_options['ability_offset'][1],
+                $target_options['ability_offset'][2],
+                $target_options['ability_text']
+                )
+            ));
+
+        // Update damage options for this ability
+        $this_ability->damage_options_update(array(
+            'kind' => $target_options['stat_kind'],
+            'frame' => $damage_options['robot_frame'],
+            'kickback' => $damage_options['robot_kickback'],
+            'success' => array(
+                $damage_options['ability_sucess_frame'],
+                $damage_options['ability_success_offset'][0],
+                $damage_options['ability_success_offset'][1],
+                $damage_options['ability_success_offset'][2],
+                $damage_options['ability_success_text']
+                ),
+            'failure' => array(
+                $damage_options['ability_failure_frame'],
+                $damage_options['ability_failure_offset'][0],
+                $damage_options['ability_failure_offset'][1],
+                $damage_options['ability_failure_offset'][2],
+                $damage_options['ability_failure_text']
+                )
+            ));
+
+        // Update recovery options for this ability
+        $this_ability->recovery_options_update(array(
+            'kind' => $target_options['stat_kind'],
+            'frame' => $recovery_options['robot_frame'],
+            'kickback' => $recovery_options['robot_kickback'],
+            'success' => array(
+                $recovery_options['ability_sucess_frame'],
+                $recovery_options['ability_success_offset'][0],
+                $recovery_options['ability_success_offset'][1],
+                $recovery_options['ability_success_offset'][2],
+                $recovery_options['ability_success_text']
+                ),
+            'failure' => array(
+                $damage_options['ability_failure_frame'],
+                $damage_options['ability_failure_offset'][0],
+                $damage_options['ability_failure_offset'][1],
+                $damage_options['ability_failure_offset'][2],
+                $damage_options['ability_failure_text']
+                )
+            ));
+
+
+        // Target the opposing robot with this ability
+        $this_robot->trigger_target($target_robot, $this_ability);
+
+        // Attempt to inflict damage on the opposing robot
+        $stat_damage_amount = $this_ability->ability_damage;
+        $target_robot->trigger_damage($this_robot, $this_ability, $stat_damage_amount);
+
+        // Only apply a secondary affect if one was defined
+        if (!empty($effect_options)){
+
+            // Define the stat property strings
+            $robot_stat_prop = 'robot_'.$effect_options['stat_kind'];
+
+            // Trigger effect if target isn't disabled and ability was successful and chance
+            if (
+                $target_robot->robot_status != 'disabled' &&
+                $this_ability->ability_results['this_result'] != 'failure' &&
+                $this_ability->ability_results['this_amount'] > 0 &&
+                $target_robot->$robot_stat_prop > 0 &&
+                ($effect_options['effect_chance'] == 100 || $this_battle->critical_chance($effect_options['effect_chance']))
+                ){
+
+                // Define the default damage options for the stat effect
+                $this_ability->damage_options_update(array(
+                    'kind' => $effect_options['stat_kind'],
+                    'frame' => 'defend',
+                    'percent' => true,
+                    'kickback' => array(10, 0, 0),
+                    'success' => array(9, 0, 0, -10, $effect_options['damage_text']),
+                    'failure' => array(9, 0, 0, -9999, '')
+                    ));
+
+                // Define the default recovery options for the stat effect
+                $this_ability->recovery_options_update(array(
+                    'kind' => $effect_options['stat_kind'],
+                    'frame' => 'taunt',
+                    'percent' => true,
+                    'kickback' => array(0, 0, 0),
+                    'success' => array(9, 0, 0, -10, $effect_options['recovery_text']),
+                    'failure' => array(9, 0, 0, -9999, '')
+                    ));
+
+                // Calculate the exact damage amount and trigger it on the target
+                $trigger_options = array('apply_modifiers' => false);
+                $stat_damage_amount = ceil($target_robot->$robot_stat_prop * ($this_ability->ability_damage2 / 100));
+                $target_robot->trigger_damage($this_robot, $this_ability, $stat_damage_amount, true, $trigger_options);
+            }
+
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+
+    // Define a static function to use as the common action for all ranged attack type abilities
+    public static function ability_function_ranged_attack($objects, $options = array()){
+
+
+    }
+
+
+    // Define a static function to use as the common action for all multi-hit attack type abilities
+    public static function ability_function_repeat_attack($objects, $options = array()){
+
+
+    }
+
+
+    // Define a static function to use as the common action for all multi-target attack type abilities
+    public static function ability_function_spread_attack($objects, $options = array()){
+
+
+    }
+
+    // Define a static function for replacing string variables with their values
+    public static function parse_string_variables($search_replace, $field_values){
+
+        // Collect all the find and replace strings
+        $find_strings = array_keys($search_replace);
+        $replace_strings = array_values($search_replace);
+        foreach ($find_strings AS $k => $v){ $find_strings[$k] = '{'.$v.'}'; }
+
+        // Loop through field values and replace string variables
+        foreach ($field_values AS $field => $value){
+            if (strstr($field, '_text')){
+                $value = str_replace($find_strings, $replace_strings, $value);
+                $field_values[$field] = $value;
+            }
+        }
+
+        // Return the parsed field values
+        return $field_values;
+
+    }
+
 }
 ?>
