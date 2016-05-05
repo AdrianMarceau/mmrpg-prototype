@@ -11,7 +11,7 @@ $ability = array(
     'ability_damage' => 24,
     'ability_recovery2' => 100,
     'ability_recovery_percent2' => true,
-    'ability_accuracy' => 95,
+    'ability_accuracy' => 92,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
