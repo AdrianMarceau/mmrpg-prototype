@@ -1145,7 +1145,7 @@ class mmrpg_ability {
         $search_replace['this_robot_name'] = $this_robot->print_robot_name();
         $search_replace['target_player_name'] = $target_player->print_player_name();
         $search_replace['target_robot_name'] = $target_robot->print_robot_name();
-        $search_replace['this_ability_name'] = $this_robot->print_robot_name();
+        $search_replace['this_ability_name'] = $this_ability->print_ability_name();
 
         // Run the obtion arrays through the parsing function
         $target_options = self::parse_string_variables($search_replace, $target_options);
