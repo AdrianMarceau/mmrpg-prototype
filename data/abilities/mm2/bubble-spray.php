@@ -10,17 +10,17 @@ $ability = array(
   'ability_damage' => 16,
   'ability_accuracy' => 98,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Define this ability's attachment token
     $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
     $this_attachment_info = array(
     	'class' => 'ability',
     	'ability_token' => $this_ability->ability_token,
     	'attachment_duration' => 9,
-      'attachment_damage_booster_electric' => 2.0,
+      'attachment_damage_input_booster_electric' => 2.0,
     	'attachment_weaknesses' => array('electric'),
     	'attachment_create' => array(
         'trigger' => 'special',
@@ -46,14 +46,14 @@ $ability = array(
       'ability_frame_animate' => array(2, 3),
       'ability_frame_offset' => array('x' => 0, 'y' => -5, 'z' => 6)
       );
-    
+
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
       'success' => array(0, 120, 5, 10, $this_robot->print_robot_name().' fires the '.$this_ability->print_ability_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Inflict damage on the opposing robot
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
@@ -70,35 +70,35 @@ $ability = array(
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-    
+
     // Inflect a break on speed if the robot wasn't disabled
     if ($target_robot->robot_status != 'disabled'
       && $target_robot->robot_speed > 0
       && $this_ability->ability_results['this_result'] != 'failure' && $this_ability->ability_results['this_amount'] > 0){
-        
+
       // If the ability flag was not set, attach the Proto Shield to the target
       if (!isset($target_robot->robot_attachments[$this_attachment_token])){
-        
+
         // Attach this ability attachment to the robot using it
         $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
         $target_robot->update_session();
-        
+
         // Target this robot's self
         $this_robot->robot_frame = 'base';
         $this_robot->update_session();
         $this_ability->target_options_update($this_attachment_info['attachment_create']);
         $target_robot->trigger_target($target_robot, $this_ability);
-  
+
       }
       // Else if the ability flag was set, reinforce the shield by one more duration point
       else {
-          
+
         // Collect the attachment from the robot to back up its info
         $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
         $this_attachment_info['attachment_duration'] = 4;
         $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
         $target_robot->update_session();
-        
+
         // Target the opposing robot
         $this_ability->target_options_update(array(
           'frame' => 'defend',
@@ -107,18 +107,18 @@ $ability = array(
         $target_robot->trigger_target($target_robot, $this_ability);
 
       }
-        
+
     }
-    
+
     // Either way, update this ability's settings to prevent recovery
     $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
     $this_ability->update_session();
-    
+
     // Return true on success
     return true;
-    
-      
+
+
     }
   );
 ?>

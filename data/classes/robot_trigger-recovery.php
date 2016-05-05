@@ -530,6 +530,7 @@ if ($this_ability->ability_results['this_result'] == 'success'){
         // If this robot has an attachment with a recovery multiplier
         if (!empty($this->robot_attachments)){
             foreach ($this->robot_attachments AS $temp_token => $temp_info){
+                $temp_token_debug = str_replace('ability_', 'attachment_', $temp_token);
 
                 // First check to see if any basic boosters or breakers have been created for this robot
                 if (true){
@@ -538,7 +539,7 @@ if ($this_ability->ability_results['this_result'] == 'success'){
                         // Apply the recovery breaker multiplier to the current recovery amount
                         $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_breaker']);
                         // DEBUG
-                        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_breaker<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker'].') = '.$temp_new_amount.'');
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker'].') = '.$temp_new_amount.'');
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                     // If this robot's attachment has a recovery booster value set
@@ -546,7 +547,23 @@ if ($this_ability->ability_results['this_result'] == 'success'){
                         // Apply the recovery breaker multiplier to the current recovery amount
                         $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_booster']);
                         // DEBUG
-                        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_booster<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster'].') = '.$temp_new_amount.'');
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster'].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery input breaker value set
+                    if (isset($temp_info['attachment_recovery_input_breaker'])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_breaker']);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_breaker = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_breaker'].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery input booster value set
+                    if (isset($temp_info['attachment_recovery_input_booster'])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_booster']);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_booster = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_booster'].') = '.$temp_new_amount.'');
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                 }
@@ -557,7 +574,7 @@ if ($this_ability->ability_results['this_result'] == 'success'){
                         // Apply the recovery breaker multiplier to the current recovery amount
                         $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_breaker_'.$this_ability->ability_type]);
                         // DEBUG
-                        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_breaker_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker_'.$this_ability->ability_type.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                     // If this robot's attachment has a recovery booster value set
@@ -565,7 +582,172 @@ if ($this_ability->ability_results['this_result'] == 'success'){
                         // Apply the recovery breaker multiplier to the current recovery amount
                         $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_booster_'.$this_ability->ability_type]);
                         // DEBUG
-                        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' vs '.$temp_token.' | attachment_recovery_booster_'.$this_ability->ability_type.'<br /> '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster_'.$this_ability->ability_type.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery breaker value set
+                    if (isset($temp_info['attachment_recovery_input_breaker_'.$this_ability->ability_type])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_breaker_'.$this_ability->ability_type]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_breaker_'.$this_ability->ability_type.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_breaker_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery booster value set
+                    if (isset($temp_info['attachment_recovery_input_booster_'.$this_ability->ability_type])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_booster_'.$this_ability->ability_type]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_booster_'.$this_ability->ability_type.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                }
+                // Next check to see if any boosters or breakers for either of this ability's types
+                if (!empty($this_ability->ability_type2)){
+                    // If this robot's attachment has a recovery breaker value set
+                    if (isset($temp_info['attachment_recovery_breaker_'.$this_ability->ability_type2])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_breaker_'.$this_ability->ability_type2]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker_'.$this_ability->ability_type2.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery booster value set
+                    if (isset($temp_info['attachment_recovery_booster_'.$this_ability->ability_type2])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_booster_'.$this_ability->ability_type2]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster_'.$this_ability->ability_type2.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery breaker value set
+                    if (isset($temp_info['attachment_recovery_input_breaker_'.$this_ability->ability_type2])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_breaker_'.$this_ability->ability_type2]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_breaker_'.$this_ability->ability_type2.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_breaker_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery booster value set
+                    if (isset($temp_info['attachment_recovery_input_booster_'.$this_ability->ability_type2])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_input_booster_'.$this_ability->ability_type2]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_booster_'.$this_ability->ability_type2.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_input_booster_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                }
+
+            }
+        }
+
+        // If this robot has an attachment with a recovery multiplier
+        if (!empty($target_robot->robot_attachments)){
+            foreach ($target_robot->robot_attachments AS $temp_token => $temp_info){
+                $temp_token_debug = str_replace('ability_', 'attachment_', $temp_token);
+
+                // First check to see if any basic boosters or breakers have been created for this robot
+                if (true){
+                    // If this robot's attachment has a recovery breaker value set
+                    if (isset($temp_info['attachment_recovery_breaker'])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_breaker']);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker'].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery booster value set
+                    if (isset($temp_info['attachment_recovery_booster'])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_booster']);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster'].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery output breaker value set
+                    if (isset($temp_info['attachment_recovery_output_breaker'])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_breaker']);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_breaker = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_breaker'].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery output booster value set
+                    if (isset($temp_info['attachment_recovery_output_booster'])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_booster']);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_booster = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_booster'].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                }
+                // Next check to see if any boosters or breakers for either of this ability's types
+                if (!empty($this_ability->ability_type)){
+                    // If this robot's attachment has a recovery breaker value set
+                    if (isset($temp_info['attachment_recovery_breaker_'.$this_ability->ability_type])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_breaker_'.$this_ability->ability_type]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker_'.$this_ability->ability_type.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery booster value set
+                    if (isset($temp_info['attachment_recovery_booster_'.$this_ability->ability_type])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_booster_'.$this_ability->ability_type]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster_'.$this_ability->ability_type.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery breaker value set
+                    if (isset($temp_info['attachment_recovery_output_breaker_'.$this_ability->ability_type])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_breaker_'.$this_ability->ability_type]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_breaker_'.$this_ability->ability_type.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_breaker_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery booster value set
+                    if (isset($temp_info['attachment_recovery_output_booster_'.$this_ability->ability_type])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_booster_'.$this_ability->ability_type]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_booster_'.$this_ability->ability_type.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_booster_'.$this_ability->ability_type].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                }
+                // Next check to see if any boosters or breakers for either of this ability's types
+                if (!empty($this_ability->ability_type2)){
+                    // If this robot's attachment has a recovery breaker value set
+                    if (isset($temp_info['attachment_recovery_breaker_'.$this_ability->ability_type2])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_breaker_'.$this_ability->ability_type2]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker_'.$this_ability->ability_type2.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery booster value set
+                    if (isset($temp_info['attachment_recovery_booster_'.$this_ability->ability_type2])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_booster_'.$this_ability->ability_type2]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster_'.$this_ability->ability_type2.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery breaker value set
+                    if (isset($temp_info['attachment_recovery_output_breaker_'.$this_ability->ability_type2])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_breaker_'.$this_ability->ability_type2]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_breaker_'.$this_ability->ability_type2.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_breaker_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
+                        $this_ability->ability_results['this_amount'] = $temp_new_amount;
+                    }
+                    // If this robot's attachment has a recovery booster value set
+                    if (isset($temp_info['attachment_recovery_output_booster_'.$this_ability->ability_type2])){
+                        // Apply the recovery breaker multiplier to the current recovery amount
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * $temp_info['attachment_recovery_output_booster_'.$this_ability->ability_type2]);
+                        // DEBUG
+                        //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_booster_'.$this_ability->ability_type2.' = '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_recovery_output_booster_'.$this_ability->ability_type2].') = '.$temp_new_amount.'');
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                 }
