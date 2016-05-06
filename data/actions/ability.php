@@ -105,17 +105,19 @@ ob_start();
 
                 $temp_damage = ceil($temp_damage * $temp_multiplier);
                 if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage = ceil($temp_damage * $this_battle->battle_field->field_multipliers['damage']); }
-                if ($temp_damage_unit == '%' && $temp_damage > 100){ $temp_damage = 100; }
+                //if ($temp_damage_unit == '%' && $temp_damage > 100){ $temp_damage = 100; }
+
                 //$temp_damage2 = ceil($temp_damage2 * $temp_multiplier);
                 //if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage2 = ceil($temp_damage2 * $this_battle->battle_field->field_multipliers['damage']); }
-                if ($temp_damage2_unit == '%' && $temp_damage2 > 100){ $temp_damage2 = 100; }
+                //if ($temp_damage2_unit == '%' && $temp_damage2 > 100){ $temp_damage2 = 100; }
 
                 $temp_recovery = ceil($temp_recovery * $temp_multiplier);
                 if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['recovery'])){ $temp_recovery = ceil($temp_recovery * $this_battle->battle_field->field_multipliers['recovery']); }
-                if ($temp_recovery_unit == '%' && $temp_recovery > 100){ $temp_recovery = 100; }
+                //if ($temp_recovery_unit == '%' && $temp_recovery > 100){ $temp_recovery = 100; }
+
                 //$temp_recovery2 = ceil($temp_recovery2 * $temp_multiplier);
                 //if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['recovery'])){ $temp_recovery2 = ceil($temp_recovery2 * $this_battle->battle_field->field_multipliers['recovery']); }
-                if ($temp_recovery2_unit == '%' && $temp_recovery2 > 100){ $temp_recovery2 = 100; }
+                //if ($temp_recovery2_unit == '%' && $temp_recovery2 > 100){ $temp_recovery2 = 100; }
 
                 // Define the amount of weapon energy for this ability
                 $temp_robot_weapons = $this_robot->robot_weapons;
