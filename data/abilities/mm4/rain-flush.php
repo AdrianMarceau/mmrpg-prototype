@@ -5,11 +5,10 @@ $ability = array(
     'ability_token' => 'rain-flush',
     'ability_game' => 'MM04',
     'ability_image_sheets' => 2,
-    'ability_description' => 'The user releases an acid rain-inducing capsule into the air that damages all robots on the field! This ability\'s damage is not affected by defense and can even pierce through even the toughest of shields!',
+    'ability_description' => 'The user releases a large capsule into the air that showers the field in acid rain and damages all robots on the opponent\'s side of the battle! This ability\'s base damage is equal to the user\'s level and is not affected by attack, defense, or position variables.',
     'ability_type' => 'water',
     'ability_energy' => 4,
-    'ability_damage' => 10,
-    'ability_damage_percent' => true,
+    'ability_damage' => 1,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -52,17 +51,44 @@ $ability = array(
         $this_robot->robot_frame = 'summon';
         $this_robot->update_session();
 
+        // CREATE ATTACHMENTS
+        if (true){
+
+            // Define this ability's attachment token
+            $temp_attachment_token = 'ability_'.$this_ability->ability_token.'_protect';
+            $temp_attachment_info = array(
+                'class' => 'ability',
+                'ability_token' => $this_ability->ability_token,
+                'ability_image' => $this_ability->ability_token,
+                'ability_frame' => 2,
+                'ability_frame_animate' => array(2),
+                'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => 20)
+                );
+
+            // Attach this ability to all robots on this player's side of the field
+            $backup_robots_active = $this_player->values['robots_active'];
+            $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
+            if ($backup_robots_active_count > 0){
+                $this_key = 0;
+                foreach ($backup_robots_active AS $key => $info){
+                    if ($info['robot_id'] == $this_robot->robot_id){ continue; }
+                    $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
+                    $temp_this_robot = new mmrpg_robot($this_battle, $this_player, $info2);
+                    $temp_this_robot->robot_frame = 'defend';
+                    $temp_this_robot->robot_attachments[$temp_attachment_token] = $temp_attachment_info;
+                    $temp_this_robot->update_session();
+                    $this_key++;
+                }
+            }
+
+        }
+
 
         // -- DAMAGE TARGETS -- //
-
-        // Attach this ability attachment to the robot using it
-        //$this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-        //$this_robot->update_session();
 
         // Inflict damage on the opposing robot
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
-            'percent' => true,
             'modifiers' => true,
             'kickback' => array(5, 0, 0),
             'success' => array(0, -5, 0, 99, 'The '.$this_ability->print_ability_name().' melts through the target!'),
@@ -70,15 +96,14 @@ $ability = array(
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
-            'percent' => true,
             'modifiers' => true,
             'frame' => 'taunt',
             'kickback' => array(5, 0, 0),
             'success' => array(0, -5, 0, 9, 'The '.$this_ability->print_ability_name().' was absorbed by the target!'),
             'failure' => array(0, -5, 0, 9, 'The '.$this_ability->print_ability_name().' had no effect on '.$target_robot->print_robot_name().'&hellip;')
             ));
-        $energy_damage_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_damage / 100));
-        $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => false, 'apply_starforce_modifiers' => false);
+        $energy_damage_amount = $this_ability->ability_damage;
+        $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
 
         // Loop through the target's benched robots, inflicting damage to each
@@ -89,7 +114,6 @@ $ability = array(
             $this_ability->ability_results_reset();
             $this_ability->damage_options_update(array(
                 'kind' => 'energy',
-                'percent' => true,
                 'modifiers' => true,
                 'kickback' => array(5, 0, 0),
                 'success' => array(($key % 2), -5, 0, 99, 'The '.$this_ability->print_ability_name().' melts through the target!'),
@@ -97,71 +121,35 @@ $ability = array(
                 ));
             $this_ability->recovery_options_update(array(
                 'kind' => 'energy',
-                'percent' => true,
                 'modifiers' => true,
                 'frame' => 'taunt',
                 'kickback' => array(5, 0, 0),
                 'success' => array(($key % 2), -5, 0, 9, 'The '.$this_ability->print_ability_name().' was absorbed by the target!'),
                 'failure' => array(($key % 2), -5, 0, 9, 'The '.$this_ability->print_ability_name().' had no effect on '.$temp_target_robot->print_robot_name().'&hellip;')
                 ));
-            $energy_damage_amount = ceil($temp_target_robot->robot_base_energy * ($this_ability->ability_damage / 100));
+            $energy_damage_amount = $this_ability->ability_damage;
             $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
         }
 
+        // REMOVE ATTACHMENTS
+        if (true){
 
-        // -- DAMAGE SELF/TEAM -- //
+            // Attach this ability to all robots on this player's side of the field
+            $backup_robots_active = $this_player->values['robots_active'];
+            $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
+            if ($backup_robots_active_count > 0){
+                $this_key = 0;
+                foreach ($backup_robots_active AS $key => $info){
+                    if ($info['robot_id'] == $this_robot->robot_id){ continue; }
+                    $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
+                    $temp_this_robot = new mmrpg_robot($this_battle, $this_player, $info2);
+                    $temp_this_robot->robot_frame = 'base';
+                    unset($temp_this_robot->robot_attachments[$temp_attachment_token]);
+                    $temp_this_robot->update_session();
+                    $this_key++;
+                }
+            }
 
-        // Attach this ability attachment to the robot using it
-        //$this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-        //$this_robot->update_session();
-
-        // Prepare the ability for inflicting damage on this side
-        $this_ability->damage_options_update(array(
-            'kind' => 'energy',
-            'percent' => true,
-            'modifiers' => true,
-            'kickback' => array(5, 0, 0),
-            'success' => array(0, -5, 0, 99, 'The '.$this_ability->print_ability_name().' melts through the target!'),
-            'failure' => array(0, -5, 0, 99,'The '. $this_ability->print_ability_name().' had no effect on '.$this_robot->print_robot_name().'&hellip;')
-            ));
-        $this_ability->recovery_options_update(array(
-            'kind' => 'energy',
-            'percent' => true,
-            'modifiers' => true,
-            'frame' => 'taunt',
-            'kickback' => array(5, 0, 0),
-            'success' => array(0, -5, 0, 9, 'The '.$this_ability->print_ability_name().' was absorbed by the target!'),
-            'failure' => array(0, -5, 0, 9, 'The '.$this_ability->print_ability_name().' had no effect on '.$this_robot->print_robot_name().'&hellip;')
-            ));
-        $energy_damage_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_damage / 100));
-        $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => false, 'apply_starforce_modifiers' => false);
-        //$this_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
-
-        // Loop through this player's benched robots, inflicting damage to each
-        $backup_this_robots_active = $this_player->values['robots_active'];
-        foreach ($backup_this_robots_active AS $key => $info){
-            if ($info['robot_id'] == $this_robot->robot_id){ continue; }
-            $temp_team_robot = new mmrpg_robot($this_battle, $this_player, $info);
-            $this_ability->ability_results_reset();
-            $this_ability->damage_options_update(array(
-                'kind' => 'energy',
-                'percent' => true,
-                'modifiers' => true,
-                'kickback' => array(5, 0, 0),
-                'success' => array(($key % 2), -5, 0, 99, 'The '.$this_ability->print_ability_name().' melts through the target!'),
-                'failure' => array(($key % 2), -5, 0, 99,'The '. $this_ability->print_ability_name().' had no effect on '.$temp_team_robot->print_robot_name().'&hellip;')
-                ));
-            $this_ability->recovery_options_update(array(
-                'kind' => 'energy',
-                'percent' => true,
-                'modifiers' => true,
-                'frame' => 'taunt',
-                'kickback' => array(5, 0, 0),
-                'success' => array(($key % 2), -5, 0, 9, 'The '.$this_ability->print_ability_name().' was absorbed by the target!'),
-                'failure' => array(($key % 2), -5, 0, 9, 'The '.$this_ability->print_ability_name().' had no effect on '.$temp_team_robot->print_robot_name().'&hellip;')
-                ));
-            $energy_damage_amount = ceil($temp_team_robot->robot_base_energy * ($this_ability->ability_damage / 100));
-            $temp_team_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
         }
 
 
@@ -173,38 +161,35 @@ $ability = array(
         $target_robot->update_session();
         foreach ($backup_target_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-            $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+            $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
+            $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $info2);
             if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){ $temp_target_robot->trigger_disabled($this_robot, $this_ability); }
             else { $temp_target_robot->robot_frame = 'base'; }
             $temp_target_robot->update_session();
         }
-
-
-        // Trigger the disabled event on the targets now if necessary
-        if ($this_robot->robot_status == 'disabled'){ $this_robot->trigger_disabled($target_robot, $this_ability); }
-        else { $this_robot->robot_frame = 'base'; }
-        $this_robot->update_session();
-        foreach ($backup_this_robots_active AS $key => $info){
-            if ($info['robot_id'] == $this_robot->robot_id){ continue; }
-            $temp_team_robot = new mmrpg_robot($this_battle, $this_player, $info);
-            if ($temp_team_robot->robot_energy <= 0 || $temp_team_robot->robot_status == 'disabled'){ $temp_team_robot->trigger_disabled($this_robot, $this_ability); }
-            else { $temp_team_robot->robot_frame = 'base'; }
-            $temp_team_robot->update_session();
-        }
-
 
         // Change the image to the full-screen rain effect
         $this_ability->ability_image = 'rain-flush';
         $this_ability->ability_frame_classes = '';
         $this_ability->update_session();
 
-        // Remove this ability attachment to the robot using it
-        //unset($this_robot->robot_attachments[$this_attachment_token]);
-        //$this_robot->update_session();
-
         // Return true on success
         return true;
 
+
+        },
+    'ability_function_onload' => function($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Set or update this ability's base damage equal to user's level
+        $this_ability->ability_damage = $this_robot->robot_level;
+        // Update the ability session
+        $this_ability->update_session();
+
+        // Return true on success
+        return true;
 
         }
     );
