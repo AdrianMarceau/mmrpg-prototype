@@ -113,7 +113,7 @@ $this_omega_factors_nine[] = array('robot' => 'splash-woman', 'field' => 'field'
 $this_omega_factors_nine[] = array('robot' => 'plug-man', 'field' => 'field', 'type' => 'electric');
 $this_omega_factors_nine[] = array('robot' => 'jewel-man', 'field' => 'gemstone-cavern', 'type' => 'crystal');
 $this_omega_factors_nine[] = array('robot' => 'hornet-man', 'field' => 'field', 'type' => 'nature');
-//$this_omega_factors_nine[] = array('robot' => 'magma-man', 'field' => 'field', 'type' => 'flame');
+$this_omega_factors_nine[] = array('robot' => 'magma-man', 'field' => 'field', 'type' => 'flame');
 $this_omega_factors_nine[] = array('robot' => 'galaxy-man', 'field' => 'field', 'type' => 'space');
 
 // Define the expansion omega factors for DR. LIGHT (MEGA MAN 10)
