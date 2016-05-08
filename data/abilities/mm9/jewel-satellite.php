@@ -148,6 +148,23 @@ $ability = array(
         // Update the ability session
         $this_ability->update_session();
 
+        // If this ability is being used by a robot with the same core type AND it's already summoned, allow targetting
+        if (isset($this_robot->robot_attachments[$this_attachment_token])){
+
+            // Update this ability's targetting setting
+            $this_ability->ability_target = 'select_target';
+            $this_ability->update_session();
+
+        }
+        // Else if the ability attachment is not there, change the target back to auto
+        else {
+
+            // Update this ability's targetting setting
+            $this_ability->ability_target = 'auto';
+            $this_ability->update_session();
+
+        }
+
         // Return true on success
         return true;
 
