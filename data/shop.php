@@ -105,9 +105,6 @@ $this_shop_index['reggae'] = array(
             'energy-mode' => 6000, 'attack-mode' => 6000,
             'defense-mode' => 6000, 'speed-mode' => 6000,
 
-            'attack-blaze' => 3000, 'defense-blaze' => 3000, 'speed-blaze' => 3000,
-            'attack-burn' => 3000, 'defense-burn' => 3000, 'speed-burn' => 3000,
-
             /*
 
             'rolling-cutter' => 6000, 'hyper-bomb' => 6000,

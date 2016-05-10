@@ -29,9 +29,7 @@ $robot = array(
   'robot_rewards' => array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
-        array('level' => 0, 'token' => 'atomic-fire'),
-        //array('level' => 6, 'token' => 'defense-burn'),
-        //array('level' => 10, 'token' => 'defense-blaze')
+        array('level' => 0, 'token' => 'atomic-fire')
       )
     ),
   'robot_quotes' => array(
