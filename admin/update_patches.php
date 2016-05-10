@@ -588,6 +588,9 @@ function mmrpg_patch_player_ability_merge_2k16($_GAME){
 
     echo("[b]Total Compensation : ".number_format($reward_battle_zenny, 0, '.', ',')."z[/b]\n\n");
 
+    // Increment the player's zenny total with the compensation reward
+    $_GAME['counters']['battle_zenny'] += $reward_battle_zenny;
+
     // Return the updated game array
     return $_GAME;
 
