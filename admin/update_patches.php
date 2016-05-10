@@ -447,6 +447,29 @@ function mmrpg_patch_battle_point_reboot_2k16($_GAME){
 }
 
 
+// -- PLAYER ABILITY MERGE 2k16 -- //
+
+// Define a patch function for applying the max robot stats update
+$token = 'player_ability_merge_2k16';
+$update_patch_tokens[] = $token;
+$update_patch_names[$token] = 'Player Ability Merge of 2016';
+$update_patch_details[$token] = "Abilities unlocked by any player can now be used by all players. ";
+$update_patch_details[$token] .= "\nIt is no longer necessary to trade robots back and forth to customize ";
+$update_patch_details[$token] .= "\nthe perfect moveset, and I hope everyone will enjoy this new change. :) ";
+function mmrpg_patch_player_ability_merge_2k16($_GAME){
+
+    // Pull in global variables
+    global $DB;
+
+    // WE'RE NOT READY
+    exit('testing');
+
+    // Return the updated game array
+    return $_GAME;
+
+}
+
+
 /*
 
 // -- PATCH FUNCTION TEMPLATE -- //
