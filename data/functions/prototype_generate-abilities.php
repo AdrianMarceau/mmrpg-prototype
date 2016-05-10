@@ -17,11 +17,9 @@ $mmrpg_prototype_support_abilities = array(
     'buster-shot'
     ),
   array(
-    'attack-blaze', 'defense-blaze', 'speed-blaze',
     'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
     ),
   array(
-    'attack-burn', 'defense-burn', 'speed-burn',
     'attack-break', 'defense-break', 'speed-break', 'energy-break',
     ),
   array(

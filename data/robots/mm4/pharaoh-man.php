@@ -29,11 +29,7 @@ $robot = array(
   'robot_rewards' => array(
     'abilities' => array(
         array('level' => 0, 'token' => 'buster-shot'),
-        array('level' => 0, 'token' => 'pharaoh-shot'),
-        //array('level' => 6, 'token' => 'speed-blaze'),
-        //array('level' => 10, 'token' => 'pharaoh-wave'),
-        //array('level' => 10, 'token' => 'speed-burn'),
-        //array('level' => 20, 'token' => 'pharaoh-curse'),
+        array('level' => 0, 'token' => 'pharaoh-shot')
       )
     ),
   'robot_quotes' => array(
