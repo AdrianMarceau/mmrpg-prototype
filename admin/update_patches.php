@@ -470,8 +470,6 @@ function mmrpg_patch_player_ability_merge_2k16($_GAME){
     $reward_battle_zenny = 0;
     $reward_value = 3000;
 
-    header('Content-type: text/plain; ');
-
     echo("Scanning player and robot abilities...\n\n");
 
     // If the player or their robots have unlocked abilities, loop through and collects them
