@@ -43,6 +43,9 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     if (!empty($data['save_values_battle_items'])){ $_GAME['values']['battle_items'] = json_decode($data['save_values_battle_items'], true); }
     elseif (!isset($_GAME['values']['battle_items'])){ $_GAME['values']['battle_items'] = array(); }
 
+    if (!empty($data['save_values_battle_abilities'])){ $_GAME['values']['battle_abilities'] = json_decode($data['save_values_battle_abilities'], true); }
+    elseif (!isset($_GAME['values']['battle_abilities'])){ $_GAME['values']['battle_abilities'] = array(); }
+
     if (!empty($data['save_values_battle_stars'])){ $_GAME['values']['battle_stars'] = json_decode($data['save_values_battle_stars'], true); }
     elseif (!isset($_GAME['values']['battle_stars'])){ $_GAME['values']['battle_stars'] = array(); }
 
@@ -189,6 +192,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         'save_values_battle_rewards' => mmrpg_admin_encode_save_data($_GAME['values']['battle_rewards']),
         'save_values_battle_settings' => mmrpg_admin_encode_save_data($_GAME['values']['battle_settings']),
         'save_values_battle_items' => mmrpg_admin_encode_save_data($_GAME['values']['battle_items']),
+        'save_values_battle_abilities' => mmrpg_admin_encode_save_data($_GAME['values']['battle_abilities']),
         'save_values_battle_stars' => mmrpg_admin_encode_save_data($_GAME['values']['battle_stars']),
         'save_values_robot_database' => mmrpg_admin_encode_save_data($_GAME['values']['robot_database']),
         'save_counters' => mmrpg_admin_encode_save_data($_GAME['counters']),
@@ -214,13 +218,14 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         if ($update_array['save_flags'] != $data['save_flags']){ $this_page_markup .= 'Save flags have been changed...<br />'; }
         if ($update_array['save_values'] != $data['save_values']){ $this_page_markup .= 'Save values have been changed...<br />'; }
         if ($update_array['save_values_battle_index'] != $data['save_values_battle_index']){ $this_page_markup .= 'Save values battle index has been changed...<br />'; }
-        if ($update_array['save_values_battle_complete'] != $data['save_values_battle_complete']){ $this_page_markup .= 'Save values battle complete has been changed...<br />'; }
-        if ($update_array['save_values_battle_failure'] != $data['save_values_battle_failure']){ $this_page_markup .= 'Save values battle failure has been changed...<br />'; }
-        if ($update_array['save_values_battle_rewards'] != $data['save_values_battle_rewards']){ $this_page_markup .= 'Save values battle rewards has been changed...<br />'; }
-        if ($update_array['save_values_battle_settings'] != $data['save_values_battle_settings']){ $this_page_markup .= 'Save values battle settings has been changed...<br />'; }
-        if ($update_array['save_values_battle_items'] != $data['save_values_battle_items']){ $this_page_markup .= 'Save values battle items has been changed...<br />'; }
-        if ($update_array['save_values_battle_stars'] != $data['save_values_battle_stars']){ $this_page_markup .= 'Save values battle stars has been changed...<br />'; }
-        if ($update_array['save_values_robot_database'] != $data['save_values_robot_database']){ $this_page_markup .= 'Save values robot_database has been changed...<br />'; }
+        if ($update_array['save_values_battle_complete'] != $data['save_values_battle_complete']){ $this_page_markup .= 'Save values battle completes have been changed...<br />'; }
+        if ($update_array['save_values_battle_failure'] != $data['save_values_battle_failure']){ $this_page_markup .= 'Save values battle failures have been changed...<br />'; }
+        if ($update_array['save_values_battle_rewards'] != $data['save_values_battle_rewards']){ $this_page_markup .= 'Save values battle rewards have been changed...<br />'; }
+        if ($update_array['save_values_battle_settings'] != $data['save_values_battle_settings']){ $this_page_markup .= 'Save values battle settings have been changed...<br />'; }
+        if ($update_array['save_values_battle_items'] != $data['save_values_battle_items']){ $this_page_markup .= 'Save values battle items have been changed...<br />'; }
+        if ($update_array['save_values_battle_abilities'] != $data['save_values_battle_abilities']){ $this_page_markup .= 'Save values battle abilities have been changed...<br />'; }
+        if ($update_array['save_values_battle_stars'] != $data['save_values_battle_stars']){ $this_page_markup .= 'Save values battle stars have been changed...<br />'; }
+        if ($update_array['save_values_robot_database'] != $data['save_values_robot_database']){ $this_page_markup .= 'Save values robot database has been changed...<br />'; }
         if ($update_array['save_counters'] != $data['save_counters']){ $this_page_markup .= 'Save counters have been changed...<br />'; }
         //$this_page_markup .= '<pre>$_SESSION[\'GAME\'][\'values\'] : '.print_r($_GAME['values'], true).'</pre><br /><hr /><br />';
         if ($temp_success === false){ $this_page_markup .= '...Failure!'; }
