@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Require the update actions file
 $update_patch_tokens = array();
@@ -7,11 +6,9 @@ require_once('update_actions.php');
 require_once('update_patches.php');
 
 // Prevent updating if logged into a file
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
 
 // Collect any extra request variables for the update
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_cache_date = !empty($_REQUEST['date']) && preg_match('/^([0-9]{8})-([0-9]{2})$/', $_REQUEST['date']) ? $_REQUEST['date'] : MMRPG_CONFIG_CACHE_DATE;
 $this_update_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : 10;
 $this_request_type = !empty($_REQUEST['type']) ? $_REQUEST['type'] : 'index';
@@ -25,7 +22,6 @@ if (!empty($this_request_id)){ $this_where_query .= "AND mmrpg_saves.user_id = {
 if (!empty($this_request_patch)){ $this_where_query .= "AND mmrpg_saves.save_patches_applied NOT LIKE '%\"{$this_request_patch}\"%' "; }
 
 // Collect any save files that have a cache date less than the current one // AND mmrpg_saves.user_id = 110
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_update_query = "SELECT
     mmrpg_saves.*,
     mmrpg_leaderboard.board_points,
@@ -59,13 +55,10 @@ $this_total_query = "SELECT
         ;";
 //die($this_update_query);
 //die($this_update_query);
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_update_list = $DB->get_array_list($this_update_query);
 $this_total_list = $DB->get_array_list($this_total_query);
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_update_count = $this_request_type == 'ajax' && !empty($this_update_list) ? count($this_update_list) : 0;
 $this_total_count = !empty($this_total_list) ? count($this_total_list) : 0;
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_update_list = !empty($this_update_list) ? $this_update_list : array();
 $this_total_list = array();
 //die($this_update_query);
@@ -75,7 +68,6 @@ if ($this_request_type == 'ajax'){ $this_page_markup = ''; }
 
 // Print out the menu header so we know where we are
 if ($this_request_type != 'ajax'){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     ob_start();
     ?>
     <div id="menu" style="margin: 0 auto 20px; font-weight: bold;">
