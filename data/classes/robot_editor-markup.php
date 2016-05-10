@@ -282,33 +282,14 @@ ob_start();
 
                             // Define the array to hold ALL the reward option markup
                             $ability_rewards_options = '';
-                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $ability_rewards_options = '.htmlentities($ability_rewards_options, ENT_QUOTES, 'UTF-8', true));  }
-
-                            // Collect this player's ability rewards and add them to the dropdown
-                            //$player_ability_rewards = !empty($player_rewards['player_abilities']) ? $player_rewards['player_abilities'] : array();
-                            //if (!empty($player_ability_rewards)){ sort($player_ability_rewards); }
-
-                            // DEBUG
-                            //$debug_tokens = array();
-                            //foreach ($player_ability_rewards AS $info){ $debug_tokens[] = $info['ability_token']; }
-                            //echo 'before:'.implode(',', array_keys($debug_tokens)).'<br />';
 
                             // Sort the ability index based on ability number
                             uasort($player_ability_rewards, array('mmrpg_player', 'abilities_sort_for_editor'));
-
-                            // DEBUG
-                            //echo 'after:'.implode(',', array_keys($player_ability_rewards)).'<br />';
-
-                            // DEBUG
-                            //$debug_tokens = array();
-                            //foreach ($player_ability_rewards AS $info){ $debug_tokens[] = $info['ability_token']; }
-                            //echo 'after:'.implode(',', $debug_tokens).'<br />';
 
                             // Dont' bother generating option dropdowns if editing is disabled
                             if ($global_allow_editing){
 
                                 $player_ability_rewards_options = array();
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $player_ability_rewards = '.implode(',', array_keys($player_ability_rewards)));  }
                                 foreach ($player_ability_rewards AS $temp_ability_key => $temp_ability_info){
                                     if (empty($temp_ability_info['ability_token']) || !isset($mmrpg_database_abilities[$temp_ability_info['ability_token']])){ continue; }
                                     $temp_token = $temp_ability_info['ability_token'];
@@ -318,13 +299,10 @@ ob_start();
                                 }
                                 $player_ability_rewards_options = '<optgroup label="Player Abilities">'.implode('', $player_ability_rewards_options).'</optgroup>';
                                 $ability_rewards_options .= $player_ability_rewards_options;
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $ability_rewards_options = '.htmlentities($ability_rewards_options, ENT_QUOTES, 'UTF-8', true));  }
 
                                 // Collect this robot's ability rewards and add them to the dropdown
                                 $robot_ability_rewards = !empty($robot_rewards['robot_abilities']) ? $robot_rewards['robot_abilities'] : array();
                                 $robot_ability_settings = !empty($robot_settings['robot_abilities']) ? $robot_settings['robot_abilities'] : array();
-                                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $robot_ability_rewards = '.implode(',', array_keys($robot_ability_rewards)));  }
-                                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $robot_ability_settings = '.implode(',', array_keys($robot_ability_settings)));  }
                                 foreach ($robot_ability_settings AS $token => $info){ if (empty($robot_ability_rewards[$token])){ $robot_ability_rewards[$token] = $info; } }
                                 if (!empty($robot_ability_rewards)){ sort($robot_ability_rewards); }
                                 $robot_ability_rewards_options = array();
@@ -337,13 +315,11 @@ ob_start();
                                 }
                                 $robot_ability_rewards_options = '<optgroup label="Robot Abilities">'.implode('', $robot_ability_rewards_options).'</optgroup>';
                                 $ability_rewards_options .= $robot_ability_rewards_options;
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $ability_rewards_options = '.htmlentities($ability_rewards_options, ENT_QUOTES, 'UTF-8', true));  }
 
                                 // Add an option at the bottom to remove the ability
                                 $ability_rewards_options .= '<optgroup label="Ability Actions">';
                                 $ability_rewards_options .= '<option value="" title="">- Remove Ability -</option>';
                                 $ability_rewards_options .= '</optgroup>';
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $ability_rewards_options = '.htmlentities($ability_rewards_options, ENT_QUOTES, 'UTF-8', true));  }
 
                             }
 
@@ -431,16 +407,9 @@ ob_start();
                                 }
 
                             }
-                            // DEBUG
-                            //echo 'temp-string:';
+
                             echo !empty($temp_string) ? implode(' ', $temp_string) : '';
-                            // DEBUG
-                            //echo '<br />temp-inputs:';
                             echo !empty($temp_inputs) ? implode(' ', $temp_inputs) : '';
-                            // DEBUG
-                            //echo '<br />';
-
-
 
                             ?>
                             </div>

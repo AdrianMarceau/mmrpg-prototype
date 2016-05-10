@@ -684,7 +684,6 @@ if ($this_player->player_side == 'left'){
             // Automatically unlock this ability for use in battle
             $this_reward = array('ability_token' => $this_ability_token);
             mmrpg_game_unlock_ability($this_player_info, false, $this_reward);
-            //$_SESSION['GAME']['values']['battle_rewards'][$this_player_token]['player_abilities'][$this_ability_token] = $this_reward;
 
             // Display the robot reward message markup
             $event_header = $ability_info['ability_name'].' Unlocked';

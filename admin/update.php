@@ -216,7 +216,7 @@ function admin_trigger_update(thisHref){
 
 
                         if (pendingUpdates > 0){
-                            var thisTimeout = setTimeout(function(){ return admin_trigger_update(thisHref); }, 500);
+                            var thisTimeout = setTimeout(function(){ return admin_trigger_update(thisHref); }, 100);
                             return true;
                             } else {
                             thisCompletedCounter.css({color:'rgb(0, 139, 0)',opacity:0.5}).animate({opacity:1.0},1000,'swing',function(){ thisCompletedCounter.css({color:'rgb(0, 0, 0)'}); });
@@ -225,7 +225,8 @@ function admin_trigger_update(thisHref){
 
                         }
 
-                }});
+                    }
+                });
     }
 }
 

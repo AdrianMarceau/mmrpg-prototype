@@ -316,7 +316,7 @@ function mmrpg_prototype_ability_unlocked($player_token, $robot_token = '', $abi
         return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities'][$ability_token]) ? true : false;
     } else {
         // Check if this ability has been unlocked by the player and return true if it was
-        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities'][$ability_token]) ? true : false;
+        return in_array($ability_token, $_SESSION[$session_token]['values']['battle_abilities']) ? true : false;
     }
 }
 // Define a function for counting the number of completed prototype battles
@@ -432,15 +432,7 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
         return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) : 0;
     } else {
         // Define the ability counter and token tracker
-        $ability_tokens = array();
-        foreach ($mmrpg_index_players AS $temp_player_token => $temp_player_info){
-            $temp_player_abilities = isset($_SESSION[$session_token]['values']['battle_rewards'][$temp_player_token]['player_abilities']) ? $_SESSION[$session_token]['values']['battle_rewards'][$temp_player_token]['player_abilities'] : array();
-            foreach ($temp_player_abilities AS $temp_ability_token => $temp_ability_info){
-                if (!in_array($temp_ability_token, $ability_tokens)){
-                    $ability_tokens[] = $temp_ability_token;
-                }
-            }
-        }
+        $ability_tokens = $_SESSION[$session_token]['values']['battle_abilities'];
         // Return the total amount of ability tokens pulled
         return !empty($ability_tokens) ? count($ability_tokens) : 0;
     }
