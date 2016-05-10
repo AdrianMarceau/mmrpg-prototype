@@ -461,8 +461,134 @@ function mmrpg_patch_player_ability_merge_2k16($_GAME){
     // Pull in global variables
     global $DB;
 
-    // WE'RE NOT READY
-    exit('testing');
+    // Collect a list of unlockable ability tokens
+    $valid_ability_tokens = $DB->get_array_list("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'master'", 'ability_token');
+    $valid_ability_tokens = !empty($valid_ability_tokens) ? array_keys($valid_ability_tokens) : array();
+
+    // Create a new entry in the session for battle abilities
+    $new_battle_abilities = array();
+    $reward_battle_zenny = 0;
+    $reward_value = 3000;
+
+    header('Content-type: text/plain; ');
+
+    echo("Scanning player and robot abilities...\n\n");
+
+    // If the player or their robots have unlocked abilities, loop through and collects them
+    $player_tokens = array('dr-light', 'dr-wily', 'dr-cossack');
+    if (!empty($_GAME['values']['battle_rewards'])){
+        foreach ($player_tokens AS $key => $player_token){
+
+            $player_name = ucwords(str_replace('dr-', 'dr. ', $player_token));
+
+            if (!isset($_GAME['values']['battle_rewards'][$player_token]) &&
+                !isset($_GAME['values']['battle_settings'][$player_token])){
+                continue;
+            }
+
+            if (empty($_GAME['values']['battle_rewards'][$player_token])){ $player_rewards = array(); }
+            else { $player_rewards = $_GAME['values']['battle_rewards'][$player_token]; }
+
+            if (empty($_GAME['values']['battle_settings'][$player_token])){ $player_settings = array(); }
+            else { $player_settings = $_GAME['values']['battle_settings'][$player_token]; }
+
+            // Loop through player and robot rewards, collecting and validating abilities
+            if (!empty($player_rewards)){
+
+                // If this player has unlocked their own abilities, collect them
+                if (!empty($player_rewards['player_abilities'])){
+                    $removed_ability = false;
+                    $player_abilities = array_keys($player_rewards['player_abilities']);
+                    $new_battle_abilities = array_merge($new_battle_abilities, $player_abilities);
+                    echo("Collecting ability rewards from {$player_name}\n");
+                    // Manually unset any invalid ability tokens
+                    foreach ($player_rewards['player_abilities'] AS $ability_token => $ability_info){
+                        $ability_name = ucwords(str_replace('-', ' ', $ability_token));
+                        if (!in_array($ability_token, $valid_ability_tokens)){
+                            unset($player_rewards['player_abilities'][$ability_token]);
+                            unset($player_settings['player_abilities'][$ability_token]);
+                            echo("- Removing legacy ability {$ability_name} (+{$reward_value}z)\n");
+                            $reward_battle_zenny += $reward_value;
+                            $removed_ability = true;
+                        }
+                    }
+                    if (!$removed_ability){ echo("+ All clear!\n"); }
+                    echo("\n");
+                }
+
+
+                // If this player has robots, loop through and collect their abilities
+                if (!empty($player_rewards['player_robots'])){
+                    foreach ($player_rewards['player_robots'] AS $robot_token => $robot_rewards){
+                        $removed_ability = false;
+                        $robot_name = ucwords(str_replace('-', ' ', $robot_token));
+                        $robot_settings = isset($player_settings['player_robots'][$robot_token]) ? $player_settings['player_robots'][$robot_token] : array();
+                        if (!empty($robot_rewards['robot_abilities'])){
+                            $robot_abilities = array_keys($robot_rewards['robot_abilities']);
+                            $new_battle_abilities = array_merge($new_battle_abilities, $robot_abilities);
+                            echo("Collecting ability rewards from {$player_name}'s {$robot_name}\n");
+                            // Manually unset any invalid ability tokens
+                            foreach ($robot_rewards['robot_abilities'] AS $ability_token => $ability_info){
+                                $ability_name = ucwords(str_replace('-', ' ', $ability_token));
+                                if (!in_array($ability_token, $valid_ability_tokens)){
+                                    unset($player_rewards['player_robots'][$robot_token]['robot_abilities'][$ability_token]);
+                                    unset($player_settings['player_robots'][$robot_token]['robot_abilities'][$ability_token]);
+                                    echo("- Removing legacy ability {$ability_name} (+{$reward_value}z)\n");
+                                    $reward_battle_zenny += $reward_value;
+                                    $removed_ability = true;
+                                    // Give this robot the buster shot if they have no more abilities
+                                    if (empty($player_settings['player_robots'][$robot_token]['robot_abilities'])){
+                                        $player_settings['player_robots'][$robot_token]['robot_abilities']['buster_shot'] = array('ability_token' => 'buster_shot');
+                                    }
+                                }
+                            }
+                        }
+                        if (!$removed_ability){ echo("+ All clear!\n"); }
+                        echo("\n");
+                    }
+                }
+
+            }
+
+            // Update parent reward and settings arrays
+            $_GAME['values']['battle_rewards'][$player_token] = $player_rewards;
+            $_GAME['values']['battle_settings'][$player_token] = $player_settings;
+
+
+        }
+    }
+
+    // Clean the unlocked ability array of duplicate values
+    $new_battle_abilities = array_unique($new_battle_abilities);
+
+    echo("Generating new global abilities array...\n\n");
+
+    // Loop through global abilities and remove incomplete
+    foreach ($new_battle_abilities AS $key => $ability_token){
+        $ability_name = str_replace(' ', '', ucwords(str_replace('-', ' ', $ability_token)));
+        $is_valid = in_array($ability_token, $valid_ability_tokens) ? true : false;
+        if ($is_valid){ echo "+{$ability_name} "; }
+        else { unset($new_battle_abilities[$key]); }
+    }
+
+    // Re-key the ability array now that duplicates are removed
+    $new_battle_abilities = array_values($new_battle_abilities);
+
+    echo("\n");
+
+    //echo('<pre>$new_battle_abilities = '.print_r($new_battle_abilities, true).'</pre>');
+    //echo('<pre>$valid_ability_tokens = '.print_r($valid_ability_tokens, true).'</pre>');
+
+    // Update the parent game array with the new ability list
+    $_GAME['values']['battle_abilities'] = $new_battle_abilities;
+
+    echo("\n");
+
+    echo("--------------------\n\n");
+
+    echo("Ability merge complete. Thank you for your understanding. \n\n");
+
+    echo("[b]Total Compensation : ".number_format($reward_battle_zenny, 0, '.', ',')."z[/b]\n\n");
 
     // Return the updated game array
     return $_GAME;
