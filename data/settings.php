@@ -59,8 +59,10 @@ define('MMRPG_SETTINGS_RECHARGE_ATTACK', 1); // Recharge one unit of attack powe
 define('MMRPG_SETTINGS_RECHARGE_DEFENSE', 1); // Recharge one unit of defense power each turn
 define('MMRPG_SETTINGS_RECHARGE_SPEED', 1); // Recharge one unit of speed power each turn
 
-// Define the global values for robot weapon energy values
-define('MMRPG_SETTINGS_ITEMS_MAXQUANTITY', 99); // Recharge one unit of weapon energy each turn
+// Define the global values for item maximums
+define('MMRPG_SETTINGS_SHARDS_MAXQUANTITY', 4); // Define the number of shards required to create a new core
+define('MMRPG_SETTINGS_ITEMS_MAXQUANTITY', 99); // Define the max quantity allowed for normal held items
+define('MMRPG_SETTINGS_CORES_MAXQUANTITY', 999); // Define the max quantity allowed for elemental robot cores
 
 // Define the global values for starforce related values
 define('MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT', 10);  // Base starforce boost percentage for each field star or half of fusion star
