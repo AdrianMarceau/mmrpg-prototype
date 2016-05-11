@@ -1,9 +1,10 @@
 <?
 // Define a function for saving the game session
-function mmrpg_save_game_session($this_save_filepath){
+function mmrpg_save_game_session($this_save_filepath = ''){
 
     // Reference global variables
     global $DB;
+    if (empty($this_save_filepath)){ global $this_save_filepath; }
     $session_token = mmrpg_game_token();
     $mmrpg_index_players = &$GLOBALS['mmrpg_index']['players'];
 

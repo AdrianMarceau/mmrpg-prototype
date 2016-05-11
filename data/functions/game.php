@@ -31,7 +31,6 @@ function mmrpg_debug_alert($alert_string, $echo = true){
 
 // -- PLAYER FUNCTIONS -- //
 
-
 // Define a function for checking is a prototype player has been unlocked
 function mmrpg_game_player_unlocked($player_token){
     // Check if this battle has been completed and return true is it was
