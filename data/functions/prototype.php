@@ -4,6 +4,29 @@
  * PROTOTYPE FUNCTIONS
  */
 
+// Define a function for calculating required experience points to the next level
+function mmrpg_prototype_calculate_shop_experience_required($this_level, $max_level = 100, $min_experience = 1000){
+
+    $last_level = $this_level - 1;
+    $level_mod = $this_level / $max_level;
+    $this_experience = round($min_experience + ($last_level * $level_mod * $min_experience));
+
+    return $this_experience;
+}
+
+// Define a function for calculating required experience points to the next level
+function mmrpg_prototype_calculate_shop_level_by_experience($this_experience, $max_level = 100, $min_experience = 1000){
+    $temp_total_experience = 0;
+    for ($this_level = 1; $this_level < $max_level; $this_level++){
+        $temp_experience = mmrpg_prototype_calculate_shop_experience_required($this_level, $max_level, $min_experience);
+        $temp_total_experience += $temp_experience;
+        if ($temp_total_experience > $this_experience){
+            return $this_level - 1;
+        }
+    }
+    return $max_level;
+}
+
 // Define a function for checking a player has completed the prototype
 function mmrpg_prototype_complete($player_token = ''){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_complete('{$player_token}')");  }
