@@ -256,7 +256,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             if (!empty($mmrpg_database_abilities[$temp_token])){
 
                 // Collect the current ability's info from the database
-                $ability_info = array('ability_token' => $temp_token); //rpg_ability::parse_index_info($mmrpg_database_abilities[$temp_token]);
+                $ability_info = array('ability_token' => $temp_token);
 
                 // Unlock this ability for all playable characters
                 mmrpg_game_unlock_ability(false, false, $ability_info, true);

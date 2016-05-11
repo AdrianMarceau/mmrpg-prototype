@@ -289,7 +289,7 @@ if (!empty($this_shop_index)){
     $shop_player = $shop_info['shop_player'];
     $shop_selling = $shop_info['shop_kind_selling'];
     $shop_buying = $shop_info['shop_kind_buying'];
-    if (mmrpg_prototype_battles_complete($shop_player) >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT){
+    if (mmrpg_prototype_battles_complete($shop_player) >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT){
       // If the shop has not been created, define its defaults
       if (!isset($this_battle_shops[$shop_token])){
         $shop_array = array();
