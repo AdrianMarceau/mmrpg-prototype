@@ -263,23 +263,25 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info){
     $this_ability_token = $ability_info['ability_token'];
     // Automatically unlock this ability for use in battle
     $this_reward = array('ability_token' => $this_ability_token);
+    $this_setting = array('ability_token' => $this_ability_token);
     // Check if this is being awarded to a specific robot or a player
     if (!empty($robot_info)){
         $_SESSION[$session_token]['values']['battle_rewards'][$player_info['player_token']]['player_robots'][$robot_info['robot_token']]['robot_abilities'][$this_ability_token] = $this_reward;
         if (empty($_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots'][$robot_info['robot_token']]['robot_abilities'])
             || count($_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots'][$robot_info['robot_token']]['robot_abilities']) < 8){
-            $this_setting = array('ability_token' => $this_ability_token);
+
             $_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots'][$robot_info['robot_token']]['robot_abilities'][$this_ability_token] = $this_setting;
         }
-    } else {
+    } elseif (!empty($player_info)) {
         // Unlock the ability for the player (really just for stat purposes)
         $_SESSION[$session_token]['values']['battle_rewards'][$player_info['player_token']]['player_abilities'][$this_ability_token] = $this_reward;
-        // And then unlock the ability globally for easier customization
-        if (!isset($_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'] = array(); }
-        if (!in_array($this_ability_token, $_SESSION[$session_token]['values']['battle_abilities'])){
-            $_SESSION[$session_token]['values']['battle_abilities'][] = $this_ability_token;
-        }
     }
+    // And then unlock the ability globally for easier customization
+    if (!isset($_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'] = array(); }
+    if (!in_array($this_ability_token, $_SESSION[$session_token]['values']['battle_abilities'])){
+        $_SESSION[$session_token]['values']['battle_abilities'][] = $this_ability_token;
+    }
+
     // Return true on success
     return true;
 }
