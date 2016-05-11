@@ -28,7 +28,7 @@ if (!empty($temp_flags['drlight_password_abilitygetdemocompletebonus'])){
     $temp_bonus_zenny = 10000;
     $_SESSION['GAME']['counters']['battle_zenny'] += $temp_bonus_zenny;
     // Unlock the Copy Shot for use in battle early
-    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-light'], false, array('ability_token' => 'copy-shot'));
+    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-light'], false, array('ability_token' => 'copy-shot'), true);
     // Reset and return to the main menu
     header('Location: prototype.php');
     exit();
@@ -39,7 +39,7 @@ if (!empty($temp_flags['drlight_password_abilitygetdemocompletebonus'])){
 if (!empty($temp_flags['drlight_password_abilitygetbubblebombsaway'])){
   if (!mmrpg_prototype_ability_unlocked('dr-light', false, 'bubble-bomb')){
     // Unlock Bubble Bomb as an equippable ability
-    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-light'], false, array('ability_token' => 'bubble-bomb'));
+    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-light'], false, array('ability_token' => 'bubble-bomb'), true);
     header('Location: prototype.php');
     exit();
   }
@@ -49,7 +49,7 @@ if (!empty($temp_flags['drlight_password_abilitygetbubblebombsaway'])){
 if (!empty($temp_flags['drlight_password_abilitygetcutterofdarkness'])){
   if (!mmrpg_prototype_ability_unlocked('dr-light', false, 'shadow-blade')){
     // Unlock Shadow Blade as an equippable ability
-    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-light'], false, array('ability_token' => 'shadow-blade'));
+    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-light'], false, array('ability_token' => 'shadow-blade'), true);
     header('Location: prototype.php');
     exit();
   }

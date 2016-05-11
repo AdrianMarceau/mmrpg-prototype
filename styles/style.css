@@ -1398,6 +1398,22 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #events #messages .event .header_right {
     text-align: right;
 }
+#events #messages .event .header_left.nomug,
+#events #messages .event .header_left.noicon {
+    margin-left: 0;
+    margin-right: 0;
+}
+#events #messages .event .header_right.nomug,
+#events #messages .event .header_right.noicon {
+    margin-left: 0;
+    margin-right: 0;
+}
+#events #messages .event .description_container {
+    white-space: normal;
+    max-width: 99%;
+    text-align: left;
+    clear: left;
+}
 
 #events #messages .event .header_left .header_core,
 #events #messages .event .header_right .header_core {

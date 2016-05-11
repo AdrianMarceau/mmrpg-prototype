@@ -1,6 +1,5 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
 // -- DR. WILY PASSWORDS -- //
 
 // Collect the temp battle flags
@@ -24,7 +23,7 @@ if (!empty($temp_flags['drwily_password_robotgetpanicatthedisco'])){
 if (!empty($temp_flags['drwily_password_abilitygetbubblebombsaway'])){
   if (!mmrpg_prototype_ability_unlocked('dr-wily', false, 'bubble-bomb')){
     // Unlock Bubble Bomb as an equippable ability
-    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-wily'], false, array('ability_token' => 'bubble-bomb'));
+    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-wily'], false, array('ability_token' => 'bubble-bomb'), true);
     header('Location: prototype.php');
     exit();
   }
@@ -34,10 +33,10 @@ if (!empty($temp_flags['drwily_password_abilitygetbubblebombsaway'])){
 if (!empty($temp_flags['drwily_password_abilitygetcutterofdarkness'])){
   if (!mmrpg_prototype_ability_unlocked('dr-wily', false, 'shadow-blade')){
     // Unlock Shadow Blade as an equippable ability
-    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-wily'], false, array('ability_token' => 'shadow-blade'));
+    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-wily'], false, array('ability_token' => 'shadow-blade'), true);
     header('Location: prototype.php');
     exit();
   }
 }
-  
+
 ?>

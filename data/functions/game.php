@@ -587,9 +587,9 @@ function mmrpg_game_ability_unlocked($player_token = '', $robot_token = '', $abi
     // Define the game session helper var
     $session_token = mmrpg_game_token();
     // If the combined array exists and we're not being specific, check that first
-    if (empty($player_token) && empty($robot_token) && isset($_SESSION[$session_token]['values']['battle_abilities'][$ability_token])){
+    if (empty($player_token) && empty($robot_token)){
         // Check if this ability exists in the array, and return true if it does
-        return !empty($_SESSION[$session_token]['values']['battle_abilities'][$ability_token]) ? $_SESSION[$session_token]['values']['battle_abilities'][$ability_token] : false;
+        return in_array($ability_token, $_SESSION[$session_token]['values']['battle_abilities']) ? true : false;
     }
     // Otherwise, check the old way by looking through individual arrays
     else {
@@ -738,7 +738,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
 
     // No matter what, always unlock new abilities in the main array
     if (!isset($_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'] = array(); }
-    $_SESSION[$session_token]['values']['battle_abilities'][$this_ability_token] = $this_reward;
+    if (!in_array($this_ability_token, $_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'][] = $this_ability_token; }
 
     // Only show the event if allowed by the function args
     if ($events_create != false){

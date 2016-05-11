@@ -25,43 +25,6 @@ $mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abili
 // Collect the editor flag if set
 $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
 
-// -- CONVERT ROBOT ABILITIES INTO PLAYER ABILITIES -- //
-
-// If we're NOT in script mode, let's loop through all the robots and make sure
-if (empty($_REQUEST['action']) && !defined('MMRPG_REMOTE_GAME')){
-    $temp_battle_rewards = &$_SESSION[$session_token]['values']['battle_rewards'];
-    $temp_battle_settings = &$_SESSION[$session_token]['values']['battle_settings'];
-    if (!empty($temp_battle_rewards)){
-        foreach ($temp_battle_rewards AS $temp_player_token => $temp_player_info){
-         //echo $temp_player_token.'<br /><br />';
-            if (!empty($temp_player_info['player_robots'])){
-                foreach ($temp_player_info['player_robots'] AS $temp_robot_token => $temp_robot_info){
-                    $temp_robot_info['original_player'] = !empty($temp_battle_settings[$temp_player_token]['player_robots'][$temp_robot_token]['original_player']) ? $temp_battle_settings[$temp_player_token]['player_robots'][$temp_robot_token]['original_player'] : $temp_player_token;
-                    //echo '-'.$temp_robot_token.' ('.$temp_robot_info['original_player'].')<br />';
-                    if (!empty($temp_robot_info['robot_abilities'])){
-                        foreach ($temp_robot_info['robot_abilities'] AS $temp_ability_token => $temp_ability_info){
-                         //echo '--'.$temp_ability_token;
-                         if (mmrpg_prototype_ability_unlocked($temp_robot_info['original_player'], false, $temp_ability_token)){
-                             //echo ' (unlocked!)';
-                         } else {
-                             //echo ' (not unlocked!)';
-                             $temp_original_player_info = array('player_token' => $temp_robot_info['original_player']);
-                             mmrpg_game_unlock_ability($temp_original_player_info, false, $temp_ability_info);
-                             //echo ' (but unlocked now!)';
-                         }
-                         //echo '<br />';
-                        }
-                    }
-                 //echo '<br />';
-                }
-            }
-            //echo '<br />';
-        }
-    }
-    //die('done');
-}
-
-
 
 // -- COLLECT SETTINGS DATA -- //
 
@@ -161,6 +124,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'player'){
 
         // Collect global abilities as player abilities
         $player_ability_rewards = array();
+        if (!isset($_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'] = array(); }
         foreach ($_SESSION[$session_token]['values']['battle_abilities'] AS $ability_key => $ability_token){ $player_ability_rewards[$ability_token] = array('ability_token' => $ability_token); }
         if (!empty($player_ability_rewards)){ asort($player_ability_rewards); }
 
@@ -614,7 +578,9 @@ if (true){
         //
         // Collect global abilities as player abilities
         $player_ability_rewards = array();
-        foreach ($_SESSION[$session_token]['values']['battle_abilities'] AS $ability_key => $ability_token){ $player_ability_rewards[$ability_token] = array('ability_token' => $ability_token); }
+        foreach ($_SESSION[$session_token]['values']['battle_abilities'] AS $ability_key => $ability_token){
+            $player_ability_rewards[$ability_token] = array('ability_token' => $ability_token);
+        }
         if (!empty($player_ability_rewards)){ asort($player_ability_rewards); }
 
         // Loop through the player robots and display their edit boxes
