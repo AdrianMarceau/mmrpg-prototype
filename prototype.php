@@ -244,6 +244,13 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
                 </span>
             </div>
         </div>
+        <div class="zenny field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+            <div class="wrapper">
+                <span class="amount">
+                    <?= number_format($_SESSION[$session_token]['counters']['battle_zenny'], 0, '.', ',') ?> z
+                </span>
+            </div>
+        </div>
 
         <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
