@@ -1,6 +1,6 @@
 <?
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
 // -- DR. COSSACK PASSWORDS -- //
 
 // Collect the temp battle flags
@@ -24,7 +24,7 @@ if (!empty($temp_flags['drcossack_password_robotgetrhythmandblues'])){
 if (!empty($temp_flags['drcossack_password_abilitygetbubblebombsaway'])){
   if (!mmrpg_prototype_ability_unlocked('dr-cossack', false, 'bubble-bomb')){
     // Unlock Bubble Bomb as an equippable ability
-    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-cossack'], false, array('ability_token' => 'bubble-bomb'));
+    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-cossack'], false, array('ability_token' => 'bubble-bomb'), true);
     header('Location: prototype.php');
     exit();
   }
@@ -34,10 +34,10 @@ if (!empty($temp_flags['drcossack_password_abilitygetbubblebombsaway'])){
 if (!empty($temp_flags['drcossack_password_abilitygetcutterofdarkness'])){
   if (!mmrpg_prototype_ability_unlocked('dr-cossack', false, 'shadow-blade')){
     // Unlock Bubble Bomb as an equippable ability
-    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-cossack'], false, array('ability_token' => 'shadow-blade'));
+    mmrpg_game_unlock_ability($mmrpg_index['players']['dr-cossack'], false, array('ability_token' => 'shadow-blade'), true);
     header('Location: prototype.php');
     exit();
   }
 }
-  
+
 ?>

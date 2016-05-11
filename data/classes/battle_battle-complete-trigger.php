@@ -320,7 +320,7 @@ if ($target_player->player_side == 'left'){
 
                     // Automatically unlock this ability for use in battle
                     $this_reward = array('ability_token' => $temp_ability_token);
-                    mmrpg_game_unlock_ability($temp_player_info, false, $this_reward);
+                    mmrpg_game_unlock_ability($temp_player_info, false, $this_reward, true);
 
                 }
 
@@ -491,7 +491,7 @@ if ($this_player->player_side == 'left'){
 
                     // Automatically unlock this ability for use in battle
                     $this_reward = array('ability_token' => $temp_ability_token);
-                    mmrpg_game_unlock_ability($temp_player_info, false, $this_reward);
+                    mmrpg_game_unlock_ability($temp_player_info, false, $this_reward, true);
 
                 }
 
@@ -683,7 +683,7 @@ if ($this_player->player_side == 'left'){
 
             // Automatically unlock this ability for use in battle
             $this_reward = array('ability_token' => $this_ability_token);
-            mmrpg_game_unlock_ability($this_player_info, false, $this_reward);
+            mmrpg_game_unlock_ability($this_player_info, false, $this_reward, true);
 
             // Display the robot reward message markup
             $event_header = $ability_info['ability_name'].' Unlocked';

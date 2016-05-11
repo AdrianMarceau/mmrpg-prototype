@@ -29,6 +29,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
     $this_playerinfo['values']['battle_rewards'] = !defined('MMRPG_REMOTE_SKIP_REWARDS') && !empty($this_playerinfo['save_values_battle_rewards']) ? json_decode($this_playerinfo['save_values_battle_rewards'], true) : array();
     $this_playerinfo['values']['battle_settings'] = !defined('MMRPG_REMOTE_SKIP_SETTINGS') && !empty($this_playerinfo['save_values_battle_settings']) ? json_decode($this_playerinfo['save_values_battle_settings'], true) : array();
     $this_playerinfo['values']['battle_items'] = !defined('MMRPG_REMOTE_SKIP_ITEMS') && !empty($this_playerinfo['save_values_battle_items']) ? json_decode($this_playerinfo['save_values_battle_items'], true) : array();
+    $this_playerinfo['values']['battle_abilities'] = !defined('MMRPG_REMOTE_SKIP_ABILITIES') && !empty($this_playerinfo['save_values_battle_abilities']) ? json_decode($this_playerinfo['save_values_battle_abilities'], true) : array();
     $this_playerinfo['values']['battle_stars'] = !defined('MMRPG_REMOTE_SKIP_STARS') && !empty($this_playerinfo['save_values_battle_stars']) ? json_decode($this_playerinfo['save_values_battle_stars'], true) : array();
     $this_playerinfo['values']['robot_database'] = !defined('MMRPG_REMOTE_SKIP_DATABASE') && !empty($this_playerinfo['save_values_robot_database']) ? json_decode($this_playerinfo['save_values_robot_database'], true) : array();
     $this_playerinfo['flags'] = !empty($this_playerinfo['save_flags']) ? json_decode($this_playerinfo['save_flags'], true) : array();
@@ -40,6 +41,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
       $this_playerinfo['save_values_battle_rewards'],
       $this_playerinfo['save_values_battle_settings'],
       $this_playerinfo['save_values_battle_items'],
+      $this_playerinfo['save_values_battle_abilities'],
       $this_playerinfo['save_values_battle_database'],
       $this_playerinfo['save_flags'],
       $this_playerinfo['save_settings']

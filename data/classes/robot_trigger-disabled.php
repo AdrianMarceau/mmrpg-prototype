@@ -706,9 +706,9 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
                     // Automatically unlock this ability for use in battle
                     $this_reward = array('ability_token' => $temp_ability_token);
                     $temp_player_info = $target_player->export_array();
-                    mmrpg_game_unlock_ability($temp_player_info, $temp_robot_info, $this_reward);
+                    mmrpg_game_unlock_ability($temp_player_info, $temp_robot_info, $this_reward, true);
                     if ($temp_robot_info['robot_original_player'] == $temp_player_info['player_token']){ mmrpg_game_unlock_ability($temp_player_info, false, $this_reward); }
-                    else { mmrpg_game_unlock_ability(array('player_token' => $temp_robot_info['robot_original_player']), false, $this_reward); }
+                    else { mmrpg_game_unlock_ability(array('player_token' => $temp_robot_info['robot_original_player']), false, $this_reward, true); }
                     //$_SESSION['GAME']['values']['battle_rewards'][$target_player_token]['player_robots'][$temp_robot_token]['robot_abilities'][$temp_ability_token] = $this_reward;
 
                 }

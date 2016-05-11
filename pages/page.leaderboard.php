@@ -94,6 +94,7 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     $this_playerinfo['save_values_battle_rewards'] = !empty($this_playerinfo['save_values_battle_rewards']) ? json_decode($this_playerinfo['save_values_battle_rewards'], true) : array();
     //$this_playerinfo['save_values_battle_settings'] = !empty($this_playerinfo['save_values_battle_settings']) ? json_decode($this_playerinfo['save_values_battle_settings'], true) : array();
     //$this_playerinfo['save_values_battle_items'] = !empty($this_playerinfo['save_values_battle_items']) ? json_decode($this_playerinfo['save_values_battle_items'], true) : array();
+    ////$this_playerinfo['save_values_battle_abilities'] = !empty($this_playerinfo['save_values_battle_abilities']) ? json_decode($this_playerinfo['save_values_battle_abilities'], true) : array();
     $this_playerinfo['save_values_battle_stars'] = !empty($this_playerinfo['save_values_battle_stars']) ? json_decode($this_playerinfo['save_values_battle_stars'], true) : array();
     $this_playerinfo['save_values_robot_database'] = !empty($this_playerinfo['save_values_robot_database']) ? json_decode($this_playerinfo['save_values_robot_database'], true) : array();
     $this_playerinfo['save_flags'] = !empty($this_playerinfo['save_flags']) ? json_decode($this_playerinfo['save_flags'], true) : array();
