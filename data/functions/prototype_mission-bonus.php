@@ -1,30 +1,43 @@
 <?
 // Collect the robot index for calculation purposes
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-$this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+$robot_index_query = "SELECT *, (robot_energy + robot_attack + robot_defense + robot_speed) AS base_total FROM mmrpg_index_robots HAVING robot_flag_complete = 1 ";
+if ($this_robot_class == 'master'){
+    $robot_index_query .= "AND robot_class = 'master' ";
+    $robot_index_query .= "AND base_total = 400 ";
+    $robot_index_query .= "AND robot_flag_hidden = 0 ";
+    $robot_index_query .= "AND robot_token NOT LIKE '%-copy' ";
+    $robot_index_query .= "AND robot_flag_published = 1 ";
+} elseif ($this_robot_class == 'mecha'){
+    $robot_index_query .= "AND robot_class = 'mecha' ";
+    $robot_index_query .= "AND base_total <= 400 ";
+    $robot_index_query .= "AND robot_flag_published = 1 ";
+}
+$robot_index_query .= "ORDER BY robot_order ASC ";
+$this_robot_index = $DB->get_array_list($robot_index_query, 'robot_token');
+
 // Populate the battle options with the starter battle option
 $temp_rand_num = $this_robot_count;
 $temp_battle_token = $this_prototype_data['phase_battle_token'].'-prototype-bonus-'.$this_robot_class;
 if ($this_robot_class == 'mecha'){
-  $temp_battle_omega = mmrpg_battle::get_index_info('bonus-prototype-complete');
-  $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field';
+    $temp_battle_omega = mmrpg_battle::get_index_info('bonus-prototype-complete');
+    $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field';
 }
 elseif ($this_robot_class == 'master'){
-  $temp_battle_omega = mmrpg_battle::get_index_info('bonus-prototype-complete-2');
-  $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field II';
+    $temp_battle_omega = mmrpg_battle::get_index_info('bonus-prototype-complete-2');
+    $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field II';
 }
 // Populate the player's target robots with compatible class matches
 $temp_battle_omega['battle_target_player']['player_robots'] = array();
 $temp_counter = 0;
 foreach ($this_robot_index AS $token => $info){
-  if (empty($info['robot_flag_complete']) || $info['robot_class'] != $this_robot_class){ continue; }
-  $temp_counter++;
-  $temp_robot_info = array();
-  $temp_robot_info['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $temp_counter;
-  $temp_robot_info['robot_token'] = $info['robot_token'];
-  $temp_robot_info['robot_core'] = $info['robot_core'];
-  $temp_robot_info['robot_core2'] = $info['robot_core2'];
-  $temp_battle_omega['battle_target_player']['player_robots'][] = $temp_robot_info;
+    if (empty($info['robot_flag_complete']) || $info['robot_class'] != $this_robot_class){ continue; }
+    $temp_counter++;
+    $temp_robot_info = array();
+    $temp_robot_info['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $temp_counter;
+    $temp_robot_info['robot_token'] = $info['robot_token'];
+    $temp_robot_info['robot_core'] = $info['robot_core'];
+    $temp_robot_info['robot_core2'] = $info['robot_core2'];
+    $temp_battle_omega['battle_target_player']['player_robots'][] = $temp_robot_info;
 }
 $temp_battle_omega['flags']['bonus_battle'] = true;
 $temp_battle_omega['battle_token'] = $temp_battle_token;
@@ -43,26 +56,26 @@ $temp_total_robots = 0;
 $temp_bonus_level_min = 100;
 $temp_bonus_level_max = 1;
 if (!empty($temp_player_rewards['player_robots'])){
-  foreach ($temp_player_rewards['player_robots'] AS $token => $info){
-    $temp_level = !empty($info['robot_level']) ? $info['robot_level'] : 1;
-    if ($temp_level > $temp_bonus_level_max){ $temp_bonus_level_max = $temp_level; }
-    if ($temp_level < $temp_bonus_level_min){ $temp_bonus_level_min = $temp_level; }
-    $temp_total_robots++;
-  }
-  //$temp_bonus_level_max = ceil($temp_total_level / $temp_total_robots);
-  //$temp_bonus_level_min = ceil($temp_bonus_level_max / 3);
+    foreach ($temp_player_rewards['player_robots'] AS $token => $info){
+        $temp_level = !empty($info['robot_level']) ? $info['robot_level'] : 1;
+        if ($temp_level > $temp_bonus_level_max){ $temp_bonus_level_max = $temp_level; }
+        if ($temp_level < $temp_bonus_level_min){ $temp_bonus_level_min = $temp_level; }
+        $temp_total_robots++;
+    }
+    //$temp_bonus_level_max = ceil($temp_total_level / $temp_total_robots);
+    //$temp_bonus_level_min = ceil($temp_bonus_level_max / 3);
 }
 
 // Loop through each of the bonus robots and update their levels
 $temp_battle_omega['battle_points'] = 0;
 foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $info){
-  $info['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
-  if ($this_robot_class != 'mecha'){
-    $index = mmrpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
-    $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
-  }
-  $temp_battle_omega['battle_points'] += $info['robot_level'] * ($this_robot_class == 'master' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2);
-  $temp_battle_omega['battle_target_player']['player_robots'][$key] = $info;
+    $info['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
+    if ($this_robot_class != 'mecha'){
+        $index = mmrpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
+        $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
+    }
+    $temp_battle_omega['battle_points'] += $info['robot_level'] * ($this_robot_class == 'master' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2);
+    $temp_battle_omega['battle_target_player']['player_robots'][$key] = $info;
 }
 // Multiply battle points by ten for bonus amount
 $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10);
@@ -81,11 +94,11 @@ foreach ($temp_types AS $key => $temp_type){ if (!empty($temp_type['type_class']
 
 $temp_battle_omega['battle_field_base']['field_multipliers'] = array();
 while (count($temp_battle_omega['battle_field_base']['field_multipliers']) < 6){
-  $temp_type = $temp_types[array_rand($temp_types)];
-  $temp_multiplier = 1;
-  while ($temp_multiplier == 1){ $temp_multiplier = round((mt_rand(10, 990) / 100), 1); }
-  $temp_battle_omega['battle_field_base']['field_multipliers'][$temp_type['type_token']] = $temp_multiplier;
-  //if (count($temp_battle_omega['battle_field_base']['field_multipliers']) >= 6){ break; }
+    $temp_type = $temp_types[array_rand($temp_types)];
+    $temp_multiplier = 1;
+    while ($temp_multiplier == 1){ $temp_multiplier = round((mt_rand(10, 990) / 100), 1); }
+    $temp_battle_omega['battle_field_base']['field_multipliers'][$temp_type['type_token']] = $temp_multiplier;
+    //if (count($temp_battle_omega['battle_field_base']['field_multipliers']) >= 6){ break; }
 }
 
 // Update the field type based on multipliers
@@ -102,11 +115,11 @@ $temp_battle_omega['battle_field_base']['field_music'] = $temp_music_name;
 
 // Add some random item drops to the starter battle
 $temp_battle_omega['battle_rewards']['items'] = array(
-  array('chance' => 20, 'token' => 'item-energy-tank'),
-  array('chance' => 20, 'token' => 'item-weapon-tank'),
-  array('chance' => 10, 'token' => 'item-yashichi'),
-  array('chance' => 20, 'token' => 'item-extra-life')
-  );
+    array('chance' => 20, 'token' => 'item-energy-tank'),
+    array('chance' => 20, 'token' => 'item-weapon-tank'),
+    array('chance' => 10, 'token' => 'item-yashichi'),
+    array('chance' => 20, 'token' => 'item-extra-life')
+    );
 
 // This battle doesn't count, so let's modify the point value
 $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
