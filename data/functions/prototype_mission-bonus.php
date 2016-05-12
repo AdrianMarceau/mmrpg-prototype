@@ -13,6 +13,19 @@ elseif ($this_robot_class == 'master'){
   $temp_battle_omega = mmrpg_battle::get_index_info('bonus-prototype-complete-2');
   $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field II';
 }
+// Populate the player's target robots with compatible class matches
+$temp_battle_omega['battle_target_player']['player_robots'] = array();
+$temp_counter = 0;
+foreach ($this_robot_index AS $token => $info){
+  if (empty($info['robot_flag_complete']) || $info['robot_class'] != $this_robot_class){ continue; }
+  $temp_counter++;
+  $temp_robot_info = array();
+  $temp_robot_info['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $temp_counter;
+  $temp_robot_info['robot_token'] = $info['robot_token'];
+  $temp_robot_info['robot_core'] = $info['robot_core'];
+  $temp_robot_info['robot_core2'] = $info['robot_core2'];
+  $temp_battle_omega['battle_target_player']['player_robots'][] = $temp_robot_info;
+}
 $temp_battle_omega['flags']['bonus_battle'] = true;
 $temp_battle_omega['battle_token'] = $temp_battle_token;
 $temp_battle_omega['battle_size'] = '1x4';
