@@ -63,6 +63,9 @@ ob_start();
             // Ensure this is an actual ability in the index
             if (!empty($ability_token)){
 
+                // If this ability is invalid, continue
+                if (!isset($temp_abilities_index[$ability_token])){ continue; }
+
                 // Check if this ability has been unlocked
                 $this_ability_unlocked = true;
                 if ($this_ability_unlocked){ $unlocked_abilities_count++; }

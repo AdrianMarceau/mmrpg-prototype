@@ -955,6 +955,13 @@ body.mobileFlag_landscapeMode #prototype .menu {
 #prototype .menu_hide {
     display: none;
 }
+@-moz-document url-prefix() {
+    #prototype .menu_hide {
+        display: block;
+        visibility: hidden;
+        position: absolute;
+    }
+}
 #prototype .block_2,
 #prototype .block_4,
 #prototype .block_6,
