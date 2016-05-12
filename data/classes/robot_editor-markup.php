@@ -336,6 +336,7 @@ ob_start();
                                     if (empty($robot_ability['ability_token'])){ continue; }
                                     elseif ($robot_ability['ability_token'] == '*'){ continue; }
                                     elseif ($robot_ability['ability_token'] == 'ability'){ continue; }
+                                    elseif (!isset($mmrpg_database_abilities[$robot_ability['ability_token']])){ continue; }
                                     elseif ($ability_key > 7){ continue; }
                                     $this_ability = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$robot_ability['ability_token']]);
                                     if (empty($this_ability)){ continue; }

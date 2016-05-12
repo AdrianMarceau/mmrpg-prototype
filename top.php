@@ -11,11 +11,18 @@ require('data/config.php');
 require('data/settings.php');
 require('data/debug.php');
 
-// Turn on error reporting
+// Turn ON error reporting if admin
 if (MMRPG_CONFIG_ADMIN_MODE){
     ini_set('display_errors',1);
     ini_set('display_startup_errors',1);
     error_reporting(-1);
+}
+
+// Turn OFF error reporting if live
+if (MMRPG_CONFIG_IS_LIVE){
+    ini_set('display_errors',0);
+    ini_set('display_startup_errors',0);
+    error_reporting(0);
 }
 
 // Start the session

@@ -81,16 +81,17 @@ ob_start();
         // Loop through this robot's current abilities and list them as well
         $temp_robot_title .= ' <br />';
         foreach ($temp_robot->robot_abilities AS $key => $token){
+          if (!isset($temp_abilities_index[$token])){ continue; }
           if ($key > 0 && $key % 4 != 0){ $temp_robot_title .= '&nbsp;|&nbsp;'; }
           if ($key > 0 && $key % 4 == 0){ $temp_robot_title .= '<br /> '; }
           $info = mmrpg_ability::parse_index_info($temp_abilities_index[$token]);
           $temp_robot_title .= $info['ability_name'];
-          
+
         }
         // Encode the tooltip for markup insertion and create a plain one too
         $temp_robot_title_plain = strip_tags(str_replace('<br />', '//', $temp_robot_title));
         $temp_robot_title_tooltip = htmlentities($temp_robot_title, ENT_QUOTES, 'UTF-8');
-        
+
         // Define the robot button text variables
         $temp_robot_label = '<span class="multi">';
         $temp_robot_label .= '<span class="maintext">'.$temp_robot->robot_name.'</span>';
@@ -105,7 +106,7 @@ ob_start();
           $temp_robot_label .= 'S:'.$temp_robot->robot_speed;
         $temp_robot_label .= '</span>';
         $temp_robot_label .= '</span>';
-                  
+
         // Define the robot sprite variables
         $temp_robot_sprite = array();
         $temp_robot_sprite['name'] = $temp_robot->robot_name;
