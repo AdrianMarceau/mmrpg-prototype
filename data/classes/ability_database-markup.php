@@ -92,7 +92,7 @@ ob_start();
 
         <? if($print_options['show_basics']): ?>
 
-            <h2 class="header header_left <?= $ability_header_types ?> <?= (!$print_options['show_icon']) ? 'noicon' : '' ?>">
+            <h2 class="header header_left <?= $ability_header_types ?> <?= (!$print_options['show_icon']) ? 'noicon' : 'hasicon' ?>">
                 <? if($print_options['layout_style'] == 'website_compact'): ?>
                     <a href="<?= preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/'.preg_replace('/^item-/i', '', $ability_info['ability_token']).'/' : 'database/abilities/'.$ability_info['ability_token'].'/' ?>"><?= $ability_info['ability_name'] ?></a>
                 <? else: ?>
