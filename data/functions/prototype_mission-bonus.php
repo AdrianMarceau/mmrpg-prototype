@@ -1,12 +1,16 @@
 <?
 // Collect the robot index for calculation purposes
-$robot_index_query = "SELECT *, (robot_energy + robot_attack + robot_defense + robot_speed) AS base_total FROM mmrpg_index_robots HAVING robot_flag_complete = 1 ";
+$robot_index_query = "SELECT *,
+    (robot_energy + robot_attack + robot_defense + robot_speed) AS base_total
+    FROM mmrpg_index_robots
+    HAVING robot_flag_complete = 1 ";
 if ($this_robot_class == 'master'){
     $robot_index_query .= "AND robot_class = 'master' ";
     $robot_index_query .= "AND base_total = 400 ";
     $robot_index_query .= "AND robot_flag_hidden = 0 ";
     $robot_index_query .= "AND robot_token NOT LIKE '%-copy' ";
     $robot_index_query .= "AND robot_flag_published = 1 ";
+    if (true){ $robot_index_query .= "OR robot_token = 'quint' "; }
 } elseif ($this_robot_class == 'mecha'){
     $robot_index_query .= "AND robot_class = 'mecha' ";
     $robot_index_query .= "AND base_total <= 400 ";
