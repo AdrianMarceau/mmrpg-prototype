@@ -823,6 +823,25 @@ class mmrpg_robot {
         return $this_ability->ability_results;
     }
 
+    // Define a function for setting and saving a robot attachment
+    public function has_attachment($attachment_token){
+        return isset($this->robot_attachments[$attachment_token]);
+    }
+
+    // Define a function for setting and saving a robot attachment
+    public function set_attachment($attachment_token, $attachment_info){
+        $this->robot_attachments[$attachment_token] = $attachment_info;
+        $this->update_session();
+        return true;
+    }
+
+    // Define a function for unsetting a robot attachment
+    public function unset_attachment($attachment_token){
+        unset($this->robot_attachments[$attachment_token]);
+        $this->update_session();
+        return true;
+    }
+
     // Define a trigger for using one of this robot's attachments
     public function trigger_attachment($attachment_info){
         global $DB;
