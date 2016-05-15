@@ -913,6 +913,14 @@ html {
     margin-left: 0;
     margin-right: 0;
 }
+#window .page .event .header_left.hasmug,
+#window .page .event .header_left.hasicon {
+    margin-right: 0;
+}
+#window .page .event .header_right.hasmug,
+#window .page .event .header_right.hasicon {
+    margin-right: 0;
+}
 
 #window .page .event .header_links,
 #window .page .event .header_left .header_core,
