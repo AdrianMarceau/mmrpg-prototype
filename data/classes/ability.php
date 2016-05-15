@@ -546,7 +546,7 @@ class mmrpg_ability {
 
         // Define the ability data array and populate basic data
         $this_data['ability_markup'] = '';
-        $this_data['data_sticky'] = isset($options['sticky']) ? $options['sticky'] : false;
+        $this_data['data_sticky'] = !empty($options['data_sticky']) ? true : false;
         $this_data['data_type'] = !empty($options['data_type']) ? $options['data_type'] : 'ability';
         $this_data['data_debug'] = !empty($options['data_debug']) ? $options['data_debug'] : '';
         $this_data['ability_name'] = isset($options['ability_name']) ? $options['ability_name'] : $this->ability_name;
@@ -607,9 +607,7 @@ class mmrpg_ability {
         //$temp_size_diff = floor(($temp_size_diff * 2) + ($temp_size_diff * $robot_data['robot_scale']));
 
         // If this is a STICKY attachedment, make sure it doesn't move with the robot
-        if ($this_data['data_sticky'] != false){
-
-            //$this_data['data_sticky'] = 'true';
+        if ($this_data['data_sticky'] == true){
 
             // Calculate the canvas X offsets using the robot's position as base
             if ($this_data['ability_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($canvas_offset_data['canvas_offset_x'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['x']/100))) + $temp_size_diff; }
@@ -623,6 +621,23 @@ class mmrpg_ability {
             if ($this_data['ability_frame_offset']['z'] > 0){ $this_data['canvas_offset_z'] = ceil($canvas_offset_data['canvas_offset_z'] + $this_data['ability_frame_offset']['z']); }
             elseif ($this_data['ability_frame_offset']['z'] < 0){ $this_data['canvas_offset_z'] = ceil($canvas_offset_data['canvas_offset_z'] - ($this_data['ability_frame_offset']['z'] * -1)); }
             else { $this_data['canvas_offset_z'] = $canvas_offset_data['canvas_offset_z'];  }
+
+        }
+        // Else if this is a normal attachment, it moves with the robot
+        else {
+
+            // Calculate the canvas X offsets using the robot's offset as base
+            if ($this_data['ability_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_offset_x'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['x']/100))) + $temp_size_diff; }
+            elseif ($this_data['ability_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_offset_x'] - ($this_data['ability_sprite_size'] * (($this_data['ability_frame_offset']['x'] * -1)/100))) + $temp_size_diff; }
+            else { $this_data['canvas_offset_x'] = $robot_data['canvas_offset_x'] + $temp_size_diff;  }
+            // Calculate the canvas Y offsets using the robot's offset as base
+            if ($this_data['ability_frame_offset']['y'] > 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_offset_y'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['y']/100))); }
+            elseif ($this_data['ability_frame_offset']['y'] < 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_offset_y'] - ($this_data['ability_sprite_size'] * (($this_data['ability_frame_offset']['y'] * -1)/100))); }
+            else { $this_data['canvas_offset_y'] = $robot_data['canvas_offset_y'];  }
+            // Calculate the canvas Z offsets using the robot's offset as base
+            if ($this_data['ability_frame_offset']['z'] > 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_offset_z'] + $this_data['ability_frame_offset']['z']); }
+            elseif ($this_data['ability_frame_offset']['z'] < 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_offset_z'] - ($this_data['ability_frame_offset']['z'] * -1)); }
+            else { $this_data['canvas_offset_z'] = $robot_data['canvas_offset_z'];  }
 
             // Collect the target, damage, and recovery options
             $this_target_options = !empty($options['this_ability']->target_options) ? $options['this_ability']->target_options : array();
@@ -641,23 +656,6 @@ class mmrpg_ability {
                     $this_data['canvas_offset_z'] -= $this_target_options['target_kickback']['z'];
                 }
             }
-
-        }
-        // Else if this is a normal attachment, it moves with the robot
-        else {
-
-            // Calculate the canvas X offsets using the robot's offset as base
-            if ($this_data['ability_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_offset_x'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['x']/100))) + $temp_size_diff; }
-            elseif ($this_data['ability_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_offset_x'] - ($this_data['ability_sprite_size'] * (($this_data['ability_frame_offset']['x'] * -1)/100))) + $temp_size_diff; }
-            else { $this_data['canvas_offset_x'] = $robot_data['canvas_offset_x'] + $temp_size_diff;  }
-            // Calculate the canvas Y offsets using the robot's offset as base
-            if ($this_data['ability_frame_offset']['y'] > 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_offset_y'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['y']/100))); }
-            elseif ($this_data['ability_frame_offset']['y'] < 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_offset_y'] - ($this_data['ability_sprite_size'] * (($this_data['ability_frame_offset']['y'] * -1)/100))); }
-            else { $this_data['canvas_offset_y'] = $robot_data['canvas_offset_y'];  }
-            // Calculate the canvas Z offsets using the robot's offset as base
-            if ($this_data['ability_frame_offset']['z'] > 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_offset_z'] + $this_data['ability_frame_offset']['z']); }
-            elseif ($this_data['ability_frame_offset']['z'] < 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_offset_z'] - ($this_data['ability_frame_offset']['z'] * -1)); }
-            else { $this_data['canvas_offset_z'] = $robot_data['canvas_offset_z'];  }
 
         }
 
@@ -683,7 +681,7 @@ class mmrpg_ability {
         ob_start();
 
             // Display the ability's battle sprite
-            echo '<div data-ability-id="'.$this_data['ability_id_token'].'" data-robot-id="'.$robot_data['robot_id_token'].'" class="'.($this_data['ability_markup_class'].$this_data['ability_frame_classes']).'" style="'.($this_data['ability_markup_style'].$this_data['ability_frame_styles']).'" data-debug="'.$this_data['data_debug'].'" data-sticky="'.($this_data['data_sticky'] === false ? 'false' : $this_data['data_sticky']).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['ability_sprite_size'].'" data-direction="'.$this_data['ability_direction'].'" data-frame="'.$this_data['ability_frame'].'" data-animate="'.$this_data['ability_frame_animate'].'" data-position="'.$this_data['ability_position'].'" data-status="'.$this_data['ability_status'].'" data-scale="'.$this_data['ability_scale'].'">'.$this_data['ability_token'].'</div>';
+            echo '<div data-ability-id="'.$this_data['ability_id_token'].'" data-robot-id="'.$robot_data['robot_id_token'].'" class="'.($this_data['ability_markup_class'].$this_data['ability_frame_classes']).'" style="'.($this_data['ability_markup_style'].$this_data['ability_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['ability_sprite_size'].'" data-direction="'.$this_data['ability_direction'].'" data-frame="'.$this_data['ability_frame'].'" data-animate="'.$this_data['ability_frame_animate'].'" data-position="'.$this_data['ability_position'].'" data-status="'.$this_data['ability_status'].'" data-scale="'.$this_data['ability_scale'].'">'.$this_data['ability_token'].'</div>';
 
         // Collect the generated ability markup
         $this_data['ability_markup'] .= trim(ob_get_clean());

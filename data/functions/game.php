@@ -1004,7 +1004,6 @@ function mmrpg_game_database_unlocked(){
 
 // -- POINT FUNCTIONS -- //
 
-
 // Define a function for checking the battle's prototype points total
 function mmrpg_game_battle_points(){
     // Return the current point total for thisgame
@@ -1017,7 +1016,6 @@ function mmrpg_game_battle_points(){
 
 // -- ZENNY FUNCTIONS -- //
 
-
 // Define a function for checking how much zenny has been unlocked by all players
 function mmrpg_game_zenny_unlocked(){
     // Define the game session helper var
@@ -1026,6 +1024,11 @@ function mmrpg_game_zenny_unlocked(){
     if (!empty($_SESSION[$session_token]['values']['battle_zenny'])){ return $_SESSION[$session_token]['values']['battle_zenny']; }
     else { return 0; }
 }
+
+
+
+// -- SAVE/LOAD/RESET FUNCTIONS -- //
+
 
 // Define a function for saving the game session
 require(MMRPG_CONFIG_ROOTDIR.'data/functions/game_reset-game-session.php');
