@@ -296,8 +296,7 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
           $this_ability = new mmrpg_ability($this, $eventinfo['this_player'], $this_robot, $attachment_info);
           // Define this ability data array and generate the markup data
           $this_attachment_options = $this_options;
-          $this_attachment_options['sticky'] = isset($attachment_info['sticky']) ? $attachment_info['sticky'] : false;
-          $this_attachment_options['data_sticky'] = $this_attachment_options['sticky'];
+          $this_attachment_options['data_sticky'] = !empty($this_options['sticky']) || !empty($attachment_info['sticky']) ? true : false;
           $this_attachment_options['data_type'] = 'attachment';
           $this_attachment_options['data_debug'] = ''; //$attachment_token;
           $this_attachment_options['ability_image'] = isset($attachment_info['ability_image']) ? $attachment_info['ability_image'] : $this_ability->ability_image;
