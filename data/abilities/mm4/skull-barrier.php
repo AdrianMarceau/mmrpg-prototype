@@ -4,7 +4,7 @@ $ability = array(
     'ability_name' => 'Skull Barrier',
     'ability_token' => 'skull-barrier',
     'ability_game' => 'MM04',
-    'ability_description' => 'The user surrounds itself with tiny skull-like barriers to bolster shields prevent all damage from attacks for one turn! The shield can also be thrown at the target for massive damage!',
+    'ability_description' => 'The user surrounds itself with tiny skull-like barriers to bolster shields and prevent all damage from attacks for one turn! The shield can also be thrown at the target for massive damage!',
     'ability_type' => 'shadow',
     'ability_type2' => 'shield',
     'ability_energy' => 4,
@@ -69,7 +69,7 @@ $ability = array(
             // Target this robot's self
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array(0, -10, 0, -10, $this_robot->print_robot_name().' raises a '.$this_ability->print_ability_name().'!')
+                'success' => array(0, -10, 0, -10, $this_robot->print_robot_name().' raises the '.$this_ability->print_ability_name().'!')
                 ));
             $this_robot->trigger_target($this_robot, $this_ability);
 

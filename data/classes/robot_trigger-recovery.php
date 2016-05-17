@@ -1042,11 +1042,14 @@ elseif ($this->robot_status != 'disabled'){
             foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
 
                 // Ensure this ability has a type before checking weaknesses, resistances, etc.
-                if (!empty($this_ability->ability_type)){
+                if (!empty($this_ability->ability_type) || in_array('*', $attachment_info['attachment_weaknesses'])){
 
                     // If this attachment has weaknesses defined and this ability is a match
                     if (!empty($attachment_info['attachment_weaknesses'])
-                        && (in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses']) || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))){
+                        && (in_array('*', $attachment_info['attachment_weaknesses'])
+                            || in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses'])
+                            || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))
+                            ){
                         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint weaknesses');
                         // Remove this attachment and inflict damage on the robot
                         unset($this->robot_attachments[$attachment_token]);

@@ -752,14 +752,14 @@ class mmrpg_robot {
 
                     // If this attachment has weaknesses defined and this ability is a match
                     if (!empty($attachment_info['attachment_weaknesses'])
-                        && (in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses']) || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))){
-                            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                        && (in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses'])
+                            || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))
+                            ){
                         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint weaknesses');
                         // Remove this attachment and inflict damage on the robot
                         unset($this->robot_attachments[$attachment_token]);
                         $this->update_session();
                         if ($attachment_info['attachment_destroy'] !== false){
-                            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                             $temp_ability = mmrpg_ability::parse_index_info($temp_attachments_index[$attachment_info['ability_token']]);
                             $attachment_info = array_merge($temp_ability, $attachment_info);
                             $temp_attachment = new mmrpg_ability($this->battle, $this->player, $this, $attachment_info);
@@ -803,7 +803,6 @@ class mmrpg_robot {
                         }
                         // If this robot was disabled, process experience for the target
                         if ($this->robot_status == 'disabled'){
-                            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                             break;
                         }
                     }

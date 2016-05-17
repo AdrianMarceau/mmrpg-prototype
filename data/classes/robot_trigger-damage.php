@@ -1024,7 +1024,6 @@ $target_robot->player->player_frame = $target_player_backup_frame;
 $this_ability->ability_frame = $this_ability_backup_frame;
 
 // Update internal variables
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $target_robot->update_session();
 $target_robot->player->update_session();
 $this->update_session();
@@ -1033,10 +1032,8 @@ $this_ability->update_session();
 
 // If this robot has been disabled, add a defeat attachment
 if ($this->robot_status == 'disabled'){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Define this ability's attachment token
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_frames = array(0,4,1,5,2,6,3,7,4,8,5,9,0,1,2,3,4,5,6,7,8,9);
     shuffle($temp_frames);
     $this_attachment_token = 'ability_attachment-defeat';
@@ -1051,7 +1048,6 @@ if ($this->robot_status == 'disabled'){
 
     // If the attachment doesn't already exists, add it to the robot
     if (!isset($this->robot_attachments[$this_attachment_token])){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this->robot_attachments[$this_attachment_token] =  $this_attachment_info;
         $this->update_session();
     }
@@ -1060,82 +1056,73 @@ if ($this->robot_status == 'disabled'){
 
 // If this robot was disabled, process experience for the target
 if ($this->robot_status == 'disabled' && $trigger_disabled){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $trigger_options = array();
     if ($this_robot_energy_ohko){ $trigger_options['item_multiplier'] = 2.0; }
     $this->trigger_disabled($target_robot, $this_ability, $trigger_options);
 }
 // Otherwise, if the target robot was not disabled
 elseif ($this->robot_status != 'disabled'){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // -- CHECK ATTACHMENTS -- //
 
     // Ensure the ability was a success before checking attachments
     if ($this_ability->ability_results['this_result'] == 'success'){
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // If this robot has any attachments, loop through them
         if (!empty($this->robot_attachments)){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
             foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                 // Ensure this ability has a type before checking weaknesses, resistances, etc.
-                if (!empty($this_ability->ability_type)){
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                if (!empty($this_ability->ability_type) || in_array('*', $attachment_info['attachment_weaknesses'])){
 
                     // If this attachment has weaknesses defined and this ability is a match
                     if (!empty($attachment_info['attachment_weaknesses'])
-                        && (in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses']) || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))){
-                        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                        && (in_array('*', $attachment_info['attachment_weaknesses'])
+                            || in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses'])
+                            || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))
+                            ){
+
                         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint weaknesses');
                         // Remove this attachment and inflict damage on the robot
                         unset($this->robot_attachments[$attachment_token]);
                         $this->update_session();
                         if ($attachment_info['attachment_destroy'] !== false){
-                            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                             $temp_attachment = new mmrpg_ability($this->battle, $this->player, $this, array('ability_token' => $attachment_info['ability_token']));
                             $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
                             if ($temp_trigger_type == 'damage'){
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->update_session();
                                 $temp_damage_kind = $attachment_info['attachment_destroy']['kind'];
                                 if (isset($attachment_info['attachment_'.$temp_damage_kind])){
-                                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                     $temp_damage_amount = $attachment_info['attachment_'.$temp_damage_kind];
                                     $temp_trigger_options = array('apply_modifiers' => false);
                                     $this->trigger_damage($target_robot, $temp_attachment, $temp_damage_amount, false, $temp_trigger_options);
                                 }
                             } elseif ($temp_trigger_type == 'recovery'){
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->update_session();
                                 $temp_recovery_kind = $attachment_info['attachment_destroy']['kind'];
                                 if (isset($attachment_info['attachment_'.$temp_recovery_kind])){
-                                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                     $temp_recovery_amount = $attachment_info['attachment_'.$temp_recovery_kind];
                                     $temp_trigger_options = array('apply_modifiers' => false);
                                     $this->trigger_recovery($target_robot, $temp_attachment, $temp_recovery_amount, false, $temp_trigger_options);
                                 }
                             } elseif ($temp_trigger_type == 'special'){
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $temp_attachment->target_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->update_session();
                                 //$this->trigger_damage($target_robot, $temp_attachment, 0, false);
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $this->trigger_target($target_robot, $temp_attachment, array('canvas_show_this_ability' => false, 'prevent_default_text' => true));
                             }
                         }
                         // If this robot was disabled, process experience for the target
                         if ($this->robot_status == 'disabled'){ break; }
+
                     }
 
                 }
