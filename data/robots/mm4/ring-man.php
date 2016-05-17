@@ -6,14 +6,14 @@ $robot = array(
   'robot_name' => 'Ring Man',
   'robot_token' => 'ring-man',
   'robot_image_editor' => 18,
-  'robot_core' => 'cutter',
+  'robot_core' => 'space',
   'robot_field' => 'space-simulator',
   'robot_description' => 'Ring Juggling Robot',
   'robot_energy' => 100,
   'robot_attack' => 100,
   'robot_defense' => 100,
   'robot_speed' => 100,
-  'robot_weaknesses' => array('flame', 'swift'), //pharaoh-shot,solar-blaze,(leaf-shield)
+  'robot_weaknesses' => array('flame', 'swift'),
   'robot_resistances' => array('wind'),
   'robot_abilities' => array(
   	'ring-boomerang',

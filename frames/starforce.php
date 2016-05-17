@@ -362,26 +362,15 @@ if (empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
         '<div class="sprite sprite_80x80 sprite_80x80_05" style="background-image: url(images/sprites/abilities/item-star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; left: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
         '<div class="sprite sprite_80x80 sprite_80x80_07" style="background-image: url(images/sprites/abilities/item-star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 25px; left: 250px; width: 80px; height: 80px;">&nbsp;</div>'+
         '<div class="sprite sprite_80x80 sprite_80x80_08" style="background-image: url(images/sprites/abilities/item-star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; right: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
-        ''
-        ),(
-        '<div class="sprite sprite_80x80" style="background-image: url(images/sprites/fields/field/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_03" style="background-image: url(images/sprites/abilities/item-star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; left: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/sprites/abilities/item-star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 25px; left: 250px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_09" style="background-image: url(images/sprites/abilities/item-star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; right: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
         '')
         ];
     // Generate a first-time event message that explains how the editor works
     gameSettings.windowEventsMessages = [
         (
-        '<p>A powerful new form of elemental energy has appeared in world of the prototype! <strong>Starforce</strong> appears in the form of <strong>Field Stars</strong> and <strong>Fusion Stars</strong> that boost Attack toward and Defense against all damage of the same type.</p>'+
+        '<p>A powerful new form of elemental energy has appeared in world of the prototype! Starforce appears in the form of Field Stars and Fusion Stars that must be collected by the player to boost all damage of the same type.  Curiously, starforce owned by a player will resist the starforce owned by opposing players and vice versa.  Neutralizing the effects of starforce on both sides is possible in some circumstances.</p>'+
         '<p>Many of the new stars have formed in previously secured areas, reviving defeated robot masters with greater power and attracting the attention of other robot masters wandering the prototype.  Only 24 Field Stars and 12 Fusion Stars have been identified so far, but rough estimates for the total number are well over one thousand.</p>'+
-        '<p>It is your mission to track down these new stars and liberate them from enemy forces, simultaneously crippling their elemental abilities while boosting ours.  Collecting stars might seem daunting at first, but it\'s actually pretty straight forward if you can remember a few things:</p>'+
-        ''),(
-        '<p>&bull; Field Stars can be found in any of the <strong>Chapter Two</strong> robot master fields and grant +10 Attack toward and +10 Defense against one elemental type.</p>'+
-        '<p>&bull; Fusion Stars can be found in any of the <strong>Chapter Four</strong> fusion fields and grant +20 Attack toward and +20 Defense against up to two different types.</p>'+
-        '<p>&bull; Every star is unique and associated with a specific elemental field, with exactly one appearing on any given mission .</p>'+
-        '<p>&bull; Defeat all target robots in a given mission to collect the star and combine its power with your own.</p>'+
-        '<p>&bull; Collecting stars beyond the identified 36 will require heavy use of the Player Editor and may not be for the feint of heart.</p>'+
+        '<p>It is your mission to track down these new stars and liberate them from enemy forces, simultaneously crippling their elemental abilities while boosting ours.  Collecting stars might seem daunting at first, but it\'s actually pretty straight forward!</p>'+
+        '<p><a class="link link_inline" href="community/mechanics/3972/field-stars-fusion-stars-and-starforce/" target="_blank">Check out guide for help!</a></p>'+
         '')
         ];
     // Push this event to the parent window and display to the user
