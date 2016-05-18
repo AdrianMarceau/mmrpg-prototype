@@ -102,14 +102,14 @@ $ability = array(
             $this_ability->damage_options_update(array(
                 'kind' => 'energy',
                 'kickback' => array(5, 0, 0),
-                'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
+                'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_ability_name().' collided into the target!'),
                 'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target...')
                 ));
             $this_ability->recovery_options_update(array(
                 'kind' => 'energy',
                 'frame' => 'taunt',
                 'kickback' => array(0, 0, 0),
-                'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
+                'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_ability_name().' collided into the target!'),
                 'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target...')
                 ));
             $energy_damage_amount = $this_ability->ability_damage;
