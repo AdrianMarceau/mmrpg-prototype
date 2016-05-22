@@ -9,7 +9,7 @@ $mmrpg_prototype_core_abilities = array(
     ),
   array(
     'rising-cutter', 'super-arm', 'ice-slasher', 'danger-bomb', 'fire-chaser', 'thunder-beam', 'time-slow', 'oil-slider',
-    'bubble-lead', 'bubble-bomb', 'laser-trident', 'jewel-satellite', 'gyro-attack', 'star-crash'
+    'bubble-lead', 'bubble-bomb', 'laser-trident', 'jewel-satellite', 'gyro-attack', 'star-crash', 'slash-claw'
     )
   );
 $mmrpg_prototype_support_abilities = array(
