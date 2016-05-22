@@ -122,7 +122,7 @@ $this_omega_factors_ten = array();
 //$this_omega_factors_ten[] = array('robot' => 'pump-man', 'field' => 'field', 'type' => 'water');
 $this_omega_factors_ten[] = array('robot' => 'commando-man', 'field' => 'field', 'type' => 'missile');
 //$this_omega_factors_ten[] = array('robot' => 'chill-man', 'field' => 'field', 'type' => 'freeze');
-//$this_omega_factors_ten[] = array('robot' => 'sheep-man', 'field' => 'field', 'type' => 'electric');
+$this_omega_factors_ten[] = array('robot' => 'sheep-man', 'field' => 'field', 'type' => 'electric');
 $this_omega_factors_ten[] = array('robot' => 'strike-man', 'field' => 'field', 'type' => 'impact');
 //$this_omega_factors_ten[] = array('robot' => 'nitro-man', 'field' => 'field', 'type' => 'swift');
 //$this_omega_factors_ten[] = array('robot' => 'solar-man', 'field' => 'field', 'type' => 'flame');
