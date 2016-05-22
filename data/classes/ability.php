@@ -1135,6 +1135,7 @@ class mmrpg_ability {
             if (!isset($effect_options['damage_text'])){ $effect_options['damage_text'] = '{this_robot_name}\'s stats were damaged!'; }
             if (!isset($effect_options['recovery_text'])){ $effect_options['recovery_text'] = '{this_robot_name}\'s stats improved!'; }
             if (!isset($effect_options['effect_chance'])){ $effect_options['effect_chance'] = 50; }
+            if (!isset($effect_options['effect_target'])){ $effect_options['effect_target'] = 'target'; }
         }
 
         // Extract all objects into the current scope
@@ -1225,39 +1226,83 @@ class mmrpg_ability {
             // Define the stat property strings
             $robot_stat_prop = 'robot_'.$effect_options['stat_kind'];
 
-            // Trigger effect if target isn't disabled and ability was successful and chance
-            if (
-                $target_robot->robot_status != 'disabled' &&
-                $this_ability->ability_results['this_result'] != 'failure' &&
-                $this_ability->ability_results['this_amount'] > 0 &&
-                $target_robot->$robot_stat_prop > 0 &&
-                ($effect_options['effect_chance'] == 100 || $this_battle->critical_chance($effect_options['effect_chance']))
-                ){
+            // Check to make sure the target of this effect is the target of the ability
+            if ($effect_options['effect_target'] == 'target'){
 
-                // Define the default damage options for the stat effect
-                $this_ability->damage_options_update(array(
-                    'kind' => $effect_options['stat_kind'],
-                    'frame' => 'defend',
-                    'percent' => true,
-                    'kickback' => array(10, 0, 0),
-                    'success' => array(9, 0, 0, -10, $effect_options['damage_text']),
-                    'failure' => array(9, 0, 0, -9999, '')
-                    ));
+                // Trigger effect if target isn't disabled and ability was successful and chance
+                if (
+                    $target_robot->robot_status != 'disabled' &&
+                    $this_ability->ability_results['this_result'] != 'failure' &&
+                    $this_ability->ability_results['this_amount'] > 0 &&
+                    $target_robot->$robot_stat_prop > 0 &&
+                    ($effect_options['effect_chance'] == 100 || $this_battle->critical_chance($effect_options['effect_chance']))
+                    ){
 
-                // Define the default recovery options for the stat effect
-                $this_ability->recovery_options_update(array(
-                    'kind' => $effect_options['stat_kind'],
-                    'frame' => 'taunt',
-                    'percent' => true,
-                    'kickback' => array(0, 0, 0),
-                    'success' => array(9, 0, 0, -10, $effect_options['recovery_text']),
-                    'failure' => array(9, 0, 0, -9999, '')
-                    ));
+                    // Define the default damage options for the stat effect
+                    $this_ability->damage_options_update(array(
+                        'kind' => $effect_options['stat_kind'],
+                        'frame' => 'defend',
+                        'percent' => true,
+                        'kickback' => array(10, 0, 0),
+                        'success' => array(9, 0, 0, -10, $effect_options['damage_text']),
+                        'failure' => array(9, 0, 0, -9999, '')
+                        ));
 
-                // Calculate the exact damage amount and trigger it on the target
-                $trigger_options = array('apply_modifiers' => false);
-                $stat_damage_amount = ceil($target_robot->$robot_stat_prop * ($this_ability->ability_damage2 / 100));
-                $target_robot->trigger_damage($this_robot, $this_ability, $stat_damage_amount, true, $trigger_options);
+                    // Define the default recovery options for the stat effect
+                    $this_ability->recovery_options_update(array(
+                        'kind' => $effect_options['stat_kind'],
+                        'frame' => 'taunt',
+                        'percent' => true,
+                        'kickback' => array(0, 0, 0),
+                        'success' => array(9, 0, 0, -10, $effect_options['recovery_text']),
+                        'failure' => array(9, 0, 0, -9999, '')
+                        ));
+
+                    // Calculate the exact damage amount and trigger it on the target
+                    $trigger_options = array('apply_modifiers' => false);
+                    $stat_damage_amount = ceil($target_robot->$robot_stat_prop * ($this_ability->ability_damage2 / 100));
+                    $target_robot->trigger_damage($this_robot, $this_ability, $stat_damage_amount, true, $trigger_options);
+                }
+
+            }
+            // Otherwise, if the target of this effect is the user of the ability
+            elseif ($effect_options['effect_target'] == 'user'){
+
+                // Trigger effect if target isn't disabled and ability was successful and chance
+                if (
+                    $this_robot->robot_status != 'disabled' &&
+                    $this_ability->ability_results['this_result'] != 'failure' &&
+                    $this_ability->ability_results['this_amount'] > 0 &&
+                    $this_robot->$robot_stat_prop < MMRPG_SETTINGS_STATS_MAX &&
+                    ($effect_options['effect_chance'] == 100 || $this_battle->critical_chance($effect_options['effect_chance']))
+                    ){
+
+                    // Define the default recovery options for the stat effect
+                    $this_ability->recovery_options_update(array(
+                        'kind' => $effect_options['stat_kind'],
+                        'frame' => 'taunt',
+                        'percent' => true,
+                        'kickback' => array(0, 0, 0),
+                        'success' => array(9, 0, 0, -10, $effect_options['recovery_text']),
+                        'failure' => array(9, 0, 0, -9999, '')
+                        ));
+
+                    // Define the default damage options for the stat effect
+                    $this_ability->damage_options_update(array(
+                        'kind' => $effect_options['stat_kind'],
+                        'frame' => 'defend',
+                        'percent' => true,
+                        'kickback' => array(10, 0, 0),
+                        'success' => array(9, 0, 0, -10, $effect_options['damage_text']),
+                        'failure' => array(9, 0, 0, -9999, '')
+                        ));
+
+                    // Calculate the exact damage amount and trigger it on the target
+                    $trigger_options = array('apply_modifiers' => false);
+                    $stat_recovery_amount = ceil($this_robot->$robot_stat_prop * ($this_ability->ability_recovery2 / 100));
+                    $this_robot->trigger_recovery($this_robot, $this_ability, $stat_recovery_amount, true, $trigger_options);
+                }
+
             }
 
         }
