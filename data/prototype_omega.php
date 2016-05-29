@@ -125,6 +125,6 @@ $this_omega_factors_ten[] = array('robot' => 'commando-man', 'field' => 'field',
 $this_omega_factors_ten[] = array('robot' => 'sheep-man', 'field' => 'field', 'type' => 'electric');
 $this_omega_factors_ten[] = array('robot' => 'strike-man', 'field' => 'field', 'type' => 'impact');
 //$this_omega_factors_ten[] = array('robot' => 'nitro-man', 'field' => 'field', 'type' => 'swift');
-//$this_omega_factors_ten[] = array('robot' => 'solar-man', 'field' => 'field', 'type' => 'flame');
+$this_omega_factors_ten[] = array('robot' => 'solar-man', 'field' => 'field', 'type' => 'flame');
 
 ?>
