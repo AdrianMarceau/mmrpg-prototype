@@ -14,7 +14,7 @@ $robot = array(
   'robot_speed' => 100,
   'robot_weaknesses' => array('cutter', 'nature'), // [none]
   'robot_affinities' => array('flame'),
-  'robot_immunity' => array('space'),
+  'robot_immunities' => array('space'),
   'robot_abilities' => array(
   	'sunstar-supernova',
     'spark-chaser', 'grab-buster', 'bubble-bomb', 'photon-missile', 'electric-shock', 'black-hole', 'deep-digger', 'salt-water', 'break-dash',
