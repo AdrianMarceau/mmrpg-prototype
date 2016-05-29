@@ -52,8 +52,7 @@ $ability = array(
 
         // If this attack returns and strikes a second time (random chance)
         if ($this_ability->ability_results['this_result'] != 'failure'
-            && $target_robot->robot_status != 'disabled'
-            && $this_battle->critical_chance($this_ability->ability_accuracy)){
+            && $target_robot->robot_status != 'disabled'){
 
             // Inflict damage on the opposing robot
             $this_ability->damage_options_update(array(
@@ -73,8 +72,7 @@ $ability = array(
 
             // If this attack returns and strikes a third time (random chance)
             if ($this_ability->ability_results['this_result'] != 'failure'
-                && $target_robot->robot_energy != 'disabled'
-                && $this_battle->critical_chance($this_ability->ability_accuracy)){
+                && $target_robot->robot_energy != 'disabled'){
 
                 // Inflict damage on the opposing robot
                 $this_ability->damage_options_update(array(
