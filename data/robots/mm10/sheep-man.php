@@ -13,7 +13,7 @@ $robot = array(
   'robot_defense' => 100,
   'robot_speed' => 100,
   'robot_weaknesses' => array('impact', 'flame'),
-  'robot_immunity' => array('electric'),
+  'robot_immunities' => array('electric'),
   'robot_abilities' => array(
   	'thunder-wool',
   	'buster-shot',
