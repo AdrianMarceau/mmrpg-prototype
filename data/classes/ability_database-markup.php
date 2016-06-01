@@ -485,6 +485,62 @@ ob_start();
 
         <? endif; ?>
 
+        <? if ($print_options['show_records'] && $ability_info['ability_class'] == 'master'): ?>
+
+          <h2 id="records" class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left;">
+            <?= $ability_info['ability_name'] ?>&#39;s Records
+          </h2>
+          <div class="body body_full" style="margin: 0 auto 5px; padding: 2px 0; min-height: 10px;">
+            <?
+
+            // Collect the database records for this ability
+            global $DB;
+            $temp_ability_records = array('ability_unlocked' => 0, 'ability_equipped');
+            $temp_record_query = "SELECT
+                COUNT(*) AS unlock_count,
+                SUM(ROUND((
+                LENGTH(saves.save_values_battle_settings)
+                - LENGTH(REPLACE(saves.save_values_battle_settings, '\"{$ability_info['ability_token']}\"', ''))
+                ) / LENGTH('\"{$ability_info['ability_token']}\"')
+                )) AS equip_count
+                FROM mmrpg_saves AS saves
+                LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
+                LEFT JOIN mmrpg_leaderboard AS points ON points.user_id = saves.user_id
+                WHERE
+                saves.save_values_battle_abilities LIKE '%\"{$ability_info['ability_token']}\"%'
+                AND points.board_points <> 0
+                AND users.user_id <> 0
+                ;";
+            $temp_record_values = $DB->get_array($temp_record_query);
+            if (!empty($temp_record_values)){
+                $temp_ability_records['ability_unlocked'] = $temp_record_values['unlock_count'];
+                $temp_ability_records['ability_equipped'] = $temp_record_values['equip_count'];
+            }
+
+            ?>
+            <table class="full" style="margin: 5px auto 10px;">
+              <colgroup>
+                <col width="100%" />
+              </colgroup>
+              <tbody>
+                  <tr>
+                    <td class="right">
+                      <label style="display: block; float: left;">Unlocked By : </label>
+                      <span class="ability_quote"><?= $temp_ability_records['ability_unlocked'] == 1 ? '1 Player' : number_format($temp_ability_records['ability_unlocked'], 0, '.', ',').' Players' ?></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="right">
+                      <label style="display: block; float: left;">Equipped To : </label>
+                      <span class="ability_quote"><?= $temp_ability_records['ability_equipped'] == 1 ? '1 Robot' : number_format($temp_ability_records['ability_equipped'], 0, '.', ',').' Robots' ?></span>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+
+        <? endif; ?>
+
         <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
