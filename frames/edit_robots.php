@@ -98,9 +98,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sort'){
 $allowed_edit_players = array();
 $allowed_edit_robots = array();
 $allowed_edit_data = array();
-foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){
+$battle_settings = $_SESSION[$session_token]['values']['battle_settings'];
+foreach ($battle_settings AS $player_token => $player_info_raw){
     if (empty($player_token) || !isset($mmrpg_index['players'][$player_token])){ continue; }
-    $player_info = array_merge($mmrpg_index['players'][$player_token], $player_info);
+    $player_index = $mmrpg_index['players'][$player_token];
+    unset($player_index['player_robots']);
+    $player_info = array_merge($player_index, $player_info_raw);
+    if (empty($player_info['player_robots'])){ continue; }
     $allowed_edit_players[] = $player_info;
     $allowed_edit_data[$player_token] = $player_info;
     foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
