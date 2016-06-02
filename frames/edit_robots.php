@@ -7,7 +7,6 @@ $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Require the remote top in case we're in viewer mode
 define('MMRPG_REMOTE_SKIP_INDEX', true);
-define('MMRPG_REMOTE_SKIP_DATABASE', true);
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 
 // Collect the session token
