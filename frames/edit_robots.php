@@ -17,11 +17,13 @@ $session_token = mmrpg_game_token();
 //require_once('../data/database.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
+
 //require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
 $mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 ORDER BY robot_game ASC, robot_number ASC;", 'robot_token');
 //require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
 $mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 ORDER BY ability_order ASC;", 'ability_token');
 //require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
+//
 // Collect the editor flag if set
 $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
 
@@ -36,6 +38,10 @@ $allowed_edit_data = array();
 // Collect the player's robot favourites
 $player_robot_favourites = mmrpg_prototype_robot_favourites();
 if (empty($player_robot_favourites)){ $player_robot_favourites = array(); }
+
+// Collect the player's robot database
+$player_robot_database = mmrpg_prototype_robot_database();
+if (empty($player_robot_database)){ $player_robot_database = array(); }
 
 // Now to actually loop through and update the allowed players, robots, and abilities arrays
 foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){

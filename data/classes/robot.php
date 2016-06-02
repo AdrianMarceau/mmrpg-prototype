@@ -1418,7 +1418,7 @@ class mmrpg_robot {
     // Define a function for calculating robot stat details
     public static function calculate_stat_values($level, $base_stats, $bonus_stats = array(), $limit = false){
         // Define the four basic stat tokens
-        $stat_tokens = array('energy', 'attack', 'defense', 'speed');
+        $stat_tokens = array('energy', 'weapons', 'attack', 'defense', 'speed');
         // Define the robot stats array to return
         $robot_stats = array();
         // Collect the robot's current level
@@ -1427,15 +1427,25 @@ class mmrpg_robot {
         // Loop through each stat and calculate values
         foreach ($stat_tokens AS $key => $stat){
             $robot_stats[$stat]['base'] = $base_stats['robot_'.$stat];
-            $robot_stats[$stat]['base_max'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level_max']);
-            $robot_stats[$stat]['bonus'] = isset($bonus_stats['robot_'.$stat]) ? $bonus_stats['robot_'.$stat] : 0;
-            $robot_stats[$stat]['bonus_max'] = $stat != 'energy' ? round($robot_stats[$stat]['base_max'] * MMRPG_SETTINGS_STATS_BONUS_MAX) : 0;
-            if ($limit && $robot_stats[$stat]['bonus'] > $robot_stats[$stat]['bonus_max']){ $robot_stats[$stat]['bonus'] = $robot_stats[$stat]['bonus_max']; }
-            $robot_stats[$stat]['current'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level']) + $robot_stats[$stat]['bonus'];
-            $robot_stats[$stat]['current_noboost'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $level);
-            $robot_stats[$stat]['max'] = $robot_stats[$stat]['base_max'] + $robot_stats[$stat]['bonus_max'];
-            if ($robot_stats[$stat]['current'] > $robot_stats[$stat]['max']){
-                $robot_stats[$stat]['over'] = $robot_stats[$stat]['current'] - $robot_stats[$stat]['max'];
+            if ($stat != 'weapons'){
+                $robot_stats[$stat]['base_max'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level_max']);
+                $robot_stats[$stat]['bonus'] = isset($bonus_stats['robot_'.$stat]) ? $bonus_stats['robot_'.$stat] : 0;
+                $robot_stats[$stat]['bonus_max'] = $stat != 'energy' ? round($robot_stats[$stat]['base_max'] * MMRPG_SETTINGS_STATS_BONUS_MAX) : 0;
+                if ($limit && $robot_stats[$stat]['bonus'] > $robot_stats[$stat]['bonus_max']){ $robot_stats[$stat]['bonus'] = $robot_stats[$stat]['bonus_max']; }
+                $robot_stats[$stat]['current'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level']) + $robot_stats[$stat]['bonus'];
+                $robot_stats[$stat]['current_noboost'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $level);
+                $robot_stats[$stat]['max'] = $robot_stats[$stat]['base_max'] + $robot_stats[$stat]['bonus_max'];
+                if ($robot_stats[$stat]['current'] > $robot_stats[$stat]['max']){
+                    $robot_stats[$stat]['over'] = $robot_stats[$stat]['current'] - $robot_stats[$stat]['max'];
+                }
+            } else {
+                $robot_stats[$stat]['base_max'] = $robot_stats[$stat]['base'];
+                $robot_stats[$stat]['bonus'] = 0;
+                $robot_stats[$stat]['bonus_max'] = 0;
+                $robot_stats[$stat]['current'] = $robot_stats[$stat]['base'];
+                $robot_stats[$stat]['current_noboost'] = $robot_stats[$stat]['base'];
+                $robot_stats[$stat]['max'] = $robot_stats[$stat]['base'];
+
             }
         }
         return $robot_stats;
