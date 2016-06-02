@@ -3,7 +3,7 @@
 global $mmrpg_index, $this_current_uri, $this_current_url, $DB;
 global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
 global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
-global $key_counter, $player_counter, $player_rewards, $player_ability_rewards, $player_robot_favourites, $temp_robot_totals, $player_options_markup;
+global $key_counter, $player_counter, $player_rewards, $player_ability_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup;
 global $mmrpg_database_abilities;
 $session_token = mmrpg_game_token();
 
@@ -50,6 +50,8 @@ ob_start();
     $robot_rewards = mmrpg_prototype_robot_rewards($player_token, $robot_token);
     // Collect the settings for this robot
     $robot_settings = mmrpg_prototype_robot_settings($player_token, $robot_token);
+    // Collect the database for this robot
+    $robot_database = !empty($player_robot_database[$robot_token]) ? $player_robot_database[$robot_token] : array();
     // Collect the stat details for this robot
     $robot_stats = mmrpg_robot::calculate_stat_values($robot_info['robot_level'], $robot_info, $robot_rewards, true);
     // Collect the robot ability core if it exists
@@ -58,7 +60,7 @@ ob_start();
     $robot_flag_copycore = $robot_ability_core == 'copy' ? true : false;
 
     // Loop through and update this robot's stats with calculated values
-    $stat_tokens = array('energy', 'attack', 'defense', 'speed');
+    $stat_tokens = array('energy', 'weapons', 'attack', 'defense', 'speed');
     foreach ($stat_tokens As $stat_token){
         // Update this robot's stat with the calculated current totals
         $robot_info['robot_'.$stat_token] = $robot_stats[$stat_token]['current'];
@@ -77,42 +79,154 @@ ob_start();
         $level_max = $robot_stats['level'] >= 100 ? true : false;
         $is_maxed = $robot_stats[$stat_token]['bonus'] >= $robot_stats[$stat_token]['bonus_max'] ? true : false;
 
-        echo $level_max && $is_maxed ? '<span class="robot_stat robot_type_'.$stat_token.'"> ' : '<span class="robot_stat"> ';
+        if ($stat_token == 'energy' || $stat_token == 'weapons'){ echo '<span class="robot_stat robot_type_'.$stat_token.'"> '; }
+        elseif ($level_max && $is_maxed){ echo '<span class="robot_stat robot_type_'.$stat_token.'"> '; }
+        else { echo '<span class="robot_stat"> '; }
 
-            echo $is_maxed && $stat_token != 'energy' ? ($level_max ? '<span>&#9733;</span> ' : '<span>&bull;</span> ') : '';
+            if ($stat_token != 'energy' && $stat_token != 'weapons'){
+                echo $is_maxed ? ($level_max ? '<span>&#9733;</span> ' : '<span>&bull;</span> ') : '';
+                echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
+                    $base_text = 'Base '.ucfirst($stat_token).' <br /> <span style="font-size: 90%">'.number_format($robot_stats[$stat_token]['base'], 0, '.', ',').' <span style="font-size: 90%">@</span>  Lv.'.$robot_stats['level'].' = '.number_format($robot_stats[$stat_token]['current_noboost'], 0, '.', ',').'</span>';
+                    echo '<span data-tooltip="'.htmlentities($base_text, ENT_QUOTES, 'UTF-8', true).'" data-tooltip-type="robot_type robot_type_none">'.$robot_stats[$stat_token]['current_noboost'].'</span> ';
+                    if (!empty($robot_stats[$stat_token]['bonus'])){
+                        $robot_bonus_text = 'Robot Bonuses <br /> <span style="font-size: 90%">'.number_format($robot_stats[$stat_token]['bonus'], 0, '.', ',').' / '.number_format($robot_stats[$stat_token]['bonus_max'], 0, '.', ',').' Max</span>';
+                        echo '+ <span data-tooltip="'.htmlentities($robot_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_shield">'.$robot_stats[$stat_token]['bonus'].'</span> ';
+                    }
+                    if (!empty($robot_stats[$stat_token]['player'])){
+                        $player_bonus_text = 'Player Bonuses <br /> <span style="font-size: 90%">'.number_format(($robot_stats[$stat_token]['current']), 0, '.', ',').' x '.$player_info['player_'.$stat_token].'% = '.number_format($robot_stats[$stat_token]['player'], 0, '.', ',').'</span>';
+                        echo '+ <span data-tooltip="'.htmlentities($player_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['player'].'</span> ';
+                    }
+                echo ' = </span>';
+                echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$stat_token], 4, '0', STR_PAD_LEFT));
+            } else {
+                echo $robot_info['robot_'.$stat_token];
+            }
 
-            echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
-                $base_text = 'Base '.ucfirst($stat_token).' <br /> <span style="font-size: 90%">'.number_format($robot_stats[$stat_token]['base'], 0, '.', ',').' <span style="font-size: 90%">@</span>  Lv.'.$robot_stats['level'].' = '.number_format($robot_stats[$stat_token]['current_noboost'], 0, '.', ',').'</span>';
-                echo '<span data-tooltip="'.htmlentities($base_text, ENT_QUOTES, 'UTF-8', true).'" data-tooltip-type="robot_type robot_type_none">'.$robot_stats[$stat_token]['current_noboost'].'</span> ';
-                if (!empty($robot_stats[$stat_token]['bonus'])){
-                    $robot_bonus_text = 'Robot Bonuses <br /> <span style="font-size: 90%">'.number_format($robot_stats[$stat_token]['bonus'], 0, '.', ',').' / '.number_format($robot_stats[$stat_token]['bonus_max'], 0, '.', ',').' Max</span>';
-                    echo '+ <span data-tooltip="'.htmlentities($robot_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_shield">'.$robot_stats[$stat_token]['bonus'].'</span> ';
-                }
-                if (!empty($robot_stats[$stat_token]['player'])){
-                    $player_bonus_text = 'Player Bonuses <br /> <span style="font-size: 90%">'.number_format(($robot_stats[$stat_token]['current']), 0, '.', ',').' x '.$player_info['player_'.$stat_token].'% = '.number_format($robot_stats[$stat_token]['player'], 0, '.', ',').'</span>';
-                    echo '+ <span data-tooltip="'.htmlentities($player_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['player'].'</span> ';
-                }
-            echo ' = </span>';
-
-            echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$stat_token], 4, '0', STR_PAD_LEFT));
+            if ($stat_token == 'energy'){ echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;"> LE</span>'; }
+            elseif ($stat_token == 'weapons'){ echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;"> WE</span>'; }
 
         echo '</span>'."\n";
         };
 
+    // Collect this robot's ability rewards and add them to the dropdown
+    $robot_ability_rewards = !empty($robot_rewards['robot_abilities']) ? $robot_rewards['robot_abilities'] : array();
+    $robot_ability_settings = !empty($robot_settings['robot_abilities']) ? $robot_settings['robot_abilities'] : array();
+    foreach ($robot_ability_settings AS $token => $info){ if (empty($robot_ability_rewards[$token])){ $robot_ability_rewards[$token] = $info; } }
+
+    // Collect the summon count from the session if it exists
+    $robot_info['robot_summoned'] = !empty($robot_database['robot_summoned']) ? $robot_database['robot_summoned'] : 0;
+
+    // Collect the alt images if there are any that are unlocked
+    $robot_alt_count = 1 + (!empty($robot_info['robot_image_alts']) ? count($robot_info['robot_image_alts']) : 0);
+    $robot_alt_options = array();
+    if (!empty($robot_info['robot_image_alts'])){
+        foreach ($robot_info['robot_image_alts'] AS $alt_key => $alt_info){
+            if ($robot_info['robot_summoned'] < $alt_info['summons']){ continue; }
+            $robot_alt_options[] = $alt_info['token'];
+        }
+    }
+
+    // Collect the current unlock image token for this robot
+    $robot_image_unlock_current = 'base';
+    if (!empty($robot_settings['robot_image']) && strstr($robot_settings['robot_image'], '_')){
+        list($token, $robot_image_unlock_current) = explode('_', $robot_settings['robot_image']);
+    }
+
+    // Define the offsets for the image tokens based on count
+    $token_first_offset = 2;
+    $token_other_offset = 6;
+    if ($robot_alt_count == 1){ $token_first_offset = 17; }
+    elseif ($robot_alt_count == 3){ $token_first_offset = 10; }
+
+    // Loop through and generate the robot image display token markup
+    $robot_image_unlock_tokens = '';
+    $temp_total_alts_count = 0;
+    for ($i = 0; $i < 6; $i++){
+        $temp_enabled = true;
+        $temp_active = false;
+        if ($i + 1 > $robot_alt_count){ break; }
+        if ($i > 0 && !isset($robot_alt_options[$i - 1])){ $temp_enabled = false; }
+        if ($temp_enabled && $i == 0 && $robot_image_unlock_current == 'base'){ $temp_active = true; }
+        elseif ($temp_enabled && $i >= 1 && $robot_image_unlock_current == $robot_alt_options[$i - 1]){ $temp_active = true; }
+        $robot_image_unlock_tokens .= '<span class="token token_'.($temp_enabled ? 'enabled' : 'disabled').' '.($temp_active ? 'token_active' : '').'" style="left: '.($token_first_offset + ($i * $token_other_offset)).'px;">&bull;</span>';
+        $temp_total_alts_count += 1;
+    }
+    $temp_unlocked_alts_count = count($robot_alt_options) + 1;
+    $temp_image_alt_title = '';
+    if ($temp_total_alts_count > 1){
+        $temp_image_alt_title = '<strong>'.$temp_unlocked_alts_count.' / '.$temp_total_alts_count.' Outfits Unlocked</strong><br />';
+        //$temp_image_alt_title .= '<span style="font-size: 90%;">';
+            $temp_image_alt_title .= '&#8226; <span style="font-size: 90%;">'.$robot_info['robot_name'].'</span><br />';
+            foreach ($robot_info['robot_image_alts'] AS $alt_key => $alt_info){
+                if ($robot_info['robot_summoned'] >= $alt_info['summons']){
+                    $temp_image_alt_title .= '&#8226; <span style="font-size: 90%;">'.$alt_info['name'].'</span><br />';
+                } else {
+                    $temp_image_alt_title .= '&#9702; <span style="font-size: 90%;">???</span><br />';
+                }
+            }
+        //$temp_image_alt_title .= '</span>';
+        $temp_image_alt_title = htmlentities($temp_image_alt_title, ENT_QUOTES, 'UTF-8', true);
+    }
+
+    // Define whether or not this robot has coreswap enabled
+    $temp_allow_coreswap = $robot_info['robot_level'] >= 100 ? true : false;
+
+    //echo $robot_info['robot_token'].' robot_image_unlock_current = '.$robot_image_unlock_current.' | robot_alt_options = '.implode(',',array_keys($robot_alt_options)).'<br />';
+
     ?>
     <div class="event event_double event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$robot_info['robot_token']?>">
-        <div class="this_sprite sprite_left" style="height: 40px;">
-            <? $temp_margin = -1 * ceil(($robot_info['robot_image_size'] - 40) * 0.5); ?>
-            <div style="margin-top: <?= $temp_margin ?>px; margin-bottom: <?= $temp_margin * 3 ?>px; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/mug_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_mug robot_status_active robot_position_active"><?=$robot_info['robot_name']?></div>
+
+        <div class="this_sprite sprite_left event_robot_mugshot" style="">
+            <?php $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
+            <div class="sprite_wrapper robot_type robot_type_<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>" style="width: 33px;">
+                <div class="sprite_wrapper robot_type robot_type_empty" style="position: absolute; width: 27px; height: 34px; left: 2px; top: 2px;"></div>
+                <div style="left: <?= $temp_offset ?>; bottom: <?= $temp_offset ?>; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/mug_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_mug robot_status_active robot_position_active"><?= $robot_info['robot_name']?></div>
+            </div>
         </div>
-        <div class="this_sprite sprite_left" style="margin-top: 48px; height: 14px;">
-            <? if($global_allow_editing): ?>
-                <a data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>" href="#">&hearts;</a>
-            <? else: ?>
-                <span class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>">&hearts;</a>
-            <? endif; ?>
+
+        <div class="this_sprite sprite_left event_robot_images" style="">
+            <?php if($global_allow_editing && !empty($robot_alt_options)): ?>
+                <a class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-tooltip="<?= $temp_image_alt_title ?>">
+                    <?php $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
+                    <span class="sprite_wrapper" style="">
+                        <?= $robot_image_unlock_tokens ?>
+                        <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active"><?= $robot_info['robot_name']?></div>
+                    </span>
+                </a>
+            <?php else: ?>
+                <span class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-tooltip="<?= $temp_image_alt_title ?>">
+                    <?php $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
+                    <span class="sprite_wrapper" style="">
+                        <?= $robot_image_unlock_tokens ?>
+                        <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active"><?= $robot_info['robot_name']?></div>
+                    </span>
+                </span>
+            <?php endif; ?>
         </div>
-        <div class="header header_left robot_type robot_type_<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>" style="margin-right: 0;"><?=$robot_info['robot_name']?>&#39;s Data <span class="robot_type"><?= !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral' ?> Core</span></div>
+
+        <div class="this_sprite sprite_left event_robot_summons" style="">
+            <div class="robot_summons">
+                <span class="summons_count"><?= $robot_info['robot_summoned'] ?></span>
+                <span class="summons_label"><?= $robot_info['robot_summoned'] == 1 ? 'Summon' : 'Summons' ?></span>
+            </div>
+        </div>
+
+        <div class="this_sprite sprite_left event_robot_favourite" style="" >
+            <?php if($global_allow_editing): ?>
+                <a class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" title="Toggle Favourite?">&hearts;</a>
+            <?php else: ?>
+                <span class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>">&hearts;</span>
+            <?php endif; ?>
+        </div>
+
+        <div class="header header_left robot_type robot_type_<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>" style="margin-right: 0;">
+            <span class="title robot_type"><?= $robot_info['robot_name']?></span>
+            <span class="core robot_type">
+                <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/abilities/item-core-<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>/icon_left_40x40.png);"></span></span>
+                <span class="text"><?= !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral' ?> Core</span>
+            </span>
+        </div>
+
         <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
             <table class="full" style="margin-bottom: 5px;">
                 <colgroup>
@@ -163,7 +277,7 @@ ob_start();
                         <td  class="right">
                             <label style="display: block; float: left;">Exp :</label>
                             <? if($robot_info['robot_level'] >= 100): ?>
-                                <span class="robot_stat robot_type_experience" title="Max Experience!"><span>&#9733;</span> <span>&#8734;</span> / 1000</span>
+                                <span class="robot_stat robot_type_experience" title="Max Experience!"><span>&#8734;</span> / 1000</span>
                             <? else: ?>
                                 <span class="robot_stat"><?= $robot_info['robot_experience'] ?> / 1000</span>
                             <? endif; ?>
@@ -191,6 +305,7 @@ ob_start();
                             <?
                             // Print out the energy stat breakdown
                             $print_robot_stat_function('energy');
+                            $print_robot_stat_function('weapons');
                             ?>
                         </td>
 

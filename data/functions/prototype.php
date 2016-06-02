@@ -255,9 +255,16 @@ function mmrpg_prototype_robot_settings($player_token = '', $robot_token){
     return array();
 }
 
+// Define a function for checking a player's robot database array
+function mmrpg_prototype_robot_database(){
+    // Return the current rewards array for this player
+    $session_token = mmrpg_game_token();
+    if (!empty($_SESSION[$session_token]['values']['robot_database'])){ return $_SESSION[$session_token]['values']['robot_database']; }
+    else { return array(); }
+}
+
 // Define a function for checking a player's robot favourites array
 function mmrpg_prototype_robot_favourites(){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_favourites()");  }
     // Return the current rewards array for this player
     $session_token = mmrpg_game_token();
     if (!empty($_SESSION[$session_token]['values']['robot_favourites'])){ return $_SESSION[$session_token]['values']['robot_favourites']; }
@@ -266,7 +273,6 @@ function mmrpg_prototype_robot_favourites(){
 
 // Define a function for checking a player's prototype rewards array
 function mmrpg_prototype_robot_favourite($robot_token){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_favourites()");  }
     // Return the current rewards array for this player
     $session_token = mmrpg_game_token();
     if (!isset($_SESSION[$session_token]['values']['robot_favourites'])){ $_SESSION[$session_token]['values']['robot_favourites'] = array(); }
@@ -275,7 +281,6 @@ function mmrpg_prototype_robot_favourite($robot_token){
 
 // Define a function for checking if a prototype battle has been completed
 function mmrpg_prototype_battle_complete($player_token, $battle_token){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_battle_complete('{$player_token}', '{$battle_token}')");  }
     // Check if this battle has been completed and return true is it was
     $session_token = mmrpg_game_token();
     return isset($_SESSION[$session_token]['values']['battle_complete'][$player_token][$battle_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token][$battle_token] : false;
@@ -283,7 +288,6 @@ function mmrpg_prototype_battle_complete($player_token, $battle_token){
 
 // Define a function for checking if a prototype battle has been failured
 function mmrpg_prototype_battle_failure($player_token, $battle_token){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_battle_failure('{$player_token}', '{$battle_token}')");  }
     // Check if this battle has been failured and return true is it was
     $session_token = mmrpg_game_token();
     return isset($_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token]) ? $_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token] : false;
@@ -291,7 +295,6 @@ function mmrpg_prototype_battle_failure($player_token, $battle_token){
 
 // Define a function for checking is a prototype player has been unlocked
 function mmrpg_prototype_player_unlocked($player_token){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_player_unlocked('{$player_token}')");  }
     // Check if this battle has been completed and return true is it was
     $session_token = mmrpg_game_token();
     return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]) ? true : false;
@@ -299,7 +302,6 @@ function mmrpg_prototype_player_unlocked($player_token){
 
 // Define a function for checking is a prototype robot has been unlocked
 function mmrpg_prototype_robot_unlocked($player_token, $robot_token){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_robot_unlocked('{$player_token}', '{$robot_token}')");  }
     // Define the game session helper var
     $session_token = mmrpg_game_token();
     // If the player token was not false, check to see if that particular player has unlocked
