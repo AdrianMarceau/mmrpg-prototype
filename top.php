@@ -6,7 +6,7 @@
 
 // Include mandatory config files
 define('MMRPG_BUILD', 'mmrpg2k11');
-define('MMRPG_VERSION', '2.6.2');
+define('MMRPG_VERSION', '2.6.9');
 require('data/config.php');
 require('data/settings.php');
 require('data/debug.php');
@@ -33,7 +33,7 @@ if (MMRPG_CONFIG_IS_LIVE){
 session_start();
 
 // Include the database class first and foremost
-require('data/classes/database.php');
+require('classes/database.php');
 // Create the global database object
 if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG'] = array(); }
@@ -51,11 +51,11 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Include mandatory class files
-require('data/classes/battle.php');
-require('data/classes/field.php');
-require('data/classes/player.php');
-require('data/classes/robot.php');
-require('data/classes/ability.php');
+require('classes/battle.php');
+require('classes/field.php');
+require('classes/player.php');
+require('classes/robot.php');
+require('classes/ability.php');
 
 // DEBUG DEBUG DEBUG
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
