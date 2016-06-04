@@ -49,7 +49,6 @@ class rpg_ability {
 
     // Define a public function for manually loading data
     public function ability_load($this_abilityinfo){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'ability_load($this_abilityinfo:'.substr(json_encode($this_abilityinfo), 0, 100).')');  }
 
         // If the ability info was not an array, return false
         if (!is_array($this_abilityinfo)){ return false; }
@@ -60,43 +59,32 @@ class rpg_ability {
         if (!isset($this_abilityinfo['ability_token'])){ return false; }
 
         // If this is a special system ability, hard-code its ID, otherwise base off robot
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_system_abilities = array('attachment-defeat');
         if (in_array($this_abilityinfo['ability_token'], $temp_system_abilities)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $this_abilityinfo['ability_id'] = $this->player_id.'000';
         }
         // Else if this is an item, tweak it's ID as well
         elseif (in_array($this_abilityinfo['ability_token'], $this->player->player_items)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $this_abilityinfo['ability_id'] = $this->player_id.str_pad($this_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_abilityinfo[\'ability_id\'] = '.$this_abilityinfo['ability_id']);  }
         }
         // Otherwise base the ID off of the robot
         elseif (!preg_match('/^'.$this->robot->robot_id.'/', $this_abilityinfo['ability_id'])){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $this_abilityinfo['ability_id'] = $this->robot_id.str_pad($this_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
         }
 
         // Collect current ability data from the session if available
         $this_abilityinfo_backup = $this_abilityinfo;
         if (isset($_SESSION['ABILITIES'][$this_abilityinfo['ability_id']])){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $this_abilityinfo = $_SESSION['ABILITIES'][$this_abilityinfo['ability_id']];
         }
         // Otherwise, collect ability data from the index if not already
         elseif (!in_array($this_abilityinfo['ability_token'], $temp_system_abilities)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_backup_id = $this_abilityinfo['ability_id'];
             if (empty($this_abilityinfo_backup['_parsed'])){
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $this_abilityinfo = self::get_index_info($this_abilityinfo_backup['ability_token']);
                 if (empty($this_abilityinfo['ability_id'])){
-                    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_abilityinfo_backup:: '."\n".print_r($this_abilityinfo_backup, true));  }
-                    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_abilityinfo:: '."\n".print_r($this_abilityinfo, true));  }
                     exit();
                 }
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $this_abilityinfo = array_replace($this_abilityinfo, $this_abilityinfo_backup);
             }
         }
