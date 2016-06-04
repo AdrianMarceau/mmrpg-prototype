@@ -55,8 +55,8 @@ $this_total_query = "SELECT
         ;";
 //die($this_update_query);
 //die($this_update_query);
-$this_update_list = $DB->get_array_list($this_update_query);
-$this_total_list = $DB->get_array_list($this_total_query);
+$this_update_list = $db->get_array_list($this_update_query);
+$this_total_list = $db->get_array_list($this_total_query);
 $this_update_count = $this_request_type == 'ajax' && !empty($this_update_list) ? count($this_update_list) : 0;
 $this_total_count = !empty($this_total_list) ? count($this_total_list) : 0;
 $this_update_list = !empty($this_update_list) ? $this_update_list : array();

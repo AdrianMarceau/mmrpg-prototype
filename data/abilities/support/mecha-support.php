@@ -118,7 +118,7 @@ $ability = array(
 
       // Collect database info for this mecha
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      global $DB;
+      global $db;
       $this_mecha_info = rpg_robot::get_index_info($this_mecha_token);
       $this_mecha_info = rpg_robot::parse_index_info($this_mecha_info);
 

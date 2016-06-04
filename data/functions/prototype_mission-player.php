@@ -1,5 +1,5 @@
 <?
-global $DB;
+global $db;
 $this_field_index = rpg_field::get_index();
 
 // Define the omega battle and default to empty
@@ -14,7 +14,7 @@ $target_player_token_backup = $target_player_token;
 //die('<pre>'.print_r($temp_player_array, true).'</pre>');
 
 // Pull and random player from the list and collect their full data
-$temp_player_array = $this_user_info; /* $temp_player_array = $DB->get_array("SELECT users.*, saves.*, boards.* FROM mmrpg_users AS users
+$temp_player_array = $this_user_info; /* $temp_player_array = $db->get_array("SELECT users.*, saves.*, boards.* FROM mmrpg_users AS users
     LEFT JOIN mmrpg_saves AS saves ON saves.user_id = users.user_id
     LEFT JOIN mmrpg_leaderboard AS boards ON boards.user_id = users.user_id
     WHERE users.user_id = {$this_user_id}

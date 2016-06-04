@@ -45,7 +45,7 @@ ob_start();
       // Define the item display counter
       $equipped_items_count = 0;
       // Collect the temp item index
-      $temp_items_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+      $temp_items_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
       // DEBUG
       //echo('$current_player_items:<pre>'.preg_replace('/\s+/', ' ', print_r($current_player_items, true)).'</pre>');

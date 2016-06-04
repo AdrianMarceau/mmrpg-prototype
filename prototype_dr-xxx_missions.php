@@ -298,7 +298,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
       // Collect the robot index for quick use
-      $temp_robots_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+      $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
       $temp_fields_index = rpg_field::get_index();
 
       // Unlock the first of the final destination battles
@@ -471,7 +471,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         LIMIT 12";
       //die($temp_player_query);
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      $temp_player_list = $DB->get_array_list($temp_player_query);
+      $temp_player_list = $db->get_array_list($temp_player_query);
       */
 
       // Include the leaderboard data for pruning

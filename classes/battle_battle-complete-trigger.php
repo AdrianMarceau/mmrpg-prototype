@@ -230,12 +230,12 @@ if ($target_player->player_token != 'player'){
         $temp_this_player_robots = !empty($temp_this_player_robots) ? implode(',', $temp_this_player_robots) : '';
         $temp_target_player_robots = !empty($temp_target_player_robots) ? implode(',', $temp_target_player_robots) : '';
         // Collect the userinfo for the target player
-        //$target_player_userinfo = $DB->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_player->player_id};");
+        //$target_player_userinfo = $db->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_player->player_id};");
         //if (!isset($_SESSION['PROTOTYPE_TEMP']['player_targets_defeated'])){ $_SESSION['PROTOTYPE_TEMP']['player_targets_defeated'] = array(); }
         //$_SESSION['PROTOTYPE_TEMP']['player_targets_defeated'][] = $target_player_userinfo['user_name_clean'];
         // Update the database with these pending rewards for each player
-        global $DB;
-        $DB->insert('mmrpg_battles', array(
+        global $db;
+        $db->insert('mmrpg_battles', array(
             'battle_field_name' => $this->battle_field->field_name,
             'battle_field_background' => $this->battle_field->field_background,
             'battle_field_foreground' => $this->battle_field->field_foreground,
@@ -278,7 +278,7 @@ if ($target_player->player_side == 'left'){
 
         // Loop through the ability rewards for this robot if set
         if (!empty($temp_player_rewards['abilities']) && empty($_SESSION['GAME']['DEMO'])){
-            $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+            $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
             foreach ($temp_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
 
                 // If this ability is already unlocked, continue
@@ -397,12 +397,12 @@ if ($this_player->player_side == 'left'){
         $temp_this_player_robots = !empty($temp_this_player_robots) ? implode(',', $temp_this_player_robots) : '';
         $temp_target_player_robots = !empty($temp_target_player_robots) ? implode(',', $temp_target_player_robots) : '';
         // Collect the userinfo for the target player
-        $target_player_userinfo = $DB->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_player->player_id};");
+        $target_player_userinfo = $db->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_player->player_id};");
         if (!isset($_SESSION['LEADERBOARD']['player_targets_defeated'])){ $_SESSION['LEADERBOARD']['player_targets_defeated'] = array(); }
         $_SESSION['LEADERBOARD']['player_targets_defeated'][] = $target_player_userinfo['user_name_clean'];
         // Update the database with these pending rewards for each player
-        global $DB;
-        $DB->insert('mmrpg_battles', array(
+        global $db;
+        $db->insert('mmrpg_battles', array(
             'battle_field_name' => $this->battle_field->field_name,
             'battle_field_background' => $this->battle_field->field_background,
             'battle_field_foreground' => $this->battle_field->field_foreground,
@@ -447,7 +447,7 @@ if ($this_player->player_side == 'left'){
 
         // Loop through the ability rewards for this player if set
         if (!empty($temp_player_rewards['abilities']) && empty($_SESSION['GAME']['DEMO'])){
-            $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+            $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
             foreach ($temp_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
 
                 // If this ability is already unlocked, continue
@@ -653,7 +653,7 @@ if ($this_player->player_side == 'left'){
     // Loop through any ability rewards for this battle
     $this_ability_rewards = !empty($this->battle_rewards['abilities']) ? $this->battle_rewards['abilities'] : array();
     if (!empty($this_ability_rewards) && empty($_SESSION['GAME']['DEMO'])){
-        $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         foreach ($this_ability_rewards AS $ability_reward_key => $ability_reward_info){
 
             // Collect the ability info from the index

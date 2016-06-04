@@ -119,7 +119,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     // Ensure this robot has abilities to loop through
     if (!isset($this_robot->flags['ability_startup']) && !empty($this_robot->robot_abilities)){
       // Loop through each of this robot's abilities and trigger the start event
-      $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+      $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       foreach ($this_robot->robot_abilities AS $this_key => $this_token){
         // Define the current ability object using the loaded ability data
         $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilities_index[$this_token]);
@@ -146,7 +146,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Combine into the actions index
-    $temp_actions_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $temp_actions_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
     // DEFINE ABILITY TOKEN
 
@@ -410,7 +410,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     if (!isset($this_robot->flags['ability_startup']) && !empty($this_robot->robot_abilities)){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       // Loop through each of this robot's abilities and trigger the start event
-      $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+      $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       foreach ($this_robot->robot_abilities AS $this_key => $this_token){
         if (!isset($temp_abilities_index[$this_token])){ continue; }
         // Define the current ability object using the loaded ability data

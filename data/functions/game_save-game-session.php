@@ -3,7 +3,7 @@
 function mmrpg_save_game_session($this_save_filepath = ''){
 
     // Reference global variables
-    global $DB;
+    global $db;
     if (empty($this_save_filepath)){ global $this_save_filepath; }
     $session_token = mmrpg_game_token();
     $mmrpg_index_players = &$GLOBALS['mmrpg_index']['players'];
@@ -42,7 +42,7 @@ function mmrpg_save_game_session($this_save_filepath = ''){
         if (!isset($this_user['userid'])){
             // Attempt to collect the user ID from the database
             $temp_query = "SELECT user_id FROM mmrpg_users WHERE user_name_clean = '{$this_user['username_clean']}' LIMIT 1";
-            $temp_value = $DB->get_value($temp_query, 'user_id');
+            $temp_value = $db->get_value($temp_query, 'user_id');
             // If the user ID was found, collect it and proceed as normal
             if (!empty($temp_value)){
 
@@ -54,9 +54,9 @@ function mmrpg_save_game_session($this_save_filepath = ''){
             else {
 
                 // Generate new user, save, and board IDs for this listing
-                $temp_user_id = $DB->get_value('SELECT MAX(user_id) AS user_id FROM mmrpg_users WHERE user_id < '.MMRPG_SETTINGS_GUEST_ID, 'user_id') + 1;
-                $temp_save_id = $DB->get_value('SELECT MAX(save_id) AS save_id FROM mmrpg_saves', 'save_id') + 1;
-                $temp_board_id = $DB->get_value('SELECT MAX(board_id) AS board_id FROM mmrpg_leaderboard', 'board_id') + 1;
+                $temp_user_id = $db->get_value('SELECT MAX(user_id) AS user_id FROM mmrpg_users WHERE user_id < '.MMRPG_SETTINGS_GUEST_ID, 'user_id') + 1;
+                $temp_save_id = $db->get_value('SELECT MAX(save_id) AS save_id FROM mmrpg_saves', 'save_id') + 1;
+                $temp_board_id = $db->get_value('SELECT MAX(board_id) AS board_id FROM mmrpg_leaderboard', 'board_id') + 1;
 
                 // Generate the USER details for import
                 $temp_user_array = array();
@@ -231,9 +231,9 @@ function mmrpg_save_game_session($this_save_filepath = ''){
                 $temp_save_array['save_date_modified'] = $temp_user_array['user_date_modified'];
 
                 // Insert these users into the database
-                $temp_user_array_return = $DB->insert('mmrpg_users', $temp_user_array);
-                $temp_save_array_return = $DB->insert('mmrpg_saves', $temp_save_array);
-                $temp_board_array_return = $DB->insert('mmrpg_leaderboard', $temp_board_array);
+                $temp_user_array_return = $db->insert('mmrpg_users', $temp_user_array);
+                $temp_save_array_return = $db->insert('mmrpg_saves', $temp_save_array);
+                $temp_board_array_return = $db->insert('mmrpg_leaderboard', $temp_board_array);
                 unset($temp_user_array, $temp_save_array, $temp_board_array);
 
                 // Update the ID in the user array and continue
@@ -266,11 +266,11 @@ function mmrpg_save_game_session($this_save_filepath = ''){
         $temp_user_array['user_date_birth'] = !empty($this_user['dateofbirth']) ? $this_user['dateofbirth'] : 0;
         $temp_user_array['user_flag_approved'] = !empty($this_user['approved']) ? 1 : 0;
         // Update this user's info in the database
-        $DB->update('mmrpg_users', $temp_user_array, 'user_id = '.$this_user['userid']);
+        $db->update('mmrpg_users', $temp_user_array, 'user_id = '.$this_user['userid']);
         unset($temp_user_array);
 
         // DEBUG
-        //$DEBUG .= '$DB->update(\'mmrpg_users\', $temp_user_array, \'user_id = \'.$this_user[\'userid\']);';
+        //$DEBUG .= '$db->update(\'mmrpg_users\', $temp_user_array, \'user_id = \'.$this_user[\'userid\']);';
         //$DEBUG .= '<pre>$temp_user_array = '.print_r($temp_user_array, true).'</pre>';
         //$DEBUG .= '<pre>$this_user = '.print_r($this_user, true).'</pre>';
 
@@ -363,7 +363,7 @@ function mmrpg_save_game_session($this_save_filepath = ''){
         //die('<pre>$temp_board_array : '.print_r($temp_board_array, true).'</pre>');
 
         // Update this board's info in the database
-        $DB->update('mmrpg_leaderboard', $temp_board_array, 'user_id = '.$this_user['userid']);
+        $db->update('mmrpg_leaderboard', $temp_board_array, 'user_id = '.$this_user['userid']);
         unset($temp_board_array);
 
         // Clear any leaderboard data that exists in the session, forcing it to recache
@@ -442,7 +442,7 @@ function mmrpg_save_game_session($this_save_filepath = ''){
         $temp_save_array['save_date_modified'] = time();
 
         // Update this save's info in the database
-        $DB->update('mmrpg_saves', $temp_save_array, 'user_id = '.$this_user['userid']);
+        $db->update('mmrpg_saves', $temp_save_array, 'user_id = '.$this_user['userid']);
         unset($temp_save_array);
 
     } else {

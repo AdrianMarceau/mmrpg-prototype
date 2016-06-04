@@ -92,7 +92,7 @@ if (!empty($temp_thread_ids)){
     ORDER BY posts.post_date ASC
 
     ;";
-  $temp_posts_array = $DB->get_array_list($this_posts_query);
+  $temp_posts_array = $db->get_array_list($this_posts_query);
   $this_posts_array = array();
   if (!empty($temp_posts_array)){
     foreach ($temp_posts_array AS $key => $array){
@@ -109,7 +109,7 @@ if (!empty($temp_thread_ids)){
 
 // Collect the thread counts for all users in an index
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-$this_user_countindex = $DB->get_array_list("SELECT
+$this_user_countindex = $db->get_array_list("SELECT
 
   users.user_id,
 
@@ -356,7 +356,7 @@ if (!empty($this_threads_array)){
   // Update all the threads that require it with a view count
   if (!MMRPG_CONFIG_DEBUG_MODE){
     $temp_update_session_ids = implode(', ', $temp_update_session_ids);
-    $temp_update_session = $DB->query("UPDATE mmrpg_threads SET thread_views = (thread_views + 1) WHERE thread_id IN ({$temp_update_session_ids});");
+    $temp_update_session = $db->query("UPDATE mmrpg_threads SET thread_views = (thread_views + 1) WHERE thread_id IN ({$temp_update_session_ids});");
   }
 
 

@@ -123,7 +123,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_prototype_data['robots_markup'] = '';
 
   // Loop through and display the available robot options for this player
-  $temp_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+  $temp_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
   foreach ($this_prototype_data['robot_options'] AS $key => $info){
     $index = rpg_robot::parse_index_info($temp_robot_index[$info['robot_token']]);
     $info = array_replace($index, $info);

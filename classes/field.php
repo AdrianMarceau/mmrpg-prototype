@@ -102,15 +102,15 @@ class rpg_field {
   // Define a function for pulling the full field index
   public static function get_index(){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index()");  }
-    global $DB;
-    $field_index = $DB->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_complete = 1;", 'field_token');
+    global $db;
+    $field_index = $db->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_complete = 1;", 'field_token');
     if (!empty($field_index)){ return $field_index; }
     else { return array(); }
   }
   // Define a public function for collecting index data from the database
   public static function get_index_info($field_token){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index_info('{$field_token}')");  }
-    global $DB;
+    global $db;
     $field_index = rpg_field::get_index();
     if (!empty($field_index[$field_token])){ $field_info = rpg_field::parse_index_info($field_index[$field_token]); }
     else { $field_info = array(); }
@@ -224,10 +224,10 @@ class rpg_field {
   // Define a static function for printing out the field's title markup
   public static function print_editor_title_markup($player_info, $field_info){
     // Pull in global variables
-    global $mmrpg_index, $DB;
+    global $mmrpg_index, $db;
     // Collect the approriate database indexes
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    $mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
     // Generate the field option markup
     $temp_player_token = $player_info['player_token'];
     if (!isset($mmrpg_index['players'][$temp_player_token])){ return false; }

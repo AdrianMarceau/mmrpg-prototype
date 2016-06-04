@@ -735,17 +735,17 @@ class rpg_ability {
 
     // Define a public function for collecting index data from the database
     public static function get_index_info($ability_token){
-        global $DB;
+        global $db;
         // Collect the data from the index or the database if necessary
         if (!is_string($ability_token)){ return false; }
-        $ability_info = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_token IN ('{$ability_token}');", 'ability_token');
+        $ability_info = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_token IN ('{$ability_token}');", 'ability_token');
         if (!empty($ability_info)){ $ability_info = self::parse_index_info($ability_info[$ability_token]); }
         else { $ability_info = array(); }
         return $ability_info;
     }
     // Define a public function for reformatting database data into proper arrays
     public static function parse_index_info($ability_info){
-        global $DB;
+        global $db;
 
         // Return false if empty
         if (empty($ability_info)){ return false; }
@@ -788,7 +788,7 @@ class rpg_ability {
         */
 
         // Update the static index with this ability's index info
-        //$DB->INDEX['ABILITIES'][$ability_info['ability_token']] = $ability_info;
+        //$db->INDEX['ABILITIES'][$ability_info['ability_token']] = $ability_info;
 
         // Return the parsed ability info
         return $ability_info;

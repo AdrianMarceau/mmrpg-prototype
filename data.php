@@ -207,7 +207,7 @@ if ($this_action == 'start'){
         unset($backup_this_playerinfo);
         // Break apart the allowed robots string and unset undefined robots
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $temp_robots_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         //$this_playerinfo = $this_player->export_array();
         //$this_playerinfo_robots = array();
         //die('<pre>after:'.print_r($debug['player_robots'], true).'</pre>');
@@ -281,7 +281,7 @@ if ($this_action == 'start'){
         unset($backup_target_playerinfo);
         // Break apart the allowed robots string and unset undefined robots
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $temp_robots_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         //strstr($target_player_robots, ',') ? explode(',', $target_player_robots) : array($target_player_robots);
         //$target_playerinfo = $target_player->export_array();
         $target_playerinfo_robots = array();
@@ -991,7 +991,7 @@ elseif ($this_action == 'ability'){
     //$this_battle->actions_append($target_player, $target_robot, $this_player, $this_robot, $target_action, $target_action_token);
 
     // Collect the abilities index for the current robot
-    $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
     // Create the temporary ability object for this player's robot
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -1018,7 +1018,7 @@ elseif ($this_action == 'ability'){
     $temp_active_target_robot_abilities = $active_target_robot->robot_abilities;
 
     // Loop through the target robot's current abilities and check weapon energy
-    $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
     foreach ($active_target_robot->robot_abilities AS $key => $token){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Collect the data for this ability from the index
@@ -1780,7 +1780,7 @@ if (!MMRPG_CONFIG_IS_LIVE || MMRPG_CONFIG_ADMIN_MODE){
 <body>
 <?
 // Unset the database variable
-unset($DB);
+unset($db);
 ?>
 </body>
 </html>

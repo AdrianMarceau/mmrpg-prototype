@@ -17,7 +17,7 @@ if ($this_robot_class == 'master'){
     $robot_index_query .= "AND robot_flag_published = 1 ";
 }
 $robot_index_query .= "ORDER BY robot_order ASC ";
-$this_robot_index = $DB->get_array_list($robot_index_query, 'robot_token');
+$this_robot_index = $db->get_array_list($robot_index_query, 'robot_token');
 
 // Populate the battle options with the starter battle option
 $temp_rand_num = $this_robot_count;

@@ -50,7 +50,7 @@ function mmrpg_game_players_unlocked(){
 // Define a function for unlocking a game player for use in battle
 function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_abilities = true){
     // Reference the global variables
-    global $mmrpg_index, $DB;
+    global $mmrpg_index, $db;
 
     //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
     $session_token = mmrpg_game_token();
@@ -79,7 +79,7 @@ function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_a
     }
     // Loop through the robot rewards for this player if set
     if ($unlock_robots && !empty($this_player_rewards['robots'])){
-        $temp_robots_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         foreach ($this_player_rewards['robots'] AS $robot_reward_key => $robot_reward_info){
             // Check if the required amount of points have been met by this player
             if ($this_player_points >= $robot_reward_info['points']){
@@ -94,7 +94,7 @@ function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_a
     // Loop through the ability rewards for this player if set
     if ($unlock_abilities && !empty($this_player_rewards['abilities'])){
         // Collect the ability index for calculation purposes
-        $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         foreach ($this_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
             // Check if the required amount of points have been met by this player
             if ($this_player_points >= $ability_reward_info['points']){
@@ -248,7 +248,7 @@ function mmrpg_game_robot_tokens_unlocked($player_token = ''){
 // Define a function for unlocking a game robot for use in battle
 function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = true, $events_create = true){
     // Reference the global variables
-    global $mmrpg_index, $DB;
+    global $mmrpg_index, $db;
 
     //$_SESSION[$session_token] = &$_SESSION[mmrpg_game_token()];
     $session_token = mmrpg_game_token();
@@ -418,7 +418,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
     // Loop through the ability rewards for this robot if set
     if ($unlock_abilities && !empty($this_robot_rewards['abilities'])){
         // Collect the ability index for calculation purposes
-        $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         foreach ($this_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
             // Check if the required amount of points have been met by this robot
             if ($this_robot_level >= $ability_reward_info['level']){
@@ -745,7 +745,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
     if ($events_create != false){
 
         // Generate the attributes and text variables for this ability unlock
-        global $DB;
+        global $db;
         $this_player_token = $player_info['player_token'];
         $ability_info_size = isset($ability_info['ability_image_size']) ? $ability_info['ability_image_size'] * 2 : 40 * 2;
         $ability_info_size_token = $ability_info_size.'x'.$ability_info_size;
@@ -757,7 +757,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
         $this_find = array('{this_player}', '{this_ability}', '{target_player}', '{target_ability}');
         $this_replace = array($player_info['player_name'], $ability_info['ability_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
         $this_field = array('field_token' => 'intro-field', 'field_name' => 'Intro Field');
-        $temp_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $temp_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         // Generate the window event's canvas and message markup then append to the global array
         $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
         $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';

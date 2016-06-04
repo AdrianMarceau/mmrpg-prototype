@@ -19,7 +19,7 @@ if (!empty($hidden_database_items)){
 }
 
 // Collect the database items
-$mmrpg_database_items = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition}", 'ability_token');
+$mmrpg_database_items = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition}", 'ability_token');
 
 // Remove unallowed items from the database, and increment counters
 foreach ($mmrpg_database_items AS $temp_token => $temp_info){

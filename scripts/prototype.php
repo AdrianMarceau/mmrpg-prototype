@@ -45,61 +45,61 @@ switch ($this_data_select){
 
   // If this was a PLAYERS request type, print out the players
   case 'this_player_token': {
-    
+
     // Require the prototype players display file
     require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_players.php');
-    
+
     // DEBUG
     //exit('success:players-requested');
-  
+
     // DEBUG DEBUG DEBUG
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Break automatically to prevent looping
     break;
-    
+
   }
-  
+
   // If this was a MISSIONS request type, print out the missions
   case 'this_battle_token': {
-    
+
     // Require the prototype missions display file
     require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_missions.php');
-    
+
     // DEBUG
     //exit('missions-requested:'.print_r($this_data_condition, true));
-  
+
     // DEBUG DEBUG DEBUG
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Break automatically to prevent looping
     break;
   }
-  
+
   // If this was a ROBOTS request type, print out the robots
   case 'this_player_robots': {
-    
+
     // Require the prototype robots display file
     require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_robots.php');
-    
+
     // DEBUG
     //exit('success:robots-requested');
-  
+
     // DEBUG DEBUG DEBUG
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
-    
+
+
     // Break automatically to prevent looping
     break;
   }
-  
+
 }
 
 // Collect the buffer contents
 $temp_markup = ob_get_clean();
 
 // Unset the database variable
-unset($DB);
+unset($db);
 
 // If the user made it this far, exit gracefully
 exit(!empty($temp_markup) ? $temp_markup : '');

@@ -552,7 +552,7 @@ class rpg_robot {
     public static function robot_choices_abilities($objects){
         // Extract all objects into the current scope
         extract($objects);
-        global $DB;
+        global $db;
         // Create the ability options and weights variables
         $options = array();
         $weights = array();
@@ -607,7 +607,7 @@ class rpg_robot {
         if ($this_robot->has_ability('speed-mode') && $this_robot->robot_speed < ($this_robot->robot_base_speed * 0.10)){ $options[] = 'speed-mode'; $weights[] = 6 * $support_multiplier;  }
         elseif ($this_robot->has_ability('speed-mode')){ $options[] = 'speed-mode'; $weights[] = 1;  }
         // Loop through any leftover abilities and add them to the weighted ability options
-        $temp_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $temp_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         foreach ($this_robot->robot_abilities AS $key => $token){
             if (!in_array($token, $options)){
                 $info = rpg_ability::parse_index_info($temp_ability_index[$token]);
@@ -633,7 +633,7 @@ class rpg_robot {
 
     // Define a trigger for using one of this robot's abilities
     public function trigger_ability($target_robot, $this_ability){
-        global $DB;
+        global $db;
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
         // Update this robot's history with the triggered ability
@@ -742,7 +742,7 @@ class rpg_robot {
         if (!empty($this->robot_attachments)){
             //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
-            $temp_attachments_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+            $temp_attachments_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
             foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
                 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
@@ -843,7 +843,7 @@ class rpg_robot {
 
     // Define a trigger for using one of this robot's attachments
     public function trigger_attachment($attachment_info){
-        global $DB;
+        global $db;
 
         // If this is an ability attachment
         if ($attachment_info['class'] == 'ability'){
@@ -927,7 +927,7 @@ class rpg_robot {
 
     // Define a trigger for using one of this robot's abilities
     public function trigger_target($target_robot, $this_ability, $trigger_options = array()){
-        global $DB;
+        global $db;
 
         // Define the event console options
         $event_options = array();
@@ -1040,7 +1040,7 @@ class rpg_robot {
 
     // Define a trigger for inflicting all types of damage on this robot
     public function trigger_damage($target_robot, $this_ability, $damage_amount, $trigger_disabled = true, $trigger_options = array()){
-        global $DB;
+        global $db;
         // Generate default trigger options if not set
         if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = true; }
         if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
@@ -1059,7 +1059,7 @@ class rpg_robot {
 
     // Define a trigger for inflicting all types of recovery on this robot
     public function trigger_recovery($target_robot, $this_ability, $recovery_amount, $trigger_disabled = true, $trigger_options = array()){
-        global $DB;
+        global $db;
         // Generate default trigger options if not set
         if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = true; }
         if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
@@ -1078,7 +1078,7 @@ class rpg_robot {
     // Define a trigger for processing disabled events
     public function trigger_disabled($target_robot, $this_ability, $trigger_options = array()){
         // Pull in the global variable
-        global $mmrpg_index, $DB;
+        global $mmrpg_index, $db;
         // Generate default trigger options if not set
         if (!isset($trigger_options['item_multiplier'])){ $trigger_options['item_multiplier'] = 1.0; }
         // Require the external function for triggering disabled
@@ -1163,7 +1163,7 @@ class rpg_robot {
     // Define a function for pulling the full robot index
     public static function get_index($filter = array()){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index()");  }
-        global $DB;
+        global $db;
 
         // If a filter was defined, parse it's values for the query
         if (!empty($filter) && is_array($filter)){
@@ -1183,7 +1183,7 @@ class rpg_robot {
         }
 
         // Collect the robot index from the database using any filters
-        $robot_index = $DB->get_array_list("SELECT *
+        $robot_index = $db->get_array_list("SELECT *
                 FROM mmrpg_index_robots
                 WHERE robot_flag_complete = 1 {$where_filter}
                 ;", 'robot_token');
@@ -1196,7 +1196,7 @@ class rpg_robot {
     // Define a public function for collecting index data from the database
     public static function get_index_info($robot_token){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index_info('{$robot_token}')");  }
-        global $DB;
+        global $db;
         $robot_index = rpg_robot::get_index(array($robot_token));
         if (!empty($robot_index[$robot_token])){ $robot_info = rpg_robot::parse_index_info($robot_index[$robot_token]); }
         else { $robot_info = array(); }

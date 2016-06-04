@@ -1,6 +1,6 @@
 <?
 // Define the global variables
-global $mmrpg_index, $this_current_uri, $this_current_url, $DB;
+global $mmrpg_index, $this_current_uri, $this_current_url, $db;
 global $allowed_edit_players, $allowed_edit_fields, $global_allow_editing;
 global $allowed_edit_data_count, $allowed_edit_player_count, $first_player_token;
 global $key_counter, $player_key, $player_counter, $player_rewards, $player_field_rewards, $player_item_rewards, $temp_player_totals, $player_options_markup;
@@ -13,9 +13,9 @@ if (empty($player_info)){ return 'error:player-empty'; }
 
 // Collect the approriate database indexes
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token'); }
+if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token'); }
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-if (empty($mmrpg_database_items)){ $mmrpg_database_items = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_class = 'item' AND ability_flag_complete = 1;", 'ability_token'); }
+if (empty($mmrpg_database_items)){ $mmrpg_database_items = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_class = 'item' AND ability_flag_complete = 1;", 'ability_token'); }
 
 // Define the quick-access variables for later use
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }

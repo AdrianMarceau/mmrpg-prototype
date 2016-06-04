@@ -584,7 +584,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 // Require the remote bottom in case we're in viewer mode
 require(MMRPG_CONFIG_ROOTDIR.'/data/analytics.php');
 // Unset the database variable
-unset($DB);
+unset($db);
 ?>
 </body>
 </html>

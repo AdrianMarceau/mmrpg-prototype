@@ -1,7 +1,7 @@
 <?
 // Define the debug checkpoint function
 function mmrpg_debug_checkpoint($file, $line, $extra = ''){
-  global $DB;
+  global $db;
   static $last_memory_usage = 0;
   static $last_micro_time = 0;
   static $checkpoint = 0;
@@ -31,10 +31,10 @@ function mmrpg_debug_checkpoint($file, $line, $extra = ''){
 
   if (!empty($extra)){ $query .= '<div style="font-size: 90%; padding: 5px 0 0 30px; margin: 0; color: #6D6D6D;">'.$extra.'</div>'; }
   $query = '<span style="color: #262626;">'.$query.'</span>';
-  $DB->DEBUG['script_queries'][] = $query;
+  $db->DEBUG['script_queries'][] = $query;
 
   //echo $query;
   $checkpoint++;
-  //if ($mem_usage >= (1024 * 1024 * 50)){ unset($DB); exit("\n\n|| -- 50MB MEMORY OVERLOAD --||\n\n"); }
+  //if ($mem_usage >= (1024 * 1024 * 50)){ unset($db); exit("\n\n|| -- 50MB MEMORY OVERLOAD --||\n\n"); }
 }
 ?>

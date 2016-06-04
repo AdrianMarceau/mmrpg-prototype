@@ -77,7 +77,7 @@ else {
 
   // Collect the ability index for calculation purposes
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+  $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
   // Define the number of core and support abilities for the robot
   foreach ($mmrpg_prototype_core_abilities AS $group_key => $group_abilities){

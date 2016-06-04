@@ -12,7 +12,7 @@ $update_patch_details[$token] .= "\n".'Any overflow of stats that are now consid
 function mmrpg_patch_stat_max_limit_update($_GAME){
 
     // Pull in global variables
-    global $DB;
+    global $db;
 
     // Parse out robot data from the player rewards and make a copy
     $player_robots_tokens = array();
@@ -140,7 +140,7 @@ $update_patch_details[$token] .= "\nWhile replaying missions for better scores i
 function mmrpg_patch_battle_point_reboot_2k16($_GAME){
 
     // Pull in global variables
-    global $DB;
+    global $db;
 
     // Define the variable to hold the current battle point totals
     $new_battle_points = 0;
@@ -433,7 +433,7 @@ function mmrpg_patch_battle_point_reboot_2k16($_GAME){
         $board_updates[] = "board_abilities_{$dbplayer} = {$new_abilities}";
         $board_updates[] = "board_missions_{$dbplayer} = {$new_missions}";
     }
-    $DB->query("UPDATE mmrpg_leaderboard SET
+    $db->query("UPDATE mmrpg_leaderboard SET
         ".implode(",\n", $board_updates)."
         WHERE user_id = {$_GAME['user_id']}
         ;");
@@ -459,10 +459,10 @@ $update_patch_details[$token] .= "\nthe perfect moveset, and I hope everyone wil
 function mmrpg_patch_player_ability_merge_2k16($_GAME){
 
     // Pull in global variables
-    global $DB;
+    global $db;
 
     // Collect a list of unlockable ability tokens
-    $valid_ability_tokens = $DB->get_array_list("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'master'", 'ability_token');
+    $valid_ability_tokens = $db->get_array_list("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_class = 'master'", 'ability_token');
     $valid_ability_tokens = !empty($valid_ability_tokens) ? array_keys($valid_ability_tokens) : array();
 
     // Create a new entry in the session for battle abilities
@@ -609,7 +609,7 @@ $update_patch_details[$token] = "Template patch details.  Use this area to descr
 function mmrpg_patch_template($_GAME){
 
     // Pull in global variables
-    global $DB;
+    global $db;
 
 
     // Return the updated game array
