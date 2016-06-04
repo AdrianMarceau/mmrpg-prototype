@@ -13,7 +13,6 @@ class rpg_battle {
 
     // Define the constructor class
     public function rpg_battle(){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
         // Collect any provided arguments
         $args = func_get_args();
@@ -31,7 +30,6 @@ class rpg_battle {
 
     // Define a public function for updating index info
     public static function update_index_info($battle_token, $battle_info){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "update_index_info('{$battle_token}', \$battle_info)");  }
         global $db;
 
         // If the internal index has not been created yet, load it into memory
@@ -49,7 +47,6 @@ class rpg_battle {
 
     // Define a public function requesting a battle index entry
     public static function get_index_info($battle_token){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index_info('{$battle_token}')");  }
         global $db;
 
         // If the internal index has not been created yet, load it into memory
@@ -72,7 +69,6 @@ class rpg_battle {
 
     // Define a function for loading the battle index cache file
     public static function load_battle_index(){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "load_battle_index()");  }
         global $db;
         // Create the index as an empty array
         $db->INDEX['BATTLES'] = array();
@@ -160,7 +156,6 @@ class rpg_battle {
 
     // Define a public function for manually loading data
     public function battle_load($this_battleinfo){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
         // Pull in the mmrpg index
         global $mmrpg_index;

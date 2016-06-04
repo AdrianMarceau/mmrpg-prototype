@@ -495,7 +495,6 @@ class rpg_robot {
         if (empty($robot_info) || empty($ability_info)){ return false; }
         $robot_token = $robot_info['robot_token'];
         $ability_token = $ability_info['ability_token'];
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'has_ability_compatibility('.$robot_token.', '.$ability_token.')');  }
         // Define the compatibility flag and default to false
         $temp_compatible = false;
         // If this ability has a type, check it against this robot
@@ -536,7 +535,6 @@ class rpg_robot {
             $temp_compatible = true;
         }
         //$robot_info['robot_abilities']
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'has_ability_compatibility('.$robot_token.', '.$ability_token.') = '.($temp_compatible ? 'true' : 'false').'<br /> <pre>'.print_r($robot_info['robot_abilities'], true).'</pre>');  }
         // DEBUG
         //die('Found '.$debug_fragment.' - robot '.($temp_compatible ? 'is' : 'is not').' compatible!');
         // Return the temp compatible result
@@ -700,7 +698,6 @@ class rpg_robot {
             }
         }
         // Return an ability based on a weighted chance
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'robot_choices_abilities('.$this_robot->robot_token.')<br /> $options = '.implode(',', $options).'<br /> $weights = '.implode(',', $weights).'<br /> $this_robot->robot_abilities = '.implode(',', $this_robot->robot_abilities));  }
         return $this_battle->weighted_chance($options, $weights);
     }
 
@@ -1130,7 +1127,6 @@ class rpg_robot {
          */
 
         // Backup this and the target robot's frames to revert later
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_robot_backup_frame = $this->robot_frame;
         $this_player_backup_frame = $this->player->player_frame;
         $target_robot_backup_frame = $target_robot->robot_frame;
@@ -2284,7 +2280,6 @@ class rpg_robot {
          */
 
         // Backup this and the target robot's frames to revert later
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_robot_backup_frame = $this->robot_frame;
         $this_player_backup_frame = $this->player->player_frame;
         $target_robot_backup_frame = $target_robot->robot_frame;
@@ -4114,7 +4109,6 @@ class rpg_robot {
 
 
             // -- ITEM REWARDS -- //
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'item rewards');  }
 
             // Define the temp player rewards array
             $target_player_rewards = array();
@@ -4129,7 +4123,6 @@ class rpg_robot {
 
             // If this robot was a MECHA class, it may drop PELLETS and SMALL SCREWS
             if ($this_robot->robot_class == 'mecha'){
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add item energy and weapon pellets for mechas');  }
                 $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'item-energy-pellet');
                 $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'item-weapon-pellet');
                 $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'item-screw-small');
@@ -4137,7 +4130,6 @@ class rpg_robot {
 
             // If this robot was a MASTER class, it may drop CAPSULES and LARGE SCREWS
             if ($this_robot->robot_class == 'master'){
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add item energy and weapon capsules for masters');  }
                 $target_player_rewards['items'][] =  array('chance' => 25, 'token' => 'item-energy-capsule');
                 $target_player_rewards['items'][] =  array('chance' => 25, 'token' => 'item-weapon-capsule');
                 $target_player_rewards['items'][] =  array('chance' => 50, 'token' => 'item-screw-large');
@@ -4147,15 +4139,12 @@ class rpg_robot {
             $temp_value_total = 0;
             $temp_count_total = 0;
             foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){ $temp_value_total += $item_reward_info['chance']; $temp_count_total += 1; }
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_count_total = '.$temp_count_total.';<br /> $temp_value_total = '.$temp_value_total.'; ');  }
 
             // If this robot was a MASTER class and destroyed by WEAKNESS, it may drop a CORE
             if ($this_robot->robot_class == 'master' && !empty($this_robot->flags['triggered_weakness'])){
                 $temp_core_type = !empty($this->robot_core) ? $this->robot_core : 'none';
                 $temp_chance_value = ($temp_value_total * 4);
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'add item core '.$temp_core_type.' with '.$temp_chance_value.' chance');  }
                 $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => 'item-core-'.$temp_core_type);
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$target_player_rewards[\'items\'] = '.json_encode($target_player_rewards['items']));  }
             }
 
             // Shuffle the rewards so it doesn't look to formulaic
@@ -4168,7 +4157,6 @@ class rpg_robot {
             if (!function_exists('temp_player_rewards_items')){
                 function temp_player_rewards_items($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_info){
                     global $mmrpg_index;
-                    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'temp_player_rewards_items('.$item_reward_info['ability_token'].')');  }
 
                     // Create the temporary ability object for event creation
                     $temp_ability = new rpg_ability($this_battle, $target_player, $target_robot, $item_reward_info);
@@ -4242,25 +4230,20 @@ class rpg_robot {
 
             // Loop through the ability rewards for this robot if set and NOT demo mode
             if (empty($_SESSION['GAME']['DEMO']) && !empty($target_player_rewards['items']) && $this->player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'let us unlock item drops now..');  }
                 $temp_items_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
                 $temp_success_value = $this_robot->robot_class == 'master' ? 50 : 25;
                 $temp_success_value = ceil($temp_success_value * $temp_chance_multiplier);
                 if ($temp_success_value > 100){ $temp_success_value = 100; }
                 $temp_failure_value = 100 - $temp_success_value;
                 $temp_dropping_result = $temp_success_value == 100 ? 'success' : $this_battle->weighted_chance(array('success', 'failure'), array($temp_success_value, $temp_failure_value));
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '..and the result of the drop ('.$temp_success_value.' / '.$temp_failure_value.') is '.$temp_dropping_result);  }
                 if ($temp_dropping_result == 'success'){
                     $temp_value_total = 0;
                     $temp_count_total = 0;
                     foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){ $temp_value_total += $item_reward_info['chance']; $temp_count_total += 1; }
-                    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_count_total = '.$temp_count_total.';<br /> $temp_value_total = '.$temp_value_total.'; ');  }
                     $temp_item_tokens = array();
                     $temp_item_weights = array();
                     foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){ $temp_item_tokens[] = $item_reward_info['token']; $temp_item_weights[] = ceil(($item_reward_info['chance'] / $temp_value_total) * 100); }
-                    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_item_tokens = '.implode(',', $temp_item_tokens).';<br /> $temp_item_weights = '.implode(',', $temp_item_weights).'; ');  }
                     $temp_random_item = $this_battle->weighted_chance($temp_item_tokens, $temp_item_weights);
-                    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_random_item = '.$temp_random_item);  }
                     $item_index_info = rpg_ability::parse_index_info($temp_items_index[$temp_random_item]);
                     temp_player_rewards_items($this_battle, $target_player, $target_robot, $this, $item_reward_key, $item_index_info);
                 }
@@ -4356,7 +4339,6 @@ class rpg_robot {
         /*
         // If this robot was a mecha, remove it from view by incrementing its key
         if ($this_robot->robot_class == 'mecha'){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'is mecha so increment key');  }
             $this_robot->robot_key += 1000;
             $this_robot->update_session();
         }
@@ -4976,7 +4958,6 @@ class rpg_robot {
          */
 
         // Define the variable to hold the console robot data
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_data = array();
 
         // Define and calculate the simpler markup and positioning variables for this robot
@@ -5073,7 +5054,6 @@ class rpg_robot {
 
     // Define a function for pulling the full robot index
     public static function get_index($filter = array()){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index()");  }
         global $db;
 
         // If a filter was defined, parse it's values for the query
@@ -5106,7 +5086,6 @@ class rpg_robot {
     }
     // Define a public function for collecting index data from the database
     public static function get_index_info($robot_token){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index_info('{$robot_token}')");  }
         global $db;
         $robot_index = rpg_robot::get_index(array($robot_token));
         if (!empty($robot_index[$robot_token])){ $robot_info = rpg_robot::parse_index_info($robot_index[$robot_token]); }
@@ -5115,7 +5094,6 @@ class rpg_robot {
     }
     // Define a public function for reformatting database data into proper arrays
     public static function parse_index_info($robot_info){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "parse_index_info(\$robot_info:{$robot_info['robot_token']})");  }
 
         // Return false if empty
         if (empty($robot_info)){ return false; }

@@ -939,27 +939,21 @@ class rpg_player {
         $session_token = mmrpg_game_token();
 
         // If either fo empty, return error
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if (empty($player_info)){ return 'error:player-empty'; }
 
         // Collect the approriate database indexes
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token'); }
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if (empty($mmrpg_database_items)){ $mmrpg_database_items = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_class = 'item' AND ability_flag_complete = 1;", 'ability_token'); }
 
         // Define the quick-access variables for later use
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $player_token = $player_info['player_token'];
         if (!isset($first_player_token)){ $first_player_token = $player_token; }
 
         // Define the player's image and size if not defined
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $player_info['player_image'] = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
         $player_info['player_image_size'] = !empty($player_info['player_image_size']) ? $player_info['player_image_size'] : 40;
 
         // Define the player's battle points total, battles complete, and other details
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $player_info['player_points'] = mmrpg_prototype_player_points($player_token);
         $player_info['player_battles_complete'] = mmrpg_prototype_battles_complete($player_token);
         $player_info['player_battles_complete_total'] = mmrpg_prototype_battles_complete($player_token, false);
@@ -975,11 +969,9 @@ class rpg_player {
         $player_info['player_experience'] = 0;
         // Collect this player's current defined omega item list
         if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             //$debug_experience_sum = $player_token.' : ';
             foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $temp_player => $temp_player_info){
                 if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'])){
-                    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     $temp_player_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'];
                     $temp_player_robot_settings = $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'];
                     if (empty($temp_player_robot_rewards) || empty($temp_player_robot_settings)){
@@ -993,7 +985,6 @@ class rpg_player {
                             unset($_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_key]);
                             continue;
                         }
-                        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                         $temp_robot_settings = $temp_player_robot_settings[$temp_robot_info['robot_token']];
                         $temp_robot_rewards = $temp_player_robot_settings[$temp_robot_info['robot_token']];
                         // If this robot is not owned by the player, skip it as it doesn't count towards their totals
@@ -1010,7 +1001,6 @@ class rpg_player {
         }
 
         // Collect this player's current field selection from the omega session
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_session_key = $player_info['player_token'].'_target-robot-omega_prototype';
         $player_info['target_robot_omega'] = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
         $player_info['player_fields_current'] = array();
@@ -1023,7 +1013,6 @@ class rpg_player {
         }
 
         // Collect this player's current item selection from the omega session
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_session_key = $player_info['player_token'].'_this-item-omega_prototype';
         $player_info['this_item_omega'] = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
         $player_info['player_items_current'] = array();
@@ -1031,7 +1020,6 @@ class rpg_player {
         //foreach ($player_info['this_item_omega'] AS $key => $token){ $player_info['player_items_current'][] = $mmrpg_database_items[$token]; }
 
         // Define this player's stat type boost for display purposes
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $player_info['player_stat_type'] = '';
         if (!empty($player_info['player_energy'])){ $player_info['player_stat_type'] = 'energy'; }
         elseif (!empty($player_info['player_attack'])){ $player_info['player_stat_type'] = 'attack'; }
@@ -1039,7 +1027,6 @@ class rpg_player {
         elseif (!empty($player_info['player_speed'])){ $player_info['player_stat_type'] = 'speed'; }
 
         // Define whether or not field switching is enabled
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_allow_field_switch = mmrpg_prototype_complete($player_info['player_token']) || mmrpg_prototype_complete();
 
         // Collect a temp robot object for printing items
@@ -1048,7 +1035,6 @@ class rpg_player {
         elseif ($player_info['player_token'] == 'dr-cossack'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['proto-man']); }
 
         // Start the output buffer
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         ob_start();
 
         // DEBUG
@@ -1174,7 +1160,6 @@ class rpg_player {
 
                                         // Define the array to hold ALL the reward option markup
                                         $item_rewards_options = '';
-                                        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $item_rewards_options = '.htmlentities($item_rewards_options, ENT_QUOTES, 'UTF-8', true));  }
 
                                         // Collect this player's item rewards and add them to the dropdown
                                         //$player_item_rewards = !empty($player_rewards['player_items']) ? $player_rewards['player_items'] : array();
@@ -1186,7 +1171,6 @@ class rpg_player {
                                         //echo 'before:'.implode(',', array_keys($debug_tokens)).'<br />';
 
                                         // Sort the item index based on item group
-                                        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $player_item_rewards = <pre>'.htmlentities(print_r($player_item_rewards, true), ENT_QUOTES, 'UTF-8', true).'</pre>');  }
                                         uasort($player_item_rewards, array('rpg_player', 'items_sort_for_editor'));
 
                                         // DEBUG
@@ -1200,7 +1184,6 @@ class rpg_player {
                                         // Dont' bother generating option dropdowns if editing is disabled
                                         if ($global_allow_editing){
                                             $player_item_rewards_options = array();
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $player_item_rewards = <pre>'.htmlentities(print_r($player_item_rewards, true), ENT_QUOTES, 'UTF-8', true).'</pre>');  }
                                             foreach ($player_item_rewards AS $temp_item_key => $temp_item_info){
                                                 if (empty($temp_item_info['ability_token'])){ continue; }
                                                 $temp_token = $temp_item_info['ability_token'];
@@ -1210,14 +1193,11 @@ class rpg_player {
                                             }
                                             $player_item_rewards_options = '<optgroup label="Player Items">'.implode('', $player_item_rewards_options).'</optgroup>';
                                             $item_rewards_options .= $player_item_rewards_options;
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $item_rewards_options = '.htmlentities($item_rewards_options, ENT_QUOTES, 'UTF-8', true));  }
 
                                             /*
                                             // Collect this robot's item rewards and add them to the dropdown
                                             $player_item_rewards = !empty($player_rewards['player_items']) ? $player_rewards['player_items'] : array();
                                             $player_item_settings = !empty($player_settings['player_items']) ? $player_settings['player_items'] : array();
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $player_item_rewards = '.implode(',', array_keys($player_item_rewards)));  }
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $player_item_settings = '.implode(',', array_keys($player_item_settings)));  }
                                             foreach ($player_item_settings AS $token => $info){ if (empty($player_item_rewards[$token])){ $player_item_rewards[$token] = $info; } }
                                             if (!empty($player_item_rewards)){ sort($player_item_rewards); }
                                             $player_item_rewards_options = array();
@@ -1230,14 +1210,12 @@ class rpg_player {
                                             }
                                             $player_item_rewards_options = '<optgroup label="Player Items">'.implode('', $player_item_rewards_options).'</optgroup>';
                                             $item_rewards_options .= $player_item_rewards_options;
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $item_rewards_options = '.htmlentities($item_rewards_options, ENT_QUOTES, 'UTF-8', true));  }
                                             */
 
                                             // Add an option at the bottom to remove the ability
                                             $item_rewards_options .= '<optgroup label="Item Actions">';
                                             $item_rewards_options .= '<option value="" title="">- Remove Item -</option>';
                                             $item_rewards_options .= '</optgroup>';
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $item_rewards_options = '.htmlentities($item_rewards_options, ENT_QUOTES, 'UTF-8', true));  }
 
                                         }
 
@@ -1247,12 +1225,10 @@ class rpg_player {
                                         $temp_inputs = array();
                                         $item_key = 0;
                                         if (!empty($player_info['player_items_current'])){
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '!empty($player_info[\'player_items\'])');  }
 
                                             // DEBUG
                                             //echo 'robot-ability:';
                                             foreach ($player_info['player_items_current'] AS $key => $player_item){
-                                                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$player_info[\'player_items\']['.$key.'] = $player_item = <pre>'.htmlentities(print_r($player_item, true), ENT_QUOTES, 'UTF-8', true).'</pre>');  }
                                                 if (empty($player_item['ability_token'])){ continue; }
                                                 elseif ($player_item['ability_token'] == '*'){ continue; }
                                                 elseif ($player_item['ability_token'] == 'ability'){ continue; }
@@ -1362,7 +1338,6 @@ class rpg_player {
 
                                         // Define the array to hold ALL the reward option markup
                                         $field_rewards_options = '';
-                                        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $field_rewards_options = '.htmlentities($field_rewards_options, ENT_QUOTES, 'UTF-8', true));  }
 
                                         // Collect this player's field rewards and add them to the dropdown
                                         //$player_field_rewards = !empty($player_rewards['player_fields']) ? $player_rewards['player_fields'] : array();
@@ -1377,7 +1352,6 @@ class rpg_player {
                                         //echo 'before:'.implode(',', array_keys($debug_tokens)).'<br />';
 
                                         // Sort the field index based on field number
-                                        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $player_field_rewards = <pre>'.htmlentities(print_r($player_field_rewards, true), ENT_QUOTES, 'UTF-8', true).'</pre>');  }
                                         uasort($player_field_rewards, array('rpg_player', 'fields_sort_for_editor'));
 
                                         // DEBUG
@@ -1390,12 +1364,10 @@ class rpg_player {
 
                                         // Don't bother generating the option markup if disabled editing
                                         if ($global_allow_editing){
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                                             // Define the field group index for displau
                                             $temp_group_index = array('MMRPG' => 'Mega Man RPG Fields', 'MM00' => 'Mega Man 0 Fields', 'MM01' => 'Mega Man 1 Fields', 'MM02' => 'Mega Man 2 Fields', 'MM03' => 'Mega Man 3 Fields', 'MM04' => 'Mega Man 4 Fields', 'MM05' => 'Mega Man 5 Fields', 'MM06' => 'Mega Man 6 Fields', 'MM07' => 'Mega Man 7 Fields', 'MM08' => 'Mega Man 8 Fields', 'MM09' => 'Mega Man 9 Fields', 'MM10' => 'Mega Man 10 Fields');
                                             // Loop through the group index and display any fields that match
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $player_field_rewards = <pre>'.htmlentities(print_r($player_field_rewards, true), ENT_QUOTES, 'UTF-8', true).'</pre>');  }
                                             $player_field_rewards_backup = $player_field_rewards;
                                             foreach ($temp_group_index AS $group_key => $group_name){
                                                 $player_field_rewards_options = array();
@@ -1425,20 +1397,16 @@ class rpg_player {
                                         $temp_inputs = array();
                                         $field_key = 0;
                                         if (!empty($player_info['player_fields_current'])){
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                                             // DEBUG
                                             //echo 'player-field:';
                                             $mmrpg_field_index = rpg_field::get_index();
                                             $player_info['player_fields_current'] = $player_info['player_fields_current']; //array_reverse($player_info['player_fields_current']);
                                             foreach ($player_info['player_fields_current'] AS $player_field){
-                                                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                                                 if ($player_field['field_token'] == '*'){ continue; }
                                                 elseif (!isset($mmrpg_field_index[$player_field['field_token']])){ continue; }
                                                 elseif ($field_key > 7){ continue; }
-
-                                                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                                 $this_field = rpg_field::parse_index_info($mmrpg_field_index[$player_field['field_token']]);
                                                 $this_field_token = $this_field['field_token'];
                                                 $this_robot_token = $this_field['field_master'];
@@ -1454,7 +1422,6 @@ class rpg_player {
                                                 } else {
                                                     $this_field_type = '';
                                                 }
-                                                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                                 $this_field_description = !empty($this_field['field_description']) ? $this_field['field_description'] : '';
                                                 $this_field_title = rpg_field::print_editor_title_markup($player_info, $this_field);
                                                 $this_field_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_field_title));
@@ -1462,18 +1429,14 @@ class rpg_player {
                                                 $this_field_title_html = str_replace(' ', '&nbsp;', $this_field_name);
                                                 $temp_select_options = str_replace('value="'.$this_field_token.'"', 'value="'.$this_field_token.'" selected="selected" disabled="disabled"', $field_rewards_options);
                                                 $temp_field_type_class = 'field_type_'.(!empty($this_field['field_type']) ? $this_field['field_type'] : 'none').(!empty($this_field['field_type2']) ? '_'.$this_field['field_type2'] : '');
-                                                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                                 if ($global_allow_editing && $temp_allow_field_switch){ $this_field_title_html = '<label class="field_type  '.$temp_field_type_class.'" style="">'.$this_field_title_html.'</label><select class="field_name" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
                                                 elseif (!$global_allow_editing && $temp_allow_field_switch){ $this_field_title_html = '<label class="field_type  '.$temp_field_type_class.'" style="cursor: default !important;">'.$this_field_title_html.'</label>'; }
                                                 else { $this_field_title_html = '<label class="field_type '.$temp_field_type_class.'" style="cursor: default !important;">'.$this_field_title_html.'</label>'; }
                                                 $temp_string[] = '<a class="field_name field_type '.$temp_field_type_class.'" style="background-image: url(images/fields/'.$this_field_token.'/battle-field_preview.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.(($field_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').(!$temp_allow_field_switch || !$global_allow_editing ? 'cursor: default !important; ' : '').(!$temp_allow_field_switch ? 'opacity: 0.50; filter: alpha(opacity=50); ' : '').'" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-field="'.$this_field_token.'" data-tooltip="'.$this_field_title_tooltip.'">'.$this_field_title_html.'</a>';
-
-                                                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                                 $field_key++;
                                             }
 
                                             if ($field_key <= 7){
-                                                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                                 for ($field_key; $field_key <= 7; $field_key++){
                                                     $empty_field_counter++;
                                                     if ($empty_field_counter >= 2){ $empty_field_disable = true; }
@@ -1486,7 +1449,6 @@ class rpg_player {
 
 
                                         } else {
-                                            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                                             for ($field_key = 0; $field_key <= 7; $field_key++){
                                                 $empty_field_counter++;
@@ -1498,7 +1460,6 @@ class rpg_player {
                                             }
 
                                         }
-                                        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                         // DEBUG
                                         //echo 'temp-string:';
                                         echo !empty($temp_string) ? implode(' ', $temp_string) : '';
@@ -1542,7 +1503,6 @@ class rpg_player {
             $key_counter++;
 
         // Collect the outbut buffer contents
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_markup = trim(ob_get_clean());
 
         // Return the generated markup
