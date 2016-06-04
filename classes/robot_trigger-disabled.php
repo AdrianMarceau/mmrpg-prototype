@@ -191,7 +191,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
     // Filter out robots who were active in this battle in at least some way
     $temp_robots_active = $target_player->values['robots_active'];
-    usort($temp_robots_active, array('mmrpg_player','robot_sort_by_active'));
+    usort($temp_robots_active, array('rpg_player','robot_sort_by_active'));
 
 
     // Define the boost multiplier and start out at zero
@@ -262,7 +262,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     $temp_robots_active_num = count($temp_robots_active);
     $temp_robots_active_num2 = $temp_robots_active_num; // This will be decremented for each non-experience gaining level 100 robots
     $temp_robots_active = array_reverse($temp_robots_active, true);
-    usort($temp_robots_active, array('mmrpg_player', 'robot_sort_by_active'));
+    usort($temp_robots_active, array('rpg_player', 'robot_sort_by_active'));
     $temp_robot_active_position = false;
     foreach ($temp_robots_active AS $temp_id => $temp_info){
         $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new rpg_robot($this, $target_player, $temp_info);

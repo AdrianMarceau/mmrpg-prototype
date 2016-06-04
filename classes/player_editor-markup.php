@@ -256,7 +256,7 @@ ob_start();
 
                 // Sort the item index based on item group
                 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $player_item_rewards = <pre>'.htmlentities(print_r($player_item_rewards, true), ENT_QUOTES, 'UTF-8', true).'</pre>');  }
-                uasort($player_item_rewards, array('mmrpg_player', 'items_sort_for_editor'));
+                uasort($player_item_rewards, array('rpg_player', 'items_sort_for_editor'));
 
                 // DEBUG
                 //echo 'after:'.implode(',', array_keys($player_item_rewards)).'<br />';
@@ -447,7 +447,7 @@ ob_start();
 
                 // Sort the field index based on field number
                 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'player_token:'.$player_info['player_token'].' | robot_token:'.$robot_info['robot_token'].' | $player_field_rewards = <pre>'.htmlentities(print_r($player_field_rewards, true), ENT_QUOTES, 'UTF-8', true).'</pre>');  }
-                uasort($player_field_rewards, array('mmrpg_player', 'fields_sort_for_editor'));
+                uasort($player_field_rewards, array('rpg_player', 'fields_sort_for_editor'));
 
                 // DEBUG
                 //echo 'after:'.implode(',', array_keys($player_field_rewards)).'<br />';
