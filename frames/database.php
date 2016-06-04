@@ -200,13 +200,13 @@ if (true){
     // Loop through all of the robots, one by one, formatting their info
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     foreach($mmrpg_database_robots AS $robot_key => &$robot_info){
-  
+
       // Update the global game counters
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_token = $robot_info['robot_token'];
       if (!isset($database_game_counters[$robot_info['robot_game']])){ $database_game_counters[$robot_info['robot_game']] = array($temp_token); }
       elseif (!in_array($temp_token, $database_game_counters[$robot_info['robot_game']])){ $database_game_counters[$robot_info['robot_game']][] = $temp_token; }
-  
+
       // Update and/or define the encountered, scanned, summoned, and unlocked flags
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       //die('dance <pre>'.print_r($_SESSION[$session_token]['values']['robot_database'], true).'</pre>');
@@ -216,7 +216,7 @@ if (true){
       if (!isset($robot_info['robot_summoned'])){ $robot_info['robot_summoned'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_summoned']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_summoned'] : 0; }
       if (!isset($robot_info['robot_unlocked'])){ $robot_info['robot_unlocked'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_unlocked']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_unlocked'] : 0; }
       if (!isset($robot_info['robot_defeated'])){ $robot_info['robot_defeated'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_defeated']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_defeated'] : 0; }
-  
+
       // Define the page token based on this robot's game of origin
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       if (!isset($robot_info['robot_page_token'])){
@@ -227,7 +227,7 @@ if (true){
         }
         $robot_info['robot_page_token'] = $temp_this_page_token;
       }
-  
+
       // Increment the global robots counters
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $global_robots_counters['total']++;
@@ -235,7 +235,7 @@ if (true){
       if ($robot_info['robot_scanned']){ $global_robots_counters['scanned']['total']++; $global_robots_counters['scanned'][$robot_info['robot_class']]++; }
       if ($robot_info['robot_unlocked']){ $global_robots_counters['unlocked']['total']++; $global_robots_counters['unlocked'][$robot_info['robot_class']]++; }
       elseif ($robot_info['robot_summoned']){ $global_robots_counters['summoned']['total']++; $global_robots_counters['summoned'][$robot_info['robot_class']]++; }
-      
+
     }
     // Return true on success
     return true;
@@ -610,12 +610,12 @@ if (true){
                           ){
                           $temp_string = array();
                           $ability_key = 0;
-                          
+
                           //$temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-                          
+
                           foreach ($robot_ability_rewards AS $this_info){
                             $this_level = $this_info['level'];
-                            $this_ability = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$this_info['token']]);
+                            $this_ability = rpg_ability::parse_index_info($mmrpg_database_abilities[$this_info['token']]);
                             $this_ability_token = $this_ability['ability_token'];
                             $this_ability_name = $this_ability['ability_name'];
                             $this_ability_type = !empty($this_ability['ability_type']) ? $this_ability['ability_type'] : false;
@@ -633,7 +633,7 @@ if (true){
                             //if (!empty($this_ability_description)){ $this_ability_title_plain .= ' | '.$this_ability_description; }
                             $this_ability_title_html = str_replace(' ', '&nbsp;', $this_ability_name);
                             $this_ability_title_html = ($this_level > 1 ? 'Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).' : ' : 'Start : ').$this_ability_title_html;
-                            $this_ability_title = mmrpg_ability::print_editor_title_markup($robot_info, $this_ability);
+                            $this_ability_title = rpg_ability::print_editor_title_markup($robot_info, $this_ability);
                             $this_ability_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_ability_title));
                             $this_ability_title_tooltip = htmlentities($this_ability_title, ENT_QUOTES, 'UTF-8');
                             $temp_string[] = '<span title="'.$this_ability_title_plain.'" data-tooltip="'.$this_ability_title_tooltip.'" class="ability_name ability_type ability_type_'.(!empty($this_ability['ability_type']) ? $this_ability['ability_type'] : 'none').(!empty($this_ability['ability_type2']) ? '_'.$this_ability['ability_type2'] : '').'">'.$this_ability_title_html.'</span>';  //.(($ability_key + 1) % 3 == 0 ? '<br />' : '');
@@ -866,7 +866,7 @@ function windowResizeFrame(){
 
   var newBodyHeight = windowHeight;
   var newFrameHeight = newBodyHeight - headerHeight;
-  
+
   if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
   else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 

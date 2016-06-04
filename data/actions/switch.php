@@ -84,7 +84,7 @@ ob_start();
           if (!isset($temp_abilities_index[$token])){ continue; }
           if ($key > 0 && $key % 4 != 0){ $temp_robot_title .= '&nbsp;|&nbsp;'; }
           if ($key > 0 && $key % 4 == 0){ $temp_robot_title .= '<br /> '; }
-          $info = mmrpg_ability::parse_index_info($temp_abilities_index[$token]);
+          $info = rpg_ability::parse_index_info($temp_abilities_index[$token]);
           $temp_robot_title .= $info['ability_name'];
 
         }

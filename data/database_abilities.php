@@ -43,7 +43,7 @@ foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
   if (true){
 
     // Send this data through the ability index parser
-    $temp_info = mmrpg_ability::parse_index_info($temp_info);
+    $temp_info = rpg_ability::parse_index_info($temp_info);
 
     // Ensure this ability's image exists, else default to the placeholder
     $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;

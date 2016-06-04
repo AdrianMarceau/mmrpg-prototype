@@ -418,7 +418,7 @@ class mmrpg_robot {
         global $mmrpg_index;
         if (empty($robot_token) || empty($ability_token)){ return false; }
         $robot_info = is_array($robot_token) ? $robot_token : mmrpg_robot::get_index_info($robot_token);
-        $ability_info = is_array($ability_token) ? $ability_token : mmrpg_ability::get_index_info($ability_token);
+        $ability_info = is_array($ability_token) ? $ability_token : rpg_ability::get_index_info($ability_token);
         if (empty($robot_info) || empty($ability_info)){ return false; }
         $robot_token = $robot_info['robot_token'];
         $ability_token = $ability_info['ability_token'];
@@ -610,7 +610,7 @@ class mmrpg_robot {
         $temp_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         foreach ($this_robot->robot_abilities AS $key => $token){
             if (!in_array($token, $options)){
-                $info = mmrpg_ability::parse_index_info($temp_ability_index[$token]);
+                $info = rpg_ability::parse_index_info($temp_ability_index[$token]);
                 $value = 3;
                 if (!empty($this_robot->robot_core) && !empty($info['ability_type'])){
                     if ($this_robot->robot_core == $info['ability_type']){ $value = 50; }
@@ -760,9 +760,9 @@ class mmrpg_robot {
                         unset($this->robot_attachments[$attachment_token]);
                         $this->update_session();
                         if ($attachment_info['attachment_destroy'] !== false){
-                            $temp_ability = mmrpg_ability::parse_index_info($temp_attachments_index[$attachment_info['ability_token']]);
+                            $temp_ability = rpg_ability::parse_index_info($temp_attachments_index[$attachment_info['ability_token']]);
                             $attachment_info = array_merge($temp_ability, $attachment_info);
-                            $temp_attachment = new mmrpg_ability($this->battle, $this->player, $this, $attachment_info);
+                            $temp_attachment = new rpg_ability($this->battle, $this->player, $this, $attachment_info);
                             $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
@@ -849,7 +849,7 @@ class mmrpg_robot {
         if ($attachment_info['class'] == 'ability'){
 
             // Create the temporary ability object
-            $this_ability = new mmrpg_ability($this->battle, $this->player, $this, array('ability_token' => $attachment_info['ability_token']));
+            $this_ability = new rpg_ability($this->battle, $this->player, $this, array('ability_token' => $attachment_info['ability_token']));
 
             // Update this robot's history with the triggered attachment
             $this->history['triggered_attachments'][] = 'ability_'.$this_ability->ability_token;

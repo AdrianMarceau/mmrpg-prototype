@@ -293,7 +293,7 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
         if ($attachment_info['class'] == 'ability'){
           // Create the temporary ability object using the provided data and generate its markup data
           //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-          $this_ability = new mmrpg_ability($this, $eventinfo['this_player'], $this_robot, $attachment_info);
+          $this_ability = new rpg_ability($this, $eventinfo['this_player'], $this_robot, $attachment_info);
           // Define this ability data array and generate the markup data
           $this_attachment_options = $this_options;
           $this_attachment_options['data_sticky'] = !empty($this_options['sticky']) || !empty($attachment_info['sticky']) ? true : false;
@@ -397,7 +397,7 @@ if ($options['canvas_show_target_robots'] && !empty($eventinfo['target_player']-
         if ($attachment_info['class'] == 'ability'){
           // Create the target's temporary ability object using the provided data
           //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-          $target_ability = new mmrpg_ability($this, $eventinfo['target_player'], $target_robot, $attachment_info);
+          $target_ability = new rpg_ability($this, $eventinfo['target_player'], $target_robot, $attachment_info);
           // Define this ability data array and generate the markup data
           $target_attachment_options = $target_options;
           $target_attachment_options['sticky'] = isset($attachment_info['sticky']) ? $attachment_info['sticky'] : false;

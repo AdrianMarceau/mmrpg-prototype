@@ -84,7 +84,7 @@ else {
     if ($robot_level < ($group_key * 10)){ break; }
     foreach ($group_abilities AS $ability_key => $ability_token){
       if (in_array($ability_token, $this_robot_abilities) || in_array($ability_token, $this_robot_abilities_addons['weapons']) || in_array($ability_token, $this_robot_abilities_addons['support'])){ continue; }
-      $ability_info = mmrpg_ability::parse_index_info($this_ability_index[$ability_token]);
+      $ability_info = rpg_ability::parse_index_info($this_ability_index[$ability_token]);
       $is_compatible = false;
       if (in_array($ability_token, $this_robot_index['robot_abilities'])){
         $is_compatible = true;
@@ -106,7 +106,7 @@ else {
     foreach ($group_abilities AS $ability_key => $ability_token){
       if ($robot_level < ($ability_key * 10)){ break; }
       if (in_array($ability_token, $this_robot_abilities) || in_array($ability_token, $this_robot_abilities_addons['support'])){ continue; }
-      $ability_info = mmrpg_ability::parse_index_info($this_ability_index[$ability_token]);
+      $ability_info = rpg_ability::parse_index_info($this_ability_index[$ability_token]);
       $is_compatible = false;
       if (in_array($ability_token, $this_robot_index['robot_abilities'])){ $is_compatible = true; }
       elseif (!empty($this_robot_index['robot_core']) && $this_robot_index['robot_core'] == 'copy'){ $is_compatible = true; }

@@ -62,7 +62,7 @@ $ability = array(
         // Loop through the opponent's ability history in reverse
         $num_triggered_abilities = count($target_robot->history['triggered_abilities']);
         $new_ability_token = $target_robot->history['triggered_abilities'][$num_triggered_abilities - 1];
-        $new_ability_info = mmrpg_ability::get_index_info($new_ability_token);
+        $new_ability_info = rpg_ability::get_index_info($new_ability_token);
 
         // Skip these abilities as they cannot be copied
 
@@ -83,7 +83,7 @@ $ability = array(
           $this_player->player_frame = 'victory';
           $this_player->update_session();
           // Create the ability object to trigger data loading
-          $this_new_ability = new mmrpg_ability($this_battle, $this_player, $this_robot, $new_ability_info);
+          $this_new_ability = new rpg_ability($this_battle, $this_player, $this_robot, $new_ability_info);
           $this_new_ability->update_session();
           // Create an event displaying the new copied ability
           //$event_header = $this_robot->robot_name.'&#39;s '.$this_ability->ability_name;

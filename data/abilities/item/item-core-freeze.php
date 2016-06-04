@@ -14,7 +14,7 @@ $ability = array(
   'ability_accuracy' => 100,
   'ability_target' => 'select_target',
   'ability_function' => function($objects){
-    return mmrpg_ability::item_function_core($objects);
+    return rpg_ability::item_function_core($objects);
   }
   );
 ?>

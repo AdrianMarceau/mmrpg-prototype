@@ -15,7 +15,7 @@ $ability = array(
     'ability_function' => function($objects){
 
         // Call a global ability function with customized options
-        return mmrpg_ability::ability_function_forward_attack($objects,
+        return rpg_ability::ability_function_forward_attack($objects,
             // Target options
             array(
                 'robot_frame' => 'shoot',

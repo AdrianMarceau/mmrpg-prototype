@@ -872,7 +872,7 @@ class mmrpg_battle {
                             unset($temp_robot->robot_attachments[$attachment_token]);
                             $temp_robot->update_session();
                             if ($attachment_info['attachment_destroy'] !== false){
-                                $temp_attachment = new mmrpg_ability($this_battle, $this_player, $temp_robot, array('ability_token' => $attachment_info['ability_token']));
+                                $temp_attachment = new rpg_ability($this_battle, $this_player, $temp_robot, array('ability_token' => $attachment_info['ability_token']));
                                 $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                                 //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
                                 //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));

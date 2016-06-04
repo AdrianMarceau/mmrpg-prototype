@@ -290,9 +290,9 @@ if ($target_player->player_side == 'left'){
                 if ($temp_player_points >= $ability_reward_info['points'] && empty($_SESSION['GAME']['DEMO'])){
 
                     // Collect the ability info from the index
-                    $ability_info = mmrpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
+                    $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
                     // Create the temporary ability object for event creation
-                    $temp_ability = new mmrpg_ability($this, $target_player, $target_robot, $ability_info);
+                    $temp_ability = new rpg_ability($this, $target_player, $target_robot, $ability_info);
 
                     // Collect or define the ability variables
                     $temp_ability_token = $ability_info['ability_token'];
@@ -459,9 +459,9 @@ if ($this_player->player_side == 'left'){
                 if ($temp_player_points >= $ability_reward_info['points']){
 
                     // Collect the ability info from the index
-                    $ability_info = mmrpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
+                    $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
                     // Create the temporary ability object for event creation
-                    $temp_ability = new mmrpg_ability($this, $this_player, $this_robot, $ability_info);
+                    $temp_ability = new rpg_ability($this, $this_player, $this_robot, $ability_info);
 
                     // Collect or define the ability variables
                     $temp_ability_token = $ability_info['ability_token'];
@@ -657,9 +657,9 @@ if ($this_player->player_side == 'left'){
         foreach ($this_ability_rewards AS $ability_reward_key => $ability_reward_info){
 
             // Collect the ability info from the index
-            $ability_info = mmrpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
+            $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
             // Create the temporary robot object for event creation
-            $temp_ability = new mmrpg_ability($this, $this_player, $this_robot, $ability_info);
+            $temp_ability = new rpg_ability($this, $this_player, $this_robot, $ability_info);
 
             // Collect or define the robot points and robot rewards variables
             $this_ability_token = $ability_info['ability_token'];

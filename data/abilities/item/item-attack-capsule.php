@@ -17,7 +17,7 @@ $ability = array(
     'ability_function' => function($objects){
 
         // Call the global stat booster item function
-        return mmrpg_ability::item_function_stat_booster($objects);
+        return rpg_ability::item_function_stat_booster($objects);
 
         }
     );

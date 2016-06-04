@@ -85,9 +85,9 @@ ob_start();
           // Create the ability object using the session/index data
           //$temp_iteminfo = array('ability_token' => $item_token);
           $temp_iteminfo = $temp_items_index[$item_token];
-          $temp_iteminfo = mmrpg_ability::parse_index_info($temp_iteminfo);
+          $temp_iteminfo = rpg_ability::parse_index_info($temp_iteminfo);
           //$temp_iteminfo['ability_id'] = $this_player->player_id.str_pad($temp_iteminfo['ability_id'], 3, '0', STR_PAD_LEFT);
-          $temp_item = new mmrpg_ability($this_battle, $this_player, $this_robot, $temp_iteminfo);
+          $temp_item = new rpg_ability($this_battle, $this_player, $this_robot, $temp_iteminfo);
           $temp_type = $temp_item->ability_type;
           $temp_type2 = $temp_item->ability_type2;
           $temp_damage = $temp_item->ability_damage;

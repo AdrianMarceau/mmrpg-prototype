@@ -56,7 +56,7 @@ foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token
         $allowed_edit_robots[] = $robot_info;
         foreach ($robot_info['robot_abilities'] AS $ability_token => $ability_info){
             if (!isset($mmrpg_database_abilities[$ability_token])){ continue; }
-            $ability_index = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$ability_token]);
+            $ability_index = rpg_ability::parse_index_info($mmrpg_database_abilities[$ability_token]);
             if (empty($ability_index)){ continue; }
             $ability_info = array_merge($ability_index, $ability_info);
             $allowed_edit_data[$player_token]['player_robots'][$robot_token]['robot_abilities'][$ability_token] = $ability_info;
@@ -115,7 +115,7 @@ foreach ($battle_settings AS $player_token => $player_info_raw){
         $allowed_edit_robots[] = $robot_info;
         foreach ($robot_info['robot_abilities'] AS $ability_token => $ability_info){
             if (!isset($mmrpg_database_abilities[$ability_token])){ continue; }
-            $ability_index = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$ability_token]);
+            $ability_index = rpg_ability::parse_index_info($mmrpg_database_abilities[$ability_token]);
             if (empty($ability_index)){ continue; }
             $ability_info = array_merge($ability_index, $ability_info);
             $allowed_edit_data[$player_token]['player_robots'][$robot_token]['robot_abilities'][$ability_token] = $ability_info;

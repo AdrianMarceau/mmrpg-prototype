@@ -1,6 +1,6 @@
 <?
 // Define a class for the abilities
-class mmrpg_ability {
+class rpg_ability {
 
     // Define global class variables
     public $flags;
@@ -9,7 +9,7 @@ class mmrpg_ability {
     public $history;
 
     // Define the constructor class
-    public function mmrpg_ability(){
+    public function rpg_ability(){
 
         // Collect any provided arguments
         $args = func_get_args();
@@ -90,7 +90,7 @@ class mmrpg_ability {
             $temp_backup_id = $this_abilityinfo['ability_id'];
             if (empty($this_abilityinfo_backup['_parsed'])){
                 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                $this_abilityinfo = mmrpg_ability::get_index_info($this_abilityinfo_backup['ability_token']);
+                $this_abilityinfo = self::get_index_info($this_abilityinfo_backup['ability_token']);
                 if (empty($this_abilityinfo['ability_id'])){
                     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_abilityinfo_backup:: '."\n".print_r($this_abilityinfo_backup, true));  }
                     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_abilityinfo:: '."\n".print_r($this_abilityinfo, true));  }
@@ -739,7 +739,7 @@ class mmrpg_ability {
         // Collect the data from the index or the database if necessary
         if (!is_string($ability_token)){ return false; }
         $ability_info = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_token IN ('{$ability_token}');", 'ability_token');
-        if (!empty($ability_info)){ $ability_info = mmrpg_ability::parse_index_info($ability_info[$ability_token]); }
+        if (!empty($ability_info)){ $ability_info = self::parse_index_info($ability_info[$ability_token]); }
         else { $ability_info = array(); }
         return $ability_info;
     }

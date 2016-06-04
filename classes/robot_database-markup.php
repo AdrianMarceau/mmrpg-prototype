@@ -580,7 +580,7 @@ ob_start();
                     //if (!empty($this_ability_recovery)){ $this_ability_title_plain .= ' | '.$this_ability_recovery.' Recovery'; }
                     //if (!empty($this_ability_accuracy)){ $this_ability_title_plain .= ' | '.$this_ability_accuracy.'% Accuracy'; }
                     //if (!empty($this_ability_description)){ $this_ability_title_plain .= ' | '.$this_ability_description; }
-                    $this_ability_title_plain = mmrpg_ability::print_editor_title_markup($robot_info, $this_ability);
+                    $this_ability_title_plain = rpg_ability::print_editor_title_markup($robot_info, $this_ability);
                     $this_ability_method = 'level';
                     $this_ability_method_text = 'Level Up';
                     $this_ability_title_html = '<strong class="name">'.$this_ability_name.'</strong>';

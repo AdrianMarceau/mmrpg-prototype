@@ -64,7 +64,7 @@ if (!empty($this_current_token)){
     }
 
     // Collect the markup for this ability and print it to the browser
-    $temp_ability_markup = mmrpg_ability::print_database_markup($ability_info, array('show_key' => $key_counter));
+    $temp_ability_markup = rpg_ability::print_database_markup($ability_info, array('show_key' => $key_counter));
     echo $temp_ability_markup;
     $key_counter++;
     break;
@@ -125,7 +125,7 @@ if (empty($this_current_token)){
     $this_ability_image = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
     if ($this_ability_image == 'ability'){ $this_seo_abilities = 'noindex'; }
     // Collect the markup for this ability and print it to the browser
-    $temp_ability_markup = mmrpg_ability::print_database_markup($ability_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+    $temp_ability_markup = rpg_ability::print_database_markup($ability_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
     echo $temp_ability_markup;
     $key_counter++;
   }
