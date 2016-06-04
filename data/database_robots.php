@@ -36,8 +36,8 @@ if (!empty($hidden_database_robots)){
 
 
 // Collect the database robots and fields
-$mmrpg_database_fields = $DB->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
-$mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition};", 'robot_token');
+$mmrpg_database_fields = $db->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
+$mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition};", 'robot_token');
 
 // Remove unallowed robots from the database, and increment type counters
 foreach ($mmrpg_database_robots AS $temp_token => $temp_info){

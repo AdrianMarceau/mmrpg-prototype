@@ -19,7 +19,7 @@ if (!empty($hidden_database_fields)){
 }
 
 // Collect the database fields
-$mmrpg_database_fields = $DB->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1 {$temp_condition};", 'field_token');
+$mmrpg_database_fields = $db->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_published = 1 {$temp_condition};", 'field_token');
 
 // Remove unallowed fields from the database
 foreach ($mmrpg_database_fields AS $temp_token => $temp_info){

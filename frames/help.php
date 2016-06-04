@@ -136,7 +136,7 @@ function windowResizeLeaderboard(){
 
   var newBodyHeight = windowHeight;
   var newFrameHeight = newBodyHeight - headerHeight;
-  
+
   if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
   else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 
@@ -204,7 +204,7 @@ function windowResizeLeaderboard(){
 // Google Analytics
 if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
 // Unset the database variable
-unset($DB);
+unset($db);
 ?>
 </body>
 </html>

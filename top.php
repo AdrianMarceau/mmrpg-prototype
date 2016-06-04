@@ -50,9 +50,9 @@ require('classes/database.php');
 // Create the global database object
 if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG'] = array(); }
-    $DB = new plutocms_database();
+    $db = new cms_database();
     // If the database could not be created, critical error mode!
-    if ($DB->CONNECT === false){
+    if ($db->CONNECT === false){
         define('MMRPG_CRITICAL_ERROR', true);
         $_GET = array();
         $_GET['page'] = 'error';

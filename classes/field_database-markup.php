@@ -1,7 +1,7 @@
 <?
 
 // Define the global variables
-global $DB;
+global $db;
 global $mmrpg_index, $this_current_uri, $this_current_url;
 global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_mechas, $mmrpg_database_abilities, $mmrpg_database_types;
 
@@ -76,9 +76,9 @@ ob_start();
 ?>
 <div class="database_container database_field_container" data-token="<?=$field_info['field_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
   <a class="anchor" id="<?=$field_info['field_token']?>">&nbsp;</a>
-  
+
   <div class="subbody event event_triple event_visible" data-token="<?=$field_info['field_token']?>" style="min-height: 90px; <?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
-    
+
     <? if($print_options['show_icon']): ?>
       <div class="this_sprite sprite_left" style="height: 40px;">
         <? if($print_options['show_key'] !== false): ?>
@@ -91,7 +91,7 @@ ob_start();
         <? }?>
       </div>
     <? endif; ?>
-    
+
     <? if($print_options['show_basics']): ?>
       <h2 class="header header_left field_type_<?= $field_type_token ?>" style="margin-right: 0;">
         <? if($print_options['layout_style'] == 'website_compact'): ?>
@@ -236,11 +236,11 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
 
     <? if($print_options['show_description'] && !empty($field_info['field_description2'])): ?>
-      
+
       <h2 class="header header_left field_type_<?= $field_type_token ?>" style="margin-right: 0;">
         <?= $field_info['field_name'] ?>&#39;s Description
       </h2>
@@ -258,12 +258,12 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
-    
+
 
     <? if($print_options['show_sprites'] && $field_image_token != 'field'): ?>
-    
+
       <h2 class="header header_full field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
         <?= $field_info['field_name'].(!preg_match('/s$/i', $field_info['field_name']) ? '&#39;s' : '&#39;') ?> Sprites
       </h2>
@@ -298,19 +298,19 @@ ob_start();
         }
         ?>
       </div>
-            
+
     <? endif; ?>
 
     <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
       <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
       <a class="link link_permalink permalink" href="database/fields/<?= $field_info['field_token'] ?>/" rel="permalink">+ Permalink</a>
-    
+
     <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
       <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
       <a class="link link_permalink permalink" href="database/fields/<?= $field_info['field_token'] ?>/" rel="permalink">+ View More</a>
-      
+
     <? endif; ?>
 
   </div>

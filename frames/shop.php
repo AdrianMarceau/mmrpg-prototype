@@ -1376,5 +1376,5 @@ if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
 // Require the remote bottom in case we're in viewer mode
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_bottom.php');
 // Unset the database variable
-unset($DB);
+unset($db);
 ?>

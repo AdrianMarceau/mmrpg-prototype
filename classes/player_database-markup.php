@@ -1,7 +1,7 @@
 <?
 
 // Define the global variables
-global $DB;
+global $db;
 global $mmrpg_index, $this_current_uri, $this_current_url;
 global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities, $mmrpg_database_types;
 
@@ -255,7 +255,7 @@ ob_start();
                   $ability_method_key = 0;
                   $ability_method = '';
                   $temp_robot_info = rpg_robot::get_index_info('mega-man');
-                  $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                  $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
                   foreach ($player_ability_rewards AS $this_info){
                     $this_points = $this_info['points'];
                     $this_ability = rpg_ability::parse_index_info($temp_abilities_index[$this_info['token']]);

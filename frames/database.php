@@ -611,7 +611,7 @@ if (true){
                           $temp_string = array();
                           $ability_key = 0;
 
-                          //$temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                          //$temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
                           foreach ($robot_ability_rewards AS $this_info){
                             $this_level = $this_info['level'];
@@ -931,5 +931,5 @@ if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
 // Require the remote bottom in case we're in viewer mode
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_bottom.php');
 // Unset the database variable
-unset($DB);
+unset($db);
 ?>

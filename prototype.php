@@ -50,7 +50,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
     // DEBUG DEBUG DEBUG
 
     //header('Location: prototype.php');
-    unset($DB);
+    unset($db);
     exit('success');
 
 }
@@ -69,7 +69,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
     mmrpg_save_game_session($this_save_filepath);
 
     //header('Location: prototype.php');
-    unset($DB);
+    unset($db);
     exit('success');
 
 }
@@ -102,7 +102,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
     mmrpg_reset_game_session($this_save_filepath);
 
     // Exit on success
-    unset($DB);
+    unset($db);
     exit('success');
 
 }
@@ -138,10 +138,10 @@ if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
     $mmrpg_index_players = $mmrpg_index['players'];
 
     // Collect the robot index for calculation purposes
-    $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
     // Collect the ability index for calculation purposes
-    $this_ability_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
     // DEBUG PLAYERS / ABILITIES
     foreach ($mmrpg_index_players AS $player_token => $player_info){
@@ -557,11 +557,11 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (empty($_SESSION[$session_token]['DEMO'])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_query = 'UPDATE mmrpg_users SET user_date_accessed = '.time().' WHERE user_id = '.$_SESSION[$session_token]['USER']['userid'];
-    $temp_result = $DB->query($temp_query);
+    $temp_result = $db->query($temp_query);
 }
 */
 // If there were any events in the session, automatically add remove them from the session
 if (!empty($_SESSION[$session_token]['EVENTS'])){ $_SESSION[$session_token]['EVENTS'] = array(); }
 // Unset the database variable
-unset($DB);
+unset($db);
 ?>

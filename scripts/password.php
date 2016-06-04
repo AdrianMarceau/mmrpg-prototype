@@ -2,7 +2,7 @@
 // Require the application top file
 require_once('../top.php');
 // Unset the database variable
-unset($DB);
+unset($db);
 
 // Collect the password string from the URL, if set
 $password_string = !empty($_REQUEST['password']) ? $_REQUEST['password'] : false;

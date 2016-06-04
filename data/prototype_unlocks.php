@@ -777,8 +777,8 @@ if ($battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 $temp_battles_query = "SELECT mmrpg_battles.*, mmrpg_users.user_name AS this_user_name, mmrpg_users.user_name_clean AS this_user_name_clean, mmrpg_users.user_name_public AS this_user_name_public FROM mmrpg_battles ";
 $temp_battles_query .= "LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_battles.this_user_id ";
 $temp_battles_query .= "WHERE mmrpg_battles.target_user_id = {$this_userid} AND mmrpg_battles.target_reward_pending = 1";
-$temp_battles_list = $DB->get_array_list($temp_battles_query);
-$temp_userinfo = $this_userinfo; //$DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+$temp_battles_list = $db->get_array_list($temp_battles_query);
+$temp_userinfo = $this_userinfo; //$db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
 
 // If the player has pending battle rewards, loop through and display window events
 if (!empty($temp_battles_list)){
@@ -844,7 +844,7 @@ if (!empty($temp_battles_list)){
     $_SESSION[$session_token]['counters']['battle_zenny'] += $temp_inc_zenny;
 
     // Update the leaderboard to remove the pending points and add them to the totals
-    $DB->update('mmrpg_battles', array(
+    $db->update('mmrpg_battles', array(
       'target_reward_pending' => 0
       ), "battle_id = {$temp_battleinfo['battle_id']}");
 

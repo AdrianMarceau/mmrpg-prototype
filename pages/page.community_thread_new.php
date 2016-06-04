@@ -57,10 +57,10 @@ if (!empty($this_current_target) && $this_category_info['category_id'] != 0){
 // If the target is not empty, collect the user info
 if (!empty($this_current_target)){
   $temp_user_name = strtolower(trim($this_current_target));
-  $target_user_info = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$temp_user_name}' LIMIT 1");
+  $target_user_info = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$temp_user_name}' LIMIT 1");
 } elseif (!empty($this_thread_info['thread_target'])){
   $temp_user_id = (int)($this_thread_info['thread_target']);
-  $target_user_info = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id} LIMIT 1");
+  $target_user_info = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id} LIMIT 1");
 }
 // Ensure it's an array, even if it was empty (redirect if personal messsage, userinfo is required)
 if (empty($target_user_info)){
@@ -97,7 +97,7 @@ if (empty($target_user_info)){
         $temp_avatar_guest = $this_userid == MMRPG_SETTINGS_GUEST_ID ? true : false;
         $temp_avatar_name = (!empty($this_userinfo['user_name_public']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']);
         $temp_avatar_title = '#'.$this_userid.' : '.$temp_avatar_name;
-        
+
         // Define the avatar class and path variables
         $temp_avatar_path = !$temp_avatar_guest ? (!empty($this_userinfo['user_image_path']) ? $this_userinfo['user_image_path'] : 'robots/mega-man/40') : 'robots/robot/40';  //!empty($this_thread_info['user_image_path']) ? $this_thread_info['user_image_path'] : 'robots/mega-man/40';
         list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
@@ -116,9 +116,9 @@ if (empty($target_user_info)){
         $temp_thread_locked = false;
         $temp_thread_sticky = false;
         if (!empty($temp_thread_id)){
-          $temp_thread_info = $DB->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = {$temp_thread_id}");
+          $temp_thread_info = $db->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = {$temp_thread_id}");
           $temp_user_id = !empty($temp_thread_info['user_id']) ? $temp_thread_info['user_id'] : $this_userinfo['user_id'];
-          $temp_user_info = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id}");
+          $temp_user_info = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id}");
           $temp_thread_name = !empty($temp_thread_info['thread_name']) ? htmlentities($temp_thread_info['thread_name'], ENT_QUOTES, 'UTF-8', true) : '';
           $temp_thread_body = !empty($temp_thread_info['thread_body']) ? htmlentities($temp_thread_info['thread_body'], ENT_QUOTES, 'UTF-8', true) : '';
           $temp_avatar_frame = !empty($temp_thread_info['thread_frame']) ? $temp_thread_info['thread_frame'] : $temp_avatar_frame;
@@ -137,7 +137,7 @@ if (empty($target_user_info)){
         $temp_avatar_class = 'avatar avatar_80x80 float float_left avatar_selector ';
         $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_'.$temp_avatar_frame;
         $temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_right_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
-        
+
         ?>
         <input type="hidden" class="hidden" name="formaction" value="thread" />
         <input type="hidden" class="hidden" name="category_id" value="<?= $this_category_info['category_id'] ?>" />
@@ -218,7 +218,7 @@ if (empty($target_user_info)){
       <? endif; ?>
     </form>
   </div>
-  
+
 </div>
 <?
 

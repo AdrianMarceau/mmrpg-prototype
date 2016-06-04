@@ -32,13 +32,13 @@ class rpg_battle {
     // Define a public function for updating index info
     public static function update_index_info($battle_token, $battle_info){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "update_index_info('{$battle_token}', \$battle_info)");  }
-        global $DB;
+        global $db;
 
         // If the internal index has not been created yet, load it into memory
-        if (!isset($DB->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
+        if (!isset($db->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
 
         // Update and/or overwrite the current info in the index
-        $DB->INDEX['BATTLES'][$battle_token] = json_encode($battle_info);
+        $db->INDEX['BATTLES'][$battle_token] = json_encode($battle_info);
         // Update the data in the session as well with provided
         $_SESSION['GAME']['values']['battle_index'][$battle_token] = json_encode($battle_info);
 
@@ -50,15 +50,15 @@ class rpg_battle {
     // Define a public function requesting a battle index entry
     public static function get_index_info($battle_token){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index_info('{$battle_token}')");  }
-        global $DB;
+        global $db;
 
         // If the internal index has not been created yet, load it into memory
-        if (!isset($DB->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
+        if (!isset($db->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
 
         // If the requested index is not empty, return the entry
-        if (!empty($DB->INDEX['BATTLES'][$battle_token])){
+        if (!empty($db->INDEX['BATTLES'][$battle_token])){
             // Decode the info and return the array
-            $battle_info = json_decode($DB->INDEX['BATTLES'][$battle_token], true);
+            $battle_info = json_decode($db->INDEX['BATTLES'][$battle_token], true);
             //die('$battle_info = <pre>'.print_r($battle_info, true).'</pre>');
             return $battle_info;
         }
@@ -73,9 +73,9 @@ class rpg_battle {
     // Define a function for loading the battle index cache file
     public static function load_battle_index(){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "load_battle_index()");  }
-        global $DB;
+        global $db;
         // Create the index as an empty array
-        $DB->INDEX['BATTLES'] = array();
+        $db->INDEX['BATTLES'] = array();
         // Default the battles index to an empty array
         $mmrpg_battles_index = array();
         // If caching is turned OFF, or a cache has not been created
@@ -97,11 +97,11 @@ class rpg_battle {
         // Return false if we got nothing from the index
         if (empty($mmrpg_battles_index)){ return false; }
         // Loop through the battles and index them after serializing
-        foreach ($mmrpg_battles_index AS $token => $array){ $DB->INDEX['BATTLES'][$token] = json_encode($array); }
+        foreach ($mmrpg_battles_index AS $token => $array){ $db->INDEX['BATTLES'][$token] = json_encode($array); }
         // Additionally, include any dynamic session-based battles
         if (!empty($_SESSION['GAME']['values']['battle_index'])){
             // The session-based battles exist, so merge them with the index
-            $DB->INDEX['BATTLES'] = array_merge($DB->INDEX['BATTLES'], $_SESSION['GAME']['values']['battle_index']);
+            $db->INDEX['BATTLES'] = array_merge($db->INDEX['BATTLES'], $_SESSION['GAME']['values']['battle_index']);
         }
         // Return true on success
         return true;
@@ -455,13 +455,13 @@ class rpg_battle {
 
     // Define a public function for triggering battle actions
     public function battle_complete_trigger(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_token = ''){
-        global $mmrpg_index, $DB;
+        global $mmrpg_index, $db;
         require('battle_battle-complete-trigger.php');
     }
 
     // Define a public function for triggering battle actions
     public function actions_trigger(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_token = ''){
-        global $DB;
+        global $db;
         // Default the return variable to false
         $this_return = false;
         // Require the actual code file

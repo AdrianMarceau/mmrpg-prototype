@@ -18,9 +18,9 @@ require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
 
 //require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
-$mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 ORDER BY robot_game ASC, robot_number ASC;", 'robot_token');
+$mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 ORDER BY robot_game ASC, robot_number ASC;", 'robot_token');
 //require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
-$mmrpg_database_abilities = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 ORDER BY ability_order ASC;", 'ability_token');
+$mmrpg_database_abilities = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 ORDER BY ability_order ASC;", 'ability_token');
 //require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
 //
 // Collect the editor flag if set
@@ -421,5 +421,5 @@ if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
 // Require the remote bottom in case we're in viewer mode
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_bottom.php');
 // Unset the database variable
-unset($DB);
+unset($db);
 ?>

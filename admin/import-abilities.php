@@ -115,9 +115,9 @@ if (!empty($mmrpg_index['abilities'])){
 
     // Check if this ability already exists in the database
     $temp_success = true;
-    $temp_exists = $DB->get_array("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_token LIKE '{$temp_insert_array['ability_token']}' LIMIT 1") ? true : false;
-    if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_abilities', $temp_insert_array); }
-    else { $temp_success = $DB->update('mmrpg_index_abilities', $temp_insert_array, array('ability_token' => $temp_insert_array['ability_token'])); }
+    $temp_exists = $db->get_array("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_token LIKE '{$temp_insert_array['ability_token']}' LIMIT 1") ? true : false;
+    if (!$temp_exists){ $temp_success = $db->insert('mmrpg_index_abilities', $temp_insert_array); }
+    else { $temp_success = $db->update('mmrpg_index_abilities', $temp_insert_array, array('ability_token' => $temp_insert_array['ability_token'])); }
 
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';

@@ -1,6 +1,6 @@
 <?
 // Define the global variables
-global $mmrpg_index, $this_current_uri, $this_current_url, $DB;
+global $mmrpg_index, $this_current_uri, $this_current_url, $db;
 global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities, $mmrpg_database_types;
 static $mmrpg_database_fields;
 if (empty($mmrpg_database_fields)){ $mmrpg_database_fields = rpg_field::get_index(); }
@@ -651,9 +651,9 @@ ob_start();
       <div class="body body_full" style="margin: 0 auto 5px; padding: 2px 0; min-height: 10px;">
         <?
         // Collect the database records for this robot
-        global $DB;
+        global $db;
         $temp_robot_records = array('robot_encountered' => 0, 'robot_defeated' => 0, 'robot_unlocked' => 0, 'robot_summoned' => 0, 'robot_scanned' => 0);
-        //$temp_robot_records['player_count'] = $DB->get_value("SELECT COUNT(board_id) AS player_count  FROM mmrpg_leaderboard WHERE board_robots LIKE '%[".$robot_info['robot_token'].":%' AND board_points > 0", 'player_count');
+        //$temp_robot_records['player_count'] = $db->get_value("SELECT COUNT(board_id) AS player_count  FROM mmrpg_leaderboard WHERE board_robots LIKE '%[".$robot_info['robot_token'].":%' AND board_points > 0", 'player_count');
         $temp_player_query = "SELECT
           mmrpg_saves.user_id,
           mmrpg_saves.save_values_robot_database,
@@ -661,7 +661,7 @@ ob_start();
         	FROM mmrpg_saves
           LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_saves.user_id
           WHERE mmrpg_saves.save_values_robot_database LIKE '%\"{$robot_info['robot_token']}\"%' AND mmrpg_leaderboard.board_points > 0;";
-        $temp_player_list = $DB->get_array_list($temp_player_query);
+        $temp_player_list = $db->get_array_list($temp_player_query);
         if (!empty($temp_player_list)){
           foreach ($temp_player_list AS $temp_data){
             $temp_values = !empty($temp_data['save_values_robot_database']) ? json_decode($temp_data['save_values_robot_database'], true) : array();

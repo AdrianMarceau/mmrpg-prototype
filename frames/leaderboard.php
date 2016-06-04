@@ -203,7 +203,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && empty($temp_game_flags[$temp_eve
 // Google Analytics
 if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
 // Unset the database variable
-unset($DB);
+unset($db);
 ?>
 </body>
 </html>

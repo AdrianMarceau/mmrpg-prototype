@@ -7,7 +7,7 @@ $this_start_key = !empty($_GET['start']) ? trim($_GET['start']) : 0;
 
 // Define a function for parsing the leaderboard data
 function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
-    global $DB, $mmrpg_index;
+    global $db, $mmrpg_index;
     global $this_userid, $this_userinfo, $this_boardinfo;
     global $this_display_limit, $this_num_offset;
     global $this_time, $this_start_key;
@@ -103,7 +103,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
                 $this_awards_string = implode(',', $this_awards);
             }
             if (!empty($this_awards_string)){
-                $DB->query("UPDATE mmrpg_leaderboard SET board_awards = '{$this_awards_string}' WHERE user_id = {$board['user_id']};");
+                $db->query("UPDATE mmrpg_leaderboard SET board_awards = '{$this_awards_string}' WHERE user_id = {$board['user_id']};");
             }
 
             // -- LEADERBOARD MARKUP -- //
@@ -194,7 +194,7 @@ $temp_leaderboard_query = "SELECT
     ";
 
 // Query the database and collect the array list of all non-bogus players
-$this_leaderboard_index = $DB->get_array_list($temp_leaderboard_query);
+$this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
 
 // Loop through the save file directory and generate an index
 $this_cache_stamp = MMRPG_CONFIG_CACHE_DATE.'_'.substr(date('YmdHi'), 0, 11); //2013 01 01 23 59 (12 length)

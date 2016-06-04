@@ -9,8 +9,8 @@ ob_start();
   // Ensure there are robots to display
   if (!empty($this_player->player_robots)){
     // Collect the temp ability index
-    //$temp_robots_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-    $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    //$temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
     // Count the total number of robots
     $num_robots = count($this_player->player_robots);
     $robot_direction = $this_player->player_side == 'left' ? 'right' : 'left';

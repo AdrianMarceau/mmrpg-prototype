@@ -3,7 +3,7 @@
 // Define a function for updating user save files
 function mmrpg_admin_update_save_file($key, $data, $patch_token){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_admin_update_save_file({$key}, \$data)");  }
-    global $DB, $this_save_filepath;
+    global $db, $this_save_filepath;
     global $update_patch_tokens, $update_patch_names, $update_patch_details;
 
     // Start the markup variable
@@ -118,7 +118,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
                 ;";
 
             // Collect the thread ID for this user, if there is one
-            $update_thread_data = $DB->get_array($thread_select_query);
+            $update_thread_data = $db->get_array($thread_select_query);
 
             // If the thread does not exist, create it now in the database
             if (empty($update_thread_data)){
@@ -147,7 +147,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
                 $update_thread_data['thread_target'] = $_GAME['user_id'];
 
                 // Insert into the database and collect thread ID
-                $update_thread_id = $DB->insert('mmrpg_threads', $update_thread_data);
+                $update_thread_id = $db->insert('mmrpg_threads', $update_thread_data);
                 $update_thread_data['thread_id'] = $update_thread_id;
 
             }
@@ -155,7 +155,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             // Update the thread and append this patch to the bottom
             $append_to_thread = date('Y/m/d @ H:i:s')." : {$patch_name}\n";
             $update_thread_data['thread_body'] = str_replace('[/system]', $append_to_thread.'[/system]', $update_thread_data['thread_body']);
-            $DB->update('mmrpg_threads', array(
+            $db->update('mmrpg_threads', array(
                 'thread_body' => $update_thread_data['thread_body'],
                 'thread_mod_date' => time(),
                 'thread_mod_user' => MMRPG_SETTINGS_TARGET_PLAYERID
@@ -171,7 +171,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             $update_post_data['post_frame'] = '02';
             $update_post_data['post_date'] = time();
             $update_post_data['post_target'] = $update_thread_data['thread_target'];
-            $DB->insert('mmrpg_posts', $update_post_data);
+            $db->insert('mmrpg_posts', $update_post_data);
 
         }
 
@@ -204,7 +204,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     //die('$update_array[\'save_values\'] : '.$update_array['save_values']);
 
     // Update the database with the recent changes
-    $temp_success = $DB->update('mmrpg_saves', $update_array, "save_id = {$data['save_id']}");
+    $temp_success = $db->update('mmrpg_saves', $update_array, "save_id = {$data['save_id']}");
 
     // DEBUG
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';

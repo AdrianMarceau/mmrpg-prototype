@@ -2,7 +2,7 @@
 // Define the global variables
 global $mmrpg_index, $this_current_uri, $this_current_url;
 global $mmrpg_database_abilities, $mmrpg_database_robots, $mmrpg_database_abilities, $mmrpg_database_types;
-global $DB;
+global $db;
 
 // Define the print style defaults
 if (!isset($print_options['layout_style'])){ $print_options['layout_style'] = 'website'; }
@@ -494,7 +494,7 @@ ob_start();
             <?
 
             // Collect the database records for this ability
-            global $DB;
+            global $db;
             $temp_ability_records = array('ability_unlocked' => 0, 'ability_equipped');
             $temp_record_query = "SELECT
                 COUNT(*) AS unlock_count,
@@ -511,7 +511,7 @@ ob_start();
                 AND points.board_points <> 0
                 AND users.user_id <> 0
                 ;";
-            $temp_record_values = $DB->get_array($temp_record_query);
+            $temp_record_values = $db->get_array($temp_record_query);
             if (!empty($temp_record_values)){
                 $temp_ability_records['ability_unlocked'] = $temp_record_values['unlock_count'];
                 $temp_ability_records['ability_equipped'] = $temp_record_values['equip_count'];

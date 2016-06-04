@@ -22,7 +22,7 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('999.999.999.999'))){
 //$this_markup_header = 'Mega Man RPG Prototype File';
 
 // Collect an index of user roles for display
-$this_roles_index = $DB->get_array_list("SELECT * FROM mmrpg_roles ORDER BY role_id ASC", 'role_id');
+$this_roles_index = $db->get_array_list("SELECT * FROM mmrpg_roles ORDER BY role_id ASC", 'role_id');
 $this_fields_index = rpg_field::get_index();
 
 // Collect the current request type if set
@@ -119,7 +119,7 @@ while ($this_action == 'profile'){
 
     // Save the current game session into the file
     mmrpg_save_game_session($this_save_filepath);
-    $this_userinfo = $DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+    $this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
     $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
 
     //die($this_save_filepath);
@@ -152,7 +152,7 @@ while ($this_action == 'profile'){
     else { return 0; }
   }
   // Sort the robot index based on robot number
-  $mmrpg_database_robots = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
+  $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
   uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
   //die('<pre>$mmrpg_database_robots = '.print_r($mmrpg_database_robots, true).'</pre>');
 
@@ -628,7 +628,7 @@ while ($this_action == 'load'){
     $this_file['name'] = $this_user['password_encoded'].'.sav';
 
     // The file exists, so let's collect this user's info from teh database
-    $temp_database_user = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
+    $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
 
     // Check if the requested save file path exists
     $temp_save_filepath = $this_save_dir.$this_file['path'];
@@ -636,7 +636,7 @@ while ($this_action == 'load'){
     if (!empty($temp_database_user)){
 
       // The file exists, so let's collect this user's info from teh database
-      //$temp_database_user = $DB->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
+      //$temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
 
       // And now let's let's check the password
       $temp_save_filepath .= $this_file['name'];
@@ -818,7 +818,7 @@ while ($this_action == 'exit'){
   $_SESSION['COMMUNITY']['threads_viewed'] = array();
   // Collect the recently updated posts for this player / guest
   $temp_last_login = time() - MMRPG_SETTINGS_UPDATE_TIMEOUT;
-  $temp_new_threads = $DB->get_array_list("SELECT CONCAT(thread_id, '_', thread_mod_date) AS thread_session_token FROM mmrpg_threads WHERE thread_mod_date > {$temp_last_login}");
+  $temp_new_threads = $db->get_array_list("SELECT CONCAT(thread_id, '_', thread_mod_date) AS thread_session_token FROM mmrpg_threads WHERE thread_mod_date > {$temp_last_login}");
   if (!empty($temp_new_threads)){ foreach ($temp_new_threads AS $key => $array){ $_SESSION['COMMUNITY']['threads_viewed'][] = $array['thread_session_token']; } }
 
   // Redirect back to the home page

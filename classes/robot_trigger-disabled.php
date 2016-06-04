@@ -662,7 +662,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
         // Loop through the ability rewards for this robot if set
         if ($temp_robot->robot_class != 'mecha' && ($temp_start_level == 100 || ($temp_start_level != $temp_new_level && !empty($index_robot_rewards['abilities'])))){
-            $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+            $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
             foreach ($index_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
 
                 // If this ability is already unlocked, continue
@@ -849,7 +849,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     // Loop through the ability rewards for this robot if set and NOT demo mode
     if (empty($_SESSION['GAME']['DEMO']) && !empty($target_player_rewards['items']) && $this->player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'let us unlock item drops now..');  }
-        $temp_items_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $temp_items_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         $temp_success_value = $this_robot->robot_class == 'master' ? 50 : 25;
         $temp_success_value = ceil($temp_success_value * $temp_chance_multiplier);
         if ($temp_success_value > 100){ $temp_success_value = 100; }

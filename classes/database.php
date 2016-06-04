@@ -1,6 +1,6 @@
 <?php
-// Define the plutocms_database() class
-class plutocms_database {
+// Define the cms_database() class
+class cms_database {
 
     // Define the private variables
     private $LINK = false;
@@ -145,8 +145,8 @@ class plutocms_database {
     if (!isset($this->LINK) || $this->LINK === false){ $this->LINK = new mysqli($this->HOST, $this->USERNAME, $this->PASSWORD, $this->NAME);    }
         // If the connection was not successful, return false
         if ($this->LINK === false){
-            if (MMRPG_CONFIG_IS_LIVE && !MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("<strong>plutocms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".htmlentities(mysqli_error($this->LINK), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
-            else { $this->critical_error("<strong>plutocms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:{$this->PASSWORD}@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno()."] : &quot;".htmlentities(mysqli_errno($this->LINK), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
+            if (MMRPG_CONFIG_IS_LIVE && !MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("<strong>cms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".htmlentities(mysqli_error($this->LINK), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
+            else { $this->critical_error("<strong>cms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:{$this->PASSWORD}@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno()."] : &quot;".htmlentities(mysqli_errno($this->LINK), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
             return false;
         }
         // Set the character set, if possible
@@ -163,7 +163,7 @@ class plutocms_database {
         else { $close = true; }
         // If the closing was not successful, return false
         if ($close === false){
-            $this->critical_error("<strong>plutocms_database::db_close</strong> : Critical error! Unable to close the database connection for host &lt;{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".mysqli_errno($this->LINK)."&quot;");
+            $this->critical_error("<strong>cms_database::db_close</strong> : Critical error! Unable to close the database connection for host &lt;{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".mysqli_errno($this->LINK)."&quot;");
             return false;
         }
         // Return true
@@ -176,7 +176,7 @@ class plutocms_database {
         $select = mysqli_select_db($this->LINK, $this->NAME);
         // If the select was not successful, return false
         if ($select === false){
-            $this->critical_error("<strong>plutocms_database::db_select</strong> : Critical error! Unable to select the database &lt;{$this->NAME}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".mysqli_errno($this->LINK)."&quot;");
+            $this->critical_error("<strong>cms_database::db_select</strong> : Critical error! Unable to select the database &lt;{$this->NAME}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".mysqli_errno($this->LINK)."&quot;");
             return false;
         }
         // Return true
@@ -198,8 +198,8 @@ class plutocms_database {
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // If a result was not found, produce an error message and return false
         if ($this->MYSQL_RESULT === false){
-            if (MMRPG_CONFIG_DEBUG_MODE || MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("[[plutocms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;."); }
-            else { $this->critical_error("[[plutocms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK)."."); }
+            if (MMRPG_CONFIG_DEBUG_MODE || MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;."); }
+            else { $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK)."."); }
             return false;
         }
 
