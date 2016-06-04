@@ -45,8 +45,11 @@ if (get_magic_quotes_gpc()){
     unset($process);
 }
 
-// Include the database class first and foremost
-require('classes/database.php');
+// Include cms classs first and foremost
+require('classes/cms_database.php');
+require('classes/cms_website.php');
+require('classes/cms_index.php');
+
 // Create the global database object
 if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG'] = array(); }
