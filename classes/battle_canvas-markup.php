@@ -22,7 +22,7 @@ if (empty($eventinfo['this_player']) || empty($eventinfo['this_robot']) || $opti
   foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
     if ($this_robotinfo['robot_position'] == 'active' && $this_robotinfo['robot_status'] != 'disabled'){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      $eventinfo['this_robot'] = new mmrpg_robot($this, $eventinfo['this_player'], $this_robotinfo);
+      $eventinfo['this_robot'] = new rpg_robot($this, $eventinfo['this_player'], $this_robotinfo);
       break;
     }
   }
@@ -59,7 +59,7 @@ if (empty($eventinfo['target_player']) || empty($eventinfo['target_robot']) || $
   foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
     if ($target_robotinfo['robot_position'] == 'active' && $target_robotinfo['robot_status'] != 'disabled'){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      $eventinfo['target_robot'] = new mmrpg_robot($this, $eventinfo['target_player'], $target_robotinfo);
+      $eventinfo['target_robot'] = new rpg_robot($this, $eventinfo['target_player'], $target_robotinfo);
       break;
     }
   }
@@ -76,7 +76,7 @@ if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->pla
   $num_player_robots = count($eventinfo['this_player']->player_robots);
   foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    $this_robot = new mmrpg_robot($this, $eventinfo['this_player'], $this_robotinfo);
+    $this_robot = new rpg_robot($this, $eventinfo['this_player'], $this_robotinfo);
     $this_options = $options;
     //if ($this_robot->robot_status == 'disabled' && $this_robot->robot_position == 'bench'){ continue; }
     if (!empty($this_robot->flags['hidden'])){ continue; }
@@ -375,7 +375,7 @@ if ($options['canvas_show_target_robots'] && !empty($eventinfo['target_player']-
 
     // Create the temporary target robot ovject
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    $target_robot = new mmrpg_robot($this, $eventinfo['target_player'], $target_robotinfo);
+    $target_robot = new rpg_robot($this, $eventinfo['target_player'], $target_robotinfo);
     $target_options = $options;
     //if ($target_robot->robot_status == 'disabled' && $target_robot->robot_position == 'bench'){ continue; }
     if (!empty($target_robot->flags['hidden'])){ continue; }

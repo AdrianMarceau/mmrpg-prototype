@@ -13,7 +13,7 @@ $robot_flag_copycore = !empty($robot_info['robot_core']) && $robot_info['robot_c
 $temp_ability_token = $ability_info['ability_token'];
 $temp_ability_type = !empty($ability_info['ability_type']) ? $mmrpg_index['types'][$ability_info['ability_type']] : false;
 $temp_ability_type2 = !empty($ability_info['ability_type2']) ? $mmrpg_index['types'][$ability_info['ability_type2']] : false;
-$temp_ability_energy = mmrpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
+$temp_ability_energy = rpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
 $temp_ability_damage = !empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0;
 $temp_ability_damage2 = !empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0;
 $temp_ability_recovery = !empty($ability_info['ability_recovery']) ? $ability_info['ability_recovery'] : 0;
@@ -48,7 +48,7 @@ if ($ability_info['ability_class'] != 'item'){
 // If show accuracy or quantity
 if (($ability_info['ability_class'] != 'item' && $print_options['show_accuracy'])
   || ($ability_info['ability_class'] == 'item' && $print_options['show_quantity'])){
-    
+
   if ($ability_info['ability_class'] != 'item' && !empty($ability_info['ability_accuracy'])){ $temp_ability_title .= ' | '.$ability_info['ability_accuracy'].'% Accuracy'; }
   elseif ($ability_info['ability_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token])){ $temp_ability_title .= ' | '.($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token] == 1 ? '1 Unit' : $_SESSION[$session_token]['values']['battle_items'][$temp_ability_token].' Units'); }
   elseif ($ability_info['ability_class'] == 'item' ){ $temp_ability_title .= ' | 0 Units'; }

@@ -254,7 +254,7 @@ ob_start();
                   $ability_key = 0;
                   $ability_method_key = 0;
                   $ability_method = '';
-                  $temp_robot_info = mmrpg_robot::get_index_info('mega-man');
+                  $temp_robot_info = rpg_robot::get_index_info('mega-man');
                   $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
                   foreach ($player_ability_rewards AS $this_info){
                     $this_points = $this_info['points'];

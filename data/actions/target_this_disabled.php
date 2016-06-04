@@ -33,7 +33,7 @@ ob_start();
       if (!empty($switch_robotinfo['robot_token'])){
         // Create the scan object using the session/index data
         //$GLOBALS['DEBUG']['checkpoint_line'] = 'data.php : line 655';
-        $temp_robot = new mmrpg_robot($this_battle, $this_player, $scan_robotinfo);
+        $temp_robot = new rpg_robot($this_battle, $this_player, $scan_robotinfo);
         // Default the allow button flag to true
         $allow_button = false;
         // If this robot is disabled, disable the button

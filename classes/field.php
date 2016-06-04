@@ -238,10 +238,10 @@ class mmrpg_field {
     $player_flag_copycore = !empty($player_info['player_core']) && $player_info['player_core'] == 'copy' ? true : false;
     $temp_field_type = !empty($field_info['field_type']) ? $mmrpg_index['types'][$field_info['field_type']] : false;
     $temp_field_type2 = !empty($field_info['field_type2']) ? $mmrpg_index['types'][$field_info['field_type2']] : false;
-    $temp_field_master = !empty($field_info['field_master']) ? mmrpg_robot::parse_index_info($mmrpg_database_robots[$field_info['field_master']]) : false;
+    $temp_field_master = !empty($field_info['field_master']) ? rpg_robot::parse_index_info($mmrpg_database_robots[$field_info['field_master']]) : false;
     $temp_field_mechas = !empty($field_info['field_mechas']) ? $field_info['field_mechas'] : array();
     foreach ($temp_field_mechas AS $key => $token){
-      $temp_mecha = mmrpg_robot::parse_index_info($mmrpg_database_robots[$token]);
+      $temp_mecha = rpg_robot::parse_index_info($mmrpg_database_robots[$token]);
       if (!empty($temp_mecha)){ $temp_field_mechas[$key] = $temp_mecha['robot_name'];  }
       else { unset($temp_field_mechas[$key]); }
     }

@@ -127,7 +127,7 @@ function mmrpg_reset_game_session($this_save_filepath){
     // Auto-select Dr. Light as the current playable character
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = 'dr-light';
     // Unlock Mega Man as a playable character
-    $unlock_robot_info = mmrpg_robot::get_index_info('mega-man');;
+    $unlock_robot_info = rpg_robot::get_index_info('mega-man');;
     $unlock_robot_info['robot_level'] = 1; //!empty($this_level_bonus) ? $this_level_bonus : 1;
     $unlock_robot_info['robot_experience'] = 999;
     //$unlock_robot_info['robot_experience'] = 4000;

@@ -26,7 +26,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_prototype_data['ability_addons_four'] = array('attack-mode', 'defense-mode', 'speed-mode');
   $this_prototype_data['ability_addons_five'] = array('repair-mode', 'recovery-booster');
   */
-  
+
   // -- DR. LIGHT BATTLE OPTIONS -- //
 
   // Define the robot options and counter for Dr. Light mode
@@ -60,7 +60,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     header('Location: prototype.php');
     exit();
   }
-  
+
   // If the demo was complete, generate the option event message
   if ($this_prototype_data['battles_complete'] >= 4){
 
@@ -82,13 +82,13 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       );
 
   }
-  
+
   // DEMO BATTLES
   if (mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], 'demo-battle-iii')){ $this_prototype_data['battle_options']['demo-battle-iv'] = array('battle_token' => 'demo-battle-iv'); }
   if (mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], 'demo-battle-ii')){ $this_prototype_data['battle_options']['demo-battle-iii'] = array('battle_token' => 'demo-battle-iii'); }
   if (mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], 'demo-battle-i')){ $this_prototype_data['battle_options']['demo-battle-ii'] = array('battle_token' => 'demo-battle-ii'); }
   $this_prototype_data['battle_options']['demo-battle-i'] = array('battle_token' => 'demo-battle-i');
-  
+
   // Define the robot options and counter for Dr. Light mode
   $this_prototype_data['robot_options'] = !empty($mmrpg_index['players'][$this_prototype_data['this_player_token']]['player_robots']) ? $mmrpg_index['players'][$this_prototype_data['this_player_token']]['player_robots'] : array();
   //die(print_r($this_prototype_data['robot_options'], true));
@@ -102,22 +102,22 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   //die(print_r($this_prototype_data['robot_options'], true));
 
-  
-  
+
+
   // -- DEMO MISSION SELECT -- //
 
   // Define the variable to hold this player's mission markup and music
   $this_prototype_data['missions_markup'] .= mmrpg_prototype_options_markup($this_prototype_data['battle_options'], $this_prototype_data['this_player_token']);
   $this_prototype_data['missions_music'] = 'misc/stage-select-mm01';
 
-  
-  
+
+
   // -- DEMO ROBOT SELECT -- //
 
   // Generate the markup for this player's robot select screen
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_prototype_data['robots_markup'] = mmrpg_prototype_robot_select_markup($this_prototype_data);
-  
+
   /*
   // Define the variable to hold this player's mission markup and music
   $this_prototype_data['robots_markup'] = '';
@@ -125,7 +125,7 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Loop through and display the available robot options for this player
   $temp_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
   foreach ($this_prototype_data['robot_options'] AS $key => $info){
-    $index = mmrpg_robot::parse_index_info($temp_robot_index[$info['robot_token']]);
+    $index = rpg_robot::parse_index_info($temp_robot_index[$info['robot_token']]);
     $info = array_replace($index, $info);
     $this_option_class = 'option option_this-robot-select option_this-'.$this_prototype_data['this_player_token'].'-robot-select option_'.($this_prototype_data['robots_unlocked'] == 1 ? '1x4' : ($this_prototype_data['robots_unlocked'] <= 2 ? '1x2' : '1x1')).' option_'.$info['robot_token'].' block_'.($key + 1);
     $this_option_style = '';

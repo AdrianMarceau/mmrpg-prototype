@@ -410,9 +410,9 @@ if (true){
 
     // Collect a temp robot object for printing items
     $player_info = $mmrpg_index['players'][$shop_info['shop_player']];
-    if ($shop_info['shop_player'] == 'dr-light'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['mega-man']); }
-    elseif ($shop_info['shop_player'] == 'dr-wily'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['bass']); }
-    elseif ($shop_info['shop_player'] == 'dr-cossack'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['proto-man']); }
+    if ($shop_info['shop_player'] == 'dr-light'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['mega-man']); }
+    elseif ($shop_info['shop_player'] == 'dr-wily'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['bass']); }
+    elseif ($shop_info['shop_player'] == 'dr-cossack'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['proto-man']); }
 
     // Collect the tokens for all this shop's selling and buying tabs
     $shop_selling_tokens = is_array($shop_info['shop_kind_selling']) ? $shop_info['shop_kind_selling'] : array($shop_info['shop_kind_selling']);

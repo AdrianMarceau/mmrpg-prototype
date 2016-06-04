@@ -84,7 +84,7 @@ if ($temp_field_star_present){
     foreach ($this_list AS $this_factor){
       //$debug_backup .= 'factor = '.implode(',', array_values($this_factor)).' // ';
       if (empty($this_factor['robot'])){ continue; }
-      $bonus_robot_info = mmrpg_robot::parse_index_info($this_robot_index[$this_factor['robot']]);
+      $bonus_robot_info = rpg_robot::parse_index_info($this_robot_index[$this_factor['robot']]);
       if (!isset($bonus_robot_info['robot_core'])){ $bonus_robot_info['robot_core'] = ''; }
       if ($bonus_robot_info['robot_core'] == $temp_option_field['field_type'] || $bonus_robot_info['robot_core'] == $temp_option_field2['field_type']){
         if (!in_array($bonus_robot_info['robot_token'], $temp_robot_tokens)){
@@ -137,7 +137,7 @@ if (true){
     $temp_mook_token = $temp_mook_options[array_rand($temp_mook_options)];
     if (!isset($temp_mook_counts[$temp_mook_token])){ $temp_mook_counts[$temp_mook_token] = 0; }
     else { $temp_mook_counts[$temp_mook_token]++; }
-    $temp_mook_info = mmrpg_robot::parse_index_info($this_robot_index[$temp_mook_token]);
+    $temp_mook_info = rpg_robot::parse_index_info($this_robot_index[$temp_mook_token]);
     $bonus_robot_info = array('robot_token' => $temp_mook_token, 'robot_id' => 1, 'robot_level' => 1);
     $bonus_robot_info['robot_abilities'] = $temp_mook_info['robot_abilities'];
     $bonus_robot_info['robot_class'] = !empty($temp_mook_info['robot_class']) ? $temp_mook_info['robot_class'] : 'master';
@@ -194,7 +194,7 @@ $temp_battle_omega['battle_turns'] = 0;
 // Loop through the target robots again update with omega values
 foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 => $robot){
   // Update the robot level and battle points plus turns
-  if (isset($this_robot_index[$robot['robot_token']])){ $robot = mmrpg_robot::parse_index_info($this_robot_index[$robot['robot_token']]); }
+  if (isset($this_robot_index[$robot['robot_token']])){ $robot = rpg_robot::parse_index_info($this_robot_index[$robot['robot_token']]); }
   else { continue; }
   $temp_robot_level = $robot['robot_class'] != 'mecha' ? $temp_omega_robot_level : mt_rand(1, ceil($temp_omega_robot_level / 3));
   $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_level'] = $temp_robot_level;

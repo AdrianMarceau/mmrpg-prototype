@@ -217,7 +217,7 @@ if ($this_action == 'start'){
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             if (!mmrpg_prototype_robot_unlocked($this_player_token, $this_data['robot_token'])){ continue; }
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-            $this_info = mmrpg_robot::parse_index_info($temp_robots_index[$this_data['robot_token']]);
+            $this_info = rpg_robot::parse_index_info($temp_robots_index[$this_data['robot_token']]);
             $this_token = $this_data['robot_id'].'_'.$this_data['robot_token'];
             $this_position = array_search($this_token, $temp_this_player_robots);
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -288,7 +288,7 @@ if ($this_action == 'start'){
         $this_key_counter = 0;
         foreach ($target_playerinfo['player_robots'] AS $this_key => $this_data){
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-            $this_info = mmrpg_robot::parse_index_info($temp_robots_index[$this_data['robot_token']]);
+            $this_info = rpg_robot::parse_index_info($temp_robots_index[$this_data['robot_token']]);
             $this_token = $this_data['robot_id'].'_'.$this_data['robot_token'];
             $this_position = $this_key; //array_search($this_token, $target_player_robots);
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -381,15 +381,15 @@ else {
 
 // Define the current robot object using the loaded robot data
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-$this_robot = new mmrpg_robot($this_battle, $this_player, $this_robotinfo);
+$this_robot = new rpg_robot($this_battle, $this_player, $this_robotinfo);
 // Define the target robot object using the loaded robot data
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if ($target_robotinfo['robot_id'] >= MMRPG_SETTINGS_TARGET_PLAYERID){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    $target_robot = new mmrpg_robot($this_battle, $target_player, $target_robotinfo);
+    $target_robot = new rpg_robot($this_battle, $target_player, $target_robotinfo);
 } else {
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    $target_robot = new mmrpg_robot($this_battle, $this_player, $target_robotinfo);
+    $target_robot = new rpg_robot($this_battle, $this_player, $target_robotinfo);
 }
 
 
@@ -509,7 +509,7 @@ elseif ($this_action == 'start'){
             $this_robot->update_session();
         } else {
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-            $temp_robot = new mmrpg_robot($this_battle, $this_player, $info);
+            $temp_robot = new rpg_robot($this_battle, $this_player, $info);
             $temp_robot->robot_frame_styles = 'display: none; ';
             $temp_robot->robot_detail_styles = 'display: none; ';
             $temp_robot->update_session();
@@ -526,7 +526,7 @@ elseif ($this_action == 'start'){
             $target_robot->update_session();
         } else {
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-            $temp_robot = new mmrpg_robot($this_battle, $target_player, $info);
+            $temp_robot = new rpg_robot($this_battle, $target_player, $info);
             $temp_robot->robot_frame_styles = 'display: none; ';
             $temp_robot->robot_detail_styles = 'display: none; ';
             $temp_robot->update_session();
@@ -738,7 +738,7 @@ elseif ($this_action == 'start'){
             $this_robot->robot_frame = 'base';
             $this_robot->update_session();
         } else {
-            $temp_robot = new mmrpg_robot($this_battle, $this_player, $info);
+            $temp_robot = new rpg_robot($this_battle, $this_player, $info);
             $temp_robot->robot_frame = 'taunt';
             $temp_robot->robot_frame_styles = '';
             $temp_robot->robot_detail_styles = '';
@@ -901,7 +901,7 @@ elseif ($this_action == 'ability'){
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             if ($temp_robotinfo['robot_position'] == 'active'){
                 $temp_robotinfo = array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']);
-                $active_target_robot = new mmrpg_robot($this_battle, $target_player, $temp_robotinfo);
+                $active_target_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
                 $active_target_robot->update_session();
                 break;
             }
@@ -910,7 +910,7 @@ elseif ($this_action == 'ability'){
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_robotinfo = array_shift(array_values($target_player->values['robots_active']));
             $temp_robotinfo = array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']);
-            $active_target_robot = new mmrpg_robot($this_battle, $target_player, $target_player->player_robots[0]);
+            $active_target_robot = new rpg_robot($this_battle, $target_player, $target_player->player_robots[0]);
             $active_target_robot->robot_position = 'active';
             $active_target_robot->update_session();
         }
@@ -1037,7 +1037,7 @@ elseif ($this_action == 'ability'){
 
     // Collect the ability choice from the robot
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    $temp_token = mmrpg_robot::robot_choices_abilities(array(
+    $temp_token = rpg_robot::robot_choices_abilities(array(
         'this_index' => &$mmrpg_index,
         'this_battle' => &$this_battle,
         'this_field' => &$this_battle->battle_field,
@@ -1084,7 +1084,7 @@ elseif ($this_action == 'ability'){
         } else {
             $temp_targetability_targetplayer = &$this_player;
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-            $temp_targetability_targetrobot = new mmrpg_robot($this_battle, $this_player, $temp_targetability_targetinfo);
+            $temp_targetability_targetrobot = new rpg_robot($this_battle, $this_player, $temp_targetability_targetinfo);
         }
     } elseif ($temp_targetability->ability_target == 'select_this'){
         // DEBUG
@@ -1098,8 +1098,8 @@ elseif ($this_action == 'ability'){
             $temp_targetability_targetrobot = &$active_target_robot;
         } else {
             $temp_targetability_targetplayer = &$target_player;
-            if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$temp_targetability_targetrobot = new mmrpg_robot(\$this_battle, \$target_player, \$temp_targetability_targetinfo); on line ".__LINE__." {$temp_targetability_targetinfo['robot_token']} ";  }
-            $temp_targetability_targetrobot = new mmrpg_robot($this_battle, $target_player, $temp_targetability_targetinfo);
+            if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$temp_targetability_targetrobot = new rpg_robot(\$this_battle, \$target_player, \$temp_targetability_targetinfo); on line ".__LINE__." {$temp_targetability_targetinfo['robot_token']} ";  }
+            $temp_targetability_targetrobot = new rpg_robot($this_battle, $target_player, $temp_targetability_targetinfo);
         }
     } else {
         $temp_targetability_targetplayer = &$this_player;
@@ -1185,7 +1185,7 @@ elseif ($this_action == 'ability'){
             // Check if this robot is targetting itself or a team mate
             if ($this_robot->robot_id == $backup_target_robot_id){
                 // Define the new target robot which is actually a team mate
-                $new_target_robot = &$this_robot; //new mmrpg_robot($this_battle, $this_player, array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token));;
+                $new_target_robot = &$this_robot; //new rpg_robot($this_battle, $this_player, array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token));;
                 // Update the target robot's session
                 $new_target_robot->update_session();
                 // DEBUG
@@ -1194,7 +1194,7 @@ elseif ($this_action == 'ability'){
                 $this_battle->actions_append($this_player, $this_robot, $this_player, $new_target_robot, $this_action, $this_action_token);
             } else {
                 // Define the new target robot which is actually a team mate
-                $new_target_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+                $new_target_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
                 // Update the target robot's session
                 $new_target_robot->update_session();
                 // DEBUG
@@ -1206,7 +1206,7 @@ elseif ($this_action == 'ability'){
         // If this is a special SELECT TARGET ability
         elseif ($temp_ability_info['ability_target'] == 'select_target'){
             // Define the new target robot which is actually a team mate
-            $new_target_robot = new mmrpg_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+            $new_target_robot = new rpg_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
             // Update the target robot's session
             $new_target_robot->update_session();
             // DEBUG
@@ -1217,7 +1217,7 @@ elseif ($this_action == 'ability'){
         // Else if the target was originally active or the ability is set to auto
         elseif ($backup_target_robot_position == 'active' || (!empty($temp_ability_info) && $temp_ability_info['ability_target'] == 'auto')){
             // Define the new target robot which is the current active target robot
-            $new_target_robot = new mmrpg_robot($this_battle, $target_player, array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
+            $new_target_robot = new rpg_robot($this_battle, $target_player, array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
             // Update the target robot's session
             $new_target_robot->update_session();
             // DEBUG
@@ -1228,7 +1228,7 @@ elseif ($this_action == 'ability'){
         // Otherwise, if a normal case of targetting
         else {
             // Define the new target robot which is the original request
-            $new_target_robot = new mmrpg_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+            $new_target_robot = new rpg_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
             // Update the target robot's session
             $new_target_robot->update_session();
                 // DEBUG
@@ -1264,7 +1264,7 @@ elseif ($this_action == 'ability'){
     foreach ($target_player->player_robots AS $temp_robotinfo){
         if ($temp_robotinfo['robot_status'] == 'disabled'
             /*&& $temp_robotinfo['robot_position'] == 'bench'*/){
-            $temp_robot = new mmrpg_robot($this_battle, $target_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
+            $temp_robot = new rpg_robot($this_battle, $target_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
             $temp_robot->flags['apply_disabled_state'] = true;
             //$temp_robot->flags['hidden'] = true;
             $temp_robot->update_session();
@@ -1291,7 +1291,7 @@ elseif ($this_action == 'ability'){
                 $active_target_robot->robot_position = 'active';
                 $active_target_robot->update_session();
             } else {
-                $temp_robot = new mmrpg_robot($this_battle, $target_player, $temp_robotinfo);
+                $temp_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
                 $temp_robot->robot_load($temp_robotinfo);
                 $temp_robot->robot_position = 'bench';
                 $temp_robot->update_session();
@@ -1309,7 +1309,7 @@ elseif ($this_action == 'ability'){
         // Check if this robot has choice data defined
         if (true){
             // Collect the ability choice from the robot
-            $temp_token = mmrpg_robot::robot_choices_abilities(array(
+            $temp_token = rpg_robot::robot_choices_abilities(array(
                 'this_index' => &$mmrpg_index,
                 'this_battle' => &$this_battle,
                 'this_field' => &$this_field,
@@ -1369,8 +1369,8 @@ elseif ($this_action == 'ability'){
     //$temp_this_robot_backup = array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token);
     //$temp_target_robot_backup = array('robot_id' => $target_robot->robot_id, 'robot_token' => $target_robot->robot_token);
     $this_battle->actions_execute();
-    //$this_robot = new mmrpg_robot($this_battle, $this_player, $temp_this_robot_backup);
-    //$target_robot = new mmrpg_robot($this_battle, $target_player, $temp_target_robot_backup);
+    //$this_robot = new rpg_robot($this_battle, $this_player, $temp_this_robot_backup);
+    //$target_robot = new rpg_robot($this_battle, $target_player, $temp_target_robot_backup);
 
     // -- END OF TURN ACTIONS -- //
 
@@ -1481,7 +1481,7 @@ if ($this_robot->robot_position != 'active'){
     // Define the variable to hold active robot info and search for it
     $temp_active_info = array();
     foreach ($this_player->player_robots AS $token => $info){
-        $temp_robot = new mmrpg_robot($this_battle, $this_player, $info);
+        $temp_robot = new rpg_robot($this_battle, $this_player, $info);
         if ($info['robot_status'] == 'active'){ $temp_robot->robot_frame = 'base'; }
         if ($info['robot_position'] == 'active'){ $temp_active_info = $info;  }
         $temp_robot->update_session();
@@ -1498,7 +1498,7 @@ if ($target_robot->robot_position != 'active'){
     // Define the variable to hold active robot info and search for it
     $temp_active_info = array();
     foreach ($target_player->player_robots AS $token => $info){
-        $temp_robot = new mmrpg_robot($this_battle, $target_player, $info);
+        $temp_robot = new rpg_robot($this_battle, $target_player, $info);
         if ($info['robot_status'] == 'active'){ $temp_robot->robot_frame = 'base'; }
         if ($info['robot_position'] == 'active'){ $temp_active_info = $info;  }
         $temp_robot->update_session();
@@ -1592,7 +1592,7 @@ $active_target_robot = false;
 foreach ($target_player->player_robots AS $temp_robotinfo){
     if (empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $active_target_robot = new mmrpg_robot($this_battle, $target_player, $temp_robotinfo);
+        $active_target_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
         if ($active_target_robot->robot_energy < 1){
             $active_target_robot->flags['apply_disabled_state'] = true;
             $active_target_robot->flags['hidden'] = true;
@@ -1602,7 +1602,7 @@ foreach ($target_player->player_robots AS $temp_robotinfo){
         }
     } elseif (!empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $temp_target_robot = new mmrpg_robot($this_battle, $target_player, $temp_robotinfo);
+        $temp_target_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
         $temp_target_robot->robot_position = 'bench';
         $temp_target_robot->update_session();
         $canvas_refresh = true;
@@ -1622,13 +1622,13 @@ if (empty($active_target_robot)){
     if (!empty($temp_robots_active_array)){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_robots_active_info = array_shift($temp_robots_active_array);
-        $active_target_robot = new mmrpg_robot($this_battle, $target_player, $temp_robots_active_info);
+        $active_target_robot = new rpg_robot($this_battle, $target_player, $temp_robots_active_info);
         $active_target_robot->robot_position = 'active';
         $active_target_robot->update_session();
     } elseif (!empty($temp_robots_disabled_array)){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_robots_active_info = array_shift($temp_robots_disabled_array);
-        $active_target_robot = new mmrpg_robot($this_battle, $target_player, $temp_robots_active_info);
+        $active_target_robot = new rpg_robot($this_battle, $target_player, $temp_robots_active_info);
         $active_target_robot->robot_position = 'active';
         $active_target_robot->update_session();
     } else {

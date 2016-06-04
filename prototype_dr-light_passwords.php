@@ -11,7 +11,7 @@ if (!empty($temp_flags['drlight_password_robotgetletsrocknroll'])){
   if (!mmrpg_prototype_robot_unlocked(false, 'roll')){
     // Unlock Roll as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-light'];
-    $unlock_robot_info = mmrpg_robot::get_index_info('roll');
+    $unlock_robot_info = rpg_robot::get_index_info('roll');
     $unlock_robot_info['robot_level'] = 1;
     $unlock_robot_info['robot_experience'] = 999;
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true);

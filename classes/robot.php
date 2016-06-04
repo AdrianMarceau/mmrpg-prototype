@@ -1,6 +1,6 @@
 <?
 // Define a class for the robots
-class mmrpg_robot {
+class rpg_robot {
 
     // Define global class variables
     public $flags;
@@ -9,7 +9,7 @@ class mmrpg_robot {
     public $history;
 
     // Define the constructor class
-    public function mmrpg_robot(){
+    public function rpg_robot(){
 
         // Collect any provided arguments
         $args = func_get_args();
@@ -78,8 +78,8 @@ class mmrpg_robot {
         // Otherwise, collect robot data from the index
         else {
             if (empty($this_robotinfo_backup['_parsed'])){
-                if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$this_robotinfo = mmrpg_robot::get_index_info({$this_robotinfo['robot_token']}); on line ".__LINE__;  }
-                $this_robotinfo = mmrpg_robot::get_index_info($this_robotinfo['robot_token']);
+                if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$this_robotinfo = rpg_robot::get_index_info({$this_robotinfo['robot_token']}); on line ".__LINE__;  }
+                $this_robotinfo = rpg_robot::get_index_info($this_robotinfo['robot_token']);
                 $this_robotinfo = array_replace($this_robotinfo, $this_robotinfo_backup);
             }
         }
@@ -233,7 +233,7 @@ class mmrpg_robot {
         // DEBUG
         /*
         if ($this_robotinfo['robot_token'] == 'mega-man'){
-            die("\nmmrpg_robot()::".__LINE__.
+            die("\nrpg_robot()::".__LINE__.
                 "\n".':: <pre>$this_robotinfo_backup:'.print_r($this_robotinfo_backup, true).'</pre>'.
                 "\n".':: <pre>$this_robotinfo:'.print_r($this_robotinfo, true).'</pre>');
         }
@@ -417,7 +417,7 @@ class mmrpg_robot {
     static public function has_ability_compatibility($robot_token, $ability_token){
         global $mmrpg_index;
         if (empty($robot_token) || empty($ability_token)){ return false; }
-        $robot_info = is_array($robot_token) ? $robot_token : mmrpg_robot::get_index_info($robot_token);
+        $robot_info = is_array($robot_token) ? $robot_token : rpg_robot::get_index_info($robot_token);
         $ability_info = is_array($ability_token) ? $ability_token : rpg_ability::get_index_info($ability_token);
         if (empty($robot_info) || empty($ability_info)){ return false; }
         $robot_token = $robot_info['robot_token'];
@@ -1197,8 +1197,8 @@ class mmrpg_robot {
     public static function get_index_info($robot_token){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index_info('{$robot_token}')");  }
         global $DB;
-        $robot_index = mmrpg_robot::get_index(array($robot_token));
-        if (!empty($robot_index[$robot_token])){ $robot_info = mmrpg_robot::parse_index_info($robot_index[$robot_token]); }
+        $robot_index = rpg_robot::get_index(array($robot_token));
+        if (!empty($robot_index[$robot_token])){ $robot_info = rpg_robot::parse_index_info($robot_index[$robot_token]); }
         else { $robot_info = array(); }
         return $robot_info;
     }

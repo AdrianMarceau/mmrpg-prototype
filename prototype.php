@@ -167,7 +167,7 @@ if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
         // DEBUG ROBOT UNLOCKS
         foreach ($this_robot_index AS $robot_token => $robot_info){
             if (mmrpg_prototype_robot_unlocked(false, $robot_token)){ continue; }
-            $robot_info = mmrpg_robot::parse_index_info($robot_info);
+            $robot_info = rpg_robot::parse_index_info($robot_info);
             $robot_string = str_replace('-', '', $robot_token);
             if ($robot_token != 'robot' && !empty($temp_flags[$player_string.'_password_robot'.$robot_string.$player_pass])){
                 // Unlock the requested robot

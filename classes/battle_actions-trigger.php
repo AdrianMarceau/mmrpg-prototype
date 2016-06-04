@@ -105,7 +105,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
         $this_robot->robot_frame = 'base';
         $this_robot->update_session();
       } else {
-        $temp_robot = new mmrpg_robot($this, $this_player, $info);
+        $temp_robot = new rpg_robot($this, $this_player, $info);
         $temp_robot->robot_frame = 'taunt';
         $temp_robot->robot_frame_styles = '';
         $temp_robot->robot_detail_styles = '';
@@ -154,7 +154,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     if (empty($this_token)){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       // Collect the ability choice from the robot
-      $temp_token = mmrpg_robot::robot_choices_abilities(array(
+      $temp_token = rpg_robot::robot_choices_abilities(array(
         'this_battle' => &$this,
         'this_field' => &$this->battle_field,
         'this_player' => &$this_player,
@@ -372,7 +372,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($this_player->player_robots AS $temp_key => $temp_robotinfo){
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $temp_robot = new mmrpg_robot($this, $this_player, $temp_robotinfo);
+        $temp_robot = new rpg_robot($this, $this_player, $temp_robotinfo);
         $temp_robot->robot_position = 'bench';
         $temp_robot->update_session();
       }
@@ -464,7 +464,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     $temp_target_robot_info = !empty($this->values['robots'][$this_token['robot_id']]) ? $this->values['robots'][$this_token['robot_id']] : array();
     $temp_target_player_info = !empty($this->values['players'][$temp_target_robot_info['player_id']]) ? $this->values['players'][$temp_target_robot_info['player_id']] : array();
     $temp_target_player = new mmrpg_player($this, $temp_target_player_info);
-    $temp_target_robot = new mmrpg_robot($this, $temp_target_player, $temp_target_robot_info);
+    $temp_target_robot = new rpg_robot($this, $temp_target_player, $temp_target_robot_info);
     //die('<pre>'.print_r($temp_target_robot, true).'</pre>');
 
     // Ensure the target robot's frame is set to its base

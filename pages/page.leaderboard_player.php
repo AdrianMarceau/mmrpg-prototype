@@ -123,7 +123,7 @@ if (!empty($this_playerinfo['save_values_robot_database'])){
 
         // Update and/or define the encountered, scanned, summoned, and unlocked flags
         //die('dance <pre>'.print_r($this_playerinfo['save_values_robot_database'], true).'</pre>');
-        //$robot_info = mmrpg_robot::parse_index_info($robot_info);
+        //$robot_info = rpg_robot::parse_index_info($robot_info);
         if (!isset($robot_info['robot_visible'])){ $robot_info['robot_visible'] = !empty($this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]) ? true : false; }
         if (!isset($robot_info['robot_encountered'])){ $robot_info['robot_encountered'] = !empty($this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_encountered']) ? $this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_encountered'] : 0; }
         if (!isset($robot_info['robot_scanned'])){ $robot_info['robot_scanned'] = !empty($this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_scanned']) ? $this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_scanned'] : 0; }
@@ -169,7 +169,7 @@ if (!empty($this_playerinfo['save_values']['robot_favourites'])){
         elseif (!in_array($token, $this_playerinfo['save_values']['robot_favourites'])){ continue; }
         if (count($temp_top_robots) < $temp_top_robots_counter){
             $temp_top_robots_tokens[] = $token;
-            $temp_index = mmrpg_robot::parse_index_info($temp_robots_index[$token]);
+            $temp_index = rpg_robot::parse_index_info($temp_robots_index[$token]);
             $temp_top_robots[] = '<strong>'.$temp_index['robot_name'].'</strong>';
             unset($temp_index);
         } else {
@@ -184,7 +184,7 @@ if (count($temp_top_robots) < $temp_top_robots_counter){
         if (in_array($token, $temp_top_robots_tokens)){ continue; }
         if (count($temp_top_robots) < $temp_top_robots_counter){
             $temp_top_robots_tokens[] = $token;
-            $temp_index = mmrpg_robot::parse_index_info($temp_robots_index[$token]);
+            $temp_index = rpg_robot::parse_index_info($temp_robots_index[$token]);
             $temp_top_robots[] = '<strong>'.$temp_index['robot_name'].'</strong>';
             unset($temp_index);
         } else {

@@ -53,7 +53,7 @@ ob_start();
     // Collect the database for this robot
     $robot_database = !empty($player_robot_database[$robot_token]) ? $player_robot_database[$robot_token] : array();
     // Collect the stat details for this robot
-    $robot_stats = mmrpg_robot::calculate_stat_values($robot_info['robot_level'], $robot_info, $robot_rewards, true);
+    $robot_stats = rpg_robot::calculate_stat_values($robot_info['robot_level'], $robot_info, $robot_rewards, true);
     // Collect the robot ability core if it exists
     $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : false;
     // Check if this robot has the copy shot ability

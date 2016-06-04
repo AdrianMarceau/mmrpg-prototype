@@ -568,7 +568,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 foreach ($this_targetinfo['player_robots'] AS $robo_key => $this_robotinfo){
                     //if (empty($this_robotinfo['robot_token'])){ die('<pre>'.$this_battleinfo['battle_token'].print_r($this_robotinfo, true).'</pre>'); }
                     if ($this_robotinfo['robot_token'] == 'robot'){ unset($this_targetinfo['player_robots'][$robo_key]); continue; }
-                    if (isset($this_robot_index[$this_robotinfo['robot_token']])){ $this_robotindex = mmrpg_robot::parse_index_info($this_robot_index[$this_robotinfo['robot_token']]); }
+                    if (isset($this_robot_index[$this_robotinfo['robot_token']])){ $this_robotindex = rpg_robot::parse_index_info($this_robot_index[$this_robotinfo['robot_token']]); }
                     else { continue; }
                     $temp_robot_tokens[] = $this_robotinfo['robot_token'];
                     $this_robotinfo = array_merge($this_robotindex, $this_robotinfo);
@@ -961,7 +961,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
         $this_robot_name .= $this_robot_favourite ? ' <span style="position: relative; bottom: 2px; font-size: 11px;">&hearts;</span>' : '';
 
-        $this_robot_stats = mmrpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards, true);
+        $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards, true);
         $this_robot_energy = $this_robot_stats['energy']['current'];
         $this_robot_attack = $this_robot_stats['attack']['current'];
         $this_robot_defense = $this_robot_stats['defense']['current'];
@@ -1331,7 +1331,7 @@ function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'
     $temp_game_counters = array();
     foreach ($temp_robot_omega AS $omega){
         if (empty($omega['robot'])){ continue; }
-        $index = mmrpg_robot::parse_index_info($temp_robot_index[$omega['robot']]);
+        $index = rpg_robot::parse_index_info($temp_robot_index[$omega['robot']]);
         $game = strtolower($index['robot_game']);
         if (!isset($temp_game_counters[$game])){ $temp_game_counters[$game] = 0; }
         $temp_game_counters[$game] += 1;
@@ -1394,7 +1394,7 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
     $temp_player_robots = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'];
     $temp_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
     foreach ($temp_player_robots AS $token => $info){
-        $index = mmrpg_robot::parse_index_info($temp_robot_index[$token]);
+        $index = rpg_robot::parse_index_info($temp_robot_index[$token]);
         $info = array_merge($index, $info);
         if (mmrpg_prototype_robot_unlocked($player_token, $token)){
             $temp_size = !empty($info['robot_image_size']) ? $info['robot_image_size'] : 40;
