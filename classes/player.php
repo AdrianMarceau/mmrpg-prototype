@@ -34,7 +34,7 @@ class mmrpg_player {
   public function player_load($this_playerinfo){
     // Pull in the global index
     global $mmrpg_index;
-    
+
     // Collect current player data from the session if available
     $this_playerinfo_backup = $this_playerinfo;
     if (isset($_SESSION['PLAYERS'][$this_playerinfo['player_id']])){
@@ -106,7 +106,7 @@ class mmrpg_player {
       }
       $this->player_abilities = array_values($this->player_abilities);
     }
-    
+
     /*
     // Remove any items that do not exist in the index
     if (!empty($this->player_items)){
@@ -116,7 +116,7 @@ class mmrpg_player {
       $this->player_items = array_values($this->player_items);
     }
     */
-  
+
     // Pull in session starforce if available for human players
     if (empty($this->player_starforce) && $this->player_side == 'left'){
       if (!empty($_SESSION['GAME']['values']['star_force'])){
@@ -131,7 +131,7 @@ class mmrpg_player {
     return true;
 
   }
-  
+
   // Define a function for adding a new robot to this player's object data
   public function load_robot($this_robotinfo, $this_key, $apply_bonuses = false){
     //$GLOBALS['DEBUG']['checkpoint_line'] = 'class.player.php : line 107 <pre>'.print_r($this->player_robots, true).'</pre>';
@@ -168,21 +168,21 @@ class mmrpg_player {
     }
     return $quote_text;
   }
-  
+
   // Define a function for checking if this player has a specific ability
   public function has_ability($ability_token){
     if (empty($this->player_abilities) || empty($ability_token)){ return false; }
     elseif (in_array($ability_token, $this->player_abilities)){ return true; }
     else { return false; }
   }
-  
+
   // Define a function for checking if this player has a specific item
   public function has_item($item_token){
     if (empty($this->player_items) || empty($item_token)){ return false; }
     elseif (in_array($item_token, $this->player_items)){ return true; }
     else { return false; }
   }
-  
+
   // Define a function for generating player canvas variables
   public function canvas_markup($options){
 
@@ -314,8 +314,8 @@ class mmrpg_player {
     elseif ($info1['robot_key'] > $info2['robot_key']){ return 1; }
     else { return 0; }
   }
-  
-  
+
+
   // Define a static function for printing out the robot's editor markup
   public static function abilities_sort_for_editor($ability_one, $ability_two){
     $ability_token_one = $ability_one['ability_token'];
@@ -324,8 +324,8 @@ class mmrpg_player {
     elseif ($ability_token_one < $ability_token_two){ return -1; }
     else { return 0; }
   }
-  
-  
+
+
   // Define a static function for printing out the robot's editor markup
   public static function fields_sort_for_editor($field_one, $field_two){
     static $mmrpg_fields_index;
@@ -343,7 +343,7 @@ class mmrpg_player {
     elseif ($field_one['field_token'] < $field_two['field_token']){ return -1; }
     else { return 0; }
   }
-  
+
   // Define a static function for printing out the robot's editor markup
   public static function items_sort_for_editor($item_one, $item_two){
     global $mmrpg_index;
@@ -351,21 +351,21 @@ class mmrpg_player {
     $item_token_two = preg_match('/^item-([a-z0-9]+)-(a-z0-9+)$/i', $item_two['ability_token']) ? $item_two['ability_token'] : $item_two['ability_token'].'-size';
     list($x, $kind_one, $size_one) = explode('-', $item_token_one);
     list($x, $kind_two, $size_two) = explode('-', $item_token_two);
-    
+
     if ($kind_one == 'energy' && $kind_two != 'energy'){ return -1; }
     elseif ($kind_one != 'energy' && $kind_two == 'energy'){ return 1; }
     elseif ($kind_one == 'weapon' && $kind_two != 'weapon'){ return -1; }
     elseif ($kind_one != 'weapon' && $kind_two == 'weapon'){ return 1; }
     elseif ($kind_one == 'core' && $kind_two != 'core'){ return -1; }
     elseif ($kind_one != 'core' && $kind_two == 'core'){ return 1; }
-  
+
     elseif ($size_one == 'pellet' && $size_two != 'pellet'){ return -1; }
     elseif ($size_one != 'pellet' && $size_two == 'pellet'){ return 1; }
     elseif ($size_one == 'capsule' && $size_two != 'capsule'){ return -1; }
     elseif ($size_one != 'capsule' && $size_two == 'capsule'){ return 1; }
     elseif ($size_one == 'tank' && $size_two != 'tank'){ return -1; }
     elseif ($size_one != 'tank' && $size_two == 'tank'){ return 1; }
-    
+
     elseif ($item_one['ability_token'] > $item_two['ability_token']){ return 1; }
     elseif ($item_one['ability_token'] < $item_two['ability_token']){ return -1; }
     else { return 0; }
@@ -568,21 +568,21 @@ class mmrpg_player {
     // Define the markup variable
     $this_markup = '';
     // Require the actual data file
-    require(MMRPG_CONFIG_ROOTDIR.'data/classes/player_database-markup.php');
+    require(MMRPG_CONFIG_ROOTDIR.'classes/player_database-markup.php');
     // Return the generated markup
     return $this_markup;
 
   }
-  
+
   // Define a static function for printing out the player's editor markup
   public static function print_editor_markup($player_info){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Define the markup variable
     $this_markup = '';
-    
+
     // Require the actual data file
-    require(MMRPG_CONFIG_ROOTDIR.'data/classes/player_editor-markup.php');
+    require(MMRPG_CONFIG_ROOTDIR.'classes/player_editor-markup.php');
 
     // Return the generated markup
     return $this_markup;

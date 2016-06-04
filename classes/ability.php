@@ -801,7 +801,7 @@ class mmrpg_ability {
     public static function print_editor_title_markup($robot_info, $ability_info, $print_options = array()){
         // Require the function file
         $temp_ability_title = '';
-        require(MMRPG_CONFIG_ROOTDIR.'data/classes/ability_editor-title-markup.php');
+        require(MMRPG_CONFIG_ROOTDIR.'classes/ability_editor-title-markup.php');
         // Return the generated option markup
         return $temp_ability_title;
     }
@@ -811,7 +811,7 @@ class mmrpg_ability {
     public static function print_editor_option_markup($robot_info, $ability_info){
         // Require the function file
         $this_option_markup = '';
-        require(MMRPG_CONFIG_ROOTDIR.'data/classes/ability_editor-option-markup.php');
+        require(MMRPG_CONFIG_ROOTDIR.'classes/ability_editor-option-markup.php');
         // Return the generated option markup
         return $this_option_markup;
     }

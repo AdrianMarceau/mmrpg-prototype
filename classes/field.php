@@ -1,40 +1,40 @@
 <?
 // Define a class for the fields
 class mmrpg_field {
-  
+
   // Define global class variables
   public $flags;
   public $counters;
   public $values;
   public $history;
-  
+
   // Define the constructor class
   public function mmrpg_field(){
-    
+
     // Collect any provided arguments
     $args = func_get_args();
-    
+
     // Define the internal battle pointer
     $this->battle = isset($args[0]) ? $args[0] : array();
     $this->battle_id = $this->battle->battle_id;
     $this->battle_token = $this->battle->battle_token;
-    
+
     // Collect current field data from the function if available
     $this_fieldinfo = isset($args[1]) ? $args[1] : array('field_id' => 0, 'field_token' => 'field');
 
     // Now load the field data from the session or index
     $this->field_load($this_fieldinfo);
-    
+
     // Return true on success
     return true;
-    
+
   }
-  
+
   // Define a public function for manually loading data
   public function field_load($this_fieldinfo){
     // Pull in the global index
     global $mmrpg_index;
-    
+
     // Collect current field data from the session if available
     $this_fieldinfo_backup = $this_fieldinfo;
     if (isset($_SESSION['FIELDS'][$this->battle->battle_id][$this_fieldinfo['field_id']])){
@@ -45,7 +45,7 @@ class mmrpg_field {
       $this_fieldinfo = mmrpg_field::get_index_info($this_fieldinfo['field_token']);
     }
     $this_fieldinfo = array_replace($this_fieldinfo, $this_fieldinfo_backup);
-    
+
     // Define the internal field values using the collected array
     $this->flags = isset($this_fieldinfo['flags']) ? $this_fieldinfo['flags'] : array();
     $this->counters = isset($this_fieldinfo['counters']) ? $this_fieldinfo['counters'] : array();
@@ -65,7 +65,7 @@ class mmrpg_field {
     $this->field_background_attachments = isset($this_fieldinfo['field_background_attachments']) ? $this_fieldinfo['field_background_attachments'] : array();
     $this->field_foreground_attachments = isset($this_fieldinfo['field_foreground_attachments']) ? $this_fieldinfo['field_foreground_attachments'] : array();
     $this->field_music = isset($this_fieldinfo['field_music']) ? $this_fieldinfo['field_music'] : 'field';
-    
+
     // Define the internal field base values using the fields index array
     $this->field_base_name = isset($this_fieldinfo['field_base_name']) ? $this_fieldinfo['field_base_name'] : $this->field_name;
     $this->field_base_token = isset($this_fieldinfo['field_base_token']) ? $this_fieldinfo['field_base_token'] : $this->field_token;
@@ -77,15 +77,15 @@ class mmrpg_field {
     $this->field_base_background_attachments = isset($this_fieldinfo['field_base_background_attachments']) ? $this_fieldinfo['field_base_background_attachments'] : $this->field_background_attachments;
     $this->field_base_foreground_attachments = isset($this_fieldinfo['field_base_foreground_attachments']) ? $this_fieldinfo['field_base_foreground_attachments'] : $this->field_foreground_attachments;
     $this->field_base_music = isset($this_fieldinfo['field_base_music']) ? $this_fieldinfo['field_base_music'] : $this->field_music;
-        
+
     // Update the session variable
     $this->update_session();
-    
+
     // Return true on success
     return true;
-    
+
   }
-  
+
   // Define public print functions for markup generation
   public function print_field_name(){ return '<span class="field_name field_type field_type_'.(!empty($this->field_type) ? $this->field_type : 'none').'">'.$this->field_name.'</span>'; }
   //public function print_field_name(){ return '<span class="field_name field_type field_type_'.(!empty($this->field_type) ? $this->field_type : 'none').'">'.$this->field_name.'</span>'; }
@@ -98,7 +98,7 @@ class mmrpg_field {
   public function print_field_description(){ return '<span class="field_description">'.$this->field_description.'</span>'; }
   public function print_field_background(){ return '<span class="field_background">'.$this->field_background.'</span>'; }
   public function print_field_foreground(){ return '<span class="field_foreground">'.$this->field_foreground.'</span>'; }
-  
+
   // Define a function for pulling the full field index
   public static function get_index(){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index()");  }
@@ -119,58 +119,58 @@ class mmrpg_field {
   // Define a public function for reformatting database data into proper arrays
   public static function parse_index_info($field_info){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "parse_index_info(\$field_info:{$field_info['field_token']})");  }
-    
+
     // Return false if empty
     if (empty($field_info)){ return false; }
-    
+
     // If the information has already been parsed, return as-is
     if (!empty($field_info['_parsed'])){ return $field_info; }
     else { $field_info['_parsed'] = true; }
-    
+
     // Explode the json encoded fields into an array
     $temp_field_names = array('field_master2', 'field_mechas', 'field_multipliers', 'field_music_link', 'field_background_frame', 'field_foreground_frame', 'field_background_attachments', 'field_foreground_attachments');
     foreach ($temp_field_names AS $field_name){
       if (!empty($field_info[$field_name])){ $field_info[$field_name] = json_decode($field_info[$field_name], true); }
       else { $field_info[$field_name] = array(); }
     }
-    
+
     // Return the parsed field info
     return $field_info;
   }
-  
+
   // Define a public function updating internal variables
   public function update_variables(){
 
     // Update parent objects first
     //$this->battle->update_variables();
-    
+
     // Return true on success
     return true;
-    
+
   }
-  
+
   // Define a public function for updating this field's session
   public function update_session(){
 
     // Update any internal counters
     $this->update_variables();
-    
+
     // Request parent battle object to update as well
     //$this->battle->update_session();
-    
+
     // Update the session with the export array
     $this_data = $this->export_array();
     $_SESSION['FIELDS'][$this->battle->battle_id][$this->field_id] = $this_data;
     $this->battle->battle_field = &$this;  //new mmrpg_field($this->battle, $this->export_array());
-    
+
     // Return true on success
     return true;
-    
+
   }
-  
+
   // Define a function for exporting the current data
   public function export_array(){
-    
+
     // Return all internal field fields in array format
     return array(
       'battle_id' => $this->battle_id,
@@ -203,7 +203,7 @@ class mmrpg_field {
       'values' => $this->values,
       'history' => $this->history
       );
-    
+
   }
 
   // Define a static function for printing out the field's database markup
@@ -212,15 +212,15 @@ class mmrpg_field {
 
     // Define the markup variable
     $this_markup = '';
-    
+
     // Require the actual data file
-    require(MMRPG_CONFIG_ROOTDIR.'data/classes/field_database-markup.php');
+    require(MMRPG_CONFIG_ROOTDIR.'classes/field_database-markup.php');
 
     // Return the generated markup
     return $this_markup;
 
   }
-  
+
   // Define a static function for printing out the field's title markup
   public static function print_editor_title_markup($player_info, $field_info){
     // Pull in global variables
@@ -264,7 +264,7 @@ class mmrpg_field {
     return $temp_field_title;
   }
 
-  
+
   // Define a static function for printing out the field's title markup
   public static function print_editor_option_markup($player_info, $field_info){
     // Pull in global variables
@@ -276,7 +276,7 @@ class mmrpg_field {
     $temp_field_token = $field_info['field_token'];
     $field_info = mmrpg_field::get_index_info($temp_field_token);
     if (empty($field_info)){ return false; }
-    
+
     // DEBUG
     //if ($temp_player_token == 'oil-man' && $temp_field_token == 'oil-shooter'){ die('WHY?!'); }
 
@@ -295,11 +295,11 @@ class mmrpg_field {
     if (!empty($temp_field_energy)){ $temp_field_option .= ' | E:'.$temp_field_energy; }
     // Return the generated option markup
     $this_option_markup = '<option value="'.$temp_field_token.'" data-label="'.$temp_field_label.'" data-type="'.(!empty($temp_field_type) ? $temp_field_type['type_token'] : 'none').'" data-type2="'.(!empty($temp_field_type2) ? $temp_field_type2['type_token'] : '').'" title="'.$temp_field_title_plain.'" data-tooltip="'.$temp_field_title_tooltip.'">'.$temp_field_option.'</option>';
-    
+
     // Return the generated option markup
     return $this_option_markup;
-    
+
   }
-  
+
 }
 ?>
