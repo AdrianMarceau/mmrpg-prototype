@@ -399,7 +399,7 @@ ob_start();
                             $ability_rewards_options = '';
 
                             // Sort the ability index based on ability number
-                            uasort($player_ability_rewards, array('mmrpg_player', 'abilities_sort_for_editor'));
+                            uasort($player_ability_rewards, array('rpg_player', 'abilities_sort_for_editor'));
 
                             // Dont' bother generating option dropdowns if editing is disabled
                             if ($global_allow_editing){
