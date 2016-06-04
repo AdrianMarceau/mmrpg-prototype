@@ -6,7 +6,7 @@
 
 // Include mandatory config files
 define('MMRPG_BUILD', 'mmrpg2k11');
-define('MMRPG_VERSION', '2.6.9');
+define('MMRPG_VERSION', '2.9.1');
 require('data/config.php');
 require('data/settings.php');
 require('data/debug.php');
@@ -401,7 +401,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
 
     // Collect the info for the chosen temp field
-    $temp_field_data = mmrpg_field::get_index_info($temp_field_token);
+    $temp_field_data = rpg_field::get_index_info($temp_field_token);
     //die('<pre>'.print_r($temp_field_data, true).'</pre>');
     //die('<pre>'.print_r($this_userinfo, true).'</pre>');
     // Define the current field token for the index

@@ -39,7 +39,7 @@ $target_player_token = isset($_GET['target_player_token']) ? $_GET['target_playe
 
 // Collect the battle index data if available
 if (!empty($this_battle_token)){
-  $this_battle_data = mmrpg_battle::get_index_info($this_battle_token);
+  $this_battle_data = rpg_battle::get_index_info($this_battle_token);
   if (empty($this_battle_data['battle_id'])){
     $this_battle_id = !empty($this_battle_id) ? $this_battle_id : 1;
     $this_battle_data['battle_id'] = $this_battle_id;
@@ -52,21 +52,21 @@ else {
 }
 
 // Collect the field index if available
-$mmrpg_index_fields = mmrpg_field::get_index();
+$mmrpg_index_fields = rpg_field::get_index();
 // Collect the field index data if available
 if (!empty($this_field_token) && isset($mmrpg_index_fields[$this_field_token])){
-  $this_field_data = mmrpg_field::parse_index_info($mmrpg_index_fields[$this_field_token]);
+  $this_field_data = rpg_field::parse_index_info($mmrpg_index_fields[$this_field_token]);
   if (empty($this_field_data['field_id'])){
     $this_field_id = !empty($this_field_id) ? $this_field_id : 1;
     $this_field_data['field_id'] = $this_field_id;
   }
 }
 elseif (!empty($this_battle_data['battle_field_base']['field_token']) && isset($mmrpg_index_fields[$this_battle_data['battle_field_base']['field_token']])){
-  $this_field_data1 = mmrpg_field::parse_index_info($mmrpg_index_fields[$this_battle_data['battle_field_base']['field_token']]);
+  $this_field_data1 = rpg_field::parse_index_info($mmrpg_index_fields[$this_battle_data['battle_field_base']['field_token']]);
   $this_field_data2 = $this_battle_data['battle_field_base'];
   //die('test1 = $this_field_data = <pre>'.print_r($this_field_data, true).'</pre> $this_field_data2 = <pre>'.print_r($this_field_data2, true).'</pre>');
   $this_field_data = array_merge($this_field_data1, $this_field_data2);
-  //$this_field_data = mmrpg_field::parse_index_info($this_field_merged);
+  //$this_field_data = rpg_field::parse_index_info($this_field_merged);
   //die('test2 = $this_field_data = <pre>'.print_r($this_field_data, true).'</pre>');
   if (empty($this_field_data['field_id'])){
     $this_field_id = !empty($this_field_id) ? $this_field_id : 1;
@@ -205,48 +205,48 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 <div id="battle" class="hidden">
 
   <form id="engine" action="data.php<?= $flag_wap ? '?wap=true' : '' ?>" target="connect" method="post">
-    
+
     <input type="hidden" name="this_action" value="" />
     <input type="hidden" name="next_action" value="loading" />
-    
+
     <input type="hidden" name="this_battle_id" value="<?=$this_battle_data['battle_id']?>" />
     <input type="hidden" name="this_battle_token" value="<?=$this_battle_data['battle_token']?>" />
     <input type="hidden" name="this_battle_status" value="active" />
     <input type="hidden" name="this_battle_result" value="pending" />
-    
+
     <input type="hidden" name="this_field_id" value="<?=$this_field_data['field_id']?>" />
     <input type="hidden" name="this_field_token" value="<?=$this_field_data['field_token']?>" />
-    
+
     <input type="hidden" name="this_user_id" value="<?=$this_player_data['user_id']?>" />
     <input type="hidden" name="this_player_id" value="<?=$this_player_data['player_id']?>" />
     <input type="hidden" name="this_player_token" value="<?=$this_player_data['player_token']?>" />
     <input type="hidden" name="this_player_robots" value="<?=$this_player_robots?>" />
     <input type="hidden" name="this_robot_id" value="auto" />
     <input type="hidden" name="this_robot_token" value="auto" />
-    
+
     <input type="hidden" name="target_user_id" value="<?=$target_player_data['user_id']?>" />
     <input type="hidden" name="target_player_id" value="<?=$target_player_data['player_id']?>" />
     <input type="hidden" name="target_player_token" value="<?=$target_player_data['player_token']?>" />
     <input type="hidden" name="target_robot_id" value="auto" />
     <input type="hidden" name="target_robot_token" value="auto" />
-    
+
   </form>
-  
+
   <div id="canvas">
     <div class="wrapper">
-      
+
       <div class="canvas_overlay_header canvas_overlay_hidden" style="">&nbsp;</div>
-      
+
       <div id="animate" style="opacity: 0;"><a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a></div>
       <div class="event sticky" style="z-index: 1;">
         <?
-        
+
         // If field data was provided, preload the background/foreground
         if (!empty($this_field_data)){
-          
+
           // Define the paths for the different attachment types
           $class_paths = array('ability' => 'abilities', 'battle' => 'battles', 'field' => 'fields', 'player' => 'players', 'robot' => 'robots', 'object' => 'objects');
-          
+
           // Define the background layer properties
           $background_animate = array();
           if (!empty($this_field_data['field_background_frame'])){
@@ -257,7 +257,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
           // Display the markup of the background layer
           //echo '<div class="animate_fadein background_canvas background background_'.$background_animate[0].'" data-frame="'.$background_animate[0].'" '.(!empty($background_data_animate) ? 'data-animate="'.$background_data_animate.'"' : '').' style="background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
           echo '<div class="animate_fadein background_canvas background background_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
-                    
+
           // Loop through and display the markup of any background attachments
           if (!empty($this_field_data['field_background_attachments'])){
             echo '<div class="animate_fadein background_event event clearback sticky" style="z-index: 30; border-color: transparent;">';
@@ -296,7 +296,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
             }
             echo '</div>';
           }
-          
+
           // Define the foreground layer properties
           $foreground_animate = array();
           if (!empty($this_field_data['field_foreground_frame'])){
@@ -307,10 +307,10 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
           // Display the markup of the foreground layer
           //echo '<div class="animate_fadein foreground_canvas foreground foreground_'.$foreground_animate[0].'" data-frame="'.$foreground_animate['0'].'" '.(!empty($foreground_data_animate) ? 'data-animate="'.$foreground_data_animate.'"' : '').' style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
           echo '<div class="animate_fadein foreground_canvas foreground foreground_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
-          
+
           // Check if this field has a fusion star in it
           if (!empty($this_battle_data['values']['field_star'])){
-            
+
             // Check if this is a field star or fusion star
             $temp_star_kind = !empty($this_field_data['field_type2']) ? 'fusion' : 'field';
             $temp_star_name = $this_field_data['field_name'].' Star';
@@ -322,7 +322,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
             // Collect the star image info from the index based on type
             $temp_star_back_info = mmrpg_prototype_star_image($temp_field_type_2);
             $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
-            
+
             // Append the new field star to the foreground attachment array
             //die('$this_field_data = <pre>'.print_r($this_field_data, true).'</pre>');
             $this_field_data['field_foreground_attachments']['field-star-back'] = array(
@@ -349,9 +349,9 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
               'ability_direction' => 'left',
               'ability_text' => $temp_star_text
               );
-            
+
           }
-          
+
           // Loop through and display the markup of any foreground attachments
           //die('$this_field_data[field_foreground_attachments] = <pre>'.print_r($this_field_data['field_foreground_attachments'], true).'</pre>');
           if (!empty($this_field_data['field_foreground_attachments'])){
@@ -382,7 +382,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                 for ($i = 0; $i < $temp_frames; $i++){ $this_frames[] = $temp_options[array_rand($temp_options)]; }
                 foreach ($temp_options AS $i){ if (!in_array($i, $this_frames)){ $this_frames[] = $i; } }
               }
-              
+
               $this_frames_shift = isset($this_info[$this_class.'_frame_shift']) ? $this_info[$this_class.'_frame_shift'] : array();
               foreach ($this_frames AS $key => $frame){ if (is_numeric($frame)){ $this_frames[$key] = str_pad($frame, 2, '0', STR_PAD_LEFT); } }
               $this_frame = $this_frames[0];
@@ -404,7 +404,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
             }
             echo '</div>';
           }
-          
+
         }
         // Otherwise, simply print the ready message
         else {
@@ -412,78 +412,78 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
         }
         ?>
       </div>
-      
+
       <div class="event event_details clearback sticky" style="">
         <?
         // Display the scanline layer if enabled
         if ($debug_flag_scanlines){ echo '<div class="foreground scanlines" style="background-image: url(images/gui/canvas-scanlines.png?'.MMRPG_CONFIG_CACHE_DATE.'); opacity: 1;">&nbsp;</div>'; }
         ?>
         <?/*
-        
+
         <div class="sprite ability_damage ability_damage_energy" style="left: 0; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-9</div>
         <div class="sprite ability_recovery ability_recovery_energy" style="right: 0; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+9</div>
-        
+
         <div class="sprite ability_damage ability_damage_attack" style="left: 50px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
         <div class="sprite ability_recovery ability_recovery_attack" style="right: 50px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+99</div>
-        
+
         <div class="sprite ability_damage ability_damage_defense" style="left: 100px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
         <div class="sprite ability_recovery ability_recovery_defense" style="right: 100px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-        
+
         <div class="sprite ability_damage ability_damage_speed" style="left: 150px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
         <div class="sprite ability_recovery ability_recovery_speed" style="right: 150px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+99 </div>
-        
+
         <div class="sprite ability_damage ability_damage_experience" style="left: 200px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
         <div class="sprite ability_recovery ability_recovery_experience" style="right: 200px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-        
+
         <div class="sprite ability_damage ability_damage_level" style="left: 300px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-1</div>
         <div class="sprite ability_recovery ability_recovery_level" style="right: 300px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+1</div>
-        
-        
-        
+
+
+
         <div class="sprite ability_damage ability_damage_energy_super" style="left: 0; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-9</div>
         <div class="sprite ability_recovery ability_recovery_energy_super" style="right: 0; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+9</div>
-        
+
         <div class="sprite ability_damage ability_damage_attack_super" style="left: 50px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
         <div class="sprite ability_recovery ability_recovery_attack_super" style="right: 50px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+99</div>
-        
+
         <div class="sprite ability_damage ability_damage_defense_super" style="left: 100px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
         <div class="sprite ability_recovery ability_recovery_defense_super" style="right: 100px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-        
+
         <div class="sprite ability_damage ability_damage_speed_super" style="left: 150px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
         <div class="sprite ability_recovery ability_recovery_speed_super" style="right: 150px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+99 </div>
-        
+
         <div class="sprite ability_damage ability_damage_experience_super" style="left: 200px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
         <div class="sprite ability_recovery ability_recovery_experience_super" style="right: 200px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-        
+
         <div class="sprite ability_damage ability_damage_level_super" style="left: 300px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-1</div>
         <div class="sprite ability_recovery ability_recovery_level_super" style="right: 300px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+1</div>
-        
-        
-        
+
+
+
         <div class="sprite ability_damage ability_damage_energy_critical" style="left: 0; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-9</div>
         <div class="sprite ability_recovery ability_recovery_energy_critical" style="right: 0; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+9</div>
-        
+
         <div class="sprite ability_damage ability_damage_attack_critical" style="left: 50px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
         <div class="sprite ability_recovery ability_recovery_attack_critical" style="right: 50px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+99</div>
-        
+
         <div class="sprite ability_damage ability_damage_defense_critical" style="left: 100px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
         <div class="sprite ability_recovery ability_recovery_defense_critical" style="right: 100px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-        
+
         <div class="sprite ability_damage ability_damage_speed_critical" style="left: 150px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
         <div class="sprite ability_recovery ability_recovery_speed_critical" style="right: 150px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+99 </div>
-        
+
         <div class="sprite ability_damage ability_damage_experience_critical" style="left: 200px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
         <div class="sprite ability_recovery ability_recovery_experience_critical" style="right: 200px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-        
+
         <div class="sprite ability_damage ability_damage_level_critical" style="left: 300px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-1</div>
         <div class="sprite ability_recovery ability_recovery_level_critical" style="right: 300px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+1</div>
        */?>
 
       </div>
-      
+
       <?/*?>
       <div class="canvas_overlay_footer canvas_overlay_hidden" style="">
-      
+
       <?
       // Print out damage mulitpliers that exist for this field
       if (!empty($this_field_data['field_multipliers'])){
@@ -492,18 +492,18 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
         }
       }
       ?>
-      
+
       </div>
       <?*/?>
-      
+
     </div>
   </div>
-  
+
   <div id="console">
     <div class="wrapper">
     </div>
   </div>
-  
+
   <div id="actions">
     <a id="actions_resend" class="actions_resend button">RESEND</a>
     <div id="actions_loading" class="actions_loading wrapper">
@@ -572,10 +572,10 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
       </div>
     </div>
   </div>
-  
+
   <iframe id="connect" name="connect" src="about:blank">
   </iframe>
-  
+
   <div id="event_console_backup" style="display: none;">
   </div>
 

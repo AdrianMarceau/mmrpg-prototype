@@ -12,7 +12,7 @@ $ability = array(
 
     // Extract all objects into the current scope
     extract($objects);
-    $mmrpg_index_fields = mmrpg_field::get_index();
+    $mmrpg_index_fields = rpg_field::get_index();
 
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
@@ -66,7 +66,7 @@ $ability = array(
           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_robot->robot_field = '.$this_robot->robot_field);  }
           // Collect the current mechas available for this robot's home field
           $temp_field = !empty($mmrpg_index_fields[$this_robot->robot_field]) ? $mmrpg_index_fields[$this_robot->robot_field] : array();
-          $this_field_info = mmrpg_field::parse_index_info($temp_field);
+          $this_field_info = rpg_field::parse_index_info($temp_field);
           $this_field_mechas = !empty($this_field_info['field_mechas']) ? $this_field_info['field_mechas'] : array();
         }
       }

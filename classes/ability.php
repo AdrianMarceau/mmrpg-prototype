@@ -1022,8 +1022,8 @@ class rpg_ability {
                 'percent' => true,
                 'modifiers' => false,
                 'frame' => 'taunt',
-                'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.' powered up '.$boost_effect_word.'! '.mmrpg_battle::random_positive_word()),
-                'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.''.$stat_verb.' not affected&hellip; '.mmrpg_battle::random_negative_word())
+                'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.' powered up '.$boost_effect_word.'! '.rpg_battle::random_positive_word()),
+                'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.''.$stat_verb.' not affected&hellip; '.rpg_battle::random_negative_word())
                 ));
             $stat_recovery_amount = ceil($target_robot->$stat_base_prop * ($this_ability->ability_recovery / 100));
             $target_robot->trigger_recovery($target_robot, $this_ability, $stat_recovery_amount);
@@ -1077,7 +1077,7 @@ class rpg_ability {
                                 "{$target_robot->robot_name}'s {$stat_name} Stat",
                                 $target_robot->print_robot_name().'\'s '.$stat_token.' stat bonuses have been raised to the max of '.
                                 '<span class="robot_type robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['max'].' &#9733;</span>!<br />'.
-                                'Congratulations and '.lcfirst(mmrpg_battle::random_victory_quote()).' '
+                                'Congratulations and '.lcfirst(rpg_battle::random_victory_quote()).' '
                                 );
                             $target_robot->robot_frame = 'base';
                             $target_robot->update_session();

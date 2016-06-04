@@ -86,7 +86,7 @@ $player_info['player_fields_current'] = array();
 //die('<pre>$player_info[\'target_robot_omega\'] = '.print_r($player_info['target_robot_omega'], true).'</pre>');
 if (count($player_info['target_robot_omega']) == 2){ $player_info['target_robot_omega'] = array_shift($player_info['target_robot_omega']); }
 foreach ($player_info['target_robot_omega'] AS $key => $info){
-  $field = mmrpg_field::get_index_info($info['field']);
+  $field = rpg_field::get_index_info($info['field']);
   if (empty($field)){ continue; }
   $player_info['player_fields_current'][] = $field;
 }
@@ -470,7 +470,7 @@ ob_start();
                     $player_field_rewards_options = array();
                     foreach ($player_field_rewards_backup AS $temp_field_key => $temp_field_info){
                       if ($temp_field_info['field_game'] != $group_key){ continue; }
-                      $temp_option_markup = mmrpg_field::print_editor_option_markup($player_info, $temp_field_info);
+                      $temp_option_markup = rpg_field::print_editor_option_markup($player_info, $temp_field_info);
                       if (!empty($temp_option_markup)){ $player_field_rewards_options[] = $temp_option_markup; }
                       unset($player_field_rewards_backup[$temp_field_key]);
                     }
@@ -498,7 +498,7 @@ ob_start();
 
                   // DEBUG
                   //echo 'player-field:';
-                  $mmrpg_field_index = mmrpg_field::get_index();
+                  $mmrpg_field_index = rpg_field::get_index();
                   $player_info['player_fields_current'] = $player_info['player_fields_current']; //array_reverse($player_info['player_fields_current']);
                   foreach ($player_info['player_fields_current'] AS $player_field){
                     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -508,7 +508,7 @@ ob_start();
                     elseif ($field_key > 7){ continue; }
 
                     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                    $this_field = mmrpg_field::parse_index_info($mmrpg_field_index[$player_field['field_token']]);
+                    $this_field = rpg_field::parse_index_info($mmrpg_field_index[$player_field['field_token']]);
                     $this_field_token = $this_field['field_token'];
                     $this_robot_token = $this_field['field_master'];
                     $this_robot = rpg_robot::parse_index_info($mmrpg_database_robots[$this_robot_token]);
@@ -525,7 +525,7 @@ ob_start();
                     }
                     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     $this_field_description = !empty($this_field['field_description']) ? $this_field['field_description'] : '';
-                    $this_field_title = mmrpg_field::print_editor_title_markup($player_info, $this_field);
+                    $this_field_title = rpg_field::print_editor_title_markup($player_info, $this_field);
                     $this_field_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_field_title));
                     $this_field_title_tooltip = htmlentities($this_field_title, ENT_QUOTES, 'UTF-8');
                     $this_field_title_html = str_replace(' ', '&nbsp;', $this_field_name);

@@ -56,7 +56,7 @@ if (!empty($this_current_token)){
     }
 
     // Collect the markup for this player and print it to the browser
-    $temp_player_markup = mmrpg_player::print_database_markup($player_info, array('show_key' => $key_counter));
+    $temp_player_markup = rpg_player::print_database_markup($player_info, array('show_key' => $key_counter));
     echo $temp_player_markup;
     $key_counter++;
     break;
@@ -114,7 +114,7 @@ if (empty($this_current_token)){
     $this_player_image = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
     if ($this_player_image == 'player'){ $this_seo_robots = 'noindex'; }
     // Collect the markup for this player and print it to the browser
-    $temp_player_markup = mmrpg_player::print_database_markup($player_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+    $temp_player_markup = rpg_player::print_database_markup($player_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
     echo $temp_player_markup;
     $key_counter++;
   }

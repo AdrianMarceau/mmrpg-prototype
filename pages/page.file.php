@@ -23,7 +23,7 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('999.999.999.999'))){
 
 // Collect an index of user roles for display
 $this_roles_index = $DB->get_array_list("SELECT * FROM mmrpg_roles ORDER BY role_id ASC", 'role_id');
-$this_fields_index = mmrpg_field::get_index();
+$this_fields_index = rpg_field::get_index();
 
 // Collect the current request type if set
 $this_action = $this_current_sub;

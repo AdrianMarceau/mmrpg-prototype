@@ -100,7 +100,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
 
   // If requested new field was an empty string, remove the previous value
   if (empty($temp_field)){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // If this was the last field, do nothing with this request
     if (count($temp_fields) <= 1){ die('success|remove-last|'.implode(',', $temp_fields)); }
@@ -116,11 +116,11 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-removed|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
+
   }
   // Otherwise if this was a shuffle request
   elseif ($temp_field == 'shuffle'){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Shuffle fields, simple as that
     shuffle($temp_fields);
@@ -134,7 +134,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     $new_target_robot_omega = array();
     foreach ($temp_fields_new AS $token => $info){
       if (!isset($mmrpg_database_fields[$token])){ continue; }
-      $info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+      $info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
       $new_target_robot_omega[] = array(
         'robot' => $info['field_master'],
         'field' => $info['field_token'],
@@ -149,12 +149,12 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-shuffled|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
-    
+
+
   }
   // Otherwise if this was a randomize request
   elseif ($temp_field == 'randomize'){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Collect a copy of the available fields and then shuffle them
     $temp_available_fields = $temp_omega_factor_options;
@@ -177,7 +177,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     $new_target_robot_omega = array();
     foreach ($temp_fields_new AS $token => $info){
       if (!isset($mmrpg_database_fields[$token])){ continue; }
-      $info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+      $info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
       $new_target_robot_omega[] = array(
         'robot' => $info['field_master'],
         'field' => $info['field_token'],
@@ -192,12 +192,12 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-randomize|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
-    
+
+
   }
   // Otherwise, if there was a new field provided, update it in the array
   elseif (!in_array($temp_field, $temp_fields)){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update this position in the array with the new field
     $temp_fields[$temp_key] = $temp_field;
@@ -211,7 +211,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     $new_target_robot_omega = array();
     foreach ($temp_fields_new AS $token => $info){
       if (!isset($mmrpg_database_fields[$token])){ continue; }
-      $info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+      $info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
       $new_target_robot_omega[] = array(
         'robot' => $info['field_master'],
         'field' => $info['field_token'],
@@ -226,11 +226,11 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
+
   }
   // Otherwise, if this field already exists, swap position in array
   elseif (in_array($temp_field, $temp_fields)){
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update this position in the array with the new field
     $this_slot_key = $temp_key;
@@ -251,7 +251,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     $new_target_robot_omega = array();
     foreach ($temp_fields_new AS $token => $info){
       if (!isset($mmrpg_database_fields[$token])){ continue; }
-      $info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+      $info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
       $new_target_robot_omega[] = array(
         'robot' => $info['field_master'],
         'field' => $info['field_token'],
@@ -266,15 +266,15 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Save, produce the success message with the new field order
     mmrpg_save_game_session($this_save_filepath);
     exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
+
   } else {
-    
+
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Collect the available star counts for this player
     $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
     // Produce an error show this field has already been selected
     exit('error|field-exists|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-    
+
   }
 
 }
@@ -307,7 +307,7 @@ if (true){
 
   // Start the output buffer
   ob_start();
-  
+
   // Loop through the allowed edit data for all players
   $key_counter = 0;
   $player_counter = 0;
@@ -327,7 +327,7 @@ if (true){
       echo '</div>'."\n";
     //echo '</td>'."\n";
   }
-  
+
   // Collect the contents of the buffer
   $edit_canvas_markup = ob_get_clean();
   $edit_canvas_markup = preg_replace('/\s+/', ' ', trim($edit_canvas_markup));
@@ -374,7 +374,7 @@ if (true){
   // Loop through the unlockable MM3 fields (from omega factor four)
   foreach ($this_omega_factors_four AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_omega_factor_options[] = $factor; } }
 */
-    
+
   // Loop through the players in the field edit data
   foreach($allowed_edit_data AS $player_token => $player_info){
 
@@ -390,7 +390,7 @@ if (true){
       // Loop through and add all the MM1 fields
       foreach ($temp_omega_factor_options AS $omega_key => $omega_info){
         if (empty($mmrpg_database_fields[$omega_info['field']])){ continue; }
-        $field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$omega_info['field']]);
+        $field_info = rpg_field::parse_index_info($mmrpg_database_fields[$omega_info['field']]);
         $player_rewards['player_fields'][] = $field_info;
       }
     }
@@ -442,7 +442,7 @@ if (true){
 
     // Collect and print the editor markup for this player
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    $temp_editor_markup = mmrpg_player::print_editor_markup($player_info);
+    $temp_editor_markup = rpg_player::print_editor_markup($player_info);
     echo $temp_editor_markup;
 
     $key_counter++;

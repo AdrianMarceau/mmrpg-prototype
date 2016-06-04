@@ -467,7 +467,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_options_markup(&\$battle_options, '{$player_token}')");  }
     // Refence the global config and index objects for easy access
     global $mmrpg_index, $DB;
-    $mmrpg_index_fields = mmrpg_field::get_index();
+    $mmrpg_index_fields = rpg_field::get_index();
     // Define the variable to collect option markup
     $this_markup = '';
 
@@ -491,13 +491,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
         else {
 
             // Collect the current battle and field info from the index
-            $this_battleinfo = mmrpg_battle::get_index_info($this_info['battle_token']);
+            $this_battleinfo = rpg_battle::get_index_info($this_info['battle_token']);
             if (!empty($this_battleinfo)){ $this_battleinfo = array_replace($this_battleinfo, $this_info); }
             else { $this_battleinfo = $this_info; }
             $this_fieldtoken = $this_battleinfo['battle_field_base']['field_token'];
             $this_fieldinfo =
                 !empty($mmrpg_index_fields[$this_fieldtoken])
-                ? array_replace(mmrpg_field::parse_index_info($mmrpg_index_fields[$this_fieldtoken]), $this_battleinfo['battle_field_base'])
+                ? array_replace(rpg_field::parse_index_info($mmrpg_index_fields[$this_fieldtoken]), $this_battleinfo['battle_field_base'])
                 : $this_battleinfo['battle_field_base'];
             $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
 

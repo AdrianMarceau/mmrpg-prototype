@@ -13,7 +13,7 @@ $ability = array(
 
     // Extract all objects into the current scope
     extract($objects);
-    $mmrpg_index_fields = mmrpg_field::get_index();
+    $mmrpg_index_fields = rpg_field::get_index();
 
     // Check if this robot is a Copy Core or Elemental Core (skip if Neutral)
     $this_field_multipliers = array();
@@ -29,7 +29,7 @@ $ability = array(
 
         // Collect the current robots available for this robot's home field
         $temp_field = !empty($mmrpg_index_fields[$this_robot->robot_field]) ? $mmrpg_index_fields[$this_robot->robot_field] : array();
-        $this_field_info = mmrpg_field::parse_index_info($temp_field);
+        $this_field_info = rpg_field::parse_index_info($temp_field);
         $this_field_multipliers = !empty($this_field_info['field_multipliers']) ? $this_field_info['field_multipliers'] : array();
 
       } elseif (empty($this_robot->robot_field)){
@@ -110,14 +110,14 @@ $ability = array(
             $temp_change = $temp_new_amount - $temp_first_amount;
             $temp_change_percent = round(($temp_change / $temp_first_amount) * 100);
             $temp_change_text = 'boosted';
-            //$temp_change_alert = mmrpg_battle::random_positive_word();
-            $temp_change_alert = $this_player->player_side == 'left' ? mmrpg_battle::random_positive_word() : mmrpg_battle::random_negative_word();
+            //$temp_change_alert = rpg_battle::random_positive_word();
+            $temp_change_alert = $this_player->player_side == 'left' ? rpg_battle::random_positive_word() : rpg_battle::random_negative_word();
           } elseif ($temp_new_amount < $temp_first_amount){
             $temp_change = $temp_first_amount - $temp_new_amount;
             $temp_change_percent = round(($temp_change / $temp_first_amount) * 100);
             $temp_change_text = 'reduced';
-            //$temp_change_alert = mmrpg_battle::random_positive_word();
-            $temp_change_alert = $this_player->player_side == 'left' ? mmrpg_battle::random_positive_word() : mmrpg_battle::random_negative_word();
+            //$temp_change_alert = rpg_battle::random_positive_word();
+            $temp_change_alert = $this_player->player_side == 'left' ? rpg_battle::random_positive_word() : rpg_battle::random_negative_word();
           } else {
             continue;
           }

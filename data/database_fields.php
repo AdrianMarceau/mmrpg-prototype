@@ -25,7 +25,7 @@ $mmrpg_database_fields = $DB->get_array_list("SELECT * FROM mmrpg_index_fields W
 foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
 
   // Send this data through the field index parser
-  $temp_info = mmrpg_field::parse_index_info($temp_info);
+  $temp_info = rpg_field::parse_index_info($temp_info);
 
   if (in_array($temp_token, $hidden_database_fields)){
     unset($mmrpg_database_fields[$temp_token]);

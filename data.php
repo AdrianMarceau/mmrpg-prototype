@@ -115,12 +115,12 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_fieldinfo = array('field_id' => $this_field_id, 'field_token' => $this_field_token);
 
 // Define the battle object using the loaded battle data and update session
-$this_battle = new mmrpg_battle($this_battleinfo);
+$this_battle = new rpg_battle($this_battleinfo);
 $this_battle->update_session();
 
 // Define the current field object using the loaded field data and update session
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-$this_field = new mmrpg_field($this_battle, $this_fieldinfo);
+$this_field = new rpg_field($this_battle, $this_fieldinfo);
 $this_field->update_session();
 
 // Define the current player object using the loaded player data
@@ -138,10 +138,10 @@ $target_playerinfo['player_side'] = 'right';
 if ($this_action != 'start'){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Define the current player object using the loaded player data and update session
-    $this_player = new mmrpg_player($this_battle, $this_playerinfo);
+    $this_player = new rpg_player($this_battle, $this_playerinfo);
     $this_player->update_session();
     // Define the target player object using the loaded player data and update session
-    $target_player = new mmrpg_player($this_battle, $target_playerinfo);
+    $target_player = new rpg_player($this_battle, $target_playerinfo);
     $target_player->update_session();
 }
 // Otherwise, prepopulate their robot arrays
@@ -191,7 +191,7 @@ if ($this_action == 'start'){
     if (!empty($this_battle->battle_field_base)){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_fieldinfo = array_replace($this_fieldinfo, $this_battle->battle_field_base);
-        $this_field = new mmrpg_field($this_battle, $this_fieldinfo);
+        $this_field = new rpg_field($this_battle, $this_fieldinfo);
         $this_field->update_session();
     }
 
@@ -202,7 +202,7 @@ if ($this_action == 'start'){
         // Precreate the player object using the newly defined details
         $backup_this_playerinfo = $this_playerinfo;
         $backup_this_playerinfo['player_robots'] = array();
-        $this_player = new mmrpg_player($this_battle, $backup_this_playerinfo);
+        $this_player = new rpg_player($this_battle, $backup_this_playerinfo);
         $this_player->update_session();
         unset($backup_this_playerinfo);
         // Break apart the allowed robots string and unset undefined robots
@@ -276,7 +276,7 @@ if ($this_action == 'start'){
         // Precreate the target player object using the newly defined details
         $backup_target_playerinfo = $target_playerinfo;
         $backup_target_playerinfo['player_robots'] = array();
-        $target_player = new mmrpg_player($this_battle, $backup_target_playerinfo);
+        $target_player = new rpg_player($this_battle, $backup_target_playerinfo);
         $target_player->update_session();
         unset($backup_target_playerinfo);
         // Break apart the allowed robots string and unset undefined robots
@@ -1386,12 +1386,12 @@ elseif ($this_action == 'ability'){
 
 
         // Loop through all this player's robots and carry out any end-turn events
-        mmrpg_battle::temp_check_robot_attachments($this_battle, $this_player, $this_robot, $target_player, $target_robot);
-        mmrpg_battle::temp_check_robot_weapons($this_battle, $this_player, $this_robot, $target_player, $target_robot);
+        rpg_battle::temp_check_robot_attachments($this_battle, $this_player, $this_robot, $target_player, $target_robot);
+        rpg_battle::temp_check_robot_weapons($this_battle, $this_player, $this_robot, $target_player, $target_robot);
 
         // Loop through all the target player's robots and carry out any end-turn events
-        mmrpg_battle::temp_check_robot_attachments($this_battle, $target_player, $target_robot, $this_player, $this_robot);
-        mmrpg_battle::temp_check_robot_weapons($this_battle, $target_player, $target_robot, $this_player, $this_robot);
+        rpg_battle::temp_check_robot_attachments($this_battle, $target_player, $target_robot, $this_player, $this_robot);
+        rpg_battle::temp_check_robot_weapons($this_battle, $target_player, $target_robot, $this_player, $this_robot);
 
         // Create an empty field to remove any leftover frames
         $this_battle->events_create(false, false, '', '');
