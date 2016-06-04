@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 /*
  * COMMUNITY CATEGORY VIEW
@@ -19,7 +18,6 @@ $this_graph_data['description'] = strip_tags($this_category_info['category_descr
 //$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
 
 // Require the leaderboard data file
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require_once('data/leaderboard.php');
 // Collect all the active sessions for this page
 $temp_viewing_category = mmrpg_website_sessions_active('community/'.$this_category_info['category_token'].'/', 3, true);
@@ -39,7 +37,7 @@ $user_chat_name = preg_replace('/([^-_a-z0-9]+)/i', '', $user_chat_name);
   <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_0<?= mt_rand(0, 2) ?>" style="background-image: url(images/robots/<?= MMRPG_SETTINGS_CURRENT_FIELDMECHA ?>/sprite_left_80x80.png);">Met</div></div>
   <p class="text"><?= $this_category_info['category_description'] ?></p>
   <p class="text" style="margin-bottom: 6px;">(!) Please log in to the chat using the same username and password that you created for your prototype account</p>
-  <p class="text" style="margin-bottom: 6px;">(!) Please see <a href="community/general/1107/official-chat-help-and-guidelines/">this thread</a> for a more thorough overview of the rules for the chat room<br /> 
+  <p class="text" style="margin-bottom: 6px;">(!) Please see <a href="community/general/1107/official-chat-help-and-guidelines/">this thread</a> for a more thorough overview of the rules for the chat room<br />
   <p class="text" style="margin-bottom: 6px;">(!) Please <a href="chat/" target="_blank">click here</a> if you would like to view the chat larger in a new window</p>
   <?/*If you need to use the legacy chat (for serious discussion and meetings) <a href="community/chat/&legacy=true">please click here</a>.*/?>
   </p>
@@ -50,7 +48,7 @@ $user_chat_name = preg_replace('/([^-_a-z0-9]+)/i', '', $user_chat_name);
     <?= mmrpg_website_print_online($this_leaderboard_online_players, $temp_viewing_userids) ?>
   </p>
   <? endif; */?>
-</div  
+</div
 <div class="subbody" style="background-color: #f0f3ff;">
   <iframe style="border-color: #f0f3ff; width: 99% !important; height: 600px !important;" src="http://rpg.megamanpoweredup.net/chat/" width="100%" height="600"></iframe>
 </div>
@@ -68,5 +66,4 @@ $user_chat_name = preg_replace('/([^-_a-z0-9]+)/i', '', $user_chat_name);
 */?>
 
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

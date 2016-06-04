@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * INDEX PAGE : HOME
  */
@@ -157,5 +156,4 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
 <?
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

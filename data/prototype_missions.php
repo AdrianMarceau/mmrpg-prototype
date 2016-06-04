@@ -3,50 +3,45 @@
  * DEMO MISSION SELECT
  */
 if (!empty($_SESSION[$session_token]['DEMO'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // DEBUG
   //echo 'checkpoint_'.__LINE__.'<br />';
-  
+
   // Only print out Light's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-light', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
     // DEBUG
     //echo 'checkpoint_'.__LINE__.'<br />';
-    
+
     // Print out the demo mode's mission select screen for Dr. Light
     echo '<div class="option_wrapper option_wrapper_hidden '.($prototype_data['demo']['battles_complete'] >= 4 ? 'option_wrapper_complete ' : 'option_wrapper_default ').'" data-condition="this_player_token=dr-light" data-music="'.$prototype_data['demo']['missions_music'].'">'."\n";
     echo $prototype_data['demo']['missions_markup']."\n";
     echo '<a class="option option_1x4 option_spacer" style="visibility: hidden;">&nbsp;</a>'."\n";
     echo '</div>'."\n";
-    
+
   }
-  
+
 }
 /*
  * NORMAL MISSION SELECT
  */
 else {
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
   // DEBUG
   //echo 'checkpoint_'.__LINE__.'<br />';
-  
+
   // Only print out Light's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-light', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
     // DEBUG
     //echo 'checkpoint_'.__LINE__.'<br />';
-    
+
     // Print out the normal mode's mission select screen for Dr. Light
     if ($unlock_flag_light){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // DEBUG
       //echo 'checkpoint_'.__LINE__.('$prototype_start_link = '.$prototype_start_link.'').'<br />';
-      
+
       $chapters_display_count = 0;
       $chapters_display_markup = '';
       ob_start();
@@ -75,7 +70,7 @@ else {
       if ($chapters_unlocked_light['5']){ $chapters_display_count++; echo '<a class="chapter_link '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus Chapter</a>'; } //else { $chapters_display_count++; echo '<a class="chapter_link chapter_link_disabled">???</a>'; }
       if ($chapters_unlocked_light['6']){ $chapters_display_count++; echo '<a class="chapter_link '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6">Player Battles</a>'; } //else { $chapters_display_count++; echo '<a class="chapter_link chapter_link_disabled">???</a>'; }
       $chapters_display_markup = ob_get_clean();
-      
+
       echo '<div class="option_wrapper option_wrapper_missions option_wrapper_hidden '.($prototype_data['dr-light']['prototype_complete'] ? 'option_wrapper_complete ' : 'option_wrapper_default ').'" data-condition="this_player_token=dr-light" data-music="'.$prototype_data['dr-light']['missions_music'].'">'."\n";
       echo '<div class="chapter_select chapter_select_'.$chapters_display_count.'" data-player="light">';
         echo $chapters_display_markup;
@@ -83,48 +78,46 @@ else {
       if ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo $prototype_data['dr-light']['missions_markup']."\n";
       }
       elseif ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && !empty($_SESSION[$session_token]['battle_settings']['this_player_token']) && $_SESSION[$session_token]['battle_settings']['this_player_token'] == 'dr-light'){
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo $prototype_data['dr-light']['missions_markup']."\n";
       }
       elseif (defined('MMRPG_SCRIPT_REQUEST')){
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo $prototype_data['dr-light']['missions_markup']."\n";
       }
       else {
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo '';
       }
       echo '<a class="option option_1x4 option_spacer" style="visibility: hidden;">&nbsp;</a>'."\n";
       echo '</div>'."\n";
-      
+
     }
-    
+
   }
 
   // Only print out Wily's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-wily', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // DEBUG
     //echo 'checkpoint_'.__LINE__.'<br />';
-    
+
     // Print out the normal mode's mission select screen for Dr. Wily
     if ($unlock_flag_wily){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // DEBUG
       //echo 'checkpoint_'.__LINE__.('$prototype_start_link = '.$prototype_start_link.'').'<br />';
-      
+
       $chapters_display_count = 0;
       $chapters_display_markup = '';
       ob_start();
@@ -153,7 +146,7 @@ else {
       if ($chapters_unlocked_wily['5']){ $chapters_display_count++; echo '<a class="chapter_link '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus Chapter</a>'; } //else { $chapters_display_count++; echo '<a class="chapter_link chapter_link_disabled">???</a>'; }
       if ($chapters_unlocked_wily['6']){ $chapters_display_count++; echo '<a class="chapter_link '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6">Player Battles</a>'; } //else { $chapters_display_count++; echo '<a class="chapter_link chapter_link_disabled">???</a>'; }
       $chapters_display_markup = ob_get_clean();
-      
+
       echo '<div class="option_wrapper option_wrapper_missions option_wrapper_hidden '.($prototype_data['dr-wily']['prototype_complete'] ? 'option_wrapper_complete ' : 'option_wrapper_default ').'" data-condition="this_player_token=dr-wily" data-music="'.$prototype_data['dr-wily']['missions_music'].'">'."\n";
       echo '<div class="chapter_select chapter_select_'.$chapters_display_count.'" data-player="wily">';
         echo $chapters_display_markup;
@@ -161,42 +154,40 @@ else {
       if ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && !empty($_SESSION[$session_token]['battle_settings']['this_player_token']) && $_SESSION[$session_token]['battle_settings']['this_player_token'] == 'dr-wily'){
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo $prototype_data['dr-wily']['missions_markup']."\n";
       }
       elseif (defined('MMRPG_SCRIPT_REQUEST')){
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo $prototype_data['dr-wily']['missions_markup']."\n";
       }
       else {
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo '';
       }
       echo '<a class="option option_1x4 option_spacer" style="visibility: hidden;">&nbsp;</a>'."\n";
       echo '</div>'."\n";
-      
+
     }
-    
+
   }
 
   // Only print out Cossack's data if conditions allow or do not exist
   if (empty($this_data_condition) || in_array('this_player_token=dr-cossack', $this_data_condition)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // DEBUG
     //echo 'checkpoint_'.__LINE__.'<br />';
-    
+
     // Print out the normal mode's mission select screen for Dr. Cossack
     if ($unlock_flag_cossack){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // DEBUG
       //echo 'checkpoint_'.__LINE__.('$prototype_start_link = '.$prototype_start_link.'').'<br />';
-      
+
       $chapters_display_count = 0;
       $chapters_display_markup = '';
       ob_start();
@@ -225,7 +216,7 @@ else {
       if ($chapters_unlocked_cossack['5']){ $chapters_display_count++; echo '<a class="chapter_link '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus Chapter</a>'; } //else { $chapters_display_count++; echo '<a class="chapter_link chapter_link_disabled">???</a>'; }
       if ($chapters_unlocked_cossack['6']){ $chapters_display_count++; echo '<a class="chapter_link '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6">Player Battles</a>'; } //else { $chapters_display_count++; echo '<a class="chapter_link chapter_link_disabled">???</a>'; }
       $chapters_display_markup = ob_get_clean();
-      
+
       echo '<div class="option_wrapper option_wrapper_missions option_wrapper_hidden '.($prototype_data['dr-cossack']['prototype_complete'] ? 'option_wrapper_complete ' : 'option_wrapper_default ').'" data-condition="this_player_token=dr-cossack" data-music="'.$prototype_data['dr-cossack']['missions_music'].'">'."\n";
       echo '<div class="chapter_select chapter_select_'.$chapters_display_count.'" data-player="cossack">';
         echo $chapters_display_markup;
@@ -233,28 +224,28 @@ else {
       if ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && !empty($_SESSION[$session_token]['battle_settings']['this_player_token']) && $_SESSION[$session_token]['battle_settings']['this_player_token'] == 'dr-cossack'){
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo $prototype_data['dr-cossack']['missions_markup']."\n";
       }
       elseif (defined('MMRPG_SCRIPT_REQUEST')){
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo $prototype_data['dr-cossack']['missions_markup']."\n";
       }
       else {
         // DEBUG
         //echo 'checkpoint_'.__LINE__.'<br />';
-        
+
         echo '';
       }
       echo '<a class="option option_1x4 option_spacer" style="visibility: hidden;">&nbsp;</a>'."\n";
       echo '</div>'."\n";
-      
+
     }
-    
+
   }
-  
+
 }
 
 ?>

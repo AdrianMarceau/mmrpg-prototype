@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 /*
  * COMMUNITY CATEGORY VIEW
@@ -79,6 +78,4 @@ if (!empty($this_threads_array)){
     </div>
     <?
 }
-
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

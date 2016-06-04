@@ -1,6 +1,4 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // FIELD DATABASE
 
@@ -41,7 +39,6 @@ foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
 }
 
 // Sort the ability index based on field number
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_pattern_first = array();
 $temp_pattern_first[] = '/^(intro-field)$/i';
 $temp_pattern_first[] = '/^light-laboratory$/i';

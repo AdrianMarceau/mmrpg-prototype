@@ -360,24 +360,19 @@ function mmrpg_website_session_update($session_href){
 
 // Define a function for collecting (and storing) data about the website categories
 function mmrpg_website_community_index(){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'mmrpg_website_community_categories()');  }
     global $db;
     // Check to see if the community category has already been pulled or not
     if (false && !empty($_SESSION['COMMUNITY']['categories'])){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_categories_index = json_decode($_SESSION['COMMUNITY']['categories'], true);
     } else {
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Collect the community catetories from the database
         // Collect all the categories from the index
         $this_categories_query = "SELECT * FROM mmrpg_categories AS categories WHERE categories.category_published = 1 ORDER BY categories.category_order ASC";
         $this_categories_index = $db->get_array_list($this_categories_query, 'category_token');
         // Update the database index cache
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $_SESSION['COMMUNITY']['categories'] = json_encode($this_categories_index);
     }
     // Return the collected community categories
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     return $this_categories_index;
 }
 

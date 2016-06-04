@@ -1,6 +1,4 @@
 <?
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // ABILITY DATABASE
 
@@ -11,7 +9,6 @@ foreach ($mmrpg_database_types AS $token => $info){
 }
 
 // Define the index of hidden abilities to not appear in the database
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $hidden_database_abilities = array();
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('ability', 'attachment-defeat', 'action-noweapons'));
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'sticky-shot', 'roll-swing'));
@@ -21,7 +18,6 @@ $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($h
 
 
 // Define the hidden ability query condition
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_condition = '';
 $temp_condition .= "AND ability_class <> 'item' ";
 if (!defined('DATA_DATABASE_SHOW_MECHAS')){
@@ -34,11 +30,9 @@ if (!empty($hidden_database_abilities)){
 }
 
 // Collect the database abilities
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $mmrpg_database_abilities = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition}", 'ability_token');
 
 // Remove unallowed abilities from the database, and increment counters
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
   if (true){
 
@@ -70,7 +64,6 @@ foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
 }
 
 // Sort the ability index based on ability number
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_pattern_first = array();
 $temp_pattern_first[] = '/^(buster-shot)$/i';
 $temp_pattern_first[] = '/^mega-(buster|ball|slide)$/i';
@@ -107,7 +100,6 @@ $temp_pattern_last[] = '/^(damage|recovery|experience)-(support|assault)$/i';
 $temp_pattern_last[] = '/^(damage|recovery|experience)-(booster|breaker)$/i';
 $temp_pattern_last[] = '/^(mecha|field)-(support|assault)$/i';
 $temp_pattern_last = array_reverse($temp_pattern_last);
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 function mmrpg_index_sort_abilities($ability_one, $ability_two){
   // Pull in global variables
   global $temp_pattern_first, $temp_pattern_last;
@@ -169,18 +161,15 @@ function mmrpg_index_sort_abilities($ability_one, $ability_two){
 uasort($mmrpg_database_abilities, 'mmrpg_index_sort_abilities');
 
 // Determine the token for the very first ability in the database
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_ability_tokens = array_values($mmrpg_database_abilities);
 $first_ability_token = array_shift($temp_ability_tokens);
 $first_ability_token = $first_ability_token['ability_token'];
 unset($temp_ability_tokens);
 
 // Count the number of abilities collected and filtered
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $mmrpg_database_abilities_count = count($mmrpg_database_abilities);
 
 // Loop through the database and generate the links for these abilities
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $key_counter = 0;
 $mmrpg_database_abilities_links = '';
 $mmrpg_database_abilities_links_counter = 0;
@@ -219,6 +208,5 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
   if ($ability_image_incomplete){ $mmrpg_database_abilities_links_counter_incomplete++; }
   $key_counter++;
 }
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 ?>

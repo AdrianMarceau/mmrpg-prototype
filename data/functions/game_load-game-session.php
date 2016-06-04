@@ -1,7 +1,6 @@
 <?
 // Define a function for loading the game session
 function mmrpg_load_game_session($this_save_filepath){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
     // Reference global variables
     global $db;

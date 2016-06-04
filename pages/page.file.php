@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 /*
 // MAINTENANCE
@@ -988,5 +987,4 @@ $_SESSION['mmrpg_form_messages'] = array();
 // Collect the buffer and define the page markup
 //$this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
 $this_markup_body = trim(ob_get_clean());
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

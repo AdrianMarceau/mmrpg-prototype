@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * INDEX PAGE : ERROR
  */
@@ -16,7 +15,7 @@ ob_start();
 ?>
 <a name="overview" class="anchor">&nbsp;</a>
 <div class="subbody">
-  
+
   <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_defeat" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png);">Mega Man</div></div>
   <p class="text">
     <strong>Yikes!</strong>  Something has gone horribly wrong on the server and the prototype is completely down at the moment.
@@ -25,10 +24,9 @@ ob_start();
     In events of extended downtime you should <a href="http://facebook.com/megamanrpgprototype/" target="_blank">check the Facebook page</a> for updates.
     Thank you for playing and you we're sorry for the inconvenience.
   </p>
-  
+
 </div>
 <?
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

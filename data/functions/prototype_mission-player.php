@@ -39,10 +39,6 @@ $temp_player_favourites = $temp_player_array['player_favourites'];
 
 //echo('<pre>'.__FILE__.' on line '.__LINE__.' : $temp_player_settings = '.preg_replace('/\s+/', ' ', print_r($temp_player_settings, true)).'</pre>');
 
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_player_rewards:'.$temp_battle_omega_player['user_name_clean'].' = '.print_r($temp_player_rewards, true).'');  }
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_player_settings:'.$temp_battle_omega_player['user_name_clean'].' = '.print_r($temp_player_settings, true).'');  }
-
 // Create the empty array for the target player's battle robots
 $temp_player_robots = array();
 $temp_player_robots_rewards = !empty($temp_player_rewards[$target_player_token]['player_robots']) ? $temp_player_rewards[$target_player_token]['player_robots'] : array();
@@ -59,20 +55,15 @@ if (empty($temp_player_robots_rewards)){
         }
     }
 }
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_player_robots_rewards:'.$temp_battle_omega_player['user_name_clean'].' = '.preg_replace('/\s+/', ' ', print_r($temp_player_robots_rewards, true)).'');  }
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_player_robots_settings:'.$temp_battle_omega_player['user_name_clean'].' = '.preg_replace('/\s+/', ' ', print_r($temp_player_robots_settings, true)).'');  }
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_player_field_settings:'.$temp_battle_omega_player['user_name_clean'].' = '.preg_replace('/\s+/', ' ', print_r($temp_player_field_settings, true)).'');  }
 //echo('<pre>'.__FILE__.' on line '.__LINE__.' : $temp_player_robots_rewards = '.preg_replace('/\s+/', ' ', print_r($temp_player_robots_rewards, true)).'</pre>');
 //echo('<pre>'.__FILE__.' on line '.__LINE__.' : $temp_player_robots_settings = '.preg_replace('/\s+/', ' ', print_r($temp_player_robots_settings, true)).'</pre>');
 // If the player fields setting is empty, define manually
 if (empty($temp_player_field_settings)){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'omega fields for '.$this_player_token.' vs '.$target_player_token.' are empty, generating...');  }
     $temp_omega_fields = array();
     if ($target_player_token == 'dr-light'){ $temp_omega_fields = $this_omega_factors_one; }
     elseif ($target_player_token == 'dr-wily'){ $temp_omega_fields = $this_omega_factors_two; }
     elseif ($target_player_token == 'dr-cossack'){ $temp_omega_fields = $this_omega_factors_three; }
     foreach ($temp_omega_fields AS $omega){ $temp_player_field_settings[$omega['field']] = array('field_token' => $omega['field']); }
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'omega fiels for '.$this_player_token.' vs '.$target_player_token.' are now '.implode(',', array_keys($temp_player_field_settings)));  }
 }
 
 // Ensure this player has been unlocked by the target before continuing

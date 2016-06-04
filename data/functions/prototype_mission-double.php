@@ -1,6 +1,5 @@
 <?
 // Collect the robot index for calculation purposes
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 $this_field_index = rpg_field::get_index();
 // Define the omega battle option and default to empty
