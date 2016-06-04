@@ -20,7 +20,7 @@ switch ($this_class){
   case 'players': {
     $key_counter = array_search($this_token, array_keys($mmrpg_database_players));
     $temp_player_info = $mmrpg_database_players[$this_token];
-    $temp_player_markup = mmrpg_player::print_database_markup($temp_player_info, array('show_key' => $key_counter));
+    $temp_player_markup = rpg_player::print_database_markup($temp_player_info, array('show_key' => $key_counter));
     $temp_player_markup = preg_replace('/\s+/', ' ', $temp_player_markup);
     echo 'success : '.$temp_player_markup;
     break;
@@ -56,7 +56,7 @@ switch ($this_class){
   case 'fields': {
     $key_counter = array_search($this_token, array_keys($mmrpg_database_fields));
     $temp_field_info = $mmrpg_database_fields[$this_token];
-    $temp_field_markup = mmrpg_field::print_database_markup($temp_field_info, array('show_key' => $key_counter));
+    $temp_field_markup = rpg_field::print_database_markup($temp_field_info, array('show_key' => $key_counter));
     $temp_field_markup = preg_replace('/\s+/', ' ', $temp_field_markup);
     echo 'success : '.$temp_field_markup;
     break;

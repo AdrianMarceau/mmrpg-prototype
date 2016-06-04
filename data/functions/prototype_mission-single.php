@@ -2,13 +2,13 @@
 // Collect the robot index for calculation purposes
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-$this_field_index = mmrpg_field::get_index();
+$this_field_index = rpg_field::get_index();
 // DEBUG
 //die('mmrpg_prototype_mission_single($this_prototype_data, $this_robot_token = '.$this_robot_token.', $this_field_token = '.$this_field_token.', $this_start_level = '.$this_start_level.')');
 // Define the array to hold this omega battle and populate with base varaibles
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_option_robot = is_array($this_robot_token) ? $this_robot_token : rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
-$temp_option_field = mmrpg_field::parse_index_info($this_field_index[$this_field_token]);
+$temp_option_field = rpg_field::parse_index_info($this_field_index[$this_field_token]);
 $temp_battle_omega = array();
 $temp_battle_omega['flags']['single_battle'] = true;
 $temp_battle_omega['values']['single_battle_masters'] = array($this_robot_token);

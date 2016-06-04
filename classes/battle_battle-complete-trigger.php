@@ -299,7 +299,7 @@ if ($target_player->player_side == 'left'){
 
                     // Display the robot reward message markup
                     $event_header = $ability_info['ability_name'].' Unlocked';
-                    $event_body = mmrpg_battle::random_positive_word().' <span class="player_name">'.$temp_player_info['player_name'].'</span> unlocked new ability data!<br />';
+                    $event_body = rpg_battle::random_positive_word().' <span class="player_name">'.$temp_player_info['player_name'].'</span> unlocked new ability data!<br />';
                     $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
                     $event_options = array();
                     $event_options['console_show_target'] = false;
@@ -468,7 +468,7 @@ if ($this_player->player_side == 'left'){
 
                     // Display the robot reward message markup
                     $event_header = $ability_info['ability_name'].' Unlocked';
-                    $event_body = mmrpg_battle::random_positive_word().' <span class="player_name">'.$temp_player_info['player_name'].'</span> unlocked new ability data!<br />';
+                    $event_body = rpg_battle::random_positive_word().' <span class="player_name">'.$temp_player_info['player_name'].'</span> unlocked new ability data!<br />';
                     $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
                     $event_options = array();
                     $event_options['console_show_target'] = false;
@@ -687,7 +687,7 @@ if ($this_player->player_side == 'left'){
 
             // Display the robot reward message markup
             $event_header = $ability_info['ability_name'].' Unlocked';
-            $event_body = mmrpg_battle::random_positive_word().' <span class="player_name">'.$this_player_info['player_name'].'</span> unlocked new ability data!<br />';
+            $event_body = rpg_battle::random_positive_word().' <span class="player_name">'.$this_player_info['player_name'].'</span> unlocked new ability data!<br />';
             $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
             $event_options = array();
             $event_options['console_show_target'] = false;
@@ -748,8 +748,8 @@ if ($this->battle_result == 'victory' && !empty($this->values['field_star'])){
 
 // Define the first event body markup, regardless of player type
 $first_event_header = $this->battle_name.($this->battle_result == 'victory' ? ' Complete' : ' Failure').' <span style="opacity:0.25;">|</span> '.$this->battle_field->field_name;
-if ($this->battle_result == 'victory'){ $first_event_body = 'Mission complete! '.($temp_human_rewards['battle_complete'] > 1 ? mmrpg_battle::random_positive_word().' That&#39;s '.$temp_human_rewards['battle_complete'].' times now! ' : '').mmrpg_battle::random_victory_quote(); }
-elseif ($this->battle_result == 'defeat'){ $first_event_body = 'Mission failure. '.($temp_human_rewards['battle_failure'] > 1 ? 'That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : '').mmrpg_battle::random_defeat_quote(); }
+if ($this->battle_result == 'victory'){ $first_event_body = 'Mission complete! '.($temp_human_rewards['battle_complete'] > 1 ? rpg_battle::random_positive_word().' That&#39;s '.$temp_human_rewards['battle_complete'].' times now! ' : '').rpg_battle::random_victory_quote(); }
+elseif ($this->battle_result == 'defeat'){ $first_event_body = 'Mission failure. '.($temp_human_rewards['battle_failure'] > 1 ? 'That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : '').rpg_battle::random_defeat_quote(); }
 $first_event_body .= '<br />';
 
 // Print out the current vs allowed turns for this mission

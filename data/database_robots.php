@@ -56,7 +56,7 @@ foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
     if ($temp_info['robot_class'] == 'mecha' && defined('DATA_DATABASE_SHOW_MECHAS')){
       // Collect this mecha's field token, then robot master token, then robot master number
       $temp_field_token = $temp_info['robot_field'];
-      $temp_field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$temp_field_token]);
+      $temp_field_info = rpg_field::parse_index_info($mmrpg_database_fields[$temp_field_token]);
       $temp_master_token = !empty($temp_field_info['field_master']) ? $temp_field_info['field_master'] : 'met';
       $temp_master_number = $mmrpg_database_robots[$temp_master_token]['robot_number'];
       $temp_info['robot_master_number'] = $temp_master_number;

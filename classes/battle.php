@@ -1,6 +1,6 @@
 <?
 // Define a class for the battles
-class mmrpg_battle {
+class rpg_battle {
 
     // Define global class variables
     public $index;
@@ -12,7 +12,7 @@ class mmrpg_battle {
     public $history;
 
     // Define the constructor class
-    public function mmrpg_battle(){
+    public function rpg_battle(){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
         // Collect any provided arguments
@@ -35,7 +35,7 @@ class mmrpg_battle {
         global $DB;
 
         // If the internal index has not been created yet, load it into memory
-        if (!isset($DB->INDEX['BATTLES'])){ mmrpg_battle::load_battle_index(); }
+        if (!isset($DB->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
 
         // Update and/or overwrite the current info in the index
         $DB->INDEX['BATTLES'][$battle_token] = json_encode($battle_info);
@@ -53,7 +53,7 @@ class mmrpg_battle {
         global $DB;
 
         // If the internal index has not been created yet, load it into memory
-        if (!isset($DB->INDEX['BATTLES'])){ mmrpg_battle::load_battle_index(); }
+        if (!isset($DB->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
 
         // If the requested index is not empty, return the entry
         if (!empty($DB->INDEX['BATTLES'][$battle_token])){
@@ -81,7 +81,7 @@ class mmrpg_battle {
         // If caching is turned OFF, or a cache has not been created
         if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists(MMRPG_CONFIG_BATTLES_CACHE_PATH)){
             // Start indexing the battle data files
-            $battles_cache_markup = mmrpg_battle::index_battle_data();
+            $battles_cache_markup = rpg_battle::index_battle_data();
             // Implode the markup into a single string and enclose in PHP tags
             $battles_cache_markup = implode('', $battles_cache_markup);
             $battles_cache_markup = "<?\n".$battles_cache_markup."\n?>";
@@ -124,7 +124,7 @@ class mmrpg_battle {
             // If this is a directory, initiate a recusive scan
             if (is_dir(MMRPG_CONFIG_BATTLES_INDEX_PATH.$this_path.$filename.'/') && $filename != '.' && $filename != '..'){
                 // Collect the markup from the recursive scan
-                $append_cache_markup = mmrpg_battle::index_battle_data($this_path.$filename.'/');
+                $append_cache_markup = rpg_battle::index_battle_data($this_path.$filename.'/');
                 // If markup was found, append if to the main container
                 if (!empty($append_cache_markup)){ $battles_cache_markup = array_merge($battles_cache_markup, $append_cache_markup); }
             }
@@ -173,7 +173,7 @@ class mmrpg_battle {
         // Otherwise, collect battle data from the index
         else {
             //die(print_r($this_battleinfo, true));
-            $this_battleinfo = mmrpg_battle::get_index_info($this_battleinfo['battle_token']);
+            $this_battleinfo = rpg_battle::get_index_info($this_battleinfo['battle_token']);
         }
         $this_battleinfo = array_replace($this_battleinfo, $this_battleinfo_backup);
 
@@ -495,10 +495,10 @@ class mmrpg_battle {
         $this_field = $this->battle_field; //array_slice($this->values['fields'];
         $this_player = false;
         $this_robot = !empty($this_robot) ? $this_robot : false;
-        if (!empty($this_robot)){ $this_player = new mmrpg_player($this, $this->values['players'][$this_robot->player_id]); }
+        if (!empty($this_robot)){ $this_player = new rpg_player($this, $this->values['players'][$this_robot->player_id]); }
         $target_player = false;
         $target_robot = !empty($target_robot) ? $target_robot : false;
-        if (!empty($target_robot)){ $target_player = new mmrpg_player($this, $this->values['players'][$target_robot->player_id]); }
+        if (!empty($target_robot)){ $target_player = new rpg_player($this, $this->values['players'][$target_robot->player_id]); }
 
         // Increment the internal events counter
         if (!isset($this->counters['events'])){ $this->counters['events'] = 1; }
@@ -796,7 +796,7 @@ class mmrpg_battle {
             foreach ($this->values['players'] AS $player_id => $player_info){
                 // If the player matches the request side, return the player
                 if ($player_info['player_side'] == $target_side){
-                    $target_player = new mmrpg_player($this, $player_info);
+                    $target_player = new rpg_player($this, $player_info);
                 }
             }
         }

@@ -2,13 +2,13 @@
 // Collect the robot index for calculation purposes
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_robot_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-$this_field_index = mmrpg_field::get_index();
+$this_field_index = rpg_field::get_index();
 // Define the omega battle option and default to empty
 $temp_battle_omega = array();
 $temp_option_battle = array();
 $temp_option_battle2 = array();
-$temp_option_field = mmrpg_field::parse_index_info($this_field_index[$this_field_tokens[0]]);
-$temp_option_field2 = mmrpg_field::parse_index_info($this_field_index[$this_field_tokens[1]]);
+$temp_option_field = rpg_field::parse_index_info($this_field_index[$this_field_tokens[0]]);
+$temp_option_field2 = rpg_field::parse_index_info($this_field_index[$this_field_tokens[1]]);
 $temp_option_robot = is_array($this_robot_tokens[0]) ? $this_robot_tokens[0] : array('robot_token' => $this_robot_tokens[0]);
 $temp_option_robot2 = is_array($this_robot_tokens[1]) ? $this_robot_tokens[1] : array('robot_token' => $this_robot_tokens[1]);
 $temp_battle_omega['flags']['double_battle'] = true;

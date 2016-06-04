@@ -1,6 +1,6 @@
 <?
 // Define a class for the players
-class mmrpg_player {
+class rpg_player {
 
   // Define global class variables
   public $flags;
@@ -9,7 +9,7 @@ class mmrpg_player {
   public $history;
 
   // Define the constructor class
-  public function mmrpg_player(){
+  public function rpg_player(){
 
     // Collect any provided arguments
     $args = func_get_args();
@@ -329,7 +329,7 @@ class mmrpg_player {
   // Define a static function for printing out the robot's editor markup
   public static function fields_sort_for_editor($field_one, $field_two){
     static $mmrpg_fields_index;
-    if (empty($mmrpg_fields_index)){ $mmrpg_fields_index = mmrpg_field::get_index(); }
+    if (empty($mmrpg_fields_index)){ $mmrpg_fields_index = rpg_field::get_index(); }
     $field_token_one = $field_one['field_token'];
     $field_token_two = $field_two['field_token'];
     if (!isset($mmrpg_fields_index[$field_token_one])){ return 0; }

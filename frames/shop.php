@@ -786,7 +786,7 @@ if (true){
                       // Loop through the items and print them one by one
                       $field_counter = 0;
                       foreach ($field_list_array AS $token => $price){
-                        if (isset($mmrpg_database_fields[$token])){ $field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]); }
+                        if (isset($mmrpg_database_fields[$token])){ $field_info = rpg_field::parse_index_info($mmrpg_database_fields[$token]); }
                         else { continue; }
                         $field_info_token = $token;
                         $field_info_price = $price;
@@ -808,7 +808,7 @@ if (true){
                         } else {
                             $global_item_quantities['field-'.$field_info_token] = $field_info_unlocked ? 1 : 0;
                             $global_item_prices['buy']['field-'.$field_info_token] = $field_info_unlocked ? 0 : $field_info_price;
-                            $temp_info_tooltip = mmrpg_field::print_editor_title_markup($player_info, $field_info);
+                            $temp_info_tooltip = rpg_field::print_editor_title_markup($player_info, $field_info);
                             $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                         }
                         if ($field_info_unlocked){ $field_info_price = 0; }
@@ -1049,7 +1049,7 @@ if (true){
                             foreach ($temp_field_star_tokens AS $key => $token){
 
                                 // Collect the info for this base field and create the star
-                                $field_info = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+                                $field_info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
                                 if (isset($_SESSION[$session_token]['values']['battle_stars'][$token])){ $star_info = $_SESSION[$session_token]['values']['battle_stars'][$token]; }
                                 else { $star_info = array('star_token' => $token, 'star_name' => $field_info['field_name'], 'star_kind' => 'field', 'star_type' => $field_info['field_type'], 'star_type2' => '', 'star_player' => '', 'star_date' => ''); }
                                 $star_list_array_raw['today'][$star_info['star_token']] = $star_info;
@@ -1059,8 +1059,8 @@ if (true){
                                 $fusion = $temp_fusion_star_tokens[$key];
                                 $token2 = $temp_fusion_tokens_index[$fusion][0];
                                 $token3 = $temp_fusion_tokens_index[$fusion][1];
-                                $field_info2 = mmrpg_field::parse_index_info($mmrpg_database_fields[$token2]);
-                                $field_info3 = mmrpg_field::parse_index_info($mmrpg_database_fields[$token3]);
+                                $field_info2 = rpg_field::parse_index_info($mmrpg_database_fields[$token2]);
+                                $field_info3 = rpg_field::parse_index_info($mmrpg_database_fields[$token3]);
                                 $fusion_token = preg_replace('/-([a-z0-9]+)$/i', '', $token2).'-'.preg_replace('/^([a-z0-9]+)-/i', '', $token3);
                                 $fusion_name = preg_replace('/\s+([a-z0-9]+)$/i', '', $field_info2['field_name']).' '.preg_replace('/^([a-z0-9]+)\s+/i', '', $field_info3['field_name']);
                                 $fusion_type = !empty($field_info2['field_type']) ? $field_info2['field_type'] : '';

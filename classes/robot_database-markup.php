@@ -3,7 +3,7 @@
 global $mmrpg_index, $this_current_uri, $this_current_url, $DB;
 global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities, $mmrpg_database_types;
 static $mmrpg_database_fields;
-if (empty($mmrpg_database_fields)){ $mmrpg_database_fields = mmrpg_field::get_index(); }
+if (empty($mmrpg_database_fields)){ $mmrpg_database_fields = rpg_field::get_index(); }
 
 // Define the print style defaults
 if (!isset($print_options['layout_style'])){ $print_options['layout_style'] = 'website'; }
@@ -75,7 +75,7 @@ if (!empty($robot_info['robot_field2'])){ $temp_robot_fields = array_merge($temp
 if ($temp_robot_fields){
   foreach ($temp_robot_fields AS $key => $token){
     if (!empty($mmrpg_database_fields[$token])){
-      $field_info_array[] = mmrpg_field::parse_index_info($mmrpg_database_fields[$token]);
+      $field_info_array[] = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
     }
   }
 }

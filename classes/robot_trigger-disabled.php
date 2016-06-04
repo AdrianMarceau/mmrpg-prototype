@@ -20,7 +20,7 @@ if ($this_player->player_id == $target_player->player_id){
         foreach ($this->battle->values['players'] AS $id => $info){
             if ($this_player->player_id != $id){
                 unset($target_player);
-                $target_player = new mmrpg_player($this_battle, $info);
+                $target_player = new rpg_player($this_battle, $info);
                 //$this->battle->events_create(false, false, 'DEBUG', 'Assiging $this->battle->values[\'players\']['.$id.'] = '.$info['player_token']);
             }
         }
@@ -799,7 +799,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
 
             // Display the robot reward message markup
             $event_header = $temp_item_name.' Item Drop';
-            $event_body = mmrpg_battle::random_positive_word().' The disabled '.$this_robot->print_robot_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="ability_name ability_type ability_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
+            $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_robot_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="ability_name ability_type ability_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
             $event_body .= $target_player->print_player_name().' added the dropped item to the inventory.';
             $event_options = array();
             $event_options['console_show_target'] = false;
@@ -1057,7 +1057,7 @@ if ($target_player->player_side == 'left' && !empty($this->battle->battle_reward
 
                 // Display the robot reward message markup
                 $event_header = $temp_unlocked_robot->robot_name.' Unlocked';
-                $event_body = mmrpg_battle::random_positive_word().' '.$target_player->print_player_name().' unlocked new robot data!<br />';
+                $event_body = rpg_battle::random_positive_word().' '.$target_player->print_player_name().' unlocked new robot data!<br />';
                 $event_body .= $temp_unlocked_robot->print_robot_name().' can now be used in battle!';
                 $event_options = array();
                 $event_options['console_show_target'] = false;

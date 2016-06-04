@@ -1,6 +1,6 @@
 <?
 // Define a class for the fields
-class mmrpg_field {
+class rpg_field {
 
   // Define global class variables
   public $flags;
@@ -9,7 +9,7 @@ class mmrpg_field {
   public $history;
 
   // Define the constructor class
-  public function mmrpg_field(){
+  public function rpg_field(){
 
     // Collect any provided arguments
     $args = func_get_args();
@@ -42,7 +42,7 @@ class mmrpg_field {
     }
     // Otherwise, collect field data from the index
     else {
-      $this_fieldinfo = mmrpg_field::get_index_info($this_fieldinfo['field_token']);
+      $this_fieldinfo = rpg_field::get_index_info($this_fieldinfo['field_token']);
     }
     $this_fieldinfo = array_replace($this_fieldinfo, $this_fieldinfo_backup);
 
@@ -111,8 +111,8 @@ class mmrpg_field {
   public static function get_index_info($field_token){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "get_index_info('{$field_token}')");  }
     global $DB;
-    $field_index = mmrpg_field::get_index();
-    if (!empty($field_index[$field_token])){ $field_info = mmrpg_field::parse_index_info($field_index[$field_token]); }
+    $field_index = rpg_field::get_index();
+    if (!empty($field_index[$field_token])){ $field_info = rpg_field::parse_index_info($field_index[$field_token]); }
     else { $field_info = array(); }
     return $field_info;
   }
@@ -161,7 +161,7 @@ class mmrpg_field {
     // Update the session with the export array
     $this_data = $this->export_array();
     $_SESSION['FIELDS'][$this->battle->battle_id][$this->field_id] = $this_data;
-    $this->battle->battle_field = &$this;  //new mmrpg_field($this->battle, $this->export_array());
+    $this->battle->battle_field = &$this;  //new rpg_field($this->battle, $this->export_array());
 
     // Return true on success
     return true;
@@ -233,7 +233,7 @@ class mmrpg_field {
     if (!isset($mmrpg_index['players'][$temp_player_token])){ return false; }
     $player_info = $mmrpg_index['players'][$temp_player_token];
     $temp_field_token = $field_info['field_token'];
-    $field_info = mmrpg_field::get_index_info($temp_field_token);
+    $field_info = rpg_field::get_index_info($temp_field_token);
     if (empty($field_info)){ return false; }
     $player_flag_copycore = !empty($player_info['player_core']) && $player_info['player_core'] == 'copy' ? true : false;
     $temp_field_type = !empty($field_info['field_type']) ? $mmrpg_index['types'][$field_info['field_type']] : false;
@@ -274,7 +274,7 @@ class mmrpg_field {
     if (!isset($mmrpg_index['players'][$temp_player_token])){ return false; }
     $player_info = $mmrpg_index['players'][$temp_player_token];
     $temp_field_token = $field_info['field_token'];
-    $field_info = mmrpg_field::get_index_info($temp_field_token);
+    $field_info = rpg_field::get_index_info($temp_field_token);
     if (empty($field_info)){ return false; }
 
     // DEBUG
@@ -283,7 +283,7 @@ class mmrpg_field {
     $temp_field_type = !empty($field_info['field_type']) ? $mmrpg_index['types'][$field_info['field_type']] : false;
     $temp_field_type2 = !empty($field_info['field_type2']) ? $mmrpg_index['types'][$field_info['field_type2']] : false;
     $temp_field_label = $field_info['field_name'];
-    $temp_field_title = mmrpg_field::print_editor_title_markup($player_info, $field_info);
+    $temp_field_title = rpg_field::print_editor_title_markup($player_info, $field_info);
     $temp_field_title_plain = strip_tags(str_replace('<br />', '&#10;', $temp_field_title));
     $temp_field_title_tooltip = htmlentities($temp_field_title, ENT_QUOTES, 'UTF-8');
     $temp_field_option = $field_info['field_name'];

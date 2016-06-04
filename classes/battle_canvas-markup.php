@@ -14,7 +14,7 @@ if (empty($eventinfo['this_player']) || empty($eventinfo['this_robot']) || $opti
   foreach ($this->values['players'] AS $this_player_id => $this_playerinfo){
     if (empty($target_player_id) || $target_player_id != $this_player_id){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      $eventinfo['this_player'] = new mmrpg_player($this, $this_playerinfo);
+      $eventinfo['this_player'] = new rpg_player($this, $this_playerinfo);
       break;
     }
   }
@@ -51,7 +51,7 @@ if (empty($eventinfo['target_player']) || empty($eventinfo['target_robot']) || $
   foreach ($this->values['players'] AS $target_player_id => $target_playerinfo){
     if (empty($this_player_id) || $this_player_id != $target_player_id){
       //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      $eventinfo['target_player'] = new mmrpg_player($this, $target_playerinfo);
+      $eventinfo['target_player'] = new rpg_player($this, $target_playerinfo);
       break;
     }
   }

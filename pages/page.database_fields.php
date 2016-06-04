@@ -56,7 +56,7 @@ if (!empty($this_current_token)){
     }
 
     // Collect the markup for this field and print it to the browser
-    $temp_field_markup = mmrpg_field::print_database_markup($field_info, array('show_key' => $key_counter));
+    $temp_field_markup = rpg_field::print_database_markup($field_info, array('show_key' => $key_counter));
     echo $temp_field_markup;
     $key_counter++;
     break;
@@ -117,7 +117,7 @@ if (empty($this_current_token)){
     $this_field_image = !empty($field_info['field_image']) ? $field_info['field_image'] : $field_info['field_token'];
     if ($this_field_image == 'field'){ $this_seo_fields = 'noindex'; }
     // Collect the markup for this field and print it to the browser
-    $temp_field_markup = mmrpg_field::print_database_markup($field_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+    $temp_field_markup = rpg_field::print_database_markup($field_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
     echo $temp_field_markup;
     $key_counter++;
   }

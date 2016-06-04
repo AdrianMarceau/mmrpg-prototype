@@ -1,5 +1,5 @@
 <?
-  
+
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while importing!');  }
 
@@ -49,11 +49,11 @@ unset($mmrpg_index['fields']['field']);
 array_unshift($mmrpg_index['fields'], $temp_empty);
 if (!empty($mmrpg_index['fields'])){
   foreach ($mmrpg_index['fields'] AS $field_token => $field_data){
-      
+
     // If this field's image exists, assign it
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/fields/'.$field_token.'/')){ $field_data['field_image'] = $field_data['field_token']; }
     else { $field_data['field_image'] = 'field'; }
-    
+
     // Define the insert array and start populating it with basic details
     $temp_insert_array = array();
     //$temp_insert_array['field_id'] = isset($field_data['field_id']) ? $field_data['field_id'] : $field_key;
@@ -61,44 +61,44 @@ if (!empty($mmrpg_index['fields'])){
     $temp_insert_array['field_number'] = !empty($field_data['field_number']) ? $field_data['field_number'] : '';
     $temp_insert_array['field_name'] = !empty($field_data['field_name']) ? $field_data['field_name'] : '';
     $temp_insert_array['field_game'] = !empty($field_data['field_game']) ? $field_data['field_game'] : '';
-    
+
     $temp_insert_array['field_class'] = !empty($field_data['field_class']) ? $field_data['field_class'] : 'master';
-    
+
     $temp_insert_array['field_master'] = !empty($field_data['field_master']) ? $field_data['field_master'] : '';
     $temp_insert_array['field_master2'] = json_encode(!empty($field_data['field_master2']) ? $field_data['field_master2'] : array());
     $temp_insert_array['field_mechas'] = json_encode(!empty($field_data['field_mechas']) ? $field_data['field_mechas'] : array());
-    
+
     $temp_insert_array['field_editor'] = !empty($field_data['field_editor']) ? $field_data['field_editor'] : 412;
-    
+
     $temp_insert_array['field_type'] = !empty($field_data['field_type']) ? $field_data['field_type'] : '';
     $temp_insert_array['field_type2'] = !empty($field_data['field_type2']) ? $field_data['field_type2'] : '';
     $temp_insert_array['field_multipliers'] = !empty($field_data['field_multipliers']) ? json_encode($field_data['field_multipliers']) : '';
-    
+
     $temp_insert_array['field_description'] = !empty($field_data['field_description']) ? trim($field_data['field_description']) : '';
     $temp_insert_array['field_description2'] = !empty($field_data['field_description2']) ? trim($field_data['field_description2']) : '';
-    
+
     $temp_insert_array['field_music'] = !empty($field_data['field_music']) ? $field_data['field_music'] : $field_data['field_token'];
     $temp_insert_array['field_music_name'] = !empty($field_data['field_music_name']) ? $field_data['field_music_name'] : '';
     $temp_insert_array['field_music_link'] = json_encode(!empty($field_data['field_music_link']) ? $field_data['field_music_link'] : '');
-    
+
     $temp_insert_array['field_background'] = !empty($field_data['field_background']) ? $field_data['field_background'] : $field_data['field_token'];
     $temp_insert_array['field_background_frame'] = json_encode(!empty($field_data['field_background_frame']) ? $field_data['field_background_frame']: array());
     $temp_insert_array['field_background_attachments'] = json_encode(!empty($field_data['field_background_attachments']) ? $field_data['field_background_attachments'] : array());
-    
+
     $temp_insert_array['field_foreground'] = !empty($field_data['field_foreground']) ? $field_data['field_foreground'] : $field_data['field_token'];
     $temp_insert_array['field_foreground_frame'] = json_encode(!empty($field_data['field_foreground_frame']) ? $field_data['field_foreground_frame']: array());
     $temp_insert_array['field_foreground_attachments'] = json_encode(!empty($field_data['field_foreground_attachments']) ? $field_data['field_foreground_attachments'] : array());
-    
+
     $temp_insert_array['field_functions'] = !empty($field_data['field_functions']) ? $field_data['field_functions'] : 'fields/field.php';
-    
+
     // Collect applicable spreadsheets for this field
     $spreadsheet_stats = !empty($spreadsheet_field_stats[$field_data['field_token']]) ? $spreadsheet_field_stats[$field_data['field_token']] : array();
     $spreadsheet_descriptions = !empty($spreadsheet_field_descriptions[$field_data['field_token']]) ? $spreadsheet_field_descriptions[$field_data['field_token']] : array();
-            
+
     // Collect any user-contributed data for this field
     if (!empty($spreadsheet_stats['field_multipliers'])){ $temp_insert_array['field_multipliers'] = json_encode($spreadsheet_stats['field_multipliers']); }
     if (!empty($spreadsheet_descriptions['field_description'])){ $temp_insert_array['field_description2'] = trim($spreadsheet_descriptions['field_description']); }
-        
+
     // Define the flags
     $temp_insert_array['field_flag_hidden'] = in_array($temp_insert_array['field_token'], array('field')) ? 1 : 0;
     $temp_insert_array['field_flag_complete'] = $field_data['field_image'] != 'field' ? 1 : 0;
@@ -109,26 +109,26 @@ if (!empty($mmrpg_index['fields'])){
       //echo('$temp_insert_array['.$temp_insert_array['field_token'].'] = <pre>'.print_r($temp_insert_array, true).'</pre>');
       //die('$spreadsheet_descriptions = <pre>'.print_r($spreadsheet_descriptions, true).'</pre>');
     }
-    
-    
+
+
     // Check if this field already exists in the database
     $temp_success = true;
     $temp_exists = $DB->get_array("SELECT field_token FROM mmrpg_index_fields WHERE field_token LIKE '{$temp_insert_array['field_token']}' LIMIT 1") ? true : false;
     if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_fields', $temp_insert_array); }
     else { $temp_success = $DB->update('mmrpg_index_fields', $temp_insert_array, array('field_token' => $temp_insert_array['field_token'])); }
-    
+
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
     $this_page_markup .= '<strong>$mmrpg_database_fields['.$field_token.']</strong><br />';
     //$this_page_markup .= '<pre>'.print_r($field_data, true).'</pre><br /><hr /><br />';
     $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-    //$this_page_markup .= '<pre>'.print_r(mmrpg_field::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
+    //$this_page_markup .= '<pre>'.print_r(rpg_field::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
     $this_page_markup .= '</p><hr />';
-    
+
     $field_key++;
-    
+
     //die('end');
-    
+
   }
 }
 // Otherwise, if empty, we're done!

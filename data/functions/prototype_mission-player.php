@@ -1,6 +1,6 @@
 <?
 global $DB;
-$this_field_index = mmrpg_field::get_index();
+$this_field_index = rpg_field::get_index();
 
 // Define the omega battle and default to empty
 $temp_battle_omega = array();
@@ -140,7 +140,7 @@ if (!empty($temp_player_robots_rewards)){
     $temp_battle_userpronoun = ($temp_battle_omega_player['user_gender'] == 'male' ? 'his' : ($temp_battle_omega_player['user_gender'] == 'female' ? 'her' : ('their')));
     $temp_robots_num = count($temp_battle_omega_robots);
     $temp_battle_token = $this_prototype_data['phase_battle_token'].'-vs-player-'.$temp_battle_usertoken;
-    $temp_battle_omega = mmrpg_battle::get_index_info('bonus-prototype-complete-3');
+    $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-3');
     $temp_battle_omega['flags']['player_battle'] = true;
     $temp_challenge_type = $temp_max_robots.'-on-'.$temp_max_robots;
     $temp_star_boost = !empty($temp_player_starforce) ? array_sum($temp_player_starforce) : 0;
@@ -184,8 +184,8 @@ if (!empty($temp_player_robots_rewards)){
     //shuffle($temp_field_info_options);
     $temp_field_token_one = $temp_field_info_options[0];
     $temp_field_token_two = $temp_field_info_options[1];
-    $temp_field_info_one = mmrpg_field::parse_index_info($this_field_index[$temp_field_token_one]);
-    $temp_field_info_two = mmrpg_field::parse_index_info($this_field_index[$temp_field_token_two]);
+    $temp_field_info_one = rpg_field::parse_index_info($this_field_index[$temp_field_token_one]);
+    $temp_field_info_two = rpg_field::parse_index_info($this_field_index[$temp_field_token_two]);
     $temp_option_multipliers = array();
     $temp_option_field_list = array($temp_field_info_one, $temp_field_info_two);
     $temp_battle_omega['battle_field_base']['field_name'] = preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$1', $temp_field_info_one['field_name']).' '.preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$2', $temp_field_info_two['field_name']);

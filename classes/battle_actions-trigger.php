@@ -463,7 +463,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
     // Create the temporary target player and robot objects
     $temp_target_robot_info = !empty($this->values['robots'][$this_token['robot_id']]) ? $this->values['robots'][$this_token['robot_id']] : array();
     $temp_target_player_info = !empty($this->values['players'][$temp_target_robot_info['player_id']]) ? $this->values['players'][$temp_target_robot_info['player_id']] : array();
-    $temp_target_player = new mmrpg_player($this, $temp_target_player_info);
+    $temp_target_player = new rpg_player($this, $temp_target_player_info);
     $temp_target_robot = new rpg_robot($this, $temp_target_player, $temp_target_robot_info);
     //die('<pre>'.print_r($temp_target_robot, true).'</pre>');
 

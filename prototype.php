@@ -145,7 +145,7 @@ if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
 
     // DEBUG PLAYERS / ABILITIES
     foreach ($mmrpg_index_players AS $player_token => $player_info){
-        //$player_info = mmrpg_player::parse_index_info($player_info);
+        //$player_info = rpg_player::parse_index_info($player_info);
         $player_string = str_replace('-', '', $player_token);
         $player_pass = strlen($player_string);
 
