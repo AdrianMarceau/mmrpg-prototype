@@ -49,7 +49,7 @@ foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token
     $allowed_edit_players[] = $player_info;
     $allowed_edit_data[$player_token] = $player_info;
     foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
-        $robot_index = mmrpg_robot::parse_index_info($mmrpg_database_robots[$robot_token]);
+        $robot_index = rpg_robot::parse_index_info($mmrpg_database_robots[$robot_token]);
         $robot_index['robot_index_abilities'] = $robot_index['robot_abilities'];
         $robot_info = array_merge($robot_index, $robot_info);
         $allowed_edit_data[$player_token]['player_robots'][$robot_token] = $robot_info;
@@ -108,7 +108,7 @@ foreach ($battle_settings AS $player_token => $player_info_raw){
     $allowed_edit_players[] = $player_info;
     $allowed_edit_data[$player_token] = $player_info;
     foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
-        $robot_index = mmrpg_robot::parse_index_info($mmrpg_database_robots[$robot_token]);
+        $robot_index = rpg_robot::parse_index_info($mmrpg_database_robots[$robot_token]);
         $robot_index['robot_index_abilities'] = $robot_index['robot_abilities'];
         $robot_info = array_merge($robot_index, $robot_info);
         $allowed_edit_data[$player_token]['player_robots'][$robot_token] = $robot_info;
@@ -259,7 +259,7 @@ if (true){
             $allow_player_selector_backup = $allow_player_selector;
 
             // Collect and print the editor markup for this robot
-            $temp_editor_markup = mmrpg_robot::print_editor_markup($player_info, $robot_info);
+            $temp_editor_markup = rpg_robot::print_editor_markup($player_info, $robot_info);
             echo $temp_editor_markup;
 
             $key_counter++;

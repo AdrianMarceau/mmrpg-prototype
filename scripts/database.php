@@ -29,7 +29,7 @@ switch ($this_class){
   case 'robots': {
     $key_counter = array_search($this_token, array_keys($mmrpg_database_robots));
     $temp_robot_info = $mmrpg_database_robots[$this_token];
-    $temp_robot_markup = mmrpg_robot::print_database_markup($temp_robot_info, array('show_key' => $key_counter));
+    $temp_robot_markup = rpg_robot::print_database_markup($temp_robot_info, array('show_key' => $key_counter));
     $temp_robot_markup = preg_replace('/\s+/', ' ', $temp_robot_markup);
     echo 'success : '.$temp_robot_markup;
     break;
@@ -38,7 +38,7 @@ switch ($this_class){
   case 'mechas': {
     $key_counter = array_search($this_token, array_keys($mmrpg_database_mechas));
     $temp_mecha_info = $mmrpg_database_mechas[$this_token];
-    $temp_mecha_markup = mmrpg_robot::print_database_markup($temp_mecha_info, array('show_key' => $key_counter));
+    $temp_mecha_markup = rpg_robot::print_database_markup($temp_mecha_info, array('show_key' => $key_counter));
     $temp_mecha_markup = preg_replace('/\s+/', ' ', $temp_mecha_markup);
     echo 'success : '.$temp_mecha_markup;
     break;

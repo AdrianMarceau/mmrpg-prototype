@@ -31,7 +31,7 @@ if ($this_player->player_id == $target_player->player_id){
             if ($info['robot_position'] == 'active'){
                 $target_robot->robot_load($info);
                 //unset($target_robot);
-                //$target_robot = new mmrpg_robot($this_battle, $target_player, $info);
+                //$target_robot = new rpg_robot($this_battle, $target_player, $info);
                 //$this->battle->events_create(false, false, 'DEBUG', 'Assiging $target_player->values[\'robots_active\']['.$key.'] = '.$info['robot_token']);
             }
         }
@@ -265,7 +265,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     usort($temp_robots_active, array('mmrpg_player', 'robot_sort_by_active'));
     $temp_robot_active_position = false;
     foreach ($temp_robots_active AS $temp_id => $temp_info){
-        $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new mmrpg_robot($this, $target_player, $temp_info);
+        $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new rpg_robot($this, $target_player, $temp_info);
         if ($temp_robot->robot_level >= 100 || $temp_robot->robot_class != 'master'){ $temp_robots_active_num2--; }
         if ($temp_robot->robot_position == 'active'){
             $temp_robot_active_position = $temp_robots_active[$temp_id];
@@ -277,7 +277,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
     foreach ($temp_robots_active AS $temp_id => $temp_info){
 
         // Collect or define the robot points and robot rewards variables
-        $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new mmrpg_robot($this, $target_player, $temp_info);
+        $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new rpg_robot($this, $target_player, $temp_info);
         //if ($temp_robot->robot_class == 'mecha'){ continue; }
         $temp_robot_token = $temp_info['robot_token'];
         if ($temp_robot_token == 'robot'){ continue; }
@@ -514,7 +514,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             $temp_robot->update_session();
 
             // Collect the base robot template from the index for calculations
-            $temp_index_robot = mmrpg_robot::get_index_info($temp_robot->robot_token);
+            $temp_index_robot = rpg_robot::get_index_info($temp_robot->robot_token);
 
             // Define the event options
             $event_options['this_ability_results']['trigger_kind'] = 'recovery';
@@ -1045,11 +1045,11 @@ if ($target_player->player_side == 'left' && !empty($this->battle->battle_reward
                 $this_robot_rewards = !empty($robot_info['robot_rewards']) ? $robot_info['robot_rewards'] : array();
 
                 // Create the temp new robot for the player
-                $temp_index_robot = mmrpg_robot::get_index_info($this_robot_token);
+                $temp_index_robot = rpg_robot::get_index_info($this_robot_token);
                 $temp_index_robot['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID * 2;
                 $temp_index_robot['robot_level'] = $this_robot_level;
                 $temp_index_robot['robot_experience'] = $this_robot_experience;
-                $temp_unlocked_robot = new mmrpg_robot($this_battle, $target_player, $temp_index_robot);
+                $temp_unlocked_robot = new rpg_robot($this_battle, $target_player, $temp_index_robot);
 
                 // Automatically unlock this robot for use in battle
                 $temp_unlocked_player = $mmrpg_index['players'][$target_player->player_token];

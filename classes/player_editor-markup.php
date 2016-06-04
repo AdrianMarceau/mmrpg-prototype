@@ -112,9 +112,9 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_allow_field_switch = mmrpg_prototype_complete($player_info['player_token']) || mmrpg_prototype_complete();
 
 // Collect a temp robot object for printing items
-if ($player_info['player_token'] == 'dr-light'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['mega-man']); }
-elseif ($player_info['player_token'] == 'dr-wily'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['bass']); }
-elseif ($player_info['player_token'] == 'dr-cossack'){ $robot_info = mmrpg_robot::parse_index_info($mmrpg_database_robots['proto-man']); }
+if ($player_info['player_token'] == 'dr-light'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['mega-man']); }
+elseif ($player_info['player_token'] == 'dr-wily'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['bass']); }
+elseif ($player_info['player_token'] == 'dr-cossack'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['proto-man']); }
 
 // Start the output buffer
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -511,7 +511,7 @@ ob_start();
                     $this_field = mmrpg_field::parse_index_info($mmrpg_field_index[$player_field['field_token']]);
                     $this_field_token = $this_field['field_token'];
                     $this_robot_token = $this_field['field_master'];
-                    $this_robot = mmrpg_robot::parse_index_info($mmrpg_database_robots[$this_robot_token]);
+                    $this_robot = rpg_robot::parse_index_info($mmrpg_database_robots[$this_robot_token]);
                     $this_field_name = $this_field['field_name'];
                     $this_field_type = !empty($this_field['field_type']) ? $this_field['field_type'] : false;
                     $this_field_type2 = !empty($this_field['field_type2']) ? $this_field['field_type2'] : false;

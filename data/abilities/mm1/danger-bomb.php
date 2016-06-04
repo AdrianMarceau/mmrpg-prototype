@@ -12,10 +12,10 @@ $ability = array(
   'ability_damage2_percent' => true,
   'ability_accuracy' => 70,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Define this ability's first attachment token
     $this_attachment_token_one = 'ability_'.$this_ability->ability_token.'_one';
     $this_attachment_info_one = array(
@@ -26,7 +26,7 @@ $ability = array(
       'ability_frame_animate' => array(1),
       'ability_frame_offset' => array('x' => 120, 'y' => 20, 'z' => 10)
       );
-    
+
     // Define this ability's second attachment token
     $this_attachment_token_two = 'ability_'.$this_ability->ability_token.'_two';
     $this_attachment_info_two = array(
@@ -37,7 +37,7 @@ $ability = array(
       'ability_frame_animate' => array(2),
       'ability_frame_offset' => array('x' => 270, 'y' => 5, 'z' => 10)
       );
-    
+
     // Target the opposing robot
     $this_ability->target_options_update(array(
       'frame' => 'throw',
@@ -45,7 +45,7 @@ $ability = array(
       'success' => array(0, 160, 15, 10, $this_robot->print_robot_name().' throws the '.$this_ability->print_ability_name().'!'),
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Inflict damage on the opposing robot
     $target_robot->robot_attachments[$this_attachment_token_one] = $this_attachment_info_one;
     $target_robot->robot_attachments[$this_attachment_token_two] = $this_attachment_info_two;
@@ -69,11 +69,11 @@ $ability = array(
     unset($target_robot->robot_attachments[$this_attachment_token_one]);
     unset($target_robot->robot_attachments[$this_attachment_token_two]);
     $target_robot->update_session();
-    
+
     // If the ability was successful against the target, this robot gets exactly half damage
     if ($this_ability->ability_results['this_result'] != 'failure'
       && $this_ability->ability_results['this_amount'] > 0){
-      
+
       // Inflict damage on the opposing robot
       $this_ability->damage_options_update(array(
         'kind' => 'energy',
@@ -100,11 +100,11 @@ $ability = array(
       $energy_damage_amount = round($energy_damage_amount * ($this_ability->ability_damage2 / 100));
       //$energy_damage_amount = round($energy_damage_amount * (2 / 3));
       $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, false);
-      
+
     }
     // Otherwise, if the ability missed or was absored somehow, treat as attack from target
     else {
-      
+
       // Inflict damage on the opposing robot
       $this_ability->damage_options_update(array(
         'kind' => 'energy',
@@ -126,27 +126,27 @@ $ability = array(
         ));
       $energy_damage_amount = 0; //ceil($this_ability->ability_damage * ($this_robot->robot_attack / $this_robot->robot_defense));
       $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, false);
-      
+
     }
-    
+
     // Update the player session quickly
-    
+
     // If this robot is no longer active, find a new active robot for this player
     $this_active_robot = $this_robot;
     if ($this_robot->robot_energy < 1 || $this_robot->robot_status == 'disabled'){
       foreach ($this_player->values['robots_active'] AS $key => $info){
         if ($info['robot_position'] != 'bench'){
-            $this_active_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']));
+            $this_active_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']));
           }
       }
     }
-  
+
     // Trigger the disabled event on the target robot now if necessary
     if ($target_robot->robot_energy < 1 || $target_robot->robot_status == 'disabled'){
       $target_robot->trigger_disabled($this_active_robot, $this_ability);
-      
+
     }
-    
+
     // Trigger the disabled event on this robot now if necessary
     if ($this_robot->robot_energy < 1 || $this_robot->robot_status == 'disabled'){
       //$this_robot->robot_energy = 1;
@@ -159,10 +159,10 @@ $ability = array(
       //$this_robot->robot_status = 'disabled';
       //$this_robot->update_session();
     }
-    
+
     // Return true on success
     return true;
-        
+
   }
   );
 ?>

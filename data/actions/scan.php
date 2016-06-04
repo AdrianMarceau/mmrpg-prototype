@@ -30,7 +30,7 @@ ob_start();
       if (!empty($switch_robotinfo['robot_token'])){
         // Create the scan object using the session/index data
         //$GLOBALS['DEBUG']['checkpoint_line'] = 'data.php : line 655';
-        $temp_robot = new mmrpg_robot($this_battle, $target_player, $scan_robotinfo);
+        $temp_robot = new rpg_robot($this_battle, $target_player, $scan_robotinfo);
         // Default the allow button flag to true
         $allow_button = true;
         // If this robot is disabled, disable the button
@@ -56,7 +56,7 @@ ob_start();
         $temp_robot_title .= ' | '.$temp_robot->robot_speed.' / '.$temp_robot->robot_base_speed.' SP';
         $temp_robot_title_plain = strip_tags(str_replace('<br />', '&#10;', $temp_robot_title));
         $temp_robot_title_tooltip = htmlentities($temp_robot_title, ENT_QUOTES, 'UTF-8');
-          
+
         // Define the robot button text variables
         $temp_robot_label = '<span class="multi">';
         $temp_robot_label .= '<span class="maintext">'.$temp_robot->robot_name.'</span>';
@@ -71,7 +71,7 @@ ob_start();
           $temp_robot_label .= 'S:'.$temp_robot->robot_speed;
         $temp_robot_label .= '</span>';
         $temp_robot_label .= '</span>';
-        
+
         // Define the robot sprite variables
         $temp_robot_sprite = array();
         $temp_robot_sprite['name'] = $temp_robot->robot_name;

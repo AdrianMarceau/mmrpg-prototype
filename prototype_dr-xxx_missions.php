@@ -11,16 +11,16 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (!defined('MMRPG_SCRIPT_REQUEST') ||
   ($this_data_select == 'this_battle_token' && in_array('this_player_token='.$this_prototype_data['this_player_token'], $this_data_condition))){
   if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
   // -- STARTER BATTLE : CHAPTER ONE -- //
 
   // Update the prototype data's global current chapter variable
   $this_prototype_data['this_current_chapter'] = '0';
-    
+
   // If the player has completed at least zero battles, display the starter battle
   if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0'])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Generate the battle option with the starter data
     $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'];
     if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
@@ -37,7 +37,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // EVENT MESSAGE : CHAPTER ONE
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_prototype_data['battle_options'][] = array(
@@ -48,21 +48,21 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Add the omega battle to the options, index, and session
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
   }
 
 
-  
-  
 
-  
+
+
+
   // -- ROBOT MASTER BATTLES : CHAPTER TWO -- //
 
   // Update the prototype data's global current chapter variable
@@ -71,7 +71,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
   // Only continue if the player has defeated first 1 battle
   if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['1'])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // EVENT MESSAGE : CHAPTER TWO
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_prototype_data['battle_options'][] = array(
@@ -82,7 +82,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Increment the phase counter
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_prototype_data['battle_phase'] += 1;
@@ -91,13 +91,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Populate the battle options with the initial eight robots
     if (isset($this_prototype_data['target_robot_omega'][1][0])){ $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1]; }
     //die('<pre>'.print_r($this_prototype_data['target_robot_omega'], true).'</pre>');
     foreach ($this_prototype_data['target_robot_omega'] AS $key => $info){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // Generate the battle option with the starter data
       $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'_'.$key;
       if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
@@ -111,19 +111,19 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
         $temp_battle_omega = mmrpg_battle::get_index_info($temp_battle_token);
       }
-    
+
       // Add the omega battle to the options, index, and session
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_prototype_data['battle_options'][] = $temp_battle_omega;
-            
+
     }
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   }
-  
-  
+
+
   // -- NEW CHALLENGER BATTLE : CHAPTER THREE -- //
 
   // Update the prototype data's global current chapter variable
@@ -143,7 +143,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Unlock the first fortress battle
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_battle_token = $this_prototype_data['this_player_token'].'-fortress-i';
@@ -153,7 +153,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // If the battle is complete, remove the player from the description
     if ($temp_battle_complete){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -166,7 +166,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Add the omega battle to the battle options
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_prototype_data['battle_options'][] = $temp_battle_omega;
@@ -175,7 +175,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   }
-  
+
 
   // -- FUSION FIELD BATTLES : CHAPTER FOUR -- //
 
@@ -185,7 +185,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
   // Only continue if the player has defeated the first 1 + 8 + 1 battles
   if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['3'])){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // EVENT MESSAGE : CHAPTER FOUR
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_prototype_data['battle_options'][] = array(
@@ -196,7 +196,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    
+
     // Increment the phase counter
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_prototype_data['battle_phase'] += 1;
@@ -212,7 +212,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       // Generate the second info option and skip if already used
       if ($key > 0 && ($key + 1) % 2 == 0){ continue; }
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-          
+
       // Generate the battle option with the starter data
       $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'_'.$key;
       if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
@@ -227,24 +227,24 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
         $temp_battle_omega = mmrpg_battle::get_index_info($temp_battle_token);
       }
-    
+
       // Add the omega battle to the options, index, and session
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_prototype_data['battle_options'][] = $temp_battle_omega;
-      
+
     }
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   }
-  
+
 
   // -- THE FINAL BATTLES : CHAPTER FIVE -- //
 
   // Update the prototype data's global current chapter variable
   $this_prototype_data['this_current_chapter'] = '4';
-  
+
   // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
   if ($this_prototype_data['prototype_complete']
     || !empty($this_prototype_data['this_chapter_unlocked']['4a'])
@@ -261,12 +261,12 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // DEBUG DEBUG DEBUG
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
     // Final Destination I
     // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
     if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4a'])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
       // Unlock the first of the final destination battles
       $temp_final_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-fortress-ii', 'battle_level' => $this_prototype_data['this_chapter_levels'][4]);
       $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
@@ -274,14 +274,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
       // DEBUG DEBUG DEBUG
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
     }
-    
+
     // Final Destination II
     // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
     if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4b'])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // Unlock the first of the final destination battles
       $temp_final_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-fortress-iii', 'battle_level' => $this_prototype_data['this_chapter_levels'][4]);
       $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
@@ -289,18 +289,18 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
       // DEBUG DEBUG DEBUG
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
     }
-    
+
     // Final Destination III
     // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
     if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4c'])){
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-          
+
       // Collect the robot index for quick use
       $temp_robots_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
       $temp_fields_index = mmrpg_field::get_index();
-      
+
       // Unlock the first of the final destination battles
       $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iv';
       $temp_final_option = mmrpg_battle::get_index_info($temp_final_option_token);
@@ -310,10 +310,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
       $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
       //$temp_final_abilities = array('attack-boost', 'attack-break', 'defense-boost', 'defense-break', 'speed-boost', 'speed-break', 'energy-boost', 'energy-break');
-      
+
       // DEBUG DEBUG DEBUG
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // Collect and define the robot masters and support mechas to appear on this field
       $temp_robot_masters = array();
       $temp_support_mechas = array();
@@ -323,14 +323,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         if (!empty($temp_field_info['field_master'])){ $temp_robot_masters[] = $temp_field_info['field_master']; }
         if (!empty($temp_field_info['field_mechas'])){ $temp_support_mechas[] = array_pop($temp_field_info['field_mechas']); }
       }
-      
+
       // Add the masters info into the omega battle
       //foreach ($temp_final_option['battle_target_player']['player_robots'] AS $key => $info){
       $temp_final_option['battle_target_player']['player_robots'] = array();
       foreach ($temp_robot_masters AS $key => $token){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         //if ($info['robot_level'] > $temp_final_option['battle_level']){ $temp_final_option['battle_level'] = $info['robot_level']; }
-        $index = mmrpg_robot::parse_index_info($temp_robots_index[$token]);
+        $index = rpg_robot::parse_index_info($temp_robots_index[$token]);
         $info = array();
         $info['robot_id'] = (MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1);
         $info['robot_token'] = $token;
@@ -343,7 +343,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $info['values']['robot_speed'] = 100;
         $temp_final_option['battle_target_player']['player_robots'][] = $info;
       }
-      
+
       // Add the mechas info into the omega battle
       $temp_battle_omega['battle_field_base']['field_mechas'] = $temp_support_mechas;
 
@@ -358,12 +358,12 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       // DEBUG DEBUG DEBUG
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
     }
 
   }
 
-  
+
   // -- PROTOTYPE COMPLETE BATTLE : CHAPTER SIX -- //
 
   // Update the prototype data's global current chapter variable
@@ -409,7 +409,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   }
-  
+
 
   // -- SPECIAL PLAYER BATTLE : BONUS CHAPTER -- //
 
@@ -424,7 +424,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     //die('checkpoint1');
     if (true){
       //die('checkpoint2');
-  
+
       // EVENT MESSAGE : BONUS CHAPTER
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_prototype_data['battle_options'][] = array(
@@ -435,12 +435,12 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
       // DEBUG DEBUG DEBUG
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
       /*
-      
+
       // Include the leaderboard data for pruning
       $this_leaderboard_online_players = mmrpg_prototype_leaderboard_online();
-      
+
       $temp_include_usernames = array();
       $temp_include_usernames_string = array();
       if (!empty($this_leaderboard_online_players)){
@@ -455,7 +455,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
       // DEBUG DEBUG DEBUG
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      
+
       // Pull a random player from the database with a similar point level
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_player_points = $this_prototype_data['points_unlocked'];
@@ -473,7 +473,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_player_list = $DB->get_array_list($temp_player_query);
       */
-        
+
       // Include the leaderboard data for pruning
       $this_leaderboard_online_players = mmrpg_prototype_leaderboard_online();
       $temp_include_usernames = array();
@@ -481,7 +481,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         foreach ($this_leaderboard_online_players AS $info){ $temp_include_usernames[] = $info['token']; }
       }
-        
+
       // Pull a random set of players from the database with similar point levels
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_player_list = mmrpg_prototype_leaderboard_targets($this_userid, $this_prototype_data['target_player_token']);
@@ -489,11 +489,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
       // DEBUG DEBUG DEBUG
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
       // If player data was actuall pulled, continue
       if (!empty($temp_player_list)){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
         // Shuffle the player list
         $max_battle_count = 2;
         if ($temp_player_list >= 4){ $max_battle_count = 4; }
@@ -501,7 +501,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         uasort($temp_player_list, 'mmrpg_prototype_leaderboard_targets_sort');
         $temp_player_list = array_slice($temp_player_list, 0, 9);
         shuffle($temp_player_list);
-  
+
         // Loop through the list up for two to four times, creating new battles
         if (empty($_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_player_battle_factors'])){
           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -528,19 +528,19 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // DEBUG DEBUG DEBUG
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        
+
         for ($i = 0; $i < $max_battle_count; $i++){
           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-  
+
           // DEBUG
           //echo('<pre>$temp_field_factors_one:'.print_r($temp_field_factors_one, true).'</pre><hr />');
           //echo('<pre>$temp_field_factors_two:'.print_r($temp_field_factors_two, true).'</pre><hr />');
           //echo('<pre>$temp_field_factors_three:'.print_r($temp_field_factors_three, true).'</pre><hr />');
           //die();
-          
+
           // If there are no more players, break
           if (empty($temp_player_list)){ break; }
-  
+
           // Pull and random player from the list and collect their full data
           $temp_max_robots = 2;
           if ($i >= 2 && $this_prototype_data['robots_unlocked'] >= 4){ $temp_max_robots = 4; }
@@ -549,11 +549,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
           //$temp_player_data = array_shift($temp_player_list); //$temp_player_list[array_rand($temp_player_list)];
           $temp_player_array = array_shift($temp_player_list);
           $temp_battle_omega = mmrpg_prototype_mission_player($this_prototype_data, $temp_player_array, $temp_max_robots, $temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three);
-    
+
           // DEBUG DEBUG DEBUG
           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           //die('<pre>$temp_battle_omega1 : '.print_r($temp_battle_omega, true).'</pre>');
-          
+
           // If the collected omega battle was empty, continue gracefully
           if (empty($temp_battle_omega) || empty($temp_battle_omega['battle_token'])){
             //$i--;
@@ -566,16 +566,16 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
           // DEBUG DEBUG DEBUG
           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           //die('<pre>$temp_battle_omega3 : '.print_r($temp_battle_omega, true).'</pre>');
-          
+
           // DEBUG
           //echo('<pre>$temp_field_factors_one:'.print_r($temp_field_factors_one, true).'</pre><hr />');
-          
+
           // If there was no battle token defined, we have a problem
           //if (empty($temp_battle_omega['battle_token'])){ die('<pre>$temp_battle_omega:'.print_r($temp_battle_omega, true).'</pre>'); }
-          
+
           // Update the option chapter to the current
           $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-          
+
           // If this user is only, update the battle button with details
           if (in_array($temp_player_array['user_name_clean'], $temp_include_usernames)){
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -586,7 +586,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
           // DEBUG DEBUG DEBUG
           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           //die('<pre>$temp_battle_omega4 : '.print_r($temp_battle_omega, true).'</pre>');
-          
+
           // Add the omega battle to the options, index, and session
           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           $this_prototype_data['battle_options'][] = $temp_battle_omega;
@@ -596,21 +596,21 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
           // DEBUG DEBUG DEBUG
           if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
           //die('<pre>$temp_battle_omega5 : ---</pre>');
-          
+
         }
-  
+
       }
-        
+
       // Unset the temp player array
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       //die('<pre>checkpoint 6 i guess? : ---</pre>');
       unset($temp_player_list);
-  
+
     }
-    
+
   }
 
-  
+
 }
 if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 //die('<pre>checkpoint 7 i guess? : ---</pre>');

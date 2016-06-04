@@ -36,7 +36,7 @@ ob_start();
     } elseif ($this_robot->robot_class == 'mecha'){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "\$this_robot->robot_class == 'mecha'");  }
         // Collect the temp ability index
-        $temp_index_info = mmrpg_robot::get_index_info($this_robot->robot_token);
+        $temp_index_info = rpg_robot::get_index_info($this_robot->robot_token);
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, print_r($temp_index_info, true));  }
         $current_robot_abilities = array();
         foreach ($temp_index_info['robot_abilities'] AS $token){ $current_robot_abilities[$token] = array('ability_token' => $token); }
@@ -53,7 +53,7 @@ ob_start();
         $temp_robots_index = $DB->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         $temp_robotinfo = $temp_robots_index[$this_robot->robot_token];
-        $temp_robotinfo = mmrpg_robot::parse_index_info($temp_robotinfo);
+        $temp_robotinfo = rpg_robot::parse_index_info($temp_robotinfo);
         if ($temp_robotinfo['robot_core'] != $this_robot->robot_core){ $temp_robotinfo['robot_core'] = $this_robot->robot_core; }
         //if (empty($temp_abilities_index)){ $temp_abilities_index = array(); }
         // Loop through each ability and display its button
@@ -171,7 +171,7 @@ ob_start();
                 // If the ability is not actually compatible with this robot, disable it
                 //$temp_robot_array = $this_robot->export_array();
                 $temp_ability_array = $temp_ability->export_array();
-                $temp_button_compatible = mmrpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo);
+                $temp_button_compatible = rpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo);
                 if (!$temp_button_compatible){ $temp_button_enabled = false; }
 
                 // If this button is enabled, add it to the global ability options array

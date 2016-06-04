@@ -1037,8 +1037,8 @@ class rpg_ability {
                 }
 
                 // Collect this robot's stat calculations
-                $robot_info = mmrpg_robot::get_index_info($target_robot->robot_token);
-                $robot_stats = mmrpg_robot::calculate_stat_values(
+                $robot_info = rpg_robot::get_index_info($target_robot->robot_token);
+                $robot_stats = rpg_robot::calculate_stat_values(
                     $target_robot->robot_level,
                     $robot_info,
                     $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]
@@ -1062,7 +1062,7 @@ class rpg_ability {
                         $target_robot->update_session();
 
                         // Recalculate robot stats with new values
-                        $robot_stats = mmrpg_robot::calculate_stat_values(
+                        $robot_stats = rpg_robot::calculate_stat_values(
                             $target_robot->robot_level,
                             $robot_info,
                             $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]

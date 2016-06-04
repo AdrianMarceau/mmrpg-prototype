@@ -11,17 +11,17 @@ $ability = array(
   'ability_recovery_percent' => true,
   'ability_accuracy' => 100,
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
       'success' => array(9, 0, 0, -10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
-    
+
     // Increase this robot's attack stat
     $this_ability->recovery_options_update(array(
       'kind' => 'attack',
@@ -32,7 +32,7 @@ $ability = array(
       ));
     $attack_recovery_amount = ceil($this_robot->robot_base_attack * ($this_ability->ability_recovery / 100));
     $this_robot->trigger_recovery($this_robot, $this_ability, $attack_recovery_amount);
-    
+
     // Attach this ability to all robots on this player's side of the field
     $backup_robots_active = $this_player->values['robots_active'];
     $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
@@ -41,7 +41,7 @@ $ability = array(
       $this_key = 0;
       foreach ($backup_robots_active AS $key => $info){
         if ($info['robot_id'] == $this_robot->robot_id){ continue; }
-        $temp_this_robot = new mmrpg_robot($this_battle, $this_player, $info);
+        $temp_this_robot = new rpg_robot($this_battle, $this_player, $info);
         // Increase this robot's attack stat
         $this_ability->recovery_options_update(array(
           'kind' => 'attack',
@@ -55,10 +55,10 @@ $ability = array(
         $this_key++;
       }
     }
-      
+
     // Return true on success
     return true;
-      
+
   }
   );
 ?>

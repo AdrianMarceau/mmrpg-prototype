@@ -10,7 +10,7 @@ if (!empty($temp_flags['drwily_password_robotgetpanicatthedisco'])){
   if (!mmrpg_prototype_robot_unlocked(false, 'disco')){
   // Unlock Roll as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-wily'];
-    $unlock_robot_info = mmrpg_robot::get_index_info('disco');
+    $unlock_robot_info = rpg_robot::get_index_info('disco');
     $unlock_robot_info['robot_level'] = 1;
     $unlock_robot_info['robot_experience'] = 999;
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true);

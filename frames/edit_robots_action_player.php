@@ -83,7 +83,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_current_
             $temp_robot_info['robot_settings'] = $temp_robot_settings;
             $temp_robot_info['robot_rewards'] = $temp_robot_rewards;
             $first_robot_token = $temp_robot_info['robot_token'];
-            exit('success|player-swapped|'.mmrpg_robot::print_editor_markup($temp_player_info, $temp_robot_info));
+            exit('success|player-swapped|'.rpg_robot::print_editor_markup($temp_player_info, $temp_robot_info));
         }
     }
 

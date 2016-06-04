@@ -600,7 +600,7 @@ if ($this_player->player_side == 'left'){
             if (mmrpg_prototype_robot_unlocked(false, $robot_reward_info['token'])){ continue; }
 
             // Collect the robot info from the index
-            $robot_info = mmrpg_robot::get_index_info($robot_reward_info['token']);
+            $robot_info = rpg_robot::get_index_info($robot_reward_info['token']);
             // Search this player's base robots for the robot ID
             $robot_info['robot_id'] = 0;
             foreach ($this_player->player_base_robots AS $base_robot){
@@ -610,7 +610,7 @@ if ($this_player->player_side == 'left'){
                 }
             }
             // Create the temporary robot object for event creation
-            $temp_robot = new mmrpg_robot($this, $this_player, $robot_info);
+            $temp_robot = new rpg_robot($this, $this_player, $robot_info);
 
             // Collect or define the robot points and robot rewards variables
             $this_robot_token = $robot_reward_info['token'];
@@ -672,7 +672,7 @@ if ($this_player->player_side == 'left'){
                 // If this robot is a mecha, skip it!
                 if (!empty($temp_info['robot_class']) && $temp_info['robot_class'] == 'mecha'){ continue; }
                 // Equip this ability to the robot is there was a match found
-                if (mmrpg_robot::has_ability_compatibility($temp_info['robot_token'], $ability_info['ability_token'])){
+                if (rpg_robot::has_ability_compatibility($temp_info['robot_token'], $ability_info['ability_token'])){
                     if (!isset( $_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities'] )){ $_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities'] = array(); }
                     if (count($_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities']) < 8){ $_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities'][$ability_info['ability_token']] = array('ability_token' => $ability_info['ability_token']); }
                 }

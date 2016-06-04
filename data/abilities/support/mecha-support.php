@@ -119,8 +119,8 @@ $ability = array(
       // Collect database info for this mecha
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       global $DB;
-      $this_mecha_info = mmrpg_robot::get_index_info($this_mecha_token);
-      $this_mecha_info = mmrpg_robot::parse_index_info($this_mecha_info);
+      $this_mecha_info = rpg_robot::get_index_info($this_mecha_token);
+      $this_mecha_info = rpg_robot::parse_index_info($this_mecha_info);
 
       // Update or create the mecha letter token
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -159,7 +159,7 @@ $ability = array(
       //elseif (preg_match('/-3$/', $this_mecha_token)){ $this_mecha_info['robot_name'] .= '³'; }
       $this_mecha_info['robot_name'] .= ' '.$this_mecha_letter;
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      $temp_mecha = new mmrpg_robot($this_battle, $this_player, $this_mecha_info);
+      $temp_mecha = new rpg_robot($this_battle, $this_player, $this_mecha_info);
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_mecha->apply_stat_bonuses();
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -184,7 +184,7 @@ $ability = array(
 
       // Refresh the current robot's frame back to normal (manually because reference confusion)
       if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-      mmrpg_robot::set_session_field($this_original_robot_id, 'robot_frame', 'base');
+      rpg_robot::set_session_field($this_original_robot_id, 'robot_frame', 'base');
 
     }
     // Otherwise print a nothing happened message

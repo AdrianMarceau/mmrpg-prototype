@@ -36,7 +36,7 @@ function mmrpg_patch_stat_max_limit_update($_GAME){
     $stat_tokens = array('energy', 'attack', 'defense', 'speed');
 
     // Collect a mini robot index for the ones unlocked by the player
-    $robot_index = mmrpg_robot::get_index($player_robots_tokens);
+    $robot_index = rpg_robot::get_index($player_robots_tokens);
 
     //echo('<pre>$stat_tokens = '.print_r($stat_tokens, true).'</pre>');
     //echo('<pre>$robot_index = '.print_r($robot_index, true).'</pre>');
@@ -58,7 +58,7 @@ function mmrpg_patch_stat_max_limit_update($_GAME){
 
                 // Collect and calculate this robot's stat details
                 $level = isset($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
-                $robot_stats = mmrpg_robot::calculate_stat_values($level, $robot_info, $robot_rewards);
+                $robot_stats = rpg_robot::calculate_stat_values($level, $robot_info, $robot_rewards);
 
                 //echo('$robot_stats => '.print_r($robot_stats, true)."\n");
 

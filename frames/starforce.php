@@ -68,7 +68,7 @@ require_once('../data/starforce.php');
 $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
 
 // Collect the robot's index for names and fields
-$rpg_robots_index = mmrpg_robot::get_index();
+$rpg_robots_index = rpg_robot::get_index();
 
 // Collect all the robots that have been unlocked by the player
 $rpg_robots_encountered = array();

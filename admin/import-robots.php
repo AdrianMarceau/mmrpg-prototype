@@ -1,5 +1,5 @@
 <?
-  
+
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while importing!');  }
 
@@ -65,11 +65,11 @@ unset($mmrpg_index['robots']['robot']);
 array_unshift($mmrpg_index['robots'], $temp_empty);
 if (!empty($mmrpg_index['robots'])){
   foreach ($mmrpg_index['robots'] AS $robot_token => $robot_data){
-      
+
     // If this robot's image exists, assign it
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$robot_token.'/')){ $robot_data['robot_image'] = $robot_data['robot_token']; }
     else { $robot_data['robot_image'] = 'robot'; }
-    
+
     // Define the insert array and start populating it with basic details
     $temp_insert_array = array();
     //$temp_insert_array['robot_id'] = isset($robot_data['robot_id']) ? $robot_data['robot_id'] : $robot_key;
@@ -93,51 +93,51 @@ if (!empty($mmrpg_index['robots'])){
     $temp_insert_array['robot_defense'] = !empty($robot_data['robot_defense']) ? $robot_data['robot_defense'] : 100;
     $temp_insert_array['robot_speed'] = !empty($robot_data['robot_speed']) ? $robot_data['robot_speed'] : 100;
     $temp_insert_array['robot_functions'] = !empty($robot_data['robot_functions']) ? $robot_data['robot_functions'] : 'robots/robot.php';
-    
+
     // Define weaknesses for this robot
     $temp_insert_array['robot_weaknesses'] = json_encode(!empty($robot_data['robot_weaknesses']) ? $robot_data['robot_weaknesses'] : array());
     //$temp_insert_array['robot_weaknesses'] = array();
     //if (!empty($robot_data['robot_weaknesses'])){ foreach ($robot_data['robot_weaknesses'] AS $key => $token){ $temp_insert_array['robot_weaknesses'][] = '['.$token.']'; } }
     //$temp_insert_array['robot_weaknesses'] = implode(',', $temp_insert_array['robot_weaknesses']);
-    
+
     // Define resistances for this robot
     $temp_insert_array['robot_resistances'] = json_encode(!empty($robot_data['robot_resistances']) ? $robot_data['robot_resistances'] : array());
     //$temp_insert_array['robot_resistances'] = array();
     //if (!empty($robot_data['robot_resistances'])){ foreach ($robot_data['robot_resistances'] AS $key => $token){ $temp_insert_array['robot_resistances'][] = '['.$token.']'; } }
     //$temp_insert_array['robot_resistances'] = implode(',', $temp_insert_array['robot_resistances']);
-    
+
     // Define affinities for this robot
     $temp_insert_array['robot_affinities'] = json_encode(!empty($robot_data['robot_affinities']) ? $robot_data['robot_affinities'] : array());
     //$temp_insert_array['robot_affinities'] = array();
     //if (!empty($robot_data['robot_affinities'])){ foreach ($robot_data['robot_affinities'] AS $key => $token){ $temp_insert_array['robot_affinities'][] = '['.$token.']'; } }
     //$temp_insert_array['robot_affinities'] = implode(',', $temp_insert_array['robot_affinities']);
-    
+
     // Define immunities for this robot
     $temp_insert_array['robot_immunities'] = json_encode(!empty($robot_data['robot_immunities']) ? $robot_data['robot_immunities'] : array());
     //$temp_insert_array['robot_immunities'] = array();
     //if (!empty($robot_data['robot_immunities'])){ foreach ($robot_data['robot_immunities'] AS $key => $token){ $temp_insert_array['robot_immunities'][] = '['.$token.']'; } }
     //$temp_insert_array['robot_immunities'] = implode(',', $temp_insert_array['robot_immunities']);
-    
+
     // Define the ability rewards for this robot
     $temp_insert_array['robot_abilities_rewards'] = json_encode(!empty($robot_data['robot_rewards']['abilities']) ? $robot_data['robot_rewards']['abilities'] : array());
     //$temp_insert_array['robot_abilities_rewards'] = array();
     //if (!empty($robot_data['robot_rewards']['abilities'])){ foreach ($robot_data['robot_rewards']['abilities'] AS $key => $info){ $temp_insert_array['robot_abilities_rewards'][] = '['.$info['level'].':'.$info['token'].']'; } }
     //$temp_insert_array['robot_abilities_rewards'] = implode(',', $temp_insert_array['robot_abilities_rewards']);
-    
+
     // Define immunities for this robot
     $temp_insert_array['robot_abilities_compatible'] = json_encode(!empty($robot_data['robot_abilities']) ? $robot_data['robot_abilities'] : array());
     //$temp_insert_array['robot_abilities_compatible'] = array();
     //if (!empty($robot_data['robot_abilities'])){ foreach ($robot_data['robot_abilities'] AS $key => $token){ $temp_insert_array['robot_abilities_compatible'][] = '['.$token.']'; } }
     //$temp_insert_array['robot_abilities_compatible'] = implode(',', $temp_insert_array['robot_abilities_compatible']);
-    
+
     // Define the battle quotes for this robot
     if (!empty($robot_data['robot_quotes'])){ foreach ($robot_data['robot_quotes'] AS $key => $quote){ $robot_data['robot_quotes'][$key] = html_entity_decode($quote, ENT_QUOTES, 'UTF-8'); } }
     $temp_insert_array['robot_quotes_start'] = !empty($robot_data['robot_quotes']['battle_start']) && $robot_data['robot_quotes']['battle_start'] != '...' ? $robot_data['robot_quotes']['battle_start'] : '';
     $temp_insert_array['robot_quotes_taunt'] = !empty($robot_data['robot_quotes']['battle_taunt']) && $robot_data['robot_quotes']['battle_taunt'] != '...' ? $robot_data['robot_quotes']['battle_taunt'] : '';
     $temp_insert_array['robot_quotes_victory'] = !empty($robot_data['robot_quotes']['battle_victory']) && $robot_data['robot_quotes']['battle_victory'] != '...' ? $robot_data['robot_quotes']['battle_victory'] : '';
     $temp_insert_array['robot_quotes_defeat'] = !empty($robot_data['robot_quotes']['battle_defeat']) && $robot_data['robot_quotes']['battle_defeat'] != '...' ? $robot_data['robot_quotes']['battle_defeat'] : '';
-    
-    
+
+
     // Collect applicable spreadsheets for this robot
     if ($temp_insert_array['robot_class'] == 'master'){
       $robot_data['robot_class'] = 'master';
@@ -149,13 +149,13 @@ if (!empty($mmrpg_index['robots'])){
       $spreadsheet_quotes = !empty($spreadsheet_mecha_quotes[$robot_data['robot_token']]) ? $spreadsheet_mecha_quotes[$robot_data['robot_token']] : array();
       $spreadsheet_descriptions = !empty($spreadsheet_mecha_descriptions[$robot_data['robot_token']]) ? $spreadsheet_mecha_descriptions[$robot_data['robot_token']] : array();
     }
-    
+
     /*
     $spreadsheet_stats = !empty($spreadsheet_robot_stats[$robot_data['robot_token']]) ? $spreadsheet_robot_stats[$robot_data['robot_token']] : (!empty($spreadsheet_mecha_stats[$robot_data['robot_token']]) ? $spreadsheet_mecha_stats[$robot_data['robot_token']] : array());
     $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$robot_data['robot_token']]) ? $spreadsheet_robot_quotes[$robot_data['robot_token']] : (!empty($spreadsheet_mecha_quotes[$robot_data['robot_token']]) ? $spreadsheet_mecha_quotes[$robot_data['robot_token']] : array());
     $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$robot_data['robot_token']]) ? $spreadsheet_robot_descriptions[$robot_data['robot_token']] : (!empty($spreadsheet_mecha_descriptions[$robot_data['robot_token']]) ? $spreadsheet_mecha_descriptions[$robot_data['robot_token']] : array());
     */
-        
+
     // Collect any user-contributed data for this robot
     if (!empty($spreadsheet_stats['energy'])){ $temp_insert_array['robot_energy'] = $spreadsheet_stats['energy']; }
     if (!empty($spreadsheet_stats['attack'])){ $temp_insert_array['robot_attack'] = $spreadsheet_stats['attack']; }
@@ -172,7 +172,7 @@ if (!empty($mmrpg_index['robots'])){
       if (!empty($spreadsheet_descriptions['mecha_class'])){ $temp_insert_array['robot_description'] = trim($spreadsheet_descriptions['mecha_class']); }
       if (!empty($spreadsheet_descriptions['mecha_description'])){ $temp_insert_array['robot_description2'] = trim($spreadsheet_descriptions['mecha_description']); }
     }
-    
+
     // Define the flags
     $temp_insert_array['robot_flag_hidden'] = $temp_insert_array['robot_class'] == 'mecha' || in_array($temp_insert_array['robot_token'], array('bond-man', 'fake-man', 'cache', 'rock')) ? 1 : 0;
     $temp_insert_array['robot_flag_complete'] = $robot_data['robot_image'] != 'robot' ? 1 : 0;
@@ -183,20 +183,20 @@ if (!empty($mmrpg_index['robots'])){
     $temp_exists = $DB->get_array("SELECT robot_token FROM mmrpg_index_robots WHERE robot_token LIKE '{$temp_insert_array['robot_token']}' LIMIT 1") ? true : false;
     if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_robots', $temp_insert_array); }
     else { $temp_success = $DB->update('mmrpg_index_robots', $temp_insert_array, array('robot_token' => $temp_insert_array['robot_token'])); }
-    
+
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
     $this_page_markup .= '<strong>$mmrpg_database_robots['.$robot_token.']</strong><br />';
     //$this_page_markup .= '<pre>'.print_r($robot_data, true).'</pre><br /><hr /><br />';
     $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-    //$this_page_markup .= '<pre>'.print_r(mmrpg_robot::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
+    //$this_page_markup .= '<pre>'.print_r(rpg_robot::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
     $this_page_markup .= '</p><hr />';
-    
+
     $robot_key++;
-    
+
     //if ($robot_data['robot_token'] == 'met'){ die('met = <pre>'.print_r($temp_insert_array, true).'</pre>'); }
     //die('end');
-    
+
   }
 }
 // Otherwise, if empty, we're done!

@@ -14,7 +14,7 @@ $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_cor
 $robot_flag_copycore = !empty($robot_info['robot_core']) && $robot_info['robot_core'] == 'copy' ? true : false;
 $temp_ability_type = !empty($ability_info['ability_type']) ? $mmrpg_index['types'][$ability_info['ability_type']] : false;
 $temp_ability_type2 = !empty($ability_info['ability_type2']) ? $mmrpg_index['types'][$ability_info['ability_type2']] : false;
-$temp_ability_energy = mmrpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
+$temp_ability_energy = rpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
 $temp_type_array = array();
 $temp_incompatible = false;
 $temp_index_abilities = !empty($robot_info['robot_index_abilities']) ? $robot_info['robot_index_abilities'] : array();

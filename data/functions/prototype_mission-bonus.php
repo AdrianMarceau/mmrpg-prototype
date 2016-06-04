@@ -75,7 +75,7 @@ $temp_battle_omega['battle_points'] = 0;
 foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $info){
     $info['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
     if ($this_robot_class != 'mecha'){
-        $index = mmrpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
+        $index = rpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
         $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
     }
     $temp_battle_omega['battle_points'] += $info['robot_level'] * ($this_robot_class == 'master' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2);

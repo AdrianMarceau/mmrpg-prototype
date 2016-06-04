@@ -446,8 +446,8 @@ class mmrpg_battle {
 
         // Recreate this and the target robot in the global space with backed up info
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        if (empty($GLOBALS['this_robot'])){ $GLOBALS['this_robot'] = new mmrpg_robot($this, $GLOBALS['this_player'], $temp_this_robot_backup); }
-        if (empty($GLOBALS['target_robot'])){ $GLOBALS['target_robot'] = new mmrpg_robot($this, $GLOBALS['target_player'], $temp_target_robot_backup); }
+        if (empty($GLOBALS['this_robot'])){ $GLOBALS['this_robot'] = new rpg_robot($this, $GLOBALS['this_player'], $temp_this_robot_backup); }
+        if (empty($GLOBALS['target_robot'])){ $GLOBALS['target_robot'] = new rpg_robot($this, $GLOBALS['target_player'], $temp_target_robot_backup); }
 
         // Return true on loop completion
         return true;
@@ -815,7 +815,7 @@ class mmrpg_battle {
             foreach ($this->values['robots'] AS $robot_id => $robot_info){
                 // If the robot matches the request side, return the robot
                 if ($robot_info['player_id'] == $target_player->player_id && $robot_info['robot_position'] == 'active'){
-                    $target_robot = new mmrpg_robot($this, $target_player, $robot_info);
+                    $target_robot = new rpg_robot($this, $target_player, $robot_info);
                 }
             }
         }
@@ -834,10 +834,10 @@ class mmrpg_battle {
         foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
 
             // Create the temp robot object
-            if (empty($temp_robot)){ $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
+            if (empty($temp_robot)){ $temp_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
             else { $temp_robot->robot_load(array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
             //if ($temp_robotinfo['robot_id'] == $this_robot->robot_id){ $temp_robot = &$this_robot; }
-            //else { $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
+            //else { $temp_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
 
             // Hide any disabled robots that have not been hidden yet
             if ($temp_robotinfo['robot_status'] == 'disabled'){
@@ -939,10 +939,10 @@ class mmrpg_battle {
         foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
 
             // Create the temp robot object
-            if (empty($temp_robot)){ $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
+            if (empty($temp_robot)){ $temp_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
             else { $temp_robot->robot_load(array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
             //if ($temp_robotinfo['robot_id'] == $this_robot->robot_id){ $temp_robot = &$this_robot; }
-            //else { $temp_robot = new mmrpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
+            //else { $temp_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
 
             // Ensure this robot has not been disabled already
             if ($temp_robotinfo['robot_status'] == 'disabled'){

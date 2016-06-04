@@ -104,7 +104,7 @@ if (!empty($this_current_token)){
     }
 
     // Collect the markup for this mecha and print it to the browser
-    $temp_mecha_markup = mmrpg_robot::print_database_markup($mecha_info, array('show_key' => $key_counter));
+    $temp_mecha_markup = rpg_robot::print_database_markup($mecha_info, array('show_key' => $key_counter));
     echo $temp_mecha_markup;
     $key_counter++;
     break;
@@ -162,7 +162,7 @@ if (empty($this_current_token)){
     $this_robot_image = !empty($mecha_info['robot_image']) ? $mecha_info['robot_image'] : $mecha_info['robot_token'];
     if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
     // Collect the markup for this robot and print it to the browser
-    $temp_mecha_markup = mmrpg_robot::print_database_markup($mecha_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+    $temp_mecha_markup = rpg_robot::print_database_markup($mecha_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
     echo $temp_mecha_markup;
     $key_counter++;
   }

@@ -45,7 +45,7 @@ foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){
   if (true){
 
     // Send this data through the mecha index parser
-    $temp_info = mmrpg_robot::parse_index_info($temp_info);
+    $temp_info = rpg_robot::parse_index_info($temp_info);
 
     // Ensure this mecha's image exists, else default to the placeholder
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$temp_token.'/')){ $temp_info['robot_image'] = $temp_token; }
