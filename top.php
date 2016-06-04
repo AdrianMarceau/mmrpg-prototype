@@ -63,11 +63,11 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 }
 
 // Include mandatory class files
-require('classes/battle.php');
-require('classes/field.php');
-require('classes/player.php');
-require('classes/robot.php');
-require('classes/ability.php');
+require('classes/rpg_battle.php');
+require('classes/rpg_field.php');
+require('classes/rpg_player.php');
+require('classes/rpg_robot.php');
+require('classes/rpg_ability.php');
 
 // Include mandatory function files
 require('data/functions/website.php');
