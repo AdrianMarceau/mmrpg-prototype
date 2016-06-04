@@ -122,8 +122,8 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
       foreach ($this_robot->robot_abilities AS $this_key => $this_token){
         // Define the current ability object using the loaded ability data
-        $temp_abilityinfo = mmrpg_ability::parse_index_info($temp_abilities_index[$this_token]);
-        $temp_ability = new mmrpg_ability($this, $this_player, $this_robot, $temp_abilityinfo);
+        $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilities_index[$this_token]);
+        $temp_ability = new rpg_ability($this, $this_player, $this_robot, $temp_abilityinfo);
         // Trigger this abilities start event, if it has one
         // Update or create this abilities session object
         $temp_ability->update_session();
@@ -165,7 +165,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       $temp_id = $this->index['abilities'][$temp_token]['ability_id'];//array_search($temp_token, $this_robot->robot_abilities);
       $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
       //$this_token = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
-      $this_token = mmrpg_ability::parse_index_info($temp_actions_index[$temp_token]);
+      $this_token = rpg_ability::parse_index_info($temp_actions_index[$temp_token]);
       $this_token['ability_id'] = $temp_id;
     }
     // Otherwise, parse the token for data
@@ -174,7 +174,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
       // Define the ability choice data for this robot
       list($temp_id, $temp_token) = explode('_', $this_token);
       //$this_token = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
-      $this_token = mmrpg_ability::parse_index_info($temp_actions_index[$temp_token]);
+      $this_token = rpg_ability::parse_index_info($temp_actions_index[$temp_token]);
       $this_token['ability_id'] = $temp_id;
     }
 
@@ -187,7 +187,7 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
 
     // Define the current ability object using the loaded ability data
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-    $this_ability = new mmrpg_ability($this, $this_player, $this_robot, $this_token);
+    $this_ability = new rpg_ability($this, $this_player, $this_robot, $this_token);
     // Trigger this robot's ability
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $this_ability->ability_results = $this_robot->trigger_ability($target_robot, $this_ability);
@@ -415,8 +415,8 @@ while ($battle_loop == true && $this->battle_status != 'complete'){
         if (!isset($temp_abilities_index[$this_token])){ continue; }
         // Define the current ability object using the loaded ability data
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        $temp_abilityinfo = mmrpg_ability::parse_index_info($temp_abilities_index[$this_token]);
-        $temp_ability = new mmrpg_ability($this, $this_player, $this_robot, $temp_abilityinfo);
+        $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilities_index[$this_token]);
+        $temp_ability = new rpg_ability($this, $this_player, $this_robot, $temp_abilityinfo);
         // Update or create this abilities session object
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_ability->update_session();

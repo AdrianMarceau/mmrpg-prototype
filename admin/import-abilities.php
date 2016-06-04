@@ -39,11 +39,11 @@ unset($mmrpg_index['abilities']['ability']);
 array_unshift($mmrpg_index['abilities'], $temp_empty);
 if (!empty($mmrpg_index['abilities'])){
   foreach ($mmrpg_index['abilities'] AS $ability_token => $ability_data){
-      
+
     // If this ability's image exists, assign it
     if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/abilities/'.$ability_token.'/')){ $ability_data['ability_image'] = $ability_data['ability_token']; }
     else { $ability_data['ability_image'] = 'ability'; }
-    
+
     // Define the insert array and start populating it with basic details
     $temp_insert_array = array();
     //$temp_insert_array['ability_id'] = isset($ability_data['ability_id']) ? $ability_data['ability_id'] : $ability_key;
@@ -73,7 +73,7 @@ if (!empty($mmrpg_index['abilities'])){
     $temp_insert_array['ability_accuracy'] = !empty($ability_data['ability_accuracy']) ? $ability_data['ability_accuracy'] : 0;
     $temp_insert_array['ability_target'] = !empty($ability_data['ability_target']) ? $ability_data['ability_target'] : 'auto';
     $temp_insert_array['ability_functions'] = !empty($ability_data['ability_functions']) ? $ability_data['ability_functions'] : 'abilities/ability.php';
-    
+
     // Define the ability frame properties
     $temp_insert_array['ability_frame'] = !empty($ability_data['ability_frame']) ? $ability_data['ability_frame'] : 'base';
     $temp_insert_array['ability_frame_animate'] = json_encode(!empty($ability_data['ability_frame_animate']) ? $ability_data['ability_frame_animate'] : array());
@@ -90,7 +90,7 @@ if (!empty($mmrpg_index['abilities'])){
     //$temp_insert_array['ability_frame_offset'] = implode(',', $temp_insert_array['ability_frame_offset']);
     $temp_insert_array['ability_frame_styles'] = !empty($ability_data['ability_frame_styles']) ? $ability_data['ability_frame_styles'] : '';
     $temp_insert_array['ability_frame_classes'] = !empty($ability_data['ability_frame_classes']) ? $ability_data['ability_frame_classes'] : '';
-    
+
     // Define the ability frame properties
     $temp_insert_array['attachment_frame'] = !empty($ability_data['attachment_frame']) ? $ability_data['attachment_frame'] : 'base';
     $temp_insert_array['attachment_frame_animate'] = json_encode(!empty($ability_data['attachment_frame_animate']) ? $ability_data['attachment_frame_animate'] : array());
@@ -107,7 +107,7 @@ if (!empty($mmrpg_index['abilities'])){
     //$temp_insert_array['attachment_frame_offset'] = implode(',', $temp_insert_array['attachment_frame_offset']);
     $temp_insert_array['attachment_frame_styles'] = !empty($ability_data['attachment_frame_styles']) ? $ability_data['attachment_frame_styles'] : '';
     $temp_insert_array['attachment_frame_classes'] = !empty($ability_data['attachment_frame_classes']) ? $ability_data['attachment_frame_classes'] : '';
-    
+
     // Define the flags
     $temp_insert_array['ability_flag_hidden'] = $temp_insert_array['ability_class'] != 'master' || in_array($temp_insert_array['ability_token'], array('ability', 'attachment-defeat')) ? 1 : 0;
     $temp_insert_array['ability_flag_complete'] = $temp_insert_array['ability_class'] == 'system' || $ability_data['ability_image'] != 'ability' ? 1 : 0;
@@ -118,15 +118,15 @@ if (!empty($mmrpg_index['abilities'])){
     $temp_exists = $DB->get_array("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_token LIKE '{$temp_insert_array['ability_token']}' LIMIT 1") ? true : false;
     if (!$temp_exists){ $temp_success = $DB->insert('mmrpg_index_abilities', $temp_insert_array); }
     else { $temp_success = $DB->update('mmrpg_index_abilities', $temp_insert_array, array('ability_token' => $temp_insert_array['ability_token'])); }
-    
+
     // Print out the generated insert array
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
     $this_page_markup .= '<strong>$mmrpg_database_abilities['.$ability_token.']</strong><br />';
     //$this_page_markup .= '<pre>'.print_r($ability_data, true).'</pre><br /><hr /><br />';
     $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-    //$this_page_markup .= '<pre>'.print_r(mmrpg_ability::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
+    //$this_page_markup .= '<pre>'.print_r(rpg_ability::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
     $this_page_markup .= '</p><hr />';
-    
+
     $ability_key++;
   }
 }

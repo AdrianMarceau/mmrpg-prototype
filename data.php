@@ -831,7 +831,7 @@ elseif ($this_action == 'ability' && preg_match('/^([0-9]+)_item-/i', $this_acti
     // Create the temporary ability object for this player's robot
     $temp_abilityinfo = array();
     list($temp_abilityinfo['ability_id'], $temp_abilityinfo['ability_token']) = explode('_', $this_action_token); //array('ability_token' => $this_action_token);
-    $temp_thisability = new mmrpg_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
+    $temp_thisability = new rpg_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
 
     // Queue up an this robot's action first, because it's faster
     $this_battle->actions_append($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token);
@@ -996,9 +996,9 @@ elseif ($this_action == 'ability'){
     // Create the temporary ability object for this player's robot
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     list($temp_id, $temp_token) = explode('_', $this_action_token); //array('ability_token' => $this_action_token);
-    $temp_abilityinfo = mmrpg_ability::parse_index_info($temp_abilities_index[$temp_token]);
+    $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilities_index[$temp_token]);
     $temp_abilityinfo['ability_id'] = $temp_id;
-    $temp_thisability = new mmrpg_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
+    $temp_thisability = new rpg_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
 
     // DEBUG
     //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, '<pre>'.preg_replace('#\s+#', ' ', print_r($temp_abilityinfo, true)).'</pre>');
@@ -1022,9 +1022,9 @@ elseif ($this_action == 'ability'){
     foreach ($active_target_robot->robot_abilities AS $key => $token){
         if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Collect the data for this ability from the index
-        $info = mmrpg_ability::parse_index_info($temp_abilities_index[$token]);
+        $info = rpg_ability::parse_index_info($temp_abilities_index[$token]);
         if (empty($info)){ unset($active_target_robot->robot_abilities[$key]); continue; }
-        $temp_ability = new mmrpg_ability($this_battle, $target_player, $active_target_robot, $info);
+        $temp_ability = new rpg_ability($this_battle, $target_player, $active_target_robot, $info);
         // Determine how much weapon energy this should take
         $temp_ability_energy = $active_target_robot->calculate_weapon_energy($temp_ability);
         // If this robot does not have enough energy for the move, remove it
@@ -1065,9 +1065,9 @@ elseif ($this_action == 'ability'){
     if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_abilityinfo = array();
     list($temp_abilityinfo['ability_id'], $temp_abilityinfo['ability_token']) = explode('_', $target_action_token);
-    $temp_indexinfo = mmrpg_ability::parse_index_info($temp_abilities_index[$temp_abilityinfo['ability_token']]);
+    $temp_indexinfo = rpg_ability::parse_index_info($temp_abilities_index[$temp_abilityinfo['ability_token']]);
     $temp_abilityinfo = array_merge($temp_indexinfo, $temp_abilityinfo);
-    $temp_targetability = new mmrpg_ability($this_battle, $target_player, $active_target_robot, $temp_abilityinfo);
+    $temp_targetability = new rpg_ability($this_battle, $target_player, $active_target_robot, $temp_abilityinfo);
 
     // If the target player's temporary ability allows target selection
     //if ($temp_targetability->ability_target == 'select'){
@@ -1170,7 +1170,7 @@ elseif ($this_action == 'ability'){
         if ($this_action == 'ability'){
             list($temp_ability_id, $temp_ability_token) = explode('_', $this_action_token);
             $temp_ability_info = array('ability_id' => $temp_ability_id, 'ability_token' => $temp_ability_token);
-            $temp_ability_object = new mmrpg_ability($this_battle, $this_player, $this_robot, $temp_ability_info);
+            $temp_ability_object = new rpg_ability($this_battle, $this_player, $this_robot, $temp_ability_info);
             $temp_ability_info = $temp_ability_object->export_array();
             //$temp_ability_info['ability_id'] = $temp_ability_id;
             if (!isset($temp_ability_info['ability_target'])){

@@ -54,7 +54,7 @@ $ability = array(
 
       // Recreate this ability using the target robot's data
       $temp_abilityinfo = array('ability_token' => $this_ability->ability_token);
-      $temp_ability = new mmrpg_ability($this_battle, $this_player, $target_robot, $temp_abilityinfo);
+      $temp_ability = new rpg_ability($this_battle, $this_player, $target_robot, $temp_abilityinfo);
       $temp_ability->update_session();
 
     }

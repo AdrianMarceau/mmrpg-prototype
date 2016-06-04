@@ -6,7 +6,7 @@ $session_token = mmrpg_game_token();
 // Generate the ability option markup
 if (empty($robot_info)){ return false; }
 if (empty($ability_info)){ return false; }
-//$ability_info = mmrpg_ability::get_index_info($temp_ability_token);
+//$ability_info = self::get_index_info($temp_ability_token);
 $temp_robot_token = $robot_info['robot_token'];
 $temp_ability_token = $ability_info['ability_token'];
 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, $temp_robot_token.'/'.$temp_ability_token.'/'."\nrobot_abilities = ".array_keys($robot_info['robot_abilities'])."\nrobot_index_abilities = ".array_keys($robot_info['robot_index_abilities']));  }
@@ -37,7 +37,7 @@ while (!in_array($temp_ability_token, $temp_compatible_abilities)){
 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, $temp_robot_token.'/'.$temp_ability_token.'/'.($temp_incompatible ? 'incompatible' : 'compatible'));  }
 if ($temp_incompatible == true){ return false; }
 $temp_ability_label = $ability_info['ability_name'];
-$temp_ability_title = mmrpg_ability::print_editor_title_markup($robot_info, $ability_info);
+$temp_ability_title = self::print_editor_title_markup($robot_info, $ability_info);
 $temp_ability_title_plain = strip_tags(str_replace('<br />', '&#10;', $temp_ability_title));
 $temp_ability_title_tooltip = htmlentities($temp_ability_title, ENT_QUOTES, 'UTF-8');
 $temp_ability_option = $ability_info['ability_name'];

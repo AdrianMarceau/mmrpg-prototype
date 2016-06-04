@@ -408,8 +408,8 @@ ob_start();
                                 foreach ($player_ability_rewards AS $temp_ability_key => $temp_ability_info){
                                     if (empty($temp_ability_info['ability_token']) || !isset($mmrpg_database_abilities[$temp_ability_info['ability_token']])){ continue; }
                                     $temp_token = $temp_ability_info['ability_token'];
-                                    $temp_ability_info = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$temp_token]);
-                                    $temp_option_markup = mmrpg_ability::print_editor_option_markup($robot_info, $temp_ability_info);
+                                    $temp_ability_info = rpg_ability::parse_index_info($mmrpg_database_abilities[$temp_token]);
+                                    $temp_option_markup = rpg_ability::print_editor_option_markup($robot_info, $temp_ability_info);
                                     if (!empty($temp_option_markup)){ $player_ability_rewards_options[] = $temp_option_markup; }
                                 }
                                 $player_ability_rewards_options = '<optgroup label="Player Abilities">'.implode('', $player_ability_rewards_options).'</optgroup>';
@@ -424,8 +424,8 @@ ob_start();
                                 foreach ($robot_ability_rewards AS $temp_ability_info){
                                     if (empty($temp_ability_info['ability_token']) || !isset($mmrpg_database_abilities[$temp_ability_info['ability_token']])){ continue; }
                                     $temp_token = $temp_ability_info['ability_token'];
-                                    $temp_ability_info = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$temp_token]);
-                                    $temp_option_markup = mmrpg_ability::print_editor_option_markup($robot_info, $temp_ability_info);
+                                    $temp_ability_info = rpg_ability::parse_index_info($mmrpg_database_abilities[$temp_token]);
+                                    $temp_option_markup = rpg_ability::print_editor_option_markup($robot_info, $temp_ability_info);
                                     if (!empty($temp_option_markup)){ $robot_ability_rewards_options[] = $temp_option_markup; }
                                 }
                                 $robot_ability_rewards_options = '<optgroup label="Robot Abilities">'.implode('', $robot_ability_rewards_options).'</optgroup>';
@@ -453,7 +453,7 @@ ob_start();
                                     elseif ($robot_ability['ability_token'] == 'ability'){ continue; }
                                     elseif (!isset($mmrpg_database_abilities[$robot_ability['ability_token']])){ continue; }
                                     elseif ($ability_key > 7){ continue; }
-                                    $this_ability = mmrpg_ability::parse_index_info($mmrpg_database_abilities[$robot_ability['ability_token']]);
+                                    $this_ability = rpg_ability::parse_index_info($mmrpg_database_abilities[$robot_ability['ability_token']]);
                                     if (empty($this_ability)){ continue; }
                                     $this_ability_token = $this_ability['ability_token'];
                                     $this_ability_name = $this_ability['ability_name'];
@@ -486,7 +486,7 @@ ob_start();
                                     $this_ability_description = str_replace('{RECOVERY}', $this_ability_recovery, $this_ability_description);
                                     $this_ability_description = str_replace('{DAMAGE2}', $this_ability_damage2, $this_ability_description);
                                     $this_ability_description = str_replace('{RECOVERY2}', $this_ability_recovery2, $this_ability_description);
-                                    $this_ability_title = mmrpg_ability::print_editor_title_markup($robot_info, $this_ability);
+                                    $this_ability_title = rpg_ability::print_editor_title_markup($robot_info, $this_ability);
                                     $this_ability_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_ability_title));
                                     $this_ability_title_tooltip = htmlentities($this_ability_title, ENT_QUOTES, 'UTF-8');
                                     $this_ability_title_html = str_replace(' ', '&nbsp;', $this_ability_name);

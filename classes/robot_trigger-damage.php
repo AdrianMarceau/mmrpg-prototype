@@ -1087,7 +1087,7 @@ elseif ($this->robot_status != 'disabled'){
                         unset($this->robot_attachments[$attachment_token]);
                         $this->update_session();
                         if ($attachment_info['attachment_destroy'] !== false){
-                            $temp_attachment = new mmrpg_ability($this->battle, $this->player, $this, array('ability_token' => $attachment_info['ability_token']));
+                            $temp_attachment = new rpg_ability($this->battle, $this->player, $this, array('ability_token' => $attachment_info['ability_token']));
                             $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));

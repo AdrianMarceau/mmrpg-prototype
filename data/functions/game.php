@@ -99,7 +99,7 @@ function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_a
             // Check if the required amount of points have been met by this player
             if ($this_player_points >= $ability_reward_info['points']){
                 // Unlock this ability
-                $this_ability_info = mmrpg_ability::parse_index_info($this_ability_index[$ability_reward_info['token']]);
+                $this_ability_info = rpg_ability::parse_index_info($this_ability_index[$ability_reward_info['token']]);
                 $show_event = !mmrpg_game_ability_unlocked('', '', $ability_reward_info['token']) ? true : false;
                 mmrpg_game_unlock_ability($player_info, false, $this_ability_info);
             }
@@ -358,7 +358,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         $this_count_abilities = count($robot_info['robot_rewards']['abilities']);
         //die('<pre>'.print_r($robot_info['robot_rewards']['abilities'], true).'</pre>');
         foreach ($robot_info['robot_rewards']['abilities'] AS $temp_key => $temp_reward){ if ($temp_reward['token'] != 'buster-shot' && $temp_reward['level'] > 0){ $this_first_ability = $temp_reward; break; } }
-        $temp_first_ability = mmrpg_ability::get_index_info($this_first_ability['token']);
+        $temp_first_ability = rpg_ability::get_index_info($this_first_ability['token']);
         $this_first_ability_name = $temp_first_ability['ability_name'];
         //die('<pre>'.print_r($this_first_ability, true).'</pre>');
         if ($robot_info['robot_token'] == 'oil-man' || $robot_info['robot_token'] == 'time-man'){ $this_first_appearance = 'that first appeared in <em>Mega Man Powered Up</em> for the Sony PlayStation Portable'; }
@@ -423,7 +423,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
             // Check if the required amount of points have been met by this robot
             if ($this_robot_level >= $ability_reward_info['level']){
                 // Unlock this ability
-                $this_ability_info = mmrpg_ability::parse_index_info($this_ability_index[$ability_reward_info['token']]);
+                $this_ability_info = rpg_ability::parse_index_info($this_ability_index[$ability_reward_info['token']]);
                 $this_ability_info['ability_points'] = $ability_reward_info['level'];
                 $show_event = !mmrpg_game_ability_unlocked('', '', $ability_reward_info['token']) ? true : false;
                 mmrpg_game_unlock_ability($player_info, $robot_info, $this_ability_info, $show_event);
@@ -709,7 +709,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
     if (!empty($_SESSION[$session_token]['DEMO'])){ $events_create = false; }
 
     // Attempt to collect info for this ability
-    $ability_index = mmrpg_ability::get_index_info($ability_info['ability_token']);
+    $ability_index = rpg_ability::get_index_info($ability_info['ability_token']);
     // If this ability does not exist in the global index, return false
     if (empty($ability_index)){ return false; }
     // Collect the ability info from the index
@@ -799,7 +799,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
             ">'.$ability_info['ability_name'].'</div></div>';
 
         $temp_console_markup = '<p>Congratulations!  <strong>'.$player_info['player_name'].'</strong> unlocked the <strong>'.$this_name.'</strong> ability! </p>'; //<strong>'.$this_name.'</strong> is '.(!empty($ability_info['ability_type']) ? (preg_match('/^(a|e|i|o|u|y)/i', $ability_info['ability_type']) ? 'an ' : 'a ').'<strong data-class="ability_type ability_type_'.$ability_info['ability_type'].(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '').'">'.ucfirst($ability_info['ability_type']).(!empty($ability_info['ability_type2']) ? ' and '.ucfirst($ability_info['ability_type2']) : '').' Type</strong> ' : '<strong data-class="ability_type ability_type_none">Neutral Type</strong> ').'ability. <strong>'.$this_name.'</strong>&#39;s data was '.($temp_data_existed ? 'updated in ' : 'added to ' ).' the <strong>Robot Database</strong>.
-        $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', mmrpg_ability::print_database_markup($ability_info, array('layout_style' => 'event'))).'</div></div></div>';
+        $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', rpg_ability::print_database_markup($ability_info, array('layout_style' => 'event'))).'</div></div></div>';
         //die(''.$this_ability_token.': '.$temp_console_markup);
 
         $_SESSION[$session_token]['EVENTS'][] = array(

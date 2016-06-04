@@ -152,7 +152,7 @@ if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
         // DEBUG ABILITY UNLOCKS
         foreach ($this_ability_index AS $ability_token => $ability_info){
             if (mmrpg_prototype_ability_unlocked($player_token, false, $ability_token)){ continue; }
-            $ability_info = mmrpg_ability::parse_index_info($ability_info);
+            $ability_info = rpg_ability::parse_index_info($ability_info);
             $ability_string = str_replace('-', '', $ability_token);
             if ($ability_token != 'ability' && !empty($temp_flags[$player_string.'_password_ability'.$ability_string.$player_pass])){
                 if (!mmrpg_prototype_ability_unlocked($player_token, false, $ability_token)){

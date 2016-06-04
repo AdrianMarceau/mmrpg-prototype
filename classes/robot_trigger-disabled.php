@@ -674,9 +674,9 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
                 if ($temp_new_level >= $ability_reward_info['level']){
 
                     // Collect the ability info from the index
-                    $ability_info = mmrpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
+                    $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
                     // Create the temporary ability object for event creation
-                    $temp_ability = new mmrpg_ability($this->battle, $target_player, $temp_robot, $ability_info);
+                    $temp_ability = new rpg_ability($this->battle, $target_player, $temp_robot, $ability_info);
 
                     // Collect or define the ability variables
                     $temp_ability_token = $ability_info['ability_token'];
@@ -777,7 +777,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'temp_player_rewards_items('.$item_reward_info['ability_token'].')');  }
 
             // Create the temporary ability object for event creation
-            $temp_ability = new mmrpg_ability($this_battle, $target_player, $target_robot, $item_reward_info);
+            $temp_ability = new rpg_ability($this_battle, $target_player, $target_robot, $item_reward_info);
             $temp_ability->ability_name = $item_reward_info['ability_name'];
             $temp_ability->ability_image = $item_reward_info['ability_token'];
             $temp_ability->update_session();
@@ -867,7 +867,7 @@ if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SE
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_item_tokens = '.implode(',', $temp_item_tokens).';<br /> $temp_item_weights = '.implode(',', $temp_item_weights).'; ');  }
             $temp_random_item = $this_battle->weighted_chance($temp_item_tokens, $temp_item_weights);
             if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$temp_random_item = '.$temp_random_item);  }
-            $item_index_info = mmrpg_ability::parse_index_info($temp_items_index[$temp_random_item]);
+            $item_index_info = rpg_ability::parse_index_info($temp_items_index[$temp_random_item]);
             temp_player_rewards_items($this_battle, $target_player, $target_robot, $this, $item_reward_key, $item_index_info);
         }
     }

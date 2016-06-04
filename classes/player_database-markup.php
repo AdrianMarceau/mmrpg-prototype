@@ -51,7 +51,7 @@ ob_start();
 <div class="database_container database_player_container" data-token="<?=$player_info['player_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
   <a class="anchor" id="<?=$player_info['player_token']?>">&nbsp;</a>
   <div class="subbody event event_triple event_visible" data-token="<?=$player_info['player_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
-   
+
     <? if($print_options['show_mugshot']): ?>
       <div class="this_sprite sprite_left" style="height: 40px;">
         <? if($print_options['show_key'] !== false): ?>
@@ -60,8 +60,8 @@ ob_start();
         <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>"><div style="background-image: url(images/players/<?= $player_image_token ?>/mug_right_<?= $player_image_size_text ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_player sprite_40x40 sprite_40x40_mug sprite_size_<?= $player_image_size_text ?> sprite_size_<?= $player_image_size_text ?>_mug player_status_active player_position_active"><?=$player_info['player_name']?>'s Mugshot</div></div>
       </div>
     <? endif; ?>
-    
-    
+
+
     <? if($print_options['show_basics']): ?>
       <h2 class="header header_left player_type_<?= $player_type_token ?>" style="margin-right: 0;">
         <? if($print_options['layout_style'] == 'website_compact'): ?>
@@ -138,7 +138,7 @@ ob_start();
     <? endif; ?>
 
     <? if($print_options['show_description'] && !empty($player_info['player_description2'])): ?>
-      
+
       <h2 class="header header_left player_type_<?= $player_type_token ?>" style="margin-right: 0;">
         <?= $player_info['player_name'] ?>&#39;s Description
       </h2>
@@ -156,7 +156,7 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
 
     <? if($print_options['show_sprites'] && (!isset($player_info['player_image_sheets']) || $player_info['player_image_sheets'] !== 0) && $player_image_token != 'player' ): ?>
@@ -242,13 +242,13 @@ ob_start();
                   if (!isset($new_ability_rewards[$this_token])){
                     if (in_array($this_token, $player_ability_core_list)){ $new_ability_rewards[$this_token] = array('level' => 'Player', 'token' => $this_token); }
                     else { $new_ability_rewards[$this_token] = array('level' => 'Player', 'token' => $this_token); }
-  
+
                   }
                 }
                 $player_ability_rewards = $new_ability_rewards;
-  
+
                 //die('<pre>'.print_r($player_ability_rewards, true).'</pre>');
-  
+
                 if (!empty($player_ability_rewards)){
                   $temp_string = array();
                   $ability_key = 0;
@@ -258,7 +258,7 @@ ob_start();
                   $temp_abilities_index = $DB->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
                   foreach ($player_ability_rewards AS $this_info){
                     $this_points = $this_info['points'];
-                    $this_ability = mmrpg_ability::parse_index_info($temp_abilities_index[$this_info['token']]);
+                    $this_ability = rpg_ability::parse_index_info($temp_abilities_index[$this_info['token']]);
                     $this_ability_token = $this_ability['ability_token'];
                     $this_ability_name = $this_ability['ability_name'];
                     $this_ability_image = !empty($this_ability['ability_image']) ? $this_ability['ability_image']: $this_ability['ability_token'];
@@ -289,8 +289,8 @@ ob_start();
                     //if (!empty($this_ability_recovery)){ $this_ability_title_plain .= ' | '.$this_ability_recovery.' Recovery'; }
                     //if (!empty($this_ability_accuracy)){ $this_ability_title_plain .= ' | '.$this_ability_accuracy.'% Accuracy'; }
                     //if (!empty($this_ability_description)){ $this_ability_title_plain .= ' | '.$this_ability_description; }
-                    $this_ability_title_plain = mmrpg_ability::print_editor_title_markup($temp_robot_info, $this_ability);
-                    
+                    $this_ability_title_plain = rpg_ability::print_editor_title_markup($temp_robot_info, $this_ability);
+
                     $this_ability_method = 'points';
                     $this_ability_method_text = 'Battle Points';
                     $this_ability_title_html = '<strong class="name">'.$this_ability_name.'</strong>';
@@ -331,21 +331,21 @@ ob_start();
           </tbody>
         </table>
       </div>
-      
+
     <? endif; ?>
 
     <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
       <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
       <a class="link link_permalink permalink" href="database/players/<?= $player_info['player_token'] ?>/" rel="permalink">+ Permalink</a>
-    
+
     <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
       <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
       <a class="link link_permalink permalink" href="database/players/<?= $player_info['player_token'] ?>/" rel="permalink">+ View More</a>
-      
+
     <? endif; ?>
-    
+
   </div>
 </div>
 <?

@@ -534,7 +534,7 @@ if (true){
                         $global_item_quantities[$item_info_token] = $item_info_quantity;
                         $global_item_prices['buy'][$item_info_token] = $item_info_price;
                         $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
-                        $temp_info_tooltip = mmrpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
+                        $temp_info_tooltip = rpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                         $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                         ?>
@@ -702,7 +702,7 @@ if (true){
                           }
                           $global_item_quantities[$ability_info_token] = $ability_info_quantity;
                           $global_item_prices['buy'][$ability_info_token] = $ability_info_price;
-                          $temp_info_tooltip = !empty($ability_info['ability_flag_complete']) ? mmrpg_ability::print_editor_title_markup($robot_info, $ability_info) : 'Coming Soon! <br /> <span style="font-size:80%;">This ability is still in development and cannot be purchased yet. <br /> Apologies for the inconveinece, and please check back later!</span>';
+                          $temp_info_tooltip = !empty($ability_info['ability_flag_complete']) ? rpg_ability::print_editor_title_markup($robot_info, $ability_info) : 'Coming Soon! <br /> <span style="font-size:80%;">This ability is still in development and cannot be purchased yet. <br /> Apologies for the inconveinece, and please check back later!</span>';
                           $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                           //if ($ability_info_quantity >= 3){ continue; }
                           //if ($ability_counter >= $ability_list_max){ break; }
@@ -931,7 +931,7 @@ if (true){
                         $global_item_prices['sell'][$item_info_token] = $item_info_price;
 
                         $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
-                        $temp_info_tooltip = mmrpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
+                        $temp_info_tooltip = rpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                         $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                         ?>
