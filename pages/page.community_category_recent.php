@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 /*
  * COMMUNITY CATEGORY VIEW
@@ -108,7 +107,6 @@ if (!empty($temp_thread_ids)){
 }
 
 // Collect the thread counts for all users in an index
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_user_countindex = $db->get_array_list("SELECT
 
   users.user_id,
@@ -370,6 +368,4 @@ if (($temp_posts_shown + $temp_threads_shown) < 1){
   </div>
   <?
 }
-
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

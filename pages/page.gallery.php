@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * INDEX PAGE : GALLERY
  */
@@ -25,16 +24,16 @@ ob_start();
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Mega Man RPG Prototype Screenshots</h2>
 <div class="subbody">
-  
+
   <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/robots/fire-man/sprite_left_80x80.png);">Fire Man</div></div>
   <p class="text">The <strong>Mega Man RPG Prototype</strong> has gone through many, many changes over the last few years and - luckily - I'm pretty good at taking screenshots! Each of these images is a window into the game's development and progress at that point in time, and together they provide a clearer picture of how far the prototype since it's early days of a single-button main menu and one hours-long eight-vs-eight battle. :P  Hover over any of the thumbnails below to see a brief description of its contents and date, or click it to view the screenshot at full resolution.  Please enjoy the images, and <a href="contact/">let me know</a> if you have any questions.</p>
-  
+
 </div>
 
 <div class="gallery">
   <div class="wrapper">
   <?
-  
+
   // Print out the generated gallery markup
   //echo $this_gallery_markup;
   //die('<pre>'.print_r($this_gallery_markup, true).'</pre>');
@@ -46,12 +45,11 @@ ob_start();
   }
 
   ?>
-  
+
   </div>
 </div>
 
 <?
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

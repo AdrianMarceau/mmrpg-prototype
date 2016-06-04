@@ -1,22 +1,18 @@
 <?
 // If the session token has not been set
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
 
 // Collect the field stars from the session variable
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_battle_stars = !empty($_SESSION[$session_token]['values']['battle_stars']) ? $_SESSION[$session_token]['values']['battle_stars'] : array();
 $this_battle_stars_count = !empty($this_battle_stars) ? count($this_battle_stars) : 0;
 $this_battle_stars_field_count = 0;
 $this_battle_stars_fusion_count = 0;
 
 // Loop through the star index and increment the various type counters
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_star_force = array();
 $this_star_force_strict = array();
 $this_star_force_total = 0;
 foreach ($this_battle_stars AS $temp_key => $temp_data){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   if ($temp_data['star_kind'] == 'field'){ $this_battle_stars_field_count++; }
   elseif ($temp_data['star_kind'] == 'fusion'){ $this_battle_stars_fusion_count++; }
   if (!empty($temp_data['star_type'])){
@@ -34,7 +30,6 @@ foreach ($this_battle_stars AS $temp_key => $temp_data){
     $this_star_force_total++;
   }
 }
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 asort($this_star_force);
 $this_star_force = array_reverse($this_star_force);
 $_SESSION[$session_token]['values']['star_force'] = $this_star_force;

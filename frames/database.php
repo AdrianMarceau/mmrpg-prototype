@@ -6,7 +6,6 @@ require_once('../top.php');
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Require the remote top in case we're in viewer mode
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 define('MMRPG_REMOTE_SKIP_INDEX', true);
 define('MMRPG_REMOTE_SKIP_COMPLETE', true);
 define('MMRPG_REMOTE_SKIP_FAILURE', true);
@@ -16,16 +15,13 @@ define('MMRPG_REMOTE_SKIP_STARS', true);
 require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 
 // Collect the session token
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $session_token = mmrpg_game_token();
 
 
 // Collect the editor flag if set
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
 
 // Collect the number of completed battles for each player
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $unlock_flag_light = mmrpg_prototype_player_unlocked('dr-light');
 $battles_complete_light = $unlock_flag_light ? mmrpg_prototype_battles_complete('dr-light') : 0;
 $unlock_flag_wily = mmrpg_prototype_player_unlocked('dr-wily');
@@ -35,19 +31,16 @@ $battles_complete_cossack = $unlock_flag_cossack ? mmrpg_prototype_battles_compl
 $prototype_complete_flag = mmrpg_prototype_complete();
 
 // Count the number of players unlocked
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $unlock_count_players = 0;
 if ($unlock_flag_light){ $unlock_count_players++; }
 if ($unlock_flag_wily){ $unlock_count_players++; }
 if ($unlock_flag_cossack){ $unlock_count_players++; }
 
 // Define a reference to the game's session flag variable
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
 
 // Require the appropriate database files
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 define('DATA_DATABASE_SHOW_MECHAS', true);
 define('DATA_DATABASE_SHOW_CACHE', true);
 define('DATA_DATABASE_SHOW_HIDDEN', true);
@@ -64,7 +57,6 @@ require(MMRPG_CONFIG_ROOTDIR.'data/database_fields.php');
 $mmrpg_database_robots = array_merge($mmrpg_database_robots, $mmrpg_database_mechas);
 
 // Preloop through all of the robots in the database session and count the games
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
 $database_game_counters = array();
 foreach ($session_robot_database AS $temp_token => $temp_info){
@@ -76,7 +68,6 @@ foreach ($session_robot_database AS $temp_token => $temp_info){
 }
 
 // Define the index of allowable robots to appear in the database
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $allowed_database_robots = array();
 //$allowed_database_robots[] = 'met';
 $allowed_database_robots[] = 'mega-man';
@@ -89,7 +80,6 @@ foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
 $allowed_database_robots_count = !empty($allowed_database_robots) ? count($allowed_database_robots) : 0;
 
 // Define the index of allowable robots to appear in the database
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $visible_database_robots = array();
 $temp_skip_games = array();
 foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
@@ -117,7 +107,6 @@ else {
 $visible_database_robots_count = !empty($visible_database_robots) ? count($visible_database_robots) : 0;
 
 // Remove unallowed robots from the database
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 foreach ($mmrpg_database_robots AS $temp_key => $temp_info){
   if (!in_array($temp_key, $allowed_database_robots)){
     unset($mmrpg_database_robots[$temp_key]);
@@ -127,7 +116,6 @@ foreach ($mmrpg_database_robots AS $temp_key => $temp_info){
 //die('<pre>'.print_r($mmrpg_database_robots, true).'</pre>');
 
 // Sort the robot index based on robot number
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 function mmrpg_index_sort_robots_visible($robot_one, $robot_two){
   global $visible_database_robots;
   if (in_array($robot_one['robot_token'], $visible_database_robots) && !in_array($robot_two['robot_token'], $visible_database_robots)){ return -1; }
@@ -139,7 +127,6 @@ uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots_visible');
 
 
 // Count the robots groups for each page
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $database_page_groups = array();
 $database_page_groups[0] = array('MM00', 'MM20', 'MMRPG');
 $database_page_groups[1] = array('MM01');
@@ -157,7 +144,6 @@ $database_page_groups[12] = array('MM30');
 $database_page_groups[13] = array('MMEXE', 'MM21');
 
 // Count the robots for each page
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $database_page_counters = array();
 foreach ($database_page_groups AS $page_key => $group_array){
   $database_page_counters[$page_key] = false;
@@ -170,7 +156,6 @@ foreach ($database_page_groups AS $page_key => $group_array){
 }
 
 // Collect the database markup from the session if set, otherwise generate it
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_cache_stamp = MMRPG_CONFIG_CACHE_DATE.'_'.$allowed_database_robots_count;
 $this_database_markup = '';
 if (true){
@@ -179,14 +164,12 @@ if (true){
   ob_start();
 
   // Determine the token for the very first robot in the database
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_robot_tokens = array_values($mmrpg_database_robots);
   $first_robot_token = array_shift($temp_robot_tokens);
   $first_robot_token = $first_robot_token['robot_token'];
   unset($temp_robot_tokens);
 
   // Define the header/base counters for the database
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $global_robots_counters = array();
   $global_robots_counters['total'] = 0;
   $global_robots_counters['encountered'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
@@ -195,10 +178,8 @@ if (true){
   $global_robots_counters['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
 
   // Define a function for looping through the robots and counting/updating them
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   function temp_process_robots(&$mmrpg_database_robots, &$database_game_counters, &$database_page_groups, &$global_robots_counters, $session_token){
     // Loop through all of the robots, one by one, formatting their info
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     foreach($mmrpg_database_robots AS $robot_key => &$robot_info){
 
       // Update the global game counters
@@ -241,13 +222,11 @@ if (true){
     return true;
   }
   // Now to call upon the temp function, passing in appropriate variables
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   temp_process_robots($mmrpg_database_robots, $database_game_counters, $database_page_groups, $global_robots_counters, $session_token);
 
   //die('<pre>$global_robots_counters : '.print_r($global_robots_counters, true).'</pre>');
 
   // Start generating the database markup
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   ?>
 
   <span class="header block_1">Robot Database
@@ -263,7 +242,6 @@ if (true){
   <?
   // DEBUG DEBUG
   //die('<pre>$global_robots_counters : '.print_r($global_robots_counters, true).'</pre>');
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   ?>
 
   <table style="width: 100%;">
@@ -274,7 +252,6 @@ if (true){
       <div id="canvas" style="">
         <?
         // START THE DATABASE CANVAS BUFFER
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         ob_start();
         ?>
           <strong class="wrapper_header wrapper_subheader">Pages</strong>
@@ -359,7 +336,6 @@ if (true){
       <div id="console" class="noresize" style="height: auto;">
         <?
         // START THE DATABASE CONSOLE BUFFER
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         ob_start();
         ?>
           <div id="robots" class="wrapper">

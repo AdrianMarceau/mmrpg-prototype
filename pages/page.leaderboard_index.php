@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 /*
  * INDEX PAGE : LEADERBOARD INDEX
  */
@@ -17,25 +16,21 @@ $this_graph_data['description'] = 'The Mega Man RPG Prototype currently has '.(!
 //die('<pre>'.print_r($_GET, true).'</pre>');
 
 // Update the GET variables with the current page num
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_display_limit_default = 50;
 $this_num_offset = $this_current_num - 1;
 $_GET['start'] = 0 + ($this_num_offset * $this_display_limit_default);
 $_GET['limit'] = $this_display_limit_default + ($this_num_offset * $this_display_limit_default);
 
 // Require the leaderboard data file
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 require_once('data/leaderboard.php');
 
 //die('<pre>'.print_r($this_leaderboard_online_players, true).'</pre>');
 
 // Define the MARKUP variables for this page
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_markup_header = 'Mega Man RPG Prototype Leaderboard';
 $this_markup_counter = '<span class="count count_header">( '.(!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').($this_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$this_leaderboard_online_count.' Online</span>' : '').' )</span>';
 
 // Start generating the page markup
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ob_start();
 ?>
 <h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Leaderboard Players Index</h2>
@@ -199,5 +194,4 @@ ob_start();
 <?
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

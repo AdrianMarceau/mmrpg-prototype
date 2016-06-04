@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Define all the available player items in a handy index array
 $temp_player_items = $this_player->player_items;
 $temp_player_items_count = count($temp_player_items);

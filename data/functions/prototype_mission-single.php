@@ -1,12 +1,10 @@
 <?
 // Collect the robot index for calculation purposes
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 $this_field_index = rpg_field::get_index();
 // DEBUG
 //die('mmrpg_prototype_mission_single($this_prototype_data, $this_robot_token = '.$this_robot_token.', $this_field_token = '.$this_field_token.', $this_start_level = '.$this_start_level.')');
 // Define the array to hold this omega battle and populate with base varaibles
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_option_robot = is_array($this_robot_token) ? $this_robot_token : rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
 $temp_option_field = rpg_field::parse_index_info($this_field_index[$this_field_token]);
 $temp_battle_omega = array();
@@ -82,14 +80,12 @@ if ($temp_field_star_present){
 
 
 // Define the omega variables for level, points, turns, and random encounter rate
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $omega_robot_level_max = $this_start_level + 7;
 $omega_robot_level = $this_start_level + (!empty($this_prototype_data['battles_complete']) ? $this_prototype_data['battles_complete'] - 1 : 0);
 if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
 $omega_random_encounter = false;
 
 // Define the battle rewards based on above data
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_battle_omega['battle_rewards']['robots'] = array();
 $temp_battle_omega['battle_rewards']['abilities'] = array();
 $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $this_robot_token);
@@ -102,7 +98,6 @@ if (!empty($temp_option_robot['robot_rewards']['abilities'])){
 
 // Fill the empty spots with minor enemy robots
 if (true){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_battle_omega['battle_target_player']['player_switch'] = 1.5;
   $bonus_robot_count = $temp_target_count; //mt_rand(1, $temp_target_count);
   //if ($temp_field_star_present){ $bonus_robot_count += 1; }
@@ -120,7 +115,6 @@ if (true){
   $temp_robot_count = count($temp_battle_omega['battle_target_player']['player_robots']);
   for ($i = $temp_robot_count; $i <= $bonus_robot_count; $i++){
     if (count($temp_battle_omega['battle_target_player']['player_robots']) >= MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ break; }
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     shuffle($temp_mook_options);
     $temp_mook_token = $temp_mook_options[array_rand($temp_mook_options)];
     $temp_mook_info = rpg_robot::parse_index_info($this_robot_index[$temp_mook_token]);
@@ -138,15 +132,12 @@ if (true){
   // Shuffle all the target player robots and then loop through them to make final changes
   //shuffle($temp_battle_omega['battle_target_player']['player_robots']);
   foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $info){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update the robot ID to prevent collisions
     $info['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1;
     // Append the appropriate letters to all the robot name tokens
     if (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_name_token = isset($info['robot_name_token']) ? $info['robot_name_token'] : $info['robot_token'];
       if ($temp_mook_counts[$temp_name_token] > 0){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if (!isset($temp_mook_counts2[$temp_name_token])){ $temp_mook_counts2[$temp_name_token] = 0; }
         else { $temp_mook_counts2[$temp_name_token]++; }
         $info['robot_name'] .= ' '.$temp_mook_letters[$temp_mook_counts2[$temp_name_token]];
@@ -158,7 +149,6 @@ if (true){
       // Do nothing for now
     }
     // Update the player robots array with recent changes
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     $temp_battle_omega['battle_target_player']['player_robots'][$key] = $info;
   }
 }
@@ -169,7 +159,6 @@ if (true){
 
 // Skip the empty battle button or a different phase
 if (empty($temp_battle_omega['battle_token']) || $temp_battle_omega['battle_token'] == 'battle' || $temp_battle_omega['battle_phase'] != $this_prototype_data['battle_phase']){ return false; }
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Collect the battle token and create an omega clone from the index base
 $temp_battle_token = $temp_battle_omega['battle_token'];
 // Make copied of the robot level, points, and turns
@@ -178,7 +167,6 @@ $temp_omega_robot_level = $omega_robot_level;
 $temp_complete_level = 0;
 $temp_complete_count = 0;
 if (!empty($temp_battle_omega['battle_complete'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   if (!empty($temp_battle_omega['battle_complete']['battle_min_level'])){ $temp_complete_level = $temp_battle_omega['battle_complete']['battle_min_level']; }
   else { $temp_complete_level = $temp_omega_robot_level; }
   if (!empty($temp_battle_omega['battle_complete']['battle_count'])){ $temp_complete_count = $temp_battle_omega['battle_complete']['battle_count']; }
@@ -189,7 +177,6 @@ if (!empty($temp_battle_omega['battle_complete'])){
 } else {
 
 }
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Define the battle difficulty level (0 - 8) based on level and completed count
 $temp_battle_difficulty = ceil(8 * ($temp_omega_robot_level / 100));
 $temp_battle_difficulty += $temp_complete_count;
@@ -202,11 +189,9 @@ $temp_battle_omega['battle_points'] = 0;
 $temp_battle_omega['battle_turns'] = 0;
 // Loop through the target robots again update with omega values
 foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 => $robot){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // Update the robot level and battle points plus turns
   if (isset($this_robot_index[$robot['robot_token']])){ $robot = rpg_robot::parse_index_info($this_robot_index[$robot['robot_token']]); }
   else { continue; }
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $temp_robot_level = $robot['robot_class'] != 'mecha' ? $temp_omega_robot_level : mt_rand(1, ceil($temp_omega_robot_level / 3));
   $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_level'] = $temp_robot_level;
   $temp_battle_omega['battle_points'] += $robot['robot_class'] != 'mecha' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * $temp_robot_level  : 0;
@@ -215,7 +200,6 @@ foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 =>
 }
 
 // Reverse the order of the robots in battle
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_battle_omega['battle_target_player']['player_robots'] = array_reverse($temp_battle_omega['battle_target_player']['player_robots']);
 $temp_first_robot = array_shift($temp_battle_omega['battle_target_player']['player_robots']);
 shuffle($temp_battle_omega['battle_target_player']['player_robots']);
@@ -232,9 +216,7 @@ $this_unlock_abilities_count = count($temp_battle_omega['battle_rewards']['abili
 
 // Loop through the omega battle robot rewards and update the robot levels there too
 if (!empty($temp_battle_omega['battle_rewards']['robots'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   foreach ($temp_battle_omega['battle_rewards']['robots'] AS $key2 => $robot){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update the robot level and battle points plus turns
     $temp_battle_omega['battle_rewards']['robots'][$key2]['level'] = $temp_omega_robot_level;  //1;
     // Remove if this robot is already unlocked
@@ -244,18 +226,14 @@ if (!empty($temp_battle_omega['battle_rewards']['robots'])){
 
 // Loop through the omega battle ability rewards and update the ability levels there too
 if (!empty($temp_battle_omega['battle_rewards']['abilities'])){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   foreach ($temp_battle_omega['battle_rewards']['abilities'] AS $key2 => $ability){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Remove if this ability is already unlocked
     if (mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, $ability['token'])){ $this_unlock_abilities_count -= 1; }
   }
 }
 
 // Check to see if we should be adding a field star to this battle
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if ($temp_field_star_present){
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Generate the necessary field star variables and add them to the battle data
   $temp_field_star = array();
@@ -274,7 +252,6 @@ if ($temp_field_star_present){
 
   // Increase the power of the robot masters by 100 bonus points in each field
   foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     // Update the robot rewards array by adding 100 points to each of the three main stats
     $temp_battle_omega['battle_target_player']['player_robots'][$key]['values']['robot_rewards'] = array('robot_attack' => 100, 'robot_defense' => 100, 'robot_speed' => 100);
   }
@@ -282,7 +259,6 @@ if ($temp_field_star_present){
 }
 
 // Update the battle description based on what we've calculated
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 if (!empty($temp_battle_omega['values']['field_star'])){
   $temp_battle_omega['battle_description'] = 'Defeat the starforce boosted '.$temp_option_robot['robot_name'].' and collect its Field Star! ';
   $temp_battle_omega['battle_description2'] = 'The '.ucfirst($temp_option_field['field_type']).' type energy appears to have attracted another robot master to the field...';
@@ -299,7 +275,6 @@ if (!empty($temp_battle_omega['values']['field_star'])){
 // If this battle has been completed already, decrease the points
 //if ($temp_battle_omega['battle_complete']){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * 0.10); }
 // Add some random item drops to the starter battle
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 $temp_battle_omega['battle_rewards']['items'] = array(
   array('chance' => 5, 'token' => 'item-extra-life')
   );

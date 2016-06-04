@@ -32,10 +32,8 @@ $ability = array(
 
     // Only continue with the ability if player has less than 8 robots
     if (count($this_player->player_robots) < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
       // Place the current robot back on the bench
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_original_robot_id = $this_robot->robot_id;
       $this_robot->robot_frame = 'taunt';
       $this_robot->robot_position = 'bench';
@@ -46,24 +44,19 @@ $ability = array(
       $this_player->update_session();
 
       // Collect the current robot level for this field
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_robot_level = !empty($this_robot->robot_level) ? $this_robot->robot_level : 1;
       $this_field_level = !empty($this_battle->battle_level) ? $this_battle->battle_level : 1;
 
       // Check if this robot is a Copy Core or Elemental Core (skip if Neutral)
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_field_mechas = array();');  }
       global $mmrpg_index;
       $this_field_mechas = array();
       if (!empty($this_robot->robot_core)){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $special_boss_robots = array('enker', 'punk', 'ballade');
         if ($this_robot->robot_core == 'copy' || in_array($this_robot->robot_token, $special_boss_robots)){
           // Collect the current robots available for this current field
-          if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_robot->robot_core == copy');  }
           $this_field_mechas = !empty($this_battle->battle_field->field_mechas) ? $this_battle->battle_field->field_mechas : array();
         } elseif (!empty($this_robot->robot_field)){
           // Collect the current robots available for this robot's home field
-          if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_robot->robot_field = '.$this_robot->robot_field);  }
           // Collect the current mechas available for this robot's home field
           $temp_field = !empty($mmrpg_index_fields[$this_robot->robot_field]) ? $mmrpg_index_fields[$this_robot->robot_field] : array();
           $this_field_info = rpg_field::parse_index_info($temp_field);
@@ -72,7 +65,6 @@ $ability = array(
       }
 
       // Remove any mechas that are of too high a level to unlock
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_field_mechas = '.print_r($this_field_mechas, true));  }
       /*
       foreach ($this_field_mechas AS $temp_key => $temp_token){
         $temp_base_token = preg_replace('/-([0-9]+)$/i', '', $temp_token);
@@ -85,12 +77,10 @@ $ability = array(
 
       // If no mechas were defined, default to the Met
       if (empty($this_field_mechas)){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_field_mechas[] = 'met';
       }
 
       // Pull a random mecha element out of the array
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_mecha_count = count($this_field_mechas);
       $this_mecha_token = $this_field_mechas[0]; //$this_field_mechas[array_rand($this_field_mechas)];
       $this_mecha_name_token = preg_replace('/-([1-3]+)$/i', '', $this_mecha_token);
@@ -98,7 +88,6 @@ $ability = array(
       $this_mecha_summoned_counter = $_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'];
 
       // Check to see if this robot has summoned a mecha during this battle already
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_mecha_count = '.$this_mecha_count);  }
       if (!isset($this_robot->counters['ability_mecha_support'])){ $this_robot->counters['ability_mecha_support'] = 0; }
       $this_robot->update_session();
 
@@ -117,36 +106,28 @@ $ability = array(
       $this_robot->update_session();
 
       // Collect database info for this mecha
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       global $db;
       $this_mecha_info = rpg_robot::get_index_info($this_mecha_token);
       $this_mecha_info = rpg_robot::parse_index_info($this_mecha_info);
 
       // Update or create the mecha letter token
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       if (!isset($this_player->counters['player_mechas'][$this_mecha_name_token])){ $this_player->counters['player_mechas'][$this_mecha_name_token] = 0; }
       else { $this_player->counters['player_mechas'][$this_mecha_name_token]++; }
       $this_player->update_session();
 
       // Add this robot's token to the robot database, as to unlock this robot's ability data
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       if (!isset($_SESSION['GAME']['values']['robot_database'][$this_mecha_token])){ $_SESSION['GAME']['values']['robot_database'][$this_mecha_token] = array('robot_token' => $this_mecha_token); }
       if (!isset($_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'])){ $_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'] = 0; }
       $_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'] += 1;
       $this_mecha_summoned_counter = $_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'];
 
       // Decide which letter to attach to this mecha
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_letter_options = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H');
       $this_mecha_letter = $this_letter_options[$this_player->counters['player_mechas'][$this_mecha_name_token]];
 
       // DEBUG
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'this_field_mechas = '.implode(', ', $this_field_mechas));  }
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'this_mecha_token = '.$this_mecha_token);  }
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'this_mecha_info = '.preg_replace('/\s+/', ' ', print_r($this_mecha_info, true)));  }
 
       // Generate the new robot and add it to this player's team
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_key = $this_player->counters['robots_active'] + $this_player->counters['robots_disabled'];
       $this_id = $this_player->player_id + 2 + $this_key;
       $this_id_token = $this_id.'_'.$this_mecha_info['robot_token'];
@@ -158,17 +139,13 @@ $ability = array(
       //if (preg_match('/-2$/', $this_mecha_token)){ $this_mecha_info['robot_name'] .= '²'; }
       //elseif (preg_match('/-3$/', $this_mecha_token)){ $this_mecha_info['robot_name'] .= '³'; }
       $this_mecha_info['robot_name'] .= ' '.$this_mecha_letter;
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_mecha = new rpg_robot($this_battle, $this_player, $this_mecha_info);
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_mecha->apply_stat_bonuses();
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       foreach ($temp_mecha->robot_abilities AS $this_key2 => $this_token){
         $temp_abilityinfo = array('ability_token' => $this_token);
         $temp_ability = new rpg_ability($this_battle, $this_player, $temp_mecha, $temp_abilityinfo);
         $temp_ability->update_session();
       }
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $temp_mecha->flags['ability_startup'] = true;
       $temp_mecha->update_session();
       $this_mecha_info = $temp_mecha->export_array();
@@ -176,14 +153,12 @@ $ability = array(
       $this_player->update_session();
 
       // Automatically trigger a switch action to the new mecha support robot
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_battle->actions_trigger($this_player, $this_robot, $target_player, $target_robot, 'switch', $this_id_token);
 
       // DEBUG
       //$this_battle->events_create(false, false, 'DEBUG '.__LINE__, 'this_mecha_token = '.$this_mecha_token);
 
       // Refresh the current robot's frame back to normal (manually because reference confusion)
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       rpg_robot::set_session_field($this_original_robot_id, 'robot_frame', 'base');
 
     }
@@ -191,7 +166,6 @@ $ability = array(
     else {
 
       // Update the ability's target options and trigger
-      if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
       $this_ability->target_options_update(array(
         'frame' => 'defend',
         'success' => array(0, 0, 0, 10, '&hellip;but nothing happened.')

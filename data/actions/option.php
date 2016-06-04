@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Generate the markup for the action option panel
 ob_start();
   // Define the markup for the option buttons
@@ -27,8 +26,8 @@ ob_start();
     //$temp_options[] = '<a class="button action_option block_3" type="button" data-panel="settings_autoScan"><label><span class="multi">Auto<br />Scan</span></label></a>';
   }
   */
-  
-  
+
+
   // Display container for the main actions
   ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Option</span><?
   // Ensure there are options to display

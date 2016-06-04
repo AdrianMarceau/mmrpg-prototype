@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   // Define global prototype data variable for the demo
   $prototype_data['demo'] = $this_prototype_data = array();
@@ -115,7 +114,6 @@ if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   // -- DEMO ROBOT SELECT -- //
 
   // Generate the markup for this player's robot select screen
-  if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
   $this_prototype_data['robots_markup'] = mmrpg_prototype_robot_select_markup($this_prototype_data);
 
   /*

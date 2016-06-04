@@ -1,5 +1,4 @@
 <?
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 // Generate the markup for the action ability panel
 ob_start();
 
@@ -34,10 +33,8 @@ ob_start();
             $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'] = $current_robot_abilities;
         }
     } elseif ($this_robot->robot_class == 'mecha'){
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "\$this_robot->robot_class == 'mecha'");  }
         // Collect the temp ability index
         $temp_index_info = rpg_robot::get_index_info($this_robot->robot_token);
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, print_r($temp_index_info, true));  }
         $current_robot_abilities = array();
         foreach ($temp_index_info['robot_abilities'] AS $token){ $current_robot_abilities[$token] = array('ability_token' => $token); }
     }

@@ -11,7 +11,6 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.
 
 // Include the TOP file
 require_once('top.php');
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // DEBUG DEBUG DEBUG
 //if ($_SERVER['REMOTE_ADDR'] != '99.255.218.123'){ die('Currently down for maintenance.  Please check back later.'); }
