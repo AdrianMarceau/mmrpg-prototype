@@ -29,38 +29,6 @@ class cms_database {
         $this->PASSWORD = MMRPG_CONFIG_DBPASSWORD;
         $this->CHARSET = MMRPG_CONFIG_DBCHARSET;
         $this->NAME = MMRPG_CONFIG_DBNAME;
-        // DEBUG
-        if (MMRPG_CONFIG_DEBUG_MODE){
-            mmrpg_debug_checkpoint(__FILE__, __LINE__);
-
-            $this->DEBUG['script_details']['initiation_script'] = $_SERVER['SCRIPT_NAME'].'?'.$_SERVER['QUERY_STRING']."\r\n";
-
-            $this->DEBUG['script_details']['memory_limit'] = ini_get('memory_limit')."\r\n";
-
-            $mem_usage = strlen(json_encode($_SESSION)); //strlen(session_encode());
-            if ($mem_usage < 1024){ $mem_usage = $mem_usage.' B'; }
-            elseif ($mem_usage < 1048576){ $mem_usage = round($mem_usage/1024,2).' KB'; }
-            else { $mem_usage = round($mem_usage/1048576,2).' MB'; }
-            $this->DEBUG['script_details']['memory_session'] = $mem_usage."\r\n";
-
-            $this->DEBUG['script_details']['memory_start_time'] = microtime(true);
-            $this->DEBUG['script_details']['memory_final_time'] = 0;
-            $this->DEBUG['script_details']['memory_time_diff'] = 0;
-
-            $this->DEBUG['script_details']['memory_start_usage'] = round(((memory_get_usage() / 1024) / 1024), 2).'M';
-            $this->DEBUG['script_details']['memory_final_usage'] = 0;
-            $this->DEBUG['script_details']['memory_usage_diff'] = 0;
-
-            $this->DEBUG['script_details']['memory_start_peak_usage'] = round((memory_get_peak_usage() / 1024) / 1024, 2).'M';
-            $this->DEBUG['script_details']['memory_final_peak_usage'] = 0;
-            $this->DEBUG['script_details']['memory_peak_usage_diff'] = 0;
-
-            $this->DEBUG['script_details']['post_vars'] = (!empty($_POST) ? print_r($_POST, true) : '')."\r\n";
-
-            $this->DEBUG['script_details']['query_count'] = 0;
-
-            $this->DEBUG['script_queries'][] = '<span style="color: blue;">EVENT DB::__construct()</span>'."\r\n";
-        }
         // First initialize the database connection
         $this->CONNECT = $this->db_connect();
         if ($this->CONNECT === false){ $this->CONNECT = false; return $this->CONNECT; }
@@ -77,48 +45,24 @@ class cms_database {
 
     // Define the constructor for the class
     public function __destruct(){
-        // DEBUG
-        if (MMRPG_CONFIG_DEBUG_MODE){
-            mmrpg_debug_checkpoint(__FILE__, __LINE__);
-            $this->DEBUG['script_queries'][] = '<span style="color: blue;">EVENT DB::__destruct()</span>'."\r\n";
-            $this->DEBUG['script_details']['memory_final_time'] = microtime(true);
-            $this->DEBUG['script_details']['memory_time_diff'] = ($this->DEBUG['script_details']['memory_final_time'] - $this->DEBUG['script_details']['memory_start_time'])."\r\n";
-            $this->DEBUG['script_details']['memory_final_usage'] = round(((memory_get_usage() / 1024) / 1024), 2).'M';
-            $this->DEBUG['script_details']['memory_final_peak_usage'] = round((memory_get_peak_usage() / 1024) / 1024, 2).'M';
-            $this->DEBUG['script_details']['memory_usage_diff'] = (trim($this->DEBUG['script_details']['memory_final_usage'], 'M') - trim($this->DEBUG['script_details']['memory_start_usage'], 'M'));
-            $this->DEBUG['script_details']['memory_usage_diff'] = ($this->DEBUG['script_details']['memory_usage_diff'] > 0 ? '+' : '').$this->DEBUG['script_details']['memory_usage_diff'].'M'."\r\n";
-            $this->DEBUG['script_details']['memory_peak_usage_diff'] = (trim($this->DEBUG['script_details']['memory_final_peak_usage'], 'M') - trim($this->DEBUG['script_details']['memory_start_peak_usage'], 'M'));
-            $this->DEBUG['script_details']['memory_peak_usage_diff'] = ($this->DEBUG['script_details']['memory_peak_usage_diff'] > 0 ? '+' : '').$this->DEBUG['script_details']['memory_peak_usage_diff'].'M'."\r\n";
-            $html = '';
-            $html .= "<!DOCTYPE html>\n";
-            $html .= "<html>\n";
-            $html .= "<head>\n";
-            $html .= "<title>MMRPG CONFIG DEBUG MODE : ".date('Y-m-d @ H:i')."</title>\n";
-            $html .= "</head>\n";
-            $html .= "<body style=\"background-color: #464646; padding: 20px;\">\n";
-            $html .= "<pre style=\"margin: 0 auto; background-color: #F2F2F2; border: 1px dotted #DEDEDE; padding: 20px; font-family: 'Courier New'; font-size: 12px; line-height: 18px; overflow: scroll;\">\n";
-            $html .=  '//-----------------------------------------------------------------------//'."\r\n";
-            $html .= '// --           MMRPG CONFIG DEBUG MODE : '.date('Y-m-d @ H:i').'          -- //'."\r\n";
-            $html .= '//-----------------------------------------------------------------------//'."\r\n";
-            $html .= "\r\n\r\n";
-            $html .= 'SCRIPT DETAILS => '.print_r($this->DEBUG['script_details'], true)."\r\n";
-            $html .= 'SCRIPT QUERIES => '.print_r($this->DEBUG['script_queries'], true)."\r\n";
-            $html .= 'SCRIPT CACHE => '.print_r($this->CACHE, true)."\r\n";
-            $html .= "\r\n\r\n";
-            $html .= "</pre>\n";
-            $html .= "</body>\n";
-            $html .= "</html>\n";
-            $file = fopen(MMRPG_CONFIG_ROOTDIR.'_logs/mmrpg-debug_'.date('Y-m-d').'.htm', 'w');
-            fwrite($file, $html);
-            fclose($file);
-            $this->DEBUG = array();
-        }
         // Empty the database cache
         $this->CACHE = array();
         // Clear any current links
         $this->clear();
         // Close the database connection
         $this->db_close();
+    }
+
+    /**
+     * Request a reference to the current database object
+     * @return cms_database
+     */
+    public static function get_database(){
+        if (isset($GLOBALS['DB'])){ $db = $GLOBALS['DB'];  }
+        elseif (isset($GLOBALS['db'])){ $db = $GLOBALS['db'];  }
+        else { $db = false; }
+        if (empty($db)){ $db = new cms_database(); }
+        return $db;
     }
 
     /*
@@ -128,7 +72,7 @@ class cms_database {
     // Define the error handler for when the database goes bye bye
     private function critical_error($message){
         if (MMRPG_CONFIG_IS_LIVE){
-            $file = fopen(MMRPG_CONFIG_ROOTDIR.'_logs/mmrpg-database-errors_'.date('Y-m-d').'.txt', 'a');
+            $file = fopen(dirname(MMRPG_CONFIG_ROOTDIR).'/logs/mmrpg-database-errors_'.date('Y-m-d').'.txt', 'a');
             fwrite($file, date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') : '.$message."\r\n\r\n");
             fclose($file);
         } else {
@@ -142,7 +86,7 @@ class cms_database {
         // Clear any leftover data
         $this->clear();
         // Attempt to open the connection to the MySQL database
-    if (!isset($this->LINK) || $this->LINK === false){ $this->LINK = new mysqli($this->HOST, $this->USERNAME, $this->PASSWORD, $this->NAME);    }
+        if (!isset($this->LINK) || $this->LINK === false){ $this->LINK = new mysqli($this->HOST, $this->USERNAME, $this->PASSWORD, $this->NAME);    }
         // If the connection was not successful, return false
         if ($this->LINK === false){
             if (MMRPG_CONFIG_IS_LIVE && !MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("<strong>cms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".htmlentities(mysqli_error($this->LINK), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
@@ -191,15 +135,18 @@ class cms_database {
     public function query($query_string, &$affected_rows = 0){
 
         // Execute the query against the database
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        if (MMRPG_CONFIG_DEBUG_MODE){ $this->DEBUG['script_details']['query_count'] += 1; }
-        if (MMRPG_CONFIG_DEBUG_MODE){ $this->DEBUG['script_queries'][] = '<span style="color: green;">DATABASE query #'.$this->DEBUG['script_details']['query_count'].' of '.preg_replace('/\s+/', ' ', substr($query_string, 0, 5000)).'</span>'."\r\n"; }
         $this->MYSQL_RESULT = mysqli_query($this->LINK, $query_string);
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
         // If a result was not found, produce an error message and return false
         if ($this->MYSQL_RESULT === false){
-            if (MMRPG_CONFIG_DEBUG_MODE || MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;."); }
-            else { $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK)."."); }
+            $bt = debug_backtrace();
+            $caller = array_shift($bt);
+            $caller2 = array_shift($bt);
+            $caller['file'] = basename(dirname($caller['file'])).'/'.basename($caller['file']);
+            $caller2['file'] = basename(dirname($caller2['file'])).'/'.basename($caller2['file']);
+            $backtrace = "{$caller['file']}:{$caller['line']} <br /> {$caller2['file']}:{$caller2['line']}";
+            if (MMRPG_CONFIG_DEBUG_MODE || MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;. <br /> {$backtrace}"); }
+            else { $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". <br /> {$backtrace}"); }
             return false;
         }
 
@@ -249,11 +196,10 @@ class cms_database {
         // Define the md5 of this query string
         $temp_query_hash = 'get_array_'.md5(preg_replace('/\s+/', ' ', $query_string));
         $temp_query_cacheable = preg_match('/mmrpg_index_/i', $query_string) ? true : false;
-        //if (MMRPG_CONFIG_DEBUG_MODE){ $this->DEBUG['checkpoint_queries'][] = 'EVENT DB::'.$temp_query_hash; }
         // Check if there's a chached copy of this data and decode if so
         if (!empty($this->CACHE[$temp_query_hash])){
             // Collect and decode the results and return that
-            $result_array = json_decode($this->CACHE[$temp_query_hash], true);
+            $result_array = $this->CACHE[$temp_query_hash]; //json_decode($this->CACHE[$temp_query_hash], true);
             return $result_array;
         }
         // Run the query against the database
@@ -267,7 +213,7 @@ class cms_database {
         // Check to see if this is a cacheable result, and encode if so
         if ($temp_query_cacheable){
             // Serialize and cache the result before we return it
-            $this->CACHE[$temp_query_hash] = json_encode($result_array);
+            $this->CACHE[$temp_query_hash] = $result_array; //json_encode($result_array);
         }
         // Now return the resulting array
         return $result_array;
@@ -289,11 +235,10 @@ class cms_database {
         // Define the md5 of this query string
         $temp_query_hash = 'get_array_list_'.md5(preg_replace('/\s+/', ' ', $query_string));
         $temp_query_cacheable = preg_match('/mmrpg_index_/i', $query_string) ? true : false;
-        //if (MMRPG_CONFIG_DEBUG_MODE){ $this->DEBUG['checkpoint_queries'][] = 'EVENT DB::'.$temp_query_hash; }
         // Check if there's a chached copy of this data and decode if so
         if (!empty($this->CACHE[$temp_query_hash])){
             // Collect and decode the results and return that
-            $array_list = json_decode($this->CACHE[$temp_query_hash], true);
+            $array_list = $this->CACHE[$temp_query_hash]; //json_decode($this->CACHE[$temp_query_hash], true);
             return $array_list;
         }
         // Run the query against the database
@@ -314,7 +259,7 @@ class cms_database {
         // Check to see if this is a cacheable result, and encode if so
         if ($temp_query_cacheable){
             // Encode and cache the result before we return it
-            $this->CACHE[$temp_query_hash] = json_encode($array_list);
+            $this->CACHE[$temp_query_hash] = $array_list; //json_encode($array_list);
         }
         // Update the $record_count variable
         $record_count = is_array($array_list) ? count($array_list) : 0;
@@ -350,7 +295,7 @@ class cms_database {
         // Check if there's a chached copy of this data and decode if so
         if (!empty($this->CACHE[$temp_query_hash])){
             // Collect and decode the results and return that
-            $result_array = json_decode($this->CACHE[$temp_query_hash], true);
+            $result_array = $this->CACHE[$temp_query_hash]; //json_decode($this->CACHE[$temp_query_hash], true);
             return $result_array;
         }
         // Run the query against the database
@@ -364,7 +309,7 @@ class cms_database {
         // Check to see if this is a cacheable result, and encode if so
         if ($temp_query_cacheable){
             // Encode and cache the result before we return it
-            $this->CACHE[$temp_query_hash] = json_encode($result_array, true);
+            $this->CACHE[$temp_query_hash] = $result_array; //json_encode($result_array, true);
         }
         // Now return the resulting array
         return isset($result_array[$field_name]) ? $result_array[$field_name] : false;
@@ -372,55 +317,46 @@ class cms_database {
 
     // Define a function for inserting a record into the database
     public function insert($table_name, $insert_data){
-
         // Ensure proper data types have been received
         if (empty($table_name) || !is_string($table_name)) { return false; }
         if (empty($insert_data) || (!is_array($insert_data) && !is_string($insert_data))) { return false; }
-
         // Create the $insert_fields and $insert_values arrays
         $insert_fields = array();
         $insert_values = array();
-
         // Initialize in insert string
         $insert_string = '';
-
         // If the insert_data was an array
         if (is_array($insert_data)){
-
             // Loop through the $insert_data array and separate the keys/values
-            foreach ($insert_data AS $field => $value){
+            foreach ($insert_data AS $field => $value)
+            {
                 // Skip fields that aren't named or have empty keys
                 if (empty($field) || !is_string($field)) { continue; }
                 // Otherwise, add to the insert_field and the insert_value lists
                 $insert_fields[] = $field;
                 $insert_values[] = "'".str_replace("'", "\'", $value)."'";
             }
-
             // Implode into an the insert strings
             $insert_string = "(".implode(', ', $insert_fields).") VALUES (".implode(', ', $insert_values).")";
-
         }
         // Else, if the $insert_data is a string
         elseif (is_string($insert_data)){
-
             // Add this preformatted value to the insert string
             $insert_string = $insert_data;
-
         }
-
         // Create the insert query to run against the database
         $insert_query = "INSERT INTO {$table_name} {$insert_string}";
-
         // Execute the insert query against the database
         $affected_rows = 0;
-        return $this->query($insert_query, $affected_rows);
-
+        $this->query($insert_query, $affected_rows);
+        // If success, return the affected number of rows
+        if ($this->MYSQL_RESULT !== false){ $this->clear(); return $affected_rows; }
+        else { $this->clear(); return false; }
     }
 
     // Define a function for updating a record in the database
     public function update($table_name, $update_data, $condition_data){
         // Ensure proper data types have been received
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if (empty($table_name) || !is_string($table_name)) { return false; }
         if (empty($update_data) || (!is_array($update_data) && !is_string($update_data))) { return false; }
         if (empty($condition_data) || (!is_array($condition_data) && !is_string($condition_data))) { return false; }
@@ -428,7 +364,6 @@ class cms_database {
         $update_string = '';
         // If the update_data is an array object
         if (is_array($update_data)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Create the update blocks array
             $update_blocks = array();
             // Loop through the $update_data array and separate the keys/values
@@ -436,75 +371,53 @@ class cms_database {
             foreach ($update_data AS $field => $value){
                 // Skip fields that aren't named or have empty keys
                 if (empty($field) || !is_string($field)) { continue; }
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 // Otherwise, add to the update_blocks list
                 $update_blocks[] = "$field = '".str_replace($find, $replace, $value)."'";
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-            }
+                }
             // Clear the update data to free memory
             unset($update_data, $field, $value);
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Implode into an update string
             $update_string = implode(', ', $update_blocks);
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             unset($update_blocks);
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        }
+            }
         // Else, if the $update_data is a string
         elseif (is_string($update_data)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Add this preformatted value to the update string
             $update_string = $update_data;
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Clear the update data to free memory
             unset($update_data);
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        }
+            }
         // Initialize the condition string
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $condition_string = '';
         // If the condition_data is an array object
         if (is_array($condition_data)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Create the condition blocks array
             $condition_blocks = array();
             // Loop through the $condition_data array and separate the keys/values
             foreach ($condition_data AS $field => $value){
                 // Skip fields that aren't named or have empty keys
                 if (empty($field) || !is_string($field)) { continue; }
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 // Otherwise, add to the condition_blocks list
                 $condition_blocks[] = "$field = '".str_replace("'", "\'", $value)."'";
-                if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-            }
+                }
             // Clear the condition data to free memory
             unset($condition_data, $field, $value);
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Implode into an condition string
             $condition_string = implode(' AND ', $condition_blocks);
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             unset($condition_blocks);
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        }
+            }
         elseif (is_string($condition_data)){
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Add this preformatted value to the condition string
             $condition_string = $condition_data;
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             // Clear the condition data to free memory
             unset($condition_data);
-            if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-        }
+            }
         // Now put together the update query to run against the database
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $update_query = "UPDATE {$table_name} SET {$update_string} WHERE {$condition_string}";
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         unset($update_string, $condition_string);
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Execute the update query against the database
         $affected_rows = 0;
         $this->query($update_query, $affected_rows);
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // If success, return the affected number of rows
         if ($this->MYSQL_RESULT !== false){ $this->clear(); return $affected_rows; }
         else { $this->clear(); return false; }
