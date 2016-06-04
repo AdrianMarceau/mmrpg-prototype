@@ -1,12 +1,8 @@
 <?php
 
-/*
- * GLOBAL INCLUDES
- */
-
 // Include mandatory config files
 define('MMRPG_BUILD', 'mmrpg2k11');
-define('MMRPG_VERSION', '2.9.1');
+define('MMRPG_VERSION', '2.9.2');
 require('data/config.php');
 require('data/settings.php');
 require('data/debug.php');
@@ -25,83 +21,12 @@ if (MMRPG_CONFIG_IS_LIVE){
     error_reporting(0);
 }
 
-// Start the session
+// Update the timezone before starting the session
 @date_default_timezone_set('Canada/Eastern');
 //@ini_set('session.gc_maxlifetime', 24*60*60);
 //@ini_set('session.gc_probability', 1);
 //@ini_set('session.gc_divisor', 1);
 session_start();
-
-// Include the database class first and foremost
-require('classes/database.php');
-// Create the global database object
-if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
-    if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG'] = array(); }
-    $DB = new plutocms_database();
-    // If the database could not be created, critical error mode!
-    if ($DB->CONNECT === false){
-        define('MMRPG_CRITICAL_ERROR', true);
-        $_GET = array();
-        $_GET['page'] = 'error';
-        //die('the database could not be accessed!');
-    }
-}
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-// Include mandatory class files
-require('classes/battle.php');
-require('classes/field.php');
-require('classes/player.php');
-require('classes/robot.php');
-require('classes/ability.php');
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-// Include mandatory function files
-require('data/functions/website.php');
-require('data/functions/game.php');
-require('data/functions/prototype.php');
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-
-/*
- * GLOBAL OBJECT INITIALIZATION
- */
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-
-/*
- * LIBRARY INDEXES
- */
-
-// Update message script killer
-//die('<pre>'.print_r($_SESSION, true).'</pre>');
-//die('Updating... Please check back in a few minutes. <br />'.date('Y-m-d H:i:s', time()));
-
-// If we're in a file page, prevent userinfo caching
-if (preg_match('/file.php$/i', basename(__FILE__))){
-    // Prevent userinfo caching for this page
-    unset($_SESSION['GAME']['USER']['userinfo']);
-}
-
-// Include mandatory library files
-$mmrpg_index = array();
-//require('data/battles/_index.php');
-//require('data/fields/_index.php');
-require('data/players/_index.php');
-//require('data/robots/_index.php');
-//require('data/abilities/_index.php');
-require('data/types/_index.php');
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Turn off magic quotes before it causes and problems
 if (get_magic_quotes_gpc()){
@@ -120,324 +45,36 @@ if (get_magic_quotes_gpc()){
     unset($process);
 }
 
-
-/*
- * SESSION VARIABLES
- */
-
-// Create mandatory session variables if they do not exist
-if (!isset($_SESSION['BATTLES'])){ $_SESSION['BATTLES'] = array(); }
-if (!isset($_SESSION['FIELDS'])){ $_SESSION['FIELDS'] = array(); }
-if (!isset($_SESSION['PLAYERS'])){ $_SESSION['PLAYERS'] = array(); }
-if (!isset($_SESSION['ROBOTS'])){ $_SESSION['ROBOTS'] = array(); }
-if (!isset($_SESSION['ABILITIES'])){ $_SESSION['ABILITIES'] = array(); }
-// Define the COMMUNITY session trackers if they do not exist
-if (!isset($_SESSION['COMMUNITY'])){ $_SESSION['COMMUNITY']['threads_viewed'] = array(); }
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-/*
- * BROWSER FLAGS
- */
-
-// Define the WAP flag to false
-$flag_wap = false;
-$flag_ipad = false;
-$flag_iphone = false;
-// Collect the WAP flag if set in the URL query
-$user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
-if (isset($_GET['wap'])){ $flag_wap = $_GET['wap'] == 'true' ? true : false; }
-//Otherwise, check if this is an iPhone or iPad browser
-elseif (!empty($_GET['iphone']) || strpos($user_agent, 'iPhone') !== FALSE){ $flag_iphone = true; }
-elseif (!empty($_GET['ipad']) || strpos($user_agent, 'iPad')){  $flag_ipad = $flag_wap = true; }
-unset($user_agent);
-
-/*
- * GAME SAVING AND LOADING
- */
-
-// Only continue with saving/loading functions if we're NOT in critical mode
-if (!defined('MMRPG_CRITICAL_ERROR')){
-
-    // Disable the memory limit for this script
-    //ini_set('memory_limit', '128M');
-    //ini_set('memory_limit', '-1');
-
-    // Define the first load boolean variable
-    $this_first_load = false;
-    // Define the game cache location path
-    $this_cache_dir = MMRPG_CONFIG_ROOTDIR.'data/cache/';
-    // Define the game save location path
-    $this_save_dir = MMRPG_CONFIG_ROOTDIR.'data/saves/';
-
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-    // If the user and file details have already been loaded to the session
-    if (
-        !empty($_SESSION['GAME']['USER']) && !empty($_SESSION['GAME']['USER']['username']) && !empty($_SESSION['GAME']['USER']['password'])
-        && !empty($_SESSION['GAME']['FILE']) && !empty($_SESSION['GAME']['FILE']['path']) && !empty($_SESSION['GAME']['FILE']['name'])
-        ){
-        // Pull the user and file info from the session
-        $this_user = $_SESSION['GAME']['USER'];
-        $this_file = $_SESSION['GAME']['FILE'];
-        // Update the save filepath with the file path and name
-        $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
-    }
-    // Otherwise, if we're in demo mode, populate manually
-    else {
-        // Auto-generate the user and file info based on their IP
-        $this_user = array();
-        $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
-        $this_user['username'] = 'demo';
-        $this_user['username_clean'] = 'demo';
-        $this_user['imagepath'] = '';
-        $this_user['colourtoken'] = '';
-        $this_user['gender'] = '';
-        $this_user['password'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo';
-        $this_user['password_encoded'] = md5($this_user['password']);
-        $this_file = array();
-        $this_file['path'] = $this_user['username_clean'].'/';
-        $this_file['name'] = $this_user['password_encoded'].'.sav';
-        // Update the session with these demo variables
-        $_SESSION['GAME']['DEMO'] = 1;
-        $_SESSION['GAME']['USER'] = $this_user;
-        $_SESSION['GAME']['FILE'] = $this_file;
-        // Update the first load to indicate true
-        $this_first_load = true;
-        // Update the global save path variable
-        $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
-    }
-
-    //  DEBUG DEBUG DEBUG
-    //mmrpg_reset_game_session($this_save_filepath);
-
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-    //die('<pre>$_GET : '.print_r($_GET, true).'</pre>');
-    //die($this_save_filepath);
-
-}
-
-/*
- * PAGE REQUESTS
- */
-
-// Collect the current page from the header if set
-$this_allowed_pages = array('home', 'about', 'gallery', 'database', 'leaderboard', 'community', 'prototype', 'credits', 'contact', 'file', 'error');
-$this_current_page = $_GET['page'] = !empty($_GET['page']) ? strtolower($_GET['page']) : false;
-$this_current_sub = $_GET['sub'] = !empty($_GET['sub']) && !is_numeric($_GET['sub']) ? strtolower($_GET['sub']) : false;
-$this_current_num = $_GET['num'] = !empty($_GET['num']) && is_numeric($_GET['num']) ? $_GET['num'] : 1;
-$this_current_token = $_GET['token'] = !empty($_GET['token']) ? $_GET['token'] : '';
-
-// Generate the current URI based on the presence of the page and/or sub tokens (not not for home)
-$this_current_uri = !empty($this_current_page) && $this_current_page != 'home' ? $this_current_page.'/' : '';
-$this_current_uri .= !empty($this_current_sub) && $this_current_sub != 'home' ? $this_current_sub.'/' : '';
-
-// Append the current num to the URI as long as we're not on a community page (it's added later)
-if ($this_current_page != 'community'){
-    $this_current_uri .= !empty($this_current_num) && $this_current_num > 1 ? $this_current_num.'/' : '';
-}
-
-// Trigger specific actions if we're on the pseudo-HOME page
-if (isset($_GET['home']) || $this_current_sub == 'home' || $this_current_page == 'home'){
-    $_GET['this_redirect'] = $this_current_url;
-    header('HTTP/1.1 301 Moved Permanently');
-    header('Location: '.$this_current_url);
-    exit();
-}
-// Trigger specific actions if we're on the UPDATES page
-elseif ($this_current_page == 'updates'){
-    $this_current_id = !empty($_GET['id']) ? strtolower($_GET['id']) : 0;
-    $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
-    if ($this_current_id !== false && !empty($this_current_token)){
-        $this_current_uri .= $this_current_id.'/'.$this_current_token.'/';
-    }
-}
-// Trigger specific actions if we're on the COMMUNITY page
-elseif ($this_current_page == 'community'){
-    $this_current_cat = !empty($_GET['cat']) ? strtolower($_GET['cat']) : '';
-    $this_current_id = !empty($_GET['id']) ? strtolower($_GET['id']) : 0;
-    $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
-    $this_current_target = !empty($_GET['target']) ? $_GET['target'] : '';
-    if (!empty($this_current_cat) && $this_current_id !== false && !empty($this_current_token)){
-        $this_current_uri .= $this_current_cat.'/'.$this_current_id.'/'.$this_current_token.'/';
-    } elseif (!empty($this_current_cat) && !empty($this_current_sub)){
-        $this_current_uri = $this_current_page.'/'.$this_current_cat.'/'.$this_current_sub.'/';
-    } elseif (!empty($this_current_cat)){
-        $this_current_uri .= $this_current_cat.'/';
-    }
-    if ($this_current_cat == 'personal' && !empty($this_current_target)){
-        $this_current_uri .= $this_current_target.'/';
-    }
-    if ($this_current_cat != 'personal' && $this_current_num > 1){
-        $this_current_uri .= $this_current_num.'/';
-    }
-}
-// Trigger specific actions if we're on the DATABASE page
-elseif ($this_current_page == 'database'){
-    $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
-    if (!empty($this_current_token) && isset($mmrpg_index['types'][$this_current_token])){
-        $this_current_filter = $_GET['filter'] = $this_current_token;
-        $this_current_filter_name = $this_current_filter == 'none' ? 'Neutral' : ucfirst($this_current_filter);
-        $this_current_uri .= $this_current_filter.'/';
-        $this_current_token = $_GET['token'] = '';
-    } elseif (!empty($this_current_token)){
-        $this_current_uri .= $this_current_token.'/';
-    }
-}
-// Trigger specific actions if we're on the LEADERBOARD page
-elseif ($this_current_page == 'leaderboard'){
-    $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
-    if (!empty($this_current_token)){
-        $this_current_uri .= $this_current_token.'/';
-        $this_current_player = !empty($_GET['player']) ? $_GET['player'] : '';
-        if (!empty($this_current_player)){
-            $this_current_uri .= $this_current_player.'/';
-        }
-    }
-}
-// Trigger specific actions if we're on the FILE page
-elseif ($this_current_page == 'file'){
-    $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
-    if (!empty($this_current_token)){
-        $this_current_uri .= $this_current_token.'/';
-    }
-}
-
-// Generate the full URL using the above URI string and update the GET
-$this_current_url = MMRPG_CONFIG_ROOTURL.$this_current_uri;
-$_GET['this_current_uri'] = $this_current_uri; //urlencode($this_current_uri);
-$_GET['this_current_url'] = $this_current_url; //urlencode($this_current_url);
-//die('<pre>'.print_r($_GET, true).'</pre>');
-
-// Now that all the redirecting is done, if the current page it totally empty, it's ACTUALLY home
-if (empty($this_current_page) || !in_array($this_current_page, $this_allowed_pages)){ $this_current_page = 'home'; }
-
-// DEBUG DEBUG DEBUG
-if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-
-/*
- * USERINFO COLLECTION
- */
-
-// If we're NOT viewing the session info
-if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
-
-    // If the user session is already in progress, collect the details
-    if (!empty($_SESSION['GAME']['USER']['userid']) && $_SESSION['GAME']['USER']['userid'] != MMRPG_SETTINGS_GUEST_ID){
-
-        // Collect this userinfo from the database
-        $this_userid = (int)($_SESSION['GAME']['USER']['userid']);
-        if (empty($_SESSION['GAME']['USER']['userinfo'])){
-            $this_userinfo = $DB->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
-            $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
-        } else {
-            $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
-        }
-
-        // DEBUG DEBUG DEBUG
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-        if (!defined('MMRPG_SCRIPT_REQUEST')){
-            $this_boardinfo = $DB->get_array("SELECT * FROM mmrpg_leaderboard WHERE user_id = {$this_userid}");
-            $this_boardid = $this_boardinfo['board_id'];
-            $this_boardinfo['board_rank'] = !empty($_SESSION['GAME']['BOARD']['boardrank']) ? $_SESSION['GAME']['BOARD']['boardrank'] : 0;
-            //if (empty($this_boardinfo['board_rank'])){ require('data/leaderboard.php'); $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank']; }
-            if (empty($this_boardinfo['board_rank'])){ $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'] = mmrpg_prototype_leaderboard_rank($this_userid); }
-        }
-
-        // DEBUG DEBUG DEBUG
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-    }
-    // Otherwise, generate some details user details
-    else {
-
-        // Collect the guest userinfo from the database
-        $this_userid = MMRPG_SETTINGS_GUEST_ID;
-        if (empty($_SESSION['GAME']['USER']['userinfo'])){
-            $this_userinfo = $DB->get_array("SELECT users.* FROM mmrpg_users AS users WHERE users.user_id = '{$this_userid}' LIMIT 1");
-            $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
-        } else {
-            $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
-        }
-
-        // DEBUG DEBUG DEBUG
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-        if (!defined('MMRPG_SCRIPT_REQUEST')){
-            $this_boardinfo = array();
-            $this_boardinfo['board_rank'] = 0;
-            $this_boardid = 0;
-        }
-
-        // DEBUG DEBUG DEBUG
-        if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-    }
-
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
-} else {
-    // Create the userinfo array anyway to prevent errors
-    $this_userinfo = array();
-}
-
-/*
- * WEBSITE THEME GENERATION
- */
-
-// If we're NOT viewing the session info
+// Include the database class first and foremost
+require('classes/database.php');
+// Create the global database object
 if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
-
-    // Select a random background image to display
-    $temp_field_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/intro-field';
-    $temp_field_type = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : '';
-    list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
-
-    // Collect the info for the chosen temp field
-    $temp_field_data = rpg_field::get_index_info($temp_field_token);
-    //die('<pre>'.print_r($temp_field_data, true).'</pre>');
-    //die('<pre>'.print_r($this_userinfo, true).'</pre>');
-    // Define the current field token for the index
-    define('MMRPG_SETTINGS_CURRENT_FIELDTOKEN', $temp_field_data['field_token']);
-    define('MMRPG_SETTINGS_CURRENT_FIELDTYPE', (!empty($temp_field_type) ? $temp_field_type : (!empty($temp_field_data['field_type']) ? $temp_field_data['field_type'] : 'none')));
-    define('MMRPG_SETTINGS_CURRENT_FIELDFRAMES', count($temp_field_data['field_background_frame']));
-    define('MMRPG_SETTINGS_CURRENT_FIELDMECHA', (!empty($temp_field_data['field_mechas']) ? $temp_field_data['field_mechas'][0] : 'met'));
-    //die('$temp_field_type = '.$temp_field_type.'; MMRPG_SETTINGS_CURRENT_FIELDTYPE = '.MMRPG_SETTINGS_CURRENT_FIELDTYPE);
-
-    // DEBUG DEBUG DEBUG
-    if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
+    if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG'] = array(); }
+    $DB = new plutocms_database();
+    // If the database could not be created, critical error mode!
+    if ($DB->CONNECT === false){
+        define('MMRPG_CRITICAL_ERROR', true);
+        $_GET = array();
+        $_GET['page'] = 'error';
+    }
 }
 
-/*
+// Include mandatory class files
+require('classes/battle.php');
+require('classes/field.php');
+require('classes/player.php');
+require('classes/robot.php');
+require('classes/ability.php');
 
-SELECT user_id, COUNT(thread_id) AS thread_count FROM mmrpg_threads WHERE mmrpg_threads.thread_target = 0 AND thread_published = 1 GROUP BY mmrpg_threads.user_id
+// Include mandatory function files
+require('data/functions/website.php');
+require('data/functions/game.php');
+require('data/functions/prototype.php');
 
-// DEBUG DEBUG DEBUG
-$this_user_countindex = $DB->get_array_list('SELECT
-    mmrpg_users.user_id,
-    mmrpg_leaderboard.board_points,
-    mmrpg_threads.thread_count,
-    mmrpg_posts.post_count
-    FROM mmrpg_users
-    LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_users.user_id
-    LEFT JOIN (
-    SELECT user_id, COUNT(thread_id) AS thread_count FROM mmrpg_threads WHERE mmrpg_threads.thread_target = 0 AND thread_published = 1 GROUP BY mmrpg_threads.user_id
-    ) mmrpg_threads ON mmrpg_threads.user_id = mmrpg_users.user_id
-    LEFT JOIN (
-    SELECT user_id, COUNT(post_id) AS post_count FROM mmrpg_posts WHERE mmrpg_posts.post_target = 0 AND post_deleted = 0 GROUP BY mmrpg_posts.user_id
-    ) mmrpg_posts ON mmrpg_posts.user_id = mmrpg_users.user_id
-    WHERE mmrpg_leaderboard.board_points > 0', 'user_id');
-unset($DB);
-exit('<pre>'.print_r($this_user_countindex, true).'</pre>');
+// Load startup file unless explicitly prevented
+if (!defined('MMRPG_EXTERNAL_TOP_INCLUDE')){
+    require('mmrpg.php');
+}
 
-*/
 
 ?>
