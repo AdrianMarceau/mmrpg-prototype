@@ -67,11 +67,44 @@ if ($temp_field_star_present){
   $temp_robot_tokens[] = $temp_option_battle['battle_target_player']['player_robots'][1]['robot_token'];
   // Collect factors based on player
   if ($this_prototype_data['this_player_token'] == 'dr-light'){
-    $temp_factors_list = array($this_omega_factors_one, array_merge($this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_ten));
+    $temp_factors_list = array($this_omega_factors_one, array_merge(
+      $this_omega_factors_two,
+      $this_omega_factors_three,
+      $this_omega_factors_four,
+      $this_omega_factors_five,
+      $this_omega_factors_six,
+      $this_omega_factors_seven,
+      $this_omega_factors_eight,
+      $this_omega_factors_eight_two,
+      $this_omega_factors_nine,
+      $this_omega_factors_ten
+      ));
   } elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){
-    $temp_factors_list = array($this_omega_factors_two, array_merge($this_omega_factors_three, $this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_ten, $this_omega_factors_one));
+    $temp_factors_list = array($this_omega_factors_two, array_merge(
+      $this_omega_factors_three,
+      $this_omega_factors_four,
+      $this_omega_factors_five,
+      $this_omega_factors_six,
+      $this_omega_factors_seven,
+      $this_omega_factors_eight,
+      $this_omega_factors_eight_two,
+      $this_omega_factors_nine,
+      $this_omega_factors_ten,
+      $this_omega_factors_one
+      ));
   } elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){
-    $temp_factors_list = array($this_omega_factors_three, array_merge($this_omega_factors_four, $this_omega_factors_five, $this_omega_factors_six, $this_omega_factors_seven, $this_omega_factors_eight, $this_omega_factors_nine, $this_omega_factors_ten, $this_omega_factors_one, $this_omega_factors_two));
+    $temp_factors_list = array($this_omega_factors_three, array_merge(
+      $this_omega_factors_four,
+      $this_omega_factors_five,
+      $this_omega_factors_six,
+      $this_omega_factors_seven,
+      $this_omega_factors_eight,
+      $this_omega_factors_eight_two,
+      $this_omega_factors_nine,
+      $this_omega_factors_ten,
+      $this_omega_factors_one,
+      $this_omega_factors_two
+      ));
   }
   // Shuffle the bonus robots section of the list
   shuffle($temp_factors_list[1]);
