@@ -2,7 +2,7 @@
 // ITEM : ENERGY TANK
 $ability = array(
   'ability_name' => 'Energy Tank',
-  'ability_token' => 'item-energy-tank',
+  'ability_token' => 'energy-tank',
   'ability_game' => 'MM00',
   'ability_class' => 'item',
   'ability_type' => 'energy',
@@ -14,10 +14,10 @@ $ability = array(
   'ability_accuracy' => 100,
   'ability_target' => 'select_this',
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
@@ -27,7 +27,7 @@ $ability = array(
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Increase this robot's life energy stat
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
@@ -39,10 +39,10 @@ $ability = array(
       ));
     $energy_recovery_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $energy_recovery_amount);
-    
+
     // Return true on success
     return true;
-      
+
   }
   );
 ?>

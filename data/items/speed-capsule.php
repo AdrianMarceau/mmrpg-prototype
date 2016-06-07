@@ -2,7 +2,7 @@
 // ITEM : SPEED CAPSULE
 $ability = array(
   'ability_name' => 'Speed Capsule',
-  'ability_token' => 'item-speed-capsule',
+  'ability_token' => 'speed-capsule',
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Speed',
   'ability_class' => 'item',

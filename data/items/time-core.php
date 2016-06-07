@@ -2,7 +2,7 @@
 // ITEM : TIME CORE
 $ability = array(
   'ability_name' => 'Time Core',
-  'ability_token' => 'item-core-time',
+  'ability_token' => 'time-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'time',

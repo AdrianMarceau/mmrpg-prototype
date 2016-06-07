@@ -2,7 +2,7 @@
 // ITEM : DEFENSE PELLET
 $ability = array(
   'ability_name' => 'Defense Pellet',
-  'ability_token' => 'item-defense-pellet',
+  'ability_token' => 'defense-pellet',
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Defense',
   'ability_class' => 'item',

@@ -2,7 +2,7 @@
 // ITEM : LASER CORE
 $ability = array(
   'ability_name' => 'Laser Core',
-  'ability_token' => 'item-core-laser',
+  'ability_token' => 'laser-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'laser',

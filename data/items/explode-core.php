@@ -2,7 +2,7 @@
 // ITEM : EXPLODE CORE
 $ability = array(
   'ability_name' => 'Explode Core',
-  'ability_token' => 'item-core-explode',
+  'ability_token' => 'explode-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'explode',

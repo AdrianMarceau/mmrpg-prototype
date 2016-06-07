@@ -2,7 +2,7 @@
 // ITEM : EXTRA LIFE
 $ability = array(
   'ability_name' => 'Extra Life',
-  'ability_token' => 'item-extra-life',
+  'ability_token' => 'extra-life',
   'ability_game' => 'MM00',
   'ability_class' => 'item',
   'ability_image_sheets' => 3,
@@ -15,22 +15,22 @@ $ability = array(
   'ability_accuracy' => 100,
   'ability_target' => 'select_this_disabled',
   'ability_function' => function($objects){
-    
+
     // Extract all objects into the current scope
     extract($objects);
-    
+
     // Automatically change this ability's image based on player
     if ($this_player->player_token == 'dr-light'){ $this_ability->ability_image = 'item-extra-life'; }
     elseif ($this_player->player_token == 'dr-wily'){ $this_ability->ability_image = 'item-extra-life-2'; }
     elseif ($this_player->player_token == 'dr-cossack'){ $this_ability->ability_image = 'item-extra-life-3'; }
-    
+
     // Allow this robot to show on the canvas again so we can revive it
     unset($target_robot->flags['apply_disabled_state']);
     unset($target_robot->flags['hidden']);
     unset($target_robot->robot_attachments['ability_attachment-defeat']);
     $target_robot->robot_frame = 'defeat';
     $target_robot->update_session();
-    
+
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'defeat',
@@ -40,7 +40,7 @@ $ability = array(
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Restore the target robot's health and weapons back to their full amounts
     $target_robot->robot_status = 'active';
     $target_robot->robot_energy = 0; //$target_robot->robot_base_energy;
@@ -49,7 +49,7 @@ $ability = array(
     $target_robot->robot_defense = $target_robot->robot_base_defense;
     $target_robot->robot_speed = $target_robot->robot_base_speed;
     $target_robot->update_session();
-    
+
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'defend',
@@ -59,7 +59,7 @@ $ability = array(
         )
       ));
     $target_robot->trigger_target($target_robot, $this_ability);
-    
+
     // Increase this robot's life energy stat
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
@@ -71,7 +71,7 @@ $ability = array(
       ));
     $energy_recovery_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $energy_recovery_amount);
-    
+
     // Increase this robot's weapon energy stat
     $this_ability->recovery_options_update(array(
       'kind' => 'weapons',
@@ -83,7 +83,7 @@ $ability = array(
       ));
     $weapons_recovery_amount = ceil($target_robot->robot_base_weapons * ($this_ability->ability_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_ability, $weapons_recovery_amount);
-    
+
     /*
     // Increase this robot's life energy stat
     $this_ability->recovery_options_update(array(
@@ -96,10 +96,10 @@ $ability = array(
     $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
     $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
     */
-    
+
     // Return true on success
     return true;
-      
+
   }
   );
 ?>

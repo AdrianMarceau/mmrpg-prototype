@@ -2,7 +2,7 @@
 // ITEM : ELECTRIC CORE
 $ability = array(
   'ability_name' => 'Electric Core',
-  'ability_token' => 'item-core-electric',
+  'ability_token' => 'electric-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'electric',

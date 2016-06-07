@@ -2,7 +2,7 @@
 // ITEM : WATER CORE
 $ability = array(
   'ability_name' => 'Water Core',
-  'ability_token' => 'item-core-water',
+  'ability_token' => 'water-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'water',

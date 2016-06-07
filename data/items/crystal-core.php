@@ -2,7 +2,7 @@
 // ITEM : CRYSTAL CORE
 $ability = array(
   'ability_name' => 'Crystal Core',
-  'ability_token' => 'item-core-crystal',
+  'ability_token' => 'crystal-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'crystal',

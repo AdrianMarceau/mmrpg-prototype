@@ -2,7 +2,7 @@
 // ITEM : MISSILE CORE
 $ability = array(
   'ability_name' => 'Missile Core',
-  'ability_token' => 'item-core-missile',
+  'ability_token' => 'missile-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'missile',

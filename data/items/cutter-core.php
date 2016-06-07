@@ -2,7 +2,7 @@
 // ITEM : CUTTER CORE
 $ability = array(
   'ability_name' => 'Cutter Core',
-  'ability_token' => 'item-core-cutter',
+  'ability_token' => 'cutter-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'cutter',

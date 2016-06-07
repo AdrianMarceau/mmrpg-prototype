@@ -2,7 +2,7 @@
 // ITEM : FREEZE CORE
 $ability = array(
   'ability_name' => 'Freeze Core',
-  'ability_token' => 'item-core-freeze',
+  'ability_token' => 'freeze-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'freeze',

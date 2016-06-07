@@ -2,7 +2,7 @@
 // ITEM : NEUTRAL CORE
 $ability = array(
   'ability_name' => 'Neutral Core',
-  'ability_token' => 'item-core-none',
+  'ability_token' => 'none-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => '',

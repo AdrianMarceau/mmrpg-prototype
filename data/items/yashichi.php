@@ -2,7 +2,7 @@
 // ITEM : YASHICHI
 $ability = array(
   'ability_name' => 'Yashichi',
-  'ability_token' => 'item-yashichi',
+  'ability_token' => 'yashichi',
   'ability_game' => 'MM00',
   'ability_class' => 'item',
   'ability_type' => 'energy',

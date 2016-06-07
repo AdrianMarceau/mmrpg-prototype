@@ -2,7 +2,7 @@
 // ITEM : FLAME CORE
 $ability = array(
   'ability_name' => 'Flame Core',
-  'ability_token' => 'item-core-flame',
+  'ability_token' => 'flame-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'flame',

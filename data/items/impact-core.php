@@ -2,7 +2,7 @@
 // ITEM : IMPACT CORE
 $ability = array(
   'ability_name' => 'Impact Core',
-  'ability_token' => 'item-core-impact',
+  'ability_token' => 'impact-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'impact',

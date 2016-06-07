@@ -2,7 +2,7 @@
 // ITEM : SUPER PELLET
 $ability = array(
   'ability_name' => 'Super Pellet',
-  'ability_token' => 'item-super-pellet',
+  'ability_token' => 'super-pellet',
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Super',
   'ability_class' => 'item',
