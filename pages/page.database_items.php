@@ -5,7 +5,7 @@
 
 // Define the SEO variables for this page
 $this_seo_title = 'Items '.(!empty($this_current_filter) ? '('.$this_current_filter_name.' Type) ' : '').'| Database | '.$this_seo_title;
-$this_seo_description = 'The item database contains detailed information about the Mega Man RPG Prototype\'s equippable abilities including their base stats, types, descriptions, and sprite sheets. The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster.';
+$this_seo_description = 'The item database contains detailed information about the Mega Man RPG Prototype\'s equippable items including their base stats, types, descriptions, and sprite sheets. The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster.';
 
 // Define the Open Graph variables for this page
 $this_graph_data['title'] = 'Item Database'.(!empty($this_current_filter) ? ' ('.$this_current_filter_name.' Type) ' : '');
@@ -20,54 +20,51 @@ $this_markup_counter .= ($mmrpg_database_items_links_counter_incomplete > 0 ? ($
 $this_markup_counter .= (!empty($mmrpg_database_items_links_counter) ? ($mmrpg_database_items_links_counter == 1 ? '1 Item' : $mmrpg_database_items_links_counter.' Items') : '0 Items');
 $this_markup_counter .= ' )</span>';
 
-// Prepend the token with the item word
-if (!empty($this_current_token)){ $this_current_token = 'item-'.$this_current_token; }
-
-// If a specific ability has NOT been defined, show the quick-switcher
+// If a specific item has NOT been defined, show the quick-switcher
 reset($mmrpg_database_items);
-if (!empty($this_current_token)){ $first_ability_key = $this_current_token; }
-else { $first_ability_key = key($mmrpg_database_items); }
+if (!empty($this_current_token)){ $first_item_key = $this_current_token; }
+else { $first_item_key = key($mmrpg_database_items); }
 
-// Only show the next part of a specific ability was requested
+// Only show the next part of a specific item was requested
 if (!empty($this_current_token)){
 
   // Loop through the item database and display the appropriate data
   $key_counter = 0;
-  foreach($mmrpg_database_items AS $ability_key => $ability_info){
+  foreach($mmrpg_database_items AS $item_key => $item_info){
 
-    // If a specific ability has been requested and it's not this one
-    if (!empty($this_current_token) && $this_current_token != $ability_info['ability_token']){ $key_counter++; continue; }
+    // If a specific item has been requested and it's not this one
+    if (!empty($this_current_token) && $this_current_token != $item_info['item_token']){ $key_counter++; continue; }
     //elseif ($key_counter > 0){ continue; }
 
-    // If this is THE specific ability requested (and one was specified)
-    if (!empty($this_current_token) && $this_current_token == $ability_info['ability_token']){
+    // If this is THE specific item requested (and one was specified)
+    if (!empty($this_current_token) && $this_current_token == $item_info['item_token']){
 
-      $this_ability_image = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
-      if ($this_ability_image == 'ability'){ $this_seo_robots = 'noindex'; }
-      $this_temp_description = 'The '.$ability_info['ability_name'].' is ';
-      if (!empty($ability_info['ability_type'])){
-        if (empty($ability_info['ability_type2'])){ $this_temp_description .= (preg_match('/^(a|e|i|o|u)/', $ability_info['ability_type']) ? 'an ' : 'a ').ucfirst($ability_info['ability_type']).' type'; }
-        else { $this_temp_description .= (preg_match('/^(a|e|i|o|u)/', $ability_info['ability_type']) ? 'an ' : 'a ').ucfirst($ability_info['ability_type']).' and '.ucfirst($ability_info['ability_type2']).' type'; }
+      $this_item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
+      if ($this_item_image == 'item'){ $this_seo_robots = 'noindex'; }
+      $this_temp_description = 'The '.$item_info['item_name'].' is ';
+      if (!empty($item_info['item_type'])){
+        if (empty($item_info['item_type2'])){ $this_temp_description .= (preg_match('/^(a|e|i|o|u)/', $item_info['item_type']) ? 'an ' : 'a ').ucfirst($item_info['item_type']).' type'; }
+        else { $this_temp_description .= (preg_match('/^(a|e|i|o|u)/', $item_info['item_type']) ? 'an ' : 'a ').ucfirst($item_info['item_type']).' and '.ucfirst($item_info['item_type2']).' type'; }
       } else {
         $this_temp_description .= 'a neutral type';
       }
-      $this_temp_description .= ' ability in the Mega Man RPG Prototype.';
+      $this_temp_description .= ' item in the Mega Man RPG Prototype.';
       // Define the SEO variables for this page
       $this_seo_title_backup = $this_seo_title;
-      $this_seo_title = $ability_info['ability_name'].' | '.$this_seo_title;
-      $this_seo_description = $this_temp_description.'  '.$ability_info['ability_description'].'  '.$this_seo_description;
+      $this_seo_title = $item_info['item_name'].' | '.$this_seo_title;
+      $this_seo_description = $this_temp_description.'  '.$item_info['item_description'].'  '.$this_seo_description;
       // Update the markup header with the robot
-      $this_markup_header = '<span class="hideme">'.$ability_info['ability_name'].' | </span>'.$this_markup_header;
+      $this_markup_header = '<span class="hideme">'.$item_info['item_name'].' | </span>'.$this_markup_header;
       // Define the Open Graph variables for this page
-      $this_graph_data['title'] .= ' | '.$ability_info['ability_name'];
-      $this_graph_data['description'] = $this_temp_description.'  '.$ability_info['ability_description'].'  '.$this_graph_data['description'];
-      $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/abilities/'.$ability_info['ability_token'].'/icon_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+      $this_graph_data['title'] .= ' | '.$item_info['item_name'];
+      $this_graph_data['description'] = $this_temp_description.'  '.$item_info['item_description'].'  '.$this_graph_data['description'];
+      $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/items/'.$item_info['item_token'].'/icon_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
 
     }
 
-    // Collect the markup for this ability and print it to the browser
-    $temp_ability_markup = rpg_ability::print_database_markup($ability_info, array('show_key' => $key_counter));
-    echo $temp_ability_markup;
+    // Collect the markup for this item and print it to the browser
+    $temp_item_markup = rpg_item::print_database_markup($item_info, array('show_key' => $key_counter));
+    echo $temp_item_markup;
     $key_counter++;
     break;
 
@@ -112,22 +109,22 @@ if (empty($this_current_token)){
   <?
 }
 
-// If we're in the index view, loop through and display all abilities
+// If we're in the index view, loop through and display all items
 if (empty($this_current_token)){
-  // Loop through the ability database and display the appropriate data
+  // Loop through the item database and display the appropriate data
   $key_counter = 0;
   foreach($mmrpg_database_items AS $item_key => $item_info){
-    // If a type filter has been applied to the ability page
+    // If a type filter has been applied to the item page
     $temp_item_types = array();
-    if (!empty($item_info['ability_type'])){ $temp_item_types[] = $item_info['ability_type']; }
-    if (!empty($item_info['ability_type2'])){ $temp_item_types[] = $item_info['ability_type2']; }
+    if (!empty($item_info['item_type'])){ $temp_item_types[] = $item_info['item_type']; }
+    if (!empty($item_info['item_type2'])){ $temp_item_types[] = $item_info['item_type2']; }
     if (empty($temp_item_types)){ $temp_item_types[] = 'none'; }
     if (isset($this_current_filter) && !in_array($this_current_filter, $temp_item_types)){ $key_counter++; continue; }
-    // Collect information about this ability
-    $this_ability_image = !empty($item_info['ability_image']) ? $item_info['ability_image'] : $item_info['ability_token'];
-    if ($this_ability_image == 'ability'){ $this_seo_abilities = 'noindex'; }
-    // Collect the markup for this ability and print it to the browser
-    $temp_item_markup = rpg_ability::print_database_markup($item_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+    // Collect information about this item
+    $this_item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
+    if ($this_item_image == 'item'){ $this_seo_items = 'noindex'; }
+    // Collect the markup for this item and print it to the browser
+    $temp_item_markup = rpg_item::print_database_markup($item_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
     echo $temp_item_markup;
     $key_counter++;
   }
