@@ -48,18 +48,19 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
 
   // Print out the PHP header in a comment
   $temp_css_markup = '/* -- MMRPG Prototype Stylesheet, Last Updated '.MMRPG_CONFIG_CACHE_DATE.' -- */'."\n";
-  
+
   // Require the master CSS file without any of the dynamic additions
   ob_start();
   require_once('style.css');
   $temp_css_markup .= ob_get_clean();
-  
+
   /* -- TYPE STYLES -- */
-  
+
   // Loop through every type in the database
   ob_start();
   foreach ($mmrpg_index['types'] AS $type_token => $type_info){
     ?>
+    #mmrpg .item_type_<?= $type_info['type_token'] ?>,
     #mmrpg .ability_type_<?= $type_info['type_token'] ?>,
     #mmrpg .battle_type_<?= $type_info['type_token'] ?>,
     #mmrpg .field_type_<?= $type_info['type_token'] ?>,
@@ -72,6 +73,7 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
     // Loop through all the types again for the dual-type ability styles
     foreach ($mmrpg_index['types'] AS $type2_token => $type2_info){
       ?>
+      #mmrpg .item_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .ability_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .battle_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .field_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
@@ -93,9 +95,10 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
         background-image: linear-gradient(to right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
       }
       <?
-      
+
       /*
       ?>
+      #mmrpg .item_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .ability_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .battle_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .field_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
@@ -121,16 +124,16 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
     }
   }
   $temp_css_markup .= ob_get_clean();
-  
+
   // Compress the CSS markup before saving it
   $temp_css_markup = preg_replace('/\s+/', ' ', $temp_css_markup);
   $temp_css_markup = str_replace('; ', ';', $temp_css_markup);
-  
+
   // Update the style cache files
   mmrpg_save_style_markup($this_cache_filedir, $temp_css_markup);
 
 }
-  
+
 // Print out the final generated CSS markup
 echo $temp_css_markup;
 
