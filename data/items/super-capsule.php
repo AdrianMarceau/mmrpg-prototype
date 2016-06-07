@@ -2,7 +2,7 @@
 // ITEM : SUPER CAPSULE
 $ability = array(
   'ability_name' => 'Super Capsule',
-  'ability_token' => 'item-super-capsule',
+  'ability_token' => 'super-capsule',
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Super',
   'ability_class' => 'item',

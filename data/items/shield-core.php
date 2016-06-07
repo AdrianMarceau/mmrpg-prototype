@@ -2,7 +2,7 @@
 // ITEM : SHIELD CORE
 $ability = array(
   'ability_name' => 'Shield Core',
-  'ability_token' => 'item-core-shield',
+  'ability_token' => 'shield-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'shield',

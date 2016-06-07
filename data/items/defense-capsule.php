@@ -2,7 +2,7 @@
 // ITEM : DEFENSE CAPSULE
 $ability = array(
   'ability_name' => 'Defense Capsule',
-  'ability_token' => 'item-defense-capsule',
+  'ability_token' => 'defense-capsule',
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Defense',
   'ability_class' => 'item',

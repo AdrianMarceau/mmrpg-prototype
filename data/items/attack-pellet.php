@@ -2,7 +2,7 @@
 // ITEM : ATTACK PELLET
 $ability = array(
   'ability_name' => 'Attack Pellet',
-  'ability_token' => 'item-attack-pellet',
+  'ability_token' => 'attack-pellet',
   'ability_game' => 'MMRPG',
   'ability_group' => 'MM00/Items/Attack',
   'ability_class' => 'item',

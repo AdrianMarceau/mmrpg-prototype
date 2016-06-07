@@ -2,7 +2,7 @@
 // ITEM : EARTH CORE
 $ability = array(
   'ability_name' => 'Earth Core',
-  'ability_token' => 'item-core-earth',
+  'ability_token' => 'earth-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'earth',

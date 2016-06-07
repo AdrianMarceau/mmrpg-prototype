@@ -2,7 +2,7 @@
 // ITEM : SPACE CORE
 $ability = array(
   'ability_name' => 'Space Core',
-  'ability_token' => 'item-core-space',
+  'ability_token' => 'space-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'space',

@@ -2,7 +2,7 @@
 // ITEM : SWIFT CORE
 $ability = array(
   'ability_name' => 'Swift Core',
-  'ability_token' => 'item-core-swift',
+  'ability_token' => 'swift-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'swift',

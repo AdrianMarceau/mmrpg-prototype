@@ -2,7 +2,7 @@
 // ITEM : NATURE CORE
 $ability = array(
   'ability_name' => 'Nature Core',
-  'ability_token' => 'item-core-nature',
+  'ability_token' => 'nature-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'nature',

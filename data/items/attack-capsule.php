@@ -2,7 +2,7 @@
 // ITEM : ATTACK CAPSULE
 $ability = array(
     'ability_name' => 'Attack Capsule',
-    'ability_token' => 'item-attack-capsule',
+    'ability_token' => 'attack-capsule',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MM00/Items/Attack',
     'ability_class' => 'item',

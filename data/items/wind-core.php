@@ -2,7 +2,7 @@
 // ITEM : WIND CORE
 $ability = array(
   'ability_name' => 'Wind Core',
-  'ability_token' => 'item-core-wind',
+  'ability_token' => 'wind-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'wind',

@@ -2,7 +2,7 @@
 // ITEM : SHADOW CORE
 $ability = array(
   'ability_name' => 'Shadow Core',
-  'ability_token' => 'item-core-shadow',
+  'ability_token' => 'shadow-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'shadow',

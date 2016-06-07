@@ -2,7 +2,7 @@
 // ITEM : COPY CORE
 $ability = array(
   'ability_name' => 'Copy Core',
-  'ability_token' => 'item-core-copy',
+  'ability_token' => 'copy-core',
   'ability_game' => 'MMRPG',
   'ability_class' => 'item',
   'ability_type' => 'copy',
