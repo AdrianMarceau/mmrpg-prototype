@@ -135,7 +135,7 @@ $(document).ready(function(){
           for (i in thisClassList){
             var tempClass = thisClassList[i] != undefined ? thisClassList[i].toString() : '';
             //console.log('tempClass = '+tempClass);
-            if (tempClass.match(/^(field_|player_|robot_|ability_)?type$/) || tempClass.match(/^(field_|player_|robot_|ability_)?type_/) || tempClass.match(/^(energy|weapons|attack|defense|speed|light|cossack|wily|experience|level|damage|recovery|none|cutter|impact|freeze|explode|flame|electric|time|earth|wind|water|swift|nature|missile|crystal|shadow|space|shield|laser|copy)(_|$)/)){
+            if (tempClass.match(/^(field_|player_|robot_|ability_|item_)?type$/) || tempClass.match(/^(field_|player_|robot_|ability_|item_)?type_/) || tempClass.match(/^(energy|weapons|attack|defense|speed|light|cossack|wily|experience|level|damage|recovery|none|cutter|impact|freeze|explode|flame|electric|time|earth|wind|water|swift|nature|missile|crystal|shadow|space|shield|laser|copy)(_|$)/)){
               //console.log('tempClass match!');
               thisTooltipType += tempClass+' ';
               }
