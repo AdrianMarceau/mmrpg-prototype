@@ -48,6 +48,11 @@ elseif ($this_page_action == 'import_abilities'){
   // Require the import abilities file
   require(MMRPG_CONFIG_ROOTDIR.'admin/import-abilities.php');
 }
+// Else if this is an IMPORT ITEMS request
+elseif ($this_page_action == 'import_items'){
+  // Require the import items file
+  require(MMRPG_CONFIG_ROOTDIR.'admin/import-items.php');
+}
 // Else if this is an IMPORT FIELDS request
 elseif ($this_page_action == 'import_fields'){
   // Require the import fields file
