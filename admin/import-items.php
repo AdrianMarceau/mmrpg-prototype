@@ -50,7 +50,7 @@ if (!empty($mmrpg_index['items'])){
     $temp_insert_array['item_token'] = $item_data['item_token'];
     $temp_insert_array['item_name'] = !empty($item_data['item_name']) ? $item_data['item_name'] : '';
     $temp_insert_array['item_game'] = !empty($item_data['item_game']) ? $item_data['item_game'] : '';
-    $temp_insert_array['item_class'] = !empty($item_data['item_class']) ? $item_data['item_class'] : 'master';
+    $temp_insert_array['item_class'] = !empty($item_data['item_class']) ? $item_data['item_class'] : 'item';
     $temp_insert_array['item_image'] = !empty($item_data['item_image']) ? $item_data['item_image'] : '';
     $temp_insert_array['item_image_sheets'] = isset($item_data['item_image_sheets']) ? $item_data['item_image_sheets'] : 1;
     $temp_insert_array['item_image_size'] = !empty($item_data['item_image_size']) ? $item_data['item_image_size'] : 40;
