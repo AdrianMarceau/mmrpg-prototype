@@ -6,6 +6,7 @@ $ability = array(
     'ability_game' => 'MM085',
     'ability_description' => 'The user throws pair of magical cards at an unlucky target to deal damage and steal life energy, restoring the user\'s own by up to {RECOVERY2}% of the damage dealt!',
     'ability_type' => 'shadow',
+    'ability_energy' => 4,
     'ability_damage' => 10,
     'ability_recovery2' => 100,
     'ability_accuracy' => 100,
