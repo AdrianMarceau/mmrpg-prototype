@@ -1,23 +1,23 @@
 <?
 // ITEM : DEFENSE PELLET
-$ability = array(
-  'ability_name' => 'Defense Pellet',
-  'ability_token' => 'defense-pellet',
-  'ability_game' => 'MMRPG',
-  'ability_group' => 'MM00/Items/Defense',
-  'ability_class' => 'item',
-  'ability_type' => 'defense',
-  'ability_description' => 'A small shield pellet that boosts the defense stat of one robot on the user\'s side of the field by {RECOVERY}%. This item\'s effects appear to be permanent, though only up until the target has reached its max stat limit.',
-  'ability_energy' => 0,
-  'ability_speed' => 10,
-  'ability_recovery' => 10,
-  'ability_recovery_percent' => true,
-  'ability_accuracy' => 100,
-  'ability_target' => 'select_this',
-  'ability_function' => function($objects){
+$item = array(
+  'item_name' => 'Defense Pellet',
+  'item_token' => 'defense-pellet',
+  'item_game' => 'MMRPG',
+  'item_group' => 'MM00/Items/Defense',
+  'item_class' => 'item',
+  'item_type' => 'defense',
+  'item_description' => 'A small shield pellet that boosts the defense stat of one robot on the user\'s side of the field by {RECOVERY}%. This item\'s effects appear to be permanent, though only up until the target has reached its max stat limit.',
+  'item_energy' => 0,
+  'item_speed' => 10,
+  'item_recovery' => 10,
+  'item_recovery_percent' => true,
+  'item_accuracy' => 100,
+  'item_target' => 'select_this',
+  'item_function' => function($objects){
 
       // Call the global stat booster item function
-      return rpg_ability::item_function_stat_booster($objects);
+      return rpg_item::item_function_stat_booster($objects);
 
     }
   );
