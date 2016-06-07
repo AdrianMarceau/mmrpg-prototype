@@ -53,11 +53,17 @@ RewriteRule ^styles/style\.css$ styles/style.php [L]
 RewriteRule ^home/?$ / [R,L]
 RewriteRule ^updates/?$ /community/news/ [R,L]
 RewriteRule ^www\.website\.com$ / [R,L]
+
+# Redirect the non-existant or renamed images to better places
 RewriteRule ^images/robots/_disco/(.*)?$ /images/robots/disco_legacy/$1 [R,L]
+RewriteRule ^images/robots/([a-z]+)man/(.*)?$ /images/robots/$1-man/$2 [R,L]
 RewriteRule ^images/fields/elec-field/(.*)?$ /images/fields/electrical-tower/$1 [R,L]
 RewriteRule ^images/fields/ice-field/(.*)?$ /images/fields/arctic-jungle/$1 [R,L]
 RewriteRule ^images/fields/guts-field/(.*)?$ /images/fields/mountain-mines/$1 [R,L]
-RewriteRule ^images/robots/([a-z]+)man/(.*)?$ /images/robots/$1-man/$2 [R,L]
+RewriteRule ^images/abilities/item-screw-small/(.*)?$ /images/items/small-screw/$1 [R,L]
+RewriteRule ^images/abilities/item-screw-large/(.*)?$ /images/items/large-screw/$1 [R,L]
+RewriteRule ^images/abilities/item-core-([a-z]+)/(.*)?$ /images/items/$1-core/$2 [R,L]
+RewriteRule ^images/abilities/item-([-_a-z0-9]+)/(.*)?$ /images/items/$1/$2 [R,L]
 
 # Define the rewrite conditions
 RewriteCond %{REQUEST_FILENAME} -d [OR]
