@@ -604,16 +604,78 @@ $token = 'ability_item_split_2k16';
 $update_patch_tokens[] = $token;
 $update_patch_names[$token] = 'Ability / Item Split of 2016';
 $update_patch_details[$token] = "Abilities and items were technically the same thing in the coding of the game ";
-$update_patch_details[$token] .= "\nand required a lot of manual extra coding to get them to work.  In an effort ";
-$update_patch_details[$token] .= "\nto optimize the game code this is being changed and items are now their own ";
-$update_patch_details[$token] .= "\nseparate entities. This patch simply re-organizes some of your data. ";
+$update_patch_details[$token] .= "\nand it required a lot of extra coding to get them to work.  In an effort to ";
+$update_patch_details[$token] .= "\noptimize the game items are being split into their own separate category of ";
+$update_patch_details[$token] .= "\objects. This patch simply re-organizes some of that data in your game file. ";
 function mmrpg_patch_ability_item_split_2k16($_GAME){
 
     // Pull in global variables
     global $db;
 
-    // Not done yet
-    exit('ability_item_split_2k16()');
+    // Collect the player's items array
+    $legacy_battle_items = !empty($_GAME['values']['battle_items']) ? $_GAME['values']['battle_items'] : array();
+
+    echo("Scanning player battle items...\n\n");
+
+    // Only bother with parsing if the player actually has items
+    if (!empty($legacy_battle_items)){
+
+        // Create arrays to hold the new item list data
+        $new_battle_items = array();
+        $new_battle_items_total_unique = 0;
+        $new_battle_items_total_overall = 0;
+
+        // Print out the player current list of items
+        foreach ($legacy_battle_items AS $legacy_item_token => $item_quantity){
+
+            // Create a clone of the item token and update it
+            $new_item_token = $legacy_item_token;
+            $new_item_token = preg_replace('/^item-/i', '', $new_item_token);
+            $new_item_token = preg_replace('/^(screw|core)-([a-z]+)$/', '$2-$1', $new_item_token);
+
+            // Print out the old and new tokens for the user
+            echo('Legacy Token : "'.$legacy_item_token.'"');
+            echo(' | New Token : "'.$new_item_token.'"');
+            echo(' | Quantity : '.$item_quantity.'');
+            echo("\n");
+
+            // Add the new item info to the parent array
+            $new_battle_items[$new_item_token] = $item_quantity;
+            $new_battle_items_total_unique += 1;
+            $new_battle_items_total_overall += $item_quantity;
+
+        }
+
+
+        // Print out the end of the scan messge with the results
+        echo("\n");
+        echo("--------------------\n\n");
+        echo("Item separation complete.  Thank you.\n");
+        echo("[b]Unique Item Total[/b] : {$new_battle_items_total_unique}\n");
+        echo("[b]Overall Item Total[/b] : ".number_format($new_battle_items_total_overall, 0, '.', ',')."\n");
+        echo("\n");
+
+        // Update the player's battle item array with the new format
+        $_GAME['values']['battle_items'] = $new_battle_items;
+
+
+    }
+    // Otherwise, if no items, the player does not need parsing
+    else {
+
+        // Print out the end of scan message an empty result
+        echo("--------------------\n\n");
+        echo("...oh, you have no items.  Sorry to bother you!\n\n");
+
+    }
+
+    // Print out debug info and exit now
+    //header('Content-type: text/plain;');
+    //echo('<pre>$new_battle_items = '.print_r($new_battle_items, true).'</pre>'."\n");
+    //exit('ability_item_split_2k16()');
+
+    // Return the updated game array
+    return $_GAME;
 
 }
 
