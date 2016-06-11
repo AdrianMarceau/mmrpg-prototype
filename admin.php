@@ -63,6 +63,11 @@ elseif ($this_page_action == 'delete_cache'){
   // Require the delete cache file
   require(MMRPG_CONFIG_ROOTDIR.'admin/delete-cache.php');
 }
+// Else if this is an CLEAR SESSIONS request
+elseif ($this_page_action == 'clear_sessions'){
+  // Require the delete cache file
+  require(MMRPG_CONFIG_ROOTDIR.'admin/clear-sessions.php');
+}
 // Otherwise, not a valid page
 else {
   // Print out error 404 text
