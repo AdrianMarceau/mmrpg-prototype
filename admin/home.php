@@ -12,5 +12,6 @@
 <li style="padding: 5px; background-color: #F2F2F2; margin-bottom: 4px;"><a href="admin.php?action=import_fields&amp;limit=10">Update Field Database</a></li>
 <li style="padding: 5px; background-color: #F2F2F2; margin-bottom: 4px;"><a href="admin.php?action=purge&amp;date=<?=MMRPG_CONFIG_CACHE_DATE?>&limit=10">Purge Inactive Members</a></li>
 <li style="padding: 5px; background-color: #F2F2F2; margin-bottom: 4px;"><a href="admin.php?action=delete_cache">Delete Cached Files</a></li>
+<li style="padding: 5px; background-color: #F2F2F2; margin-bottom: 4px;"><a href="admin.php?action=clear_sessions">Clear All Sessions</a></li>
 </ul>
 <? $this_page_markup .= ob_get_clean(); ?>
