@@ -16,6 +16,13 @@ $this_request_id = !empty($_REQUEST['id']) && is_numeric($_REQUEST['id']) ? $_RE
 $this_request_patch = !empty($_REQUEST['patch']) ? trim($_REQUEST['patch']) : '';
 $this_return_markup = '';
 
+// Prevent undefined patches from being applied
+if (!in_array($this_request_patch, $update_patch_tokens)){
+    $this_request_type = 'index';
+    $this_request_patch = '';
+    $this_request_id = 0;
+}
+
 // Define a WHERE clause for queries if user ID provided
 $this_where_query = '';
 if (!empty($this_request_id)){ $this_where_query .= "AND mmrpg_saves.user_id = {$this_request_id} "; }
