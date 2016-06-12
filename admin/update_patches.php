@@ -597,16 +597,16 @@ function mmrpg_patch_player_ability_merge_2k16($_GAME){
 }
 
 
-// -- PLAYER ABILITY MERGE 2k16 -- //
+// -- PLAYER ITEM / ABILITY SPLIT 2k16 -- //
 
 // Define a patch function for applying the max robot stats update
 $token = 'ability_item_split_2k16';
 $update_patch_tokens[] = $token;
 $update_patch_names[$token] = 'Ability / Item Split of 2016';
-$update_patch_details[$token] = "Abilities and items were technically the same thing in the coding of the game ";
-$update_patch_details[$token] .= "\nand it required a lot of extra coding to get them to work.  In an effort to ";
-$update_patch_details[$token] .= "\noptimize the game items are being split into their own separate category of ";
-$update_patch_details[$token] .= "\objects. This patch simply re-organizes some of that data in your game file. ";
+$update_patch_details[$token] = "Abilities and items were technically the same thing in the coding of the game \n";
+$update_patch_details[$token] .= "and it required a lot of extra coding to get them to work.  In an effort to \n";
+$update_patch_details[$token] .= "optimize the game items are being split into their own separate category of \n";
+$update_patch_details[$token] .= "objects. This patch simply re-organizes some of that data in your game file. ";
 function mmrpg_patch_ability_item_split_2k16($_GAME){
 
     // Pull in global variables
