@@ -53,6 +53,6 @@ $this_page_markup .= '<div style="padding: 6px; background-color: rgb(218, 255, 
     $this_page_markup .= '</pre>'."\n";
 
     $this_page_markup .= '<p><strong>ALL ACTIVE SESSIONS HAVE BEEN CLEARED</strong></p>';
-$this_page_markup .= '</div>';
+    $this_page_markup .= '</div>';
 
 ?>

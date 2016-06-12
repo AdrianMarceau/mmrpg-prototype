@@ -71,7 +71,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         }
 
         // If the any key fields were empty, abort mission!
-        if (empty($_GAME['user_id'])){ die('Something happened to the user ID..'); }
+        if (empty($_GAME['user_id'])){ die('Something happened to the user ID...'); }
 
         // If a patch was found and applied, update save file and generate notes
         if (!empty($patch_name) && !empty($patch_details) && !empty($patch_notes)){
@@ -82,6 +82,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             // Generate the header for this update patch's notes including details
             ob_start();
             echo("[b]MMRPG Prototype Patch Notes[/b]\n");
+            echo("User    : {$_GAME['user_id']}\n");
             echo("Name    : {$patch_name}\n");
             echo("Token   : {$patch_token}\n");
             echo("Date    : ".date('Y/m/d @ H:i:s')."\n");
@@ -106,14 +107,21 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             // Parse and print the message formatting and print details
             //echo mmrpg_formatting_decode($patch_markup)."\n";
 
+            // Define the patch thread parameters
+            $patch_thread_category = 0;
+            $patch_thread_name = 'Mega Man RPG Prototype Updates';
+            $patch_thread_token = 'mega-man-rpg-prototype-updates';
+            $patch_thread_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
+            $patch_thread_target = $_GAME['user_id'];
+
             // Define the thread select query
             $thread_select_query = "SELECT *
                 FROM mmrpg_threads
                 WHERE
-                category_id = 0 AND
-                thread_token = 'mega-man-rpg-prototype-updates' AND
-                thread_target = {$_GAME['user_id']} AND
-                user_id = ".MMRPG_SETTINGS_TARGET_PLAYERID."
+                category_id = {$patch_thread_category} AND
+                thread_token = '{$patch_thread_token}' AND
+                user_id = {$patch_thread_user_id} AND
+                thread_target = {$patch_thread_target}
                 ;";
 
             // Collect the thread ID for this user, if there is one
@@ -124,11 +132,11 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
 
                 // Generate the details for the new update thread
                 $update_thread_data = array();
-                $update_thread_data['category_id'] = 0;
-                $update_thread_data['user_id'] = MMRPG_SETTINGS_TARGET_PLAYERID;
+                $update_thread_data['category_id'] = $patch_thread_category;
+                $update_thread_data['user_id'] = $patch_thread_user_id;
                 $update_thread_data['user_ip'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
-                $update_thread_data['thread_name'] = 'Mega Man RPG Prototype Updates';
-                $update_thread_data['thread_token'] = 'mega-man-rpg-prototype-updates';
+                $update_thread_data['thread_name'] = $patch_thread_name;
+                $update_thread_data['thread_token'] = $patch_thread_token;
                 $update_thread_data['thread_body'] = "[system]\n";
                 $update_thread_data['thread_body'] .= "This thread is an auto-generated system message and cannot be responded to.\n\n";
                 $update_thread_data['thread_body'] .= "Please use this thread to review patch notes and game updates automatically applied to your save file.\n\n";
@@ -143,11 +151,12 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
                 $update_thread_data['thread_mod_date'] = time();
                 $update_thread_data['thread_mod_user'] = MMRPG_SETTINGS_TARGET_PLAYERID;
                 $update_thread_data['thread_published'] = 1;
-                $update_thread_data['thread_target'] = $_GAME['user_id'];
+                $update_thread_data['thread_target'] = $patch_thread_target;
 
-                // Insert into the database and collect thread ID
-                $update_thread_id = $db->insert('mmrpg_threads', $update_thread_data);
-                $update_thread_data['thread_id'] = $update_thread_id;
+                // Insert into the database with generated information
+                $db->insert('mmrpg_threads', $update_thread_data);
+                // Recollect the thread from the DB to refresh its values
+                $update_thread_data = $db->get_array($thread_select_query);
 
             }
 
@@ -157,7 +166,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             $db->update('mmrpg_threads', array(
                 'thread_body' => $update_thread_data['thread_body'],
                 'thread_mod_date' => time(),
-                'thread_mod_user' => MMRPG_SETTINGS_TARGET_PLAYERID
+                'thread_mod_user' => $patch_thread_user_id
                 ), array('thread_id' => $update_thread_data['thread_id']));
 
             // Append a new comment on this player's update thread
