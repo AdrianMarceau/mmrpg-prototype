@@ -77,8 +77,8 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
         // Ensure this item exists before continuing
         if (isset($_SESSION[$session_token]['values']['battle_items'][$temp_token])){
             // Collect a reference to the session variable amount
-            $temp_is_shard = preg_match('/^item-shard-/i', $temp_token) ? true : false;
-            $temp_is_core = preg_match('/^item-core-/i', $temp_token) ? true : false;
+            $temp_is_shard = preg_match('/-shard$/i', $temp_token) ? true : false;
+            $temp_is_core = preg_match('/-core$/i', $temp_token) ? true : false;
             if ($temp_is_shard){ $temp_max_quantity = MMRPG_SETTINGS_SHARDS_MAXQUANTITY; }
             elseif ($temp_is_core){ $temp_max_quantity = MMRPG_SETTINGS_CORES_MAXQUANTITY; }
             else { $temp_max_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY;  }
@@ -202,8 +202,8 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         // Ensure this item exists before continuing
         if (isset($mmrpg_database_items[$temp_token])){
             // Collect a reference to the session variable amount
-            $temp_is_shard = preg_match('/^item-shard-/i', $temp_token) ? true : false;
-            $temp_is_core = preg_match('/^item-core-/i', $temp_token) ? true : false;
+            $temp_is_shard = preg_match('/-shard$/i', $temp_token) ? true : false;
+            $temp_is_core = preg_match('/-core$/i', $temp_token) ? true : false;
             if ($temp_is_shard){ $temp_max_quantity = MMRPG_SETTINGS_SHARDS_MAXQUANTITY; }
             elseif ($temp_is_core){ $temp_max_quantity = MMRPG_SETTINGS_CORES_MAXQUANTITY; }
             else { $temp_max_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY;  }
@@ -526,15 +526,15 @@ if (true){
                         $item_counter++;
                         $item_info_token = $token;
                         $item_info_price = $price;
-                        $item_info_name = $item_info['ability_name'];
-                        $item_info_type = !empty($item_info['ability_type']) ? $item_info['ability_type'] : 'none';
-                        if ($item_info_type != 'none' && !empty($item_info['ability_type2'])){ $item_info_type .= '_'.$item_info['ability_type2']; }
-                        elseif ($item_info_type == 'none' && !empty($item_info['ability_type2'])){ $item_info_type = $item_info['ability_type2']; }
+                        $item_info_name = $item_info['item_name'];
+                        $item_info_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
+                        if ($item_info_type != 'none' && !empty($item_info['item_type2'])){ $item_info_type .= '_'.$item_info['item_type2']; }
+                        elseif ($item_info_type == 'none' && !empty($item_info['item_type2'])){ $item_info_type = $item_info['item_type2']; }
                         $item_info_quantity = !empty($_SESSION[$session_token]['values']['battle_items'][$token]) ? $_SESSION[$session_token]['values']['battle_items'][$token] : 0;
                         $global_item_quantities[$item_info_token] = $item_info_quantity;
                         $global_item_prices['buy'][$item_info_token] = $item_info_price;
                         $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
-                        $temp_info_tooltip = rpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
+                        $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                         $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                         ?>
@@ -921,17 +921,17 @@ if (true){
                         $item_counter++;
                         $item_info_token = $token;
                         $item_info_price = $price;
-                        $item_info_name = $item_info['ability_name'];
+                        $item_info_name = $item_info['item_name'];
                         $item_info_quantity = !empty($_SESSION[$session_token]['values']['battle_items'][$token]) ? $_SESSION[$session_token]['values']['battle_items'][$token] : 0;
-                        $item_info_type = !empty($item_info['ability_type']) ? $item_info['ability_type'] : 'none';
-                        if ($item_info_type != 'none' && !empty($item_info['ability_type2'])){ $item_info_type .= '_'.$item_info['ability_type2']; }
-                        elseif ($item_info_type == 'none' && !empty($item_info['ability_type2'])){ $item_info_type = $item_info['ability_type2']; }
+                        $item_info_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
+                        if ($item_info_type != 'none' && !empty($item_info['item_type2'])){ $item_info_type .= '_'.$item_info['item_type2']; }
+                        elseif ($item_info_type == 'none' && !empty($item_info['item_type2'])){ $item_info_type = $item_info['item_type2']; }
 
                         $global_item_quantities[$item_info_token] = $item_info_quantity;
                         $global_item_prices['sell'][$item_info_token] = $item_info_price;
 
                         $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
-                        $temp_info_tooltip = rpg_ability::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
+                        $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                         $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                         ?>
