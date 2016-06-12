@@ -89,80 +89,80 @@ $this_shop_index['auto'] = array(
     'shop_items' => array(
         'items_selling' => array(
 
-            'item-energy-pellet' => 200, 'item-weapon-pellet' => 200,
-            'item-energy-capsule' => 400, 'item-weapon-capsule' => 400,
-            'item-energy-tank' => 800, 'item-weapon-tank' => 800
+            'energy-pellet' => 200, 'weapon-pellet' => 200,
+            'energy-capsule' => 400, 'weapon-capsule' => 400,
+            'energy-tank' => 800, 'weapon-tank' => 800
 
             ),
         'items_selling2' => array(
 
-            'item-energy-pellet' => 200, 'item-weapon-pellet' => 200,
-            'item-energy-capsule' => 400, 'item-weapon-capsule' => 400,
-            'item-energy-tank' => 800, 'item-weapon-tank' => 800,
+            'energy-pellet' => 200, 'weapon-pellet' => 200,
+            'energy-capsule' => 400, 'weapon-capsule' => 400,
+            'energy-tank' => 800, 'weapon-tank' => 800,
 
-            'item-attack-pellet' => 900, 'item-defense-pellet' => 900,
-            'item-attack-capsule' => 1800, 'item-defense-capsule' => 1800,
-            'item-speed-pellet' => 900, 'item-super-pellet' => 2700,
-            'item-speed-capsule' => 1800, 'item-super-capsule' => 5400
+            'attack-pellet' => 900, 'defense-pellet' => 900,
+            'attack-capsule' => 1800, 'defense-capsule' => 1800,
+            'speed-pellet' => 900, 'super-pellet' => 2700,
+            'speed-capsule' => 1800, 'super-capsule' => 5400
 
             ),
         'items_selling3' => array(
 
-            'item-energy-pellet' => 200, 'item-weapon-pellet' => 200,
-            'item-energy-capsule' => 400, 'item-weapon-capsule' => 400,
-            'item-energy-tank' => 800, 'item-weapon-tank' => 800,
+            'energy-pellet' => 200, 'weapon-pellet' => 200,
+            'energy-capsule' => 400, 'weapon-capsule' => 400,
+            'energy-tank' => 800, 'weapon-tank' => 800,
 
-            'item-attack-pellet' => 900, 'item-defense-pellet' => 900,
-            'item-attack-capsule' => 1800, 'item-defense-capsule' => 1800,
-            'item-speed-pellet' => 900, 'item-super-pellet' => 2700,
-            'item-speed-capsule' => 1800, 'item-super-capsule' => 5400,
+            'attack-pellet' => 900, 'defense-pellet' => 900,
+            'attack-capsule' => 1800, 'defense-capsule' => 1800,
+            'speed-pellet' => 900, 'super-pellet' => 2700,
+            'speed-capsule' => 1800, 'super-capsule' => 5400,
 
-            'item-extra-life' => 1600, 'item-yashichi' => 1600
+            'extra-life' => 1600, 'yashichi' => 1600
 
             ),
         'items_selling4' => array(
 
-            'item-energy-pellet' => 200, 'item-weapon-pellet' => 200,
-            'item-energy-capsule' => 400, 'item-weapon-capsule' => 400,
-            'item-energy-tank' => 800, 'item-weapon-tank' => 800,
+            'energy-pellet' => 200, 'weapon-pellet' => 200,
+            'energy-capsule' => 400, 'weapon-capsule' => 400,
+            'energy-tank' => 800, 'weapon-tank' => 800,
 
-            'item-attack-pellet' => 900, 'item-defense-pellet' => 900,
-            'item-attack-capsule' => 1800, 'item-defense-capsule' => 1800,
-            'item-speed-pellet' => 900, 'item-super-pellet' => 2700,
-            'item-speed-capsule' => 1800, 'item-super-capsule' => 5400,
+            'attack-pellet' => 900, 'defense-pellet' => 900,
+            'attack-capsule' => 1800, 'defense-capsule' => 1800,
+            'speed-pellet' => 900, 'super-pellet' => 2700,
+            'speed-capsule' => 1800, 'super-capsule' => 5400,
 
-            'item-extra-life' => 1600, 'item-yashichi' => 1600,
+            'extra-life' => 1600, 'yashichi' => 1600,
 
             /*
-            'item-score-ball-red' => 5000, 'item-score-ball-blue' => 10000,
-            'item-score-ball-green' => 5000, 'item-score-ball-purple' => 10000
+            'red-score-ball' => 5000, 'blue-score-ball' => 10000,
+            'green-score-ball' => 5000, 'purple-score-ball' => 10000
             */
 
             ),
         'items_buying' => array(
 
-            'item-screw-small' => 100, 'item-screw-large' => 1000,
+            'screw-small' => 100, 'screw-large' => 1000,
 
-            'item-energy-pellet' => 100, 'item-weapon-pellet' => 100,
-            'item-energy-capsule' => 200, 'item-weapon-capsule' => 200,
-            'item-energy-tank' => 400, 'item-weapon-tank' => 400,
+            'energy-pellet' => 100, 'weapon-pellet' => 100,
+            'energy-capsule' => 200, 'weapon-capsule' => 200,
+            'energy-tank' => 400, 'weapon-tank' => 400,
 
-            'item-attack-pellet' => 450, 'item-defense-pellet' => 450,
-            'item-attack-capsule' => 900, 'item-defense-capsule' => 900,
-            'item-speed-pellet' => 450, 'item-super-pellet' => 1350,
-            'item-speed-capsule' => 900, 'item-super-capsule' => 2800,
+            'attack-pellet' => 450, 'defense-pellet' => 450,
+            'attack-capsule' => 900, 'defense-capsule' => 900,
+            'speed-pellet' => 450, 'super-pellet' => 1350,
+            'speed-capsule' => 900, 'super-capsule' => 2800,
 
-            'item-extra-life' => 800, 'item-yashichi' => 800,
+            'extra-life' => 800, 'yashichi' => 800,
 
             /*
-            'item-score-ball-red' => 1750, 'item-score-ball-blue' => 2500,
-            'item-score-ball-green' => 1750, 'item-score-ball-purple' => 2500,
+            'red-score-ball-' => 1750, 'blue-score-ball' => 2500,
+            'green-score-ball' => 1750, 'purple-score-ball' => 2500,
 
-            'item-energy-upgrade' => 4000, 'item-weapon-upgrade' => 4000,
-            'item-attack-booster' => 4000, 'item-defense-booster' => 4000,
-            'item-speed-booster' => 4000, 'item-field-booster' => 4000,
-            'item-target-module' => 4000, 'item-charge-module' => 4000,
-            'item-growth-module' => 4000, 'item-fortune-module' => 4000
+            'energy-upgrade' => 4000, 'weapon-upgrade' => 4000,
+            'attack-booster' => 4000, 'defense-booster' => 4000,
+            'speed-booster' => 4000, 'field-booster' => 4000,
+            'target-module' => 4000, 'charge-module' => 4000,
+            'growth-module' => 4000, 'fortune-module' => 4000
             */
 
             )
@@ -222,16 +222,16 @@ $this_shop_index['reggae'] = array(
   'shop_items' => array(
     'items_buying' => array(
 
-      'item-core-none' => 3000, 'item-core-cutter' => 3000,
-      'item-core-impact' => 3000,  'item-core-freeze' => 3000,
-      'item-core-explode' => 3000, 'item-core-flame' => 3000,
-      'item-core-electric' => 3000, 'item-core-time' => 3000,
-      'item-core-earth' => 3000, 'item-core-wind' => 3000,
-      'item-core-water' => 3000, 'item-core-swift' => 3000,
-      'item-core-nature' => 3000, 'item-core-missile' => 3000,
-      'item-core-crystal' => 3000, 'item-core-shadow' => 3000,
-      'item-core-space' => 3000, 'item-core-shield' => 3000,
-      'item-core-laser' => 3000, 'item-core-copy' => 3000
+      'none-core' => 3000, 'cutter-core' => 3000,
+      'impact-core' => 3000,  'freeze-core' => 3000,
+      'explode-core' => 3000, 'flame-core' => 3000,
+      'electric-core' => 3000, 'time-core' => 3000,
+      'earth-core' => 3000, 'wind-core' => 3000,
+      'water-core' => 3000, 'swift-core' => 3000,
+      'nature-core' => 3000, 'missile-core' => 3000,
+      'crystal-core' => 3000, 'shadow-core' => 3000,
+      'space-core' => 3000, 'shield-core' => 3000,
+      'laser-core' => 3000, 'copy-core' => 3000
 
       )
     )
@@ -256,16 +256,16 @@ $this_shop_index['kalinka'] = array(
     'shop_quote_buying' => array('stars' => 'Do you have any field or fusion stars? I\'m studying the effects of starforce and need some samples.'),
     'shop_items' => array(
         'items_selling' => array(
-            'item-energy-upgrade' => 32000, 'item-weapon-upgrade' => 32000,
-            'item-attack-booster' => 32000, 'item-defense-booster' => 32000,
-            'item-target-module' => 32000, 'item-growth-module' => 32000
+            'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,
+            'attack-booster' => 32000, 'defense-booster' => 32000,
+            'target-module' => 32000, 'growth-module' => 32000
             ),
         'items_selling2' => array(
-            'item-energy-upgrade' => 32000, 'item-weapon-upgrade' => 32000,
-            'item-attack-booster' => 32000, 'item-defense-booster' => 32000,
-            'item-speed-booster' => 32000, 'item-field-booster' => 32000,
-            'item-target-module' => 32000, 'item-charge-module' => 32000,
-            'item-growth-module' => 32000, 'item-fortune-module' => 32000
+            'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,
+            'attack-booster' => 32000, 'defense-booster' => 32000,
+            'speed-booster' => 32000, 'field-booster' => 32000,
+            'target-module' => 32000, 'charge-module' => 32000,
+            'growth-module' => 32000, 'fortune-module' => 32000
             )
         ),
     'shop_stars' => array(
@@ -342,7 +342,7 @@ if (!empty($this_shop_index['auto'])){
   unset($this_shop_index['auto']['shop_items']['items_selling4']);
 
   // Loop through Auto's shop and remove items you do not yet own from the buying list
-  $key_items = array('item-screw-small', 'item-screw-large');
+  $key_items = array('screw-small', 'screw-large');
   if (!empty($this_shop_index['auto']['shop_items']['items_buying'])){
     foreach ($this_shop_index['auto']['shop_items']['items_buying'] AS $token => $price){
       if (!in_array($token, $key_items) && !in_array($token, $global_unlocked_items_tokens)){
@@ -378,7 +378,7 @@ if (!empty($this_shop_index['reggae'])){
     // Loop through all the sold cores and add associated abilities
     if (!empty($this_battle_shops['reggae']['cores_bought'])){
         foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
-            $type_token = preg_replace('/^item-core-/i', '', $item_token);
+            $type_token = preg_replace('/-core$/i', '', $item_token);
             $type_info = $mmrpg_index['types'][$type_token];
             $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 100 : 0;
             if ($type_token == 'none'){ continue; }
@@ -412,7 +412,7 @@ if (!empty($this_shop_index['reggae'])){
         if (!empty($this_shop_index['reggae']['shop_items']['items_buying'])){
             $items_list = $this_shop_index['reggae']['shop_items']['items_buying'];
             foreach ($items_list AS $item_token => $item_price){
-                $type_token = preg_replace('/^item-core-/', '', $item_token);
+                $type_token = preg_replace('/-core$/', '', $item_token);
                 $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
                 $ability_boost = !empty($global_unlocked_abilities_types[$type_token]) ? $global_unlocked_abilities_types[$type_token] : 0;
                 $robot_price_boost = ceil($robot_boost * 100);

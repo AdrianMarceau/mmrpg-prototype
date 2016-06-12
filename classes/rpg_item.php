@@ -804,25 +804,12 @@ class rpg_item {
         $temp_item_token = $item_info['item_token'];
         $temp_item_type = !empty($item_info['item_type']) ? $mmrpg_index['types'][$item_info['item_type']] : false;
         $temp_item_type2 = !empty($item_info['item_type2']) ? $mmrpg_index['types'][$item_info['item_type2']] : false;
-        $temp_item_energy = rpg_robot::calculate_weapon_energy_static($robot_info, $item_info);
+        $temp_item_energy = 0;
         $temp_item_damage = !empty($item_info['item_damage']) ? $item_info['item_damage'] : 0;
         $temp_item_damage2 = !empty($item_info['item_damage2']) ? $item_info['item_damage2'] : 0;
         $temp_item_recovery = !empty($item_info['item_recovery']) ? $item_info['item_recovery'] : 0;
         $temp_item_recovery2 = !empty($item_info['item_recovery2']) ? $item_info['item_recovery2'] : 0;
         $temp_item_target = !empty($item_info['item_target']) ? $item_info['item_target'] : 'auto';
-        while (!in_array($item_info['item_token'], $robot_info['robot_items'])){
-            if (!$robot_flag_copycore){
-                if (empty($robot_item_core)){ break; }
-                elseif (empty($temp_item_type) && empty($temp_item_type2)){ break; }
-                else {
-                    $temp_type_array = array();
-                    if (!empty($temp_item_type)){ $temp_type_array[] = $temp_item_type['type_token']; }
-                    if (!empty($temp_item_type2)){ $temp_type_array[] = $temp_item_type2['type_token']; }
-                    if (!in_array($robot_item_core, $temp_type_array)){ break; }
-                }
-            }
-            break;
-        }
 
         $temp_item_title = $item_info['item_name'];
         if (!empty($temp_item_type)){ $temp_item_title .= ' ('.$temp_item_type['type_name'].' Type)'; }
@@ -883,7 +870,7 @@ class rpg_item {
         $robot_flag_copycore = !empty($robot_info['robot_core']) && $robot_info['robot_core'] == 'copy' ? true : false;
         $temp_item_type = !empty($item_info['item_type']) ? $mmrpg_index['types'][$item_info['item_type']] : false;
         $temp_item_type2 = !empty($item_info['item_type2']) ? $mmrpg_index['types'][$item_info['item_type2']] : false;
-        $temp_item_energy = rpg_robot::calculate_weapon_energy_static($robot_info, $item_info);
+        $temp_item_energy = 0;
         $temp_type_array = array();
         $temp_incompatible = false;
         $temp_index_items = !empty($robot_info['robot_index_items']) ? $robot_info['robot_index_items'] : array();
