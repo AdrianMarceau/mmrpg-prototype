@@ -293,7 +293,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
             $this_menu_tooltips = array();
             $this_menu_tooltips['leaderboard'] = '&laquo; Player Leaderboard &raquo; &lt;br /&gt;Live leaderboards ranking all players by their total Battle Point scores from highest to lowest. Keep an eye on your Battle Points by checking the top-right of the main menu and try to work your way up to the first page!';
             $this_menu_tooltips['database'] = '&laquo; Robot Database &raquo; &lt;br /&gt;A comprehensive list of all robots encountered in battle so far including their name and basic details. Scanning robots adds their stats and weaknesses to the database and unlocking them adds a complete list of their level-up abilities.';
-            $this_menu_tooltips['starforce'] = '&laquo; Star Force &raquo; &lt;br /&gt;A detailed list of all Field and Fusion Stars collected so far as well as a percentage-based breakdown of your current Star Force and its elemental affinities. Use robots and abilities that match the boosted star types for increased damage, recovery, and experience points!';
+            $this_menu_tooltips['starforce'] = '&laquo; Field Stars &raquo; &lt;br /&gt;A detailed list of all Field and Fusion Stars collected so far as well as a percentage-based breakdown of your current Starforce levels and elemental affinities. Try to collect all the stars in the prototype!';
             $this_menu_tooltips['help'] = '&laquo; Battle Tips &raquo; &lt;br /&gt;A bullet-point list covering both basic and advanced battle tips to help you progress through the game and level up faster.';
             $this_menu_tooltips['demo'] = '&laquo; Demo Menu &raquo; &lt;br /&gt;Select your mission from the demo menu and prepare for battle! Please note that progress cannot be saved in this mode.';
             $this_menu_tooltips['home'] = '&laquo; Home Menu &raquo; &lt;br /&gt;Select your mission from the home menu and prepare for battle! Complete missions in fewer turns to earn more battle points!';
@@ -305,6 +305,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
             $this_menu_tooltips['robots'] = '&laquo; Robot Editor &raquo; &lt;br /&gt;Review detailed stats about your battle robots, equip them with new abilities, and transfer them to other players in your save file.';
             $this_menu_tooltips['players'] = '&laquo; Player Editor &raquo; &lt;br /&gt;Review detailed stats about your player characters and reconfigure chapter two battle fields to generate new field and fusion stars.';
             $this_menu_tooltips['shop'] = '&laquo; Item Shop &raquo; &lt;br /&gt;Trade in your extra inventory for zenny in the shop and then put your earnings towards new items, new abilities, and new battle fields.';
+            $this_menu_tooltips['items'] = '&laquo; Item Inventory &raquo; &lt;br /&gt;View your inventory of collected items thus far, including quantities, descriptions, and images.';
             $temp_prototype_complete = mmrpg_prototype_complete();
             $temp_data_index = 0;
             // If we're in the DEMO MODE, define the available options and their attributes
@@ -325,12 +326,17 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
                 <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $temp_data_index++ ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>home</label></a> <span class="pipe">|</span>
                 <? if (mmrpg_prototype_battles_complete('dr-light') >= 1): ?>
                     <? if(!empty($_SESSION[$session_token]['values']['battle_items'])): ?>
+                        <a class="link link_items" data-step="items" data-index="<?= $temp_data_index++ ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>items</label></a> <span class="pipe">|</span>
+                    <? endif; ?>
+                    <? if($temp_prototype_complete): ?>
+                        <a class="link link_stars" data-step="starforce" data-index="<?= $temp_data_index++ ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['starforce'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>stars</label></a> <span class="pipe">|</span>
+                    <? endif; ?>
+                    <? if(!empty($_SESSION[$session_token]['values']['battle_items'])): ?>
                         <a class="link link_shop" data-step="shop" data-index="<?= $temp_data_index++ ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>shop</label></a> <span class="pipe">|</span>
                     <? endif; ?>
                     <a class="link link_robots" data-step="edit_robots" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>robots</label></a> <span class="pipe">|</span>
                     <? if($temp_prototype_complete): ?>
                         <a class="link link_players" data-step="edit_players" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>players</label></a> <span class="pipe">|</span>
-                        <a class="link link_stars" data-step="starforce" data-index="<?= $temp_data_index++ ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['starforce'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>starforce</label></a> <span class="pipe">|</span>
                     <? endif; ?>
                 <? endif; ?>
                 <a class="link link_data" data-step="database" data-index="<?= $temp_data_index++ ?>" data-source="frames/database.php" data-music="misc/data-base" data-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>database</label></a> <span class="pipe">|</span>
@@ -428,6 +434,8 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
     <div class="menu menu_hide menu_file_load" data-step="file_load" data-source="frames/file.php?action=load"></div>
 
     <div class="menu menu_hide menu_file_save" data-step="file_save" data-source="frames/file.php?action=save"></div>
+
+    <div class="menu menu_hide menu_items" data-step="items" data-source="frames/items.php"></div>
 
     <div class="menu menu_hide menu_shop" data-step="shop" data-source="frames/shop.php"></div>
 
