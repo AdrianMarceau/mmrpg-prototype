@@ -261,7 +261,8 @@
     opacity: 0.55;
     filter: alpha(opacity=55);
 }
-#item #console .event .item_cell_disabled {
+#item #console .event .item_cell_disabled,
+#item #console .event .item_cell_disabled[data-count="0"] {
     opacity: 0.15;
     filter: alpha(opacity=15);
 }
