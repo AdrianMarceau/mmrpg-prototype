@@ -120,11 +120,11 @@ if (true){
         ?>
         <div class="event event_double event_visible">
 
-            <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/intro-field/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
-                <div class="sprite sprite_player sprite_player_sprite sprite_40x40 sprite_40x40_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/shops/auto/sprite_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>); ">Auto</div>
+            <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/prototype-complete/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
+                <div class="sprite sprite_player sprite_player_sprite sprite_40x40 sprite_40x40_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/robots/met/sprite_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "></div>
             </div>
             <div class="header header_left item_type item_type_none" style="margin-right: 0;">
-                Prototype Item Inventory
+                Item Inventory
             </div>
 
             <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
@@ -205,6 +205,7 @@ if (true){
 
                                             // Define basic item slot details
                                             $item_info_token = $item_info['item_token'];
+                                            $item_sprite_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
                                             $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
                                             $temp_is_disabled = false;
                                             $temp_is_comingsoon = false;
@@ -227,7 +228,7 @@ if (true){
                                             else {
 
                                                 // Define placeholder, mysterious details for the user
-                                                $item_info_name = preg_replace('/[-_a-z0-9]/i', '?', $item_info_name);
+                                                $item_info_name = preg_replace('/[-_a-z0-9]/i', '?', $item_info['item_name']);
                                                 $item_info_type = 'empty';
                                                 $item_info_quantity = 0;
                                                 $temp_info_tooltip = '';
@@ -237,9 +238,15 @@ if (true){
                                             }
 
                                             ?>
-                                            <td class="<?= $item_cell_float ?> item_cell <?= $temp_is_disabled ? 'item_cell_disabled' : '' ?>" data-kind="item" data-action="use-item" data-token="<?= $item_info_token ?>" data-unlocked="<?= $temp_is_comingsoon ? 'coming-soon' : 'true' ?>">
+                                            <td class="<?= $item_cell_float ?> item_cell <?= $temp_is_disabled ? 'item_cell_disabled' : '' ?>" data-kind="item" data-action="use-item" data-token="<?= !$temp_is_comingsoon ? $item_info_token : 'comingsoon' ?>" data-unlocked="<?= $temp_is_comingsoon ? 'coming-soon' : 'true' ?>" data-count="<?= $item_info_quantity ?>">
+                                                <span class="item_number item_type item_type_empty">No. <?= str_replace(' ', '&nbsp;', str_pad($item_counter, 2, ' ', STR_PAD_LEFT)); ?></span>
                                                 <span class="item_name item_type item_type_<?= $item_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $item_info_name ?></span>
                                                 <? /* <a class="use_button item_type item_type_none" href="#">Use</a> */ ?>
+                                                <? if (!$temp_is_comingsoon): ?>
+                                                    <span class="item_sprite item_type item_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= $item_sprite_image ?>/icon_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>);"></span></span>
+                                                <? else: ?>
+                                                    <span class="item_sprite item_type item_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00"></span></span>
+                                                <? endif; ?>
                                                 <label class="item_quantity" data-quantity="<?= $item_info_quantity ?>">x <?= $item_info_quantity ?></label>
                                             </td>
                                             <?

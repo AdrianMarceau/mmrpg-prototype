@@ -128,11 +128,11 @@
 
 
 #item #console .event td.left {
-    padding-right: 5px;
+    padding-right: 10px;
     text-align: left;
 }
 #item #console .event td.right {
-    padding-left: 5px;
+    padding-left: 10px;
     text-align: left;
 }
 #item #console .event .item_header,
@@ -257,6 +257,10 @@
 #item #console .event .item_confirm {
 
 }
+#item #console .event .item_cell[data-count="0"] {
+    opacity: 0.55;
+    filter: alpha(opacity=55);
+}
 #item #console .event .item_cell_disabled {
     opacity: 0.15;
     filter: alpha(opacity=15);
@@ -295,6 +299,7 @@
 #item #console .event .this_sprite .sprite:hover {
     background-position: -40px 0;
 }
+#item #console .event .item_number,
 #item #console .event .item_name,
 #item #console .event .ability_name,
 #item #console .event .field_name,
@@ -303,6 +308,7 @@
 #item #console .event .cancel_button,
 #item #console .event .player_button,
 #item #console .event .item_quantity,
+#item #console .event .item_sprite,
 #item #console .event .item_owned {
     display: block;
     float: left;
@@ -325,10 +331,6 @@
     color: #FFFFFF;
     text-decoration: none;
     cursor: default;
-}
-#item #console .event .item_cell_confirm .item_name {
-    float: right;
-    margin-right: 30px;
 }
 #item #console .event .use_button,
 #item #console .event .confirm_button,
@@ -392,6 +394,25 @@
 }
 #item #console .event .item_owned .player_type {
     font-size: 9px;
+}
+#item #console .event .item_number {
+    font-size: 9px;
+    margin-right: 4px;
+    min-width: 48px;
+    box-sizing: border-box;
+}
+#item #console .event .item_sprite {
+    float: right;
+    width: 20px;
+    height: 18px;
+    margin-left: 6px;
+    overflow: visible;
+    box-sizing: border-box;
+}
+#item #console .event .item_sprite .sprite {
+    position: relative;
+    left: -17px;
+    top: -10px;
 }
 
 #item #console .event .item_button_header,
