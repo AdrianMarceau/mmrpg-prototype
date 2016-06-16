@@ -103,7 +103,8 @@ body.index #header {
 #mmrpg .tooltip .field_type,
 #mmrpg .tooltip .player_type,
 #mmrpg .tooltip .robot_type,
-#mmrpg .tooltip .ability_type {
+#mmrpg .tooltip .ability_type,
+#mmrpg .tooltip .item_type {
     display: inline-block;
     padding: 0 3px;
     -moz-border-radius: 0.3em;
@@ -413,6 +414,7 @@ body.index #header {
 
 
 #mmrpg .ability_type,
+#mmrpg .item_type,
 #mmrpg .battle_type,
 #mmrpg .field_type,
 #mmrpg .player_type,
@@ -429,6 +431,7 @@ body.index #header {
     position: relative;
     background-repeat: no-repeat !important;
 }
+#mmrpg .item_type a,
 #mmrpg .ability_type a,
 #mmrpg .battle_type a,
 #mmrpg .field_type a,
@@ -722,7 +725,9 @@ body.index #header {
 }
 
 #mmrpg .ability_damage,
-#mmrpg .ability_recovery {
+#mmrpg .ability_recovery.
+#mmrpg .item_damage,
+#mmrpg .item_recovery {
     z-index: 9100;
     width: 52px;
     height: 41px;
@@ -803,7 +808,73 @@ body.index #header {
 #mmrpg .ability_damage_level_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -205px; }
 
 
+#mmrpg .item_recovery_energy { background-position: 0 0; }
+#mmrpg .item_recovery_weapons { background-position: -52px 0; }
+#mmrpg .item_recovery_attack { background-position: -104px 0; }
+#mmrpg .item_recovery_defense { background-position: -156px 0; }
+#mmrpg .item_recovery_speed { background-position: -208px 0; }
+#mmrpg .item_recovery_experience { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px 0; }
+#mmrpg .item_recovery_level { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px 0; }
+
+#mmrpg .item_damage_energy { background-position: 0 -123px; }
+#mmrpg .item_damage_weapons { background-position: -52px -123px; }
+#mmrpg .item_damage_attack { background-position: -104px -123px; }
+#mmrpg .item_damage_defense { background-position: -156px -123px; }
+#mmrpg .item_damage_speed { background-position: -208px -123px; }
+#mmrpg .item_damage_experience { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -123px; }
+#mmrpg .item_damage_level { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -123px; }
+
+#mmrpg .item_recovery_energy_low { background-position: 0 0; }
+#mmrpg .item_recovery_weapons_low { background-position: -52px 0; }
+#mmrpg .item_recovery_attack_low { background-position: -104px 0; }
+#mmrpg .item_recovery_defense_low { background-position: -156px 0; }
+#mmrpg .item_recovery_speed_low { background-position: -208px 0; }
+#mmrpg .item_recovery_experience_low { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px 0; }
+#mmrpg .item_recovery_level_low { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px 0; }
+
+#mmrpg .item_damage_energy_low { background-position: 0 -123px; }
+#mmrpg .item_damage_weapons_low { background-position: -52px -123px; }
+#mmrpg .item_damage_attack_low { background-position: -104px -123px; }
+#mmrpg .item_damage_defense_low { background-position: -156px -123px; }
+#mmrpg .item_damage_speed_low { background-position: -208px -123px; }
+#mmrpg .item_damage_experience_low { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -123px; }
+#mmrpg .item_damage_level_low { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -123px; }
+
+#mmrpg .item_recovery_energy_base { background-position: 0 -41px; }
+#mmrpg .item_recovery_weapons_base { background-position: -52px -41px; }
+#mmrpg .item_recovery_attack_base { background-position: -104px -41px; }
+#mmrpg .item_recovery_defense_base { background-position: -156px -41px; }
+#mmrpg .item_recovery_speed_base { background-position: -208px -41px; }
+#mmrpg .item_recovery_experience_base { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -41px; }
+#mmrpg .item_recovery_level_base { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -41px; }
+
+#mmrpg .item_damage_energy_base { background-position: 0 -164px; }
+#mmrpg .item_damage_weapons_base { background-position: -52px -164px; }
+#mmrpg .item_damage_attack_base { background-position: -104px -164px; }
+#mmrpg .item_damage_defense_base { background-position: -156px -164px; }
+#mmrpg .item_damage_speed_base { background-position: -208px -164px; }
+#mmrpg .item_damage_experience_base { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -164px; }
+#mmrpg .item_damage_level_base { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -164px; }
+
+#mmrpg .item_recovery_energy_high { background-position: 0 -82px; }
+#mmrpg .item_recovery_weapons_high { background-position: -52px -82px; }
+#mmrpg .item_recovery_attack_high { background-position: -104px -82px; }
+#mmrpg .item_recovery_defense_high { background-position: -156px -82px; }
+#mmrpg .item_recovery_speed_high { background-position: -208px -82px; }
+#mmrpg .item_recovery_experience_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -82px; }
+#mmrpg .item_recovery_level_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -82px; }
+
+#mmrpg .item_damage_energy_high { background-position: 0 -205px; }
+#mmrpg .item_damage_weapons_high { background-position: -52px -205px; }
+#mmrpg .item_damage_attack_high { background-position: -104px -205px; }
+#mmrpg .item_damage_defense_high { background-position: -156px -205px; }
+#mmrpg .item_damage_speed_high { background-position: -208px -205px; }
+#mmrpg .item_damage_experience_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -205px; }
+#mmrpg .item_damage_level_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -205px; }
+
+
 #mmrpg .ability_overlay,
+#mmrpg .item_overlay,
 #mmrpg .scan_overlay {
     position: absolute;
     top: 0;
@@ -1140,7 +1211,8 @@ body.index #header {
     margin: 0 1px !important;
 }
 
-#mmrpg .canvas_ability_details {
+#mmrpg .canvas_ability_details,
+#mmrpg .canvas_item_details {
     text-indent: 0;
     left: 250px;
     right: 250px;
@@ -1156,7 +1228,8 @@ body.index #header {
     text-overflow: ellipsis;
     z-index: 5100;
 }
-#canvas .canvas_ability_details .ability_icon {
+#canvas .canvas_ability_details .ability_icon,
+#canvas .canvas_item_details .item_icon {
     top: 5px;
     left: 5px;
     width: 30px;
@@ -1167,14 +1240,16 @@ body.index #header {
     -webkit-border-radius: 5px 0 0 5px;
     background: #000000 none scroll no-repeat -5px -5px;
 }
-#canvas .canvas_ability_details .ability_icon_right {
+#canvas .canvas_ability_details .ability_icon_right,
+#canvas .canvas_item_details .item_icon_right {
     left: auto;
     right: 5px;
     border-radius: 0 5px 5px 0;
     -moz-border-radius: 0 5px 5px 0;
     -webkit-border-radius: 0 5px 5px 0;
 }
-#canvas .canvas_ability_details .ability_name {
+#canvas .canvas_ability_details .ability_name,
+#canvas .canvas_item_details .item_name {
     text-indent: 0;
     color: #FFFFFF;
     font-size: 12px;
@@ -1323,6 +1398,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #events #messages .player_type,
 #events #messages .robot_type,
 #events #messages .ability_type,
+#events #messages .item_type,
 #events #messages .field_type {
     padding: 0 6px;
     border-radius: 0.3em;
@@ -1920,7 +1996,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 
 #console .event .sprite_robot_mug,
-#console .event .sprite_ability_icon {
+#console .event .sprite_ability_icon,
+#console .event .sprite_item_icon {
     border: 1px solid #191919;
     background-color: #000000;
     border-radius: 0.5em;
@@ -1946,6 +2023,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #console .event .field_name,
 #console .event .ability_name,
 #console .event .ability_stat,
+#console .event .item_name,
+#console .event .item_stat,
 #console .event .damage_strikes,
 #console .event .damage_misses,
 #console .event .damage_result,
@@ -1973,7 +2052,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #console .event .robot_name {
 
 }
-#console .event .ability_name {
+#console .event .ability_name,
+#console .event .item_name {
 
 }
 #console .event .damage_amount {
@@ -2362,7 +2442,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_settings_autoScan .main_actions,
 #actions .actions_switch .main_actions,
 #actions .actions_scan .main_actions,
-#actions .actions_ability .main_actions {
+#actions .actions_ability .main_actions,
+#actions .actions_item .main_actions {
 
 }
 #actions .actions_option .action_option,
@@ -2373,7 +2454,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch,
 #actions .actions_scan .action_scan,
 #actions .actions_target .action_target,
-#actions .actions_ability .action_ability {
+#actions .actions_ability .action_ability,
+#actions .actions_item .action_item {
     width: 181px;
     height: 68px;
     line-height: 68px;
@@ -2387,7 +2469,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label,
 #actions .actions_scan .action_scan label,
 #actions .actions_target .action_target label,
-#actions .actions_ability .action_ability label {
+#actions .actions_ability .action_ability label,
+#actions .actions_item .action_item label {
     width: auto;
     height: 56px;
     line-height: 56px;
@@ -2401,7 +2484,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .multi,
 #actions .actions_scan .action_scan label .multi,
 #actions .actions_target .action_target label .multi,
-#actions .actions_ability .action_ability label .multi {
+#actions .actions_ability .action_ability label .multi,
+#actions .actions_item .action_item label .multi {
     display: block;
     line-height: 14px;
     margin-top: 13px;
@@ -2410,7 +2494,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .sprite_40x40,
 #actions .actions_scan .action_scan label .sprite_40x40,
 #actions .actions_target .action_target label .sprite_40x40,
-#actions .actions_ability .action_ability label .sprite_40x40 {
+#actions .actions_ability .action_ability label .sprite_40x40,
+#actions .actions_item .action_item label .sprite_40x40 {
     background-color: #000000 !important;
     border: 1px solid #373737;
     width: 40px;
@@ -2419,10 +2504,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -moz-border-radius: 0.75em;
     -webkit-border-radius: 0.75em;
 }
-#actions .actions_switch .action_switch label .sprite_40x40_ability,
-#actions .actions_scan .action_scan label .sprite_40x40_ability,
-#actions .actions_target .action_target label .sprite_40x40_ability,
-#actions .actions_ability .action_ability label .sprite_40x40_ability {
+#actions .actions_ability .action_ability label .sprite_40x40_ability,
+#actions .actions_item .action_item label .sprite_40x40_item {
     height: 30px;
     background-position-y: -5px !important;
     border-radius: 5px 5px 0 0;
@@ -2432,7 +2515,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .sprite_40x40_weapons,
 #actions .actions_scan .action_scan label .sprite_40x40_weapons,
 #actions .actions_target .action_target label .sprite_40x40_weapons,
-#actions .actions_ability .action_ability label .sprite_40x40_weapons {
+#actions .actions_ability .action_ability label .sprite_40x40_weapons,
+#actions .actions_item .action_item label .sprite_40x40_weapons {
     height: 8px;
     padding-bottom: 4px;
     border-radius: 0 0 5px 5px;
@@ -2449,45 +2533,46 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #actions .actions_switch .action_switch label .sprite_40x40_energy_high,
 #actions .actions_scan .action_scan label .sprite_40x40_energy_high,
-#actions .actions_target .action_target label .sprite_40x40_energy_high,
-#actions .actions_ability .action_ability label .sprite_40x40_energy_high {
+#actions .actions_target .action_target label .sprite_40x40_energy_high {
     background-color: #09210A;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_energy_medium,
 #actions .actions_scan .action_scan label .sprite_40x40_energy_medium,
-#actions .actions_target .action_target label .sprite_40x40_energy_medium,
-#actions .actions_ability .action_ability label .sprite_40x40_energy_medium {
+#actions .actions_target .action_target label .sprite_40x40_energy_medium {
     background-color: #282204;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_energy_low,
 #actions .actions_scan .action_scan label .sprite_40x40_energy_low,
-#actions .actions_target .action_target label .sprite_40x40_energy_low,
-#actions .actions_ability .action_ability label .sprite_40x40_energy_low {
+#actions .actions_target .action_target label .sprite_40x40_energy_low {
     background-color: #2B0A0A;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_base,
 #actions .actions_scan .action_scan label .sprite_40x40_base,
 #actions .actions_target .action_target label .sprite_40x40_base,
-#actions .actions_ability .action_ability label .sprite_40x40_base {
+#actions .actions_ability .action_ability label .sprite_40x40_base,
+#actions .actions_item .action_item label .sprite_40x40_base {
     background-position: 0 1px;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_defend,
 #actions .actions_scan .action_scan label .sprite_40x40_defend,
 #actions .actions_target .action_target label .sprite_40x40_defend,
-#actions .actions_ability .action_ability label .sprite_40x40_defend {
+#actions .actions_ability .action_ability label .sprite_40x40_defend,
+#actions .actions_item .action_item label .sprite_40x40_defend {
     background-position: -320px 1px;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_defeat,
 #actions .actions_scan .action_scan label .sprite_40x40_defeat,
 #actions .actions_target .action_target label .sprite_40x40_defeat,
-#actions .actions_ability .action_ability label .sprite_40x40_defeat {
+#actions .actions_ability .action_ability label .sprite_40x40_defeat,
+#actions .actions_item .action_item label .sprite_40x40_defeat {
     background-position: -120px 1px;
 }
 
 #actions .actions_switch .action_switch label .sprite_80x80,
 #actions .actions_scan .action_scan label .sprite_80x80,
 #actions .actions_target .action_target label .sprite_80x80,
-#actions .actions_ability .action_ability label .sprite_80x80 {
+#actions .actions_ability .action_ability label .sprite_80x80,
+#actions .actions_item .action_item label .sprite_80x80 {
     background-color: #000000 !important;
     border: 1px solid #373737;
     width: 40px;
@@ -2498,45 +2583,46 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #actions .actions_switch .action_switch label .sprite_80x80_energy_high,
 #actions .actions_scan .action_scan label .sprite_80x80_energy_high,
-#actions .actions_target .action_target label .sprite_80x80_energy_high,
-#actions .actions_ability .action_ability label .sprite_80x80_energy_high {
+#actions .actions_target .action_target label .sprite_80x80_energy_high {
     background-color: #09210A;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_energy_medium,
 #actions .actions_scan .action_scan label .sprite_80x80_energy_medium,
-#actions .actions_target .action_target label .sprite_80x80_energy_medium,
-#actions .actions_ability .action_ability label .sprite_80x80_energy_medium {
+#actions .actions_target .action_target label .sprite_80x80_energy_medium {
     background-color: #282204;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_energy_low,
 #actions .actions_scan .action_scan label .sprite_80x80_energy_low,
-#actions .actions_target .action_target label .sprite_80x80_energy_low,
-#actions .actions_ability .action_ability label .sprite_80x80_energy_low {
+#actions .actions_target .action_target label .sprite_80x80_energy_low {
     background-color: #2B0A0A;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_base,
 #actions .actions_scan .action_scan label .sprite_80x80_base,
 #actions .actions_target .action_target label .sprite_80x80_base,
-#actions .actions_ability .action_ability label .sprite_80x80_base {
+#actions .actions_ability .action_ability label .sprite_80x80_base,
+#actions .actions_item .action_item label .sprite_80x80_base {
     background-position: -19px -42px;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_defend,
 #actions .actions_scan .action_scan label .sprite_80x80_defend,
 #actions .actions_target .action_target label .sprite_80x80_defend,
-#actions .actions_ability .action_ability label .sprite_80x80_defend {
+#actions .actions_ability .action_ability label .sprite_80x80_defend,
+#actions .actions_item .action_item label .sprite_80x80_defend {
     background-position: -658px -42px;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_defeat,
 #actions .actions_scan .action_scan label .sprite_80x80_defeat,
 #actions .actions_target .action_target label .sprite_80x80_defeat,
-#actions .actions_ability .action_ability label .sprite_80x80_defeat {
+#actions .actions_ability .action_ability label .sprite_80x80_defeat,
+#actions .actions_item .action_item label .sprite_80x80_defeat {
     background-position: -260px -42px;
 }
 
 #actions .actions_switch .action_switch label .sprite_160x160,
 #actions .actions_scan .action_scan label .sprite_160x160,
 #actions .actions_target .action_target label .sprite_160x160,
-#actions .actions_ability .action_ability label .sprite_160x160 {
+#actions .actions_ability .action_ability label .sprite_160x160,
+#actions .actions_item .action_item label .sprite_160x160 {
     background-color: #000000 !important;
     border: 1px solid #373737;
     width: 160px;
@@ -2547,45 +2633,46 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #actions .actions_switch .action_switch label .sprite_160x160_energy_high,
 #actions .actions_scan .action_scan label .sprite_160x160_energy_high,
-#actions .actions_target .action_target label .sprite_160x160_energy_high,
-#actions .actions_ability .action_ability label .sprite_160x160_energy_high {
+#actions .actions_target .action_target label .sprite_160x160_energy_high {
     background-color: #09210A;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_energy_medium,
 #actions .actions_scan .action_scan label .sprite_160x160_energy_medium,
-#actions .actions_target .action_target label .sprite_160x160_energy_medium,
-#actions .actions_ability .action_ability label .sprite_160x160_energy_medium {
+#actions .actions_target .action_target label .sprite_160x160_energy_medium {
     background-color: #282204;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_energy_low,
 #actions .actions_scan .action_scan label .sprite_160x160_energy_low,
-#actions .actions_target .action_target label .sprite_160x160_energy_low,
-#actions .actions_ability .action_ability label .sprite_160x160_energy_low {
+#actions .actions_target .action_target label .sprite_160x160_energy_low {
     background-color: #2B0A0A;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_base,
 #actions .actions_scan .action_scan label .sprite_160x160_base,
 #actions .actions_target .action_target label .sprite_160x160_base,
-#actions .actions_ability .action_ability label .sprite_160x160_base {
+#actions .actions_ability .action_ability label .sprite_160x160_base,
+#actions .actions_item .action_item label .sprite_160x160_base {
     background-position: 0 1px;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_defend,
 #actions .actions_scan .action_scan label .sprite_160x160_defend,
 #actions .actions_target .action_target label .sprite_160x160_defend,
-#actions .actions_ability .action_ability label .sprite_160x160_defend {
+#actions .actions_ability .action_ability label .sprite_160x160_defend,
+#actions .actions_item .action_item label .sprite_160x160_defend {
     background-position: -1280px 1px;
 }
 #actions .actions_switch .action_switch label .sprite_160x160_defeat,
 #actions .actions_scan .action_scan label .sprite_160x160_defeat,
 #actions .actions_target .action_target label .sprite_160x160_defeat,
-#actions .actions_ability .action_ability label .sprite_160x160_defeat {
+#actions .actions_ability .action_ability label .sprite_160x160_defeat,
+#actions .actions_item .action_item label .sprite_160x160_defeat {
     background-position: -640px 1px;
 }
 
 #actions .actions_switch .action_switch label .multi,
 #actions .actions_scan .action_scan label .multi,
 #actions .actions_target .action_target label .multi,
-#actions .actions_ability .action_ability label .multi {
+#actions .actions_ability .action_ability label .multi,
+#actions .actions_item .action_item label .multi {
     text-align: left;
     margin: 7px 5px 0 5px;
 }
@@ -2593,10 +2680,12 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_scan .action_scan label .maintext,
 #actions .actions_target .action_target label .maintext,
 #actions .actions_ability .action_ability label .maintext,
+#actions .actions_item .action_item label .maintext,
 #actions .actions_switch .action_switch label .subtext,
 #actions .actions_scan .action_scan label .subtext,
 #actions .actions_target .action_target label .subtext,
-#actions .actions_ability .action_ability label .subtext {
+#actions .actions_ability .action_ability label .subtext,
+#actions .actions_item .action_item label .subtext {
     display: block;
     width: 100%;
     overflow: hidden;
@@ -2606,7 +2695,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .maintext,
 #actions .actions_scan .action_scan label .maintext,
 #actions .actions_target .action_target label .maintext,
-#actions .actions_ability .action_ability label .maintext {
+#actions .actions_ability .action_ability label .maintext,
+#actions .actions_item .action_item label .maintext {
     margin-bottom: 0;
     font-size: 11px;
     line-height: 14px;
@@ -2615,7 +2705,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_switch .action_switch label .subtext,
 #actions .actions_scan .action_scan label .subtext,
 #actions .actions_target .action_target label .subtext,
-#actions .actions_ability .action_ability label .subtext {
+#actions .actions_ability .action_ability label .subtext,
+#actions .actions_item .action_item label .subtext {
     margin-bottom: 0;
     font-size: 9px;
     line-height: 13px;
@@ -2733,6 +2824,7 @@ body.windowFlag_landscapeMode #canvas .clearback .sprite_160x160_mugshot_right {
     right: -163px;
 }
 body.windowFlag_landscapeMode #canvas .clearback .ability_overlay,
+body.windowFlag_landscapeMode #canvas .clearback .item_overlay,
 body.windowFlag_landscapeMode #canvas .clearback .scan_overlay {
     width: auto;
     left: -130px;
@@ -2781,7 +2873,8 @@ body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_settin
 body.windowFlag_landscapeMode #actions .actions_switch .action_switch,
 body.windowFlag_landscapeMode #actions .actions_scan .action_scan,
 body.windowFlag_landscapeMode #actions .actions_target .action_target,
-body.windowFlag_landscapeMode #actions .actions_ability .action_ability {
+body.windowFlag_landscapeMode #actions .actions_ability .action_ability,
+body.windowFlag_landscapeMode #actions .actions_item .action_item {
     width: 245px;
 }
 body.windowFlag_landscapeMode #actions .actions_option .action_option label,
@@ -2797,7 +2890,8 @@ body.windowFlag_landscapeMode #actions .actions_scan .action_switch label {
     width: auto;
 }
 
-body.windowFlag_landscapeMode #actions .actions_battle .action_ability label {
+body.windowFlag_landscapeMode #actions .actions_battle .action_ability label,
+body.windowFlag_landscapeMode #actions .actions_battle .action_item label {
     width: auto;
 }
 
@@ -2810,6 +2904,7 @@ body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_settin
 body.windowFlag_landscapeMode #actions .actions_scan .action_scan label,
 body.windowFlag_landscapeMode #actions .actions_target .action_target label,
 body.windowFlag_landscapeMode #actions .actions_ability .action_ability label,
+body.windowFlag_landscapeMode #actions .actions_item .action_item label,
 body.windowFlag_landscapeMode #actions .actions_switch .action_switch label {
     width: auto;
 }
