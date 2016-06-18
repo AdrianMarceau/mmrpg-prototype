@@ -11,7 +11,7 @@
  */
 
 
-      
+
 require_once('../../top.php');
 //require_once('../../data/database.php');
 
@@ -147,7 +147,7 @@ class SimpleCaptcha {
 
     /** Debug? */
     public $debug = false;
-    
+
     /** Image format: jpeg or png */
     public $imageFormat = 'jpeg';
 
@@ -178,7 +178,7 @@ class SimpleCaptcha {
 
         /** Initialization */
         $this->ImageAllocate();
-        
+
         /** Text insertion */
         $text = $this->GetCaptchaText();
         $fontcfg  = $this->fonts[array_rand($this->fonts)];
@@ -314,9 +314,9 @@ class SimpleCaptcha {
      * @return string Word
      */
     function GetDictionaryCaptchaText($extended = false) {
-        global $DB;
-        
-      
+        global $db;
+
+
         /*
         if (empty($this->wordsFile)) {
             return false;
@@ -349,7 +349,7 @@ class SimpleCaptcha {
         */
 
         // Collect a random robot token from the database
-        $temp_robots = $DB->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_class LIKE 'master' AND robot_flag_hidden = 0 AND robot_flag_published = 1");
+        $temp_robots = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_class LIKE 'master' AND robot_flag_hidden = 0 AND robot_flag_published = 1");
         shuffle($temp_robots);
         do {
           $temp_robot = array_shift($temp_robots);
@@ -358,7 +358,7 @@ class SimpleCaptcha {
         } while (strlen($temp_token) > 10 || strlen($temp_token) < 1);
         $text = $temp_token;
         return $text;
-        
+
     }
 
 
