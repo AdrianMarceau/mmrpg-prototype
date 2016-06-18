@@ -133,7 +133,7 @@ while ($this_formaction == 'contact'){
     ob_start();
     ?>
     <p style="margin: 0 auto 10px;"><strong>Mega Man RPG Prototype,</strong></p>
-    <p style="margin: 0 auto 10px;">A new message has been sent to you using the contact form on <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">megamanpoweredup.net</a>.  Please find the details of the message below:</p>
+    <p style="margin: 0 auto 10px;">A new message has been sent to you using the contact form on <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">rpg.megamanpoweredup.net</a>.  Please find the details of the message below:</p>
     <p style="margin: 0 auto;">
     <span style="display: block; margin: 0 auto; text-align: left;"><strong>Name</strong> : <?= htmlentities($formdata['contact_name'], ENT_QUOTES, 'UTF-8', true) ?></span>
     <span style="display: block; margin: 0 auto; text-align: left;"><strong>Email</strong> : <?= htmlentities($formdata['contact_email'], ENT_QUOTES, 'UTF-8', true)?></span>
