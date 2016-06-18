@@ -20,7 +20,7 @@ $this_markup_header = 'Mega Man RPG Prototype Contact &amp; Feedback';
 function mmrpg_send_email($to_email, $from_email, $message_subject, $message_body, $reply_to_email = false, $email_type = 'text/html'){
 
     // preset the mail settings
-    $from_mmrpg = '"Mega Man RPG Prototype" <info@megamanpoweredup.net>';
+    $from_mmrpg = '"Mega Man RPG Prototype" <info@rpg.megamanpoweredup.net>';
     ini_set( 'SMTP', 'smtp.gmail.com' );
     ini_set( 'SMTP_PORT', 587 );
     ini_set( 'sendmail_from', $from_mmrpg );
