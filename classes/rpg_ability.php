@@ -692,8 +692,7 @@ class rpg_ability {
         $this_data['ability_name'] = isset($options['ability_name']) ? $options['ability_name'] : $this->ability_name;
         $this_data['ability_title'] = $this_data['ability_name'];
         $this_data['ability_token'] = $this->ability_token;
-        if (preg_match('/^item-/i', $this->ability_token)){ $this_data['ability_direction'] = 'right'; }
-        else { $this_data['ability_direction'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this->robot_id ? $robot_data['robot_direction'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left'); }
+        $this_data['ability_direction'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this->robot_id ? $robot_data['robot_direction'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
         $this_data['ability_float'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this->robot_id ? $robot_data['robot_float'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
         $this_data['ability_size'] = $this->ability_image_size;
         $this_data['ability_frame'] = isset($options['ability_frame']) ? $options['ability_frame'] : $this->ability_frame;
@@ -1084,9 +1083,6 @@ class rpg_ability {
         if ($ability_type_class != 'none' && !empty($ability_info['ability_type2'])){ $ability_type_class .= '_'.$ability_info['ability_type2']; }
         elseif ($ability_type_class == 'none' && !empty($ability_info['ability_type2'])){ $ability_type_class = $ability_info['ability_type2'];  }
         $ability_header_types = 'ability_type_'.$ability_type_class.' ';
-        // If this is a special category of item, it's a special type
-        if (preg_match('/^item-score-ball-(red|blue|green|purple)$/i', $ability_info['ability_token'])){ $ability_info['ability_type_special'] = 'bonus'; }
-        elseif (preg_match('/^item-super-(pellet|capsule)$/i', $ability_info['ability_token'])){ $ability_info['ability_type_special'] = 'multi'; }
 
         // Define the sprite sheet alt and title text
         $ability_sprite_size = $ability_image_size * 2;
@@ -1136,7 +1132,7 @@ class rpg_ability {
 
                     <h2 class="header header_left <?= $ability_header_types ?> <?= (!$print_options['show_icon']) ? 'noicon' : 'hasicon' ?>">
                         <? if($print_options['layout_style'] == 'website_compact'): ?>
-                            <a href="<?= preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/'.preg_replace('/^item-/i', '', $ability_info['ability_token']).'/' : 'database/abilities/'.$ability_info['ability_token'].'/' ?>"><?= $ability_info['ability_name'] ?></a>
+                            <a href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>"><?= $ability_info['ability_name'] ?></a>
                         <? else: ?>
                             <?= $ability_info['ability_name'] ?>&#39;s Data
                         <? endif; ?>
@@ -1169,19 +1165,19 @@ class rpg_ability {
                                         <? if($print_options['layout_style'] != 'event'): ?>
                                             <?
                                             if (!empty($ability_info['ability_type_special'])){
-                                                echo '<a href="'.((preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/' : 'database/abilities/').$ability_info['ability_type_special'].'/').'" class="ability_type '.$ability_header_types.'">'.ucfirst($ability_info['ability_type_special']).'</a>';
+                                                echo '<a href="database/abilities/'.$ability_info['ability_type_special'].'/" class="ability_type '.$ability_header_types.'">'.ucfirst($ability_info['ability_type_special']).'</a>';
                                             }
                                             elseif (!empty($ability_info['ability_type'])){
                                                 $temp_string = array();
                                                 $ability_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
-                                                $temp_string[] = '<a href="'.((preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/' : 'database/abilities/').$ability_type.'/').'" class="ability_type ability_type_'.$ability_type.'">'.$mmrpg_index['types'][$ability_type]['type_name'].'</a>';
+                                                $temp_string[] = '<a href="database/abilities/'.$ability_type.'/" class="ability_type ability_type_'.$ability_type.'">'.$mmrpg_index['types'][$ability_type]['type_name'].'</a>';
                                                 if (!empty($ability_info['ability_type2'])){
                                                     $ability_type2 = !empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : 'none';
-                                                    $temp_string[] = '<a href="'.((preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/' : 'database/abilities/').$ability_type2.'/').'" class="ability_type ability_type_'.$ability_type2.'">'.$mmrpg_index['types'][$ability_type2]['type_name'].'</a>';
+                                                    $temp_string[] = '<a href="database/abilities/'.$ability_type2.'/" class="ability_type ability_type_'.$ability_type2.'">'.$mmrpg_index['types'][$ability_type2]['type_name'].'</a>';
                                                 }
                                                 echo implode(' ', $temp_string);
                                             } else {
-                                                echo '<a href="'.((preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/' : 'database/abilities/').'none/').'" class="ability_type ability_type_none">Neutral</a>';
+                                                echo '<a href="database/abilities/none/" class="ability_type ability_type_none">Neutral</a>';
                                             }
                                             ?>
                                         <? else: ?>
@@ -1205,66 +1201,64 @@ class rpg_ability {
                                         <? endif; ?>
                                     </td>
                                 </tr>
-                                <? if($ability_info['ability_class'] != 'item'): ?>
 
-                                    <? if($ability_image_token != 'ability'): ?>
+                                <? if($ability_image_token != 'ability'): ?>
 
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Power :</label>
-                                                <? if(!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])): ?>
-                                                    <? if(!empty($ability_info['ability_damage'])){ ?><span class="ability_stat"><?= $ability_info['ability_damage'].(!empty($ability_info['ability_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
-                                                    <? if(!empty($ability_info['ability_recovery'])){ ?><span class="ability_stat"><?= $ability_info['ability_recovery'].(!empty($ability_info['ability_recovery_percent']) ? '%' : '') ?> Recovery</span><? } ?>
-                                                <? else: ?>
-                                                    <span class="ability_stat">-</span>
-                                                <? endif; ?>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Accuracy :</label>
-                                                <span class="ability_stat"><?= $ability_info['ability_accuracy'].'%' ?></span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Energy :</label>
-                                                <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'] : '-' ?></span>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Speed :</label>
-                                                <span class="ability_stat"><?= !empty($ability_info['ability_speed']) ? $ability_info['ability_speed'] : '1' ?></span>
-                                            </td>
-                                        </tr>
-
-                                    <? else: ?>
-
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Power :</label>
+                                    <tr>
+                                        <td  class="right">
+                                            <label style="display: block; float: left;">Power :</label>
+                                            <? if(!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])): ?>
+                                                <? if(!empty($ability_info['ability_damage'])){ ?><span class="ability_stat"><?= $ability_info['ability_damage'].(!empty($ability_info['ability_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
+                                                <? if(!empty($ability_info['ability_recovery'])){ ?><span class="ability_stat"><?= $ability_info['ability_recovery'].(!empty($ability_info['ability_recovery_percent']) ? '%' : '') ?> Recovery</span><? } ?>
+                                            <? else: ?>
                                                 <span class="ability_stat">-</span>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Accuracy :</label>
-                                                <span class="ability_stat">-</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Energy :</label>
-                                                <span class="ability_stat">-</span>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Speed :</label>
-                                                <span class="ability_stat">-</span>
-                                            </td>
-                                        </tr>
+                                            <? endif; ?>
+                                        </td>
+                                        <td class="center">&nbsp;</td>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Accuracy :</label>
+                                            <span class="ability_stat"><?= $ability_info['ability_accuracy'].'%' ?></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td  class="right">
+                                            <label style="display: block; float: left;">Energy :</label>
+                                            <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'] : '-' ?></span>
+                                        </td>
+                                        <td class="center">&nbsp;</td>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Speed :</label>
+                                            <span class="ability_stat"><?= !empty($ability_info['ability_speed']) ? $ability_info['ability_speed'] : '1' ?></span>
+                                        </td>
+                                    </tr>
 
-                                    <? endif; ?>
+                                <? else: ?>
+
+                                    <tr>
+                                        <td  class="right">
+                                            <label style="display: block; float: left;">Power :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                        <td class="center">&nbsp;</td>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Accuracy :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td  class="right">
+                                            <label style="display: block; float: left;">Energy :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                        <td class="center">&nbsp;</td>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Speed :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                    </tr>
 
                                 <? endif; ?>
+
                             </tbody>
                         </table>
                         <table class="full" style="margin: 5px auto 10px;">
@@ -1586,12 +1580,12 @@ class rpg_ability {
                 <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="<?= preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/'.preg_replace('/^item-/i', '', $ability_info['ability_token']).'/' : 'database/abilities/'.$ability_info['ability_token'].'/' ?>" rel="permalink">+ Permalink</a>
+                    <a class="link link_permalink permalink" href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>" rel="permalink">+ Permalink</a>
 
                 <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="<?= preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/'.preg_replace('/^item-/i', '', $ability_info['ability_token']).'/' : 'database/abilities/'.$ability_info['ability_token'].'/' ?>" rel="permalink">+ View More</a>
+                    <a class="link link_permalink permalink" href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>" rel="permalink">+ View More</a>
 
                 <? endif; ?>
 
@@ -1603,168 +1597,6 @@ class rpg_ability {
 
         // Return the generated markup
         return $this_markup;
-    }
-
-    // Define a static function to use as the common action for all item-core-___ abilities
-    public static function item_function_core($objects){
-
-        // Extract all objects into the current scope
-        extract($objects);
-
-        // Target the opposing robot
-        $this_ability->target_options_update(array(
-            'frame' => 'throw',
-            'kickback' => array(0, 0, 0),
-            'success' => array(0, 85, 35, 10, $this_robot->print_robot_name().' thows a '.$this_ability->print_ability_name().'!'),
-            ));
-        $this_robot->trigger_target($target_robot, $this_ability);
-
-        // Inflict damage on the opposing robot
-        $this_ability->damage_options_update(array(
-            'kind' => 'energy',
-            'percent' => true,
-            'modifiers' => true,
-            'frame' => 'damage',
-            'kickback' => array(10, 5, 0),
-            'success' => array(0, 10, 0, 10, 'The '.$this_ability->print_ability_name().' damaged the target!'),
-            'failure' => array(0, -30, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
-            ));
-        $this_ability->recovery_options_update(array(
-            'kind' => 'energy',
-            'percent' => true,
-            'modifiers' => true,
-            'frame' => 'taunt',
-            'kickback' => array(0, 0, 0),
-            'success' => array(0, 10, 0, 10, 'The '.$this_ability->print_ability_name().' recovered the target!'),
-            'failure' => array(0, -30, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
-            ));
-        $energy_damage_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_damage / 100));
-        $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => false, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => false, 'apply_position_modifiers' => false, 'apply_starforce_modifiers' => false);
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
-
-        // Return true on success
-        return true;
-
-    }
-
-    // Define a static function to use as the common action for all stat pellet and capsule items
-    public static function item_function_stat_booster($objects){
-
-        // Extract all objects into the current scope
-        extract($objects);
-
-        // Target this robot's self and print item use text
-        $this_ability->target_options_update(array(
-            'frame' => 'summon',
-            'success' => array(0, 40, -2, 99,
-                $this_player->print_player_name().' uses an item from the inventory&hellip; <br />'.
-                $target_robot->print_robot_name().' is given the '.$this_ability->print_ability_name().'!'
-                )
-            ));
-        $target_robot->trigger_target($target_robot, $this_ability);
-
-        // Define the various object words used for each boost type
-        $stat_boost_subjects = array('attack' => 'weapons', 'defense' => 'shields', 'speed' => 'mobility');
-        $stat_boost_verbs = array('weapons' => 'were', 'shields' => 'were', 'mobility' => 'was');
-
-        // Define the various effect words used for each item size
-        if (strstr($this_ability->ability_token, 'pellet')){ $boost_effect_word = 'a bit'; }
-        elseif (strstr($this_ability->ability_token, 'capsule')){ $boost_effect_word = 'a lot'; }
-
-        // Define the stat(s) this ability will boost (super items boost all)
-        $stat_boost_tokens = array();
-        if (strstr($this_ability->ability_token, 'super')){ $stat_boost_tokens = array('attack', 'defense', 'speed'); }
-        else { $stat_boost_tokens[] = $this_ability->ability_type; }
-
-        // Loop through each stat boost token and raise it
-        foreach ($stat_boost_tokens AS $stat_token){
-
-            // Collect the object word for this stat type
-            $stat_name = ucfirst($stat_token);
-            $stat_subject = $stat_boost_subjects[$stat_token];
-            $stat_verb = $stat_boost_verbs[$stat_subject];
-            $stat_base_prop = 'robot_base_'.$stat_token;
-            $stat_max_prop = 'robot_max_'.$stat_token;
-
-            // Increase this robot's in-battle stat
-            $this_ability->recovery_options_update(array(
-                'kind' => $stat_token,
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'taunt',
-                'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.' powered up '.$boost_effect_word.'! '.rpg_battle::random_positive_word()),
-                'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.''.$stat_verb.' not affected&hellip; '.rpg_battle::random_negative_word())
-                ));
-            $stat_recovery_amount = ceil($target_robot->$stat_base_prop * ($this_ability->ability_recovery / 100));
-            $target_robot->trigger_recovery($target_robot, $this_ability, $stat_recovery_amount);
-
-            // Only update the session of the ability was successful
-            if ($this_ability->ability_results['this_result'] == 'success' && $this_ability->ability_results['total_amount'] > 0){
-
-                // Create the stat boost variable if it doesn't already exist in the session
-                if (!isset($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_'.$stat_token])){
-                    $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_'.$stat_token] = 0;
-                }
-
-                // Collect this robot's stat calculations
-                $robot_info = rpg_robot::get_index_info($target_robot->robot_token);
-                $robot_stats = rpg_robot::calculate_stat_values(
-                    $target_robot->robot_level,
-                    $robot_info,
-                    $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]
-                    );
-
-                // If this robot is not already over their stat limit, increment pending boosts
-                if ($target_player->player_side == 'left' && $robot_stats[$stat_token]['bonus'] < $robot_stats[$stat_token]['bonus_max']){
-
-                    // Calculate the actual amount to permanently boost in case it goes over max
-                    $stat_boost_amount = $this_ability->ability_results['total_amount'];
-                    if (($robot_stats[$stat_token]['bonus'] + $stat_boost_amount) > $robot_stats[$stat_token]['bonus_max']){
-                        $stat_boost_amount = $robot_stats[$stat_token]['bonus_max'] - $robot_stats[$stat_token]['bonus'];
-                    }
-
-                    // Only update session variables if the boost is not empty
-                    if (!empty($stat_boost_amount)){
-
-                        // Update the session variables with the incremented stat boost
-                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_'.$stat_token] += $stat_boost_amount;
-                        $target_robot->$stat_base_prop += $stat_boost_amount;
-                        $target_robot->update_session();
-
-                        // Recalculate robot stats with new values
-                        $robot_stats = rpg_robot::calculate_stat_values(
-                            $target_robot->robot_level,
-                            $robot_info,
-                            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]
-                            );
-
-                        // Check if this robot has now reached max stats
-                        if ($robot_stats[$stat_token]['bonus'] >= $robot_stats[$stat_token]['bonus_max']){
-                            // Print the success message for reaching max stats for this robot
-                            $target_robot->robot_frame = 'victory';
-                            $target_robot->update_session();
-                            $this_battle->events_create($target_robot, false,
-                                "{$target_robot->robot_name}'s {$stat_name} Stat",
-                                $target_robot->print_robot_name().'\'s '.$stat_token.' stat bonuses have been raised to the max of '.
-                                '<span class="robot_type robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['max'].' &#9733;</span>!<br />'.
-                                'Congratulations and '.lcfirst(rpg_battle::random_victory_quote()).' '
-                                );
-                            $target_robot->robot_frame = 'base';
-                            $target_robot->update_session();
-                        }
-
-                    }
-
-                }
-
-            }
-
-
-        }
-
-        // Return true on success
-        return true;
-
     }
 
 
