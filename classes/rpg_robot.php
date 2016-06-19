@@ -704,7 +704,6 @@ class rpg_robot {
     // Define a trigger for using one of this robot's abilities
     public function trigger_ability($target_robot, $this_ability){
         global $db;
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
         // Update this robot's history with the triggered ability
         $this->history['triggered_abilities'][] = $this_ability->ability_token;
@@ -734,17 +733,14 @@ class rpg_robot {
         $this_ability->ability_results['flag_immunity'] = false;
 
         // Reset the ability options to default
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_ability->target_options_reset();
         $this_ability->damage_options_reset();
         $this_ability->recovery_options_reset();
 
         // Determine how much weapon energy this should take
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $temp_ability_energy = $this->calculate_weapon_energy($this_ability);
 
         // Decrease this robot's weapon energy
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this->robot_weapons = $this->robot_weapons - $temp_ability_energy;
         if ($this->robot_weapons < 0){ $this->robot_weapons = 0; }
         $this->update_session();
@@ -761,7 +757,7 @@ class rpg_robot {
         $temp_image_changed = false;
         $temp_ability_type = !empty($this_ability->ability_type) ? $this_ability->ability_type : '';
         $temp_ability_type2 = !empty($this_ability->ability_type2) ? $this_ability->ability_type2 : $temp_ability_type;
-        if (!preg_match('/^item-/', $this_ability->ability_token) && !empty($temp_ability_type) && $this->robot_base_core == 'copy'){
+        if (!empty($temp_ability_type) && $this->robot_base_core == 'copy'){
             $this->robot_image_overlay['copy_type1'] = $this->robot_base_image.'_'.$temp_ability_type.'2';
             $this->robot_image_overlay['copy_type2'] = $this->robot_base_image.'_'.$temp_ability_type2.'3';
             $this->update_session();
@@ -769,7 +765,6 @@ class rpg_robot {
         }
 
         // Copy the ability function to local scope and execute it
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_ability_function = $this_ability->ability_function;
         $this_ability_function(array(
             'this_battle' => $this->battle,
@@ -790,7 +785,6 @@ class rpg_robot {
         }
 
         // DEBUG DEBUG DEBUG
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         // Update this ability's history with the triggered ability data and results
         $this_ability->history['ability_results'][] = $this_ability->ability_results;
         // Update this ability's history with the triggered ability damage options
@@ -801,7 +795,6 @@ class rpg_robot {
         $target_robot->robot_stance = 'base';
 
         // Update internal variables
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $target_robot->update_session();
         $this_ability->update_session();
 
@@ -810,15 +803,12 @@ class rpg_robot {
 
         // If this robot has any attachments, loop through them
         if (!empty($this->robot_attachments)){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
             $temp_attachments_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
             foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                 // Ensure this ability has a type before checking weaknesses, resistances, etc.
                 if (!empty($this_ability->ability_type)){
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
                     // If this attachment has weaknesses defined and this ability is a match
                     if (!empty($attachment_info['attachment_weaknesses'])
@@ -837,37 +827,31 @@ class rpg_robot {
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
                             if ($temp_trigger_type == 'damage'){
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->update_session();
                                 $temp_damage_kind = $attachment_info['attachment_destroy']['kind'];
                                 if (isset($attachment_info['attachment_'.$temp_damage_kind])){
-                                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                     $temp_damage_amount = $attachment_info['attachment_'.$temp_damage_kind];
                                     $temp_trigger_options = array('apply_modifiers' => false);
                                     $this->trigger_damage($target_robot, $temp_attachment, $temp_damage_amount, false, $temp_trigger_options);
                                 }
                             } elseif ($temp_trigger_type == 'recovery'){
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->update_session();
                                 $temp_recovery_kind = $attachment_info['attachment_destroy']['kind'];
                                 if (isset($attachment_info['attachment_'.$temp_recovery_kind])){
-                                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                     $temp_recovery_amount = $attachment_info['attachment_'.$temp_recovery_kind];
                                     $temp_trigger_options = array('apply_modifiers' => false);
                                     $this->trigger_recovery($target_robot, $temp_attachment, $temp_recovery_amount, false, $temp_trigger_options);
                                 }
                             } elseif ($temp_trigger_type == 'special'){
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $temp_attachment->target_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                 $temp_attachment->update_session();
                                 //$this->trigger_damage($target_robot, $temp_attachment, 0, false);
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $this->trigger_target($target_robot, $temp_attachment, array('canvas_show_this_ability' => false, 'prevent_default_text' => true));
                             }
                         }
@@ -883,13 +867,184 @@ class rpg_robot {
         }
 
         // Update internal variables
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $target_robot->update_session();
         $this_ability->update_session();
 
         // Return the ability results
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         return $this_ability->ability_results;
+    }
+
+    // Define a trigger for using one of this robot's items
+    public function trigger_item($target_robot, $this_item){
+        global $db;
+
+        // Update this robot's history with the triggered item
+        $this->history['triggered_items'][] = $this_item->item_token;
+
+        // Define a variable to hold the item results
+        $this_item->item_results = array();
+        $this_item->item_results['total_result'] = '';
+        $this_item->item_results['total_actions'] = 0;
+        $this_item->item_results['total_strikes'] = 0;
+        $this_item->item_results['total_misses'] = 0;
+        $this_item->item_results['total_amount'] = 0;
+        $this_item->item_results['total_overkill'] = 0;
+        $this_item->item_results['this_result'] = '';
+        $this_item->item_results['this_amount'] = 0;
+        $this_item->item_results['this_overkill'] = 0;
+        $this_item->item_results['this_text'] = '';
+        $this_item->item_results['counter_criticals'] = 0;
+        $this_item->item_results['counter_affinities'] = 0;
+        $this_item->item_results['counter_weaknesses'] = 0;
+        $this_item->item_results['counter_resistances'] = 0;
+        $this_item->item_results['counter_immunities'] = 0;
+        $this_item->item_results['counter_coreboosts'] = 0;
+        $this_item->item_results['flag_critical'] = false;
+        $this_item->item_results['flag_affinity'] = false;
+        $this_item->item_results['flag_weakness'] = false;
+        $this_item->item_results['flag_resistance'] = false;
+        $this_item->item_results['flag_immunity'] = false;
+
+        // Reset the item options to default
+        $this_item->target_options_reset();
+        $this_item->damage_options_reset();
+        $this_item->recovery_options_reset();
+
+        // Determine how much weapon energy this should take
+        $temp_item_energy = $this->calculate_weapon_energy($this_item);
+
+        // Decrease this robot's weapon energy
+        $this->robot_weapons = $this->robot_weapons - $temp_item_energy;
+        if ($this->robot_weapons < 0){ $this->robot_weapons = 0; }
+        $this->update_session();
+
+        // Default this and the target robot's frames to their base
+        $this->robot_frame = 'base';
+        $target_robot->robot_frame = 'base';
+
+        // Default the robot's stances to attack/defend
+        $this->robot_stance = 'attack';
+        $target_robot->robot_stance = 'defend';
+
+        // If this is a copy core robot and the item type does not match its core
+        $temp_image_changed = false;
+        $temp_item_type = !empty($this_item->item_type) ? $this_item->item_type : '';
+        $temp_item_type2 = !empty($this_item->item_type2) ? $this_item->item_type2 : $temp_item_type;
+        if (preg_match('/^([a-z0-9]+)-(shard|core|star)/', $this_item->item_token) && !empty($temp_item_type) && $this->robot_base_core == 'copy'){
+            $this->robot_image_overlay['copy_type1'] = $this->robot_base_image.'_'.$temp_item_type.'2';
+            $this->robot_image_overlay['copy_type2'] = $this->robot_base_image.'_'.$temp_item_type2.'3';
+            $this->update_session();
+            $temp_image_changed = true;
+        }
+
+        // Copy the item function to local scope and execute it
+        $this_item_function = $this_item->item_function;
+        $this_item_function(array(
+            'this_battle' => $this->battle,
+            'this_field' => $this->field,
+            'this_player' => $this->player,
+            'this_robot' => $this,
+            'target_player' => $target_robot->player,
+            'target_robot' => $target_robot,
+            'this_item' => $this_item
+            ));
+
+
+        // If this robot's image has been changed, reveert it back to what it was
+        if ($temp_image_changed){
+            unset($this->robot_image_overlay['copy_type1']);
+            unset($this->robot_image_overlay['copy_type2']);
+            $this->update_session();
+        }
+
+        // DEBUG DEBUG DEBUG
+        // Update this item's history with the triggered item data and results
+        $this_item->history['item_results'][] = $this_item->item_results;
+        // Update this item's history with the triggered item damage options
+        $this_item->history['item_options'][] = $this_item->item_options;
+
+        // Reset the robot's stances to the base
+        $this->robot_stance = 'base';
+        $target_robot->robot_stance = 'base';
+
+        // Update internal variables
+        $target_robot->update_session();
+        $this_item->update_session();
+
+
+        // -- CHECK ATTACHMENTS -- //
+
+        // If this robot has any attachments, loop through them
+        if (!empty($this->robot_attachments)){
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
+            $temp_attachments_index = $db->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
+            foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
+
+                // Ensure this item has a type before checking weaknesses, resistances, etc.
+                if (!empty($this_item->item_type)){
+
+                    // If this attachment has weaknesses defined and this item is a match
+                    if (!empty($attachment_info['attachment_weaknesses'])
+                        && (in_array($this_item->item_type, $attachment_info['attachment_weaknesses'])
+                            || in_array($this_item->item_type2, $attachment_info['attachment_weaknesses']))
+                            ){
+                        //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint weaknesses');
+                        // Remove this attachment and inflict damage on the robot
+                        unset($this->robot_attachments[$attachment_token]);
+                        $this->update_session();
+                        if ($attachment_info['attachment_destroy'] !== false){
+                            $temp_item = rpg_item::parse_index_info($temp_attachments_index[$attachment_info['item_token']]);
+                            $attachment_info = array_merge($temp_item, $attachment_info);
+                            $temp_attachment = new rpg_item($this->battle, $this->player, $this, $attachment_info);
+                            $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
+                            //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
+                            //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
+                            if ($temp_trigger_type == 'damage'){
+                                $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
+                                $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
+                                $temp_attachment->update_session();
+                                $temp_damage_kind = $attachment_info['attachment_destroy']['kind'];
+                                if (isset($attachment_info['attachment_'.$temp_damage_kind])){
+                                    $temp_damage_amount = $attachment_info['attachment_'.$temp_damage_kind];
+                                    $temp_trigger_options = array('apply_modifiers' => false);
+                                    $this->trigger_damage($target_robot, $temp_attachment, $temp_damage_amount, false, $temp_trigger_options);
+                                }
+                            } elseif ($temp_trigger_type == 'recovery'){
+                                $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
+                                $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
+                                $temp_attachment->update_session();
+                                $temp_recovery_kind = $attachment_info['attachment_destroy']['kind'];
+                                if (isset($attachment_info['attachment_'.$temp_recovery_kind])){
+                                    $temp_recovery_amount = $attachment_info['attachment_'.$temp_recovery_kind];
+                                    $temp_trigger_options = array('apply_modifiers' => false);
+                                    $this->trigger_recovery($target_robot, $temp_attachment, $temp_recovery_amount, false, $temp_trigger_options);
+                                }
+                            } elseif ($temp_trigger_type == 'special'){
+                                $temp_attachment->target_options_update($attachment_info['attachment_destroy']);
+                                $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
+                                $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
+                                $temp_attachment->update_session();
+                                //$this->trigger_damage($target_robot, $temp_attachment, 0, false);
+                                $this->trigger_target($target_robot, $temp_attachment, array('canvas_show_this_item' => false, 'prevent_default_text' => true));
+                            }
+                        }
+                        // If this robot was disabled, process experience for the target
+                        if ($this->robot_status == 'disabled'){
+                            break;
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+        // Update internal variables
+        $target_robot->update_session();
+        $this_item->update_session();
+
+        // Return the item results
+        return $this_item->item_results;
     }
 
     // Define a function for setting and saving a robot attachment
