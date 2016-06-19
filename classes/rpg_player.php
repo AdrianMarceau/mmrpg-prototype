@@ -347,8 +347,8 @@ class rpg_player {
     // Define a static function for printing out the robot's editor markup
     public static function items_sort_for_editor($item_one, $item_two){
         global $mmrpg_index;
-        $item_token_one = preg_match('/^item-([a-z0-9]+)-(a-z0-9+)$/i', $item_one['ability_token']) ? $item_one['ability_token'] : $item_one['ability_token'].'-size';
-        $item_token_two = preg_match('/^item-([a-z0-9]+)-(a-z0-9+)$/i', $item_two['ability_token']) ? $item_two['ability_token'] : $item_two['ability_token'].'-size';
+        $item_token_one = $item_one['item_token'];
+        $item_token_two = $item_two['item_token'];
         list($x, $kind_one, $size_one) = explode('-', $item_token_one);
         list($x, $kind_two, $size_two) = explode('-', $item_token_two);
 
@@ -366,8 +366,8 @@ class rpg_player {
         elseif ($size_one == 'tank' && $size_two != 'tank'){ return -1; }
         elseif ($size_one != 'tank' && $size_two == 'tank'){ return 1; }
 
-        elseif ($item_one['ability_token'] > $item_two['ability_token']){ return 1; }
-        elseif ($item_one['ability_token'] < $item_two['ability_token']){ return -1; }
+        elseif ($item_one['item_token'] > $item_two['item_token']){ return 1; }
+        elseif ($item_one['item_token'] < $item_two['item_token']){ return -1; }
         else { return 0; }
     }
 
