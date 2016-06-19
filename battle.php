@@ -326,28 +326,28 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
             // Append the new field star to the foreground attachment array
             //die('$this_field_data = <pre>'.print_r($this_field_data, true).'</pre>');
             $this_field_data['field_foreground_attachments']['field-star-back'] = array(
-              'class' => 'ability',
+              'class' => 'item',
               'size' => 80,
               'offset_x' => 325,
               'offset_y' => 75,
-              'ability_token' => 'item-star',
-              'ability_image' => 'item-star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'],
-              'ability_frame' => array($temp_star_back_info['frame'], $temp_star_back_info['frame'], $temp_star_back_info['frame'], $temp_star_back_info['frame']),
-              'ability_frame_shift' => array('325,75', '325,80', '325,85', '325,80'),
-              'ability_direction' => 'left',
-              'ability_text' => $temp_star_text
+              'items_token' => 'star',
+              'items_image' => 'star-'$temp_star_kind.'-'.$temp_star_back_info['sheet'],
+              'items_frame' => array($temp_star_back_info['frame'], $temp_star_back_info['frame'], $temp_star_back_info['frame'], $temp_star_back_info['frame']),
+              'items_frame_shift' => array('325,75', '325,80', '325,85', '325,80'),
+              'items_direction' => 'left',
+              'items_text' => $temp_star_text
               );
             $this_field_data['field_foreground_attachments']['field-star-front'] = array(
-              'class' => 'ability',
+              'class' => 'items',
               'size' => 80,
               'offset_x' => 325,
               'offset_y' => 75,
-              'ability_token' => 'item-star',
-              'ability_image' => 'item-star-base-'.$temp_star_front_info['sheet'],
-              'ability_frame' => array($temp_star_front_info['frame'], $temp_star_front_info['frame'], $temp_star_front_info['frame'], $temp_star_front_info['frame']),
-              'ability_frame_shift' => array('325,75', '325,80', '325,85', '325,80'),
-              'ability_direction' => 'left',
-              'ability_text' => $temp_star_text
+              'items_token' => 'star',
+              'items_image' => 'star-base-'.$temp_star_front_info['sheet'],
+              'items_frame' => array($temp_star_front_info['frame'], $temp_star_front_info['frame'], $temp_star_front_info['frame'], $temp_star_front_info['frame']),
+              'items_frame_shift' => array('325,75', '325,80', '325,85', '325,80'),
+              'items_direction' => 'left',
+              'items_text' => $temp_star_text
               );
 
           }
