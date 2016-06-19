@@ -1070,7 +1070,7 @@ class rpg_robot {
     public function trigger_attachment($attachment_info){
         global $db;
 
-        // If this is an ability attachment
+        // If this is an ABILITY attachment
         if ($attachment_info['class'] == 'ability'){
 
             // Create the temporary ability object
@@ -1142,6 +1142,78 @@ class rpg_robot {
             return $this_ability->attachment_results;
 
         }
+        // If this is an ITEM attachment
+        elseif ($attachment_info['class'] == 'item'){
+
+            // Create the temporary item object
+            $this_item = new rpg_item($this->battle, $this->player, $this, array('item_token' => $attachment_info['item_token']));
+
+            // Update this robot's history with the triggered attachment
+            $this->history['triggered_attachments'][] = 'item_'.$this_item->item_token;
+
+            // Define a variable to hold the item results
+            $this_item->attachment_results = array();
+            $this_item->attachment_results['total_result'] = '';
+            $this_item->attachment_results['total_actions'] = 0;
+            $this_item->attachment_results['total_strikes'] = 0;
+            $this_item->attachment_results['total_misses'] = 0;
+            $this_item->attachment_results['total_amount'] = 0;
+            $this_item->attachment_results['total_overkill'] = 0;
+            $this_item->attachment_results['this_result'] = '';
+            $this_item->attachment_results['this_amount'] = 0;
+            $this_item->attachment_results['this_overkill'] = 0;
+            $this_item->attachment_results['this_text'] = '';
+            $this_item->attachment_results['counter_critical'] = 0;
+            $this_item->attachment_results['counter_affinity'] = 0;
+            $this_item->attachment_results['counter_weakness'] = 0;
+            $this_item->attachment_results['counter_resistance'] = 0;
+            $this_item->attachment_results['counter_immunity'] = 0;
+            $this_item->attachment_results['counter_coreboosts'] = 0;
+            $this_item->attachment_results['flag_critical'] = false;
+            $this_item->attachment_results['flag_affinity'] = false;
+            $this_item->attachment_results['flag_weakness'] = false;
+            $this_item->attachment_results['flag_resistance'] = false;
+            $this_item->attachment_results['flag_immunity'] = false;
+
+            // Reset the item options to default
+            $this_item->attachment_options_reset();
+
+            // Default this and the target robot's frames to their base
+            $this->robot_frame = 'base';
+            //$target_robot->robot_frame = 'base';
+
+            // Collect the target robot and player objects
+            //$target_robot_info = $this->battle->values['robots'][];
+
+            // Copy the attachment function to local scope and execute it
+            $this_attachment_function = $this_item->item_function_attachment;
+            $this_attachment_function(array(
+                'this_battle' => $this->battle,
+                'this_field' => $this->field,
+                'this_player' => $this->player,
+                'this_robot' => $this,
+                //'target_player' => $target_robot->player,
+                //'target_robot' => $target_robot,
+                'this_item' => $this_item
+                ));
+
+            // Update this item's attachment history with the triggered attachment data and results
+            $this_item->history['attachment_results'][] = $this_item->attachment_results;
+            // Update this item's attachment history with the triggered attachment damage options
+            $this_item->history['attachment_options'][] = $this_item->attachment_options;
+
+            // Reset the robot's stances to the base
+            $this->robot_stance = 'base';
+            //$target_robot->robot_stance = 'base';
+
+            // Update internal variables
+            $this->update_session();
+            $this_item->update_session();
+
+            // Return the item results
+            return $this_item->attachment_results;
+
+        }
 
     }
 
@@ -1150,116 +1222,202 @@ class rpg_robot {
 //    $this->trigger_damage('energy', $target_robot, $this_ability, &$ability_results, $damage_amount, &$damage_options);
 //  }
 
-    // Define a trigger for using one of this robot's abilities
-    public function trigger_target($target_robot, $this_ability, $trigger_options = array()){
+    // Define a trigger for using one of this robot's abilities or items
+    public function trigger_target($target_robot, $this_object, $trigger_options = array()){
         global $db;
+
+        // Predefine the ability and item variables
+        $object_type = false;
+        $this_ability_token = false;
+        $this_item_token = false;
+        $this_ability = false;
+        $this_item = false;
+
+        // Check to see which object type has been provided
+        if (isset($this_object['ability_token'])){
+            $this_ability_token = $this_object['ability_token'];
+            $this_ability = $this_object;
+            $object_type = 'ability';
+        } elseif (isset($this_object['item_token'])){
+            $this_item_token = $this_object['item_token'];
+            $this_item = $this_object;
+            $object_type = 'item';
+        }
 
         // Define the event console options
         $event_options = array();
         $event_options['console_container_height'] = 1;
-        $event_options['this_ability'] = $this_ability;
-        $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
-        $event_options['this_ability_target_key'] = $target_robot->robot_key;
-        $event_options['this_ability_target_position'] = $target_robot->robot_position;
-        $event_options['this_ability_results'] = array();
         $event_options['console_show_target'] = false;
+        if ($object_type == 'ability'){
+            $event_options['this_ability'] = $this_ability;
+            $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
+            $event_options['this_ability_target_key'] = $target_robot->robot_key;
+            $event_options['this_ability_target_position'] = $target_robot->robot_position;
+            $event_options['this_ability_results'] = array();
+        } elseif ($object_type == 'item'){
+            $event_options['this_item'] = $this_item;
+            $event_options['this_item_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
+            $event_options['this_item_target_key'] = $target_robot->robot_key;
+            $event_options['this_item_target_position'] = $target_robot->robot_position;
+            $event_options['this_item_results'] = array();
+        }
+        if ($object_type == 'ability'){
 
-        // Empty any text from the previous ability result
-        $this_ability->ability_results['this_text'] = '';
+        } elseif ($object_type == 'item'){
+
+        }
+
+        // Empty any text from the previous ability/item result
+        if ($object_type == 'ability'){
+            $this_ability->ability_results['this_text'] = '';
+        } elseif ($object_type == 'item'){
+            $this_item->item_results['this_text'] = '';
+        }
 
         // Update this robot's history with the triggered ability
-        $this->history['triggered_targets'][] = $target_robot->robot_token;
+        if ($object_type == 'ability'){
+            $this->history['triggered_targets'][] = $target_robot->robot_token;
+        } elseif ($object_type == 'item' && preg_match('/^([a-z0-9]+)-(shard|core|star)$/i', $this_item_token)){
+            $this->history['triggered_targets'][] = $target_robot->robot_token;
+        }
 
         // Backup this and the target robot's frames to revert later
         $this_robot_backup_frame = $this->robot_frame;
         $this_player_backup_frame = $this->player->player_frame;
         $target_robot_backup_frame = $target_robot->robot_frame;
         $target_player_backup_frame = $target_robot->player->player_frame;
-        $this_ability_backup_frame = $this_ability->ability_frame;
-
-        // Update this robot's frames using the target options
-        $this->robot_frame = $this_ability->target_options['target_frame'];
-        if ($this->robot_id != $target_robot->robot_id){ $target_robot->robot_frame = 'defend'; }
-        $this->player->player_frame = 'command';
-        $this->player->update_session();
-        $this_ability->ability_frame = $this_ability->target_options['ability_success_frame'];
-        $this_ability->ability_frame_span = $this_ability->target_options['ability_success_frame_span'];
-        $this_ability->ability_frame_offset = $this_ability->target_options['ability_success_frame_offset'];
-
-        // If the target player is on the bench, alter the ability scale
-        $temp_ability_styles_backup = $this_ability->ability_frame_styles;
-        if ($target_robot->robot_position == 'bench' && $event_options['this_ability_target'] != $this->robot_id.'_'.$this->robot_token){
-            $temp_scale = 1 - ($target_robot->robot_key * 0.06);
-            $temp_translate = 20 + ($target_robot->robot_key * 20);
-            $temp_translate2 = ceil($temp_translate / 10) * -1;
-            $temp_translate = $temp_translate * ($target_robot->player->player_side == 'left' ? -1 : 1);
-            //$this_ability->ability_frame_styles .= 'border: 1px solid red !important; ';
-            $this_ability->ability_frame_styles .= 'transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -webkit-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -moz-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); ';
+        if ($object_type == 'ability'){
+            $this_ability_backup_frame = $this_ability->ability_frame;
+        } elseif ($object_type == 'item'){
+            $this_item_backup_frame = $this_item->ability_frame;
         }
 
-        // Create a message to show the initial targeting action
-        if ($this->robot_id != $target_robot->robot_id && empty($trigger_options['prevent_default_text'])){
-            $this_ability->ability_results['this_text'] .= "{$this->print_robot_name()} targets {$target_robot->print_robot_name()}!<br />";
-        } else {
-            //$this_ability->ability_results['this_text'] .= ''; //"{$this->print_robot_name()} targets itself&hellip;<br />";
+        // If this is an ABILITY process the final details
+        if ($object_type == 'ability'){
+
+            // Update this robot's frames using the target options
+            $this->robot_frame = $this_ability->target_options['target_frame'];
+            if ($this->robot_id != $target_robot->robot_id){ $target_robot->robot_frame = 'defend'; }
+            $this->player->player_frame = 'command';
+            $this->player->update_session();
+            $this_ability->ability_frame = $this_ability->target_options['ability_success_frame'];
+            $this_ability->ability_frame_span = $this_ability->target_options['ability_success_frame_span'];
+            $this_ability->ability_frame_offset = $this_ability->target_options['ability_success_frame_offset'];
+
+            // If the target player is on the bench, alter the ability scale
+            $temp_ability_styles_backup = $this_ability->ability_frame_styles;
+            if ($target_robot->robot_position == 'bench' && $event_options['this_ability_target'] != $this->robot_id.'_'.$this->robot_token){
+                $temp_scale = 1 - ($target_robot->robot_key * 0.06);
+                $temp_translate = 20 + ($target_robot->robot_key * 20);
+                $temp_translate2 = ceil($temp_translate / 10) * -1;
+                $temp_translate = $temp_translate * ($target_robot->player->player_side == 'left' ? -1 : 1);
+                $this_ability->ability_frame_styles .= 'transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -webkit-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -moz-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); ';
+            }
+
+            // Create a message to show the initial targeting action
+            if ($this->robot_id != $target_robot->robot_id && empty($trigger_options['prevent_default_text'])){
+                $this_ability->ability_results['this_text'] .= "{$this->print_robot_name()} targets {$target_robot->print_robot_name()}!<br />";
+            }
+
+            // Append the targetting text to the event body
+            $this_ability->ability_results['this_text'] .= $this_ability->target_options['target_text'];
+
+            // Update the ability results with the the trigger kind
+            $this_ability->ability_results['trigger_kind'] = 'target';
+            $this_ability->ability_results['this_result'] = 'success';
+
+            // Update the event options with the ability results
+            $event_options['this_ability_results'] = $this_ability->ability_results;
+            if (isset($trigger_options['canvas_show_this_ability'])){ $event_options['canvas_show_this_ability'] = $trigger_options['canvas_show_this_ability'];  }
+
+            // Create a new entry in the event log for the targeting event
+            $this->battle->events_create($this, $target_robot, $this_ability->target_options['target_header'], $this_ability->ability_results['this_text'], $event_options);
+
+            // Update this ability's history with the triggered ability data and results
+            $this_ability->history['ability_results'][] = $this_ability->ability_results;
+
+            // Refresh the ability styles from any changes
+            $this_ability->ability_frame_styles = '';
+
         }
+        // Else if this was an ITEM process the final details
+        elseif ($object_type == 'item'){
 
-        // Append the targetting text to the event body
-        $this_ability->ability_results['this_text'] .= $this_ability->target_options['target_text'];
+            // Update this robot's frames using the target options
+            $this->robot_frame = $this_item->target_options['target_frame'];
+            if ($this->robot_id != $target_robot->robot_id){ $target_robot->robot_frame = 'defend'; }
+            $this->player->player_frame = 'command';
+            $this->player->update_session();
+            $this_item->item_frame = $this_item->target_options['item_success_frame'];
+            $this_item->item_frame_span = $this_item->target_options['item_success_frame_span'];
+            $this_item->item_frame_offset = $this_item->target_options['item_success_frame_offset'];
 
-        // Update the ability results with the the trigger kind
-        $this_ability->ability_results['trigger_kind'] = 'target';
-        $this_ability->ability_results['this_result'] = 'success';
+            // If the target player is on the bench, alter the item scale
+            $temp_item_styles_backup = $this_item->item_frame_styles;
+            if ($target_robot->robot_position == 'bench' && $event_options['this_item_target'] != $this->robot_id.'_'.$this->robot_token){
+                $temp_scale = 1 - ($target_robot->robot_key * 0.06);
+                $temp_translate = 20 + ($target_robot->robot_key * 20);
+                $temp_translate2 = ceil($temp_translate / 10) * -1;
+                $temp_translate = $temp_translate * ($target_robot->player->player_side == 'left' ? -1 : 1);
+                $this_item->item_frame_styles .= 'transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -webkit-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -moz-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); ';
+            }
 
-        // Update the event options with the ability results
-        $event_options['this_ability_results'] = $this_ability->ability_results;
-        if (isset($trigger_options['canvas_show_this_ability'])){ $event_options['canvas_show_this_ability'] = $trigger_options['canvas_show_this_ability'];  }
+            // Create a message to show the initial targeting action
+            if ($this->robot_id != $target_robot->robot_id && empty($trigger_options['prevent_default_text'])){
+                $this_item->item_results['this_text'] .= "{$this->print_robot_name()} targets {$target_robot->print_robot_name()}!<br />";
+            }
 
-        /*
-        // If this is a non-transformed copy robot, change its colour
-        $temp_image_changed = false;
-        $temp_ability_type = !empty($this_ability->ability_type) && $this_ability->ability_type != 'copy' ? $this_ability->ability_type : '';
-        if ($this->robot_base_core == 'copy' && $this->robot_core != $temp_ability_type){
-            $this_backup_image = $this->robot_image;
-            $this->robot_image = $this->robot_base_image.'_'.$temp_ability_type;
-            $this->update_session();
-            $temp_image_changed = true;
+            // Append the targetting text to the event body
+            $this_item->item_results['this_text'] .= $this_item->target_options['target_text'];
+
+            // Update the item results with the the trigger kind
+            $this_item->item_results['trigger_kind'] = 'target';
+            $this_item->item_results['this_result'] = 'success';
+
+            // Update the event options with the item results
+            $event_options['this_item_results'] = $this_item->item_results;
+            if (isset($trigger_options['canvas_show_this_item'])){ $event_options['canvas_show_this_item'] = $trigger_options['canvas_show_this_item'];  }
+
+            // Create a new entry in the event log for the targeting event
+            $this->battle->events_create($this, $target_robot, $this_item->target_options['target_header'], $this_item->item_results['this_text'], $event_options);
+
+            // Update this item's history with the triggered item data and results
+            $this_item->history['item_results'][] = $this_item->item_results;
+
+            // Refresh the item styles from any changes
+            $this_item->item_frame_styles = '';
+
         }
-        */
-
-        // Create a new entry in the event log for the targeting event
-        $this->battle->events_create($this, $target_robot, $this_ability->target_options['target_header'], $this_ability->ability_results['this_text'], $event_options);
-
-        /*
-        // If this is a non-transformed copy robot, change its colour
-        if ($temp_image_changed){
-            $this->robot_image = $this_backup_image;
-            $this->update_session();
-        }
-        */
-
-        // Update this ability's history with the triggered ability data and results
-        $this_ability->history['ability_results'][] = $this_ability->ability_results;
-
-        // Refresh the ability styles from any changes
-        $this_ability->ability_frame_styles = ''; //$temp_ability_styles_backup;
 
         // restore this and the target robot's frames to their backed up state
         $this->robot_frame = $this_robot_backup_frame;
         $this->player->player_frame = $this_player_backup_frame;
         $target_robot->robot_frame = $target_robot_backup_frame;
         $target_robot->player->player_frame = $target_player_backup_frame;
-        $this_ability->ability_frame = $this_ability_backup_frame;
-        $this_ability->target_options_reset();
+        if ($object_type == 'ability'){
+            $this_ability->ability_frame = $this_ability_backup_frame;
+            $this_ability->target_options_reset();
+        } elseif ($object_type == 'item'){
+            $this_item->ability_frame = $this_item_backup_frame;
+            $this_item->target_options_reset();
+        }
 
         // Update internal variables
         $this->update_session();
         $this->player->update_session();
         $target_robot->update_session();
-        $this_ability->update_session();
+        if ($object_type == 'ability'){
+            $this_ability->update_session();
+        } elseif ($object_type == 'item'){
+            $this_item->update_session();
+        }
 
         // Return the ability results
-        return $this_ability->ability_results;
+        if ($object_type == 'ability'){
+            return $this_ability->ability_results;
+        } elseif ($object_type == 'item'){
+            return $this_item->ability_results;
+        }
 
     }
 
@@ -1276,10 +1434,6 @@ class rpg_robot {
         if (!isset($trigger_options['apply_starforce_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_starforce_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['referred_damage'])){ $trigger_options['referred_damage'] = false; }
-        /*
-         * ROBOT CLASS FUNCTION TRIGGER DAMAGE
-         * public function trigger_damage($target_robot, $this_ability, $damage_amount, $trigger_disabled = true){}
-         */
 
         // Backup this and the target robot's frames to revert later
         $this_robot_backup_frame = $this->robot_frame;
@@ -1307,19 +1461,15 @@ class rpg_robot {
 
         // Collect the damage amount argument from the function
         $this_ability->ability_results['this_amount'] = $damage_amount;
+
         // DEBUG
         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | this('.$this->robot_id.') vs target('.$target_robot->robot_id.') | damage_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->damage_options['damage_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->damage_options['damage_kind'].' | type1:'.(!empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none').' | type2:'.(!empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : 'none').'');
-
 
         // DEBUG
         $debug = '';
         foreach ($trigger_options AS $key => $value){ $debug .= $key.'='.($value === true ? 'true' : ($value === false ? 'false' : $value)).'; '; }
         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' : damage_trigger_options : '.$debug);
 
-        /*
-        // Only apply weakness, resistance, etc. if not percent
-        if (true || !$this_ability->damage_options['damage_percent']){
-        */
         // Only apply modifiers if they have not been disabled
         if ($trigger_options['apply_modifiers'] != false){
 
@@ -2429,10 +2579,6 @@ class rpg_robot {
         if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['referred_recovery'])){ $trigger_options['referred_recovery'] = false; }
-        /*
-         * ROBOT CLASS FUNCTION TRIGGER RECOVERY
-         * public function trigger_recovery($target_robot, $this_ability, $recovery_amount, $trigger_disabled = true){}
-         */
 
         // Backup this and the target robot's frames to revert later
         $this_robot_backup_frame = $this->robot_frame;
@@ -2456,19 +2602,15 @@ class rpg_robot {
 
         // Collect the recovery amount argument from the function
         $this_ability->ability_results['this_amount'] = $recovery_amount;
+
         // DEBUG
         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' | recovery_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->recovery_options['recovery_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->recovery_options['recovery_kind'].'');
-
 
         // DEBUG
         $debug = '';
         foreach ($trigger_options AS $key => $value){ $debug .= $key.'='.($value === true ? 'true' : ($value === false ? 'false' : $value)).'; '; }
         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_ability->ability_token.' : recovery_trigger_options : '.$debug);
 
-        /*
-        // Only apply weakness, resistance, etc. if not percent
-        if (true || !$this_ability->recovery_options['recovery_percent']){
-        */
         // Only apply modifiers if they have not been disabled
         if ($trigger_options['apply_modifiers'] != false){
 
@@ -3543,10 +3685,6 @@ class rpg_robot {
 
         // Generate default trigger options if not set
         if (!isset($trigger_options['item_multiplier'])){ $trigger_options['item_multiplier'] = 1.0; }
-        /*
-         * ROBOT CLASS FUNCTION TRIGGER DISABLED
-         * public function trigger_disabled($target_robot, $this_ability){}
-         */
 
         // Create references to save time 'cause I'm tired
         // (rather than replace all target references to this references)
