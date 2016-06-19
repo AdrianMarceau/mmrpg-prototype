@@ -2,7 +2,7 @@
 
 // Include mandatory config files
 define('MMRPG_BUILD', 'mmrpg2k11');
-define('MMRPG_VERSION', '2.9.2');
+define('MMRPG_VERSION', '2.3.0');
 require('data/config.php');
 require('data/settings.php');
 require('data/debug.php');
@@ -63,6 +63,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 }
 
 // Include mandatory class files
+require('classes/rpg_object.php');
 require('classes/rpg_battle.php');
 require('classes/rpg_field.php');
 require('classes/rpg_player.php');

@@ -1,18 +1,23 @@
 <?
-// Define a class for the battles
-class rpg_battle {
+/**
+ * Mega Man RPG Battle Object
+ * <p>The base class for all battle objects in the Mega Man RPG Prototype.</p>
+ */
+class rpg_battle extends rpg_object {
 
     // Define global class variables
-    public $index;
-    public $flags;
-    public $counters;
-    public $values;
     public $events;
     public $actions;
-    public $history;
 
     // Define the constructor class
     public function rpg_battle(){
+
+        // Update the session keys for this object
+        $this->session_key = 'BATTLES';
+        $this->session_token = 'battle_token';
+        $this->session_id = 'battle_id';
+        $this->class = 'battle';
+        $this->multi = 'battles';
 
         // Collect any provided arguments
         $args = func_get_args();

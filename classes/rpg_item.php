@@ -1,15 +1,19 @@
 <?
-// Define a class for the items
-class rpg_item {
-
-    // Define global class variables
-    public $flags;
-    public $counters;
-    public $values;
-    public $history;
+/**
+ * Mega Man RPG Item Object
+ * <p>The base class for all item objects in the Mega Man RPG Prototype.</p>
+ */
+class rpg_item extends rpg_object {
 
     // Define the constructor class
     public function rpg_item(){
+
+        // Update the session keys for this object
+        $this->session_key = 'ITEMS';
+        $this->session_token = 'item_token';
+        $this->session_id = 'item_id';
+        $this->class = 'item';
+        $this->multi = 'items';
 
         // Collect any provided arguments
         $args = func_get_args();

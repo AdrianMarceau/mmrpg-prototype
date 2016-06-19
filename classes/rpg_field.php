@@ -1,15 +1,19 @@
 <?
-// Define a class for the fields
-class rpg_field {
-
-    // Define global class variables
-    public $flags;
-    public $counters;
-    public $values;
-    public $history;
+/**
+ * Mega Man RPG Field Object
+ * <p>The base class for all field objects in the Mega Man RPG Prototype.</p>
+ */
+class rpg_field extends rpg_object {
 
     // Define the constructor class
     public function rpg_field(){
+
+        // Update the session keys for this object
+        $this->session_key = 'FIELDS';
+        $this->session_token = 'field_token';
+        $this->session_id = 'field_id';
+        $this->class = 'field';
+        $this->multi = 'fields';
 
         // Collect any provided arguments
         $args = func_get_args();
