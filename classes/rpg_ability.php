@@ -1,15 +1,19 @@
 <?
-// Define a class for the abilities
-class rpg_ability {
-
-    // Define global class variables
-    public $flags;
-    public $counters;
-    public $values;
-    public $history;
+/**
+ * Mega Man RPG Ability Object
+ * <p>The base class for all ability objects in the Mega Man RPG Prototype.</p>
+ */
+class rpg_ability extends rpg_object {
 
     // Define the constructor class
     public function rpg_ability(){
+
+        // Update the session keys for this object
+        $this->session_key = 'ABILITIES';
+        $this->session_token = 'ability_token';
+        $this->session_id = 'ability_id';
+        $this->class = 'ability';
+        $this->multi = 'abilities';
 
         // Collect any provided arguments
         $args = func_get_args();

@@ -1,21 +1,22 @@
 <?
-// Define a class for the robots
-class rpg_robot {
-
-    // Define global class variables
-    public $flags;
-    public $counters;
-    public $values;
-    public $history;
+/**
+ * Mega Man RPG Robot Object
+ * <p>The base class for all robot objects in the Mega Man RPG Prototype.</p>
+ */
+class rpg_robot extends rpg_object {
 
     // Define the constructor class
     public function rpg_robot(){
 
+        // Update the session keys for this object
+        $this->session_key = 'ROBOTS';
+        $this->session_token = 'robot_token';
+        $this->session_id = 'robot_id';
+        $this->class = 'robot';
+        $this->multi = 'robots';
+
         // Collect any provided arguments
         $args = func_get_args();
-
-        // Define the internal class identifier
-        $this->class = 'robot';
 
         // Define the internal battle pointer
         $this->battle = isset($args[0]) ? $args[0] : $GLOBALS['this_battle'];
@@ -1261,11 +1262,6 @@ class rpg_robot {
             $event_options['this_item_target_position'] = $target_robot->robot_position;
             $event_options['this_item_results'] = array();
         }
-        if ($object_type == 'ability'){
-
-        } elseif ($object_type == 'item'){
-
-        }
 
         // Empty any text from the previous ability/item result
         if ($object_type == 'ability'){
@@ -1416,7 +1412,7 @@ class rpg_robot {
         if ($object_type == 'ability'){
             return $this_ability->ability_results;
         } elseif ($object_type == 'item'){
-            return $this_item->ability_results;
+            return $this_item->item_results;
         }
 
     }

@@ -1,15 +1,19 @@
 <?
-// Define a class for the players
-class rpg_player {
-
-    // Define global class variables
-    public $flags;
-    public $counters;
-    public $values;
-    public $history;
+/**
+ * Mega Man RPG Player Object
+ * <p>The base class for all player objects in the Mega Man RPG Prototype.</p>
+ */
+class rpg_player extends rpg_object {
 
     // Define the constructor class
     public function rpg_player(){
+
+        // Update the session keys for this object
+        $this->session_key = 'PLAYERS';
+        $this->session_token = 'player_token';
+        $this->session_id = 'player_id';
+        $this->class = 'player';
+        $this->multi = 'players';
 
         // Collect any provided arguments
         $args = func_get_args();
