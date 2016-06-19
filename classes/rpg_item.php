@@ -691,9 +691,7 @@ class rpg_item {
         // Define and calculate the simpler markup and positioning variables for this item
         $this_data['item_name'] = isset($options['item_name']) ? $options['item_name'] : $this->item_name;
         $this_data['item_title'] = $this_data['item_name'];
-        $this_data['item_token'] = $this->item_token;
-        if (preg_match('/^item-/i', $this->item_token)){ $this_data['item_direction'] = 'right'; }
-        else { $this_data['item_direction'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this->robot_id ? $robot_data['robot_direction'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left'); }
+        $this_data['item_token'] = $this->item_token;$this_data['item_direction'] = 'right';
         $this_data['item_float'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this->robot_id ? $robot_data['robot_float'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
         $this_data['item_size'] = $this->item_image_size;
         $this_data['item_frame'] = isset($options['item_frame']) ? $options['item_frame'] : $this->item_frame;
@@ -1072,8 +1070,8 @@ class rpg_item {
         elseif ($item_type_class == 'none' && !empty($item_info['item_type2'])){ $item_type_class = $item_info['item_type2'];  }
         $item_header_types = 'item_type_'.$item_type_class.' ';
         // If this is a special category of item, it's a special type
-        if (preg_match('/^item-score-ball-(red|blue|green|purple)$/i', $item_info['item_token'])){ $item_info['item_type_special'] = 'bonus'; }
-        elseif (preg_match('/^item-super-(pellet|capsule)$/i', $item_info['item_token'])){ $item_info['item_type_special'] = 'multi'; }
+        if (preg_match('/^(red|blue|green|purple)-score-ball$/i', $item_info['item_token'])){ $item_info['item_type_special'] = 'bonus'; }
+        elseif (preg_match('/^super-(pellet|capsule)$/i', $item_info['item_token'])){ $item_info['item_type_special'] = 'multi'; }
 
         // Define the sprite sheet alt and title text
         $item_sprite_size = $item_image_size * 2;
@@ -1123,7 +1121,7 @@ class rpg_item {
 
                     <h2 class="header header_left <?= $item_header_types ?> <?= (!$print_options['show_icon']) ? 'noicon' : 'hasicon' ?>">
                         <? if($print_options['layout_style'] == 'website_compact'): ?>
-                            <a href="<?= preg_match('/^item-/', $item_info['item_token']) ? 'database/items/'.preg_replace('/^item-/i', '', $item_info['item_token']).'/' : 'database/items/'.$item_info['item_token'].'/' ?>"><?= $item_info['item_name'] ?></a>
+                            <a href="<?= 'database/items/'.$item_info['item_token'].'/' ?>"><?= $item_info['item_name'] ?></a>
                         <? else: ?>
                             <?= $item_info['item_name'] ?>&#39;s Data
                         <? endif; ?>
@@ -1156,19 +1154,19 @@ class rpg_item {
                                         <? if($print_options['layout_style'] != 'event'): ?>
                                             <?
                                             if (!empty($item_info['item_type_special'])){
-                                                echo '<a href="'.((preg_match('/^item-/', $item_info['item_token']) ? 'database/items/' : 'database/items/').$item_info['item_type_special'].'/').'" class="item_type '.$item_header_types.'">'.ucfirst($item_info['item_type_special']).'</a>';
+                                                echo '<a href="database/items/'.$item_info['item_type_special'].'/" class="item_type '.$item_header_types.'">'.ucfirst($item_info['item_type_special']).'</a>';
                                             }
                                             elseif (!empty($item_info['item_type'])){
                                                 $temp_string = array();
                                                 $item_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
-                                                $temp_string[] = '<a href="'.((preg_match('/^item-/', $item_info['item_token']) ? 'database/items/' : 'database/items/').$item_type.'/').'" class="item_type item_type_'.$item_type.'">'.$mmrpg_index['types'][$item_type]['type_name'].'</a>';
+                                                $temp_string[] = '<a href="database/items/'.$item_type.'/" class="item_type item_type_'.$item_type.'">'.$mmrpg_index['types'][$item_type]['type_name'].'</a>';
                                                 if (!empty($item_info['item_type2'])){
                                                     $item_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : 'none';
                                                     $temp_string[] = '<a href="'.((preg_match('/^item-/', $item_info['item_token']) ? 'database/items/' : 'database/items/').$item_type2.'/').'" class="item_type item_type_'.$item_type2.'">'.$mmrpg_index['types'][$item_type2]['type_name'].'</a>';
                                                 }
                                                 echo implode(' ', $temp_string);
                                             } else {
-                                                echo '<a href="'.((preg_match('/^item-/', $item_info['item_token']) ? 'database/items/' : 'database/items/').'none/').'" class="item_type item_type_none">Neutral</a>';
+                                                echo '<a href="database/items/none/" class="item_type item_type_none">Neutral</a>';
                                             }
                                             ?>
                                         <? else: ?>
@@ -1573,12 +1571,12 @@ class rpg_item {
                 <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="<?= preg_match('/^item-/', $item_info['item_token']) ? 'database/items/'.preg_replace('/^item-/i', '', $item_info['item_token']).'/' : 'database/items/'.$item_info['item_token'].'/' ?>" rel="permalink">+ Permalink</a>
+                    <a class="link link_permalink permalink" href="<?= 'database/items/'.$item_info['item_token'].'/' ?>" rel="permalink">+ Permalink</a>
 
                 <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="<?= preg_match('/^item-/', $item_info['item_token']) ? 'database/items/'.preg_replace('/^item-/i', '', $item_info['item_token']).'/' : 'database/items/'.$item_info['item_token'].'/' ?>" rel="permalink">+ View More</a>
+                    <a class="link link_permalink permalink" href="<?= 'database/items/'.$item_info['item_token'].'/' ?>" rel="permalink">+ View More</a>
 
                 <? endif; ?>
 
@@ -1751,242 +1749,6 @@ class rpg_item {
 
         // Return true on success
         return true;
-
-    }
-
-
-    // Define a static function to use as the common action for all forward attack type items
-    public static function item_function_forward_attack($objects, $target_options, $damage_options, $recovery_options, $effect_options = array()){
-
-        // Define defaults for undefined target options
-        if (!isset($target_options['stat_kind'])){ $target_options['stat_kind'] = 'energy'; }
-        if (!isset($target_options['robot_frame'])){ $target_options['robot_frame'] = 'shoot'; }
-        if (!isset($target_options['robot_kickback'])){ $target_options['robot_kickback'] = array(0, 0, 0); }
-        if (!isset($target_options['item_frame'])){ $target_options['item_frame'] = 0; }
-        if (!isset($target_options['item_offset'])){ $target_options['item_offset'] = array(110, 0, 10); }
-        if (!isset($target_options['item_text'])){ $target_options['item_text'] = '{this_robot_name} uses the {this_item_name}!'; }
-
-        // Define defaults for undefined damage options
-        if (!isset($damage_options['robot_frame'])){ $damage_options['robot_frame'] = 'damage'; }
-        if (!isset($damage_options['robot_kickback'])){ $damage_options['robot_kickback'] = array(10, 0, 0); }
-        if (!isset($damage_options['item_sucess_frame'])){ $damage_options['item_sucess_frame'] = 4; }
-        if (!isset($damage_options['item_success_offset'])){ $damage_options['item_success_offset'] = array(-90, 0, 10); }
-        if (!isset($damage_options['item_success_text'])){ $damage_options['item_success_text'] = 'The {this_item_name} hit the target!'; }
-        if (!isset($damage_options['item_failure_frame'])){ $damage_options['item_failure_frame'] = 4; }
-        if (!isset($damage_options['item_failure_offset'])){ $damage_options['item_failure_offset'] = array(-100, 0, -10); }
-        if (!isset($damage_options['item_failure_text'])){ $damage_options['item_failure_text'] = 'The {this_item_name} missed...'; }
-
-        // Define defaults for undefined recovery options
-        if (!isset($recovery_options['robot_frame'])){ $recovery_options['robot_frame'] = 'taunt'; }
-        if (!isset($recovery_options['robot_kickback'])){ $recovery_options['robot_kickback'] = array(0, 0, 0); }
-        if (!isset($recovery_options['item_sucess_frame'])){ $recovery_options['item_sucess_frame'] = 4; }
-        if (!isset($recovery_options['item_success_offset'])){ $recovery_options['item_success_offset'] = array(-45, 0, 10); }
-        if (!isset($recovery_options['item_success_text'])){ $recovery_options['item_success_text'] = 'The {this_item_name} was absorbed by the target!'; }
-        if (!isset($recovery_options['item_failure_frame'])){ $recovery_options['item_failure_frame'] = 4; }
-        if (!isset($recovery_options['item_failure_offset'])){ $recovery_options['item_failure_offset'] = array(-100, 0, -10); }
-        if (!isset($recovery_options['item_failure_text'])){ $recovery_options['item_failure_text'] = 'The {this_item_name} had no effect on the target...'; }
-
-        // Define defaults for undefined effect options
-        if (!isset($effect_options['stat_kind'])){ $effect_options = false; }
-        else {
-            if (!isset($effect_options['damage_text'])){ $effect_options['damage_text'] = '{this_robot_name}\'s stats were damaged!'; }
-            if (!isset($effect_options['recovery_text'])){ $effect_options['recovery_text'] = '{this_robot_name}\'s stats improved!'; }
-            if (!isset($effect_options['effect_chance'])){ $effect_options['effect_chance'] = 50; }
-            if (!isset($effect_options['effect_target'])){ $effect_options['effect_target'] = 'target'; }
-        }
-
-        // Extract all objects into the current scope
-        extract($objects);
-
-        // Define Search and replace object strings for replacing
-        $search_replace = array();
-        $search_replace['this_player_name'] = $this_player->print_player_name();
-        $search_replace['this_robot_name'] = $this_robot->print_robot_name();
-        $search_replace['target_player_name'] = $target_player->print_player_name();
-        $search_replace['target_robot_name'] = $target_robot->print_robot_name();
-        $search_replace['this_item_name'] = $this_item->print_item_name();
-
-        // Run the obtion arrays through the parsing function
-        $target_options = self::parse_string_variables($search_replace, $target_options);
-        $damage_options = self::parse_string_variables($search_replace, $damage_options);
-        $recovery_options = self::parse_string_variables($search_replace, $recovery_options);
-        if (!empty($effect_options)){
-            $effect_options = self::parse_string_variables($search_replace, $effect_options);
-        }
-
-        // Update target options for this item
-        $this_item->target_options_update(array(
-            'frame' => $target_options['robot_frame'],
-            'kickback' => $target_options['robot_kickback'],
-            'success' => array(
-                $target_options['item_frame'],
-                $target_options['item_offset'][0],
-                $target_options['item_offset'][1],
-                $target_options['item_offset'][2],
-                $target_options['item_text']
-                )
-            ));
-
-        // Update damage options for this item
-        $this_item->damage_options_update(array(
-            'kind' => $target_options['stat_kind'],
-            'frame' => $damage_options['robot_frame'],
-            'kickback' => $damage_options['robot_kickback'],
-            'success' => array(
-                $damage_options['item_sucess_frame'],
-                $damage_options['item_success_offset'][0],
-                $damage_options['item_success_offset'][1],
-                $damage_options['item_success_offset'][2],
-                $damage_options['item_success_text']
-                ),
-            'failure' => array(
-                $damage_options['item_failure_frame'],
-                $damage_options['item_failure_offset'][0],
-                $damage_options['item_failure_offset'][1],
-                $damage_options['item_failure_offset'][2],
-                $damage_options['item_failure_text']
-                )
-            ));
-
-        // Update recovery options for this item
-        $this_item->recovery_options_update(array(
-            'kind' => $target_options['stat_kind'],
-            'frame' => $recovery_options['robot_frame'],
-            'kickback' => $recovery_options['robot_kickback'],
-            'success' => array(
-                $recovery_options['item_sucess_frame'],
-                $recovery_options['item_success_offset'][0],
-                $recovery_options['item_success_offset'][1],
-                $recovery_options['item_success_offset'][2],
-                $recovery_options['item_success_text']
-                ),
-            'failure' => array(
-                $damage_options['item_failure_frame'],
-                $damage_options['item_failure_offset'][0],
-                $damage_options['item_failure_offset'][1],
-                $damage_options['item_failure_offset'][2],
-                $damage_options['item_failure_text']
-                )
-            ));
-
-
-        // Target the opposing robot with this item
-        $this_robot->trigger_target($target_robot, $this_item);
-
-        // Attempt to inflict damage on the opposing robot
-        $stat_damage_amount = $this_item->item_damage;
-        $target_robot->trigger_damage($this_robot, $this_item, $stat_damage_amount);
-
-        // Only apply a secondary affect if one was defined
-        if (!empty($effect_options)){
-
-            // Define the stat property strings
-            $robot_stat_prop = 'robot_'.$effect_options['stat_kind'];
-
-            // Check to make sure the target of this effect is the target of the item
-            if ($effect_options['effect_target'] == 'target'){
-
-                // Trigger effect if target isn't disabled and item was successful and chance
-                if (
-                    $target_robot->robot_status != 'disabled' &&
-                    $this_item->item_results['this_result'] != 'failure' &&
-                    $this_item->item_results['this_amount'] > 0 &&
-                    $target_robot->$robot_stat_prop > 0 &&
-                    ($effect_options['effect_chance'] == 100 || $this_battle->critical_chance($effect_options['effect_chance']))
-                    ){
-
-                    // Define the default damage options for the stat effect
-                    $this_item->damage_options_update(array(
-                        'kind' => $effect_options['stat_kind'],
-                        'frame' => 'defend',
-                        'percent' => true,
-                        'kickback' => array(10, 0, 0),
-                        'success' => array(9, 0, 0, -10, $effect_options['damage_text']),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
-
-                    // Define the default recovery options for the stat effect
-                    $this_item->recovery_options_update(array(
-                        'kind' => $effect_options['stat_kind'],
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'kickback' => array(0, 0, 0),
-                        'success' => array(9, 0, 0, -10, $effect_options['recovery_text']),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
-
-                    // Calculate the exact damage amount and trigger it on the target
-                    $trigger_options = array('apply_modifiers' => false);
-                    $stat_damage_amount = ceil($target_robot->$robot_stat_prop * ($this_item->item_damage2 / 100));
-                    $target_robot->trigger_damage($this_robot, $this_item, $stat_damage_amount, true, $trigger_options);
-                }
-
-            }
-            // Otherwise, if the target of this effect is the user of the item
-            elseif ($effect_options['effect_target'] == 'user'){
-
-                // Trigger effect if target isn't disabled and item was successful and chance
-                if (
-                    $this_robot->robot_status != 'disabled' &&
-                    $this_item->item_results['this_result'] != 'failure' &&
-                    $this_item->item_results['this_amount'] > 0 &&
-                    $this_robot->$robot_stat_prop < MMRPG_SETTINGS_STATS_MAX &&
-                    ($effect_options['effect_chance'] == 100 || $this_battle->critical_chance($effect_options['effect_chance']))
-                    ){
-
-                    // Define the default recovery options for the stat effect
-                    $this_item->recovery_options_update(array(
-                        'kind' => $effect_options['stat_kind'],
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'kickback' => array(0, 0, 0),
-                        'success' => array(9, 0, 0, -10, $effect_options['recovery_text']),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
-
-                    // Define the default damage options for the stat effect
-                    $this_item->damage_options_update(array(
-                        'kind' => $effect_options['stat_kind'],
-                        'frame' => 'defend',
-                        'percent' => true,
-                        'kickback' => array(10, 0, 0),
-                        'success' => array(9, 0, 0, -10, $effect_options['damage_text']),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
-
-                    // Calculate the exact damage amount and trigger it on the target
-                    $trigger_options = array('apply_modifiers' => false);
-                    $stat_recovery_amount = ceil($this_robot->$robot_stat_prop * ($this_item->item_recovery2 / 100));
-                    $this_robot->trigger_recovery($this_robot, $this_item, $stat_recovery_amount, true, $trigger_options);
-                }
-
-            }
-
-        }
-
-        // Return true on success
-        return true;
-
-    }
-
-
-    // Define a static function to use as the common action for all ranged attack type items
-    public static function item_function_ranged_attack($objects, $options = array()){
-
-
-    }
-
-
-    // Define a static function to use as the common action for all multi-hit attack type items
-    public static function item_function_repeat_attack($objects, $options = array()){
-
-
-    }
-
-
-    // Define a static function to use as the common action for all multi-target attack type items
-    public static function item_function_spread_attack($objects, $options = array()){
-
 
     }
 
