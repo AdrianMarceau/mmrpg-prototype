@@ -992,7 +992,7 @@ class rpg_item extends rpg_object {
                                                 $temp_string[] = '<a href="database/items/'.$item_type.'/" class="item_type item_type_'.$item_type.'">'.$mmrpg_index['types'][$item_type]['type_name'].'</a>';
                                                 if (!empty($item_info['item_type2'])){
                                                     $item_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : 'none';
-                                                    $temp_string[] = '<a href="'.((preg_match('/^item-/', $item_info['item_token']) ? 'database/items/' : 'database/items/').$item_type2.'/').'" class="item_type item_type_'.$item_type2.'">'.$mmrpg_index['types'][$item_type2]['type_name'].'</a>';
+                                                    $temp_string[] = '<a href="database/items/'.$item_type2.'/" class="item_type item_type_'.$item_type2.'">'.$mmrpg_index['types'][$item_type2]['type_name'].'</a>';
                                                 }
                                                 echo implode(' ', $temp_string);
                                             } else {

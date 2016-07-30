@@ -6,7 +6,7 @@
 class rpg_ability_recovery extends rpg_recovery {
 
     // Define a trigger for inflicting all types of recovery on this robot
-    public function trigger_robot_recovery($this_robot, $target_robot, $this_ability, $recovery_amount, $trigger_disabled = true, $trigger_options = array()){
+    public static function trigger_robot_recovery($this_robot, $target_robot, $this_ability, $recovery_amount, $trigger_disabled = true, $trigger_options = array()){
         global $db;
 
         // Generate default trigger options if not set

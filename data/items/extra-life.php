@@ -20,9 +20,10 @@ $item = array(
     extract($objects);
 
     // Automatically change this item's image based on player
-    if ($this_player->player_token == 'dr-light'){ $this_item->item_image = 'item-extra-life'; }
-    elseif ($this_player->player_token == 'dr-wily'){ $this_item->item_image = 'item-extra-life-2'; }
-    elseif ($this_player->player_token == 'dr-cossack'){ $this_item->item_image = 'item-extra-life-3'; }
+    if ($this_player->player_token == 'dr-light'){ $this_item->item_image = 'extra-life'; }
+    elseif ($this_player->player_token == 'dr-wily'){ $this_item->item_image = 'extra-life-2'; }
+    elseif ($this_player->player_token == 'dr-cossack'){ $this_item->item_image = 'extra-life-3'; }
+    //elseif ($this_player->player_token == 'dr-lalinde'){ $this_item->item_image = 'extra-life-4'; }
 
     // Allow this robot to show on the canvas again so we can revive it
     unset($target_robot->flags['apply_disabled_state']);

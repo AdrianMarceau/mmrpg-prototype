@@ -119,10 +119,10 @@ $temp_battle_omega['battle_field_base']['field_music'] = $temp_music_name;
 
 // Add some random item drops to the starter battle
 $temp_battle_omega['battle_rewards']['items'] = array(
-    array('chance' => 20, 'token' => 'item-energy-tank'),
-    array('chance' => 20, 'token' => 'item-weapon-tank'),
-    array('chance' => 10, 'token' => 'item-yashichi'),
-    array('chance' => 20, 'token' => 'item-extra-life')
+    array('chance' => 20, 'token' => 'energy-tank'),
+    array('chance' => 20, 'token' => 'weapon-tank'),
+    array('chance' => 10, 'token' => 'yashichi'),
+    array('chance' => 20, 'token' => 'extra-life')
     );
 
 // This battle doesn't count, so let's modify the point value

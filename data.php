@@ -216,7 +216,7 @@ if ($this_action == 'start'){
     */
     if (!empty($_SESSION['GAME']['values']['battle_items'])){
         $this_player_items = $_SESSION['GAME']['values']['battle_items'];
-        unset($this_player_items['item-screw-small'], $this_player_items['item-screw-large']);
+        unset($this_player_items['small-screw'], $this_player_items['large-screw']);
         $this_player_items = array_keys($this_player_items);
         //$this_player_items = array_slice($this_player_items, 0, 8);
         $_SESSION['GAME']['values'][$temp_session_token] = $this_player_items;
@@ -271,7 +271,6 @@ if ($this_action == 'start'){
     }
 
     // Ensure the target player's items were provided
-    //$target_playerinfo['player_items'] = array('item-energy-pellet','item-energy-capsule','item-weapon-pellet','item-weapon-capsule', 'item-energy-tank', 'item-weapon-tank', 'item-yashichi', 'item-extra-life');
     $target_playerinfo['player_items'] = array();
     if (!empty($target_playerinfo['player_items'])){
         // Update this player's items with the requested tokens

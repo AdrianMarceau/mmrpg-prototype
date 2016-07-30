@@ -1259,7 +1259,7 @@ class rpg_robot extends rpg_object {
 
         } elseif (isset($this_object->item_token)){
             // This was an item so delegate to the item class function
-            return rpg_item_recovery::trigger_robot_recovery($target_robot, $this_object, $recovery_amount, $trigger_disabled, $trigger_options);
+            return rpg_item_recovery::trigger_robot_recovery($this, $target_robot, $this_object, $recovery_amount, $trigger_disabled, $trigger_options);
         }
 
     }
