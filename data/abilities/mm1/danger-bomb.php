@@ -143,7 +143,7 @@ $ability = array(
 
     // Trigger the disabled event on the target robot now if necessary
     if ($target_robot->robot_energy < 1 || $target_robot->robot_status == 'disabled'){
-      $target_robot->trigger_disabled($this_active_robot, $this_ability);
+      $target_robot->trigger_disabled($this_active_robot);
 
     }
 
@@ -153,7 +153,7 @@ $ability = array(
       //$this_robot->robot_status = 'active';
       //$this_robot->robot_frame = 'defeat';
       //$this_robot->update_session();
-      $this_robot->trigger_disabled($target_robot, $this_ability);
+      $this_robot->trigger_disabled($target_robot);
       //$this_battle->actions_empty();
       //$this_robot->robot_energy = 0;
       //$this_robot->robot_status = 'disabled';

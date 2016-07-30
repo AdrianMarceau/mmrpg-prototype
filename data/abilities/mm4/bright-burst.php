@@ -94,7 +94,9 @@ $ability = array(
     $target_robot->update_session();
 
     // If the target was disabled, trigger the event now
-    if ($target_robot->robot_status == 'disabled' || $target_robot->robot_energy == 0){ $target_robot->trigger_disabled($this_robot, $this_ability); }
+    if ($target_robot->robot_status == 'disabled' || $target_robot->robot_energy == 0){
+      $target_robot->trigger_disabled($this_robot);
+    }
 
     // Randomly trigger a defense break if the ability was successful
     if ($target_robot->robot_status != 'disabled'

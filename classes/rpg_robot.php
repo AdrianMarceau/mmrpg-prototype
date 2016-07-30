@@ -1265,7 +1265,7 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a trigger for processing disabled events from abilities
-    public function trigger_disabled($target_robot, $this_ability, $trigger_options = array()){
+    public function trigger_disabled($target_robot, $trigger_options = array()){
 
         // This was an ability so delegate to the ability class function
         return rpg_disabled::trigger_robot_disabled($this, $target_robot, $trigger_options);

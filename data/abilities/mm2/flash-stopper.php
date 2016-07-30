@@ -78,11 +78,15 @@ $ability = array(
       $temp_target_robot->update_session();
     }
     // Trigger the disabled event on the targets now if necessary
-    if ($target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot, $this_ability); }
+    if ($target_robot->robot_status == 'disabled'){
+      $target_robot->trigger_disabled($this_robot);
+    }
     foreach ($backup_robots_active AS $key => $info){
       if ($info['robot_id'] == $target_robot->robot_id){ continue; }
       $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
-      if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){ $temp_target_robot->trigger_disabled($this_robot, $this_ability); }
+      if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
+        $temp_target_robot->trigger_disabled($this_robot);
+      }
     }
 
     // Return true on success

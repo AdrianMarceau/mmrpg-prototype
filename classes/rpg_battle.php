@@ -2352,7 +2352,7 @@ class rpg_battle extends rpg_object {
                                 }
                                 // If the temp robot was disabled, trigger the event
                                 if ($temp_robot->robot_energy < 1){
-                                    $temp_robot->trigger_disabled($target_robot, $temp_attachment);
+                                    $temp_robot->trigger_disabled($target_robot);
                                     // If this the player's last robot
                                     if ($this_player->counters['robots_active'] < 1){
                                         // Trigger the battle complete event
