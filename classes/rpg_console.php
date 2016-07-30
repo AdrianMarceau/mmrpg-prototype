@@ -182,7 +182,7 @@ class rpg_console {
     }
 
     // Define a function for generating item console variables
-    public function item_markup($this_item, $options, $player_data, $robot_data){
+    public static function item_markup($this_item, $options, $player_data, $robot_data){
 
         // Define the variable to hold the console item data
         $this_data = array();
@@ -219,7 +219,7 @@ class rpg_console {
     }
 
     // Define a function for generating console message markup
-    public function battle_markup($this_battle, $eventinfo, $options){
+    public static function battle_markup($this_battle, $eventinfo, $options){
 
         // Define the console markup string
         $this_markup = '';
