@@ -83,7 +83,7 @@ class rpg_target {
         */
 
         // Create a new entry in the event log for the targeting event
-        $this_robot->battle->events_create($this, $target_robot, $this_ability->target_options['target_header'], $this_ability->ability_results['this_text'], $event_options);
+        $this_robot->battle->events_create($this_robot, $target_robot, $this_ability->target_options['target_header'], $this_ability->ability_results['this_text'], $event_options);
 
         /*
         // If this is a non-transformed copy robot, change its colour
@@ -196,7 +196,7 @@ class rpg_target {
         */
 
         // Create a new entry in the event log for the targeting event
-        $this_robot->battle->events_create($this, $target_robot, $this_item->target_options['target_header'], $this_item->item_results['this_text'], $event_options);
+        $this_robot->battle->events_create($this_robot, $target_robot, $this_item->target_options['target_header'], $this_item->item_results['this_text'], $event_options);
 
         /*
         // If this is a non-transformed copy robot, change its colour
