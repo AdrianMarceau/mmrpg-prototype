@@ -1235,12 +1235,12 @@ class rpg_robot extends rpg_object {
         $this_item = false;
 
         // Check to see which object type has been provided
-        if (isset($this_object['ability_token'])){
-            $this_ability_token = $this_object['ability_token'];
+        if (isset($this_object->ability_token)){
+            $this_ability_token = $this_object->ability_token;
             $this_ability = $this_object;
             $object_type = 'ability';
-        } elseif (isset($this_object['item_token'])){
-            $this_item_token = $this_object['item_token'];
+        } elseif (isset($this_object->item_token)){
+            $this_item_token = $this_object->item_token;
             $this_item = $this_object;
             $object_type = 'item';
         }
@@ -1265,9 +1265,9 @@ class rpg_robot extends rpg_object {
 
         // Empty any text from the previous ability/item result
         if ($object_type == 'ability'){
-            $this_ability->ability_results['this_text'] = '';
+            $this_object->results('ability', 'this_text', '');
         } elseif ($object_type == 'item'){
-            $this_item->item_results['this_text'] = '';
+            $this_object->results('item', 'this_text', '');
         }
 
         // Update this robot's history with the triggered ability
@@ -1278,31 +1278,27 @@ class rpg_robot extends rpg_object {
         }
 
         // Backup this and the target robot's frames to revert later
-        $this_robot_backup_frame = $this->robot_frame;
-        $this_player_backup_frame = $this->player->player_frame;
-        $target_robot_backup_frame = $target_robot->robot_frame;
-        $target_player_backup_frame = $target_robot->player->player_frame;
-        if ($object_type == 'ability'){
-            $this_ability_backup_frame = $this_ability->ability_frame;
-        } elseif ($object_type == 'item'){
-            $this_item_backup_frame = $this_item->ability_frame;
-        }
+        $this_robot_backup_frame = $this->frame();
+        $this_player_backup_frame = $this->player->frame();
+        $target_robot_backup_frame = $target_robot->frame();
+        $target_player_backup_frame = $target_robot->player->frame();
+        $this_object_backup_frame = $this_object->frame();
 
         // If this is an ABILITY process the final details
         if ($object_type == 'ability'){
 
             // Update this robot's frames using the target options
-            $this->robot_frame = $this_ability->target_options['target_frame'];
-            if ($this->robot_id != $target_robot->robot_id){ $target_robot->robot_frame = 'defend'; }
-            $this->player->player_frame = 'command';
+            $this->frame($this_object->options('target', 'target_frame'));
+            if ($this->id() != $target_robot->id()){ $target_robot->frame('defend'); }
+            $this->player->frame('command');
             $this->player->update_session();
-            $this_ability->ability_frame = $this_ability->target_options['ability_success_frame'];
-            $this_ability->ability_frame_span = $this_ability->target_options['ability_success_frame_span'];
-            $this_ability->ability_frame_offset = $this_ability->target_options['ability_success_frame_offset'];
+            $this_object->frame($this_object->options('target', 'ability_success_frame'));
+            $this_object->frame_span($this_object->options('target', 'ability_success_frame_span'));
+            $this_object->frame_offset($this_object->options('target', 'ability_success_frame_offset'));
 
             // If the target player is on the bench, alter the ability scale
-            $temp_ability_styles_backup = $this_ability->ability_frame_styles;
-            if ($target_robot->robot_position == 'bench' && $event_options['this_ability_target'] != $this->robot_id.'_'.$this->robot_token){
+            $temp_ability_styles_backup = $this_object->frame_styles();
+            if ($target_robot->robot_position == 'bench' && $event_options['this_ability_target'] != $this->id().'_'.$this->token()){
                 $temp_scale = 1 - ($target_robot->robot_key * 0.06);
                 $temp_translate = 20 + ($target_robot->robot_key * 20);
                 $temp_translate2 = ceil($temp_translate / 10) * -1;
@@ -1390,30 +1386,17 @@ class rpg_robot extends rpg_object {
         $this->player->player_frame = $this_player_backup_frame;
         $target_robot->robot_frame = $target_robot_backup_frame;
         $target_robot->player->player_frame = $target_player_backup_frame;
-        if ($object_type == 'ability'){
-            $this_ability->ability_frame = $this_ability_backup_frame;
-            $this_ability->target_options_reset();
-        } elseif ($object_type == 'item'){
-            $this_item->ability_frame = $this_item_backup_frame;
-            $this_item->target_options_reset();
-        }
+        $this_object->frame($this_object_backup_frame);
+        $this_object->target_options_reset();
 
         // Update internal variables
         $this->update_session();
         $this->player->update_session();
         $target_robot->update_session();
-        if ($object_type == 'ability'){
-            $this_ability->update_session();
-        } elseif ($object_type == 'item'){
-            $this_item->update_session();
-        }
+        $this_object->update_session();
 
-        // Return the ability results
-        if ($object_type == 'ability'){
-            return $this_ability->ability_results;
-        } elseif ($object_type == 'item'){
-            return $this_item->item_results;
-        }
+        // Return the object results
+        return $this_object->results($object_type);
 
     }
 
