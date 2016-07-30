@@ -190,7 +190,7 @@ class rpg_player extends rpg_object {
     // Define a function for generating player canvas variables
     public function canvas_markup($options){
 
-        // Delegate markup generation to the canvas function
+        // Delegate markup generation to the canvas class
         return rpg_canvas::player_markup($this, $options);
 
     }
@@ -198,7 +198,7 @@ class rpg_player extends rpg_object {
     // Define a function for generating player console variables
     public function console_markup($options){
 
-        // Delegate markup generation to the console function
+        // Delegate markup generation to the console class
         return rpg_console::player_markup($this, $options);
 
     }
