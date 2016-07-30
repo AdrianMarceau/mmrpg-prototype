@@ -2939,7 +2939,7 @@ body.windowFlag_landscapeMode #actions .actions_settings_autoScan .block_8 label
 
 
 
-/* -- DEBUG DEBUG DEBUG DEBUG DEBUG -- */
+/* -- DEBUG DEBUG DEBUG DEBUG DEBUG --
 
 #connect {
     display: block;
@@ -2956,3 +2956,5 @@ body.windowFlag_landscapeMode #window iframe,
 body.windowFlag_landscapeMode #battle {
     height: 1024px !important;
 }
+
+*/
