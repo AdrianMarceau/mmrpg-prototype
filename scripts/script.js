@@ -90,7 +90,7 @@ $(document).ready(function(){
         'data-tooltip-align="', 'data-tooltip-type="', 'data-tooltip="', 'data-order="',
         'data-robotid="', 'data-playerid="', 'data-abilityid="', 'data-shadowid="', 'data-mugshotid="', 'data-detailsid="',
         'type="button"', 'data-key="', 'data-type="', 'data-panel="', 'data-action="', 'data-preload="', 'data-size="', 'data-frame="', 'data-scale="', 'data-direction="', 'data-position="', 'data-status="', 'data-target="',
-        'images/players_shadows/', 'images/players/', 'images/robots_shadows/', 'images/robots/', 'images/abilities/item-', 'images/abilities/',
+        'images/players_shadows/', 'images/players/', 'images/robots_shadows/', 'images/robots/', 'images/items/', 'images/abilities/',
         'background-image: url(', 'background-position:', 'background-size:', 'border-color:', '-webkit-transform:', '-moz-transform:', 'transform:', ' translate(', ' rotate(',
         '</div><div ', '</span><span ', '<strong>', '</strong>', '</label>',
         'abilities', 'attachment', 'position', 'disabled', 'prototype', 'maintext',
@@ -1084,6 +1084,28 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         }
         mmrpg_engine_update({this_action_token:thisAbility});
         thisAction = 'ability';
+        } else if (thisAction.match(/^item_([-a-z0-9_]+)$/i)){
+        // Parse the item token and clean the main action token
+        var thisItem = thisAction.replace(/^item_([-a-z0-9_]+)$/i, '$1');
+        // If this item's target is not set to auto
+        if (thisTarget == 'select_this'){
+            // Make sure the engine is not submit yet
+            submitEngine = false;
+            // Make sure the next panel is the target
+            nextPanel = 'target_this';
+        } else if (thisTarget == 'select_this_disabled'){
+            // Make sure the engine is not submit yet
+            submitEngine = false;
+            // Make sure the next panel is the target
+            nextPanel = 'target_this_disabled';
+        } else if (thisTarget == 'select_target'){
+            // Make sure the engine is not submit yet
+            submitEngine = false;
+            // Make sure the next panel is the target
+            nextPanel = 'target_target';
+        }
+        mmrpg_engine_update({this_action_token:thisItem});
+        thisAction = 'item';
         } else if (thisAction.match(/^switch_([-a-z0-9_]+)$/i)){
         // Parse the switch token and clean the main action token
         var thisSwitch = thisAction.replace(/^switch_([-a-z0-9_]+)$/i, '$1');

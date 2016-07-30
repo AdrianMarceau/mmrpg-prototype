@@ -1273,29 +1273,49 @@ class rpg_robot extends rpg_object {
 
     // Define a function for calculating required weapon energy
     public function calculate_weapon_energy($this_ability, &$energy_base = 0, &$energy_mods = 0){
-        // Determine how much weapon energy this should take
-        $energy_new = $this_ability->ability_energy;
-        $energy_base = $energy_new;
-        $energy_mods = 0;
-        if ($this_ability->ability_token != 'action-noweapons'){
-            if (!empty($this->robot_core) && ($this->robot_core == $this_ability->ability_type || $this->robot_core == $this_ability->ability_type2)){
-                $energy_mods++;
-                $energy_new = ceil($energy_new * 0.5);
-            }
-            if (!empty($this->robot_rewards['abilities'])){
-                foreach ($this->robot_rewards['abilities'] AS $key => $info){
-                    if ($info['token'] == $this_ability->ability_token){
-                        $energy_mods++;
-                        $energy_new = ceil($energy_new * 0.5);
-                        break;
+
+        // If this is an item the weapon energy is zero
+        if (isset($this_object->item_token)){
+
+            // Define the return to the item variable
+            $this_item = $this_object;
+
+            // Return zero as items are free
+            return 0;
+
+        }
+        // Otherwise if ability then we have to calculate
+        elseif (isset($this_object->ability_token)){
+
+            // Define the return to the ability variable
+            $this_ability = $this_object;
+
+            // Determine how much weapon energy this should take
+            $energy_new = $this_ability->ability_energy;
+            $energy_base = $energy_new;
+            $energy_mods = 0;
+            if ($this_ability->ability_token != 'action-noweapons'){
+                if (!empty($this->robot_core) && ($this->robot_core == $this_ability->ability_type || $this->robot_core == $this_ability->ability_type2)){
+                    $energy_mods++;
+                    $energy_new = ceil($energy_new * 0.5);
+                }
+                if (!empty($this->robot_rewards['abilities'])){
+                    foreach ($this->robot_rewards['abilities'] AS $key => $info){
+                        if ($info['token'] == $this_ability->ability_token){
+                            $energy_mods++;
+                            $energy_new = ceil($energy_new * 0.5);
+                            break;
+                        }
                     }
                 }
+            } else {
+                $this_ability->ability_energy = 0;
             }
-        } else {
-            $this_ability->ability_energy = 0;
+
+            // Return the resulting weapon energy
+            return $energy_new;
+
         }
-        // Return the resulting weapon energy
-        return $energy_new;
     }
 
     // Define a function for calculating required weapon energy without using objects

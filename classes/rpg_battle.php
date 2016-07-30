@@ -385,6 +385,20 @@ class rpg_battle extends rpg_object {
                         );
                     break;
                 }
+                // If the robot item action was called
+                case 'item': {
+                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                    // Initiate the item event for this player's robot
+                    $battle_action = $this->actions_trigger(
+                        $current_action['this_player'],
+                        $current_action['this_robot'],
+                        $current_action['target_player'],
+                        $current_action['target_robot'],
+                        'item',
+                        $current_action['this_action_token']
+                        );
+                    break;
+                }
                 // If the robot switch action was called
                 case 'switch': {
                     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -1500,6 +1514,95 @@ class rpg_battle extends rpg_object {
 
                 // Return from the battle function with the used ability
                 $this_return = &$this_ability;
+                break;
+
+            }
+            // Else if the player has chosen to use an item
+            elseif ($this_action == 'item'){
+                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+                // Combine into the actions index
+                $temp_actions_index = $db->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
+
+                // DEFINE ABILITY TOKEN
+
+                // If an item token was not collected
+                if (empty($this_token)){
+                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                    // Collect the item choice from the robot
+                    $temp_token = rpg_robot::robot_choices_items(array(
+                        'this_battle' => &$this,
+                        'this_field' => &$this->battle_field,
+                        'this_player' => &$this_player,
+                        'this_robot' => &$this_robot,
+                        'target_player' => &$target_player,
+                        'target_robot' => &$target_robot
+                        ));
+                    $temp_id = $this->index['items'][$temp_token]['item_id'];//array_search($temp_token, $this_robot->robot_items);
+                    $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
+                    //$this_token = array('item_id' => $temp_id, 'item_token' => $temp_token);
+                    $this_token = rpg_item::parse_index_info($temp_actions_index[$temp_token]);
+                    $this_token['item_id'] = $temp_id;
+                }
+                // Otherwise, parse the token for data
+                else {
+                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                    // Define the item choice data for this robot
+                    list($temp_id, $temp_token) = explode('_', $this_token);
+                    //$this_token = array('item_id' => $temp_id, 'item_token' => $temp_token);
+                    $this_token = rpg_item::parse_index_info($temp_actions_index[$temp_token]);
+                    $this_token['item_id'] = $temp_id;
+                }
+
+                // If the current robot has been already disabled
+                if ($this_robot->robot_status == 'disabled'){
+                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                    // Break from this queued action as the robot cannot fight
+                    break;
+                }
+
+                // Define the current item object using the loaded item data
+                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                $this_item = new rpg_item($this, $this_player, $this_robot, $this_token);
+                // Trigger this robot's item
+                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                $this_item->item_results = $this_robot->trigger_item($target_robot, $this_item);
+
+                // Ensure the battle has not completed before triggering the taunt event
+                if ($this->battle_status != 'complete'){
+                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
+                    // Check to ensure this robot hasn't taunted already
+                    if (!isset($this_robot->flags['robot_quotes']['battle_taunt'])
+                        && isset($this_robot->robot_quotes['battle_taunt'])
+                        && $this_robot->robot_quotes['battle_taunt'] != '...'
+                        && $this_item->item_results['this_amount'] > 0
+                        && $target_robot->robot_status != 'disabled'
+                        && $this->critical_chance(3)){
+                        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                        // Generate this robot's taunt event after dealing damage, which only happens once per battle
+                        $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
+                        $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                        $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                        //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
+                        $event_body = ($this_player->player_token != 'player' ? $this_player->print_player_name().'&#39;s ' : '').$this_robot->print_robot_name().' taunts the opponent!<br />';
+                        $event_body .= $this_robot->print_robot_quote('battle_taunt', $this_find, $this_replace);
+                        //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
+                        $this_robot->robot_frame = 'taunt';
+                        $target_robot->robot_frame = 'base';
+                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, array('console_show_target' => false));
+                        $this_robot->robot_frame = 'base';
+                        // Create the quote flag to ensure robots don't repeat themselves
+                        $this_robot->flags['robot_quotes']['battle_taunt'] = true;
+                    }
+
+                }
+
+                // Set this token to the ID and token of the triggered item
+                $this_token = $this_token['item_id'].'_'.$this_token['item_token'];
+
+                // Return from the battle function with the used item
+                $this_return = &$this_item;
                 break;
 
             }

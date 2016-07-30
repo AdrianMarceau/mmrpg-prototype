@@ -1127,16 +1127,16 @@ class rpg_player extends rpg_object {
                                             // DEBUG
                                             //echo 'robot-ability:';
                                             foreach ($player_info['player_items_current'] AS $key => $player_item){
-                                                if (empty($player_item['ability_token'])){ continue; }
-                                                elseif ($player_item['ability_token'] == '*'){ continue; }
-                                                elseif ($player_item['ability_token'] == 'ability'){ continue; }
+                                                if (empty($player_item['item_token'])){ continue; }
+                                                elseif ($player_item['item_token'] == '*'){ continue; }
+                                                elseif ($player_item['item_token'] == 'item'){ continue; }
                                                 elseif ($item_key > 7){ continue; }
-                                                $this_item = rpg_ability::parse_index_info($mmrpg_database_items[$player_item['ability_token']]);
+                                                $this_item = rpg_item::parse_index_info($mmrpg_database_items[$player_item['item_token']]);
                                                 if (empty($this_item)){ continue; }
-                                                $this_item_token = $this_item['ability_token'];
-                                                $this_item_name = $this_item['ability_name'];
-                                                $this_item_type = !empty($this_item['ability_type']) ? $this_item['ability_type'] : false;
-                                                $this_item_type2 = !empty($this_item['ability_type2']) ? $this_item['ability_type2'] : false;
+                                                $this_item_token = $this_item['item_token'];
+                                                $this_item_name = $this_item['item_name'];
+                                                $this_item_type = !empty($this_item['item_type']) ? $this_item['item_type'] : false;
+                                                $this_item_type2 = !empty($this_item['item_type2']) ? $this_item['item_type2'] : false;
                                                 if (!empty($this_item_type) && !empty($mmrpg_index['types'][$this_item_type])){
                                                     $this_item_type = $mmrpg_index['types'][$this_item_type]['type_name'].' Type';
                                                     if (!empty($this_item_type2) && !empty($mmrpg_index['types'][$this_item_type2])){
@@ -1145,33 +1145,33 @@ class rpg_player extends rpg_object {
                                                 } else {
                                                     $this_item_type = '';
                                                 }
-                                                $this_item_energy = isset($this_item['ability_energy']) ? $this_item['ability_energy'] : 4;
-                                                $this_item_damage = !empty($this_item['ability_damage']) ? $this_item['ability_damage'] : 0;
-                                                $this_item_damage2 = !empty($this_item['ability_damage2']) ? $this_item['ability_damage2'] : 0;
-                                                $this_item_damage_percent = !empty($this_item['ability_damage_percent']) ? true : false;
-                                                $this_item_damage2_percent = !empty($this_item['ability_damage2_percent']) ? true : false;
+                                                $this_item_energy = isset($this_item['item_energy']) ? $this_item['item_energy'] : 4;
+                                                $this_item_damage = !empty($this_item['item_damage']) ? $this_item['item_damage'] : 0;
+                                                $this_item_damage2 = !empty($this_item['item_damage2']) ? $this_item['item_damage2'] : 0;
+                                                $this_item_damage_percent = !empty($this_item['item_damage_percent']) ? true : false;
+                                                $this_item_damage2_percent = !empty($this_item['item_damage2_percent']) ? true : false;
                                                 if ($this_item_damage_percent && $this_item_damage > 100){ $this_item_damage = 100; }
                                                 if ($this_item_damage2_percent && $this_item_damage2 > 100){ $this_item_damage2 = 100; }
-                                                $this_item_recovery = !empty($this_item['ability_recovery']) ? $this_item['ability_recovery'] : 0;
-                                                $this_item_recovery2 = !empty($this_item['ability_recovery2']) ? $this_item['ability_recovery2'] : 0;
-                                                $this_item_recovery_percent = !empty($this_item['ability_recovery_percent']) ? true : false;
-                                                $this_item_recovery2_percent = !empty($this_item['ability_recovery2_percent']) ? true : false;
+                                                $this_item_recovery = !empty($this_item['item_recovery']) ? $this_item['item_recovery'] : 0;
+                                                $this_item_recovery2 = !empty($this_item['item_recovery2']) ? $this_item['item_recovery2'] : 0;
+                                                $this_item_recovery_percent = !empty($this_item['item_recovery_percent']) ? true : false;
+                                                $this_item_recovery2_percent = !empty($this_item['item_recovery2_percent']) ? true : false;
                                                 if ($this_item_recovery_percent && $this_item_recovery > 100){ $this_item_recovery = 100; }
                                                 if ($this_item_recovery2_percent && $this_item_recovery2 > 100){ $this_item_recovery2 = 100; }
-                                                $this_item_accuracy = !empty($this_item['ability_accuracy']) ? $this_item['ability_accuracy'] : 0;
-                                                $this_item_description = !empty($this_item['ability_description']) ? $this_item['ability_description'] : '';
+                                                $this_item_accuracy = !empty($this_item['item_accuracy']) ? $this_item['item_accuracy'] : 0;
+                                                $this_item_description = !empty($this_item['item_description']) ? $this_item['item_description'] : '';
                                                 $this_item_description = str_replace('{DAMAGE}', $this_item_damage, $this_item_description);
                                                 $this_item_description = str_replace('{RECOVERY}', $this_item_recovery, $this_item_description);
                                                 $this_item_description = str_replace('{DAMAGE2}', $this_item_damage2, $this_item_description);
                                                 $this_item_description = str_replace('{RECOVERY2}', $this_item_recovery2, $this_item_description);
-                                                $this_item_title = rpg_ability::print_editor_title_markup($robot_info, $this_item);
+                                                $this_item_title = rpg_item::print_editor_title_markup($robot_info, $this_item);
                                                 $this_item_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_item_title));
                                                 $this_item_title_tooltip = htmlentities($this_item_title, ENT_QUOTES, 'UTF-8');
                                                 $this_item_title_html = str_replace(' ', '&nbsp;', $this_item_name);
                                                 $temp_select_options = str_replace('value="'.$this_item_token.'"', 'value="'.$this_item_token.'" selected="selected" disabled="disabled"', $item_rewards_options);
-                                                $this_item_title_html = '<label style="background-image: url(images/abilities/'.$this_item_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_item_title_html.'</label>';
-                                                if ($global_allow_editing){ $this_item_title_html .= '<select class="ability_name" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
-                                                $temp_string[] = '<a class="ability_name ability_type ability_type_'.(!empty($this_item['ability_type']) ? $this_item['ability_type'] : 'none').(!empty($this_item['ability_type2']) ? '_'.$this_item['ability_type2'] : '').'" style="'.(($item_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-item="'.$this_item_token.'" title="'.$this_item_title_plain.'" data-tooltip="'.$this_item_title_tooltip.'">'.$this_item_title_html.'</a>';
+                                                $this_item_title_html = '<label style="background-image: url(images/items/'.$this_item_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_item_title_html.'</label>';
+                                                if ($global_allow_editing){ $this_item_title_html .= '<select class="item_name" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
+                                                $temp_string[] = '<a class="item_name item_type item_type_'.(!empty($this_item['item_type']) ? $this_item['item_type'] : 'none').(!empty($this_item['item_type2']) ? '_'.$this_item['item_type2'] : '').'" style="'.(($item_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-item="'.$this_item_token.'" title="'.$this_item_title_plain.'" data-tooltip="'.$this_item_title_tooltip.'">'.$this_item_title_html.'</a>';
                                                 $item_key++;
                                             }
 
