@@ -536,7 +536,7 @@ class rpg_ability extends rpg_object {
     // Define a function for generating ability canvas variables
     public function canvas_markup($options, $player_data, $robot_data){
 
-        // Offload to the canvas function
+        // Delegate markup generation to the canvas class
         return rpg_canvas::ability_markup($this, $options, $player_data, $robot_data);
 
     }
@@ -544,7 +544,7 @@ class rpg_ability extends rpg_object {
     // Define a function for generating ability console variables
     public function console_markup($options, $player_data, $robot_data){
 
-        // Offload to the canvas function
+        // Delegate markup generation to the console class
         return rpg_console::ability_markup($this, $options, $player_data, $robot_data);
 
     }

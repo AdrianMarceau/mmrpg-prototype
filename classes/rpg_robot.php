@@ -4891,7 +4891,7 @@ class rpg_robot extends rpg_object {
     // Define a function for generating robot canvas variables
     public function canvas_markup($options, $player_data){
 
-        // Offload the markup generation to the canvas class
+        // Delegate markup generation to the canvas class
         return rpg_canvas::robot_markup($this, $options, $player_data);
 
     }
@@ -4899,7 +4899,7 @@ class rpg_robot extends rpg_object {
     // Define a function for generating robot console variables
     public function console_markup($options, $player_data){
 
-        // Offload the markup generation to the canvas class
+        // Delegate markup generation to the console class
         return rpg_console::robot_markup($this, $options, $player_data);
 
     }
