@@ -1052,7 +1052,8 @@ class rpg_ability_recovery extends rpg_recovery {
                     foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
 
                         // Ensure this ability has a type before checking weaknesses, resistances, etc.
-                        if (!empty($this_ability->ability_type) || in_array('*', $attachment_info['attachment_weaknesses'])){
+                        if (!empty($this_ability->ability_type)
+                                || (isset($attachment_info['attachment_weaknesses']) && in_array('*', $attachment_info['attachment_weaknesses']))){
 
                             // If this attachment has weaknesses defined and this ability is a match
                             if (!empty($attachment_info['attachment_weaknesses'])
