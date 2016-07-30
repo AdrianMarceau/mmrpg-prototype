@@ -23,9 +23,9 @@ $battle = array(
     'abilities' => array(
       ),
     'items' => array(
-      array('chance' => 10, 'token' => 'item-energy-tank'),
-      array('chance' => 10, 'token' => 'item-weapon-tank'),
-      array('chance' => 5, 'token' => 'item-extra-life')
+      array('chance' => 10, 'token' => 'energy-tank'),
+      array('chance' => 10, 'token' => 'weapon-tank'),
+      array('chance' => 5, 'token' => 'extra-life')
       )
     )
   );

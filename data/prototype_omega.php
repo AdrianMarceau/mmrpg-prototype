@@ -5,7 +5,7 @@
  */
 
 // Define the base omega factors for ITEMS
-$this_omega_factors_items = array('item-energy-pellet','item-energy-capsule','item-weapon-pellet','item-weapon-capsule', 'item-energy-tank', 'item-weapon-tank', 'item-yashichi', 'item-extra-life');
+$this_omega_factors_items = array('energy-pellet','energy-capsule','weapon-pellet','weapon-capsule', 'energy-tank', 'weapon-tank', 'yashichi', 'extra-life');
 
 // Define the base omega factors for SYSTEM (MEGA MAN 0)
 $this_omega_factors_system = array();

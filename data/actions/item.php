@@ -185,13 +185,12 @@ ob_start();
                     $temp_item_sprite = array();
                     $temp_item_sprite['name'] = $temp_item->item_name;
                     $temp_item_sprite['image'] = $temp_item->item_image;
-                    if ($temp_item->item_token == 'item-extra-life'){
+                    if ($temp_item->item_token == 'extra-life'){
                         // Automatically change this item's image based on player
-                        if ($this_player->player_token == 'dr-light'){ $temp_item_sprite['image'] = 'item-extra-life'; }
-                        elseif ($this_player->player_token == 'dr-wily'){ $temp_item_sprite['image'] = 'item-extra-life-2'; }
-                        elseif ($this_player->player_token == 'dr-cossack'){ $temp_item_sprite['image'] = 'item-extra-life-3'; }
-                        //elseif ($this_player->player_token == 'dr-wily'){ $temp_item_sprite['image'] = 'item-extra-life-2'; }
-                        //elseif ($this_player->player_token == 'dr-cossack'){ $temp_item_sprite['image'] = 'item-extra-life-3'; }
+                        if ($this_player->player_token == 'dr-light'){ $temp_item_sprite['image'] = 'extra-life'; }
+                        elseif ($this_player->player_token == 'dr-wily'){ $temp_item_sprite['image'] = 'extra-life-2'; }
+                        elseif ($this_player->player_token == 'dr-cossack'){ $temp_item_sprite['image'] = 'extra-life-3'; }
+                        //elseif ($this_player->player_token == 'dr-lalinde'){ $temp_item_sprite['image'] = 'extra-life-4'; }
                     }
                     $temp_item_sprite['image_size'] = $temp_item->item_image_size;
                     $temp_item_sprite['image_size_text'] = $temp_item_sprite['image_size'].'x'.$temp_item_sprite['image_size'];

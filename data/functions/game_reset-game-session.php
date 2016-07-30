@@ -53,7 +53,7 @@ function mmrpg_reset_game_session($this_save_filepath){
     $unlock_player_info = $mmrpg_index['players']['dr-light'];
     mmrpg_game_unlock_player($unlock_player_info, false, true);
     $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_points'] = 0;
-    $_SESSION[$session_token]['values']['battle_items'] = array('item-energy-pellet' => 3, 'item-energy-capsule' => 2, 'item-weapon-pellet' => 3, 'item-weapon-capsule' => 2);
+    $_SESSION[$session_token]['values']['battle_items'] = array('energy-pellet' => 3, 'energy-capsule' => 2, 'weapon-pellet' => 3, 'weapon-capsule' => 2);
     $_SESSION[$session_token]['values']['battle_abilities'] = array('buster-shot');
     // Auto-select Dr. Light as the current playable character
     $_SESSION[$session_token]['battle_settings']['this_player_token'] = 'dr-light';

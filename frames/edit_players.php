@@ -370,34 +370,10 @@ if (true){
       }
     }
 
-    /*
-    // Auto-populate the player items array with appropriate values
-    if (!empty($_SESSION[$session_token]['values']['battle_items'])){
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$_SESSION[$session_token][\'values\'][\'battle_items\'] = <pre>'.print_r($_SESSION[$session_token]['values']['battle_items'], true).'</pre>');  }
-      // Define the player items array and prepare to populate
-      $player_rewards['player_items'] = array();
-      // Loop through and add all the collected items as options
-      $temp_key_items = array('item-screw-large', 'item-screw-small', 'item-heart', 'item-star');
-      foreach ($_SESSION[$session_token]['values']['battle_items'] AS $omega_token => $omega_count){
-        if (empty($mmrpg_database_items[$omega_token])){ continue; }
-        elseif (in_array($omega_token, $temp_key_items)){ continue; }
-        $item_info = $mmrpg_database_items[$omega_token];
-        $player_rewards['player_items'][] = $item_info;
-      }
-    }
-    */
-
     // Check how many players this player has and see if they should be able to transfer
     $counter_player_players = !empty($player_info['player_players']) ? count($player_info['player_players']) : false;
     $counter_player_missions = mmrpg_prototype_battles_complete($player_info['player_token']);
     $allow_player_selector = $player_counter > 1 && $counter_player_missions > 0 ? true : false; //$counter_player_players > 1 && $player_counter > 1 ? true : false;
-
-    // If this player has fewer players than any other player
-    //$temp_flag_most_players = true;
-    //foreach ($temp_player_totals AS $temp_player => $temp_total){
-      //if ($temp_player == $player_token){ continue; }
-      //elseif ($temp_total > $counter_player_players){ $allow_player_selector = false; }
-    //}
 
     // Update the player key to the current counter
     $player_key = $key_counter;
@@ -407,10 +383,6 @@ if (true){
     $player_field_rewards = !empty($player_rewards['player_fields']) ? $player_rewards['player_fields'] : array();
     // Collect this player's item rewards and add them to the dropdown
     $player_item_rewards = !empty($player_rewards['player_items']) ? $player_rewards['player_items'] : array();
-    //if (!empty($player_field_rewards)){ sort($player_field_rewards); }
-
-    // DEBUG
-    //die(print_r($player_rewards, true));
 
     // Collect and print the editor markup for this player
     $temp_editor_markup = rpg_player::print_editor_markup($player_info);

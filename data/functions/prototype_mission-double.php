@@ -346,9 +346,9 @@ if (!empty($temp_battle_omega['values']['field_star'])){
 //if ($temp_battle_omega['battle_complete']){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * 0.10); }
 // Add some random item drops to the starter battle
 $temp_battle_omega['battle_rewards']['items'] = array(
-  array('chance' => 10, 'token' => 'item-energy-tank'),
-  array('chance' => 10, 'token' => 'item-weapon-tank'),
-  array('chance' => 10, 'token' => 'item-extra-life')
+  array('chance' => 10, 'token' => 'energy-tank'),
+  array('chance' => 10, 'token' => 'weapon-tank'),
+  array('chance' => 10, 'token' => 'extra-life')
   );
 
 ?>

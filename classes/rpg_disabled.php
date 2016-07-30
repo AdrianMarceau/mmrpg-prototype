@@ -18,7 +18,6 @@ class rpg_disabled {
         // (rather than replace all target references to this references)
         $this_battle = &$this_robot->battle;
         $this_player = &$this_robot->player; // the player of the robot being disabled
-        $this_robot = &$this; // the robot being disabled
         $target_player = &$target_robot->player; // the player of the other robot
         $target_robot = &$target_robot; // the other robot that isn't this one
 
@@ -81,9 +80,9 @@ class rpg_disabled {
         if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
 
             // Collect this robot's stat details for reference
-            $temp_index_info = self::get_index_info($target_robot->robot_token);
+            $temp_index_info = rpg_robot::get_index_info($target_robot->robot_token);
             $temp_reward_info = mmrpg_prototype_robot_rewards($target_player->player_token, $target_robot->robot_token);
-            $temp_robot_stats = self::calculate_stat_values($target_robot->robot_level, $temp_index_info, $temp_reward_info);
+            $temp_robot_stats = rpg_robot::calculate_stat_values($target_robot->robot_level, $temp_index_info, $temp_reward_info);
 
             // Define the stats to loop through and alter
             //$stat_tokens = array('energy', 'attack', 'defense', 'speed');
@@ -744,16 +743,16 @@ class rpg_disabled {
 
             // If this robot was a MECHA class, it may drop PELLETS and SMALL SCREWS
             if ($this_robot->robot_class == 'mecha'){
-                $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'item-energy-pellet');
-                $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'item-weapon-pellet');
-                $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'item-screw-small');
+                $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'energy-pellet');
+                $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'weapon-pellet');
+                $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw');
             }
 
             // If this robot was a MASTER class, it may drop CAPSULES and LARGE SCREWS
             if ($this_robot->robot_class == 'master'){
-                $target_player_rewards['items'][] =  array('chance' => 25, 'token' => 'item-energy-capsule');
-                $target_player_rewards['items'][] =  array('chance' => 25, 'token' => 'item-weapon-capsule');
-                $target_player_rewards['items'][] =  array('chance' => 50, 'token' => 'item-screw-large');
+                $target_player_rewards['items'][] =  array('chance' => 25, 'token' => 'energy-capsule');
+                $target_player_rewards['items'][] =  array('chance' => 25, 'token' => 'weapon-capsule');
+                $target_player_rewards['items'][] =  array('chance' => 50, 'token' => 'large-screw');
             }
 
             // Precount the item values for later use
@@ -765,7 +764,7 @@ class rpg_disabled {
             if ($this_robot->robot_class == 'master' && !empty($this_robot->flags['triggered_weakness'])){
                 $temp_core_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
                 $temp_chance_value = ($temp_value_total * 4);
-                $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => 'item-core-'.$temp_core_type);
+                $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => $temp_core_type.'-core');
             }
 
             // Shuffle the rewards so it doesn't look to formulaic

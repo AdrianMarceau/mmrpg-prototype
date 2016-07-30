@@ -189,7 +189,7 @@ while ($this_action == 'save'){
         if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
           foreach ($mmrpg_index['types'] AS $type_token => $type_info){
             if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
-            if (!isset($_SESSION['GAME']['values']['battle_items']['item-core-'.$type_token]) && $this_userinfo['role_id'] != 1){ continue; }
+            if (!isset($_SESSION['GAME']['values']['battle_items'][$type_token.'-core']) && $this_userinfo['role_id'] != 1){ continue; }
             $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)'.'</option>';
           }
         }
