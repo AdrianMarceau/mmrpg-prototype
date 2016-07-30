@@ -1019,11 +1019,11 @@ class rpg_ability_damage extends rpg_damage {
         if ($this_robot->robot_id == $target_robot->robot_id){ //$this_ability->damage_options['damage_kind'] == 'energy'
             $event_options['console_show_target'] = false;
             $event_options['this_ability_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;;
-            $this_robot->battle->events_create($target_robot, $this, $this_ability->damage_options['damage_header'], $this_ability->ability_results['this_text'], $event_options);
+            $this_robot->battle->events_create($target_robot, $this_robot, $this_ability->damage_options['damage_header'], $this_ability->ability_results['this_text'], $event_options);
         } else {
             $event_options['console_show_target'] = false;
             $event_options['this_ability_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;;
-            $this_robot->battle->events_create($this, $target_robot, $this_ability->damage_options['damage_header'], $this_ability->ability_results['this_text'], $event_options);
+            $this_robot->battle->events_create($this_robot, $target_robot, $this_ability->damage_options['damage_header'], $this_ability->ability_results['this_text'], $event_options);
         }
 
         // Restore this and the target robot's frames to their backed up state
@@ -1097,7 +1097,7 @@ class rpg_ability_damage extends rpg_damage {
                                 unset($this_robot->robot_attachments[$attachment_token]);
                                 $this_robot->update_session();
                                 if ($attachment_info['attachment_destroy'] !== false){
-                                    $temp_attachment = new rpg_ability($this_robot->battle, $this_robot->player, $this, array('ability_token' => $attachment_info['ability_token']));
+                                    $temp_attachment = new rpg_ability($this_robot->battle, $this_robot->player, $this_robot, array('ability_token' => $attachment_info['ability_token']));
                                     $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                                     //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
                                     //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
