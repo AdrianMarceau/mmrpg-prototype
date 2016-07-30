@@ -331,7 +331,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
               'offset_x' => 325,
               'offset_y' => 75,
               'items_token' => 'star',
-              'items_image' => 'star-'$temp_star_kind.'-'.$temp_star_back_info['sheet'],
+              'items_image' => 'star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'],
               'items_frame' => array($temp_star_back_info['frame'], $temp_star_back_info['frame'], $temp_star_back_info['frame'], $temp_star_back_info['frame']),
               'items_frame_shift' => array('325,75', '325,80', '325,85', '325,80'),
               'items_direction' => 'left',
