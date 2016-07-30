@@ -674,7 +674,7 @@ class rpg_canvas {
     }
 
     // Define a function for generating item canvas variables
-    public function item_markup($this_item, $options, $player_data, $robot_data){
+    public static function item_markup($this_item, $options, $player_data, $robot_data){
 
         // Define the variable to hold the console robot data
         $this_data = array();
@@ -827,7 +827,7 @@ class rpg_canvas {
     }
 
     // Define a function for generating canvas scene markup
-    public function battle_markup($this_battle, $eventinfo, $options = array()){
+    public static function battle_markup($this_battle, $eventinfo, $options = array()){
 
         // Define the console markup string
         $this_markup = '';
