@@ -5,6 +5,46 @@
  */
 class rpg_console {
 
+    // Define a function for generating player console variables
+    public static function player_markup($this_player, $options){
+
+        // Define the variable to hold the console robot data
+        $this_data = array();
+
+        // Define and calculate the simpler markup and positioning variables for this player
+        $this_data['player_frame'] = !empty($this_player->player_frame) ? $this_player->player_frame : 'base';
+        $this_data['player_frame'] = str_pad(array_search($this_data['player_frame'], $this_player->player_frame_index), 2, '0', STR_PAD_LEFT);
+        $this_data['player_title'] = $this_player->player_name;
+        $this_data['player_token'] = $this_player->player_token;
+        $this_data['player_float'] = $this_player->player_side;
+        $this_data['player_direction'] = $this_player->player_side == 'left' ? 'right' : 'left';
+        $this_data['player_position'] = 'active';
+
+        // Define the rest of the display variables
+        $this_data['container_class'] = 'this_sprite sprite_'.$this_data['player_float'];
+        $this_data['container_style'] = '';
+        $this_data['player_class'] = 'sprite ';
+        $this_data['player_style'] = '';
+        $this_data['player_size'] = $this_player->player_image_size;
+        $this_data['player_image'] = 'images/players/'.$this_data['player_token'].'/'.(!empty($options['this_player_image']) ? $options['this_player_image'] : 'sprite').'_'.$this_data['player_direction'].'_'.$this_data['player_size'].'x'.$this_data['player_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $this_data['player_class'] .= 'sprite_'.$this_data['player_size'].'x'.$this_data['player_size'].' sprite_'.$this_data['player_size'].'x'.$this_data['player_size'].'_'.$this_data['player_frame'].' ';
+        $this_data['player_class'] .= 'player_position_'.$this_data['player_position'].' ';
+        $this_data['player_style'] .= 'background-image: url('.$this_data['player_image'].'); ';
+
+        // Generate the final markup for the console player
+        $this_data['player_markup'] = '';
+        // If this was an undefined player, do not create markup
+        if ($this_player->player_token != 'player'){
+            $this_data['player_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
+            $this_data['player_markup'] .= '<div class="'.$this_data['player_class'].'" style="'.$this_data['player_style'].'" title="'.$this_data['player_title'].'" data-tooltip-align="'.$this_data['player_float'].'">'.$this_data['player_title'].'</div>';
+            $this_data['player_markup'] .= '</div>';
+        }
+
+        // Return the player console data
+        return $this_data;
+
+    }
+
     // Define a function for generating robot console variables
     public static function robot_markup($this_robot, $options, $player_data){
 
