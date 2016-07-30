@@ -33,43 +33,8 @@ class rpg_object {
     }
 
     /**
-     * Get any object property by name without the prefix
-     * @param   string      $name       Name of the object property
-     * @return  mixed
-     */
-    public function __get($name){
-
-        // If the property exists verbetim, return now
-        if (isset($this->$name)){ return $this->$name; }
-
-        // Otherwise, define the actual property name
-        $prop_name = $this->class.'_'.$name;
-
-        // Return the property if it exists, else null
-        if (isset($this->$prop_name)){ return $this->$prop_name; }
-        else { return null; }
-
-    }
-
-    /**
-     * Set any object property by name and value without the prefix
-     * @param   string      $name       Name of the object property
-     * @param   mixed       $value      Value for the object property
-     */
-    public function __set($name, $value){
-
-        // Determine the real property name, verbetim or otherwise
-        if (isset($this->$name)){ $prop_name = $name; }
-        else { $prop_name = $this->class.'_'.$name; }
-
-        // Update the object property with provided value
-        $this->$prop_name = $value;
-
-    }
-
-    /**
      * Get or set this object's value
-     * @param   string      $name       Name of the object property
+     * @param   string      $key        Name of the object property
      * @param   mixed       $value      Value of the object property (optional)
      * @return  mixed
      */
@@ -82,6 +47,76 @@ class rpg_object {
         if ($value !== null){ $this->$prop_name = $value; }
         // Otherwsie set the property value if it exists
         elseif (isset($this->$prop_name)){ return $this->$prop_name; }
+        // Else return null
+        else { return null; }
+
+    }
+
+    /**
+     * Get or set this object's sub-value
+     * @param   string      $key        Name of the object property
+     * @param   string      $key2       Name of the inner object property
+     * @param   string      $subname    Subname of the object property
+     * @param   mixed       $value      Value of the object property (optional)
+     * @return  mixed
+     */
+    public function subvalue($key, $key2, $value = null){
+
+        // Define the prop name
+        $prop_name = $this->class.'_'.$key;
+
+        // If value was not provided, return current
+        if ($value !== null){ $this->$prop_name[$key2] = $value; }
+        // Otherwsie set the property value if it exists
+        elseif (isset($this->$prop_name[$key2])){ return $this->$prop_name[$key2]; }
+        // Else return null
+        else { return null; }
+
+    }
+
+    /**
+     * Get or set this object's option value
+     * @param   string      $key       Name of the object property
+     * @param   string      $key2      Name of the inner object property
+     * @param   string      $subname    Subname of the object property
+     * @param   mixed       $value      Value of the object property (optional)
+     * @return  mixed
+     */
+    public function options($key, $key2 = null, $value = null){
+
+        // Define the prop name
+        $prop_name = $key.'_options';
+
+        // If a key2 not provided, return entire array
+        if ($key2 === null){ return $this->$prop_name; }
+        // Else if value was not provided, return current
+        elseif ($value !== null){ $this->$prop_name[$key2] = $value; }
+        // Otherwsie set the property value if it exists
+        elseif (isset($this->$prop_name[$key2])){ return $this->$prop_name[$key2]; }
+        // Else return null
+        else { return null; }
+
+    }
+
+    /**
+     * Get or set this object's result value
+     * @param   string      $key       Name of the object property
+     * @param   string      $key2      Name of the inner object property
+     * @param   string      $subname    Subname of the object property
+     * @param   mixed       $value      Value of the object property (optional)
+     * @return  mixed
+     */
+    public function results($key, $key2 = null, $value = null){
+
+        // Define the prop name
+        $prop_name = $key.'_results';
+
+        // If a key2 not provided, return entire array
+        if ($key2 === null){ return $this->$prop_name; }
+        // Else if value was not provided, return current
+        elseif ($value !== null){ $this->$prop_name[$key2] = $value; }
+        // Otherwsie set the property value if it exists
+        elseif (isset($this->$prop_name[$key2])){ return $this->$prop_name[$key2]; }
         // Else return null
         else { return null; }
 
@@ -232,6 +267,33 @@ class rpg_object {
      */
     public function frame($value = null){
         return $this->value('frame', $value);
+    }
+
+    /**
+     * Get or set this object's integer frame span
+     * @param   integer     $value      Integer object frame span (optional)
+     * @return  string
+     */
+    public function frame_span($value = null){
+        return $this->value('frame_span', $value);
+    }
+
+    /**
+     * Get or set this object's string frame animate
+     * @param   array       $values      Array object frame animate (optional)
+     * @return  string
+     */
+    public function frame_animate($values = null){
+        return $this->value('frame_animate', $values);
+    }
+
+    /**
+     * Get or set this object's string frame index
+     * @param   array       $values      Array object frame index (optional)
+     * @return  string
+     */
+    public function frame_index($values = null){
+        return $this->value('frame_index', $values);
     }
 
     /**
