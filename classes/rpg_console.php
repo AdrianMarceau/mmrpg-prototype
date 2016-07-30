@@ -181,6 +181,43 @@ class rpg_console {
 
     }
 
+    // Define a function for generating item console variables
+    public function item_markup($this_item, $options, $player_data, $robot_data){
+
+        // Define the variable to hold the console item data
+        $this_data = array();
+
+        // Define and calculate the simpler markup and positioning variables for this item
+        $this_data['item_name'] = isset($options['item_name']) ? $options['item_name'] : $this->item_name;
+        $this_data['item_title'] = $this_data['item_name'];
+        $this_data['item_token'] = $this->item_token;$this_data['item_direction'] = 'right';
+        $this_data['item_float'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this->robot_id ? $robot_data['robot_float'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
+        $this_data['item_size'] = $this->item_image_size;
+        $this_data['item_frame'] = isset($options['item_frame']) ? $options['item_frame'] : $this->item_frame;
+        if (is_numeric($this_data['item_frame']) && $this_data['item_frame'] >= 0){ $this_data['item_frame'] = str_pad($this_data['item_frame'], 2, '0', STR_PAD_LEFT); }
+        elseif (is_numeric($this_data['item_frame']) && $this_data['item_frame'] < 0){ $this_data['item_frame'] = ''; }
+        $this_data['image_type'] = !empty($options['this_item_image']) ? $options['this_item_image'] : 'icon';
+
+        // Define the rest of the display variables
+        $this_data['container_class'] = 'this_sprite sprite_'.$this_data['item_float'];
+        $this_data['container_style'] = '';
+        $this_data['item_markup_class'] = 'sprite sprite_item sprite_item_'.$this_data['image_type'].' ';
+        $this_data['item_markup_style'] = '';
+        if (empty($this_data['item_image']) || !preg_match('/^images/i', $this_data['item_image'])){ $this_data['item_image'] = 'images/items/'.(!empty($this_data['item_image']) ? $this_data['item_image'] : $this_data['item_token']).'/'.$this_data['image_type'].'_'.$this_data['item_direction'].'_'.$this_data['item_size'].'x'.$this_data['item_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE; }
+        $this_data['item_markup_class'] .= 'sprite_'.$this_data['item_size'].'x'.$this_data['item_size'].' sprite_'.$this_data['item_size'].'x'.$this_data['item_size'].'_'.$this_data['item_frame'].' ';
+        $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); ';
+
+        // Generate the final markup for the console item
+        $this_data['item_markup'] = '';
+        $this_data['item_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
+        $this_data['item_markup'] .= '<div class="'.$this_data['item_markup_class'].'" style="'.$this_data['item_markup_style'].'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
+        $this_data['item_markup'] .= '</div>';
+
+        // Return the item console data
+        return $this_data;
+
+    }
+
 
 
 }
