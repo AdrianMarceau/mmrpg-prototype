@@ -2937,16 +2937,22 @@ body.windowFlag_landscapeMode #actions .actions_settings_autoScan .block_8 label
 
 }
 
+
+
 /* -- DEBUG DEBUG DEBUG DEBUG DEBUG -- */
 
-/*
 #connect {
     display: block;
     position: relative;
-    bottom: 545px;
+    bottom: 0;
     width: 995px;
-    height: 300px;
+    height: 380px;
     border-color: rgba(200, 200, 200, 0.3);
     background-color: rgba(125, 125, 125, 0.2);
 }
-*/
+body.windowFlag_landscapeMode #prototype,
+body.windowFlag_landscapeMode #window,
+body.windowFlag_landscapeMode #window iframe,
+body.windowFlag_landscapeMode #battle {
+    height: 1024px !important;
+}
