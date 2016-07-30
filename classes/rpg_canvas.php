@@ -844,7 +844,7 @@ class rpg_canvas {
             foreach ($this_battle->values['players'] AS $this_player_id => $this_playerinfo){
                 if (empty($target_player_id) || $target_player_id != $this_player_id){
                     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                    $eventinfo['this_player'] = new rpg_player($this, $this_playerinfo);
+                    $eventinfo['this_player'] = new rpg_player($this_battle, $this_playerinfo);
                     break;
                 }
             }
@@ -852,7 +852,7 @@ class rpg_canvas {
             foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
                 if ($this_robotinfo['robot_position'] == 'active' && $this_robotinfo['robot_status'] != 'disabled'){
                     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                    $eventinfo['this_robot'] = new rpg_robot($this, $eventinfo['this_player'], $this_robotinfo);
+                    $eventinfo['this_robot'] = new rpg_robot($this_battle, $eventinfo['this_player'], $this_robotinfo);
                     break;
                 }
             }
@@ -881,7 +881,7 @@ class rpg_canvas {
             foreach ($this_battle->values['players'] AS $target_player_id => $target_playerinfo){
                 if (empty($this_player_id) || $this_player_id != $target_player_id){
                     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                    $eventinfo['target_player'] = new rpg_player($this, $target_playerinfo);
+                    $eventinfo['target_player'] = new rpg_player($this_battle, $target_playerinfo);
                     break;
                 }
             }
@@ -889,7 +889,7 @@ class rpg_canvas {
             foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
                 if ($target_robotinfo['robot_position'] == 'active' && $target_robotinfo['robot_status'] != 'disabled'){
                     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                    $eventinfo['target_robot'] = new rpg_robot($this, $eventinfo['target_player'], $target_robotinfo);
+                    $eventinfo['target_robot'] = new rpg_robot($this_battle, $eventinfo['target_player'], $target_robotinfo);
                     break;
                 }
             }
@@ -906,7 +906,7 @@ class rpg_canvas {
             $num_player_robots = count($eventinfo['this_player']->player_robots);
             foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
                 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                $this_robot = new rpg_robot($this, $eventinfo['this_player'], $this_robotinfo);
+                $this_robot = new rpg_robot($this_battle, $eventinfo['this_player'], $this_robotinfo);
                 $this_options = $options;
                 //if ($this_robot->robot_status == 'disabled' && $this_robot->robot_position == 'bench'){ continue; }
                 if (!empty($this_robot->flags['hidden'])){ continue; }
@@ -1123,7 +1123,7 @@ class rpg_canvas {
                         if ($attachment_info['class'] == 'ability'){
                             // Create the temporary ability object using the provided data and generate its markup data
                             //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                            $this_ability = new rpg_ability($this, $eventinfo['this_player'], $this_robot, $attachment_info);
+                            $this_ability = new rpg_ability($this_battle, $eventinfo['this_player'], $this_robot, $attachment_info);
                             // Define this ability data array and generate the markup data
                             $this_attachment_options = $this_options;
                             $this_attachment_options['data_sticky'] = !empty($this_options['sticky']) || !empty($attachment_info['sticky']) ? true : false;
@@ -1205,7 +1205,7 @@ class rpg_canvas {
 
                 // Create the temporary target robot ovject
                 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                $target_robot = new rpg_robot($this, $eventinfo['target_player'], $target_robotinfo);
+                $target_robot = new rpg_robot($this_battle, $eventinfo['target_player'], $target_robotinfo);
                 $target_options = $options;
                 //if ($target_robot->robot_status == 'disabled' && $target_robot->robot_position == 'bench'){ continue; }
                 if (!empty($target_robot->flags['hidden'])){ continue; }
@@ -1227,7 +1227,7 @@ class rpg_canvas {
                         if ($attachment_info['class'] == 'ability'){
                             // Create the target's temporary ability object using the provided data
                             //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-                            $target_ability = new rpg_ability($this, $eventinfo['target_player'], $target_robot, $attachment_info);
+                            $target_ability = new rpg_ability($this_battle, $eventinfo['target_player'], $target_robot, $attachment_info);
                             // Define this ability data array and generate the markup data
                             $target_attachment_options = $target_options;
                             $target_attachment_options['sticky'] = isset($attachment_info['sticky']) ? $attachment_info['sticky'] : false;
