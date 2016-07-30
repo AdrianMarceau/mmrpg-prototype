@@ -5,6 +5,88 @@
  */
 class rpg_canvas {
 
+    // Define a function for generating player canvas variables
+    public static function player_markup($this_player, $options){
+
+        // Define the variable to hold the console player data
+        $this_data = array();
+        $this_results = !empty($options['this_ability']->ability_results) ? $options['this_ability']->ability_results : array();
+
+        // Only proceed if this is a real player
+        if ($this_player->player_token != 'player'){
+
+            // Define and calculate the simpler markup and positioning variables for this player
+            $this_data['data_type'] = 'player';
+            $this_data['player_id'] = $this_player->player_id;
+            $this_data['player_frame'] = $this_player->player_frame !== false ? $this_player->player_frame : 'base'; // IMPORTANT
+            //$this_data['player_frame'] = str_pad(array_search($this_data['player_frame'], $this_player->player_frame_index), 2, '0', STR_PAD_LEFT);
+            $this_data['player_frame_index'] = !empty($this_player->player_frame_index) ? $this_player->player_frame_index : array('base');
+            $this_data['player_title'] = $this_player->player_name;
+            $this_data['player_token'] = $this_player->player_token;
+            $this_data['player_float'] = $this_player->player_side;
+            $this_data['player_direction'] = $this_player->player_side == 'left' ? 'right' : 'left';
+            $this_data['player_position'] = 'active';
+            $this_data['player_size'] = 80;
+            $this_data['image_type'] = !empty($options['this_player_image']) ? $options['this_player_image'] : 'sprite';
+            /*
+            $this_data['player_image'] = 'images/players/'.$this_data['player_token'].'/sprite_'.$this_data['player_direction'].'_'.$this_data['player_size'].'x'.$this_data['player_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $this_data['player_class'] = 'sprite sprite_player sprite_player_'.$this_data['image_type'].' sprite_80x80 sprite_80x80_'.$this_data['player_frame'];
+            $this_data['player_styles'] = '';
+            */
+            $this_data['player_image'] = 'images/players/'.$this_data['player_token'].'/sprite_'.$this_data['player_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $this_data['player_class'] = 'sprite sprite_player sprite_player_'.$this_data['image_type'].' sprite_75x75 sprite_75x75_'.$this_data['player_frame'];
+
+
+            $this_data['player_scale'] = 0.5 + ((7 / 8) * 0.5);
+            $this_data['player_sprite_size'] = ceil($this_data['player_scale'] * 80);
+            $this_data['player_sprite_width'] = ceil($this_data['player_scale'] * 80);
+            $this_data['player_sprite_height'] = ceil($this_data['player_scale'] * 80);
+            $this_data['player_image_width'] = ceil($this_data['player_scale'] * 800);
+            $this_data['player_image_height'] = ceil($this_data['player_scale'] * 80);
+            $this_data['canvas_offset_z'] = 4900;
+            $this_data['canvas_offset_x'] = 200;
+            $this_data['canvas_offset_y'] = 60;
+
+            $frame_position = array_search($this_data['player_frame'], $this_data['player_frame_index']);
+            if ($frame_position === false){ $frame_position = 0; }
+            $frame_background_offset = -1 * ceil(($this_data['player_sprite_size'] * $frame_position));
+            $this_data['player_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
+            $this_data['player_style'] .= 'z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['player_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
+            $this_data['player_style'] .= 'background-image: url('.$this_data['player_image'].'); width: '.$this_data['player_sprite_size'].'px; height: '.$this_data['player_sprite_size'].'px; background-size: '.$this_data['player_image_width'].'px '.$this_data['player_image_height'].'px; ';
+
+            // Generate the final markup for the canvas player
+            ob_start();
+
+                // Display this player's sprite in the active position
+                global $flag_wap, $flag_ipad, $flag_iphone;
+                if (!$flag_wap && !$flag_ipad && !$flag_iphone){
+                    $shadow_offset_z = $this_data['canvas_offset_z'] - 1;
+                    $shadow_scale = array(1.5, 0.25);
+                    $shadow_skew = $this_data['player_direction'] == 'right' ? 30 : -30;
+                    $shadow_translate = array(
+                        ($this_data['player_direction'] == 'right' ? -1 : 1) * ($this_data['player_sprite_width'] + ceil($this_data['player_sprite_width'] * $shadow_scale[1])) + ceil($shadow_skew * $shadow_scale[1]),
+                        $this_data['player_position'] == 'active' ? 115 : ceil($this_data['player_sprite_height'] * $shadow_scale[0]),
+                        );
+                    $shadow_styles = 'z-index: '.$shadow_offset_z.'; transform: scale('.$shadow_scale[0].','.$shadow_scale[1].') skew('.$shadow_skew.'deg) translate('.$shadow_translate[0].'px,'.$shadow_translate[1].'px);  -webkit-transform: scale('.$shadow_scale[0].','.$shadow_scale[1].') skew('.$shadow_skew.'deg) translate('.$shadow_translate[0].'px,'.$shadow_translate[1].'px);  -moz-transform: scale('.$shadow_scale[0].','.$shadow_scale[1].') skew('.$shadow_skew.'deg) translate('.$shadow_translate[0].'px,'.$shadow_translate[1].'px);';
+                    echo '<div data-shadowid="'.$this_data['player_id'].'" class="'.str_replace($this_data['player_token'], 'player', $this_data['player_class']).'" style="'.str_replace('players/', 'players_shadows/', $this_data['player_style']).$shadow_styles.'" data-type="'.$this_data['data_type'].'_shadow" data-size="'.$this_data['player_sprite_size'].'" data-direction="'.$this_data['player_direction'].'" data-frame="'.$this_data['player_frame'].'">'.$this_data['player_token'].'_shadow</div>';
+                }
+                echo '<div data-playerid="'.$this_data['player_id'].'" class="'.$this_data['player_class'].'" style="'.$this_data['player_style'].'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['player_sprite_size'].'" data-direction="'.$this_data['player_direction'].'" data-frame="'.$this_data['player_frame'].'" data-position="'.$this_data['player_position'].'">'.$this_data['player_title'].'</div>';
+
+            // Collect the generated player markup
+            $this_data['player_markup'] = trim(ob_get_clean());
+
+        } else {
+
+            // Define empty player markup
+            $this_data['player_markup'] = '';
+
+        }
+
+        // Return the player canvas data
+        return $this_data;
+
+    }
+
     // Define a function for generating robot canvas variables
     public static function robot_markup($this_robot, $options, $player_data){
 
