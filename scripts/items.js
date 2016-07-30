@@ -47,9 +47,6 @@ $(document).ready(function(){
     // Automatically click the first shop link
     $('.item_tabs_links .tab_link[data-tab]', gameConsole).first().trigger('click');
 
-    // Update all the item cells automatically
-    //updateItemCells();
-
 
     /*
      * OTHER STUFF
@@ -77,56 +74,6 @@ $(document).ready(function(){
         }, false, true);
 
 });
-
-// Define a function for refreshing all items
-function updateItemCells(){
-    var itemCells = $('.item_cell[data-token]', gameConsole);
-    //console.log('updateItems('+itemCells.length+')');
-    //console.log('thisItemData', thisItemData);
-    itemCells.each(function(index, value){ $(this).removeClass('item_cell_disabled'); });
-    updateItemQuantities();
-}
-
-// Define a function for updating item quantities
-function updateItemQuantities(){
-    //console.log('updateItemQuantities()');
-    for (var itemToken in thisItemData.itemQuantities){
-        var itemQuantity = thisItemData.itemQuantities[itemToken];
-        updateItemQuantity(itemToken, itemQuantity);
-    }
-}
-// Define a function for updating a single item's quantity
-function updateItemQuantity(itemToken, itemQuantity){
-    var itemCells = $('.item_cell[data-token='+itemToken+']', gameConsole);
-    itemCells.each(function(index, value){
-        var thisCell = $(this);
-        var thisKind = thisCell.attr('data-kind');
-        var thisAction = thisCell.attr('data-action');
-        //console.log('updateItemQuantity('+thisKind+' / '+thisAction+' / '+itemToken+' / '+itemQuantity+' / '+(thisCell.hasClass('item_cell_disabled') ? 'item_cell_disabled' : 'item_cell_enabled')+')');
-        if (thisKind == 'item'){
-
-            thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('x '+itemQuantity);
-            if (thisAction == 'buy' && itemQuantity >= 99){ thisCell.addClass('item_cell_disabled');  }
-            else if (thisAction == 'sell' && itemQuantity <= 0){ thisCell.addClass('item_cell_disabled');  }
-
-            } else if (thisKind == 'ability'){
-
-            thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('&nbsp;');
-            if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
-            else if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); }
-
-            } else if (thisKind == 'field'){
-
-            if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }
-
-            } else if (thisKind == 'star'){
-
-            if (itemQuantity < 1){ thisCell.addClass('item_cell_disabled');  }
-
-            }
-        });
-    return true;
-}
 
 // Create the windowResize event for this page
 function windowResizeFrame(){
