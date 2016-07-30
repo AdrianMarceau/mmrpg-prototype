@@ -15,7 +15,7 @@ $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
 //require_once('../data/database.php');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
+require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
 //require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
 //require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
