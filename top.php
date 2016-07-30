@@ -82,6 +82,8 @@ require('classes/rpg_player.php');
 require('classes/rpg_robot.php');
 require('classes/rpg_ability.php');
 require('classes/rpg_item.php');
+require('classes/rpg_canvas.php');
+require('classes/rpg_console.php');
 
 // Include mandatory function files
 require('data/functions/website.php');
