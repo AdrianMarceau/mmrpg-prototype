@@ -76,16 +76,20 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 
 // Include mandatory class files
 require('classes/rpg_object.php');
+require('classes/rpg_damage.php');
+require('classes/rpg_recovery.php');
+require('classes/rpg_canvas.php');
+require('classes/rpg_console.php');
 require('classes/rpg_battle.php');
 require('classes/rpg_field.php');
 require('classes/rpg_player.php');
 require('classes/rpg_robot.php');
 require('classes/rpg_ability.php');
+require('classes/rpg_ability_damage.php');
+require('classes/rpg_ability_recovery.php');
 require('classes/rpg_item.php');
-require('classes/rpg_canvas.php');
-require('classes/rpg_console.php');
-require('classes/rpg_damage.php');
-require('classes/rpg_recovery.php');
+require('classes/rpg_item_damage.php');
+require('classes/rpg_item_recovery.php');
 
 // Include mandatory function files
 require('data/functions/website.php');
