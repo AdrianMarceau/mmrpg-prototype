@@ -21,6 +21,18 @@ if (MMRPG_CONFIG_IS_LIVE){
     error_reporting(0);
 }
 
+// Stop BANNED users from accessing the website
+if (MMRPG_CONFIG_BANNED_LIST){
+    $current_ip = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
+    $banned_list = explode(',', MMRPG_CONFIG_BANNED_LIST);
+    foreach ($banned_list AS $ip_key => $ip_start){
+        $ip_start_pattern = '/^'.str_replace('.', '\\.', $ip_start).'/';
+        if (preg_match($ip_start_pattern, $current_ip)){
+            exit('No thank you ['.$ip_key.']');
+        }
+    }
+}
+
 // Update the timezone before starting the session
 @date_default_timezone_set('Canada/Eastern');
 //@ini_set('session.gc_maxlifetime', 24*60*60);
