@@ -1068,7 +1068,7 @@ class rpg_ability_damage extends rpg_damage {
         if ($this_robot->robot_status == 'disabled' && $trigger_disabled){
             $trigger_options = array();
             if ($this_robot_energy_ohko){ $trigger_options['item_multiplier'] = 2.0; }
-            $this_robot->trigger_disabled($target_robot, $this_ability, $trigger_options);
+            $this_robot->trigger_disabled($target_robot, $trigger_options);
         }
         // Otherwise, if the target robot was not disabled
         elseif ($this_robot->robot_status != 'disabled'){

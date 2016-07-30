@@ -1037,7 +1037,7 @@ class rpg_item_recovery extends rpg_recovery {
 
         // If this robot was disabled, process experience for the target
         if ($this_robot->robot_status == 'disabled' && $trigger_disabled){
-            $this_robot->trigger_disabled($target_robot, $this_item);
+            $this_robot->trigger_disabled($target_robot);
         }
         // Otherwise, if the target robot was not disabled
         elseif ($this_robot->robot_status != 'disabled'){
