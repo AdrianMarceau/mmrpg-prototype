@@ -4,7 +4,7 @@
 
 // Define the index of hidden fields to not appear in the database
 $hidden_database_fields = array();
-$hidden_database_fields = array_merge($hidden_database_fields, array('field')); //'prototype-complete'
+$hidden_database_fields = array_merge($hidden_database_fields, array('field'));
 $hidden_database_fields_count = !empty($hidden_database_fields) ? count($hidden_database_fields) : 0;
 
 // Define the hidden field query condition

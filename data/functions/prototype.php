@@ -1390,7 +1390,7 @@ function mmrpg_prototype_get_player_mission_music($player_token, $session_token 
 function mmrpg_prototype_get_player_boss_music($player_token, $session_token = 'GAME'){
     $most_key = mmrpg_prototype_get_player_music($player_token, $session_token);
     $most_key_int = preg_replace('/^mm0?/i', '', $most_key);
-    return 'prototype-complete'.($most_key_int > 1 ? '-'.$most_key_int : '');
+    return 'boss-theme-mm'.str_pad($most_key_int, 2, '0', STR_PAD_LEFT);
 
 }
 
