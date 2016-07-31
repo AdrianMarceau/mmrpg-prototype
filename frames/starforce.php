@@ -276,8 +276,8 @@ gameSettings.autoScrollTop = false;
                                             $temp_field_type_2 = !empty($star_data['star_type2']) ? $star_data['star_type2'] : $temp_field_type_1;
                                             $temp_star_back_info = mmrpg_prototype_star_image($temp_field_type_2);
                                             $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
-                                            $temp_star_front = array('path' => 'images/abilities/item-star-base-'.$temp_star_front_info['sheet'].'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => str_pad($temp_star_front_info['frame'], 2, '0', STR_PAD_LEFT));
-                                            $temp_star_back = array('path' => 'images/abilities/item-star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'].'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => str_pad($temp_star_back_info['frame'], 2, '0', STR_PAD_LEFT));
+                                            $temp_star_front = array('path' => 'images/items/star-base-'.$temp_star_front_info['sheet'].'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => str_pad($temp_star_front_info['frame'], 2, '0', STR_PAD_LEFT));
+                                            $temp_star_back = array('path' => 'images/items/star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'].'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => str_pad($temp_star_back_info['frame'], 2, '0', STR_PAD_LEFT));
                                             $temp_star_title = $star_data['star_name'].' Star <br />';
                                             $temp_star_title .= '<span style="font-size:80%;">';
                                             if ($temp_field_type_1 != $temp_field_type_2){ $temp_star_title .= ''.ucfirst($temp_field_type_1).(!empty($temp_field_type_2) ? ' / '.ucfirst($temp_field_type_2) : '').' Type'; }
@@ -359,9 +359,9 @@ if (empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
     gameSettings.windowEventsCanvas = [
         (
         '<div class="sprite sprite_80x80" style="background-image: url(images/sprites/fields/field/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_05" style="background-image: url(images/sprites/abilities/item-star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; left: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_07" style="background-image: url(images/sprites/abilities/item-star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 25px; left: 250px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_08" style="background-image: url(images/sprites/abilities/item-star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; right: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
+        '<div class="sprite sprite_80x80 sprite_80x80_05" style="background-image: url(images/sprites/items/star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; left: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
+        '<div class="sprite sprite_80x80 sprite_80x80_07" style="background-image: url(images/sprites/items/star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 25px; left: 250px; width: 80px; height: 80px;">&nbsp;</div>'+
+        '<div class="sprite sprite_80x80 sprite_80x80_08" style="background-image: url(images/sprites/items/star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; right: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
         '')
         ];
     // Generate a first-time event message that explains how the editor works

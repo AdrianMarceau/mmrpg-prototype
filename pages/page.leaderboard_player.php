@@ -13,7 +13,7 @@ $temp_background_path = !empty($this_playerinfo['user_background_path']) ? $this
 $temp_is_contributor = in_array($this_playerinfo['role_token'], array('developer', 'administrator', 'moderator', 'contributor')) ? true : false;
 if ($temp_is_contributor){
     $temp_item_class = 'sprite sprite_80x80 sprite_80x80_00';
-    $temp_item_path = 'images/abilities/item-'.(!empty($this_playerinfo['role_icon']) ? $this_playerinfo['role_icon'] : 'energy-pellet' ).'/icon_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+    $temp_item_path = 'images/items/'.(!empty($this_playerinfo['role_icon']) ? $this_playerinfo['role_icon'] : 'energy-pellet' ).'/icon_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
     $temp_item_title = !empty($this_playerinfo['role_name']) ? $this_playerinfo['role_name'] : 'Contributor';
 }
 $temp_last_login = !empty($this_playerinfo['user_date_accessed']) ? $this_playerinfo['user_date_accessed'] : $this_playerinfo['user_date_created'];

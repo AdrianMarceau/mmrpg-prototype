@@ -597,8 +597,8 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 $temp_field_type_2 = !empty($temp_star_data['star_type2']) ? $temp_star_data['star_type2'] : $temp_field_type_1;
                 $temp_star_back_info = mmrpg_prototype_star_image($temp_field_type_2);
                 $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
-                $temp_star_back = array('path' => 'abilities/item-star-base-'.$temp_star_front_info['sheet'], 'size' => 40, 'frame' => $temp_star_front_info['frame']);
-                $temp_star_front = array('path' => 'abilities/item-star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'], 'size' => 40, 'frame' => $temp_star_back_info['frame']);
+                $temp_star_back = array('path' => 'items/star-base-'.$temp_star_front_info['sheet'], 'size' => 40, 'frame' => $temp_star_front_info['frame']);
+                $temp_star_front = array('path' => 'items/star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'], 'size' => 40, 'frame' => $temp_star_back_info['frame']);
                 //if ($temp_field_type_1 == 'wind'){ die('<pre>'.print_r($temp_star_back, true).' '.print_r($temp_star_front, true).'</pre>'); }
                 array_unshift($this_battleinfo['battle_sprite'], $temp_star_back, $temp_star_front);
 

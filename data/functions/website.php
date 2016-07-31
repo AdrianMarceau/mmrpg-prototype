@@ -145,8 +145,8 @@ function mmrpg_formatting_decode($string){
             );
         $mmrpg_formatting_array += array(
             // item 40x40
-            '/\[item\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40"><img src="images/abilities/item-$1/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[item:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40"><img src="images/abilities/item-$2/icon_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[item\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40"><img src="images/items/$1/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
+            '/\[item:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40"><img src="images/items/$2/icon_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
             '/\[item:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/abilities/item-$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
             );
         $mmrpg_formatting_array += array(

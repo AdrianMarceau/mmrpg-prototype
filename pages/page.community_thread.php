@@ -213,7 +213,7 @@ $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_tok
 $temp_is_contributor = in_array($this_thread_info['role_token'], array('developer', 'administrator', 'contributor', 'moderator')) ? true : false;
 if ($temp_is_contributor){
     $temp_item_class = 'sprite sprite_80x80 sprite_80x80_00';
-    $temp_item_path = 'images/abilities/item-'.(!empty($this_thread_info['role_icon']) ? $this_thread_info['role_icon'] : 'energy-pellet' ).'/icon_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+    $temp_item_path = 'images/items/'.(!empty($this_thread_info['role_icon']) ? $this_thread_info['role_icon'] : 'energy-pellet' ).'/icon_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
     $temp_item_title = !empty($this_thread_info['role_name']) ? $this_thread_info['role_name'] : 'Contributor';
 }
 
@@ -437,7 +437,7 @@ else { $this_thread_info['post_count'] = false; }
             $temp_is_contributor = in_array($this_post_info['role_token'], array('developer', 'administrator', 'moderator', 'contributor')) ? true : false;
             if ($temp_is_contributor){
                 $temp_item_class = 'sprite sprite_40x40 sprite_40x40_00';
-                $temp_item_path = 'images/abilities/item-'.(!empty($this_post_info['role_icon']) ? $this_post_info['role_icon'] : 'energy-pellet' ).'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+                $temp_item_path = 'images/items/'.(!empty($this_post_info['role_icon']) ? $this_post_info['role_icon'] : 'energy-pellet' ).'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
                 $temp_item_title = !empty($this_post_info['role_name']) ? $this_post_info['role_name'] : 'Contributor';
             }
 
