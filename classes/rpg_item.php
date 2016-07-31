@@ -1420,7 +1420,7 @@ class rpg_item extends rpg_object {
         return $this_markup;
     }
 
-    // Define a static function to use as the common action for all item-core-___ items
+    // Define a static function to use as the common action for all _____-core items
     public static function item_function_core($objects){
 
         // Extract all objects into the current scope

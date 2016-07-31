@@ -69,7 +69,7 @@ ob_start();
 
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><a class="link" href="database/items/">Item Database <span class="count">( <?= $mmrpg_database_items_links_counter_incomplete > 0 ? ($mmrpg_database_items_links_counter - $mmrpg_database_items_links_counter_incomplete).' / ' : '' ?><?= !empty($mmrpg_database_items_count) ? ($mmrpg_database_items_count == 1 ? '1 Item' : $mmrpg_database_items_count.' Items') : '0 Items' ?> )</span></a><a class="float_link" href="database/items/">View the Item Database &raquo;</a></h2>
     <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="items" data-class-single="item">
-      <div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/items/" style="margin: -10px 0 5px; background-image: url(images/abilities/item-extra-life/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Extra Life</a></div>
+      <div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/items/" style="margin: -10px 0 5px; background-image: url(images/items/extra-life/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Extra Life</a></div>
       <p class="text">The item database contains detailed information on the collectable items in the prototype, including stats, descriptions, and sprite sheets.</p>
       <div class="text" style="overflow: hidden;">
       <?= $mmrpg_database_items_links ?>
