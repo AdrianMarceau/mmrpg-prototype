@@ -177,7 +177,7 @@ class rpg_battle extends rpg_object {
         }
         $this_battleinfo = array_replace($this_battleinfo, $this_battleinfo_backup);
 
-        // Define the internal ability values using the provided array
+        // Define the internal battle values using the provided array
         $this->flags = isset($this_battleinfo['flags']) ? $this_battleinfo['flags'] : array();
         $this->counters = isset($this_battleinfo['counters']) ? $this_battleinfo['counters'] : array();
         $this->values = isset($this_battleinfo['values']) ? $this_battleinfo['values'] : array();
@@ -359,7 +359,6 @@ class rpg_battle extends rpg_object {
             switch ($current_action['this_action']){
                 // If the battle start action was called
                 case 'start': {
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     // Initiate the battle start event for this robot
                     $battle_action = $this->actions_trigger(
                         $current_action['this_player'],
@@ -373,7 +372,6 @@ class rpg_battle extends rpg_object {
                 }
                 // If the robot ability action was called
                 case 'ability': {
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     // Initiate the ability event for this player's robot
                     $battle_action = $this->actions_trigger(
                         $current_action['this_player'],
@@ -387,7 +385,6 @@ class rpg_battle extends rpg_object {
                 }
                 // If the robot item action was called
                 case 'item': {
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     // Initiate the item event for this player's robot
                     $battle_action = $this->actions_trigger(
                         $current_action['this_player'],
@@ -401,7 +398,6 @@ class rpg_battle extends rpg_object {
                 }
                 // If the robot switch action was called
                 case 'switch': {
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     // Initiate the switch event for this player's robot
                     $battle_action = $this->actions_trigger(
                         $current_action['this_player'],
@@ -415,7 +411,6 @@ class rpg_battle extends rpg_object {
                 }
                 // If the robot scan action was called
                 case 'scan': {
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     // Initiate the scan event for this player's robot
                     $battle_action = $this->actions_trigger(
                         $current_action['this_player'],
@@ -431,7 +426,6 @@ class rpg_battle extends rpg_object {
 
             // Create a closing event with robots in base frames, if the battle is not over
             if ($this->battle_status != 'complete'){
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $temp_this_robot = false;
                 $temp_target_robot = false;
                 if (!empty($current_action['this_robot'])){
@@ -459,7 +453,6 @@ class rpg_battle extends rpg_object {
         }
 
         // Recreate this and the target robot in the global space with backed up info
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         if (empty($GLOBALS['this_robot'])){ $GLOBALS['this_robot'] = new rpg_robot($this, $GLOBALS['this_player'], $temp_this_robot_backup); }
         if (empty($GLOBALS['target_robot'])){ $GLOBALS['target_robot'] = new rpg_robot($this, $GLOBALS['target_player'], $temp_target_robot_backup); }
 
@@ -2154,6 +2147,7 @@ class rpg_battle extends rpg_object {
         $options['console_show_this_player'] = isset($eventinfo['event_options']['console_show_this_player']) ? $eventinfo['event_options']['console_show_this_player'] : false;
         $options['console_show_this_robot'] = isset($eventinfo['event_options']['console_show_this_robot']) ? $eventinfo['event_options']['console_show_this_robot'] : true;
         $options['console_show_this_ability'] = isset($eventinfo['event_options']['console_show_this_ability']) ? $eventinfo['event_options']['console_show_this_ability'] : false;
+        $options['console_show_this_item'] = isset($eventinfo['event_options']['console_show_this_item']) ? $eventinfo['event_options']['console_show_this_item'] : false;
         $options['console_show_this_star'] = isset($eventinfo['event_options']['console_show_this_star']) ? $eventinfo['event_options']['console_show_this_star'] : false;
         $options['console_show_target'] = isset($eventinfo['event_options']['console_show_target']) ? $eventinfo['event_options']['console_show_target'] : true;
         $options['console_show_target_player'] = isset($eventinfo['event_options']['console_show_target_player']) ? $eventinfo['event_options']['console_show_target_player'] : true;
@@ -2168,15 +2162,22 @@ class rpg_battle extends rpg_object {
         $options['canvas_show_target'] = isset($eventinfo['event_options']['canvas_show_target']) ? $eventinfo['event_options']['canvas_show_target'] : true;
         $options['canvas_show_target_robots'] = isset($eventinfo['event_options']['canvas_show_target_robots']) ? $eventinfo['event_options']['canvas_show_target_robots'] : true;
         $options['canvas_show_target_ability'] = isset($eventinfo['event_options']['canvas_show_target_ability']) ? $eventinfo['event_options']['canvas_show_target_ability'] : true;
+        $options['canvas_show_target_item'] = isset($eventinfo['event_options']['canvas_show_target_item']) ? $eventinfo['event_options']['canvas_show_target_item'] : true;
         $options['this_ability'] = isset($eventinfo['event_options']['this_ability']) ? $eventinfo['event_options']['this_ability'] : false;
         $options['this_ability_target'] = isset($eventinfo['event_options']['this_ability_target']) ? $eventinfo['event_options']['this_ability_target'] : false;
         $options['this_ability_target_key'] = isset($eventinfo['event_options']['this_ability_target_key']) ? $eventinfo['event_options']['this_ability_target_key'] : 0;
         $options['this_ability_target_position'] = isset($eventinfo['event_options']['this_ability_target_position']) ? $eventinfo['event_options']['this_ability_target_position'] : 'active';
         $options['this_ability_results'] = isset($eventinfo['event_options']['this_ability_results']) ? $eventinfo['event_options']['this_ability_results'] : false;
+        $options['this_item'] = isset($eventinfo['event_options']['this_item']) ? $eventinfo['event_options']['this_item'] : false;
+        $options['this_item_target'] = isset($eventinfo['event_options']['this_item_target']) ? $eventinfo['event_options']['this_item_target'] : false;
+        $options['this_item_target_key'] = isset($eventinfo['event_options']['this_item_target_key']) ? $eventinfo['event_options']['this_item_target_key'] : 0;
+        $options['this_item_target_position'] = isset($eventinfo['event_options']['this_item_target_position']) ? $eventinfo['event_options']['this_item_target_position'] : 'active';
+        $options['this_item_results'] = isset($eventinfo['event_options']['this_item_results']) ? $eventinfo['event_options']['this_item_results'] : false;
         $options['this_star'] = isset($eventinfo['event_options']['this_star']) ? $eventinfo['event_options']['this_star'] : false;
         $options['this_player_image'] = isset($eventinfo['event_options']['this_player_image']) ? $eventinfo['event_options']['this_player_image'] : 'sprite';
         $options['this_robot_image'] = isset($eventinfo['event_options']['this_robot_image']) ? $eventinfo['event_options']['this_robot_image'] : 'sprite';
         $options['this_ability_image'] = isset($eventinfo['event_options']['this_ability_image']) ? $eventinfo['event_options']['this_ability_image'] : 'sprite';
+        $options['this_item_image'] = isset($eventinfo['event_options']['this_item_image']) ? $eventinfo['event_options']['this_item_image'] : 'sprite';
 
         // Define the variable to collect markup
         $this_markup = array();
