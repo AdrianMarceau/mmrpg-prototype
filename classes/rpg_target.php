@@ -48,15 +48,12 @@ class rpg_target {
             $temp_translate = 20 + ($target_robot->robot_key * 20);
             $temp_translate2 = ceil($temp_translate / 10) * -1;
             $temp_translate = $temp_translate * ($target_robot->player->player_side == 'left' ? -1 : 1);
-            //$this_ability->ability_frame_styles .= 'border: 1px solid red !important; ';
             $this_ability->ability_frame_styles .= 'transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -webkit-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -moz-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); ';
         }
 
         // Create a message to show the initial targeting action
         if ($this_robot->robot_id != $target_robot->robot_id && empty($trigger_options['prevent_default_text'])){
             $this_ability->ability_results['this_text'] .= "{$this_robot->print_robot_name()} targets {$target_robot->print_robot_name()}!<br />";
-        } else {
-            //$this_ability->ability_results['this_text'] .= ''; //"{$this_robot->print_robot_name()} targets itself&hellip;<br />";
         }
 
         // Append the targetting text to the event body
@@ -70,34 +67,14 @@ class rpg_target {
         $event_options['this_ability_results'] = $this_ability->ability_results;
         if (isset($trigger_options['canvas_show_this_ability'])){ $event_options['canvas_show_this_ability'] = $trigger_options['canvas_show_this_ability'];  }
 
-        /*
-        // If this is a non-transformed copy robot, change its colour
-        $temp_image_changed = false;
-        $temp_ability_type = !empty($this_ability->ability_type) && $this_ability->ability_type != 'copy' ? $this_ability->ability_type : '';
-        if ($this_robot->robot_base_core == 'copy' && $this_robot->robot_core != $temp_ability_type){
-            $this_backup_image = $this_robot->robot_image;
-            $this_robot->robot_image = $this_robot->robot_base_image.'_'.$temp_ability_type;
-            $this_robot->update_session();
-            $temp_image_changed = true;
-        }
-        */
-
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_ability->target_options['target_header'], $this_ability->ability_results['this_text'], $event_options);
-
-        /*
-        // If this is a non-transformed copy robot, change its colour
-        if ($temp_image_changed){
-            $this_robot->robot_image = $this_backup_image;
-            $this_robot->update_session();
-        }
-        */
 
         // Update this ability's history with the triggered ability data and results
         $this_ability->history['ability_results'][] = $this_ability->ability_results;
 
         // Refresh the ability styles from any changes
-        $this_ability->ability_frame_styles = ''; //$temp_ability_styles_backup;
+        $this_ability->ability_frame_styles = '';
 
         // restore this and the target robot's frames to their backed up state
         $this_robot->robot_frame = $this_robot_backup_frame;
@@ -161,15 +138,12 @@ class rpg_target {
             $temp_translate = 20 + ($target_robot->robot_key * 20);
             $temp_translate2 = ceil($temp_translate / 10) * -1;
             $temp_translate = $temp_translate * ($target_robot->player->player_side == 'left' ? -1 : 1);
-            //$this_item->item_frame_styles .= 'border: 1px solid red !important; ';
             $this_item->item_frame_styles .= 'transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -webkit-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -moz-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); ';
         }
 
         // Create a message to show the initial targeting action
         if ($this_robot->robot_id != $target_robot->robot_id && empty($trigger_options['prevent_default_text'])){
             $this_item->item_results['this_text'] .= "{$this_robot->print_robot_name()} targets {$target_robot->print_robot_name()}!<br />";
-        } else {
-            //$this_item->item_results['this_text'] .= ''; //"{$this_robot->print_robot_name()} targets itself&hellip;<br />";
         }
 
         // Append the targetting text to the event body
@@ -183,34 +157,14 @@ class rpg_target {
         $event_options['this_item_results'] = $this_item->item_results;
         if (isset($trigger_options['canvas_show_this_item'])){ $event_options['canvas_show_this_item'] = $trigger_options['canvas_show_this_item'];  }
 
-        /*
-        // If this is a non-transformed copy robot, change its colour
-        $temp_image_changed = false;
-        $temp_item_type = !empty($this_item->item_type) && $this_item->item_type != 'copy' ? $this_item->item_type : '';
-        if ($this_robot->robot_base_core == 'copy' && $this_robot->robot_core != $temp_item_type){
-            $this_backup_image = $this_robot->robot_image;
-            $this_robot->robot_image = $this_robot->robot_base_image.'_'.$temp_item_type;
-            $this_robot->update_session();
-            $temp_image_changed = true;
-        }
-        */
-
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_item->target_options['target_header'], $this_item->item_results['this_text'], $event_options);
-
-        /*
-        // If this is a non-transformed copy robot, change its colour
-        if ($temp_image_changed){
-            $this_robot->robot_image = $this_backup_image;
-            $this_robot->update_session();
-        }
-        */
 
         // Update this item's history with the triggered item data and results
         $this_item->history['item_results'][] = $this_item->item_results;
 
         // Refresh the item styles from any changes
-        $this_item->item_frame_styles = ''; //$temp_item_styles_backup;
+        $this_item->item_frame_styles = '';
 
         // restore this and the target robot's frames to their backed up state
         $this_robot->robot_frame = $this_robot_backup_frame;
