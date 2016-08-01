@@ -1213,6 +1213,7 @@ body.index #header {
 
 #mmrpg .canvas_ability_details,
 #mmrpg .canvas_item_details {
+    position: absolute;
     text-indent: 0;
     left: 250px;
     right: 250px;
