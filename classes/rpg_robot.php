@@ -1272,7 +1272,7 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a function for calculating required weapon energy
-    public function calculate_weapon_energy($this_ability, &$energy_base = 0, &$energy_mods = 0){
+    public function calculate_weapon_energy($this_object, &$energy_base = 0, &$energy_mods = 0){
 
         // If this is an item the weapon energy is zero
         if (isset($this_object->item_token)){
