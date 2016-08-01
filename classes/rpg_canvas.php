@@ -832,30 +832,40 @@ class rpg_canvas {
         // Define the console markup string
         $this_markup = '';
 
+        // Define the results type we'll be working with
+        $results_type = false;
+        if (!empty($options['this_ability'])){
+            $results_type = 'ability';
+        } elseif (!empty($options['this_item'])){
+            $results_type = 'item';
+        }
+
         // If this robot was not provided or allowed by the function
         if (empty($eventinfo['this_player']) || empty($eventinfo['this_robot']) || $options['canvas_show_this'] == false){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
             // Set both this player and robot to false
             $eventinfo['this_player'] = false;
             $eventinfo['this_robot'] = false;
+
             // Collect the target player ID if set
             $target_player_id = !empty($eventinfo['target_player']) ? $eventinfo['target_player']->player_id : false;
+
             // Loop through the players index looking for this player
             foreach ($this_battle->values['players'] AS $this_player_id => $this_playerinfo){
                 if (empty($target_player_id) || $target_player_id != $this_player_id){
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     $eventinfo['this_player'] = new rpg_player($this_battle, $this_playerinfo);
                     break;
                 }
             }
+
             // Now loop through this player's robots looking for an active one
             foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
                 if ($this_robotinfo['robot_position'] == 'active' && $this_robotinfo['robot_status'] != 'disabled'){
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     $eventinfo['this_robot'] = new rpg_robot($this_battle, $eventinfo['this_player'], $this_robotinfo);
                     break;
                 }
             }
+
         }
 
         // If this robot was targetting itself, set the target to false
@@ -864,49 +874,56 @@ class rpg_canvas {
                 || ($eventinfo['this_robot']->robot_id < MMRPG_SETTINGS_TARGET_PLAYERID && $eventinfo['target_robot']->robot_id < MMRPG_SETTINGS_TARGET_PLAYERID)
                 || ($eventinfo['this_robot']->robot_id >= MMRPG_SETTINGS_TARGET_PLAYERID && $eventinfo['target_robot']->robot_id >= MMRPG_SETTINGS_TARGET_PLAYERID)
                 ){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                 $eventinfo['target_robot'] = array();
             }
         }
 
         // If the target robot was not provided or allowed by the function
         if (empty($eventinfo['target_player']) || empty($eventinfo['target_robot']) || $options['canvas_show_target'] == false){
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
             // Set both this player and robot to false
             $eventinfo['target_player'] = false;
             $eventinfo['target_robot'] = false;
+
             // Collect this player ID if set
             $this_player_id = !empty($eventinfo['this_player']) ? $eventinfo['this_player']->player_id : false;
+
             // Loop through the players index looking for this player
             foreach ($this_battle->values['players'] AS $target_player_id => $target_playerinfo){
                 if (empty($this_player_id) || $this_player_id != $target_player_id){
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     $eventinfo['target_player'] = new rpg_player($this_battle, $target_playerinfo);
                     break;
                 }
             }
+
             // Now loop through the target player's robots looking for an active one
             foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
                 if ($target_robotinfo['robot_position'] == 'active' && $target_robotinfo['robot_status'] != 'disabled'){
-                    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                     $eventinfo['target_robot'] = new rpg_robot($this_battle, $eventinfo['target_player'], $target_robotinfo);
                     break;
                 }
             }
+
         }
 
         // Collect this player's markup data
         $this_player_data = $eventinfo['this_player']->canvas_markup($options);
+
         // Append this player's markup to the main markup array
         $this_markup .= $this_player_data['player_markup'];
 
         // Loop through and display this player's robots
         if ($options['canvas_show_this_robots'] && !empty($eventinfo['this_player']->player_robots)){
+
+            // Count the number of robots on this side of the field
             $num_player_robots = count($eventinfo['this_player']->player_robots);
+
+            // Loop through each of this player's robots and generate it's markup
             foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
-                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+
                 $this_robot = new rpg_robot($this_battle, $eventinfo['this_player'], $this_robotinfo);
                 $this_options = $options;
+
                 //if ($this_robot->robot_status == 'disabled' && $this_robot->robot_position == 'bench'){ continue; }
                 if (!empty($this_robot->flags['hidden'])){ continue; }
                 elseif (!empty($eventinfo['this_robot']->robot_id) && $eventinfo['this_robot']->robot_id != $this_robot->robot_id){ $this_options['this_ability'] = false; }
@@ -937,17 +954,8 @@ class rpg_canvas {
                     $this_markup .= '<div class="item_overlay overlay3" style="z-index: 100;">&nbsp;</div>';
                 }
 
-                // Define the results type we'll be working with
-                $results_type = false;
-                if (!empty($this_options['this_ability'])){
-                    $results_type = 'ability';
-                } elseif (!empty($this_options['this_item'])){
-                    $results_type = 'item';
-                }
-
                 // RESULTS ANIMATION STUFF
-                if (!empty($results_type)
-                    && !empty($this_options['this_'.$results_type.'_results'])
+                if (!empty($this_options['this_'.$results_type.'_results'])
                     && $this_options['this_'.$results_type.'_target'] == $this_robot_id_token
                     ){
 
@@ -1223,6 +1231,7 @@ class rpg_canvas {
 
         // Collect the target player's markup data
         $target_player_data = $eventinfo['target_player']->canvas_markup($options);
+
         // Append the target player's markup to the main markup array
         $this_markup .= $target_player_data['player_markup'];
 
@@ -1232,7 +1241,7 @@ class rpg_canvas {
             // Count the number of robots on the target's side of the field
             $num_player_robots = count($eventinfo['target_player']->player_robots);
 
-            // Loop through each target robot and generate it's markup
+            // Loop through each of the target player's robot and generate it's markup
             foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
 
                 // Create the temporary target robot object
