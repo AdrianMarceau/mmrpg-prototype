@@ -245,7 +245,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
         if (!empty($this_field_data)){
 
           // Define the paths for the different attachment types
-          $class_paths = array('ability' => 'abilities', 'battle' => 'battles', 'field' => 'fields', 'player' => 'players', 'robot' => 'robots', 'object' => 'objects');
+          $class_paths = array('ability' => 'abilities', 'item' => 'items', 'battle' => 'battles', 'field' => 'fields', 'player' => 'players', 'robot' => 'robots', 'object' => 'objects');
 
           // Define the background layer properties
           $background_animate = array();

@@ -1094,27 +1094,6 @@ class rpg_battle extends rpg_object {
                     $this_reward['robot_level'] = $this_robot_level;
                     $this_reward['robot_experience'] = $this_robot_experience;
                     mmrpg_game_unlock_robot($this_player_info, $this_reward, true, true);
-                    //$_SESSION['GAME']['values']['battle_rewards'][$this_player_token]['player_robots'][$this_robot_token] = $this_reward;
-
-                    // DEBUG
-                    //$debug_body = '<pre>$robot_reward_info:'.preg_replace('/\s+/', ' ', print_r($robot_reward_info, true)).'</pre>';
-                    //$debug_body .= '<pre>$this_reward:'.preg_replace('/\s+/', ' ', print_r($this_reward, true)).'</pre>';
-                    //$this->events_create(false, false, 'DEBUG', $debug_body);
-
-                    // Display the robot reward message markup
-                    /*
-                    $event_header = $robot_info['robot_name'].' Unlocked';
-                    $event_body = 'A new robot has been unlocked!<br />';
-                    $event_body .= '<span class="robot_name">'.$robot_info['robot_name'].'</span> can now be used in battle!';
-                    $event_options = array();
-                    $event_options['console_show_target'] = false;
-                    $event_options['this_header_float'] = $this_player->player_side;
-                    $event_options['this_body_float'] = $this_player->player_side;
-                    $event_options['this_robot_image'] = 'mug';
-                    $temp_robot->robot_frame = 'base';
-                    $temp_robot->update_session();
-                    $this->events_create($temp_robot, false, $event_header, $event_body, $event_options);
-                    */
 
                 }
             }
@@ -2184,6 +2163,8 @@ class rpg_battle extends rpg_object {
         $options['canvas_show_this_robots'] = isset($eventinfo['event_options']['canvas_show_this_robots']) ? $eventinfo['event_options']['canvas_show_this_robots'] : true;
         $options['canvas_show_this_ability'] = isset($eventinfo['event_options']['canvas_show_this_ability']) ? $eventinfo['event_options']['canvas_show_this_ability'] : true;
         $options['canvas_show_this_ability_overlay'] = isset($eventinfo['event_options']['canvas_show_this_ability_overlay']) ? $eventinfo['event_options']['canvas_show_this_ability_overlay'] : false;
+        $options['canvas_show_this_item'] = isset($eventinfo['event_options']['canvas_show_this_item']) ? $eventinfo['event_options']['canvas_show_this_item'] : true;
+        $options['canvas_show_this_item_overlay'] = isset($eventinfo['event_options']['canvas_show_this_item_overlay']) ? $eventinfo['event_options']['canvas_show_this_item_overlay'] : false;
         $options['canvas_show_target'] = isset($eventinfo['event_options']['canvas_show_target']) ? $eventinfo['event_options']['canvas_show_target'] : true;
         $options['canvas_show_target_robots'] = isset($eventinfo['event_options']['canvas_show_target_robots']) ? $eventinfo['event_options']['canvas_show_target_robots'] : true;
         $options['canvas_show_target_ability'] = isset($eventinfo['event_options']['canvas_show_target_ability']) ? $eventinfo['event_options']['canvas_show_target_ability'] : true;
@@ -2201,41 +2182,33 @@ class rpg_battle extends rpg_object {
         $this_markup = array();
 
         // Generate the event flags markup
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $event_flags = array();
-        //$event_flags['testing'] = true;
         $event_flags['autoplay'] = $options['event_flag_autoplay'];
         $event_flags['victory'] = $options['event_flag_victory'];
         $event_flags['defeat'] = $options['event_flag_defeat'];
         $this_markup['flags'] = json_encode($event_flags);
 
         // Generate the console message markup
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_markup['console'] = $this->console_markup($eventinfo, $options);
 
         // Generate the canvas scene markup
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_markup['canvas'] = $this->canvas_markup($eventinfo, $options);
 
         // Generate the jSON encoded event data markup
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this_markup['data'] = array();
-        //$this_markup['data']['this_battle'] = $eventinfo['this_battle']->export_array();
         $this_markup['data']['this_battle'] = '';
         $this_markup['data']['this_field'] = '';
-        $this_markup['data']['this_player'] = ''; //!empty($eventinfo['this_player']) ? $eventinfo['this_player']->export_array() : false;
-        $this_markup['data']['this_robot'] = ''; //!empty($eventinfo['this_robot']) ? $eventinfo['this_robot']->export_array() : false;
-        $this_markup['data']['target_player'] = ''; //!empty($eventinfo['target_player']) ? $eventinfo['target_player']->export_array() : false;
-        $this_markup['data']['target_robot'] = ''; //!empty($eventinfo['target_robot']) ? $eventinfo['target_robot']->export_array() : false;
+        $this_markup['data']['this_player'] = '';
+        $this_markup['data']['this_robot'] = '';
+        $this_markup['data']['target_player'] = '';
+        $this_markup['data']['target_robot'] = '';
         $this_markup['data'] = json_encode($this_markup['data']);
 
         // Increment this battle's frames counter
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this->counters['event_frames'] += 1;
         $this->update_session();
 
         // Return the generated event markup
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         return $this_markup;
 
     }

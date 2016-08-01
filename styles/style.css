@@ -725,7 +725,7 @@ body.index #header {
 }
 
 #mmrpg .ability_damage,
-#mmrpg .ability_recovery.
+#mmrpg .ability_recovery,
 #mmrpg .item_damage,
 #mmrpg .item_recovery {
     z-index: 9100;
