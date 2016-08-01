@@ -77,29 +77,6 @@ $(document).ready(function(){
     gameSettings.wapFlagIphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ? true : false;
     gameSettings.wapFlagIpad = navigator.userAgent.match(/iPad/i) ? true : false;
 
-    // Update the decompressed array values
-    decompressActionArray = [
-        'sprite_right', 'sprite_left', 'player_right', 'player_left', 'ability_right', 'ability_left', 'attachment_right', 'attachment_left',
-        'field_multiplier', 'field_type', 'player_type', 'robot_type', 'ability_type', 'attachment_type', 'mugshot_right', 'mugshot_left', 'icon_right', 'icon_left',
-        'robot_level', 'robot_experience', 'robot_energy', 'robot_attack', 'robot_defense', 'robot_speed', 'action_ability', 'action_option', 'action_scan', 'action_target', 'action_item',
-        'field_name', 'player_name', 'robot_name', 'ability_name', 'player_shadow', 'robot_shadow',
-        'class="main_actions main_actions_hastitle', 'class="main_actions', 'class="sub_actions', 'class="canvas_overlay_footer', 'class="overlay_label', 'class="overlay_multiplier',
-        'class="button', 'class="text', 'class="subtext', 'class="multi', 'class="type', 'class="number"', 'class="cross"',
-        'class="level', 'class="experience', 'class="energy', 'class="attack', 'class="defense', 'class="speed',
-        'class="sprite', 'class="field', 'class="player', 'class="robot', 'class="attachment', 'class="mugshot',
-        'data-tooltip-align="', 'data-tooltip-type="', 'data-tooltip="', 'data-order="',
-        'data-robotid="', 'data-playerid="', 'data-abilityid="', 'data-shadowid="', 'data-mugshotid="', 'data-detailsid="',
-        'type="button"', 'data-key="', 'data-type="', 'data-panel="', 'data-action="', 'data-preload="', 'data-size="', 'data-frame="', 'data-scale="', 'data-direction="', 'data-position="', 'data-status="', 'data-target="',
-        'images/players_shadows/', 'images/players/', 'images/robots_shadows/', 'images/robots/', 'images/items/', 'images/abilities/',
-        'background-image: url(', 'background-position:', 'background-size:', 'border-color:', '-webkit-transform:', '-moz-transform:', 'transform:', ' translate(', ' rotate(',
-        '</div><div ', '</span><span ', '<strong>', '</strong>', '</label>',
-        'abilities', 'attachment', 'position', 'disabled', 'prototype', 'maintext',
-        'experience', '-support', '-assault', 'buster-shot', 'dr-light', 'dr-cossack', 'light-buster', 'wily-buster', 'cossack-buster', '-support', '-capsule',
-        'Active Position', 'Bench Position', 'Abilities', ' Accuracy', ' Weapons', ' Attack', ' Defense', ' Recovery', ' Experience', ' Support', 'Buster Shot', 'Dr. Light', 'Dr. Wily', 'Dr. Cossack', 'Light Buster', 'Wily Buster', 'Cossack Buster', 'Neutral ', ' Capsule',
-        ' title="', ' class="', ' style="', 'sprite_40x40_', 'sprite_80x80_', 'sprite_160x160_', '_left_40x40', '_left_80x80', '_left_160x160',  '_right_40x40', '_right_80x80', '_right_160x160',
-        '.png?'+gameSettings.cacheTime+');',
-        ];
-
     /*
      * INDEX EVENTS
      */
@@ -1332,32 +1309,12 @@ String.prototype.replaceAll = function(search, replace) {
         //return this.split(search).join(replace);
 }
 
-// Define a quick function for decompressing action panel markup
-var decompressActionArray = [];
-//gameSettings.cacheTime
-function decompress_action_markup(thisMarkup){
-    //console.log('decompress_action_markup(thisMarkup:before)', thisMarkup);
-    var beforeLength = thisMarkup.length;
-    //console.log('decompress_action_markup(thisMarkup:before:'+beforeLength+')');
-    var arrayLength = decompressActionArray.length;
-    for (var i = 0; i < arrayLength; i++){
-        var thisSearch = '!'+i.toString(16)+'¡';
-        var thisReplace = decompressActionArray[i];
-        thisMarkup = thisMarkup.replaceAll(thisSearch, thisReplace);
-        //thisMarkup = thisMarkup.split(thisSearch).join(thisReplace);
-    }
-    //console.log('decompress_action_markup(thisMarkup:after)', thisMarkup);
-    var afterLength = thisMarkup.length;
-    //console.log('decompress_action_markup(thisMarkup:after:'+afterLength+':(+'+(afterLength - beforeLength)+'/+'+(100 - Math.ceil((beforeLength / afterLength) * 100))+'%))');
-    return thisMarkup;
-}
-
 // Define a function for updating an action panel's markup
 var actionPanelCache = [];
 function mmrpg_action_panel_update(thisPanel, thisMarkup){
     // Update the requested panel with the supplied markup
     var thisActionPanel = $('#actions_'+thisPanel, gameActions);
-    thisActionPanel.empty().html(decompress_action_markup(thisMarkup));
+    thisActionPanel.empty().html(thisMarkup);
     // Search for any sprites in this panel's markup
     $('.sprite', thisActionPanel).each(function(){
         var thisBackground = $(this).css('background-image').replace(/^url\("?(.*?)"?\)$/i, '$1');
@@ -1393,10 +1350,10 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
                 */
                 }
             if (canvasMarkup.length){
-                mmrpg_canvas_event(decompress_action_markup(canvasMarkup)); //, flagsMarkup
+                mmrpg_canvas_event(canvasMarkup); //, flagsMarkup
                 }
             if (consoleMarkup.length){
-                mmrpg_console_event(decompress_action_markup(consoleMarkup));  //, flagsMarkup
+                mmrpg_console_event(consoleMarkup);  //, flagsMarkup
                 }
             },
         'event_flags' : flagsMarkup //$.parseJSON(flagsMarkup)
