@@ -203,6 +203,7 @@ require('data/leaderboard.php');
 // Define whether or not the players or starforce tabs should be open
 $temp_remote_session = $this_playerinfo['user_id'] != $_SESSION['GAME']['USER']['userid'] ? true : false;
 $temp_show_players = true;
+$temp_show_items = !empty($this_playerinfo['save_values_battle_items']) ? true : false;
 $temp_show_starforce = $this_playerinfo['save_values_battle_stars'] > 0 ? true : false;
 
 // Define the prototype complete flags for this player
@@ -319,6 +320,7 @@ ob_start();
             <a class="link_button field_type <?= empty($this_current_token) ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/' ?>">Profile</a>
             <a class="link_button field_type <?= $this_current_token == 'robots' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/robots/' ?>">Robots</a>
             <? if(!empty($temp_show_players)): ?><a class="link_button field_type <?= $this_current_token == 'players' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/players/' ?>">Players</a><? endif; ?>
+            <? if(!empty($temp_show_items)): ?><a class="link_button field_type <?= $this_current_token == 'items' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/items/' ?>">Items</a><? endif; ?>
             <? if(!empty($temp_show_starforce)): ?><a class="link_button field_type <?= $this_current_token == 'starforce' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/starforce/' ?>">Starforce</a><? endif; ?>
             <a class="link_button field_type <?= $this_current_token == 'database' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/database/' ?>">Database</a>
             <? if ($this_playerinfo['board_missions'] > 1): ?>
@@ -339,7 +341,7 @@ ob_start();
         // -- LEADERBOARD PAGES -- //
 
         // Define the allowable pages
-        $temp_allowed_pages = array('robots', 'players', 'starforce', 'database', 'missions');
+        $temp_allowed_pages = array('robots', 'players', 'items', 'starforce', 'database', 'missions');
 
         // If this is the View Profile page, show the appropriate content
         if (empty($this_current_token) || !in_array($this_current_token, $temp_allowed_pages)){
@@ -409,7 +411,7 @@ ob_start();
             ?>
 
             <div id="game_frames" class="field" style="height: 600px;">
-                <iframe name="edit_robots" src="frames/edit_robots.php?action=robots&amp;1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+                <iframe name="view_robots" src="frames/edit_robots.php?action=robots&amp;1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
             </div>
 
             <?
@@ -419,7 +421,17 @@ ob_start();
             ?>
 
             <div id="game_frames" class="field" style="height: 600px;">
-                <iframe name="edit_players" src="frames/edit_players.php?action=players&amp;1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+                <iframe name="view_players" src="frames/edit_players.php?action=players&amp;1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+            </div>
+
+            <?
+        }
+        // Else if this is the View Items page, show the appropriate content
+        elseif ($this_current_token == 'items'){
+            ?>
+
+            <div id="game_frames" class="field" style="height: 600px;">
+                <iframe name="view_items" src="frames/items.php?1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
             </div>
 
             <?
@@ -429,7 +441,7 @@ ob_start();
             ?>
 
             <div id="game_frames" class="field" style="height: 600px;">
-                <iframe name="edit_starforce" src="frames/starforce.php?1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+                <iframe name="view_starforce" src="frames/starforce.php?1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
             </div>
 
             <?
@@ -439,7 +451,7 @@ ob_start();
             ?>
 
             <div id="game_frames" class="field" style="height: 600px;">
-                <iframe name="database" src="frames/database.php?1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+                <iframe name="view_database" src="frames/database.php?1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
             </div>
 
             <?
