@@ -1235,6 +1235,7 @@ function mmrpg_engine_update(newValues){
 
 // Define a function for switching to a different action panel
 function mmrpg_action_panel(thisPanel, currentPanel){
+
     // Switch to the event actions panel
     $('.wrapper', gameActions).css({display:'none'});
     var newWrapper = $('#actions_'+thisPanel, gameActions);
@@ -1244,44 +1245,55 @@ function mmrpg_action_panel(thisPanel, currentPanel){
         if (newWrapperTitle.length){ newWrapperTitle.html(newWrapperTitle.html().replace('{thisPanel}', currentPanel)); }
         //alert('thisPanel = '+thisPanel+'; currentPanel = '+currentPanel);
         }
+
     // Unhide the new wrapper
     newWrapper.css({display:''});
+
     // If the new action panel has numbered links in the title
     var mainActionsTitle = $('.main_actions_title', newWrapper);
     var floatLinkContainer = $('.float_links', mainActionsTitle);
     if (floatLinkContainer.length){
-        //console.log('We\'ve got links, batman!');
+
         // Assign events to any of the page links here
         $('.num', floatLinkContainer).click(function(e){
             e.preventDefault();
+
             // Collect references to this link and number
             var thisLink = $(this);
             var thisNum = parseInt(thisLink.attr('href').replace(/^#/, ''));
+
             // If this this panel is disabled, prevent clicking but only the first link
-            if (thisNum > 1 && mainActionsTitle.hasClass('main_actions_title_disabled')){ return false; }
+            //if (thisNum > 1 && mainActionsTitle.hasClass('main_actions_title_disabled')){ return false; }
             //console.log('num link '+thisNum+' clicked!');
+
             // Remove the active class from other links and add to this one
             $('.num', floatLinkContainer).removeClass('active');
             thisLink.addClass('active');
+
             // Define the key of the first and last element to be shown
             var lastElementKey = thisNum * 8;
             var firstElementKey = lastElementKey - 8;
             //console.log('first key should be '+firstElementKey+' and last should be '+lastElementKey+'!');
+
             // Hide all item buttons in the current view and then show only relevant
             $('.action_ability, .action_item', newWrapper).css({display:'none'});
             var activeButtons = $('.action_ability, .action_item', newWrapper).slice(firstElementKey, lastElementKey);
             //console.log('we have selected a total of '+activeButtons.length+' elements');
             activeButtons.css({display:'block'});
+
             // Loop through the active buttons and update their order values
             var tempOrder = 1;
             activeButtons.each(function(){ $(this).attr('data-order', tempOrder); tempOrder++; });
             $('.action_back', newWrapper).attr('data-order', tempOrder);
+
             // Update the session with the last page click
             var thisRequestType = 'session';
             var thisRequestData = 'battle_settings,action_ability_page_num,'+thisNum;
             $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+
             // Return true on success
             return true;
+
             });
 
         var activeLink = $('.active', floatLinkContainer);
