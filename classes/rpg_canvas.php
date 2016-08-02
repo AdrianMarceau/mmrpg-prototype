@@ -925,32 +925,21 @@ class rpg_canvas {
 
                 //if ($this_robot->robot_status == 'disabled' && $this_robot->robot_position == 'bench'){ continue; }
                 if (!empty($this_robot->flags['hidden'])){ continue; }
-                elseif (!empty($eventinfo['this_robot']->robot_id) && $eventinfo['this_robot']->robot_id != $this_robot->robot_id){ $this_options['this_ability'] = false; }
+                elseif (!empty($eventinfo['this_robot']->robot_id) && $eventinfo['this_robot']->robot_id != $this_robot->robot_id){ $this_options['this_'.$results_type] = false; }
                 elseif (!empty($eventinfo['this_robot']->robot_id) && $eventinfo['this_robot']->robot_id == $this_robot->robot_id && $options['canvas_show_this'] != false){ $this_robot->robot_frame =  $eventinfo['this_robot']->robot_frame; }
                 $this_robot->robot_key = $this_robot->robot_key !== false ? $this_robot->robot_key : ($this_key > 0 ? $this_key : $num_player_robots);
                 $this_robot_data = $this_robot->canvas_markup($this_options, $this_player_data);
                 $this_robot_id_token = $this_robot_data['robot_id'].'_'.$this_robot_data['robot_token'];
 
-                // ABILITY OVERLAY STUFF
-                if (!empty($this_options['this_ability_results']) && $this_options['this_ability_target'] == $this_robot_id_token){
-                    $this_markup .= '<div class="ability_overlay overlay1" data-target="'.$this_options['this_ability_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: '.(($this_robot_data['robot_position'] == 'active' ? 5050 : (4900 - ($this_robot_data['robot_key'] * 100)))).';">&nbsp;</div>';
+                // OVERLAY STUFF
+                if (!empty($this_options['this_'.$results_type.'_results']) && $this_options['this_'.$results_type.'_target'] == $this_robot_id_token){
+                    $this_markup .= '<div class="'.$results_type.'_overlay overlay1" data-target="'.$this_options['this_'.$results_type.'_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: '.(($this_robot_data['robot_position'] == 'active' ? 5050 : (4900 - ($this_robot_data['robot_key'] * 100)))).';">&nbsp;</div>';
                 }
-                elseif ($this_robot_data['robot_position'] != 'bench' && !empty($this_options['this_ability']) && !empty($options['canvas_show_this_ability'])){
-                    $this_markup .= '<div class="ability_overlay overlay2" data-target="'.$this_options['this_ability_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: 5050;">&nbsp;</div>';
+                elseif ($this_robot_data['robot_position'] != 'bench' && !empty($this_options['this_'.$results_type]) && !empty($options['canvas_show_this_'.$results_type])){
+                    $this_markup .= '<div class="'.$results_type.'_overlay overlay2" data-target="'.$this_options['this_'.$results_type.'_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: 5050;">&nbsp;</div>';
                 }
-                elseif ($this_robot_data['robot_position'] != 'bench' && !empty($options['canvas_show_this_ability_overlay'])){
-                    $this_markup .= '<div class="ability_overlay overlay3" style="z-index: 100;">&nbsp;</div>';
-                }
-
-                // ITEM OVERLAY STUFF
-                if (!empty($this_options['this_item_results']) && $this_options['this_item_target'] == $this_robot_id_token){
-                    $this_markup .= '<div class="item_overlay overlay1" data-target="'.$this_options['this_item_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: '.(($this_robot_data['robot_position'] == 'active' ? 5050 : (4900 - ($this_robot_data['robot_key'] * 100)))).';">&nbsp;</div>';
-                }
-                elseif ($this_robot_data['robot_position'] != 'bench' && !empty($this_options['this_item']) && !empty($options['canvas_show_this_item'])){
-                    $this_markup .= '<div class="item_overlay overlay2" data-target="'.$this_options['this_item_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: 5050;">&nbsp;</div>';
-                }
-                elseif ($this_robot_data['robot_position'] != 'bench' && !empty($options['canvas_show_this_item_overlay'])){
-                    $this_markup .= '<div class="item_overlay overlay3" style="z-index: 100;">&nbsp;</div>';
+                elseif ($this_robot_data['robot_position'] != 'bench' && !empty($options['canvas_show_this_'.$results_type.'_overlay'])){
+                    $this_markup .= '<div class="'.$results_type.'_overlay overlay3" style="z-index: 100;">&nbsp;</div>';
                 }
 
                 // RESULTS ANIMATION STUFF
