@@ -1186,8 +1186,11 @@ body.mobileFlag_landscapeMode #prototype .menu {
 #mmrpg #prototype .option_fieldback {
     background-position: center center;
     background-size: 150% auto;
-    -webkit-transition: 1s ease-in;
-    transition: 1s ease-in;
+    -moz-transition: background 1s ease-in;
+    -ms-transition: background 1s ease-in;
+    -o-transition: background 1s ease-in;
+    -webkit-transition: background 1s ease-in;
+    transition: background 1s ease-in;
 }
 #mmrpg #prototype .option_fieldback:hover {
     background-size: 175% auto;
