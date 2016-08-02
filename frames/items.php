@@ -32,7 +32,7 @@ unset($mmrpg_database_items['heart']);
 unset($mmrpg_database_items['star']);
 
 // Define which items we're allowed to see
-$global_battle_items = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items'] : 0;
+$global_battle_items = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items'] : array();
 $global_battle_item_categories = array();
 $global_battle_item_categories['all'] = array('category_name' => 'All Items', 'category_quote' => 'The prototype is home to many different items.  Which ones have you collected so far?');
 
@@ -301,7 +301,10 @@ if (true){
     // Start generating the edit markup
     ?>
 
-    <span class="header block_1">Item Inventory (<span id="item_counter"><?= number_format(count($global_battle_items), 0, '.', ',') ?> / <?= number_format(count($mmrpg_database_items), 0, '.', ',') ?></span> Items)</span>
+    <span class="header block_1">Item Inventory (
+        <span id="item_counter"><?= number_format(count($global_battle_items), 0, '.', ',') ?> /
+        <?= number_format(count($mmrpg_database_items), 0, '.', ',') ?></span> Items
+        )</span>
 
     <div style="float: left; width: 100%;">
     <table class="formatter" style="width: 100%; table-layout: fixed;">

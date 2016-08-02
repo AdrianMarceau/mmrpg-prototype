@@ -440,6 +440,26 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
         return !empty($ability_tokens) ? count($ability_tokens) : 0;
     }
 }
+// Define a function for checking if a prototype item has been unlocked
+function mmrpg_prototype_items_unlocked($player_token = '', $robot_token = ''){
+    // Pull in global variables
+    //global $mmrpg_index;
+    $mmrpg_index_players = $GLOBALS['mmrpg_index']['players'];
+    $session_token = mmrpg_game_token();
+    // If a specific robot token was provided
+    if (!empty($player_token) && !empty($robot_token)){
+        // Check if this battle has been completed and return true is it was
+        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_items']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_items']) : 0;
+    } elseif (!empty($player_token)){
+        // Check if this item has been unlocked by the player and return true if it was
+        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_items']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_items']) : 0;
+    } else {
+        // Define the item counter and token tracker
+        $item_tokens = $_SESSION[$session_token]['values']['battle_items'];
+        // Return the total amount of item tokens pulled
+        return !empty($item_tokens) ? count($item_tokens) : 0;
+    }
+}
 // Define a function for displaying prototype battle option markup
 function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     // Refence the global config and index objects for easy access
