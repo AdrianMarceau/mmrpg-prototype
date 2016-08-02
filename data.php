@@ -1277,7 +1277,7 @@ elseif ($this_action == 'ability'){
     }
 
 }
-// Else if the player's robot is using an item (MAYBE NOT?!)
+// Else if the player's robot is using an item
 elseif ($this_action == 'item'){
 
     // Create the temporary item object for this player's robot
@@ -1313,6 +1313,24 @@ elseif ($this_action == 'item'){
 
     // Now execute the stored actions (and any created in the process of executing them!)
     $this_battle->actions_execute();
+
+    // -- END OF TURN ACTIONS -- //
+
+    // If the battle has not concluded, check the robot attachments
+    if ($target_robot->robot_status == 'disabled'){
+
+        // If this the player's last robot
+        if ($this_player->counters['robots_active'] == 0){
+            // Trigger the battle complete event
+            $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
+        }
+        // Else if the target player's on their last robot
+        elseif ($target_player->counters['robots_active'] == 0){
+            // Trigger the battle complete event
+            $this_battle->battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, '', '');
+        }
+
+    }
 
 }
 

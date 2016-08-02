@@ -1430,7 +1430,7 @@ class rpg_item extends rpg_object {
         $this_item->target_options_update(array(
             'frame' => 'throw',
             'kickback' => array(0, 0, 0),
-            'success' => array(0, 85, 35, 10, $this_robot->print_robot_name().' thows a '.$this_item->print_item_name().'!'),
+            'success' => array(0, 85, 35, 10, $this_robot->print_robot_name().' throws a '.$this_item->print_item_name().'!'),
             ));
         $this_robot->trigger_target($target_robot, $this_item);
 
@@ -1454,8 +1454,23 @@ class rpg_item extends rpg_object {
             'failure' => array(0, -30, 0, -10, 'The '.$this_item->print_item_name().' missed&hellip;')
             ));
         $energy_damage_amount = ceil($target_robot->robot_base_energy * ($this_item->item_damage / 100));
-        $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => false, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => false, 'apply_position_modifiers' => false, 'apply_starforce_modifiers' => false);
-        $target_robot->trigger_damage($this_robot, $this_item, $energy_damage_amount, false, $trigger_options);
+        $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => true, 'apply_position_modifiers' => true, 'apply_starforce_modifiers' => true);
+        $target_robot->trigger_damage($this_robot, $this_item, $energy_damage_amount, true, $trigger_options);
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a static function to use as the common action for all _____-core items
+    public static function item_function_onload_core($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Update this item's damage amount based on the active robot's level
+        $this_item->item_damage = $this_robot->robot_level;
+        $this_item->update_session();
 
         // Return true on success
         return true;
