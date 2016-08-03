@@ -465,6 +465,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     // Refence the global config and index objects for easy access
     global $mmrpg_index, $db;
     $mmrpg_index_fields = rpg_field::get_index();
+
     // Define the variable to collect option markup
     $this_markup = '';
 
@@ -637,9 +638,8 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $temp_frame = !empty($this_battle_sprite['frame']) ? $this_battle_sprite['frame'] : '';
                     $temp_size_text = $temp_size.'x'.$temp_size;
                     $temp_top = -2 + (40 - $temp_size);
-                    if (!preg_match('/^abilities/i', $temp_path)){
+                    if (!preg_match('/^(abilities|items)/i', $temp_path)){
                         if ($temp_right === false){
-                            //die('<pre>'.print_r($temp_right, true).'</pre>');
                             if ($temp_size == 40){
                                 $temp_right_inc =  0;
                                 $temp_right = 18 + $temp_right_inc;
@@ -664,9 +664,11 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     } else {
                         $temp_right = 5;
                     }
-                    //if ($temp_size > 40) die('<pre>'.print_r($temp_size.':'.$temp_left_inc, true).'</pre>');
-                    if (preg_match('/^(abilities|items)/i', $temp_path)){ $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: 1px; right: -3px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.';">&nbsp;</span>'; }
-                    else { $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' '.($this_option_complete && !$this_has_field_star && $this_option_frame == 'base' ? 'sprite_'.$temp_size_text.'_defeat ' : 'sprite_'.$temp_size_text.'_'.$this_option_frame.' ').'" style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_top.'px; right: '.$temp_right.'px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.';">&nbsp;</span>'; } //'.$this_battleinfo['battle_name'].'
+                    if (preg_match('/^(abilities|items)/i', $temp_path)){
+                        $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: 1px; right: -3px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.';">&nbsp;</span>';
+                    } else {
+                        $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' '.($this_option_complete && !$this_has_field_star && $this_option_frame == 'base' ? 'sprite_'.$temp_size_text.'_defeat ' : 'sprite_'.$temp_size_text.'_'.$this_option_frame.' ').'" style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_top.'px; right: '.$temp_right.'px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.';">&nbsp;</span>';
+                    }
                     $temp_layer -= 1;
                     $temp_last_size = $temp_size;
                 }
