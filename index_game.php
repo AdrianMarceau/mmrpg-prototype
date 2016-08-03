@@ -1,13 +1,11 @@
 <?php
 
-/*
 // MAINTENANCE
 if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.226.238.61', '72.137.208.122'))){
-    die('<div style="margin: 0; padding: 10px 25%; background-color: rgb(122, 0, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
-        ATTENTION!<br /> The Mega Man RPG Prototype is currently being updated.  Please stand by until further notice.  Several parts of the website are being taken offline during this process and any progress made during will likely be lost, so please hold tight before trying to log in again.  I apologize for the inconvenience and thank you for your patience.<br /> - Adrian
+    die('<div style="font-family: Arial; font-size: 16px; line-height: 21px; margin: 0; padding: 20px 25%; background-color: rgb(0, 122, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
+        UPDATE IN PROGRESS<br /> The Mega Man RPG Prototype is currently being updated.  Please stand by until further notice.  Several parts of the website are being taken offline during this process and any progress made during will likely be lost, so please hold tight before trying to log in again.  I apologize for the inconvenience and thank you for your patience.<br /> - Adrian
         </div>');
 }
-*/
 
 // Include the TOP file
 require_once('top.php');
@@ -24,46 +22,46 @@ $this_seo_description = 'Battle through more than thirty robot masters in classi
 
 // Define the default Open Graph tag variables
 $this_graph_data = array(
-  'title' => 'Mega Man RPG Prototype',
-  'type' => 'website',
-  'url' => $this_current_url,
-  'image' => MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo.png?'.MMRPG_CONFIG_CACHE_DATE,
-  'site_name' => 'Mega Man RPG Prototype',
-  'description' => $this_seo_description,
-  );
+    'title' => 'Mega Man RPG Prototype',
+    'type' => 'website',
+    'url' => $this_current_url,
+    'image' => MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo.png?'.MMRPG_CONFIG_CACHE_DATE,
+    'site_name' => 'Mega Man RPG Prototype',
+    'description' => $this_seo_description,
+    );
 
 // If a reset was intentionally called
 if (!empty($_GET['reset']) || (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE)){
-  // Reset the game session
-  mmrpg_reset_game_session($this_save_filepath);
+    // Reset the game session
+    mmrpg_reset_game_session($this_save_filepath);
 }
 // Else if this is an out-of-sync demo
 elseif (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE){
-  // Reset the game session
-  mmrpg_reset_game_session($this_save_filepath);
+    // Reset the game session
+    mmrpg_reset_game_session($this_save_filepath);
 }
 // Check if the session has not been created or the cache date has changed
 elseif (
-  !empty($_GET['reload']) || // if a reload was specifically requested
-  !isset($_SESSION['GAME']['CACHE_DATE']) || // if there is no session created yet
-  (!empty($_SESSION['GAME']['DEMO']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE) // if we're in demo mode and the cache date is out of sync
-  ){
+    !empty($_GET['reload']) || // if a reload was specifically requested
+    !isset($_SESSION['GAME']['CACHE_DATE']) || // if there is no session created yet
+    (!empty($_SESSION['GAME']['DEMO']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE) // if we're in demo mode and the cache date is out of sync
+    ){
 
-  // Ensure there is a save file to load
-  if (!empty($this_save_filepath) && file_exists($this_save_filepath)){
-    // Load the save file into memory and overwrite the session
-    mmrpg_load_game_session($this_save_filepath);
-  }
-  // Otherwise, simply reset the game
-  else {
-    // Reset the game session
-    mmrpg_reset_game_session($this_save_filepath);
-  }
+    // Ensure there is a save file to load
+    if (!empty($this_save_filepath) && file_exists($this_save_filepath)){
+        // Load the save file into memory and overwrite the session
+        mmrpg_load_game_session($this_save_filepath);
+    }
+    // Otherwise, simply reset the game
+    else {
+        // Reset the game session
+        mmrpg_reset_game_session($this_save_filepath);
+    }
 
-  // Update the cache date to reflect the reload
-  $_SESSION['GAME']['CACHE_DATE'] = MMRPG_CONFIG_CACHE_DATE;
-  // Save the updated file back to the system
-  mmrpg_save_game_session($this_save_filepath);
+    // Update the cache date to reflect the reload
+    $_SESSION['GAME']['CACHE_DATE'] = MMRPG_CONFIG_CACHE_DATE;
+    // Save the updated file back to the system
+    mmrpg_save_game_session($this_save_filepath);
 
 }
 // Automatically empty all temporary battle variables
@@ -80,19 +78,19 @@ $this_browser_flag = true;
 //if ($_SERVER['REMOTE_ADDR'] == '99.255.218.123'){ $this_online_flag = true; }
 preg_match('/MSIE (.*?);/', $_SERVER['HTTP_USER_AGENT'], $matches);
 if (count($matches)>1){
-  //Then we're using IE
-  $version = $matches[1];
-  switch(true){
-    case ($version<=8):
-      //IE 8 or under!
-      $this_browser_flag = false;
-      break;
-    case ($version==9):
-      //IE9!
-      break;
-    default:
-      //You get the idea
-  }
+    //Then we're using IE
+    $version = $matches[1];
+    switch(true){
+        case ($version<=8):
+            //IE 8 or under!
+            $this_browser_flag = false;
+            break;
+        case ($version==9):
+            //IE9!
+            break;
+        default:
+            //You get the idea
+    }
 }
 
 ?>
@@ -136,47 +134,47 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
 <h1 id="header">Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></h1>
 <div id="window" style="position: relative; ">
 
-  <?if($this_online_flag && $this_browser_flag):?>
-    <?if(!$flag_wap):?>
-      <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=false" width="768" height="1004" frameborder="1" scrolling="no"></iframe>
-    <?else:?>
-      <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" frameborder="0" scrolling="no"></iframe>
-    <?endif;?>
-    <div id="music" class="onload">
-      <a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
-      <audio class="stream paused" onended="this.play();">
-        <div style="color: white; background-color: black; padding: 10px;">Your browser does not support the audio tag.</div>
-      </audio>
-    </div>
-    <div id="events" class="hidden">
-      <div class="event_wrapper">
-        <div class="event_container">
-          <div id="canvas" class="event_canvas"></div>
-          <div id="messages" class="event_messages"></div>
-          <div id="buttons" class="event_buttons"><a class="event_continue">Continue</a></div>
+    <?if($this_online_flag && $this_browser_flag):?>
+        <?if(!$flag_wap):?>
+            <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=false" width="768" height="1004" frameborder="1" scrolling="no"></iframe>
+        <?else:?>
+            <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" frameborder="0" scrolling="no"></iframe>
+        <?endif;?>
+        <div id="music" class="onload">
+            <a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
+            <audio class="stream paused" onended="this.play();">
+                <div style="color: white; background-color: black; padding: 10px;">Your browser does not support the audio tag.</div>
+            </audio>
         </div>
-      </div>
-    </div>
-  <?elseif(!$this_online_flag):?>
-    <strong style="display: block; margin: 100px auto; font-size: 13px; line-height: 19px; color: #DEDEDE; ">
-      The <strong>Mega Man RPG Prototype</strong> is temporarily down for maintenance.<br />
-      Please check back later and we aplogize for the inconvenience.
-    </strong>
-  <?elseif(!$this_browser_flag):?>
-    <strong style="display: block; margin: 100px auto; font-size: 13px; line-height: 19px; color: #DEDEDE; ">
-      The <strong>Mega Man RPG Prototype</strong> is not supported by your browser.<br />
-      Please try upgrading your version or consider switching to something else.<br />
-      We aplogize for the inconvenience.
-    </strong>
-  <?endif;?>
+        <div id="events" class="hidden">
+            <div class="event_wrapper">
+                <div class="event_container">
+                    <div id="canvas" class="event_canvas"></div>
+                    <div id="messages" class="event_messages"></div>
+                    <div id="buttons" class="event_buttons"><a class="event_continue">Continue</a></div>
+                </div>
+            </div>
+        </div>
+    <?elseif(!$this_online_flag):?>
+        <strong style="display: block; margin: 100px auto; font-size: 13px; line-height: 19px; color: #DEDEDE; ">
+            The <strong>Mega Man RPG Prototype</strong> is temporarily down for maintenance.<br />
+            Please check back later and we aplogize for the inconvenience.
+        </strong>
+    <?elseif(!$this_browser_flag):?>
+        <strong style="display: block; margin: 100px auto; font-size: 13px; line-height: 19px; color: #DEDEDE; ">
+            The <strong>Mega Man RPG Prototype</strong> is not supported by your browser.<br />
+            Please try upgrading your version or consider switching to something else.<br />
+            We aplogize for the inconvenience.
+        </strong>
+    <?endif;?>
 
 </div>
 <?if(!$flag_wap):?>
 <div id="credits">
-  <a href="<?= MMRPG_CONFIG_ROOTURL ?>">&laquo; Back to Website</a> |
-  Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.
-  | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback &raquo;</a><?= !$flag_iphone ? '<br />' : '' ?>
-  This game is fan-made by <a href="https://plus.google.com/113336469005774860291?rel=author" target="_blank">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
+    <a href="<?= MMRPG_CONFIG_ROOTURL ?>">&laquo; Back to Website</a> |
+    Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.
+    | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback &raquo;</a><?= !$flag_iphone ? '<br />' : '' ?>
+    This game is fan-made by <a href="https://plus.google.com/113336469005774860291?rel=author" target="_blank">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
 </div>
 <?endif;?>
 <script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/jquery.js"></script>
@@ -189,37 +187,37 @@ gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
 <script type="text/javascript">
 // When the document is ready for event binding
 $(document).ready(function(){
-  // Preload essential audio tracks
-  mmrpg_music_preload('misc/player-select');
-  mmrpg_music_preload('misc/stage-select-dr-light');
-  //mmrpg_music_preload('misc/stage-select-dr-wily');
-  //mmrpg_music_preload('misc/data-base');
-  //mmrpg_music_preload('misc/leader-board');
-  //mmrpg_music_preload('misc/file-menu');
-  //mmrpg_music_preload('misc/robot-editor');
-  // Check if we're running the game in mobile mode
-  if (false && gameSettings.wapFlag){
-    // Let the user know about the full-screen option for mobile browsers
-    if (('standalone' in window.navigator) && !window.navigator.standalone){
-      //alert('launched from full-screen ready browser, but not in full screen...');
-      alert('Use the "Add to Home Screen" option for fullscreen view! :)');
-      } else if (('standalone' in window.navigator) && window.navigator.standalone){
-      //alert('launched from full-screen ready browser, and in full screen!');
-      } else {
-      //alert('launched from a regular old browser...');
-      }
-    }
-  // Collect a reference to the continue button
-  var eventContinue = $('#events #buttons .event_continue');
-  // Create the continue event for the event window
-  eventContinue.click(function(e){
-    e.preventDefault();
-    //alert('clicked');
-    windowEventDestroy();
-    if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
-      windowEventDisplay();
-      }
-    });
+    // Preload essential audio tracks
+    mmrpg_music_preload('misc/player-select');
+    mmrpg_music_preload('misc/stage-select-dr-light');
+    //mmrpg_music_preload('misc/stage-select-dr-wily');
+    //mmrpg_music_preload('misc/data-base');
+    //mmrpg_music_preload('misc/leader-board');
+    //mmrpg_music_preload('misc/file-menu');
+    //mmrpg_music_preload('misc/robot-editor');
+    // Check if we're running the game in mobile mode
+    if (false && gameSettings.wapFlag){
+        // Let the user know about the full-screen option for mobile browsers
+        if (('standalone' in window.navigator) && !window.navigator.standalone){
+            //alert('launched from full-screen ready browser, but not in full screen...');
+            alert('Use the "Add to Home Screen" option for fullscreen view! :)');
+            } else if (('standalone' in window.navigator) && window.navigator.standalone){
+            //alert('launched from full-screen ready browser, and in full screen!');
+            } else {
+            //alert('launched from a regular old browser...');
+            }
+        }
+    // Collect a reference to the continue button
+    var eventContinue = $('#events #buttons .event_continue');
+    // Create the continue event for the event window
+    eventContinue.click(function(e){
+        e.preventDefault();
+        //alert('clicked');
+        windowEventDestroy();
+        if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
+            windowEventDisplay();
+            }
+        });
 
 });
 //function updateMobileCache(event){ window.applicationCache.swapCache(); }
@@ -227,31 +225,31 @@ $(document).ready(function(){
 gameSettings.canvasMarkupArray = [];
 gameSettings.messagesMarkupArray = [];
 function windowEventCreate(canvasMarkupArray, messagesMarkupArray){
-  //console.log('windowEventCreate('+canvasMarkupArray+', '+messagesMarkupArray+')');
-  gameSettings.canvasMarkupArray = canvasMarkupArray;
-  gameSettings.messagesMarkupArray = messagesMarkupArray;
-  windowEventDisplay();
+    //console.log('windowEventCreate('+canvasMarkupArray+', '+messagesMarkupArray+')');
+    gameSettings.canvasMarkupArray = canvasMarkupArray;
+    gameSettings.messagesMarkupArray = messagesMarkupArray;
+    windowEventDisplay();
 }
 // Define a function for displaying event messages to the player
 function windowEventDisplay(){
-  var eventContainer = $('#events');
-  //console.log('windowEventDisplay()');
-  var canvasMarkup = gameSettings.canvasMarkupArray.length ? gameSettings.canvasMarkupArray.shift() : '';
-  var messagesMarkup = gameSettings.messagesMarkupArray.length ? gameSettings.messagesMarkupArray.shift() : '';
-  $('#canvas', eventContainer).empty().html(canvasMarkup);
-  $('#messages', eventContainer).empty().html(messagesMarkup);
-  eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
-  $(window).focus();
-  //alert(eventMarkup);
+    var eventContainer = $('#events');
+    //console.log('windowEventDisplay()');
+    var canvasMarkup = gameSettings.canvasMarkupArray.length ? gameSettings.canvasMarkupArray.shift() : '';
+    var messagesMarkup = gameSettings.messagesMarkupArray.length ? gameSettings.messagesMarkupArray.shift() : '';
+    $('#canvas', eventContainer).empty().html(canvasMarkup);
+    $('#messages', eventContainer).empty().html(messagesMarkup);
+    eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
+    $(window).focus();
+    //alert(eventMarkup);
 }
 // Define a function for displaying event messages to the player
 function windowEventDestroy(){
-  var eventContainer = $('#events');
-  //console.log('windowEventDestroy()');
-  $('#canvas', eventContainer).empty();
-  $('#messages', eventContainer).empty();
-  eventContainer.addClass('hidden');
-  //alert(eventMarkup);
+    var eventContainer = $('#events');
+    //console.log('windowEventDestroy()');
+    $('#canvas', eventContainer).empty();
+    $('#messages', eventContainer).empty();
+    eventContainer.addClass('hidden');
+    //alert(eventMarkup);
 }
 </script>
 <?
