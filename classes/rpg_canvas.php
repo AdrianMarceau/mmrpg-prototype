@@ -832,9 +832,9 @@ class rpg_canvas {
 
         // Define the results type we'll be working with
         $results_type = false;
-        if (!empty($options['this_item'])){
+        if (!empty($options['this_item']) || !empty($options['this_item_results'])){
             $results_type = 'item';
-        } elseif (!empty($options['this_ability'])){
+        } elseif (!empty($options['this_ability']) || !empty($options['this_ability_results'])){
             $results_type = 'ability';
         }
 
