@@ -12,7 +12,7 @@ elseif (empty($this_token)){ die('error : no token defined'); }
 
 // Require the database top include file
 if ($this_class == 'mechas' || $this_class == 'fields'){ define('DATA_DATABASE_SHOW_MECHAS', true); }
-require_once('../data/database.php');
+require_once('../database/database.php');
 
 // Proceed based on the type of class the request is
 switch ($this_class){

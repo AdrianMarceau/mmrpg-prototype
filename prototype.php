@@ -12,7 +12,7 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.
 */
 
 // Require the robot database for... stuff?
-//require_once('data/database.php');
+//require_once('database/database.php');
 
 // Collect the game's session token
 $session_token = mmrpg_game_token();

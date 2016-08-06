@@ -13,15 +13,15 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
-//require_once('../data/database.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
+//require_once('../database/database.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_types.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_players.php');
 
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database_robots.php');
 $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 ORDER BY robot_game ASC, robot_number ASC;", 'robot_token');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database_abilities.php');
 $mmrpg_database_abilities = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 ORDER BY ability_order ASC;", 'ability_token');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database_items.php');
 //
 // Collect the editor flag if set
 $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;

@@ -5,7 +5,7 @@
 
 // Require the database top include file
 if ($this_current_sub == 'mechas' || $this_current_sub == 'fields'){ define('DATA_DATABASE_SHOW_MECHAS', true); }
-require_once('data/database.php');
+require_once('database/database.php');
 
 //die('<pre>'.print_r($_REQUEST, true).'</pre>');
 
