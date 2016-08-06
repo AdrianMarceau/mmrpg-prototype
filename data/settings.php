@@ -10,7 +10,7 @@ $is_admin = in_array($_SERVER['REMOTE_ADDR'], explode(',', MMRPG_CONFIG_ADMIN_LI
 define('MMRPG_CONFIG_ADMIN_MODE', $is_admin);
 
 // Define the cache and save paths on this system
-define('MMRPG_CONFIG_SAVE_PATH', MMRPG_CONFIG_ROOTDIR.'_saves/');
+define('MMRPG_CONFIG_SAVES_PATH', MMRPG_CONFIG_ROOTDIR.'_saves/');
 define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'_cache/');
 
 // Define the cache and index paths for battles

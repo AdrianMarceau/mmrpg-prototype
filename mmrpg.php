@@ -66,7 +66,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Define the game cache location path
     $this_cache_dir = MMRPG_CONFIG_CACHE_PATH;
     // Define the game save location path
-    $this_save_dir = MMRPG_CONFIG_SAVE_PATH;
+    $this_save_dir = MMRPG_CONFIG_SAVES_PATH;
 
     // If the user and file details have already been loaded to the session
     if (
