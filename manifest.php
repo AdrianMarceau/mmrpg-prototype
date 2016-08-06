@@ -54,7 +54,7 @@ echo "NETWORK:\r\n";
 echo "{$asset_base_url}index.php\r\n";
 echo "{$asset_base_url}prototype.php\r\n";
 echo "{$asset_base_url}battle.php\r\n";
-echo "{$asset_base_url}data.php\r\n";
+echo "{$asset_base_url}battle_loop.php\r\n";
 //echo "{$asset_base_url}manifest.php\r\n";
 
 ?>

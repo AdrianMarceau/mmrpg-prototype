@@ -204,7 +204,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 <body id="mmrpg" class="battle">
 <div id="battle" class="hidden">
 
-    <form id="engine" action="data.php<?= $flag_wap ? '?wap=true' : '' ?>" target="connect" method="post">
+    <form id="engine" action="battle_loop.php<?= $flag_wap ? '?wap=true' : '' ?>" target="connect" method="post">
 
         <input type="hidden" name="this_action" value="" />
         <input type="hidden" name="next_action" value="loading" />
