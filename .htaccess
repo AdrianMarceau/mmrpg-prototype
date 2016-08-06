@@ -64,8 +64,8 @@ RewriteRule ^images/abilities/item-screw-small/(.*)?$ /images/items/small-screw/
 RewriteRule ^images/abilities/item-screw-large/(.*)?$ /images/items/large-screw/$1 [R,L]
 RewriteRule ^images/abilities/item-core-([a-z]+)/(.*)?$ /images/items/$1-core/$2 [R,L]
 RewriteRule ^images/abilities/item-([-_a-z0-9]+)/(.*)?$ /images/items/$1/$2 [R,L]
-RewriteRule ^images/items/core-([a-z]+)/(.*)?$ /images/items/$1-core/$2 [R,L]
-RewriteRule ^images/items/screw-([a-z]+)/(.*)?$ /images/items/$1-screw/$2 [R,L]
+RewriteRule ^(images|database)/items/core-([a-z]+)/(.*)?$ /$1/items/$2-core/$3 [R,L]
+RewriteRule ^(images|database)/items/screw-([a-z]+)/(.*)?$ /$1/items/$2-screw/$3 [R,L]
 
 # Define the rewrite conditions
 RewriteCond %{REQUEST_FILENAME} -d [OR]
