@@ -1031,12 +1031,12 @@ function mmrpg_game_zenny_unlocked(){
 
 
 // Define a function for saving the game session
-require(MMRPG_CONFIG_ROOTDIR.'data/functions/game_reset-game-session.php');
+require(MMRPG_CONFIG_ROOTDIR.'functions/game_reset-game-session.php');
 
 // Define a function for saving the game session
-require(MMRPG_CONFIG_ROOTDIR.'data/functions/game_save-game-session.php');
+require(MMRPG_CONFIG_ROOTDIR.'functions/game_save-game-session.php');
 
 // Define a function for loading the game session
-require(MMRPG_CONFIG_ROOTDIR.'data/functions/game_load-game-session.php');
+require(MMRPG_CONFIG_ROOTDIR.'functions/game_load-game-session.php');
 
 ?>

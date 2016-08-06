@@ -94,9 +94,9 @@ require('classes/rpg_item_damage.php');
 require('classes/rpg_item_recovery.php');
 
 // Include mandatory function files
-require('data/functions/website.php');
-require('data/functions/game.php');
-require('data/functions/prototype.php');
+require('functions/website.php');
+require('functions/game.php');
+require('functions/prototype.php');
 
 // Load startup file unless explicitly prevented
 if (!defined('MMRPG_EXTERNAL_TOP_INCLUDE')){
