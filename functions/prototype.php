@@ -802,7 +802,7 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
 function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $ability_num = 1){
     global $db;
     // Require the actual code file
-    require('prototype_generate-abilities.php');
+    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_generate-abilities.php');
     // Return the ability array, whatever it was
     return $this_robot_abilities;
 }
@@ -823,7 +823,7 @@ function mmrpg_prototype_mission_starter($this_prototype_data, $this_robot_token
     global $this_omega_factors_nine;
     global $this_omega_factors_ten;
     // Require the definition file
-    require('prototype_mission-starter.php');
+    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-starter.php');
     // Return the generated omega battle data
     return $temp_battle_omega;
 }
@@ -844,7 +844,7 @@ function mmrpg_prototype_mission_single($this_prototype_data, $this_robot_token,
     global $this_omega_factors_nine;
     global $this_omega_factors_ten;
     // Require the actual code file
-    require('prototype_mission-single.php');
+    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-single.php');
     // Return the generated battle data
     return $temp_battle_omega;
 }
@@ -865,7 +865,7 @@ function mmrpg_prototype_mission_double($this_prototype_data, $this_robot_tokens
     global $this_omega_factors_nine;
     global $this_omega_factors_ten;
     // Require the actual code file
-    require('prototype_mission-double.php');
+    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-double.php');
     // Return the generated battle data
     return $temp_battle_omega;
 
@@ -887,7 +887,7 @@ function mmrpg_prototype_mission_player($this_prototype_data, $this_user_info, $
     global $this_omega_factors_nine;
     global $this_omega_factors_ten;
     // Require the actual code file
-    require('prototype_mission-player.php');
+    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-player.php');
     // Return the generated battle data
     return $temp_battle_omega;
 }
@@ -908,7 +908,7 @@ function mmrpg_prototype_mission_bonus($this_prototype_data, $this_robot_count =
     global $this_omega_factors_nine;
     global $this_omega_factors_ten;
     // Require the actual code file
-    require('prototype_mission-bonus.php');
+    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-bonus.php');
     // Return the generated battle data
     return $temp_battle_omega;
 }
