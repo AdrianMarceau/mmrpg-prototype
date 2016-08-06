@@ -14,14 +14,14 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
-//require_once('../database/database.php');
+//require_once('../database/include.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/prototype_omega.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/database_types.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/database_players.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/database_robots.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/database_abilities.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/database_fields.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/database_items.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
 require(MMRPG_CONFIG_ROOTDIR.'data/starforce.php');
 // Collect the editor flag if set
 $global_allow_editing = true;
