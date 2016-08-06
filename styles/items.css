@@ -127,11 +127,12 @@
 
 
 #item #console .event td.left {
-    padding-right: 10px;
+    padding-right: 20px;
     text-align: left;
 }
 #item #console .event td.right {
     padding-left: 10px;
+    padding-right: 20px;
     text-align: left;
 }
 #item #console .event .item_header,
@@ -270,6 +271,7 @@
 }
 #item #console .event .item_cell_disabled[data-unlocked="coming-soon"] .item_name {
     font-size: 9px;
+    color: #696969;
 }
 #item #console .event .item_cell_disabled .use_button {
     cursor: default;
@@ -318,16 +320,16 @@
     width: auto;
     max-width: 50%;
     font-size: 12px;
-    line-height: 16px;
+    line-height: 18px;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     border-width: 1px;
     border-style: solid;
-    border-radius: 0.3em;
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
     color: #FFFFFF;
     text-decoration: none;
     cursor: default;
@@ -397,22 +399,27 @@
 }
 #item #console .event .item_number {
     font-size: 9px;
-    margin-right: 4px;
+    margin-right: 0;
     min-width: 48px;
     box-sizing: border-box;
 }
 #item #console .event .item_sprite {
-    float: right;
-    width: 20px;
-    height: 18px;
-    margin-left: 6px;
+    float: left;
+    width: 22px;
+    height: 20px;
+    margin-right: 6px;
+    margin-left: -4px;
     overflow: visible;
     box-sizing: border-box;
+    border-left: 0 none transparent;
+    -moz-border-radius: 0 0.3em 0.3em 0;
+    -webkit-border-radius: 0 0.3em 0.3em 0;
+    border-radius: 0 0.3em 0.3em 0;
 }
 #item #console .event .item_sprite .sprite {
     position: relative;
     left: -17px;
-    top: -10px;
+    top: -9px;
 }
 
 #item #console .event .item_button_header,
