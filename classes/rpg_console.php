@@ -190,13 +190,15 @@ class rpg_console {
         // Define and calculate the simpler markup and positioning variables for this item
         $this_data['item_name'] = isset($options['item_name']) ? $options['item_name'] : $this_item->item_name;
         $this_data['item_title'] = $this_data['item_name'];
-        $this_data['item_token'] = $this_item->item_token;$this_data['item_direction'] = 'right';
+        $this_data['item_token'] = $this_item->item_token;
+        $this_data['item_direction'] = 'right';
         $this_data['item_float'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this_item->robot_id ? $robot_data['robot_float'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
         $this_data['item_size'] = $this_item->item_image_size;
         $this_data['item_frame'] = isset($options['item_frame']) ? $options['item_frame'] : $this_item->item_frame;
         if (is_numeric($this_data['item_frame']) && $this_data['item_frame'] >= 0){ $this_data['item_frame'] = str_pad($this_data['item_frame'], 2, '0', STR_PAD_LEFT); }
         elseif (is_numeric($this_data['item_frame']) && $this_data['item_frame'] < 0){ $this_data['item_frame'] = ''; }
         $this_data['image_type'] = !empty($options['this_item_image']) ? $options['this_item_image'] : 'icon';
+        $this_data['image_quantity'] = !empty($options['this_item_quantity']) ? $options['this_item_quantity'] : 1;
 
         // Define the rest of the display variables
         $this_data['container_class'] = 'this_sprite sprite_'.$this_data['item_float'];
@@ -210,7 +212,7 @@ class rpg_console {
         // Generate the final markup for the console item
         $this_data['item_markup'] = '';
         $this_data['item_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
-        $this_data['item_markup'] .= '<div class="'.$this_data['item_markup_class'].'" style="'.$this_data['item_markup_style'].'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
+            $this_data['item_markup'] .= '<div class="'.$this_data['item_markup_class'].'" style="'.$this_data['item_markup_style'].'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
         $this_data['item_markup'] .= '</div>';
 
         // Return the item console data

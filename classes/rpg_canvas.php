@@ -688,6 +688,7 @@ class rpg_canvas {
         $this_data['item_token'] = $this_item->item_token;
         $this_data['item_id_token'] = $this_item->item_id.'_'.$this_item->item_token;
         $this_data['item_image'] = isset($options['item_image']) ? $options['item_image'] : $this_item->item_image;
+        $this_data['item_quantity'] = !empty($options['this_item_quantity']) ? $options['this_item_quantity'] : $this_item->item_quantity;
         $this_data['item_status'] = $robot_data['robot_status'];
         $this_data['item_position'] = $robot_data['robot_position'];
         $this_data['robot_id_token'] = $robot_data['robot_id'].'_'.$robot_data['robot_token'];
@@ -792,29 +793,61 @@ class rpg_canvas {
 
         }
 
+        // Define the middle value of item quantity for perspection calculations
+        if ($this_data['item_quantity'] == 1){ $middle_quantity_key = 0; }
+        elseif ($this_data['item_quantity'] % 2 != 0){ $middle_quantity_key = ($this_data['item_quantity'] - 1) / 2; }
+        else { $middle_quantity_key = $this_data['item_quantity'] / 2; }
 
-        // Define the rest of the display variables
-        //$this_data['item_image'] = 'images/items/'.(!empty($this_data['item_image']) ? $this_data['item_image'] : $this_data['item_token']).'/sprite_'.$this_data['item_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
-        if (!preg_match('/^images/i', $this_data['item_image'])){ $this_data['item_image'] = 'images/items/'.$this_data['item_image'].'/sprite_'.$this_data['item_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
-        $this_data['item_markup_class'] = 'sprite sprite_item ';
-        $this_data['item_markup_class'] .= 'sprite_'.$this_data['item_sprite_size'].'x'.$this_data['item_sprite_size'].' sprite_'.$this_data['item_sprite_size'].'x'.$this_data['item_sprite_size'].'_'.$this_data['item_frame'].' ';
-        $this_data['item_markup_class'] .= 'item_status_'.$this_data['item_status'].' item_position_'.$this_data['item_position'].' ';
-        $frame_position = is_numeric($this_data['item_frame']) ? (int)($this_data['item_frame']) : array_search($this_data['item_frame'], $this_data['item_frame_index']);
-        if ($frame_position === false){ $frame_position = 0; }
-        $frame_background_offset = -1 * ceil(($this_data['item_sprite_size'] * $frame_position));
-        $this_data['item_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
-        $this_data['item_markup_style'] .= 'pointer-events: none; z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['item_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
-        $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); width: '.($this_data['item_sprite_size'] * $this_data['item_frame_span']).'px; height: '.$this_data['item_sprite_size'].'px; background-size: '.$this_data['item_image_width'].'px '.$this_data['item_image_height'].'px; ';
-
-        // DEBUG
-        //$this_data['item_title'] .= 'DEBUG checkpoint data sticky = '.preg_replace('/\s+/i', ' ', htmlentities(print_r($options, true), ENT_QUOTES, 'UTF-8', true));
-
+        // Shift the original x offset if there's more than one of an item
+        if ($this_data['item_quantity'] > 1){
+            $this_data['canvas_offset_x'] += 50;
+            $this_data['canvas_offset_x'] -= round(($this_data['item_quantity'] / 2) * 7);
+            $this_data['canvas_offset_y'] -= round(($this_data['item_quantity'] / 2) * 1);
+        }
 
         // Generate the final markup for the canvas item
         ob_start();
 
-            // Display the item's battle sprite
-            echo '<div data-item-id="'.$this_data['item_id_token'].'" data-robot-id="'.$robot_data['robot_id_token'].'" class="'.($this_data['item_markup_class'].$this_data['item_frame_classes']).'" style="'.($this_data['item_markup_style'].$this_data['item_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['item_sprite_size'].'" data-direction="'.$this_data['item_direction'].'" data-frame="'.$this_data['item_frame'].'" data-animate="'.$this_data['item_frame_animate'].'" data-position="'.$this_data['item_position'].'" data-status="'.$this_data['item_status'].'" data-scale="'.$this_data['item_scale'].'">'.$this_data['item_token'].'</div>';
+            // Loop through the item quantity and display sprites
+            $canvas_offset_x = $this_data['canvas_offset_x'];
+            $canvas_offset_y = $this_data['canvas_offset_y'];
+            $canvas_offset_z = $this_data['canvas_offset_z'];
+            for ($item_key = 0; $item_key < $this_data['item_quantity']; $item_key++){
+
+                // Define the rest of the display variables
+                //$this_data['item_image'] = 'images/items/'.(!empty($this_data['item_image']) ? $this_data['item_image'] : $this_data['item_token']).'/sprite_'.$this_data['item_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+                if (!preg_match('/^images/i', $this_data['item_image'])){ $this_data['item_image'] = 'images/items/'.$this_data['item_image'].'/sprite_'.$this_data['item_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
+                $this_data['item_markup_class'] = 'sprite sprite_item ';
+                $this_data['item_markup_class'] .= 'sprite_'.$this_data['item_sprite_size'].'x'.$this_data['item_sprite_size'].' sprite_'.$this_data['item_sprite_size'].'x'.$this_data['item_sprite_size'].'_'.$this_data['item_frame'].' ';
+                $this_data['item_markup_class'] .= 'item_status_'.$this_data['item_status'].' item_position_'.$this_data['item_position'].' ';
+
+                $frame_position = is_numeric($this_data['item_frame']) ? (int)($this_data['item_frame']) : array_search($this_data['item_frame'], $this_data['item_frame_index']);
+                if ($frame_position === false){ $frame_position = 0; }
+                $frame_background_offset = -1 * ceil(($this_data['item_sprite_size'] * $frame_position));
+
+                if ($item_key > 0){
+                    $offset_multiplier = $item_key > $middle_quantity_key ? 1 : -1;
+                    $canvas_offset_x += 10;
+                    if ($item_key > $middle_quantity_key){
+                        $canvas_offset_y += 3;
+                        $canvas_offset_z -= 1;
+                    } else {
+                        $canvas_offset_y -= 3;
+                        $canvas_offset_z += 1;
+                    }
+                }
+
+                $this_data['item_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
+                $this_data['item_markup_style'] .= 'pointer-events: none; z-index: '.$canvas_offset_z.'; '.$this_data['item_float'].': '.$canvas_offset_x.'px; bottom: '.$canvas_offset_y.'px; ';
+                $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); width: '.($this_data['item_sprite_size'] * $this_data['item_frame_span']).'px; height: '.$this_data['item_sprite_size'].'px; background-size: '.$this_data['item_image_width'].'px '.$this_data['item_image_height'].'px; ';
+
+                // DEBUG
+                //$this_data['item_title'] .= 'DEBUG checkpoint data sticky = '.preg_replace('/\s+/i', ' ', htmlentities(print_r($options, true), ENT_QUOTES, 'UTF-8', true));
+
+                // Display the item's battle sprite
+                echo '<div data-item-id="'.$this_data['item_id_token'].'" data-item-quantity="'.$this_data['item_quantity'].'" data-robot-id="'.$robot_data['robot_id_token'].'" class="'.($this_data['item_markup_class'].$this_data['item_frame_classes']).'" style="'.($this_data['item_markup_style'].$this_data['item_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['item_sprite_size'].'" data-direction="'.$this_data['item_direction'].'" data-frame="'.$this_data['item_frame'].'" data-animate="'.$this_data['item_frame_animate'].'" data-position="'.$this_data['item_position'].'" data-status="'.$this_data['item_status'].'" data-scale="'.$this_data['item_scale'].'">'.$this_data['item_token'].'</div>';
+
+            }
 
         // Collect the generated item markup
         $this_data['item_markup'] .= trim(ob_get_clean());
@@ -1298,6 +1331,7 @@ class rpg_canvas {
                             $target_attachment_options['data_type'] = 'attachment';
                             $target_attachment_options['data_debug'] = ''; //$attachment_token;
                             $target_attachment_options['item_image'] = isset($attachment_info['item_image']) ? $attachment_info['item_image'] : $target_item->item_image;
+                            $target_attachment_options['item_quantity'] = isset($attachment_info['item_quantity']) ? $attachment_info['item_quantity'] : $target_item->item_quantity;
                             $target_attachment_options['item_frame'] = isset($attachment_info['item_frame']) ? $attachment_info['item_frame'] : $target_item->item_frame;
                             $target_attachment_options['item_frame_span'] = isset($attachment_info['item_frame_span']) ? $attachment_info['item_frame_span'] : $target_item->item_frame_span;
                             $target_attachment_options['item_frame_animate'] = isset($attachment_info['item_frame_animate']) ? $attachment_info['item_frame_animate'] : $target_item->item_frame_animate;

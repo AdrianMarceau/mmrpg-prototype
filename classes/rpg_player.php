@@ -269,6 +269,88 @@ class rpg_player extends rpg_object {
         else { return 0; }
     }
 
+    public static function trigger_item_drop($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_token, $item_quantity_dropped = 1){
+        global $mmrpg_index;
+
+        // Create the temporary item object for event creation
+        $item_reward_info = rpg_item::get_index_info($item_reward_token);
+        $temp_item = new rpg_item($this_battle, $target_player, $target_robot, $item_reward_info);
+        $temp_item->item_name = $item_reward_info['item_name'];
+        $temp_item->item_image = $item_reward_info['item_token'];
+        $temp_item->item_quantity = $item_quantity_dropped;
+        $temp_item->update_session();
+
+        // Collect or define the item variables
+        $temp_item_token = $item_reward_info['item_token'];
+        $temp_item_name = $item_reward_info['item_name'];
+        $temp_item_colour = !empty($item_reward_info['item_type']) ? $item_reward_info['item_type'] : 'none';
+        if (!empty($item_reward_info['item_type2'])){ $temp_item_colour .= '_'.$item_reward_info['item_type2']; }
+
+        // Create the session variable for this item if it does not exist and collect its value
+        if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
+        $temp_item_quantity = $_SESSION['GAME']['values']['battle_items'][$temp_item_token];
+
+        // If this item is already at the quantity limit, skip it entirely
+        if ($temp_item_quantity >= MMRPG_SETTINGS_ITEMS_MAXQUANTITY){
+            $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = MMRPG_SETTINGS_ITEMS_MAXQUANTITY;
+            $temp_item_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY;
+            return true;
+        }
+
+        // Display the robot reward message markup
+        $event_header = $temp_item_name.' Item Drop';
+        if ($item_quantity_dropped > 1){
+            $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_robot_name().' dropped <strong>x'.$item_quantity_dropped.'</strong> '.' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.($item_quantity_dropped > 1 ? 's' : '').'</span>!<br />';
+            $event_body .= $target_player->print_player_name().' added the dropped items to the inventory.';
+        } else {
+            $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_robot_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
+            $event_body .= $target_player->print_player_name().' added the dropped item to the inventory.';
+        }
+        $event_options = array();
+        $event_options['console_show_target'] = false;
+        $event_options['this_header_float'] = $target_player->player_side;
+        $event_options['this_body_float'] = $target_player->player_side;
+        $event_options['this_item'] = $temp_item;
+        $event_options['this_item_image'] = 'icon';
+        $event_options['this_item_quantity'] = $item_quantity_dropped;
+        $event_options['event_flag_victory'] = true;
+        $event_options['console_show_this_player'] = false;
+        $event_options['console_show_this_robot'] = false;
+        $event_options['console_show_this_item'] = true;
+        $event_options['canvas_show_this_item'] = true;
+        $target_player->player_frame = $item_reward_key % 3 == 0 ? 'victory' : 'taunt';
+        $target_player->update_session();
+        $target_robot->robot_frame = $item_reward_key % 2 == 0 ? 'taunt' : 'base';
+        $target_robot->update_session();
+        $temp_item->item_frame = 'base';
+        $temp_item->item_frame_offset = array('x' => 260, 'y' => 0, 'z' => 10);
+        $temp_item->update_session();
+        $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
+
+        // Create and/or increment the session variable for this item increasing its quantity
+        if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
+        $_SESSION['GAME']['values']['battle_items'][$temp_item_token] += $item_quantity_dropped;
+
+        // If this item is not on the list of key items (un-equippable), don't add it
+        $temp_key_items = array('large-screw', 'small-screw', 'heart', 'star');
+        if (!in_array($temp_item_token, $temp_key_items)){
+            // If there is room in this player's current item omega, add the new item
+            $temp_session_token = $target_player->player_token.'_this-item-omega_prototype';
+            if (!empty($_SESSION['GAME']['values'][$temp_session_token])){
+                $temp_count = count($_SESSION['GAME']['values'][$temp_session_token]);
+                if ($temp_count < 8 && !in_array($temp_item_token, $_SESSION['GAME']['values'][$temp_session_token])){
+                    $_SESSION['GAME']['values'][$temp_session_token][] = $temp_item_token;
+                    $target_player->player_items[] = $temp_item_token;
+                    $target_player->update_session();
+                }
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
     // Define a public function updating internal varibales
     public function update_variables(){
 
