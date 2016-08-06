@@ -405,7 +405,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
     </script>
     <?
     // Require the remote bottom in case we're in viewer mode
-    require(MMRPG_CONFIG_ROOTDIR.'/data/analytics.php');
+    require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
     ?>
 </body>
 </html>

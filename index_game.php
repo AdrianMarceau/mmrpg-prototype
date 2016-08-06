@@ -254,7 +254,7 @@ function windowEventDestroy(){
 </script>
 <?
 // Require the remote bottom in case we're in viewer mode
-require(MMRPG_CONFIG_ROOTDIR.'/data/analytics.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
 ?>
 </body>
 </html>

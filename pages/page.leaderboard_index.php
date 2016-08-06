@@ -22,7 +22,7 @@ $_GET['start'] = 0 + ($this_num_offset * $this_display_limit_default);
 $_GET['limit'] = $this_display_limit_default + ($this_num_offset * $this_display_limit_default);
 
 // Require the leaderboard data file
-require_once('data/leaderboard.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
 
 //die('<pre>'.print_r($this_leaderboard_online_players, true).'</pre>');
 

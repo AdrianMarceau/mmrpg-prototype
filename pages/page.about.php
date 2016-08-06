@@ -35,39 +35,6 @@ ob_start();
 
 </div>
 
-
-<?
-/*
-// Require the screenshots data for display
-require_once('data/screenshots.php');
-?>
-<a name="screenshots" class="anchor">&nbsp;</a>
-<h2 class="subheader"><a class="link" href="http://imgur.com/a/MJCVi" target="_blank" rel="screenshots">Mega Man RPG Prototype Screenshots</a><a class="float_link" href="<?= $mmrpg_screenshots_album ?>" target="_blank">View More Screenshots &raquo;</a></h2>
-<?
-// Loop through the screenshot array and display its contents
-$temp_screenshot_counter = 0;
-$temp_screenshot_limit = 5;
-echo '<div class="subwrap">';
-foreach ($mmrpg_screenshots_array AS $group_yyyymmdd => $group_screenshots){
-  $this_group_date = preg_replace('#^([0-9]{4})([0-9]{2})([0-9]{2})$#', '$1/$2/$3', $group_yyyymmdd);
-  //echo '<h2 class="subheader">'.date('F jS, Y', strtotime($this_group_date)).'</h2>';
-  //echo '<div class="subwrap">';
-  foreach ($group_screenshots AS $screenshot_key => $screenshot_info){
-    $this_screenshot_title = $screenshot_info['image_title'];
-    $this_screenshot_link = 'http://imgur.com/'.$screenshot_info['image_token'].'';
-    $this_screenshot_thumb = 'http://i.imgur.com/'.$screenshot_info['image_token'].'l.png';
-    $this_screenshot_alt = $this_screenshot_title.' | Mega Man RPG Prototype Screenshot | '.$this_group_date;
-    echo '<a class="image image_1x5" href="'.$this_screenshot_link.'" target="_blank"><img src="'.$this_screenshot_thumb.'" alt="'.$this_screenshot_alt.'" title="'.$this_screenshot_title.'" width="100%" /><label>'.$this_screenshot_title.'</label></a>';
-    $temp_screenshot_counter++;
-    if ($temp_screenshot_counter >= $temp_screenshot_limit){ break;  }
-  }
-  //echo '</div>';
-  if ($temp_screenshot_counter >= $temp_screenshot_limit){ break;  }
-}
-echo '</div>';
-*/
-?>
-
 <a name="development" class="anchor">&nbsp;</a>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Mega Man RPG Prototype Mechanics &amp; Development</h2>
 <div class="subbody">
@@ -82,10 +49,6 @@ echo '</div>';
   <p class="text">Though the game is fully playable in its current state, it is always in development and as such things are constantly changing.  I apologize for bugs or confusion you may experience during this process, but we hope that you enjoy what we&#39;ve created so far.   Also, it never hurts to send us your feedback!  Thank you so much for visiting this website and for playing our game - we look forward to seeing everyone on the <a href="leaderboard/">Leaderboard</a>!</p>
 
 </div>
-
-
-
-
 
 <a name="links" class="anchor">&nbsp;</a>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Mega Man RPG Prototype Links</h2>
@@ -133,9 +96,6 @@ echo '</div>';
     </p>
   </div>
 </div>
-
-
-
 
 <div class="subbody" style="margin-top: 20px;">
   <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/robot/sprite_left_80x80.png);">Robot</div></div>

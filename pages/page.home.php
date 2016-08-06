@@ -62,9 +62,11 @@ ob_start();
 </div>
 
 <?
+
 // Require the leaderboard data for display
 $this_display_limit_default = 3;
-require('data/leaderboard.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
+
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><span class="subheader_typewrapper"><a class="link" href="leaderboard/">Mega Man RPG Prototype Leaderboard <span class="count">( <?= (!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').($this_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$this_leaderboard_online_count.' Online</span>' : '') ?> )</span></a><a class="float_link" href="leaderboard/">View More Players &raquo;</a></span></h2>
 <div class="leaderboard" style="margin-bottom: 12px; overflow: visible;">
@@ -93,8 +95,10 @@ require('data/leaderboard.php');
 </div>
 
 <?
+
 // Require the gallery data for display
-require_once('data/gallery.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'includes/gallery.php');
+
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><span class="subheader_typewrapper"><a class="link" href="gallery/">Mega Man RPG Prototype Gallery <span class="count">( <?= !empty($this_file_count) ? ($this_file_count == 1 ? '1 Image' : $this_file_count.' Images') : '0 Images' ?> )</span></a><a class="float_link" href="gallery/">View More Images &raquo;</a></span></h2>
 <div class="gallery" style="margin-bottom: 12px;">

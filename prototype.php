@@ -526,21 +526,18 @@ $(document).ready(function(){
 });
 </script>
 <?
+
 // Require the remote bottom in case we're in viewer mode
-require(MMRPG_CONFIG_ROOTDIR.'/data/analytics.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
+
 ?>
 </body>
 </html>
 <?
-// If we're NOT in demo mode, automatically update the date-accessed for their database entry
-/*
-if (empty($_SESSION[$session_token]['DEMO'])){
-    $temp_query = 'UPDATE mmrpg_users SET user_date_accessed = '.time().' WHERE user_id = '.$_SESSION[$session_token]['USER']['userid'];
-    $temp_result = $db->query($temp_query);
-}
-*/
+
 // If there were any events in the session, automatically add remove them from the session
 if (!empty($_SESSION[$session_token]['EVENTS'])){ $_SESSION[$session_token]['EVENTS'] = array(); }
 // Unset the database variable
 unset($db);
+
 ?>

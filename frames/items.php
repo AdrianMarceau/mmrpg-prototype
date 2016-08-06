@@ -19,7 +19,7 @@ require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/starforce.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 
 // Collect the editor flag if set
 $global_allow_editing = !defined('MMRPG_REMOTE_GAME_ID') ? true : false;
@@ -374,7 +374,7 @@ if (true){
     </script>
     <?
     // Google Analytics
-    if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
+    if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
     ?>
 </body>
 </html>

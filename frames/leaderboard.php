@@ -3,7 +3,7 @@
 require_once('../top.php');
 
 // Require the leaderboard data file
-require_once('../data/leaderboard.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
 
 // Collect the session token
 $session_token = mmrpg_game_token();
@@ -200,10 +200,13 @@ if (empty($_SESSION[$session_token]['DEMO']) && empty($temp_game_flags[$temp_eve
 });
 </script>
 <?
+
 // Google Analytics
-if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
+if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
+
 // Unset the database variable
 unset($db);
+
 ?>
 </body>
 </html>
