@@ -4,20 +4,20 @@ $mmrpg_index['fields'] = array();
 
 // Define the cache and index paths for fields
 $fields_index_path = MMRPG_CONFIG_ROOTDIR.'data/fields/';
-$fields_cache_path = MMRPG_CONFIG_ROOTDIR.'data/cache/'.'cache.fields.'.MMRPG_CONFIG_CACHE_DATE.'.php';
+$fields_cache_path = MMRPG_CONFIG_CACHE_PATH.'cache.fields.'.MMRPG_CONFIG_CACHE_DATE.'.php';
 
 // If caching is turned OFF, or a cache has not been created
 if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists($fields_cache_path)){
-  
+
   // Default the fields markup index to an empty array
   $fields_cache_markup = array();
-  
+
   // Open the type data directory for scanning
   $data_fields  = opendir($fields_index_path);
-  
+
   // Loop through all the files in the directory
   while (false !== ($filename = readdir($data_fields))) {
-    
+
     // Ensure the file matches the naming format
     if ($filename != '_index.php' && preg_match('#^[-_a-z0-9]+\.php$#i', $filename)){
       // Collect the field token from the filename
@@ -33,23 +33,23 @@ if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists($fields_cache_path)){
       // Copy this field's data to the markup cache
       $fields_cache_markup[] = $this_field_markup;
     }
-    
+
   }
-  
+
   // Close the field data directory
   closedir($data_fields);
-  
+
   // Implode the markup into a single string and enclose in PHP tags
   $fields_cache_markup = implode('', $fields_cache_markup);
   $fields_cache_markup = "<?\n".$fields_cache_markup."\n?>";
-  
+
   // Write the index to a cache file, if caching is enabled
   $fields_cache_file = @fopen($fields_cache_path, 'w');
   if (!empty($fields_cache_file)){
     @fwrite($fields_cache_file, $fields_cache_markup);
     @fclose($fields_cache_file);
   }
-    
+
 }
 
 // Include the cache file so it can be evaluated

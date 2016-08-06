@@ -4,7 +4,7 @@ $mmrpg_index['items'] = array();
 
 // Define the cache and index paths for items
 $items_index_path = MMRPG_CONFIG_ROOTDIR.'data/items/';
-$items_cache_path = MMRPG_CONFIG_ROOTDIR.'data/cache/'.'cache.items.'.MMRPG_CONFIG_CACHE_DATE.'.php';
+$items_cache_path = MMRPG_CONFIG_CACHE_PATH.'cache.items.'.MMRPG_CONFIG_CACHE_DATE.'.php';
 
 // If caching is turned OFF, or a cache has not been created
 if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists($items_cache_path)){

@@ -4,7 +4,7 @@ $mmrpg_index['battles'] = array();
 
 // Define the cache and index paths for battles
 define('MMRPG_CONFIG_BATTLES_INDEX_PATH', MMRPG_CONFIG_ROOTDIR.'data/battles/');
-define('MMRPG_CONFIG_BATTLES_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'data/cache/'.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.php');
+define('MMRPG_CONFIG_BATTLES_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.php');
 
 // If caching is turned OFF, or a cache has not been created
 if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists(MMRPG_CONFIG_BATTLES_CACHE_PATH)){
