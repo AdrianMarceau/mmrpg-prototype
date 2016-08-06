@@ -1,8 +1,10 @@
 <?php
+
 // Include the TOP file
 require_once('top.php');
+
 // Require the starforce data file
-require_once('data/starforce.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 
 //$GLOBALS['DEBUG']['checkpoint_line'] = 'battle.php : line 5';
 
@@ -580,7 +582,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 </div>
 <?
 // Require the remote bottom in case we're in viewer mode
-require(MMRPG_CONFIG_ROOTDIR.'/data/analytics.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
 // Unset the database variable
 unset($db);
 ?>

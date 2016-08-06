@@ -32,9 +32,12 @@ echo '<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
       <game_url>http://megamanpoweredup.net/rpg2k11/prototype/</game_url>
       <ranking_url>http://megamanpoweredup.net/rpg2k11/mmrpg-ranking.xml</ranking_url>
       <players><?php
+
         // Require the gallery data for display
-        require_once('data/leaderboard.php');
+        require_once(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
+
         echo !empty($this_leaderboard_count) ? $this_leaderboard_count : 0;
+
         ?></players>
       <status>open</status>
 			<descriptions>
@@ -43,11 +46,14 @@ echo '<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
     </server>
   </servers>
   <screenshots><?php
+
     // Require the gallery data for display
-    require_once('data/gallery.php');
+    require_once(MMRPG_CONFIG_ROOTDIR.'includes/gallery.php');
+
     foreach ($this_gallery_xml AS $key => $xml){
       if ($key >= 10){ break; }
       echo $xml."\n";
     }
+
     ?></screenshots>
 </browsergameshub>

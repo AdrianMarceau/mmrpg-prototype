@@ -22,7 +22,7 @@ require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/starforce.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 // Collect the editor flag if set
 $global_allow_editing = true;
 
@@ -30,7 +30,7 @@ $global_allow_editing = true;
 // -- GENERATE EDITOR MARKUP
 
 // Require the shop index so we can use it's data
-require(MMRPG_CONFIG_ROOTDIR.'data/shop.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/shop.php');
 
 // Define which shops we're allowed to see
 $allowed_edit_data = $this_shop_index;
@@ -1368,7 +1368,7 @@ if (!$temp_event_shown && !empty($allowed_edit_data['kalinka']) && empty($temp_g
 </script>
 <?
 // Google Analytics
-if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'data/analytics.php'); }
+if(MMRPG_CONFIG_IS_LIVE){ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php'); }
 ?>
 </body>
 </html>

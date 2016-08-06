@@ -18,7 +18,8 @@ $this_graph_data['description'] = strip_tags($this_category_info['category_descr
 //$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
 
 // Require the leaderboard data file
-require_once('data/leaderboard.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
+
 // Collect all the active sessions for this page
 $temp_viewing_category = mmrpg_website_sessions_active('community/'.$this_category_info['category_token'].'/', 3, true);
 $temp_viewing_userids = array();

@@ -61,9 +61,10 @@ foreach ($this_omega_factors_four AS $key => $factor){
 foreach ($temp_omega_factor_options AS $key => $factor){
     $temp_omega_factor_options_unlocked[] = $factor['field'];
 }
-//
+
 // Require the starforce data file
-require_once('../data/starforce.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
+
 // Collect the editor flag if set
 $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
 

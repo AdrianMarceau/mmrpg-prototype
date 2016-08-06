@@ -198,7 +198,7 @@ if (count($temp_top_robots) < $temp_top_robots_counter){
 // Require the leaderboard data file
 define('MMRPG_SKIP_MARKUP', true);
 define('MMRPG_SHOW_MARKUP_'.$this_playerinfo['user_id'], true);
-require('data/leaderboard.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
 
 // Define whether or not the players or starforce tabs should be open
 $temp_remote_session = $this_playerinfo['user_id'] != $_SESSION['GAME']['USER']['userid'] ? true : false;
