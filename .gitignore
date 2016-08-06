@@ -32,7 +32,6 @@
 .project
 .htaccess-current
 _saves/
-_cache/
 test/
 test.php
 _todo.php
