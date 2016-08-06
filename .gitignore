@@ -10,8 +10,6 @@
 /chat/*
 /data/config.php
 /data/analytics.php
-/data/cache/*
-/data/saves/*
 /images/.git
 /sounds/.git
 /images/*
@@ -31,7 +29,6 @@
 *.bak.php
 .project
 .htaccess-current
-_saves/
 test/
 test.php
 _todo.php
