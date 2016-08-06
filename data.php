@@ -2,8 +2,6 @@
 // Include the TOP file
 require_once('top.php');
 
-//$GLOBALS['DEBUG']['checkpoint_line'] = 'data.php : line 6';
-
 //die('<pre>'.print_r($_REQUEST, true).'</pre>');
 
 // Start the output buffer to capture any errors

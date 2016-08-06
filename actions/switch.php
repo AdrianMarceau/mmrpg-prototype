@@ -37,7 +37,6 @@ ob_start();
       // Ensure this is an actual switch in the index
       if (!empty($switch_robotinfo['robot_token'])){
         // Create the switch object using the session/index data
-        //$GLOBALS['DEBUG']['checkpoint_line'] = 'data.php : line 591';
         $temp_robot = new rpg_robot($this_battle, $this_player, $switch_robotinfo);
         // Check if the switch should be disabled based on attachments on this robot
         $temp_switch_disabled = false;
