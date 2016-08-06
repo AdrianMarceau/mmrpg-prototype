@@ -242,7 +242,7 @@ function mmrpg_formatting_help(){
     // Start the output buffer and prepare to collect contents
     ob_start();
     // Include the website formatting text file for reference
-    require('website_formatting.php');
+    require(MMRPG_CONFIG_ROOTDIR.'functions/website_formatting.php');
     // Collect the output buffer contents into a variable
     $this_formatting = nl2br(mmrpg_formatting_decode(ob_get_clean()));
 
