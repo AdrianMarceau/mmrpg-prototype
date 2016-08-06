@@ -8,7 +8,7 @@
 /_mail/
 /admin/_phpinfo.php
 /chat/*
-/data/config.php
+/includes/config.php
 /images/.git
 /sounds/.git
 /images/*
