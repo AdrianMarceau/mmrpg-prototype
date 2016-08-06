@@ -14,7 +14,7 @@ ob_start();
 $this_page_markup .= ob_get_clean();
 
 // Empty the cache, simple as that
-$files = glob(MMRPG_CONFIG_ROOTDIR.'data/cache/*'); // get all file names
+$files = glob(MMRPG_CONFIG_CACHE_PATH.'*'); // get all file names
 foreach($files as $file){ // iterate files
   if(is_file($file))
     unlink($file); // delete file

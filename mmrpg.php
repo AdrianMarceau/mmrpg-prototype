@@ -64,9 +64,9 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Define the first load boolean variable
     $this_first_load = false;
     // Define the game cache location path
-    $this_cache_dir = MMRPG_CONFIG_ROOTDIR.'data/cache/';
+    $this_cache_dir = MMRPG_CONFIG_CACHE_PATH;
     // Define the game save location path
-    $this_save_dir = MMRPG_CONFIG_ROOTDIR.'data/saves/';
+    $this_save_dir = MMRPG_CONFIG_SAVE_PATH;
 
     // If the user and file details have already been loaded to the session
     if (
