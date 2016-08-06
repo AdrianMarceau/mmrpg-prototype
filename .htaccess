@@ -68,7 +68,7 @@ RewriteRule ^(images|database)/items/core-([a-z]+)/(.*)?$ /$1/items/$2-core/$3 [
 RewriteRule ^(images|database)/items/screw-([a-z]+)/(.*)?$ /$1/items/$2-screw/$3 [R,L]
 
 # Define the rewrite conditions
-RewriteCond %{REQUEST_FILENAME} -d [OR]
+#RewriteCond %{REQUEST_FILENAME} -d [OR]
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule (.*) - [S=19]
 
