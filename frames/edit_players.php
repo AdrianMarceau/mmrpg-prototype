@@ -14,19 +14,19 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
-//require_once('../data/database.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_fields.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
+//require_once('../database/database.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_types.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_players.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database_robots.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database_abilities.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_fields.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_items.php');
 // Collect the editor flag if set
 $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
 
 // Include the prototype data for getting omega factors
-//require_once('../data/prototype.php');
-require_once('../data/prototype_omega.php');
+//require_once('../database/prototype.php');
+require_once('../database/prototype_omega.php');
 $temp_omega_factor_options = array();
 if (mmrpg_prototype_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
 if (mmrpg_prototype_complete('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }

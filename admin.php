@@ -4,9 +4,6 @@ require_once('top.php');
 // If someone is not supposed to be here...
 if (!MMRPG_CONFIG_ADMIN_MODE){ die('You shouldn\'t be here...'); }
 
-// Require the database top include file
-//require_once('data/database.php');
-
 // Define the page title and markup variables
 $this_page_title = 'Admin Panel';
 $this_page_markup = '';

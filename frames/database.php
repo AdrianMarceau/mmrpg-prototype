@@ -44,14 +44,14 @@ $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
 define('DATA_DATABASE_SHOW_MECHAS', true);
 define('DATA_DATABASE_SHOW_CACHE', true);
 define('DATA_DATABASE_SHOW_HIDDEN', true);
-//require_once('../data/database.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_players.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_robots.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_mechas.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_abilities.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_fields.php');
-//require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
+//require_once('../database/database.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_types.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_players.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_robots.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_mechas.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_abilities.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_fields.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/database_items.php');
 
 // Merge the robots and mechas
 $mmrpg_database_robots = array_merge($mmrpg_database_robots, $mmrpg_database_mechas);

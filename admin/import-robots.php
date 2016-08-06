@@ -20,7 +20,7 @@ $this_page_markup .= ob_get_clean();
 //define('DATA_DATABASE_SHOW_MECHAS', true);
 //define('DATA_DATABASE_SHOW_CACHE', true);
 //define('DATA_DATABASE_SHOW_HIDDEN', true);
-//require_once('data/database.php');
+//require_once('database/database.php');
 
 // Require the robots index file
 require(MMRPG_CONFIG_ROOTDIR.'data/robots/_index.php');

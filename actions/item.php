@@ -16,8 +16,8 @@ $current_player_items_count = count($current_player_items);
 $current_player_items_pages = $current_player_items_count <= 8 ? 1 : ceil($current_player_items_count / 8);
 
 // Require the item database page for sorting purposes
-require(MMRPG_CONFIG_ROOTDIR.'data/database_types.php');
-require(MMRPG_CONFIG_ROOTDIR.'data/database_items.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_types.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/database_items.php');
 
 // Generate the markup for the action item panel
 ob_start();
