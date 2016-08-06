@@ -15,7 +15,7 @@ $temp_console_markup = '';
 
 // If it's not set, create a fake prototype start link
 if (!isset($prototype_start_link)){ $prototype_start_link = 'home'; }
-require(MMRPG_CONFIG_ROOTDIR.'data/prototype_vars.php');
+require(MMRPG_CONFIG_ROOTDIR.'prototype/vars.php');
 
 // DEBUG DEBUG DEBUG
 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -42,7 +42,7 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
 else {
 
   // Require the omega factors
-  require(MMRPG_CONFIG_ROOTDIR.'data/prototype_omega.php');
+  require(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php');
 
   // DEBUG DEBUG DEBUG
   //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -51,7 +51,7 @@ else {
   if (!defined('MMRPG_SCRIPT_REQUEST')){
 
     // Include the demo mode options and markup
-    require(MMRPG_CONFIG_ROOTDIR.'data/prototype_unlocks.php');
+    require(MMRPG_CONFIG_ROOTDIR.'prototype/unlocks.php');
 
     // DEBUG DEBUG DEBUG
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
