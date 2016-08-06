@@ -341,8 +341,8 @@ if (true){
 
   /*
   // Include the prototype data for getting omega factors
-  //require_once('../data/prototype.php');
-  require_once('../data/prototype_omega.php');
+  //require_once('../prototype/include.php');
+  require_once('../prototype/omega.php');
   $temp_omega_factor_options = array();
   if (mmrpg_prototype_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
   if (mmrpg_prototype_complete('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
