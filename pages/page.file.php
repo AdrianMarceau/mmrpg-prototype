@@ -277,7 +277,7 @@ while ($this_action == 'profile'){
     $html_form_fields .= '</div>';
 
     // Player Background
-    require('data/prototype_omega.php');
+    require('prototype/omega.php');
     $temp_omega_factor_options = array();
     if (mmrpg_prototype_player_unlocked('dr-light')){ $temp_omega_factor_options['MM01'] = $this_omega_factors_one; }
     if (mmrpg_prototype_player_unlocked('dr-wily')){ $temp_omega_factor_options['MM02'] = $this_omega_factors_two; }

@@ -17,10 +17,10 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 $session_token = mmrpg_game_token();
 
 // Require the prototype data file
-//require_once('../data/prototype.php');
+//require_once('../prototype/include.php');
 
 // Require the prototype omega data file
-require_once('../data/prototype_omega.php');
+require_once('../prototype/omega.php');
 $unlocked_factor_one_robots = false;
 $unlocked_factor_two_robots = false;
 $unlocked_factor_three_robots = false;

@@ -3,7 +3,7 @@
 require_once('../top.php');
 
 // Require the tooltip data file
-//require_once('../data/prototype.php');
+//require_once('../prototype/include.php');
 
 // Define the available tooltips based on what has been completed
 $prototype_tooltip_index = array();

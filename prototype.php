@@ -116,7 +116,7 @@ if (!isset($_SESSION['LEADERBOARD']['online_timestamp'])
 
 
 // Require the prototype data file
-require_once('data/prototype.php');
+require_once('prototype/include.php');
 
 
 
@@ -358,7 +358,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
         </span>
         <?
         // Require the prototype players display file
-        require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_players.php');
+        require_once(MMRPG_CONFIG_ROOTDIR.'prototype/players.php');
 
         ?>
     </div>
@@ -370,7 +370,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
         <?
 
         // Require the prototype missions display file
-        require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_missions.php');
+        require_once(MMRPG_CONFIG_ROOTDIR.'prototype/missions.php');
 
         // If we're NOT in demo mode, maybe add a back button
         if (empty($_SESSION[$session_token]['DEMO'])){
@@ -397,7 +397,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
                 echo '<span class="header block_1"><span class="count">Robot Select</span></span>'."\n";
 
                 // Require the prototype robots display file
-                require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_robots.php');
+                require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
 
                 // Print out the back button for going back to player select
                 echo '<a class="option option_back block_1" data-back="2">&#9668; Back</a>'."\n";
@@ -418,7 +418,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
             echo '<span class="header block_1"><span class="count">Robot Select</span></span>'."\n";
 
             // Require the prototype robots display file
-            require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_robots.php');
+            require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
 
             // Print out the back button for going back to player select
             echo '<a class="option option_back block_1" data-back="2">&#9668; Back</a>'."\n";

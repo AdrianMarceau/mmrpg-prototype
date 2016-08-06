@@ -32,7 +32,7 @@ foreach ($this_data_condition AS $key => $string){
 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Otherwise, require the prototype data file
-require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'prototype/include.php');
 
 // DEBUG DEBUG DEBUG
 //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
@@ -47,7 +47,7 @@ switch ($this_data_select){
   case 'this_player_token': {
 
     // Require the prototype players display file
-    require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_players.php');
+    require_once(MMRPG_CONFIG_ROOTDIR.'prototype/players.php');
 
     // DEBUG
     //exit('success:players-requested');
@@ -64,7 +64,7 @@ switch ($this_data_select){
   case 'this_battle_token': {
 
     // Require the prototype missions display file
-    require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_missions.php');
+    require_once(MMRPG_CONFIG_ROOTDIR.'prototype/missions.php');
 
     // DEBUG
     //exit('missions-requested:'.print_r($this_data_condition, true));
@@ -80,7 +80,7 @@ switch ($this_data_select){
   case 'this_player_robots': {
 
     // Require the prototype robots display file
-    require_once(MMRPG_CONFIG_ROOTDIR.'data/prototype_robots.php');
+    require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
 
     // DEBUG
     //exit('success:robots-requested');
