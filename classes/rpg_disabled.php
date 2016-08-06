@@ -13,6 +13,8 @@ class rpg_disabled {
 
         // Generate default trigger options if not set
         if (!isset($trigger_options['item_multiplier'])){ $trigger_options['item_multiplier'] = 1.0; }
+        if (!isset($trigger_options['item_quantity_min'])){ $trigger_options['item_quantity_min'] = 1; }
+        if (!isset($trigger_options['item_quantity_max'])){ $trigger_options['item_quantity_max'] = 3; }
 
         // Create references to save time 'cause I'm tired
         // (rather than replace all target references to this references)
@@ -735,6 +737,7 @@ class rpg_disabled {
 
             // Define the chance multiplier and start at one
             $temp_chance_multiplier = $trigger_options['item_multiplier'];
+
             // Increase the item chance multiplier if one is set for the stage
             if (isset($this_battle->field->field_multipliers['items'])){ $temp_chance_multiplier = ($temp_chance_multiplier * $this_battle->field->field_multipliers['items']); }
 
@@ -743,28 +746,31 @@ class rpg_disabled {
 
             // If this robot was a MECHA class, it may drop PELLETS and SMALL SCREWS
             if ($this_robot->robot_class == 'mecha'){
-                $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'energy-pellet');
-                $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'weapon-pellet');
-                $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw');
+                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'energy-pellet', 'min' => 1, 'max' => 3);
+                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'weapon-pellet', 'min' => 1, 'max' => 3);
+                $target_player_rewards['items'][] =  array('chance' => 40, 'token' => 'small-screw', 'min' => 1, 'max' => 6);
             }
 
             // If this robot was a MASTER class, it may drop CAPSULES and LARGE SCREWS
             if ($this_robot->robot_class == 'master'){
-                $target_player_rewards['items'][] =  array('chance' => 25, 'token' => 'energy-capsule');
-                $target_player_rewards['items'][] =  array('chance' => 25, 'token' => 'weapon-capsule');
-                $target_player_rewards['items'][] =  array('chance' => 50, 'token' => 'large-screw');
+                $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'energy-capsule', 'min' => 1, 'max' => 2);
+                $target_player_rewards['items'][] =  array('chance' => 15, 'token' => 'weapon-capsule', 'min' => 1, 'max' => 2);
+                $target_player_rewards['items'][] =  array('chance' => 60, 'token' => 'large-screw', 'min' => 1, 'max' => 4);
             }
 
             // Precount the item values for later use
             $temp_value_total = 0;
             $temp_count_total = 0;
-            foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){ $temp_value_total += $item_reward_info['chance']; $temp_count_total += 1; }
+            foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){
+                $temp_value_total += $item_reward_info['chance'];
+                $temp_count_total += 1;
+            }
 
             // If this robot was a MASTER class and destroyed by WEAKNESS, it may drop a CORE
             if ($this_robot->robot_class == 'master' && !empty($this_robot->flags['triggered_weakness'])){
                 $temp_core_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
                 $temp_chance_value = ($temp_value_total * 4);
-                $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => $temp_core_type.'-core');
+                $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => $temp_core_type.'-core', 'min' => 1, 'max' => 1);
             }
 
             // Shuffle the rewards so it doesn't look to formulaic
@@ -773,99 +779,50 @@ class rpg_disabled {
             // DEBUG
             //$this_battle->events_create(false, false, 'DEBUG', '$target_player_rewards[\'items\'] = '.count($target_player_rewards['items']));
 
-            // Define a function for dealing with item drops
-            if (!function_exists('temp_player_rewards_items')){
-                function temp_player_rewards_items($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_info){
-                    global $mmrpg_index;
-
-                    // Create the temporary item object for event creation
-                    $temp_item = new rpg_item($this_battle, $target_player, $target_robot, $item_reward_info);
-                    $temp_item->item_name = $item_reward_info['item_name'];
-                    $temp_item->item_image = $item_reward_info['item_token'];
-                    $temp_item->update_session();
-
-                    // Collect or define the item variables
-                    $temp_item_token = $item_reward_info['item_token'];
-                    $temp_item_name = $item_reward_info['item_name'];
-                    $temp_item_colour = !empty($item_reward_info['item_type']) ? $item_reward_info['item_type'] : 'none';
-                    if (!empty($item_reward_info['item_type2'])){ $temp_item_colour .= '_'.$item_reward_info['item_type2']; }
-                    // Create the session variable for this item if it does not exist and collect its value
-                    if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
-                    $temp_item_quantity = $_SESSION['GAME']['values']['battle_items'][$temp_item_token];
-                    // If this item is already at the quantity limit, skip it entirely
-                    if ($temp_item_quantity >= MMRPG_SETTINGS_ITEMS_MAXQUANTITY){
-                        $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = MMRPG_SETTINGS_ITEMS_MAXQUANTITY;
-                        $temp_item_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY;
-                        return true;
-                    }
-
-                    // Display the robot reward message markup
-                    $event_header = $temp_item_name.' Item Drop';
-                    $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_robot_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
-                    $event_body .= $target_player->print_player_name().' added the dropped item to the inventory.';
-                    $event_options = array();
-                    $event_options['console_show_target'] = false;
-                    $event_options['this_header_float'] = $target_player->player_side;
-                    $event_options['this_body_float'] = $target_player->player_side;
-                    $event_options['this_item'] = $temp_item;
-                    $event_options['this_item_image'] = 'icon';
-                    $event_options['event_flag_victory'] = true;
-                    $event_options['console_show_this_player'] = false;
-                    $event_options['console_show_this_robot'] = false;
-                    $event_options['console_show_this_item'] = true;
-                    $event_options['canvas_show_this_item'] = true;
-                    $target_player->player_frame = $item_reward_key % 3 == 0 ? 'victory' : 'taunt';
-                    $target_player->update_session();
-                    $target_robot->robot_frame = $item_reward_key % 2 == 0 ? 'taunt' : 'base';
-                    $target_robot->update_session();
-                    $temp_item->item_frame = 'base';
-                    $temp_item->item_frame_offset = array('x' => 220, 'y' => 0, 'z' => 10);
-                    $temp_item->update_session();
-                    $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
-
-                    // Create and/or increment the session variable for this item increasing its quantity
-                    if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
-                    $_SESSION['GAME']['values']['battle_items'][$temp_item_token] += 1;
-
-                    // If this item is not on the list of key items (un-equippable), don't add it
-                    $temp_key_items = array('large-screw', 'small-screw', 'heart', 'star');
-                    if (!in_array($temp_item_token, $temp_key_items)){
-                        // If there is room in this player's current item omega, add the new item
-                        $temp_session_token = $target_player->player_token.'_this-item-omega_prototype';
-                        if (!empty($_SESSION['GAME']['values'][$temp_session_token])){
-                            $temp_count = count($_SESSION['GAME']['values'][$temp_session_token]);
-                            if ($temp_count < 8 && !in_array($temp_item_token, $_SESSION['GAME']['values'][$temp_session_token])){
-                                $_SESSION['GAME']['values'][$temp_session_token][] = $temp_item_token;
-                                $target_player->player_items[] = $temp_item_token;
-                                $target_player->update_session();
-                            }
-                        }
-                    }
-
-                    // Return true on success
-                    return true;
-
-                }
-            }
-
             // Loop through the ability rewards for this robot if set and NOT demo mode
             if (empty($_SESSION['GAME']['DEMO']) && !empty($target_player_rewards['items']) && $this_robot->player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
-                $temp_items_index = $db->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
+
+                // Calculate the drop result based on success vs failure values
                 $temp_success_value = $this_robot->robot_class == 'master' ? 50 : 25;
                 $temp_success_value = ceil($temp_success_value * $temp_chance_multiplier);
                 if ($temp_success_value > 100){ $temp_success_value = 100; }
                 $temp_failure_value = 100 - $temp_success_value;
                 $temp_dropping_result = $temp_success_value == 100 ? 'success' : $this_battle->weighted_chance(array('success', 'failure'), array($temp_success_value, $temp_failure_value));
+
+                // If the drop was a success, calculate the details
                 if ($temp_dropping_result == 'success'){
+
+                    // Define variables to hold totals then loop to calculate them
                     $temp_value_total = 0;
                     $temp_count_total = 0;
-                    foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){ $temp_value_total += $item_reward_info['chance']; $temp_count_total += 1; }
+                    foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){
+                        $temp_value_total += $item_reward_info['chance'];
+                        $temp_count_total += 1;
+                    }
+
+                    // Generate the tokens and weights then pick a random item
                     $temp_item_tokens = array();
                     $temp_item_weights = array();
-                    foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){ $temp_item_tokens[] = $item_reward_info['token']; $temp_item_weights[] = ceil(($item_reward_info['chance'] / $temp_value_total) * 100); }
-                    $temp_random_item = $this_battle->weighted_chance($temp_item_tokens, $temp_item_weights);
-                    $item_index_info = rpg_item::parse_index_info($temp_items_index[$temp_random_item]);
-                    temp_player_rewards_items($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_index_info);
+                    foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){
+                        $temp_item_tokens[] = $item_reward_info['token'];
+                        $temp_item_weights[] = ceil(($item_reward_info['chance'] / $temp_value_total) * 100);
+                    }
+                    $random_item_token = $this_battle->weighted_chance($temp_item_tokens, $temp_item_weights);
+                    $random_item_key = array_search($random_item_token, $temp_item_tokens);
+                    $random_item_info = $target_player_rewards['items'][$random_item_key];
+
+                    // Define the quantity multiplier based on chance and rarity
+                    if (!isset($random_item_info['min'])){ $random_item_info['min'] = 1; }
+                    if (!isset($random_item_info['max'])){ $random_item_info['max'] = $random_item_info['min']; }
+                    if ($random_item_info['min'] != $random_item_info['max']){
+                        $temp_quantity_dropped = mt_rand($random_item_info['min'], $random_item_info['max']);
+                    } else {
+                        $temp_quantity_dropped = $random_item_info['min'];
+                    }
+
+                    // Trigger the actual item drop function on for the player
+                    rpg_player::trigger_item_drop($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $random_item_token, $temp_quantity_dropped);
+
                 }
             }
 

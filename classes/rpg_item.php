@@ -102,6 +102,7 @@ class rpg_item extends rpg_object {
         $this->item_name = isset($this_iteminfo['item_name']) ? $this_iteminfo['item_name'] : 'Ability';
         $this->item_token = isset($this_iteminfo['item_token']) ? $this_iteminfo['item_token'] : 'item';
         $this->item_class = isset($this_iteminfo['item_class']) ? $this_iteminfo['item_class'] : 'master';
+        $this->item_quantity = isset($this_iteminfo['item_quantity']) ? $this_iteminfo['item_quantity'] : 1;
         $this->item_image = isset($this_iteminfo['item_image']) ? $this_iteminfo['item_image'] : $this->item_token;
         $this->item_image_size = isset($this_iteminfo['item_image_size']) ? $this_iteminfo['item_image_size'] : 40;
         $this->item_description = isset($this_iteminfo['item_description']) ? $this_iteminfo['item_description'] : '';
@@ -559,6 +560,7 @@ class rpg_item extends rpg_object {
         else { $item_info = array(); }
         return $item_info;
     }
+
     // Define a public function for reformatting database data into proper arrays
     public static function parse_index_info($item_info){
         global $db;
