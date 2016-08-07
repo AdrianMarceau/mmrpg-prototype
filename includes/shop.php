@@ -141,7 +141,7 @@ $this_shop_index['auto'] = array(
             ),
         'items_buying' => array(
 
-            'screw-small' => 100, 'screw-large' => 1000,
+            'small-screw' => 100, 'large-screw' => 1000,
 
             'energy-pellet' => 100, 'weapon-pellet' => 100,
             'energy-capsule' => 200, 'weapon-capsule' => 200,
@@ -342,7 +342,7 @@ if (!empty($this_shop_index['auto'])){
   unset($this_shop_index['auto']['shop_items']['items_selling4']);
 
   // Loop through Auto's shop and remove items you do not yet own from the buying list
-  $key_items = array('screw-small', 'screw-large');
+  $key_items = array('small-screw', 'large-screw');
   if (!empty($this_shop_index['auto']['shop_items']['items_buying'])){
     foreach ($this_shop_index['auto']['shop_items']['items_buying'] AS $token => $price){
       if (!in_array($token, $key_items) && !in_array($token, $global_unlocked_items_tokens)){
