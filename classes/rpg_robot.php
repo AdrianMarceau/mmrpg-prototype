@@ -2073,6 +2073,7 @@ class rpg_robot extends rpg_object {
                         if (!empty($robot_info['robot_image_editor'])){
                             $temp_break = false;
                             if ($robot_info['robot_image_editor'] == 412){ $temp_editor_title = 'Adrian Marceau / Ageman20XX'; }
+                            elseif ($robot_info['robot_image_editor'] == 110 && in_array($robot_info['robot_token'], array('nitro-man'))){ $temp_break = true; $temp_editor_title = 'MetalMarioX100 / EliteP1</strong> <span style="color: #565656;"> | </span> Assembly by <strong>MegaBossMan / milansaponja'; }
                             elseif ($robot_info['robot_image_editor'] == 110){ $temp_break = true; $temp_editor_title = 'MetalMarioX100 / EliteP1</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
                             elseif ($robot_info['robot_image_editor'] == 18){ $temp_break = true; $temp_editor_title = 'Sean Adamson / MetalMan</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
                             elseif ($robot_info['robot_image_editor'] == 4117 && in_array($robot_info['robot_token'], array('splash-woman'))){ $temp_break = true; $temp_editor_title = 'Jonathan Backstrom / Rhythm_BCA</strong> <span style="color: #565656;"> | </span> Assembly by <strong>MegaBossMan / milansaponja'; }
