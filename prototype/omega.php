@@ -88,7 +88,7 @@ $this_omega_factors_seven = array();
 $this_omega_factors_seven[] = array('robot' => 'freeze-man', 'field' => 'field', 'type' => 'freeze');
 //$this_omega_factors_seven[] = array('robot' => 'junk-man', 'field' => 'field', 'type' => 'earth');
 //$this_omega_factors_seven[] = array('robot' => 'burst-man', 'field' => 'field', 'type' => 'explode');
-//$this_omega_factors_seven[] = array('robot' => 'cloud-man', 'field' => 'field', 'type' => 'electric');
+$this_omega_factors_seven[] = array('robot' => 'cloud-man', 'field' => 'field', 'type' => 'electric');
 //$this_omega_factors_seven[] = array('robot' => 'spring-man', 'field' => 'field', 'type' => 'impact');
 $this_omega_factors_seven[] = array('robot' => 'slash-man', 'field' => 'field', 'type' => 'nature');
 //$this_omega_factors_seven[] = array('robot' => 'shade-man', 'field' => 'field', 'type' => 'shadow');
@@ -132,7 +132,7 @@ $this_omega_factors_ten[] = array('robot' => 'commando-man', 'field' => 'field',
 //$this_omega_factors_ten[] = array('robot' => 'chill-man', 'field' => 'field', 'type' => 'freeze');
 $this_omega_factors_ten[] = array('robot' => 'sheep-man', 'field' => 'field', 'type' => 'electric');
 $this_omega_factors_ten[] = array('robot' => 'strike-man', 'field' => 'field', 'type' => 'impact');
-//$this_omega_factors_ten[] = array('robot' => 'nitro-man', 'field' => 'field', 'type' => 'swift');
+$this_omega_factors_ten[] = array('robot' => 'nitro-man', 'field' => 'field', 'type' => 'swift');
 $this_omega_factors_ten[] = array('robot' => 'solar-man', 'field' => 'field', 'type' => 'flame');
 
 ?>
