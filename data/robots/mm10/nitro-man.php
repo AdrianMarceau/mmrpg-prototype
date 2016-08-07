@@ -5,6 +5,7 @@ $robot = array(
   'robot_game' => 'MM10',
   'robot_name' => 'Nitro Man',
   'robot_token' => 'nitro-man',
+  'robot_image_editor' => 18,
   'robot_core' => 'swift',
   'robot_description' => 'Motorcycle Stunt Robot',
   'robot_energy' => 100,
