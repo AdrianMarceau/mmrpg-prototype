@@ -70,7 +70,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 
     // If the user and file details have already been loaded to the session
     if (
-        !empty($_SESSION['GAME']['USER']) && !empty($_SESSION['GAME']['USER']['username']) && !empty($_SESSION['GAME']['USER']['password'])
+        !empty($_SESSION['GAME']['USER']) && !empty($_SESSION['GAME']['USER']['username']) && !empty($_SESSION['GAME']['USER']['omega'])
         && !empty($_SESSION['GAME']['FILE']) && !empty($_SESSION['GAME']['FILE']['path']) && !empty($_SESSION['GAME']['FILE']['name'])
         ){
         // Pull the user and file info from the session
@@ -82,6 +82,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Otherwise, if we're in demo mode, populate manually
     else {
         // Auto-generate the user and file info based on their IP
+        $omega = md5(!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo');
         $this_user = array();
         $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
         $this_user['username'] = 'demo';
@@ -89,11 +90,12 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
         $this_user['imagepath'] = '';
         $this_user['colourtoken'] = '';
         $this_user['gender'] = '';
-        $this_user['password'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo';
-        $this_user['password_encoded'] = md5($this_user['password']);
+        $this_user['password'] = '';
+        $this_user['password_encoded'] = '';
+        $this_user['omega'] = $omega;
         $this_file = array();
         $this_file['path'] = $this_user['username_clean'].'/';
-        $this_file['name'] = $this_user['password_encoded'].'.sav';
+        $this_file['name'] = $this_user['omega'].'.sav';
         // Update the session with these demo variables
         $_SESSION['GAME']['DEMO'] = 1;
         $_SESSION['GAME']['USER'] = $this_user;
@@ -223,6 +225,8 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
         if (empty($_SESSION['GAME']['USER']['userinfo'])){
             $this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
             $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
+            $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
+            $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
         } else {
             $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
         }

@@ -109,7 +109,7 @@ while ($this_action == 'save'){
   // Update the header markup title
   $html_header_title .= 'Save Current Game File';
   // Update the header markup text
-  $html_header_text .= 'Your game is saved automatically whenever you return to the main menu and any time you interact with your file through the other sub menus.  Use the form below to make changes to your save file\'s configuration and appearance then click the save button when complete.  Your email address is used for account recovery purposes <em>only</em> and will never be given to third parties or otherwise used for nefarious purposes.';
+  $html_header_text .= 'Your game is saved automatically whenever you return to the main menu and any time you interact with your file through the other sub menus.  Use the form below to make changes to your account and settings then click the save button when complete.  Your email address is used for account recovery <em>only</em> and will never be given to third parties or otherwise used for nefarious purposes.';
   // Update the form markup fields
   $html_form_fields .= '<div style="float: left; margin-right: 14px; ">';
 
@@ -118,9 +118,10 @@ while ($this_action == 'save'){
     $html_form_fields .= '<input class="text text_username" type="text" style="width: 230px; " name="username" value="'.htmlentities(trim($_SESSION[$session_token]['USER']['username']), ENT_QUOTES, 'UTF-8', true).'" disabled="disabled" />';
 
     // Password
+    $temp_password = $db->get_value("SELECT user_password FROM mmrpg_users WHERE user_id = {$this_userid} LIMIT 1;", 'user_password');
     $html_form_fields .= '<label class="label label_password" style="width: 100px; ">Password :</label>';
-    $html_form_fields .= '<input class="hidden hidden_password" type="hidden" name="password_current" value="'.htmlentities(trim($_SESSION[$session_token]['USER']['password']), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" />';
-    $html_form_fields .= '<input class="hidden hidden_password" type="hidden" name="password_new" value="'.htmlentities(trim($_SESSION[$session_token]['USER']['password']), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" />';
+    $html_form_fields .= '<input class="hidden hidden_password" type="hidden" name="password_current" value="'.htmlentities(trim($temp_password), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" />';
+    $html_form_fields .= '<input class="hidden hidden_password" type="hidden" name="password_new" value="'.htmlentities(trim($temp_password), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" />';
     $html_form_fields .= '<input class="text text_password" type="password" style="width: 230px; " name="password_display" value="'.htmlentities(trim($_SESSION[$session_token]['USER']['password']), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" disabled="disabled" />';
 
     // Email Address

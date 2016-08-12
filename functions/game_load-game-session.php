@@ -23,7 +23,7 @@ function mmrpg_load_game_session($this_save_filepath){
         $temp_matches = array();
         preg_match('#/([-_a-z0-9]+/)([-_a-z0-9]+.sav)$#i', $this_save_filepath, $temp_matches);
         $this_database_save = $db->get_array("SELECT * FROM mmrpg_saves WHERE save_file_name = '{$temp_matches[2]}' AND save_file_path = '{$temp_matches[1]}' LIMIT 1");
-        $this_database_user =   $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = '{$this_database_save['user_id']}' LIMIT 1");
+        $this_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = '{$this_database_save['user_id']}' LIMIT 1");
 
         // Update the game session with database extracted variables
         $new_game_data = array();
@@ -34,8 +34,9 @@ function mmrpg_load_game_session($this_save_filepath){
         $new_game_data['USER']['roleid'] = $this_database_user['role_id'];
         $new_game_data['USER']['username'] = $this_database_user['user_name'];
         $new_game_data['USER']['username_clean'] = $this_database_user['user_name_clean'];
-        $new_game_data['USER']['password'] = $this_database_user['user_password'];
-        $new_game_data['USER']['password_encoded'] = $this_database_user['user_password_encoded'];
+        $new_game_data['USER']['password'] = '';
+        $new_game_data['USER']['password_encoded'] = '';
+        $new_game_data['USER']['omega'] = $this_database_user['user_omega'];
         $new_game_data['USER']['profiletext'] = $this_database_user['user_profile_text'];
         $new_game_data['USER']['creditstext'] = $this_database_user['user_credit_text'];
         $new_game_data['USER']['creditsline'] = $this_database_user['user_credit_line'];
@@ -103,6 +104,13 @@ function mmrpg_load_game_session($this_save_filepath){
         // Unset the player selection to restart at the player select screen
         if (mmrpg_prototype_players_unlocked() > 1){ $_SESSION[$session_token]['battle_settings']['this_player_token'] = false; }
 
+        // Update the user table in the database if not done already
+        if (empty($_SESSION[$session_token]['DEMO'])){
+            $db->update('mmrpg_users', array(
+                'user_last_login' => time(),
+                'user_backup_login' => $this_database_user['user_last_login'],
+                ), "user_id = {$this_database_user['user_id']}");
+        }
 
     }
     // Otherwise, load from the file
@@ -144,14 +152,6 @@ function mmrpg_load_game_session($this_save_filepath){
 
     // Update the last saved value
     $_SESSION[$session_token]['values']['last_load'] = time();
-
-    // Update the user table in the database if not done already
-    if (empty($_SESSION[$session_token]['DEMO'])){
-        $db->update('mmrpg_users', array(
-            'user_last_login' => time(),
-            'user_backup_login' => $this_database_user['user_last_login'],
-            ), "user_id = {$this_database_user['user_id']}");
-    }
 
     //exit();
 
