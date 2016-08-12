@@ -13,6 +13,11 @@ function mmrpg_save_game_session(){
     // Update the last saved value
     $_SESSION[$session_token]['values']['last_save'] = time();
 
+    // Collect the save info
+    $save = $_SESSION[$session_token];
+    $this_user = $save['USER'];
+    $this_file = $save['FILE'];
+
     // DEBUG
     //echo 'I\'ve been asked to save ';
 
@@ -26,9 +31,6 @@ function mmrpg_save_game_session(){
         //
 
         // Collect the save info
-        $save = $_SESSION[$session_token];
-        $this_user = $save['USER'];
-        $this_file = $save['FILE'];
         $this_cache_date = !empty($save['CACHE_DATE']) ? $save['CACHE_DATE'] : MMRPG_CONFIG_CACHE_DATE;
         $this_counters = !empty($save['counters']) ? $save['counters'] : array();
         $this_values = !empty($save['values']) ? $save['values'] : array();
@@ -39,9 +41,11 @@ function mmrpg_save_game_session(){
 
         // Collect this user's ID from the database if not set
         if (!isset($this_user['userid'])){
+
             // Attempt to collect the user ID from the database
             $temp_query = "SELECT user_id FROM mmrpg_users WHERE user_name_clean = '{$this_user['username_clean']}' LIMIT 1";
             $temp_value = $db->get_value($temp_query, 'user_id');
+
             // If the user ID was found, collect it and proceed as normal
             if (!empty($temp_value)){
 
@@ -64,8 +68,9 @@ function mmrpg_save_game_session(){
                 $this_user_array['user_name'] = $this_user['username'];
                 $this_user_array['user_name_clean'] = $this_user['username_clean'];
                 $this_user_array['user_name_public'] = !empty($this_user['displayname']) ? $this_user['displayname'] : '';
-                $this_user_array['user_password'] = $this_user['password'];
-                $this_user_array['user_password_encoded'] = $this_user['password_encoded'];
+                if (!empty($this_user['password'])){ $this_user_array['user_password'] = $this_user['password']; }
+                if (!empty($this_user['password_encoded'])){ $this_user_array['user_password_encoded'] = $this_user['password_encoded']; }
+                $this_user_array['user_omega'] = $this_user['omega'];
                 $this_user_array['user_profile_text'] = !empty($this_user['profiletext']) ? $this_user['profiletext'] : '';
                 $this_user_array['user_credit_text'] = !empty($this_user['creditstext']) ? $this_user['creditstext'] : '';
                 $this_user_array['user_credit_line'] = !empty($this_user['creditsline']) ? $this_user['creditsline'] : '';
@@ -248,8 +253,7 @@ function mmrpg_save_game_session(){
         $this_user_array['user_name'] = $this_user['username'];
         $this_user_array['user_name_clean'] = $this_user['username_clean'];
         $this_user_array['user_name_public'] = !empty($this_user['displayname']) ? $this_user['displayname'] : '';
-        $this_user_array['user_password'] = $this_user['password'];
-        $this_user_array['user_password_encoded'] = $this_user['password_encoded'];
+        $this_user_array['user_omega'] = $this_user['omega'];
         $this_user_array['user_profile_text'] = !empty($this_user['profiletext']) ? $this_user['profiletext'] : '';
         $this_user_array['user_credit_text'] = !empty($this_user['creditstext']) ? $this_user['creditstext'] : '';
         $this_user_array['user_credit_line'] = !empty($this_user['creditsline']) ? $this_user['creditsline'] : '';
@@ -443,23 +447,19 @@ function mmrpg_save_game_session(){
     // We also need the folder created for future user generated content
 
     // Generate the base directory for this request
-    $this_base_dir = MMRPG_CONFIG_SAVES_PATH.$this_user_array['user_name_clean'].'/';
+    $this_base_dir = MMRPG_CONFIG_SAVES_PATH.$this_file['path'].'/';
     if (!file_exists($this_base_dir)){ @mkdir($this_base_dir); }
 
     // Generate the save data by serializing the session variable
     $this_save_content = array();
     $this_save_content['user_id'] = $this_user['userid'];
-    $this_save_content['user_name'] = !empty($this_user_array['user_name_public']) ? $this_user_array['user_name_public'] : $this_user_array['user_name'];
-    $this_save_content['user_name_clean'] = $this_user_array['user_name_clean'];
-    $this_save_content['user_image_path'] = $this_user_array['user_image_path'];
-    $this_save_content['user_background_path'] = $this_user_array['user_background_path'];
-    $this_save_content['user_colour_token'] = $this_user_array['user_colour_token'];
-    $this_save_content['user_gender'] = $this_user_array['user_gender'];
-    $this_save_content['user_date_modified'] = $this_user_array['user_date_modified'];
+    $this_save_content['user_name'] = $this_user['username'];
+    $this_save_content['user_name_clean'] = $this_user['username_clean'];
+    $this_save_content['user_omega'] = $this_user['omega'];
     $this_save_content = json_encode($this_save_content);
 
     // Save the user's data to a flat text file
-    $this_save_file = fopen($this_base_dir.'user.json', 'w');
+    $this_save_file = fopen($this_base_dir.$this_user['omega'].'.sav', 'w');
     fwrite($this_save_file, $this_save_content);
     fclose($this_save_file);
 

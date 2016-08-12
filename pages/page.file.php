@@ -66,18 +66,47 @@ while ($this_action == 'profile'){
     // If the form has already been submit, process input
     while (!empty($_POST['submit']) && $_POST['submit'] == 'true'){
 
-        // If the new password field was empty, produce an error
-        if (empty($_POST['password_current']) || empty($_POST['password_new'])){
-            // Update the form messages markup text
-            $html_form_messages .= '<span class="error">(!) A password must be set for your game to be saved.</span>';
-            break;
-        }
-        // Else, collect the current and new password and process them
-        elseif (!empty($_POST['password_current']) && !empty($_POST['password_new'])){
+        // If a new password was provided, collect the new it and update the same file
+        if (!empty($_POST['password_new'])){
 
             // Trim any whitespace from the passwords
-            $_POST['password_current'] = trim($_POST['password_current']);
             $_POST['password_new'] = trim($_POST['password_new']);
+
+            // If the password was too short, error out
+            if (strlen($_POST['password_new']) < 6){
+
+                // Update the form messages markup text
+                $html_form_messages .= '<span class="error">(!) The new password was too short - must be at least 6 characters.</span>';
+                $_POST['password_new'] = '';
+
+            }
+            // Else if the password was too long, error out
+            elseif (strlen($_POST['password_new']) > 18){
+
+                // Update the form messages markup text
+                $html_form_messages .= '<span class="error">(!) The new password was too long - must not be more than 18 characters.</span>';
+                $_POST['password_new'] = '';
+
+            }
+            // Otherwise update the user's password in the database directory
+            else {
+
+                // Update this user's accont password in the db
+                $html_form_messages .= '<span class="success">(!) Your account password has been changed.</span>';
+                $temp_password = $_POST['password_new'];
+                $temp_password_encoded = md5($temp_password);
+                $db->update('mmrpg_users', array(
+                    'user_password' => $temp_password,
+                    'user_password_encoded' => $temp_password_encoded
+                    ), "user_id = {$this_userid}");
+                $_POST['password_new'] = '';
+
+            }
+
+        }
+
+        // Else, collect the current and new password and process them
+        if (true){
 
             // Collect any profile details
             $user_displayname = !empty($_POST['displayname']) ? preg_replace('/[^-_a-z0-9\.\s]+/i', '', trim($_POST['displayname'])) : '';
@@ -102,14 +131,10 @@ while ($this_action == 'profile'){
                 $_SESSION['GAME']['USER']['profiletext'] = $user_profiletext;
                 $_SESSION['GAME']['USER']['creditstext'] = $user_creditstext;
                 $_SESSION['GAME']['USER']['creditsline'] = $user_creditsline;
-                $_SESSION['GAME']['USER']['password'] = $_POST['password_new'];
-                $_SESSION['GAME']['USER']['password_encoded'] = md5($_SESSION['GAME']['USER']['password']);
                 $_SESSION['GAME']['USER']['imagepath'] = $_POST['imagepath'];
                 $_SESSION['GAME']['USER']['backgroundpath'] = $_POST['backgroundpath'];
                 $_SESSION['GAME']['USER']['colourtoken'] = $_POST['colourtoken'];
                 $_SESSION['GAME']['USER']['gender'] = $_POST['gender'];
-                $_SESSION['GAME']['FILE']['path'] = $_SESSION['GAME']['USER']['username_clean'].'/';
-                $_SESSION['GAME']['FILE']['name'] = $_SESSION['GAME']['USER']['password_encoded'].'.sav';
                 $this_save_filepath = $this_save_dir.$_SESSION['GAME']['FILE']['path'].$_SESSION['GAME']['FILE']['name'];
 
             }
@@ -117,9 +142,11 @@ while ($this_action == 'profile'){
         }
 
         // Save the current game session into the file
-        mmrpg_save_game_session($this_save_filepath);
+        mmrpg_save_game_session();
         $this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
         $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
+        $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
+        $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
 
         //die($this_save_filepath);
         // If a game session's info was backup up for deletion
@@ -159,17 +186,20 @@ while ($this_action == 'profile'){
     $html_header_title .= 'Edit Profile';
 
     // Update the header markup text
-    $html_header_text .= 'Use the fields below to update your player profile for the Mega Man RPG Prototype game and community pages.<br /> Usernames and passwords cannot be changed, so please remember them.';
+    $html_header_text .= 'Use the fields below to update your player profile for the Mega Man RPG Prototype game and community pages.<br /> Usernames cannot be changed, so please remember them.';
     // Update the form markup fields
+    $temp_password = $db->get_value("SELECT user_password FROM mmrpg_users WHERE user_id = {$this_userid} LIMIT 1;", 'user_password');
     $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
         $html_form_fields .= '<label class="label label_username" style="width: 230px; ">Username :</label>';
         $html_form_fields .= '<input class="text text_username" type="text" name="username" style="width: 100%; opacity: 0.50; filter: alpha(opacity = 50); " value="'.htmlentities(trim($_SESSION['GAME']['USER']['username']), ENT_QUOTES, 'UTF-8', true).'" disabled="disabled" />';
     $html_form_fields .= '</div>';
-    $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">';
-        $html_form_fields .= '<label class="label label_password" style="width: 230px; ">Password :</label>';
-        $html_form_fields .= '<input class="hidden hidden_password" type="hidden" name="password_current" value="'.htmlentities(trim($_SESSION['GAME']['USER']['password']), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" />';
-        $html_form_fields .= '<input class="hidden hidden_password" type="hidden" name="password_new" value="'.htmlentities(trim($_SESSION['GAME']['USER']['password']), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" />';
-        $html_form_fields .= '<input class="text text_password" type="password" name="password_display" style="width: 100%; opacity: 0.50; filter: alpha(opacity = 50); " value="'.htmlentities(trim($_SESSION['GAME']['USER']['password']), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" disabled="disabled" />';
+    $html_form_fields .= '<div class="field" style="float: left; width: 23%; min-height: 50px; margin-right: 0; ">';
+        $html_form_fields .= '<label class="label label_password" style="width: auto; ">Current Password : </label>';
+        $html_form_fields .= '<input class="text text_password" type="password" name="password_display" style="width: 90%; opacity: 0.50; filter: alpha(opacity = 50); " value="'.htmlentities(trim($temp_password), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" disabled="disabled" />';
+    $html_form_fields .= '</div>';
+    $html_form_fields .= '<div class="field" style="float: left; width: 23%; min-height: 50px; margin-right: 0; ">';
+        $html_form_fields .= '<label class="label label_password" style="width: auto; ">Change Password : <span style="font-size: 10px; padding-left: 6px; position: relative; bottom: 1px; color: #CACACA;">(6 - 18 chars)</span></label>';
+        $html_form_fields .= '<input class="text text_password" type="text" name="password_new" style="width: 90%; float: left; margin-right: 6px;" value="" maxlength="18" />';
     $html_form_fields .= '</div>';
     $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
         $html_form_fields .= '<label class="label label_displayname" style="width: 230px; ">Display Name :</label>';
@@ -487,9 +517,10 @@ while ($this_action == 'new'){
         $this_user['gender'] = 'male';
         $this_user['password'] = trim($_REQUEST['password']);
         $this_user['password_encoded'] = md5($this_user['password']);
+        $this_user['omega'] = $this_user['password_encoded'];
         $this_file = array();
         $this_file['path'] = $this_user['username_clean'].'/';
-        $this_file['name'] = $this_user['password_encoded'].'.sav';
+        $this_file['name'] = $this_user['omega'].'.sav';
 
         // Update the save path with the filename
         $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
@@ -530,7 +561,7 @@ while ($this_action == 'new'){
     // Update the form messages with notice text
     if (empty($html_form_messages)){
         $html_form_messages .= '<span class="help">(!) The Username and Password must be from 6 - 18 characters and can <u>only</u> contain letters and numbers!</span>';
-        $html_form_messages .= '<span class="help">(!) The Username and Password combo you select for this file <u>cannot</u> be changed, so please remember it!</span>';
+        $html_form_messages .= '<span class="help">(!) The Username you select for this file <u>cannot</u> be changed, so please remember it!</span>';
     }
 
     // Update the form markup fields
@@ -549,7 +580,7 @@ while ($this_action == 'new'){
         <input class="text text_dateofbirth" type="text" name="dateofbirth" style="width: 230px; " value="<?= !empty($_REQUEST['dateofbirth']) ? htmlentities(trim($_REQUEST['dateofbirth']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="10" />
     </div>
     <div class="field">
-        <label class="label label_password" style="width: 230px; " title="This password is used to store and encypt the data in your save file.  This password cannot be changed so please remember it.">Password : *</label>
+        <label class="label label_password" style="width: 230px; " title="This password is used to store and encypt the data in your save file.  This password is important so please remember it.">Password : *</label>
         <input class="text text_password" type="text" name="password" style="width: 230px; " value="<?= !empty($_REQUEST['password']) ? htmlentities(trim($_REQUEST['password']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="18" />
     </div>
     <div class="field">
@@ -622,24 +653,24 @@ while ($this_action == 'load'){
         $this_user['username_clean'] = preg_replace('/[^-a-z0-9]+/i', '', strtolower($this_user['username']));
         $this_user['password'] = trim($_REQUEST['password']);
         $this_user['password_encoded'] = md5($this_user['password']);
-        $this_file = array();
-        $this_file['path'] = $this_user['username_clean'].'/';
-        $this_file['name'] = $this_user['password_encoded'].'.sav';
 
         // The file exists, so let's collect this user's info from teh database
         $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
 
         // Check if the requested save file path exists
-        $temp_save_filepath = $this_save_dir.$this_file['path'];
-        //if (file_exists($temp_save_filepath) && is_dir($temp_save_filepath)){
         if (!empty($temp_database_user)){
 
-            // The file exists, so let's collect this user's info from teh database
-            //$temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
+            // Create the file array with save data path
+            $this_file = array();
+            $this_file['path'] = $temp_database_user['user_name_clean'].'/';
+            $this_file['name'] = $temp_database_user['user_omega'].'.sav';
 
             // And now let's let's check the password
-            $temp_save_filepath .= $this_file['name'];
             if ($this_user['password_encoded'] == $temp_database_user['user_password_encoded']){
+
+                // Clear the password from these vars, we don't need it anymore
+                $this_user['password'] = '';
+                $this_user['password_encoded'] = '';
 
                 // The password was correct, but let's also make sure the user is old enough
                 if (!empty($temp_database_user['user_date_birth']) && !empty($temp_database_user['user_flag_approved'])){
@@ -648,8 +679,9 @@ while ($this_action == 'load'){
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
                     $_SESSION['GAME']['FILE'] = $this_file;
+
                     // Load the save file into memory and overwrite the session
-                    $this_save_filepath = $temp_save_filepath;
+                    $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
                     mmrpg_load_game_session($this_save_filepath);
                     if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
                         //die('battle points are empty 2');
@@ -700,18 +732,21 @@ while ($this_action == 'load'){
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
                     $_SESSION['GAME']['FILE'] = $this_file;
+
                     // Load the save file into memory and overwrite the session
-                    $this_save_filepath = $temp_save_filepath;
+                    $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
                     mmrpg_load_game_session($this_save_filepath);
                     if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
                         //die('battle points are empty 1');
                         mmrpg_reset_game_session($this_save_filepath);
                     }
+
                     // Update the file with the coppa approval flag and birthdate
                     $_SESSION['GAME']['USER']['dateofbirth'] = strtotime($_REQUEST['dateofbirth']);
                     $_SESSION['GAME']['USER']['approved'] = 1;
                     //die('<pre>$_SESSION[GAME][USER] = '.print_r($_SESSION['GAME']['USER'], true).'</pre>');
                     mmrpg_save_game_session($this_save_filepath);
+
                     // Update the form markup, then break from the loop
                     $file_has_updated = true;
                     break;
@@ -790,6 +825,7 @@ while ($this_action == 'load'){
 while ($this_action == 'exit'){
 
     // Auto-generate the user and file info based on their IP
+    $omega = md5(!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo');
     $this_user = array();
     $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
     $this_user['username'] = 'demo';
@@ -800,9 +836,10 @@ while ($this_action == 'exit'){
     $this_user['gender'] = 'male';
     $this_user['password'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo';
     $this_user['password_encoded'] = md5($this_user['password']);
+    $this_user['omega'] = $omega;
     $this_file = array();
     $this_file['path'] = $this_user['username_clean'].'/';
-    $this_file['name'] = $this_user['password_encoded'].'.sav';
+    $this_file['name'] = $this_user['omega'].'.sav';
     // Update the session with these demo variables
     $_SESSION['GAME']['DEMO'] = 1;
     $_SESSION['GAME']['USER'] = $this_user;
@@ -887,6 +924,7 @@ ob_start();
                         <input type="hidden" name="submit" value="true" />
                         <input type="hidden" name="return" value="<?= !empty($_GET['return']) ? htmlentities($_GET['return']) : '' ?>" />
                         <input type="hidden" name="action" value="<?= $this_action ?>" />
+                        <input type="hidden" name="userid" value="<?= $this_userid ?>" />
                         <?= !empty($html_form_fields) ? $html_form_fields : '' ?>
                     </div>
                     <? if(!empty($html_form_buttons)): ?>

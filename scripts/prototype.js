@@ -395,7 +395,7 @@ function prototype_trigger_exit(thisContext, thisLink){
     // Define the object references
     var thisLink = $(thisLink);
     // Define the confirmation text string
-    var confirmText = 'Are you sure you want to exit your game?\nAll unsaved progress will be lost and cannot be restored.';
+    var confirmText = 'Are you sure you want to exit your game?';
     // Attempt to confirm with the user of they want to resey
     if (navigator.userAgent.match(/Android/i) != null || confirm(confirmText)){
         // Redirect the user to the prototype reset page

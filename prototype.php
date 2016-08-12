@@ -78,6 +78,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
 
     // Auto-generate the user and file info based on their IP
+    $omega = md5(!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo');
     $this_user = array();
     $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
     $this_user['username'] = 'demo';
@@ -87,9 +88,10 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
     $this_user['gender'] = 'male';
     $this_user['password'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo';
     $this_user['password_encoded'] = md5($this_user['password']);
+    $this_user['omega'] = $omega;
     $this_file = array();
     $this_file['path'] = $this_user['username_clean'].'/';
-    $this_file['name'] = $this_user['password_encoded'].'.sav';
+    $this_file['name'] = $this_user['omega'].'.sav';
     // Update the session with these demo variables
     $_SESSION[$session_token]['DEMO'] = 1;
     $_SESSION[$session_token]['USER'] = $this_user;
@@ -243,12 +245,12 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
                 </span>
             </div>
         </div>
-        <? if (isset($_SESSION[$session_token]['counters']['battle_zenny'])){
+        <? if (empty($_SESSION[$session_token]['DEMO'])){
             ?>
             <div class="zenny field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                 <div class="wrapper">
                     <span class="amount">
-                        <?= number_format($_SESSION[$session_token]['counters']['battle_zenny'], 0, '.', ',') ?> z
+                        <?= isset($_SESSION[$session_token]['counters']['battle_zenny']) ? number_format($_SESSION[$session_token]['counters']['battle_zenny'], 0, '.', ',') : 0 ?> z
                     </span>
                 </div>
             </div>
