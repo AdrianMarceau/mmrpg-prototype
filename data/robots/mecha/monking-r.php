@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Monking R',
   'robot_token' => 'monking-r',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Monking R (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Monking R (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'impact',
   'robot_field' => 'rocky-plateau',
   'robot_description' => 'Returning Monkey Mecha',
