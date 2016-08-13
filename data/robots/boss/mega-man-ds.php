@@ -2,6 +2,7 @@
 // MEGA MAN COPY
 $robot = array(
   'robot_number' => 'PCR-DRN',
+  'robot_class' => 'boss',
   'robot_game' => 'MM00',
   'robot_name' => 'Mega Man S',
   'robot_token' => 'mega-man-copy',
