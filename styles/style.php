@@ -60,6 +60,7 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
   ob_start();
   foreach ($mmrpg_index['types'] AS $type_token => $type_info){
     ?>
+    #mmrpg .type_<?= $type_info['type_token'] ?>,
     #mmrpg .item_type_<?= $type_info['type_token'] ?>,
     #mmrpg .ability_type_<?= $type_info['type_token'] ?>,
     #mmrpg .battle_type_<?= $type_info['type_token'] ?>,
@@ -73,6 +74,7 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
     // Loop through all the types again for the dual-type ability styles
     foreach ($mmrpg_index['types'] AS $type2_token => $type2_info){
       ?>
+      #mmrpg .type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .item_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .ability_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
       #mmrpg .battle_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
