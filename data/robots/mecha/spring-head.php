@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Spring Head',
   'robot_token' => 'spring-head',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Spring Head (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Spring Head (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'swift',
   'robot_field' => 'underground-laboratory',
   'robot_description' => 'Spring Headbutt Mecha',
