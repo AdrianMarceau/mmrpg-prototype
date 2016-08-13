@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Ring Ring',
   'robot_token' => 'ring-ring',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Ring Ring (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Ring Ring (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'space',
   'robot_field' => 'space-simulator',
   'robot_description' => 'Saturn Seeking Mecha',
