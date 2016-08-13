@@ -260,7 +260,7 @@ class rpg_robot extends rpg_object {
          */
 
         // If this is robot's player is human controlled
-        if ($this->player->player_autopilot != true && $this->robot_class != 'mecha'){
+        if ($this->player->player_autopilot != true && $this->robot_class == 'master'){
 
             // Collect this robot's rewards and settings
             $this_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
@@ -1660,15 +1660,8 @@ class rpg_robot extends rpg_object {
         //$robot_sprite_title = $robot_info['robot_number'].' '.$robot_info['robot_name'];
         //$robot_sprite_title .= ' Sprite Sheet | Robot Database | Mega Man RPG Prototype';
 
-        // If this is a mecha, define it's generation for display
+        // If this is a non-master, define it's generation for display
         $robot_info['robot_name_append'] = '';
-        if (!empty($robot_info['robot_class']) && $robot_info['robot_class'] == 'mecha'){
-            $robot_info['robot_generation'] = '1st';
-            if (preg_match('/-2$/', $robot_info['robot_token'])){ $robot_info['robot_generation'] = '2nd'; $robot_info['robot_name_append'] = ' 2'; }
-            elseif (preg_match('/-3$/', $robot_info['robot_token'])){ $robot_info['robot_generation'] = '3rd'; $robot_info['robot_name_append'] = ' 3'; }
-        } elseif (preg_match('/^duo/i', $robot_info['robot_token'])){
-
-        }
 
         // Define the sprite frame index for robot images
         $robot_sprite_frames = array('base','taunt','victory','defeat','shoot','throw','summon','slide','defend','damage','base2');
@@ -1718,7 +1711,7 @@ class rpg_robot extends rpg_object {
         // Start the output buffer
         ob_start();
         ?>
-        <div class="database_container database_<?= $robot_info['robot_class'] == 'mecha' ? 'mecha' : 'robot' ?>_container" data-token="<?=$robot_info['robot_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
+        <div class="database_container database_<?= $robot_info['robot_class'] ?>_container" data-token="<?=$robot_info['robot_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
 
             <? if($print_options['layout_style'] == 'website' || $print_options['layout_style'] == 'website_compact'): ?>
                 <a class="anchor" id="<?=$robot_info['robot_token']?>">&nbsp;</a>
@@ -1747,7 +1740,7 @@ class rpg_robot extends rpg_object {
 
                     <h2 class="header header_left <?= $robot_header_types ?>" style="margin-right: 0; <?= (!$print_options['show_mugshot']) ? 'margin-left: 0;' : '' ?>">
                         <? if($print_options['layout_style'] == 'website_compact'): ?>
-                            <a href="database/<?= $robot_info['robot_class'] == 'mecha' ? 'mechas' : 'robots' ?>/<?= $robot_info['robot_token'] ?>/"><?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?></a>
+                            <a href="database/<?= $robot_class_token_plural ?>/<?= $robot_info['robot_token'] ?>/"><?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?></a>
                         <? else: ?>
                             <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>&#39;s Data
                         <? endif; ?>
@@ -1832,11 +1825,11 @@ class rpg_robot extends rpg_object {
                                         <? if($print_options['layout_style'] != 'event'): ?>
                                             <? if(!empty($robot_info['robot_core2'])): ?>
                                                 <span class="robot_type robot_type_<?= $robot_info['robot_core'].'_'.$robot_info['robot_core2'] ?>">
-                                                    <a href="database/<?= $robot_info['robot_class'] == 'mecha' ? 'mechas' : 'robots' ?>/<?= $robot_info['robot_core'] ?>/"><?= ucfirst($robot_info['robot_core']) ?></a> /
-                                                    <a href="database/<?= $robot_info['robot_class'] == 'mecha' ? 'mechas' : 'robots' ?>/<?= $robot_info['robot_core2'] ?>/"><?= ucfirst($robot_info['robot_core2']) ?><?= $robot_info['robot_class'] == 'master' ? ' Core' : ' Type' ?></a>
+                                                    <a href="database/<?= $robot_class_token_plural ?>/<?= $robot_info['robot_core'] ?>/"><?= ucfirst($robot_info['robot_core']) ?></a> /
+                                                    <a href="database/<?= $robot_class_token_plural ?>/<?= $robot_info['robot_core2'] ?>/"><?= ucfirst($robot_info['robot_core2']) ?><?= $robot_info['robot_class'] == 'master' ? ' Core' : ' Type' ?></a>
                                                 </span>
                                             <? else: ?>
-                                                <a href="database/<?= $robot_info['robot_class'] == 'mecha' ? 'mechas' : 'robots' ?>/<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>/" class="robot_type robot_type_<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>"><?= !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral' ?><?= $robot_info['robot_class'] == 'master' ? ' Core' : ' Type' ?></a>
+                                                <a href="database/<?= $robot_class_token_plural ?>/<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>/" class="robot_type robot_type_<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>"><?= !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral' ?><?= $robot_info['robot_class'] == 'master' ? ' Core' : ' Type' ?></a>
                                             <? endif; ?>
                                         <? else: ?>
                                             <span class="robot_type robot_type_<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') : 'none' ?>"><?= !empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')) : 'Neutral' ?><?= $robot_info['robot_class'] == 'master' ? ' Core' : ' Type' ?></span>
@@ -2282,7 +2275,7 @@ class rpg_robot extends rpg_object {
                                         //if ($robot_copy_program){ $robot_ability_list = $temp_all_ability_tokens; }
                                         $robot_ability_core_list = array();
                                         if ((!empty($robot_ability_core) || !empty($robot_ability_core2))
-                                            && $robot_ability_class != 'mecha'){ // only robot masters can core match abilities
+                                            && $robot_ability_class == 'master'){ // only robot masters can core match abilities
                                             foreach ($mmrpg_database_abilities AS $token => $info){
                                                 if (
                                                     (!empty($info['ability_type']) && ($robot_copy_program || $info['ability_type'] == $robot_ability_core || $info['ability_type'] == $robot_ability_core2)) ||
@@ -2386,8 +2379,8 @@ class rpg_robot extends rpg_object {
                                                 if ($this_ability_method != 'level' && $robot_copy_program){ continue; }
                                                 // Only show if this ability is greater than level 0 OR it's not copy core (?)
                                                 elseif ($this_level >= 0 || !$robot_copy_program){
-                                                    $temp_element = $this_ability_class != 'mecha' ? 'a' : 'span';
-                                                    $temp_markup = '<'.$temp_element.' '.($this_ability_class != 'mecha' ? 'href="'.MMRPG_CONFIG_ROOTURL.'database/abilities/'.$this_ability['ability_token'].'/"' : '').' class="ability_name ability_class_'.$this_ability_class.' ability_type ability_type_'.(!empty($this_ability['ability_type']) ? $this_ability['ability_type'] : 'none').(!empty($this_ability['ability_type2']) ? '_'.$this_ability['ability_type2'] : '').'" title="'.$this_ability_title_plain.'" style="'.($this_ability_image == 'ability' ? 'opacity: 0.3; ' : '').'">';
+                                                    $temp_element = $this_ability_class == 'master' ? 'a' : 'span';
+                                                    $temp_markup = '<'.$temp_element.' '.($this_ability_class == 'master' ? 'href="'.MMRPG_CONFIG_ROOTURL.'database/abilities/'.$this_ability['ability_token'].'/"' : '').' class="ability_name ability_class_'.$this_ability_class.' ability_type ability_type_'.(!empty($this_ability['ability_type']) ? $this_ability['ability_type'] : 'none').(!empty($this_ability['ability_type2']) ? '_'.$this_ability['ability_type2'] : '').'" title="'.$this_ability_title_plain.'" style="'.($this_ability_image == 'ability' ? 'opacity: 0.3; ' : '').'">';
                                                     $temp_markup .= '<span class="chrome">'.$this_ability_sprite_html.$this_ability_title_html.'</span>';
                                                     $temp_markup .= '</'.$temp_element.'>';
                                                     $temp_string[] = $temp_markup;
@@ -2486,12 +2479,12 @@ class rpg_robot extends rpg_object {
                 <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="database/<?= $robot_info['robot_class'] == 'mecha' ? 'mechas' : 'robots' ?>/<?= $robot_info['robot_token'] ?>/" rel="permalink">+ Permalink</a>
+                    <a class="link link_permalink permalink" href="database/<?= $robot_class_token_plural ?>/<?= $robot_info['robot_token'] ?>/" rel="permalink">+ Permalink</a>
 
                 <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="database/<?= $robot_info['robot_class'] == 'mecha' ? 'mechas' : 'robots' ?>/<?= $robot_info['robot_token'] ?>/" rel="permalink">+ View More</a>
+                    <a class="link link_permalink permalink" href="database/<?= $robot_class_token_plural ?>/<?= $robot_info['robot_token'] ?>/" rel="permalink">+ View More</a>
 
                 <? endif; ?>
             </div>
