@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Robo Fishtot',
   'robot_token' => 'robo-fishtot',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Robo Fishtot (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Robo Fishtot (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'water',
   'robot_field' => 'rainy-sewers',
   'robot_description' => 'Underwater Patrol Mecha',
