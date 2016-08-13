@@ -103,7 +103,8 @@ foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){
 //die('<pre>$mmrpg_database_mechas : '.print_r($mmrpg_database_mechas, true).'</pre>');
 
 // Sort the mecha index based on mecha number
-$temp_last_mechas = array('met');
+$temp_first_mechas = array('met');
+$temp_last_mechas = array('beak');
 $temp_serial_ordering = array(
 	'DLN', // Dr. Light Number
 	'DWN', // Dr. Wily Number
@@ -111,24 +112,39 @@ $temp_serial_ordering = array(
   'DLM'  // Dr. Light Robot
   );
 function mmrpg_index_sort_mechas($mecha_one, $mecha_two){
-  global $temp_last_mechas, $temp_serial_ordering;
+  global $temp_first_mechas, $temp_last_mechas, $temp_serial_ordering;
   $mecha_one['robot_game'] = !empty($mecha_one['robot_game']) ? $mecha_one['robot_game'] : 'MM00';
   $mecha_two['robot_game'] = !empty($mecha_two['robot_game']) ? $mecha_two['robot_game'] : 'MM00';
   $mecha_one['robot_class'] = !empty($mecha_one['robot_class']) ? $mecha_one['robot_class'] : 'master';
   $mecha_two['robot_class'] = !empty($mecha_two['robot_class']) ? $mecha_two['robot_class'] : 'master';
-  $mecha_one['robot_token_position'] = array_search($mecha_one['robot_token'], $temp_last_mechas);
-  $mecha_two['robot_token_position'] = array_search($mecha_two['robot_token'], $temp_last_mechas);
-  if ($mecha_one['robot_token_position'] !== false && $mecha_two['robot_token_position'] !== false){
-    if ($mecha_one['robot_token_position'] > $mecha_two['robot_token_position']){ return -1; }
-    elseif ($mecha_one['robot_token_position'] < $mecha_two['robot_token_position']){ return 1; }
+  $mecha_one['robot_token_first_position'] = array_search($mecha_one['robot_token'], $temp_first_mechas);
+  $mecha_two['robot_token_first_position'] = array_search($mecha_two['robot_token'], $temp_first_mechas);
+  $mecha_one['robot_token_last_position'] = array_search($mecha_one['robot_token'], $temp_last_mechas);
+  $mecha_two['robot_token_last_position'] = array_search($mecha_two['robot_token'], $temp_last_mechas);
+  if ($mecha_one['robot_token_first_position'] !== false && $mecha_two['robot_token_first_position'] !== false){
+    if ($mecha_one['robot_token_first_position'] > $mecha_two['robot_token_first_position']){ return -1; }
+    elseif ($mecha_one['robot_token_first_position'] > $mecha_two['robot_token_first_position']){ return 1; }
     else { return 0; }
   }
-  elseif ($mecha_one['robot_token_position'] !== false || $mecha_two['robot_token_position'] !== false){
-    if ($mecha_one['robot_token_position'] === false){ return -1; }
-    elseif ($mecha_two['robot_token_position'] === false){ return 1; }
+  elseif ($mecha_one['robot_token_first_position'] !== false || $mecha_two['robot_token_first_position'] !== false){
+    if ($mecha_one['robot_token_first_position'] === false){ return 1; }
+    elseif ($mecha_two['robot_token_first_position'] === false){ return -1; }
     else { return 0; }
   }
-  elseif ($mecha_one['robot_token_position'] === false && $mecha_two['robot_token_position'] === false){
+  elseif ($mecha_one['robot_token_last_position'] !== false && $mecha_two['robot_token_last_position'] !== false){
+    if ($mecha_one['robot_token_last_position'] > $mecha_two['robot_token_last_position']){ return -1; }
+    elseif ($mecha_one['robot_token_last_position'] < $mecha_two['robot_token_last_position']){ return 1; }
+    else { return 0; }
+  }
+  elseif ($mecha_one['robot_token_last_position'] !== false || $mecha_two['robot_token_last_position'] !== false){
+    if ($mecha_one['robot_token_last_position'] === false){ return -1; }
+    elseif ($mecha_two['robot_token_last_position'] === false){ return 1; }
+    else { return 0; }
+  }
+  elseif (
+    ($mecha_one['robot_token_first_position'] === false && $mecha_two['robot_token_first_position'] === false) ||
+    ($mecha_one['robot_token_last_position'] === false && $mecha_two['robot_token_last_position'] === false)
+    ){
     if ($mecha_one['robot_class'] > $mecha_two['robot_class']){ return 1; }
     elseif ($mecha_one['robot_class'] < $mecha_two['robot_class']){ return -1; }
     elseif ($mecha_one['robot_game'] > $mecha_two['robot_game']){ return 1; }
