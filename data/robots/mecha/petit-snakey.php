@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Petit Snakey',
   'robot_token' => 'petit-snakey',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Petit Snakey (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Petit Snakey (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'nature',
   'robot_field' => 'serpent-column',
   'robot_description' => 'Small Serpent Mecha',
