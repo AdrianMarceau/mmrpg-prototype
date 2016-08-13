@@ -2,6 +2,7 @@
 // NEPTUNE
 $robot = array(
   'robot_number' => 'SRN-009',
+  'robot_class' => 'boss',
   'robot_game' => 'MM30',
   'robot_name' => 'Neptune',
   'robot_token' => 'neptune',

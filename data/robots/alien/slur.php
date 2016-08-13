@@ -2,6 +2,7 @@
 // SLUR
 $robot = array(
   'robot_number' => 'EXN-00Y',
+  'robot_class' => 'boss',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Slur',
   'robot_token' => 'slur',

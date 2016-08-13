@@ -2,6 +2,7 @@
 // HYPER STORM H
 $robot = array(
   'robot_number' => 'WWN-003',
+  'robot_class' => 'boss',
   'robot_game' => 'MM21',
   'robot_name' => 'Hyper Storm H',
   'robot_token' => 'hyper-storm-h',

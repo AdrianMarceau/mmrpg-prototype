@@ -2,6 +2,7 @@
 // MEGA WATER S
 $robot = array(
   'robot_number' => 'WWN-002',
+  'robot_class' => 'boss',
   'robot_game' => 'MM21',
   'robot_name' => 'Mega Water S',
   'robot_token' => 'mega-water-s',

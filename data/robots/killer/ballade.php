@@ -2,6 +2,7 @@
 // BALLADE
 $robot = array(
   'robot_number' => 'MKN-003',
+  'robot_class' => 'boss',
   'robot_game' => 'MM20',
   'robot_name' => 'Ballade',
   'robot_token' => 'ballade',

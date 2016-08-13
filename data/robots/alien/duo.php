@@ -2,6 +2,7 @@
 // DUO
 $robot = array(
   'robot_number' => 'EXN-002α',
+  'robot_class' => 'boss',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Duo α',
   'robot_token' => 'duo',

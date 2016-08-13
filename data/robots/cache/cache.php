@@ -2,6 +2,7 @@
 // CACHE
 $robot = array(
   'robot_number' => 'PCR-00Z',
+  'robot_class' => 'boss',
   'robot_game' => 'MM19',
   'robot_name' => 'Cache',
   'robot_token' => 'cache',

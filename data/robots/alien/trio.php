@@ -2,6 +2,7 @@
 // TRIO
 $robot = array(
   'robot_number' => 'EXN-003Φ',
+  'robot_class' => 'boss',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Trio Φ',
   'robot_token' => 'trio',

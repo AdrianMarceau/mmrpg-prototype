@@ -2,6 +2,7 @@
 // KING
 $robot = array(
   'robot_number' => 'KGN-00X',
+  'robot_class' => 'boss',
   'robot_game' => 'MM085',
   'robot_name' => 'King',
   'robot_token' => 'king',

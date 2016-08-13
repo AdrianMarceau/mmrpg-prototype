@@ -2,6 +2,7 @@
 // PLANET MAN
 $robot = array(
   'robot_number' => 'EXN-00B',
+  'robot_class' => 'boss',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Planet Man',
   'robot_token' => 'planet-man',

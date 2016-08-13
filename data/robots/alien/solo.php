@@ -2,6 +2,7 @@
 // SOLO
 $robot = array(
   'robot_number' => 'EXN-001',
+  'robot_class' => 'boss',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Solo',
   'robot_token' => 'solo',
