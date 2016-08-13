@@ -60,7 +60,7 @@ ob_start();
 
         <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><a class="link" href="database/bosses/">Boss Database <span class="count">( <?= $mmrpg_database_bosses_links_counter_incomplete > 0 ? ($mmrpg_database_bosses_links_counter - $mmrpg_database_bosses_links_counter_incomplete).' / ' : '' ?><?= !empty($mmrpg_database_bosses_count) ? ($mmrpg_database_bosses_count == 1 ? '1 Boss' : $mmrpg_database_bosses_count.' Bosses') : '0 Bosses' ?> )</span></a><a class="float_link" href="database/bosses/">View the Boss Database &raquo;</a></h2>
         <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="bosses" data-class-single="boss">
-            <div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_07" href="database/bosses/" style="background-image: url(images/robots/met/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Met</a></div>
+            <div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_08" href="database/bosses/" style="background-image: url(images/robots/trill/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Trill</a></div>
             <p class="text">The boss database contains detailed information on the various fortress bosses in the prototype, including abilities, stats, quotes, and sprite sheets.</p>
             <div class="text" style="overflow: hidden;">
             <?= $mmrpg_database_bosses_links ?>
