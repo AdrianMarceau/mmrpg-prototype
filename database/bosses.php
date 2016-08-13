@@ -16,7 +16,10 @@ foreach ($mmrpg_database_types AS $token => $info){
 $hidden_database_bosses = array();
 $hidden_database_bosses = array_merge($hidden_database_bosses, array('boss'));
 if (!defined('DATA_DATABASE_SHOW_CACHE')){ $hidden_database_bosses[] = 'cache'; }
-//if (!defined('DATA_DATABASE_SHOW_HIDDEN')){ $hidden_database_bosses[] = 'bond-man'; $hidden_database_bosses[] = 'fake-man'; }
+if (!defined('DATA_DATABASE_SHOW_HIDDEN')){
+  $hidden_database_bosses = array_merge($hidden_database_bosses, array('planet-man', 'cosmo-man'));
+  $hidden_database_bosses = array_merge($hidden_database_bosses, array('solo', 'duo', 'duo-2', 'trio', 'trio-2', 'trio-3'));
+}
 //$hidden_database_bosses = array_merge($hidden_database_bosses, array('bomb-man', 'cut-man', 'elec-man', 'fire-man', 'guts-man', 'ice-man', 'oil-man', 'time-man'));
 //$hidden_database_bosses = array_merge($hidden_database_bosses, array('air-man', 'bubble-man', 'crash-man', 'flash-man', 'heat-man', 'metal-man', 'quick-man', 'wood-man'));
 //$hidden_database_bosses = array_merge($hidden_database_bosses, array('needle-man', 'magnet-man', 'gemini-man', 'hard-man', 'top-man', 'snake-man', 'spark-man', 'shadow-man'));
