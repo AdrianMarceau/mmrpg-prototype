@@ -1,7 +1,7 @@
 <?
 // BASS COPY
 $robot = array(
-  'robot_number' => 'PCR-SWN',
+  'robot_number' => 'DSN-0W2',
   'robot_class' => 'boss',
   'robot_game' => 'MM00',
   'robot_name' => 'Bass DS',

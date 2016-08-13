@@ -1,7 +1,7 @@
 <?
 // MEGA MAN COPY
 $robot = array(
-  'robot_number' => 'PCR-DRN',
+  'robot_number' => 'DSN-0L1',
   'robot_class' => 'boss',
   'robot_game' => 'MM00',
   'robot_name' => 'Mega Man DS',
