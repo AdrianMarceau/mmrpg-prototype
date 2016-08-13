@@ -1,7 +1,7 @@
 <?
 // PROTO MAN COPY
 $robot = array(
-  'robot_number' => 'PCR-DWN',
+  'robot_number' => 'DSN-0C3',
   'robot_class' => 'boss',
   'robot_game' => 'MM00',
   'robot_name' => 'Proto Man DS',
