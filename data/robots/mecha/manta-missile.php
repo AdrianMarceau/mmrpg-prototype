@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Manta Missile',
   'robot_token' => 'manta-missile',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Manta Missile (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Manta Missile (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'missile',
   'robot_field' => 'submerged-armory',
   'robot_description' => 'Homing Mantaray Mecha',
