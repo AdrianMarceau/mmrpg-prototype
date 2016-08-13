@@ -186,7 +186,7 @@ foreach ($mmrpg_database_mechas AS $mecha_key => $mecha_info){
   // Start the output buffer and collect the generated markup
   ob_start();
   ?>
-  <div title="<?= $mecha_title_text ?>" data-token="<?= $mecha_info['robot_token'] ?>" class="float float_left float_link robot_type robot_type_<?= !empty($mecha_info['robot_core']) ? $mecha_info['robot_core'] : 'none' ?><?= $robot_image_incomplete  ? ' incomplete' : '' ?>">
+  <div title="<?= $mecha_title_text ?>" data-token="<?= $mecha_info['robot_token'] ?>" class="float float_left float_link robot_type robot_type_<?= !empty($mecha_info['robot_core']) ? $mecha_info['robot_core'] : 'none' ?><?= $mecha_image_incomplete  ? ' incomplete' : '' ?>">
     <a class="sprite sprite_robot_link sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot sprite_size_<?= $mecha_image_size_text ?>  robot_status_active robot_position_active <?= $mecha_key == $first_mecha_token ? 'sprite_robot_current ' : '' ?>" href="<?='database/mechas/'.$mecha_info['robot_token']?>/" rel="<?= $mecha_image_incomplete ? 'nofollow' : 'follow' ?>">
       <? if($mecha_image_token != 'mecha'): ?>
         <img src="<?= $mecha_image_path ?>" width="<?= $mecha_image_size ?>" height="<?= $mecha_image_size ?>" alt="<?= $mecha_title_text ?>" />
