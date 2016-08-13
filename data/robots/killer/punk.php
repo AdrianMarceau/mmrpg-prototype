@@ -2,6 +2,7 @@
 // PUNK
 $robot = array(
   'robot_number' => 'MKN-002',
+  'robot_class' => 'boss',
   'robot_game' => 'MM20',
   'robot_name' => 'Punk',
   'robot_token' => 'punk',

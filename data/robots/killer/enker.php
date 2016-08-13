@@ -2,6 +2,7 @@
 // ENKER
 $robot = array(
   'robot_number' => 'MKN-001',
+  'robot_class' => 'boss',
   'robot_game' => 'MM20',
   'robot_name' => 'Enker',
   'robot_token' => 'enker',

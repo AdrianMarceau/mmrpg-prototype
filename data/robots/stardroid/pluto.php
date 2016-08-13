@@ -2,6 +2,7 @@
 // PLUTO
 $robot = array(
   'robot_number' => 'SRN-008',
+  'robot_class' => 'boss',
   'robot_game' => 'MM30',
   'robot_name' => 'Pluto',
   'robot_token' => 'pluto',

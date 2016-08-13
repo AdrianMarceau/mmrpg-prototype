@@ -2,6 +2,7 @@
 // BUSTER ROD G
 $robot = array(
   'robot_number' => 'WWN-001',
+  'robot_class' => 'boss',
   'robot_game' => 'MM21',
   'robot_name' => 'Buster Rod G',
   'robot_token' => 'buster-rod-g',

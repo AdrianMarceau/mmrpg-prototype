@@ -2,6 +2,7 @@
 // COSMO MAN
 $robot = array(
   'robot_number' => 'EXN-00A',
+  'robot_class' => 'boss',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Cosmo Man',
   'robot_token' => 'cosmo-man',

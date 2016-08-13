@@ -2,6 +2,7 @@
 // QUINT
 $robot = array(
   'robot_number' => 'SVN-001',
+  'robot_class' => 'boss',
   'robot_game' => 'MM20',
   'robot_name' => 'Quint',
   'robot_token' => 'quint',

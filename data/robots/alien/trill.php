@@ -2,6 +2,7 @@
 // TRILL
 $robot = array(
   'robot_number' => 'EXN-00X',
+  'robot_class' => 'boss',
   'robot_game' => 'MMEXE',
   'robot_name' => 'Trill',
   'robot_token' => 'trill',
