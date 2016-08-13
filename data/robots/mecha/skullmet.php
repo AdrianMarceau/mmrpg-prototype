@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Skullmet',
   'robot_token' => 'skullmet',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Skullmet (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Skullmet (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'shadow',
   'robot_field' => 'robosaur-boneyard',
   'robot_description' => 'Armored Skull Mecha',
