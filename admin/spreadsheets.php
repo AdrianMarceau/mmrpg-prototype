@@ -6,7 +6,7 @@ function google_csv_spreadsheet($google_url, $sheet_name = ''){
     // Define the file token for this spreadsheet
     $cache_token = md5($google_url);
     $cache_filename = 'cache.'.(!empty($sheet_name) ? $sheet_name : $cache_token).'.'.MMRPG_CONFIG_CACHE_DATE.'.csv';
-    $cache_filepath = MMRPG_CONFIG_ROOTDIR.'data/cache/'.$cache_filename;
+    $cache_filepath = MMRPG_CONFIG_CACHE_PATH.$cache_filename;
     $cache_modified = file_exists($cache_filepath) ? filemtime($cache_filepath) : 0;
     $cache_timeout = !empty($cache_modified) ? time() - $cache_modified : 0;
     $google_sheet = array();
@@ -45,7 +45,8 @@ function google_csv_spreadsheet($google_url, $sheet_name = ''){
 
     }
 
-    //die('$google_sheet = '.$google_url.'<br /><pre>'.print_r($google_sheet, true).'</pre>');
+    //echo($sheet_name.' = '.$google_url.PHP_EOL);
+    //echo('$google_sheet = '.$sheet_name.' = '.$google_url.'<br /><pre>'.print_r($google_sheet, true).'</pre>');
 
     $google_sheet = !empty($google_sheet) ? explode("\n", $google_sheet) : array();
     foreach ($google_sheet AS $key => $string){ $google_sheet[$key] = str_getcsv($string); }
@@ -177,7 +178,7 @@ function mmrpg_spreadsheet_mecha_descriptions(){
 // Define a function for collecting boss descriptions from CSV
 function mmrpg_spreadsheet_boss_descriptions(){
 
-    $key = '14xbg8tuhz_l4AofN9Ek7OWuPfRQaSFPuRLB1DcvHlF4'; // Mega Man RPG Boss Descriptions
+    $key = '1Ho7CeUmnnwsWzzCW8HBDzL3ltwnv9unAOcJpq7OitiU'; // Mega Man RPG Boss Descriptions
     $google_url = 'https://docs.google.com/spreadsheets/d/'.$key.'/export?format=csv&id&ndplr=1';
     $rawsheet = google_csv_spreadsheet($google_url, 'boss_descriptions');
     $newsheet = array();

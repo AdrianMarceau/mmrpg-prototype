@@ -64,15 +64,15 @@ $spreadsheet_boss_descriptions = mmrpg_spreadsheet_boss_descriptions();
 /*
 header('Content-type: text/plain; charset=UTF-8');
 die($this_page_markup."\n\n".
-    '$spreadsheet_robot_stats = <pre>'.print_r($spreadsheet_robot_stats, true).'</pre>'."\n\n".
+    //'$spreadsheet_robot_stats = <pre>'.print_r($spreadsheet_robot_stats, true).'</pre>'."\n\n".
     //'$spreadsheet_mecha_stats = <pre>'.print_r($spreadsheet_mecha_stats, true).'</pre>'."\n\n".
-    //'$spreadsheet_boss_stats = <pre>'.print_r($spreadsheet_boss_stats, true).'</pre>'."\n\n".
+    '$spreadsheet_boss_stats = <pre>'.print_r($spreadsheet_boss_stats, true).'</pre>'."\n\n".
     //'$spreadsheet_robot_quotes = <pre>'.print_r($spreadsheet_robot_quotes, true).'</pre>'."\n\n".
     //'$spreadsheet_mecha_quotes = <pre>'.print_r($spreadsheet_mecha_quotes, true).'</pre>'."\n\n".
-    //'$spreadsheet_boss_quotes = <pre>'.print_r($spreadsheet_boss_quotes, true).'</pre>'."\n\n".
+    '$spreadsheet_boss_quotes = <pre>'.print_r($spreadsheet_boss_quotes, true).'</pre>'."\n\n".
     //'$spreadsheet_robot_descriptions = <pre>'.print_r($spreadsheet_robot_descriptions, true).'</pre>'."\n\n".
     //'$spreadsheet_mecha_descriptions = <pre>'.print_r($spreadsheet_mecha_descriptions, true).'</pre>'."\n\n".
-    //'$spreadsheet_boss_descriptions = <pre>'.print_r($spreadsheet_boss_descriptions, true).'</pre>'."\n\n".
+    '$spreadsheet_boss_descriptions = <pre>'.print_r($spreadsheet_boss_descriptions, true).'</pre>'."\n\n".
     '---');
 */
 
@@ -275,15 +275,10 @@ if (!empty($mmrpg_index['robots'])){
             $spreadsheet_descriptions = !empty($spreadsheet_mecha_descriptions[$robot_data['robot_token']]) ? $spreadsheet_mecha_descriptions[$robot_data['robot_token']] : array();
         } elseif ($temp_insert_array['robot_class'] == 'boss'){
             $robot_data['robot_class'] = 'boss';
-            $spreadsheet_stats = !empty($spreadsheet_robot_stats[$robot_data['robot_token']]) ? $spreadsheet_robot_stats[$robot_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$robot_data['robot_token']]) ? $spreadsheet_robot_quotes[$robot_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$robot_data['robot_token']]) ? $spreadsheet_robot_descriptions[$robot_data['robot_token']] : array();
-        }
-        /*elseif ($temp_insert_array['robot_class'] == 'boss'){
             $spreadsheet_stats = !empty($spreadsheet_boss_stats[$robot_data['robot_token']]) ? $spreadsheet_boss_stats[$robot_data['robot_token']] : array();
             $spreadsheet_quotes = !empty($spreadsheet_boss_quotes[$robot_data['robot_token']]) ? $spreadsheet_boss_quotes[$robot_data['robot_token']] : array();
             $spreadsheet_descriptions = !empty($spreadsheet_boss_descriptions[$robot_data['robot_token']]) ? $spreadsheet_boss_descriptions[$robot_data['robot_token']] : array();
-        }*/
+        }
 
         // Collect any user-contributed data for this robot
         if (!empty($spreadsheet_stats['energy'])){ $temp_insert_array['robot_energy'] = $spreadsheet_stats['energy']; }
@@ -736,15 +731,10 @@ if (!empty($mmrpg_index['bosses'])){
             $spreadsheet_descriptions = !empty($spreadsheet_mecha_descriptions[$boss_data['robot_token']]) ? $spreadsheet_mecha_descriptions[$boss_data['robot_token']] : array();
         } elseif ($temp_insert_array['robot_class'] == 'boss'){
             $boss_data['robot_class'] = 'boss';
-            $spreadsheet_stats = !empty($spreadsheet_robot_stats[$boss_data['robot_token']]) ? $spreadsheet_robot_stats[$boss_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$boss_data['robot_token']]) ? $spreadsheet_robot_quotes[$boss_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$boss_data['robot_token']]) ? $spreadsheet_robot_descriptions[$boss_data['robot_token']] : array();
-        }
-        /*elseif ($temp_insert_array['robot_class'] == 'boss'){
             $spreadsheet_stats = !empty($spreadsheet_boss_stats[$boss_data['robot_token']]) ? $spreadsheet_boss_stats[$boss_data['robot_token']] : array();
             $spreadsheet_quotes = !empty($spreadsheet_boss_quotes[$boss_data['robot_token']]) ? $spreadsheet_boss_quotes[$boss_data['robot_token']] : array();
             $spreadsheet_descriptions = !empty($spreadsheet_boss_descriptions[$boss_data['robot_token']]) ? $spreadsheet_boss_descriptions[$boss_data['robot_token']] : array();
-        }*/
+        }
 
         // Collect any user-contributed data for this robot
         if (!empty($spreadsheet_stats['energy'])){ $temp_insert_array['robot_energy'] = $spreadsheet_stats['energy']; }
