@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Peng',
   'robot_token' => 'peng',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Peng (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Peng (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'freeze',
   'robot_field' => 'arctic-jungle',
   'robot_description' => 'Sliding Penguin Mecha',
