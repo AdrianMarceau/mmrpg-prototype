@@ -14,7 +14,7 @@ foreach ($mmrpg_database_types AS $token => $info){
 
 // Define the index of hidden robots to not appear in the database
 $hidden_database_robots = array();
-$hidden_database_robots = array_merge($hidden_database_robots, array('robot', 'mega-man-copy', 'proto-man-copy', 'bass-copy', 'rock'));
+$hidden_database_robots = array_merge($hidden_database_robots, array('robot', 'rock'));
 if (!defined('DATA_DATABASE_SHOW_CACHE')){ $hidden_database_robots[] = 'cache'; }
 if (!defined('DATA_DATABASE_SHOW_HIDDEN')){ $hidden_database_robots[] = 'bond-man'; $hidden_database_robots[] = 'fake-man'; }
 //$hidden_database_robots = array_merge($hidden_database_robots, array('bomb-man', 'cut-man', 'elec-man', 'fire-man', 'guts-man', 'ice-man', 'oil-man', 'time-man'));
