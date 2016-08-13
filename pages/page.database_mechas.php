@@ -86,11 +86,6 @@ if (!empty($this_current_token)){
       $this_markup_header = '<span class="hideme">'.$mecha_info['robot_number'].' '.$mecha_info['robot_name'].' | </span>'.$this_markup_header;
       // Check if this is a mecha and prepare extra text
       $mecha_info['robot_name_append'] = '';
-      if (!empty($mecha_info['robot_class']) && $mecha_info['robot_class'] == 'mecha'){
-        $mecha_info['robot_generation'] = '1st';
-        if (preg_match('/-2$/', $mecha_info['robot_token'])){ $mecha_info['robot_generation'] = '2nd'; $mecha_info['robot_name_append'] = ' 2'; }
-        elseif (preg_match('/-3$/', $mecha_info['robot_token'])){ $mecha_info['robot_generation'] = '3rd'; $mecha_info['robot_name_append'] = ' 3'; }
-      }
       // Define the SEO variables for this page
       $this_seo_title_backup = $this_seo_title;
       $this_seo_title = $mecha_info['robot_name'].$mecha_info['robot_name_append'].' | '.$this_seo_title;
