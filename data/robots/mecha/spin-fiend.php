@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Spin Fiend',
   'robot_token' => 'spin-fiend',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Spin Fiend (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Spin Fiend (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'swift',
   'robot_field' => 'spinning-greenhouse',
   'robot_description' => 'Top Dispensing Mecha',
