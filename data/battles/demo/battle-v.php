@@ -13,15 +13,15 @@ $battle = array(
     'player_token' => 'dr-wily',
     'player_switch' => 10,
     'player_robots' => array(
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'bass', 'robot_level' => 10, 'robot_abilities' => array('buster-shot', 'bass-buster', 'energy-assault', 'recovery-breaker', 'shadow-blade', 'spark-shock', 'gemini-laser', 'search-snake')),
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'mega-man-copy', 'robot_level' => 7, 'robot_abilities' => array('buster-shot', 'mega-buster', 'mega-ball', 'mega-slide')),
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'proto-man-copy', 'robot_level' => 7, 'robot_abilities' => array('buster-shot', 'proto-buster', 'proto-shield', 'proto-strike')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'bass-ds', 'robot_level' => 10, 'robot_abilities' => array('buster-shot', 'bass-buster', 'bass-crush', 'base-baroque')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'mega-man-ds', 'robot_level' => 7, 'robot_abilities' => array('buster-shot', 'mega-buster', 'mega-ball', 'mega-slide')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 3), 'robot_token' => 'proto-man-ds', 'robot_level' => 7, 'robot_abilities' => array('buster-shot', 'proto-buster', 'proto-shield', 'proto-strike')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 4), 'robot_token' => 'guts-man', 'robot_level' => 5, 'robot_abilities' => array('super-arm', 'attack-boost', 'defense-break', 'speed-boost')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 5), 'robot_token' => 'time-man', 'robot_level' => 5, 'robot_abilities' => array('time-arrow', 'attack-break', 'defense-boost', 'speed-boost')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 6), 'robot_token' => 'quick-man', 'robot_level' => 5, 'robot_abilities' => array('quick-boomerang', 'attack-boost', 'defense-break', 'speed-break')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 7), 'robot_token' => 'air-man', 'robot_level' => 5, 'robot_abilities' => array('air-shooter', 'attack-break', 'defense-boost', 'speed-break')),
       array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 8), 'robot_token' => 'flash-man', 'robot_level' => 5, 'robot_abilities' => array('flash-stopper', 'speed-boost', 'speed-break', 'speed-mode')),
-      
+
       )
     ),
   'battle_rewards' => array(
