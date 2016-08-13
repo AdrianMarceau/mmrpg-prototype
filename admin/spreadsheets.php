@@ -99,7 +99,7 @@ function mmrpg_spreadsheet_mecha_stats(){
 // Define a function for collecting boss stats from CSV
 function mmrpg_spreadsheet_boss_stats(){
 
-    $key = '0AhQWV_m4SqtwdGtnZmE5SGJuVTRPSm9CRllPX3JCMGc'; // Mega Man RPG Boss Stats
+    $key = '1WKUgd422RaQNzseyc-t7QnQtTsFJG_VWEtII3rIhmeE'; // Mega Man RPG Boss Stats
     $google_url = 'https://docs.google.com/spreadsheet/pub?key='.$key.'&single=true&gid=0&output=csv&ndplr=1';
     $rawsheet = google_csv_spreadsheet($google_url, 'boss_stats');
     $newsheet = array();
@@ -138,7 +138,7 @@ function mmrpg_spreadsheet_mecha_quotes(){
 // Define a function for collecting boss quotes from CSV
 function mmrpg_spreadsheet_boss_quotes(){
 
-    $key = '1Z4-He2of0r5roEzLewobsk7BfA7bO_wyF3aZOMliTQc'; // Mega Man RPG Boss Quotes
+    $key = '1BMAH7Spy0G3HcDTEER3siIK5F6dLmeOh6NDNGMAg86A'; // Mega Man RPG Boss Quotes
     $google_url = 'https://docs.google.com/spreadsheets/d/'.$key.'/export?format=csv&id&ndplr=1';
     $rawsheet = google_csv_spreadsheet($google_url, 'boss_quotes');
     $newsheet = array();
