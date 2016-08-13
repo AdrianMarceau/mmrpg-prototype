@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Killer Bullet',
   'robot_token' => 'killer-bullet',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Killer Bullet (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Killer Bullet (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'explode',
   'robot_field' => 'pipe-station',
   'robot_description' => 'Industrial Bomb Mecha',
