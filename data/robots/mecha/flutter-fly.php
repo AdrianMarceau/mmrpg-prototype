@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Flutter Fly',
   'robot_token' => 'flutter-fly',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Flutter Fly (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Flutter Fly (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'time',
   'robot_field' => 'clock-citadel',
   'robot_description' => 'Temporal Pulse Mecha',
