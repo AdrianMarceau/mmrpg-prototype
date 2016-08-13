@@ -5,6 +5,7 @@ $robot = array(
   'robot_game' => 'MM00',
   'robot_name' => 'Disco',
   'robot_token' => 'disco',
+  'robot_gender' => 'female',
   'robot_image_editor' => 4117,
   'robot_image_alts' => array(
     array('token' => 'alt', 'name' => 'Disco (Bass Alt)', 'summons' => 50),

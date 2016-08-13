@@ -5,6 +5,7 @@ $robot = array(
   'robot_game' => 'MM09',
   'robot_name' => 'Splash Woman',
   'robot_token' => 'splash-woman',
+  'robot_gender' => 'female',
   'robot_image_editor' => 4117,
   'robot_image_size' => 80,
   'robot_core' => 'water',
