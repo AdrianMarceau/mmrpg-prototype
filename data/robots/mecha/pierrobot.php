@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Pierrobot',
   'robot_token' => 'pierrobot',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Pierrobot (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Pierrobot (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'cutter',
   'robot_field' => 'industrial-facility',
   'robot_description' => 'Balancing Performer Mecha',
