@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Pyre Fly',
   'robot_token' => 'pyre-fly',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Pyre Fly (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Pyre Fly (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'flame',
   'robot_field' => 'egyptian-excavation',
   'robot_description' => 'Burning Dragonfly Mecha',
