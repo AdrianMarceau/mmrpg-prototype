@@ -1,25 +1,25 @@
 <?
-// NITRON III
+// NITRON R
 $robot = array(
-  'robot_number' => 'NTRN-003', // ROBOT : NITRON (3rd Gen)
+  'robot_number' => 'NTRN-001', // ROBOT : NITRON (RED)
   'robot_class' => 'mecha',
   'robot_game' => 'MM03',
-  'robot_name' => 'Nitron',
-  'robot_token' => 'nitron-3',
+  'robot_name' => 'Nitron R',
+  'robot_token' => 'nitron-r',
   'robot_image_editor' => 412,
-  'robot_core' => 'electric',
+  'robot_core' => 'flame',
   'robot_field' => 'reflection-chamber',
-  'robot_description' => 'Electric Sparks Mecha',
+  'robot_description' => 'Flaming Geysers Mecha',
   'robot_energy' => 100,
   'robot_attack' => 100,
   'robot_defense' => 100,
   'robot_speed' => 100,
-  'robot_weaknesses' => array('flame', 'freeze'),
-  'robot_affinities' => array('electric'),
-  'robot_abilities' => array('nitron-bolt'),
+  'robot_weaknesses' => array('freeze', 'electric'),
+  'robot_affinities' => array('flame'),
+  'robot_abilities' => array('nitron-fire'),
   'robot_rewards' => array(
     'abilities' => array(
-        array('level' => 0, 'token' => 'nitron-bolt')
+        array('level' => 0, 'token' => 'nitron-fire')
       )
     ),
   'robot_quotes' => array(
