@@ -83,6 +83,7 @@ if (!empty($mmrpg_index['robots'])){
     $temp_insert_array['robot_image'] = !empty($robot_data['robot_image']) ? $robot_data['robot_image'] : '';
     $temp_insert_array['robot_image_size'] = !empty($robot_data['robot_image_size']) ? $robot_data['robot_image_size'] : 40;
     $temp_insert_array['robot_image_editor'] = !empty($robot_data['robot_image_editor']) ? $robot_data['robot_image_editor'] : 0;
+    $temp_insert_array['robot_image_alts'] = !empty($robot_data['robot_image_alts']) ? $robot_data['robot_image_alts'] : array();
     $temp_insert_array['robot_core'] = !empty($robot_data['robot_core']) ? $robot_data['robot_core'] : '';
     $temp_insert_array['robot_core2'] = !empty($robot_data['robot_core2']) ? $robot_data['robot_core2'] : '';
     $temp_insert_array['robot_description'] = !empty($robot_data['robot_description']) ? $robot_data['robot_description'] : '';
@@ -129,6 +130,9 @@ if (!empty($mmrpg_index['robots'])){
     //$temp_insert_array['robot_abilities_compatible'] = array();
     //if (!empty($robot_data['robot_abilities'])){ foreach ($robot_data['robot_abilities'] AS $key => $token){ $temp_insert_array['robot_abilities_compatible'][] = '['.$token.']'; } }
     //$temp_insert_array['robot_abilities_compatible'] = implode(',', $temp_insert_array['robot_abilities_compatible']);
+
+    // Define image alts for this robot
+    $temp_insert_array['robot_image_alts'] = json_encode(!empty($robot_data['robot_image_alts']) ? $robot_data['robot_image_alts'] : array());
 
     // Define the battle quotes for this robot
     if (!empty($robot_data['robot_quotes'])){ foreach ($robot_data['robot_quotes'] AS $key => $quote){ $robot_data['robot_quotes'][$key] = html_entity_decode($quote, ENT_QUOTES, 'UTF-8'); } }
