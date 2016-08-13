@@ -6,6 +6,13 @@ $robot = array(
   'robot_name' => 'Rhythm',
   'robot_token' => 'rhythm',
   'robot_image_editor' => 4117,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Rhythm (Proto Alt)', 'summons' => 100),
+    array('token' => 'alt2', 'name' => 'Cute Dress Rhythm', 'summons' => 200),
+    array('token' => 'alt3', 'name' => 'Cute Dress Rhythm (Proto Alt)', 'summons' => 300),
+    array('token' => 'alt4', 'name' => 'Mobile Suit Rhythm', 'summons' => 400),
+    array('token' => 'alt5', 'name' => 'Mobile Suit Rhythm (Proto Alt)', 'summons' => 500)
+    ),
   'robot_description' => 'Genius Hacker Robot',
   'robot_description2' => 'Rhythm is a digital support robot coded by Dr. Cossack and integrated directly into the data of the prototype.  Rhythm\'s initial function was to act as kind of debug tool for the two doctors during the prototype\'s development, tweaking values and swapping parameters as needed, but recent events have forced Cossack to clone her data for battle purposes instead.  As a genius hacker, the Rhythm series excels in abilities that modify the system from the inside to alter the conditions of battle in strange and unusual ways. With abilities that allow her to swap and shuffle robot stats at will, the Rhythm series is both a great ally and a formidable, unpredictable foe.',
   'robot_field' => 'cossack-citadel',

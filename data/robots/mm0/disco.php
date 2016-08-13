@@ -6,6 +6,13 @@ $robot = array(
   'robot_name' => 'Disco',
   'robot_token' => 'disco',
   'robot_image_editor' => 4117,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Disco (Bass Alt)', 'summons' => 50),
+    array('token' => 'alt2', 'name' => 'Pretty Dress Disco', 'summons' => 100),
+    array('token' => 'alt3', 'name' => 'Pretty Dress Disco (Bass Alt)', 'summons' => 150),
+    array('token' => 'alt4', 'name' => 'Power Suit Disco', 'summons' => 200),
+    array('token' => 'alt5', 'name' => 'Power Suit Disco (Bass Alt)', 'summons' => 250)
+    ),
   'robot_description' => 'Loyal Apprentice Robot',
   'robot_description2' => 'Disco was an apprentice robot built by Dr. Wily as an analogue to Roll, providing obedience and loyalty in ways that Bass never could. Opposite to the way the Roll series of robots specialize in boost and support abilities, the Disco series specializes in break and assault abilities, lowering the targets\' stats to dangerously low levels in short time and setting them up to be KOed.  Much like her brother robot\'s feelings toward the Mega Man line, Disco robots have a deeply rooted rivalry with the Roll series and will use any opportunity to flaunt her battle prowess in one\'s presence.',
   'robot_field' => 'wily-castle',
