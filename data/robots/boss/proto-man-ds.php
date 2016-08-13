@@ -1,20 +1,21 @@
 <?
-// BASS COPY
+// PROTO MAN COPY
 $robot = array(
-  'robot_number' => 'PCR-SWN',
+  'robot_number' => 'PCR-DWN',
+  'robot_class' => 'boss',
   'robot_game' => 'MM00',
-  'robot_name' => 'Bass S',
-  'robot_token' => 'bass-copy',
+  'robot_name' => 'Proto Man S',
+  'robot_token' => 'proto-man-copy',
+  'robot_field' => 'final-destination-2',
   'robot_image_editor' => 412,
   'robot_core' => 'shadow',
-  'robot_description' => 'Strongest Challenger Robot',
-  'robot_field' => 'final-destination-2',
+  'robot_description' => '',
   'robot_energy' => 100,
   'robot_attack' => 100,
   'robot_defense' => 100,
   'robot_speed' => 100,
-  'robot_weaknesses' => array('flame', 'nature', 'wind', 'explode'), // first four robots by weakness
-  'robot_resistances' => array('time', 'swift', 'cutter', 'water'), // last four robots by weakness
+  'robot_weaknesses' => array('earth', 'water', 'missile', 'space'), // first four robots by weakness
+  'robot_resistances' => array('time', 'flame', 'wind', 'shield'), // last four robots by weakness
   'robot_affinities' => array('shadow'),
   'robot_abilities' => array(
     'buster-shot',
@@ -28,17 +29,17 @@ $robot = array(
     'experience-booster', 'recovery-booster', 'damage-booster',
     'experience-breaker', 'recovery-breaker', 'damage-breaker',
     'field-support', 'mecha-support',
-    'mega-buster', 'proto-buster', 'roll-buster', 'disco-buster', 'rhythm-buster',
+    'mega-buster', 'bass-buster', 'roll-buster', 'disco-buster', 'rhythm-buster',
     'light-buster', 'wily-buster', 'cossack-buster',
-    'mega-ball', 'mega-slide', 'proto-shield', 'proto-strike'
+    'mega-ball', 'mega-slide', 'bass-crush', 'bass-baroque'
     ),
   'robot_rewards' => array(
     'abilities' => array(
-      array('level' => 0, 'token' => 'buster-shot'),
-      array('level' => 2, 'token' => 'bass-buster'),
-      array('level' => 4, 'token' => 'bass-crush'),
-      array('level' => 8, 'token' => 'bass-baroque'),
-      array('level' => 16, 'token' => 'copy-shot')
+        array('level' => 0, 'token' => 'buster-shot'),
+        array('level' => 2, 'token' => 'proto-buster'),
+        array('level' => 4, 'token' => 'proto-shield'),
+        array('level' => 8, 'token' => 'proto-strike'),
+        array('level' => 16, 'token' => 'copy-shot')
       )
     ),
   'robot_quotes' => array(
