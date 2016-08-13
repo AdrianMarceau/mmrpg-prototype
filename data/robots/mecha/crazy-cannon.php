@@ -7,6 +7,10 @@ $robot = array(
   'robot_name' => 'Crazy Cannon',
   'robot_token' => 'crazy-cannon',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Crazy Cannon (2nd Gen)', 'summons' => 30),
+    array('token' => 'alt2', 'name' => 'Crazy Cannon (3rd Gen)', 'summons' => 60)
+    ),
   'robot_core' => 'time',
   'robot_field' => 'photon-collider',
   'robot_description' => 'Tachyon Cannon Mecha',
