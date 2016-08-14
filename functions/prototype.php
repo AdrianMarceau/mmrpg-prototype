@@ -799,13 +799,7 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
  */
 
 // Define a function for generating an ability set for a given robot
-function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $ability_num = 1){
-    global $db;
-    // Require the actual code file
-    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_generate-abilities.php');
-    // Return the ability array, whatever it was
-    return $this_robot_abilities;
-}
+require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_generate-abilities.php');
 
 // Define a function for generating the STARTER missions
 function mmrpg_prototype_mission_starter($this_prototype_data, $this_robot_token = 'met', $this_start_level = 1, $this_rescue_token = 'roll'){
