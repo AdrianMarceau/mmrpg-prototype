@@ -52,10 +52,10 @@ $temp_counter_abilities = array('total' => 0);
 $temp_counter_stars = array('total' => 0, 'field' => 0, 'fusion' => 0);
 $temp_counter_database = array();
 $temp_counter_database['total'] = 0;
-$temp_counter_database['encountered'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
-$temp_counter_database['scanned'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
-$temp_counter_database['summoned'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
-$temp_counter_database['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
+$temp_counter_database['encountered'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+$temp_counter_database['scanned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+$temp_counter_database['summoned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+$temp_counter_database['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
 $temp_counter_levels = array();
 // Loop through the completed battles
 if (!empty($this_playerinfo['save_values_battle_complete'])){

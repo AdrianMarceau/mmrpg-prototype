@@ -180,7 +180,7 @@ gameSettings.autoScrollTop = false;
             $temp_potential_stars_label = $temp_potential_count == 1 ? '1 Star' : $temp_potential_count.' Stars';
             $temp_total_boost_label = '+'.number_format($this_battle_stars_boost, 0, '.', ',').'% Boost';
             ?>
-            <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+            <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                 <span class="count">
                     StarForce <span style="opacity: 0.25;">(
                         <span><?= $temp_total_stars_label ?></span> /

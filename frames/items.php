@@ -301,7 +301,7 @@ if (true){
     // Start generating the edit markup
     ?>
 
-    <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+    <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <span class="count">
             Item Inventory (<span id="item_counter">
                 <?= number_format(count($global_battle_items), 0, '.', ',') ?> /

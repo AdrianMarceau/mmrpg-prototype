@@ -228,7 +228,7 @@ if (true){
     // Start generating the database markup
     ?>
 
-    <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+    <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <span class="count">
             Robot Database
             <span style="opacity: 0.25;">(

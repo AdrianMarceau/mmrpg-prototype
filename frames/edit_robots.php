@@ -298,7 +298,7 @@ if (true){
     // Start generating the edit markup
     ?>
 
-    <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+    <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <span class="count">
             Robot <?= $global_allow_editing ? 'Editor' : 'Viewer' ?> (<?= $allowed_edit_robot_count == 1 ? '1 Robot' : $allowed_edit_robot_count.' Robots' ?>)
         </span>
