@@ -1208,7 +1208,11 @@ if (true){
   // Start generating the edit markup
   ?>
 
-  <span class="header block_1">Item Shop (<span id="zenny_counter"><?= number_format($global_zenny_counter, 0, '.', ',') ?></span> Zenny)</span>
+    <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+        <span class="count">
+            Item Shop (<span id="zenny_counter"><?= number_format($global_zenny_counter, 0, '.', ',') ?></span> Zenny)
+        </span>
+    </span>
 
   <div style="float: left; width: 100%;">
   <table class="formatter" style="width: 100%; table-layout: fixed;">

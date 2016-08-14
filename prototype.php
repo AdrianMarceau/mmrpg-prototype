@@ -354,7 +354,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
     </div>
 
     <div class="menu select_this_player" data-step="1" data-title="Player Select (<?= !empty($_SESSION[$session_token]['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players' ?>)" data-select="this_player_token">
-        <span class="header block_1">
+        <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <span class="count">Player Select (<?= !empty($_SESSION[$session_token]['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players' ?>)</span>
             <?/*<span class="reload">&#8634;</span>*/?>
         </span>
@@ -366,7 +366,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
     </div>
 
     <div class="menu menu_hide select_this_battle" data-step="2" data-title="Battle Select" data-select="this_battle_token">
-        <span class="header block_1">
+        <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <span class="count"><?= !empty($_SESSION[$session_token]['DEMO']) ? 'Mega Man RPG Prototype' : 'Mission Select' ?></span>
         </span>
         <?
@@ -396,7 +396,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 
                 // Print out the opening tags for the robot select container
                 echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
-                echo '<span class="header block_1"><span class="count">Robot Select</span></span>'."\n";
+                echo '<span class="header block_1 header_types type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"><span class="count">Robot Select</span></span>'."\n";
 
                 // Require the prototype robots display file
                 require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
@@ -417,7 +417,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 
             // Print out the opening tags for the robot select container
             echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
-            echo '<span class="header block_1"><span class="count">Robot Select</span></span>'."\n";
+            echo '<span class="header block_1 header_types type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"><span class="count">Robot Select</span></span>'."\n";
 
             // Require the prototype robots display file
             require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
