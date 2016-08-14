@@ -406,11 +406,6 @@
   color: #B0B0B0;
 }
 
-/* -- DELETE ME LATER -- */
-#edit #console .event .event_robot_images .sprite_wrapper .token {
-  display: none;
-}
-
 
 #edit #console .event .event_robot_core .robot_core,
 #edit #console .event .event_robot_core2 .robot_core2 {

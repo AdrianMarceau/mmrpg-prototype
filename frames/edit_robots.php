@@ -90,6 +90,11 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sort'){
     require('edit_robots_action_sort.php');
 }
 
+// Check if an action request has been sent with an altimage type
+if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'altimage'){
+    require('edit_robots_action_altimage.php');
+}
+
 
 
 // -- RECOLLECT SETTINGS DATA -- //
