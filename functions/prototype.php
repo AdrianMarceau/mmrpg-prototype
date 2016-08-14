@@ -1004,13 +1004,19 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_experience_title = $this_robot_level >= 100 ? '&#8734;' : $this_robot_experience;
 
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
-        $this_robot_name .= $this_robot_favourite ? ' <span style="position: relative; bottom: 2px; font-size: 11px;">&hearts;</span>' : '';
+        $this_robot_name .= $this_robot_favourite ? ' <span class="icons favs">&hearts;</span>' : '';
 
+        // Calculate this robot's current and max stat values
         $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards, true);
         $this_robot_energy = $this_robot_stats['energy']['current'];
         $this_robot_attack = $this_robot_stats['attack']['current'];
         $this_robot_defense = $this_robot_stats['defense']['current'];
         $this_robot_speed = $this_robot_stats['speed']['current'];
+
+        // Update the robot's image if in the settings
+        if (isset($this_robot_settings['robot_image'])){
+            $this_option_image = $this_robot_settings['robot_image'];
+        }
 
         $starcount = 0;
         $bullcount = 0;
@@ -1023,7 +1029,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         if ($this_robot_stats['speed']['bonus'] >= $this_robot_stats['speed']['bonus_max']){ if ($level_max){ $starcount++; } else { $bullcount++; } }
         for ($i = 0; $i < $starcount; $i++){ $namestring .= '&#9733;'; }
         for ($i = 0; $i < $bullcount; $i++){ $namestring .= '&bull;'; }
-        $this_robot_name .= !empty($namestring) ? ' <span style="position: relative; bottom: 2px; font-size: 9px; letter-spacing: 0;">'.$namestring.'</span>' : '';
+        $this_robot_name .= !empty($namestring) ? ' <span class="icons stats">'.$namestring.'</span>' : '';
 
         if (!empty($this_player_info['player_energy'])){ $this_robot_energy += ceil(($this_player_info['player_energy'] / 100) * $this_robot_energy); }
         if (!empty($this_player_info['player_attack'])){ $this_robot_attack += ceil(($this_player_info['player_attack'] / 100) * $this_robot_attack); }
