@@ -42,6 +42,7 @@ $temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
 
 // Require the appropriate database files
 define('DATA_DATABASE_SHOW_MECHAS', true);
+define('DATA_DATABASE_SHOW_BOSSES', true);
 define('DATA_DATABASE_SHOW_CACHE', true);
 define('DATA_DATABASE_SHOW_HIDDEN', true);
 //require_once('../database/include.php');
@@ -49,12 +50,13 @@ require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/mechas.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/bosses.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
 //require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
 
 // Merge the robots and mechas
-$mmrpg_database_robots = array_merge($mmrpg_database_robots, $mmrpg_database_mechas);
+$mmrpg_database_robots = array_merge($mmrpg_database_robots, $mmrpg_database_mechas, $mmrpg_database_bosses);
 
 // Preloop through all of the robots in the database session and count the games
 $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
@@ -113,18 +115,6 @@ foreach ($mmrpg_database_robots AS $temp_key => $temp_info){
     }
 }
 
-//die('<pre>'.print_r($mmrpg_database_robots, true).'</pre>');
-
-// Sort the robot index based on robot number
-function mmrpg_index_sort_robots_visible($robot_one, $robot_two){
-    global $visible_database_robots;
-    if (in_array($robot_one['robot_token'], $visible_database_robots) && !in_array($robot_two['robot_token'], $visible_database_robots)){ return -1; }
-    elseif (!in_array($robot_one['robot_token'], $visible_database_robots) && in_array($robot_two['robot_token'], $visible_database_robots)){ return 1; }
-    else { return 0; }
-}
-uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots_visible');
-
-
 // Count the robots groups for each page
 $database_page_groups = array();
 $database_page_groups[0] = array('MM00', 'MM20', 'MMRPG');
@@ -171,10 +161,10 @@ if (true){
     // Define the header/base counters for the database
     $global_robots_counters = array();
     $global_robots_counters['total'] = 0;
-    $global_robots_counters['encountered'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
-    $global_robots_counters['scanned'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
-    $global_robots_counters['summoned'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
-    $global_robots_counters['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0);
+    $global_robots_counters['encountered'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+    $global_robots_counters['scanned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+    $global_robots_counters['summoned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+    $global_robots_counters['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
 
     // Define a function for looping through the robots and counting/updating them
     function temp_process_robots(&$mmrpg_database_robots, &$database_game_counters, &$database_page_groups, &$global_robots_counters, $session_token){
@@ -182,13 +172,11 @@ if (true){
         foreach($mmrpg_database_robots AS $robot_key => &$robot_info){
 
             // Update the global game counters
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $temp_token = $robot_info['robot_token'];
             if (!isset($database_game_counters[$robot_info['robot_game']])){ $database_game_counters[$robot_info['robot_game']] = array($temp_token); }
             elseif (!in_array($temp_token, $database_game_counters[$robot_info['robot_game']])){ $database_game_counters[$robot_info['robot_game']][] = $temp_token; }
 
             // Update and/or define the encountered, scanned, summoned, and unlocked flags
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             //die('dance <pre>'.print_r($_SESSION[$session_token]['values']['robot_database'], true).'</pre>');
             if (!isset($robot_info['robot_visible'])){ $robot_info['robot_visible'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]) ? true : false; }
             if (!isset($robot_info['robot_encountered'])){ $robot_info['robot_encountered'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_encountered']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_encountered'] : 0; }
@@ -198,7 +186,6 @@ if (true){
             if (!isset($robot_info['robot_defeated'])){ $robot_info['robot_defeated'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_defeated']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_defeated'] : 0; }
 
             // Define the page token based on this robot's game of origin
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             if (!isset($robot_info['robot_page_token'])){
                 $temp_this_page_token = '?';
                 foreach ($database_page_groups AS $page_key => $group_array){
@@ -209,7 +196,6 @@ if (true){
             }
 
             // Increment the global robots counters
-            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
             $global_robots_counters['total']++;
             if ($robot_info['robot_encountered']){ $global_robots_counters['encountered']['total']++; $global_robots_counters['encountered'][$robot_info['robot_class']]++; }
             if ($robot_info['robot_scanned']){ $global_robots_counters['scanned']['total']++; $global_robots_counters['scanned'][$robot_info['robot_class']]++; }
@@ -276,7 +262,7 @@ if (true){
                         $key_counter = 0;
                         foreach($mmrpg_database_robots AS $robot_key => $robot_info){
                             // Skip if not the correct robot class
-                            if ($robot_info['robot_class'] == 'mecha'){ continue; }
+                            if ($robot_info['robot_class'] != 'master'){ continue; }
                             $temp_robot_type_class = 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none');
                             // If this robot is visible, display normally
                             if ($robot_info['robot_visible'] && in_array($robot_info['robot_token'], $visible_database_robots)){
@@ -304,7 +290,7 @@ if (true){
                         //$key_counter = 0;
                         foreach($mmrpg_database_robots AS $robot_key => $robot_info){
                             // Skip if not the correct robot class
-                            if ($robot_info['robot_class'] == 'master'){ continue; }
+                            if ($robot_info['robot_class'] != 'mecha'){ continue; }
                             $temp_robot_type_class = 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none');
                             $robot_info['robot_name'] .= preg_match('/^([-a-z0-9]+)-(2|3)$/i', $robot_info['robot_token']) ? ' '.preg_replace('/^([-a-z0-9]+)-(2|3)$/i', '$2', $robot_info['robot_token']) : '';
                             // If this robot is visible, display normally
@@ -313,8 +299,35 @@ if (true){
                                 $robot_image_offset = $robot_info['robot_image_size'] > 40 ? ceil(($robot_info['robot_image_size'] - 40) * 0.5) : 0;
                                 $robot_image_offset_x = -5 - $robot_image_offset;
                                 $robot_image_offset_y = -5 - $robot_image_offset;
-                                $robot_complete_markup = $robot_info['robot_summoned'] ? '<span class="complete '.$temp_robot_type_class.'">&#10022;</span>' : '';
-                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" style="background-position: '.$robot_image_offset_x.'px '.$robot_image_offset_y.'px; background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.');" class="sprite sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class.'">'.$robot_info['robot_name'].$robot_complete_markup.'</a>';
+                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" style="background-position: '.$robot_image_offset_x.'px '.$robot_image_offset_y.'px; background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.');" class="sprite sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class.'">'.$robot_info['robot_name'].'</a>';
+                            }
+                            // Otherwise, show a placeholder box for later
+                            else {
+                                //echo '<a data-token-locked="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_game'].'" title="???" style="background-position: -4px -4px; background-image: url(images/robots/robot/mug_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');" class="sprite sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot robot_status_active robot_position_active">???</a>';
+                                echo '<a data-token-locked="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" title="'.$robot_info['robot_number'].' ???" style="background-color: #202020; background-image: none;" class="sprite sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot robot_status_active robot_position_active">???</a>';
+                            }
+                            // Increment the key counter
+                            $key_counter++;
+                        }
+                        ?>
+                    </div>
+                    <strong class="wrapper_header wrapper_header_bosses">Fortress Bosses</strong>
+                    <div class="wrapper wrapper_robots wrapper_robots_bosses" data-select="robots" data-kind="bosses">
+                        <?
+                        // Loop through all of the robots, one by one, displaying their buttons
+                        //$key_counter = 0;
+                        foreach($mmrpg_database_robots AS $robot_key => $robot_info){
+                            // Skip if not the correct robot class
+                            if ($robot_info['robot_class'] != 'boss'){ continue; }
+                            $temp_robot_type_class = 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none');
+                            $robot_info['robot_name'] .= preg_match('/^([-a-z0-9]+)-(2|3)$/i', $robot_info['robot_token']) ? ' '.preg_replace('/^([-a-z0-9]+)-(2|3)$/i', '$2', $robot_info['robot_token']) : '';
+                            // If this robot is visible, display normally
+                            if ($robot_info['robot_visible'] && in_array($robot_info['robot_token'], $visible_database_robots)){
+                                $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
+                                $robot_image_offset = $robot_info['robot_image_size'] > 40 ? ceil(($robot_info['robot_image_size'] - 40) * 0.25) : 0;
+                                $robot_image_offset_x = -9 - $robot_image_offset;
+                                $robot_image_offset_y = -9 - $robot_image_offset;
+                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" style="background-position: '.$robot_image_offset_x.'px '.$robot_image_offset_y.'px; background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.');" class="sprite sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class.'">'.$robot_info['robot_name'].'</a>';
                             }
                             // Otherwise, show a placeholder box for later
                             else {
@@ -708,6 +721,9 @@ var thisPrototype = false;
 var thisWindow = false;
 $(document).ready(function(){
 
+    // Tint background color if not in frame
+    if (window.top == window.self){ $('body').css({backgroundColor:'#262626'}); }
+
     // Update global reference variables
     thisBody = $('#mmrpg');
     thisPrototype = $('#prototype', thisBody);
@@ -790,6 +806,7 @@ $(document).ready(function(){
         var visibleRobotsCount = visibleRobots.length;
         var visibleRobotMasters = visibleRobots.filter('.sprite[data-kind=master]').length;
         var visibleRobotMechas = visibleRobots.filter('.sprite[data-kind=mecha]').length;
+        var visibleRobotBosses = visibleRobots.filter('.sprite[data-kind=boss]').length;
         //console.log('Switched to '+dataGame+'! Total = '+visibleRobotsCount+'; Robot Masters = '+visibleRobotMasters+'; Mecha Support = '+visibleRobotMechas);
         // Hide or show the robot master container based on count
         if (visibleRobotMasters > 0){ $('.wrapper_header_masters, .wrapper_robots_masters', gameCanvas).css({display:'block'}); }
@@ -797,6 +814,9 @@ $(document).ready(function(){
         // Hide or show the robot mecha container based on count
         if (visibleRobotMechas > 0){ $('.wrapper_header_mechas, .wrapper_robots_mechas', gameCanvas).css({display:'block'}); }
         else { $('.wrapper_header_mechas, .wrapper_robots_mechas', gameCanvas).css({display:'none'}); }
+        // Hide or show the robot boss container based on count
+        if (visibleRobotBosses > 0){ $('.wrapper_header_bosses, .wrapper_robots_bosses', gameCanvas).css({display:'block'}); }
+        else { $('.wrapper_header_bosses, .wrapper_robots_bosses', gameCanvas).css({display:'none'}); }
         // Auto-click the first visible robot sprite in the canvas
         if (gameSettings.firstRobot !== false){
             var firstVisibleSprite = $('.sprite[data-token='+gameSettings.firstRobot+']', gameCanvas);
