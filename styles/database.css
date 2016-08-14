@@ -38,7 +38,7 @@
   background-color: rgba(0, 0, 0, 0.15);
   border-radius: 0 0 0.3em 0.3em;
   -moz-border-radius: 0 0 0.3em 0.3em;
-  -webkit-border-radius: 0 0 0.3em 0.3em;  
+  -webkit-border-radius: 0 0 0.3em 0.3em;
 }
 #database #canvas #robot_games .game_link {
   display: block;
@@ -56,7 +56,7 @@
   -webkit-border-radius: 0.75em;
   color: #FFFFFF;
   border: 1px solid transparent;
-  background-color: transparent;  
+  background-color: transparent;
   background-image: -webkit-gradient(
       linear,
       left bottom,
@@ -74,7 +74,7 @@
   -khtml-user-select: none;
   -moz-user-select: none;
   -o-user-select: none;
-  user-select: none;    
+  user-select: none;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
@@ -88,7 +88,7 @@
 #database #canvas #robot_games .game_link_active {
   color: #FFFFFF;
   border-color: #2B2B2B;
-  background-color: #333333; 
+  background-color: #333333;
 }
 #database #canvas #robot_games .game_link_disabled,
 #database #canvas #robot_games .game_link_disabled:hover {
@@ -105,7 +105,7 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;  
+  bottom: 0;
 }
 #database #canvas .wrapper_robots {
   position: static;
@@ -121,7 +121,7 @@
   background-color: rgba(0, 0, 0, 0.15);
   border-radius: 0 0 0.3em 0.3em;
   -moz-border-radius: 0 0 0.3em 0.3em;
-  -webkit-border-radius: 0 0 0.3em 0.3em;  
+  -webkit-border-radius: 0 0 0.3em 0.3em;
 }
 #database #canvas .wrapper .event {
   width: 100%;
@@ -146,7 +146,7 @@
   background-color: rgba(0, 0, 0, 0.20);
   border-radius: 0.3em 0.3em 0 0;
   -moz-border-radius: 0.3em 0.3em 0 0;
-  -webkit-border-radius: 0.3em 0.3em 0 0;  
+  -webkit-border-radius: 0.3em 0.3em 0 0;
 }
 #database #canvas .wrapper_subheader {
   margin: 0 2px;
@@ -158,7 +158,7 @@
   text-transform: uppercase;
   color: #BBBBBB;
   border-color: rgba(0, 0, 0, 0.40);
-  background-color: rgba(0, 0, 0, 0.20);  
+  background-color: rgba(0, 0, 0, 0.20);
 }
 #database #canvas .sprite_robot {
   position: static;
@@ -193,14 +193,17 @@
 #database #canvas .wrapper_robots_masters .sprite_robot {
   position: relative;
 }
-#database #canvas .wrapper_robots_mechas {
+#database #canvas .wrapper_robots_mechas,
+#database #canvas .wrapper_robots_bosses {
   min-height: 21px;
 }
-#database #canvas .wrapper_robots_mechas .sprite_robot {
+#database #canvas .wrapper_robots_mechas .sprite_robot,
+#database #canvas .wrapper_robots_bosses .sprite_robot {
   position: relative;
 }
 #database #canvas .wrapper_robots_masters .sprite_robot .complete,
-#database #canvas .wrapper_robots_mechas .sprite_robot .complete {
+#database #canvas .wrapper_robots_mechas .sprite_robot .complete,
+#database #canvas .wrapper_robots_bosses .sprite_robot .complete {
   position: absolute;
   right: -4px;
   top: -4px;
@@ -220,7 +223,8 @@
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
 }
-#database #canvas .wrapper_robots_mechas .sprite_robot .complete {
+#database #canvas .wrapper_robots_mechas .sprite_robot .complete,
+#database #canvas .wrapper_robots_bosses .sprite_robot .complete {
   top: auto;
   right: -4px;
   bottom: -4px;
@@ -232,6 +236,12 @@
   width: 17px;
   margin: 0 4px 4px 0;
   background-size: 27px 27px;
+}
+#database #canvas .wrapper_robots_bosses .sprite_robot {
+  height: 17px;
+  width: 17px;
+  margin: 0 4px 4px 0;
+  background-size: 54px 54px;
 }
 
 #database #canvas .options {
@@ -284,7 +294,7 @@
   float: none;
   margin: 0 0 4px;
   width: auto !important;
-  min-height: 256px;  
+  min-height: 256px;
 }
 #database #console .event {
   margin: 0;
@@ -293,7 +303,7 @@
   display: none;
 }
 #database #console .event_visible {
-  
+
 }
 #database #console .event table td.right {
   line-height: 21px;
@@ -302,12 +312,12 @@
 #database #console .event .field_container,
 #database #console .event .ability_container,
 #database #console .event .record_container {
-  display: block; 
-  float: right; 
+  display: block;
+  float: right;
   padding-top: 2px;
-  width: 100%; 
-  text-align: left; 
-  overflow: hidden; 
+  width: 100%;
+  text-align: left;
+  overflow: hidden;
   height: auto;
   min-height: 24px;
   white-space: normal;
@@ -316,23 +326,23 @@
 #database #console .event .field_name,
 #database #console .event .ability_name,
 #database #console .event .record_name {
-  display: inline-block; 
-  padding: 2px 10px; 
-  width: 28%; 
-  text-align: left; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
+  display: inline-block;
+  padding: 2px 10px;
+  width: 28%;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 #database #console .event .field_name {
- 
+
 }
 #database #console .event .record_name {
   font-weight: normal;
   font-size: 10px;
   line-height: 10px;
   border-color: #383636 !important;
-  background-color: rgb(44, 44, 44) !important; 
+  background-color: rgb(44, 44, 44) !important;
 }
 
 #database #console .header {
