@@ -147,6 +147,10 @@ else {
     $target_player_data = array();
 }
 
+// Collect the battle records if they exist in the session
+$this_battle_data['battle_complete'] = mmrpg_prototype_battle_complete($this_player_token, $this_battle_token);
+$this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_player_token, $this_battle_token);
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -201,6 +205,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 ?>
 
 });
+
 </script>
 </head>
 <body id="mmrpg" class="battle">
@@ -246,6 +251,9 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                 // If field data was provided, preload the background/foreground
                 if (!empty($this_field_data)){
 
+                    // Define an index to cache robot/mecha info
+                    $this_robot_index = array();
+
                     // Define the paths for the different attachment types
                     $class_paths = array('ability' => 'abilities', 'item' => 'items', 'battle' => 'battles', 'field' => 'fields', 'player' => 'players', 'robot' => 'robots', 'object' => 'objects');
 
@@ -275,10 +283,23 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             $this_offset_y = $this_info['offset_y'];
                             $this_offset_z = $this_key + 1;
                             $this_token = $this_info[$this_class.'_token'];
+                            $this_image = !empty($this_info[$this_class.'_image']) ? $this_info[$this_class.'_image'] : $this_token;
                             $this_frames = $this_info[$this_class.'_frame'];
                             if ($this_class == 'robot' && !empty($this_field_data['field_mechas']) && preg_match('/^mecha/i', $this_id)){
                                 $this_token = $this_field_data['field_mechas'][array_rand($this_field_data['field_mechas'])];
-                                //$this_token = 'met';
+                                if (!isset($this_robot_index[$this_token])){ $this_robot_index[$this_token] = rpg_robot::get_index_info($this_token); }
+                                $this_index = $this_robot_index[$this_token];
+                                $this_image = $this_token;
+                                if (!empty($this_battle_data['battle_complete']['battle_count'])
+                                    && !empty($this_index['robot_image_alts'])){
+                                    $images = array($this_token);
+                                    foreach ($this_index['robot_image_alts'] AS $alt){
+                                        if (count($images) > $this_battle_data['battle_complete']['battle_count']){ break; }
+                                        $images[] = $this_token.'_'.$alt['token'];
+                                    }
+                                    shuffle($images);
+                                    $this_image = array_shift($images);
+                                }
                                 $this_frames = array();
                                 $temp_frames = mt_rand(1, 20);
                                 $temp_options = array(0, 1, 2, 8);
@@ -292,7 +313,18 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             $this_animate_shift = implode('|', $this_frames_shift);
                             $this_direction = $this_info[$this_class.'_direction'];
                             $this_float = $this_direction == 'left' ? 'right' : 'left';
-                            echo '<div data-id="background_attachment_'.$this_key.'" class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" data-type="attachment" data-position="background" data-size="'.$this_size.'" data-direction="'.$this_direction.'" data-frame="'.$this_frame.'" data-animate="'.$this_animate.'" '.(!empty($this_animate_shift) ? 'data-animate-shift="'.$this_animate_shift.'"' : '').' style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_token.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '').'">&nbsp;</div>';
+                            echo '<div '.
+                                'data-id="background_attachment_'.$this_key.'" '.
+                                'class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" '.
+                                'data-type="attachment" '.
+                                'data-position="background" '.
+                                'data-size="'.$this_size.'" '.
+                                'data-direction="'.$this_direction.'" '.
+                                'data-frame="'.$this_frame.'" '.
+                                'data-animate="'.$this_animate.'" '.
+                                (!empty($this_animate_shift) ? 'data-animate-shift="'.$this_animate_shift.'" ' : '').
+                                'style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_image.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '').'" '.
+                                '>&nbsp;</div>';
                         }
                         echo '</div>';
                     }
@@ -373,7 +405,19 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             // We want mechas, but not actual robots replaced
                             if ($this_class == 'robot' && !empty($this_field_data['field_mechas']) && preg_match('/^mecha/i', $this_id)){
                                 $this_token = $this_field_data['field_mechas'][array_rand($this_field_data['field_mechas'])];
+                                if (!isset($this_robot_index[$this_token])){ $this_robot_index[$this_token] = rpg_robot::get_index_info($this_token); }
+                                $this_index = $this_robot_index[$this_token];
                                 $this_image = $this_token;
+                                if (!empty($this_battle_data['battle_complete']['battle_count'])
+                                    && !empty($this_index['robot_image_alts'])){
+                                    $images = array($this_token);
+                                    foreach ($this_index['robot_image_alts'] AS $alt){
+                                        if (count($images) > $this_battle_data['battle_complete']['battle_count']){ break; }
+                                        $images[] = $this_token.'_'.$alt['token'];
+                                    }
+                                    shuffle($images);
+                                    $this_image = array_shift($images);
+                                }
                                 $this_frames = array();
                                 $temp_frames = mt_rand(1, 20);
                                 $temp_options = array(0, 1, 2, 8);
