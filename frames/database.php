@@ -120,10 +120,9 @@ function mmrpg_index_sort_robots_visible($robot_one, $robot_two){
   global $visible_database_robots;
   if (in_array($robot_one['robot_token'], $visible_database_robots) && !in_array($robot_two['robot_token'], $visible_database_robots)){ return -1; }
   elseif (!in_array($robot_one['robot_token'], $visible_database_robots) && in_array($robot_two['robot_token'], $visible_database_robots)){ return 1; }
-  else { return mmrpg_index_sort_robots($robot_one, $robot_two); }
+  else { return 0; }
 }
 uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots_visible');
-//uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
 
 
 // Count the robots groups for each page
