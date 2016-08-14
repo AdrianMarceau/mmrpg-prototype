@@ -745,7 +745,7 @@ function windowResizeFrame(){
         <form class="menu" action="frames/file.php?action=<?= $this_action ?>" method="post" autocomplete="on">
 
             <? if(!empty($html_header_text)): ?>
-                <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <span class="count">
                         <?= $html_header_title ?>
                     </span>
