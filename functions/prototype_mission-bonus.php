@@ -75,10 +75,17 @@ $temp_battle_omega['battle_points'] = 0;
 foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $info){
     $info['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
     $index = rpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
-    if ($this_robot_class == 'master'){
-        $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
-    } elseif ($this_robot_class == 'mecha'){
-        $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 4);
+    // Generate a number of abilities based on robot class
+    if ($this_robot_class == 'boss'){ $extra_count = 8; }
+    elseif ($this_robot_class == 'master'){ $extra_count = 6; }
+    elseif ($this_robot_class == 'mecha'){ $extra_count = 4; }
+    $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], $extra_count);
+    // Use a random alt image for this robot if available
+    if (!empty($index['robot_image_alts'])){
+        $images = array($info['robot_token']);
+        foreach ($index['robot_image_alts'] AS $alt){ $images[] = $info['robot_token'].'_'.$alt['token']; }
+        shuffle($images);
+        $info['robot_image'] = array_shift($images);
     }
     $temp_battle_omega['battle_points'] += $info['robot_level'] * ($this_robot_class == 'master' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2);
     $temp_battle_omega['battle_target_player']['player_robots'][$key] = $info;
