@@ -301,10 +301,14 @@ if (true){
     // Start generating the edit markup
     ?>
 
-    <span class="header block_1">Item Inventory (
-        <span id="item_counter"><?= number_format(count($global_battle_items), 0, '.', ',') ?> /
-        <?= number_format(count($mmrpg_database_items), 0, '.', ',') ?></span> Items
-        )</span>
+    <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+        <span class="count">
+            Item Inventory (<span id="item_counter">
+                <?= number_format(count($global_battle_items), 0, '.', ',') ?> /
+                <?= number_format(count($mmrpg_database_items), 0, '.', ',') ?>
+                </span> Items)
+        </span>
+    </span>
 
     <div style="float: left; width: 100%;">
     <table class="formatter" style="width: 100%; table-layout: fixed;">
@@ -351,7 +355,7 @@ if (true){
 <?endif;?>
 </head>
 <body id="mmrpg" class="iframe" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
-    <div id="prototype" class="hidden" style="opacity: 0; <?= !$global_allow_editing ? 'width: 100% !important; ' : '' ?>">
+    <div id="prototype" class="hidden" style="opacity: 0;">
         <div id="item" class="menu" style="position: relative;">
             <div id="item_overlay" style="border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background-color: rgba(0, 0, 0, 0.75); position: absolute; top: 50px; left: 6px; right: 4px; height: 340px; z-index: 9999; display: none;">&nbsp;</div>
             <?= $this_item_markup ?>

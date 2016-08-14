@@ -501,5 +501,12 @@
     #mmrpg #prototype {
         width: 1024px;
     }
+    #prototype {
+        width: auto;
+    }
+    #prototype .header,
+    #prototype .option {
+        width: 100%;
+    }
 
 }

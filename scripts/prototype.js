@@ -717,7 +717,6 @@ function prototype_menu_click_option(thisContext, thisOption){
             // Count the number of available missions right now
             var availableMissions = $('.option[data-token]', tempShowOptionWrapper);
             $('.header', tempMenu).find('.count').html('Mission Select ('+(availableMissions.length == 1 ? '1 Mission' : availableMissions.length+' Missions')+')');
-            $('.header', tempMenu).removeClass('header_dr-light header_dr-wily header_dr-cossack').addClass('header_'+battleOptions['this_player_token']);
 
             break;
             }
@@ -747,7 +746,6 @@ function prototype_menu_click_option(thisContext, thisOption){
 
             var tempMenuHeader = $('.header', tempMenu);
             tempMenuHeader.find('.count').html('Robot Select ('+(availableRobots.length == 1 ? '1 Robot' : availableRobots.length+' Robots')+')');
-            tempMenuHeader.removeClass('header_dr-light header_dr-wily header_dr-cossack').addClass('header_'+battleOptions['this_player_token']);
             if (!$('.reselect', tempMenuHeader).length){
                 var tempReselect = $('<span class="reselect">&#215;</span>');
                 tempReselect.click(function(){

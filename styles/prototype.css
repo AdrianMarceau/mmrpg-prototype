@@ -578,6 +578,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     left: 6px;
 }
 
+#prototype .header_types,
 #prototype .header_dr-light,
 #prototype .header_dr-wily,
 #prototype .header_dr-cossack {
@@ -593,6 +594,11 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .header_dr-cossack {
     background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
 }
+#prototype .header_types {
+    background-image: url(../images/menus/menu-options_header-gradient.png?4);
+    border-color: #1A1A1A !important;
+}
+#prototype .header_types .count,
 #prototype .header_dr-light .count,
 #prototype .header_dr-wily .count,
 #prototype .header_dr-cossack .count {
