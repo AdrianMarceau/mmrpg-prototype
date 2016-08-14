@@ -199,17 +199,36 @@ class rpg_robot extends rpg_object {
         if ($this->robot_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_speed = MMRPG_SETTINGS_STATS_MAX; }
         if ($this->robot_base_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_speed = MMRPG_SETTINGS_STATS_MAX; }
 
-        // If this is a player-controlled robot, load abilities from session
-        if ($this->player->player_side == 'left' && empty($this->flags['apply_session_abilities'])){
+        // If this is a player-controlled robot, load settings from session
+        if ($this->player->player_side == 'left' && empty($this->flags['apply_session_settings'])){
+
             // Collect the abilities for this robot from the session
             $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
+
+            // If this is a player-controlled robot, load abilities from session
             if (!empty($temp_robot_settings['robot_abilities'])){
                 $temp_robot_abilities = $temp_robot_settings['robot_abilities'];
                 $this->robot_abilities = array();
                 foreach ($temp_robot_abilities AS $token => $info){ $this->robot_abilities[] = $token; }
             }
-            // Set the session ability flag to true
-            $this->flags['apply_session_abilities'] = true;
+
+            // If there is an alternate image set, apply it
+            if (!empty($temp_robot_settings['robot_image'])){
+                $this->robot_image = $temp_robot_settings['robot_image'];
+                $this->robot_base_image = $this->robot_image;
+            }
+
+            /*
+            // If there is a held item set, apply it
+            if (!empty($temp_robot_settings['robot_item'])){
+                $this->robot_item = $temp_robot_settings['robot_item'];
+                $this->robot_base_item = $this->robot_item;
+            }
+            */
+
+            // Set the session settings flag to true
+            $this->flags['apply_session_settings'] = true;
+
         }
 
         // Remove any abilities that do not exist in the index
@@ -227,19 +246,17 @@ class rpg_robot extends rpg_object {
             $this->robot_energy = 0;
         }
 
-
+        // Trigger the onload function if it exists
+        $temp_function = $this->robot_function_onload;
+        $temp_result = $temp_function(array(
+            'this_field' => isset($this->battle->battle_field) ? $this->battle->battle_field : false,
+            'this_battle' => $this->battle,
+            'this_player' => $this->player,
+            'this_robot' => $this
+            ));
 
         // Update the session variable
         $this->update_session();
-
-        // DEBUG
-        /*
-        if ($this_robotinfo['robot_token'] == 'mega-man'){
-            die("\nrpg_robot()::".__LINE__.
-                "\n".':: <pre>$this_robotinfo_backup:'.print_r($this_robotinfo_backup, true).'</pre>'.
-                "\n".':: <pre>$this_robotinfo:'.print_r($this_robotinfo, true).'</pre>');
-        }
-        */
 
         // Return true on success
         return true;
