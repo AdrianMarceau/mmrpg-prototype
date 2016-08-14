@@ -553,6 +553,11 @@ class rpg_robot extends rpg_object {
             //$debug_fragment .= 'has-playeronly '; // DEBUG
             $temp_compatible = true;
         }
+        // Otherwise, see if this is a globally compatible ability
+        if (!$temp_compatible && preg_match('/^(energy|attack|defense|speed)-(boost|break)$/i', $ability_info['ability_token'])){
+            //$debug_fragment .= 'has-global '; // DEBUG
+            $temp_compatible = true;
+        }
         //$robot_info['robot_abilities']
         // DEBUG
         //die('Found '.$debug_fragment.' - robot '.($temp_compatible ? 'is' : 'is not').' compatible!');
