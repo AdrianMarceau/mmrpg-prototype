@@ -34,9 +34,10 @@ ob_start();
         }
     } elseif ($this_robot->robot_class == 'mecha'){
         // Collect the temp ability index
-        $temp_index_info = rpg_robot::get_index_info($this_robot->robot_token);
         $current_robot_abilities = array();
-        foreach ($temp_index_info['robot_abilities'] AS $token){ $current_robot_abilities[$token] = array('ability_token' => $token); }
+        foreach ($this_robot->robot_abilities AS $token){
+            $current_robot_abilities[$token] = array('ability_token' => $token);
+        }
     }
 
     // Ensure this robot has abilities to display
@@ -177,7 +178,7 @@ ob_start();
                 // Define the ability sprite variables
                 $temp_ability_sprite = array();
                 $temp_ability_sprite['name'] = $temp_ability->ability_name;
-                if ($this_robot->robot_class == 'master'){
+                if ($temp_ability->ability_class == 'master'){
 
                     $temp_ability_sprite['image'] = $temp_ability->ability_image;
                     $temp_ability_sprite['image_size'] = $temp_ability->ability_image_size;
@@ -190,7 +191,7 @@ ob_start();
                     $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_ability" style="'.$temp_ability_sprite['style'].'">'.$temp_ability_sprite['name'].'</span>';
                     $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_weapons" style="top: 35px; left: 5px; '.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
 
-                } elseif ($this_robot->robot_class == 'mecha'){
+                } elseif ($temp_ability->ability_class == 'mecha'){
 
                     $temp_ability_sprite['image'] = $this_robot->robot_image;
                     $temp_ability_sprite['image_size'] = $this_robot->robot_image_size;
@@ -233,7 +234,7 @@ ob_start();
     ?></div><?
 
     // Display the back button by default
-    ?><div data-debug="<?= $temp_robot_weapons ?>" class="sub_actions"><a data-order="<?=$temp_order_counter?>" class="button action_back" type="button" data-panel="battle"><label>Back</label></a></div><?
+    ?><div class="sub_actions"><a data-order="<?=$temp_order_counter?>" class="button action_back" type="button" data-panel="battle"><label>Back</label></a></div><?
 
     // Increment the order counter
     $temp_order_counter++;
