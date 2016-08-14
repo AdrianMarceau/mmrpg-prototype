@@ -2500,6 +2500,7 @@ class rpg_robot extends rpg_object {
 
     // Define a static function for printing out the robot's editor markup
     public static function print_editor_markup($player_info, $robot_info, $mmrpg_database_abilities = array()){
+
         // Define the global variables
         global $mmrpg_index, $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
