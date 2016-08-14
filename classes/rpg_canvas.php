@@ -368,14 +368,6 @@ class rpg_canvas {
                 $this_data['weapons_title'] = $this_data['weapons_percent'].'% | '.$this_data['weapons_fraction'].' WE';
                 $this_data['robot_title'] .= ' | '.$this_data['weapons_fraction'].' WE';
 
-                if ($this_data['robot_class'] == 'mecha'){
-                    $temp_generation = '1st';
-                    if (preg_match('/-2$/', $this_data['robot_token'])){ $temp_generation = '2nd'; }
-                    elseif (preg_match('/-3$/', $this_data['robot_token'])){ $temp_generation = '3rd'; }
-                    $this_data['experience_title'] = $temp_generation.' Gen';
-                    $this_data['robot_title'] .= ' | '.$temp_generation.' Gen';
-                }
-
                 $this_data['robot_title'] .= ' <br />'.$this_robot->robot_attack.' / '.$this_robot->robot_base_attack.' AT';
                 $this_data['robot_title'] .= ' | '.$this_robot->robot_defense.' / '.$this_robot->robot_base_defense.' DF';
                 $this_data['robot_title'] .= ' | '.$this_robot->robot_speed.' / '.$this_robot->robot_base_speed.' SP';
@@ -399,10 +391,14 @@ class rpg_canvas {
                 $shadow_translate[0] = $shadow_translate[0] * ($this_data['robot_direction'] == 'right' ? -1 : 1);
                 $shadow_styles = 'z-index: '.$shadow_offset_z.'; transform: scale('.$shadow_scale[0].','.$shadow_scale[1].') skew('.$shadow_skew.'deg) translate('.$shadow_translate[0].'px,'.$shadow_translate[1].'px); -webkit-transform: scale('.$shadow_scale[0].','.$shadow_scale[1].') skew('.$shadow_skew.'deg) translate('.$shadow_translate[0].'px,'.$shadow_translate[1].'px); -moz-transform: scale('.$shadow_scale[0].','.$shadow_scale[1].') skew('.$shadow_skew.'deg) translate('.$shadow_translate[0].'px,'.$shadow_translate[1].'px); ';
                 $shadow_token = 'shadow-'.$this_robot->robot_class;
-                if ($this_robot->robot_class == 'mecha'){ $shadow_image_token = preg_replace('/(-2|-3)$/', '', $this_data['robot_image']); }
-                elseif (strstr($this_data['robot_image'], '_')){ list($shadow_image_token) = explode('_', $this_data['robot_image']); }
-                else { $shadow_image_token = $this_data['robot_image']; }
-                //$shadow_image_token = $this_robot->robot_class == 'mecha' ? preg_replace('/(-2|-3)$/', '', $this_data['robot_image']) : $this_data['robot_image'];
+
+                $shadow_image_token = $this_data['robot_image'];
+                if (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots_shadows/'.$shadow_image_token.'/')){
+                    if (strstr($shadow_image_token, '_')){ list($shadow_image_token) = explode('_', $shadow_image_token); }
+                    elseif (preg_match('/(-[0-9])$/', $shadow_image_token)){ $shadow_image_token = preg_replace('/(-[0-9])$/', '', $shadow_image_token); }
+                    else { $shadow_image_token = 'robot'; }
+                }
+
                 echo '<div data-shadowid="'.$this_data['robot_id'].
                     '" class="'.str_replace($this_data['robot_token'], $shadow_token, $this_data['robot_markup_class']).
                     '" style="'.str_replace('robots/'.$this_data['robot_image'], 'robots_shadows/'.$shadow_image_token, $this_data['robot_markup_style']).$shadow_styles.
