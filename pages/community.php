@@ -27,9 +27,9 @@ $this_markup_header = 'Mega Man RPG Prototype Community';
 
 // Collect this player's battle point total
 if (empty($_SESSION[mmrpg_game_token()]['DEMO'])){
-  $community_battle_points = mmrpg_prototype_battle_points();
+    $community_battle_points = mmrpg_prototype_battle_points();
 } else {
-  $community_battle_points = 0;
+    $community_battle_points = 0;
 }
 
 // Collect all the categories from the index
@@ -57,8 +57,8 @@ if ($this_current_id !== false && !empty($this_current_token)){ $this_current_vi
 // If a specific category has been requested, collect its info
 $this_category_info = array();
 if (!empty($this_current_cat) && !empty($this_categories_index[$this_current_cat])){
-  // Collect this specific category from the database index
-  $this_category_info = $this_categories_index[$this_current_cat];
+    // Collect this specific category from the database index
+    $this_category_info = $this_categories_index[$this_current_cat];
 }
 
 // If a specific thread has been requested, collect its info
@@ -66,56 +66,56 @@ $this_thread_info = array();
 // If this is a new thread, collect default info
 if (empty($this_current_id) && $this_current_token == 'new'){
 
-  // Collect this specific thread from the database
-  $this_thread_query = "SELECT threads.*
-  	FROM mmrpg_threads AS threads
-  	LIMIT 1";
-    //WHERE threads.thread_id = '0'";
-  $this_thread_info = $db->get_array($this_thread_query);
-  foreach ($this_thread_info AS $key => $info){ $this_thread_info[$key] = is_numeric($info) ? 0 : ''; }
-  $this_thread_info['user_id'] = $this_userinfo['user_id'];
-  $this_thread_info['user_name'] = $this_userinfo['user_name'];
-  $this_thread_info['user_name_public'] = $this_userinfo['user_name_public'];
-  //die('<pre>'.print_r($this_thread_info, true).'</pre>');
+    // Collect this specific thread from the database
+    $this_thread_query = "SELECT threads.*
+        FROM mmrpg_threads AS threads
+        LIMIT 1";
+        //WHERE threads.thread_id = '0'";
+    $this_thread_info = $db->get_array($this_thread_query);
+    foreach ($this_thread_info AS $key => $info){ $this_thread_info[$key] = is_numeric($info) ? 0 : ''; }
+    $this_thread_info['user_id'] = $this_userinfo['user_id'];
+    $this_thread_info['user_name'] = $this_userinfo['user_name'];
+    $this_thread_info['user_name_public'] = $this_userinfo['user_name_public'];
+    //die('<pre>'.print_r($this_thread_info, true).'</pre>');
 
 }
 elseif (!empty($this_current_id) && !empty($this_current_token)){
 
-  // Collect this specific thread from the database
-  $this_thread_query = "SELECT threads.*,
-    users.user_id,
-    users.role_id,
-    roles.role_token,
-    roles.role_name,
-    roles.role_icon,
-    users.user_name,
-    users.user_name_clean,
-    users.user_name_public,
-    users.user_gender,
-    users.user_image_path,
-    users.user_background_path,
-    users.user_colour_token,
-    users.user_email_address,
-    users.user_website_address,
-    users.user_date_created,
-    users.user_date_accessed,
-    users.user_date_modified,
-    users.user_last_login
-  	FROM mmrpg_threads AS threads
-  	LEFT JOIN mmrpg_users AS users ON threads.user_id = users.user_id
-  	LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
-  	WHERE threads.thread_id = '{$this_current_id}' AND threads.thread_token = '{$this_current_token}'";
-  $this_thread_info = $db->get_array($this_thread_query);
+    // Collect this specific thread from the database
+    $this_thread_query = "SELECT threads.*,
+        users.user_id,
+        users.role_id,
+        roles.role_token,
+        roles.role_name,
+        roles.role_icon,
+        users.user_name,
+        users.user_name_clean,
+        users.user_name_public,
+        users.user_gender,
+        users.user_image_path,
+        users.user_background_path,
+        users.user_colour_token,
+        users.user_email_address,
+        users.user_website_address,
+        users.user_date_created,
+        users.user_date_accessed,
+        users.user_date_modified,
+        users.user_last_login
+        FROM mmrpg_threads AS threads
+        LEFT JOIN mmrpg_users AS users ON threads.user_id = users.user_id
+        LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+        WHERE threads.thread_id = '{$this_current_id}' AND threads.thread_token = '{$this_current_token}'";
+    $this_thread_info = $db->get_array($this_thread_query);
 
-  // If this thread has not already been viewed this session, increment the counter
-  $temp_session_key = 'mmrpg_thread_viewed_'.$this_thread_info['thread_id'];
-  if (empty($_SESSION[$temp_session_key])){
-    $temp_current_views = $this_thread_info['thread_views'];
-    $temp_new_views = $temp_current_views + 1;
-    $temp_update_session = $db->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
-    if (!empty($temp_update_session)){ $this_thread_info['thread_views'] = $temp_new_views; }
-    $_SESSION[$temp_session_key] = true;
-  }
+    // If this thread has not already been viewed this session, increment the counter
+    $temp_session_key = 'mmrpg_thread_viewed_'.$this_thread_info['thread_id'];
+    if (empty($_SESSION[$temp_session_key])){
+        $temp_current_views = $this_thread_info['thread_views'];
+        $temp_new_views = $temp_current_views + 1;
+        $temp_update_session = $db->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
+        if (!empty($temp_update_session)){ $this_thread_info['thread_views'] = $temp_new_views; }
+        $_SESSION[$temp_session_key] = true;
+    }
 
 }
 
@@ -132,59 +132,59 @@ echo '<div class="community">';
 // If the current view is a specific thread
 if ($this_current_view == 'thread'){
 
-  // Check if we're creating a new thread or not
-  if (
-  (empty($this_current_id) && $this_current_token == 'new') ||
-  (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'edit' && !empty($_REQUEST['thread_id']))
-  ){
-    // Require the community thread view
-    require_once('page.community_thread_new.php');
-  } else {
-    // Require the community thread view
-    require_once('page.community_thread.php');
-  }
+    // Check if we're creating a new thread or not
+    if (
+    (empty($this_current_id) && $this_current_token == 'new') ||
+    (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'edit' && !empty($_REQUEST['thread_id']))
+    ){
+        // Require the community thread view
+        require_once('community_thread_new.php');
+    } else {
+        // Require the community thread view
+        require_once('community_thread.php');
+    }
 
 }
 // Else if the current view is the category listing
 elseif ($this_current_view == 'category' && empty($this_current_sub)){
 
-  // Prevent logged-out users from viewing personal messages
-  //if ($this_userid == MMRPG_SETTINGS_GUEST_ID && ($this_current_cat == 'personal' || $this_current_cat == 'chat')){
-  if ($this_userid == MMRPG_SETTINGS_GUEST_ID && ($this_current_cat == 'personal')){
-    header('Location: '.MMRPG_CONFIG_ROOTURL.'community/');
-    exit();
-  }
+    // Prevent logged-out users from viewing personal messages
+    //if ($this_userid == MMRPG_SETTINGS_GUEST_ID && ($this_current_cat == 'personal' || $this_current_cat == 'chat')){
+    if ($this_userid == MMRPG_SETTINGS_GUEST_ID && ($this_current_cat == 'personal')){
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'community/');
+        exit();
+    }
 
-  //die(print_r($this_category_info, true));
+    //die(print_r($this_category_info, true));
 
-  // If this if chat specifically, include separate file
-  if ($this_current_cat == 'chat'){
+    // If this if chat specifically, include separate file
+    if ($this_current_cat == 'chat'){
 
-    // Require the community chat view
-    require_once('page.community_chat.php');
+        // Require the community chat view
+        require_once('community_chat.php');
 
-  }
-  // Otherwise, include the normal community category file
-  else {
+    }
+    // Otherwise, include the normal community category file
+    else {
 
-    // Require the community category view
-    require_once('page.community_category.php');
+        // Require the community category view
+        require_once('community_category.php');
 
-  }
+    }
 
 }
 // Else if the current view is the category listing
 elseif ($this_current_view == 'category' && $this_current_sub == 'new'){
 
-  // Require the community category recent view
-  require_once('page.community_category_recent.php');
+    // Require the community category recent view
+    require_once('community_category_recent.php');
 
 }
 // Else if the current view is the community index
 elseif ($this_current_view == 'index'){
 
-  // Require the community thread view
-  require_once('page.community_index.php');
+    // Require the community thread view
+    require_once('community_index.php');
 
 }
 
@@ -216,7 +216,7 @@ ob_start();
 $(document).ready(function(){
 
 
-  });
+    });
 </script>
 <?
 // Collect the buffer and define the page markup

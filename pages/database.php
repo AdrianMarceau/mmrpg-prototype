@@ -164,56 +164,56 @@ ob_start();
     elseif ($this_current_sub == 'players'){
 
         // Require the database players page
-        require_once('page.database_players.php');
+        require_once('database_players.php');
 
     }
     // Otherwise, if we're viewing the ROBOT DATABASE
     elseif ($this_current_sub == 'robots'){
 
         // Require the database robots page
-        require_once('page.database_robots.php');
+        require_once('database_robots.php');
 
     }
     // Otherwise, if we're viewing the MECHA DATABASE
     elseif ($this_current_sub == 'mechas'){
 
         // Require the database mechas page
-        require_once('page.database_mechas.php');
+        require_once('database_mechas.php');
 
     }
     // Otherwise, if we're viewing the BOSS DATABASE
     elseif ($this_current_sub == 'bosses'){
 
         // Require the database bosses page
-        require_once('page.database_bosses.php');
+        require_once('database_bosses.php');
 
     }
     // Otherwise, if we're viewing the ABILITY DATABASE
     elseif ($this_current_sub == 'abilities'){
 
         // Require the database abilities page
-        require_once('page.database_abilities.php');
+        require_once('database_abilities.php');
 
     }
     // Otherwise, if we're viewing the FIELD DATABASE
     elseif ($this_current_sub == 'fields'){
 
         // Require the database fields page
-        require_once('page.database_fields.php');
+        require_once('database_fields.php');
 
     }
     // Otherwise, if we're viewing the ITEM DATABASE
     elseif ($this_current_sub == 'items'){
 
         // Require the database items page
-        require_once('page.database_items.php');
+        require_once('database_items.php');
 
     }
     // Otherwise, if we're viewing the TYPE DATABASE
     elseif ($this_current_sub == 'types'){
 
         // Require the database abilities page
-        require_once('page.database_types.php');
+        require_once('database_types.php');
 
     }
 
