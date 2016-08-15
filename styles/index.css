@@ -600,6 +600,9 @@ html {
     color: #FFFFFF;
     text-decoration: none;
 }
+#window .page .body .subheader .link:hover .name {
+    text-decoration: underline;
+}
 #window .page .header .count,
 #window .page .body .subheader .count {
     padding-left: 5px;
