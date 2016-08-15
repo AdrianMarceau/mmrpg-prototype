@@ -182,7 +182,7 @@ if (true){
 
             // Increment the global robots counters
             $global_robots_counters['total']++;
-            if ($robot_info['robot_encountered']){ $global_robots_counters['encountered']['total']++; $global_robots_counters['encountered'][$robot_info['robot_class']]++; }
+            if ($robot_info['robot_unlocked'] || $robot_info['robot_encountered']){ $global_robots_counters['encountered']['total']++; $global_robots_counters['encountered'][$robot_info['robot_class']]++; }
             if ($robot_info['robot_scanned']){ $global_robots_counters['scanned']['total']++; $global_robots_counters['scanned'][$robot_info['robot_class']]++; }
             if ($robot_info['robot_unlocked']){ $global_robots_counters['unlocked']['total']++; $global_robots_counters['unlocked'][$robot_info['robot_class']]++; }
             elseif ($robot_info['robot_summoned']){ $global_robots_counters['summoned']['total']++; $global_robots_counters['summoned'][$robot_info['robot_class']]++; }
