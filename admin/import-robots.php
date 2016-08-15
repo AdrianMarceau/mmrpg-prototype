@@ -423,6 +423,7 @@ if (!empty($mmrpg_index['mechas'])){
         $temp_insert_array['robot_number'] = !empty($mecha_data['robot_number']) ? $mecha_data['robot_number'] : '';
         $temp_insert_array['robot_name'] = !empty($mecha_data['robot_name']) ? $mecha_data['robot_name'] : '';
         $temp_insert_array['robot_game'] = !empty($mecha_data['robot_game']) ? $mecha_data['robot_game'] : '';
+        $temp_insert_array['robot_group'] = !empty($mecha_data['robot_group']) ? $mecha_data['robot_group'] : '';
         $temp_insert_array['robot_field'] = !empty($mecha_data['robot_field']) ? $mecha_data['robot_field'] : 'field';
         $temp_insert_array['robot_field2'] = !empty($mecha_data['robot_field2']) ? json_encode($mecha_data['robot_field2']) : '';
         $temp_insert_array['robot_class'] = !empty($mecha_data['robot_class']) ? $mecha_data['robot_class'] : 'master';
@@ -654,6 +655,7 @@ if (!empty($mmrpg_index['bosses'])){
         $temp_insert_array['robot_number'] = !empty($boss_data['robot_number']) ? $boss_data['robot_number'] : '';
         $temp_insert_array['robot_name'] = !empty($boss_data['robot_name']) ? $boss_data['robot_name'] : '';
         $temp_insert_array['robot_game'] = !empty($boss_data['robot_game']) ? $boss_data['robot_game'] : '';
+        $temp_insert_array['robot_group'] = !empty($boss_data['robot_group']) ? $boss_data['robot_group'] : '';
         $temp_insert_array['robot_field'] = !empty($boss_data['robot_field']) ? $boss_data['robot_field'] : 'field';
         $temp_insert_array['robot_field2'] = !empty($boss_data['robot_field2']) ? json_encode($boss_data['robot_field2']) : '';
         $temp_insert_array['robot_class'] = !empty($boss_data['robot_class']) ? $boss_data['robot_class'] : 'master';
