@@ -176,6 +176,7 @@ while ($this_action == 'save'){
                 elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
                 elseif (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
                 if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
+
                 // If the game has changed print the new optgroup
                 if ($info['robot_game'] != $temp_optgroup_token){
                     $temp_optgroup_token = $info['robot_game'];
@@ -185,15 +186,33 @@ while ($this_action == 'save'){
                     $html_avatar_options[] = '</optgroup>';
                     $html_avatar_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
                 }
+
                 $size = isset($info['robot_image_size']) ? $info['robot_image_size'] : 40;
                 $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
+
+                // Collect the summon count for this robot
+                $temp_summon_count = mmrpg_prototype_database_summoned($token);
+
+                // If this is a copy core, add it's type alts
                 if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
                     foreach ($mmrpg_index['types'] AS $type_token => $type_info){
                         if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
-                        if (!isset($_SESSION['GAME']['values']['battle_items'][$type_token.'-core']) && $this_userinfo['role_id'] != 1){ continue; }
+                        if (!isset($_SESSION['GAME']['values']['battle_items']['item-core-'.$type_token]) && $this_userinfo['role_id'] != 1){ continue; }
                         $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)'.'</option>';
                     }
                 }
+                // Otherwise, if this ROBOT MASTER alt skin has been inlocked
+                elseif (!empty($info['robot_image_alts'])){
+                    // Loop through each of the available alts and print if unlocked
+                    $info['robot_image_alts'] = json_decode($info['robot_image_alts'], true);
+                    foreach ($info['robot_image_alts'] AS $key => $this_altinfo){
+                        // Only print if unlocked or admin
+                        if ($temp_summon_count >= $this_altinfo['summons']){
+                            $html_avatar_options[] = '<option value="robots/'.$token.'_'.$this_altinfo['token'].'/'.$size.'">'.$info['robot_number'].' : '.$this_altinfo['name'].'</option>';
+                        }
+                    }
+                }
+
             }
             // Add player avatars if this is the developer
             if ($this_userinfo['role_id'] == 1 || $this_userinfo['role_id'] == 6){
