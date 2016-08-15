@@ -193,12 +193,10 @@
 #database #canvas .wrapper_robots_masters .sprite_robot {
   position: relative;
 }
-#database #canvas .wrapper_robots_mechas,
-#database #canvas .wrapper_robots_bosses {
+#database #canvas .wrapper_robots_smaller {
   min-height: 21px;
 }
-#database #canvas .wrapper_robots_mechas .sprite_robot,
-#database #canvas .wrapper_robots_bosses .sprite_robot {
+#database #canvas .wrapper_robots_smaller .sprite_robot {
   position: relative;
 }
 #database #canvas .wrapper_robots_masters .sprite_robot .complete,
@@ -223,25 +221,34 @@
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
 }
-#database #canvas .wrapper_robots_mechas .sprite_robot .complete,
-#database #canvas .wrapper_robots_bosses .sprite_robot .complete {
+#database #canvas .wrapper_robots_smaller .sprite_robot .complete {
   top: auto;
   right: -4px;
   bottom: -4px;
   width: 4px;
   height: 4px;
 }
-#database #canvas .wrapper_robots_mechas .sprite_robot {
+#database #canvas .wrapper_robots .sprite_robot[data-size="40"] {
+  background-size: 40px 40px;
+  background-position: -6px -6px;
+}
+#database #canvas .wrapper_robots .sprite_robot[data-size="80"] {
+  background-size: 80px 80px;
+  background-position: -26px -26px;
+}
+#database #canvas .wrapper_robots_smaller .sprite_robot[data-size="40"] {
   height: 17px;
   width: 17px;
   margin: 0 4px 4px 0;
   background-size: 27px 27px;
+  background-position: -5px -5px;
 }
-#database #canvas .wrapper_robots_bosses .sprite_robot {
+#database #canvas .wrapper_robots_smaller .sprite_robot[data-size="80"] {
   height: 17px;
   width: 17px;
   margin: 0 4px 4px 0;
   background-size: 54px 54px;
+  background-position: -18px -18px;
 }
 
 #database #canvas .options {
