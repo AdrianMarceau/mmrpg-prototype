@@ -1099,7 +1099,8 @@ html {
     height: 32px;
     margin: 0 !important;
     background-position: -4px -4px;
-    background-color: #000000;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.6);
     border: 1px solid #1A1A1A;
     border-radius: 0.5em;
     -moz-border-radius: 0.5em;
