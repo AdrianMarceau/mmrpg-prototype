@@ -1416,6 +1416,37 @@ function mmrpg_prototype_get_player_boss_music($player_token, $session_token = '
 
 }
 
+// Define a function for checking the battle's prototype points total
+function mmrpg_prototype_database_summoned($robot_token = ''){
+    // Define static variables amd populate if necessary
+    static $this_count_array;
+    // Return the current point total for thisgame
+    $session_token = mmrpg_game_token();
+    // Check if the array is empty and populate if not
+    if (empty($this_count_array)){
+        // Define the array to hold all the summon counts
+        $this_count_array = array();
+        // If the robot database array is not empty, loop through it
+        if (!empty($_SESSION[$session_token]['values']['robot_database'])){
+            foreach ($_SESSION[$session_token]['values']['robot_database'] AS $token => $info){
+                if (!empty($info['robot_summoned'])){ $this_count_array[$token] = $info['robot_summoned']; }
+            }
+        }
+    }
+    // If the robot token was not empty
+    if (!empty($robot_token)){
+        // If the array exists, return the count
+        if (!empty($this_count_array[$robot_token])){ return $this_count_array[$robot_token]; }
+        // Otherwise, return zero
+        else { return 0; }
+    }
+    // Otherwise, return the full array
+    else {
+        // Return the count array
+        return $this_count_array;
+    }
+}
+
 // Define a function for collecting robot sprite markup
 function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token = 'GAME'){
     global $mmrpg_index, $db;
