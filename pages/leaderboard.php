@@ -6,7 +6,7 @@
 // If the current sub was not provided OR if a specific page was requested
 if (empty($this_current_sub) || preg_match('/^([0-9]+)$/i', $this_current_sub)){
   // Require the index page
-  require_once('page.leaderboard_index.php');
+  require_once('leaderboard_index.php');
 }
 // If a player has been provided in the URL as a sub
 elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_current_sub)){
@@ -101,7 +101,7 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     $this_playerinfo['save_flags'] = !empty($this_playerinfo['save_flags']) ? json_decode($this_playerinfo['save_flags'], true) : array();
     $this_playerinfo['save_settings'] = !empty($this_playerinfo['save_settings']) ? json_decode($this_playerinfo['save_settings'], true) : array();
     // Require the player page
-    require_once('page.leaderboard_player.php');
+    require_once('leaderboard_player.php');
   }
   // Otherwise, redirect back to the index page
   else {
