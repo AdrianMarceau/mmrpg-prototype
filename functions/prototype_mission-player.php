@@ -10,34 +10,17 @@ $this_player_token = $this_prototype_data['this_player_token'];
 $target_player_token = $this_prototype_data['target_player_token'];
 $target_player_token_backup = $target_player_token;
 
-// DEBUG
-//die('<pre>'.print_r($temp_player_array, true).'</pre>');
-
 // Pull and random player from the list and collect their full data
-$temp_player_array = $this_user_info; /* $temp_player_array = $db->get_array("SELECT users.*, saves.*, boards.* FROM mmrpg_users AS users
-    LEFT JOIN mmrpg_saves AS saves ON saves.user_id = users.user_id
-    LEFT JOIN mmrpg_leaderboard AS boards ON boards.user_id = users.user_id
-    WHERE users.user_id = {$this_user_id}
-    "); */
+$temp_player_array = $this_user_info;
 
 // Add this player data to the omage array
 $temp_battle_omega_player = $temp_player_array;
-
-// DEBUG
-//echo('<pre>'.print_r($temp_player_array, true).'</pre>');
 
 // Collect the player values and decode the rewards and settings arrays
 $temp_player_rewards = $temp_player_array['player_rewards'];
 $temp_player_settings = $temp_player_array['player_settings'];
 $temp_player_starforce = $temp_player_array['player_starforce'];
 $temp_player_favourites = $temp_player_array['player_favourites'];
-
-
-// DEBUG
-//echo('<pre>'.__FILE__.' on line '.__LINE__.' : $temp_player_rewards = '.preg_replace('/\s+/', ' ', print_r($temp_player_rewards, true)).'</pre>');
-
-
-//echo('<pre>'.__FILE__.' on line '.__LINE__.' : $temp_player_settings = '.preg_replace('/\s+/', ' ', print_r($temp_player_settings, true)).'</pre>');
 
 // Create the empty array for the target player's battle robots
 $temp_player_robots = array();
@@ -55,8 +38,7 @@ if (empty($temp_player_robots_rewards)){
         }
     }
 }
-//echo('<pre>'.__FILE__.' on line '.__LINE__.' : $temp_player_robots_rewards = '.preg_replace('/\s+/', ' ', print_r($temp_player_robots_rewards, true)).'</pre>');
-//echo('<pre>'.__FILE__.' on line '.__LINE__.' : $temp_player_robots_settings = '.preg_replace('/\s+/', ' ', print_r($temp_player_robots_settings, true)).'</pre>');
+
 // If the player fields setting is empty, define manually
 if (empty($temp_player_field_settings)){
     $temp_omega_fields = array();
@@ -68,7 +50,6 @@ if (empty($temp_player_field_settings)){
 
 // Ensure this player has been unlocked by the target before continuing
 if (!empty($temp_player_robots_rewards)){
-    //echo('<pre>'.__FILE__.' on line '.__LINE__.' : '.preg_replace('/\s+/', ' ', print_r($temp_player_rewards[$target_player_token], true)).'</pre>');
 
     // Collect the target player's robot rewards from the array
     $temp_player_robots = $temp_player_robots_rewards;
@@ -92,6 +73,7 @@ if (!empty($temp_player_robots_rewards)){
         $temp_robot_token = $temp_robotinfo['robot_token'];
         $temp_robot_level = !empty($temp_robotinfo['robot_level']) ? $temp_robotinfo['robot_level'] : 1;
         $temp_robot_favourite = in_array($temp_robot_token, $temp_player_favourites) ? 1 : 0;
+        $temp_robot_image = !empty($temp_settings_array['robot_image']) ? $temp_settings_array['robot_image'] : $temp_robotinfo['robot_token'];
         //$temp_robot_rewards = $temp_player_rewards[$target_player_token];
         $temp_robot_rewards = $temp_rewards_array;
         // Collect this robot's abilities, format them, and crop if necessary
@@ -99,7 +81,7 @@ if (!empty($temp_player_robots_rewards)){
         foreach ($temp_settings_array['robot_abilities'] AS $key2 => $temp_abilityinfo){ $temp_robot_abilities[] = $temp_abilityinfo['ability_token'] != 'copy-shot' ? $temp_abilityinfo['ability_token'] : 'buster-shot'; }
         $temp_robot_abilities = count($temp_robot_abilities) > 8 ? array_slice($temp_robot_abilities, 0, 8) : $temp_robot_abilities;
         // Create the new robot info array to be added to the omega battle options
-        $temp_new_array = array('values' => array('flag_favourite' => $temp_robot_favourite,'robot_rewards' => $temp_robot_rewards), 'robot_id' => $temp_robot_id, 'robot_token' => $temp_robot_token, 'robot_level' => $temp_robot_level, 'robot_abilities' => $temp_robot_abilities);
+        $temp_new_array = array('values' => array('flag_favourite' => $temp_robot_favourite,'robot_rewards' => $temp_robot_rewards), 'robot_id' => $temp_robot_id, 'robot_token' => $temp_robot_token, 'robot_level' => $temp_robot_level, 'robot_image' => $temp_robot_image, 'robot_abilities' => $temp_robot_abilities);
         // Add this robot to the omega array and increment the counter
         $temp_battle_omega_robots[] = $temp_new_array;
         $temp_counter++;
@@ -119,10 +101,6 @@ if (!empty($temp_player_robots_rewards)){
         $temp_max_robots = $temp_omega_robots_count;
     }
     $temp_omega_robots_count = count($temp_battle_omega_robots);
-
-
-    // DEBUG
-    //die('<pre><strong>$temp_battle_omega_robots</strong><br />'.print_r($temp_battle_omega_robots, true).'</pre>');
 
     // Populate the battle options with the player battle option
     $temp_battle_userid = $temp_battle_omega_player['user_id'];
@@ -144,7 +122,6 @@ if (!empty($temp_player_robots_rewards)){
         reset($temp_player_starforce);
         $temp_most_powerful = key($temp_player_starforce);
         $temp_most_powerful_value = $temp_player_starforce[$temp_most_powerful];
-        //$temp_battle_omega['battle_description'] = 'Defeat '.ucfirst($temp_battle_username).'&#39;s starforce boosted player data in a '.$temp_challenge_type.' battle! The '.ucfirst($temp_most_powerful).' type appears to be '.$temp_battle_userpronoun.' most powerful element, with '.($temp_most_powerful_value * 10).'&nbsp;/&nbsp;'.($temp_star_boost * 10).'% of the total boost!';
         $temp_battle_omega['battle_description'] = 'Defeat '.ucfirst($temp_battle_username).'&#39;'.(!preg_match('/s$/i', $temp_battle_username) ? 's' : '').' starforce boosted player data in a '.$temp_challenge_type.' battle!';
         $temp_battle_omega['battle_description2'] = 'The '.ucfirst($temp_most_powerful).' type appears to be '.$temp_battle_userpronoun.' most powerful element, with '.($temp_most_powerful_value * 10).'&nbsp;/&nbsp;'.($temp_star_boost * 10).'% of the total boost!';
     } else {
@@ -164,15 +141,13 @@ if (!empty($temp_player_robots_rewards)){
         $temp_battle_omega['battle_points'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * $info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER) + $temp_stat_counter;
         $temp_battle_omega['battle_points'] += !empty($temp_star_boost) ? $temp_star_boost * $temp_stat_counter : 0;
     }
-    //if (!empty($temp_star_boost)){ $temp_battle_omega['battle_points'] += ceil($temp_star_boost * 1000);  }
+
     // Define the fusion field properties
-    //$temp_battle_omega['battle_field_base']['field_name'] = ucfirst($temp_battle_username); //'Player Battle : '.$temp_battle_username;
     $temp_battle_omega['battle_button'] = ucfirst($temp_battle_username);
     $temp_field_info_options = array_keys($temp_player_field_settings);
     $temp_rand_int = mt_rand(1, 4);
     $temp_rand_start = ($temp_rand_int - 1) * 2;
     $temp_field_info_options = array_slice($temp_field_info_options, $temp_rand_start, 2);
-    //shuffle($temp_field_info_options);
     $temp_field_token_one = $temp_field_info_options[0];
     $temp_field_token_two = $temp_field_info_options[1];
     $temp_field_info_one = rpg_field::parse_index_info($this_field_index[$temp_field_token_one]);
@@ -189,18 +164,15 @@ if (!empty($temp_player_robots_rewards)){
         }
     }
 
-    //$temp_battle_omega['battle_field_base']['field_music'] = $temp_field_token_three['field'];
     $temp_battle_omega['battle_field_base']['field_type'] = !empty($temp_field_info_one['field_type']) ? $temp_field_info_one['field_type'] : '';
     $temp_battle_omega['battle_field_base']['field_type2'] = !empty($temp_field_info_two['field_type']) ? $temp_field_info_two['field_type'] : '';
     $temp_battle_omega['battle_field_base']['field_music'] = $temp_field_token_two;
     $temp_battle_omega['battle_field_base']['field_background'] = $temp_field_token_one;
     $temp_battle_omega['battle_field_base']['field_foreground'] = $temp_field_token_two;
-    //$temp_battle_omega['battle_description'] .= ' // starforce:+'.($temp_star_boost * 10).'% // background:'.$temp_battle_omega['battle_field_base']['field_background'].' / foreground:'.$temp_battle_omega['battle_field_base']['field_foreground'];
     $temp_battle_omega['battle_field_base']['field_multipliers'] = $temp_option_multipliers;
     $temp_battle_omega['battle_field_base']['field_mechas'] = array();
     if (!empty($temp_field_info_one['field_mechas'])){ $temp_battle_omega['battle_field_base']['field_mechas'] = array_merge($temp_battle_omega['battle_field_base']['field_mechas'], $temp_field_info_one['field_mechas']); }
     if (!empty($temp_field_info_two['field_mechas'])){ $temp_battle_omega['battle_field_base']['field_mechas'] = array_merge($temp_battle_omega['battle_field_base']['field_mechas'], $temp_field_info_two['field_mechas']); }
-    //if (!empty($temp_option_field_list[2]['field_mechas'])){ $temp_battle_omega['battle_field_base']['field_mechas'] = array_merge($temp_battle_omega['battle_field_base']['field_mechas'], $temp_option_field_list[2]['field_mechas']); }
     if (empty($temp_battle_omega['battle_field_base']['field_mechas'])){ $temp_battle_omega['battle_field_base']['field_mechas'][] = 'met'; }
     $temp_battle_omega['battle_field_base']['field_background_frame'] = $temp_field_info_one['field_background_frame'];
     $temp_battle_omega['battle_field_base']['field_foreground_frame'] = $temp_field_info_two['field_foreground_frame'];
