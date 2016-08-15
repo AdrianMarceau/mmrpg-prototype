@@ -299,6 +299,7 @@ ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please,
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/players/" class="link <?= $this_current_sub == 'players' ? 'link_active field_type_empty' : '' ?>"><span>Players</span></a>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/robots/" class="link <?= $this_current_sub == 'robots' ? 'link_active field_type_empty' : '' ?>"><span>Robots</span></a>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/mechas/" class="link <?= $this_current_sub == 'mechas' ? 'link_active field_type_empty' : '' ?>"><span>Mechas</span></a>
+                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/bosses/" class="link <?= $this_current_sub == 'bosses' ? 'link_active field_type_empty' : '' ?>"><span>Bosses</span></a>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/abilities/" class="link <?= $this_current_sub == 'abilities' ? 'link_active field_type_empty' : '' ?>"><span>Abilities</span></a>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/items/" class="link <?= $this_current_sub == 'items' ? 'link_active field_type_empty' : '' ?>"><span>Items</span></a>
                         <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/fields/" class="link <?= $this_current_sub == 'fields' ? 'link_active field_type_empty' : '' ?>"><span>Fields</span></a>
