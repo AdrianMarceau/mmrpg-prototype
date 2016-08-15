@@ -203,10 +203,7 @@ if (true){
         <span class="count">
             Robot Database
             <span style="opacity: 0.25;">(
-                <? $temp_unlocked_summoned_total = $global_robots_counters['unlocked']['total'] + $global_robots_counters['summoned']['total']; ?>
-                <?= $temp_unlocked_summoned_total == 1 ? '<span title="1 Robot Summoned">1</span>' : '<span title="'.$temp_unlocked_summoned_total.' Robots Summoned">'.$temp_unlocked_summoned_total.'</span>' ?>
-                / <?= $global_robots_counters['scanned']['total'] == 1 ? '<span title="1 Robot Scanned">1</span>' : '<span title="'.$global_robots_counters['scanned']['total'].' Robots Scanned">'.$global_robots_counters['scanned']['total'].'</span>' ?>
-                / <?= $global_robots_counters['encountered']['total'] == 1 ? '<span title="1 Robot Encountered">1</span>' : '<span title="'.$global_robots_counters['encountered']['total'].' Robots Encountered">'.$global_robots_counters['encountered']['total'].'</span>' ?>
+                <?= $global_robots_counters['encountered']['total'] == 1 ? '<span title="1 Robot Encountered">1</span>' : '<span title="'.$global_robots_counters['encountered']['total'].' Robots Encountered">'.$global_robots_counters['encountered']['total'].'</span>' ?>
                 / <?= $global_robots_counters['total'] == 1 ? '<span title="1 Robot">1 Robot Total</span>' : '<span title="'.$global_robots_counters['total'].' Robots Total">'.$global_robots_counters['total'].' Robots</span>' ?>
             )</span>
         </span>
