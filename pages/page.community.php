@@ -38,7 +38,7 @@ $this_categories_index_tokens = array();
 foreach ($this_categories_index AS $token => $info){ $this_categories_index_tokens[$info['category_id']] = $token; }
 
 // Include the community form actions
-require_once('pages/page.community_actions.php');
+require_once('pages/community_actions.php');
 
 
 /*

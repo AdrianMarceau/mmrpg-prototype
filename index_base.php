@@ -91,7 +91,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 }
 
 // Include the required page logic files
-require_once('pages/page.'.$this_current_page.'.php');
+require_once('pages/'.$this_current_page.'.php');
 
 ?>
 <!DOCTYPE html>

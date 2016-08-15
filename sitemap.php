@@ -31,7 +31,7 @@ require_once('database/include.php');
 	</url>
 	<url>
 		<loc><?= $global_rooturl ?>about/</loc>
-		<lastmod><?= date('Y-m-d', filemtime('pages/page.about.php')) ?></lastmod>
+		<lastmod><?= date('Y-m-d', filemtime('pages/about.php')) ?></lastmod>
 		<changefreq>monthly</changefreq>
 		<priority>0.7</priority>
 	</url>
@@ -106,7 +106,7 @@ require_once('database/include.php');
   ?>
   <url>
     <loc><?= $global_rooturl ?>database/types/</loc>
-    <lastmod><?= date('Y-m-d', filemtime('pages/page.database_types.php')) ?></lastmod>
+    <lastmod><?= date('Y-m-d', filemtime('pages/database_types.php')) ?></lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
@@ -154,13 +154,13 @@ require_once('database/include.php');
 	</url>
   <url>
     <loc><?= $global_rooturl ?>credits/</loc>
-    <lastmod><?= date('Y-m-d', filemtime('pages/page.credits.php')) ?></lastmod>
+    <lastmod><?= date('Y-m-d', filemtime('pages/credits.php')) ?></lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
 	<url>
 		<loc><?= $global_rooturl ?>contact/</loc>
-		<lastmod><?= date('Y-m-d', filemtime('pages/page.contact.php')) ?></lastmod>
+		<lastmod><?= date('Y-m-d', filemtime('pages/contact.php')) ?></lastmod>
 		<changefreq>monthly</changefreq>
 		<priority>0.3</priority>
 	</url>
