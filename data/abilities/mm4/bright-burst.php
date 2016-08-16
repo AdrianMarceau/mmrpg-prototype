@@ -33,8 +33,8 @@ $ability = array(
 
     // Define the target and impact frames based on user
     $this_frames = array('target' => 0, 'impact' => 0);
-    //if (preg_match('/-2$/', $this_robot->robot_token)){ $this_frames = array('target' => 4, 'impact' => 5); }
-    //elseif (preg_match('/-3$/', $this_robot->robot_token)){ $this_frames = array('target' => 0, 'impact' => 1); }
+    //if (preg_match('/_alt$/', $this_robot->robot_image)){ $this_frames = array('target' => 4, 'impact' => 5); }
+    //elseif (preg_match('/_alt2$/', $this_robot->robot_image)){ $this_frames = array('target' => 0, 'impact' => 1); }
 
     // Change the image to the full-screen rain effect
     $this_ability->ability_image = $this_ability->ability_token.'-2';
