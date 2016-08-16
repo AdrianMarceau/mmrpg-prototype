@@ -5,11 +5,11 @@ $ability = array(
   'ability_token' => 'bullet-tackle',
   'ability_game' => 'MM02',
   'ability_class' => 'mecha',
-  'ability_description' => 'The user dashes across the field until it crashes into the target and explodes to inflict massive damage, destroying itself in the process.',
+  'ability_description' => 'The user dashes across the field until it crashes into the target and explodes to inflict massive damage, damaging itself in the process.',
   'ability_type' => 'explode',
   'ability_energy' => 0,
-  'ability_damage' => 30,
-  'ability_accuracy' => 92,
+  'ability_damage' => 20,
+  'ability_accuracy' => 96,
   'ability_function' => function($objects){
 
     // Extract all objects into the current scope
@@ -17,8 +17,8 @@ $ability = array(
 
     // Define the target and impact frames based on user
     $this_frames = array('target' => 0, 'impact' => 1);
-    if (preg_match('/-2$/', $this_robot->robot_token)){ $this_frames = array('target' => 2, 'impact' => 3); }
-    elseif (preg_match('/-3$/', $this_robot->robot_token)){ $this_frames = array('target' => 4, 'impact' => 5); }
+    if (preg_match('/_alt$/', $this_robot->robot_image)){ $this_frames = array('target' => 2, 'impact' => 3); }
+    elseif (preg_match('/_alt2$/', $this_robot->robot_image)){ $this_frames = array('target' => 4, 'impact' => 5); }
 
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
@@ -61,10 +61,8 @@ $ability = array(
         'success' => array(6, -9999, 5, -10, 'The '.$this_robot->print_robot_name().' was damaged by the blast!'),
         'failure' => array(6, -9999, 5, -10, $this_robot->print_robot_name().' was not affected by the blast&hellip;')
         ));
-      $energy_damage_amount = $this_robot->robot_energy;
-      $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, false);
-      $this_robot->robot_frame = 'defeat';
-      $this_robot->trigger_disabled($target_robot);
+      $energy_damage_amount = ceil($this_robot->robot_energy * (1 / 3));
+      $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount);
 
     }
 
