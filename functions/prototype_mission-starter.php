@@ -88,7 +88,7 @@ else {
 // Add some random item drops to the starter battle
 if ($temp_target_count > 1){
   $temp_battle_omega['battle_rewards']['items'] = array(
-    array('chance' => 1, 'token' => 'extra-life', 'min' => 1, 'max' => 1)
+    // Nothing if fought more than once FOR NOW
     );
 } else {
   $temp_battle_omega['battle_rewards']['items'] = array(

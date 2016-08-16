@@ -366,16 +366,9 @@ if (!empty($temp_battle_omega['values']['field_star'])){
     $temp_battle_omega['battle_description'] = 'Defeat the '.$temp_description_target_robots.'!';
 }
 
-//$temp_battle_omega['battle_description'] .= ' // '.preg_replace('/\s+/', ' ', print_r($temp_option_battle['battle_complete'], true));
-//$temp_battle_omega['battle_description'] .= ' // '.$debug_backup;
-
-// If this battle has been completed already, decrease the points
-//if ($temp_battle_omega['battle_complete']){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * 0.10); }
 // Add some random item drops to the starter battle
 $temp_battle_omega['battle_rewards']['items'] = array(
-    //array('chance' => 20, 'token' => 'energy-tank', 'min' => 1, 'max' => 2),
-    //array('chance' => 20, 'token' => 'weapon-tank', 'min' => 1, 'max' => 2),
-    array('chance' => 10, 'token' => 'extra-life', 'min' => 1, 'max' => 1)
+
     );
 
 ?>
