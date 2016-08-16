@@ -12,6 +12,7 @@ $robot = array(
     'robot_core' => '',
     'robot_description' => 'Prototype Megaman Hunter',
     'robot_description2' => 'Enker was created to scrap Mega Man, being the first in the Mega Man Killer series. Now this series does not just hunt Mega Man but any robot it sees as a threat. They are made to kill, and have great fighting skill. Their Mirror Buster is a buster in which any shot sent to them will be reflected back to the opponent. This series does show any compassion except on New Year\'s eve and believe in staying true to themselves. They also do not like foreign robots and enjoy Nabeyaki-Udon. They have a strong Japanese spirit and destroy any robot no matter what the cost.',
+    'robot_field' => 'final-destination',
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,
