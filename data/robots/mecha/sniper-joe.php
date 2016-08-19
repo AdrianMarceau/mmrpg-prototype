@@ -2,7 +2,8 @@
 // SNIPER JOE
 $robot = array(
   'robot_number' => 'SJOE-001', // ROBOT : SNIPER JOE (1st Gen)
-  'robot_game' => 'MMRPG',
+  'robot_game' => 'MM01',
+  'robot_group' => 'MMRPG',
   'robot_name' => 'Sniper Joe',
   'robot_token' => 'sniper-joe',
   'robot_description' => 'Shield Sniper Mecha',
