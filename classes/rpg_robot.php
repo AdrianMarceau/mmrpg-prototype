@@ -2326,6 +2326,7 @@ class rpg_robot extends rpg_object {
                                             $ability_method_key = 0;
                                             $ability_method = '';
                                             foreach ($robot_ability_rewards AS $this_info){
+                                                if (!isset($mmrpg_database_abilities[$this_info['token']])){ continue; }
                                                 $this_level = $this_info['level'];
                                                 $this_ability = $mmrpg_database_abilities[$this_info['token']];
                                                 $this_ability_token = $this_ability['ability_token'];
