@@ -3,7 +3,8 @@
 $robot = array(
   'robot_number' => 'BEAK-001', // ROBOT : BEAK (1st Gen)
   'robot_class' => 'mecha',
-  'robot_game' => 'MM005',
+  'robot_game' => 'MM01',
+  'robot_group' => 'MM005',
   'robot_name' => 'Beak',
   'robot_token' => 'beak',
   'robot_image_editor' => 412,
