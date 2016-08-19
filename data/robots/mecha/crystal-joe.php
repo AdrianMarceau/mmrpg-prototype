@@ -2,7 +2,8 @@
 // CRYSTAL JOE
 $robot = array(
   'robot_number' => 'SJOE-003', // ROBOT : CRYSTAL JOE (1st Gen)
-  'robot_game' => 'MMRPG',
+  'robot_game' => 'MM05',
+  'robot_group' => 'MMRPG',
   'robot_name' => 'Crystal Joe',
   'robot_token' => 'crystal-joe',
   'robot_description' => 'Diamond Shard Mecha',
