@@ -2,7 +2,8 @@
 // SKELETON JOE
 $robot = array(
   'robot_number' => 'SJOE-002', // ROBOT : SKELETON JOE (1st Gen)
-  'robot_game' => 'MMRPG',
+  'robot_game' => 'MM04',
+  'robot_group' => 'MMRPG',
   'robot_name' => 'Skeleton Joe',
   'robot_token' => 'skeleton-joe',
   'robot_description' => 'Bone Boomerang Mecha',
