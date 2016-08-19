@@ -89,6 +89,10 @@ function mmrpg_load_game_session($this_save_filepath){
             $new_game_data['values']['battle_stars'] = json_decode($this_database_save['save_values_battle_stars'], true);
             $new_game_data['values']['battle_stars_hash'] = md5($this_database_save['save_values_battle_stars']);
         }
+        if (!empty($this_database_save['save_values_robot_alts'])){
+            $new_game_data['values']['robot_alts'] = json_decode($this_database_save['save_values_robot_alts'], true);
+            $new_game_data['values']['robot_alts_hash'] = md5($this_database_save['save_values_robot_alts']);
+        }
         if (!empty($this_database_save['save_values_robot_database'])){
             $new_game_data['values']['robot_database'] = json_decode($this_database_save['save_values_robot_database'], true);
             $new_game_data['values']['robot_database_hash'] = md5($this_database_save['save_values_robot_database']);

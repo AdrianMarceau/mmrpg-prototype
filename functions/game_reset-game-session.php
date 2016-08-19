@@ -14,6 +14,7 @@ function mmrpg_reset_game_session($this_save_filepath){
   $this_battle_points = !empty($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
   $this_battle_complete = !empty($_SESSION[$session_token]['values']['battle_complete']) ? $_SESSION[$session_token]['values']['battle_complete'] : array();
   $this_battle_failure = !empty($_SESSION[$session_token]['values']['battle_failure']) ? $_SESSION[$session_token]['values']['battle_failure'] : array();
+  $this_robot_alts = !empty($_SESSION[$session_token]['values']['robot_alts']) ? $_SESSION[$session_token]['values']['robot_alts'] : array();
   $this_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
   $this_battle_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
   $this_battle_items = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items'] : array();
@@ -36,6 +37,14 @@ function mmrpg_reset_game_session($this_save_filepath){
   $_SESSION[$session_token]['values']['battle_failure'] = array();
   // Automatically create the battle index array and start at empty
   $_SESSION[$session_token]['values']['battle_index'] = array();
+  // Automatically create the battle items array and start at empty
+  $_SESSION[$session_token]['values']['battle_items'] = array();
+  // Automatically create the battle abilities array and start at empty
+  $_SESSION[$session_token]['values']['battle_abilities'] = array();
+  // Automatically create the battle stars array and start at empty
+  $_SESSION[$session_token]['values']['battle_stars'] = array();
+  // Automatically create the robot alts array and start at empty
+  $_SESSION[$session_token]['values']['robot_alts'] = array();
   // Automatically create the robot database array and start at empty
   $_SESSION[$session_token]['values']['robot_database'] = array();
   // Automatically create the last load and save variable and set to now

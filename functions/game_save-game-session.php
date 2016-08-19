@@ -215,6 +215,12 @@ function mmrpg_save_game_session(){
                     if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
                     unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
                 }
+                if (!empty($this_values['robot_alts'])){
+                    $this_save_array['save_values_robot_alts'] = json_encode($this_values['robot_alts']);
+                    $temp_hash = md5($this_save_array['save_values_robot_alts']);
+                    if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
+                    unset($this_values['robot_alts'], $this_values['robot_alts_hash']);
+                }
                 if (!empty($this_values['robot_database'])){
                     $this_save_array['save_values_robot_database'] = json_encode($this_values['robot_database']);
                     $temp_hash = md5($this_save_array['save_values_robot_database']);
@@ -415,6 +421,12 @@ function mmrpg_save_game_session(){
             $temp_hash = md5($this_save_array['save_values_battle_stars']);
             if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
             unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
+        }
+        if (!empty($this_values['robot_alts'])){
+            $this_save_array['save_values_robot_alts'] = json_encode($this_values['robot_alts']);
+            $temp_hash = md5($this_save_array['save_values_robot_alts']);
+            if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
+            unset($this_values['robot_alts'], $this_values['robot_alts_hash']);
         }
         if (!empty($this_values['robot_database'])){
             $this_save_array['save_values_robot_database'] = json_encode($this_values['robot_database']);
