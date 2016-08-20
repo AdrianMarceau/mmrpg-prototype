@@ -311,7 +311,7 @@ while ($this_action == 'profile'){
                     // Else if this alt is unlocked via the shop and has been purchased
                     elseif (in_array($this_altinfo['token'], $temp_alts_unlocked)){ $alt_unlocked = true; }
                     // Print the alt option markup if unlocked
-                    if (true || $alt_unlocked){
+                    if ($alt_unlocked){
                         $html_avatar_options[] = '<option value="robots/'.$token.'_'.$this_altinfo['token'].'/'.$size.'">'.$info['robot_number'].' : '.$this_altinfo['name'].'</option>';
                     }
                 }
