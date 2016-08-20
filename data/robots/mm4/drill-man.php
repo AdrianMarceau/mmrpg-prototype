@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Drill Man',
   'robot_token' => 'drill-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Drill Man (Green Alt)', 'summons' => 100, 'colour' => 'nature'),
+    array('token' => 'alt2', 'name' => 'Drill Man (Blue Alt)', 'summons' => 200, 'colour' => 'water'),
+    array('token' => 'alt9', 'name' => 'Drill Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'earth',
   'robot_field' => 'mineral-quarry',
   'robot_description' => 'Mineral Excavation Robot',

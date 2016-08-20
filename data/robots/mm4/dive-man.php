@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'dive-man',
   'robot_image_editor' => 18,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Dive Man (Crimson Alt)', 'summons' => 100, 'colour' => 'flame'),
+    array('token' => 'alt2', 'name' => 'Dive Man (Platinum Alt)', 'summons' => 200, 'colour' => 'cutter'),
+    array('token' => 'alt9', 'name' => 'Dive Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'missile',
   'robot_field' => 'submerged-armory',
   'robot_description' => 'Submerged Warfare Robot',
