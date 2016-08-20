@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Guts Man',
   'robot_token' => 'guts-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Guts Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
+    array('token' => 'alt2', 'name' => 'Guts Man (Green Alt)', 'summons' => 200, 'colour' => 'nature'),
+    array('token' => 'alt9', 'name' => 'Guts Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'impact',
   'robot_description' => 'Tough Construction Robot',
   'robot_field' => 'mountain-mines',

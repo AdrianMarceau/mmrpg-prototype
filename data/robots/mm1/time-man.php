@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Time Man',
   'robot_token' => 'time-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Time Man (Green Alt)', 'summons' => 100, 'colour' => 'nature'),
+    array('token' => 'alt2', 'name' => 'Time Man (Orange Alt)', 'summons' => 200, 'colour' => 'explode'),
+    array('token' => 'alt9', 'name' => 'Time Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'time',
   'robot_description' => 'Prototype Time-Control Robot',
   'robot_field' => 'clock-citadel',

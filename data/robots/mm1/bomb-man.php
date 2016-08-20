@@ -7,9 +7,9 @@ $robot = array(
   'robot_token' => 'bomb-man',
   'robot_image_editor' => 412,
   'robot_image_alts' => array(
-    array('token' => 'alt', 'name' => 'Bomb Man (Green Alt)', 'price' => 25000),
-    array('token' => 'alt2', 'name' => 'Bomb Man (Purple Alt)', 'price' => 50000),
-    array('token' => 'alt9', 'name' => 'Bomb Man (Darkness Alt)', 'price' => 100000)
+    array('token' => 'alt', 'name' => 'Bomb Man (Green Alt)', 'summons' => 100, 'colour' => 'nature'),
+    array('token' => 'alt2', 'name' => 'Bomb Man (Purple Alt)', 'summons' => 200, 'colour' => 'time'),
+    array('token' => 'alt9', 'name' => 'Bomb Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
     ),
   'robot_core' => 'explode',
   'robot_description' => 'Hyper Explosive Robot',
