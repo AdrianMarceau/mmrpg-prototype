@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Fire Man',
   'robot_token' => 'fire-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Fire Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
+    array('token' => 'alt2', 'name' => 'Fire Man (Yellow Alt)', 'summons' => 200, 'colour' => 'electric'),
+    array('token' => 'alt9', 'name' => 'Fire Man (Darkness Alt)', 'summons' => 900,  'colour' => 'empty')
+    ),
   'robot_core' => 'flame',
   'robot_description' => 'Trash Incinerator Robot',
   'robot_field' => 'steel-mill',

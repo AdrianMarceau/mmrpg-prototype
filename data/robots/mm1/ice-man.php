@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Ice Man',
   'robot_token' => 'ice-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Ice Man (Pink Alt)', 'summons' => 100, 'colour' => 'laser'),
+    array('token' => 'alt2', 'name' => 'Ice Man (Mint Alt)', 'summons' => 200, 'colour' => 'shield'),
+    array('token' => 'alt9', 'name' => 'Ice Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'freeze',
   'robot_description' => 'Arctic Exploration Robot',
   'robot_field' => 'arctic-jungle',

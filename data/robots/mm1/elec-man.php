@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Elec Man',
   'robot_token' => 'elec-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Elec Man (Green Alt)', 'summons' => 100, 'colour' => 'nature'),
+    array('token' => 'alt2', 'name' => 'Elec Man (Blue Alt)', 'summons' => 200, 'colour' => 'water'),
+    array('token' => 'alt9', 'name' => 'Elec Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'electric',
   'robot_description' => 'High Voltage Robot',
   'robot_description2' => 'When first created, the Elec Man series was considered to be the most powerful robots ever created. With the advancements of science, more robots were being made with some attributes similar to Elec Man. The Elec Man series can still keep up with newer models thanks to their powerful control over electricity and their Thunder Beam, a highly powerful beam of electricity. This series was created to watch over production in nuclear power plants but are also great fighters. This series usually have personality traits of leadership and quick judgement, but also brag a lot, talking about their "shocking beauty". In short, the Elec Man series are very capable fighters and have great control over electricity.',

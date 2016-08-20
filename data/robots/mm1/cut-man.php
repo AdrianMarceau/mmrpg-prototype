@@ -7,13 +7,12 @@ $robot = array(
   'robot_token' => 'cut-man',
   'robot_image_editor' => 412,
   'robot_image_alts' => array(
-    array('token' => 'alt', 'name' => 'Cut Man (Blue Alt)', 'price' => 25000),
-    array('token' => 'alt2', 'name' => 'Cut Man (Yellow Alt)', 'price' => 50000),
-    array('token' => 'alt9', 'name' => 'Cut Man (Darkness Alt)', 'price' => 100000)
+    array('token' => 'alt', 'name' => 'Cut Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
+    array('token' => 'alt2', 'name' => 'Cut Man (Yellow Alt)', 'summons' => 200, 'colour' => 'electric'),
+    array('token' => 'alt9', 'name' => 'Cut Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
     ),
   'robot_core' => 'cutter',
   'robot_description' => 'Giant Scissor Robot',
-  'robot_description2' => 'The Cut Man unit was designed to be a lumber-chopping robot, and does so by the cutter on their head. They have the technique, Rolling Cutter, a move in which they throw their Cutter on the top of their head and cuts down most opponents to size. Some units have the Rising Cutter which is a technique in which they release a giant cutter below the opponent. Most have shown personality traits of children and making awful cutting puns. The Cut Man unit is one of the most used units in the world for their versatility and their simplicity.',
   'robot_field' => 'abandoned-warehouse',
   'robot_energy' => 100,
   'robot_attack' => 100,

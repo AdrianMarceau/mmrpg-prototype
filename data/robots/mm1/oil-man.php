@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Oil Man',
   'robot_token' => 'oil-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Oil Man (Black Alt)', 'summons' => 100, 'colour' => 'shadow'),
+    array('token' => 'alt2', 'name' => 'Oil Man (White Alt)', 'summons' => 200, 'colour' => 'cutter'),
+    array('token' => 'alt9', 'name' => 'Oil Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'earth',
   'robot_description' => 'Slick Sliding Robot',
   'robot_field' => 'oil-wells',
