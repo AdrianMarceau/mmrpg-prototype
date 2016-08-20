@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Metal Man',
   'robot_token' => 'metal-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Metal Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
+    array('token' => 'alt2', 'name' => 'Metal Man (Green Alt)', 'summons' => 200, 'colour' => 'nature'),
+    array('token' => 'alt9', 'name' => 'Metal Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'cutter',
   'robot_description' => 'Lethal Blades Robot',
   'robot_description2' => 'This unit is an upgrade on the Cut Man series and fight with deadly skill. They have the Metal Blade, one of the most deadly attacks ever created and has been said to have took down an entire army. They have great speed and like to fight on conveyor belts. They have also been called dentists of the future, jokingly. This unit is often sarcastic and not to be trusted by anyone. They like playing with flying discs but hate when dogs catch them instead. This unit is very powerful but some rumors suggest it can be defeated with their own weapon...',

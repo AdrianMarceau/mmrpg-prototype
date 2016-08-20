@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Quick Man',
   'robot_token' => 'quick-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Quick Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
+    array('token' => 'alt2', 'name' => 'Quick Man (Green Alt)', 'summons' => 200, 'colour' => 'nature'),
+    array('token' => 'alt9', 'name' => 'Quick Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'swift',
   'robot_description' => 'Lightspeed Boomerang Robot',
   'robot_description2' => 'Quick Man was designed to be the fastest robot, and his unit is still considered to be the fastest made. This unit excels in speed and utilizes the Quick Boomerang, a fast-moving blade that returns to it\'s user when the user wills it. This unit is seen as a leader but is impulsive and impatient, always wanting to move. This unit has a friendly rivalry with the Turbo Man unit and anything it sees as fast. They seem to be just going with the flow of battle, but are actually very strategic. There is a rumor saying that their speed is achieved by a device in which they speed up time in their area, but the only one who knows if this is true is the Quick Man unit itself.',

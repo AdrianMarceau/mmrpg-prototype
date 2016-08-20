@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Bubble Man',
   'robot_token' => 'bubble-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Bubble Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
+    array('token' => 'alt2', 'name' => 'Bubble Man (Red Alt)', 'summons' => 200, 'colour' => 'flame'),
+    array('token' => 'alt9', 'name' => 'Bubble Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'water',
   'robot_description' => 'Underwater Combat Robot',
   'robot_field' => 'waterfall-institute',
