@@ -168,8 +168,10 @@ while ($this_action == 'save'){
             // Print the optgroup opening tag
             $temp_optgroup_token = 'MM00';
             $html_avatar_options[] = '<optgroup label="Mega Man Robots">';
+
             // Add all the robot avatars to the list
             foreach ($mmrpg_database_robots AS $token => $info){
+
                 if ($token == 'robot' || strstr($token, 'copy')){ continue; }
                 elseif (isset($info['robot_image']) && $info['robot_image'] == 'robot'){ continue; }
                 elseif (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){ continue; }
@@ -190,14 +192,15 @@ while ($this_action == 'save'){
                 $size = isset($info['robot_image_size']) ? $info['robot_image_size'] : 40;
                 $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
 
-                // Collect the summon count for this robot
+                // Collect the summon count for this robot and unlocked alts
                 $temp_summon_count = mmrpg_prototype_database_summoned($token);
+                $temp_alts_unlocked = mmrpg_prototype_altimage_unlocked($token);
 
                 // If this is a copy core, add it's type alts
                 if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
                     foreach ($mmrpg_index['types'] AS $type_token => $type_info){
                         if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
-                        if (!isset($_SESSION['GAME']['values']['battle_items']['item-core-'.$type_token]) && $this_userinfo['role_id'] != 1){ continue; }
+                        if (!isset($_SESSION['GAME']['values']['battle_items'][$type_token.'-core']) && $this_userinfo['role_id'] != 1){ continue; }
                         $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)'.'</option>';
                     }
                 }
@@ -206,14 +209,21 @@ while ($this_action == 'save'){
                     // Loop through each of the available alts and print if unlocked
                     $info['robot_image_alts'] = json_decode($info['robot_image_alts'], true);
                     foreach ($info['robot_image_alts'] AS $key => $this_altinfo){
-                        // Only print if unlocked or admin
-                        if ($temp_summon_count >= $this_altinfo['summons']){
+                        // Define the unlocked flag as false to start
+                        $alt_unlocked = false;
+                        // If this alt is unlocked via summon and we have enough
+                        if (!empty($this_altinfo['summons']) && $temp_summon_count >= $this_altinfo['summons']){ $alt_unlocked = true; }
+                        // Else if this alt is unlocked via the shop and has been purchased
+                        elseif (in_array($this_altinfo['token'], $temp_alts_unlocked)){ $alt_unlocked = true; }
+                        // Print the alt option markup if unlocked
+                        if (true || $alt_unlocked){
                             $html_avatar_options[] = '<option value="robots/'.$token.'_'.$this_altinfo['token'].'/'.$size.'">'.$info['robot_number'].' : '.$this_altinfo['name'].'</option>';
                         }
                     }
                 }
 
             }
+
             // Add player avatars if this is the developer
             if ($this_userinfo['role_id'] == 1 || $this_userinfo['role_id'] == 6){
                 $html_avatar_options[] = '</optgroup>';
@@ -222,6 +232,7 @@ while ($this_action == 'save'){
                 $html_avatar_options[] = '<option value="players/dr-wily/40">PLAYER : Dr. Wily</option>';
                 $html_avatar_options[] = '<option value="players/dr-cossack/40">PLAYER : Dr. Cossack</option>';
             }
+
             // Add the optgroup closing tag
             $html_avatar_options[] = '</optgroup>';
             $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['imagepath'].'"', 'value="'.$_SESSION['GAME']['USER']['imagepath'].'" selected="selected"', implode('', $html_avatar_options));
