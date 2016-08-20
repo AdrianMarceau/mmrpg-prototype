@@ -154,7 +154,7 @@ if (true){
                         foreach ($shop_buying_tokens AS $buying_token){
                             ?>
                                 <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
-                                <a class="tab_link tab_link_buying" href="#" data-tab="buying" data-tab-type="<?= $buying_token ?>"><span class="inset">Sell <?= ucfirst($buying_token) ?></span></a>
+                                <a class="tab_link tab_link_buying" href="#" data-tab="buying" data-tab-type="<?= $buying_token ?>"><span class="inset">Sell</span></a>
                             <?
                             $tab_counter++;
                         }
