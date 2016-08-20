@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Wood Man',
   'robot_token' => 'wood-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Wood Man (Burnt Alt)', 'summons' => 100, 'colour' => 'shield'),
+    array('token' => 'alt2', 'name' => 'Wood Man (Mossy Alt)', 'summons' => 200, 'colour' => 'nature'),
+    array('token' => 'alt9', 'name' => 'Wood Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'nature',
   'robot_description' => 'Forest Protector Robot',
   'robot_field' => 'preserved-forest',

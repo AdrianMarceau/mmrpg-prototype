@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Heat Man',
   'robot_token' => 'heat-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Heat Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
+    array('token' => 'alt2', 'name' => 'Heat Man (Green Alt)', 'summons' => 200, 'colour' => 'nature'),
+    array('token' => 'alt9', 'name' => 'Heat Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'flame',
   'robot_description' => 'Armored Flame Robot',
   'robot_field' => 'atomic-furnace',

@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Crash Man',
   'robot_token' => 'crash-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Crash Man (Green Alt)', 'summons' => 100, 'colour' => 'nature'),
+    array('token' => 'alt2', 'name' => 'Crash Man (Blue Alt)', 'summons' => 200, 'colour' => 'water'),
+    array('token' => 'alt9', 'name' => 'Crash Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'explode',
   'robot_description' => 'Aggressive Bomber Robot',
   'robot_field' => 'pipe-station',

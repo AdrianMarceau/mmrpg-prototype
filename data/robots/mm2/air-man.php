@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Air Man',
   'robot_token' => 'air-man',
   'robot_image_editor' => 412,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Air Man (Red Alt)', 'summons' => 100, 'colour' => 'flame'),
+    array('token' => 'alt2', 'name' => 'Air Man (Green Alt)', 'summons' => 200, 'colour' => 'nature'),
+    array('token' => 'alt9', 'name' => 'Air Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'wind',
   'robot_field' => 'sky-ridge',
   'robot_description' => 'Powerful Winds Robot',
