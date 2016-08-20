@@ -1,4 +1,4 @@
-<?php
+<?
 // Include the TOP file
 require_once('../top.php');
 
@@ -131,7 +131,7 @@ if (true){
 
         <div class="shop_tabs_links" style="margin: 0 auto; color: #FFFFFF; ">
           <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
-          <?php
+          <?
           // Define a counter for the number of tabs
           $tab_counter = 0;
           // Loop through the selling tokens and display tabs for them
@@ -139,7 +139,7 @@ if (true){
             ?>
             <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
             <a class="tab_link tab_link_selling" href="#" data-tab="selling" data-tab-type="<?= $selling_token ?>"><span class="inset">Buy <?= ucfirst($selling_token) ?></span></a>
-            <?php
+            <?
             $tab_counter++;
           }
           // Loop through the buying tokens and display tabs for them
@@ -147,7 +147,7 @@ if (true){
             ?>
             <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
             <a class="tab_link tab_link_buying" href="#" data-tab="buying" data-tab-type="<?= $buying_token ?>"><span class="inset">Sell <?= ucfirst($buying_token) ?></span></a>
-            <?php
+            <?
             $tab_counter++;
           }
           // Define the tab width total
@@ -160,7 +160,7 @@ if (true){
 
         <div class="shop_tabs_containers" style="margin: 0 auto 10px;">
 
-          <?php
+          <?
           // Loop through the selling tokens and display tabs for them
           foreach ($shop_selling_tokens AS $selling_token){
 
@@ -169,10 +169,13 @@ if (true){
 
               <div class="shop_quote shop_quote_selling">&quot;<?= isset($shop_info['shop_quote_selling'][$selling_token]) ? $shop_info['shop_quote_selling'][$selling_token] : $shop_info['shop_quote_selling']  ?>&quot;</div>
 
-              <?php
+              <?
               // -- SHOP SELLING ITEMS -- //
               // If this shop has items to selling, print them out
-              if (in_array($selling_token, array('items', 'cores')) && !empty($shop_info['shop_items']['items_selling'])){
+              if (
+                ($selling_token == 'items' && !empty($shop_info['shop_items']['items_selling'])) ||
+                ($selling_token == 'cores')
+                ){
                 ?>
                 <table class="full" style="margin-bottom: 5px;">
                   <colgroup>
@@ -202,7 +205,7 @@ if (true){
                     </colgroup>
                     <tbody>
                       <tr>
-                      <?php
+                      <?
                       // Collect the items for buying and slice/shuffle if nessary
                       $item_list_array = $shop_info['shop_items']['items_selling'];
                       /*
@@ -243,7 +246,7 @@ if (true){
                           <label class="item_quantity" data-quantity="0">x 0</label>
                           <label class="item_price" data-price="<?= $item_info_price ?>">&hellip; <?= $item_info_price ?>z</label>
                         </td>
-                        <?php
+                        <?
                         if ($item_cell_float == 'right' && $item_counter < $item_counter_total){ echo '</tr><tr>'; }
                       }
                       if ($item_counter % 2 != 0){
@@ -251,18 +254,21 @@ if (true){
                         <td class="right item_cell item_cell_disabled">
                           &nbsp;
                         </td>
-                        <?php
+                        <?
                       }
                       ?>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <?php
+                <?
               }
               // -- SHOP SELLING ABILITIES -- //
-              // If this shop has abilities to selling, print them out
-              elseif (in_array($selling_token, array('abilities', 'weapons')) && (!empty($shop_info['shop_abilities']['abilities_selling']) || !empty($shop_info['shop_weapons']['weapons_selling']))){
+              // If this shop has abilities to sell, print them out
+              elseif (
+                ($selling_token == 'abilities' && !empty($shop_info['shop_abilities']['abilities_selling'])) ||
+                ($selling_token == 'weapons' && !empty($shop_info['shop_weapons']['weapons_selling']))
+                ){
                 ?>
                 <table class="full" style="margin-bottom: 5px;">
                   <colgroup>
@@ -292,7 +298,7 @@ if (true){
                     </colgroup>
                     <tbody>
                       <tr>
-                      <?php
+                      <?
                       // Collect the abilities for buying and slice/shuffle if nessary
                       if ($selling_token == 'abilities'){ $ability_list_array = $shop_info['shop_abilities']['abilities_selling']; }
                       elseif ($selling_token == 'weapons'){ $ability_list_array = $shop_info['shop_weapons']['weapons_selling']; }
@@ -414,7 +420,7 @@ if (true){
                             <label class="item_quantity" data-quantity="0"><?= !empty($ability_info_quantity) ? '&#10004;' : '-' ?></label>
                             <label class="item_price" data-price="<?= $ability_info_price ?>">&hellip; <?= $ability_info_price ?>z</label>
                           </td>
-                          <?php
+                          <?
                           if ($ability_cell_float == 'right'){ echo '</tr><tr>'; }
                         }
                         if ($ability_counter % 2 != 0){
@@ -422,14 +428,14 @@ if (true){
                           <td class="right item_cell item_cell_disabled">
                             &nbsp;
                           </td>
-                          <?php
+                          <?
                         }
                       } else {
                         ?>
                         <td class="right item_cell item_cell_disabled" colspan="2" style="text-align: center">
                           <span class="item_name ability_type ability_type_empty" style="float: none; width: 100px; margin: 6px auto; text-align: center;">Sold Out!</span>
                         </td>
-                        <?php
+                        <?
                       }
 
                       /*
@@ -444,11 +450,13 @@ if (true){
                     </tbody>
                   </table>
                 </div>
-                <?php
+                <?
               }
               // -- SHOP SELLING FIELDS -- //
               // If this shop has fields to selling, print them out
-              if ($selling_token == 'fields' && !empty($shop_info['shop_fields']['fields_selling'])){
+              if (
+                ($selling_token == 'fields' && !empty($shop_info['shop_fields']['fields_selling']))
+                ){
                 ?>
                 <table class="full" style="margin-bottom: 5px;">
                   <colgroup>
@@ -476,7 +484,8 @@ if (true){
                     </colgroup>
                     <tbody>
                       <tr>
-                      <?php
+                      <?
+
                       // Collect the abilities for buying and slice/shuffle if nessary
                       $field_list_array = $shop_info['shop_fields']['fields_selling'];
                       // Collect the unlocked fields for this game file
@@ -523,7 +532,7 @@ if (true){
                           <label class="item_quantity" data-quantity="0" style="display: none;">x 0</label>
                           <label class="item_price" data-price="<?= $field_info_price ?>">&hellip; <?= $field_info_price ?>z</label>
                         </td>
-                        <?php
+                        <?
                         if ($field_cell_float == 'right'){ echo '</tr><tr>'; }
                       }
                       if ($field_counter % 2 != 0){
@@ -531,14 +540,14 @@ if (true){
                         <td class="right item_cell item_cell_disabled">
                           &nbsp;
                         </td>
-                        <?php
+                        <?
                       }
                       ?>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <?php
+                <?
               }
               ?>
               <table class="full" style="margin-bottom: 5px;">
@@ -555,7 +564,7 @@ if (true){
               </table>
 
             </div>
-            <?php
+            <?
 
           }
           // Loop through the buying tokens and display tabs for them
@@ -565,7 +574,7 @@ if (true){
             <div class="tab_container tab_container_buying" data-tab="buying" data-tab-type="<?= $buying_token ?>">
 
               <div class="shop_quote shop_quote_buying">&quot;<?= isset($shop_info['shop_quote_buying'][$buying_token]) ? $shop_info['shop_quote_buying'][$buying_token] : $shop_info['shop_quote_buying'] ?>&quot;</div>
-              <?php
+              <?
               // -- SHOP BUYING ITEMS -- //
               // If this shop has items to buying, print them out
               if (in_array($buying_token, array('items', 'cores')) && !empty($shop_info['shop_items']['items_buying'])){
@@ -598,7 +607,7 @@ if (true){
                     </colgroup>
                     <tbody>
                       <tr>
-                      <?php
+                      <?
                       // Collect the items for buying and slice/shuffle if nessary
                       $item_list_array = $shop_info['shop_items']['items_buying'];
                       /*
@@ -640,7 +649,7 @@ if (true){
                           <label class="item_quantity" data-quantity="0">x 0</label>
                           <label class="item_price" data-price="<?= $item_info_price ?>">&hellip; <?= $item_info_price ?>z</label>
                         </td>
-                        <?php
+                        <?
                         if ($item_cell_float == 'right'){ echo '</tr><tr>'; }
                       }
                       if ($item_counter % 2 != 0){
@@ -648,14 +657,14 @@ if (true){
                         <td class="right item_cell item_cell_disabled">
                           &nbsp;
                         </td>
-                        <?php
+                        <?
                       }
                       ?>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <?php
+                <?
               }
               // -- SHOP BUYING STARS -- //
               // If this shop has items to buying, print them out
@@ -838,7 +847,7 @@ if (true){
                           <label class="item_quantity" data-quantity="1" style="display: none;">x 1</label>
                           <label class="item_price" data-price="<?= $star_info_price ?>">&hellip; <?= $star_info_price ?>z</label>
                         </td>
-                        <?php
+                        <?
                         if ($star_cell_float == 'right'){ echo '</tr><tr>'; }
                       }
                       if ($star_counter % 2 != 0){
@@ -846,14 +855,14 @@ if (true){
                         <td class="right item_cell item_cell_disabled">
                           &nbsp;
                         </td>
-                        <?php
+                        <?
                       }
                       ?>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <?php
+                <?
               }
               ?>
               <table class="full" style="margin-bottom: 5px;">
@@ -870,7 +879,7 @@ if (true){
               </table>
 
             </div>
-            <?php
+            <?
 
           }
           ?>
@@ -879,7 +888,7 @@ if (true){
 
       </div>
     </div>
-    <?php
+    <?
 
     // Increment the key counter
     $key_counter++;
@@ -940,7 +949,7 @@ if (true){
   </table>
   </div>
 
-  <?php
+  <?
 
   // Collect the output buffer content
   $this_shop_markup = preg_replace('#\s+#', ' ', trim(ob_get_clean()));
