@@ -4,6 +4,7 @@
 
 // Check if an action request has been sent with an sell type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
+
     // Collect the action variables from the request header, if they exist
     $temp_shop = !empty($_REQUEST['shop']) ? $_REQUEST['shop'] : '';
     $temp_kind = !empty($_REQUEST['kind']) ? $_REQUEST['kind'] : '';
@@ -127,6 +128,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
 
 // Check if an action request has been sent with an buy type
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
+
     // Collect the action variables from the request header, if they exist
     $temp_shop = !empty($_REQUEST['shop']) ? $_REQUEST['shop'] : '';
     $temp_kind = !empty($_REQUEST['kind']) ? $_REQUEST['kind'] : '';
@@ -147,6 +149,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
 
     // Check if this is an ITEM based action
     if ($temp_kind == 'item'){
+
         // Ensure this item exists before continuing
         if (isset($mmrpg_database_items[$temp_token])){
             // Collect a reference to the session variable amount
@@ -163,7 +166,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
                 $_SESSION[$session_token]['values']['battle_items'][$temp_token] = $temp_current_quantity + $temp_quantity;
                 $temp_current_quantity = $_SESSION[$session_token]['values']['battle_items'][$temp_token];
 
-                // Increment the player's zenny count based on the provided price
+                // Decrement the player's zenny count based on the provided price
                 $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
                 $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
 
@@ -198,6 +201,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
     }
     // Check if this is an ABILITY based action
     elseif ($temp_kind == 'ability'){
+
         // Ensure this ability exists before continuing
         if (isset($mmrpg_database_abilities[$temp_token])){
             // Ensure the requested ability token was valid
@@ -213,7 +217,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
                 // If the unlock was successful
                 if (mmrpg_game_ability_unlocked('', '', $temp_token)){
 
-                    // Increment the player's zenny count based on the provided price
+                    // Decrement the player's zenny count based on the provided price
                     $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
                     $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
 
@@ -257,11 +261,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
     }
     // Check if this is an FIELD based action
     elseif ($temp_kind == 'field'){
+
         // Collect the actual field token from the provided one
         $temp_actual_token = preg_replace('/^field-/i', '', $temp_token);
 
         // Ensure this field exists before continuing
         if (isset($mmrpg_database_fields[$temp_actual_token])){
+
             // Remove this field's entry from the global arrayand define the new quantity
             $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
             $temp_unlocked_fields[] = $temp_actual_token;
@@ -269,7 +275,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             $_SESSION[$session_token]['values']['battle_fields'] = $temp_unlocked_fields;
             $temp_current_quantity = 1;
 
-            // Increment the player's zenny count based on the provided price
+            // Decrement the player's zenny count based on the provided price
             $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
             $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
 
@@ -288,7 +294,47 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         else {
 
             // Print an error message and kill the script
-            exit('error|invalid-star|'.$temp_actual_token);
+            exit('error|invalid-field|'.$temp_actual_token);
+
+        }
+
+    }
+    // Check if this is an ALT based action
+    elseif ($temp_kind == 'alt'){
+        // Collect the actual alt token from the provided one
+        $temp_actual_token = preg_replace('/^alt-/i', '', $temp_token);
+        list($temp_robot_token, $temp_alt_token) = explode('_', $temp_actual_token);
+
+        // Ensure this alt's robot exists before continuing
+        if (isset($mmrpg_database_robots[$temp_robot_token])){
+
+            // Remove this alts's entry from the global arrayand define the new quantity
+            $temp_unlocked_alts = !empty($_SESSION[$session_token]['values']['robot_alts']) ? $_SESSION[$session_token]['values']['robot_alts'] : array();
+            $temp_unlocked_alts[$temp_robot_token][] = $temp_alt_token;
+            $temp_unlocked_alts[$temp_robot_token] = array_unique($temp_unlocked_alts[$temp_robot_token]);
+            $_SESSION[$session_token]['values']['robot_alts'] = $temp_unlocked_alts;
+            $temp_current_quantity = 1;
+
+            // Decrement the player's zenny count based on the provided price
+            $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
+            $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
+
+            // Update the shop history with this sold item under the given character
+            if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['alts_sold'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['alts_sold'][$temp_token] = 0; }
+            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['alts_sold'][$temp_token] += 1;
+            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
+            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
+
+            // Save, produce the success message with the new alt order
+            mmrpg_save_game_session();
+            exit('success|alt-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
+
+        }
+        // Otherwise if this star does not exist
+        else {
+
+            // Print an error message and kill the script
+            exit('error|invalid-alt|'.$temp_actual_token);
 
         }
 

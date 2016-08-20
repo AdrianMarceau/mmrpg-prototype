@@ -319,8 +319,10 @@ function mmrpg_prototype_robot_unlocked($player_token, $robot_token){
 
 // Define a function for checking if a prototype ability has been unlocked
 function mmrpg_prototype_ability_unlocked($player_token, $robot_token = '', $ability_token = ''){
+
     // Define the game session helper var
     $session_token = mmrpg_game_token();
+
     // If a specific robot token was provided
     if (!empty($robot_token)){
         // Check if this ability has been unlocked by the specified robot and return true if it was
@@ -329,7 +331,39 @@ function mmrpg_prototype_ability_unlocked($player_token, $robot_token = '', $abi
         // Check if this ability has been unlocked by the player and return true if it was
         return in_array($ability_token, $_SESSION[$session_token]['values']['battle_abilities']) ? true : false;
     }
+
 }
+
+// Define a function for checking if a prototype alt image has been unlocked
+function mmrpg_prototype_altimage_unlocked($robot_token, $alt_token = ''){
+
+    // Define the game session helper var
+    $session_token = mmrpg_game_token();
+
+    // If robot token not provided return false
+    if (empty($robot_token)){ return false; }
+
+    // If a specific robot token was provided
+    if (!empty($robot_token) && !empty($alt_token)){
+
+        // Check if this alt has been unlocked by the specified robot and return true if it was
+        if (!isset($_SESSION[$session_token]['values']['robot_alts'][$robot_token])){ return false; }
+        return in_array($alt_token, $_SESSION[$session_token]['values']['robot_alts'][$robot_token]) ? true : false;
+
+    } elseif (!empty($robot_token)){
+
+        // Return all the alt tokens unlocked by this robot
+        if (!isset($_SESSION[$session_token]['values']['robot_alts'][$robot_token])){ return array(); }
+        return $_SESSION[$session_token]['values']['robot_alts'][$robot_token];
+
+    } else {
+
+        // Definitely not unlocked
+        return false;
+    }
+
+}
+
 // Define a function for counting the number of completed prototype battles
 function mmrpg_prototype_battles_complete($player_token, $unique = true){
     // Define the game session helper var

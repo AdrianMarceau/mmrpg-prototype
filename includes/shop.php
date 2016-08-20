@@ -83,11 +83,11 @@ $this_shop_index['auto'] = array(
         'shop_field' => 'light-laboratory',
         'shop_player' => 'dr-light',
         'shop_number' => 'SHOP-001',
-        'shop_kind_selling' => array('items', 'alts'),
+        'shop_kind_selling' => array('items'),
         'shop_kind_buying' => array('items'),
         'shop_quote_selling' => array(
             'items' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.',
-            'alts' => 'Great news! I figured out how to pallet swap the armor of our robot master team mates. Interested?'
+            'alts' => '"Great news! I designed some alternate outfits for the robots on our team. Interested in a new look?"'
             ),
         'shop_quote_buying' => array(
             'items' => 'So you wanna sell something, eh? Let\'s see what you\'ve collected so far! Hopefully lots of screws!'
@@ -172,14 +172,7 @@ $this_shop_index['auto'] = array(
                         */
 
                         )
-                ),
-        'shop_alts' => array(
-            'alts_selling' => array(
-                'cut-man_alt' => 3000, 'cut-man_alt2' => 3000,
-                'cut-man_alt9' => 6000, 'bomb-man_alt' => 6000,
-                'bomb-man_alt2' => 6000, 'bomb-man_alt9' => 6000
-                ),
-            )
+                )
         );
 
 // REGGAE'S SHOP
@@ -351,12 +344,97 @@ if (!empty($this_shop_index)){
 if (!empty($this_shop_index['auto'])){
 
     // If Auto's Shop has reached sufficient levels, expand the inventory
-    if ($this_shop_index['auto']['shop_level'] >= 10){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling2']; }
-    if ($this_shop_index['auto']['shop_level'] >= 20){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling3']; }
-    if ($this_shop_index['auto']['shop_level'] >= 30){ $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling4']; }
-    unset($this_shop_index['auto']['shop_items']['items_selling2']);
-    unset($this_shop_index['auto']['shop_items']['items_selling3']);
-    unset($this_shop_index['auto']['shop_items']['items_selling4']);
+    if ($this_shop_index['auto']['shop_level'] >= 10){
+        $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling2'];
+        unset($this_shop_index['auto']['shop_items']['items_selling2']);
+    }
+    if ($this_shop_index['auto']['shop_level'] >= 20){
+        $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling3'];
+        unset($this_shop_index['auto']['shop_items']['items_selling3']);
+    }
+    if ($this_shop_index['auto']['shop_level'] >= 30){
+        $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling4'];
+        unset($this_shop_index['auto']['shop_items']['items_selling4']);
+    }
+
+    // If Auto's Shop has reached the appropriate level, unlock robot alts
+    if (true || $this_shop_index['auto']['shop_level'] >= 40){
+
+        // Generate the max tier of alts to sell based on level
+        $max_alt_tier_key = floor(($this_shop_index['auto']['shop_level'] - 40) / 5);
+
+        // Create an array to hold any alts unlocked for selling
+        $unlocked_alts_list = array();
+
+        // Collect all the robot tokens unlocked by the player so far and filter special
+        $banned_tokens = array('mega-man', 'proto-man', 'bass');
+        $discount_tokens = array('roll', 'disco', 'rhythm');
+        $allowed_tokens = array_values($global_unlocked_robots);
+        $allowed_tokens = array_diff_key($allowed_tokens, array_flip($banned_tokens));
+
+        // Pull alt images from the database for the player's unlocked robots
+        if (!empty($allowed_tokens)){
+
+            // Generate the allowed token string and pull alt data from the database
+            $allowed_tokens_string = "'".implode("', '", $allowed_tokens)."'";
+            $unlocked_robot_data = $db->get_array_list("SELECT
+                robot_token,
+                robot_image_alts
+                FROM mmrpg_index_robots
+                WHERE
+                robot_token IN ({$allowed_tokens_string})
+                AND robot_image_alts <> ''
+                AND robot_image_alts <> '[]'
+                ORDER BY robot_order ASC
+                ;");
+
+            // If alts were found, loop through and collect their details
+            if (!empty($unlocked_robot_data)){
+                foreach ($unlocked_robot_data AS $key => $robot_info){
+                    // Collect the alt data and decompress its fields
+                    $robot_token = $robot_info['robot_token'];
+                    $alt_array = json_decode($robot_info['robot_image_alts'], true);
+                    // Loop through the alts themselves and add any with prices
+                    foreach ($alt_array AS $key2 => $alt_info){
+                        // Skip alts without defined prices
+                        if (!isset($alt_info['summons'])){ continue; }
+                        // Generate the token and then add to the parent shop
+                        $alt_token = $robot_token.'_'.$alt_info['token'];
+                        $alt_rate = in_array($robot_token, $discount_tokens) ? 100 : 1000;
+                        $alt_price = $alt_info['summons'] * $alt_rate;
+                        $unlocked_alts_list[$alt_info['token']][$alt_token] = $alt_price;
+                    }
+                }
+            }
+
+            // If any alts groups were unlocked, loop through and extract into parent array
+            if (!empty($unlocked_alts_list)){
+                $backup_alts_list = $unlocked_alts_list;
+                $unlocked_alts_list = array();
+                $group_key = 0;
+                foreach ($backup_alts_list AS $group_token => $group_list){
+                    if ($group_key > $max_alt_tier_key){ break; }
+                    foreach ($group_list AS $alt_token => $alt_price){
+                        $unlocked_alts_list[$alt_token] = $alt_price;
+                    }
+                    $group_key++;
+                }
+            }
+
+            //echo('<pre>$unlocked_robot_data = '.print_r($unlocked_robot_data, true).'</pre>');
+            //echo('<pre>$unlocked_alts_list = '.print_r($unlocked_alts_list, true).'</pre>');
+            //exit();
+
+            // If any alts were unlocked, add them to the parent shop array
+            if (!empty($unlocked_alts_list)){
+                $this_shop_index['auto']['shop_kind_selling'][] = 'alts';
+                $this_shop_index['auto']['shop_alts']['alts_selling'] = $unlocked_alts_list;
+            }
+
+        }
+
+    }
+
 
     // Loop through Auto's shop and remove items you do not yet own from the buying list
     $key_items = array('small-screw', 'large-screw');
