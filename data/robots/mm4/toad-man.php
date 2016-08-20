@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'toad-man',
   'robot_image_editor' => 18,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Toad Man (Watermelon Alt)', 'summons' => 100, 'colour' => 'laser'),
+    array('token' => 'alt2', 'name' => 'Toad Man (Blueberry Alt)', 'summons' => 200, 'colour' => 'water'),
+    array('token' => 'alt9', 'name' => 'Toad Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'water',
   'robot_field' => 'rainy-sewers',
   'robot_description' => 'Hopping Farmer Robot',

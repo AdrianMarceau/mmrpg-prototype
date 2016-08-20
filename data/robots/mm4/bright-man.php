@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Bright Man',
   'robot_token' => 'bright-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Bright Man (Green Alt)', 'summons' => 100, 'colour' => 'nature'),
+    array('token' => 'alt2', 'name' => 'Bright Man (Purple Alt)', 'summons' => 200, 'colour' => 'time'),
+    array('token' => 'alt9', 'name' => 'Bright Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'time',
   'robot_field' => 'lighting-control',
   'robot_description' => 'Bright Thinking Robot',

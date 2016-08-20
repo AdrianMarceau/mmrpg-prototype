@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Dust Man',
   'robot_token' => 'dust-man',
   'robot_image_editor' => 18,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Dust Man (Purple Alt)', 'summons' => 100, 'colour' => 'time'),
+    array('token' => 'alt2', 'name' => 'Dust Man (Green Alt)', 'summons' => 200, 'colour' => 'nature'),
+    array('token' => 'alt9', 'name' => 'Dust Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'wind',
   'robot_field' => 'rusty-scrapheap',
   'robot_description' => 'Scrap Contracting Robot',
