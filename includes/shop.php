@@ -87,7 +87,7 @@ $this_shop_index['auto'] = array(
         'shop_kind_buying' => array('items'),
         'shop_quote_selling' => array(
             'items' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.',
-            'alts' => '"Great news! I designed some alternate outfits for the robots on our team. Interested in a new look?"'
+            'alts' => 'Great news! I designed some alternate outfits for the robots on our team. Interested in a new look?'
             ),
         'shop_quote_buying' => array(
             'items' => 'So you wanna sell something, eh? Let\'s see what you\'ve collected so far! Hopefully lots of screws!'
@@ -357,11 +357,11 @@ if (!empty($this_shop_index['auto'])){
         unset($this_shop_index['auto']['shop_items']['items_selling4']);
     }
 
-    // If Auto's Shop has reached the appropriate level, unlock robot alts
-    if (true || $this_shop_index['auto']['shop_level'] >= 40){
+    // If the player has completed the prototype, Auto's Shop also sells alts
+    if (mmrpg_prototype_complete()){
 
         // Generate the max tier of alts to sell based on level
-        $max_alt_tier_key = floor(($this_shop_index['auto']['shop_level'] - 40) / 5);
+        $max_alt_tier_key = floor($this_shop_index['auto']['shop_level'] / 10);
 
         // Create an array to hold any alts unlocked for selling
         $unlocked_alts_list = array();
