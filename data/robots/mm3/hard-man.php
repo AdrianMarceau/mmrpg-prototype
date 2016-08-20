@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'hard-man',
   'robot_image_editor' => 110,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Hard Man (Golden Alt)', 'summons' => 100, 'colour' => 'electric'),
+    array('token' => 'alt2', 'name' => 'Hard Man (Diamond Alt)', 'summons' => 200, 'colour' => 'shield'),
+    array('token' => 'alt9', 'name' => 'Hard Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'impact',
   'robot_field' => 'rocky-plateau',
   'robot_description' => 'Titanium Heavyweight Robot',

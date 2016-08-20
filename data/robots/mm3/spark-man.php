@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'spark-man',
   'robot_image_editor' => 110,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Spark Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
+    array('token' => 'alt2', 'name' => 'Spark Man (Yellow Alt)', 'summons' => 200, 'colour' => 'electric'),
+    array('token' => 'alt9', 'name' => 'Spark Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'electric',
   'robot_field' => 'power-plant',
   'robot_description' => 'Double Spark-Plug Robot',

@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Magnet Man',
   'robot_token' => 'magnet-man',
   'robot_image_editor' => 110,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Magnet Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
+    array('token' => 'alt2', 'name' => 'Magnet Man (Gold Alt)', 'summons' => 200, 'colour' => 'electric'),
+    array('token' => 'alt9', 'name' => 'Magnet Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'missile',
   'robot_field' => 'magnetic-generator',
   'robot_description' => 'Electro Magnetism Robot',

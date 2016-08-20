@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Gemini Man',
   'robot_token' => 'gemini-man',
   'robot_image_editor' => 110,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Gemini Man (Kunzite Alt)', 'summons' => 100, 'colour' => 'laser'),
+    array('token' => 'alt2', 'name' => 'Gemini Man (Emerald Alt)', 'summons' => 200, 'colour' => 'energy'),
+    array('token' => 'alt9', 'name' => 'Gemini Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_image_size' => 80,
   'robot_core' => 'crystal',
   'robot_field' => 'reflection-chamber',
