@@ -2641,12 +2641,18 @@ class rpg_robot extends rpg_object {
             // Collect the summon count from the session if it exists
             $robot_info['robot_summoned'] = !empty($robot_database['robot_summoned']) ? $robot_database['robot_summoned'] : 0;
 
+            // Collect any manually unlocked alts from the session if exists
+            $robot_info['robot_altimages'] = mmrpg_prototype_altimage_unlocked($robot_token);
+
             // Collect the alt images if there are any that are unlocked
             $robot_alt_count = 1 + (!empty($robot_info['robot_image_alts']) ? count($robot_info['robot_image_alts']) : 0);
             $robot_alt_options = array();
             if (!empty($robot_info['robot_image_alts'])){
                 foreach ($robot_info['robot_image_alts'] AS $alt_key => $alt_info){
-                    if ($robot_info['robot_summoned'] < $alt_info['summons']){ continue; }
+                    $is_unlocked = false;
+                    if (in_array($alt_info['token'], $robot_info['robot_altimages'])){ $is_unlocked = true; }
+                    elseif ($robot_info['robot_summoned'] >= $alt_info['summons']){ $is_unlocked = true; $robot_info['robot_altimages'][] = $alt_info['token']; }
+                    if (!$is_unlocked){ continue; }
                     $robot_alt_options[] = $alt_info['token'];
                 }
             }
@@ -2683,7 +2689,10 @@ class rpg_robot extends rpg_object {
                 //$temp_image_alt_title .= '<span style="font-size: 90%;">';
                     $temp_image_alt_title .= '&#8226; <span style="font-size: 90%;">'.$robot_info['robot_name'].'</span><br />';
                     foreach ($robot_info['robot_image_alts'] AS $alt_key => $alt_info){
-                        if ($robot_info['robot_summoned'] >= $alt_info['summons']){
+                        if (
+                            ($robot_info['robot_summoned'] >= $alt_info['summons']) ||
+                            (in_array($alt_info['token'], $robot_info['robot_altimages']))
+                            ){
                             $temp_image_alt_title .= '&#8226; <span style="font-size: 90%;">'.$alt_info['name'].'</span><br />';
                         } else {
                             $temp_image_alt_title .= '&#9702; <span style="font-size: 90%;">???</span><br />';
