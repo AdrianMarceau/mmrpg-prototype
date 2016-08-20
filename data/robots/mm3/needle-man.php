@@ -7,6 +7,11 @@ $robot = array(
   'robot_token' => 'needle-man',
   'robot_image_editor' => 110,
   'robot_image_size' => 80,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Needle Man (Magenta Alt)', 'summons' => 100, 'colour' => 'laser'),
+    array('token' => 'alt2', 'name' => 'Needle Man (Emerald Alt)', 'summons' => 200, 'colour' => 'nature'),
+    array('token' => 'alt9', 'name' => 'Needle Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'cutter',
   'robot_field' => 'construction-site',
   'robot_description' => 'Deadly Spikes Robot',

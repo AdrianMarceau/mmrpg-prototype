@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Snake Man',
   'robot_token' => 'snake-man',
   'robot_image_editor' => 110,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Snake Man (Amber Alt)', 'summons' => 100, 'colour' => 'electric'),
+    array('token' => 'alt2', 'name' => 'Snake Man (Crimson Alt)', 'summons' => 200, 'colour' => 'flame'),
+    array('token' => 'alt9', 'name' => 'Snake Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'nature',
   'robot_field' => 'serpent-column',
   'robot_description' => 'Stealthy Serpent Robot',

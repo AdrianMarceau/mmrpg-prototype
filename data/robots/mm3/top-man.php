@@ -6,6 +6,11 @@ $robot = array(
   'robot_name' => 'Top Man',
   'robot_token' => 'top-man',
   'robot_image_editor' => 110,
+  'robot_image_alts' => array(
+    array('token' => 'alt', 'name' => 'Top Man (Purple Alt)', 'summons' => 100, 'colour' => 'time'),
+    array('token' => 'alt2', 'name' => 'Top Man (Green Alt)', 'summons' => 200, 'colour' => 'nature'),
+    array('token' => 'alt9', 'name' => 'Top Man (Darkness Alt)', 'summons' => 900, 'colour' => 'empty')
+    ),
   'robot_core' => 'swift',
   'robot_field' => 'spinning-greenhouse',
   'robot_description' => 'Dizzy Spinning Robot',
