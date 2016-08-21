@@ -4,7 +4,7 @@ $battle = array(
   'battle_name' => 'Chapter Five Final Battle 3/3',
   'battle_size' => '1x4',
   'battle_encore' => true,
-  'battle_description' => 'Defeat the army of powered up Robot Master copies and download their data!',
+  'battle_description' => 'Defeat the powered up army of dark Robot Master clones and download their data!',
   'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 8),
   'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 45 * 8),
   'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination-3', 'field_name' => 'Final Destination III', 'field_music' => 'final-destination', 'field_mechas' => array('beak-3', 'beetle-borg-3', 'tackle-fire-3', 'flea-3', 'flutter-fly-3', 'picket-man-3', 'peng-3', 'spine-3')),
