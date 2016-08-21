@@ -747,34 +747,40 @@ class rpg_disabled {
             // If this robot was a MECHA class, it may drop PELLETS and SMALL SCREWS
             if ($this_robot->robot_class == 'mecha'){
                 // Append the Tier I item drops
-                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'energy-pellet', 'min' => 1, 'max' => 2);
-                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'weapon-pellet', 'min' => 1, 'max' => 2);
-                $target_player_rewards['items'][] =  array('chance' => 40, 'token' => 'small-screw', 'min' => 1, 'max' => 3);
+                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'energy-pellet', 'min' => 1, 'max' => 3);
+                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'weapon-pellet', 'min' => 1, 'max' => 3);
+
+                // Append the Tier I screw drops
+                $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 1, 'max' => 3);
+
             }
             // If this robot was a MASTER class, it may drop PELLETS, CAPSULES and SMALL, LARGE SCREWS
             elseif ($this_robot->robot_class == 'master'){
-                // Append the Tier I item drops
-                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'energy-pellet', 'min' => 2, 'max' => 3);
-                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'weapon-pellet', 'min' => 2, 'max' => 3);
-                $target_player_rewards['items'][] =  array('chance' => 40, 'token' => 'small-screw', 'min' => 2, 'max' => 4);
+
                 // Append the Tier II item drops
-                $target_player_rewards['items'][] =  array('chance' => 20, 'token' => 'energy-capsule', 'min' => 1, 'max' => 2);
-                $target_player_rewards['items'][] =  array('chance' => 20, 'token' => 'weapon-capsule', 'min' => 1, 'max' => 2);
-                $target_player_rewards['items'][] =  array('chance' => 80, 'token' => 'large-screw', 'min' => 1, 'max' => 3);
+                $target_player_rewards['items'][] =  array('chance' => 20, 'token' => 'energy-capsule', 'min' => 2, 'max' => 6);
+                $target_player_rewards['items'][] =  array('chance' => 20, 'token' => 'weapon-capsule', 'min' => 2, 'max' => 6);
+
+                // Append the Tier I screw drops
+                $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 3, 'max' => 6);
+                // Append the Tier II screw drops
+                $target_player_rewards['items'][] =  array('chance' => 60, 'token' => 'large-screw', 'min' => 1, 'max' => 3);
+
             }
             // If this robot was a BOSS class, it may drop PELLETS, CAPSULES and SMALL, LARGE SCREWS and ....?
             elseif ($this_robot->robot_class == 'boss'){
-                // Append the Tier I item drops
-                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'energy-pellet', 'min' => 3, 'max' => 4);
-                $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'weapon-pellet', 'min' => 3, 'max' => 4);
-                $target_player_rewards['items'][] =  array('chance' => 40, 'token' => 'small-screw', 'min' => 3, 'max' => 5);
-                // Append the Tier II item drops
-                $target_player_rewards['items'][] =  array('chance' => 20, 'token' => 'energy-capsule', 'min' => 2, 'max' => 3);
-                $target_player_rewards['items'][] =  array('chance' => 20, 'token' => 'weapon-capsule', 'min' => 2, 'max' => 3);
-                $target_player_rewards['items'][] =  array('chance' => 80, 'token' => 'large-screw', 'min' => 2, 'max' => 4);
+
                 // Append the Tier III item drops
-                $target_player_rewards['items'][] =  array('chance' => 5, 'token' => 'energy-tank', 'min' => 1, 'max' => 1);
-                $target_player_rewards['items'][] =  array('chance' => 5, 'token' => 'weapon-tank', 'min' => 1, 'max' => 1);
+                $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'energy-tank', 'min' => 3, 'max' => 9);
+                $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'weapon-tank', 'min' => 3, 'max' => 9);
+
+                // Append the Tier I screw drops
+                $target_player_rewards['items'][] =  array('chance' => 60, 'token' => 'small-screw', 'min' => 6, 'max' => 9);
+                // Append the Tier II screw drops
+                $target_player_rewards['items'][] =  array('chance' => 90, 'token' => 'large-screw', 'min' => 3, 'max' => 6);
+                // Append the Tier III screw drops
+                //$target_player_rewards['items'][] =  array('chance' => 90, 'token' => 'hyper-screw', 'min' => 1, 'max' => 3);
+
             }
 
             // Precount the item values for later use
@@ -788,8 +794,10 @@ class rpg_disabled {
             // If this robot was a MASTER class and destroyed by WEAKNESS, it may drop a CORE
             if ($this_robot->robot_class == 'master' && !empty($this_robot->flags['triggered_weakness'])){
                 $temp_core_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
-                $temp_chance_value = ($temp_value_total * 4);
-                $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => $temp_core_type.'-core', 'min' => 1, 'max' => 1);
+                if ($temp_core_type != 'empty'){
+                    $temp_chance_value = ($temp_value_total * 4);
+                    $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => $temp_core_type.'-core', 'min' => 1, 'max' => 1);
+                }
             }
 
             // Shuffle the rewards so it doesn't look to formulaic
