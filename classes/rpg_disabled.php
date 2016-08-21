@@ -741,11 +741,15 @@ class rpg_disabled {
             // Increase the item chance multiplier if one is set for the stage
             if (isset($this_battle->field->field_multipliers['items'])){ $temp_chance_multiplier = ($temp_chance_multiplier * $this_battle->field->field_multipliers['items']); }
 
+            // Increse the multiplier if this is an empty core robot
+            if ($this_robot->robot_core == 'empty' || $this_robot->robot_core2 == 'empty'){ $temp_chance_multiplier = $temp_chance_multiplier * 2; }
+
             // Define the available item drops for this battle
             $target_player_rewards['items'] = !empty($this_battle->battle_rewards['items']) ? $this_battle->battle_rewards['items'] : array();
 
             // If this robot was a MECHA class, it may drop PELLETS and SMALL SCREWS
             if ($this_robot->robot_class == 'mecha'){
+
                 // Append the Tier I item drops
                 $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'energy-pellet', 'min' => 1, 'max' => 3);
                 $target_player_rewards['items'][] =  array('chance' => 10, 'token' => 'weapon-pellet', 'min' => 1, 'max' => 3);
