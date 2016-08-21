@@ -410,6 +410,7 @@ class rpg_robot extends rpg_object {
             if (in_array($this_type_token, array('water','wind'))){ $temp_saturator = 1.5; }
             elseif (in_array($this_type_token, array('earth', 'time', 'impact'))){ $temp_saturator = 1.75; }
             elseif (in_array($this_type_token, array('space', 'shadow'))){ $temp_saturator = 2.0; }
+            elseif (in_array($this_type_token, array('empty'))){ $this_text_colour = array(172, 45, 27); }
             if ($temp_saturator > 1){
                 $temp_overflow = 0;
                 foreach ($this_text_colour AS $key => $val){ $this_text_colour[$key] = ceil($val * $temp_saturator); if ($this_text_colour[$key] > 255){ $temp_overflow = $this_text_colour[$key] - 255; $this_text_colour[$key] = 255; } }
