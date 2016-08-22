@@ -238,13 +238,14 @@ foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 =>
     $temp_battle_omega['battle_turns'] += $robot['robot_class'] == 'master' ? MMRPG_SETTINGS_BATTLETURNS_PERROBOT : 0;
 
     // If this is a mecha, only allow limited extra abilities
+    $ability_count = $temp_ability_count;
     if ($robot['robot_class'] == 'mecha'){
-        $temp_ability_count = ceil($temp_ability_count / 2);
-        if ($temp_ability_count > 2){ $temp_ability_count = 2; }
+        $ability_count = ceil($ability_count / 2);
+        if ($ability_count > 2){ $ability_count = 2; }
     }
 
     // Generate abilities and update the omega robot array
-    $temp_abilities = mmrpg_prototype_generate_abilities($robot, $omega_robot_level, $temp_ability_count);
+    $temp_abilities = mmrpg_prototype_generate_abilities($robot, $omega_robot_level, $ability_count);
     $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_abilities'] = $temp_abilities;
 
     // If this is a mecha with alt images, randomly assign one
