@@ -665,12 +665,6 @@ class rpg_robot extends rpg_object {
             $weights[] = $this_robot->robot_token == 'met' ? 90 : 1;
         }
 
-        // Define the frequency of the super throw ability based on benched targets
-        if ($this_robot->has_ability('super-throw')){
-            $options[] = 'super-throw';
-            $weights[] = $target_player->counters['robots_active'] > 1 ? 10 : 1;
-        }
-
         // Define the frequency of the energy boost ability if set
         if ($this_robot->has_ability('energy-boost')){
             $options[] = 'energy-boost';
@@ -771,6 +765,21 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 1;  }
         }
 
+        // Define the frequency of the super throw ability based on benched targets
+        if ($this_robot->has_ability('super-throw')){
+            $options[] = 'super-throw';
+            if ($target_player->counters['robots_active'] > 1){ $weights[] = 10; }
+            else { $weights[] = 1; }
+        }
+
+        // Define the frequency of the mecha support ability based benched robot count
+        if ($this_robot->has_ability('mecha-support')){
+            $options[] = 'mecha-support';
+            if ($target_player->counters['robots_total'] == 1){ $weights[] = 50; }
+            elseif ($target_player->counters['robots_total'] < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ $weights[] = 10; }
+            else { $weights[] = 0; }
+        }
+
         // Loop through any leftover abilities and add them to the weighted ability options
         $temp_ability_tokens = "'".implode("','", array_values($this_robot->robot_abilities))."'";
         $temp_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
@@ -791,6 +800,18 @@ class rpg_robot extends rpg_object {
                 $weights[] = $value;
             }
         }
+
+        // Remove any options that have absolute zero values
+        foreach ($weights AS $key => $value){
+            if (empty($value)){
+                unset($weights[$key]);
+                unset($options[$key]);
+                continue;
+            }
+        }
+
+        // This robot doesn't have ANY abilities, return buster shot
+        if (empty($options) || empty($weights)){ return 'buster-shot'; }
 
         // Return an ability based on a weighted chance
         return $this_battle->weighted_chance($options, $weights);
