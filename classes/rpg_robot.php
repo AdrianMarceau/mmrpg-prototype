@@ -781,7 +781,6 @@ class rpg_robot extends rpg_object {
                     if ($this_robot->robot_core == $info['ability_type']){ $value = 50; }
                     elseif ($this_robot->robot_core == 'copy'){ $value = 40; }
                     elseif ($this_robot->robot_core != $info['ability_type']){ $value = 30; }
-                    if (preg_match('/^(attack|defense|speed)-(burn|blaze)$/i', $token)){ $value = ceil($value * 0.10); }
                 } elseif (empty($this_robot->robot_core)){
                     $value = 30;
                 } else {
