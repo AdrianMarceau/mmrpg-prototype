@@ -5,7 +5,7 @@ $ability = array(
   'ability_token' => 'energy-boost',
   'ability_game' => 'MMRPG',
   'ability_description' => 'The user manually repairs damaged systems to restore energy by {RECOVERY}% of its base value!',
-  'ability_energy' => 4,
+  'ability_energy' => 8,
   'ability_recovery' => 15,
   'ability_recovery_percent' => true,
   'ability_accuracy' => 100,
@@ -62,7 +62,7 @@ $ability = array(
     extract($objects);
 
     // If this ability is being used by a special support robot, allow targetting
-    $temp_support_robots = array('roll', 'disco', 'rhythm', 'met');
+    $temp_support_robots = array('roll', 'disco', 'rhythm');
     if (in_array($this_robot->robot_token, $temp_support_robots) && $this_player->counters['robots_active'] > 1){
 
       // Update this ability's targetting setting
