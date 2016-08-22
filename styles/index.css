@@ -3845,6 +3845,7 @@ body.windowFlag_landscapeMode #window .page .body .community .thread_name .threa
     border: 1px solid rgb(46,46,46);
     font-weight: normal;
     white-space: normal;
+    line-height: 16px;
 }
 #window .page .body .bodytext .field_panel {
     background-color: #262626;
