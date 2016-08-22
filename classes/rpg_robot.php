@@ -1414,6 +1414,9 @@ class rpg_robot extends rpg_object {
                 if (!empty($this->robot_core) && ($this->robot_core == $this_ability->ability_type || $this->robot_core == $this_ability->ability_type2)){
                     $energy_mods++;
                     $energy_new = ceil($energy_new * 0.5);
+                } elseif (empty($this->robot_core) && empty($this_ability->ability_type) && empty($this_ability->ability_type2)){
+                    $energy_mods++;
+                    $energy_new = ceil($energy_new * 0.5);
                 }
                 if (!empty($this->robot_rewards['abilities'])){
                     foreach ($this->robot_rewards['abilities'] AS $key => $info){
