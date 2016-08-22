@@ -5,7 +5,7 @@ $ability = array(
   'ability_token' => 'attack-break',
   'ability_game' => 'MMRPG',
   'ability_description' => 'The user breaks down the target&#39;s weapons, lowering its attack by {DAMAGE}%!',
-  'ability_energy' => 2,
+  'ability_energy' => 4,
   'ability_damage' => 15,
   'ability_damage_percent' => true,
   'ability_accuracy' => 95,
@@ -42,7 +42,7 @@ $ability = array(
     extract($objects);
 
     // If this ability is being used by a special support robot, allow targetting
-    $temp_support_robots = array('roll', 'disco', 'rhythm', 'met');
+    $temp_support_robots = array('roll', 'disco', 'rhythm');
     if (in_array($this_robot->robot_token, $temp_support_robots) && $target_player->counters['robots_active'] > 1){
 
       // Update this ability's targetting setting
