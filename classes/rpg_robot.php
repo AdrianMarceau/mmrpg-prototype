@@ -772,7 +772,8 @@ class rpg_robot extends rpg_object {
         }
 
         // Loop through any leftover abilities and add them to the weighted ability options
-        $temp_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $temp_ability_tokens = "'".implode("','", array_values($this_robot->robot_abilities))."'";
+        $temp_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
         foreach ($this_robot->robot_abilities AS $key => $token){
             if (!in_array($token, $options)){
                 $info = rpg_ability::parse_index_info($temp_ability_index[$token]);
