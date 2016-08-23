@@ -39,6 +39,9 @@ function mmrpg_save_game_session(){
         $this_stars = !empty($save['values']['battle_stars']) ? $save['values']['battle_stars'] : array();
         unset($save);
 
+        // Define the flag for whether this is a new user
+        $is_new_user = false;
+
         // Collect this user's ID from the database if not set
         if (!isset($this_user['userid'])){
 
@@ -55,6 +58,9 @@ function mmrpg_save_game_session(){
             }
             // Otherwise, create database rows for this new file
             else {
+
+                // This is a new user so update the flag
+                $is_new_user = true;
 
                 // Generate new user, save, and board IDs for this listing
                 $temp_user_id = $db->get_value('SELECT MAX(user_id) AS user_id FROM mmrpg_users WHERE user_id < '.MMRPG_SETTINGS_GUEST_ID, 'user_id') + 1;
@@ -440,8 +446,10 @@ function mmrpg_save_game_session(){
         $this_save_array['save_flags'] = json_encode($this_flags);
         $this_save_array['save_settings'] = json_encode($this_settings);
         $this_save_array['save_cache_date'] = $this_cache_date;
-        $this_save_array['save_file_name'] = $this_file['name'];
-        $this_save_array['save_file_path'] = $this_file['path'];
+        if ($is_new_user){
+            $this_save_array['save_file_name'] = $this_file['name'];
+            $this_save_array['save_file_path'] = $this_file['path'];
+        }
         $this_save_array['save_date_modified'] = time();
 
         // Update this save's info in the database
