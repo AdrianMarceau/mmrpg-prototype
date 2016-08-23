@@ -24,7 +24,7 @@ function mmrpg_load_game_session($this_save_filepath){
         preg_match('#/([-_a-z0-9]+/)([-_a-z0-9]+.sav)$#i', $this_save_filepath, $temp_matches);
         $this_database_save = $db->get_array("SELECT * FROM mmrpg_saves WHERE save_file_name = '{$temp_matches[2]}' AND save_file_path = '{$temp_matches[1]}' LIMIT 1");
         $this_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = '{$this_database_save['user_id']}' LIMIT 1");
-        if (empty($this_database_save)){ die('could not save load for '.$temp_matches[2].' AND '.$temp_matches[1].' on line '.__LINE__); }
+        if (empty($this_database_save)){ die('could not save load for file '.$temp_matches[2].' and path '.$temp_matches[1].' on line '.__LINE__); }
         if (empty($this_database_user)){ die('could not user load for '.$this_database_save['user_id'].' on line '.__LINE__); }
 
         // Update the game session with database extracted variables

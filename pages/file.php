@@ -712,10 +712,10 @@ while ($this_action == 'load'){
                     $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
                     mmrpg_load_game_session($this_save_filepath);
                     if (empty($_SESSION['GAME']['counters']['battle_points'])){
-                        die('battle points are empty on line '.__LINE__);
+                        //die('battle points are empty on line '.__LINE__);
                         mmrpg_reset_game_session($this_save_filepath);
                     } elseif (empty($_SESSION['GAME']['values']['battle_rewards'])){
-                        die('battle rewards are empty on line '.__LINE__);
+                        //die('battle rewards are empty on line '.__LINE__);
                         mmrpg_reset_game_session($this_save_filepath);
                     } else {
                         mmrpg_save_game_session($this_save_filepath);
