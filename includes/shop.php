@@ -242,7 +242,7 @@ $this_shop_index['reggae'] = array(
     'shop_items' => array(
         'items_buying' => array(
 
-            'none-core' => 3000, 'cutter-core' => 3000,
+            'none-core' => 1500, 'cutter-core' => 3000,
             'impact-core' => 3000,  'freeze-core' => 3000,
             'explode-core' => 3000, 'flame-core' => 3000,
             'electric-core' => 3000, 'time-core' => 3000,
@@ -251,7 +251,7 @@ $this_shop_index['reggae'] = array(
             'nature-core' => 3000, 'missile-core' => 3000,
             'crystal-core' => 3000, 'shadow-core' => 3000,
             'space-core' => 3000, 'shield-core' => 3000,
-            'laser-core' => 3000, 'copy-core' => 3000
+            'laser-core' => 3000, 'copy-core' => 6000
 
             )
         )
