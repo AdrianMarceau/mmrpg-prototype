@@ -200,7 +200,9 @@ $this_shop_index['reggae'] = array(
             'energy-boost' => 6000, 'attack-boost' => 6000,
             'defense-boost' => 6000, 'speed-boost' => 6000,
             'energy-break' => 9000, 'attack-break' => 9000,
-            'defense-break' => 9000, 'speed-break' => 9000
+            'defense-break' => 9000, 'speed-break' => 9000,
+            'energy-swap' => 12000, 'attack-swap' => 12000,
+            'defense-swap' => 12000, 'speed-swap' => 12000,
             ),
         'abilities_selling2' => array(
             'buster-charge' => 3000, 'buster-relay' => 3000,
@@ -210,8 +212,12 @@ $this_shop_index['reggae'] = array(
             'defense-break' => 9000, 'speed-break' => 9000,
             'energy-swap' => 12000, 'attack-swap' => 12000,
             'defense-swap' => 12000, 'speed-swap' => 12000,
+            'attack-support' => 15000, 'defense-support' => 15000,
+            'speed-support' => 15000, 'energy-support' => 15000,
+            'attack-assault' => 15000, 'defense-assault' => 15000,
+            'speed-assault' => 15000, 'energy-assault' => 15000,
             'attack-mode' => 15000, 'defense-mode' => 15000,
-            'speed-mode' => 15000, 'energy-mode' => 15000
+            'speed-mode' => 15000, 'energy-mode' => 15000,
             ),
         'abilities_selling3' => array(
             'buster-charge' => 3000, 'buster-relay' => 3000,
@@ -221,6 +227,10 @@ $this_shop_index['reggae'] = array(
             'defense-break' => 9000, 'speed-break' => 9000,
             'energy-swap' => 12000, 'attack-swap' => 12000,
             'defense-swap' => 12000, 'speed-swap' => 12000,
+            'attack-support' => 15000, 'defense-support' => 15000,
+            'speed-support' => 15000, 'energy-support' => 15000,
+            'attack-assault' => 15000, 'defense-assault' => 15000,
+            'speed-assault' => 15000, 'energy-assault' => 15000,
             'attack-mode' => 15000, 'defense-mode' => 15000,
             'speed-mode' => 15000, 'energy-mode' => 15000,
             'experience-booster' => 18000, 'experience-breaker' => 18000,
@@ -455,10 +465,12 @@ if (!empty($this_shop_index['auto'])){
 if (!empty($this_shop_index['reggae'])){
 
         // If Reggae's Shop has reached sufficient levels, expand the inventory
-        if ($this_shop_index['reggae']['shop_level'] >= 20){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling2']; }
-        if ($this_shop_index['reggae']['shop_level'] >= 30){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling3']; }
+        if ($this_shop_index['reggae']['shop_level'] >= 10){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling2']; }
+        if ($this_shop_index['reggae']['shop_level'] >= 20){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling3']; }
+        //if ($this_shop_index['reggae']['shop_level'] >= 30){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling4']; }
         unset($this_shop_index['reggae']['shop_abilities']['abilities_selling2']);
         unset($this_shop_index['reggae']['shop_abilities']['abilities_selling3']);
+        //unset($this_shop_index['reggae']['shop_abilities']['abilities_selling4']);
 
         /*
         // If the player has X, Reggae's Shop also sells weapons
