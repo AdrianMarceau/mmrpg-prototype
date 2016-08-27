@@ -32,7 +32,7 @@ $robot = array(
     'attack-support', 'defense-support', 'speed-support', 'energy-support',
     'attack-assault', 'defense-assault', 'speed-assault', 'energy-assault',
     'attack-shuffle', 'defense-shuffle', 'speed-shuffle', 'energy-shuffle',
-    'attack-mode', 'defense-mode', 'speed-mode', 'energy-mode',
+    'attack-mode', 'defense-mode', 'speed-mode', 'energy-mode', 'repair-mode',
     'experience-booster', 'recovery-booster', 'damage-booster',
     'experience-breaker', 'recovery-breaker', 'damage-breaker',
     'field-support', 'mecha-support',
