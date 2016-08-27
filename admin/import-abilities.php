@@ -109,7 +109,7 @@ if (!empty($mmrpg_index['abilities'])){
     $temp_insert_array['attachment_frame_classes'] = !empty($ability_data['attachment_frame_classes']) ? $ability_data['attachment_frame_classes'] : '';
 
     // Define the flags
-    $temp_insert_array['ability_flag_hidden'] = $temp_insert_array['ability_class'] != 'master' || in_array($temp_insert_array['ability_token'], array('ability', 'attachment-defeat')) ? 1 : 0;
+    $temp_insert_array['ability_flag_hidden'] = $temp_insert_array['ability_class'] != 'master' || in_array($temp_insert_array['ability_token'], array('ability', 'attachment-defeat', 'energy-shuffle', 'attack-shuffle', 'defense-shuffle', 'speed-shuffle', 'repair-mode')) ? 1 : 0;
     $temp_insert_array['ability_flag_complete'] = $temp_insert_array['ability_class'] == 'system' || $ability_data['ability_image'] != 'ability' ? 1 : 0;
     $temp_insert_array['ability_flag_published'] = 1;
 
