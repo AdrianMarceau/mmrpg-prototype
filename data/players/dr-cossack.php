@@ -130,16 +130,8 @@ $player = array(
       ),
     'abilities' => array(
       array('points' =>        0, 'token' => 'buster-shot'),
-      //array('points' =>     3750, 'token' => 'copy-shot'),
-      array('points' =>     7500, 'token' => 'cossack-buster'),
-      array('points' =>    15000, 'token' => 'energy-swap'),
-      array('points' =>    30000, 'token' => 'attack-swap'),
-      array('points' =>    60000, 'token' => 'defense-swap'),
-      array('points' =>   120000, 'token' => 'speed-swap'),
-      array('points' =>   240000, 'token' => 'repair-mode'),
-      array('points' =>   480000, 'token' => 'attack-mode'),
-      array('points' =>   960000, 'token' => 'defense-mode'),
-      array('points' =>  1920000, 'token' => 'speed-mode')
+      array('points' =>    10000, 'token' => 'cossack-buster'),
+      array('points' =>   100000, 'token' => 'copy-shot')
       )
     ),
   'player_quotes' => array(

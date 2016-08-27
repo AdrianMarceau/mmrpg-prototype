@@ -1264,8 +1264,9 @@ class rpg_ability extends rpg_object {
                                                 'energy-boost', 'attack-boost', 'defense-boost', 'speed-boost',
                                                 'energy-break', 'attack-break', 'defense-break', 'speed-break',
                                                 'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
-                                                'repair-mode', 'attack-mode', 'defense-mode', 'speed-mode',
-                                                'field-support', 'mecha-support'
+                                                'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
+                                                'field-support', 'mecha-support',
+                                                'repair-mode' // legacy support
                                                 );
                                             foreach ($ability_robot_rewards AS $this_info){
                                                 $this_level = $this_info['level'];

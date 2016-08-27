@@ -62,7 +62,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',
                 ),
             array(
-                'attack-mode', 'defense-mode', 'speed-mode', 'repair-mode',
+                'attack-mode', 'defense-mode', 'speed-mode', 'energy-mode',
                 ),
             array(
                 'attack-support', 'defense-support', 'speed-support', 'energy-support',

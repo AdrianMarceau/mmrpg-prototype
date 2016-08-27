@@ -1254,12 +1254,7 @@ class rpg_item extends rpg_object {
                                             $robot_method_key = 0;
                                             $robot_method = '';
                                             $temp_global_items = array(
-                                                'light-buster', 'wily-buster', 'cossack-buster',
-                                                'energy-boost', 'attack-boost', 'defense-boost', 'speed-boost',
-                                                'energy-break', 'attack-break', 'defense-break', 'speed-break',
-                                                'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
-                                                'repair-mode', 'attack-mode', 'defense-mode', 'speed-mode',
-                                                'field-support', 'mecha-support'
+                                                // no such thing
                                                 );
                                             foreach ($item_robot_rewards AS $this_info){
                                                 $this_level = $this_info['level'];

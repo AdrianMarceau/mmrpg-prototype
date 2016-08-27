@@ -32,7 +32,7 @@ $robot = array(
     'attack-support', 'defense-support', 'speed-support', 'energy-support',
     'attack-assault', 'defense-assault', 'speed-assault', 'energy-assault',
     'attack-shuffle', 'defense-shuffle', 'speed-shuffle', 'energy-shuffle',
-    'attack-mode', 'defense-mode', 'speed-mode', 'repair-mode',
+    'attack-mode', 'defense-mode', 'speed-mode', 'energy-mode',
     'experience-booster', 'recovery-booster', 'damage-booster',
     'experience-breaker', 'recovery-breaker', 'damage-breaker',
     'field-support', 'mecha-support',
@@ -42,15 +42,7 @@ $robot = array(
   'robot_rewards' => array(
     'abilities' => array(
       array('level' => 0, 'token' => 'buster-shot'),
-      array('level' => 2, 'token' => 'roll-buster'),
-      array('level' => 4, 'token' => 'attack-boost'),
-      array('level' => 6, 'token' => 'defense-boost'),
-      array('level' => 8, 'token' => 'speed-boost'),
-      array('level' => 10, 'token' => 'energy-boost'),
-      array('level' => 12, 'token' => 'attack-support'),
-      array('level' => 14, 'token' => 'defense-support'),
-      array('level' => 16, 'token' => 'speed-support'),
-      array('level' => 18, 'token' => 'energy-support')
+      array('level' => 2, 'token' => 'roll-buster')
       )
     ),
   'robot_quotes' => array(

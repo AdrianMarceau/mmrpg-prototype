@@ -23,7 +23,7 @@
   $this_prototype_data['ability_addons_two'] = array('attack-break', 'defense-break', 'speed-break');
   $this_prototype_data['ability_addons_three'] = array('buster-shot', 'energy-boost', 'energy-break');
   $this_prototype_data['ability_addons_four'] = array('attack-mode', 'defense-mode', 'speed-mode');
-  $this_prototype_data['ability_addons_five'] = array('repair-mode', 'recovery-booster');
+  $this_prototype_data['ability_addons_five'] = array('energy-mode', 'recovery-booster');
   */
 
   // -- DR. LIGHT BATTLE OPTIONS -- //
@@ -44,7 +44,7 @@
   $this_prototype_data['ability_addons_two'] = array('attack-break', 'defense-break', 'speed-break');
   $this_prototype_data['ability_addons_three'] = array('buster-shot', 'energy-boost', 'energy-break');
   $this_prototype_data['ability_addons_four'] = array('attack-mode', 'defense-mode', 'speed-mode');
-  $this_prototype_data['ability_addons_five'] = array('repair-mode', 'recovery-booster');
+  $this_prototype_data['ability_addons_five'] = array('energy-mode', 'recovery-booster');
 
   // If the final battle was completed, update the flag, else set to false
   $this_prototype_data['demo_complete'] = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], 'demo-battle-iv') ? true : false;

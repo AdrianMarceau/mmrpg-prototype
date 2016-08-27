@@ -131,16 +131,8 @@ $player = array(
       ),
     'abilities' => array(
       array('points' =>        0, 'token' => 'buster-shot'),
-      //array('points' =>     3750, 'token' => 'copy-shot'),
-      array('points' =>     7500, 'token' => 'wily-buster'),
-      array('points' =>    15000, 'token' => 'energy-break'),
-      array('points' =>    30000, 'token' => 'attack-break'),
-      array('points' =>    60000, 'token' => 'defense-break'),
-      array('points' =>   120000, 'token' => 'speed-break'),
-      array('points' =>   240000, 'token' => 'repair-mode'),
-      array('points' =>   480000, 'token' => 'attack-mode'),
-      array('points' =>   960000, 'token' => 'defense-mode'),
-      array('points' =>  1920000, 'token' => 'speed-mode')
+      array('points' =>    10000, 'token' => 'wily-buster'),
+      array('points' =>   100000, 'token' => 'copy-shot')
       )
     ),
   'player_quotes' => array(
