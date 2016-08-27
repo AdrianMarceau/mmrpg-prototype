@@ -27,6 +27,7 @@ if (!empty($hidden_database_abilities)){
   $temp_tokens = array();
   foreach ($hidden_database_abilities AS $token){ $temp_tokens[] = "'".$token."'"; }
   $temp_condition .= 'AND ability_token NOT IN ('.implode(',', $temp_tokens).') ';
+  $temp_condition .= 'AND ability_flag_hidden = 0 ';
 }
 
 // Collect the database abilities
