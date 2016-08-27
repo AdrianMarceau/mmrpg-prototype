@@ -21,7 +21,7 @@ $robot = array(
   	'attack-boost', 'attack-break', 'attack-mode',
   	'defense-boost', 'defense-break', 'defense-mode',
     'speed-boost', 'speed-break', 'speed-mode',
-    'energy-boost', 'energy-break', 'repair-mode'
+    'energy-boost', 'energy-break', 'energy-mode'
     */
     ),
   'robot_rewards' => array(

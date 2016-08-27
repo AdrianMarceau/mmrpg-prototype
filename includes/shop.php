@@ -211,7 +211,7 @@ $this_shop_index['reggae'] = array(
             'energy-swap' => 12000, 'attack-swap' => 12000,
             'defense-swap' => 12000, 'speed-swap' => 12000,
             'attack-mode' => 15000, 'defense-mode' => 15000,
-            'speed-mode' => 15000, 'repair-mode' => 15000
+            'speed-mode' => 15000, 'energy-mode' => 15000
             ),
         'abilities_selling3' => array(
             'buster-charge' => 3000, 'buster-relay' => 3000,
@@ -222,7 +222,7 @@ $this_shop_index['reggae'] = array(
             'energy-swap' => 12000, 'attack-swap' => 12000,
             'defense-swap' => 12000, 'speed-swap' => 12000,
             'attack-mode' => 15000, 'defense-mode' => 15000,
-            'speed-mode' => 15000, 'repair-mode' => 15000,
+            'speed-mode' => 15000, 'energy-mode' => 15000,
             'experience-booster' => 18000, 'experience-breaker' => 18000,
             'recovery-booster' => 18000, 'recovery-breaker' => 18000,
             'damage-booster' => 18000, 'damage-breaker' => 18000,

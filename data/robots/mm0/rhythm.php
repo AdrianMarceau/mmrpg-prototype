@@ -32,7 +32,7 @@ $robot = array(
     'attack-support', 'defense-support', 'speed-support', 'energy-support',
     'attack-assault', 'defense-assault', 'speed-assault', 'energy-assault',
     'attack-shuffle', 'defense-shuffle', 'speed-shuffle', 'energy-shuffle',
-    'attack-mode', 'defense-mode', 'speed-mode', 'repair-mode',
+    'attack-mode', 'defense-mode', 'speed-mode', 'energy-mode',
     'experience-booster', 'recovery-booster', 'damage-booster',
     'experience-breaker', 'recovery-breaker', 'damage-breaker',
     'field-support', 'mecha-support',
@@ -42,15 +42,7 @@ $robot = array(
   'robot_rewards' => array(
     'abilities' => array(
       array('level' => 0, 'token' => 'buster-shot'),
-      array('level' => 22, 'token' => 'rhythm-buster'),
-      array('level' => 24, 'token' => 'attack-swap'),
-      array('level' => 26, 'token' => 'defense-swap'),
-      array('level' => 28, 'token' => 'speed-swap'),
-      array('level' => 30, 'token' => 'energy-swap'),
-      array('level' => 32, 'token' => 'attack-shuffle'),
-      array('level' => 34, 'token' => 'defense-shuffle'),
-      array('level' => 36, 'token' => 'speed-shuffle'),
-      array('level' => 38, 'token' => 'energy-shuffle')
+      array('level' => 22, 'token' => 'rhythm-buster')
       )
     ),
   'robot_quotes' => array(

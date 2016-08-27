@@ -21,7 +21,7 @@ $robot = array(
   	'buster-shot', 'buster-charge',
     'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
     'attack-break', 'defense-break', 'speed-break', 'energy-break',
-    'attack-mode', 'defense-mode', 'speed-mode', 'repair-mode',
+    'attack-mode', 'defense-mode', 'speed-mode', 'energy-mode',
     'light-buster', 'wily-buster', 'cossack-buster'
     ),
   'robot_rewards' => array(

@@ -741,7 +741,12 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 1;  }
         }
 
-        // Define the frequency of the repair mode ability if set
+        // Define the frequency of the energy/repair mode ability if set
+        if ($this_robot->has_ability('energy-mode')){
+            $options[] = 'energy-mode';
+            if ($this_robot->robot_energy < ($this_robot->robot_base_energy * 0.5)){ $weights[] = 9 * $support_multiplier;  }
+            else { $weights[] = 1;  }
+        }
         if ($this_robot->has_ability('repair-mode')){
             $options[] = 'repair-mode';
             if ($this_robot->robot_energy < ($this_robot->robot_base_energy * 0.5)){ $weights[] = 9 * $support_multiplier;  }
