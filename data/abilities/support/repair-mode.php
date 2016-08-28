@@ -2,7 +2,7 @@
 // REPAIR MODE
 $ability = array(
   'ability_name' => 'Repair Mode',
-  'ability_token' => 'energy-mode',
+  'ability_token' => 'repair-mode',
   'ability_game' => 'MMRPG',
   'ability_description' => 'The user lowers its attack, defense, and speed by {DAMAGE}% to repair damaged systems and recovery up to {RECOVERY}% energy!',
   'ability_energy' => 4,
