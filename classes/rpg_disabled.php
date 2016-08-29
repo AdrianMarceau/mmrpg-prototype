@@ -204,7 +204,6 @@ class rpg_disabled {
             $temp_robots_active = $target_player->values['robots_active'];
             usort($temp_robots_active, array('rpg_player','robot_sort_by_active'));
 
-
             // Define the boost multiplier and start out at zero
             $temp_boost_multiplier = 0;
 
@@ -277,13 +276,17 @@ class rpg_disabled {
             $temp_robot_active_position = false;
             foreach ($temp_robots_active AS $temp_id => $temp_info){
                 $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new rpg_robot($this_robot, $target_player, $temp_info);
-                if ($temp_robot->robot_level >= 100 || $temp_robot->robot_class != 'master'){ $temp_robots_active_num2--; }
+                if ($temp_robot->robot_class != 'master'){ $temp_robots_active_num2--; }
                 if ($temp_robot->robot_position == 'active'){
                     $temp_robot_active_position = $temp_robots_active[$temp_id];
                     unset($temp_robots_active[$temp_id]);
                 }
             }
             $temp_unshift = array_unshift($temp_robots_active, $temp_robot_active_position);
+
+            // DEBUG
+            //$event_body = preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_robots_active = <pre>'.count($temp_robots_active).'</pre>');
+            //$this_battle->events_create(false, false, 'DEBUG', $event_body);
 
             foreach ($temp_robots_active AS $temp_id => $temp_info){
 
@@ -858,9 +861,6 @@ class rpg_disabled {
             }
 
         }
-
-        // DEBUG
-        //$this_robot->battle->events_create(false, false, 'DEBUG', 'we made it past the experience boosts');
 
         // If the player has replacement robots and the knocked-out one was active
         if ($this_player->counters['robots_active'] > 0){
