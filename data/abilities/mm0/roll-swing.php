@@ -39,7 +39,10 @@ $ability = array(
         $this_ability->target_options_update(array(
             'frame' => 'summon',
             'kickback' => array(15, 0, 0),
-            'success' => array($this_swing_offset[0], 30, 10, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().' to generate a '.$this_swing_weapon.'!')
+            'success' => array($this_swing_offset[0], 30, 10, 10,
+                $this_robot->print_name().' uses the '.$this_ability->print_name().
+                ' to generate '.(preg_match('/^(a|e|i|o|u)/i', $this_swing_weapon) ? 'an' : 'a').' '.
+                $this_swing_weapon.'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
 
@@ -62,7 +65,7 @@ $ability = array(
         $this_robot->set_frame_offset('x', 0);
 
         // Disable the target if this ability brought them to zero
-        if ($target_robot->robot_energy <= 0){ $target_robot->trigger_disabled($this_robot, $this_ability); }
+        if ($target_robot->robot_energy <= 0){ $target_robot->trigger_disabled($this_robot); }
 
         // Return true on success
         return true;
