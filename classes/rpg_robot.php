@@ -135,7 +135,7 @@ class rpg_robot extends rpg_object {
         $this->robot_functions = isset($this_robotinfo['robot_functions']) ? $this_robotinfo['robot_functions'] : 'robots/robot.php';
         $this->robot_frame = isset($this_robotinfo['robot_frame']) ? $this_robotinfo['robot_frame'] : 'base';
         //$this->robot_frame_index = isset($this_robotinfo['robot_frame_index']) ? $this_robotinfo['robot_frame_index'] : array('base','taunt','victory','defeat','shoot','throw','summon','slide','defend','damage','base2');
-        $this->robot_frame_offset = isset($this_robotinfo['robot_frame_offset']) ? $this_robotinfo['robot_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
+        $this->robot_frame_offset = !empty($this_robotinfo['robot_frame_offset']) ? $this_robotinfo['robot_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
         $this->robot_frame_classes = isset($this_robotinfo['robot_frame_classes']) ? $this_robotinfo['robot_frame_classes'] : '';
         $this->robot_frame_styles = isset($this_robotinfo['robot_frame_styles']) ? $this_robotinfo['robot_frame_styles'] : '';
         $this->robot_detail_styles = isset($this_robotinfo['robot_detail_styles']) ? $this_robotinfo['robot_detail_styles'] : '';
@@ -261,6 +261,330 @@ class rpg_robot extends rpg_object {
         // Return true on success
         return true;
 
+    }
+
+
+    // Define alias functions for updating specific fields quickly
+
+    public function get_id(){ return intval($this->get_info('robot_id')); }
+    public function set_id($value){ $this->set_info('robot_id', intval($value)); }
+
+    public function get_key(){ return intval($this->get_info('robot_key')); }
+    public function set_key($value){ $this->set_info('robot_key', intval($value)); }
+    public function get_base_key(){ return intval($this->get_info('robot_base_key')); }
+    public function set_base_key($value){ $this->set_info('robot_base_key', intval($value)); }
+
+    public function get_name(){ return $this->get_info('robot_name'); }
+    public function set_name($value){ $this->set_info('robot_name', $value); }
+    public function get_base_name(){ return $this->get_info('robot_base_name'); }
+    public function set_base_name($value){ $this->set_info('robot_base_name', $value); }
+
+    public function get_token(){ return $this->get_info('robot_token'); }
+    public function set_token($value){ $this->set_info('robot_token', $value); }
+
+    public function get_description(){ return $this->get_info('robot_description'); }
+    public function set_description($value){ $this->set_info('robot_description', $value); }
+    public function get_base_description(){ return $this->get_info('robot_base_description'); }
+    public function set_base_description($value){ $this->set_info('robot_base_description', $value); }
+
+    public function get_number(){ return $this->get_info('robot_number'); }
+    public function set_number($value){ $this->set_info('robot_number', $value); }
+    public function get_base_number(){ return $this->get_info('robot_base_number'); }
+    public function set_base_number($value){ $this->set_info('robot_base_number', $value); }
+
+    public function get_field(){ return $this->get_info('robot_field'); }
+    public function set_field($value){ $this->set_info('robot_field', $value); }
+    public function get_base_field(){ return $this->get_info('robot_base_field'); }
+    public function set_base_field($value){ $this->set_info('robot_base_field', $value); }
+
+    public function get_class(){ return $this->get_info('robot_class'); }
+    public function set_class($value){ $this->set_info('robot_class', $value); }
+    public function is_class($class){ return $this->get_class() == $class ? true : false; }
+    public function get_base_class(){ return $this->get_info('robot_base_class'); }
+    public function set_base_class($value){ $this->set_info('robot_base_class', $value); }
+    public function is_base_class($class){ return $this->get_base_class() == $class ? true : false; }
+
+    public function get_gender(){ return $this->get_info('robot_gender'); }
+    public function set_gender($value){ $this->set_info('robot_gender', $value); }
+
+    public function get_core(){ return $this->get_info('robot_core'); }
+    public function set_core($value){ $this->set_info('robot_core', $value); }
+    public function get_base_core(){ return $this->get_info('robot_base_core'); }
+    public function set_base_core($value){ $this->set_info('robot_base_core', $value); }
+
+    public function get_core2(){ return $this->get_info('robot_core2'); }
+    public function set_core2($value){ $this->set_info('robot_core2', $value); }
+    public function get_base_core2(){ return $this->get_info('robot_base_core2'); }
+    public function set_base_core2($value){ $this->set_info('robot_base_core2', $value); }
+
+    public function get_experience(){ return $this->get_info('robot_experience'); }
+    public function set_experience($value){ $this->set_info('robot_experience', $value); }
+    public function get_base_experience(){ return $this->get_info('robot_base_experience'); }
+    public function set_base_experience($value){ $this->set_info('robot_base_experience', $value); }
+
+    public function get_level(){ return $this->get_info('robot_level'); }
+    public function set_level($value){ $this->set_info('robot_level', $value); }
+    public function get_base_level(){ return $this->get_info('robot_base_level'); }
+    public function set_base_level($value){ $this->set_info('robot_base_level', $value); }
+
+    public function get_energy(){
+        return $this->get_info('robot_energy');
+    }
+    public function set_energy($value){
+        $energy = $value;
+        $max_energy = $this->get_base_energy();
+        $min_energy = 0;
+        if ($energy > $max_energy){ $energy = $max_energy; }
+        elseif ($energy < $min_energy){ $energy = $min_energy; }
+        $this->set_info('robot_energy', $energy);
+    }
+    public function get_base_energy(){
+        return $this->get_info('robot_base_energy');
+    }
+    public function set_base_energy($value){
+        $energy = $value;
+        if ($energy < 0){ $energy = 0; }
+        $this->set_info('robot_base_energy', $energy);
+    }
+    public function reset_energy($value){
+        $this->set_info('robot_energy', $this->get_info('robot_base_energy'));
+    }
+
+    public function get_weapons(){
+        return $this->get_info('robot_weapons');
+    }
+    public function set_weapons($value){
+        $weapons = $value;
+        $max_weapons = $this->get_base_weapons();
+        $min_weapons = 0;
+        if ($weapons > $max_weapons){ $weapons = $max_weapons; }
+        elseif ($weapons < $min_weapons){ $weapons = $min_weapons; }
+        $this->set_info('robot_weapons', $weapons);
+    }
+    public function get_base_weapons(){
+        return $this->get_info('robot_base_weapons');
+    }
+    public function set_base_weapons($value){
+        $weapons = $value;
+        if ($weapons < 0){ $weapons = 0; }
+        $this->set_info('robot_base_weapons', $weapons);
+    }
+    public function reset_weapons($value){
+        $this->set_info('robot_weapons', $this->get_info('robot_base_weapons'));
+    }
+
+    public function get_attack(){ return $this->get_info('robot_attack'); }
+    public function set_attack($value){ $this->set_info('robot_attack', $value); }
+    public function get_base_attack(){ return $this->get_info('robot_base_attack'); }
+    public function set_base_attack($value){ $this->set_info('robot_base_attack', $value); }
+
+    public function get_defense(){ return $this->get_info('robot_defense'); }
+    public function set_defense($value){ $this->set_info('robot_defense', $value); }
+    public function get_base_defense(){ return $this->get_info('robot_base_defense'); }
+    public function set_base_defense($value){ $this->set_info('robot_base_defense', $value); }
+
+    public function get_speed(){ return $this->get_info('robot_speed'); }
+    public function set_speed($value){ $this->set_info('robot_speed', $value); }
+    public function get_base_speed(){ return $this->get_info('robot_base_speed'); }
+    public function set_base_speed($value){ $this->set_info('robot_base_speed', $value); }
+
+    public function get_total(){ return $this->get_info('robot_total'); }
+    public function set_total($value){ $this->set_info('robot_total', $value); }
+    public function get_base_total(){ return $this->get_info('robot_base_total'); }
+    public function set_base_total($value){ $this->set_info('robot_base_total', $value); }
+
+    public function get_stat($stat){ return $this->get_info('robot_'.$stat); }
+    public function set_stat($stat, $value){ $this->set_info('robot_'.$stat, $value); }
+    public function get_base_stat($stat){ return $this->get_info('robot_base_'.$stat); }
+    public function set_base_stat($stat, $value){ $this->set_info('robot_base_'.$stat, $value); }
+
+    public function get_weaknesses(){ return $this->get_info('robot_weaknesses'); }
+    public function set_weaknesses($value){ $this->set_info('robot_weaknesses', $value); }
+    public function get_base_weaknesses(){ return $this->get_info('robot_base_weaknesses'); }
+    public function set_base_weaknesses($value){ $this->set_info('robot_base_weaknesses', $value); }
+
+    public function get_resistances(){ return $this->get_info('robot_resistances'); }
+    public function set_resistances($value){ $this->set_info('robot_resistances', $value); }
+    public function get_base_resistances(){ return $this->get_info('robot_base_resistances'); }
+    public function set_base_resistances($value){ $this->set_info('robot_base_resistances', $value); }
+
+    public function get_affinities(){ return $this->get_info('robot_affinities'); }
+    public function set_affinities($value){ $this->set_info('robot_affinities', $value); }
+    public function get_base_affinities(){ return $this->get_info('robot_base_affinities'); }
+    public function set_base_affinities($value){ $this->set_info('robot_base_affinities', $value); }
+
+    public function get_immunities(){ return $this->get_info('robot_immunities'); }
+    public function set_immunities($value){ $this->set_info('robot_immunities', $value); }
+    public function get_base_immunities(){ return $this->get_info('robot_base_immunities'); }
+    public function set_base_immunities($value){ $this->set_info('robot_base_immunities', $value); }
+
+    public function get_item(){ return $this->get_info('robot_item'); }
+    public function set_item($value){ $this->set_info('robot_item', $value); }
+    public function unset_item(){ $this->set_info('robot_item', ''); }
+
+    /**
+     * Check if this robot is holding an item, optionally checking for a specific one
+     * @param string $item_token (optional)
+     * @return bool
+     */
+    public function has_item(){
+        $args = func_get_args();
+        $item = $this->get_info('robot_item');
+        if (!empty($args[0])){ return $item == $args[0] ? true : false; }
+        else { return !empty($item) ? true : false; }
+    }
+
+    public function get_base_item(){ return $this->get_info('robot_base_item'); }
+    public function set_base_item($value){ $this->set_info('robot_base_item', $value); }
+    public function unset_base_item(){ $this->set_info('robot_base_item', ''); }
+
+    /**
+     * Check if this robot is holding a base item, optionally checking for a specific one
+     * @param string $item_token (optional)
+     * @return bool
+     */
+    public function has_base_item(){
+        $args = func_get_args();
+        $item = $this->get_info('robot_base_item');
+        if (!empty($args[0])){ return $item == $args[0] ? true : false; }
+        else { return !empty($item) ? true : false; }
+    }
+
+    public function reset_item(){ $this->set_info('robot_item', $this->get_info('robot_base_item')); }
+
+    public function get_abilities(){ return $this->get_info('robot_abilities'); }
+    public function set_abilities($value){ $this->set_info('robot_abilities', $value); }
+    public function has_abilities(){ return $this->get_info('robot_abilities') ? true : false; }
+    public function has_ability($token){ return in_array($token, $this->get_info('robot_abilities')) ? true : false; }
+    public function get_base_abilities(){ return $this->get_info('robot_base_abilities'); }
+    public function set_base_abilities($value){ $this->set_info('robot_base_abilities', $value); }
+    public function has_base_abilities(){ return $this->get_info('robot_base_abilities') ? true : false; }
+    public function has_base_ability($token){ return in_array($token, $this->get_info('robot_base_abilities')) ? true : false; }
+
+    public function get_attachments(){ return $this->get_info('robot_attachments'); }
+    public function set_attachments($value){ $this->set_info('robot_attachments', $value); }
+    public function has_attachments(){ return $this->get_info('robot_attachments') ? true : false; }
+    public function has_attachment($token){ return $this->get_info('robot_attachments', $token) ? true : false; }
+    public function get_base_attachments(){ return $this->get_info('robot_base_attachments'); }
+    public function set_base_attachments($value){ $this->set_info('robot_base_attachments', $value); }
+    public function has_base_attachments(){ return $this->get_info('robot_base_attachments') ? true : false; }
+    public function has_base_attachment($token){ return in_array($token, $this->get_info('robot_base_attachments')) ? true : false; }
+
+    public function get_quotes(){ return $this->get_info('robot_quotes'); }
+    public function set_quotes($value){ $this->set_info('robot_quotes', $value); }
+    public function get_base_quotes(){ return $this->get_info('robot_base_quotes'); }
+    public function set_base_quotes($value){ $this->set_info('robot_base_quotes', $value); }
+
+    public function get_quote($token){ return $this->get_info('robot_quotes', $token); }
+    public function set_quote($token, $value){ $this->set_info('robot_quotes', $token, $value); }
+    public function unset_quote($token){ $this->unset_info('robot_quotes', $token); }
+    public function has_quote($token){
+        $quote = $this->get_info('robot_quotes', $token);
+        return !empty($quote) ? true : false;
+    }
+    public function get_base_quote($token){ return $this->get_info('robot_base_quotes', $token); }
+    public function set_base_quote($token, $value){ $this->set_info('robot_base_quotes', $token, $value); }
+    public function unset_base_quote($token){ $this->unset_info('robot_base_quotes', $token); }
+    public function has_base_quote($token){
+        $quote = $this->get_info('robot_base_quotes', $token);
+        return !empty($quote) ? true : false;
+    }
+
+    public function get_status(){ return $this->get_info('robot_status'); }
+    public function set_status($value){ $this->set_info('robot_status', $value); }
+
+    public function get_side(){ return $this->get_info('robot_side'); }
+    public function set_side($value){ $this->set_info('robot_side', $value); }
+
+    public function get_direction(){ return $this->get_info('robot_direction'); }
+    public function set_direction($value){ $this->set_info('robot_direction', $value); }
+
+    public function get_position(){ return $this->get_info('robot_position'); }
+    public function set_position($value){ $this->set_info('robot_position', $value); }
+
+    public function get_stance(){ return $this->get_info('robot_stance'); }
+    public function set_stance($value){ $this->set_info('robot_stance', $value); }
+
+    public function get_rewards(){ return $this->get_info('robot_rewards'); }
+    public function set_rewards($value){ $this->set_info('robot_rewards', $value); }
+    public function get_base_rewards(){ return $this->get_info('robot_base_rewards'); }
+    public function set_base_rewards($value){ $this->set_info('robot_base_rewards', $value); }
+
+    public function get_functions(){ return $this->get_info('robot_functions'); }
+    public function set_functions($value){ $this->set_info('robot_functions', $value); }
+
+    public function get_image(){ return $this->get_info('robot_image'); }
+    public function set_image($value){ $this->set_info('robot_image', $value); }
+    public function get_base_image(){ return $this->get_info('robot_base_image'); }
+    public function set_base_image($value){ $this->set_info('robot_base_image', $value); }
+    public function reset_image(){ $this->set_info('robot_image', $this->get_info('robot_base_image')); }
+
+    public function get_image_size(){ return $this->get_info('robot_image_size'); }
+    public function set_image_size($value){ $this->set_info('robot_image_size', $value); }
+    public function get_base_image_size(){ return $this->get_info('robot_base_image_size'); }
+    public function set_base_image_size($value){ $this->set_info('robot_base_image_size', $value); }
+    public function reset_base_image_size(){ $this->set_info('robot_image_size', $this->get_info('robot_base_image_size')); }
+
+    public function get_image_overlay(){
+        return $this->get_info('robot_image_overlay');
+    }
+    public function set_image_overlay($value){
+        $args = func_get_args();
+        if (count($args) == 2){ $this->set_info('robot_image_overlay', $args[0], $args[1]); }
+        else { $this->set_info('robot_image_overlay', $value); }
+    }
+    public function unset_image_overlay($token){
+        $this->unset_info('robot_image_overlay', $token);
+    }
+    public function get_base_image_overlay(){
+        return $this->get_info('robot_base_image_overlay');
+    }
+    public function set_base_image_overlay($value){
+        $args = func_get_args();
+        if (count($args) == 2){ $this->set_info('robot_base_image_overlay', $args[0], $args[1]); }
+        else { $this->set_info('robot_base_image_overlay', $value); }
+    }
+    public function unset_base_image_overlay($token){
+        $this->unset_info('robot_base_image_overlay', $token);
+    }
+
+    public function get_image_alts(){ return $this->get_info('robot_image_alts'); }
+    public function set_image_alts($value){ $this->set_info('robot_image_alts', $value); }
+
+    public function get_frame(){ return $this->get_info('robot_frame'); }
+    public function set_frame($value){ $this->set_info('robot_frame', $value); }
+
+    public function get_frame_offset(){
+        $args = func_get_args();
+        if (isset($args[0])){ return $this->get_info('robot_frame_offset', $args[0]); }
+        else { return $this->get_info('robot_frame_offset'); }
+    }
+    public function set_frame_offset($value){
+        $args = func_get_args();
+        if (isset($args[1])){ $this->set_info('robot_frame_offset', $args[0], $args[1]); }
+        else { $this->set_info('robot_frame_offset', $value); }
+    }
+
+    public function get_frame_classes(){ return $this->get_info('robot_frame_classes'); }
+    public function set_frame_classes($value){ $this->set_info('robot_frame_classes', $value); }
+
+    public function get_frame_styles(){ return $this->get_info('robot_frame_styles'); }
+    public function set_frame_styles($value){ $this->set_info('robot_frame_styles', $value); }
+
+    public function get_detail_styles(){ return $this->get_info('robot_detail_styles'); }
+    public function set_detail_styles($value){ $this->set_info('robot_detail_styles', $value); }
+
+    public function get_original_player(){ return $this->get_info('robot_original_player'); }
+    public function set_original_player($value){ $this->set_info('robot_original_player', $value); }
+
+    public function get_string(){ return $this->get_info('robot_string'); }
+    public function set_string($value){ $this->set_info('robot_string', $value); }
+
+    public function get_lookup(){
+        $lookup = array();
+        $lookup['robot_id'] = $this->get_id();
+        $lookup['robot_token'] = $this->get_token();
+        return $lookup;
     }
 
     // Define a public function for applying robot stat bonuses
@@ -496,14 +820,6 @@ class rpg_robot extends rpg_object {
             $quote_text = '<span style="color: rgb('.implode(',', $this_text_colour).');">&quot;<em>'.$this_quote_text.'</em>&quot;</span>';
         }
         return $quote_text;
-    }
-
-
-    // Define a function for checking if this robot has a specific ability
-    public function has_ability($ability_token){
-        if (empty($this->robot_abilities) || empty($ability_token)){ return false; }
-        elseif (in_array($ability_token, $this->robot_abilities)){ return true; }
-        else { return false; }
     }
 
     // Define a function for checking if this robot is compatible with a specific ability
@@ -1169,25 +1485,6 @@ class rpg_robot extends rpg_object {
         return $this_item->item_results;
     }
 
-    // Define a function for setting and saving a robot attachment
-    public function has_attachment($attachment_token){
-        return isset($this->robot_attachments[$attachment_token]);
-    }
-
-    // Define a function for setting and saving a robot attachment
-    public function set_attachment($attachment_token, $attachment_info){
-        $this->robot_attachments[$attachment_token] = $attachment_info;
-        $this->update_session();
-        return true;
-    }
-
-    // Define a function for unsetting a robot attachment
-    public function unset_attachment($attachment_token){
-        unset($this->robot_attachments[$attachment_token]);
-        $this->update_session();
-        return true;
-    }
-
     // Define a trigger for using one of this robot's attachments
     public function trigger_attachment($attachment_info){
         global $db;
@@ -1540,6 +1837,7 @@ class rpg_robot extends rpg_object {
 
         // Explode the weaknesses, resistances, affinities, and immunities into an array
         $temp_field_names = array('robot_image_alts', 'robot_field2', 'robot_weaknesses', 'robot_resistances', 'robot_affinities', 'robot_immunities');
+        $temp_field_names = array_merge($temp_field_names, array('robot_frame_animate', 'robot_frame_index', 'robot_frame_offset'));
         foreach ($temp_field_names AS $field_name){
             if (!empty($robot_info[$field_name])){ $robot_info[$field_name] = json_decode($robot_info[$field_name], true); }
             else { $robot_info[$field_name] = array(); }

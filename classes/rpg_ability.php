@@ -748,7 +748,7 @@ class rpg_ability extends rpg_object {
         else { $ability_info['_parsed'] = true; }
 
         // Explode the base and animation indexes into an array
-        $temp_field_names = array('ability_frame_animate', 'attachment_frame_animate', 'ability_frame_index', 'attachment_frame_index', 'ability_frame_offset', 'attachment_frame_offset');
+        $temp_field_names = array('ability_frame_animate', 'ability_frame_index', 'attachment_frame_index', 'ability_frame_offset', 'attachment_frame_offset');
         foreach ($temp_field_names AS $field_name){
             if (!empty($ability_info[$field_name])){ $ability_info[$field_name] = json_decode($ability_info[$field_name], true); }
             else { $ability_info[$field_name] = array(); }
