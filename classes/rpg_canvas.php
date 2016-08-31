@@ -130,9 +130,9 @@ class rpg_canvas {
 
         // Calculate the canvas offset variables for this robot
         $temp_data = $this_robot->battle->canvas_markup_offset($this_data['robot_key'], $this_data['robot_position'], $this_data['robot_size']);
-        $this_data['canvas_offset_x'] = $temp_data['canvas_offset_x'];
-        $this_data['canvas_offset_y'] = $temp_data['canvas_offset_y'];
-        $this_data['canvas_offset_z'] = $temp_data['canvas_offset_z'];
+        $this_data['canvas_offset_x'] = $temp_data['canvas_offset_x'] + round($this_robot->robot_frame_offset['x'] * $temp_data['canvas_scale']);
+        $this_data['canvas_offset_y'] = $temp_data['canvas_offset_y'] + round($this_robot->robot_frame_offset['y'] * $temp_data['canvas_scale']);
+        $this_data['canvas_offset_z'] = $temp_data['canvas_offset_z'] + round($this_robot->robot_frame_offset['z'] * $temp_data['canvas_scale']);
         $this_data['canvas_offset_rotate'] = 0;
         $this_data['robot_scale'] = $temp_data['canvas_scale'];
 
