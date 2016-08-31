@@ -18,7 +18,7 @@ $ability = array(
     // Target this robot's self
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array(9, 0, 0, -10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
+      'success' => array(9, 0, 0, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -27,8 +27,8 @@ $ability = array(
       'kind' => 'energy',
       'percent' => true,
       'frame' => 'taunt',
-      'success' => array(0, -2, 0, -10, $this_robot->print_robot_name().'&#39;s energy was restored!'),
-      'failure' => array(9, -2, 0, -10, $this_robot->print_robot_name().'&#39;s energy was not affected&hellip;')
+      'success' => array(0, -2, 0, -10, $this_robot->print_name().'&#39;s energy was restored!'),
+      'failure' => array(9, -2, 0, -10, $this_robot->print_name().'&#39;s energy was not affected&hellip;')
       ));
     $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
     $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
@@ -47,8 +47,8 @@ $ability = array(
           'kind' => 'energy',
           'percent' => true,
           'frame' => 'taunt',
-          'success' => array(0, -2, 0, -10, $temp_this_robot->print_robot_name().'&#39;s energy was restored!'),
-          'failure' => array(9, -2, 0, -10, $temp_this_robot->print_robot_name().'&#39;s energy was not affected&hellip;')
+          'success' => array(0, -2, 0, -10, $temp_this_robot->print_name().'&#39;s energy was restored!'),
+          'failure' => array(9, -2, 0, -10, $temp_this_robot->print_name().'&#39;s energy was not affected&hellip;')
           ));
         $energy_recovery_amount = ceil($temp_this_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
         $temp_this_robot->trigger_recovery($temp_this_robot, $this_ability, $energy_recovery_amount);

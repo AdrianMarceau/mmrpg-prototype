@@ -349,20 +349,20 @@ class rpg_robot extends rpg_object {
     }
 
     // Define public print functions for markup generation
-    public function print_robot_number(){ return '<span class="robot_number">'.$this->robot_number.'</span>'; }
-    public function print_robot_name(){ return '<span class="robot_name robot_type">'.$this->robot_name.'</span>'; } //.'<span>('.preg_replace('#\s+#', ' ', print_r($this->flags, true)).(!empty($this->flags['triggered_weakness']) ? 'true' : 'false').')</span>'
-    public function print_robot_token(){ return '<span class="robot_token">'.$this->robot_token.'</span>'; }
-    public function print_robot_core(){ return '<span class="robot_core '.(!empty($this->robot_core) ? 'robot_type_'.$this->robot_core : '').'">'.(!empty($this->robot_core) ? ucfirst($this->robot_core) : 'Neutral').'</span>'; }
-    public function print_robot_description(){ return '<span class="robot_description">'.$this->robot_description.'</span>'; }
-    public function print_robot_energy(){ return '<span class="robot_stat robot_stat_energy">'.$this->robot_energy.'</span>'; }
+    public function print_number(){ return '<span class="robot_number">'.$this->robot_number.'</span>'; }
+    public function print_name(){ return '<span class="robot_name robot_type">'.$this->robot_name.'</span>'; } //.'<span>('.preg_replace('#\s+#', ' ', print_r($this->flags, true)).(!empty($this->flags['triggered_weakness']) ? 'true' : 'false').')</span>'
+    public function print_token(){ return '<span class="robot_token">'.$this->robot_token.'</span>'; }
+    public function print_core(){ return '<span class="robot_core '.(!empty($this->robot_core) ? 'robot_type_'.$this->robot_core : '').'">'.(!empty($this->robot_core) ? ucfirst($this->robot_core) : 'Neutral').'</span>'; }
+    public function print_description(){ return '<span class="robot_description">'.$this->robot_description.'</span>'; }
+    public function print_energy(){ return '<span class="robot_stat robot_stat_energy">'.$this->robot_energy.'</span>'; }
     public function print_robot_base_energy(){ return '<span class="robot_stat robot_stat_base_energy">'.$this->robot_base_energy.'</span>'; }
-    public function print_robot_attack(){ return '<span class="robot_stat robot_stat_attack">'.$this->robot_attack.'</span>'; }
+    public function print_attack(){ return '<span class="robot_stat robot_stat_attack">'.$this->robot_attack.'</span>'; }
     public function print_robot_base_attack(){ return '<span class="robot_stat robot_stat_base_attack">'.$this->robot_base_attack.'</span>'; }
-    public function print_robot_defense(){ return '<span class="robot_stat robot_stat_defense">'.$this->robot_defense.'</span>'; }
+    public function print_defense(){ return '<span class="robot_stat robot_stat_defense">'.$this->robot_defense.'</span>'; }
     public function print_robot_base_defense(){ return '<span class="robot_stat robot_stat_base_defense">'.$this->robot_base_defense.'</span>'; }
-    public function print_robot_speed(){ return '<span class="robot_stat robot_stat_speed">'.$this->robot_speed.'</span>'; }
+    public function print_speed(){ return '<span class="robot_stat robot_stat_speed">'.$this->robot_speed.'</span>'; }
     public function print_robot_base_speed(){ return '<span class="robot_stat robot_stat_base_speed">'.$this->robot_base_speed.'</span>'; }
-    public function print_robot_weaknesses(){
+    public function print_weaknesses(){
         $this_markup = array();
         foreach ($this->robot_weaknesses AS $this_type){
             $this_markup[] = '<span class="robot_weakness robot_type robot_type_'.$this_type.'">'.ucfirst($this_type).'</span>';
@@ -370,7 +370,7 @@ class rpg_robot extends rpg_object {
         $this_markup = implode(', ', $this_markup);
         return $this_markup;
     }
-    public function print_robot_resistances(){
+    public function print_resistances(){
         $this_markup = array();
         foreach ($this->robot_resistances AS $this_type){
             $this_markup[] = '<span class="robot_resistance robot_type robot_type_'.$this_type.'">'.ucfirst($this_type).'</span>';
@@ -378,7 +378,7 @@ class rpg_robot extends rpg_object {
         $this_markup = implode(', ', $this_markup);
         return $this_markup;
     }
-    public function print_robot_affinities(){
+    public function print_affinities(){
         $this_markup = array();
         foreach ($this->robot_affinities AS $this_type){
             $this_markup[] = '<span class="robot_affinity robot_type robot_type_'.$this_type.'">'.ucfirst($this_type).'</span>';
@@ -386,7 +386,7 @@ class rpg_robot extends rpg_object {
         $this_markup = implode(', ', $this_markup);
         return $this_markup;
     }
-    public function print_robot_immunities(){
+    public function print_immunities(){
         $this_markup = array();
         foreach ($this->robot_immunities AS $this_type){
             $this_markup[] = '<span class="robot_immunity robot_type robot_type_'.$this_type.'">'.ucfirst($this_type).'</span>';
@@ -394,7 +394,7 @@ class rpg_robot extends rpg_object {
         $this_markup = implode(', ', $this_markup);
         return $this_markup;
     }
-    public function print_robot_quote($quote_type, $this_find = array(), $this_replace = array()){
+    public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
         global $mmrpg_index;
         // Define the quote text variable
         $quote_text = '';

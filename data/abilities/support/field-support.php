@@ -69,7 +69,7 @@ $ability = array(
       $this_ability->target_options_update(array(
         'frame' => 'summon',
         'success' => array(0, -9999, -9999, -10,
-          $this_robot->print_robot_name().' activated the '.$this_ability->print_ability_name().'!<br />'.
+          $this_robot->print_name().' activated the '.$this_ability->print_name().'!<br />'.
           'The ability altered the conditions of the battle field&hellip;'
           )
         ));
@@ -264,7 +264,7 @@ $ability = array(
       $this_ability->target_options_update(array(
         'frame' => 'summon',
         'success' => array(0, -9999, -9999, -10,
-          $this_robot->print_robot_name().' activated the '.$this_ability->print_ability_name().'&hellip;'
+          $this_robot->print_name().' activated the '.$this_ability->print_name().'&hellip;'
           )
         ));
       $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));

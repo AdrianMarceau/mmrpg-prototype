@@ -23,7 +23,7 @@ $ability = array(
         // Update the ability's target options and trigger
         $this_ability->target_options_update(array(
             'frame' => 'summon',
-            'success' => array($this_frames['target'], 0, 30, 10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
+            'success' => array($this_frames['target'], 0, 30, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -31,14 +31,14 @@ $ability = array(
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
             'kickback' => array(10, 0, 0),
-            'success' => array($this_frames['impact'], 0, 5, 10, 'The '.$this_ability->print_ability_name().' shocked the target!'),
-            'failure' => array(2, -40, 0, 10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+            'success' => array($this_frames['impact'], 0, 5, 10, 'The '.$this_ability->print_name().' shocked the target!'),
+            'failure' => array(2, -40, 0, 10, 'The '.$this_ability->print_name().' missed&hellip;')
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
             'kickback' => array(10, 0, 0),
-            'success' => array($this_frames['impact'], 0, 5, 10, 'The '.$this_ability->print_ability_name().' charged the target!'),
-            'failure' => array(2, -40, 0, 10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+            'success' => array($this_frames['impact'], 0, 5, 10, 'The '.$this_ability->print_name().' charged the target!'),
+            'failure' => array(2, -40, 0, 10, 'The '.$this_ability->print_name().' missed&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
@@ -56,11 +56,11 @@ $ability = array(
                 $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
                 // Update the ability options text
                 $this_ability->damage_options_update(array(
-                    'success' => array($this_frames['impact'], 0, 5, 10, $temp_target_robot->print_robot_name().' was hit by a spark!'),
+                    'success' => array($this_frames['impact'], 0, 5, 10, $temp_target_robot->print_name().' was hit by a spark!'),
                     'failure' => array(2, -40, 0, 10, '')
                     ));
                 $this_ability->recovery_options_update(array(
-                    'success' => array($this_frames['impact'], 0, 5, 10, $temp_target_robot->print_robot_name().' absorbed a spark!'),
+                    'success' => array($this_frames['impact'], 0, 5, 10, $temp_target_robot->print_name().' absorbed a spark!'),
                     'failure' => array(2, -40, 0, 10, '')
                     ));
                 $energy_damage_amount = ceil($this_ability->ability_damage * 0.20); //ceil($this_ability->ability_damage / $backup_robots_active_count);

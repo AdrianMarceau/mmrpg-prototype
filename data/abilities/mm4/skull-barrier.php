@@ -33,12 +33,12 @@ $ability = array(
                 'frame' => 'taunt',
                 'rates' => array(100, 0, 0),
                 'success' => array(1, -10, 0, -10,
-                    'The '.$this_ability->print_ability_name().' resists all damage!<br /> '.
-                    $this_robot->print_robot_name().'\'s defenses were bolstered!'
+                    'The '.$this_ability->print_name().' resists all damage!<br /> '.
+                    $this_robot->print_name().'\'s defenses were bolstered!'
                     ),
                 'failure' => array(1, -10, 0, -10,
-                    'The '.$this_ability->print_ability_name().' resists all damage!<br /> '.
-                    $this_robot->print_robot_name().'\'s defenses were bolstered!'
+                    'The '.$this_ability->print_name().' resists all damage!<br /> '.
+                    $this_robot->print_name().'\'s defenses were bolstered!'
                     )
                 ),
             'attachment_destroy' => array(
@@ -50,12 +50,12 @@ $ability = array(
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
                 'success' => array(9, -10, 0, -10,
-                    'The '.$this_ability->print_ability_name().' faded away!<br /> '.
-                    $this_robot->print_robot_name().' is no longer protected...'
+                    'The '.$this_ability->print_name().' faded away!<br /> '.
+                    $this_robot->print_name().' is no longer protected...'
                     ),
                 'failure' => array(9, -10, 0, -10,
-                    'The '.$this_ability->print_ability_name().' faded away!<br /> '.
-                    $this_robot->print_robot_name().' is no longer protected...'
+                    'The '.$this_ability->print_name().' faded away!<br /> '.
+                    $this_robot->print_name().' is no longer protected...'
                     )
                 ),
             'ability_frame' => 0,
@@ -69,7 +69,7 @@ $ability = array(
             // Target this robot's self
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array(0, -10, 0, -10, $this_robot->print_robot_name().' raises the '.$this_ability->print_ability_name().'!')
+                'success' => array(0, -10, 0, -10, $this_robot->print_name().' raises the '.$this_ability->print_name().'!')
                 ));
             $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -94,7 +94,7 @@ $ability = array(
             // Target the opposing robot
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array(0, 85, -10, -10, $this_robot->print_robot_name().' releases the '.$this_ability->print_ability_name().'!')
+                'success' => array(0, 85, -10, -10, $this_robot->print_name().' releases the '.$this_ability->print_name().'!')
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -102,15 +102,15 @@ $ability = array(
             $this_ability->damage_options_update(array(
                 'kind' => 'energy',
                 'kickback' => array(5, 0, 0),
-                'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
-                'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target...')
+                'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_name().' crashed into the target!'),
+                'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_name().' missed the target...')
                 ));
             $this_ability->recovery_options_update(array(
                 'kind' => 'energy',
                 'frame' => 'taunt',
                 'kickback' => array(0, 0, 0),
-                'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
-                'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target...')
+                'success' => array(1, -75, 0, -10, 'The '.$this_ability->print_name().' crashed into the target!'),
+                'failure' => array(1, -85, 0, -10, 'The '.$this_ability->print_name().' missed the target...')
                 ));
             $energy_damage_amount = $this_ability->ability_damage;
             $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);

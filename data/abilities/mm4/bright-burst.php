@@ -49,7 +49,7 @@ $ability = array(
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'summon',
-      'success' => array($this_frames['target'], -5, 0, -10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
+      'success' => array($this_frames['target'], -5, 0, -10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -67,14 +67,14 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(10, 0, 0),
-      'success' => array($this_frames['impact'], -5, 0, 99, 'The '.$this_ability->print_ability_name().' blinded the target!'),
-      'failure' => array($this_frames['impact'], -5, 0, -10, 'The '.$this_ability->print_ability_name().' had no effect&hellip;')
+      'success' => array($this_frames['impact'], -5, 0, 99, 'The '.$this_ability->print_name().' blinded the target!'),
+      'failure' => array($this_frames['impact'], -5, 0, -10, 'The '.$this_ability->print_name().' had no effect&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'kickback' => array(10, 0, 0),
-      'success' => array($this_frames['impact'], -5, 0, 99, 'The '.$this_ability->print_ability_name().' enlightened the target!'),
-      'failure' => array($this_frames['impact'], -5, 0, -10, 'The '.$this_ability->print_ability_name().' had no effect&hellip;')
+      'success' => array($this_frames['impact'], -5, 0, 99, 'The '.$this_ability->print_name().' enlightened the target!'),
+      'failure' => array($this_frames['impact'], -5, 0, -10, 'The '.$this_ability->print_name().' had no effect&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
@@ -110,7 +110,7 @@ $ability = array(
           'modifiers' => false,
           'frame' => 'defend',
           'kickback' => array(10, 0, 0),
-          'success' => array(9, -5, 20, -10, $target_robot->print_robot_name().'&#39;s shields were damaged!'),
+          'success' => array(9, -5, 20, -10, $target_robot->print_name().'&#39;s shields were damaged!'),
           'failure' => array(9, -5, 20, -10, '')
           ));
         $this_ability->recovery_options_update(array(
@@ -119,7 +119,7 @@ $ability = array(
           'modifiers' => false,
           'frame' => 'taunt',
           'kickback' => array(5, 0, 0),
-          'success' => array(9, -5, 20, -10, $target_robot->print_robot_name().'&#39;s shields were bolstered!'),
+          'success' => array(9, -5, 20, -10, $target_robot->print_name().'&#39;s shields were bolstered!'),
           'failure' => array(9, -5, 20, -10, '')
           ));
         $defense_damage_amount = ceil($target_robot->robot_defense * ($this_ability->ability_damage2 / 100));

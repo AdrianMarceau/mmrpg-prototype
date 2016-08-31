@@ -32,8 +32,8 @@ $ability = array(
           'modifiers' => false,
           'frame' => 'taunt',
           'rates' => array(100, 0, 0),
-          'success' => array(0, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s flame was bolstered!'),
-          'failure' => array(0, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s flame was not affected&hellip;')
+          'success' => array(0, 0, 0, -9999, $this_robot->print_name().'&#39;s flame was bolstered!'),
+          'failure' => array(0, 0, 0, -9999, $this_robot->print_name().'&#39;s flame was not affected&hellip;')
           ),
       	'attachment_destroy' => array(
           'kind' => 'attack',
@@ -43,8 +43,8 @@ $ability = array(
           'modifiers' => false,
           'frame' => 'defend',
           'rates' => array(100, 0, 0),
-          'success' => array(0, 0, 0, -9999,  'The '.$this_ability->print_ability_name().'&#39;s flame was lost&hellip;'),
-          'failure' => array(0, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s flame was not affected&hellip;')
+          'success' => array(0, 0, 0, -9999,  'The '.$this_ability->print_name().'&#39;s flame was lost&hellip;'),
+          'failure' => array(0, 0, 0, -9999, $this_robot->print_name().'&#39;s flame was not affected&hellip;')
           ),
         'ability_frame' => 3,
         'ability_frame_animate' => array(3, 4),
@@ -108,7 +108,7 @@ $ability = array(
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'throw',
-      'success' => array($shot_power_frame, 75 + (25 * $shot_power), 0, 10, $this_robot->print_robot_name().' throws an '.$this_ability->print_ability_name().'!') // [shot_power='.$shot_power.'|attachment_attack='.$this_attachment_info['attachment_attack'].']
+      'success' => array($shot_power_frame, 75 + (25 * $shot_power), 0, 10, $this_robot->print_name().' throws an '.$this_ability->print_name().'!') // [shot_power='.$shot_power.'|attachment_attack='.$this_attachment_info['attachment_attack'].']
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -117,14 +117,14 @@ $ability = array(
       'kind' => 'energy',
       'kickback' => array(($shot_power * 10), 0, 0),
       'success' => array($shot_power_frame, (-20 - (40 * $shot_power)), 0, 10, $shot_power_text.' hit the target!'),
-      'failure' => array($shot_power_frame, (-50 - (60 * $shot_power)), 0, -10, $this_ability->print_ability_name().' missed&hellip;')
+      'failure' => array($shot_power_frame, (-50 - (60 * $shot_power)), 0, -10, $this_ability->print_name().' missed&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(0, 0, 0),
       'success' => array($shot_power_frame, (-20 - (40 * $shot_power)), 0, 10, $shot_power_text.' ignited the target!'),
-      'failure' => array($shot_power_frame, (-50 - (60 * $shot_power)), 0, -10, $this_ability->print_ability_name().' missed&hellip;')
+      'failure' => array($shot_power_frame, (-50 - (60 * $shot_power)), 0, -10, $this_ability->print_name().' missed&hellip;')
       ));
     $energy_damage_amount = ceil($this_ability->ability_damage * $shot_power);
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);

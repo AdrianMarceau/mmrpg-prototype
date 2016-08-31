@@ -30,8 +30,8 @@ $ability = array(
         'percent' => true,
         'frame' => 'taunt',
         'rates' => array(100, 0, 0),
-        'success' => array(0, -10, 0, -18, $temp_text.$this_ability->print_ability_name().' attached itself to '.$target_robot->print_robot_name().'!<br /> '.$target_robot->print_robot_name().'&#39;s defenses were compromised!'),
-        'failure' => array(0, -10, 0, -18, $temp_text.$this_ability->print_ability_name().' attached itself to '.$target_robot->print_robot_name().'!<br /> '.$target_robot->print_robot_name().'&#39;s defenses were compromised!')
+        'success' => array(0, -10, 0, -18, $temp_text.$this_ability->print_name().' attached itself to '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s defenses were compromised!'),
+        'failure' => array(0, -10, 0, -18, $temp_text.$this_ability->print_name().' attached itself to '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s defenses were compromised!')
         ),
     	'attachment_destroy' => array(
         'trigger' => 'special',
@@ -41,8 +41,8 @@ $ability = array(
         'modifiers' => false,
         'frame' => 'defend',
         'rates' => array(100, 0, 0),
-        'success' => array(2, -10, 0, -10,  $temp_text2.$this_ability->print_ability_name().' faded away!<br /> '.$target_robot->print_robot_name().'&#39;s defenses returned to normal!'),
-        'failure' => array(2, -10, 0, -10, $temp_text2.$this_ability->print_ability_name().' faded away!<br /> '.$target_robot->print_robot_name().'&#39;s defenses returned to normal!')
+        'success' => array(2, -10, 0, -10,  $temp_text2.$this_ability->print_name().' faded away!<br /> '.$target_robot->print_name().'&#39;s defenses returned to normal!'),
+        'failure' => array(2, -10, 0, -10, $temp_text2.$this_ability->print_name().' faded away!<br /> '.$target_robot->print_name().'&#39;s defenses returned to normal!')
         ),
         'ability_frame' => 0,
         'ability_frame_animate' => array(0, 1, 2, 1),
@@ -66,7 +66,7 @@ $ability = array(
       // Target this robot's self
       $this_ability->target_options_update(array(
         'frame' => 'summon',
-        'success' => array((!isset($this_robot->robot_attachments[$this_attachment_token]) ? 0 : 9), -10, 0, -18, $this_robot->print_robot_name().' summons a '.$this_ability->print_ability_name().'!')
+        'success' => array((!isset($this_robot->robot_attachments[$this_attachment_token]) ? 0 : 9), -10, 0, -18, $this_robot->print_name().' summons a '.$this_ability->print_name().'!')
         ));
       $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -94,7 +94,7 @@ $ability = array(
       // Target the opposing robot
       $temp_ability->target_options_update(array(
         'frame' => 'summon',
-        'success' => array(9, -10, 0, -10, $this_robot->print_robot_name().' reinforced the '.$this_ability->print_ability_name().'!<br /> '.$target_robot->print_robot_name().'&#39;s compromised defenses were extended!')
+        'success' => array(9, -10, 0, -10, $this_robot->print_name().' reinforced the '.$this_ability->print_name().'!<br /> '.$target_robot->print_name().'&#39;s compromised defenses were extended!')
         ));
       $this_robot->trigger_target($this_robot, $temp_ability);
 

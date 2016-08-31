@@ -22,7 +22,7 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'slide',
       'kickback' => array(150, 0, 0),
-      'success' => array(0, 15, -10, -10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 15, -10, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -30,15 +30,15 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(15, 0, 0),
-      'success' => array(1, -65, -10, 10, 'The '.$this_ability->print_ability_name().' crashes into the target!'),
-      'failure' => array(0, -85, -5, -10, 'The '.$this_ability->print_ability_name().' continued past the target&hellip;')
+      'success' => array(1, -65, -10, 10, 'The '.$this_ability->print_name().' crashes into the target!'),
+      'failure' => array(0, -85, -5, -10, 'The '.$this_ability->print_name().' continued past the target&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(5, 0, 0),
-      'success' => array(1, -35, -10, 10, 'The '.$this_ability->print_ability_name().' was absorbed by the target!'),
-      'failure' => array(1, -65, -5, -10, 'The '.$this_ability->print_ability_name().' continued past the target&hellip;')
+      'success' => array(1, -35, -10, 10, 'The '.$this_ability->print_name().' was absorbed by the target!'),
+      'failure' => array(1, -65, -5, -10, 'The '.$this_ability->print_name().' continued past the target&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
@@ -53,7 +53,7 @@ $ability = array(
         'percent' => true,
         'modifiers' => false,
         'kickback' => array(0, 0, 0),
-        'success' => array(2, -15, 10, -10, $this_robot->print_robot_name().'&#39;s mobility improved!'),
+        'success' => array(2, -15, 10, -10, $this_robot->print_name().'&#39;s mobility improved!'),
         'failure' => array(2, 0, 0, -9999, '')
         ));
       $this_ability->damage_options_update(array(
@@ -62,7 +62,7 @@ $ability = array(
         'percent' => true,
         'modifiers' => false,
         'kickback' => array(0, 0, 0),
-        'success' => array(2, -15, 10, -10, $this_robot->print_robot_name().'&#39;s mobility worsened!'),
+        'success' => array(2, -15, 10, -10, $this_robot->print_name().'&#39;s mobility worsened!'),
         'failure' => array(2, 0, 0, -9999, '')
         ));
       $speed_damage_amount = ceil($this_robot->robot_speed * ($this_ability->ability_recovery2 / 100));

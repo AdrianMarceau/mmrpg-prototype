@@ -481,13 +481,13 @@ elseif ($this_action == 'start'){
 
         // Create the enter event for the target player's robots
         $event_header = $target_player->player_name.'&#39;s '.($target_player->counters['robots_active'] > 1 ? 'Robots' : 'Robot');
-        $event_body = $target_player->print_player_name().'&#39;s '.($target_player->counters['robots_active'] > 1 ? 'robots appear' : 'robot appears').' on the battle field!<br />';
+        $event_body = $target_player->print_name().'&#39;s '.($target_player->counters['robots_active'] > 1 ? 'robots appear' : 'robot appears').' on the battle field!<br />';
         //if (isset($target_player->player_quotes['battle_start'])){ $event_body .= '&quot;<em>'.$target_player->player_quotes['battle_start'].'</em>&quot;'; }
         if ($target_player->player_token != 'player'
             && isset($target_player->player_quotes['battle_start'])){
             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
             $this_replace = array($this_player->player_name, $this_robot->robot_name, $target_player->player_name, $target_robot->robot_name);
-            $event_body .= $target_player->print_player_quote('battle_start', $this_find, $this_replace);
+            $event_body .= $target_player->print_quote('battle_start', $this_find, $this_replace);
         }
         $event_options = array();
         $event_options['this_header_float'] = $event_options['this_body_float'] = 'right';
@@ -515,13 +515,13 @@ elseif ($this_action == 'start'){
 
         // Create the enter event for this player's robots
         $event_header = "{$this_player->player_name}&#39;s ".($this_player->counters['robots_active'] > 1 ? 'Robots' : 'Robot');
-        $event_body = $this_player->print_player_name().'&#39;s '.($this_player->counters['robots_active'] > 1 ? 'robots appear' : 'robot appears').' on the battle field!<br />';
+        $event_body = $this_player->print_name().'&#39;s '.($this_player->counters['robots_active'] > 1 ? 'robots appear' : 'robot appears').' on the battle field!<br />';
         //if (isset($this_player->player_quotes['battle_start'])){ $event_body .= '&quot;<em>'.$this_player->player_quotes['battle_start'].'</em>&quot;'; }
         if ($this_player->player_token != 'player'
             && isset($this_player->player_quotes['battle_start'])){
             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-            $event_body .= $this_player->print_player_quote('battle_start', $this_find, $this_replace);
+            $event_body .= $this_player->print_quote('battle_start', $this_find, $this_replace);
         }
         $event_options = array();
         $event_options['this_header_float'] = $event_options['this_body_float'] = 'left';
@@ -576,13 +576,13 @@ elseif ($this_action == 'start'){
 
             // Create the enter event for this player's robots
             $event_header = "{$this_player->player_name}&#39;s Robots";
-            $event_body = $this_player->print_player_name().'&#39;s '.($this_player->counters['robots_active'] > 1 ? 'robots appear' : 'robot appears').' on the battle field!<br />';
+            $event_body = $this_player->print_name().'&#39;s '.($this_player->counters['robots_active'] > 1 ? 'robots appear' : 'robot appears').' on the battle field!<br />';
             //if (isset($this_player->player_quotes['battle_start'])){ $event_body .= '&quot;<em>'.$this_player->player_quotes['battle_start'].'</em>&quot;'; }
             if ($this_player->player_token != 'player'
                 && isset($this_player->player_quotes['battle_start'])){
                 $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                 $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                $event_body .= $this_player->print_player_quote('battle_start', $this_find, $this_replace);
+                $event_body .= $this_player->print_quote('battle_start', $this_find, $this_replace);
             }
             $event_options = array();
             $event_options['this_header_float'] = $event_options['this_body_float'] = 'left';
@@ -598,14 +598,14 @@ elseif ($this_action == 'start'){
 
             // Create the enter event for this player's robots
             $event_header = "{$this_player->player_name}&#39;s {$this_robot->robot_name}";
-            //$event_body = $this_player->print_player_name().'&#39;s '.$this_robot->print_robot_name().' appears the battle field!<br />';
-            $event_body = $this_robot->print_robot_name().' enters the battle!<br />';
+            //$event_body = $this_player->print_name().'&#39;s '.$this_robot->print_name().' appears the battle field!<br />';
+            $event_body = $this_robot->print_name().' enters the battle!<br />';
             //if (isset($this_player->player_quotes['battle_start'])){ $event_body .= '&quot;<em>'.$this_player->player_quotes['battle_start'].'</em>&quot;'; }
             if ($this_robot->robot_token != 'robot'
                 && isset($this_robot->robot_quotes['battle_start'])){
                 $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                 $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                $event_body .= $this_robot->print_robot_quote('battle_start', $this_find, $this_replace);
+                $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
             }
             $event_options = array();
             $event_options['this_header_float'] = $event_options['this_body_float'] = 'left';

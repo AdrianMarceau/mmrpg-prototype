@@ -38,7 +38,7 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'summon',
-            'success' => array(1, 10, 100, 10, $this_robot->print_robot_name().' releases the '.$this_ability->print_ability_name().'!')
+            'success' => array(1, 10, 100, 10, $this_robot->print_name().' releases the '.$this_ability->print_name().'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability, array('prevent_stats_text' => true));
 
@@ -91,16 +91,16 @@ $ability = array(
             'kind' => 'energy',
             'modifiers' => true,
             'kickback' => array(5, 0, 0),
-            'success' => array(0, -5, 0, 99, 'The '.$this_ability->print_ability_name().' melts through the target!'),
-            'failure' => array(0, -5, 0, 99,'The '. $this_ability->print_ability_name().' had no effect on '.$target_robot->print_robot_name().'&hellip;')
+            'success' => array(0, -5, 0, 99, 'The '.$this_ability->print_name().' melts through the target!'),
+            'failure' => array(0, -5, 0, 99,'The '. $this_ability->print_name().' had no effect on '.$target_robot->print_name().'&hellip;')
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
             'modifiers' => true,
             'frame' => 'taunt',
             'kickback' => array(5, 0, 0),
-            'success' => array(0, -5, 0, 9, 'The '.$this_ability->print_ability_name().' was absorbed by the target!'),
-            'failure' => array(0, -5, 0, 9, 'The '.$this_ability->print_ability_name().' had no effect on '.$target_robot->print_robot_name().'&hellip;')
+            'success' => array(0, -5, 0, 9, 'The '.$this_ability->print_name().' was absorbed by the target!'),
+            'failure' => array(0, -5, 0, 9, 'The '.$this_ability->print_name().' had no effect on '.$target_robot->print_name().'&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
         $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
@@ -116,16 +116,16 @@ $ability = array(
                 'kind' => 'energy',
                 'modifiers' => true,
                 'kickback' => array(5, 0, 0),
-                'success' => array(($key % 2), -5, 0, 99, 'The '.$this_ability->print_ability_name().' melts through the target!'),
-                'failure' => array(($key % 2), -5, 0, 99,'The '. $this_ability->print_ability_name().' had no effect on '.$temp_target_robot->print_robot_name().'&hellip;')
+                'success' => array(($key % 2), -5, 0, 99, 'The '.$this_ability->print_name().' melts through the target!'),
+                'failure' => array(($key % 2), -5, 0, 99,'The '. $this_ability->print_name().' had no effect on '.$temp_target_robot->print_name().'&hellip;')
                 ));
             $this_ability->recovery_options_update(array(
                 'kind' => 'energy',
                 'modifiers' => true,
                 'frame' => 'taunt',
                 'kickback' => array(5, 0, 0),
-                'success' => array(($key % 2), -5, 0, 9, 'The '.$this_ability->print_ability_name().' was absorbed by the target!'),
-                'failure' => array(($key % 2), -5, 0, 9, 'The '.$this_ability->print_ability_name().' had no effect on '.$temp_target_robot->print_robot_name().'&hellip;')
+                'success' => array(($key % 2), -5, 0, 9, 'The '.$this_ability->print_name().' was absorbed by the target!'),
+                'failure' => array(($key % 2), -5, 0, 9, 'The '.$this_ability->print_name().' had no effect on '.$temp_target_robot->print_name().'&hellip;')
                 ));
             $energy_damage_amount = $this_ability->ability_damage;
             $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);

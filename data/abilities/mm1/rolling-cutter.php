@@ -18,7 +18,7 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'throw',
-            'success' => array(1, 100, 0, 10, $this_robot->print_robot_name().' throws a '.$this_ability->print_ability_name().'!')
+            'success' => array(1, 100, 0, 10, $this_robot->print_name().' throws a '.$this_ability->print_name().'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -26,15 +26,15 @@ $ability = array(
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
             'kickback' => array(10, 0, 0),
-            'success' => array(0, 0, 5, 10, 'The '.$this_ability->print_ability_name().' hit the target!'),
-            'failure' => array(0, -50, 5, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+            'success' => array(0, 0, 5, 10, 'The '.$this_ability->print_name().' hit the target!'),
+            'failure' => array(0, -50, 5, -10, 'The '.$this_ability->print_name().' missed&hellip;')
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
             'frame' => 'taunt',
             'kickback' => array(0, 0, 0),
-            'success' => array(0, 0, 5, 10, 'The '.$this_ability->print_ability_name().' was enjoyed by the target!'),
-            'failure' => array(0, -50, 5, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+            'success' => array(0, 0, 5, 10, 'The '.$this_ability->print_name().' was enjoyed by the target!'),
+            'failure' => array(0, -50, 5, -10, 'The '.$this_ability->print_name().' missed&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);

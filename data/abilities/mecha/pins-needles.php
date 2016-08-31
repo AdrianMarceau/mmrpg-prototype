@@ -18,7 +18,7 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'shoot',
-            'success' => array(0, -50, 70, 10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!', 2),
+            'success' => array(0, -50, 70, 10, $this_robot->print_name().' uses '.$this_ability->print_name().'!', 2),
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 

@@ -18,7 +18,7 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'throw',
-            'success' => array(4, 125, 0, 10, $this_robot->print_robot_name().' throws a pair of '.$this_ability->print_ability_name(true).'!')
+            'success' => array(4, 125, 0, 10, $this_robot->print_name().' throws a pair of '.$this_ability->print_name(true).'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -26,15 +26,15 @@ $ability = array(
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
             'kickback' => array(10, 0, 0),
-            'success' => array(5, -100, 0, 10, 'The '.$this_ability->print_ability_name(true).' drained the target!'),
-            'failure' => array(2, -125, 0, -10, 'The '.$this_ability->print_ability_name(true).' missed the target&hellip;')
+            'success' => array(5, -100, 0, 10, 'The '.$this_ability->print_name(true).' drained the target!'),
+            'failure' => array(2, -125, 0, -10, 'The '.$this_ability->print_name(true).' missed the target&hellip;')
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
             'frame' => 'taunt',
             'kickback' => array(10, 0, 0),
-            'success' => array(5, -75, 0, 10, 'The '.$this_ability->print_ability_name(true).' emboldened the target!'),
-            'failure' => array(2, -100, 0, -10, 'The '.$this_ability->print_ability_name(true).' missed the target&hellip;')
+            'success' => array(5, -75, 0, 10, 'The '.$this_ability->print_name(true).' emboldened the target!'),
+            'failure' => array(2, -100, 0, -10, 'The '.$this_ability->print_name(true).' missed the target&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
@@ -50,7 +50,7 @@ $ability = array(
                 'frame' => 'taunt',
                 'percent' => true,
                 'kickback' => array(0, 0, 0),
-                'success' => array(2, -5, -5, -10, $this_robot->print_robot_name().'\'s life energy was restored!'),
+                'success' => array(2, -5, -5, -10, $this_robot->print_name().'\'s life energy was restored!'),
                 'failure' => array(3, 0, 0, -9999, '')
                 ));
             $this_ability->damage_options_update(array(
@@ -58,7 +58,7 @@ $ability = array(
                 'frame' => 'defend',
                 'percent' => true,
                 'kickback' => array(0, 0, 0),
-                'success' => array(2, -5, -5, -10, $this_robot->print_robot_name().'\'s life energy was lowered!'),
+                'success' => array(2, -5, -5, -10, $this_robot->print_name().'\'s life energy was lowered!'),
                 'failure' => array(3, 0, 0, -9999, '')
                 ));
             $energy_recovery_amount = ceil($this_ability->ability_results['this_amount'] * ($this_ability->ability_recovery2 / 100));

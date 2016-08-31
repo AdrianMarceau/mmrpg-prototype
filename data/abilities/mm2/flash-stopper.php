@@ -34,7 +34,7 @@ $ability = array(
     $this_ability->target_options_update(array(
       'kickback' => array(-5, 0, 0),
       'frame' => 'summon',
-      'success' => array(0, -10, 0, -10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
+      'success' => array(0, -10, 0, -10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -46,15 +46,15 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(5, 0, 0),
-      'success' => array(1, -5, 0, -8, 'The '.$this_ability->print_ability_name().' freezes time around the target!'),
-      'failure' => array(2, -5, 0, -8, $this_ability->print_ability_name().' had no effect&hellip;')
+      'success' => array(1, -5, 0, -8, 'The '.$this_ability->print_name().' freezes time around the target!'),
+      'failure' => array(2, -5, 0, -8, $this_ability->print_name().' had no effect&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(0, 0, 0),
-      'success' => array(1, -5, 0, -8, 'The '.$this_ability->print_ability_name().' freezes time around the target!'),
-      'failure' => array(2, -5, 0, -8, $this_ability->print_ability_name().' had no effect&hellip;')
+      'success' => array(1, -5, 0, -8, 'The '.$this_ability->print_name().' freezes time around the target!'),
+      'failure' => array(2, -5, 0, -8, $this_ability->print_name().' had no effect&hellip;')
       ));
     $energy_damage_amount = ceil($this_ability->ability_damage / $target_robots_active);
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);

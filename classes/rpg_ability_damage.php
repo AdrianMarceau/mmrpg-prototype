@@ -916,13 +916,13 @@ class rpg_ability_damage extends rpg_damage {
 
             // Add the final damage text showing the amount based on damage type
             if ($this_ability->damage_options['damage_kind'] == 'energy'){
-                $this_ability->ability_results['this_text'] .= "{$this_robot->print_robot_name()} takes {$this_ability->ability_results['print_amount']} life energy damage";
+                $this_ability->ability_results['this_text'] .= "{$this_robot->print_name()} takes {$this_ability->ability_results['print_amount']} life energy damage";
                 $this_ability->ability_results['this_text'] .= ($this_ability->ability_results['this_overkill'] > 0 && $this_robot->player->player_side == 'right' ? " and {$this_ability->ability_results['print_overkill']} overkill" : '');
                 $this_ability->ability_results['this_text'] .= '!<br />';
             }
             // Otherwise add the final damage text showing the amount based on weapon energy damage
             elseif ($this_ability->damage_options['damage_kind'] == 'weapons'){
-                $this_ability->ability_results['this_text'] .= "{$this_robot->print_robot_name()} takes {$this_ability->ability_results['print_amount']} weapon energy damage";
+                $this_ability->ability_results['this_text'] .= "{$this_robot->print_name()} takes {$this_ability->ability_results['print_amount']} weapon energy damage";
                 $this_ability->ability_results['this_text'] .= '!<br />';
             }
             // Otherwise, if this is one of the robot's other internal stats
@@ -931,7 +931,7 @@ class rpg_ability_damage extends rpg_damage {
                 || $this_ability->damage_options['damage_kind'] == 'speed'){
                 // Print the result based on if the stat will go any lower
                 if ($this_ability->ability_results['this_amount'] > 0){
-                    $this_ability->ability_results['this_text'] .= "{$this_robot->print_robot_name()}&#39;s {$this_ability->damage_options['damage_kind']} fell by {$this_ability->ability_results['print_amount']}";
+                    $this_ability->ability_results['this_text'] .= "{$this_robot->print_name()}&#39;s {$this_ability->damage_options['damage_kind']} fell by {$this_ability->ability_results['print_amount']}";
                     $this_ability->ability_results['this_text'] .= '!<br />';
                 }
                 // Otherwise if the stat wouldn't go any lower

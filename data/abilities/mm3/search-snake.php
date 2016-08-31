@@ -42,7 +42,7 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'shoot',
-            'success' => array(0, 135, 0, 10, $this_robot->print_robot_name().' fires a series of '.$this_ability->print_ability_name(true).'!')
+            'success' => array(0, 135, 0, 10, $this_robot->print_name().' fires a series of '.$this_ability->print_name(true).'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -56,16 +56,16 @@ $ability = array(
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
             'kickback' => array(10, 0, 0),
-            'success' => array(1, -45, 0, 10, 'The '.$this_ability->print_ability_name().' collided with the target!'),
-            'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_ability_name().' slithered past the target&hellip;'),
+            'success' => array(1, -45, 0, 10, 'The '.$this_ability->print_name().' collided with the target!'),
+            'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_name().' slithered past the target&hellip;'),
             'options' => array('apply_position_modifiers' => false)
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
             'frame' => 'taunt',
             'kickback' => array(10, 0, 0),
-            'success' => array(1, -45, 0, 10, 'The '.$this_ability->print_ability_name().' healed the target!'),
-            'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_ability_name().' slithered past the target&hellip;'),
+            'success' => array(1, -45, 0, 10, 'The '.$this_ability->print_name().' healed the target!'),
+            'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_name().' slithered past the target&hellip;'),
             'options' => array('apply_position_modifiers' => false)
             ));
         $energy_damage_amount = $this_ability->ability_damage;

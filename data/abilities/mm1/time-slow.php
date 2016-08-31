@@ -31,7 +31,7 @@ $ability = array(
       // Target this robot's self
       $this_ability->target_options_update(array(
         'frame' => 'defend',
-        'success' => array(1, -10, 0, -10, $this_robot->print_robot_name().' charges the '.$this_ability->print_ability_name().'&hellip;')
+        'success' => array(1, -10, 0, -10, $this_robot->print_name().' charges the '.$this_ability->print_name().'&hellip;')
         ));
       $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -51,7 +51,7 @@ $ability = array(
       $this_ability->target_options_update(array(
         'frame' => 'summon',
         'kickback' => array(0, 0, 0),
-        'success' => array(5, 5, 70, 10, $this_robot->print_robot_name().' releases the '.$this_ability->print_ability_name().'!'),
+        'success' => array(5, 5, 70, 10, $this_robot->print_name().' releases the '.$this_ability->print_name().'!'),
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -60,15 +60,15 @@ $ability = array(
         'kind' => 'speed',
             'percent' => 'true',
         'kickback' => array(10, 0, 0),
-        'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_ability_name().' damaged the target&#39;s mobility!'),
-        'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_ability_name().' had no effect on '.$target_robot->print_robot_name().'&hellip;')
+        'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_name().' damaged the target&#39;s mobility!'),
+        'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_name().' had no effect on '.$target_robot->print_name().'&hellip;')
         ));
       $this_ability->recovery_options_update(array(
         'kind' => 'speed',
             'percent' => 'true',
         'kickback' => array(10, 0, 0),
-        'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_ability_name().' improved the target&#39;s mobility!'),
-        'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_ability_name().' had no effect on '.$target_robot->print_robot_name().'&hellip;')
+        'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_name().' improved the target&#39;s mobility!'),
+        'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_name().' had no effect on '.$target_robot->print_name().'&hellip;')
         ));
       $energy_damage_amount = ceil(($this_ability->ability_damage / 100) * $target_robot->robot_speed);
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
@@ -89,15 +89,15 @@ $ability = array(
             'kind' => 'speed',
             'percent' => 'true',
             'kickback' => array(10, 0, 0),
-            'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_ability_name().' damaged the target&#39;s mobility!'),
-            'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_ability_name().' had no effect on '.$temp_target_robot->print_robot_name().'&hellip;')
+            'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_name().' damaged the target&#39;s mobility!'),
+            'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_name().' had no effect on '.$temp_target_robot->print_name().'&hellip;')
             ));
           $this_ability->recovery_options_update(array(
             'kind' => 'speed',
             'percent' => 'true',
             'kickback' => array(10, 0, 0),
-            'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_ability_name().' improved the target&#39;s mobility!'),
-            'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_ability_name().' had no effect on '.$temp_target_robot->print_robot_name().'&hellip;')
+            'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_name().' improved the target&#39;s mobility!'),
+            'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_name().' had no effect on '.$temp_target_robot->print_name().'&hellip;')
             ));
           $energy_damage_amount = ceil(($this_ability->ability_damage / 100) * $temp_target_robot->robot_speed);
           $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);

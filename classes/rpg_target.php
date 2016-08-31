@@ -53,7 +53,7 @@ class rpg_target {
 
         // Create a message to show the initial targeting action
         if ($this_robot->robot_id != $target_robot->robot_id && empty($trigger_options['prevent_default_text'])){
-            $this_ability->ability_results['this_text'] .= "{$this_robot->print_robot_name()} targets {$target_robot->print_robot_name()}!<br />";
+            $this_ability->ability_results['this_text'] .= "{$this_robot->print_name()} targets {$target_robot->print_name()}!<br />";
         }
 
         // Append the targetting text to the event body
@@ -143,7 +143,7 @@ class rpg_target {
 
         // Create a message to show the initial targeting action
         if ($this_robot->robot_id != $target_robot->robot_id && empty($trigger_options['prevent_default_text'])){
-            $this_item->item_results['this_text'] .= "{$this_robot->print_robot_name()} targets {$target_robot->print_robot_name()}!<br />";
+            $this_item->item_results['this_text'] .= "{$this_robot->print_name()} targets {$target_robot->print_name()}!<br />";
         }
 
         // Append the targetting text to the event body
