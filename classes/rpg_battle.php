@@ -216,11 +216,11 @@ class rpg_battle extends rpg_object {
     }
 
     // Define public print functions for markup generation
-    //public function print_battle_name(){ return '<span class="battle_name battle_type battle_type_none">'.$this->battle_name.'</span>'; }
-    public function print_battle_name(){ return '<span class="battle_name battle_type">'.$this->battle_name.'</span>'; }
-    public function print_battle_token(){ return '<span class="battle_token">'.$this->battle_token.'</span>'; }
-    public function print_battle_description(){ return '<span class="battle_description">'.$this->battle_description.'</span>'; }
-    public function print_battle_points(){ return '<span class="battle_points">'.$this->battle_points.'</span>'; }
+    //public function print_name(){ return '<span class="battle_name battle_type battle_type_none">'.$this->battle_name.'</span>'; }
+    public function print_name(){ return '<span class="battle_name battle_type">'.$this->battle_name.'</span>'; }
+    public function print_token(){ return '<span class="battle_token">'.$this->battle_token.'</span>'; }
+    public function print_description(){ return '<span class="battle_description">'.$this->battle_description.'</span>'; }
+    public function print_points(){ return '<span class="battle_points">'.$this->battle_points.'</span>'; }
 
     // Define a static public function for encouraging battle words
     public static function random_positive_word(){
@@ -601,8 +601,8 @@ class rpg_battle extends rpg_object {
                 $this_robot->update_session();
                 $event_header = $this_robot->robot_name.' Undefeated';
                 $event_body = '';
-                $event_body .= $this_robot->print_robot_name().' could not be defeated! ';
-                //$event_body .= $this_robot->print_robot_name().' downloads the '.($target_robot->counters['robots_disabled'] > 1 ? 'targets#39;' : 'target#39;s').' battle data!';
+                $event_body .= $this_robot->print_name().' could not be defeated! ';
+                //$event_body .= $this_robot->print_name().' downloads the '.($target_robot->counters['robots_disabled'] > 1 ? 'targets#39;' : 'target#39;s').' battle data!';
                 $event_body .= '<br />';
                 $event_options = array();
                 $event_options['console_show_this_robot'] = true;
@@ -613,7 +613,7 @@ class rpg_battle extends rpg_object {
                     && isset($this_robot->robot_quotes['battle_victory'])){
                     $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                     $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                    $event_body .= $this_robot->print_robot_quote('battle_victory', $this_find, $this_replace);
+                    $event_body .= $this_robot->print_quote('battle_victory', $this_find, $this_replace);
                     //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_victory']);
                     //$this_text_colour = !empty($mmrpg_index['types'][$this_robot->robot_token]) ? $mmrpg_index['types'][$this_robot->robot_token]['type_colour_light'] : array(200, 200, 200);
                     //$event_body .= '&quot;<em style="color: rgb('.implode(',', $this_text_colour).');">'.$this_quote_text.'</em>&quot;';
@@ -626,8 +626,8 @@ class rpg_battle extends rpg_object {
             $target_robot->update_session();
             $target_player->update_session();
             $event_header = $target_player->player_name.' Defeated';
-            $event_body = $target_player->print_player_name().' was defeated'.($target_player->player_side == 'left' ? '&hellip;' : '!').' ';
-            //if (!empty($target_battle_points)){ $event_body .= $target_player->print_player_name().' collects <span class="recovery_amount">'.number_format($target_battle_points, 0, '.', ',').'</span> battle points&hellip;'; }
+            $event_body = $target_player->print_name().' was defeated'.($target_player->player_side == 'left' ? '&hellip;' : '!').' ';
+            //if (!empty($target_battle_points)){ $event_body .= $target_player->print_name().' collects <span class="recovery_amount">'.number_format($target_battle_points, 0, '.', ',').'</span> battle points&hellip;'; }
             $event_body .= '<br />';
             $event_options = array();
             $event_options['console_show_this_player'] = true;
@@ -639,7 +639,7 @@ class rpg_battle extends rpg_object {
                 $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                 $this_replace = array($this_player->player_name, $this_robot->robot_name, $target_player->player_name, $target_robot->robot_name);
                 $this_quote_text = str_replace($this_find, $this_replace, $target_player->player_quotes['battle_defeat']);
-                $event_body .= $target_player->print_player_quote('battle_defeat', $this_find, $this_replace);
+                $event_body .= $target_player->print_quote('battle_defeat', $this_find, $this_replace);
                 //$this_text_colour = !empty($mmrpg_index['types'][$target_player->player_token]) ? $mmrpg_index['types'][$target_player->player_token]['type_colour_light'] : array(200, 200, 200);
                 //$event_body .= '&quot;<em style="color: rgb('.implode(',', $this_text_colour).');">'.$this_quote_text.'</em>&quot;';
             }
@@ -666,9 +666,9 @@ class rpg_battle extends rpg_object {
                 $target_robot->update_session();
                 $this_player->update_session();
                 $event_header = $this_player->player_name.' Victorious';
-                $event_body = $this_player->print_player_name().' was victorious! ';
-                $event_body .= $this_player->print_player_name().' collects <span class="recovery_amount">'.number_format($other_battle_points_modded, 0, '.', ',').'</span> battle points!';
-                //$event_body .= $this_player->print_player_name().' downloads the '.($target_player->counters['robots_disabled'] > 1 ? 'targets#39;' : 'target#39;s').' battle data!';
+                $event_body = $this_player->print_name().' was victorious! ';
+                $event_body .= $this_player->print_name().' collects <span class="recovery_amount">'.number_format($other_battle_points_modded, 0, '.', ',').'</span> battle points!';
+                //$event_body .= $this_player->print_name().' downloads the '.($target_player->counters['robots_disabled'] > 1 ? 'targets#39;' : 'target#39;s').' battle data!';
                 $event_body .= '<br />';
                 $event_options = array();
                 $event_options['console_show_this_player'] = true;
@@ -679,7 +679,7 @@ class rpg_battle extends rpg_object {
                     && isset($this_player->player_quotes['battle_victory'])){
                     $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                     $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                    $event_body .= $this_player->print_player_quote('battle_victory', $this_find, $this_replace);
+                    $event_body .= $this_player->print_quote('battle_victory', $this_find, $this_replace);
                     //$this_quote_text = str_replace($this_find, $this_replace, $this_player->player_quotes['battle_victory']);
                     //$this_text_colour = !empty($mmrpg_index['types'][$this_player->player_token]) ? $mmrpg_index['types'][$this_player->player_token]['type_colour_light'] : array(200, 200, 200);
                     //$event_body .= '&quot;<em style="color: rgb('.implode(',', $this_text_colour).');">'.$this_quote_text.'</em>&quot;';
@@ -825,8 +825,8 @@ class rpg_battle extends rpg_object {
             $this_robot->update_session();
             $this_player->update_session();
             $event_header = $this_player->player_name.' Victorious';
-            $event_body = $this_player->print_player_name().' was victorious! ';
-            //$event_body .= $this_player->print_player_name().' collects <span class="recovery_amount">'.number_format($this_player_points, 0, '.', ',').'</span> battle points!';
+            $event_body = $this_player->print_name().' was victorious! ';
+            //$event_body .= $this_player->print_name().' collects <span class="recovery_amount">'.number_format($this_player_points, 0, '.', ',').'</span> battle points!';
             $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
             $event_body .= '<br />';
             $event_options = array();
@@ -838,7 +838,7 @@ class rpg_battle extends rpg_object {
                 && isset($this_player->player_quotes['battle_victory'])){
                 $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                 $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                $event_body .= $this_player->print_player_quote('battle_victory', $this_find, $this_replace);
+                $event_body .= $this_player->print_quote('battle_victory', $this_find, $this_replace);
                 //$this_quote_text = str_replace($this_find, $this_replace, $this_player->player_quotes['battle_victory']);
                 //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
             }
@@ -1165,7 +1165,7 @@ class rpg_battle extends rpg_object {
             // Print out the event for collecting the new field star
             $temp_name_markup = '<span class="field_name field_type field_type_'.(!empty($temp_field_star['star_type']) ? $temp_field_star['star_type'] : 'none').(!empty($temp_field_star['star_type2']) ? '_'.$temp_field_star['star_type2'] : '').'">'.$temp_field_star['star_name'].' Star</span>';
             $temp_event_header = $this_player->player_name.'&#39;s '.ucfirst($temp_field_star['star_kind']).' Star';
-            $temp_event_body = $this_player->print_player_name().' collected the '.$temp_name_markup.'!<br />';
+            $temp_event_body = $this_player->print_name().' collected the '.$temp_name_markup.'!<br />';
             $temp_event_body .= 'The new '.ucfirst($temp_field_star['star_kind']).' Star amplifies your Star Force!';
             $temp_event_options = array();
             $temp_event_options['console_show_this_player'] = false;
@@ -1303,8 +1303,8 @@ class rpg_battle extends rpg_object {
                     /*
                     // Create the enter event for this robot
                     $event_header = $this_player->player_name.'&#39;s '.$this_robot->robot_name;
-                    if ($target_player->player_token != 'player'){ $event_body = "{$this_robot->print_robot_name()} enters the battle!<br />"; }
-                    else { $event_body = "{$this_robot->print_robot_name()} prepares for battle!<br />"; }
+                    if ($target_player->player_token != 'player'){ $event_body = "{$this_robot->print_name()} enters the battle!<br />"; }
+                    else { $event_body = "{$this_robot->print_name()} prepares for battle!<br />"; }
                     $this_robot->robot_frame = 'base';
                     $this_player->player_frame = 'command';
                     $this_robot->robot_position = 'active';
@@ -1323,7 +1323,7 @@ class rpg_battle extends rpg_object {
 
                     // Create the enter event for this robot
                     $event_header = $this_robot->robot_name;
-                    $event_body = "{$this_robot->print_robot_name()} wants to fight!<br />";
+                    $event_body = "{$this_robot->print_name()} wants to fight!<br />";
                     $this_robot->robot_frame = 'defend';
                     $this_robot->robot_frame_styles = '';
                     $this_robot->robot_detail_styles = '';
@@ -1331,7 +1331,7 @@ class rpg_battle extends rpg_object {
                     if (isset($this_robot->robot_quotes['battle_start'])){
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                        $event_body .= $this_robot->print_robot_quote('battle_start', $this_find, $this_replace);
+                        $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
                         //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_start']);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                     }
@@ -1468,8 +1468,8 @@ class rpg_battle extends rpg_object {
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
                         //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
-                        $event_body = ($this_player->player_token != 'player' ? $this_player->print_player_name().'&#39;s ' : '').$this_robot->print_robot_name().' taunts the opponent!<br />';
-                        $event_body .= $this_robot->print_robot_quote('battle_taunt', $this_find, $this_replace);
+                        $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
+                        $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                         $this_robot->robot_frame = 'taunt';
                         $target_robot->robot_frame = 'base';
@@ -1557,8 +1557,8 @@ class rpg_battle extends rpg_object {
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
                         //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
-                        $event_body = ($this_player->player_token != 'player' ? $this_player->print_player_name().'&#39;s ' : '').$this_robot->print_robot_name().' taunts the opponent!<br />';
-                        $event_body .= $this_robot->print_robot_quote('battle_taunt', $this_find, $this_replace);
+                        $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
+                        $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                         $this_robot->robot_frame = 'taunt';
                         $target_robot->robot_frame = 'base';
@@ -1691,11 +1691,11 @@ class rpg_battle extends rpg_object {
                     $this_robot->update_session();
                     $this_player->update_session();
                     $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
-                    $event_body = $this_robot->print_robot_name().' is '.$this_switch_reason.' from battle!';
+                    $event_body = $this_robot->print_name().' is '.$this_switch_reason.' from battle!';
                     if ($this_robot->robot_status != 'disabled' && isset($this_robot->robot_quotes['battle_retreat'])){
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                        $event_body .= $this_robot->print_robot_quote('battle_retreat', $this_find, $this_replace);
+                        $event_body .= $this_robot->print_quote('battle_retreat', $this_find, $this_replace);
                         //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_retreat']);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                     }
@@ -1738,12 +1738,12 @@ class rpg_battle extends rpg_object {
                     $this_robot->update_session();
                     $this_player->update_session();
                     $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
-                    $event_body = "{$this_robot->print_robot_name()} joins the battle!<br />";
+                    $event_body = "{$this_robot->print_name()} joins the battle!<br />";
                     if (isset($this_robot->robot_quotes['battle_start'])){
                         $this_robot->robot_frame = 'taunt';
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                        $event_body .= $this_robot->print_robot_quote('battle_start', $this_find, $this_replace);
+                        $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
                         //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_start']);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                     }
@@ -1820,10 +1820,10 @@ class rpg_battle extends rpg_object {
                 $temp_target_robot->update_session();
 
                 // Collect the weakness, resistsance, affinity, and immunity text
-                $temp_target_robot_weaknesses = $temp_target_robot->print_robot_weaknesses();
-                $temp_target_robot_resistances = $temp_target_robot->print_robot_resistances();
-                $temp_target_robot_affinities = $temp_target_robot->print_robot_affinities();
-                $temp_target_robot_immunities = $temp_target_robot->print_robot_immunities();
+                $temp_target_robot_weaknesses = $temp_target_robot->print_weaknesses();
+                $temp_target_robot_resistances = $temp_target_robot->print_resistances();
+                $temp_target_robot_affinities = $temp_target_robot->print_affinities();
+                $temp_target_robot_immunities = $temp_target_robot->print_immunities();
 
                 // Change the target robot's frame to defend base and save
                 $temp_target_robot->robot_frame = 'taunt';
@@ -1875,10 +1875,10 @@ class rpg_battle extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="left">Name  : </td>
-                                    <td  class="right"><?= $temp_target_robot->print_robot_number() ?> <?= $temp_target_robot->print_robot_name() ?></td>
+                                    <td  class="right"><?= $temp_target_robot->print_number() ?> <?= $temp_target_robot->print_name() ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Core : </td>
-                                    <td  class="right"><?= $temp_target_robot->print_robot_core() ?></td>
+                                    <td  class="right"><?= $temp_target_robot->print_core() ?></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Weaknesses : </td>

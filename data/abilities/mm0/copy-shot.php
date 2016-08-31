@@ -37,7 +37,7 @@ $ability = array(
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array($temp_ability_frames['target'], 105, 0, 10, $this_robot->print_robot_name().' fires a '.$this_ability->print_ability_name().'!')
+      'success' => array($temp_ability_frames['target'], 105, 0, 10, $this_robot->print_name().' fires a '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -45,8 +45,8 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(10, 0, 0),
-      'success' => array($temp_ability_frames['damage'], -70, 0, 10, 'The '.$this_ability->print_ability_name().' hit the target!'),
-      'failure' => array($temp_ability_frames['damage'], -70, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array($temp_ability_frames['damage'], -70, 0, 10, 'The '.$this_ability->print_name().' hit the target!'),
+      'failure' => array($temp_ability_frames['damage'], -70, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $target_robot->trigger_damage($this_robot, $this_ability, $this_ability->ability_damage);
 
@@ -88,9 +88,9 @@ $ability = array(
           // Create an event displaying the new copied ability
           //$event_header = $this_robot->robot_name.'&#39;s '.$this_ability->ability_name;
           $event_header = $this_new_ability->ability_name.' Unlocked';
-          $event_body = $this_ability->print_ability_name().' downloads the target&#39;s battle data&hellip;<br />';
-          //$event_body .= $this_robot->print_robot_name().' learned how to use '.$this_new_ability->print_ability_name().'!';
-          $event_body .= $this_new_ability->print_ability_name().' can now be used in battle!';
+          $event_body = $this_ability->print_name().' downloads the target&#39;s battle data&hellip;<br />';
+          //$event_body .= $this_robot->print_name().' learned how to use '.$this_new_ability->print_name().'!';
+          $event_body .= $this_new_ability->print_name().' can now be used in battle!';
           $event_options = array();
           $event_options['console_show_target'] = false;
           $event_options['this_ability'] = $this_new_ability;

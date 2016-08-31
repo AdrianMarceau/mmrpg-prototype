@@ -15,8 +15,8 @@ $item = array(
     $this_item->target_options_update(array(
       'frame' => 'summon',
       'success' => array(0, 40, -2, 99,
-        $this_player->print_player_name().' uses an item from the inventory&hellip; <br />'.
-        $target_robot->print_robot_name().' is given the '.$this_item->print_item_name().'!'
+        $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
+        $target_robot->print_name().' is given the '.$this_item->print_name().'!'
         )
       ));
     $target_robot->trigger_target($target_robot, $this_item);

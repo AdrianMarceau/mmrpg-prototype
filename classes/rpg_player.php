@@ -152,10 +152,10 @@ class rpg_player extends rpg_object {
     }
 
     // Define public print functions for markup generation
-    public function print_player_name(){ return '<span class="player_name player_type">'.$this->player_name.'</span>'; }
-    public function print_player_token(){ return '<span class="player_token">'.$this->player_token.'</span>'; }
-    public function print_player_description(){ return '<span class="player_description">'.$this->player_description.'</span>'; }
-    public function print_player_quote($quote_type, $this_find = array(), $this_replace = array()){
+    public function print_name(){ return '<span class="player_name player_type">'.$this->player_name.'</span>'; }
+    public function print_token(){ return '<span class="player_token">'.$this->player_token.'</span>'; }
+    public function print_description(){ return '<span class="player_description">'.$this->player_description.'</span>'; }
+    public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
         global $mmrpg_index;
         // Define the quote text variable
         $quote_text = '';
@@ -300,11 +300,11 @@ class rpg_player extends rpg_object {
         // Display the robot reward message markup
         $event_header = $temp_item_name.' Item Drop';
         if ($item_quantity_dropped > 1){
-            $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_robot_name().' dropped <strong>x'.$item_quantity_dropped.'</strong> '.' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.($item_quantity_dropped > 1 ? 's' : '').'</span>!<br />';
-            $event_body .= $target_player->print_player_name().' added the dropped items to the inventory.';
+            $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_name().' dropped <strong>x'.$item_quantity_dropped.'</strong> '.' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.($item_quantity_dropped > 1 ? 's' : '').'</span>!<br />';
+            $event_body .= $target_player->print_name().' added the dropped items to the inventory.';
         } else {
-            $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_robot_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
-            $event_body .= $target_player->print_player_name().' added the dropped item to the inventory.';
+            $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
+            $event_body .= $target_player->print_name().' added the dropped item to the inventory.';
         }
         $event_options = array();
         $event_options['console_show_target'] = false;

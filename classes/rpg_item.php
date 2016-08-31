@@ -198,21 +198,21 @@ class rpg_item extends rpg_object {
     }
 
     // Define public print functions for markup generation
-    public function print_item_name($plural = false){
+    public function print_name($plural = false){
         $type_class = !empty($this->item_type) ? $this->item_type : 'none';
         if ($type_class != 'none' && !empty($this->item_type2)){ $type_class .= '_'.$this->item_type2; }
         elseif ($type_class == 'none' && !empty($this->item_type2)){ $type_class = $this->item_type2; }
         return '<span class="item_name item_type item_type_'.$type_class.'">'.$this->item_name.($plural ? 's' : '').'</span>';
     }
-    //public function print_item_name(){ return '<span class="item_name">'.$this->item_name.'</span>'; }
-    public function print_item_token(){ return '<span class="item_token">'.$this->item_token.'</span>'; }
-    public function print_item_description(){ return '<span class="item_description">'.$this->item_description.'</span>'; }
-    public function print_item_type(){ return '<span class="item_type">'.$this->item_type.'</span>'; }
-    public function print_item_type2(){ return '<span class="item_type2">'.$this->item_type2.'</span>'; }
-    public function print_item_speed(){ return '<span class="item_speed">'.$this->item_speed.'</span>'; }
-    public function print_item_damage(){ return '<span class="item_damage">'.$this->item_damage.'</span>'; }
-    public function print_item_recovery(){ return '<span class="item_recovery">'.$this->item_recovery.'</span>'; }
-    public function print_item_accuracy(){ return '<span class="item_accuracy">'.$this->item_accuracy.'%</span>'; }
+    //public function print_name(){ return '<span class="item_name">'.$this->item_name.'</span>'; }
+    public function print_token(){ return '<span class="item_token">'.$this->item_token.'</span>'; }
+    public function print_description(){ return '<span class="item_description">'.$this->item_description.'</span>'; }
+    public function print_type(){ return '<span class="item_type">'.$this->item_type.'</span>'; }
+    public function print_type2(){ return '<span class="item_type2">'.$this->item_type2.'</span>'; }
+    public function print_speed(){ return '<span class="item_speed">'.$this->item_speed.'</span>'; }
+    public function print_damage(){ return '<span class="item_damage">'.$this->item_damage.'</span>'; }
+    public function print_recovery(){ return '<span class="item_recovery">'.$this->item_recovery.'</span>'; }
+    public function print_accuracy(){ return '<span class="item_accuracy">'.$this->item_accuracy.'%</span>'; }
 
     // Define a trigger for using one of this robot's items
     public function reset_item($target_robot, $this_item){
@@ -272,7 +272,7 @@ class rpg_item extends rpg_object {
         $this->target_options['item_failure_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
         $this->target_options['target_kickback'] = array('x' => 0, 'y' => 0, 'z' => 0);
         $this->target_options['target_header'] = $this->robot->robot_name.'&#39;s '.$this->item_name;
-        $this->target_options['target_text'] = "{$this->robot->print_robot_name()} uses {$this->print_item_name()}!";
+        $this->target_options['target_text'] = "{$this->robot->print_name()} uses {$this->print_name()}!";
         // Update this item's data
         $this->update_session();
         // Return the resuling array
@@ -1427,7 +1427,7 @@ class rpg_item extends rpg_object {
         $this_item->target_options_update(array(
             'frame' => 'throw',
             'kickback' => array(0, 0, 0),
-            'success' => array(0, 85, 35, 10, $this_robot->print_robot_name().' throws a '.$this_item->print_item_name().'!'),
+            'success' => array(0, 85, 35, 10, $this_robot->print_name().' throws a '.$this_item->print_name().'!'),
             ));
         $this_robot->trigger_target($target_robot, $this_item);
 
@@ -1438,8 +1438,8 @@ class rpg_item extends rpg_object {
             'modifiers' => true,
             'frame' => 'damage',
             'kickback' => array(10, 5, 0),
-            'success' => array(0, 10, 0, 10, 'The '.$this_item->print_item_name().' damaged the target!'),
-            'failure' => array(0, -30, 0, -10, 'The '.$this_item->print_item_name().' missed&hellip;')
+            'success' => array(0, 10, 0, 10, 'The '.$this_item->print_name().' damaged the target!'),
+            'failure' => array(0, -30, 0, -10, 'The '.$this_item->print_name().' missed&hellip;')
             ));
         $this_item->recovery_options_update(array(
             'kind' => 'energy',
@@ -1447,8 +1447,8 @@ class rpg_item extends rpg_object {
             'modifiers' => true,
             'frame' => 'taunt',
             'kickback' => array(0, 0, 0),
-            'success' => array(0, 10, 0, 10, 'The '.$this_item->print_item_name().' recovered the target!'),
-            'failure' => array(0, -30, 0, -10, 'The '.$this_item->print_item_name().' missed&hellip;')
+            'success' => array(0, 10, 0, 10, 'The '.$this_item->print_name().' recovered the target!'),
+            'failure' => array(0, -30, 0, -10, 'The '.$this_item->print_name().' missed&hellip;')
             ));
         $energy_damage_amount = ceil($target_robot->robot_base_energy * ($this_item->item_damage / 100));
         $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => true, 'apply_position_modifiers' => true, 'apply_starforce_modifiers' => true);
@@ -1484,8 +1484,8 @@ class rpg_item extends rpg_object {
         $this_item->target_options_update(array(
             'frame' => 'summon',
             'success' => array(0, 40, -2, 99,
-                $this_player->print_player_name().' uses an item from the inventory&hellip; <br />'.
-                $target_robot->print_robot_name().' is given the '.$this_item->print_item_name().'!'
+                $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
+                $target_robot->print_name().' is given the '.$this_item->print_name().'!'
                 )
             ));
         $target_robot->trigger_target($target_robot, $this_item);
@@ -1519,8 +1519,8 @@ class rpg_item extends rpg_object {
                 'percent' => true,
                 'modifiers' => false,
                 'frame' => 'taunt',
-                'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.' powered up '.$boost_effect_word.'! '.rpg_battle::random_positive_word()),
-                'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s '.$stat_subject.''.$stat_verb.' not affected&hellip; '.rpg_battle::random_negative_word())
+                'success' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s '.$stat_subject.' powered up '.$boost_effect_word.'! '.rpg_battle::random_positive_word()),
+                'failure' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s '.$stat_subject.''.$stat_verb.' not affected&hellip; '.rpg_battle::random_negative_word())
                 ));
             $stat_recovery_amount = ceil($target_robot->$stat_base_prop * ($this_item->item_recovery / 100));
             $target_robot->trigger_recovery($target_robot, $this_item, $stat_recovery_amount);
@@ -1572,7 +1572,7 @@ class rpg_item extends rpg_object {
                             $target_robot->update_session();
                             $this_battle->events_create($target_robot, false,
                                 "{$target_robot->robot_name}'s {$stat_name} Stat",
-                                $target_robot->print_robot_name().'\'s '.$stat_token.' stat bonuses have been raised to the max of '.
+                                $target_robot->print_name().'\'s '.$stat_token.' stat bonuses have been raised to the max of '.
                                 '<span class="robot_type robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['max'].' &#9733;</span>!<br />'.
                                 'Congratulations and '.lcfirst(rpg_battle::random_victory_quote()).' '
                                 );

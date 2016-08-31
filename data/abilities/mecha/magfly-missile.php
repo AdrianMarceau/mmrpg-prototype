@@ -26,7 +26,7 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'summon',
       'kickback' => array(50, 0, 0),
-      'success' => array($this_frames['target'], 50, -15, 10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
+      'success' => array($this_frames['target'], 50, -15, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
       ));
     $this_robot->robot_frame_styles = 'display: none; ';
     $this_robot->update_session();
@@ -37,15 +37,15 @@ $ability = array(
       'kind' => 'weapons',
       'percent' => true,
       'kickback' => array(40, 0, 0),
-      'success' => array($this_frames['impact'], 40, -15, 10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
-      'failure' => array($this_frames['impact'], -120, -15, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array($this_frames['impact'], 40, -15, 10, 'The '.$this_ability->print_name().' crashed into the target!'),
+      'failure' => array($this_frames['impact'], -120, -15, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'weapons',
       'percent' => true,
       'kickback' => array(20, 0, 0),
-      'success' => array($this_frames['impact'], 40, -15, 10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
-      'failure' => array($this_frames['impact'], -120, -15, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array($this_frames['impact'], 40, -15, 10, 'The '.$this_ability->print_name().' crashed into the target!'),
+      'failure' => array($this_frames['impact'], -120, -15, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $weapons_damage_amount = ceil($target_robot->robot_base_weapons * ($this_ability->ability_damage / 100));
     $target_robot->trigger_damage($this_robot, $this_ability, $weapons_damage_amount);

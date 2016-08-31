@@ -23,7 +23,7 @@ $ability = array(
     // Update the ability's target options and trigger
     $this_ability->target_options_update(array(
       'frame' => 'shoot',
-      'success' => array($this_frames['target'], 100, -10, 10, $this_robot->print_robot_name().' activated the '.$this_ability->print_ability_name().'!')
+      'success' => array($this_frames['target'], 100, -10, 10, $this_robot->print_name().' activated the '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -31,14 +31,14 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(10, 0, 0),
-      'success' => array($this_frames['impact'], -60, -10, 10, 'The '.$this_ability->print_ability_name().'&#39;s whirlwind crashed into the target!'),
-      'failure' => array($this_frames['impact'], -60, -10, -10, 'The '.$this_ability->print_ability_name().'&#39;s whirlwind missed&hellip;')
+      'success' => array($this_frames['impact'], -60, -10, 10, 'The '.$this_ability->print_name().'&#39;s whirlwind crashed into the target!'),
+      'failure' => array($this_frames['impact'], -60, -10, -10, 'The '.$this_ability->print_name().'&#39;s whirlwind missed&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'kickback' => array(10, 0, 0),
-      'success' => array($this_frames['impact'], -60, -10, 10, 'The '.$this_ability->print_ability_name().'&#39;s whirlwind was absorbed by the target!'),
-      'failure' => array($this_frames['impact'], -60, -10, -10, 'The '.$this_ability->print_ability_name().'&#39;s whirlwind missed&hellip;')
+      'success' => array($this_frames['impact'], -60, -10, 10, 'The '.$this_ability->print_name().'&#39;s whirlwind was absorbed by the target!'),
+      'failure' => array($this_frames['impact'], -60, -10, -10, 'The '.$this_ability->print_name().'&#39;s whirlwind missed&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);

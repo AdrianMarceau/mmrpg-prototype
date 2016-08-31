@@ -24,7 +24,7 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'slide',
       'kickback' => array(40, 0, 0),
-      'success' => array($this_frames['target'], 40, 0, 10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
+      'success' => array($this_frames['target'], 40, 0, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
       ));
     $this_robot->robot_frame_styles = 'display: none; ';
     $this_robot->update_session();
@@ -34,14 +34,14 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(30, 0, 0),
-      'success' => array($this_frames['impact'], 10, 0, 10, 'The '.$this_ability->print_ability_name().'&#39;s explosion hit the target!'),
-      'failure' => array($this_frames['target'], -30, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array($this_frames['impact'], 10, 0, 10, 'The '.$this_ability->print_name().'&#39;s explosion hit the target!'),
+      'failure' => array($this_frames['target'], -30, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'kickback' => array(10, 0, 0),
-      'success' => array($this_frames['impact'], 10, 0, 10, 'The '.$this_ability->print_ability_name().'&#39;s explosion invigorated the target!'),
-      'failure' => array($this_frames['target'], -30, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array($this_frames['impact'], 10, 0, 10, 'The '.$this_ability->print_name().'&#39;s explosion invigorated the target!'),
+      'failure' => array($this_frames['target'], -30, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
@@ -58,8 +58,8 @@ $ability = array(
         'modifiers' => false,
         'type' => '',
         'frame' => 'damage',
-        'success' => array(6, -9999, 5, -10, 'The '.$this_robot->print_robot_name().' was damaged by the blast!'),
-        'failure' => array(6, -9999, 5, -10, $this_robot->print_robot_name().' was not affected by the blast&hellip;')
+        'success' => array(6, -9999, 5, -10, 'The '.$this_robot->print_name().' was damaged by the blast!'),
+        'failure' => array(6, -9999, 5, -10, $this_robot->print_name().' was not affected by the blast&hellip;')
         ));
       $energy_damage_amount = ceil($this_robot->robot_energy * (1 / 3));
       $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount);

@@ -906,13 +906,13 @@ class rpg_item_recovery extends rpg_recovery {
 
             // Add the final recovery text showing the amount based on life energy recovery
             if ($this_item->recovery_options['recovery_kind'] == 'energy'){
-                $this_item->item_results['this_text'] .= "{$this_robot->print_robot_name()} recovers {$this_item->item_results['print_amount']} life energy";
+                $this_item->item_results['this_text'] .= "{$this_robot->print_name()} recovers {$this_item->item_results['print_amount']} life energy";
                 //$this_item->item_results['this_text'] .= ($this_item->item_results['this_overkill'] > 0 ? " and {$this_item->item_results['print_overkill']} overkill" : '');
                 $this_item->item_results['this_text'] .= '!<br />';
             }
             // Otherwise add the final recovery text showing the amount based on weapon energy recovery
             elseif ($this_item->recovery_options['recovery_kind'] == 'weapons'){
-                $this_item->item_results['this_text'] .= "{$this_robot->print_robot_name()} recovers {$this_item->item_results['print_amount']} weapon energy";
+                $this_item->item_results['this_text'] .= "{$this_robot->print_name()} recovers {$this_item->item_results['print_amount']} weapon energy";
                 $this_item->item_results['this_text'] .= '!<br />';
             }
             // Otherwise, if this is one of the robot's other internal stats
@@ -921,7 +921,7 @@ class rpg_item_recovery extends rpg_recovery {
                 || $this_item->recovery_options['recovery_kind'] == 'speed'){
                 // Print the result based on if the stat will go any lower
                 if ($this_item->item_results['this_amount'] > 0){
-                    $this_item->item_results['this_text'] .= "{$this_robot->print_robot_name()}&#39;s {$this_item->recovery_options['recovery_kind']} rose by {$this_item->item_results['print_amount']}";
+                    $this_item->item_results['this_text'] .= "{$this_robot->print_name()}&#39;s {$this_item->recovery_options['recovery_kind']} rose by {$this_item->item_results['print_amount']}";
                     $this_item->item_results['this_text'] .= '!<br />';
                 }
                 // Otherwise if the stat wouldn't go any lower

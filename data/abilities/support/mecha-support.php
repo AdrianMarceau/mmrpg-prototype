@@ -17,7 +17,7 @@ $ability = array(
         // Update the ability's target options and trigger
         $this_ability->target_options_update(array(
             'frame' => 'summon',
-            'success' => array(0, 0, 0, 10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
+            'success' => array(0, 0, 0, 10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
 
@@ -26,7 +26,7 @@ $ability = array(
         $this_robot->robot_frame = 'summon';
         $this_robot->update_session();
         $event_header = $this_robot->robot_name.'&#39;s '.$this_ability->ability_name;
-        $event_body = $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!';
+        $event_body = $this_robot->print_name().' uses the '.$this_ability->print_name().'!';
         $this_battle->events_create($this_robot, false, $event_header, $event_body);
         */
 

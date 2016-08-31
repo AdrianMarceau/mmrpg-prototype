@@ -22,7 +22,7 @@ $ability = array(
       $this_ability->target_options_update(array(
         'frame' => 'summon',
         'success' => array(9, 0, 0, -10,
-          $this_robot->print_robot_name().' activated the '.$this_ability->print_ability_name().'!<br />'.
+          $this_robot->print_name().' activated the '.$this_ability->print_name().'!<br />'.
           'But the field\'s experience wont go any lower&hellip;'
           )
         ));
@@ -37,7 +37,7 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'summon',
       'success' => array(9, 0, 0, -10,
-        $this_robot->print_robot_name().' activated the '.$this_ability->print_ability_name().'!<br />'.
+        $this_robot->print_name().' activated the '.$this_ability->print_name().'!<br />'.
         'The ability altered the conditions of the battle field&hellip;'
         )
       ));

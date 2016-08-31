@@ -21,7 +21,7 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'slide',
       'kickback' => array(150, 0, 0),
-      'success' => array(0, 25, 0, -10, $this_robot->print_robot_name().' uses '.$this_ability->print_ability_name().'!')
+      'success' => array(0, 25, 0, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')
       ));
     $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -30,16 +30,16 @@ $ability = array(
       'kind' => 'energy',
       'kickback' => array(60, 0, 0),
       'rates' => array('auto', 'auto', $this_ability->ability_recovery2),
-      'success' => array(1, -65, 0, 10, 'The '.$this_ability->print_ability_name().' crashes into the target!'),
-      'failure' => array(0, -85, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target&hellip;')
+      'success' => array(1, -65, 0, 10, 'The '.$this_ability->print_name().' crashes into the target!'),
+      'failure' => array(0, -85, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'frame' => 'taunt',
       'kickback' => array(20, 0, 0),
       'rates' => array('auto', 'auto', $this_ability->ability_recovery2),
-      'success' => array(1, -35, 0, 10, 'The '.$this_ability->print_ability_name().' was absorbed by the target!'),
-      'failure' => array(1, -65, 0, -10, 'The '.$this_ability->print_ability_name().' missed the target&hellip;')
+      'success' => array(1, -35, 0, 10, 'The '.$this_ability->print_name().' was absorbed by the target!'),
+      'failure' => array(1, -65, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);

@@ -36,8 +36,8 @@ $item = array(
     $this_item->target_options_update(array(
       'frame' => 'defeat',
       'success' => array(0, 40, -2, 99,
-        $this_player->print_player_name().' uses an item from the inventory&hellip; <br />'.
-        $target_robot->print_robot_name().' is given the '.$this_item->print_item_name().'!'
+        $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
+        $target_robot->print_name().' is given the '.$this_item->print_name().'!'
         )
       ));
     $target_robot->trigger_target($target_robot, $this_item);
@@ -55,8 +55,8 @@ $item = array(
     $this_item->target_options_update(array(
       'frame' => 'defend',
       'success' => array(0, 40, -2, 10,
-        $target_robot->print_robot_name().'&#39;s battle data was restored!<br />'.
-        $target_robot->print_robot_name().'&#39;s is no longer disabled!'
+        $target_robot->print_name().'&#39;s battle data was restored!<br />'.
+        $target_robot->print_name().'&#39;s is no longer disabled!'
         )
       ));
     $target_robot->trigger_target($target_robot, $this_item);
@@ -67,8 +67,8 @@ $item = array(
       'percent' => true,
       'modifiers' => false,
       'frame' => 'taunt',
-      'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s life energy was fully restored!'),
-      'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s life energy was not affected&hellip;')
+      'success' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s life energy was fully restored!'),
+      'failure' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s life energy was not affected&hellip;')
       ));
     $energy_recovery_amount = ceil($target_robot->robot_base_energy * ($this_item->item_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_item, $energy_recovery_amount);
@@ -79,8 +79,8 @@ $item = array(
       'percent' => true,
       'modifiers' => false,
       'frame' => 'taunt',
-      'success' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s weapon energy was fully restored!'),
-      'failure' => array(9, 0, 0, -9999, $target_robot->print_robot_name().'&#39;s weapon energy was not affected&hellip;')
+      'success' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s weapon energy was fully restored!'),
+      'failure' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s weapon energy was not affected&hellip;')
       ));
     $weapons_recovery_amount = ceil($target_robot->robot_base_weapons * ($this_item->item_recovery / 100));
     $target_robot->trigger_recovery($target_robot, $this_item, $weapons_recovery_amount);
@@ -91,8 +91,8 @@ $item = array(
       'kind' => 'energy',
       'percent' => true,
       'frame' => 'taunt',
-      'success' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s life energy was restored!'),
-      'failure' => array(9, 0, 0, -9999, $this_robot->print_robot_name().'&#39;s life energy was not affected&hellip;')
+      'success' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s life energy was restored!'),
+      'failure' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s life energy was not affected&hellip;')
       ));
     $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_item->item_recovery / 100));
     $this_robot->trigger_recovery($this_robot, $this_item, $energy_recovery_amount);

@@ -39,7 +39,7 @@ $ability = array(
       // Target the opposing robot
       $this_ability->target_options_update(array(
         'frame' => 'summon',
-        'success' => array(0, 0, 0, 10, $this_robot->print_robot_name().' prepares for the '.$this_ability->print_ability_name().'!')
+        'success' => array(0, 0, 0, 10, $this_robot->print_name().' prepares for the '.$this_ability->print_name().'!')
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -52,15 +52,15 @@ $ability = array(
         'kind' => 'energy',
         'frame' => 'damage',
         'kickback' => array(0, 0, 0),
-        'success' => array(0, -65, 0, 10, $target_robot->print_robot_name().' is thrown to the bench!'),
-        'failure' => array(0, -85, 0, -10, $target_robot->print_robot_name().' is thrown to the bench!')
+        'success' => array(0, -65, 0, 10, $target_robot->print_name().' is thrown to the bench!'),
+        'failure' => array(0, -85, 0, -10, $target_robot->print_name().' is thrown to the bench!')
         ));
       $this_ability->recovery_options_update(array(
         'kind' => 'energy',
         'frame' => 'taunt',
         'kickback' => array(0, 0, 0),
-        'success' => array(0, -65, 0, 10, $target_robot->print_robot_name().' is thrown to the bench!'),
-        'failure' => array(0, -85, 0, -10, $target_robot->print_robot_name().' is thrown to the bench!')
+        'success' => array(0, -65, 0, 10, $target_robot->print_name().' is thrown to the bench!'),
+        'failure' => array(0, -85, 0, -10, $target_robot->print_name().' is thrown to the bench!')
         ));
       $energy_damage_amount = $this_ability->ability_damage;
       $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
@@ -140,7 +140,7 @@ $ability = array(
       $temp_pronoun = in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm', 'spash-woman')) ? 'her' : 'him';
       $this_ability->target_options_update(array(
         'frame' => 'throw',
-        'success' => array(0, 0, 0, 10, $this_ability->print_ability_name().' attempts to throw '.$target_robot->print_robot_name().' to the bench&hellip;<br />But speed break prevents '.$temp_pronoun.' from getting a lock on the target!')
+        'success' => array(0, 0, 0, 10, $this_ability->print_name().' attempts to throw '.$target_robot->print_name().' to the bench&hellip;<br />But speed break prevents '.$temp_pronoun.' from getting a lock on the target!')
         ));
       $this_robot->trigger_target($target_robot, $this_ability);
 

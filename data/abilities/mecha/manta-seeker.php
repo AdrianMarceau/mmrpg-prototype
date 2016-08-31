@@ -25,7 +25,7 @@ $ability = array(
     $this_ability->target_options_update(array(
       'frame' => 'summon',
       'kickback' => array(50, 0, 0),
-      'success' => array($this_frames['target'], 50, 0, 10, $this_robot->print_robot_name().' uses the '.$this_ability->print_ability_name().'!')
+      'success' => array($this_frames['target'], 50, 0, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
       ));
     $this_robot->robot_frame_styles = 'display: none; ';
     $this_robot->update_session();
@@ -35,14 +35,14 @@ $ability = array(
     $this_ability->damage_options_update(array(
       'kind' => 'energy',
       'kickback' => array(30, 0, 0),
-      'success' => array($this_frames['impact'], -60, 0, 10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
-      'failure' => array($this_frames['impact'], -120, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array($this_frames['impact'], -60, 0, 10, 'The '.$this_ability->print_name().' crashed into the target!'),
+      'failure' => array($this_frames['impact'], -120, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $this_ability->recovery_options_update(array(
       'kind' => 'energy',
       'kickback' => array(15, 0, 0),
-      'success' => array($this_frames['impact'], -60, 0, 10, 'The '.$this_ability->print_ability_name().' crashed into the target!'),
-      'failure' => array($this_frames['impact'], -120, 0, -10, 'The '.$this_ability->print_ability_name().' missed&hellip;')
+      'success' => array($this_frames['impact'], -60, 0, 10, 'The '.$this_ability->print_name().' crashed into the target!'),
+      'failure' => array($this_frames['impact'], -120, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
       ));
     $energy_damage_amount = $this_ability->ability_damage;
     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);

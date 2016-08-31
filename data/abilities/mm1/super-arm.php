@@ -68,12 +68,12 @@ $ability = array(
                 'rates' => array(100, 0, 0),
                 'kickback' => array(0, 0, 0),
                 'success' => array($this_target_frame, 105, 0, 10,
-                    $this_robot->print_robot_name().' shielded '.($this_gender == 'female' ? 'herself' : 'himself').' with the '.$this_object_name.'!<br /> '.
-                    $this_robot->print_robot_name().'\'s defenses were bolstered!'
+                    $this_robot->print_name().' shielded '.($this_gender == 'female' ? 'herself' : 'himself').' with the '.$this_object_name.'!<br /> '.
+                    $this_robot->print_name().'\'s defenses were bolstered!'
                     ),
                 'failure' => array($this_target_frame, 105, 0, 10,
-                    $this_robot->print_robot_name().' shielded '.($this_gender == 'female' ? 'herself' : 'himself').' with the '.$this_object_name.'!<br /> '.
-                    $this_robot->print_robot_name().'\'s defenses were bolstered!'
+                    $this_robot->print_name().' shielded '.($this_gender == 'female' ? 'herself' : 'himself').' with the '.$this_object_name.'!<br /> '.
+                    $this_robot->print_name().'\'s defenses were bolstered!'
                     )
                 ),
             'attachment_destroy' => array(
@@ -86,12 +86,12 @@ $ability = array(
                 'rates' => array(100, 0, 0),
                 'kickback' => array(0, 0, 0),
                 'success' => array(-1, -10, 0, -10,
-                    'The '.$this_ability->print_ability_name().'\'s '.$this_object_name.' was destroyed!<br /> '.
-                    $this_robot->print_robot_name().' is no longer protected...'
+                    'The '.$this_ability->print_name().'\'s '.$this_object_name.' was destroyed!<br /> '.
+                    $this_robot->print_name().' is no longer protected...'
                     ),
                 'failure' => array(-1, -10, 0, -10,
-                    'The '.$this_ability->print_ability_name().'\'s '.$this_object_name.' was destroyed!<br /> '.
-                    $this_robot->print_robot_name().' is no longer protected...'
+                    'The '.$this_ability->print_name().'\'s '.$this_object_name.' was destroyed!<br /> '.
+                    $this_robot->print_name().' is no longer protected...'
                     )
                 ),
             'ability_frame' => $this_target_frame,
@@ -109,7 +109,7 @@ $ability = array(
             // Target this robot's self
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array($this_target_frame, 105, 0, 10, 'The '.$this_ability->print_ability_name().' created '.(preg_match('/^(a|e|i|o|u)/i', $this_object_name) ? 'an '.$this_object_name : 'a '.$this_object_name).'!')
+                'success' => array($this_target_frame, 105, 0, 10, 'The '.$this_ability->print_name().' created '.(preg_match('/^(a|e|i|o|u)/i', $this_object_name) ? 'an '.$this_object_name : 'a '.$this_object_name).'!')
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -130,7 +130,7 @@ $ability = array(
             // Target the opposing robot
             $this_ability->target_options_update(array(
                 'frame' => 'throw',
-                'success' => array($this_impact_frame, 175, 15, 10, $this_ability->print_ability_name().' throws the '.$this_object_name.'!')
+                'success' => array($this_impact_frame, 175, 15, 10, $this_ability->print_name().' throws the '.$this_object_name.'!')
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 

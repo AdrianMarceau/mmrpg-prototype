@@ -55,11 +55,11 @@ class rpg_disabled {
 
         // Create the robot disabled event
         $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
-        $event_body = ($this_player->player_token != 'player' ? $this_player->print_player_name().'&#39;s ' : 'The target ').' '.$this_robot->print_robot_name().' was disabled!<br />'; //'.($this_robot->robot_position == 'bench' ? ' and removed from battle' : '').'
+        $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />'; //'.($this_robot->robot_position == 'bench' ? ' and removed from battle' : '').'
         if (isset($this_robot->robot_quotes['battle_defeat'])){
             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-            $event_body .= $this_robot->print_robot_quote('battle_defeat', $this_find, $this_replace);
+            $event_body .= $this_robot->print_quote('battle_defeat', $this_find, $this_replace);
             //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_defeat']);
             //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
         }
@@ -147,9 +147,9 @@ class rpg_disabled {
                         $event_options['this_ability_results']['total_actions'] = $temp_boost_actions++;
                         $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
                         $event_options['console_show_target'] = false;
-                        $event_body = $target_robot->print_robot_name().' downloads '.$stat_system[$stat].' data from the target robot! ';
+                        $event_body = $target_robot->print_name().' downloads '.$stat_system[$stat].' data from the target robot! ';
                         $event_body .= '<br />';
-                        $event_body .= $target_robot->print_robot_name().'&#39;s '.$stat.' grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
+                        $event_body .= $target_robot->print_name().'&#39;s '.$stat.' grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
                         $target_robot->robot_frame = 'shoot';
                         $target_robot->update_session();
                         $target_player->update_session();
@@ -468,12 +468,12 @@ class rpg_disabled {
                     $target_player->player_frame = 'victory';
                     $event_header = $temp_robot->robot_name.'&#39;s Rewards';
                     $event_multiplier_text = $temp_robot_boost_text;
-                    $event_body = $temp_robot->print_robot_name().' collects '.$event_multiplier_text.'<span class="recovery_amount ability_type ability_type_cutter">'.$target_robot_experience.'</span> experience points! ';
+                    $event_body = $temp_robot->print_name().' collects '.$event_multiplier_text.'<span class="recovery_amount ability_type ability_type_cutter">'.$target_robot_experience.'</span> experience points! ';
                     $event_body .= '<br />';
                     if (isset($temp_robot->robot_quotes['battle_victory'])){
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($this_player->player_name, $this_robot->robot_name, $target_player->player_name, $temp_robot->robot_name);
-                        $event_body .= $temp_robot->print_robot_quote('battle_victory', $this_find, $this_replace);
+                        $event_body .= $temp_robot->print_quote('battle_victory', $this_find, $this_replace);
                     }
                     //$event_options = array();
                     $event_options['console_show_target'] = false;
@@ -515,8 +515,8 @@ class rpg_disabled {
                     else { $temp_robot->robot_experience = $temp_new_experience; }
                     $target_player->player_frame = 'victory';
                     $event_header = $temp_robot->robot_name.'&#39;s Rewards';
-                    //$event_body = $temp_robot->print_robot_name().' grew to <span class="recovery_amount'.($temp_new_level >= 100 ? ' ability_type ability_type_electric' : '').'">Level '.$temp_new_level.'</span>!<br /> ';
-                    $event_body = $temp_robot->print_robot_name().' grew to <span class="recovery_amount ability_type ability_type_level">Level '.$temp_new_level.($temp_new_level >= 100 ? ' &#9733;' : '').'</span>!<br /> ';
+                    //$event_body = $temp_robot->print_name().' grew to <span class="recovery_amount'.($temp_new_level >= 100 ? ' ability_type ability_type_electric' : '').'">Level '.$temp_new_level.'</span>!<br /> ';
+                    $event_body = $temp_robot->print_name().' grew to <span class="recovery_amount ability_type ability_type_level">Level '.$temp_new_level.($temp_new_level >= 100 ? ' &#9733;' : '').'</span>!<br /> ';
                     $event_body .= $temp_robot->robot_name.'&#39;s energy, weapons, shields, and mobility were upgraded!';
                     //$event_options = array();
                     $event_options['console_show_target'] = false;
@@ -564,9 +564,9 @@ class rpg_disabled {
                     $event_options['this_ability_results']['recovery_kind'] = 'energy';
                     $event_options['this_ability_results']['this_amount'] = $temp_energy_boost;
                     $event_options['this_ability_results']['total_actions']++;
-                    $event_body = $temp_robot->print_robot_name().'&#39;s health improved! ';
+                    $event_body = $temp_robot->print_name().'&#39;s health improved! ';
                     $event_body .= '<br />';
-                    $event_body .= $temp_robot->print_robot_name().'&#39;s energy grew by <span class="recovery_amount">'.$temp_energy_boost.'</span>! ';
+                    $event_body .= $temp_robot->print_name().'&#39;s energy grew by <span class="recovery_amount">'.$temp_energy_boost.'</span>! ';
                     $temp_robot->robot_frame = 'summon';
                     $temp_robot->update_session();
                     $target_player->update_session();
@@ -592,9 +592,9 @@ class rpg_disabled {
                     $event_options['this_ability_results']['recovery_kind'] = 'attack';
                     $event_options['this_ability_results']['this_amount'] = $temp_stat_boost;
                     $event_options['this_ability_results']['total_actions']++;
-                    $event_body = $temp_robot->print_robot_name().'&#39;s weapons improved! ';
+                    $event_body = $temp_robot->print_name().'&#39;s weapons improved! ';
                     $event_body .= '<br />';
-                    $event_body .= $temp_robot->print_robot_name().'&#39;s attack grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
+                    $event_body .= $temp_robot->print_name().'&#39;s attack grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
                     $temp_robot->robot_frame = 'shoot';
                     $temp_robot->update_session();
                     $target_player->update_session();
@@ -620,9 +620,9 @@ class rpg_disabled {
                     $event_options['this_ability_results']['recovery_kind'] = 'defense';
                     $event_options['this_ability_results']['this_amount'] = $temp_defense_boost;
                     $event_options['this_ability_results']['total_actions']++;
-                    $event_body = $temp_robot->print_robot_name().'&#39;s shields improved! ';
+                    $event_body = $temp_robot->print_name().'&#39;s shields improved! ';
                     $event_body .= '<br />';
-                    $event_body .= $temp_robot->print_robot_name().'&#39;s defense grew by <span class="recovery_amount">'.$temp_defense_boost.'</span>! ';
+                    $event_body .= $temp_robot->print_name().'&#39;s defense grew by <span class="recovery_amount">'.$temp_defense_boost.'</span>! ';
                     $temp_robot->robot_frame = 'defend';
                     $temp_robot->update_session();
                     $target_player->update_session();
@@ -648,9 +648,9 @@ class rpg_disabled {
                     $event_options['this_ability_results']['total_actions']++;
                     $temp_base_speed_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_speed']));
                     $temp_robot->robot_base_speed += $temp_base_speed_boost;
-                    $event_body = $temp_robot->print_robot_name().'&#39;s mobility improved! ';
+                    $event_body = $temp_robot->print_name().'&#39;s mobility improved! ';
                     $event_body .= '<br />';
-                    $event_body .= $temp_robot->print_robot_name().'&#39;s speed grew by <span class="recovery_amount">'.$temp_speed_boost.'</span>! ';
+                    $event_body .= $temp_robot->print_name().'&#39;s speed grew by <span class="recovery_amount">'.$temp_speed_boost.'</span>! ';
                     $temp_robot->robot_frame = 'slide';
                     $temp_robot->update_session();
                     $target_player->update_session();
@@ -994,8 +994,8 @@ class rpg_disabled {
                                 // Generate the robot removed event showing the destruction
                                 /*
                                 $event_header = $this_robot->robot_name.'&#39;s Data Destroyed';
-                                $event_body = $this_robot->print_robot_name().'&#39;s battle data was damaged beyond repair!<br />';
-                                $event_body .= $this_robot->print_robot_name().' could not be unlocked for use in battle&hellip;';
+                                $event_body = $this_robot->print_name().'&#39;s battle data was damaged beyond repair!<br />';
+                                $event_body .= $this_robot->print_name().' could not be unlocked for use in battle&hellip;';
                                 $event_options = array();
                                 $event_options['console_show_target'] = false;
                                 $event_options['this_header_float'] = $this_player->player_side;
@@ -1041,8 +1041,8 @@ class rpg_disabled {
 
                         // Display the robot reward message markup
                         $event_header = $temp_unlocked_robot->robot_name.' Unlocked';
-                        $event_body = rpg_battle::random_positive_word().' '.$target_player->print_player_name().' unlocked new robot data!<br />';
-                        $event_body .= $temp_unlocked_robot->print_robot_name().' can now be used in battle!';
+                        $event_body = rpg_battle::random_positive_word().' '.$target_player->print_name().' unlocked new robot data!<br />';
+                        $event_body .= $temp_unlocked_robot->print_name().' can now be used in battle!';
                         $event_options = array();
                         $event_options['console_show_target'] = false;
                         $event_options['this_header_float'] = $target_player->player_side;

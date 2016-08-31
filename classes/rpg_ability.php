@@ -196,22 +196,200 @@ class rpg_ability extends rpg_object {
 
     }
 
+    // Define alias functions for updating specific fields quickly
+
+    public function get_id(){ return intval($this->get_info('ability_id')); }
+    public function set_id($value){ $this->set_info('ability_id', intval($value)); }
+
+    public function get_name(){ return $this->get_info('ability_name'); }
+    public function set_name($value){ $this->set_info('ability_name', $value); }
+    public function get_base_name(){ return $this->get_info('ability_base_name'); }
+    public function set_base_name($value){ $this->set_info('ability_base_name', $value); }
+    public function reset_name(){ $this->set_info('ability_name', $this->get_info('ability_base_name')); }
+
+    public function get_token(){ return $this->get_info('ability_token'); }
+    public function set_token($value){ $this->set_info('ability_token', $value); }
+
+    public function get_description(){ return $this->get_info('ability_description'); }
+    public function set_description($value){ $this->set_info('ability_description', $value); }
+    public function get_base_description(){ return $this->get_info('ability_base_description'); }
+    public function set_base_description($value){ $this->set_info('ability_base_description', $value); }
+
+    public function get_class(){ return $this->get_info('ability_class'); }
+    public function set_class($value){ $this->set_info('ability_class', $value); }
+
+    public function get_subclass(){ return $this->get_info('ability_subclass'); }
+    public function set_subclass($value){ $this->set_info('ability_subclass', $value); }
+
+    public function get_master(){ return $this->get_info('ability_master'); }
+    public function set_master($value){ $this->set_info('ability_master', $value); }
+    public function get_base_master(){ return $this->get_info('ability_base_master'); }
+    public function set_base_master($value){ $this->set_info('ability_base_master', $value); }
+
+    public function get_number(){ return $this->get_info('ability_number'); }
+    public function set_number($value){ $this->set_info('ability_number', $value); }
+    public function get_base_number(){ return $this->get_info('ability_base_number'); }
+    public function set_base_number($value){ $this->set_info('ability_base_number', $value); }
+
+    public function get_type(){ return $this->get_info('ability_type'); }
+    public function set_type($value){ $this->set_info('ability_type', $value); }
+    public function get_base_type(){ return $this->get_info('ability_base_type'); }
+    public function set_base_type($value){ $this->set_info('ability_base_type', $value); }
+
+    public function get_type2(){ return $this->get_info('ability_type2'); }
+    public function set_type2($value){ $this->set_info('ability_type2', $value); }
+    public function get_base_type2(){ return $this->get_info('ability_base_type2'); }
+    public function set_base_type2($value){ $this->set_info('ability_base_type2', $value); }
+
+    public function get_speed(){ return $this->get_info('ability_speed'); }
+    public function set_speed($value){ $this->set_info('ability_speed', $value); }
+    public function get_base_speed(){ return $this->get_info('ability_base_speed'); }
+    public function set_base_speed($value){ $this->set_info('ability_base_speed', $value); }
+    public function reset_speed(){ $this->set_info('ability_speed', $this->get_base_speed()); }
+
+    public function get_energy(){ return $this->get_info('ability_energy'); }
+    public function set_energy($value){ $this->set_info('ability_energy', $value); }
+    public function get_base_energy(){ return $this->get_info('ability_base_energy'); }
+    public function set_base_energy($value){ $this->set_info('ability_base_energy', $value); }
+    public function reset_energy(){ $this->set_info('ability_energy', $this->get_base_energy()); }
+
+    public function get_damage(){ return $this->get_info('ability_damage'); }
+    public function set_damage($value){ $this->set_info('ability_damage', $value); }
+    public function get_base_damage(){ return $this->get_info('ability_base_damage'); }
+    public function set_base_damage($value){ $this->set_info('ability_base_damage', $value); }
+    public function reset_damage(){ $this->set_info('ability_damage', $this->get_base_damage()); }
+
+    public function get_damage_percent(){ return $this->get_info('ability_damage_percent'); }
+    public function set_damage_percent($value){ $this->set_info('ability_damage_percent', $value); }
+    public function get_base_damage_percent(){ return $this->get_info('ability_base_damage_percent'); }
+    public function set_base_damage_percent($value){ $this->set_info('ability_base_damage_percent', $value); }
+
+    public function get_damage2(){ return $this->get_info('ability_damage2'); }
+    public function set_damage2($value){ $this->set_info('ability_damage2', $value); }
+    public function get_base_damage2(){ return $this->get_info('ability_base_damage2'); }
+    public function set_base_damage2($value){ $this->set_info('ability_base_damage2', $value); }
+    public function reset_damage2(){ $this->set_info('ability_damage2', $this->get_base_damage2()); }
+
+    public function get_damage2_percent(){ return $this->get_info('ability_damage2_percent'); }
+    public function set_damage2_percent($value){ $this->set_info('ability_damage2_percent', $value); }
+    public function get_base_damage2_percent(){ return $this->get_info('ability_base_damage2_percent'); }
+    public function set_base_damage2_percent($value){ $this->set_info('ability_base_damage2_percent', $value); }
+
+    public function get_recovery(){ return $this->get_info('ability_recovery'); }
+    public function set_recovery($value){ $this->set_info('ability_recovery', $value); }
+    public function get_base_recovery(){ return $this->get_info('ability_base_recovery'); }
+    public function set_base_recovery($value){ $this->set_info('ability_base_recovery', $value); }
+    public function reset_recovery(){ $this->set_info('ability_recovery', $this->get_base_recovery()); }
+
+    public function get_recovery_percent(){ return $this->get_info('ability_recovery_percent'); }
+    public function set_recovery_percent($value){ $this->set_info('ability_recovery_percent', $value); }
+    public function get_base_recovery_percent(){ return $this->get_info('ability_base_recovery_percent'); }
+    public function set_base_recovery_percent($value){ $this->set_info('ability_base_recovery_percent', $value); }
+
+    public function get_recovery2(){ return $this->get_info('ability_recovery2'); }
+    public function set_recovery2($value){ $this->set_info('ability_recovery2', $value); }
+    public function get_base_recovery2(){ return $this->get_info('ability_base_recovery2'); }
+    public function set_base_recovery2($value){ $this->set_info('ability_base_recovery2', $value); }
+    public function reset_recovery2(){ $this->set_info('ability_recovery2', $this->get_base_recovery2()); }
+
+    public function get_recovery2_percent(){ return $this->get_info('ability_recovery2_percent'); }
+    public function set_recovery2_percent($value){ $this->set_info('ability_recovery2_percent', $value); }
+    public function get_base_recovery2_percent(){ return $this->get_info('ability_base_recovery2_percent'); }
+    public function set_base_recovery2_percent($value){ $this->set_info('ability_base_recovery2_percent', $value); }
+
+    public function get_accuracy(){ return $this->get_info('ability_accuracy'); }
+    public function set_accuracy($value){ $this->set_info('ability_accuracy', $value); }
+    public function get_base_accuracy(){ return $this->get_info('ability_base_accuracy'); }
+    public function set_base_accuracy($value){ $this->set_info('ability_base_accuracy', $value); }
+    public function reset_accuracy(){ $this->set_info('ability_accuracy', $this->get_base_accuracy()); }
+
+    public function get_target(){ return $this->get_info('ability_target'); }
+    public function set_target($value){ $this->set_info('ability_target', $value); }
+    public function get_base_target(){ return $this->get_info('ability_base_target'); }
+    public function set_base_target($value){ $this->set_info('ability_base_target', $value); }
+    public function reset_target(){ $this->set_info('ability_target', $this->get_base_target()); }
+
+    public function get_functions(){ return $this->get_info('ability_functions'); }
+    public function set_functions($value){ $this->set_info('ability_functions', $value); }
+
+    public function get_image(){ return $this->get_info('ability_image'); }
+    public function set_image($value){ $this->set_info('ability_image', $value); }
+    public function get_base_image(){ return $this->get_info('ability_base_image'); }
+    public function set_base_image($value){ $this->set_info('ability_base_image', $value); }
+    public function reset_image(){ $this->set_info('ability_image', $this->get_base_image()); }
+
+    public function get_image_size(){ return $this->get_info('ability_image_size'); }
+    public function set_image_size($value){ $this->set_info('ability_image_size', $value); }
+    public function get_base_image_size(){ return $this->get_info('ability_base_image_size'); }
+    public function set_base_image_size($value){ $this->set_info('ability_base_image_size', $value); }
+    public function reset_image_size(){ $this->set_info('ability_image_size', $this->get_base_image_size()); }
+
+    public function get_frame(){ return $this->get_info('ability_frame'); }
+    public function set_frame($value){ $this->set_info('ability_frame', $value); }
+
+    public function get_frame_span(){ return $this->get_info('ability_frame_span'); }
+    public function set_frame_span($value){ $this->set_info('ability_frame_span', $value); }
+
+    public function get_frame_animate(){ return $this->get_info('ability_frame_animate'); }
+    public function set_frame_animate($value){ $this->set_info('ability_frame_animate', $value); }
+
+    public function get_frame_index(){ return $this->get_info('ability_frame_index'); }
+    public function set_frame_index($value){ $this->set_info('ability_frame_index', $value); }
+
+    public function get_frame_offset(){
+        $args = func_get_args();
+        if (isset($args[0])){ return $this->get_info('ability_frame_offset', $args[0]); }
+        else { return $this->get_info('ability_frame_offset'); }
+    }
+    public function set_frame_offset($value){
+        $args = func_get_args();
+        if (isset($args[1])){ $this->set_info('ability_frame_offset', $args[0], $args[1]); }
+        else { $this->set_info('ability_frame_offset', $value); }
+    }
+
+    public function get_frame_styles(){ return $this->get_info('ability_frame_styles'); }
+    public function set_frame_styles($value){ $this->set_info('ability_frame_styles', $value); }
+    public function reset_frame_styles(){ $this->set_info('ability_frame_styles', ''); }
+
+    public function get_frame_classes(){ return $this->get_info('ability_frame_classes'); }
+    public function set_frame_classes($value){ $this->set_info('ability_frame_classes', $value); }
+    public function reset_frame_classes(){ $this->set_info('ability_frame_classes', ''); }
+
+    public function get_results(){ return $this->get_info('ability_results'); }
+    public function set_results($value){ $this->set_info('ability_results', $value); }
+
+    public function get_options(){ return $this->get_info('ability_options'); }
+    public function set_options($value){ $this->set_info('ability_options', $value); }
+
+    public function get_target_options(){ return $this->get_info('target_options'); }
+    public function set_target_options($value){ $this->set_info('target_options', $value); }
+
+    public function get_damage_options(){ return $this->get_info('ddamage_options'); }
+    public function set_damage_options($value){ $this->set_info('damage_options', $value); }
+
+    public function get_recovery_options(){ return $this->get_info('recovery_options'); }
+    public function set_recovery_options($value){ $this->set_info('recovery_options', $value); }
+
+    public function get_attachment_options(){ return $this->get_info('attachment_options'); }
+    public function set_attachment_options($value){ $this->set_info('attachment_options', $value); }
+
     // Define public print functions for markup generation
-    public function print_ability_name($plural = false){
+    public function print_name($plural = false){
         $type_class = !empty($this->ability_type) ? $this->ability_type : 'none';
         if ($type_class != 'none' && !empty($this->ability_type2)){ $type_class .= '_'.$this->ability_type2; }
         elseif ($type_class == 'none' && !empty($this->ability_type2)){ $type_class = $this->ability_type2; }
         return '<span class="ability_name ability_type ability_type_'.$type_class.'">'.$this->ability_name.($plural ? 's' : '').'</span>';
     }
-    //public function print_ability_name(){ return '<span class="ability_name">'.$this->ability_name.'</span>'; }
-    public function print_ability_token(){ return '<span class="ability_token">'.$this->ability_token.'</span>'; }
-    public function print_ability_description(){ return '<span class="ability_description">'.$this->ability_description.'</span>'; }
-    public function print_ability_type(){ return '<span class="ability_type">'.$this->ability_type.'</span>'; }
-    public function print_ability_type2(){ return '<span class="ability_type2">'.$this->ability_type2.'</span>'; }
-    public function print_ability_speed(){ return '<span class="ability_speed">'.$this->ability_speed.'</span>'; }
-    public function print_ability_damage(){ return '<span class="ability_damage">'.$this->ability_damage.'</span>'; }
-    public function print_ability_recovery(){ return '<span class="ability_recovery">'.$this->ability_recovery.'</span>'; }
-    public function print_ability_accuracy(){ return '<span class="ability_accuracy">'.$this->ability_accuracy.'%</span>'; }
+
+    //public function print_name(){ return '<span class="ability_name">'.$this->ability_name.'</span>'; }
+    public function print_token(){ return '<span class="ability_token">'.$this->ability_token.'</span>'; }
+    public function print_description(){ return '<span class="ability_description">'.$this->ability_description.'</span>'; }
+    public function print_type(){ return '<span class="ability_type">'.$this->ability_type.'</span>'; }
+    public function print_type2(){ return '<span class="ability_type2">'.$this->ability_type2.'</span>'; }
+    public function print_speed(){ return '<span class="ability_speed">'.$this->ability_speed.'</span>'; }
+    public function print_damage(){ return '<span class="ability_damage">'.$this->ability_damage.'</span>'; }
+    public function print_recovery(){ return '<span class="ability_recovery">'.$this->ability_recovery.'</span>'; }
+    public function print_accuracy(){ return '<span class="ability_accuracy">'.$this->ability_accuracy.'%</span>'; }
 
     // Define a trigger for using one of this robot's abilities
     public function reset_ability($target_robot, $this_ability){
@@ -271,7 +449,7 @@ class rpg_ability extends rpg_object {
         $this->target_options['ability_failure_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
         $this->target_options['target_kickback'] = array('x' => 0, 'y' => 0, 'z' => 0);
         $this->target_options['target_header'] = $this->robot->robot_name.'&#39;s '.$this->ability_name;
-        $this->target_options['target_text'] = "{$this->robot->print_robot_name()} uses {$this->print_ability_name()}!";
+        $this->target_options['target_text'] = "{$this->robot->print_name()} uses {$this->print_name()}!";
         // Update this ability's data
         $this->update_session();
         // Return the resuling array
@@ -1475,11 +1653,11 @@ class rpg_ability extends rpg_object {
 
         // Define Search and replace object strings for replacing
         $search_replace = array();
-        $search_replace['this_player_name'] = $this_player->print_player_name();
-        $search_replace['this_robot_name'] = $this_robot->print_robot_name();
-        $search_replace['target_player_name'] = $target_player->print_player_name();
-        $search_replace['target_robot_name'] = $target_robot->print_robot_name();
-        $search_replace['this_ability_name'] = $this_ability->print_ability_name();
+        $search_replace['this_player_name'] = $this_player->print_name();
+        $search_replace['this_robot_name'] = $this_robot->print_name();
+        $search_replace['target_player_name'] = $target_player->print_name();
+        $search_replace['target_robot_name'] = $target_robot->print_name();
+        $search_replace['this_ability_name'] = $this_ability->print_name();
 
         // Run the obtion arrays through the parsing function
         $target_options = self::parse_string_variables($search_replace, $target_options);
