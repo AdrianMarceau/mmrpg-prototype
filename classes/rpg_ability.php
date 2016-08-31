@@ -381,7 +381,6 @@ class rpg_ability extends rpg_object {
         return '<span class="ability_name ability_type ability_type_'.$type_class.'">'.$this->ability_name.($plural ? 's' : '').'</span>';
     }
 
-    //public function print_name(){ return '<span class="ability_name">'.$this->ability_name.'</span>'; }
     public function print_token(){ return '<span class="ability_token">'.$this->ability_token.'</span>'; }
     public function print_description(){ return '<span class="ability_description">'.$this->ability_description.'</span>'; }
     public function print_type(){ return '<span class="ability_type">'.$this->ability_type.'</span>'; }
@@ -961,7 +960,7 @@ class rpg_ability extends rpg_object {
 
         // Update the session with the export array
         $this_data = $this->export_array();
-        $_SESSION['ABILITIES'][$this->robot->robot_id][$this->ability_id] = $this_data;
+        $_SESSION['ABILITIES'][$this->ability_id] = $this_data;
         $this->battle->values['abilities'][$this->ability_id] = $this_data;
         //$this->player->values['abilities'][$this->ability_id] = $this_data;
         //$this->robot->values['abilities'][$this->ability_id] = $this_data;

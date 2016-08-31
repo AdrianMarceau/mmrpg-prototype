@@ -78,8 +78,8 @@ class rpg_item extends rpg_object {
 
         // Collect current item data from the session if available
         $this_iteminfo_backup = $this_iteminfo;
-        if (isset($_SESSION['ABILITIES'][$this_iteminfo['item_id']])){
-            $this_iteminfo = $_SESSION['ABILITIES'][$this_iteminfo['item_id']];
+        if (isset($_SESSION['ITEMS'][$this_iteminfo['item_id']])){
+            $this_iteminfo = $_SESSION['ITEMS'][$this_iteminfo['item_id']];
         }
         // Otherwise, collect item data from the index if not already
         elseif (!in_array($this_iteminfo['item_token'], $temp_system_items)){
@@ -606,7 +606,7 @@ class rpg_item extends rpg_object {
         */
 
         // Update the static index with this item's index info
-        //$db->INDEX['ABILITIES'][$item_info['item_token']] = $item_info;
+        //$db->INDEX['ITEMS'][$item_info['item_token']] = $item_info;
 
         // Return the parsed item info
         return $item_info;
@@ -772,7 +772,7 @@ class rpg_item extends rpg_object {
 
         // Update the session with the export array
         $this_data = $this->export_array();
-        $_SESSION['ABILITIES'][$this->robot->robot_id][$this->item_id] = $this_data;
+        $_SESSION['ITEMS'][$this->item_id] = $this_data;
         $this->battle->values['items'][$this->item_id] = $this_data;
         //$this->player->values['items'][$this->item_id] = $this_data;
         //$this->robot->values['items'][$this->item_id] = $this_data;
