@@ -11,7 +11,7 @@ foreach ($mmrpg_database_types AS $token => $info){
 // Define the index of hidden abilities to not appear in the database
 $hidden_database_abilities = array();
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('ability', 'attachment-defeat', 'action-noweapons'));
-$hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'sticky-shot', 'roll-swing'));
+$hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'sticky-shot'));
 //$hidden_database_abilities = array_merge($hidden_database_abilities, array('air-man', 'bubble-man', 'crash-man', 'flash-man', 'heat-man', 'metal-man', 'quick-man', 'wood-man'));
 //$hidden_database_abilities = array_merge($hidden_database_abilities, array('needle-man', 'magnet-man', 'gemini-man', 'hard-man', 'top-man', 'snake-man', 'spark-man', 'shadow-man'));
 $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($hidden_database_abilities) : 0;
@@ -70,7 +70,7 @@ $temp_pattern_first[] = '/^(buster-shot)$/i';
 $temp_pattern_first[] = '/^mega-(buster|ball|slide)$/i';
 $temp_pattern_first[] = '/^bass-(buster|crush|baroque)$/i';
 $temp_pattern_first[] = '/^proto-(buster|shield|strike)$/i';
-$temp_pattern_first[] = '/^roll-(buster)$/i';
+$temp_pattern_first[] = '/^roll-(buster|swing)$/i';
 $temp_pattern_first[] = '/^disco-(buster)$/i';
 $temp_pattern_first[] = '/^rhythm-(buster)$/i';
 $temp_pattern_first[] = '/^light-buster$/i';
