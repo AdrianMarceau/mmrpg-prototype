@@ -1612,6 +1612,7 @@ if (!MMRPG_CONFIG_IS_LIVE && !empty($output_buffer_contents)){
     $output_buffer_contents = str_replace("\n", '\n', $output_buffer_contents);
     $output_buffer_contents = preg_replace('/\s+/', ' ', $output_buffer_contents);
     $output_buffer_contents = str_replace("'", "\'", $output_buffer_contents);
+    $output_buffer_contents = strip_tags($output_buffer_contents);
     echo "alert('".$output_buffer_contents."');";
 }
 ?>
