@@ -585,21 +585,47 @@ class rpg_object {
     public function set_info($key, $value){
         $session_key = $this->session_key;
         $session_id = $this->session_id;
+
         $args = func_get_args();
         $value = array_pop($args);
         $key = array_shift($args);
         if (count($args) == 2){
             $key2 = array_shift($args);
             $key3 = array_shift($args);
-            $this->$key[$key2][$key3] = $value;
+            $key_array = $this->$key;
+                $key2_array = $key_array[$key2];
+                    $key2_array[$key3] = $value;
+                $key_array[$key2] = $key2_array;
+            $this->$key = $key_array;
             $_SESSION[$session_key][$this->$session_id][$key][$key2][$key3] = $value;
+            /* echo("\$_SESSION[$session_key]".
+                "[".print_r($this->$session_id, true)."]".
+                "[".print_r($key, true)."]".
+                "[".print_r($key2, true)."]".
+                "[".print_r($key3, true)."]".
+                " = ".
+                print_r($_SESSION[$session_key][$this->$session_id][$key][$key2][$key3], true).
+                ";"); */
         } elseif (count($args) == 1){
             $key2 = array_shift($args);
-            $this->$key[$key2] = $value;
+            $key_array = $this->$key;
+                $key_array[$key2] = $value;
+            $this->$key = $key_array;
             $_SESSION[$session_key][$this->$session_id][$key][$key2] = $value;
+            /* echo("\$_SESSION[$session_key]".
+                "[".print_r($this->$session_id, true)."]".
+                "[".print_r($key, true)."]".
+                "[".print_r($key2, true)."] = ".
+                print_r($_SESSION[$session_key][$this->$session_id][$key][$key2], true).
+                ";"); */
         } else {
             $this->$key = $value;
             $_SESSION[$session_key][$this->$session_id][$key] = $value;
+            /* echo("\$_SESSION[$session_key]".
+                "[".print_r($this->$session_id, true)."]".
+                "[".print_r($key, true)."] = ".
+                print_r($_SESSION[$session_key][$this->$session_id][$key], true).
+                ";"); */
         }
     }
 
