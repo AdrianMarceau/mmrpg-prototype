@@ -1136,7 +1136,7 @@ class rpg_robot extends rpg_object {
         $options = array_values($options);
 
         // This robot doesn't have ANY abilities, return buster shot
-        if (empty($options) || empty($weights)){ return 'buster-shot'; }
+        if (empty($options) || empty($weights)){ return 'action-noweapons'; }
 
         // Return an ability based on a weighted chance
         $ability_token = $this_battle->weighted_chance($options, $weights);
