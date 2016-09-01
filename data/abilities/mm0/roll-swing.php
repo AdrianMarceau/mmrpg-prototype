@@ -21,17 +21,17 @@ $ability = array(
         // Define which type of weapon will be generated and power
         if ($this_battle_turn % 3 == 0){
             $this_swing_weapon = 'vaccuum';
-            $this_swing_offset = array(4, 5);
+            $this_ability->set_image($this_ability->ability_token.'-3');
             $this_ability->set_damage($this_ability->ability_base_damage * 3);
         }
         elseif ($this_battle_turn % 2 == 0){
             $this_swing_weapon = 'umbrella';
-            $this_swing_offset = array(2, 3);
+            $this_ability->set_image($this_ability->ability_token.'-2');
             $this_ability->set_damage($this_ability->ability_base_damage * 2);
         }
         else {
             $this_swing_weapon = 'broom';
-            $this_swing_offset = array(0, 1);
+            $this_ability->set_image($this_ability->ability_token.'-1');
             $this_ability->reset_damage();
         }
 
@@ -39,7 +39,7 @@ $ability = array(
         $this_ability->target_options_update(array(
             'frame' => 'summon',
             'kickback' => array(15, 0, 0),
-            'success' => array($this_swing_offset[0], 30, 10, 10,
+            'success' => array(0, 30, 10, 10,
                 $this_robot->print_name().' uses the '.$this_ability->print_name().
                 ' to generate '.(preg_match('/^(a|e|i|o|u)/i', $this_swing_weapon) ? 'an' : 'a').' '.
                 $this_swing_weapon.'!')
@@ -54,8 +54,8 @@ $ability = array(
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
             'kickback' => array(20, 0, 0),
-            'success' => array($this_swing_offset[1], 30, 0, 10, 'The '.$this_ability->print_name().'\'s '.$this_swing_weapon.' smashed the target!'),
-            'failure' => array($this_swing_offset[1], -60, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
+            'success' => array(1, 30, 0, 10, 'The '.$this_ability->print_name().'\'s '.$this_swing_weapon.' smashed the target!'),
+            'failure' => array(1, -60, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
@@ -86,12 +86,20 @@ $ability = array(
         }
         */
 
-        // Define which type of weapon will be generated
+        // Update the ability damage and image based on turn
         $next_battle_turn = $this->battle->counters['battle_turn'] + 1;
         if ($next_battle_turn > 3){ $next_battle_turn = $next_battle_turn % 3; }
-        if ($next_battle_turn % 3 == 0){ $this_ability->set_damage($this_ability->ability_base_damage * 3); }
-        elseif ($next_battle_turn % 2 == 0){ $this_ability->set_damage($this_ability->ability_base_damage * 2); }
-        else { $this_ability->reset_damage(); }
+
+        if ($next_battle_turn % 3 == 0){
+            $this_ability->set_image($this_ability->ability_token.'-3');
+            $this_ability->set_damage($this_ability->ability_base_damage * 3);
+        } elseif ($next_battle_turn % 2 == 0){
+            $this_ability->set_image($this_ability->ability_token.'-2');
+            $this_ability->set_damage($this_ability->ability_base_damage * 2);
+        } else {
+            $this_ability->set_image($this_ability->ability_token.'-1');
+            $this_ability->reset_damage();
+        }
 
         // Return true on success
         return true;
