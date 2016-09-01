@@ -324,6 +324,8 @@ class rpg_player extends rpg_object {
         $target_robot->update_session();
         $temp_item->item_frame = 'base';
         $temp_item->item_frame_offset = array('x' => 260, 'y' => 0, 'z' => 10);
+        if ($item_quantity_dropped > 1){ $temp_item->item_name = $temp_item->item_base_name.'s'; }
+        else { $temp_item->item_name = $temp_item->item_base_name; }
         $temp_item->update_session();
         $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
 
