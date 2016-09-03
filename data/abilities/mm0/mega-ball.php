@@ -20,12 +20,16 @@ $ability = array(
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
+            'attachment_token' => $this_attachment_token,
             'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
             'ability_frame' => 7,
             'ability_frame_animate' => array(7, 6, 5, 4, 3, 2, 1, 0),
             'ability_frame_offset' => array('x' => 60, 'y' => 0, 'z' => 28)
             );
+
+        // Create the attachment object for this ability
+        $this_attachment = new rpg_ability($this_battle, $this_player, $this_robot, $this_attachment_info);
 
         // If the ability flag was not set, this ability begins charging
         if (!isset($this_robot->robot_attachments[$this_attachment_token])){
