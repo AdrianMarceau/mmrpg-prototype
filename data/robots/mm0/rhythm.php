@@ -25,7 +25,7 @@ $robot = array(
     'robot_weaknesses' => array('laser', 'crystal'),
     'robot_resistances' => array('space'),
     'robot_abilities' => array(
-        'buster-shot', 'rhythm-buster',
+        'buster-shot', 'rhythm-buster', 'rhythm-satellite',
         'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
         'attack-break', 'defense-break', 'speed-break', 'energy-break',
         'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',
@@ -43,7 +43,7 @@ $robot = array(
         'abilities' => array(
             array('level' => 0, 'token' => 'buster-shot'),
             array('level' => 22, 'token' => 'rhythm-buster'),
-            //array('level' => 24, 'token' => 'rhythm-heaven')
+            array('level' => 24, 'token' => 'rhythm-satellite')
             )
         ),
     'robot_quotes' => array(
