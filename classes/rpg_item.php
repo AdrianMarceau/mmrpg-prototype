@@ -126,7 +126,7 @@ class rpg_item extends rpg_object {
         $this->item_frame = isset($this_iteminfo['item_frame']) ? $this_iteminfo['item_frame'] : 'base';
         $this->item_frame_span = isset($this_iteminfo['item_frame_span']) ? $this_iteminfo['item_frame_span'] : 1;
         $this->item_frame_animate = isset($this_iteminfo['item_frame_animate']) ? $this_iteminfo['item_frame_animate'] : array($this->item_frame);
-        $this->item_frame_index = isset($this_iteminfo['item_frame_index']) ? $this_iteminfo['item_frame_index'] : array('base');
+        $this->item_frame_index = isset($this_iteminfo['item_frame_index']) ? $this_iteminfo['item_frame_index'] : array('00');
         $this->item_frame_offset = isset($this_iteminfo['item_frame_offset']) ? $this_iteminfo['item_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 1);
         $this->item_frame_styles = isset($this_iteminfo['item_frame_styles']) ? $this_iteminfo['item_frame_styles'] : '';
         $this->item_frame_classes = isset($this_iteminfo['item_frame_classes']) ? $this_iteminfo['item_frame_classes'] : '';
@@ -196,6 +196,185 @@ class rpg_item extends rpg_object {
         return true;
 
     }
+
+
+
+    // Define alias functions for updating specific fields quickly
+
+    public function get_id(){ return intval($this->get_info('item_id')); }
+    public function set_id($value){ $this->set_info('item_id', intval($value)); }
+
+    public function get_name(){ return $this->get_info('item_name'); }
+    public function set_name($value){ $this->set_info('item_name', $value); }
+    public function get_base_name(){ return $this->get_info('item_base_name'); }
+    public function set_base_name($value){ $this->set_info('item_base_name', $value); }
+    public function reset_name(){ $this->set_info('item_name', $this->get_info('item_base_name')); }
+
+    public function get_token(){ return $this->get_info('item_token'); }
+    public function set_token($value){ $this->set_info('item_token', $value); }
+
+    public function get_description(){ return $this->get_info('item_description'); }
+    public function set_description($value){ $this->set_info('item_description', $value); }
+    public function get_base_description(){ return $this->get_info('item_base_description'); }
+    public function set_base_description($value){ $this->set_info('item_base_description', $value); }
+
+    public function get_class(){ return $this->get_info('item_class'); }
+    public function set_class($value){ $this->set_info('item_class', $value); }
+
+    public function get_subclass(){ return $this->get_info('item_subclass'); }
+    public function set_subclass($value){ $this->set_info('item_subclass', $value); }
+
+    public function get_master(){ return $this->get_info('item_master'); }
+    public function set_master($value){ $this->set_info('item_master', $value); }
+    public function get_base_master(){ return $this->get_info('item_base_master'); }
+    public function set_base_master($value){ $this->set_info('item_base_master', $value); }
+
+    public function get_number(){ return $this->get_info('item_number'); }
+    public function set_number($value){ $this->set_info('item_number', $value); }
+    public function get_base_number(){ return $this->get_info('item_base_number'); }
+    public function set_base_number($value){ $this->set_info('item_base_number', $value); }
+
+    public function get_type(){ return $this->get_info('item_type'); }
+    public function set_type($value){ $this->set_info('item_type', $value); }
+    public function get_base_type(){ return $this->get_info('item_base_type'); }
+    public function set_base_type($value){ $this->set_info('item_base_type', $value); }
+
+    public function get_type2(){ return $this->get_info('item_type2'); }
+    public function set_type2($value){ $this->set_info('item_type2', $value); }
+    public function get_base_type2(){ return $this->get_info('item_base_type2'); }
+    public function set_base_type2($value){ $this->set_info('item_base_type2', $value); }
+
+    public function get_speed(){ return $this->get_info('item_speed'); }
+    public function set_speed($value){ $this->set_info('item_speed', $value); }
+    public function get_base_speed(){ return $this->get_info('item_base_speed'); }
+    public function set_base_speed($value){ $this->set_info('item_base_speed', $value); }
+    public function reset_speed(){ $this->set_info('item_speed', $this->get_base_speed()); }
+
+    public function get_energy(){ return $this->get_info('item_energy'); }
+    public function set_energy($value){ $this->set_info('item_energy', $value); }
+    public function get_base_energy(){ return $this->get_info('item_base_energy'); }
+    public function set_base_energy($value){ $this->set_info('item_base_energy', $value); }
+    public function reset_energy(){ $this->set_info('item_energy', $this->get_base_energy()); }
+
+    public function get_damage(){ return $this->get_info('item_damage'); }
+    public function set_damage($value){ $this->set_info('item_damage', $value); }
+    public function get_base_damage(){ return $this->get_info('item_base_damage'); }
+    public function set_base_damage($value){ $this->set_info('item_base_damage', $value); }
+    public function reset_damage(){ $this->set_info('item_damage', $this->get_base_damage()); }
+
+    public function get_damage_percent(){ return $this->get_info('item_damage_percent'); }
+    public function set_damage_percent($value){ $this->set_info('item_damage_percent', $value); }
+    public function get_base_damage_percent(){ return $this->get_info('item_base_damage_percent'); }
+    public function set_base_damage_percent($value){ $this->set_info('item_base_damage_percent', $value); }
+
+    public function get_damage2(){ return $this->get_info('item_damage2'); }
+    public function set_damage2($value){ $this->set_info('item_damage2', $value); }
+    public function get_base_damage2(){ return $this->get_info('item_base_damage2'); }
+    public function set_base_damage2($value){ $this->set_info('item_base_damage2', $value); }
+    public function reset_damage2(){ $this->set_info('item_damage2', $this->get_base_damage2()); }
+
+    public function get_damage2_percent(){ return $this->get_info('item_damage2_percent'); }
+    public function set_damage2_percent($value){ $this->set_info('item_damage2_percent', $value); }
+    public function get_base_damage2_percent(){ return $this->get_info('item_base_damage2_percent'); }
+    public function set_base_damage2_percent($value){ $this->set_info('item_base_damage2_percent', $value); }
+
+    public function get_recovery(){ return $this->get_info('item_recovery'); }
+    public function set_recovery($value){ $this->set_info('item_recovery', $value); }
+    public function get_base_recovery(){ return $this->get_info('item_base_recovery'); }
+    public function set_base_recovery($value){ $this->set_info('item_base_recovery', $value); }
+    public function reset_recovery(){ $this->set_info('item_recovery', $this->get_base_recovery()); }
+
+    public function get_recovery_percent(){ return $this->get_info('item_recovery_percent'); }
+    public function set_recovery_percent($value){ $this->set_info('item_recovery_percent', $value); }
+    public function get_base_recovery_percent(){ return $this->get_info('item_base_recovery_percent'); }
+    public function set_base_recovery_percent($value){ $this->set_info('item_base_recovery_percent', $value); }
+
+    public function get_recovery2(){ return $this->get_info('item_recovery2'); }
+    public function set_recovery2($value){ $this->set_info('item_recovery2', $value); }
+    public function get_base_recovery2(){ return $this->get_info('item_base_recovery2'); }
+    public function set_base_recovery2($value){ $this->set_info('item_base_recovery2', $value); }
+    public function reset_recovery2(){ $this->set_info('item_recovery2', $this->get_base_recovery2()); }
+
+    public function get_recovery2_percent(){ return $this->get_info('item_recovery2_percent'); }
+    public function set_recovery2_percent($value){ $this->set_info('item_recovery2_percent', $value); }
+    public function get_base_recovery2_percent(){ return $this->get_info('item_base_recovery2_percent'); }
+    public function set_base_recovery2_percent($value){ $this->set_info('item_base_recovery2_percent', $value); }
+
+    public function get_accuracy(){ return $this->get_info('item_accuracy'); }
+    public function set_accuracy($value){ $this->set_info('item_accuracy', $value); }
+    public function get_base_accuracy(){ return $this->get_info('item_base_accuracy'); }
+    public function set_base_accuracy($value){ $this->set_info('item_base_accuracy', $value); }
+    public function reset_accuracy(){ $this->set_info('item_accuracy', $this->get_base_accuracy()); }
+
+    public function get_target(){ return $this->get_info('item_target'); }
+    public function set_target($value){ $this->set_info('item_target', $value); }
+    public function get_base_target(){ return $this->get_info('item_base_target'); }
+    public function set_base_target($value){ $this->set_info('item_base_target', $value); }
+    public function reset_target(){ $this->set_info('item_target', $this->get_base_target()); }
+
+    public function get_functions(){ return $this->get_info('item_functions'); }
+    public function set_functions($value){ $this->set_info('item_functions', $value); }
+
+    public function get_image(){ return $this->get_info('item_image'); }
+    public function set_image($value){ $this->set_info('item_image', $value); }
+    public function get_base_image(){ return $this->get_info('item_base_image'); }
+    public function set_base_image($value){ $this->set_info('item_base_image', $value); }
+    public function reset_image(){ $this->set_info('item_image', $this->get_base_image()); }
+
+    public function get_image_size(){ return $this->get_info('item_image_size'); }
+    public function set_image_size($value){ $this->set_info('item_image_size', $value); }
+    public function get_base_image_size(){ return $this->get_info('item_base_image_size'); }
+    public function set_base_image_size($value){ $this->set_info('item_base_image_size', $value); }
+    public function reset_image_size(){ $this->set_info('item_image_size', $this->get_base_image_size()); }
+
+    public function get_frame(){ return $this->get_info('item_frame'); }
+    public function set_frame($value){ $this->set_info('item_frame', $value); }
+
+    public function get_frame_span(){ return $this->get_info('item_frame_span'); }
+    public function set_frame_span($value){ $this->set_info('item_frame_span', $value); }
+
+    public function get_frame_animate(){ return $this->get_info('item_frame_animate'); }
+    public function set_frame_animate($value){ $this->set_info('item_frame_animate', $value); }
+
+    public function get_frame_index(){ return $this->get_info('item_frame_index'); }
+    public function set_frame_index($value){ $this->set_info('item_frame_index', $value); }
+
+    public function get_frame_offset(){
+        $args = func_get_args();
+        if (isset($args[0])){ return $this->get_info('item_frame_offset', $args[0]); }
+        else { return $this->get_info('item_frame_offset'); }
+    }
+    public function set_frame_offset($value){
+        $args = func_get_args();
+        if (isset($args[1])){ $this->set_info('item_frame_offset', $args[0], $args[1]); }
+        else { $this->set_info('item_frame_offset', $value); }
+    }
+
+    public function get_frame_styles(){ return $this->get_info('item_frame_styles'); }
+    public function set_frame_styles($value){ $this->set_info('item_frame_styles', $value); }
+    public function reset_frame_styles(){ $this->set_info('item_frame_styles', ''); }
+
+    public function get_frame_classes(){ return $this->get_info('item_frame_classes'); }
+    public function set_frame_classes($value){ $this->set_info('item_frame_classes', $value); }
+    public function reset_frame_classes(){ $this->set_info('item_frame_classes', ''); }
+
+    public function get_results(){ return $this->get_info('item_results'); }
+    public function set_results($value){ $this->set_info('item_results', $value); }
+
+    public function get_options(){ return $this->get_info('item_options'); }
+    public function set_options($value){ $this->set_info('item_options', $value); }
+
+    public function get_target_options(){ return $this->get_info('target_options'); }
+    public function set_target_options($value){ $this->set_info('target_options', $value); }
+
+    public function get_damage_options(){ return $this->get_info('ddamage_options'); }
+    public function set_damage_options($value){ $this->set_info('damage_options', $value); }
+
+    public function get_recovery_options(){ return $this->get_info('recovery_options'); }
+    public function set_recovery_options($value){ $this->set_info('recovery_options', $value); }
+
+    public function get_attachment_options(){ return $this->get_info('attachment_options'); }
+    public function set_attachment_options($value){ $this->set_info('attachment_options', $value); }
 
     // Define public print functions for markup generation
     public function print_name($plural = false){
@@ -839,7 +1018,7 @@ class rpg_item extends rpg_object {
             'item_base_target' => $this->item_base_target,
             'item_frame' => $this->item_frame,
             'item_frame_span' => $this->item_frame_span,
-            'item_frame_index' => $this->item_frame_index,
+            //'item_frame_index' => $this->item_frame_index,
             'item_frame_animate' => $this->item_frame_animate,
             'item_frame_offset' => $this->item_frame_offset,
             'item_frame_classes' => $this->item_frame_classes,

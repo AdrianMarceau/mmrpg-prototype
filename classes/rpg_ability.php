@@ -1027,7 +1027,7 @@ class rpg_ability extends rpg_object {
             'ability_base_target' => $this->ability_base_target,
             'ability_frame' => $this->ability_frame,
             'ability_frame_span' => $this->ability_frame_span,
-            'ability_frame_index' => $this->ability_frame_index,
+            //'ability_frame_index' => $this->ability_frame_index,
             'ability_frame_animate' => $this->ability_frame_animate,
             'ability_frame_offset' => $this->ability_frame_offset,
             'ability_frame_classes' => $this->ability_frame_classes,
