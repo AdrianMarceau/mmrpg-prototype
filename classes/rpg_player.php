@@ -297,6 +297,16 @@ class rpg_player extends rpg_object {
             return true;
         }
 
+        $target_player->player_frame = $item_reward_key % 3 == 0 ? 'victory' : 'taunt';
+        $target_player->update_session();
+        $target_robot->robot_frame = $item_reward_key % 2 == 0 ? 'taunt' : 'base';
+        $target_robot->update_session();
+        $temp_item->item_frame = 0;
+        $temp_item->item_frame_offset = array('x' => 260, 'y' => 0, 'z' => 10);
+        if ($item_quantity_dropped > 1){ $temp_item->item_name = $temp_item->item_base_name.'s'; }
+        else { $temp_item->item_name = $temp_item->item_base_name; }
+        $temp_item->update_session();
+
         // Display the robot reward message markup
         $event_header = $temp_item_name.' Item Drop';
         if ($item_quantity_dropped > 1){
@@ -318,15 +328,6 @@ class rpg_player extends rpg_object {
         $event_options['console_show_this_robot'] = false;
         $event_options['console_show_this_item'] = true;
         $event_options['canvas_show_this_item'] = true;
-        $target_player->player_frame = $item_reward_key % 3 == 0 ? 'victory' : 'taunt';
-        $target_player->update_session();
-        $target_robot->robot_frame = $item_reward_key % 2 == 0 ? 'taunt' : 'base';
-        $target_robot->update_session();
-        $temp_item->item_frame = 'base';
-        $temp_item->item_frame_offset = array('x' => 260, 'y' => 0, 'z' => 10);
-        if ($item_quantity_dropped > 1){ $temp_item->item_name = $temp_item->item_base_name.'s'; }
-        else { $temp_item->item_name = $temp_item->item_base_name; }
-        $temp_item->update_session();
         $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
 
         // Create and/or increment the session variable for this item increasing its quantity
