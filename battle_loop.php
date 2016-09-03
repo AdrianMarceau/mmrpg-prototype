@@ -770,7 +770,8 @@ elseif ($this_action == 'ability'){
             }
         }
         if (empty($active_target_robot)){
-            $temp_robotinfo = array_shift(array_slice($target_player->values['robots_active'], 0, 1));
+            $temp_robotinfo = array_slice($target_player->values['robots_active'], 0, 1);
+            $temp_robotinfo = array_shift($temp_robotinfo);
             $temp_robotinfo = array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']);
             $active_target_robot = new rpg_robot($this_battle, $target_player, $target_player->player_robots[0]);
             $active_target_robot->robot_position = 'active';
