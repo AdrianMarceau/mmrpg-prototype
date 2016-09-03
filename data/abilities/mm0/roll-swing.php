@@ -6,6 +6,7 @@ $ability = array(
     'ability_game' => 'MM08',
     'ability_group' => 'MM00/Weapons/Roll',
     'ability_description' => 'The user swings a hand-held weapon at the target to deal damage! The exact weapon used for this ability and the resulting damage appear to rotate with each turn that passes...',
+    'ability_type' => '',
     'ability_energy' => 8,
     'ability_damage' => 10,
     'ability_accuracy' => 98,
@@ -33,6 +34,12 @@ $ability = array(
             $this_swing_weapon = 'broom';
             $this_ability->set_image($this_ability->ability_token.'-1');
             $this_ability->reset_damage();
+        }
+
+        // Update the ability image if the user is in their alt image
+        $alt_image_triggers = array('roll_alt', 'roll_alt3', 'roll_alt5');
+        if (in_array($this_robot->robot_image, $alt_image_triggers)){
+            $this_ability->set_image($this_ability->ability_image.'-b');
         }
 
         // Target the opposing robot
@@ -99,6 +106,12 @@ $ability = array(
         } else {
             $this_ability->set_image($this_ability->ability_token.'-1');
             $this_ability->reset_damage();
+        }
+
+        // Update the ability image if the user is in their alt image
+        $alt_image_triggers = array('roll_alt', 'roll_alt3', 'roll_alt5');
+        if (in_array($this_robot->robot_image, $alt_image_triggers)){
+            $this_ability->set_image($this_ability->ability_image.'-b');
         }
 
         // Return true on success

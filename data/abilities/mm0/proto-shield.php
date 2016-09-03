@@ -20,6 +20,7 @@ $ability = array(
             'class' => 'ability',
             'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
+            'attachment_token' => $this_attachment_token,
             'attachment_duration' => 4,
             'attachment_damage_input_breaker' => 0.5,
             'attachment_create' => array(
@@ -47,16 +48,8 @@ $ability = array(
                 'ability_frame_offset' => array('x' => 34, 'y' => -10, 'z' => 18)
             );
 
-        // If this robot is targetting itself
-        if ($this_robot->robot_id != $target_robot->robot_id){
-
-            // Recreate this ability using the target robot's data
-            $temp_abilityinfo = array('ability_token' => $this_ability->ability_token);
-            $temp_ability = new rpg_ability($this_battle, $this_player, $target_robot, $temp_abilityinfo);
-            $temp_ability->update_session();
-
-        }
-
+        // Create the attachment object for this ability
+        $this_attachment = new rpg_ability($this_battle, $this_player, $target_robot, $this_attachment_info);
 
         // If the ability flag was not set, attach the ability to the target
         if (!isset($target_robot->robot_attachments[$this_attachment_token])){
@@ -87,8 +80,8 @@ $ability = array(
                 // Target this robot's self
                 $this_robot->robot_frame = 'base';
                 $this_robot->update_session();
-                $temp_ability->target_options_update($this_attachment_info['attachment_create']);
-                $target_robot->trigger_target($target_robot, $temp_ability);
+                $this_attachment->target_options_update($this_attachment_info['attachment_create']);
+                $target_robot->trigger_target($target_robot, $this_attachment);
 
                 // Attach this ability attachment to the robot using it
                 $this_attachment_info['ability_frame_animate'] = array(0, 1, 2, 1);
@@ -128,29 +121,20 @@ $ability = array(
                 $target_robot->update_session();
 
                 // Target the opposing robot
-                $temp_ability->target_options_update(array(
+                $this_attachment->target_options_update(array(
                     'frame' => 'summon',
                     'success' => array(9, 85, -10, -10, $this_robot->print_name().' reinforced the '.$this_ability->print_name().'!<br /> '.$target_robot->print_name().'&#39;s protection has been extended!')
                     ));
-                $this_robot->trigger_target($this_robot, $temp_ability);
+                $this_robot->trigger_target($this_robot, $this_attachment);
 
             }
 
         }
 
         // Either way, update this ability's settings to prevent recovery
-        $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
-        $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
-        $this_ability->update_session();
-        if (isset($temp_ability)){
-            $temp_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
-            $temp_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
-            $temp_ability->update_session();
-        }
-
-        // DEBUG
-        //$this_battle->events_create(false, false, 'DEBUG', '<pre>Reached the end... '.preg_replace('#\s+#', ' ', print_r(array('ability_id' => $this_ability->ability_id, 'ability_token' => $this_ability->ability_token), true)).'</pre>');
-
+        $this_attachment->damage_options_update($this_attachment_info['attachment_destroy'], true);
+        $this_attachment->recovery_options_update($this_attachment_info['attachment_destroy'], true);
+        $this_attachment->update_session();
 
         // Return true on success
         return true;
