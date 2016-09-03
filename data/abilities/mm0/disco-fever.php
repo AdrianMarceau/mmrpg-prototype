@@ -20,6 +20,7 @@ $ability = array(
         $temp_text2 = $target_robot->robot_token == 'bass' ? 'The ' : 'The ';
         $this_attachment_info = array(
             'class' => 'ability',
+            'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
             'attachment_duration' => 3,
             'attachment_damage_output_breaker' => 0.5,
