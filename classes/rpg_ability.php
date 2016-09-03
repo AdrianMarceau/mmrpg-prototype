@@ -78,7 +78,7 @@ class rpg_ability extends rpg_object {
                 else { $ability_id .= substr(md5($this_abilityinfo['ability_token']), 0, 3); }
             }
             $this_abilityinfo['ability_id'] = $ability_id;
-            echo("ability_id for {$this->robot->robot_token}:{$this_abilityinfo['ability_token']} is {$this_abilityinfo['ability_id']} \n");
+            //echo("ability_id for {$this->robot->robot_token}:{$this_abilityinfo['ability_token']} is {$this_abilityinfo['ability_id']} \n");
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint ability auto-assigned an ID from '.$this_abilityinfo['ability_token'].' on '.$this->robot->robot_token.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($this_abilityinfo['ability_id'], true), ENT_QUOTES, 'UTF-8', true)));
         }
 
