@@ -18,6 +18,7 @@ $ability = array(
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
         $this_attachment_info = array(
             'class' => 'ability',
+            'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
             'attachment_duration' => 4,
             'attachment_damage_input_breaker' => 0.5,
