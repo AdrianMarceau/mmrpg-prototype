@@ -54,6 +54,9 @@ class rpg_ability extends rpg_object {
     // Define a public function for manually loading data
     public function ability_load($this_abilityinfo){
 
+        // Collect ability index info in case we need it
+        $this_indexinfo = self::get_index_info($this_abilityinfo['ability_token']);
+
         // If the ability info was not an array, return false
         if (!is_array($this_abilityinfo)){ return false; }
         // If the ability ID was not provided, return false
@@ -67,13 +70,16 @@ class rpg_ability extends rpg_object {
         if (in_array($this_abilityinfo['ability_token'], $temp_system_abilities)){
             $this_abilityinfo['ability_id'] = $this->player_id.'000';
         }
-        // Else if this is an item, tweak it's ID as well
-        elseif (in_array($this_abilityinfo['ability_token'], $this->player->player_items)){
-            $this_abilityinfo['ability_id'] = $this->player_id.str_pad($this_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
-        }
         // Otherwise base the ID off of the robot
-        elseif (!preg_match('/^'.$this->robot->robot_id.'/', $this_abilityinfo['ability_id'])){
-            $this_abilityinfo['ability_id'] = $this->robot_id.str_pad($this_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
+        else {
+            $ability_id = $this->robot_id.str_pad($this_indexinfo['ability_id'], 3, '0', STR_PAD_LEFT);
+            if (!empty($this_abilityinfo['flags']['is_attachment'])){
+                if (isset($this_abilityinfo['attachment_token'])){ $ability_id .= 'x'.strtoupper(substr(md5($this_abilityinfo['attachment_token']), 0, 3)); }
+                else { $ability_id .= substr(md5($this_abilityinfo['ability_token']), 0, 3); }
+            }
+            $this_abilityinfo['ability_id'] = $ability_id;
+            echo("ability_id for {$this->robot->robot_token}:{$this_abilityinfo['ability_token']} is {$this_abilityinfo['ability_id']} \n");
+            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint ability auto-assigned an ID from '.$this_abilityinfo['ability_token'].' on '.$this->robot->robot_token.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($this_abilityinfo['ability_id'], true), ENT_QUOTES, 'UTF-8', true)));
         }
 
         // Collect current ability data from the session if available
@@ -86,9 +92,6 @@ class rpg_ability extends rpg_object {
             $temp_backup_id = $this_abilityinfo['ability_id'];
             if (empty($this_abilityinfo_backup['_parsed'])){
                 $this_abilityinfo = self::get_index_info($this_abilityinfo_backup['ability_token']);
-                if (empty($this_abilityinfo['ability_id'])){
-                    exit();
-                }
                 $this_abilityinfo = array_replace($this_abilityinfo, $this_abilityinfo_backup);
             }
         }

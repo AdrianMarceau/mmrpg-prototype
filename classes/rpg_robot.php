@@ -461,6 +461,10 @@ class rpg_robot extends rpg_object {
     public function has_base_abilities(){ return $this->get_info('robot_base_abilities') ? true : false; }
     public function has_base_ability($token){ return in_array($token, $this->get_info('robot_base_abilities')) ? true : false; }
 
+    public function get_attachment($token){ return $this->get_info('robot_attachments', $token); }
+    public function set_attachment($token, $value){ $this->set_info('robot_attachments', $token, $value); }
+    public function unset_attachment($token){ return $this->unset_info('robot_attachments', $token); }
+
     public function get_attachments(){ return $this->get_info('robot_attachments'); }
     public function set_attachments($value){ $this->set_info('robot_attachments', $value); }
     public function has_attachments(){ return $this->get_info('robot_attachments') ? true : false; }
@@ -1498,6 +1502,8 @@ class rpg_robot extends rpg_object {
         if ($attachment_info['class'] == 'ability'){
 
             // Create the temporary ability object
+            $attachment_info['flags']['is_attachment'] = true;
+            if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_info['ability_token']; }
             $this_ability = new rpg_ability($this->battle, $this->player, $this, array('ability_token' => $attachment_info['ability_token']));
 
             // Update this robot's history with the triggered attachment

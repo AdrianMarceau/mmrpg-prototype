@@ -544,7 +544,7 @@ class rpg_canvas {
         $this_data['ability_frame_index'] = isset($options['ability_frame_index']) ? $options['ability_frame_index'] : $this_ability->ability_frame_index;
         if (is_numeric($this_data['ability_frame']) && $this_data['ability_frame'] >= 0){ $this_data['ability_frame'] = str_pad($this_data['ability_frame'], 2, '0', STR_PAD_LEFT); }
         elseif (is_numeric($this_data['ability_frame']) && $this_data['ability_frame'] < 0){ $this_data['ability_frame'] = ''; }
-        $this_data['ability_frame_offset'] = isset($options['ability_frame_offset']) ? $options['ability_frame_offset'] : $this_ability->ability_frame_offset;
+        $this_data['ability_frame_offset'] = isset($options['ability_frame_offset']) && is_array($options['ability_frame_offset']) ? $options['ability_frame_offset'] : $this_ability->ability_frame_offset;
         $animate_frames_array = isset($options['ability_frame_animate']) ? $options['ability_frame_animate'] : array($this_data['ability_frame']);
         $animate_frames_string = array();
         if (!empty($animate_frames_array)){
@@ -699,7 +699,7 @@ class rpg_canvas {
         if (is_numeric($this_data['item_frame']) && $this_data['item_frame'] >= 0){ $this_data['item_frame'] = str_pad($this_data['item_frame'], 2, '0', STR_PAD_LEFT); }
         elseif (is_numeric($this_data['item_frame']) && $this_data['item_frame'] < 0){ $this_data['item_frame'] = ''; }
         //$this_data['item_image'] = 'images/items/'.(!empty($this_data['item_image']) ? $this_data['item_image'] : $this_data['item_token']).'/sprite_'.$this_data['item_direction'].'_'.$this_data['item_size'].'x'.$this_data['item_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
-        $this_data['item_frame_offset'] = isset($options['item_frame_offset']) ? $options['item_frame_offset'] : $this_item->item_frame_offset;
+        $this_data['item_frame_offset'] = isset($options['item_frame_offset']) && is_array($options['item_frame_offset']) ? $options['item_frame_offset'] : $this_item->item_frame_offset;
         $animate_frames_array = isset($options['item_frame_animate']) ? $options['item_frame_animate'] : array($this_data['item_frame']);
         $animate_frames_string = array();
         if (!empty($animate_frames_array)){
@@ -1139,6 +1139,8 @@ class rpg_canvas {
                         // If this is an ability attachment
                         if ($attachment_info['class'] == 'ability'){
                             // Create the temporary ability object using the provided data and generate its markup data
+                            $attachment_info['flags']['is_attachment'] = true;
+                            if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                             $this_ability = new rpg_ability($this_battle, $eventinfo['this_player'], $this_robot, $attachment_info);
                             // Define this ability data array and generate the markup data
                             $this_attachment_options = $this_options;
@@ -1170,6 +1172,8 @@ class rpg_canvas {
                         elseif ($attachment_info['class'] == 'item'){
                             // Create the temporary item object using the provided data and generate its markup data
                             //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
+                            $attachment_info['flags']['is_attachment'] = true;
+                            if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                             $this_item = new rpg_item($this_battle, $eventinfo['this_player'], $this_robot, $attachment_info);
                             // Define this item data array and generate the markup data
                             $this_attachment_options = $this_options;
