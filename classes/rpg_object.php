@@ -589,14 +589,13 @@ class rpg_object {
         $args = func_get_args();
         $value = array_pop($args);
         $key = array_shift($args);
+        if (!isset($this->$key)){ return false; }
+        else { $key_array = &$this->$key; }
+
         if (count($args) == 2){
             $key2 = array_shift($args);
             $key3 = array_shift($args);
-            $key_array = $this->$key;
-                $key2_array = $key_array[$key2];
-                    $key2_array[$key3] = $value;
-                $key_array[$key2] = $key2_array;
-            $this->$key = $key_array;
+            $key_array[$key2][$key3] = $value;
             $_SESSION[$session_key][$this->$session_id][$key][$key2][$key3] = $value;
             /* echo("\$_SESSION[$session_key]".
                 "[".print_r($this->$session_id, true)."]".
@@ -608,9 +607,7 @@ class rpg_object {
                 ";"); */
         } elseif (count($args) == 1){
             $key2 = array_shift($args);
-            $key_array = $this->$key;
-                $key_array[$key2] = $value;
-            $this->$key = $key_array;
+            $key_array[$key2] = $value;
             $_SESSION[$session_key][$this->$session_id][$key][$key2] = $value;
             /* echo("\$_SESSION[$session_key]".
                 "[".print_r($this->$session_id, true)."]".
@@ -619,7 +616,7 @@ class rpg_object {
                 print_r($_SESSION[$session_key][$this->$session_id][$key][$key2], true).
                 ";"); */
         } else {
-            $this->$key = $value;
+            $key_array = $value;
             $_SESSION[$session_key][$this->$session_id][$key] = $value;
             /* echo("\$_SESSION[$session_key]".
                 "[".print_r($this->$session_id, true)."]".
@@ -640,17 +637,19 @@ class rpg_object {
         $session_id = $this->session_id;
         $args = func_get_args();
         $key = array_shift($args);
+        if (!isset($this->$key)){ return; }
+        else { $key_array = &$this->$key; }
         if (count($args) == 2){
             $key2 = array_shift($args);
             $key3 = array_shift($args);
-            unset($this->$key[$key2][$key3]);
+            unset($key_array[$key2][$key3]);
             unset($_SESSION[$session_key][$this->$session_id][$key][$key2][$key3]);
         } elseif (count($args) == 1){
             $key2 = array_shift($args);
-            unset($this->$key[$key2]);
+            unset($key_array[$key2]);
             unset($_SESSION[$session_key][$this->$session_id][$key][$key2]);
         } else {
-            unset($this->$key);
+            unset($key_array);
             unset($_SESSION[$session_key][$this->$session_id][$key]);
         }
     }
@@ -667,20 +666,22 @@ class rpg_object {
         $session_id = $this->session_id;
         $args = func_get_args();
         $key = array_shift($args);
+        if (!isset($this->$key)){ return false; }
+        else { $key_array = &$this->$key; }
         if (count($args) == 2){
             $key2 = array_shift($args);
             $key3 = array_shift($args);
-            if (isset($_SESSION[$session_key][$this->$session_id][$key][$key2][$key3])){ $this->$key[$key2][$key3] = $_SESSION[$session_key][$this->$session_id][$key][$key2][$key3]; }
-            if (isset($this->$key[$key2][$key3])){ return $this->$key[$key2][$key3]; }
+            if (isset($_SESSION[$session_key][$this->$session_id][$key][$key2][$key3])){ $key_array[$key2][$key3] = $_SESSION[$session_key][$this->$session_id][$key][$key2][$key3]; }
+            if (isset($key_array[$key2][$key3])){ return $key_array[$key2][$key3]; }
             else { return false; }
         } elseif (count($args) == 1){
             $key2 = array_shift($args);
-            if (isset($_SESSION[$session_key][$this->$session_id][$key][$key2])){ $this->$key[$key2] = $_SESSION[$session_key][$this->$session_id][$key][$key2]; }
-            if (isset($this->$key[$key2])){ return $this->$key[$key2]; }
+            if (isset($_SESSION[$session_key][$this->$session_id][$key][$key2])){ $key_array[$key2] = $_SESSION[$session_key][$this->$session_id][$key][$key2]; }
+            if (isset($key_array[$key2])){ return $key_array[$key2]; }
             else { return false; }
         } else {
-            if (isset($_SESSION[$session_key][$this->$session_id][$key])){ $this->$key = $_SESSION[$session_key][$this->$session_id][$key]; }
-            if (isset($this->$key)){ return $this->$key; }
+            if (isset($_SESSION[$session_key][$this->$session_id][$key])){ $key_array = $_SESSION[$session_key][$this->$session_id][$key]; }
+            if (isset($key_array)){ return $key_array; }
             else { return false; }
         }
     }
