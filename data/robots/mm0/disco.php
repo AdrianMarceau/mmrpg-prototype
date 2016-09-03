@@ -25,7 +25,7 @@ $robot = array(
     'robot_weaknesses' => array('cutter', 'swift'),
     'robot_resistances' => array('shadow'),
     'robot_abilities' => array(
-        'buster-shot', 'disco-buster',
+        'buster-shot', 'disco-buster', 'disco-fever',
         'attack-boost', 'defense-boost', 'speed-boost', 'energy-boost',
         'attack-break', 'defense-break', 'speed-break', 'energy-break',
         'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',
@@ -43,7 +43,7 @@ $robot = array(
         'abilities' => array(
             array('level' => 0, 'token' => 'buster-shot'),
             array('level' => 12, 'token' => 'disco-buster'),
-            //array('level' => 14, 'token' => 'disco-fever')
+            array('level' => 14, 'token' => 'disco-fever')
             )
         ),
     'robot_quotes' => array(
