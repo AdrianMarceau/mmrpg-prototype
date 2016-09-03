@@ -1066,6 +1066,8 @@ class rpg_ability_recovery extends rpg_recovery {
                                 unset($this_robot->robot_attachments[$attachment_token]);
                                 $this_robot->update_session();
                                 if ($attachment_info['attachment_destroy'] !== false){
+                                    $attachment_info['flags']['is_attachment'] = true;
+                                    if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                                     $temp_attachment = new rpg_ability($this_robot->battle, $this_robot->player, $this_robot, array('ability_token' => $attachment_info['ability_token']));
                                     $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                                     //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');

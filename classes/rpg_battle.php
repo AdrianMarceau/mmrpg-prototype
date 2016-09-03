@@ -2397,10 +2397,13 @@ class rpg_battle extends rpg_object {
                             unset($temp_robot->robot_attachments[$attachment_token]);
                             $temp_robot->update_session();
                             if ($attachment_info['attachment_destroy'] !== false){
-                                $temp_attachment = new rpg_ability($this_battle, $this_player, $temp_robot, array('ability_token' => $attachment_info['ability_token']));
+                                $attachment_info['flags']['is_attachment'] = true;
+                                if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
+                                $temp_attachment = new rpg_ability($this_battle, $this_player, $temp_robot, $attachment_info);
                                 $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                                 //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
                                 //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
+                                //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info, true), ENT_QUOTES, 'UTF-8', true)));
                                 if ($temp_trigger_type == 'damage'){
                                     $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                     $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
