@@ -33,7 +33,7 @@ $ability = array(
                     'frame' => 'taunt',
                     'rates' => array(100, 0, 0),
                     'success' => array(0, 0, 0, -9999, $this_robot->print_name().'&#39;s flame was bolstered!'),
-                    'failure' => array(0, 0, 0, -9999, $this_robot->print_name().'&#39;s flame was not affected&hellip;')
+                    'failure' => array(0, 0, 0, -9999, $this_robot->print_name().'&#39;s flame was bolstered!')
                     ),
                 'attachment_destroy' => array(
                     'trigger' => 'special',
@@ -41,7 +41,7 @@ $ability = array(
                     'frame' => 'defend',
                     'rates' => array(100, 0, 0),
                     'success' => array(0, 0, 0, -9999,  'The '.$this_ability->print_name().'&#39;s flame was lost&hellip;'),
-                    'failure' => array(0, 0, 0, -9999, $this_robot->print_name().'&#39;s flame was not affected&hellip;')
+                    'failure' => array(0, 0, 0, -9999, $this_robot->print_name().'&#39;s flame was lost&hellip;')
                     ),
                 'ability_frame' => 3,
                 'ability_frame_animate' => array(3, 4),
