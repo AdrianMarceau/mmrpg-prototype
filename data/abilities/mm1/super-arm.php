@@ -5,8 +5,9 @@ $ability = array(
     'ability_token' => 'super-arm',
     'ability_game' => 'MM01',
     'ability_image_sheets' => 8,
-    'ability_description' => 'The user creates a blockade using the surrounding environment to bolster shields and reduce damage by {RECOVERY2}%!  The blockade can also be thrown at the target for massive damage! This ability\'s second type appears to change based on which battle field it\'s being used on.',
+    'ability_description' => 'The user creates a blockade using the surrounding environment to bolster shields and reduce damage by {RECOVERY2}%!  The blockade can also be thrown at the target for massive damage!',
     'ability_type' => 'impact',
+    'ability_type2' => 'shield',
     'ability_energy' => 8,
     'ability_damage' => 30,
     'ability_recovery2' => 60,
@@ -62,7 +63,8 @@ $ability = array(
             'attachment_damage_input_breaker' => $this_effect_multiplier,
             'attachment_weaknesses' => $this_object_weaknesses,
             'attachment_create' => array(
-                'kind' => 'defense',
+                'trigger' => 'special',
+                'kind' => '',
                 'percent' => true,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
@@ -77,8 +79,8 @@ $ability = array(
                     )
                 ),
             'attachment_destroy' => array(
-                'kind' => 'defense',
-                'type' => '',
+                'trigger' => 'special',
+                'kind' => '',
                 'type2' => '',
                 'percent' => true,
                 'modifiers' => false,
@@ -173,15 +175,6 @@ $ability = array(
 
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
-
-        // If the current field has a type, apply it to this ability
-        if (!empty($this_field->field_type) && $this_field->field_type != $this_ability->ability_type){
-            $this_ability->ability_type2 = $this_field->field_type;
-            $this_ability->update_session();
-        } else {
-            $this_ability->ability_type2 = '';
-            $this_ability->update_session();
-        }
 
         // If this ability is being used by a robot with the same core type AND it's already summoned, allow targetting
         if ((!empty($this_robot->robot_core) && $this_robot->robot_core == $this_ability->ability_type)
