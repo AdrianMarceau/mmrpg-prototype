@@ -37,8 +37,8 @@ $allowed_edit_data = $this_shop_index;
 $prototype_player_counter = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
 $prototype_complete_counter = mmrpg_prototype_complete();
 $prototype_battle_counter = mmrpg_prototype_battles_complete('dr-light');
-if ($prototype_complete_counter < 3){ unset($allowed_edit_data['kalinka']); }
-if ($prototype_player_counter < 3){ unset($allowed_edit_data['reggae']); }
+if ($prototype_player_counter < 3 || $prototype_complete_counter < 3){ unset($allowed_edit_data['kalinka']); }
+if ($prototype_player_counter < 2){ unset($allowed_edit_data['reggae']); }
 if ($prototype_battle_counter < 1){ unset($allowed_edit_data['auto']); }
 $allowed_edit_data_count = count($allowed_edit_data);
 //die('$prototype_player_counter = '.$prototype_player_counter.'; $allowed_edit_data = <pre>'.print_r($allowed_edit_data, true).'</pre>');
