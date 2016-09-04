@@ -1,7 +1,7 @@
 <?
 
 // Define all the available player items in a handy index array
-$current_player_items = $this_player->player_items;
+$current_player_items = !empty($_SESSION['GAME']['values']['battle_items']) ? $_SESSION['GAME']['values']['battle_items'] : array();
 
 // Filter out items that should not be shown
 $item_token_skip = array('large-screw', 'small-screw');
@@ -13,7 +13,7 @@ foreach ($current_player_items AS $token => $quantity){
 
 // Count the number of items the player has and determine pages
 $current_player_items_count = count($current_player_items);
-$current_player_items_pages = $current_player_items_count <= 8 ? 1 : ceil($current_player_items_count / 8);
+$current_player_items_pages = ceil($current_player_items_count / 8);
 
 // Require the item database page for sorting purposes
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
