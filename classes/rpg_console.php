@@ -114,6 +114,8 @@ class rpg_console {
         $this_data['container_style'] = '';
         //$this_data['robot_class'] = 'sprite sprite_robot_'.$this_data['robot_status'];
         $this_data['robot_class'] = 'sprite sprite_robot sprite_robot_'.$this_data['image_type'].' ';
+        $this_data['robot_type_class'] = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
+        if (!empty($this_robot->robot_core) && !empty($this_robot->robot_core2)){ $this_data['robot_type_class'] .= '_'.$this_robot->robot_core2; }
         $this_data['robot_style'] = '';
         $this_data['robot_size'] = $this_robot->robot_image_size;
         $this_data['robot_image'] = 'images/robots/'.$this_data['robot_image'].'/'.$this_data['image_type'].'_'.$this_data['robot_direction'].'_'.$this_data['robot_size'].'x'.$this_data['robot_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
@@ -135,7 +137,7 @@ class rpg_console {
         // Generate the final markup for the console robot
         $this_data['robot_markup'] = '';
         $this_data['robot_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
-        $this_data['robot_markup'] .= '<div class="'.$this_data['robot_class'].'" style="'.$this_data['robot_style'].'" title="'.$this_data['robot_title'].'">'.$this_data['robot_title'].'</div>';
+        $this_data['robot_markup'] .= '<div class="'.$this_data['robot_class'].'" style="'.$this_data['robot_style'].'" title="'.$this_data['robot_title'].'" data-tooltip-type="robot_type type_'.$this_data['robot_type_class'].'">'.$this_data['robot_title'].'</div>';
         if ($this_data['image_type'] != 'mug'){ $this_data['robot_markup'] .= '<div class="'.$this_data['energy_class'].'" style="'.$this_data['energy_style'].'" title="'.$this_data['energy_title'].'">'.$this_data['energy_title'].'</div>'; }
         $this_data['robot_markup'] .= '</div>';
 
