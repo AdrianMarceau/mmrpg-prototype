@@ -23,10 +23,12 @@ $ability = array(
         $this_attachment_info = array(
             'class' => 'ability',
             'ability_token' => $this_ability->ability_token,
+            'attachment_token' => $this_attachment_token,
             'attachment_damage_input_breaker' => $this_effect_multiplier,
             'attachment_weaknesses' => array('flame'),
             'attachment_create' => array(
-                'kind' => 'defense',
+                'trigger' => 'special',
+                'kind' => '',
                 'percent' => true,
                 'modifiers' => false,
                 'frame' => 'taunt',
@@ -41,18 +43,19 @@ $ability = array(
                     )
                 ),
             'attachment_destroy' => array(
-                'kind' => 'defense',
+                'trigger' => 'special',
+                'kind' => '',
                 'type' => '',
                 'percent' => true,
                 'modifiers' => false,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
                 'success' => array(9, -10, 0, -10,
-                    'The '.$this_ability->print_name().' burned away!<br /> '.
+                    'The '.$this_ability->print_name().' faded away!<br /> '.
                     $this_robot->print_name().' is no longer protected...'
                     ),
                 'failure' => array(9, -10, 0, -10,
-                    'The '.$this_ability->print_name().' burned away!<br /> '.
+                    'The '.$this_ability->print_name().' faded away!<br /> '.
                     $this_robot->print_name().' is no longer protected...'
                     )
                 ),
