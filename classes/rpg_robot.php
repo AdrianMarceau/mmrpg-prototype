@@ -842,7 +842,7 @@ class rpg_robot extends rpg_object {
             //$debug_fragment .= 'has-type '; // DEBUG
             if (!empty($robot_info['robot_core'])){
             //$debug_fragment .= 'has-core '; // DEBUG
-                if ($robot_info['robot_core'] == 'copy'){
+                if ($robot_info['robot_core'] == 'copy' && !empty($ability_info['ability_type'])){
                     //$debug_fragment .= 'copy-core '; // DEBUG
                     $temp_compatible = true;
                 }
