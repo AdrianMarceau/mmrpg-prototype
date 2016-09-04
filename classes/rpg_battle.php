@@ -2028,6 +2028,10 @@ class rpg_battle extends rpg_object {
         if (!isset($this->counters['events'])){ $this->counters['events'] = 1; }
         else { $this->counters['events']++; }
 
+        // Create the event body and header
+        $event_header = preg_replace('/\s+/i', ' ', $event_header);
+        $event_body = preg_replace('/\s+/i', ' ', $event_body);
+
         // Generate the event markup and add it to the array
         //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
         $this->events[] = $this->events_markup_generate(array(
@@ -2312,37 +2316,90 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a function for finding a target player based on field side
-    public function find_target_player($target_side){
+    public function find_target_player($side_or_id){
+
+        // If a string argument was provided in left/right, search that way
+        if (is_string($side_or_id) && in_array($side_or_id, array('left', 'right'))){ $target_side = $side_or_id; }
+        elseif (is_numeric($side_or_id) && !empty($side_or_id)){ $target_id = $side_or_id; }
+        else { return false; }
+
         // Define the target player variable to start
         $target_player = false;
-        // Ensure the player array is not empty
-        if (!empty($this->values['players'])){
-            // Loop through the battle's player characters one by one
-            foreach ($this->values['players'] AS $player_id => $player_info){
-                // If the player matches the request side, return the player
-                if ($player_info['player_side'] == $target_side){
-                    $target_player = new rpg_player($this, $player_info);
+
+        // If this search is based on player side, loop and filter
+        if (isset($target_side)){
+
+            // Ensure the player array is not empty
+            if (!empty($this->values['players'])){
+                // Loop through the battle's player characters one by one
+                foreach ($this->values['players'] AS $player_id => $player_info){
+                    // If the player matches the request side, return the player
+                    if ($player_info['player_side'] == $target_side){
+                        $target_player = new rpg_player($this, $player_info);
+                    }
                 }
             }
+
         }
+        // Otherwise if we're searching for a player based on ID
+        elseif (isset($target_id)){
+
+            // If the ID was empty, return false
+            if (empty($target_id)){ return false; }
+            // If the player does not exists in the battle, return false
+            elseif (!isset($this->values['players'][$target_id])){ return false; }
+            // Otherwise collect the player info from the battle
+            $player_info = $this->values['players'][$target_id];
+            // Create the robot object and return to caller
+            $target_player = new rpg_player($this, $player_info);
+        }
+
         // Return the final value of the target player
         return $target_player;
     }
 
     // Define a function for finding a target robot based on field side
-    public function find_target_robot($target_side){
+    public function find_target_robot($side_or_id){
+
+        // If a string argument was provided in left/right, search that way
+        if (is_string($side_or_id) && in_array($side_or_id, array('left', 'right'))){ $target_side = $side_or_id; }
+        elseif (is_numeric($side_or_id) && !empty($side_or_id)){ $target_id = $side_or_id; }
+        else { return false; }
+
         // Define the target robot variable to start
-        $target_player = $this->find_target_player($target_side);
         $target_robot = false;
-        // Ensure the robot array is not empty
-        if (!empty($this->values['robots'])){
-            // Loop through the battle's robot characters one by one
-            foreach ($this->values['robots'] AS $robot_id => $robot_info){
-                // If the robot matches the request side, return the robot
-                if ($robot_info['player_id'] == $target_player->player_id && $robot_info['robot_position'] == 'active'){
-                    $target_robot = new rpg_robot($this, $target_player, $robot_info);
+
+        // If this search is based on robot side, loop and filter
+        if (isset($target_side)){
+
+            // Define the target robot variable to start
+            $target_player = $this->find_target_player($target_side);
+            // Ensure the robot array is not empty
+            if (!empty($this->values['robots'])){
+                // Loop through the battle's robot characters one by one
+                foreach ($this->values['robots'] AS $robot_id => $robot_info){
+                    // If the robot matches the request side, return the robot
+                    if ($robot_info['player_id'] == $target_player->player_id && $robot_info['robot_position'] == 'active'){
+                        $target_robot = new rpg_robot($this, $target_player, $robot_info);
+                    }
                 }
             }
+
+        }
+        // Otherwise if we're searching for a robot based on ID
+        elseif (isset($target_id)){
+
+            // If the ID was empty, return false
+            if (empty($target_id)){ return false; }
+            // If the robot does not exists in the battle, return false
+            elseif (!isset($this->values['robots'][$target_id])){ return false; }
+            // Otherwise collect the robot info from the battle
+            $robot_info = $this->values['robots'][$target_id];
+            // Collect the player info as well
+            $target_player = $this->find_target_player($robot_info['player_id']);
+            // Create the robot object and return to caller
+            $target_robot = new rpg_robot($this, $target_player, $robot_info);
+
         }
         // Return the final value of the target robot
         return $target_robot;
@@ -2355,18 +2412,16 @@ class rpg_battle extends rpg_object {
     public static function temp_check_robot_attachments(&$this_battle, &$this_player, &$this_robot, &$target_player, &$target_robot){
 
         // Loop through all the target player's robots and carry out any end-turn events
-        $temp_robot = false;
         foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
 
             // Create the temp robot object
-            if (empty($temp_robot)){ $temp_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
-            else { $temp_robot->robot_load(array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
-            //if ($temp_robotinfo['robot_id'] == $this_robot->robot_id){ $temp_robot = &$this_robot; }
-            //else { $temp_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
+            if (isset($temp_robot)){ unset($temp_robot); }
+            $temp_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
 
             // Hide any disabled robots that have not been hidden yet
-            if ($temp_robotinfo['robot_status'] == 'disabled'){
+            if ($temp_robotinfo['robot_energy'] == 0 || $temp_robotinfo['robot_status'] == 'disabled'){
                 // Hide robot and update session
+                $temp_robot->robot_status = 'disabled';
                 $temp_robot->flags['apply_disabled_state'] = true;
                 //$temp_robot->flags['hidden'] = true;
                 $temp_robot->update_session();
@@ -2381,29 +2436,43 @@ class rpg_battle extends rpg_object {
                 //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has attachments');
                 foreach ($temp_robot->robot_attachments AS $attachment_token => $attachment_info){
                     //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has attachments '.$attachment_token);
+
                     // If this attachment has a duration set
                     if (isset($attachment_info['attachment_duration'])){
                         //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has attachments '.$attachment_token.' duration '.$attachment_info['attachment_duration']);
+
                         // If the duration is not empty, decrement it and continue
                         if ($attachment_info['attachment_duration'] > 0){
+
+                            // Decrement the duration for this attachment and update session
                             $attachment_info['attachment_duration'] = $attachment_info['attachment_duration'] - 1;
                             $temp_robot->robot_attachments[$attachment_token] = $attachment_info;
                             $temp_robot->update_session();
                             //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has attachments '.$attachment_token.' duration '.$temp_robot->robot_attachments[$attachment_token]['attachment_duration']);
+
                         }
                         // Otherwise, trigger the destory action for this attachment
                         else {
-                            // Remove this attachment and inflict damage on the robot
+
+                            // Remove this attachment before we inflict damage/recovery on the robot
                             unset($temp_robot->robot_attachments[$attachment_token]);
                             $temp_robot->update_session();
+
+                            // If this attachment has a DESTROY action defined
                             if ($attachment_info['attachment_destroy'] !== false){
+
+                                // Create the attachment object from available data
                                 $attachment_info['flags']['is_attachment'] = true;
                                 if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                                 $temp_attachment = new rpg_ability($this_battle, $this_player, $temp_robot, $attachment_info);
+
+                                // Collect the attachment trigger type before processing
                                 $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                                 //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
                                 //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
                                 //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info, true), ENT_QUOTES, 'UTF-8', true)));
+
+                                // If this destory action deals DAMAGAE to the holder
                                 if ($temp_trigger_type == 'damage'){
                                     $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                     $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
@@ -2412,9 +2481,11 @@ class rpg_battle extends rpg_object {
                                     $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array('apply_modifiers' => false);
                                     if (isset($attachment_info['attachment_'.$temp_damage_kind])){
                                         $temp_damage_amount = $attachment_info['attachment_'.$temp_damage_kind];
-                                        $temp_robot->trigger_damage($temp_robot, $temp_attachment, $temp_damage_amount, false, $temp_trigger_options);
+                                        $temp_robot->trigger_damage($temp_robot, $temp_attachment, $temp_damage_amount, true, $temp_trigger_options);
                                     }
-                                } elseif ($temp_trigger_type == 'recovery'){
+                                }
+                                // Else if this destroy action deals RECOVERY to the holder
+                                elseif ($temp_trigger_type == 'recovery'){
                                     $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                                     $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                     $temp_attachment->update_session();
@@ -2422,9 +2493,11 @@ class rpg_battle extends rpg_object {
                                     $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array('apply_modifiers' => false);
                                     if (isset($attachment_info['attachment_'.$temp_recovery_kind])){
                                         $temp_recovery_amount = $attachment_info['attachment_'.$temp_recovery_kind];
-                                        $temp_robot->trigger_recovery($temp_robot, $temp_attachment, $temp_recovery_amount, false, $temp_trigger_options);
+                                        $temp_robot->trigger_recovery($temp_robot, $temp_attachment, $temp_recovery_amount, true, $temp_trigger_options);
                                     }
-                                } elseif ($temp_trigger_type == 'special'){
+                                }
+                                // Otherwise if this destroy action has SPECIAL properties
+                                elseif ($temp_trigger_type == 'special'){
                                     $temp_attachment->target_options_update($attachment_info['attachment_destroy']);
                                     $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                                     $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
@@ -2432,17 +2505,16 @@ class rpg_battle extends rpg_object {
                                     $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array();
                                     $temp_robot->trigger_damage($temp_robot, $temp_attachment, 0, false, $temp_trigger_options);
                                 }
-                                // If the temp robot was disabled, trigger the event
-                                if ($temp_robot->robot_energy < 1){
-                                    $temp_robot->trigger_disabled($target_robot);
-                                    // If this the player's last robot
-                                    if ($this_player->counters['robots_active'] < 1){
-                                        // Trigger the battle complete event
-                                        $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
-                                    }
+
+                                // If this player no longer has active robots
+                                if ($this_player->counters['robots_active'] < 1){
+                                    // Trigger the battle complete event
+                                    $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
                                 }
+
                                 // Create an empty field to remove any leftover frames
                                 $this_battle->events_create(false, false, '', '');
+
                             }
                         }
                     }

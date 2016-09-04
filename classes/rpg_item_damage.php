@@ -9,6 +9,9 @@ class rpg_item_damage extends rpg_damage {
     public static function trigger_robot_damage($this_robot, $target_robot, $this_item, $damage_amount, $trigger_disabled = true, $trigger_options = array()){
         global $db;
 
+        // DEBUG
+        $debug = '';
+
         // Generate default trigger options if not set
         if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = true; }
         if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
@@ -18,6 +21,21 @@ class rpg_item_damage extends rpg_damage {
         if (!isset($trigger_options['apply_starforce_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_starforce_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['referred_damage'])){ $trigger_options['referred_damage'] = false; }
+        if (!isset($trigger_options['referred_damage_id'])){ $trigger_options['referred_damage_id'] = 0; }
+
+        // If this is referred damage, collect the actual target
+        if (!empty($trigger_options['referred_damage']) && !empty($trigger_options['referred_damage_id'])){
+            //$debug .= "<br /> referred_damage is true and created by robot ID {$trigger_options['referred_damage_id']} ";
+            $new_target_robot = $this_robot->battle->find_target_robot($trigger_options['referred_damage_id']);
+            if (!empty($new_target_robot) && isset($new_target_robot->robot_token)){
+                //$debug .= "<br /> \$new_target_robot was found! {$new_target_robot->robot_token} ";
+                unset($target_player, $target_robot);
+                $target_player = $new_target_robot->player;
+                $target_robot = $new_target_robot;
+            } else {
+                //$debug .= "<br /> \$new_target_robot returned ".print_r($new_target_robot, true)." ";
+            }
+        }
 
         // Backup this and the target robot's frames to revert later
         $this_robot_backup_frame = $this_robot->robot_frame;
@@ -50,7 +68,6 @@ class rpg_item_damage extends rpg_damage {
         //$this_robot->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_item->item_token.' | this('.$this_robot->robot_id.') vs target('.$target_robot->robot_id.') | damage_start_amount |<br /> '.'amount:'.$this_item->item_results['this_amount'].' | '.'percent:'.($this_item->damage_options['damage_percent'] ? 'true' : 'false').' | '.'kind:'.$this_item->damage_options['damage_kind'].' | type1:'.(!empty($this_item->damage_options['damage_type']) ? $this_item->damage_options['damage_type'] : 'none').' | type2:'.(!empty($this_item->damage_options['damage_type2']) ? $this_item->damage_options['damage_type2'] : 'none').'');
 
         // DEBUG
-        $debug = '';
         foreach ($trigger_options AS $key => $value){ $debug .= $key.'='.($value === true ? 'true' : ($value === false ? 'false' : $value)).'; '; }
         //$this_robot->battle->events_create(false, false, 'DEBUG_'.__LINE__, $this_item->item_token.' : damage_trigger_options : '.$debug);
 

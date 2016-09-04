@@ -27,11 +27,12 @@ class rpg_disabled {
         if ($this_player->player_id == $target_player->player_id){
             //$this_robot->battle->events_create(false, false, 'DEBUG', 'It appears the target and the subject player are the same... ('.$this_player->player_id.' == '.$target_player->player_id.')');
             // Collect the actual target player from the battle values
-            if (!empty($this_robot->battle->values['players'])){
-                foreach ($this_robot->battle->values['players'] AS $id => $info){
+            if (!empty($this_battle->values['players'])){
+                foreach ($this_battle->values['players'] AS $id => $info){
                     if ($this_player->player_id != $id){
-                        unset($target_player);
+                        unset($target_player, $target_robot);
                         $target_player = new rpg_player($this_battle, $info);
+                        $target_robot = $this_battle->find_target_robot($target_player->player_side);
                         //$this_robot->battle->events_create(false, false, 'DEBUG', 'Assiging $this_robot->battle->values[\'players\']['.$id.'] = '.$info['player_token']);
                     }
                 }
