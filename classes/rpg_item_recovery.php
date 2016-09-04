@@ -9,6 +9,9 @@ class rpg_item_recovery extends rpg_recovery {
     public static function trigger_robot_recovery($this_robot, $target_robot, $this_item, $recovery_amount, $trigger_disabled = true, $trigger_options = array()){
         global $db;
 
+        // DEBUG
+        $debug = '';
+
         // Generate default trigger options if not set
         if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = true; }
         if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
@@ -18,6 +21,21 @@ class rpg_item_recovery extends rpg_recovery {
         if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['referred_recovery'])){ $trigger_options['referred_recovery'] = false; }
+        if (!isset($trigger_options['referred_recovery_id'])){ $trigger_options['referred_recovery_id'] = 0; }
+
+        // If this is referred recovery, collect the actual target
+        if (!empty($trigger_options['referred_recovery']) && !empty($trigger_options['referred_recovery_id'])){
+            //$debug .= "<br /> referred_recovery is true and created by robot ID {$trigger_options['referred_recovery_id']} ";
+            $new_target_robot = $this_robot->battle->find_target_robot($trigger_options['referred_recovery_id']);
+            if (!empty($new_target_robot) && isset($new_target_robot->robot_token)){
+                //$debug .= "<br /> \$new_target_robot was found! {$new_target_robot->robot_token} ";
+                unset($target_player, $target_robot);
+                $target_player = $new_target_robot->player;
+                $target_robot = $new_target_robot;
+            } else {
+                //$debug .= "<br /> \$new_target_robot returned ".print_r($new_target_robot, true)." ";
+            }
+        }
 
         // Backup this and the target robot's frames to revert later
         $this_robot_backup_frame = $this_robot->robot_frame;
