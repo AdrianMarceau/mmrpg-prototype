@@ -1618,6 +1618,7 @@ if (!MMRPG_CONFIG_IS_LIVE && !empty($output_buffer_contents)){
 }
 ?>
 <?
+/*
 // TEMP DEBUG
 if (!MMRPG_CONFIG_IS_LIVE || MMRPG_CONFIG_ADMIN_MODE){
     echo "console.log('memory_limit() = ".ini_get('memory_limit')."');\n";
@@ -1625,6 +1626,7 @@ if (!MMRPG_CONFIG_IS_LIVE || MMRPG_CONFIG_ADMIN_MODE){
     echo "console.log('memory_get_peak_usage() = ".round((memory_get_peak_usage() / 1024) / 1024, 2)."M');\n";
     //echo 'memory_get_peak_usage_peak() = '.memory_get_peak_usage_peak().'<br />';
 }
+*/
 ?>
 </script>
 </head>
