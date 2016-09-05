@@ -114,7 +114,8 @@ $ability = array(
                     'apply_stat_modifiers' => true,
                     'apply_position_modifiers' => false,
                     'referred_damage' => true,
-                    'referred_damage_id' => $this_robot->robot_id
+                    'referred_damage_id' => $this_robot->robot_id,
+                    'referred_damage_stats' => $this_robot->get_stats()
                     )
                 )
             );

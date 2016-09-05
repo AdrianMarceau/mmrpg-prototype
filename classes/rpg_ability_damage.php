@@ -25,18 +25,22 @@ class rpg_ability_damage extends rpg_damage {
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['referred_damage'])){ $trigger_options['referred_damage'] = false; }
         if (!isset($trigger_options['referred_damage_id'])){ $trigger_options['referred_damage_id'] = 0; }
+        if (!isset($trigger_options['referred_damage_stats'])){ $trigger_options['referred_damage_stats'] = array(); }
 
         // If this is referred damage, collect the actual target
         if (!empty($trigger_options['referred_damage']) && !empty($trigger_options['referred_damage_id'])){
-            $debug .= "<br /> referred_damage is true and created by robot ID {$trigger_options['referred_damage_id']} ";
+            //$debug .= "<br /> referred_damage is true and created by robot ID {$trigger_options['referred_damage_id']} ";
             $new_target_robot = $this_battle->find_target_robot($trigger_options['referred_damage_id']);
             if (!empty($new_target_robot) && isset($new_target_robot->robot_token)){
-                $debug .= "<br /> \$new_target_robot was found! {$new_target_robot->robot_token} ";
+                //$debug .= "<br /> \$new_target_robot was found! {$new_target_robot->robot_token} ";
                 unset($target_player, $target_robot);
                 $target_player = $new_target_robot->player;
                 $target_robot = $new_target_robot;
             } else {
-                $debug .= "<br /> \$new_target_robot returned ".print_r($new_target_robot, true)." ";
+                //$debug .= "<br /> \$new_target_robot returned ".print_r($new_target_robot, true)." ";
+                $trigger_options['referred_damage'] = false;
+                $trigger_options['referred_damage_id'] = false;
+                $trigger_options['referred_damage_stats'] = array();
             }
         }
 
@@ -47,8 +51,15 @@ class rpg_ability_damage extends rpg_damage {
         $target_player_backup_frame = $target_robot->player->player_frame;
         $this_ability_backup_frame = $this_ability->ability_frame;
 
+        // Collect this and the target's stat levels for later
+        $this_robot_stats = $this_robot->get_stats();
+        $target_robot_stats = $target_robot->get_stats();
+        if (!empty($trigger_options['referred_damage_stats'])){
+            $target_robot_stats = array_merge($target_robot_stats, $trigger_options['referred_damage_stats']);
+        }
+
         // Check if this robot is at full health before triggering
-        $this_robot_energy_start = $this_robot->robot_energy;
+        $this_robot_energy_start = $this_robot_stats['robot_energy'];
         $this_robot_energy_start_max = $this_robot_energy_start >= $this_robot->robot_base_energy ? true : false;
 
         // Define the event console options
@@ -66,10 +77,17 @@ class rpg_ability_damage extends rpg_damage {
 
         // Collect the damage amount argument from the function
         $this_ability->ability_results['this_amount'] = $damage_amount;
-        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | this('.$this_robot->robot_id.') vs target('.$target_robot->robot_id.') | damage_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->damage_options['damage_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->damage_options['damage_kind'].' | type1:'.(!empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none').' | type2:'.(!empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : 'none').'');
+        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | to('.$this_robot->robot_id.':'.$this_robot->robot_token.') vs from('.$target_robot->robot_id.':'.$target_robot->robot_token.') | damage_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->damage_options['damage_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->damage_options['damage_kind'].' | type1:'.(!empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none').' | type2:'.(!empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : 'none').'');
 
         // DEBUG
-        foreach ($trigger_options AS $key => $value){ $debug .= $key.'='.($value === true ? 'true' : ($value === false ? 'false' : $value)).'; '; }
+        if (!empty($debug)){ $debug .= ' <br /> '; }
+        foreach ($trigger_options AS $key => $value){
+            if ($value === true){ $debug .= $key.'=true; ';  }
+            elseif ($value === false){ $debug .= $key.'=false; ';  }
+            elseif (is_array($value) && !empty($value)){ $debug .= $key.'='.implode(',', $value).'; '; }
+            elseif (is_array($value)){ $debug .= $key.'=[]; '; }
+            else { $debug .= $key.'='.$value.'; '; }
+        }
         $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' : damage_trigger_options : '.$debug);
 
         // Only apply modifiers if they have not been disabled
@@ -268,12 +286,12 @@ class rpg_ability_damage extends rpg_damage {
                 $this_ability->damage_options['success_rate'] = $this_ability->ability_accuracy;
             }
             // Otherwise, if this robot is in speed break or ability accuracy 100%
-            elseif ($target_robot->robot_speed <= 0 && $this_robot->robot_speed > 0){
+            elseif ($target_robot_stats['robot_speed'] <= 0 && $this_robot_stats['robot_speed'] > 0){
                 // Hard-code the success rate at 100% accuracy
                     $this_ability->damage_options['success_rate'] = 0;
             }
             // Otherwise, if this robot is in speed break or ability accuracy 100%
-            elseif ($this_robot->robot_speed <= 0 || $this_ability->ability_accuracy == 100){
+            elseif ($this_robot_stats['robot_speed'] <= 0 || $this_ability->ability_accuracy == 100){
                 // Hard-code the success rate at 100% accuracy
                     $this_ability->damage_options['success_rate'] = 100;
             }
@@ -282,9 +300,9 @@ class rpg_ability_damage extends rpg_damage {
                 // Collect this ability's accuracy stat for modification
                 $this_ability_accuracy = $this_ability->ability_accuracy;
                 // If the target was faster/slower, boost/lower the ability accuracy
-                if ($target_robot->robot_speed > $this_robot->robot_speed
-                    || $target_robot->robot_speed < $this_robot->robot_speed){
-                    $this_modifier = $target_robot->robot_speed / $this_robot->robot_speed;
+                if ($target_robot_stats['robot_speed'] > $this_robot_stats['robot_speed']
+                    || $target_robot_stats['robot_speed'] < $this_robot_stats['robot_speed']){
+                    $this_modifier = $target_robot_stats['robot_speed'] / $this_robot_stats['robot_speed'];
                     //$this_ability_accuracy = ceil($this_ability_accuracy * $this_modifier);
                     $this_ability_accuracy = ceil($this_ability_accuracy * 0.95) + ceil(($this_ability_accuracy * 0.05) * $this_modifier);
                     if ($this_ability_accuracy > 100){ $this_ability_accuracy = 100; }
@@ -306,12 +324,12 @@ class rpg_ability_damage extends rpg_damage {
         }
 
         // If this robot is in speed break, increase success rate, reduce failure
-        if ($this_robot->robot_speed == 0 && $this_ability->damage_options['success_rate'] > 0){
+        if ($this_robot_stats['robot_speed'] == 0 && $this_ability->damage_options['success_rate'] > 0){
             $this_ability->damage_options['success_rate'] = ceil($this_ability->damage_options['success_rate'] * 2);
             $this_ability->damage_options['failure_rate'] = ceil($this_ability->damage_options['failure_rate'] / 2);
         }
         // If the target robot is in speed break, decease the success rate, increase failure
-        elseif ($target_robot->robot_speed == 0 && $this_ability->damage_options['success_rate'] > 0){
+        elseif ($target_robot_stats['robot_speed'] == 0 && $this_ability->damage_options['success_rate'] > 0){
             $this_ability->damage_options['success_rate'] = ceil($this_ability->damage_options['success_rate'] / 2);
             $this_ability->damage_options['failure_rate'] = ceil($this_ability->damage_options['failure_rate'] * 2);
         }
@@ -338,27 +356,27 @@ class rpg_ability_damage extends rpg_damage {
         }
 
         // If this is ENERGY damage and this robot is already disabled
-        if ($this_ability->damage_options['damage_kind'] == 'energy' && $this_robot->robot_energy <= 0){
+        if ($this_ability->damage_options['damage_kind'] == 'energy' && $this_robot_stats['robot_energy'] <= 0){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
         // If this is WEAPONS recovery and this robot is already at empty ammo
-        elseif ($this_ability->damage_options['damage_kind'] == 'weapons' && $this_robot->robot_weapons <= 0){
+        elseif ($this_ability->damage_options['damage_kind'] == 'weapons' && $this_robot_stats['robot_weapons'] <= 0){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
         // Otherwise if ATTACK damage but attack is already zero
-        elseif ($this_ability->damage_options['damage_kind'] == 'attack' && $this_robot->robot_attack <= 0){
+        elseif ($this_ability->damage_options['damage_kind'] == 'attack' && $this_robot_stats['robot_attack'] <= 0){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
         // Otherwise if DEFENSE damage but defense is already zero
-        elseif ($this_ability->damage_options['damage_kind'] == 'defense' && $this_robot->robot_defense <= 0){
+        elseif ($this_ability->damage_options['damage_kind'] == 'defense' && $this_robot_stats['robot_defense'] <= 0){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
         // Otherwise if SPEED damage but speed is already zero
-        elseif ($this_ability->damage_options['damage_kind'] == 'speed' && $this_robot->robot_speed <= 0){
+        elseif ($this_ability->damage_options['damage_kind'] == 'speed' && $this_robot_stats['robot_speed'] <= 0){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
@@ -462,34 +480,34 @@ class rpg_ability_damage extends rpg_damage {
                     $temp_amount_backup = $this_ability->ability_results['this_amount'];
 
                     // If this robot's defense is at absolute zero, and the target's attack isnt, OHKO
-                    if ($this_robot->robot_defense <= 0 && $target_robot->robot_attack >= 1){
+                    if ($this_robot_stats['robot_defense'] <= 0 && $target_robot_stats['robot_attack'] >= 1){
                         // Set the new damage amount to OHKO this robot
                         $temp_new_amount = $this_robot->robot_base_energy;
-                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$this_robot->robot_token.'_defense_break | D:'.$this_robot->robot_defense.' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$this_robot->robot_token.'_defense_break | D:'.$this_robot_stats['robot_defense'].' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                     // Elseif the target robot's attack is at absolute zero, and the this's defense isnt, NOKO
-                    elseif ($target_robot->robot_attack <= 0 && $this_robot->robot_defense >= 1){
+                    elseif ($target_robot_stats['robot_attack'] <= 0 && $this_robot_stats['robot_defense'] >= 1){
                         // Set the new damage amount to NOKO this robot
                         $temp_new_amount = 0;
-                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break | A:'.$target_robot->robot_attack.' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break | A:'.$target_robot_stats['robot_attack'].' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                     // Elseif this robot's defense is at absolute zero and the target's attack is too, NOKO
-                    elseif ($this_robot->robot_defense <= 0 && $target_robot->robot_attack <= 0){
+                    elseif ($this_robot_stats['robot_defense'] <= 0 && $target_robot_stats['robot_attack'] <= 0){
                         // Set the new damage amount to NOKO this robot
                         $temp_new_amount = 0;
-                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break and '.$this_robot->robot_token.'_defense_break | A:'.$target_robot->robot_attack.' D:'.$this_robot->robot_defense.' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break and '.$this_robot->robot_token.'_defense_break | A:'.$target_robot_stats['robot_attack'].' D:'.$this_robot_stats['robot_defense'].' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                     // Otherwise if both robots have normal stats, calculate the new amount normally
                     else {
                         // Set the new damage amount relative to this robot's defense and the target robot's attack
-                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * ($target_robot->robot_attack / $this_robot->robot_defense));
-                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | normal_damage | A:'.$target_robot->robot_attack.' D:'.$this_robot->robot_defense.' | '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * ('.$target_robot->robot_attack.' / '.$this_robot->robot_defense.')) = '.$temp_new_amount.'');
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * ($target_robot_stats['robot_attack'] / $this_robot_stats['robot_defense']));
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | normal_damage | A:'.$target_robot_stats['robot_attack'].' D:'.$this_robot_stats['robot_defense'].' | '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * ('.$target_robot_stats['robot_attack'].' / '.$this_robot_stats['robot_defense'].')) = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
@@ -545,8 +563,8 @@ class rpg_ability_damage extends rpg_damage {
 
             }
 
-            // Only apply other modifiers if allowed to
-            if ($trigger_options['apply_modifiers'] != false){
+            // Only apply attachment modifiers if allowed to and not referred
+            if ($trigger_options['apply_modifiers'] != false && $trigger_options['referred_damage'] == false){
 
                 // If this robot has an attachment with a damage multiplier
                 if (!empty($this_robot->robot_attachments)){
@@ -793,13 +811,13 @@ class rpg_ability_damage extends rpg_damage {
                 // If this is an ATTACK type damage trigger
                 case 'robot_attack': {
                     // Inflict attack damage on the target's internal stat
-                    $this_robot->robot_attack = $this_robot->robot_attack - $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_attack = $this_robot_stats['robot_attack'] - $this_ability->ability_results['this_amount'];
                     // If the damage put the robot's attack below zero
-                    if ($this_robot->robot_attack < MMRPG_SETTINGS_STATS_MIN){
+                    if ($this_robot_stats['robot_attack'] < MMRPG_SETTINGS_STATS_MIN){
                         // Calculate the overkill amount
-                        $this_ability->ability_results['this_overkill'] = $this_robot->robot_attack * -1;
+                        $this_ability->ability_results['this_overkill'] = $this_robot_stats['robot_attack'] * -1;
                         // Calculate the actual damage amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot->robot_attack;
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot_stats['robot_attack'];
                         // Zero out the robots attack
                         $this_robot->robot_attack = MMRPG_SETTINGS_STATS_MIN;
                     }
@@ -809,13 +827,13 @@ class rpg_ability_damage extends rpg_damage {
                 // If this is an DEFENSE type damage trigger
                 case 'robot_defense': {
                     // Inflict defense damage on the target's internal stat
-                    $this_robot->robot_defense = $this_robot->robot_defense - $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_defense = $this_robot_stats['robot_defense'] - $this_ability->ability_results['this_amount'];
                     // If the damage put the robot's defense below zero
-                    if ($this_robot->robot_defense < MMRPG_SETTINGS_STATS_MIN){
+                    if ($this_robot_stats['robot_defense'] < MMRPG_SETTINGS_STATS_MIN){
                         // Calculate the overkill amount
-                        $this_ability->ability_results['this_overkill'] = $this_robot->robot_defense * -1;
+                        $this_ability->ability_results['this_overkill'] = $this_robot_stats['robot_defense'] * -1;
                         // Calculate the actual damage amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot->robot_defense;
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot_stats['robot_defense'];
                         // Zero out the robots defense
                         $this_robot->robot_defense = MMRPG_SETTINGS_STATS_MIN;
                     }
@@ -825,13 +843,13 @@ class rpg_ability_damage extends rpg_damage {
                 // If this is an SPEED type damage trigger
                 case 'robot_speed': {
                     // Inflict attack damage on the target's internal stat
-                    $this_robot->robot_speed = $this_robot->robot_speed - $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_speed = $this_robot_stats['robot_speed'] - $this_ability->ability_results['this_amount'];
                     // If the damage put the robot's speed below zero
-                    if ($this_robot->robot_speed < MMRPG_SETTINGS_STATS_MIN){
+                    if ($this_robot_stats['robot_speed'] < MMRPG_SETTINGS_STATS_MIN){
                         // Calculate the overkill amount
-                        $this_ability->ability_results['this_overkill'] = $this_robot->robot_speed * -1;
+                        $this_ability->ability_results['this_overkill'] = $this_robot_stats['robot_speed'] * -1;
                         // Calculate the actual damage amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot->robot_speed;
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot_stats['robot_speed'];
                         // Zero out the robots speed
                         $this_robot->robot_speed = MMRPG_SETTINGS_STATS_MIN;
                     }
@@ -841,13 +859,13 @@ class rpg_ability_damage extends rpg_damage {
                 // If this is a WEAPONS type damage trigger
                 case 'robot_weapons': {
                     // Inflict weapon damage on the target's internal stat
-                    $this_robot->robot_weapons = $this_robot->robot_weapons - $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_weapons = $this_robot_stats['robot_weapons'] - $this_ability->ability_results['this_amount'];
                     // If the damage put the robot's weapons below zero
-                    if ($this_robot->robot_weapons < MMRPG_SETTINGS_STATS_MIN){
+                    if ($this_robot_stats['robot_weapons'] < MMRPG_SETTINGS_STATS_MIN){
                         // Calculate the overkill amount
-                        $this_ability->ability_results['this_overkill'] = $this_robot->robot_weapons * -1;
+                        $this_ability->ability_results['this_overkill'] = $this_robot_stats['robot_weapons'] * -1;
                         // Calculate the actual damage amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot->robot_weapons;
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot_stats['robot_weapons'];
                         // Zero out the robots weapons
                         $this_robot->robot_weapons = MMRPG_SETTINGS_STATS_MIN;
                     }
@@ -857,18 +875,18 @@ class rpg_ability_damage extends rpg_damage {
                 // If this is an ENERGY type damage trigger
                 case 'robot_energy': default: {
                     // Inflict the actual damage on the robot
-                    $this_robot->robot_energy = $this_robot->robot_energy - $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_energy = $this_robot_stats['robot_energy'] - $this_ability->ability_results['this_amount'];
                     // If the damage put the robot into overkill, recalculate the damage
-                    if ($this_robot->robot_energy < MMRPG_SETTINGS_STATS_MIN){
+                    if ($this_robot_stats['robot_energy'] < MMRPG_SETTINGS_STATS_MIN){
                         // Calculate the overkill amount
-                        $this_ability->ability_results['this_overkill'] = $this_robot->robot_energy * -1;
+                        $this_ability->ability_results['this_overkill'] = $this_robot_stats['robot_energy'] * -1;
                         // Calculate the actual damage amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot->robot_energy;
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot_stats['robot_energy'];
                         // Zero out the robots energy
                         $this_robot->robot_energy = MMRPG_SETTINGS_STATS_MIN;
                     }
                     // If the robot's energy has dropped to zero, disable them
-                    if ($this_robot->robot_energy == 0){
+                    if ($this_robot_stats['robot_energy'] == 0){
                         // Change the status to disabled
                         $this_robot->robot_status = 'disabled';
                         // Remove any attachments this robot has
@@ -979,8 +997,8 @@ class rpg_ability_damage extends rpg_damage {
 
         // If this robot was at full energy but is now at zero, it's a OHKO
         $this_robot_energy_ohko = false;
-        if ($this_robot->robot_energy <= 0 && $this_robot_energy_start_max){
-            $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | damage_result_OHKO! | Start:'.$this_robot_energy_start.' '.($this_robot_energy_start_max ? '(MAX!)' : '-').' | Finish:'.$this_robot->robot_energy);
+        if ($this_robot_stats['robot_energy'] <= 0 && $this_robot_energy_start_max){
+            $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | damage_result_OHKO! | Start:'.$this_robot_energy_start.' '.($this_robot_energy_start_max ? '(MAX!)' : '-').' | Finish:'.$this_robot_stats['robot_energy']);
             // Ensure the attacking player was a human
             if ($this_robot->player->player_side == 'right'){
                 $this_robot_energy_ohko = true;

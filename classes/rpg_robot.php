@@ -395,8 +395,26 @@ class rpg_robot extends rpg_object {
 
     public function get_stat($stat){ return $this->get_info('robot_'.$stat); }
     public function set_stat($stat, $value){ $this->set_info('robot_'.$stat, $value); }
+    public function get_stats(){
+        $stats = array();
+        $stats['robot_energy'] = $this->get_energy();
+        $stats['robot_weapons'] = $this->get_weapons();
+        $stats['robot_attack'] = $this->get_attack();
+        $stats['robot_defense'] = $this->get_defense();
+        $stats['robot_speed'] = $this->get_speed();
+        return $stats;
+    }
     public function get_base_stat($stat){ return $this->get_info('robot_base_'.$stat); }
     public function set_base_stat($stat, $value){ $this->set_info('robot_base_'.$stat, $value); }
+    public function get_base_stats(){
+        $stats = array();
+        $stats['robot_base_energy'] = $this->get_base_energy();
+        $stats['robot_base_weapons'] = $this->get_base_weapons();
+        $stats['robot_base_attack'] = $this->get_base_attack();
+        $stats['robot_base_defense'] = $this->get_base_defense();
+        $stats['robot_base_speed'] = $this->get_base_speed();
+        return $stats;
+    }
 
     public function get_weaknesses(){ return $this->get_info('robot_weaknesses'); }
     public function set_weaknesses($value){ $this->set_info('robot_weaknesses', $value); }
