@@ -30,7 +30,6 @@ $robot = array(
         ),
     'robot_rewards' => array(
         'abilities' => array(
-                array('level' => 0, 'token' => 'buster-shot'),
                 array('level' => 0, 'token' => 'sakugarne-hammer')
             )
         ),
