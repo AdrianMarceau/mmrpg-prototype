@@ -39,8 +39,7 @@ $robot = array(
                 array('level' => 0, 'token' => 'buster-shot'),
                 array('level' => 2, 'token' => 'proto-buster'),
                 array('level' => 4, 'token' => 'proto-shield'),
-                array('level' => 8, 'token' => 'proto-strike'),
-                array('level' => 16, 'token' => 'copy-shot')
+                array('level' => 8, 'token' => 'proto-strike')
             )
         ),
     'robot_quotes' => array(
