@@ -874,7 +874,6 @@ class rpg_item extends rpg_object {
         //$item_info = self::get_index_info($temp_item_token);
         $temp_robot_token = $robot_info['robot_token'];
         $temp_item_token = $item_info['item_token'];
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, $temp_robot_token.'/'.$temp_item_token.'/'."\nrobot_items = ".array_keys($robot_info['robot_items'])."\nrobot_index_items = ".array_keys($robot_info['robot_index_items']));  }
         $robot_item_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
         $robot_flag_copycore = !empty($robot_info['robot_core']) && $robot_info['robot_core'] == 'copy' ? true : false;
         $temp_item_type = !empty($item_info['item_type']) ? $mmrpg_index['types'][$item_info['item_type']] : false;
@@ -885,8 +884,6 @@ class rpg_item extends rpg_object {
         $temp_index_items = !empty($robot_info['robot_index_items']) ? $robot_info['robot_index_items'] : array();
         $temp_current_items = !empty($robot_info['robot_items']) ? array_keys($robot_info['robot_items']) : array();
         $temp_compatible_items = array_merge($temp_index_items, $temp_current_items);
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, $temp_robot_token.'/'.$temp_item_token.'/'."\nindex_items = ".implode(',', $temp_index_items)."\ncurrent_items = ".implode(',', $temp_current_items)."\ncompatible_items = ".implode(',', $temp_compatible_items));  }
-        //while (!in_array($temp_item_token, $robot_info['robot_items'])){
         while (!in_array($temp_item_token, $temp_compatible_items)){
             if (!$robot_flag_copycore){
                 if (empty($robot_item_core)){ $temp_incompatible = true; break; }
@@ -899,7 +896,6 @@ class rpg_item extends rpg_object {
             }
             break;
         }
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, $temp_robot_token.'/'.$temp_item_token.'/'.($temp_incompatible ? 'incompatible' : 'compatible'));  }
         if ($temp_incompatible == true){ return false; }
         $temp_item_label = $item_info['item_name'];
         $temp_item_title = self::print_editor_title_markup($robot_info, $item_info);

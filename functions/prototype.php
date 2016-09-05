@@ -943,7 +943,6 @@ function mmrpg_prototype_mission_bonus($this_prototype_data, $this_robot_count =
 
 // Define a function for sorting the omega player robots
 function mmrpg_prototype_sort_player_robots($info1, $info2){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_sort_player_robots(\$info1, \$info2)");  }
     $info1_robot_level = $info1['robot_level'];
     $info2_robot_level = $info2['robot_level'];
     $info1_robot_favourite = isset($info1['values']['flag_favourite']) ? $info1['values']['flag_favourite'] : 0;
@@ -957,7 +956,6 @@ function mmrpg_prototype_sort_player_robots($info1, $info2){
 
 // Define a function to sort prototype robots based on their current level / experience points
 function mmrpg_prototype_sort_robots_experience($info1, $info2){
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, "mmrpg_prototype_sort_robots_experience(\$info1, \$info2)");  }
     global $this_prototype_data;
     $info1_robot_level = mmrpg_prototype_robot_level($this_prototype_data['this_player_token'], $info1['robot_token']);
     $info1_robot_experience = mmrpg_prototype_robot_experience($this_prototype_data['this_player_token'], $info1['robot_token']);
@@ -1164,7 +1162,6 @@ function mmrpg_prototype_leaderboard_index(){
         $db->INDEX['LEADERBOARD']['index'] = json_encode($this_leaderboard_index);
     }
     // Return the collected leaderboard index
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, 'return <pre>'.print_r($this_leaderboard_index, true).'</pre>;');  }
     return $this_leaderboard_index;
 }
 
