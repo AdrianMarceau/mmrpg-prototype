@@ -5,9 +5,6 @@ define('MMRPG_SCRIPT_REQUEST', true);
 // Require the application top file
 require_once('../top.php');
 
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Collect the request data from the headers
 $this_data_step = !empty($_REQUEST['step']) ? $_REQUEST['step'] : false;
 $this_data_select = !empty($_REQUEST['select']) ? $_REQUEST['select'] : false;
@@ -28,14 +25,8 @@ foreach ($this_data_condition AS $key => $string){
   $this_data_condition[$key] = str_replace('%3d', '=', $string);
 }
 
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // Otherwise, require the prototype data file
 require_once(MMRPG_CONFIG_ROOTDIR.'prototype/include.php');
-
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 // Start the output buffer
 ob_start();
@@ -52,9 +43,6 @@ switch ($this_data_select){
     // DEBUG
     //exit('success:players-requested');
 
-    // DEBUG DEBUG DEBUG
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Break automatically to prevent looping
     break;
 
@@ -69,9 +57,6 @@ switch ($this_data_select){
     // DEBUG
     //exit('missions-requested:'.print_r($this_data_condition, true));
 
-    // DEBUG DEBUG DEBUG
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
     // Break automatically to prevent looping
     break;
   }
@@ -84,9 +69,6 @@ switch ($this_data_select){
 
     // DEBUG
     //exit('success:robots-requested');
-
-    // DEBUG DEBUG DEBUG
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 
     // Break automatically to prevent looping

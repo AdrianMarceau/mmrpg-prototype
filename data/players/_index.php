@@ -55,7 +55,4 @@ if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists($players_cache_path)){
 // Include the cache file so it can be evaluated
 require_once($players_cache_path);
 //die('<pre>'.print_r($mmrpg_index['players'], true).'</pre>'); //DEBUG
-
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>

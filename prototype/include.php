@@ -10,15 +10,9 @@ if (!isset($_SESSION[$session_token]['EVENTS'])){ $_SESSION[$session_token]['EVE
 $temp_canvas_markup = '';
 $temp_console_markup = '';
 
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 // If it's not set, create a fake prototype start link
 if (!isset($prototype_start_link)){ $prototype_start_link = 'home'; }
 require(MMRPG_CONFIG_ROOTDIR.'prototype/vars.php');
-
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
 //die('<pre>'.print_r($temp_game_flags, true).'</pre>');
 //die('<pre>'.print_r($chapters_unlocked_light, true).'</pre>');
@@ -32,9 +26,6 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
   // Include the demo mode options and markup
   require(MMRPG_CONFIG_ROOTDIR.'prototype_demo_menu.php');
 
-  // DEBUG DEBUG DEBUG
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
 }
 /*
  * NORMAL BATTLE OPTIONS
@@ -44,17 +35,11 @@ else {
   // Require the omega factors
   require(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php');
 
-  // DEBUG DEBUG DEBUG
-  //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
-
   // Do not process any events while we're in javascript mode
   if (!defined('MMRPG_SCRIPT_REQUEST')){
 
     // Include the demo mode options and markup
     require(MMRPG_CONFIG_ROOTDIR.'prototype/unlocks.php');
-
-    // DEBUG DEBUG DEBUG
-    //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 
   }
 
@@ -70,8 +55,6 @@ else {
       if ($unlock_flag_light){
         require(MMRPG_CONFIG_ROOTDIR.'prototype_dr-light_menu.php');
       }
-      // DEBUG DEBUG DEBUG
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     }
   }
   // NORMAL MENU OPTIONS
@@ -82,8 +65,6 @@ else {
       if ($unlock_flag_light){
         require(MMRPG_CONFIG_ROOTDIR.'prototype_dr-light_menu.php');
       }
-      // DEBUG DEBUG DEBUG
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     }
     // Only print out Wily's data if conditions allow or do not exist
     if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-wily', $this_data_condition)){
@@ -91,8 +72,6 @@ else {
       if ($unlock_flag_wily){
         require(MMRPG_CONFIG_ROOTDIR.'prototype_dr-wily_menu.php');
       }
-      // DEBUG DEBUG DEBUG
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     }
     // Only print out Cossack's data if conditions allow or do not exist
     if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-cossack', $this_data_condition)){
@@ -100,8 +79,6 @@ else {
       if ($unlock_flag_cossack){
         require(MMRPG_CONFIG_ROOTDIR.'prototype_dr-cossack_menu.php');
       }
-      // DEBUG DEBUG DEBUG
-      //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
     }
   }
 

@@ -38,7 +38,4 @@ if (!empty($_SESSION['GAME']['values']['battle_index'])){
 if (!empty($_GET['debug']) && $_GET['debug'] == 'index_battles'){
   die('<pre>'.print_r($mmrpg_index['battles'], true).'</pre>'); //DEBUG
 }
-
-// DEBUG DEBUG DEBUG
-//if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
 ?>
