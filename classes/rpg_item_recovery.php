@@ -352,7 +352,7 @@ class rpg_item_recovery extends rpg_recovery {
         }
 
         // If this is ENERGY recovery and this robot is already at full health
-        if ($this_item->recovery_options['recovery_kind'] == 'energy' && $this_robot_stats['robot_energy'] >= $this_robot->robot_base_energy){
+        if ($this_item->recovery_options['recovery_kind'] == 'energy' && $this_robot->robot_energy >= $this_robot->robot_base_energy){
             // Hard code the result to failure
             $this_item->item_results['this_result'] = 'failure';
         }
@@ -865,18 +865,18 @@ class rpg_item_recovery extends rpg_recovery {
                 // If this is an ENERGY type recovery trigger
                 case 'robot_energy': default: {
                     // Inflict the actual recovery on the robot
-                    $this_robot->robot_energy = $this_robot_stats['robot_energy'] + $this_item->item_results['this_amount'];
+                    $this_robot->robot_energy = $this_robot->robot_energy + $this_item->item_results['this_amount'];
                     // If the recovery put the robot into overboost, recalculate the recovery
-                    if ($this_robot_stats['robot_energy'] > $this_robot->robot_base_energy){
+                    if ($this_robot->robot_energy > $this_robot->robot_base_energy){
                         // Calculate the overcure amount
-                        $this_item->item_results['this_overkill'] = ($this_robot->robot_base_energy - $this_robot_stats['robot_energy']) * -1;
+                        $this_item->item_results['this_overkill'] = ($this_robot->robot_base_energy - $this_robot->robot_energy) * -1;
                         // Calculate the actual recovery amount
                         $this_item->item_results['this_amount'] = $this_item->item_results['this_amount'] - $this_item->item_results['this_overkill'];
                         // Max out the robots energy
                         $this_robot->robot_energy = $this_robot->robot_base_energy;
                     }
                     // If the robot's energy has dropped to zero, disable them
-                    if ($this_robot_stats['robot_energy'] == 0){
+                    if ($this_robot->robot_energy <= 0){
                         // Change the status to disabled
                         $this_robot->robot_status = 'disabled';
                         // Remove any attachments this robot has

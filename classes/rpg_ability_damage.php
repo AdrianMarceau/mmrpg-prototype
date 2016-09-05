@@ -59,7 +59,7 @@ class rpg_ability_damage extends rpg_damage {
         }
 
         // Check if this robot is at full health before triggering
-        $this_robot_energy_start = $this_robot_stats['robot_energy'];
+        $this_robot_energy_start = $this_robot->robot_energy;
         $this_robot_energy_start_max = $this_robot_energy_start >= $this_robot->robot_base_energy ? true : false;
 
         // Define the event console options
@@ -356,7 +356,7 @@ class rpg_ability_damage extends rpg_damage {
         }
 
         // If this is ENERGY damage and this robot is already disabled
-        if ($this_ability->damage_options['damage_kind'] == 'energy' && $this_robot_stats['robot_energy'] <= 0){
+        if ($this_ability->damage_options['damage_kind'] == 'energy' && $this_robot->robot_energy <= 0){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
@@ -875,18 +875,18 @@ class rpg_ability_damage extends rpg_damage {
                 // If this is an ENERGY type damage trigger
                 case 'robot_energy': default: {
                     // Inflict the actual damage on the robot
-                    $this_robot->robot_energy = $this_robot_stats['robot_energy'] - $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_energy = $this_robot->robot_energy - $this_ability->ability_results['this_amount'];
                     // If the damage put the robot into overkill, recalculate the damage
-                    if ($this_robot_stats['robot_energy'] < MMRPG_SETTINGS_STATS_MIN){
+                    if ($this_robot->robot_energy < MMRPG_SETTINGS_STATS_MIN){
                         // Calculate the overkill amount
-                        $this_ability->ability_results['this_overkill'] = $this_robot_stats['robot_energy'] * -1;
+                        $this_ability->ability_results['this_overkill'] = $this_robot->robot_energy * -1;
                         // Calculate the actual damage amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot_stats['robot_energy'];
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] + $this_robot->robot_energy;
                         // Zero out the robots energy
                         $this_robot->robot_energy = MMRPG_SETTINGS_STATS_MIN;
                     }
                     // If the robot's energy has dropped to zero, disable them
-                    if ($this_robot_stats['robot_energy'] == 0){
+                    if ($this_robot->robot_energy <= 0){
                         // Change the status to disabled
                         $this_robot->robot_status = 'disabled';
                         // Remove any attachments this robot has
@@ -997,8 +997,8 @@ class rpg_ability_damage extends rpg_damage {
 
         // If this robot was at full energy but is now at zero, it's a OHKO
         $this_robot_energy_ohko = false;
-        if ($this_robot_stats['robot_energy'] <= 0 && $this_robot_energy_start_max){
-            $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | damage_result_OHKO! | Start:'.$this_robot_energy_start.' '.($this_robot_energy_start_max ? '(MAX!)' : '-').' | Finish:'.$this_robot_stats['robot_energy']);
+        if ($this_robot->robot_energy <= 0 && $this_robot_energy_start_max){
+            $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | damage_result_OHKO! | Start:'.$this_robot_energy_start.' '.($this_robot_energy_start_max ? '(MAX!)' : '-').' | Finish:'.$this_robot->robot_energy);
             // Ensure the attacking player was a human
             if ($this_robot->player->player_side == 'right'){
                 $this_robot_energy_ohko = true;
