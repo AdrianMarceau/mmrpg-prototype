@@ -1160,18 +1160,15 @@ class rpg_canvas {
                             $this_attachment_options['ability_frame_offset'] = isset($attachment_info['ability_frame_offset']) ? $attachment_info['ability_frame_offset'] : $this_ability->ability_frame_offset;
                             $this_attachment_options['ability_frame_styles'] = isset($attachment_info['ability_frame_styles']) ? $attachment_info['ability_frame_styles'] : $this_ability->ability_frame_styles;
                             $this_attachment_options['ability_frame_classes'] = isset($attachment_info['ability_frame_classes']) ? $attachment_info['ability_frame_classes'] : $this_ability->ability_frame_classes;
-                            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                             $this_ability_data = $this_ability->canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
                             // Append this ability's markup to the main markup array
                             if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $this_markup .= $this_ability_data['ability_markup'];
                             }
                         }
                         // Else if this is an item attachment
                         elseif ($attachment_info['class'] == 'item'){
                             // Create the temporary item object using the provided data and generate its markup data
-                            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                             $attachment_info['flags']['is_attachment'] = true;
                             if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                             $this_item = new rpg_item($this_battle, $eventinfo['this_player'], $this_robot, $attachment_info);
@@ -1193,11 +1190,9 @@ class rpg_canvas {
                             $this_attachment_options['item_frame_offset'] = isset($attachment_info['item_frame_offset']) ? $attachment_info['item_frame_offset'] : $this_item->item_frame_offset;
                             $this_attachment_options['item_frame_styles'] = isset($attachment_info['item_frame_styles']) ? $attachment_info['item_frame_styles'] : $this_item->item_frame_styles;
                             $this_attachment_options['item_frame_classes'] = isset($attachment_info['item_frame_classes']) ? $attachment_info['item_frame_classes'] : $this_item->item_frame_classes;
-                            //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                             $this_item_data = $this_item->canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
                             // Append this item's markup to the main markup array
                             if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
-                                //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__);  }
                                 $this_markup .= $this_item_data['item_markup'];
                             }
                         }
