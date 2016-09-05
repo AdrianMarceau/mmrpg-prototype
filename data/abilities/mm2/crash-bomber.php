@@ -211,7 +211,9 @@ $ability = array(
             $energy_damage_amount = round($this_attachment_info['attachment_energy'] * 0.5);
 
             // Now that we have the new amount, we can trigger the reduced damage
-            $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, true, $this_attachment_info['attachment_destroy']['options']);
+            $damage_trigger_options = $this_attachment_info['attachment_destroy']['options'];
+            unset($damage_trigger_options['referred_damage'], $damage_trigger_options['referred_damage_id']);
+            $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, true, $damage_trigger_options);
 
         }
 
