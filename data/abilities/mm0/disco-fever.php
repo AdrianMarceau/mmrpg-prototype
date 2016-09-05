@@ -28,6 +28,9 @@ $ability = array(
             'attachment_token' => $this_overlay_token
             );
 
+        // Create the attachment object for this ability
+        $this_overlay = new rpg_ability($this_battle, $target_player, $target_robot, $this_overlay_info);
+
         // Update the ability image if the user is in their alt image
         $alt_image_triggers = array('disco_alt', 'disco_alt3', 'disco_alt5');
         if (in_array($this_robot->robot_image, $alt_image_triggers)){
