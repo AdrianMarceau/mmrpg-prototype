@@ -47,62 +47,6 @@ foreach ($mmrpg_database_items AS $temp_token => $temp_info){
   }
 }
 
-// Sort the item index based on item number
-$temp_pattern_first = array();
-$temp_pattern_first[] = '/^small-screw$/i';
-$temp_pattern_first[] = '/^large-screw$/i';
-$temp_pattern_first[] = '/^energy-pellet$/i';
-$temp_pattern_first[] = '/^energy-capsule$/i';
-$temp_pattern_first[] = '/^weapon-pellet$/i';
-$temp_pattern_first[] = '/^weapon-capsule$/i';
-$temp_pattern_first[] = '/^energy-tank$/i';
-$temp_pattern_first[] = '/^weapon-tank$/i';
-$temp_pattern_first[] = '/^extra-life$/i';
-$temp_pattern_first[] = '/^yashichi$/i';
-$temp_pattern_first[] = '/^attack-pellet$/i';
-$temp_pattern_first[] = '/^attack-capsule$/i';
-$temp_pattern_first[] = '/^defense-pellet$/i';
-$temp_pattern_first[] = '/^defense-capsule$/i';
-$temp_pattern_first[] = '/^speed-pellet$/i';
-$temp_pattern_first[] = '/^speed-capsule$/i';
-$temp_pattern_first[] = '/^super-pellet$/i';
-$temp_pattern_first[] = '/^super-capsule$/i';
-$temp_pattern_last = array();
-$temp_pattern_last[] = '/^none-core$/i';
-$temp_pattern_last[] = '/^copy-core$/i';
-$temp_pattern_last[] = '/^(crystal|cutter|earth|electric|explode|flame|freeze|impact|laser|missile|nature|shadow|shield|space|swift|time|water|wind)-core$/i';
-$temp_pattern_last[] = '/^heart$/i';
-$temp_pattern_last[] = '/^star$/i';
-$temp_pattern_last = array_reverse($temp_pattern_last);
-function mmrpg_index_sort_items($item_one, $item_two){
-  // Pull in global variables
-  global $temp_pattern_first, $temp_pattern_last;
-  // Loop through all the temp patterns and compare them one at a time
-  foreach ($temp_pattern_first AS $key => $pattern){
-    // Check if either of these two items matches the current pattern
-    if (preg_match($pattern, $item_one['item_token']) && !preg_match($pattern, $item_two['item_token'])){ return -1; }
-    elseif (!preg_match($pattern, $item_one['item_token']) && preg_match($pattern, $item_two['item_token'])){ return 1; }
-  }
-  foreach ($temp_pattern_last AS $key => $pattern){
-    // Check if either of these two items matches the current pattern
-    if (preg_match($pattern, $item_one['item_token']) && !preg_match($pattern, $item_two['item_token'])){ return 1; }
-    elseif (!preg_match($pattern, $item_one['item_token']) && preg_match($pattern, $item_two['item_token'])){ return -1; }
-  }
-  // If only one of the two items has a type, the one with goes first
-  if (!empty($item_one['item_token']) && empty($item_two['item_token'])){ return 1; }
-  elseif (empty($item_one['item_token']) && !empty($item_two['item_token'])){ return -1; }
-  else {
-    // If only one of the two items has a type, the one with goes first
-    if ($item_one['item_token'] > $item_two['item_token']){ return 1; }
-    elseif ($item_one['item_token'] < $item_two['item_token']){ return -1; }
-    else {
-      // Return 0 by default
-      return 0;
-    }
-  }
-}
-uasort($mmrpg_database_items, 'mmrpg_index_sort_items');
-
 // Determine the token for the very first item in the database
 $temp_item_tokens = array_values($mmrpg_database_items);
 $first_item_token = array_shift($temp_item_tokens);
