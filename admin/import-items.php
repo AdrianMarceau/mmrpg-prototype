@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while importing!');  }
@@ -11,9 +11,9 @@ ob_start();
 ?>
 <div style="margin: 0 auto 20px; font-weight: bold;">
 <a href="admin.php">Admin Panel</a> &raquo;
-<a href="admin.php?action=import-items&limit=<?=$this_import_limit?>">Update Ability Database</a> &raquo;
+<a href="admin.php?action=import-items&limit=<?= $this_import_limit?>">Update Ability Database</a> &raquo;
 </div>
-<?
+<?php
 $this_page_markup .= ob_get_clean();
 
 
@@ -21,22 +21,150 @@ $this_page_markup .= ob_get_clean();
 //define('DATA_DATABASE_SHOW_MECHAS', true);
 //define('DATA_DATABASE_SHOW_CACHE', true);
 //define('DATA_DATABASE_SHOW_HIDDEN', true);
-//require_once('database/include.php');
+//require_once('includes/include.database.php');
+
+// TYPES DATABASE
+
+// Define the index of types for the game
+$mmrpg_database_types = rpg_type::get_index();
+$temp_remove_types = array('attack', 'defense', 'speed', 'energy', 'weapons', 'empty', 'light', 'wily', 'cossack', 'damage', 'recovery', 'experience', 'level');
+foreach ($temp_remove_types AS $token){ unset($mmrpg_database_types[$token]); }
+uasort($mmrpg_database_types, function($t1, $t2){
+  if ($t1['type_order'] > $t2['type_order']){ return 1; }
+  elseif ($t1['type_order'] < $t2['type_order']){ return -1; }
+  else { return 0; }
+});
+
+// HIDDEN ITEMS
+
+// Define the index of hidden items to not appear in the database
+$hidden_database_items = array();
+$hidden_database_items = array_merge($hidden_database_items, array('heart'));
+$hidden_database_items_count = !empty($hidden_database_items) ? count($hidden_database_items) : 0;
+
+// Truncate any robots currently in the database
+$db->query('TRUNCATE TABLE mmrpg_index_items');
 
 // Require the items index file
+//$mmrpg_index = array();
 require(MMRPG_CONFIG_ROOTDIR.'data/items/_index.php');
+//die('$mmrpg_index[types] = <pre>'.print_r($mmrpg_database_types, true).'</pre>');
+
+// Fill in potentially missing fields with defaults for sorting
+if (!empty($mmrpg_index['items'])){
+  foreach ($mmrpg_index['items'] AS $token => $item){
+    $item['item_class'] = isset($item['item_class']) ? $item['item_class'] : 'item';
+    $item['item_subclass'] = isset($item['item_subclass']) ? $item['item_subclass'] : '';
+    $item['item_game'] = isset($item['item_game']) ? $item['item_game'] : 'MMRPG';
+    $item['item_group'] = isset($item['item_group']) ? $item['item_group'] : 'MMRPG';
+    $item['item_master'] = isset($item['item_master']) ? $item['item_master'] : '';
+    $item['item_number'] = isset($item['item_number']) ? $item['item_number'] : '';
+    $item['item_energy'] = isset($item['item_energy']) ? $item['item_energy'] : 1;
+    $item['item_type'] = isset($item['item_type']) ? $item['item_type'] : '';
+    $item['item_type2'] = isset($item['item_type2']) ? $item['item_type2'] : '';
+    $mmrpg_index['items'][$token] = $item;
+  }
+}
+
+
+// -- MMRPG IMPORT ITEMS -- //
+
+
+// Sort the item index based on item number
+$temp_pattern_first = array();
+$temp_pattern_first[] = '/^small-screw$/i';
+$temp_pattern_first[] = '/^large-screw$/i';
+$temp_pattern_first[] = '/^energy-pellet$/i';
+$temp_pattern_first[] = '/^energy-capsule$/i';
+$temp_pattern_first[] = '/^weapon-pellet$/i';
+$temp_pattern_first[] = '/^weapon-capsule$/i';
+$temp_pattern_first[] = '/^energy-tank$/i';
+$temp_pattern_first[] = '/^weapon-tank$/i';
+$temp_pattern_first[] = '/^extra-life$/i';
+$temp_pattern_first[] = '/^yashichi$/i';
+$temp_pattern_first[] = '/^attack-pellet$/i';
+$temp_pattern_first[] = '/^attack-capsule$/i';
+$temp_pattern_first[] = '/^defense-pellet$/i';
+$temp_pattern_first[] = '/^defense-capsule$/i';
+$temp_pattern_first[] = '/^speed-pellet$/i';
+$temp_pattern_first[] = '/^speed-capsule$/i';
+$temp_pattern_first[] = '/^super-pellet$/i';
+$temp_pattern_first[] = '/^super-capsule$/i';
+//die('$mmrpg_index[\'types\'] = <pre>'.print_r($mmrpg_database_types, true).'</pre>');
+//$temp_element_types = $mmrpg_database_types; //array('none', 'copy', 'crystal', 'cutter', 'earth', 'electric', 'explode', 'flame', 'freeze', 'impact', 'laser', 'missile', 'nature', 'shadow', 'shield', 'space', 'swift', 'time', 'water', 'wind');
+foreach ($mmrpg_database_types AS $type_token => $type_info){
+  if ($type_token == 'none' || $type_token == 'copy'){ continue; }
+  if (!empty($type_info['type_class']) && $type_info['type_class'] == 'special'){ continue; }
+  $temp_pattern_first[] = '/^shard-'.$type_token.'$/i';
+  $temp_pattern_first[] = '/^core-'.$type_token.'$/i';
+  $temp_pattern_first[] = '/^star-'.$type_token.'$/i';
+}
+$temp_pattern_first[] = '/^shard-none$/i';
+$temp_pattern_first[] = '/^core-none$/i';
+$temp_pattern_first[] = '/^star-none$/i';
+$temp_pattern_first[] = '/^shard-copy$/i';
+$temp_pattern_first[] = '/^core-copy$/i';
+$temp_pattern_first[] = '/^star-copy$/i';
+$temp_pattern_first[] = '/^energy-upgrade$/i';
+$temp_pattern_first[] = '/^weapon-upgrade$/i';
+$temp_pattern_first[] = '/^attack-booster$/i';
+$temp_pattern_first[] = '/^defense-booster$/i';
+$temp_pattern_first[] = '/^speed-booster$/i';
+$temp_pattern_first[] = '/^field-booster$/i';
+$temp_pattern_first[] = '/^target-module$/i';
+$temp_pattern_first[] = '/^charge-module$/i';
+$temp_pattern_first[] = '/^growth-module$/i';
+$temp_pattern_first[] = '/^fortune-module$/i';
+$temp_pattern_first[] = '/^score-ball-red$/i';
+$temp_pattern_first[] = '/^score-ball-blue$/i';
+$temp_pattern_first[] = '/^score-ball-green$/i';
+$temp_pattern_first[] = '/^score-ball-purple$/i';
+//die('$temp_pattern_first = <pre>'.print_r($temp_pattern_first, true).'</pre>');
+$temp_pattern_last = array();
+//$temp_pattern_last[] = '/^heart$/i';
+$temp_pattern_last[] = '/^star$/i';
+$temp_pattern_last = array_reverse($temp_pattern_last);
+function mmrpg_index_sort_items($item_one, $item_two){
+  // Pull in global variables
+  global $temp_pattern_first, $temp_pattern_last;
+  // Loop through all the temp patterns and compare them one at a time
+  foreach ($temp_pattern_first AS $key => $pattern){
+    // Check if either of these two items matches the current pattern
+    if (preg_match($pattern, $item_one['item_token']) && !preg_match($pattern, $item_two['item_token'])){ return -1; }
+    elseif (!preg_match($pattern, $item_one['item_token']) && preg_match($pattern, $item_two['item_token'])){ return 1; }
+  }
+  foreach ($temp_pattern_last AS $key => $pattern){
+    // Check if either of these two items matches the current pattern
+    if (preg_match($pattern, $item_one['item_token']) && !preg_match($pattern, $item_two['item_token'])){ return 1; }
+    elseif (!preg_match($pattern, $item_one['item_token']) && preg_match($pattern, $item_two['item_token'])){ return -1; }
+  }
+  // If only one of the two items has a type, the one with goes first
+  if (!empty($item_one['item_token']) && empty($item_two['item_token'])){ return 1; }
+  elseif (empty($item_one['item_token']) && !empty($item_two['item_token'])){ return -1; }
+  else {
+    // If only one of the two items has a type, the one with goes first
+    if ($item_one['item_token'] > $item_two['item_token']){ return 1; }
+    elseif ($item_one['item_token'] < $item_two['item_token']){ return -1; }
+    else {
+      // Return 0 by default
+      return 0;
+    }
+  }
+}
+uasort($mmrpg_index['items'], 'mmrpg_index_sort_items');
 
 // DEBUG
 $this_page_markup .= '<p style="margin-bottom: 10px;"><strong>$mmrpg_database_items</strong><br />';
-$this_page_markup .= 'Count:'.(!empty($mmrpg_database_items) ? count($mmrpg_database_items) : 0).'<br />';
+$this_page_markup .= 'Count:'.(!empty($mmrpg_index['items']) ? count($mmrpg_index['items']) : 0).'<br />';
 //$this_page_markup .= '<pre>'.htmlentities(print_r($mmrpg_database_items, true), ENT_QUOTES, 'UTF-8', true).'</pre><br />';
 $this_page_markup .= '</p>';
 
 // Loop through each of the item info arrays
 $item_key = 0;
-$temp_empty = $mmrpg_index['items']['item'];
-unset($mmrpg_index['items']['item']);
-array_unshift($mmrpg_index['items'], $temp_empty);
+$item_order = 0;
+//$temp_empty = $mmrpg_index['items']['item'];
+//unset($mmrpg_index['items']['item']);
+//array_unshift($mmrpg_index['items'], $temp_empty);
 if (!empty($mmrpg_index['items'])){
   foreach ($mmrpg_index['items'] AS $item_token => $item_data){
 
@@ -50,7 +178,9 @@ if (!empty($mmrpg_index['items'])){
     $temp_insert_array['item_token'] = $item_data['item_token'];
     $temp_insert_array['item_name'] = !empty($item_data['item_name']) ? $item_data['item_name'] : '';
     $temp_insert_array['item_game'] = !empty($item_data['item_game']) ? $item_data['item_game'] : '';
+    $temp_insert_array['item_group'] = !empty($item_data['item_group']) ? $item_data['item_group'] : '';
     $temp_insert_array['item_class'] = !empty($item_data['item_class']) ? $item_data['item_class'] : 'item';
+    $temp_insert_array['item_subclass'] = !empty($item_data['item_subclass']) ? $item_data['item_subclass'] : '';
     $temp_insert_array['item_image'] = !empty($item_data['item_image']) ? $item_data['item_image'] : '';
     $temp_insert_array['item_image_sheets'] = isset($item_data['item_image_sheets']) ? $item_data['item_image_sheets'] : 1;
     $temp_insert_array['item_image_size'] = !empty($item_data['item_image_size']) ? $item_data['item_image_size'] : 40;
@@ -79,39 +209,21 @@ if (!empty($mmrpg_index['items'])){
     $temp_insert_array['item_frame_animate'] = json_encode(!empty($item_data['item_frame_animate']) ? $item_data['item_frame_animate'] : array());
     $temp_insert_array['item_frame_index'] = json_encode(!empty($item_data['item_frame_index']) ? $item_data['item_frame_index'] : array());
     $temp_insert_array['item_frame_offset'] = json_encode(!empty($item_data['item_frame_offset']) ? $item_data['item_frame_offset'] : array());
-    //$temp_insert_array['item_frame_animate'] = array();
-    //if (!empty($item_data['item_frame_animate'])){ foreach ($item_data['item_frame_animate'] AS $key => $token){ $temp_insert_array['item_frame_animate'][] = '['.$token.']'; } }
-    //$temp_insert_array['item_frame_animate'] = implode(',', $temp_insert_array['item_frame_animate']);
-    //$temp_insert_array['item_frame_index'] = array();
-    //if (!empty($item_data['item_frame_index'])){ foreach ($item_data['item_frame_index'] AS $key => $token){ $temp_insert_array['item_frame_index'][] = '['.$token.']'; } }
-    //$temp_insert_array['item_frame_index'] = implode(',', $temp_insert_array['item_frame_index']);
-    //$temp_insert_array['item_frame_offset'] = array();
-    //if (!empty($item_data['item_frame_offset'])){ foreach ($item_data['item_frame_offset'] AS $key => $token){ $temp_insert_array['item_frame_offset'][] = '['.$key.':'.$token.']'; } }
-    //$temp_insert_array['item_frame_offset'] = implode(',', $temp_insert_array['item_frame_offset']);
     $temp_insert_array['item_frame_styles'] = !empty($item_data['item_frame_styles']) ? $item_data['item_frame_styles'] : '';
     $temp_insert_array['item_frame_classes'] = !empty($item_data['item_frame_classes']) ? $item_data['item_frame_classes'] : '';
 
-    // Define the item frame properties
-    $temp_insert_array['attachment_frame'] = !empty($item_data['attachment_frame']) ? $item_data['attachment_frame'] : 'base';
-    $temp_insert_array['attachment_frame_animate'] = json_encode(!empty($item_data['attachment_frame_animate']) ? $item_data['attachment_frame_animate'] : array());
-    $temp_insert_array['attachment_frame_index'] = json_encode(!empty($item_data['attachment_frame_index']) ? $item_data['attachment_frame_index'] : array());
-    $temp_insert_array['attachment_frame_offset'] = json_encode(!empty($item_data['attachment_frame_offset']) ? $item_data['attachment_frame_offset'] : array());
-    //$temp_insert_array['attachment_frame_animate'] = array();
-    //if (!empty($item_data['attachment_frame_animate'])){ foreach ($item_data['attachment_frame_animate'] AS $key => $token){ $temp_insert_array['attachment_frame_animate'][] = '['.$token.']'; } }
-    //$temp_insert_array['attachment_frame_animate'] = implode(',', $temp_insert_array['attachment_frame_animate']);
-    //$temp_insert_array['attachment_frame_index'] = array();
-    //if (!empty($item_data['attachment_frame_index'])){ foreach ($item_data['attachment_frame_index'] AS $key => $token){ $temp_insert_array['attachment_frame_index'][] = '['.$token.']'; } }
-    //$temp_insert_array['attachment_frame_index'] = implode(',', $temp_insert_array['attachment_frame_index']);
-    //$temp_insert_array['attachment_frame_offset'] = array();
-    //if (!empty($item_data['attachment_frame_offset'])){ foreach ($item_data['attachment_frame_offset'] AS $key => $token){ $temp_insert_array['attachment_frame_offset'][] = '['.$key.':'.$token.']'; } }
-    //$temp_insert_array['attachment_frame_offset'] = implode(',', $temp_insert_array['attachment_frame_offset']);
-    $temp_insert_array['attachment_frame_styles'] = !empty($item_data['attachment_frame_styles']) ? $item_data['attachment_frame_styles'] : '';
-    $temp_insert_array['attachment_frame_classes'] = !empty($item_data['attachment_frame_classes']) ? $item_data['attachment_frame_classes'] : '';
-
     // Define the flags
-    $temp_insert_array['item_flag_hidden'] = $temp_insert_array['item_class'] != 'master' || in_array($temp_insert_array['item_token'], array('item', 'attachment-defeat')) ? 1 : 0;
+    $temp_insert_array['item_flag_hidden'] = $temp_insert_array['item_class'] != 'master' || in_array($temp_insert_array['item_token'], $hidden_database_items) ? 1 : 0;
     $temp_insert_array['item_flag_complete'] = $temp_insert_array['item_class'] == 'system' || $item_data['item_image'] != 'item' ? 1 : 0;
     $temp_insert_array['item_flag_published'] = 1;
+
+    // Define the order counter
+    if ($temp_insert_array['item_class'] != 'system'){
+      $temp_insert_array['item_order'] = $item_order;
+      $item_order++;
+    } else {
+      $temp_insert_array['item_order'] = 0;
+    }
 
     // Check if this item already exists in the database
     $temp_success = true;
@@ -132,7 +244,7 @@ if (!empty($mmrpg_index['items'])){
 }
 // Otherwise, if empty, we're done!
 else {
-  $this_page_markup .= '<p style="padding: 6px; background-color: rgb(218, 255, 218);"><strong>ALL ROBOT HAVE BEEN IMPORTED UPDATED!</strong></p>';
+  $this_page_markup .= '<p style="padding: 6px; background-color: rgb(218, 255, 218);"><strong>ALL ITEMS HAVE BEEN IMPORTED UPDATED!</strong></p>';
 }
 
 
