@@ -5,7 +5,6 @@ define('MMRPG_BUILD', 'mmrpg2k11');
 define('MMRPG_VERSION', '2.3.4');
 require('includes/config.php');
 require('includes/settings.php');
-require('includes/debug.php');
 
 // Turn ON error reporting if admin
 if (MMRPG_CONFIG_ADMIN_MODE){

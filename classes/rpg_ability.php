@@ -886,7 +886,6 @@ class rpg_ability extends rpg_object {
         //$ability_info = self::get_index_info($temp_ability_token);
         $temp_robot_token = $robot_info['robot_token'];
         $temp_ability_token = $ability_info['ability_token'];
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, $temp_robot_token.'/'.$temp_ability_token.'/'."\nrobot_abilities = ".array_keys($robot_info['robot_abilities'])."\nrobot_index_abilities = ".array_keys($robot_info['robot_index_abilities']));  }
         $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
         $robot_flag_copycore = !empty($robot_info['robot_core']) && $robot_info['robot_core'] == 'copy' ? true : false;
         $temp_ability_type = !empty($ability_info['ability_type']) ? $mmrpg_index['types'][$ability_info['ability_type']] : false;
@@ -897,8 +896,6 @@ class rpg_ability extends rpg_object {
         $temp_index_abilities = !empty($robot_info['robot_index_abilities']) ? $robot_info['robot_index_abilities'] : array();
         $temp_current_abilities = !empty($robot_info['robot_abilities']) ? array_keys($robot_info['robot_abilities']) : array();
         $temp_compatible_abilities = array_merge($temp_index_abilities, $temp_current_abilities);
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, $temp_robot_token.'/'.$temp_ability_token.'/'."\nindex_abilities = ".implode(',', $temp_index_abilities)."\ncurrent_abilities = ".implode(',', $temp_current_abilities)."\ncompatible_abilities = ".implode(',', $temp_compatible_abilities));  }
-        //while (!in_array($temp_ability_token, $robot_info['robot_abilities'])){
         while (!in_array($temp_ability_token, $temp_compatible_abilities)){
             if (!$robot_flag_copycore){
                 if (empty($robot_ability_core)){ $temp_incompatible = true; break; }
@@ -911,7 +908,6 @@ class rpg_ability extends rpg_object {
             }
             break;
         }
-        //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, $temp_robot_token.'/'.$temp_ability_token.'/'.($temp_incompatible ? 'incompatible' : 'compatible'));  }
         if ($temp_incompatible == true){ return false; }
         $temp_ability_label = $ability_info['ability_name'];
         $temp_ability_title = self::print_editor_title_markup($robot_info, $ability_info);
