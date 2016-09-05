@@ -20,8 +20,8 @@ $ability = array(
             $this_ability->set_name($this_ability->ability_base_name . ' Δ');
             $this_ability->set_damage($this_ability->ability_base_damage * 2);
         } else {
-            $this_ability->set_name($this_ability->ability_base_name);
-            $this_ability->set_damage($this_ability->ability_base_damage);
+            $this_ability->reset_name();
+            $this_ability->reset_damage();
         }
 
         // Target the opposing robot
@@ -62,8 +62,8 @@ $ability = array(
             $this_ability->set_name($this_ability->ability_base_name . ' Δ');
             $this_ability->set_damage($this_ability->ability_base_damage * 2);
         } else {
-            $this_ability->set_name($this_ability->ability_base_name);
-            $this_ability->set_damage($this_ability->ability_base_damage);
+            $this_ability->reset_name();
+            $this_ability->reset_damage();
         }
 
         // Return true on success
