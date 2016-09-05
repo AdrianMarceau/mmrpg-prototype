@@ -62,8 +62,6 @@ class rpg_item_recovery extends rpg_recovery {
 
         // Collect the recovery amount argument from the function
         $this_item->item_results['this_amount'] = $recovery_amount;
-
-        // DEBUG
         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | recovery_start_amount |<br /> '.'amount:'.$this_item->item_results['this_amount'].' | '.'percent:'.($this_item->recovery_options['recovery_percent'] ? 'true' : 'false').' | '.'kind:'.$this_item->recovery_options['recovery_kind'].'');
 
         // DEBUG
@@ -165,7 +163,6 @@ class rpg_item_recovery extends rpg_recovery {
                     $temp_recovery_key = $this_robot->robot_key + 1;
                     $temp_recovery_resistor = (10 - $temp_recovery_key) / 10;
                     $new_recovery_amount = round($recovery_amount * $temp_recovery_resistor);
-                    // DEBUG
                     $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | position_modifier_recovery | '.$recovery_amount.' = round('.$recovery_amount.' * '.$temp_recovery_resistor.') = '.$new_recovery_amount.'');
                     $recovery_amount = $new_recovery_amount;
                 }
@@ -187,7 +184,6 @@ class rpg_item_recovery extends rpg_recovery {
             // If there's a recovery booster, apply that first
             if (isset($field_multipliers['recovery'])){
                 $new_recovery_amount = round($recovery_amount * $field_multipliers['recovery']);
-                // DEBUG
                 $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | field_multiplier_recovery | '.$recovery_amount.' = round('.$recovery_amount.' * '.$field_multipliers['recovery'].') = '.$new_recovery_amount.'');
                 $recovery_amount = $new_recovery_amount;
             }
@@ -200,14 +196,12 @@ class rpg_item_recovery extends rpg_recovery {
                 // If this item's type matches the multiplier, apply it
                 if ($temp_item_recovery_type == $temp_type){
                     $new_recovery_amount = round($recovery_amount * $temp_multiplier);
-                    // DEBUG
                     $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | field_multiplier_'.$temp_type.' | '.$recovery_amount.' = round('.$recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
                     $recovery_amount = $new_recovery_amount;
                 }
                 // If this item's type2 matches the multiplier, apply it
                 if ($temp_item_recovery_type2 == $temp_type){
                     $new_recovery_amount = round($recovery_amount * $temp_multiplier);
-                    // DEBUG
                     $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | field_multiplier_'.$temp_type.' | '.$recovery_amount.' = round('.$recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
                     $recovery_amount = $new_recovery_amount;
                 }
@@ -240,11 +234,9 @@ class rpg_item_recovery extends rpg_recovery {
             if (!empty($temp_item_recovery_type) && !empty($target_starforce_modified[$temp_item_recovery_type])){
                 $temp_multiplier = 1 + ($target_starforce_modified[$temp_item_recovery_type] / 10);
                 $new_recovery_amount = round($recovery_amount * $temp_multiplier);
-                // DEBUG
                 $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | starforce_multiplier_'.$temp_item_recovery_type.' | force:'.$target_starforce[$temp_item_recovery_type].' vs resist:'.$this_starforce[$temp_item_recovery_type].' = '.($target_starforce_modified[$temp_item_recovery_type] * 10).'% boost | '.$recovery_amount.' = round('.$recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
                 $recovery_amount = $new_recovery_amount;
             } elseif (!empty($temp_item_recovery_type) && isset($target_starforce_modified[$temp_item_recovery_type])){
-                // DEBUG
                 $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | starforce_multiplier_'.$temp_item_recovery_type.' | force:'.$target_starforce[$temp_item_recovery_type].' vs resist:'.$this_starforce[$temp_item_recovery_type].' = no boost');
             }
 
@@ -252,11 +244,9 @@ class rpg_item_recovery extends rpg_recovery {
             if (!empty($temp_item_recovery_type2) && !empty($target_starforce_modified[$temp_item_recovery_type2])){
                 $temp_multiplier = 1 + ($target_starforce_modified[$temp_item_recovery_type2] / 10);
                 $new_recovery_amount = round($recovery_amount * $temp_multiplier);
-                // DEBUG
                 $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | starforce_multiplier_'.$temp_item_recovery_type2.' | force:'.$target_starforce[$temp_item_recovery_type2].' vs resist:'.$this_starforce[$temp_item_recovery_type2].' = '.($target_starforce_modified[$temp_item_recovery_type2] * 10).'% boost | '.$recovery_amount.' = round('.$recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
                 $recovery_amount = $new_recovery_amount;
             } elseif (!empty($temp_item_recovery_type2) && isset($target_starforce_modified[$temp_item_recovery_type2])){
-                // DEBUG
                 $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | starforce_multiplier_'.$temp_item_recovery_type2.' | force:'.$target_starforce[$temp_item_recovery_type2].' vs resist:'.$this_starforce[$temp_item_recovery_type2].' = no boost');
             }
 
@@ -448,7 +438,6 @@ class rpg_item_recovery extends rpg_recovery {
                 if ($this_item->item_results['flag_coreboost']){
                     $temp_multiplier = MMRPG_SETTINGS_COREBOOST_MULTIPLIER;
                     $this_item->item_results['this_amount'] = ceil($this_item->item_results['this_amount'] * $temp_multiplier);
-                    // DEBUG
                     $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | apply_core_modifiers | x '.$temp_multiplier.' = '.$this_item->item_results['this_amount'].'');
                 }
 
@@ -467,7 +456,6 @@ class rpg_item_recovery extends rpg_recovery {
                     if ($this_robot->robot_defense <= 0 && $target_robot->robot_attack >= 1){
                         // Set the new recovery amount to OHKO this robot
                         $temp_new_amount = $this_robot->robot_base_energy;
-                        // DEBUG
                         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | '.$this_robot->robot_token.'_defense_break | D:'.$this_robot->robot_defense.' | '.$this_item->item_results['this_amount'].' = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_item->item_results['this_amount'] = $temp_new_amount;
@@ -476,7 +464,6 @@ class rpg_item_recovery extends rpg_recovery {
                     elseif ($target_robot->robot_attack <= 0 && $this_robot->robot_defense >= 1){
                         // Set the new recovery amount to NOKO this robot
                         $temp_new_amount = 0;
-                        // DEBUG
                         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | '.$target_robot->robot_token.'_attack_break | A:'.$target_robot->robot_attack.' | '.$this_item->item_results['this_amount'].' = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_item->item_results['this_amount'] = $temp_new_amount;
@@ -485,7 +472,6 @@ class rpg_item_recovery extends rpg_recovery {
                     elseif ($this_robot->robot_defense <= 0 && $target_robot->robot_attack <= 0){
                         // Set the new recovery amount to NOKO this robot
                         $temp_new_amount = 0;
-                        // DEBUG
                         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | '.$target_robot->robot_token.'_attack_break and '.$this_robot->robot_token.'_defense_break | A:'.$target_robot->robot_attack.' D:'.$this_robot->robot_defense.' | '.$this_item->item_results['this_amount'].' = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_item->item_results['this_amount'] = $temp_new_amount;
@@ -494,7 +480,6 @@ class rpg_item_recovery extends rpg_recovery {
                     else {
                         // Set the new recovery amount relative to this robot's defense and the target robot's attack
                         $temp_new_amount = round($this_item->item_results['this_amount'] * ($target_robot->robot_attack / $this_robot->robot_defense));
-                        // DEBUG
                         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | normal_recovery | A:'.$target_robot->robot_attack.' D:'.$this_robot->robot_defense.' | '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * ('.$target_robot->robot_attack.' / '.$this_robot->robot_defense.')) = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_item->item_results['this_amount'] = $temp_new_amount;
@@ -509,7 +494,6 @@ class rpg_item_recovery extends rpg_recovery {
                 if ($this_robot->battle->critical_chance($this_item->recovery_options['critical_rate'])){
                     $this_item->item_results['this_amount'] = $this_item->item_results['this_amount'] * $this_item->recovery_options['critical_multiplier'];
                     $this_item->item_results['flag_critical'] = true;
-                    // DEBUG
                     $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | flag_critical | x '.$this_item->recovery_options['critical_multiplier'].' = '.$this_item->item_results['this_amount'].'');
                 } else {
                     $this_item->item_results['flag_critical'] = false;
@@ -525,7 +509,6 @@ class rpg_item_recovery extends rpg_recovery {
                     $loop_count = $this_item->item_results['counter_affinities'] / ($this_item->item_results['total_strikes'] + 1);
                     for ($i = 1; $i <= $loop_count; $i++){
                         $temp_new_amount = round($this_item->item_results['this_amount'] * $this_item->recovery_options['affinity_multiplier']);
-                        // DEBUG
                         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | flag_affinity ('.$i.'/'.$loop_count.') | '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$this_item->recovery_options['affinity_multiplier'].') = '.$temp_new_amount.'');
                         $this_item->item_results['this_amount'] = $temp_new_amount;
                     }
@@ -536,7 +519,6 @@ class rpg_item_recovery extends rpg_recovery {
                     $loop_count = $this_item->item_results['counter_resistances'] / ($this_item->item_results['total_strikes'] + 1);
                     for ($i = 1; $i <= $loop_count; $i++){
                         $temp_new_amount = round($this_item->item_results['this_amount'] * $this_item->recovery_options['resistance_multiplier']);
-                        // DEBUG
                         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | flag_resistance ('.$i.'/'.$loop_count.') | '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$this_item->recovery_options['resistance_multiplier'].') = '.$temp_new_amount.'');
                         $this_item->item_results['this_amount'] = $temp_new_amount;
                     }
@@ -547,7 +529,6 @@ class rpg_item_recovery extends rpg_recovery {
                     $loop_count = $this_item->item_results['counter_immunities'] / ($this_item->item_results['total_strikes'] + 1);
                     for ($i = 1; $i <= $loop_count; $i++){
                         $this_item->item_results['this_amount'] = round($this_item->item_results['this_amount'] * $this_item->recovery_options['immunity_multiplier']);
-                        // DEBUG
                         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | flag_immunity ('.$i.'/'.$loop_count.') | '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$this_item->recovery_options['immunity_multiplier'].') = '.$temp_new_amount.'');
                         $this_item->item_results['this_amount'] = $temp_new_amount;
                     }
@@ -569,7 +550,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_breaker'])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_breaker']);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker'].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -577,7 +557,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_booster'])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_booster']);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_booster'].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -585,7 +564,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_input_breaker'])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_input_breaker']);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_breaker = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_input_breaker'].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -593,7 +571,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_input_booster'])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_input_booster']);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_booster = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_input_booster'].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -604,7 +581,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_breaker_'.$this_item->item_type])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_breaker_'.$this_item->item_type]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker_'.$this_item->item_type.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_item->item_type].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -612,7 +588,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_booster_'.$this_item->item_type])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_booster_'.$this_item->item_type]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster_'.$this_item->item_type.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_item->item_type].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -620,7 +595,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_input_breaker_'.$this_item->item_type])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_input_breaker_'.$this_item->item_type]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_breaker_'.$this_item->item_type.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_input_breaker_'.$this_item->item_type].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -628,7 +602,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_input_booster_'.$this_item->item_type])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_input_booster_'.$this_item->item_type]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_booster_'.$this_item->item_type.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_input_booster_'.$this_item->item_type].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -639,7 +612,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_breaker_'.$this_item->item_type2])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_breaker_'.$this_item->item_type2]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker_'.$this_item->item_type2.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_item->item_type2].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -647,7 +619,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_booster_'.$this_item->item_type2])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_booster_'.$this_item->item_type2]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster_'.$this_item->item_type2.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_item->item_type2].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -655,7 +626,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_input_breaker_'.$this_item->item_type2])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_input_breaker_'.$this_item->item_type2]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_breaker_'.$this_item->item_type2.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_input_breaker_'.$this_item->item_type2].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -663,7 +633,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_input_booster_'.$this_item->item_type2])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_input_booster_'.$this_item->item_type2]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_input_booster_'.$this_item->item_type2.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_input_booster_'.$this_item->item_type2].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -683,7 +652,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_breaker'])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_breaker']);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker'].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -691,7 +659,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_booster'])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_booster']);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_booster'].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -699,7 +666,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_output_breaker'])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_output_breaker']);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_breaker = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_output_breaker'].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -707,7 +673,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_output_booster'])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_output_booster']);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_booster = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_output_booster'].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -718,7 +683,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_breaker_'.$this_item->item_type])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_breaker_'.$this_item->item_type]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker_'.$this_item->item_type.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_item->item_type].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -726,7 +690,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_booster_'.$this_item->item_type])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_booster_'.$this_item->item_type]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster_'.$this_item->item_type.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_item->item_type].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -734,7 +697,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_output_breaker_'.$this_item->item_type])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_output_breaker_'.$this_item->item_type]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_breaker_'.$this_item->item_type.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_output_breaker_'.$this_item->item_type].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -742,7 +704,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_output_booster_'.$this_item->item_type])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_output_booster_'.$this_item->item_type]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_booster_'.$this_item->item_type.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_output_booster_'.$this_item->item_type].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -753,7 +714,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_breaker_'.$this_item->item_type2])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_breaker_'.$this_item->item_type2]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_breaker_'.$this_item->item_type2.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_breaker_'.$this_item->item_type2].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -761,7 +721,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_booster_'.$this_item->item_type2])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_booster_'.$this_item->item_type2]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_booster_'.$this_item->item_type2.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_booster_'.$this_item->item_type2].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -769,7 +728,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_output_breaker_'.$this_item->item_type2])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_output_breaker_'.$this_item->item_type2]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_breaker_'.$this_item->item_type2.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_output_breaker_'.$this_item->item_type2].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
@@ -777,7 +735,6 @@ class rpg_item_recovery extends rpg_recovery {
                             if (isset($temp_info['attachment_recovery_output_booster_'.$this_item->item_type2])){
                                 // Apply the recovery breaker multiplier to the current recovery amount
                                 $temp_new_amount = round($this_item->item_results['this_amount'] * $temp_info['attachment_recovery_output_booster_'.$this_item->item_type2]);
-                                // DEBUG
                                 $this_battle->events_debug(__FILE__, __LINE__, 'item_'.$this_item->item_token.' vs. '.$temp_token_debug.' <br /> attachment_recovery_output_booster_'.$this_item->item_type2.' = '.$this_item->item_results['this_amount'].' = round('.$this_item->item_results['this_amount'].' * '.$temp_info['attachment_recovery_output_booster_'.$this_item->item_type2].') = '.$temp_new_amount.'');
                                 $this_item->item_results['this_amount'] = $temp_new_amount;
                             }
