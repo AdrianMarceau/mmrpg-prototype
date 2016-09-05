@@ -2491,6 +2491,18 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     line-height: 14px;
     margin-top: 13px;
 }
+#actions .actions_option .action_option label .multi .type {
+    display: inline-block;
+    line-height: 14px;
+    padding: 0 6px 0 9px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+#actions .actions_option .action_option label .multi .type.value {
+    position: relative;
+    top: 3px;
+}
 
 #actions .actions_switch .action_switch label .sprite_40x40,
 #actions .actions_scan .action_scan label .sprite_40x40,
