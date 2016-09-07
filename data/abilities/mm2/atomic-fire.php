@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Atomic Fire',
     'ability_token' => 'atomic-fire',
     'ability_game' => 'MM02',
+    'ability_group' => 'MM02/Weapons/015',
     'ability_description' => 'The user unleashes a barrage of fire at the target, dealing damage and raising the user\'s attack by {RECOVERY2}%! This ability has three levels of charge, with damage multiplying on each successive barrage until the limit is reached or another technique is used.',
     'ability_type' => 'flame',
     'ability_energy' => 4,

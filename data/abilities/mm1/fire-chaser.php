@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Fire Chaser',
     'ability_token' => 'fire-chaser',
     'ability_game' => 'MM01',
+    'ability_group' => 'MM01/Weapons/007',
     'ability_description' => 'The user a unleashes a powerful wave of fire that chases the target, inflicting twice as much damage if the target has higher speed than the user!',
     'ability_type' => 'flame',
     'ability_type2' => 'swift',

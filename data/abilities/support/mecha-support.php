@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Mecha Support',
     'ability_token' => 'mecha-support',
     'ability_game' => 'MMRPG',
+    'ability_group' => 'MMRPG/Support/Special',
     'ability_description' => 'The user summons a familiar support mecha from their own home field to their side of the battle, allowing it to temporarily fight as part of the user\'s own team! This ability seems to work differently for Neutral and Copy Core robots...',
     'ability_energy' => 5,
     'ability_speed' => 10,

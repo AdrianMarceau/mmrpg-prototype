@@ -3,7 +3,8 @@
 $ability = array(
   'ability_name' => 'Damage Booster',
   'ability_token' => 'damage-booster',
-  'ability_game' => 'MMRPG',
+    'ability_token' => 'damage-booster',
+    'ability_group' => 'MMRPG/Support/Damage',
   'ability_description' => 'The user alters the conditions of the field to boost the damaging effects of abilities by {RECOVERY}%! This ability appears to be unaffected by existing field multipliers.',
   'ability_speed' => -2,
   'ability_energy' => 6,

@@ -3,7 +3,8 @@
 $ability = array(
     'ability_name' => 'Proto Shield',
     'ability_token' => 'proto-shield',
-    'ability_game' => 'MM00',
+    'ability_game' => 'MM03',
+    'ability_group' => 'MM00/Weapons/Proto',
     'ability_description' => 'The user creates a large reflective shield that hovers in front of its target and halves all damage received from attacks for three turns!',
     'ability_type' => 'shield',
     'ability_energy' => 4,

@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Laser Trident',
     'ability_token' => 'laser-trident',
     'ability_game' => 'MM09',
+    'ability_group' => 'MM09/Weapons/067',
     'ability_description' => 'The user fires a powerful three-pronged energy beam at the target to deal damage and reduce their attack power by {DAMAGE2}%.',
     'ability_type' => 'water',
     'ability_type2' => 'laser',

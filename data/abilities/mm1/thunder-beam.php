@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Thunder Beam',
     'ability_token' => 'thunder-beam',
     'ability_game' => 'MM01',
+    'ability_group' => 'MM01/Weapons/008',
     'ability_description' => 'The user throws a powerful bolt of electricity at the target, inflicting damage and occasionally raising the user\'s attack by {RECOVERY2}%!',
     'ability_type' => 'electric',
     'ability_type2' => 'laser',

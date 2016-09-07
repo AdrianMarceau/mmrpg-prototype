@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Speed Swap',
     'ability_token' => 'speed-swap',
     'ability_game' => 'MMRPG',
+    'ability_group' => 'MMRPG/Support/Speed',
     'ability_description' => 'The user triggers a glitch in the prototype that swaps the user\'s own speed stats with the target\'s!',
     'ability_energy' => 4,
     'ability_accuracy' => 100,
