@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Gyro Attack',
     'ability_token' => 'gyro-attack',
     'ability_game' => 'MM05',
+    'ability_group' => 'MM05/Weapons/036',
     'ability_description' => 'The user throws a giant helicopter blade toward the target that deals damage and then loops around to hit another robot on the way back! Even if this ability misses the first time, there\'s still a chance the second will hit!',
     'ability_type' => 'wind',
     'ability_type2' => 'cutter',

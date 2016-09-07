@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Rain Flush',
     'ability_token' => 'rain-flush',
     'ability_game' => 'MM04',
+    'ability_group' => 'MM04/Weapons/026',
     'ability_image_sheets' => 2,
     'ability_description' => 'The user releases a large capsule into the air that showers the field in acid rain and damages all robots on the opponent\'s side of the battle! This ability\'s base damage is equal to the user\'s level and is not affected by attack, defense, or position variables.',
     'ability_type' => 'water',

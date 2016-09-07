@@ -27,7 +27,9 @@ $robot = array(
         ),
     'robot_rewards' => array(
         'abilities' => array(
-                array('level' => 0, 'token' => 'buster-shot')
+            array('level' => 15, 'token' => 'trill-aura'),
+            array('level' => 30, 'token' => 'trill-slasher'),
+            array('level' => 45, 'token' => 'trill-teranova')
             )
         ),
     'robot_quotes' => array(

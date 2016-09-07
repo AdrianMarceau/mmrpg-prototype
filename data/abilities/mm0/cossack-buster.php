@@ -3,7 +3,8 @@
 $ability = array(
     'ability_name' => 'Cossack Buster',
     'ability_token' => 'cossack-buster',
-    'ability_game' => 'MM00',
+    'ability_game' => 'MMRPG',
+    'ability_group' => 'MM00/Weapons/00/Doctors',
     'ability_description' => 'An adaptation of the Proto Buster created for use on other robot masters.  The user charges on the first turn to build power and raise speed by {RECOVERY2}%, then releases a powerful energy shot on the second to inflict massive damage! This ability\'s power increases when used by a robot belonging to Dr. Cossack.',
     'ability_player' => 'dr-cossack',
     'ability_energy' => 2,

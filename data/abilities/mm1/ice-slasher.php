@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Ice Slasher',
     'ability_token' => 'ice-slasher',
     'ability_game' => 'MM01',
+    'ability_group' => 'MM01/Weapons/005',
     'ability_description' => 'The user fires a blast of razor-sharp ice at the target, inflicting damage and occasionally lowering their speed by {DAMAGE2}%!',
     'ability_type' => 'freeze',
     'ability_type2' => 'cutter',

@@ -3,7 +3,8 @@
 $ability = array(
     'ability_name' => 'Bass Crush',
     'ability_token' => 'bass-crush',
-    'ability_game' => 'MM00',
+    'ability_game' => 'MMRPG',
+    'ability_group' => 'MM00/Weapons/Bass',
     'ability_description' => 'The user summons a large tablet that hovers behind the target and crushes its spirits causing it to receive double damage from attacks for the next three turns!',
     'ability_type' => 'shadow',
     'ability_energy' => 4,

@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Leaf Shield',
     'ability_token' => 'leaf-shield',
     'ability_game' => 'MM02',
+    'ability_group' => 'MM02/Weapons/016',
     'ability_description' => 'The user surrounds itself with sharp leaf-like blades to bolster shields and reduce damage by {RECOVERY2}%! The leaf blades can also be thrown at the target for massive damage!',
     'ability_type' => 'nature',
     'ability_type2' => 'shield',

@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Magic Card',
     'ability_token' => 'magic-card',
     'ability_game' => 'MM085',
+    'ability_group' => 'MM10B/Weapons/006',
     'ability_description' => 'The user throws pair of magical cards at an unlucky target to deal damage and steal life energy, restoring the user\'s own by up to {RECOVERY2}% of the damage dealt!',
     'ability_type' => 'shadow',
     'ability_energy' => 4,

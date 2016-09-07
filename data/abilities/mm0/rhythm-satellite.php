@@ -3,7 +3,8 @@
 $ability = array(
     'ability_name' => 'Rhythm Satellite',
     'ability_token' => 'rhythm-satellite',
-    'ability_game' => 'MM00',
+    'ability_game' => 'MMRPG',
+    'ability_group' => 'MM00/Weapons/Rhythm',
     'ability_description' => 'The user creates a pair of orbiting satellites that hover beind their target and doubles all damage dealt by attacks for three turns!',
     'ability_type' => 'space',
     'ability_energy' => 4,

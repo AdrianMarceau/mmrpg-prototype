@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Defense Swap',
     'ability_token' => 'defense-swap',
     'ability_game' => 'MMRPG',
+    'ability_group' => 'MMRPG/Support/Defense',
     'ability_description' => 'The user triggers a glitch in the prototype that swaps the user\'s own defense stats with the target\'s!',
     'ability_energy' => 4,
     'ability_accuracy' => 100,

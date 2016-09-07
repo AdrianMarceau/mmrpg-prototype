@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Rolling Cutter',
     'ability_token' => 'rolling-cutter',
     'ability_game' => 'MM01',
+    'ability_group' => 'MM01/Weapons/003',
     'ability_description' => 'The user throws a boomerang-like blade at any target that strikes up to three times dealing massive damage!',
     'ability_type' => 'cutter',
     'ability_energy' => 4,

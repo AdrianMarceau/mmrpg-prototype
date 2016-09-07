@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Crash Bomber',
     'ability_token' => 'crash-bomber',
     'ability_game' => 'MM02',
+    'ability_group' => 'MM02/Weapons/013',
     'ability_description' => 'The user fires a small explosive that seeks out and latches onto the target, building power for two turns and then exploding to deal damage equal to {DAMAGE}% of the target\'s base life energy! Manually triggering this ability early appears to weaken its power...',
     'ability_type' => 'explode',
     'ability_energy' => 4,

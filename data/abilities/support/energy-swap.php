@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Energy Swap',
     'ability_token' => 'energy-swap',
     'ability_game' => 'MMRPG',
+    'ability_group' => 'MMRPG/Support/Energy',
     'ability_description' => 'The user triggers a glitch in the prototype that swaps the user\'s own life energy with the target\'s!',
     'ability_energy' => 8,
     'ability_accuracy' => 100,

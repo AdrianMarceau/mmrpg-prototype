@@ -3,7 +3,8 @@
 $ability = array(
     'ability_name' => 'Disco Fever',
     'ability_token' => 'disco-fever',
-    'ability_game' => 'MM00',
+    'ability_game' => 'MMRPG',
+    'ability_group' => 'MM00/Weapons/Disco',
     'ability_description' => 'The user summons a disco ball above the target to distract its attention and cause it to deal half damage from its attacks for the next three turns!',
     'ability_type' => 'laser',
     'ability_energy' => 4,

@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Fire Storm',
     'ability_token' => 'fire-storm',
     'ability_game' => 'MM01',
+    'ability_group' => 'MM01/Weapons/007',
     'ability_description' => 'The user unleashes a blast of fire at the target, dealing damage and raising the user\'s defense by {RECOVERY2}%! This ability has three levels of charge, with damage multiplying on each successive blast until the limit is reached or another technique is used.',
     'ability_type' => 'flame',
     'ability_energy' => 4,

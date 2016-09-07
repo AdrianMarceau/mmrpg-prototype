@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Ring Boomerang',
     'ability_token' => 'ring-boomerang',
     'ability_game' => 'MM04',
+    'ability_group' => 'MM04/Weapons/029',
     'ability_description' => 'The user throws a large, boomerang-like ring at the target, striking twice with perfect accuracy and inflicting damage each time!',
     'ability_type' => 'space',
     'ability_type2' => 'cutter',

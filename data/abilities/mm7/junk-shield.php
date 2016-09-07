@@ -1,9 +1,10 @@
 <?
 // JUNK SHIELD
 $ability = array(
-  'ability_name' => 'Junk Shield',
-  'ability_token' => 'junk-shield',
-  'ability_game' => 'MM07',
+    'ability_name' => 'Junk Shield',
+    'ability_token' => 'junk-shield',
+    'ability_game' => 'MM07',
+    'ability_group' => 'MM07/Weapons/050',
     'ability_description' => 'The user surrounds itself with large pieces of scrap metal to bolster shields and prevent all damage from one attack! If the shield survives it can also be thrown at the target for damage!',
     'ability_type' => 'earth',
     'ability_type2' => 'shield',

@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Slash Claw',
     'ability_token' => 'slash-claw',
     'ability_game' => 'MM07',
+    'ability_group' => 'MM07/Weapons/054',
     'ability_description' => 'The user slashes at the target with razor-sharp claws, launching a wave of energy that inflicts damage with perfect accuracy and increases attack by {RECOVERY2}%!',
     'ability_type' => 'cutter',
     'ability_energy' => 4,

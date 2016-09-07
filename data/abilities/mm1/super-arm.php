@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Super Arm',
     'ability_token' => 'super-arm',
     'ability_game' => 'MM01',
+    'ability_group' => 'MM01/Weapons/004',
     'ability_image_sheets' => 8,
     'ability_description' => 'The user creates a blockade using the surrounding environment to bolster shields and reduce damage by {RECOVERY2}%!  The blockade can also be thrown at the target for massive damage!',
     'ability_type' => 'impact',

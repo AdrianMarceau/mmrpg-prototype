@@ -3,7 +3,8 @@
 $ability = array(
     'ability_name' => 'Mega Ball',
     'ability_token' => 'mega-ball',
-    'ability_game' => 'MM00',
+    'ability_game' => 'MM08',
+    'ability_group' => 'MM00/Weapons/Mega',
     'ability_description' => 'The user creates a ball-shaped weapon that rocks back and forth along the ground until being kicked at any target for massive damage!',
     'ability_type' => '',
     'ability_energy' => 4,

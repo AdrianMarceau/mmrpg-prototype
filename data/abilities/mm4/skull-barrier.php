@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Skull Barrier',
     'ability_token' => 'skull-barrier',
     'ability_game' => 'MM04',
+    'ability_group' => 'MM04/Weapons/032',
     'ability_description' => 'The user surrounds itself with tiny skull-like barriers to bolster shields and prevent all damage from attacks for one turn! The shield can also be thrown at the target for massive damage!',
     'ability_type' => 'shadow',
     'ability_type2' => 'shield',

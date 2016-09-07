@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Jewel Satellite',
     'ability_token' => 'jewel-satellite',
     'ability_game' => 'MM09',
+    'ability_group' => 'MM09/Weapons/069',
     'ability_description' => 'The user raises a shield of orbiting diamonds that protect it from all Flame, Nature, Electric, and Water type damage. The group of diamonds can also be thrown at any target to deal massive damage!',
     'ability_type' => 'crystal',
     'ability_type2' => 'shield',
