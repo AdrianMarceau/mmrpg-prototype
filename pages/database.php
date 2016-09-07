@@ -3,8 +3,51 @@
  * INDEX PAGE : DATABASE
  */
 
+// Define ROBOT preview fields if we're not in a specific sub-index
+if ($this_current_sub != 'robots'){
+    // If we're not on the full robot index, only show preview robots
+    $mmrpg_database_robots_filter = "AND (robot_token IN ('mega-man', 'bass', 'proto-man') OR robot_game IN ('MM01')) ";
+}
+
+// Define MECHA preview fields if we're not in a specific sub-index
+if ($this_current_sub != 'mechas'){
+    // If we're not on the full mecha index, only show preview mechas
+    $mmrpg_database_mechas_filter = "AND robot_game IN ('MM00', 'MM01') ";
+}
+
+// Define BOSS preview fields if we're not in a specific sub-index
+if ($this_current_sub != 'bosses'){
+    // If we're not on the full boss index, only show preview bosses
+    $mmrpg_database_bosses_filter = "AND (robot_token IN ('doc-robot', 'trill') OR robot_game IN ('MM20')) ";
+}
+
+// Define ABILITY preview fields if we're not in a specific sub-index
+if ($this_current_sub != 'abilities'){
+    // If we're not on the full ability index, only show preview abilities
+    $mmrpg_database_abilities_filter = "AND (ability_token IN ('buster-shot') OR (
+        (ability_master IN ('mega-man', 'bass', 'proto-man') AND ability_energy = 2) OR
+        (ability_game = 'MM01' AND ability_energy = 4)
+        )) ";
+}
+
+// Define ITEM preview fields if we're not in a specific sub-index
+if ($this_current_sub != 'items'){
+    // If we're not on the full item index, only show preview items
+    $mmrpg_database_items_filter = "AND (item_token IN ('small-screw', 'large-screw') OR (
+        (item_game = 'MM00' AND item_group LIKE 'MM00/%')
+        )) ";
+}
+
+// Define FIELD preview fields if we're not in a specific sub-index
+if ($this_current_sub != 'fields'){
+    // If we're not on the full field index, only show preview fields
+    $mmrpg_database_fields_filter = "AND (field_token IN ('intro-field') OR field_game IN ('MM00', 'MM01')) ";
+}
+
+
 // Require the database top include file
 if ($this_current_sub == 'mechas' || $this_current_sub == 'fields'){ define('DATA_DATABASE_SHOW_MECHAS', true); }
+if ($this_current_sub == 'bosses' || $this_current_sub == 'fields'){ define('DATA_DATABASE_SHOW_BOSSES', true); }
 require_once('database/include.php');
 
 //die('<pre>'.print_r($_REQUEST, true).'</pre>');
@@ -92,18 +135,16 @@ ob_start();
         </div>
 
         <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-            <a class="link" href="database/abilities/">
-                <span class="name">Ability Database</span>
-                <span class="count">( <?= $mmrpg_database_abilities_links_counter_incomplete > 0 ? ($mmrpg_database_abilities_links_counter - $mmrpg_database_abilities_links_counter_incomplete).' / ' : '' ?><?= !empty($mmrpg_database_abilities_count) ? ($mmrpg_database_abilities_count == 1 ? '1 Ability' : $mmrpg_database_abilities_count.' Abilities') : '0 Abilities' ?> )</span>
-            </a>
-            <a class="float_link" href="database/abilities/">View the Ability Database &raquo;</a>
+            <span class="subheader_typewrapper">
+                <a class="inline_link" href="database/abilities/">Ability Database</a>
+                <span class="count">( <?= $mmrpg_database_abilities_count_complete ?> / <?= !empty($mmrpg_database_abilities_count) ? ($mmrpg_database_abilities_count == 1 ? '1 Ability' : $mmrpg_database_abilities_count.' Abilities') : '0 Abilities' ?> )</span>
+                <a class="float_link" href="database/abilities/">View the Ability Database &raquo;</a>
+            </span>
         </h2>
         <div class="subbody subbody_databaselinks subbody_databaselinks_noajax" data-class="abilities" data-class-single="ability">
-            <div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/abilities/" style="margin: -10px 0 5px; background-image: url(images/abilities/mega-slide/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Mega Slide</a></div>
+            <?/*<div class="float float_right"><a class="sprite sprite_80x80 sprite_80x80_00" href="database/abilities/" style="margin: -10px 0 5px; background-image: url(images/abilities/mega-slide/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">Mega Slide</a></div>*/?>
             <p class="text">The ability database contains detailed information on the unlockable abilities in the prototype, including compatible robots, stats, and sprite sheets.</p>
-            <div class="text" style="overflow: hidden;">
-            <?= $mmrpg_database_abilities_links ?>
-            </div>
+            <div class="text iconwrap"><?= $mmrpg_database_abilities_links ?></div>
         </div>
 
         <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
