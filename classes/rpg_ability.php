@@ -729,19 +729,210 @@ class rpg_ability extends rpg_object {
 
     }
 
+
+    // -- INDEX FUNCTIONS -- //
+
+    /**
+     * Get a list of all ability index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @param string $table (optional)
+     * @return mixed
+     */
+    public static function get_index_fields($implode = false, $table = ''){
+
+        // Define the various index fields for ability objects
+        $index_fields = array(
+            'ability_id',
+            'ability_token',
+            'ability_name',
+            'ability_game',
+            'ability_group',
+            'ability_class',
+            'ability_subclass',
+            'ability_master',
+            'ability_number',
+            'ability_image',
+            'ability_image_sheets',
+            'ability_image_size',
+            'ability_image_editor',
+            'ability_type',
+            'ability_type2',
+            'ability_description',
+            'ability_description2',
+            'ability_speed',
+            'ability_energy',
+            'ability_energy_percent',
+            'ability_damage',
+            'ability_damage_percent',
+            'ability_damage2',
+            'ability_damage2_percent',
+            'ability_recovery',
+            'ability_recovery_percent',
+            'ability_recovery2',
+            'ability_recovery2_percent',
+            'ability_accuracy',
+            'ability_price',
+            'ability_target',
+            'ability_frame',
+            'ability_frame_animate',
+            'ability_frame_index',
+            'ability_frame_offset',
+            'ability_frame_styles',
+            'ability_frame_classes',
+            'attachment_frame',
+            'attachment_frame_animate',
+            'attachment_frame_index',
+            'attachment_frame_offset',
+            'attachment_frame_styles',
+            'attachment_frame_classes',
+            'ability_functions',
+            'ability_flag_hidden',
+            'ability_flag_complete',
+            'ability_flag_published',
+            'ability_order'
+            );
+
+        // Add table name to each field string if requested
+        if (!empty($table)){
+            foreach ($index_fields AS $key => $field){
+                $index_fields[$key] = $table.'.'.$field;
+            }
+        }
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $index_fields = implode(', ', $index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $index_fields;
+
+    }
+
+    /**
+     * Get the entire ability index array with parsed info
+     * @param bool $parse_data
+     * @return array
+     */
+    public static function get_index($include_hidden = false, $include_unpublished = false, $filter_class = '', $include_tokens = array()){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND ability_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND ability_flag_published = 1 '; }
+        if (!empty($filter_class)){ $temp_where .= "AND ability_class = '{$filter_class}' "; }
+        if (!empty($include_tokens)){
+            $include_string = $include_tokens;
+            array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
+            $include_tokens = implode(', ', $include_string);
+            $temp_where .= 'OR ability_token IN ('.$include_tokens.') ';
+        }
+
+        // Collect every type's info from the database index
+        $ability_fields = self::get_index_fields(true);
+        $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_id <> 0 {$temp_where};", 'ability_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($ability_index)){
+            $ability_index = self::parse_index($ability_index);
+            return $ability_index;
+        } else {
+            return array();
+        }
+
+    }
+
+    /**
+     * Get the tokens for all abilities in the global index
+     * @return array
+     */
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND ability_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND ability_flag_published = 1 '; }
+
+        // Collect an array of ability tokens from the database
+        $ability_index = $db->get_array_list("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_id <> 0 {$temp_where};", 'ability_token');
+
+        // Return the tokens if not empty, else nothing
+        if (!empty($ability_index)){
+            $ability_tokens = array_keys($ability_index);
+            return $ability_tokens;
+        } else {
+            return array();
+        }
+
+    }
+
+    // Define a function for pulling a custom ability index
+    public static function get_index_custom($ability_tokens = array()){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Generate a token string for the database query
+        $ability_tokens_string = array();
+        foreach ($ability_tokens AS $ability_token){ $ability_tokens_string[] = "'{$ability_token}'"; }
+        $ability_tokens_string = implode(', ', $ability_tokens_string);
+
+        // Collect the requested ability's info from the database index
+        $ability_fields = self::get_index_fields(true);
+        $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_token IN ({$ability_tokens_string});", 'ability_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($ability_index)){
+            $ability_index = self::parse_index($ability_index);
+            return $ability_index;
+        } else {
+            return array();
+        }
+
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($ability_token){
-        global $db;
-        // Collect the data from the index or the database if necessary
-        if (!is_string($ability_token)){ return false; }
-        $ability_info = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_token IN ('{$ability_token}');", 'ability_token');
-        if (!empty($ability_info)){ $ability_info = self::parse_index_info($ability_info[$ability_token]); }
-        else { $ability_info = array(); }
-        return $ability_info;
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Collect this ability's info from the database index
+        $lookup = !is_numeric($ability_token) ? "ability_token = '{$ability_token}'" : "ability_id = {$ability_token}";
+        $ability_fields = self::get_index_fields(true);
+        $ability_index = $db->get_array("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE {$lookup};", 'ability_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($ability_index)){
+            $ability_index = self::parse_index_info($ability_index);
+            return $ability_index;
+        } else {
+            return array();
+        }
+
     }
+
+    // Define a public function for parsing a ability index array in bulk
+    public static function parse_index($ability_index){
+
+        // Loop through each entry and parse its data
+        foreach ($ability_index AS $token => $info){
+            $ability_index[$token] = self::parse_index_info($info);
+        }
+
+        // Return the parsed index
+        return $ability_index;
+
+    }
+
     // Define a public function for reformatting database data into proper arrays
     public static function parse_index_info($ability_info){
-        global $db;
 
         // Return false if empty
         if (empty($ability_info)){ return false; }
@@ -751,47 +942,18 @@ class rpg_ability extends rpg_object {
         else { $ability_info['_parsed'] = true; }
 
         // Explode the base and animation indexes into an array
-        $temp_field_names = array('ability_frame_animate', 'ability_frame_index', 'attachment_frame_index', 'ability_frame_offset', 'attachment_frame_offset');
+        $temp_field_names = array('ability_frame_animate', 'ability_frame_index', 'ability_frame_offset');
         foreach ($temp_field_names AS $field_name){
             if (!empty($ability_info[$field_name])){ $ability_info[$field_name] = json_decode($ability_info[$field_name], true); }
             else { $ability_info[$field_name] = array(); }
-            /*
-            if (!empty($ability_info[$field_name])){
-                $ability_info[$field_name] = strstr($ability_info[$field_name], ',') ? explode(',', $ability_info[$field_name]) : array($ability_info[$field_name]);
-                foreach ($ability_info[$field_name] AS $key => $string){ $ability_info[$field_name][$key] = trim($string, '[]'); }
-            } else {
-                $ability_info[$field_name] = array();
-            }
-            */
         }
-
-        // Explode the base and animation frame offsets into an array
-        /*
-        $temp_field_names = array('ability_frame_offset', 'attachment_frame_offset');
-        foreach ($temp_field_names AS $field_name){
-            if (!empty($ability_info[$field_name])){
-                $ability_info[$field_name] = strstr($ability_info[$field_name], ',') ? explode(',', $ability_info[$field_name]) : array($ability_info[$field_name]);
-                $temp_array = array();
-                foreach ($ability_info[$field_name] AS $key => $string){
-                    list($field, $value) = explode(':', trim($string, '[]'));
-                    $temp_array[$field] = (int)($value);
-                }
-                $ability_info[$field_name][$key] = $temp_array;
-            } else {
-                $ability_info[$field_name] = array();
-            }
-        }
-        */
-
-        // Update the static index with this ability's index info
-        //$db->INDEX['ABILITIES'][$ability_info['ability_token']] = $ability_info;
 
         // Return the parsed ability info
         return $ability_info;
     }
 
 
-
+    // -- PRINT FUNCTIONS -- //
 
     // Define a static function for printing out the ability's title markup
     public static function print_editor_title_markup($robot_info, $ability_info, $print_options = array()){
