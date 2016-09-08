@@ -26,9 +26,9 @@ $this_page_markup .= ob_get_clean();
 // TYPES DATABASE
 
 // Define the index of types for the game
-$mmrpg_database_types = rpg_type::get_index();
-$temp_remove_types = array('attack', 'defense', 'speed', 'energy', 'weapons', 'empty', 'light', 'wily', 'cossack', 'damage', 'recovery', 'experience', 'level');
-foreach ($temp_remove_types AS $token){ unset($mmrpg_database_types[$token]); }
+$mmrpg_database_types = rpg_type::get_index(true);
+//$temp_remove_types = array('attack', 'defense', 'speed', 'energy', 'weapons', 'empty', 'light', 'wily', 'cossack', 'damage', 'recovery', 'experience', 'level');
+//foreach ($temp_remove_types AS $token){ unset($mmrpg_database_types[$token]); }
 uasort($mmrpg_database_types, function($t1, $t2){
   if ($t1['type_order'] > $t2['type_order']){ return 1; }
   elseif ($t1['type_order'] < $t2['type_order']){ return -1; }
@@ -39,7 +39,7 @@ uasort($mmrpg_database_types, function($t1, $t2){
 
 // Define the index of hidden items to not appear in the database
 $hidden_database_items = array();
-$hidden_database_items = array_merge($hidden_database_items, array('heart'));
+$hidden_database_items = array_merge($hidden_database_items, array('heart', 'star'));
 $hidden_database_items_count = !empty($hidden_database_items) ? count($hidden_database_items) : 0;
 
 // Truncate any robots currently in the database
@@ -93,18 +93,12 @@ $temp_pattern_first[] = '/^super-capsule$/i';
 //die('$mmrpg_index[\'types\'] = <pre>'.print_r($mmrpg_database_types, true).'</pre>');
 //$temp_element_types = $mmrpg_database_types; //array('none', 'copy', 'crystal', 'cutter', 'earth', 'electric', 'explode', 'flame', 'freeze', 'impact', 'laser', 'missile', 'nature', 'shadow', 'shield', 'space', 'swift', 'time', 'water', 'wind');
 foreach ($mmrpg_database_types AS $type_token => $type_info){
-  if ($type_token == 'none' || $type_token == 'copy'){ continue; }
+  //if ($type_token == 'none' || $type_token == 'copy'){ continue; }
   if (!empty($type_info['type_class']) && $type_info['type_class'] == 'special'){ continue; }
-  $temp_pattern_first[] = '/^shard-'.$type_token.'$/i';
-  $temp_pattern_first[] = '/^core-'.$type_token.'$/i';
-  $temp_pattern_first[] = '/^star-'.$type_token.'$/i';
+  $temp_pattern_first[] = '/^'.$type_token.'-shard$/i';
+  $temp_pattern_first[] = '/^'.$type_token.'-core$/i';
+  $temp_pattern_first[] = '/^'.$type_token.'-star$/i';
 }
-$temp_pattern_first[] = '/^shard-none$/i';
-$temp_pattern_first[] = '/^core-none$/i';
-$temp_pattern_first[] = '/^star-none$/i';
-$temp_pattern_first[] = '/^shard-copy$/i';
-$temp_pattern_first[] = '/^core-copy$/i';
-$temp_pattern_first[] = '/^star-copy$/i';
 $temp_pattern_first[] = '/^energy-upgrade$/i';
 $temp_pattern_first[] = '/^weapon-upgrade$/i';
 $temp_pattern_first[] = '/^attack-booster$/i';
@@ -121,6 +115,13 @@ $temp_pattern_first[] = '/^score-ball-green$/i';
 $temp_pattern_first[] = '/^score-ball-purple$/i';
 //die('$temp_pattern_first = <pre>'.print_r($temp_pattern_first, true).'</pre>');
 $temp_pattern_last = array();
+foreach ($mmrpg_database_types AS $type_token => $type_info){
+  //if ($type_token == 'none' || $type_token == 'copy'){ continue; }
+  if (!empty($type_info['type_class']) && $type_info['type_class'] != 'special'){ continue; }
+  $temp_pattern_last[] = '/^'.$type_token.'-shard$/i';
+  $temp_pattern_last[] = '/^'.$type_token.'-core$/i';
+  $temp_pattern_last[] = '/^'.$type_token.'-star$/i';
+}
 //$temp_pattern_last[] = '/^heart$/i';
 $temp_pattern_last[] = '/^star$/i';
 $temp_pattern_last = array_reverse($temp_pattern_last);
