@@ -1814,46 +1814,191 @@ class rpg_robot extends rpg_object {
 
     }
 
-    // Define a function for pulling the full robot index
-    public static function get_index($filter = array()){
-        global $db;
 
-        // If a filter was defined, parse it's values for the query
-        if (!empty($filter) && is_array($filter)){
-                $where_filter = array();
-                $filter_ids = array();
-                $filter_tokens = array();
-                foreach ($filter AS $key => $value){
-                        if (is_numeric($value)){ $filter_ids[] = $value; }
-                        else { $filter_tokens[] = "'{$value}'"; }
-                }
-                if (!empty($filter_ids)){ $where_filter[] = 'robot_id IN ('.implode(', ', $filter_ids).')'; }
-                if (!empty($filter_tokens)){ $where_filter[] = 'robot_token IN ('.implode(', ', $filter_tokens).')'; }
-                if (!empty($where_filter)){ $where_filter = 'AND ('.implode(' OR ', $where_filter).') '; }
-                else { $where_filter = ''; }
-        } else {
-                $where_filter = '';
+    // -- INDEX FUNCTIONS -- //
+
+    /**
+     * Get a list of all robot index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_index_fields($implode = false){
+
+        // Define the various index fields for robot objects
+        $index_fields = array(
+            'robot_id',
+            'robot_token',
+            'robot_number',
+            'robot_name',
+            'robot_game',
+            'robot_group',
+            'robot_field',
+            'robot_field2',
+            'robot_class',
+            'robot_gender',
+            'robot_image',
+            'robot_image_size',
+            'robot_image_editor',
+            'robot_image_alts',
+            'robot_core',
+            'robot_core2',
+            'robot_description',
+            'robot_description2',
+            'robot_energy',
+            'robot_weapons',
+            'robot_attack',
+            'robot_defense',
+            'robot_speed',
+            'robot_weaknesses',
+            'robot_resistances',
+            'robot_affinities',
+            'robot_immunities',
+            'robot_abilities_rewards',
+            'robot_abilities_compatible',
+            'robot_quotes_start',
+            'robot_quotes_taunt',
+            'robot_quotes_victory',
+            'robot_quotes_defeat',
+            'robot_functions',
+            'robot_flag_hidden',
+            'robot_flag_complete',
+            'robot_flag_published',
+            'robot_order'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $index_fields = implode(', ', $index_fields);
         }
 
-        // Collect the robot index from the database using any filters
-        $robot_index = $db->get_array_list("SELECT *
-                FROM mmrpg_index_robots
-                WHERE robot_flag_complete = 1 {$where_filter}
-                ;", 'robot_token');
-
-        // Return the robot index, empty or not
-        if (!empty($robot_index)){ return $robot_index; }
-        else { return array(); }
+        // Return the index fields, array or string
+        return $index_fields;
 
     }
+
+    /**
+     * Get the entire robot index array with parsed info
+     * @param bool $parse_data
+     * @return array
+     */
+    public static function get_index($include_hidden = false, $include_unpublished = false, $filter_class = '', $include_tokens = array()){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND robot_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND robot_flag_published = 1 '; }
+        if (!empty($filter_class)){ $temp_where .= "AND robot_class = '{$filter_class}' "; }
+        if (!empty($include_tokens)){
+            $include_string = $include_tokens;
+            array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
+            $include_tokens = implode(', ', $include_string);
+            $temp_where .= 'OR robot_token IN ('.$include_tokens.') ';
+        }
+
+        // Collect every type's info from the database index
+        $robot_fields = self::get_index_fields(true);
+        $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($robot_index)){
+            $robot_index = self::parse_index($robot_index);
+            return $robot_index;
+        } else {
+            return array();
+        }
+
+    }
+
+    /**
+     * Get the tokens for all robots in the global index
+     * @return array
+     */
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $filter_class = ''){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND robot_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND robot_flag_published = 1 '; }
+        if (!empty($filter_class)){ $temp_where .= "AND robot_class = '{$filter_class}' "; }
+
+        // Collect an array of robot tokens from the database
+        $robot_index = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
+
+        // Return the tokens if not empty, else nothing
+        if (!empty($robot_index)){
+            $robot_tokens = array_keys($robot_index);
+            return $robot_tokens;
+        } else {
+            return array();
+        }
+
+    }
+
+    // Define a function for pulling a custom robot index
+    public static function get_index_custom($robot_tokens = array()){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Generate a token string for the database query
+        $robot_tokens_string = array();
+        foreach ($robot_tokens AS $robot_token){ $robot_tokens_string[] = "'{$robot_token}'"; }
+        $robot_tokens_string = implode(', ', $robot_tokens_string);
+
+        // Collect the requested robot's info from the database index
+        $robot_fields = self::get_index_fields(true);
+        $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_token IN ({$robot_tokens_string});", 'robot_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($robot_index)){
+            $robot_index = self::parse_index($robot_index);
+            return $robot_index;
+        } else {
+            return array();
+        }
+
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($robot_token){
-        global $db;
-        $robot_index = rpg_robot::get_index(array($robot_token));
-        if (!empty($robot_index[$robot_token])){ $robot_info = rpg_robot::parse_index_info($robot_index[$robot_token]); }
-        else { $robot_info = array(); }
-        return $robot_info;
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Collect this robot's info from the database index
+        $lookup = !is_numeric($robot_token) ? "robot_token = '{$robot_token}'" : "robot_id = {$robot_token}";
+        $robot_fields = self::get_index_fields(true);
+        $robot_index = $db->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE {$lookup};", 'robot_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($robot_index)){
+            $robot_index = self::parse_index_info($robot_index);
+            return $robot_index;
+        } else {
+            return array();
+        }
+
     }
+
+    // Define a public function for parsing a robot index array in bulk
+    public static function parse_index($robot_index){
+
+        // Loop through each entry and parse its data
+        foreach ($robot_index AS $token => $info){
+            $robot_index[$token] = self::parse_index_info($info);
+        }
+
+        // Return the parsed index
+        return $robot_index;
+
+    }
+
     // Define a public function for reformatting database data into proper arrays
     public static function parse_index_info($robot_info){
 
@@ -1865,8 +2010,7 @@ class rpg_robot extends rpg_object {
         else { $robot_info['_parsed'] = true; }
 
         // Explode the weaknesses, resistances, affinities, and immunities into an array
-        $temp_field_names = array('robot_image_alts', 'robot_field2', 'robot_weaknesses', 'robot_resistances', 'robot_affinities', 'robot_immunities');
-        $temp_field_names = array_merge($temp_field_names, array('robot_frame_animate', 'robot_frame_index', 'robot_frame_offset'));
+        $temp_field_names = array('robot_field2', 'robot_weaknesses', 'robot_resistances', 'robot_affinities', 'robot_immunities', 'robot_image_alts');
         foreach ($temp_field_names AS $field_name){
             if (!empty($robot_info[$field_name])){ $robot_info[$field_name] = json_decode($robot_info[$field_name], true); }
             else { $robot_info[$field_name] = array(); }
@@ -1881,15 +2025,16 @@ class rpg_robot extends rpg_object {
         unset($robot_info['robot_abilities_rewards']);
 
         // Collect the quotes into the proper arrays
-        $robot_info['robot_quotes']['battle_start'] = !empty($robot_info['robot_quotes_start']) ? $robot_info['robot_quotes_start']: '';
-        $robot_info['robot_quotes']['battle_taunt'] = !empty($robot_info['robot_quotes_taunt']) ? $robot_info['robot_quotes_taunt']: '';
-        $robot_info['robot_quotes']['battle_victory'] = !empty($robot_info['robot_quotes_victory']) ? $robot_info['robot_quotes_victory']: '';
-        $robot_info['robot_quotes']['battle_defeat'] = !empty($robot_info['robot_quotes_defeat']) ? $robot_info['robot_quotes_defeat']: '';
-        unset($robot_info['robot_quotes_start'], $robot_info['robot_quotes_taunt'], $robot_info['robot_quotes_victory'], $robot_info['robot_quotes_defeat']);
+        $quote_types = array('start', 'taunt', 'victory', 'defeat');
+        foreach ($quote_types AS $type){
+            $robot_info['robot_quotes']['battle_'.$type] = !empty($robot_info['robot_quotes_'.$type]) ? $robot_info['robot_quotes_'.$type]: '';
+            unset($robot_info['robot_quotes_'.$type]);
+        }
 
         // Return the parsed robot info
         return $robot_info;
     }
+
 
     // Define a public function for recalculating internal counters
     public function update_variables(){
