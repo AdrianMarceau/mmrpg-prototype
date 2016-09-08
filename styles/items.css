@@ -387,7 +387,7 @@
     margin-left: 10px;
 }
 #item #console .event .item_quantity {
-    width: 30px;
+    width: 36px;
     text-align: right;
 }
 #item #console .event .item_owned {
@@ -399,22 +399,21 @@
 }
 #item #console .event .item_number {
     font-size: 9px;
-    margin-right: 0;
+    margin-right: 6px;
     min-width: 48px;
     box-sizing: border-box;
 }
 #item #console .event .item_sprite {
-    float: left;
-    width: 22px;
+    float: right;
+    width: 20px;
     height: 20px;
     margin-right: 6px;
-    margin-left: -4px;
+    margin-left: 6px;
     overflow: visible;
     box-sizing: border-box;
-    border-left: 0 none transparent;
-    -moz-border-radius: 0 0.3em 0.3em 0;
-    -webkit-border-radius: 0 0.3em 0.3em 0;
-    border-radius: 0 0.3em 0.3em 0;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
 }
 #item #console .event .item_sprite .sprite {
     position: relative;
