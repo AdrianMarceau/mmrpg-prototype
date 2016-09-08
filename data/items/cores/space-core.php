@@ -12,6 +12,7 @@ $item = array(
     'item_speed' => 10,
     'item_damage' => 0,
     'item_accuracy' => 100,
+    'item_price' => 3000,
     'item_target' => 'select_target',
     'item_function' => function($objects){
         return rpg_item::item_function_core($objects);

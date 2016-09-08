@@ -8,10 +8,11 @@ $item = array(
     'item_class' => 'item',
     'item_subclass' => 'collectible',
     'item_type' => 'copy',
-    'item_description' => 'A mysterious elemental shard that radiates with the Copy type energy of a defeated support mecha.  Collect four of these items to generate a new core that can be held by a robot master to equip Copy type abilities or traded in at the shop for a variable amount of Zenny.',
+    'item_description' => 'A mysterious elemental shard that radiates with the Copy type energy of a defeated support mecha.  Collect four of these items to generate a new core that can be traded in at the shop for a variable amount of Zenny.',
     'item_energy' => 0,
     'item_speed' => 10,
     'item_accuracy' => 100,
+    'item_price' => 200,
     'item_target' => 'auto',
     'item_function' => function($objects){
         return rpg_item::item_function_shard($objects);
