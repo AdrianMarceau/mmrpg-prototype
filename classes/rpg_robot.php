@@ -2200,11 +2200,17 @@ class rpg_robot extends rpg_object {
 
         // Define the markup variable
         $this_markup = '';
+
         // Define the global variables
         global $mmrpg_index, $this_current_uri, $this_current_url, $db;
-        global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities, $mmrpg_database_types;
-        static $mmrpg_database_fields;
-        if (empty($mmrpg_database_fields)){ $mmrpg_database_fields = rpg_field::get_index(); }
+        global $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_fields, $mmrpg_database_types;
+        global $mmrpg_stat_base_max_value;
+
+        // Collect the approriate database indexes
+        if (empty($mmrpg_database_players)){ $mmrpg_database_players = rpg_player::get_index(true); }
+        if (empty($mmrpg_database_items)){ $mmrpg_database_items = rpg_item::get_index(true); }
+        if (empty($mmrpg_database_fields)){ $mmrpg_database_fields = rpg_field::get_index(true); }
+        if (empty($mmrpg_database_types)){ $mmrpg_database_types = rpg_type::get_index(); }
 
         // Define the print style defaults
         if (!isset($print_options['layout_style'])){ $print_options['layout_style'] = 'website'; }
@@ -2836,7 +2842,6 @@ class rpg_robot extends rpg_object {
                     <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
                         <div class="link_wrapper">
                             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                            <a class="link link_permalink" href="<?= $database_category_robot_url ?>#sprites" rel="permalink">#Sprites</a>
                         </div>
                     <? endif; ?>
 
@@ -2847,7 +2852,7 @@ class rpg_robot extends rpg_object {
                     <h2 id="abilities" class="header header_full <?= $robot_header_types ?>" style="margin: 10px 0 0; text-align: left;">
                         <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>&#39;s Abilities
                     </h2>
-                    <div class="body body_full" style="margin: 0; padding: 2px 3px;">
+                    <div class="body body_full" style="margin: 0; padding: 2px 3px; min-height: 10px;">
                         <table class="full" style="margin: 5px auto 10px;">
                             <colgroup>
                                 <col width="100%" />
@@ -2856,12 +2861,21 @@ class rpg_robot extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <div class="ability_container">
-                                        <?
+                                        <?php
+
+                                        // Define the robot ability class and collect the cores for testing
                                         $robot_ability_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : 'master';
                                         $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : false;
                                         $robot_ability_core2 = !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : false;
                                         $robot_ability_list = !empty($robot_info['robot_abilities']) ? $robot_info['robot_abilities'] : array();
                                         $robot_ability_rewards = !empty($robot_info['robot_rewards']['abilities']) ? $robot_info['robot_rewards']['abilities'] : array();
+
+                                        // Collect a FULL list of abilities for display
+                                        $temp_required = array();
+                                        foreach ($robot_ability_rewards AS $info){ $temp_required[] = $info['token']; }
+                                        $temp_abilities_index = rpg_ability::get_index(false, false, '', $temp_required);
+
+                                        // Clone abilities into new array for filtering
                                         $new_ability_rewards = array();
                                         foreach ($robot_ability_rewards AS $this_info){
                                             $new_ability_rewards[$this_info['token']] = $this_info;
@@ -2870,8 +2884,8 @@ class rpg_robot extends rpg_object {
                                         //if ($robot_copy_program){ $robot_ability_list = $temp_all_ability_tokens; }
                                         $robot_ability_core_list = array();
                                         if ((!empty($robot_ability_core) || !empty($robot_ability_core2))
-                                            && $robot_ability_class == 'master'){ // only robot masters can core match abilities
-                                            foreach ($mmrpg_database_abilities AS $token => $info){
+                                            && $robot_ability_class != 'mecha'){ // only robot masters can core match abilities
+                                            foreach ($temp_abilities_index AS $token => $info){
                                                 if (
                                                     (!empty($info['ability_type']) && ($robot_copy_program || $info['ability_type'] == $robot_ability_core || $info['ability_type'] == $robot_ability_core2)) ||
                                                     (!empty($info['ability_type2']) && ($info['ability_type2'] == $robot_ability_core || $info['ability_type2'] == $robot_ability_core2))
@@ -2899,18 +2913,18 @@ class rpg_robot extends rpg_object {
                                             $ability_method_key = 0;
                                             $ability_method = '';
                                             foreach ($robot_ability_rewards AS $this_info){
-                                                if (!isset($mmrpg_database_abilities[$this_info['token']])){ continue; }
+                                                if (!isset($temp_abilities_index[$this_info['token']])){ continue; }
                                                 $this_level = $this_info['level'];
-                                                $this_ability = $mmrpg_database_abilities[$this_info['token']];
+                                                $this_ability = $temp_abilities_index[$this_info['token']];
                                                 $this_ability_token = $this_ability['ability_token'];
                                                 $this_ability_name = $this_ability['ability_name'];
                                                 $this_ability_class = !empty($this_ability['ability_class']) ? $this_ability['ability_class'] : 'master';
                                                 $this_ability_image = !empty($this_ability['ability_image']) ? $this_ability['ability_image']: $this_ability['ability_token'];
                                                 $this_ability_type = !empty($this_ability['ability_type']) ? $this_ability['ability_type'] : false;
                                                 $this_ability_type2 = !empty($this_ability['ability_type2']) ? $this_ability['ability_type2'] : false;
-                                                if (!empty($this_ability_type) && !empty($mmrpg_index['types'][$this_ability_type])){ $this_ability_type = $mmrpg_index['types'][$this_ability_type]['type_name'].' Type'; }
+                                                if (!empty($this_ability_type) && !empty($mmrpg_database_types[$this_ability_type])){ $this_ability_type = $mmrpg_database_types[$this_ability_type]['type_name'].' Type'; }
                                                 else { $this_ability_type = ''; }
-                                                if (!empty($this_ability_type2) && !empty($mmrpg_index['types'][$this_ability_type2])){ $this_ability_type = str_replace('Type', '/ '.$mmrpg_index['types'][$this_ability_type2]['type_name'], $this_ability_type); }
+                                                if (!empty($this_ability_type2) && !empty($mmrpg_database_types[$this_ability_type2])){ $this_ability_type = str_replace('Type', '/ '.$mmrpg_database_types[$this_ability_type2]['type_name'], $this_ability_type); }
                                                 $this_ability_damage = !empty($this_ability['ability_damage']) ? $this_ability['ability_damage'] : 0;
                                                 $this_ability_damage2 = !empty($this_ability['ability_damage2']) ? $this_ability['ability_damage2'] : 0;
                                                 $this_ability_damage_percent = !empty($this_ability['ability_damage_percent']) ? true : false;
@@ -2951,17 +2965,23 @@ class rpg_robot extends rpg_object {
                                                     }
                                                     $this_ability_title_html .= '<span class="level">&nbsp;</span>';
                                                 }
+
+                                                // If this is a boss, don't bother showing player or core match abilities
+                                                if ($this_ability_method != 'level' && $robot_info['robot_class'] == 'boss'){ continue; }
+
                                                 if (!empty($this_ability_type)){ $this_ability_title_html .= '<span class="type">'.$this_ability_type.'</span>'; }
                                                 if (!empty($this_ability_damage)){ $this_ability_title_html .= '<span class="damage">'.$this_ability_damage.(!empty($this_ability_damage_percent) ? '%' : '').' '.($this_ability_damage && $this_ability_recovery ? 'D' : 'Damage').'</span>'; }
                                                 if (!empty($this_ability_recovery)){ $this_ability_title_html .= '<span class="recovery">'.$this_ability_recovery.(!empty($this_ability_recovery_percent) ? '%' : '').' '.($this_ability_damage && $this_ability_recovery ? 'R' : 'Recovery').'</span>'; }
                                                 if (!empty($this_ability_accuracy)){ $this_ability_title_html .= '<span class="accuracy">'.$this_ability_accuracy.'% Accuracy</span>'; }
                                                 $this_ability_sprite_path = 'images/abilities/'.$this_ability_image.'/icon_left_40x40.png';
-                                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.$this_ability_sprite_path)){ $this_ability_image = 'ability'; $this_ability_sprite_path = 'images/abilities/ability/icon_left_40x40.png'; }
+                                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.$this_ability_sprite_path)){ $this_ability_image = 'ability'; $this_ability_sprite_path = 'i/a/ability/il40.png'; }
+                                                else { $this_ability_sprite_path = 'images/abilities/'.$this_ability_image.'/icon_left_40x40.png'; }
                                                 $this_ability_sprite_html = '<span class="icon"><img src="'.$this_ability_sprite_path.'?'.MMRPG_CONFIG_CACHE_DATE.'" alt="'.$this_ability_name.' Icon" /></span>';
                                                 $this_ability_title_html = '<span class="label">'.$this_ability_title_html.'</span>';
                                                 //$this_ability_title_html = (is_numeric($this_level) && $this_level > 1 ? 'Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).' : ' : $this_level.' : ').$this_ability_title_html;
+
                                                 // Show the ability method separator if necessary
-                                                if ($ability_method != $this_ability_method){
+                                                if ($ability_method != $this_ability_method && $robot_info['robot_class'] == 'master'){
                                                     $temp_separator = '<div class="ability_separator">'.$this_ability_method_text.'</div>';
                                                     $temp_string[] = $temp_separator;
                                                     $ability_method = $this_ability_method;
@@ -2986,7 +3006,7 @@ class rpg_robot extends rpg_object {
                                             }
                                             echo implode(' ', $temp_string);
                                         } else {
-                                            echo '<span class="robot_ability robot_type_none"><span class="chrome">None</span></span>';
+                                            echo '<span class="robot_ability type_none"><span class="chrome">None</span></span>';
                                         }
                                         ?>
                                         </div>
@@ -2995,6 +3015,12 @@ class rpg_robot extends rpg_object {
                             </tbody>
                         </table>
                     </div>
+
+                    <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <?php endif; ?>
 
                 <? endif; ?>
 
