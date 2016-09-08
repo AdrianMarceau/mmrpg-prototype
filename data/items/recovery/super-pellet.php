@@ -16,6 +16,7 @@ $item = array(
     'item_recovery2' => 10,
     'item_recovery_percent' => true,
     'item_accuracy' => 100,
+    'item_price' => 2700,
     'item_target' => 'select_this',
     'item_function' => function($objects){
 
