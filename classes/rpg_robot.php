@@ -2204,7 +2204,6 @@ class rpg_robot extends rpg_object {
         // Define the global variables
         global $mmrpg_index, $this_current_uri, $this_current_url, $db;
         global $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_fields, $mmrpg_database_types;
-        global $mmrpg_stat_base_max_value;
 
         // Collect the approriate database indexes
         if (empty($mmrpg_database_players)){ $mmrpg_database_players = rpg_player::get_index(true); }
