@@ -799,6 +799,15 @@ class rpg_disabled {
                 $temp_count_total += 1;
             }
 
+            // If this robot was a MECHA class and destroyed by WEAKNESS, it may drop a SHARD
+            if ($this_robot->robot_class == 'mecha' && !empty($this_robot->flags['triggered_weakness'])){
+                $temp_shard_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
+                if ($temp_shard_type != 'empty'){
+                    $temp_chance_value = ($temp_value_total * 4);
+                    $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => $temp_shard_type.'-shard', 'min' => 1, 'max' => 1);
+                }
+            }
+
             // If this robot was a MASTER class and destroyed by WEAKNESS, it may drop a CORE
             if ($this_robot->robot_class == 'master' && !empty($this_robot->flags['triggered_weakness'])){
                 $temp_core_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';

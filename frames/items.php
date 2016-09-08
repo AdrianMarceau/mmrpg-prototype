@@ -196,7 +196,6 @@ if (true){
                                     <tbody>
                                         <tr>
                                         <?
-
                                         // Loop through the items and print them one by one
                                         $item_counter = 0;
                                         $item_counter_total = count($mmrpg_database_items);
@@ -205,23 +204,37 @@ if (true){
 
                                             // Define basic item slot details
                                             $item_info_token = $item_info['item_token'];
+                                            $item_info_name = $item_info['item_name'];
+                                            $item_primary_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
+                                            $item_info_type = $item_primary_type;
+                                            if ($item_info_type != 'none' && !empty($item_info['item_type2'])){ $item_info_type .= '_'.$item_info['item_type2']; }
+                                            elseif ($item_info_type == 'none' && !empty($item_info['item_type2'])){ $item_info_type = $item_info['item_type2']; }
                                             $item_sprite_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
                                             $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
                                             $temp_is_disabled = false;
                                             $temp_is_comingsoon = false;
 
+                                            // Check to see if this is a special item type
+                                            $item_is_shard = strstr($item_token, '-shard') ? true : false;
+                                            $item_is_core = strstr($item_token, '-core') ? true : false;
+                                            $item_is_star = strstr($item_token, '-star') ? true : false;
+
                                             // Only collect detailed info if this item has been seen
                                             if (isset($global_battle_items[$item_token])){
 
                                                 // Collect the items details and current quantity
-                                                $item_info_name = $item_info['item_name'];
-                                                $item_info_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
-                                                if ($item_info_type != 'none' && !empty($item_info['item_type2'])){ $item_info_type .= '_'.$item_info['item_type2']; }
-                                                elseif ($item_info_type == 'none' && !empty($item_info['item_type2'])){ $item_info_type = $item_info['item_type2']; }
                                                 $item_info_quantity = !empty($global_battle_items[$item_token]) ? $global_battle_items[$item_token] : 0;
                                                 $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
-                                                //if ($item_info_quantity == 0){ $temp_is_disabled = true; }
+
+                                            }
+                                            // Otherwise if this is a star, use the starforce counts as quantity
+                                            elseif ($item_is_star && isset($this_star_force_strict[$item_primary_type])){
+
+                                                // Collect the items details and current quantity
+                                                $item_info_quantity = !empty($this_star_force_strict[$item_primary_type]) ? $this_star_force_strict[$item_primary_type] : 0;
+                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
+                                                $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                                             }
                                             // Otherwise this item slot is mysterious
@@ -239,14 +252,13 @@ if (true){
 
                                             ?>
                                             <td class="<?= $item_cell_float ?> item_cell <?= $temp_is_disabled ? 'item_cell_disabled' : '' ?>" data-kind="item" data-action="use-item" data-token="<?= !$temp_is_comingsoon ? $item_info_token : 'comingsoon' ?>" data-unlocked="<?= $temp_is_comingsoon ? 'coming-soon' : 'true' ?>" data-count="<?= $item_info_quantity ?>">
-                                                <span class="item_number item_type item_type_empty">No. <?= str_replace(' ', '&nbsp;', str_pad($item_counter, 2, ' ', STR_PAD_LEFT)); ?></span>
+                                                <span class="item_number item_type item_type_empty">No. <?= str_replace(' ', '&nbsp;', str_pad($item_counter, 2, ' ', STR_PAD_LEFT)); ?></span><span class="item_name item_type item_type_<?= $item_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $item_info_name ?></span>
+                                                <? /* <a class="use_button item_type item_type_none" href="#">Use</a> */ ?>
                                                 <? if (!$temp_is_comingsoon): ?>
                                                     <span class="item_sprite item_type item_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= $item_sprite_image ?>/icon_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>);"></span></span>
                                                 <? else: ?>
                                                     <span class="item_sprite item_type item_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00"></span></span>
                                                 <? endif; ?>
-                                                <span class="item_name item_type item_type_<?= $item_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $item_info_name ?></span>
-                                                <? /* <a class="use_button item_type item_type_none" href="#">Use</a> */ ?>
                                                 <label class="item_quantity" data-quantity="<?= $item_info_quantity ?>">x <?= $item_info_quantity ?></label>
                                             </td>
                                             <?
