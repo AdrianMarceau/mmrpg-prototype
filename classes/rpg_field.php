@@ -103,21 +103,176 @@ class rpg_field extends rpg_object {
     public function print_field_background(){ return '<span class="field_background">'.$this->field_background.'</span>'; }
     public function print_field_foreground(){ return '<span class="field_foreground">'.$this->field_foreground.'</span>'; }
 
-    // Define a function for pulling the full field index
-    public static function get_index(){
-        global $db;
-        $field_index = $db->get_array_list("SELECT * FROM mmrpg_index_fields WHERE field_flag_complete = 1;", 'field_token');
-        if (!empty($field_index)){ return $field_index; }
-        else { return array(); }
+
+    // -- INDEX FUNCTIONS -- //
+
+    /**
+     * Get a list of all field index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_index_fields($implode = false){
+
+        // Define the various index fields for field objects
+        $index_fields = array(
+            'field_id',
+            'field_token',
+            'field_number',
+            'field_name',
+            'field_game',
+            'field_group',
+            'field_class',
+            'field_master',
+            'field_master2',
+            'field_mechas',
+            'field_editor',
+            'field_image',
+            'field_type',
+            'field_type2',
+            'field_multipliers',
+            'field_description',
+            'field_description2',
+            'field_music',
+            'field_music_name',
+            'field_music_link',
+            'field_background',
+            'field_background_frame',
+            'field_background_attachments',
+            'field_foreground',
+            'field_foreground_frame',
+            'field_foreground_attachments',
+            'field_functions',
+            'field_flag_hidden',
+            'field_flag_complete',
+            'field_flag_published',
+            'field_order'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $index_fields = implode(', ', $index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $index_fields;
+
     }
+
+    /**
+     * Get the entire field index array with parsed info
+     * @param bool $parse_data
+     * @return array
+     */
+    public static function get_index($include_hidden = false, $include_unpublished = false){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND field_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND field_flag_published = 1 '; }
+
+        // Collect every type's info from the database index
+        $field_fields = self::get_index_fields(true);
+        $field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($field_index)){
+            $field_index = self::parse_index($field_index);
+            return $field_index;
+        } else {
+            return array();
+        }
+
+    }
+
+    /**
+     * Get the tokens for all fields in the global index
+     * @return array
+     */
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND field_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND field_flag_published = 1 '; }
+
+        // Collect an array of field tokens from the database
+        $field_index = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
+
+        // Return the tokens if not empty, else nothing
+        if (!empty($field_index)){
+            $field_tokens = array_keys($field_index);
+            return $field_tokens;
+        } else {
+            return array();
+        }
+
+    }
+
+    // Define a function for pulling a custom field index
+    public static function get_index_custom($field_tokens = array()){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Generate a token string for the database query
+        $field_tokens_string = array();
+        foreach ($field_tokens AS $field_token){ $field_tokens_string[] = "'{$field_token}'"; }
+        $field_tokens_string = implode(', ', $field_tokens_string);
+
+        // Collect the requested field's info from the database index
+        $field_fields = self::get_index_fields(true);
+        $field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_token IN ({$field_tokens_string});", 'field_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($field_index)){
+            $field_index = self::parse_index($field_index);
+            return $field_index;
+        } else {
+            return array();
+        }
+
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($field_token){
-        global $db;
-        $field_index = rpg_field::get_index();
-        if (!empty($field_index[$field_token])){ $field_info = rpg_field::parse_index_info($field_index[$field_token]); }
-        else { $field_info = array(); }
-        return $field_info;
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Collect this field's info from the database index
+        $lookup = !is_numeric($field_token) ? "field_token = '{$field_token}'" : "field_id = {$field_token}";
+        $field_fields = self::get_index_fields(true);
+        $field_index = $db->get_array("SELECT {$field_fields} FROM mmrpg_index_fields WHERE {$lookup};", 'field_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($field_index)){
+            $field_index = self::parse_index_info($field_index);
+            return $field_index;
+        } else {
+            return array();
+        }
+
     }
+
+    // Define a public function for parsing a field index array in bulk
+    public static function parse_index($field_index){
+
+        // Loop through each entry and parse its data
+        foreach ($field_index AS $token => $info){
+            $field_index[$token] = self::parse_index_info($info);
+        }
+
+        // Return the parsed index
+        return $field_index;
+
+    }
+
     // Define a public function for reformatting database data into proper arrays
     public static function parse_index_info($field_info){
 
@@ -128,7 +283,7 @@ class rpg_field extends rpg_object {
         if (!empty($field_info['_parsed'])){ return $field_info; }
         else { $field_info['_parsed'] = true; }
 
-        // Explode the json encoded fields into an array
+        // Explode json encoded fields into expanded array objects
         $temp_field_names = array('field_master2', 'field_mechas', 'field_multipliers', 'field_music_link', 'field_background_frame', 'field_foreground_frame', 'field_background_attachments', 'field_foreground_attachments');
         foreach ($temp_field_names AS $field_name){
             if (!empty($field_info[$field_name])){ $field_info[$field_name] = json_decode($field_info[$field_name], true); }
@@ -138,6 +293,9 @@ class rpg_field extends rpg_object {
         // Return the parsed field info
         return $field_info;
     }
+
+
+    // -- SESSION FUNCTIONS -- //
 
     // Define a public function updating internal variables
     public function update_variables(){

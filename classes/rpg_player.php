@@ -354,6 +354,209 @@ class rpg_player extends rpg_object {
 
     }
 
+
+    // -- INDEX FUNCTIONS -- //
+
+    /**
+     * Get a list of all player index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_index_fields($implode = false){
+
+        // Define the various index fields for player objects
+        $index_fields = array(
+            'player_id',
+            'player_token',
+            'player_number',
+            'player_name',
+            'player_game',
+            'player_group',
+            'player_class',
+            'player_image',
+            'player_image_size',
+            'player_image_editor',
+            'player_image_alts',
+            'player_type',
+            'player_type2',
+            'player_description',
+            'player_description2',
+            'player_energy',
+            'player_weapons',
+            'player_attack',
+            'player_defense',
+            'player_speed',
+            'player_abilities_rewards',
+            'player_abilities_compatible',
+            'player_robots_rewards',
+            'player_robots_compatible',
+            'player_quotes_start',
+            'player_quotes_taunt',
+            'player_quotes_victory',
+            'player_quotes_defeat',
+            'player_functions',
+            'player_flag_hidden',
+            'player_flag_complete',
+            'player_flag_published',
+            'player_order'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $index_fields = implode(', ', $index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $index_fields;
+
+    }
+
+    /**
+     * Get the entire player index array with parsed info
+     * @param bool $parse_data
+     * @return array
+     */
+    public static function get_index($include_hidden = false, $include_unpublished = false){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND player_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND player_flag_published = 1 '; }
+
+        // Collect every type's info from the database index
+        $player_fields = self::get_index_fields(true);
+        $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($player_index)){
+            $player_index = self::parse_index($player_index);
+            return $player_index;
+        } else {
+            return array();
+        }
+
+    }
+
+    /**
+     * Get the tokens for all players in the global index
+     * @return array
+     */
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Define the query condition based on args
+        $temp_where = '';
+        if (!$include_hidden){ $temp_where .= 'AND player_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND player_flag_published = 1 '; }
+
+        // Collect an array of player tokens from the database
+        $player_index = $db->get_array_list("SELECT player_token FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
+
+        // Return the tokens if not empty, else nothing
+        if (!empty($player_index)){
+            $player_tokens = array_keys($player_index);
+            return $player_tokens;
+        } else {
+            return array();
+        }
+
+    }
+
+    // Define a function for pulling a custom player index
+    public static function get_index_custom($player_tokens = array()){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Generate a token string for the database query
+        $player_tokens_string = array();
+        foreach ($player_tokens AS $player_token){ $player_tokens_string[] = "'{$player_token}'"; }
+        $player_tokens_string = implode(', ', $player_tokens_string);
+
+        // Collect the requested player's info from the database index
+        $player_fields = self::get_index_fields(true);
+        $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_token IN ({$player_tokens_string});", 'player_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($player_index)){
+            $player_index = self::parse_index($player_index);
+            return $player_index;
+        } else {
+            return array();
+        }
+
+    }
+
+    // Define a public function for collecting index data from the database
+    public static function get_index_info($player_token){
+
+        // Pull in global variables
+        $db = cms_database::get_database();
+
+        // Collect this player's info from the database index
+        $lookup = !is_numeric($player_token) ? "player_token = '{$player_token}'" : "player_id = {$player_token}";
+        $player_fields = self::get_index_fields(true);
+        $player_index = $db->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE {$lookup};", 'player_token');
+
+        // Parse and return the data if not empty, else nothing
+        if (!empty($player_index)){
+            $player_index = self::parse_index_info($player_index);
+            return $player_index;
+        } else {
+            return array();
+        }
+
+    }
+
+    // Define a public function for parsing a player index array in bulk
+    public static function parse_index($player_index){
+
+        // Loop through each entry and parse its data
+        foreach ($player_index AS $token => $info){
+            $player_index[$token] = self::parse_index_info($info);
+        }
+
+        // Return the parsed index
+        return $player_index;
+
+    }
+
+    // Define a public function for reformatting database data into proper arrays
+    public static function parse_index_info($player_info){
+
+        // Return false if empty
+        if (empty($player_info)){ return false; }
+
+        // If the information has already been parsed, return as-is
+        if (!empty($player_info['_parsed'])){ return $player_info; }
+        else { $player_info['_parsed'] = true; }
+
+        // Explode json encoded fields into expanded array objects
+        $temp_fields = array('player_abilities_rewards', 'player_abilities_compatible', 'player_robots_rewards', 'player_robots_compatible');
+        foreach ($temp_fields AS $field_name){
+            if (!empty($player_info[$field_name])){ $player_info[$field_name] = json_decode($player_info[$field_name], true); }
+            else { $player_info[$field_name] = array(); }
+        }
+
+        // Collect the quotes into the proper arrays
+        $quote_types = array('start', 'taunt', 'victory', 'defeat');
+        foreach ($quote_types AS $type){
+            $player_info['player_quotes']['battle_'.$type] = !empty($player_info['player_quotes_'.$type]) ? $player_info['player_quotes_'.$type]: '';
+            unset($player_info['player_quotes_'.$type]);
+        }
+
+        // Return the parsed player info
+        return $player_info;
+    }
+
+
+    // -- SESSION FUNCTIONS -- //
+
     // Define a public function updating internal varibales
     public function update_variables(){
 
