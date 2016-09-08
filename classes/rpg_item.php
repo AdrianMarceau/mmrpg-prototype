@@ -1199,6 +1199,12 @@ class rpg_item extends rpg_object {
         global $mmrpg_database_items, $mmrpg_database_robots, $mmrpg_database_items, $mmrpg_database_types;
         global $db;
 
+        // Collect global indexes for easier search
+        $mmrpg_types = rpg_type::get_index(true);
+
+        // Define the markup variable
+        $this_markup = '';
+
         // Define the print style defaults
         if (!isset($print_options['layout_style'])){ $print_options['layout_style'] = 'website'; }
         if ($print_options['layout_style'] == 'website'){
@@ -1260,48 +1266,48 @@ class rpg_item extends rpg_object {
         // Start the output buffer
         ob_start();
         ?>
-        <div class="database_container database_<?= $item_info['item_class'] == 'item' ? 'item' : 'item' ?>_container" data-token="<?=$item_info['item_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
+        <div class="database_container database_<?= $item_info['item_class'] == 'item' ? 'item' : 'item' ?>_container" data-token="<?= $item_info['item_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
 
-            <? if($print_options['layout_style'] == 'website' || $print_options['layout_style'] == 'website_compact'): ?>
-                <a class="anchor" id="<?=$item_info['item_token']?>">&nbsp;</a>
-            <? endif; ?>
+            <?php if($print_options['layout_style'] == 'website' || $print_options['layout_style'] == 'website_compact'): ?>
+                <a class="anchor" id="<?= $item_info['item_token']?>">&nbsp;</a>
+            <?php endif; ?>
 
             <div class="subbody event event_triple event_visible" data-token="<?= $item_info['item_token']?>" style="<?= ($print_options['layout_style'] == 'event' ? 'margin: 0 !important; ' : '').($print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important; ' : '') ?>">
 
-                <? if($print_options['show_icon']): ?>
+                <?php if($print_options['show_icon']): ?>
 
                     <div class="this_sprite sprite_left" style="height: 40px;">
-                        <? if($print_options['show_icon']): ?>
-                            <? if($print_options['show_key'] !== false): ?>
-                                <div class="icon item_type <?= $item_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.($print_options['show_key'] + 1) ?></div>
-                            <? endif; ?>
-                            <? if ($item_image_token != 'item'){ ?>
-                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: url(images/items/<?= $item_image_token ?>/icon_right_<?= $item_image_size_text ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon item_status_active item_position_active"><?=$item_info['item_name']?>'s Mugshot</div></div>
-                            <? } else { ?>
-                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: none; background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon item_status_active item_position_active">No Image</div></div>
-                            <? } ?>
-                        <? endif; ?>
+                        <?php if($print_options['show_icon']): ?>
+                            <?php if($print_options['show_key'] !== false): ?>
+                                <div class="icon item_type <?= $item_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$item_info['item_key'] ?></div>
+                            <?php endif; ?>
+                            <?php if ($item_image_token != 'item'){ ?>
+                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: url(images/items/<?= $item_image_token ?>/icon_right_<?= $item_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon"><?= $item_info['item_name']?>'s Mugshot</div></div>
+                            <?php } else { ?>
+                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: none; background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon">No Image</div></div>
+                            <?php } ?>
+                        <?php endif; ?>
                     </div>
 
-                <? endif; ?>
+                <?php endif; ?>
 
-                <? if($print_options['show_basics']): ?>
+                <?php if($print_options['show_basics']): ?>
 
-                    <h2 class="header header_left <?= $item_header_types ?> <?= (!$print_options['show_icon']) ? 'noicon' : 'hasicon' ?>">
-                        <? if($print_options['layout_style'] == 'website_compact'): ?>
-                            <a href="<?= 'database/items/'.$item_info['item_token'].'/' ?>"><?= $item_info['item_name'] ?></a>
-                        <? else: ?>
+                    <h2 class="header header_left <?= $item_header_types ?> <?= (!$print_options['show_icon']) ? 'noicon' : '' ?>">
+                        <?php if($print_options['layout_style'] == 'website_compact'): ?>
+                            <a href="<?= preg_match('/^item-/', $item_info['item_token']) ? 'database/items/'.preg_replace('/^item-/i', '', $item_info['item_token']).'/' : 'database/items/'.$item_info['item_token'].'/' ?>"><?= $item_info['item_name'] ?></a>
+                        <?php else: ?>
                             <?= $item_info['item_name'] ?>&#39;s Data
-                        <? endif; ?>
-                        <? if (!empty($item_info['item_type_special'])){ ?>
-                            <div class="header_core item_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($item_info['item_type_special']) ?> Type</div>
-                        <? } elseif (!empty($item_info['item_type']) && !empty($item_info['item_type2'])){ ?>
-                            <div class="header_core item_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($item_info['item_type']).' / '.ucfirst($item_info['item_type2']) ?> Type</div>
-                        <? } elseif (!empty($item_info['item_type'])){ ?>
-                            <div class="header_core item_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($item_info['item_type']) ?> Type</div>
-                        <? } else { ?>
-                            <div class="header_core item_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;">Neutral Type</div>
-                        <? } ?>
+                        <?php endif; ?>
+                        <?php if (!empty($item_info['item_type_special'])){ ?>
+                            <div class="header_core item_type"><?= ucfirst($item_info['item_type_special']) ?> Type</div>
+                        <?php } elseif (!empty($item_info['item_type']) && !empty($item_info['item_type2'])){ ?>
+                            <div class="header_core item_type"><?= ucfirst($item_info['item_type']).' / '.ucfirst($item_info['item_type2']) ?> Type</div>
+                        <?php } elseif (!empty($item_info['item_type'])){ ?>
+                            <div class="header_core item_type"><?= ucfirst($item_info['item_type']) ?> Type</div>
+                        <?php } else { ?>
+                            <div class="header_core item_type">Neutral Type</div>
+                        <?php } ?>
                     </h2>
                     <div class="body body_left" style="margin-right: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px; <?= (!$print_options['show_icon']) ? 'margin-left: 0; ' : '' ?><?= $print_options['layout_style'] == 'event' ? 'font-size: 10px; min-height: 150px; ' : '' ?>">
                         <table class="full" style="margin: 5px auto 10px;">
@@ -1314,110 +1320,73 @@ class rpg_item extends rpg_object {
                                 <tr>
                                     <td  class="right">
                                         <label style="display: block; float: left;">Name :</label>
-                                        <span class="item_type item_type_"><?=$item_info['item_name']?></span>
+                                        <span class="item_type item_type_"><?= $item_info['item_name']?></span>
                                     </td>
                                     <td class="center">&nbsp;</td>
                                     <td class="right">
                                         <label style="display: block; float: left;">Type :</label>
-                                        <? if($print_options['layout_style'] != 'event'): ?>
-                                            <?
+                                        <?php if($print_options['layout_style'] != 'event'): ?>
+                                            <?php
                                             if (!empty($item_info['item_type_special'])){
                                                 echo '<a href="database/items/'.$item_info['item_type_special'].'/" class="item_type '.$item_header_types.'">'.ucfirst($item_info['item_type_special']).'</a>';
                                             }
                                             elseif (!empty($item_info['item_type'])){
                                                 $temp_string = array();
                                                 $item_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
-                                                $temp_string[] = '<a href="database/items/'.$item_type.'/" class="item_type item_type_'.$item_type.'">'.$mmrpg_index['types'][$item_type]['type_name'].'</a>';
+                                                $temp_string[] = '<a href="database/items/'.$item_type.'/" class="item_type item_type_'.$item_type.'">'.$mmrpg_types[$item_type]['type_name'].'</a>';
                                                 if (!empty($item_info['item_type2'])){
                                                     $item_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : 'none';
-                                                    $temp_string[] = '<a href="database/items/'.$item_type2.'/" class="item_type item_type_'.$item_type2.'">'.$mmrpg_index['types'][$item_type2]['type_name'].'</a>';
+                                                    $temp_string[] = '<a href="database/items/'.$item_type2.'/" class="item_type item_type_'.$item_type2.'">'.$mmrpg_types[$item_type2]['type_name'].'</a>';
                                                 }
                                                 echo implode(' ', $temp_string);
                                             } else {
                                                 echo '<a href="database/items/none/" class="item_type item_type_none">Neutral</a>';
                                             }
                                             ?>
-                                        <? else: ?>
-                                            <?
+                                        <?php else: ?>
+                                            <?php
                                             if (!empty($item_info['item_type_special'])){
                                                 echo '<span class="item_type '.$item_header_types.'">'.ucfirst($item_info['item_type_special']).'</span>';
                                             }
                                             elseif (!empty($item_info['item_type'])){
                                                 $temp_string = array();
                                                 $item_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
-                                                $temp_string[] = '<span class="item_type item_type_'.$item_type.'">'.$mmrpg_index['types'][$item_type]['type_name'].'</span>';
+                                                $temp_string[] = '<span class="item_type item_type_'.$item_type.'">'.$mmrpg_types[$item_type]['type_name'].'</span>';
                                                 if (!empty($item_info['item_type2'])){
                                                     $item_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : 'none';
-                                                    $temp_string[] = '<span class="item_type item_type_'.$item_type2.'">'.$mmrpg_index['types'][$item_type2]['type_name'].'</span>';
+                                                    $temp_string[] = '<span class="item_type item_type_'.$item_type2.'">'.$mmrpg_types[$item_type2]['type_name'].'</span>';
                                                 }
                                                 echo implode(' ', $temp_string);
                                             } else {
                                                 echo '<span class="item_type item_type_none">Neutral</span>';
                                             }
                                             ?>
-                                        <? endif; ?>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
-                                <? if($item_info['item_class'] != 'item'): ?>
-
-                                    <? if($item_image_token != 'item'): ?>
-
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Power :</label>
-                                                <? if(!empty($item_info['item_damage']) || !empty($item_info['item_recovery'])): ?>
-                                                    <? if(!empty($item_info['item_damage'])){ ?><span class="item_stat"><?= $item_info['item_damage'].(!empty($item_info['item_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
-                                                    <? if(!empty($item_info['item_recovery'])){ ?><span class="item_stat"><?= $item_info['item_recovery'].(!empty($item_info['item_recovery_percent']) ? '%' : '') ?> Recovery</span><? } ?>
-                                                <? else: ?>
-                                                    <span class="item_stat">-</span>
-                                                <? endif; ?>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Accuracy :</label>
-                                                <span class="item_stat"><?= $item_info['item_accuracy'].'%' ?></span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Energy :</label>
-                                                <span class="item_stat"><?= !empty($item_info['item_energy']) ? $item_info['item_energy'] : '-' ?></span>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Speed :</label>
-                                                <span class="item_stat"><?= !empty($item_info['item_speed']) ? $item_info['item_speed'] : '1' ?></span>
-                                            </td>
-                                        </tr>
-
-                                    <? else: ?>
-
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Power :</label>
-                                                <span class="item_stat">-</span>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Accuracy :</label>
-                                                <span class="item_stat">-</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Energy :</label>
-                                                <span class="item_stat">-</span>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Speed :</label>
-                                                <span class="item_stat">-</span>
-                                            </td>
-                                        </tr>
-
-                                    <? endif; ?>
-
-                                <? endif; ?>
+                                <tr>
+                                    <td  class="right">
+                                        <label style="display: block; float: left;">Power :</label>
+                                        <?php if(!empty($item_info['item_damage']) || !empty($item_info['item_recovery'])): ?>
+                                            <?php if(!empty($item_info['item_damage'])){ ?><span class="item_stat"><?= number_format($item_info['item_damage'], 0, '.', ',').(!empty($item_info['item_damage_percent']) ? '%' : '') ?> Damage</span><?php } ?>
+                                            <?php if(!empty($item_info['item_recovery'])){ ?><span class="item_stat"><?= number_format($item_info['item_recovery'], 0, '.', ',').(!empty($item_info['item_recovery_percent']) ? '%' : '') ?> Recovery</span><?php } ?>
+                                        <?php elseif(!empty($item_info['item_damage2']) || !empty($item_info['item_recovery2'])): ?>
+                                            <?php if(!empty($item_info['item_damage2'])){ ?><span class="item_stat"><?= number_format($item_info['item_damage2'], 0, '.', ',').(!empty($item_info['item_damage2_percent']) ? '%' : '') ?></span><?php } ?>
+                                            <?php if(!empty($item_info['item_recovery2'])){ ?><span class="item_stat"><?= number_format($item_info['item_recovery2'], 0, '.', ',').(!empty($item_info['item_recovery2_percent']) ? '%' : '') ?></span><?php } ?>
+                                        <?php else: ?>
+                                            <span class="item_stat">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="center">&nbsp;</td>
+                                    <td class="right">
+                                        <label style="display: block; float: left;">Value :</label>
+                                        <?php if(!empty($item_info['item_price'])): ?>
+                                            <span class="item_stat"><?= number_format($item_info['item_price'], 0, '.', ',').'z' ?></span>
+                                        <?php else: ?>
+                                            <span class="item_stat">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                         <table class="full" style="margin: 5px auto 10px;">
@@ -1427,15 +1396,17 @@ class rpg_item extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label style="display: block; float: left;">Description :</label>
-                                        <div class="description_container"><?
+                                        <?php if($print_options['layout_style'] != 'event'): ?>
+                                            <label style="display: block; float: left;">Description :</label>
+                                        <?php endif; ?>
+                                        <div class="description_container" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?php
                                         // Define the search/replace pairs for the description
                                         $temp_find = array('{DAMAGE}', '{RECOVERY}', '{DAMAGE2}', '{RECOVERY2}', '{}');
                                         $temp_replace = array(
-                                            (!empty($item_info['item_damage']) ? $item_info['item_damage'] : 0), // {DAMAGE}
-                                            (!empty($item_info['item_recovery']) ? $item_info['item_recovery'] : 0), // {RECOVERY}
-                                            (!empty($item_info['item_damage2']) ? $item_info['item_damage2'] : 0), // {DAMAGE2}
-                                            (!empty($item_info['item_recovery2']) ? $item_info['item_recovery2'] : 0), // {RECOVERY2}
+                                            (!empty($item_info['item_damage']) ? number_format($item_info['item_damage'], 0, '.', ',') : 0), // {DAMAGE}
+                                            (!empty($item_info['item_recovery']) ? number_format($item_info['item_recovery'], 0, '.', ',') : 0), // {RECOVERY}
+                                            (!empty($item_info['item_damage2']) ? number_format($item_info['item_damage2'], 0, '.', ',') : 0), // {DAMAGE2}
+                                            (!empty($item_info['item_recovery2']) ? number_format($item_info['item_recovery2'], 0, '.', ',') : 0), // {RECOVERY2}
                                             '' // {}
                                             );
                                         echo !empty($item_info['item_description']) ? str_replace($temp_find, $temp_replace, $item_info['item_description']) : '&hellip;'
@@ -1446,50 +1417,134 @@ class rpg_item extends rpg_object {
                         </table>
                     </div>
 
-                <? endif; ?>
+                <?php endif; ?>
 
-                <? if($print_options['show_sprites'] && (!isset($item_info['item_image_sheets']) || $item_info['item_image_sheets'] !== 0) && $item_image_token != 'item' ): ?>
+                <?php if($print_options['show_sprites'] && (!isset($item_info['item_image_sheets']) || $item_info['item_image_sheets'] !== 0) && $item_image_token != 'item' ): ?>
 
-                    <h2 class="header header_full <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left;">
-                        <?=$item_info['item_name']?>&#39;s Sprites
-                    </h2>
-                    <div class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
-                        <div style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #4d4d4d url(images/sprite-grid.gif) scroll repeat -10px -30px; overflow: hidden; padding: 10px 30px;">
-                            <?
-                            // Show the item mugshot sprite
+                    <?php
+                    // Start the output buffer and prepare to collect sprites
+                    ob_start();
+
+                    // Define the alts we'll be looping through for this item
+                    $temp_alts_array = array();
+                    $temp_alts_array[] = array('token' => '', 'name' => $item_info['item_name'], 'summons' => 0);
+                    // Append predefined alts automatically, based on the item image alt array
+                    if (!empty($item_info['item_image_alts'])){
+                        $temp_alts_array = array_merge($temp_alts_array, $item_info['item_image_alts']);
+                    }
+                    // Otherwise, if this is a copy item, append based on all the types in the index
+                    elseif ($item_info['item_type'] == 'copy' && preg_match('/^(mega-man|proto-man|bass)$/i', $item_info['item_token'])){
+                        foreach ($mmrpg_database_types AS $type_token => $type_info){
+                            if (empty($type_token) || $type_token == 'none' || $type_token == 'copy'){ continue; }
+                            $temp_alts_array[] = array('token' => $type_token, 'name' => $item_info['item_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0);
+                        }
+                    }
+                    // Otherwise, if this robot has multiple sheets, add them as alt options
+                    elseif (!empty($item_info['item_image_sheets'])){
+                        for ($i = 2; $i <= $item_info['item_image_sheets']; $i++){
+                            $temp_alts_array[] = array('sheet' => $i, 'name' => $item_info['item_name'].' (Sheet #'.$i.')', 'summons' => 0);
+                        }
+                    }
+
+                    // Loop through the alts and display images for them (yay!)
+                    foreach ($temp_alts_array AS $alt_key => $alt_info){
+
+                        // Define the current image token with alt in mind
+                        $temp_item_image_token = $item_image_token;
+                        $temp_item_image_token .= !empty($alt_info['token']) ? '_'.$alt_info['token'] : '';
+                        $temp_item_image_token .= !empty($alt_info['sheet']) ? '-'.$alt_info['sheet'] : '';
+                        $temp_item_image_name = $alt_info['name'];
+                        // Update the alt array with this info
+                        $temp_alts_array[$alt_key]['image'] = $temp_item_image_token;
+
+                        // Collect the number of sheets
+                        $temp_sheet_number = !empty($item_info['item_image_sheets']) ? $item_info['item_image_sheets'] : 1;
+
+                        // Loop through the different frames and print out the sprite sheets
+                        foreach (array('right', 'left') AS $temp_direction){
+                            $temp_direction2 = substr($temp_direction, 0, 1);
+                            $temp_embed = '[item:'.$temp_direction.']{'.$temp_item_image_token.'}';
+                            $temp_title = $temp_item_image_name.' | Icon Sprite '.ucfirst($temp_direction);
+                            $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
+                            $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
+                            $temp_label = 'Icon '.ucfirst(substr($temp_direction, 0, 1));
+                            echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_item_image_token.'" data-frame="icon" style="padding-top: 20px; float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$item_sprite_size.'px; height: '.$item_sprite_size.'px; overflow: hidden;">';
+                                echo '<img style="margin-left: 0;" data-tooltip="'.$temp_title.'" src="images/items/'.$temp_item_image_token.'/icon_'.$temp_direction.'_'.$item_sprite_size.'x'.$item_sprite_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
+                            echo '</div>';
+                        }
+
+
+                        // Loop through the different frames and print out the sprite sheets
+                        foreach ($item_sprite_frames AS $this_key => $this_frame){
+                            $margin_left = ceil((0 - $this_key) * $item_sprite_size);
+                            $frame_relative = $this_frame;
+                            //if ($temp_sheet > 1){ $frame_relative = 'frame_'.str_pad((($temp_sheet - 1) * count($item_sprite_frames) + $this_key + 1), 2, '0', STR_PAD_LEFT); }
+                            $frame_relative_text = ucfirst(str_replace('_', ' ', $frame_relative));
                             foreach (array('right', 'left') AS $temp_direction){
-                                $temp_title = $item_sprite_title.' | Icon Sprite '.ucfirst($temp_direction);
-                                $temp_label = 'Icon '.ucfirst(substr($temp_direction, 0, 1));
-                                echo '<div style="'.($item_sprite_size <= 80 ? 'padding-top: 20px; ' : '').'float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$item_sprite_size.'px; height: '.$item_sprite_size.'px; overflow: hidden;">';
-                                    echo '<img style="margin-left: 0;" title="'.$temp_title.'" alt="'.$temp_title.'" src="images/items/'.$item_image_token.'/icon_'.$temp_direction.'_'.$item_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                $temp_direction2 = substr($temp_direction, 0, 1);
+                                $temp_embed = '[item:'.$temp_direction.':'.$frame_relative.']{'.$temp_item_image_token.'}';
+                                $temp_title = $temp_item_image_name.' | '.$frame_relative_text.' Sprite '.ucfirst($temp_direction);
+                                $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
+                                $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
+                                $temp_label = $frame_relative_text.' '.ucfirst(substr($temp_direction, 0, 1));
+                                //$image_token = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
+                                //if ($temp_sheet > 1){ $temp_item_image_token .= '-'.$temp_sheet; }
+                                echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_item_image_token.'" data-frame="'.$frame_relative.'" style="padding-top: 20px; float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$item_sprite_size.'px; height: '.$item_sprite_size.'px; overflow: hidden;">';
+                                    echo '<img style="margin-left: '.$margin_left.'px;" title="'.$temp_title.'" alt="'.$temp_title.'" src="images/items/'.$temp_item_image_token.'/sprite_'.$temp_direction.'_'.$item_sprite_size.'x'.$item_sprite_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
                                     echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
                                 echo '</div>';
                             }
-                            // Loop through the different frames and print out the sprite sheets
-                            $temp_sheet_number = !empty($item_info['item_image_sheets']) ? $item_info['item_image_sheets'] : 1;
-                            for ($temp_sheet = 1; $temp_sheet <= $temp_sheet_number; $temp_sheet++){
-                                foreach ($item_sprite_frames AS $this_key => $this_frame){
-                                    $margin_left = ceil((0 - $this_key) * $item_sprite_size);
-                                    $frame_relative = $this_frame;
-                                    if ($temp_sheet > 1){ $frame_relative = 'frame_'.str_pad((($temp_sheet - 1) * count($item_sprite_frames) + $this_key + 1), 2, '0', STR_PAD_LEFT); }
-                                    $frame_relative_text = ucfirst(str_replace('_', ' ', $frame_relative));
-                                    foreach (array('right', 'left') AS $temp_direction){
-                                        $temp_title = $item_sprite_title.' | '.$frame_relative_text.' Sprite '.ucfirst($temp_direction);
-                                        $temp_label = $frame_relative_text.' '.ucfirst(substr($temp_direction, 0, 1));
-                                        $image_token = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
-                                        if ($temp_sheet > 1){ $image_token .= '-'.$temp_sheet; }
-                                        echo '<div style="padding-top: 20px; float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$item_sprite_size.'px; height: '.$item_sprite_size.'px; overflow: hidden;">';
-                                            echo '<img style="margin-left: '.$margin_left.'px;" title="'.$temp_title.'" alt="'.$temp_title.'" src="images/items/'.$image_token.'/sprite_'.$temp_direction.'_'.$item_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
-                                            echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
-                                        echo '</div>';
+                        }
+                    }
+
+                    // Collect the sprite markup from the output buffer for later
+                    $this_sprite_markup = ob_get_clean();
+
+                    ?>
+
+                    <h2 id="sprites" class="header header_full <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left;">
+                        <?= $item_info['item_name']?>&#39;s Sprites
+                        <span class="header_links image_link_container">
+                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>"><?php
+                                // Loop though and print links for the alts
+                                foreach ($temp_alts_array AS $alt_key => $alt_info){
+                                    $alt_type = '';
+                                    $alt_style = '';
+                                    $alt_title = $alt_info['name'];
+                                    if (preg_match('/^(?:[-_a-z0-9\s]+)\s\(([a-z0-9]+)\sCore\)$/i', $alt_info['name'])){
+                                        $alt_type = strtolower(preg_replace('/^(?:[-_a-z0-9\s]+)\s\(([a-z0-9]+)\sCore\)$/i', '$1', $alt_info['name']));
+                                        $alt_name = '&bull;'; //ucfirst($alt_type); //substr(ucfirst($alt_type), 0, 2);
+                                        $alt_type = 'item_type item_type_'.$alt_type.' core_type ';
+                                        $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; ';
                                     }
-
-
+                                    else {
+                                        $alt_name = $alt_key + 1; //$alt_key == 0 ? $item_info['item_name'] : 'Alt'.($alt_key > 1 ? ' '.$alt_key : ''); //$alt_key == 0 ? $item_info['item_name'] : $item_info['item_name'].' Alt'.($alt_key > 1 ? ' '.$alt_key : '');
+                                        $alt_type = 'item_type item_type_empty ';
+                                        $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ';
+                                        //if ($item_info['item_type'] == 'copy' && $alt_key == 0){ $alt_type = 'item_type item_type_empty '; }
+                                    }
+                                    echo '<a href="#" data-tooltip="'.$alt_title.'" class="link link_image '.($alt_key == 0 ? 'link_active ' : '').'" data-image="'.$alt_info['image'].'">';
+                                    echo '<span class="'.$alt_type.'" style="'.$alt_style.'">'.$alt_name.'</span>';
+                                    echo '</a>';
                                 }
-                            }
-                            ?>
+                                ?></span>
+                            <span class="pipe" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>">|</span>
+                            <span class="directions"><?php
+                                // Loop though and print links for the alts
+                                foreach (array('right', 'left') AS $temp_key => $temp_direction){
+                                    echo '<a href="#" data-tooltip="'.ucfirst($temp_direction).' Facing Sprites" class="link link_direction '.($temp_key == 0 ? 'link_active' : '').'" data-direction="'.$temp_direction.'">';
+                                    echo '<span class="item_type item_type_empty" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ">'.ucfirst($temp_direction).'</span>';
+                                    echo '</a>';
+                                }
+                                ?></span>
+                        </span>
+                    </h2>
+                    <div id="sprites_body" class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
+                        <div style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #4d4d4d url(images/sprite-grid.gif) scroll repeat -10px -30px; overflow: hidden; padding: 10px 30px;">
+                            <?= $this_sprite_markup ?>
                         </div>
-                        <?
+                        <?php
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
                         if (!empty($item_info['item_image_editor'])){
@@ -1503,254 +1558,29 @@ class rpg_item extends rpg_object {
                         <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span style="color: #565656;"> | </span> Original Artwork by <strong>Capcom</strong></p>
                     </div>
 
-                <? endif; ?>
+                <?php endif; ?>
 
-                <? if($print_options['show_robots'] && $item_info['item_class'] != 'item'): ?>
-
-                    <h2 class="header header_full <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left;">
-                        <?=$item_info['item_name']?>&#39;s Robots
-                    </h2>
-                    <div class="body body_full" style="margin: 0; padding: 2px 3px;">
-                        <table class="full" style="margin: 5px auto 10px;">
-                            <colgroup>
-                                <col width="100%" />
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <td class="right">
-                                        <div class="robot_container">
-                                        <?
-                                        $item_type_one = !empty($item_info['item_type']) ? $item_info['item_type'] : false;
-                                        $item_type_two = !empty($item_info['item_type2']) ? $item_info['item_type2'] : false;
-                                        $item_robot_rewards = array();
-                                        $item_robot_rewards_level = array();
-                                        $item_robot_rewards_core = array();
-                                        $item_robot_rewards_player = array();
-
-                                        // Loop through and remove any robots that do not learn the item
-                                        foreach ($mmrpg_database_robots AS $robot_token => $robot_info){
-
-                                            // Define the match flah to prevent doubling up
-                                            $temp_match_flag = false;
-
-                                            // Loop through this robot's item rewards one by one
-                                            foreach ($robot_info['robot_rewards']['items'] AS $temp_info){
-                                                // If the temp info's type token matches this item
-                                                if ($temp_info['token'] == $item_info['item_token']){
-                                                    // Add this item to the rewards list
-                                                    $item_robot_rewards_level[] = array_merge($robot_info, array('token' => $robot_info['robot_token'], 'level' => $temp_info['level']));
-                                                    $temp_match_flag = true;
-                                                    break;
-                                                }
-                                            }
-
-                                            // If a type match was found, continue
-                                            if ($temp_match_flag){ continue; }
-
-                                            // If this item's type matches the robot's first
-                                            if (!empty($robot_info['robot_core']) && ($robot_info['robot_core'] == $item_type_one || $robot_info['robot_core'] == $item_type_two)){
-                                                // Add this item to the rewards list
-                                                $item_robot_rewards_core[] = array_merge($robot_info, array('token' => $robot_info['robot_token'], 'level' => 'core'));
-                                                continue;
-                                            }
-
-                                            // If this item's type matches the robot's second
-                                            if (!empty($robot_info['robot_core2']) && ($robot_info['robot_core2'] == $item_type_one || $robot_info['robot_core2'] == $item_type_two)){
-                                                // Add this item to the rewards list
-                                                $item_robot_rewards_core[] = array_merge($robot_info, array('token' => $robot_info['robot_token'], 'level' => 'core'));
-                                                continue;
-                                            }
-
-                                            // If a type match was found, continue
-                                            if ($temp_match_flag){ continue; }
-
-                                            // If this item's in the robot's list of player-only items
-                                            if (
-                                                (!empty($robot_info['robot_items']) && in_array($item_info['item_token'], $robot_info['robot_items'])) ||
-                                                (!empty($robot_info['robot_core']) && $robot_info['robot_core'] == 'copy') ||
-                                                (!empty($robot_info['robot_core2']) && $robot_info['robot_core2'] == 'copy')
-                                                ){
-                                                // Add this item to the rewards list
-                                                $item_robot_rewards_player[] = array_merge($robot_info, array('token' => $robot_info['robot_token'], 'level' => 'player'));
-                                                continue;
-                                            }
-
-                                            // If a type match was found, continue
-                                            if ($temp_match_flag){ continue; }
-
-                                        }
-
-                                        // Combine the arrays together into one
-                                        $item_robot_rewards = array_merge($item_robot_rewards_level, $item_robot_rewards_core, $item_robot_rewards_player);
-
-                                        // Loop through the collected robots if there are any
-                                        if (!empty($item_robot_rewards)){
-                                            $temp_string = array();
-                                            $robot_key = 0;
-                                            $robot_method_key = 0;
-                                            $robot_method = '';
-                                            $temp_global_items = array(
-                                                // no such thing
-                                                );
-                                            foreach ($item_robot_rewards AS $this_info){
-                                                $this_level = $this_info['level'];
-                                                $this_robot = $mmrpg_database_robots[$this_info['token']];
-                                                $this_robot_token = $this_robot['robot_token'];
-                                                $this_robot_name = $this_robot['robot_name'];
-                                                $this_robot_image = !empty($this_robot['robot_image']) ? $this_robot['robot_image']: $this_robot['robot_token'];
-                                                $this_robot_energy = !empty($this_robot['robot_energy']) ? $this_robot['robot_energy'] : 0;
-                                                $this_robot_attack = !empty($this_robot['robot_attack']) ? $this_robot['robot_attack'] : 0;
-                                                $this_robot_defense = !empty($this_robot['robot_defense']) ? $this_robot['robot_defense'] : 0;
-                                                $this_robot_speed = !empty($this_robot['robot_speed']) ? $this_robot['robot_speed'] : 0;
-                                                $this_robot_method = 'level';
-                                                $this_robot_method_text = 'Level Up';
-                                                $this_robot_title_html = '<strong class="name">'.$this_robot_name.'</strong>';
-                                                if (is_numeric($this_level)){
-                                                    if ($this_level > 1){ $this_robot_title_html .= '<span class="level">Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).'</span>'; }
-                                                    else { $this_robot_title_html .= '<span class="level">Start</span>'; }
-                                                } else {
-                                                    if ($this_level == 'core'){
-                                                        $this_robot_method = 'core';
-                                                        $this_robot_method_text = 'Core Match';
-                                                    } elseif ($this_level == 'player'){
-                                                        $this_robot_method = 'player';
-                                                        $this_robot_method_text = 'Player Only';
-                                                    }
-                                                    $this_robot_title_html .= '<span class="level">&nbsp;</span>';
-                                                }
-                                                $this_stat_base_total = $this_robot_energy + $this_robot_attack + $this_robot_defense + $this_robot_speed;
-                                                $this_stat_width_total = 84;
-                                                if (!empty($this_robot['robot_core'])){ $this_robot_title_html .= '<span class="type">'.ucwords($this_robot['robot_core'].(!empty($this_robot['robot_core2']) ? ' / '.$this_robot['robot_core2'] : '')).' Core</span>'; }
-                                                else { $this_robot_title_html .= '<span class="type">Neutral Core</span>'; }
-                                                $this_robot_title_html .= '<span class="class">'.(!empty($this_robot['robot_description']) ? $this_robot['robot_description'] : '&hellip;').'</span>';
-                                                if (!empty($this_robot_speed)){ $temp_speed_width = floor($this_stat_width_total * ($this_robot_speed / $this_stat_base_total)); }
-                                                if (!empty($this_robot_defense)){ $temp_defense_width = floor($this_stat_width_total * ($this_robot_defense / $this_stat_base_total)); }
-                                                if (!empty($this_robot_attack)){ $temp_attack_width = floor($this_stat_width_total * ($this_robot_attack / $this_stat_base_total)); }
-                                                if (!empty($this_robot_energy)){ $temp_energy_width = $this_stat_width_total - ($temp_speed_width + $temp_defense_width + $temp_attack_width); }
-                                                if (!empty($this_robot_energy)){ $this_robot_title_html .= '<span class="energy robot_type robot_type_energy" style="width: '.$temp_energy_width.'%;" title="'.$this_robot_energy.' Energy">'.$this_robot_energy.'</span>'; }
-                                                if (!empty($this_robot_attack)){ $this_robot_title_html .= '<span class="attack robot_type robot_type_attack" style="width: '.$temp_attack_width.'%;" title="'.$this_robot_attack.' Attack">'.$this_robot_attack.'</span>'; }
-                                                if (!empty($this_robot_defense)){ $this_robot_title_html .= '<span class="defense robot_type robot_type_defense" style="width: '.$temp_defense_width.'%;" title="'.$this_robot_defense.' Defense">'.$this_robot_defense.'</span>'; }
-                                                if (!empty($this_robot_speed)){ $this_robot_title_html .= '<span class="speed robot_type robot_type_speed" style="width: '.$temp_speed_width.'%;" title="'.$this_robot_speed.' Speed">'.$this_robot_speed.'</span>'; }
-                                                $this_robot_sprite_size = !empty($this_robot['robot_image_size']) ? $this_robot['robot_image_size'] : 40;
-                                                $this_robot_sprite_path = 'images/robots/'.$this_robot_image.'/mug_left_'.$this_robot_sprite_size.'x'.$this_robot_sprite_size.'.png';
-                                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.$this_robot_sprite_path)){ $this_robot_image = 'robot'; $this_robot_sprite_path = 'images/robots/robot/mug_left_40x40.png'; }
-                                                $this_robot_sprite_html = '<span class="mug"><img class="size_'.$this_robot_sprite_size.'x'.$this_robot_sprite_size.'" src="'.$this_robot_sprite_path.'?'.MMRPG_CONFIG_CACHE_DATE.'" alt="'.$this_robot_name.' Mug" /></span>';
-                                                $this_robot_title_html = '<span class="label">'.$this_robot_title_html.'</span>';
-                                                //$this_robot_title_html = (is_numeric($this_level) && $this_level > 1 ? 'Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).' : ' : $this_level.' : ').$this_robot_title_html;
-                                                if ($robot_method != $this_robot_method){
-                                                    $temp_separator = '<div class="robot_separator">'.$this_robot_method_text.'</div>';
-                                                    $temp_string[] = $temp_separator;
-                                                    $robot_method = $this_robot_method;
-                                                    $robot_method_key++;
-                                                    // Print out the disclaimer if a global item
-                                                    if ($this_robot_method == 'level' && $item_info['item_token'] == 'buster-shot'){
-                                                        $temp_string[] = '<div class="" style="margin: 10px auto; text-align: center; color: #767676; font-size: 11px;">'.$item_info['item_name'].' is known by <em>all</em> robot masters from the start!</div>';
-                                                    } elseif ($this_robot_method != 'level' && in_array($item_info['item_token'], $temp_global_items)){
-                                                        $temp_string[] = '<div class="" style="margin: 10px auto; text-align: center; color: #767676; font-size: 11px;">'.$item_info['item_name'].' can be equipped by <em>any</em> robot master!</div>';
-                                                    }
-                                                }
-                                                // If this is a global item, don't bother showing EVERY compatible robot
-                                                if ($this_robot_method == 'level' && $item_info['item_token'] == 'buster-shot' || $this_robot_method != 'level' && in_array($item_info['item_token'], $temp_global_items)){ continue; }
-                                                if ($this_level >= 0){
-                                                    //title="'.$this_robot_title_plain.'"
-                                                    $temp_markup = '<a href="'.MMRPG_CONFIG_ROOTURL.'database/robots/'.$this_robot['robot_token'].'/"  class="robot_name robot_type robot_type_'.(!empty($this_robot['robot_core']) ? $this_robot['robot_core'].(!empty($this_robot['robot_core2']) ? '_'.$this_robot['robot_core2'] : '') : 'none').'" style="'.($this_robot_image == 'robot' ? 'opacity: 0.3; ' : '').'">';
-                                                    $temp_markup .= '<span class="chrome">'.$this_robot_sprite_html.$this_robot_title_html.'</span>';
-                                                    $temp_markup .= '</a>';
-                                                    $temp_string[] = $temp_markup;
-                                                    $robot_key++;
-                                                    continue;
-                                                }
-                                            }
-                                            echo implode(' ', $temp_string);
-                                        } else {
-                                            echo '<span class="robot_item robot_type_none"><span class="chrome">Neutral</span></span>';
-                                        }
-                                        ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                <? endif; ?>
-
-                <? if ($print_options['show_records'] && $item_info['item_class'] == 'master'): ?>
-
-                  <h2 id="records" class="header header_full <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left;">
-                    <?= $item_info['item_name'] ?>&#39;s Records
-                  </h2>
-                  <div class="body body_full" style="margin: 0 auto 5px; padding: 2px 0; min-height: 10px;">
-                    <?
-
-                    // Collect the database records for this item
-                    global $db;
-                    $temp_item_records = array('item_unlocked' => 0, 'item_equipped');
-                    $temp_record_query = "SELECT
-                        COUNT(*) AS unlock_count,
-                        SUM(ROUND((
-                        LENGTH(saves.save_values_battle_settings)
-                        - LENGTH(REPLACE(saves.save_values_battle_settings, '\"{$item_info['item_token']}\"', ''))
-                        ) / LENGTH('\"{$item_info['item_token']}\"')
-                        )) AS equip_count
-                        FROM mmrpg_saves AS saves
-                        LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
-                        LEFT JOIN mmrpg_leaderboard AS points ON points.user_id = saves.user_id
-                        WHERE
-                        saves.save_values_battle_items LIKE '%\"{$item_info['item_token']}\"%'
-                        AND points.board_points <> 0
-                        AND users.user_id <> 0
-                        ;";
-                    $temp_record_values = $db->get_array($temp_record_query);
-                    if (!empty($temp_record_values)){
-                        $temp_item_records['item_unlocked'] = $temp_record_values['unlock_count'];
-                        $temp_item_records['item_equipped'] = $temp_record_values['equip_count'];
-                    }
-
-                    ?>
-                    <table class="full" style="margin: 5px auto 10px;">
-                      <colgroup>
-                        <col width="100%" />
-                      </colgroup>
-                      <tbody>
-                          <tr>
-                            <td class="right">
-                              <label style="display: block; float: left;">Unlocked By : </label>
-                              <span class="item_quote"><?= $temp_item_records['item_unlocked'] == 1 ? '1 Player' : number_format($temp_item_records['item_unlocked'], 0, '.', ',').' Players' ?></span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td class="right">
-                              <label style="display: block; float: left;">Equipped To : </label>
-                              <span class="item_quote"><?= $temp_item_records['item_equipped'] == 1 ? '1 Robot' : number_format($temp_item_records['item_equipped'], 0, '.', ',').' Robots' ?></span>
-                            </td>
-                          </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                <? endif; ?>
-
-                <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
                     <a class="link link_permalink permalink" href="<?= 'database/items/'.$item_info['item_token'].'/' ?>" rel="permalink">+ Permalink</a>
 
-                <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
+                <?php elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
                     <a class="link link_permalink permalink" href="<?= 'database/items/'.$item_info['item_token'].'/' ?>" rel="permalink">+ View More</a>
 
-                <? endif; ?>
+                <?php endif; ?>
 
             </div>
         </div>
-        <?
+        <?php
         // Collect the outbut buffer contents
         $this_markup = trim(ob_get_clean());
 
         // Return the generated markup
         return $this_markup;
+
     }
 
     // Define a static function to use as the common action for all _____-core items
