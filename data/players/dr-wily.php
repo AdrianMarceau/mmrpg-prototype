@@ -132,7 +132,7 @@ $player = array(
         'abilities' => array(
             array('points' =>        0, 'token' => 'buster-shot'),
             array('points' =>    10000, 'token' => 'wily-buster'),
-            array('points' =>   100000, 'token' => 'copy-shot')
+            //array('points' =>   100000, 'token' => 'copy-shot')
             )
         ),
     'player_quotes' => array(
