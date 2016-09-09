@@ -248,6 +248,13 @@ if (!empty($mmrpg_index['robots'])){
         //$temp_insert_array['robot_abilities_rewards'] = implode(',', $temp_insert_array['robot_abilities_rewards']);
 
         // Define immunities for this robot
+        if (!empty($robot_data['robot_rewards']['abilities'])){
+            foreach ($robot_data['robot_rewards']['abilities'] AS $key => $ability){
+                if (!in_array($ability['token'], $robot_data['robot_abilities'])){
+                    $robot_data['robot_abilities'][] = $ability['token'];
+                }
+            }
+        }
         $temp_insert_array['robot_abilities_compatible'] = json_encode(!empty($robot_data['robot_abilities']) ? $robot_data['robot_abilities'] : array());
         //$temp_insert_array['robot_abilities_compatible'] = array();
         //if (!empty($robot_data['robot_abilities'])){ foreach ($robot_data['robot_abilities'] AS $key => $token){ $temp_insert_array['robot_abilities_compatible'][] = '['.$token.']'; } }
@@ -479,6 +486,13 @@ if (!empty($mmrpg_index['mechas'])){
         //$temp_insert_array['robot_abilities_rewards'] = implode(',', $temp_insert_array['robot_abilities_rewards']);
 
         // Define immunities for this robot
+        if (!empty($mecha_data['robot_rewards']['abilities'])){
+            foreach ($mecha_data['robot_rewards']['abilities'] AS $key => $ability){
+                if (!in_array($ability['token'], $mecha_data['robot_abilities'])){
+                    $mecha_data['robot_abilities'][] = $ability['token'];
+                }
+            }
+        }
         $temp_insert_array['robot_abilities_compatible'] = json_encode(!empty($mecha_data['robot_abilities']) ? $mecha_data['robot_abilities'] : array());
         //$temp_insert_array['robot_abilities_compatible'] = array();
         //if (!empty($mecha_data['robot_abilities'])){ foreach ($mecha_data['robot_abilities'] AS $key => $token){ $temp_insert_array['robot_abilities_compatible'][] = '['.$token.']'; } }
@@ -711,6 +725,13 @@ if (!empty($mmrpg_index['bosses'])){
         //$temp_insert_array['robot_abilities_rewards'] = implode(',', $temp_insert_array['robot_abilities_rewards']);
 
         // Define immunities for this robot
+        if (!empty($boss_data['robot_rewards']['abilities'])){
+            foreach ($boss_data['robot_rewards']['abilities'] AS $key => $ability){
+                if (!in_array($ability['token'], $boss_data['robot_abilities'])){
+                    $boss_data['robot_abilities'][] = $ability['token'];
+                }
+            }
+        }
         $temp_insert_array['robot_abilities_compatible'] = json_encode(!empty($boss_data['robot_abilities']) ? $boss_data['robot_abilities'] : array());
         //$temp_insert_array['robot_abilities_compatible'] = array();
         //if (!empty($boss_data['robot_abilities'])){ foreach ($boss_data['robot_abilities'] AS $key => $token){ $temp_insert_array['robot_abilities_compatible'][] = '['.$token.']'; } }
