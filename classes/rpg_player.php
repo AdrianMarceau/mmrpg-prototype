@@ -136,6 +136,1108 @@ class rpg_player extends rpg_object {
 
     }
 
+
+    // -- ID FUNCTIONS -- //
+
+    /**
+     * Get the ID of this player object
+     * @return integer
+     */
+    public function get_id(){
+        return intval($this->get_info('player_id'));
+    }
+
+    /**
+     * Set the ID of this player object
+     * @param int $value
+     */
+    public function set_id($value){
+        $this->set_info('player_id', intval($value));
+    }
+
+    // -- NAME FUNCTIONS -- //
+
+    /**
+     * Get the name of this player object
+     * @return string
+     */
+    public function get_name(){
+        return $this->get_info('player_name');
+    }
+
+    /**
+     * Set the name of this player object
+     * @param string $value
+     */
+    public function set_name($name){
+        $this->set_info('player_name', $name);
+    }
+
+    /**
+     * Get the base name of this player object
+     * @return string value
+     */
+    public function get_base_name(){
+        return $this->get_info('player_base_name');
+    }
+
+    /**
+     * Set the base name of this player object
+     * @param string $value
+     */
+    public function set_base_name($name){
+        $this->set_info('player_base_name', $name);
+    }
+
+
+    // -- TOKEN FUNCTIONS -- //
+
+    /**
+     * Get the token of this player object
+     * @return string
+     */
+    public function get_token(){
+        return $this->get_info('player_token');
+    }
+
+    /**
+     * Set the token of this player object
+     * @param string $value
+     */
+    public function set_token($token){
+        $this->set_info('player_token', $token);
+    }
+
+
+    // -- DESCRIPTION FUNCTIONS -- //
+
+    /**
+     * Get the description of this player object
+     * @return string
+     */
+    public function get_description(){
+        return $this->get_info('player_description');
+    }
+
+    /**
+     * Set the description of this player object
+     * @param string $description
+     */
+    public function set_description($description){
+        $this->set_info('player_description', $description);
+    }
+
+    /**
+     * Get the base description of this player object
+     * @return string
+     */
+    public function get_base_description(){
+        return $this->get_info('player_base_description');
+    }
+
+    /**
+     * Set the base description of this player object
+     * @param string $description
+     */
+    public function set_base_description($description){
+        $this->set_info('player_base_description', $description);
+    }
+
+
+    // -- ENERGY FUNCTIONS -- //
+
+    /**
+     * Get the energy stat for this player object
+     * @return int
+     */
+    public function get_energy(){
+        return $this->get_info('player_energy');
+    }
+
+    /**
+     * Set the energy stat for this player object
+     * @param int $energy
+     */
+    public function set_energy($energy){
+        $this->set_info('player_energy', $energy);
+    }
+
+    /**
+     * Get the base energy stat for this player object
+     * @return int
+     */
+    public function get_base_energy(){
+        return $this->get_info('player_base_energy');
+    }
+
+    /**
+     * Set the base energy stat for this player object
+     * @param int $energy
+     */
+    public function set_base_energy($energy){
+        $this->set_info('player_base_energy', $energy);
+    }
+
+
+    // -- WEAPONS FUNCTIONS -- //
+
+    /**
+     * Get the weapons stat for this player object
+     * @return int
+     */
+    public function get_weapons(){
+        return $this->get_info('player_weapons');
+    }
+
+    /**
+     * Set the weapons stat for this player object
+     * @param int $weapons
+     */
+    public function set_weapons($weapons){
+        $this->set_info('player_weapons', $weapons);
+    }
+
+    /**
+     * Get the base weapons stat for this player object
+     * @return int
+     */
+    public function get_base_weapons(){
+        return $this->get_info('player_base_weapons');
+    }
+
+    /**
+     * Set the base weapons stat for this player object
+     * @param int $weapons
+     */
+    public function set_base_weapons($weapons){
+        $this->set_info('player_base_weapons', $weapons);
+    }
+
+
+    // -- ATTACK FUNCTIONS -- //
+
+    /**
+     * Get the attack stat for this player object
+     * @return int
+     */
+    public function get_attack(){
+        return $this->get_info('player_attack');
+    }
+
+    /**
+     * Set the attack stat for this player object
+     * @param int $attack
+     */
+    public function set_attack($attack){
+        $this->set_info('player_attack', $attack);
+    }
+
+    /**
+     * Get the base attack stat for this player object
+     * @return int
+     */
+    public function get_base_attack(){
+        return $this->get_info('player_base_attack');
+    }
+
+    /**
+     * Set the base attack stat for this player object
+     * @param int $attack
+     */
+    public function set_base_attack($attack){
+        $this->set_info('player_base_attack', $attack);
+    }
+
+
+    // -- DEFENSE FUNCTIONS -- //
+
+    /**
+     * Get the defense stat for this player object
+     * @return int
+     */
+    public function get_defense(){
+        return $this->get_info('player_defense');
+    }
+
+    /**
+     * Set the defense stat for this player object
+     * @param int $defense
+     */
+    public function set_defense($defense){
+        $this->set_info('player_defense', $defense);
+    }
+
+    /**
+     * Get the base defense stat for this player object
+     * @return int
+     */
+    public function get_base_defense(){
+        return $this->get_info('player_base_defense');
+    }
+
+    /**
+     * Set the base defense stat for this player object
+     * @param int $defense
+     */
+    public function set_base_defense($defense){
+        $this->set_info('player_base_defense', $defense);
+    }
+
+
+    // -- SPEED FUNCTIONS -- //
+
+    /**
+     * Get the speed stat for this player object
+     * @return int
+     */
+    public function get_speed(){
+        return $this->get_info('player_speed');
+    }
+
+    /**
+     * Set the speed stat for this player object
+     * @param int $speed
+     */
+    public function set_speed($speed){
+        $this->set_info('player_speed', $speed);
+    }
+
+    /**
+     * Get the base speed stat for this player object
+     * @return int
+     */
+    public function get_base_speed(){
+        return $this->get_info('player_base_speed');
+    }
+
+    /**
+     * Set the base speed stat for this player object
+     * @param int $speed
+     */
+    public function set_base_speed($speed){
+        $this->set_info('player_base_speed', $speed);
+    }
+
+
+    // -- IMAGE FUNCTIONS -- //
+
+    /**
+     * Get the image token of this player object
+     * @return string
+     */
+    public function get_image(){
+        return $this->get_info('player_image');
+    }
+
+    /**
+     * Set the image token of this player object
+     * @param string $image
+     */
+    public function set_image($image){
+        $this->set_info('player_image', $image);
+    }
+
+    /**
+     * Get the base image token of this player object
+     * @return string
+     */
+    public function get_base_image(){
+        return $this->get_info('player_base_image');
+    }
+
+    /**
+     * Set the base image token of this player object
+     * @param string $image
+     */
+    public function set_base_image($image){
+        $this->set_info('player_base_image', $image);
+    }
+
+    /**
+     * Get the image size of this player object
+     * @return int
+     */
+    public function get_image_size(){
+        return $this->get_info('player_image_size');
+    }
+
+    /**
+     * Set the image size of this player object
+     * @param int $size
+     */
+    public function set_image_size($size){
+        $this->set_info('player_image_size', $size);
+    }
+
+    /**
+     * Get the base image size of this player object
+     * @return int
+     */
+    public function get_base_image_size(){
+        return $this->get_info('player_base_image_size');
+    }
+
+    /**
+     * Set the base image size of this player object
+     * @param int $size
+     */
+    public function set_base_image_size($size){
+        $this->set_info('player_base_image_size', $size);
+    }
+
+
+    // -- ROBOT FUNCTIONS -- //
+
+    /**
+     * Get the list of robots owned by this player object
+     * @return array
+     */
+    public function get_robots(){
+        return $this->get_info('player_robots');
+    }
+
+    /**
+     * Set the list of robots owned by this player object
+     * @param array $robots
+     */
+    public function set_robots($robots){
+        $this->set_info('player_robots', $robots);
+    }
+
+    /*
+
+    /**
+     * Get the base list of robots owned by this player object
+     * @return array
+     * /
+    public function get_base_robots(){
+        return $this->get_info('player_base_robots');
+    }
+
+    /**
+     * Set the list of robots owned by this player object
+     * @param array $robots
+     * /
+    public function set_base_robots($robots){
+        $this->set_info('player_base_robots', $robots);
+    }
+
+    */
+
+    /**
+     * Get the list of active status robots owned by this player object
+     * @return array
+     */
+    public function get_robots_active(){
+        $filters = array('player_id' => $this->player_id, 'robot_status' => 'active');
+        $robots = $this->battle->find_robots($filters);
+        return $robots;
+    }
+
+    /**
+     * Get the list of disabled status robots owned by this player object
+     * @return array
+     */
+    public function get_robots_disabled(){
+        $filters = array('player_id' => $this->player_id, 'robot_status' => 'disabled');
+        $robots = $this->battle->find_robots($filters);
+        return $robots;
+    }
+
+
+    // -- ABILITY FUNCTIONS -- //
+
+    /**
+     * Get the list of abilities equipped to this player object
+     * @return array
+     */
+    public function get_abilities(){
+        return $this->get_info('player_abilities');
+    }
+
+    /**
+     * Get the number of abilities equipped to this player object
+     * @return int
+     */
+    public function get_abilities_count(){
+        $abilities = $this->get_info('player_abilities');
+        return count($abilities);
+    }
+
+    /**
+     * Set the list of abilities equipped to this player object
+     * @param array $abilities
+     */
+    public function set_abilities($abilities){
+        $this->set_info('player_abilities', $abilities);
+    }
+
+    /**
+     * Check if this player object has any abilities
+     * @param array $abilities
+     */
+    public function has_abilities(){
+        $abilities = $this->get_info('player_abilities');
+        return !empty($abilities) ? true : false;
+    }
+
+    /**
+     * Get one of this player object's abilities by its slot key
+     * @param int $key
+     * @return string
+     */
+    public function get_ability($key){
+        return $this->get_info('player_abilities', $key);
+    }
+
+    /**
+     * Set one of this player object's abilities by its slot key
+     * @param int $key
+     * @param string $ability
+     */
+    public function set_ability($key, $token){
+        $this->set_info('player_abilities', $key, $token);
+    }
+
+    /**
+     * Unset one of this player object's abilities by its slot key
+     * @param int $key
+     */
+    public function unset_ability($key){
+        $this->unset_info('player_abilities', $key);
+    }
+
+    /**
+     * Check if this player object has a specific ability by its slot key or token
+     * @param mixed $value
+     * @return bool
+     */
+    public function has_ability($value){
+        $abilities = $this->get_info('player_abilities');
+        if (is_numeric($value)){ return in_array($value, $abilities) ? true : false; }
+        else { return isset($abilities[$value]) ? true : false; }
+    }
+
+    /*
+
+    /**
+     * Get the base list of abilities equipped to this player object
+     * @return array
+     * /
+    public function get_base_abilities(){
+        return $this->get_info('player_base_abilities');
+    }
+
+    /**
+     * Get the number of base list of abilities equipped to this player object
+     * @return array
+     * /
+    public function get_base_abilities_count(){
+        $abilities = $this->get_info('player_base_abilities');
+        return count($abilities);
+    }
+
+    /**
+     * Set the base list of abilities equipped to this player object
+     * @param array $abilities
+     * /
+    public function set_base_abilities($abilities){
+        $this->set_info('player_base_abilities', $abilities);
+    }
+
+    /**
+     * Check if this player object has any base abilities
+     * @param array $abilities
+     * /
+    public function has_base_abilities(){
+        $abilities = $this->get_info('player_base_abilities');
+        return !empty($abilities) ? true : false;
+    }
+
+    /**
+     * Get one of this player object's base abilities by its slot key
+     * @param int $key
+     * @return string
+     * /
+    public function get_base_ability($key){
+        return $this->get_info('player_base_abilities', $key);
+    }
+
+    /**
+     * Set one of this player object's base abilities by its slot key
+     * @param int $key
+     * @param string $ability
+     * /
+    public function set_base_ability($key, $token){
+        $this->set_info('player_base_abilities', $key, $token);
+    }
+
+    /**
+     * Unset one of this player object's abilities by its slot key
+     * @param int $key
+     * /
+    public function unset_base_ability($key){
+        $this->unset_info('player_base_abilities', $key);
+    }
+
+    /**
+     * Check if this player object has a specific base ability by its slot key or token
+     * @param mixed $value
+     * @return bool
+     * /
+    public function has_base_ability($value){
+        $abilities = $this->get_info('player_base_abilities');
+        if (is_numeric($value)){ return in_array($value, $abilities) ? true : false; }
+        else { return isset($abilities[$value]) ? true : false; }
+    }
+
+    */
+
+
+    // -- ITEM FUNCTIONS -- //
+
+    /**
+     * Get the list of items equipped to this player object
+     * @return array
+     */
+    public function get_items(){
+        return $this->get_info('player_items');
+    }
+
+    /**
+     * Get the number of items equipped to this player object
+     * @return array
+     */
+    public function get_items_count(){
+        $items = $this->get_info('player_items');
+        return count($items);
+    }
+
+    /**
+     * Set the list of items equipped to this player object
+     * @param array $items
+     */
+    public function set_items($items){
+        $this->set_info('player_items', $items);
+    }
+
+    /**
+     * Get one of this player object's items by its slot key
+     * @param int $key
+     * @return string
+     */
+    public function get_item($key){
+        return $this->get_info('player_items', $key);
+    }
+
+    /**
+     * Set one of this player object's items by its slot key
+     * @param int $key
+     * @param string $item
+     */
+    public function set_item($key, $token){
+        $this->set_info('player_items', $key, $token);
+    }
+
+    /**
+     * Unset one of this player object's items by its slot key
+     * @param int $key
+     */
+    public function unset_item($key){
+        $this->unset_info('player_items', $key);
+    }
+
+    /**
+     * Check if this player object has a specific item by its slot key or token
+     * @param mixed $value
+     * @return bool
+     */
+    public function has_item($value){
+        $items = $this->get_info('player_items');
+        if (is_numeric($value)){ return in_array($value, $items) ? true : false; }
+        else { return isset($items[$value]) ? true : false; }
+    }
+
+    /*
+
+    /**
+     * Get the base list of items equipped to this player object
+     * @return array
+     * /
+    public function get_base_items(){
+        return $this->get_info('player_base_items');
+    }
+
+    /**
+     * Get the base list of items equipped to this player object
+     * @return array
+     * /
+    public function get_base_items_count(){
+        $items = $this->get_info('player_base_items');
+        return count($items);
+    }
+
+    /**
+     * Set the base list of items equipped to this player object
+     * @param array $items
+     * /
+    public function set_base_items($items){
+        $this->set_info('player_base_items', $items);
+    }
+
+    /**
+     * Get one of this player object's base items by its slot key
+     * @param int $key
+     * @return string
+     * /
+    public function get_base_item($key){
+        return $this->get_info('player_base_items', $key);
+    }
+
+    /**
+     * Set one of this player object's base items by its slot key
+     * @param int $key
+     * @param string $item
+     * /
+    public function set_base_item($key, $token){
+        $this->set_info('player_base_items', $key, $token);
+    }
+
+    /**
+     * Unset one of this player object's items by its slot key
+     * @param int $key
+     * /
+    public function unset_base_item($key){
+        $this->unset_info('player_base_items', $key);
+    }
+
+    /**
+     * Check if this player object has a specific base item by its slot key or token
+     * @param mixed $value
+     * @return bool
+     * /
+    public function has_base_item($value){
+        $items = $this->get_info('player_base_items');
+        if (is_numeric($value)){ return in_array($value, $items) ? true : false; }
+        else { return isset($items[$value]) ? true : false; }
+    }
+
+    */
+
+
+    // -- CONTROLLER FUNCTIONS -- //
+
+    /**
+     * Get the side of the field this player object is fighting for
+     * @return string
+     */
+    public function get_side(){
+        return $this->get_info('player_side');
+    }
+
+    /**
+     * Set the side of the field this player object is fighting for
+     * @param string $side
+     */
+    public function set_side($side){
+        $this->set_info('player_side', $side);
+    }
+
+    /**
+     * Get the direction of the field this player object is fighting for
+     * @return string
+     */
+    public function get_direction(){
+        return $this->get_info('player_direction');
+    }
+
+    /**
+     * Set the direction of the field this player object is fighting for
+     * @param string $direction
+     */
+    public function set_direction($direction){
+        $this->set_info('player_direction', $direction);
+    }
+
+    /**
+     * Get the value of the auto-pilot flag for this player object
+     * @return bool
+     */
+    public function is_autopilot(){
+        return $this->get_autopilot() == true ? true : false;
+    }
+
+    /**
+     * Get the value of the auto-pilot flag for this player object
+     * @return bool
+     */
+    public function get_autopilot(){
+        return $this->get_info('player_autopilot');
+    }
+
+    /**
+     * Set the value of the auto-pilot flag for this player object
+     * @param bool $flag
+     */
+    public function set_autopilot($flag){
+        $this->set_info('player_autopilot', $flag);
+    }
+
+    /**
+     * Get the controller value for this player object
+     * @return string
+     */
+    public function get_controller(){
+        return $this->get_info('player_controller');
+    }
+
+    /**
+     * Set the controller value for this player object
+     * @param string $controller
+     */
+    public function set_controller($controller){
+        $this->set_info('player_controller', $controller);
+    }
+
+
+    // -- QUOTE FUNCTIONS -- //
+
+    /**
+     * Get the list of quotes for this player object
+     * @return array
+     */
+    public function get_quotes(){
+        return $this->get_info('player_quotes');
+    }
+
+    /**
+     * Set the list of quotes for this player object
+     * @param array $quotes
+     */
+    public function set_quotes($quotes){
+        $this->set_info('player_quotes', $quotes);
+    }
+
+    /**
+     * Get a specific quote for this player object by its token
+     * @param string $token
+     * @return string
+     */
+    public function get_quote($token){
+        $quotes = $this->get_info('player_quotes');
+        return isset($quotes[$token]) ? $quotes[$token] : '';
+    }
+
+    /**
+     * Set a specific quote for this player object by its token
+     * @param string $token
+     * @param string $quote
+     */
+    public function set_quote($token, $quote){
+        $this->set_info('player_quotes', $token, $quote);
+    }
+
+    /**
+     * Check if this player object has a specific quote by its token
+     * @param string $token
+     * @return bool
+     */
+    public function has_quote($token){
+        $quotes = $this->get_info('player_quotes');
+        return isset($quotes[$token]) ? true : false;
+    }
+
+    /*
+
+    /**
+     * Get the base list of quotes for this player object
+     * @return array
+     * /
+    public function get_base_quotes(){
+        return $this->get_info('player_base_quotes');
+    }
+
+    /**
+     * Set the base list of quotes for this player object
+     * @param array $quotes
+     * /
+    public function set_base_quotes($quotes){
+        $this->set_info('player_base_quotes', $quotes);
+    }
+
+    /**
+     * Get a specific base quote for this player object by its token
+     * @param string $token
+     * @return string
+     * /
+    public function get_base_quote($token){
+        $quotes = $this->get_info('player_base_quotes');
+        return isset($quotes[$token]) ? $quotes[$token] : '';
+    }
+
+    /**
+     * Set a specific base quote for this player object by its token
+     * @param string $token
+     * @param string $quote
+     * /
+    public function set_base_quote($token, $quote){
+        $this->set_info('player_base_quotes', $token, $quote);
+    }
+
+    /**
+     * Check if this player object has a specific base quote by its token
+     * @param string $token
+     * @return bool
+     * /
+    public function has_base_quote($token){
+        $quotes = $this->get_info('player_base_quotes');
+        return isset($quotes[$token]) ? true : false;
+    }
+
+    */
+
+
+    // -- REWARD FUNCTIONS -- //
+
+    /**
+     * Get the list of rewards for this player object
+     * @return array
+     */
+    public function get_rewards(){
+        return $this->get_info('player_rewards');
+    }
+
+    /**
+     * Set the list of rewards for this player object
+     * @param array $rewards
+     */
+    public function set_rewards($rewards){
+        $this->set_info('player_rewards', $rewards);
+    }
+
+    /*
+
+    /**
+     * Get the base list of rewards for this player object
+     * @return array
+     * /
+    public function get_base_rewards(){
+        return $this->get_info('player_base_rewards');
+    }
+
+    /**
+     * Set the base list of rewards for this player object
+     * @param array $rewards
+     * /
+    public function set_base_rewards($rewards){
+        $this->set_info('player_base_rewards', $rewards);
+    }
+
+    */
+
+
+    // -- STARFORCE FUNCTIONS -- //
+
+    /**
+     * Get the list of starforce values for this player object
+     * @return array
+     */
+    public function get_starforce(){
+        return $this->get_info('player_starforce');
+    }
+
+    /**
+     * Set the list of starforce values for this player object
+     * @param array $starforce
+     */
+    public function set_starforce($starforce){
+        $this->set_info('player_starforce', $starforce);
+    }
+
+    /*
+
+    /**
+     * Get the base list of starforce values for this player object
+     * @return array
+     * /
+    public function get_base_starforce(){
+        return $this->get_info('player_base_starforce');
+    }
+
+    /**
+     * Set the base list of starforce values for this player object
+     * @param array $starforce
+     * /
+    public function set_base_starforce($value){
+        $this->set_info('player_base_starforce', $value);
+    }
+
+    */
+
+
+    // -- FRAME FUNCTIONS -- //
+
+    /**
+     * Get the current frame of this player object's sprite
+     * @return string
+     */
+    public function get_frame(){
+        $frame = $this->get_info('player_frame');
+        return !empty($frame) ? $frame : 'base';
+    }
+
+    /**
+     * Set the current frame of this player object's sprite
+     * @param string $frame
+     */
+    public function set_frame($frame){
+        $this->set_info('player_frame', $frame);
+    }
+
+    /**
+     * Get the frame index for this player object's sprite
+     * @return array
+     */
+    public function get_frame_index(){
+        $index = $this->get_info('player_frame_index');
+        return !empty($index) ? $index : array();
+    }
+
+    /**
+     * Get the frame index key for a specific frame of this player sprite
+     * @param string $frame
+     * @return string
+     */
+    public function get_frame_index_key($frame){
+        $index = $this->get_info('player_frame_index');
+        $key = array_search($frame, $index);
+        return $key != false ? str_pad($key, 2, '0', STR_PAD_LEFT) : '00';
+    }
+
+    /**
+     * Set the frame index for this player object's sprite
+     * @param array $index
+     */
+    public function set_frame_index($index){
+        $this->set_info('player_frame_index', $index);
+    }
+
+    /**
+     * Get the frame offset for this player object's sprite
+     * @return array
+     */
+    public function get_frame_offset(){
+        $offset = $this->get_info('player_frame_offset');
+        return !empty($offset) ? $offset : array();
+    }
+
+    /**
+     * Set the frame offset for this player object's sprite
+     * @param array $offset
+     */
+    public function set_frame_offset($offset){
+        $this->set_info('player_frame_offset', $offset);
+    }
+
+
+    // -- POINTS FUNCTIONS -- //
+
+    /**
+     * Get the battle points for this player object
+     * @return int
+     */
+    public function get_points(){
+        return $this->get_info('player_points');
+    }
+
+    /**
+     * Set the battle points for this player object
+     * @param int $points
+     */
+    public function set_points($points){
+        $this->set_info('player_points', $points);
+    }
+
+    /*
+
+    /**
+     * Get the base battle points for this player object
+     * @return int
+     * /
+    public function get_base_points(){
+        return $this->get_info('player_base_points');
+    }
+
+    /**
+     * Set the base battle points for this player object
+     * @param int $points
+     * /
+    public function set_base_points($value){
+        $this->set_info('player_base_points', $value);
+    }
+
+    */
+
+    // -- SWITCH FUNCTIONS -- //
+
+    /**
+     * Get the switch frequency of this player object
+     * @return float
+     */
+    public function get_switch(){
+        return $this->get_info('player_switch');
+    }
+
+    /**
+     * Set the switch frequency of this player object
+     * @param float $switch
+     */
+    public function set_switch($switch){
+        $this->set_info('player_switch', $switch);
+    }
+
+    /*
+
+    /**
+     * Get the base switch frequency of this player object
+     * @return float
+     * /
+    public function get_base_switch(){
+        return $this->get_info('player_base_switch');
+    }
+
+    /**
+     * Set the switch frequency of this player object
+     * @param float $switch
+     * /
+    public function set_base_switch($switch){
+        $this->set_info('player_base_switch', $switch);
+    }
+
+    */
+
+
+    // -- ACTION FUNCTIONS -- //
+
+    /**
+     * Get the next action of this player object
+     * @return string
+     */
+    public function get_next_action(){
+        return $this->get_info('player_next_action');
+    }
+
+    /**
+     * Set the next action of this player object
+     * @param string $action
+     */
+    public function set_next_action($action){
+        $this->set_info('player_next_action', $action);
+    }
+
+
+    // -- LOAD FUNCTIONS -- //
+
     // Define a function for adding a new robot to this player's object data
     public function load_robot($this_robotinfo, $this_key, $apply_bonuses = false){
         //$GLOBALS['DEBUG']['checkpoint_line'] = 'class.player.php : line 107 <pre>'.print_r($this->player_robots, true).'</pre>';
@@ -171,20 +1273,6 @@ class rpg_player extends rpg_object {
             $quote_text = '<span style="color: rgb('.implode(',', $this_text_colour).');">&quot;<em>'.$this_quote_text.'</em>&quot;</span>';
         }
         return $quote_text;
-    }
-
-    // Define a function for checking if this player has a specific ability
-    public function has_ability($ability_token){
-        if (empty($this->player_abilities) || empty($ability_token)){ return false; }
-        elseif (in_array($ability_token, $this->player_abilities)){ return true; }
-        else { return false; }
-    }
-
-    // Define a function for checking if this player has a specific item
-    public function has_item($item_token){
-        if (empty($this->player_items) || empty($item_token)){ return false; }
-        elseif (in_array($item_token, $this->player_items)){ return true; }
-        else { return false; }
     }
 
     // Define a function for generating player canvas variables
@@ -403,9 +1491,9 @@ class rpg_player extends rpg_object {
             $item_core_info = array('item_token' => $temp_core_token, 'item_name' => $temp_core_name, 'item_type' => $item_reward_info['item_type']);
 
             // Create the temporary item object for event creation
-            $temp_info['item_id'] += 1;
-            $temp_info['item_token'] = $temp_core_token;
-            $temp_core = new rpg_item($target_player, $target_robot, $temp_info);
+            $item_core_info['item_id'] = $item_reward_info['item_id'] + 1;
+            $item_core_info['item_token'] = $temp_core_token;
+            $temp_core = new rpg_item($this_battle, $target_player, $target_robot, $item_core_info);
             $temp_core->item_name = $item_core_info['item_name'];
             $temp_core->item_image = $item_core_info['item_token'];
             $temp_core->update_session();
@@ -430,7 +1518,7 @@ class rpg_player extends rpg_object {
 
             // Display the robot reward message markup
             $event_header = $temp_core_name.' Item Fusion';
-            $event_body = rpg_functions::get_random_positive_word().' The glowing shards fused to create a new '.$temp_core->print_name().'!<br />';
+            $event_body = rpg_battle::random_positive_word().' The glowing shards fused to create a new '.$temp_core->print_name().'!<br />';
             $event_body .= $target_player->print_name().' added the new core to the inventory.';
             $event_options = array();
             $event_options['console_show_target'] = false;
