@@ -37,7 +37,7 @@ $robot = array(
             array('level' => 0, 'token' => 'buster-shot'), // = 20
             array('level' => 22, 'token' => 'proto-buster'), // +2
             array('level' => 26, 'token' => 'proto-shield'), // +4
-            array('level' => 32, 'token' => 'proto-shield'), // +6
+            array('level' => 32, 'token' => 'proto-strike'), // +6
             //array('level' => 40, 'token' => 'proto-???'), // +8
             //array('level' => 50, 'token' => 'mirror-move') // +10
             )
