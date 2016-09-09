@@ -6,6 +6,12 @@ $robot = array(
     'robot_game' => 'MMEXE',
     'robot_name' => 'Trill',
     'robot_token' => 'trill',
+    'robot_image_editor' => 412,
+    'robot_image_alts' => array(
+        array('token' => 'alt', 'name' => 'Trill (Attack Alt)', 'summons' => 100),
+        array('token' => 'alt2', 'name' => 'Trill (Defense Alt)', 'summons' => 200),
+        array('token' => 'alt3', 'name' => 'Trill (Speed Alt)', 'summons' => 300),
+        ),
     'robot_core' => 'space',
     'robot_description' => 'Galactic Assistant Robot',
     'robot_energy' => 100,
