@@ -22,55 +22,60 @@ $this_page_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : 'home';
 
 // If this is an EMPTY request
 if ($this_page_action == 'home'){
-  // Require the admin home file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
+    // Require the admin home file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
 }
 // Else if this is an UPDATE request
 elseif ($this_page_action == 'update'){
-  // Require the update file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/update.php');
+    // Require the update file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/update.php');
 }
 // Else if this is a PRURGE request
 elseif ($this_page_action == 'purge'){
-  // Require the purge file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/purge.php');
+    // Require the purge file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/purge.php');
+}
+// Else if this is an IMPORT PLAYERS request
+elseif ($this_page_action == 'import_players'){
+    // Require the import players file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/import-players.php');
 }
 // Else if this is an IMPORT ROBOTS request
 elseif ($this_page_action == 'import_robots'){
-  // Require the import robots file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/import-robots.php');
+    // Require the import robots file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/import-robots.php');
 }
 // Else if this is an IMPORT ABILITIES request
 elseif ($this_page_action == 'import_abilities'){
-  // Require the import abilities file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/import-abilities.php');
+    // Require the import abilities file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/import-abilities.php');
 }
 // Else if this is an IMPORT ITEMS request
 elseif ($this_page_action == 'import_items'){
-  // Require the import items file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/import-items.php');
+    // Require the import items file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/import-items.php');
 }
 // Else if this is an IMPORT FIELDS request
 elseif ($this_page_action == 'import_fields'){
-  // Require the import fields file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/import-fields.php');
+    // Require the import fields file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/import-fields.php');
 }
 // Else if this is an DELETE CACHE request
 elseif ($this_page_action == 'delete_cache'){
-  // Require the delete cache file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/delete-cache.php');
+    // Require the delete cache file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/delete-cache.php');
 }
 // Else if this is an CLEAR SESSIONS request
 elseif ($this_page_action == 'clear_sessions'){
-  // Require the delete cache file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/clear-sessions.php');
+    // Require the delete cache file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/clear-sessions.php');
 }
 // Otherwise, not a valid page
 else {
-  // Print out error 404 text
-  $this_error_markup = '<strong>Error 404</strong><br />Page Not Found';
-  // Require the admin home file
-  require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
+    // Print out error 404 text
+    $this_error_markup = '<strong>Error 404</strong><br />Page Not Found';
+    // Require the admin home file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
 }
 
 // Unset the database variable
@@ -96,22 +101,22 @@ unset($db);
 <script type="text/javascript" src="scripts/jquery.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 </head>
 <body id="mmrpg" style="background-color: #F2F2F2;">
-  <div id="admin" style="margin: 20px;">
-    <h1 class="header" style="font-size: 20px; line-height: 40px; "><?= $this_page_title ?></h1>
-    <div class="content" style="text-align: left; padding: 20px; background-color: #FFFFFF;">
-      <?= $this_page_markup ?>
+    <div id="admin" style="margin: 20px;">
+        <h1 class="header" style="font-size: 20px; line-height: 40px; "><?= $this_page_title ?></h1>
+        <div class="content" style="text-align: left; padding: 20px; background-color: #FFFFFF;">
+            <?= $this_page_markup ?>
+        </div>
     </div>
-  </div>
-  &nbsp;
-  <? if(false){ ?>
-    <pre style="text-align: left; padding: 20px;">
-    <? foreach ($_SESSION['GAME']['values']['battle_settings'] AS $player_token => $battle_settings){
-      echo '<h1>'.$player_token.'</h1>'."\n";
-      echo htmlentities(print_r($battle_settings), ENT_QUOTES, 'UTF-8', true);
-    } ?>
-    <?= htmlentities(print_r($_REQUEST), ENT_QUOTES, 'UTF-8', true) ?>
-    </pre>
-  <? } ?>
-  &nbsp;
+    &nbsp;
+    <? if(false){ ?>
+        <pre style="text-align: left; padding: 20px;">
+        <? foreach ($_SESSION['GAME']['values']['battle_settings'] AS $player_token => $battle_settings){
+            echo '<h1>'.$player_token.'</h1>'."\n";
+            echo htmlentities(print_r($battle_settings), ENT_QUOTES, 'UTF-8', true);
+        } ?>
+        <?= htmlentities(print_r($_REQUEST), ENT_QUOTES, 'UTF-8', true) ?>
+        </pre>
+    <? } ?>
+    &nbsp;
 </body>
 </html>

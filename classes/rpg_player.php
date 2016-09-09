@@ -1743,6 +1743,16 @@ class rpg_player extends rpg_object {
             else { $player_info[$field_name] = array(); }
         }
 
+        // Restructure reward and compatibility arrays for the player
+        $player_info['player_rewards'] = array();
+        $player_info['player_rewards']['robots'] = $player_info['player_robots_rewards'];
+        $player_info['player_rewards']['abilities'] = $player_info['player_abilities_rewards'];
+        unset($player_info['player_robots_rewards'], $player_info['player_abilities_rewards']);
+        $player_info['player_abilities'] = $player_info['player_abilities_compatible'];
+        unset($player_info['player_abilities_compatible']);
+        $player_info['player_robots_unlockable'] = $player_info['player_robots_compatible'];
+        unset($player_info['player_robots_compatible']);
+
         // Collect the quotes into the proper arrays
         $quote_types = array('start', 'taunt', 'victory', 'defeat');
         foreach ($quote_types AS $type){
@@ -2176,6 +2186,9 @@ class rpg_player extends rpg_object {
                                         $player_ability_core = !empty($index_player['player_type']) ? $index_player['player_type'] : false;
                                         $player_ability_list = !empty($index_player['player_abilities']) ? $index_player['player_abilities'] : array();
                                         $player_ability_rewards = !empty($player_info['player_rewards']['abilities']) ? $player_info['player_rewards']['abilities'] : array();
+
+                                        //die('<pre>'.print_r($player_info, true).'</pre>');
+
                                         $new_ability_rewards = array();
                                         foreach ($player_ability_rewards AS $this_info){
                                             $new_ability_rewards[$this_info['token']] = $this_info;
@@ -2276,7 +2289,7 @@ class rpg_player extends rpg_object {
                                             }
                                             echo implode(' ', $temp_string);
                                         } else {
-                                            echo '<span class="player_ability player_type_none"><span class="chrome">None</span></span>';
+                                            echo '<span class="player_ability player_type type_none"><span class="chrome">None</span></span>';
                                         }
                                         ?>
                                         </div>
