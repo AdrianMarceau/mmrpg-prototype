@@ -6,6 +6,7 @@
 <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 <ul style="margin: 0 auto 20px; font-weight: bold;">
 <li style="padding: 5px; background-color: #F2F2F2; margin-bottom: 4px;"><a href="admin.php?action=update&amp;date=<?=MMRPG_CONFIG_CACHE_DATE?>&limit=1">Update Save Files</a></li>
+<li style="padding: 5px; background-color: #F2F2F2; margin-bottom: 4px;"><a href="admin.php?action=import_players&amp;limit=10">Update Player Database</a></li>
 <li style="padding: 5px; background-color: #F2F2F2; margin-bottom: 4px;"><a href="admin.php?action=import_robots&amp;limit=10">Update Robot Database</a></li>
 <li style="padding: 5px; background-color: #F2F2F2; margin-bottom: 4px;"><a href="admin.php?action=import_abilities&amp;limit=10">Update Ability Database</a></li>
 <li style="padding: 5px; background-color: #F2F2F2; margin-bottom: 4px;"><a href="admin.php?action=import_items&amp;limit=10">Update Item Database</a></li>
