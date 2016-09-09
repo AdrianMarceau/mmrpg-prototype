@@ -16,7 +16,7 @@ $ability = array(
         extract($objects);
 
         // Collect the battle turn and its counter position
-        $this_battle_turn = $this->battle->counters['battle_turn'];
+        $this_battle_turn = $this_battle->counters['battle_turn'];
         if ($this_battle_turn > 3){ $this_battle_turn = $this_battle_turn % 3; }
 
         // Define which type of weapon will be generated and power
@@ -94,7 +94,7 @@ $ability = array(
         */
 
         // Update the ability damage and image based on turn
-        $next_battle_turn = $this->battle->counters['battle_turn'] + 1;
+        $next_battle_turn = $this_battle->counters['battle_turn'] + 1;
         if ($next_battle_turn > 3){ $next_battle_turn = $next_battle_turn % 3; }
 
         if ($next_battle_turn % 3 == 0){
