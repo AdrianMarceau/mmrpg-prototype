@@ -14,7 +14,7 @@ if (MMRPG_CONFIG_ADMIN_MODE){
 }
 
 // Turn OFF error reporting if live
-if (MMRPG_CONFIG_IS_LIVE){
+if (!MMRPG_CONFIG_ADMIN_MODE && MMRPG_CONFIG_IS_LIVE){
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
     error_reporting(0);
