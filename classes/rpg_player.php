@@ -1737,7 +1737,7 @@ class rpg_player extends rpg_object {
         else { $player_info['_parsed'] = true; }
 
         // Explode json encoded fields into expanded array objects
-        $temp_fields = array('player_abilities_rewards', 'player_abilities_compatible', 'player_robots_rewards', 'player_robots_compatible');
+        $temp_fields = array('player_abilities_rewards', 'player_abilities_compatible', 'player_robots_rewards', 'player_robots_compatible', 'player_image_alts');
         foreach ($temp_fields AS $field_name){
             if (!empty($player_info[$field_name])){ $player_info[$field_name] = json_decode($player_info[$field_name], true); }
             else { $player_info[$field_name] = array(); }
@@ -1961,9 +1961,6 @@ class rpg_player extends rpg_object {
     // Define a static function for printing out the player's database markup
     public static function print_database_markup($player_info, $print_options = array()){
 
-        // Define the markup variable
-        $this_markup = '';
-
         // Define the global variables
         global $db;
         global $mmrpg_index, $this_current_uri, $this_current_url;
@@ -2009,33 +2006,36 @@ class rpg_player extends rpg_object {
         // Define the sprite frame index for robot images
         $player_sprite_frames = array('base','taunt','victory','defeat','command','damage');
 
+        // Define the markup variable
+        $this_markup = '';
+
         // Start the output buffer
         ob_start();
         ?>
-        <div class="database_container database_player_container" data-token="<?=$player_info['player_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
-            <a class="anchor" id="<?=$player_info['player_token']?>">&nbsp;</a>
-            <div class="subbody event event_triple event_visible" data-token="<?=$player_info['player_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
+        <div class="database_container database_player_container" data-token="<?= $player_info['player_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
+            <a class="anchor" id="<?= $player_info['player_token']?>">&nbsp;</a>
+            <div class="subbody event event_triple event_visible" data-token="<?= $player_info['player_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
 
-                <? if($print_options['show_mugshot']): ?>
+                <?php if($print_options['show_mugshot']): ?>
                     <div class="this_sprite sprite_left" style="height: 40px;">
-                        <? if($print_options['show_key'] !== false): ?>
-                            <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.($print_options['show_key'] + 1) ?></div>
-                        <? endif; ?>
-                        <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>"><div style="background-image: url(images/players/<?= $player_image_token ?>/mug_right_<?= $player_image_size_text ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_player sprite_40x40 sprite_40x40_mug sprite_size_<?= $player_image_size_text ?> sprite_size_<?= $player_image_size_text ?>_mug player_status_active player_position_active"><?=$player_info['player_name']?>'s Mugshot</div></div>
+                        <?php if($print_options['show_key'] !== false): ?>
+                            <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$player_info['player_key'] ?></div>
+                        <?php endif; ?>
+                        <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>"><div style="background-image: url(images/players/<?= $player_image_token ?>/mug_right_<?= $player_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_player sprite_40x40 sprite_40x40_mug sprite_size_<?= $player_image_size_text ?> sprite_size_<?= $player_image_size_text ?>_mug player_status_active player_position_active"><?= $player_info['player_name']?>'s Mugshot</div></div>
                     </div>
-                <? endif; ?>
+                <?php endif; ?>
 
 
-                <? if($print_options['show_basics']): ?>
+                <?php if($print_options['show_basics']): ?>
                     <h2 class="header header_left player_type_<?= $player_type_token ?>" style="margin-right: 0;">
-                        <? if($print_options['layout_style'] == 'website_compact'): ?>
+                        <?php if($print_options['layout_style'] == 'website_compact'): ?>
                             <a href="database/players/<?= $player_info['player_token'] ?>/"><?= $player_info['player_name'] ?></a>
-                        <? else: ?>
+                        <?php else: ?>
                             <?= $player_info['player_name'] ?>&#39;s Data
-                        <? endif; ?>
-                        <? if (!empty($player_info['player_type'])): ?>
+                        <?php endif; ?>
+                        <?php if (!empty($player_info['player_type'])): ?>
                             <span class="header_core ability_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($player_info['player_type']) ?> Type</span>
-                        <? endif; ?>
+                        <?php endif; ?>
                     </h2>
                     <div class="body body_left" style="margin-right: 0; padding: 2px 3px;">
                         <table class="full" style="margin: 5px auto 10px;">
@@ -2048,12 +2048,12 @@ class rpg_player extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <label style="display: block; float: left;">Name :</label>
-                                        <span class="player_name player_type"><?=$player_info['player_name']?></span>
+                                        <span class="player_name player_type"><?= $player_info['player_name']?></span>
                                     </td>
                                     <td class="middle">&nbsp;</td>
                                     <td class="right">
                                         <label style="display: block; float: left;">Bonus :</label>
-                                        <?
+                                        <?php
                                             // Display any special boosts this player has
                                             if (!empty($player_info['player_energy'])){ echo '<span class="player_name player_type player_type_energy">Robot Energy +'.$player_info['player_energy'].'%</span>'; }
                                             elseif (!empty($player_info['player_attack'])){ echo '<span class="player_name player_type player_type_attack">Robot Attack +'.$player_info['player_attack'].'%</span>'; }
@@ -2065,7 +2065,7 @@ class rpg_player extends rpg_object {
                                 </tr>
                             </tbody>
                         </table>
-                        <? if($print_options['show_quotes']): ?>
+                        <?php if($print_options['show_quotes']): ?>
                             <table class="full" style="margin: 5px auto 10px;">
                                 <colgroup>
                                     <col width="100%" />
@@ -2097,16 +2097,152 @@ class rpg_player extends rpg_object {
                                     </tr>
                                 </tbody>
                             </table>
-                        <? endif; ?>
+                        <?php endif; ?>
                     </div>
-                <? endif; ?>
+                <?php endif; ?>
 
-                <? if($print_options['show_description'] && !empty($player_info['player_description2'])): ?>
+                <?php if($print_options['show_sprites'] && (!isset($player_info['player_image_sheets']) || $player_info['player_image_sheets'] !== 0) && $player_image_token != 'player' ): ?>
 
-                    <h2 class="header header_left player_type_<?= $player_type_token ?>" style="margin-right: 0;">
+                    <?php
+                    // Start the output buffer and prepare to collect sprites
+                    ob_start();
+
+                    // Define the alts we'll be looping through for this player
+                    $temp_alts_array = array();
+                    $temp_alts_array[] = array('token' => '', 'name' => $player_info['player_name'], 'summons' => 0);
+                    // Append predefined alts automatically, based on the player image alt array
+                    if (!empty($player_info['player_image_alts'])){
+                        $temp_alts_array = array_merge($temp_alts_array, $player_info['player_image_alts']);
+                    }
+                    // Otherwise, if this is a copy player, append based on all the types in the index
+                    elseif ($player_info['player_type'] == 'copy' && preg_match('/^(mega-man|proto-man|bass)$/i', $player_info['player_token'])){
+                        foreach ($mmrpg_database_types AS $type_token => $type_info){
+                            if (empty($type_token) || $type_token == 'none' || $type_token == 'copy'){ continue; }
+                            $temp_alts_array[] = array('token' => $type_token, 'name' => $player_info['player_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0);
+                        }
+                    }
+
+                    // Loop through the alts and display images for them (yay!)
+                    foreach ($temp_alts_array AS $alt_key => $alt_info){
+
+                        // Define the current image token with alt in mind
+                        $temp_player_image_token = $player_image_token;
+                        $temp_player_image_token .= !empty($alt_info['token']) ? '_'.$alt_info['token'] : '';
+                        $temp_player_image_token .= !empty($alt_info['sheet']) ? '-'.$alt_info['sheet'] : '';
+                        $temp_player_image_name = $alt_info['name'];
+                        // Update the alt array with this info
+                        $temp_alts_array[$alt_key]['image'] = $temp_player_image_token;
+
+                        // Collect the number of sheets
+                        $temp_sheet_number = !empty($player_info['player_image_sheets']) ? $player_info['player_image_sheets'] : 1;
+
+                        // Loop through the different frames and print out the sprite sheets
+                        foreach (array('right', 'left') AS $temp_direction){
+                            $temp_direction2 = substr($temp_direction, 0, 1);
+                            $temp_embed = '[player:'.$temp_direction.']{'.$temp_player_image_token.'}';
+                            $temp_title = $temp_player_image_name.' | Mugshot Sprite '.ucfirst($temp_direction);
+                            $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
+                            $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
+                            $temp_label = 'Mugshot '.ucfirst(substr($temp_direction, 0, 1));
+                            echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_player_image_token.'" data-frame="mugshot" style="padding-top: 20px; float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$player_sprite_size.'px; height: '.$player_sprite_size.'px; overflow: hidden;">';
+                                echo '<img style="margin-left: 0;" data-tooltip="'.$temp_title.'" src="images/players/'.$temp_player_image_token.'/mug_'.$temp_direction.'_'.$player_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
+                            echo '</div>';
+                        }
+
+
+                        // Loop through the different frames and print out the sprite sheets
+                        foreach ($player_sprite_frames AS $this_key => $this_frame){
+                            $margin_left = ceil((0 - $this_key) * $player_sprite_size);
+                            $frame_relative = $this_frame;
+                            //if ($temp_sheet > 1){ $frame_relative = 'frame_'.str_pad((($temp_sheet - 1) * count($player_sprite_frames) + $this_key + 1), 2, '0', STR_PAD_LEFT); }
+                            $frame_relative_text = ucfirst(str_replace('_', ' ', $frame_relative));
+                            foreach (array('right', 'left') AS $temp_direction){
+                                $temp_direction2 = substr($temp_direction, 0, 1);
+                                $temp_embed = '[player:'.$temp_direction.':'.$frame_relative.']{'.$temp_player_image_token.'}';
+                                $temp_title = $temp_player_image_name.' | '.$frame_relative_text.' Sprite '.ucfirst($temp_direction);
+                                $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
+                                $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
+                                $temp_label = $frame_relative_text.' '.ucfirst(substr($temp_direction, 0, 1));
+                                //$image_token = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
+                                //if ($temp_sheet > 1){ $temp_player_image_token .= '-'.$temp_sheet; }
+                                echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_player_image_token.'" data-frame="'.$frame_relative.'" style="padding-top: 20px; float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$player_sprite_size.'px; height: '.$player_sprite_size.'px; overflow: hidden;">';
+                                    echo '<img style="margin-left: '.$margin_left.'px;" title="'.$temp_title.'" alt="'.$temp_title.'" src="images/players/'.$temp_player_image_token.'/sprite_'.$temp_direction.'_'.$player_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                    echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
+                                echo '</div>';
+                            }
+                        }
+
+                    }
+
+                    // Collect the sprite markup from the output buffer for later
+                    $this_sprite_markup = ob_get_clean();
+
+                    ?>
+
+                    <h2 id="sprites" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left;">
+                        <?= $player_info['player_name']?>&#39;s Sprites
+                        <span class="header_links image_link_container">
+                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>"><?php
+                                // Loop though and print links for the alts
+                                foreach ($temp_alts_array AS $alt_key => $alt_info){
+                                    $alt_type = '';
+                                    $alt_style = '';
+                                    $alt_title = $alt_info['name'];
+                                    if (preg_match('/^(?:[-_a-z0-9\s]+)\s\(([a-z0-9]+)\sCore\)$/i', $alt_info['name'])){
+                                        $alt_type = strtolower(preg_replace('/^(?:[-_a-z0-9\s]+)\s\(([a-z0-9]+)\sCore\)$/i', '$1', $alt_info['name']));
+                                        $alt_name = '&bull;'; //ucfirst($alt_type); //substr(ucfirst($alt_type), 0, 2);
+                                        $alt_type = 'player_type player_type_'.$alt_type.' core_type ';
+                                        $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; ';
+                                    }
+                                    else {
+                                        $alt_name = $alt_key == 0 ? $player_info['player_name'] : 'Alt'.($alt_key > 1 ? ' '.$alt_key : ''); //$alt_key == 0 ? $player_info['player_name'] : $player_info['player_name'].' Alt'.($alt_key > 1 ? ' '.$alt_key : '');
+                                        $alt_type = 'player_type player_type_empty ';
+                                        $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ';
+                                        //if ($player_info['player_type'] == 'copy' && $alt_key == 0){ $alt_type = 'player_type player_type_empty '; }
+                                    }
+                                    echo '<a href="#" data-tooltip="'.$alt_title.'" class="link link_image '.($alt_key == 0 ? 'link_active ' : '').'" data-image="'.$alt_info['image'].'">';
+                                    echo '<span class="'.$alt_type.'" style="'.$alt_style.'">'.$alt_name.'</span>';
+                                    echo '</a>';
+                                }
+                                ?></span>
+                            <span class="pipe" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>">|</span>
+                            <span class="directions"><?php
+                                // Loop though and print links for the alts
+                                foreach (array('right', 'left') AS $temp_key => $temp_direction){
+                                    echo '<a href="#" data-tooltip="'.ucfirst($temp_direction).' Facing Sprites" class="link link_direction '.($temp_key == 0 ? 'link_active' : '').'" data-direction="'.$temp_direction.'">';
+                                    echo '<span class="ability_type ability_type_empty" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ">'.ucfirst($temp_direction).'</span>';
+                                    echo '</a>';
+                                }
+                                ?></span>
+                        </span>
+                    </h2>
+                    <div id="sprites_body" class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
+                        <div style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #4d4d4d url(images/sprite-grid.gif) scroll repeat -10px -30px; overflow: hidden; padding: 10px 30px;">
+                            <?= $this_sprite_markup ?>
+                        </div>
+                        <?php
+                        // Define the editor title based on ID
+                        $temp_editor_title = 'Undefined';
+                        if (!empty($player_info['player_image_editor'])){
+                            if ($player_info['player_image_editor'] == 412){ $temp_editor_title = 'Adrian Marceau / Ageman20XX'; }
+                            elseif ($player_info['player_image_editor'] == 110){ $temp_editor_title = 'MetalMarioX100 / EliteP1'; }
+                            elseif ($player_info['player_image_editor'] == 18){ $temp_editor_title = 'Sean Adamson / MetalMan'; }
+                        } else {
+                            $temp_editor_title = 'Adrian Marceau / Ageman20XX';
+                        }
+                        ?>
+                        <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span style="color: #565656;"> | </span> Original Artwork by <strong>Capcom</strong></p>
+                    </div>
+
+                <?php endif; ?>
+
+                <?php if($print_options['show_description'] && !empty($player_info['player_description2'])): ?>
+
+                    <h2 class="header header_left player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
                         <?= $player_info['player_name'] ?>&#39;s Description
                     </h2>
-                    <div class="body body_left" style="margin-right: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px;">
+                    <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px;">
                         <table class="full" style="margin: 5px auto 10px;">
                             <colgroup>
                                 <col width="100%" />
@@ -2121,52 +2257,7 @@ class rpg_player extends rpg_object {
                         </table>
                     </div>
 
-                <? endif; ?>
-
-                <? if($print_options['show_sprites'] && (!isset($player_info['player_image_sheets']) || $player_info['player_image_sheets'] !== 0) && $player_image_token != 'player' ): ?>
-                    <h2 id="sprites" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left;">
-                        <?=$player_info['player_name']?>&#39;s Sprites
-                    </h2>
-                    <div class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
-                        <div style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #4d4d4d url(images/sprite-grid.gif) scroll repeat -10px -30px; overflow: hidden; padding: 10px 30px;">
-                            <?
-                            // Show the player mugshot sprite
-                            foreach (array('right', 'left') AS $temp_direction){
-                                $temp_title = $player_sprite_title.' | Mugshot Sprite '.ucfirst($temp_direction);
-                                $temp_label = 'Mugshot '.ucfirst(substr($temp_direction, 0, 1));
-                                echo '<div style="'.($player_sprite_size <= 80 ? 'padding-top: 20px; ' : '').'float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$player_sprite_size.'px; height: '.$player_sprite_size.'px; overflow: hidden;">';
-                                    echo '<img style="margin-left: 0;" title="'.$temp_title.'" alt="'.$temp_title.'" src="images/players/'.$player_image_token.'/mug_'.$temp_direction.'_'.$player_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
-                                    echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
-                                echo '</div>';
-                            }
-                            // Loop through the different frames and print out the sprite sheets
-                            foreach ($player_sprite_frames AS $this_key => $this_frame){
-                                $margin_left = ceil((0 - $this_key) * $player_sprite_size);
-                                foreach (array('right', 'left') AS $temp_direction){
-                                    $temp_title = $player_sprite_title.' | '.ucfirst($this_frame).' Sprite '.ucfirst($temp_direction);
-                                    $temp_label = ucfirst($this_frame).' '.ucfirst(substr($temp_direction, 0, 1));
-                                    echo '<div style="'.($player_sprite_size <= 80 ? 'padding-top: 20px; ' : '').'float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$player_sprite_size.'px; height: '.$player_sprite_size.'px; overflow: hidden;">';
-                                        echo '<img style="margin-left: '.$margin_left.'px;" title="'.$temp_title.'" alt="'.$temp_title.'" src="images/players/'.$player_image_token.'/sprite_'.$temp_direction.'_'.$player_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
-                                        echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
-                                    echo '</div>';
-                                }
-                            }
-                            ?>
-                        </div>
-                        <?
-                        // Define the editor title based on ID
-                        $temp_editor_title = 'Undefined';
-                        if (!empty($player_info['player_image_editor'])){
-                            if ($player_info['player_image_editor'] == 412){ $temp_editor_title = 'Adrian Marceau / Ageman20XX'; }
-                            elseif ($player_info['player_image_editor'] == 110){ $temp_editor_title = 'MetalMarioX100 / EliteP1'; }
-                            elseif ($player_info['player_image_editor'] == 18){ $temp_editor_title = 'Sean Adamson / MetalMan'; }
-                        } else {
-                            $temp_editor_title = 'Adrian Marceau / Ageman20XX';
-                        }
-                        ?>
-                        <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span style="color: #565656;"> | </span> Original Artwork by <strong>Capcom</strong></p>
-                    </div>
-                <? endif; ?>
+                <?php endif; ?>
 
                 <? if($print_options['show_abilities']): ?>
                     <h2 id="abilities" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left;">
@@ -2301,24 +2392,23 @@ class rpg_player extends rpg_object {
 
                 <? endif; ?>
 
-                <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
                     <a class="link link_permalink permalink" href="database/players/<?= $player_info['player_token'] ?>/" rel="permalink">+ Permalink</a>
 
-                <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
+                <?php elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
                     <a class="link link_permalink permalink" href="database/players/<?= $player_info['player_token'] ?>/" rel="permalink">+ View More</a>
 
-                <? endif; ?>
+                <?php endif; ?>
 
             </div>
         </div>
-        <?
+        <?php
         // Collect the outbut buffer contents
         $this_markup = trim(ob_get_clean());
-
         // Return the generated markup
         return $this_markup;
 

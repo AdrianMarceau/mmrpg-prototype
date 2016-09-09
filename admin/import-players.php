@@ -103,26 +103,6 @@ if (!empty($mmrpg_index['players'])){
         if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/players/'.$player_token.'/')){ $player_data['player_image'] = $player_data['player_token']; }
         else { $player_data['player_image'] = 'player'; }
 
-        /*
-
-CREATE TABLE `mmrpg_index_players` (
-
-
-    `player_flag_hidden` SMALLINT(1) NOT NULL DEFAULT '0' COMMENT 'Player Flag Hidden',
-    `player_flag_complete` SMALLINT(1) NOT NULL DEFAULT '0' COMMENT 'Player Flag Complete',
-    `player_flag_published` SMALLINT(1) NOT NULL DEFAULT '1' COMMENT 'Player Flag Published',
-    `player_order` SMALLINT(8) NOT NULL DEFAULT '0' COMMENT 'Player Order',
-    PRIMARY KEY (`player_id`),
-    INDEX `player_token` (`player_token`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=MyISAM
-AUTO_INCREMENT=5
-;
-
-
-         */
-
         // Define the insert array and start populating it with basic details
         $temp_insert_array = array();
         //$temp_insert_array['player_id'] = isset($player_data['player_id']) ? $player_data['player_id'] : $player_key;
