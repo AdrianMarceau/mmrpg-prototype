@@ -1820,20 +1820,20 @@ class rpg_player extends rpg_object {
                     // Increment the active robot counter
                     $this->counters['robots_active']++;
                     // Add this robot to the active robots array
-                    $this->values['robots_active'][] = &$this->player_robots[$this_key]; //$this_info;
+                    $this->values['robots_active'][] = $this->player_robots[$this_key]; //$this_info;
                     // Check if this robot is in the active position
                     if ($temp_robot->robot_position == 'active'){
                         // Increment the active robot counter
                         $this->counters['robots_positions']['active']++;
                         // Add this robot to the active robots array
-                        $this->values['robots_positions']['active'][] = &$this->player_robots[$this_key]; //$this_info;
+                        $this->values['robots_positions']['active'][] = $this->player_robots[$this_key]; //$this_info;
                     }
                     // Otherwise, if this robot is in benched position
                     elseif ($temp_robot->robot_position == 'bench'){
                         // Increment the bench robot counter
                         $this->counters['robots_positions']['bench']++;
                         // Add this robot to the bench robots array
-                        $this->values['robots_positions']['bench'][] = &$this->player_robots[$this_key]; //$this_info;
+                        $this->values['robots_positions']['bench'][] = $this->player_robots[$this_key]; //$this_info;
                     }
                 }
                 // Otherwise, if this robot is in disabled status
@@ -1841,7 +1841,7 @@ class rpg_player extends rpg_object {
                     // Increment the disabled robot counter
                     $this->counters['robots_disabled']++;
                     // Add this robot to the disabled robots array
-                    $this->values['robots_disabled'][] = &$this->player_robots[$this_key]; //$this_info;
+                    $this->values['robots_disabled'][] = $this->player_robots[$this_key]; //$this_info;
                 }
 
                 // Increment the robot total by default

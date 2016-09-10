@@ -320,7 +320,7 @@ class rpg_field extends rpg_object {
         // Update the session with the export array
         $this_data = $this->export_array();
         $_SESSION['FIELDS'][$this->battle->battle_id][$this->field_id] = $this_data;
-        $this->battle->battle_field = &$this;  //new rpg_field($this->battle, $this->export_array());
+        $this->battle->battle_field = $this;
 
         // Return true on success
         return true;
