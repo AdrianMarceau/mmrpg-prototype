@@ -200,7 +200,7 @@ class rpg_console {
         if (is_numeric($this_data['item_frame']) && $this_data['item_frame'] >= 0){ $this_data['item_frame'] = str_pad($this_data['item_frame'], 2, '0', STR_PAD_LEFT); }
         elseif (is_numeric($this_data['item_frame']) && $this_data['item_frame'] < 0){ $this_data['item_frame'] = ''; }
         $this_data['image_type'] = !empty($options['this_item_image']) ? $options['this_item_image'] : 'icon';
-        $this_data['image_quantity'] = !empty($options['this_item_quantity']) ? $options['this_item_quantity'] : 1;
+        $this_data['item_quantity'] = !empty($options['this_item_quantity']) ? $options['this_item_quantity'] : 1;
 
         // Define the rest of the display variables
         $this_data['container_class'] = 'this_sprite sprite_'.$this_data['item_float'];
@@ -209,12 +209,31 @@ class rpg_console {
         $this_data['item_markup_style'] = '';
         if (empty($this_data['item_image']) || !preg_match('/^images/i', $this_data['item_image'])){ $this_data['item_image'] = 'images/items/'.(!empty($this_data['item_image']) ? $this_data['item_image'] : $this_data['item_token']).'/'.$this_data['image_type'].'_'.$this_data['item_direction'].'_'.$this_data['item_size'].'x'.$this_data['item_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE; }
         $this_data['item_markup_class'] .= 'sprite_'.$this_data['item_size'].'x'.$this_data['item_size'].' sprite_'.$this_data['item_size'].'x'.$this_data['item_size'].'_'.$this_data['item_frame'].' ';
-        $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); ';
 
         // Generate the final markup for the console item
         $this_data['item_markup'] = '';
         $this_data['item_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
-            $this_data['item_markup'] .= '<div class="'.$this_data['item_markup_class'].'" style="'.$this_data['item_markup_style'].'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
+            // Check if the item should be printed multiple times or not
+            if ($this_data['item_quantity'] > 1){
+                $class = $this_data['item_markup_class'];
+                $style = $this_data['item_markup_style'];
+                $this_data['item_markup'] .= '<div class="'.$class.'" style="'.$style.'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
+                $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); ';
+                $offset = 6;
+                $margin_left = (($this_data['item_quantity'] - 1) * $offset) * -1;
+                if ($this_data['item_quantity'] % 2 == 0){ $margin_left -= ($offset / 2); }
+                for ($i = 1; $i <= $this_data['item_quantity']; $i++){
+                    $margin_left += $offset;
+                    $class = $this_data['item_markup_class'];
+                    $class = str_replace('sprite_item_icon ', '', $class);
+                    $style = $this_data['item_markup_style'].' ';
+                    $style .= 'margin-top: -42px; margin-left: '.$margin_left.'px; ';
+                    $this_data['item_markup'] .= '<div class="'.$class.'" style="'.$style.'"></div>';
+                }
+            } else {
+                $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); ';
+                $this_data['item_markup'] .= '<div class="'.$this_data['item_markup_class'].'" style="'.$this_data['item_markup_style'].'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
+            }
         $this_data['item_markup'] .= '</div>';
 
         // Return the item console data
@@ -258,6 +277,15 @@ class rpg_console {
                 $this_ability_data = array();
                 $options['console_show_this_ability'] = false;
             }
+            // Define the necessary text markup for the current item if allowed and exists
+            if (!empty($options['this_item'])){
+                // Collect the console data for this item
+                $this_item_data = $options['this_item']->console_markup($options, $this_player_data, $this_robot_data);
+            } else {
+                // Define empty console data for this item
+                $this_item_data = array();
+                $options['console_show_this_item'] = false;
+            }
             // Define the necessary text markup for the current star if allowed and exists
             if (!empty($options['this_star'])){
                 // Collect the console data for this star
@@ -273,6 +301,7 @@ class rpg_console {
             if (empty($options['console_show_this_player'])
                 && empty($options['console_show_this_robot'])
                 && empty($options['console_show_this_ability'])
+                && empty($options['console_show_this_item'])
                 && empty($options['console_show_this_star'])){
                 // Automatically set the console option to false
                 $options['console_show_this'] = false;
@@ -372,6 +401,8 @@ class rpg_console {
                 elseif ($options['console_show_this_robot'] != false){ $this_markup .= $this_robot_data['robot_markup']; }
                 // Otherwise, append this ability's markup if allowed
                 elseif ($options['console_show_this_ability'] != false){ $this_markup .= $this_ability_data['ability_markup']; }
+                // Otherwise, append this items's markup if allowed
+                elseif ($options['console_show_this_item'] != false){ $this_markup .= $this_item_data['item_markup']; }
                 // Otherwise, append this star's markup if allowed
                 elseif ($options['console_show_this_star'] != false){ $this_markup .= $this_star_data['star_markup']; }
             }
@@ -391,6 +422,7 @@ class rpg_console {
             $eventinfo['event_body'] .= 'console_show_this_player : '.($options['console_show_this_player'] != false ? 'true : '.$this_player_data['player_markup'] : 'false : -').'<br />';
             $eventinfo['event_body'] .= 'console_show_this_robot : '.($options['console_show_this_robot'] != false ? 'true : '.$this_robot_data['robot_markup'] : 'false : -').'<br />';
             $eventinfo['event_body'] .= 'console_show_this_ability : '.($options['console_show_this_ability'] != false ? 'true : '.$this_ability_data['ability_markup'] : 'false : -').'<br />';
+            $eventinfo['event_body'] .= 'console_show_this_item : '.($options['console_show_this_item'] != false ? 'true : '.$this_item_data['item_markup'] : 'false : -').'<br />';
             $eventinfo['event_body'] .= '</div>';
             */
 
