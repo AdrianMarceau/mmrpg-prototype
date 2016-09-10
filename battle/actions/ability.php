@@ -338,11 +338,12 @@ if (empty($this_robot)){
 }
 
 // Refresh the backed up target robot
-$target_robot->robot_load(array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+$target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
 if ($target_robot->robot_status == 'disabled'){
-    // Reset the target robot to the active one for the sake of auto targetting
-    $target_robot->robot_load(array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
-    $target_robot->update_session();
+
+    // Recollect the active target robot for the sake of auto targetting
+    $target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
+
 }
 
 // Loop through the target robots and hide any disabled robots
@@ -370,20 +371,19 @@ if ($target_action == 'switch'){
     // Update the active robot reference just in case it has changed
     foreach ($target_player->player_robots AS $temp_robotinfo){
         if ($temp_robotinfo['robot_position'] == 'active'){
-            $active_target_robot->robot_load($temp_robotinfo);
+            $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
             $active_target_robot->robot_position = 'active';
             $active_target_robot->update_session();
         } else {
             $temp_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
-            $temp_robot->robot_load($temp_robotinfo);
             $temp_robot->robot_position = 'bench';
             $temp_robot->update_session();
         }
-
     }
 
+    // Use the first target robot as active if one could not be found
     if (empty($active_target_robot)){
-        $active_target_robot->robot_load($target_player->player_robots[0]);
+        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $target_player->player_robots[0]);
         $active_target_robot->robot_position = 'active';
         $active_target_robot->update_session();
     }

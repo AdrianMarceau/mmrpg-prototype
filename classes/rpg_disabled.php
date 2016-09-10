@@ -25,7 +25,7 @@ class rpg_disabled {
 
         // If the target player is the same as the current
         if ($this_player->player_id == $target_player->player_id){
-            //$this_robot->battle->events_create(false, false, 'DEBUG', 'It appears the target and the subject player are the same... ('.$this_player->player_id.' == '.$target_player->player_id.')');
+
             // Collect the actual target player from the battle values
             if (!empty($this_battle->values['players'])){
                 foreach ($this_battle->values['players'] AS $id => $info){
@@ -33,22 +33,19 @@ class rpg_disabled {
                         unset($target_player, $target_robot);
                         $target_player = rpg_game::get_player($this_battle, $info);
                         $target_robot = $this_battle->find_target_robot($target_player->player_side);
-                        //$this_robot->battle->events_create(false, false, 'DEBUG', 'Assiging $this_robot->battle->values[\'players\']['.$id.'] = '.$info['player_token']);
                     }
                 }
             }
+
             // Collect the actual target robot from the battle values
             if (!empty($target_player->values['robots_active'])){
                 foreach ($target_player->values['robots_active'] AS $key => $info){
                     if ($info['robot_position'] == 'active'){
-                        $target_robot->robot_load($info);
-                        //unset($target_robot);
-                        //$target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
-                        //$this_robot->battle->events_create(false, false, 'DEBUG', 'Assiging $target_player->values[\'robots_active\']['.$key.'] = '.$info['robot_token']);
+                        $target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
                     }
                 }
             }
-            //$this_robot->battle->events_create(false, false, 'DEBUG', 'But after some magic...! ('.$this_player->player_id.' == '.$target_player->player_id.')');
+
         }
 
         // Update the target player's session
@@ -61,8 +58,6 @@ class rpg_disabled {
             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
             $event_body .= $this_robot->print_quote('battle_defeat', $this_find, $this_replace);
-            //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_defeat']);
-            //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
         }
         $target_robot->robot_frame = 'base';
         $this_robot->robot_frame = 'defeat';

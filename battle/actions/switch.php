@@ -32,9 +32,8 @@ $this_battle->actions_execute();
 list($temp_robot_id, $temp_robot_token) = explode('_', $this_action_token);
 foreach ($this_player->values['robots_active'] AS $key => $info){
     if ($info['robot_id'] == $temp_robot_id){
-        $this_robot->robot_load(array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']));
-        //$this_robot->robot_load($info);
-        $this_robot->update_session();
+        $this_info = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
+        $this_robot = rpg_game::get_robot($this_battle, $this_player, $this_info);
         break;
      }
 }
