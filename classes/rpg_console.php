@@ -215,25 +215,25 @@ class rpg_console {
         $this_data['item_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
             // Check if the item should be printed multiple times or not
             if ($this_data['item_quantity'] > 1){
+                $start_offset = (2 - (2 * ($this_data['item_quantity'] - 1)));
                 $class = $this_data['item_markup_class'];
                 $style = $this_data['item_markup_style'];
                 $this_data['item_markup'] .= '<div class="'.$class.'" style="'.$style.'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
                 $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); ';
-                $offset = 6;
-                $margin_left = (($this_data['item_quantity'] - 1) * $offset) * -1;
-                if ($this_data['item_quantity'] % 2 == 0){ $margin_left -= ($offset / 2); }
-                for ($i = 1; $i <= $this_data['item_quantity']; $i++){
-                    $margin_left += $offset;
+                for ($i = 0; $i < $this_data['item_quantity']; $i++){
+                    $offset = $start_offset + (4 * $i);
                     $class = $this_data['item_markup_class'];
                     $class = str_replace('sprite_item_icon ', '', $class);
                     $style = $this_data['item_markup_style'].' ';
-                    $style .= 'margin-top: -42px; margin-left: '.$margin_left.'px; ';
+                    $style .= 'position: absolute; top: '.$offset.'px; left: '.$offset.'px; ';
                     $this_data['item_markup'] .= '<div class="'.$class.'" style="'.$style.'"></div>';
                 }
             } else {
                 $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); ';
                 $this_data['item_markup'] .= '<div class="'.$this_data['item_markup_class'].'" style="'.$this_data['item_markup_style'].'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
             }
+
+        // Close the item markup container
         $this_data['item_markup'] .= '</div>';
 
         // Return the item console data
