@@ -892,7 +892,7 @@ class rpg_canvas {
             // Now loop through this player's robots looking for an active one
             foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
                 if ($this_robotinfo['robot_position'] == 'active' && $this_robotinfo['robot_status'] != 'disabled'){
-                    $eventinfo['this_robot'] = new rpg_robot($this_battle, $eventinfo['this_player'], $this_robotinfo);
+                    $eventinfo['this_robot'] = rpg_game::get_robot($this_battle, $eventinfo['this_player'], $this_robotinfo);
                     break;
                 }
             }
@@ -930,7 +930,7 @@ class rpg_canvas {
             // Now loop through the target player's robots looking for an active one
             foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
                 if ($target_robotinfo['robot_position'] == 'active' && $target_robotinfo['robot_status'] != 'disabled'){
-                    $eventinfo['target_robot'] = new rpg_robot($this_battle, $eventinfo['target_player'], $target_robotinfo);
+                    $eventinfo['target_robot'] = rpg_game::get_robot($this_battle, $eventinfo['target_player'], $target_robotinfo);
                     break;
                 }
             }
@@ -953,7 +953,7 @@ class rpg_canvas {
             foreach ($eventinfo['this_player']->player_robots AS $this_key => $this_robotinfo){
 
                 // Collect the robot and canvas options
-                $this_robot = new rpg_robot($this_battle, $eventinfo['this_player'], $this_robotinfo);
+                $this_robot = rpg_game::get_robot($this_battle, $eventinfo['this_player'], $this_robotinfo);
                 $this_options = $options;
 
                 //if ($this_robot->robot_status == 'disabled' && $this_robot->robot_position == 'bench'){ continue; }
@@ -1267,7 +1267,7 @@ class rpg_canvas {
             foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
 
                 // Create the temporary target robot object
-                $target_robot = new rpg_robot($this_battle, $eventinfo['target_player'], $target_robotinfo);
+                $target_robot = rpg_game::get_robot($this_battle, $eventinfo['target_player'], $target_robotinfo);
                 $target_options = $options;
 
                 if (!empty($target_robot->flags['hidden'])){ continue; }

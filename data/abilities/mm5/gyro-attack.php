@@ -47,7 +47,7 @@ $ability = array(
             // Collect the last robot on the opponent's side of the field
             $last_target_info = array_pop((array_slice($target_player->values['robots_active'], -1)));
             $last_target_info = array('robot_id' => $last_target_info['robot_id'], 'robot_token' => $last_target_info['robot_token']);
-            if ($last_target_info['robot_id'] != $target_robot->robot_id){ $last_target_robot = new rpg_robot($this_battle, $target_player, $last_target_info); }
+            if ($last_target_info['robot_id'] != $target_robot->robot_id){ $last_target_robot = rpg_game::get_robot($this_battle, $target_player, $last_target_info); }
             else { $last_target_robot = &$target_robot; }
 
             // If the (possibly) new target is not disabled, strike again

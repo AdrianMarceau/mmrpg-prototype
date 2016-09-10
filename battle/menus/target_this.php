@@ -31,7 +31,7 @@ ob_start();
       // Ensure this is an actual switch in the index
       if (!empty($switch_robotinfo['robot_token'])){
         // Create the scan object using the session/index data
-        $temp_robot = new rpg_robot($this_battle, $this_player, $scan_robotinfo);
+        $temp_robot = rpg_game::get_robot($this_battle, $this_player, $scan_robotinfo);
         // Default the allow button flag to true
         $allow_button = true;
         // If this robot is disabled, disable the button

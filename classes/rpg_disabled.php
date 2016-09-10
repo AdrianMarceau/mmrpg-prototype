@@ -43,7 +43,7 @@ class rpg_disabled {
                     if ($info['robot_position'] == 'active'){
                         $target_robot->robot_load($info);
                         //unset($target_robot);
-                        //$target_robot = new rpg_robot($this_battle, $target_player, $info);
+                        //$target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
                         //$this_robot->battle->events_create(false, false, 'DEBUG', 'Assiging $target_player->values[\'robots_active\']['.$key.'] = '.$info['robot_token']);
                     }
                 }
@@ -276,7 +276,7 @@ class rpg_disabled {
             usort($temp_robots_active, array('rpg_player', 'robot_sort_by_active'));
             $temp_robot_active_position = false;
             foreach ($temp_robots_active AS $temp_id => $temp_info){
-                $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new rpg_robot($this_robot, $target_player, $temp_info);
+                $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : rpg_game::get_robot($this_robot, $target_player, $temp_info);
                 if ($temp_robot->robot_class != 'master'){ $temp_robots_active_num2--; }
                 if ($temp_robot->robot_position == 'active'){
                     $temp_robot_active_position = $temp_robots_active[$temp_id];
@@ -292,7 +292,7 @@ class rpg_disabled {
             foreach ($temp_robots_active AS $temp_id => $temp_info){
 
                 // Collect or define the robot points and robot rewards variables
-                $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : new rpg_robot($this_robot, $target_player, $temp_info);
+                $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : rpg_game::get_robot($this_robot, $target_player, $temp_info);
                 //if ($temp_robot->robot_class == 'mecha'){ continue; }
                 $temp_robot_token = $temp_info['robot_token'];
                 if ($temp_robot_token == 'robot'){ continue; }
@@ -1043,7 +1043,7 @@ class rpg_disabled {
                         $temp_index_robot['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID * 2;
                         $temp_index_robot['robot_level'] = $this_robot_level;
                         $temp_index_robot['robot_experience'] = $this_robot_experience;
-                        $temp_unlocked_robot = new rpg_robot($this_battle, $target_player, $temp_index_robot);
+                        $temp_unlocked_robot = rpg_game::get_robot($this_battle, $target_player, $temp_index_robot);
 
                         // Automatically unlock this robot for use in battle
                         $temp_unlocked_player = $mmrpg_index['players'][$target_player->player_token];

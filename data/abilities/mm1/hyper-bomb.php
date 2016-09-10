@@ -60,7 +60,7 @@ $ability = array(
                 if ($info['robot_id'] == $target_robot->robot_id){ continue; }
                 if (!$this_battle->critical_chance(ceil((9 - $info['robot_key']) * 10))){ break; }
                 $this_ability->ability_results_reset();
-                $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+                $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
                 // Update the ability options text
                 $this_ability->damage_options_update(array(
                     'success' => array(2, -20, -5, -5, $temp_target_robot->print_name().' was damaged by the blast!'),
@@ -83,7 +83,7 @@ $ability = array(
         }
         foreach ($backup_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-            $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
             if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
                 $temp_target_robot->trigger_disabled($this_robot);
             }

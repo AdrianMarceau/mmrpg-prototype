@@ -155,7 +155,7 @@ $ability = array(
                 $extra_ability = array_shift($this_extra_abilities);
                 $this_mecha_info['robot_abilities'][] = $extra_ability;
             }
-            $temp_mecha = new rpg_robot($this_battle, $this_player, $this_mecha_info);
+            $temp_mecha = rpg_game::get_robot($this_battle, $this_player, $this_mecha_info);
             $temp_mecha->apply_stat_bonuses();
             foreach ($temp_mecha->robot_abilities AS $this_key2 => $this_token){
                 $temp_abilityinfo = array('ability_token' => $this_token);

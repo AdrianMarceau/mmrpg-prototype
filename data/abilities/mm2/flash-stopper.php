@@ -69,7 +69,7 @@ $ability = array(
         foreach ($backup_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
             $this_ability->ability_results_reset();
-            $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
             $temp_target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
             $temp_target_robot->update_session();
             //$energy_damage_amount = ceil($this_ability->ability_damage / $target_robots_active);
@@ -84,7 +84,7 @@ $ability = array(
         }
         foreach ($backup_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-            $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
             if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
                 $temp_target_robot->trigger_disabled($this_robot);
             }

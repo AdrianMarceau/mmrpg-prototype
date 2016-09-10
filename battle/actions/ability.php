@@ -34,7 +34,7 @@ else {
     foreach ($target_player->values['robots_active'] AS $temp_robotinfo){
         if ($temp_robotinfo['robot_position'] == 'active'){
             $temp_robotinfo = array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']);
-            $active_target_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
+            $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
             $active_target_robot->update_session();
             break;
         }
@@ -43,7 +43,7 @@ else {
         $temp_robotinfo = array_slice($target_player->values['robots_active'], 0, 1);
         $temp_robotinfo = array_shift($temp_robotinfo);
         $temp_robotinfo = array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']);
-        $active_target_robot = new rpg_robot($this_battle, $target_player, $target_player->player_robots[0]);
+        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $target_player->player_robots[0]);
         $active_target_robot->robot_position = 'active';
         $active_target_robot->update_session();
     }
@@ -202,7 +202,7 @@ if ($temp_targetability->ability_target == 'select_target'){
         $temp_targetability_targetrobot = &$this_robot;
     } else {
         $temp_targetability_targetplayer = &$this_player;
-        $temp_targetability_targetrobot = new rpg_robot($this_battle, $this_player, $temp_targetability_targetinfo);
+        $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $this_player, $temp_targetability_targetinfo);
     }
 } elseif ($temp_targetability->ability_target == 'select_this'){
     // DEBUG
@@ -216,8 +216,8 @@ if ($temp_targetability->ability_target == 'select_target'){
         $temp_targetability_targetrobot = &$active_target_robot;
     } else {
         $temp_targetability_targetplayer = &$target_player;
-        if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$temp_targetability_targetrobot = new rpg_robot(\$this_battle, \$target_player, \$temp_targetability_targetinfo); on line ".__LINE__." {$temp_targetability_targetinfo['robot_token']} ";  }
-        $temp_targetability_targetrobot = new rpg_robot($this_battle, $target_player, $temp_targetability_targetinfo);
+        if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$temp_targetability_targetrobot = rpg_game::get_robot(\$this_battle, \$target_player, \$temp_targetability_targetinfo); on line ".__LINE__." {$temp_targetability_targetinfo['robot_token']} ";  }
+        $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $target_player, $temp_targetability_targetinfo);
     }
 } else {
     $temp_targetability_targetplayer = &$this_player;
@@ -299,7 +299,7 @@ else {
         // Check if this robot is targetting itself or a team mate
         if ($this_robot->robot_id == $backup_target_robot_id){
             // Define the new target robot which is actually a team mate
-            $new_target_robot = &$this_robot; //new rpg_robot($this_battle, $this_player, array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token));;
+            $new_target_robot = &$this_robot; //rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token));;
             // Update the target robot's session
             $new_target_robot->update_session();
             // DEBUG
@@ -308,7 +308,7 @@ else {
             $this_battle->actions_append($this_player, $this_robot, $this_player, $new_target_robot, $this_action, $this_action_token);
         } else {
             // Define the new target robot which is actually a team mate
-            $new_target_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+            $new_target_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
             // Update the target robot's session
             $new_target_robot->update_session();
             // DEBUG
@@ -320,7 +320,7 @@ else {
     // If this is a special SELECT TARGET ability
     elseif ($temp_ability_info['ability_target'] == 'select_target'){
         // Define the new target robot which is actually a team mate
-        $new_target_robot = new rpg_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+        $new_target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
         // Update the target robot's session
         $new_target_robot->update_session();
         // DEBUG
@@ -331,7 +331,7 @@ else {
     // Else if the target was originally active or the ability is set to auto
     elseif ($backup_target_robot_position == 'active' || (!empty($temp_ability_info) && $temp_ability_info['ability_target'] == 'auto')){
         // Define the new target robot which is the current active target robot
-        $new_target_robot = new rpg_robot($this_battle, $target_player, array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
+        $new_target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
         // Update the target robot's session
         $new_target_robot->update_session();
         // DEBUG
@@ -342,7 +342,7 @@ else {
     // Otherwise, if a normal case of targetting
     else {
         // Define the new target robot which is the original request
-        $new_target_robot = new rpg_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+        $new_target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
         // Update the target robot's session
         $new_target_robot->update_session();
             // DEBUG
@@ -378,7 +378,7 @@ if ($target_robot->robot_status == 'disabled'){
 foreach ($target_player->player_robots AS $temp_robotinfo){
     if ($temp_robotinfo['robot_status'] == 'disabled'
         /*&& $temp_robotinfo['robot_position'] == 'bench'*/){
-        $temp_robot = new rpg_robot($this_battle, $target_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
+        $temp_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
         $temp_robot->flags['apply_disabled_state'] = true;
         //$temp_robot->flags['hidden'] = true;
         $temp_robot->update_session();
@@ -405,7 +405,7 @@ if ($target_action == 'switch'){
             $active_target_robot->robot_position = 'active';
             $active_target_robot->update_session();
         } else {
-            $temp_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
+            $temp_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
             $temp_robot->robot_load($temp_robotinfo);
             $temp_robot->robot_position = 'bench';
             $temp_robot->update_session();
@@ -483,8 +483,8 @@ if (empty($this_robot)){
 //$temp_this_robot_backup = array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token);
 //$temp_target_robot_backup = array('robot_id' => $target_robot->robot_id, 'robot_token' => $target_robot->robot_token);
 $this_battle->actions_execute();
-//$this_robot = new rpg_robot($this_battle, $this_player, $temp_this_robot_backup);
-//$target_robot = new rpg_robot($this_battle, $target_player, $temp_target_robot_backup);
+//$this_robot = rpg_game::get_robot($this_battle, $this_player, $temp_this_robot_backup);
+//$target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_robot_backup);
 
 // -- END OF TURN ACTIONS -- //
 

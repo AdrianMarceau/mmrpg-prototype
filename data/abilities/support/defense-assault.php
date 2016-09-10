@@ -42,7 +42,7 @@ $ability = array(
             $this_key = 0;
             foreach ($backup_robots_active AS $key => $info){
                 if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-                $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+                $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
                 // Increase this robot's defense stat
                 $this_ability->damage_options_update(array(
                     'kind' => 'defense',
