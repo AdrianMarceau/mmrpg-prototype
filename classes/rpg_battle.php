@@ -742,7 +742,7 @@ class rpg_battle extends rpg_object {
                             // Collect the ability info from the index
                             $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
                             // Create the temporary ability object for event creation
-                            $temp_ability = new rpg_ability($this, $target_player, $target_robot, $ability_info);
+                            $temp_ability = rpg_game::get_ability($this, $target_player, $target_robot, $ability_info);
 
                             // Collect or define the ability variables
                             $temp_ability_token = $ability_info['ability_token'];
@@ -911,7 +911,7 @@ class rpg_battle extends rpg_object {
                             // Collect the ability info from the index
                             $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
                             // Create the temporary ability object for event creation
-                            $temp_ability = new rpg_ability($this, $this_player, $this_robot, $ability_info);
+                            $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $ability_info);
 
                             // Collect or define the ability variables
                             $temp_ability_token = $ability_info['ability_token'];
@@ -1088,7 +1088,7 @@ class rpg_battle extends rpg_object {
                     // Collect the ability info from the index
                     $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
                     // Create the temporary robot object for event creation
-                    $temp_ability = new rpg_ability($this, $this_player, $this_robot, $ability_info);
+                    $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $ability_info);
 
                     // Collect or define the robot points and robot rewards variables
                     $this_ability_token = $ability_info['ability_token'];
@@ -1360,10 +1360,7 @@ class rpg_battle extends rpg_object {
                     foreach ($this_robot->robot_abilities AS $this_key => $this_token){
                         // Define the current ability object using the loaded ability data
                         $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilities_index[$this_token]);
-                        $temp_ability = new rpg_ability($this, $this_player, $this_robot, $temp_abilityinfo);
-                        // Trigger this abilities start event, if it has one
-                        // Update or create this abilities session object
-                        $temp_ability->update_session();
+                        $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $temp_abilityinfo);
                     }
                     // And now update the robot with the flag
                     $this_robot->flags['ability_startup'] = true;
@@ -1419,7 +1416,7 @@ class rpg_battle extends rpg_object {
                 }
 
                 // Define the current ability object using the loaded ability data
-                $this_ability = new rpg_ability($this, $this_player, $this_robot, $this_token);
+                $this_ability = rpg_game::get_ability($this, $this_player, $this_robot, $this_token);
                 // Trigger this robot's ability
                 $this_ability->ability_results = $this_robot->trigger_ability($target_robot, $this_ability);
 
@@ -1702,9 +1699,7 @@ class rpg_battle extends rpg_object {
                         if (!isset($temp_abilities_index[$this_token])){ continue; }
                         // Define the current ability object using the loaded ability data
                         $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilities_index[$this_token]);
-                        $temp_ability = new rpg_ability($this, $this_player, $this_robot, $temp_abilityinfo);
-                        // Update or create this abilities session object
-                        $temp_ability->update_session();
+                        $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $temp_abilityinfo);
                     }
                     // And now update the robot with the flag
                     $this_robot->flags['ability_startup'] = true;
@@ -2386,13 +2381,10 @@ class rpg_battle extends rpg_object {
                                 // Create the attachment object from available data
                                 $attachment_info['flags']['is_attachment'] = true;
                                 if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
-                                $temp_attachment = new rpg_ability($this_battle, $this_player, $temp_robot, $attachment_info);
+                                $temp_attachment = rpg_game::get_ability($this_battle, $this_player, $temp_robot, $attachment_info);
 
                                 // Collect the attachment trigger type before processing
                                 $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
-                                //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
-                                //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
-                                //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info, true), ENT_QUOTES, 'UTF-8', true)));
 
                                 // If this destory action deals DAMAGAE to the holder
                                 if ($temp_trigger_type == 'damage'){

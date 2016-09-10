@@ -1141,7 +1141,7 @@ class rpg_canvas {
                             // Create the temporary ability object using the provided data and generate its markup data
                             $attachment_info['flags']['is_attachment'] = true;
                             if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
-                            $this_ability = new rpg_ability($this_battle, $eventinfo['this_player'], $this_robot, $attachment_info);
+                            $this_ability = rpg_game::get_ability($this_battle, $eventinfo['this_player'], $this_robot, $attachment_info);
                             // Define this ability data array and generate the markup data
                             $this_attachment_options = $this_options;
                             $this_attachment_options['data_sticky'] = !empty($this_options['sticky']) || !empty($attachment_info['sticky']) ? true : false;
@@ -1286,7 +1286,7 @@ class rpg_canvas {
                         if ($attachment_info['class'] == 'ability'){
 
                             // Create the target's temporary ability object using the provided data
-                            $target_ability = new rpg_ability($this_battle, $eventinfo['target_player'], $target_robot, $attachment_info);
+                            $target_ability = rpg_game::get_ability($this_battle, $eventinfo['target_player'], $target_robot, $attachment_info);
 
                             // Define this ability data array and generate the markup data
                             $target_attachment_options = $target_options;

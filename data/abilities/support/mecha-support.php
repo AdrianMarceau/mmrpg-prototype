@@ -22,15 +22,6 @@ $ability = array(
             ));
         $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
 
-        /*
-        // Create the entry message for this new mecha added to the field
-        $this_robot->robot_frame = 'summon';
-        $this_robot->update_session();
-        $event_header = $this_robot->robot_name.'&#39;s '.$this_ability->ability_name;
-        $event_body = $this_robot->print_name().' uses the '.$this_ability->print_name().'!';
-        $this_battle->events_create($this_robot, false, $event_header, $event_body);
-        */
-
         // Only continue with the ability if player has less than 8 robots
         if (count($this_player->player_robots) < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){
 
@@ -64,17 +55,6 @@ $ability = array(
                     $this_field_mechas = !empty($this_field_info['field_mechas']) ? $this_field_info['field_mechas'] : array();
                 }
             }
-
-            // Remove any mechas that are of too high a level to unlock
-            /*
-            foreach ($this_field_mechas AS $temp_key => $temp_token){
-                $temp_base_token = preg_replace('/-([0-9]+)$/i', '', $temp_token);
-                $temp_unlock_token = false;
-                if (preg_match('/-2$/i', $temp_token)){ $temp_unlock_token = $temp_base_token; }
-                if (preg_match('/-3$/i', $temp_token)){ $temp_unlock_token = $temp_base_token.'-2'; }
-                if (!empty($temp_unlock_token) && !empty($_SESSION['GAME']['values']['robot_database'][$temp_unlock_token])){ unset($this_field_mechas[$temp_key]); }
-            }
-            */
 
             // If no mechas were defined, default to the Met
             if (empty($this_field_mechas)){
@@ -159,8 +139,7 @@ $ability = array(
             $temp_mecha->apply_stat_bonuses();
             foreach ($temp_mecha->robot_abilities AS $this_key2 => $this_token){
                 $temp_abilityinfo = array('ability_token' => $this_token);
-                $temp_ability = new rpg_ability($this_battle, $this_player, $temp_mecha, $temp_abilityinfo);
-                $temp_ability->update_session();
+                $temp_ability = rpg_game::get_ability($this_battle, $this_player, $temp_mecha, $temp_abilityinfo);
             }
             $temp_mecha->flags['ability_startup'] = true;
             $temp_mecha->update_session();
@@ -170,9 +149,6 @@ $ability = array(
 
             // Automatically trigger a switch action to the new mecha support robot
             $this_battle->actions_trigger($this_player, $this_robot, $target_player, $target_robot, 'switch', $this_id_token);
-
-            // DEBUG
-            //$this_battle->events_create(false, false, 'DEBUG '.__LINE__, 'this_mecha_token = '.$this_mecha_token);
 
             // Refresh the current robot's frame back to normal (manually because reference confusion)
             rpg_robot::set_session_field($this_original_robot_id, 'robot_frame', 'base');

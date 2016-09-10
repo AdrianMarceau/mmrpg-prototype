@@ -56,7 +56,7 @@ $ability = array(
             );
 
         // Create the attachment object for this ability
-        $this_attachment = new rpg_ability($this_battle, $this_player, $target_robot, $this_attachment_info);
+        $this_attachment = rpg_game::get_ability($this_battle, $this_player, $target_robot, $this_attachment_info);
 
         // If the ability flag was not set, attach the ability to the target
         if (!isset($target_robot->robot_attachments[$this_attachment_token])){

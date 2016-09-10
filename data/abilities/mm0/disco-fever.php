@@ -30,7 +30,7 @@ $ability = array(
             );
 
         // Create the attachment object for this ability
-        $this_overlay = new rpg_ability($this_battle, $target_player, $target_robot, $this_overlay_info);
+        $this_overlay = rpg_game::get_ability($this_battle, $target_player, $target_robot, $this_overlay_info);
 
         // Update the ability image if the user is in their alt image
         $alt_image_triggers = array('disco_alt', 'disco_alt3', 'disco_alt5');
@@ -74,7 +74,7 @@ $ability = array(
             );
 
         // Create the attachment object for this ability
-        $this_attachment = new rpg_ability($this_battle, $target_player, $target_robot, $this_attachment_info);
+        $this_attachment = rpg_game::get_ability($this_battle, $target_player, $target_robot, $this_attachment_info);
 
         // Add the black background overlay attachment
         $target_robot->robot_attachments[$this_overlay_token] = $this_overlay_info;

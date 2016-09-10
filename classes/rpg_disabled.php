@@ -686,7 +686,7 @@ class rpg_disabled {
                             // Collect the ability info from the index
                             $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
                             // Create the temporary ability object for event creation
-                            $temp_ability = new rpg_ability($this_robot->battle, $target_player, $temp_robot, $ability_info);
+                            $temp_ability = rpg_game::get_ability($this_robot->battle, $target_player, $temp_robot, $ability_info);
 
                             // Collect or define the ability variables
                             $temp_ability_token = $ability_info['ability_token'];

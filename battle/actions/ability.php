@@ -115,7 +115,7 @@ else {
 list($temp_id, $temp_token) = explode('_', $this_action_token); //array('ability_token' => $this_action_token);
 $temp_abilityinfo = rpg_ability::get_index_info($temp_token);
 $temp_abilityinfo['ability_id'] = $temp_id;
-$temp_thisability = new rpg_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
+$temp_thisability = rpg_game::get_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
 
 // DEBUG
 if (empty($this_robot)){
@@ -134,7 +134,7 @@ foreach ($active_target_robot->robot_abilities AS $key => $token){
     // Collect the data for this ability from the index
     $info = rpg_ability::parse_index_info($temp_abilities_index[$token]);
     if (empty($info)){ unset($active_target_robot->robot_abilities[$key]); continue; }
-    $temp_ability = new rpg_ability($this_battle, $target_player, $active_target_robot, $info);
+    $temp_ability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $info);
     // Determine how much weapon energy this should take
     $temp_ability_energy = $active_target_robot->calculate_weapon_energy($temp_ability);
     // If this robot does not have enough energy for the move, remove it
@@ -174,7 +174,7 @@ $temp_abilityinfo = array();
 list($temp_abilityinfo['ability_id'], $temp_abilityinfo['ability_token']) = explode('_', $target_action_token);
 $temp_indexinfo = rpg_ability::get_index_info($temp_abilityinfo['ability_token']);
 $temp_abilityinfo = array_merge($temp_indexinfo, $temp_abilityinfo);
-$temp_targetability = new rpg_ability($this_battle, $target_player, $active_target_robot, $temp_abilityinfo);
+$temp_targetability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_abilityinfo);
 
 // If the target player's temporary ability allows target selection
 if ($temp_targetability->ability_target == 'select_target'){
@@ -259,7 +259,7 @@ else {
     if ($this_action == 'ability'){
         list($temp_ability_id, $temp_ability_token) = explode('_', $this_action_token);
         $temp_ability_info = array('ability_id' => $temp_ability_id, 'ability_token' => $temp_ability_token);
-        $temp_ability_object = new rpg_ability($this_battle, $this_player, $this_robot, $temp_ability_info);
+        $temp_ability_object = rpg_game::get_ability($this_battle, $this_player, $this_robot, $temp_ability_info);
         $temp_ability_info = $temp_ability_object->export_array();
     }
 
