@@ -384,6 +384,13 @@ elseif ($this_action == 'ability'){
     require_once('battle/actions/ability.php');
 
 }
+// Else if the player's robot is using an ability-item
+elseif ($this_action == 'item' && strstr($this_action_token, '-core')){
+
+    // Require the ability-item action file
+    require_once('battle/actions/ability_item.php');
+
+}
 // Else if the player's robot is using an item
 elseif ($this_action == 'item'){
 
