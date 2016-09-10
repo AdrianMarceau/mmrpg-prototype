@@ -100,8 +100,7 @@ $this_battleinfo['flags']['wap'] = $flag_wap ? true : false;
 $this_fieldinfo = array('field_id' => $this_field_id, 'field_token' => $this_field_token);
 
 // Define the battle object using the loaded battle data and update session
-$this_battle = new rpg_battle($this_battleinfo);
-$this_battle->update_session();
+$this_battle = rpg_game::get_battle($this_battleinfo);
 
 // Define the current field object using the loaded field data and update session
 $this_field = new rpg_field($this_battle, $this_fieldinfo);
@@ -674,7 +673,7 @@ if (window != window.top){
 <?
 // DEBUG
 // If output buffer content was created, alert the webmaster of its content
-if (!empty($output_buffer_contents) && (MMRPG_CONFIG_IS_LOCAL && MMRPG_CONFIG_ADMIN_MODE)){
+if (!empty($output_buffer_contents) && (!MMRPG_CONFIG_IS_LIVE && MMRPG_CONFIG_ADMIN_MODE)){
     $output_buffer_contents = str_replace("\\", '\\', $output_buffer_contents);
     $output_buffer_contents = str_replace("\n", '\n', $output_buffer_contents);
     $output_buffer_contents = preg_replace('/\s+/', ' ', $output_buffer_contents);
