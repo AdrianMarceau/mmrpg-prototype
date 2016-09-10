@@ -173,35 +173,7 @@ function windowResizeLeaderboard(){
     </div>
 <script type="text/javascript">
 $(document).ready(function(){
-<?
-// Define a reference to the game's session flag variable
-if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
-$temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
-// If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_battle-leaderboard-intro';
-if (empty($_SESSION[$session_token]['DEMO']) && empty($temp_game_flags[$temp_event_flag])){
-    $temp_game_flags[$temp_event_flag] = true;
-    ?>
-    // Generate a first-time event canvas that explains how the editor works
-    gameSettings.windowEventsCanvas = [
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/field/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/proto-man/sprite_right_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 20px; left: 120px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 35px; left: 240px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/bass/sprite_right_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 20px; right: 120px; width: 80px; height: 80px;">&nbsp;</div>'+
-        ''
-        ];
-    // Generate a first-time event message that explains how the editor works
-    gameSettings.windowEventsMessages = [
-        '<p>The <strong>Mega Man RPG Prototype</strong> currently has <?= $this_leaderboard_count ?> players and that number is growing all the time. Throughout the course of the game, players collect Battle Points from missions and those points build up to unlock new abilities and other new content.</p>'+
-        '<p>Not all players are created equal, however, and some clearly stand above the rest in terms of their commitment to the game and their skill at exploiting the battle system\'s mechanics. In the spirit of competition, all players have been ranked by their total Battle Point scores and listed from highest to lowest.</p>'+
-        '<p>Use the numbered links at the bottom of the page to navigate through the listings.</p>'+
-        ''
-        ];
-    // Push this event to the parent window and display to the user
-    top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-    <?
-}
-?>
+
 });
 </script>
 <?

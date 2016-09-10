@@ -502,36 +502,6 @@ $(document).ready(function(){
     // Update the player and player count by counting elements
     thisEditorData.playerTotal = $('#canvas .wrapper[data-player]', thisEditor).length;
     thisEditorData.playerTotal = $('#canvas .sprite[data-player]', thisEditor).length;
-    //console.log(thisEditorData);
-    //resizePlayerWrapper();
-<?
-// Define a reference to the game's session flag variable
-if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
-$temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
-// If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_player-editor-intro';
-if (empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
-    $temp_game_flags[$temp_event_flag] = true;
-    ?>
-    // Generate a first-time event canvas that explains how the editor works
-    gameSettings.windowEventsCanvas = [
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/field/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/players/dr-wily/mug_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 50px; left: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/players/dr-light/mug_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 25px; left: 250px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/players/dr-cossack/mug_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 50px; right: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
-        ''
-        ];
-    // Generate a first-time event message that explains how the editor works
-    gameSettings.windowEventsMessages = [
-        '<p>The <strong>Player Editor</strong> contains detailed records on all unlocked playable characters and allows you to reconfigure their mission options post-game, greatly increasing the likelyhood of finding new fusion stars.</p>'+
-        '<p>Click on any of any of the eight field slots for a player and you can swap it with any other field you\'ve unlocked - even if the field was originally owned by another player. The fields selected in this editor directly correspond to the missions found in chapters two and four of that player\'s campaign, so try to use that to your advantage.</p>'+
-        ''
-        ];
-    // Push this event to the parent window and display to the user
-    top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-    <?
-}
-?>
 });
 </script>
 <?

@@ -351,38 +351,7 @@ gameSettings.autoScrollTop = false;
     </div>
 <script type="text/javascript">
 $(document).ready(function(){
-<?php
-// Define a reference to the game's session flag variable
-if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
-$temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
-// If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'unlocked-tooltip_starforce-viewer-intro';
-if (empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
-    $temp_game_flags[$temp_event_flag] = true;
-    ?>
-    // Generate a first-time event canvas that explains how the editor works
-    gameSettings.windowEventsCanvas = [
-        (
-        '<div class="sprite sprite_80x80" style="background-image: url(images/sprites/fields/field/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_05" style="background-image: url(images/sprites/items/star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; left: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_07" style="background-image: url(images/sprites/items/star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 25px; left: 250px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_08" style="background-image: url(images/sprites/items/star/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 50px; right: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '')
-        ];
-    // Generate a first-time event message that explains how the editor works
-    gameSettings.windowEventsMessages = [
-        (
-        '<p>A powerful new form of elemental energy has appeared in world of the prototype! Starforce appears in the form of Field Stars and Fusion Stars that must be collected by the player to boost all damage of the same type.  Curiously, starforce owned by a player will resist the starforce owned by opposing players and vice versa.  Neutralizing the effects of starforce on both sides is possible in some circumstances.</p>'+
-        '<p>Many of the new stars have formed in previously secured areas, reviving defeated robot masters with greater power and attracting the attention of other robot masters wandering the prototype.  Only 24 Field Stars and 12 Fusion Stars have been identified so far, but rough estimates for the total number are well over one thousand.</p>'+
-        '<p>It is your mission to track down these new stars and liberate them from enemy forces, simultaneously crippling their elemental abilities while boosting ours.  Collecting stars might seem daunting at first, but it\'s actually pretty straight forward!</p>'+
-        '<p><a class="link link_inline" href="community/mechanics/3972/field-stars-fusion-stars-and-starforce/" target="_blank">Check out guide for help!</a></p>'+
-        '')
-        ];
-    // Push this event to the parent window and display to the user
-    top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-    <?php
-}
-?>
+
 });
 </script>
 <?

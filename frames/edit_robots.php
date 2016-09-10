@@ -386,38 +386,7 @@ $(document).ready(function(){
     // Update the player and robot count by counting elements
     thisEditorData.playerTotal = $('#canvas .wrapper[data-player]', thisEditor).length;
     thisEditorData.robotTotal = $('#canvas .sprite[data-robot]', thisEditor).length;
-    //console.log(thisEditorData);
     resizePlayerWrapper();
-<?
-// Define a reference to the game's session flag variable
-if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
-$temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
-// If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_robot-editor-intro';
-if (empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
-    $temp_game_flags[$temp_event_flag] = true;
-    ?>
-    // Generate a first-time event canvas that explains how the editor works
-    gameSettings.windowEventsCanvas = [
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/field/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/abilities/ice-slasher/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 20px; left: 0px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/abilities/fire-storm/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 35px; left: 100px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/abilities/mega-buster/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 50px; left: 200px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/abilities/rolling-cutter/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 35px; left: 300px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/abilities/hyper-bomb/icon_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 20px; left: 400px; width: 80px; height: 80px;">&nbsp;</div>'+
-        ''
-        ];
-    // Generate a first-time event message that explains how the editor works
-    gameSettings.windowEventsMessages = [
-        '<p>The <strong>Robot Editor</strong> contains detailed information on all of your unlocked robot masters and allows you to edit their attributes.  Detailed stat breakdowns track the growth of your robtos while the weaknesses and resistances provide helpful reference before battle. The most powerful feature of the editor, however, comes in the form of ability customization.</p>'+
-        '<p>Click on any of any of the eight weapon slots for a robot and you can equip it with any ability it\'s compatible with - based on their core type - even if the ability was originally learned by another robot. Some abilities can be used by all robots and some by only a select few, so don\'t be afraid to experiment when a new one is unlocked.</p>'+
-        ''
-        ];
-    // Push this event to the parent window and display to the user
-    top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-    <?
-}
-?>
 });
 </script>
 <?
