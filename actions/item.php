@@ -82,7 +82,7 @@ ob_start();
             foreach ($item_token_list AS $item_key => $item_token){
 
                 // Ensure this is an actual item in the index
-                if (!empty($item_token) && !in_array($item_token, $item_token_skip)){
+                if (!empty($item_token) && !in_array($item_token, $item_token_skip) && !strstr($item_token, '-shard') && !strstr($item_token, '-star')){
 
                     // Define the amount of weapon energy for this item
                     $temp_item_quantity = !empty($_SESSION['GAME']['values']['battle_items'][$item_token]) ? $_SESSION['GAME']['values']['battle_items'][$item_token] : 0;
