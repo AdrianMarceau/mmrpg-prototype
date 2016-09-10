@@ -278,15 +278,15 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for prepending to the action array
-    public function actions_prepend(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_action_token){
+    public function actions_prepend($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token){
 
         // Prepend the new action to the array
         array_unshift($this->actions, array(
-            'this_field' => &$this->battle_field,
-            'this_player' => &$this_player,
-            'this_robot' => &$this_robot,
-            'target_player' => &$target_player,
-            'target_robot' => &$target_robot,
+            'this_field' => $this->battle_field,
+            'this_player' => $this_player,
+            'this_robot' => $this_robot,
+            'target_player' => $target_player,
+            'target_robot' => $target_robot,
             'this_action' => $this_action,
             'this_action_token' => $this_action_token
             ));
@@ -297,15 +297,15 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for appending to the action array
-    public function actions_append(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_action_token){
+    public function actions_append($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token){
 
         // Append the new action to the array
         $this->actions[] = array(
-            'this_field' => &$this->battle_field,
-            'this_player' => &$this_player,
-            'this_robot' => &$this_robot,
-            'target_player' => &$target_player,
-            'target_robot' => &$target_robot,
+            'this_field' => $this->battle_field,
+            'this_player' => $this_player,
+            'this_robot' => $this_robot,
+            'target_player' => $target_player,
+            'target_robot' => $target_robot,
             'this_action' => $this_action,
             'this_action_token' => $this_action_token
             );
@@ -422,19 +422,16 @@ class rpg_battle extends rpg_object {
                     $current_action['this_robot']->update_session();
                     $current_action['this_player']->player_frame = $current_action['this_robot']->robot_status != 'disabled' ? 'base' : 'defeat';
                     $current_action['this_player']->update_session();
-                    //$this_robot = $current_action['this_robot'];
-                    $temp_this_robot = &$current_action['this_robot'];
+                    $temp_this_robot = $current_action['this_robot'];
                 }
                 if (!empty($current_action['target_robot'])){
                     $current_action['target_robot']->robot_frame = $current_action['target_robot']->robot_status != 'disabled' ? 'base' : 'defeat';
                     $current_action['target_robot']->update_session();
                     $current_action['target_player']->player_frame = $current_action['target_robot']->robot_status != 'disabled' ? 'base' : 'defeat';
                     $current_action['target_player']->update_session();
-                    //$target_robot = $current_action['target_robot'];
-                    $temp_target_robot = &$current_action['target_robot'];
+                    $temp_target_robot = $current_action['target_robot'];
                 }
                 if (!empty($battle_action) && $battle_action != 'start'){
-                    //$this->events_create($temp_this_robot, $temp_target_robot, '', '');
                     $this->events_create(false, false, '', '');
                 }
             }
@@ -450,7 +447,7 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for triggering battle actions
-    public function battle_complete_trigger(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_token = ''){
+    public function battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_token = ''){
         global $mmrpg_index, $db;
         // DEBUG
         //$this->events_create(false, false, 'DEBUG', 'Battle complete trigger triggered!');
@@ -1393,12 +1390,12 @@ class rpg_battle extends rpg_object {
                 if (empty($this_token)){
                     // Collect the ability choice from the robot
                     $temp_token = rpg_robot::robot_choices_abilities(array(
-                        'this_battle' => &$this,
-                        'this_field' => &$this->battle_field,
-                        'this_player' => &$this_player,
-                        'this_robot' => &$this_robot,
-                        'target_player' => &$target_player,
-                        'target_robot' => &$target_robot
+                        'this_battle' => $this,
+                        'this_field' => $this->battle_field,
+                        'this_player' => $this_player,
+                        'this_robot' => $this_robot,
+                        'target_player' => $target_player,
+                        'target_robot' => $target_robot
                         ));
                     $temp_id = $this->index['abilities'][$temp_token]['ability_id'];//array_search($temp_token, $this_robot->robot_abilities);
                     $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
@@ -1458,7 +1455,7 @@ class rpg_battle extends rpg_object {
                 $this_token = $this_token['ability_id'].'_'.$this_token['ability_token'];
 
                 // Return from the battle function with the used ability
-                $this_return = &$this_ability;
+                $this_return = $this_ability;
                 break;
 
             }
@@ -1474,12 +1471,12 @@ class rpg_battle extends rpg_object {
                 if (empty($this_token)){
                     // Collect the item choice from the robot
                     $temp_token = rpg_robot::robot_choices_items(array(
-                        'this_battle' => &$this,
-                        'this_field' => &$this->battle_field,
-                        'this_player' => &$this_player,
-                        'this_robot' => &$this_robot,
-                        'target_player' => &$target_player,
-                        'target_robot' => &$target_robot
+                        'this_battle' => $this,
+                        'this_field' => $this->battle_field,
+                        'this_player' => $this_player,
+                        'this_robot' => $this_robot,
+                        'target_player' => $target_player,
+                        'target_robot' => $target_robot
                         ));
                     $temp_id = $this->index['items'][$temp_token]['item_id'];//array_search($temp_token, $this_robot->robot_items);
                     $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
@@ -1539,7 +1536,7 @@ class rpg_battle extends rpg_object {
                 $this_token = $this_token['item_id'].'_'.$this_token['item_token'];
 
                 // Return from the battle function with the used item
-                $this_return = &$this_item;
+                $this_return = $this_item;
                 break;
 
             }
@@ -1865,7 +1862,7 @@ class rpg_battle extends rpg_object {
                 $this_token = $this_token['robot_id'].'_'.$this_token['robot_token'];
 
                 // Return from the battle function with the scanned robot
-                $this_return = &$this_ability;
+                $this_return = $this_ability;
                 break;
 
             }
@@ -2334,7 +2331,7 @@ class rpg_battle extends rpg_object {
     // -- CHECK ATTACHMENTS FUNCTION -- //
 
     // Define a function for checking attachment status
-    public static function temp_check_robot_attachments(&$this_battle, &$this_player, &$this_robot, &$target_player, &$target_robot){
+    public static function temp_check_robot_attachments($this_battle, $this_player, $this_robot, $target_player, $target_robot){
 
         // Loop through all the target player's robots and carry out any end-turn events
         foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
@@ -2457,7 +2454,7 @@ class rpg_battle extends rpg_object {
     // -- CHECK WEAPONS FUNCTION -- //
 
     // Define a function for checking weapons status
-    public static function temp_check_robot_weapons(&$this_battle, &$this_player, &$this_robot, &$target_player, &$target_robot, $regen_weapons = true){
+    public static function temp_check_robot_weapons($this_battle, $this_player, $this_robot, $target_player, $target_robot, $regen_weapons = true){
 
         // Loop through all the target player's robots and carry out any end-turn events
         $temp_robot = false;

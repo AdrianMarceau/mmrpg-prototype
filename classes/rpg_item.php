@@ -180,13 +180,13 @@ class rpg_item extends rpg_object {
         $temp_target_robot = $this->battle->find_target_robot($this->player->player_side != 'right' ? 'right' : 'left');
         $temp_function = $this->item_function_onload;
         $temp_result = $temp_function(array(
-            'this_field' => &$this->battle->battle_field,
-            'this_battle' => &$this->battle,
-            'this_player' => &$this->player,
-            'this_robot' => &$this->robot,
-            'target_player' => &$temp_target_player,
-            'target_robot' => &$temp_target_robot,
-            'this_item' => &$this
+            'this_field' => $this->battle->battle_field,
+            'this_battle' => $this->battle,
+            'this_player' => $this->player,
+            'this_robot' => $this->robot,
+            'target_player' => $temp_target_player,
+            'target_robot' => $temp_target_robot,
+            'this_item' => $this
             ));
 
         // Update the session variable
