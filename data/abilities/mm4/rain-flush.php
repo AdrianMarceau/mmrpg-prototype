@@ -74,7 +74,7 @@ $ability = array(
                 foreach ($backup_robots_active AS $key => $info){
                     if ($info['robot_id'] == $this_robot->robot_id){ continue; }
                     $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
-                    $temp_this_robot = new rpg_robot($this_battle, $this_player, $info2);
+                    $temp_this_robot = rpg_game::get_robot($this_battle, $this_player, $info2);
                     $temp_this_robot->robot_frame = 'defend';
                     $temp_this_robot->robot_attachments[$temp_attachment_token] = $temp_attachment_info;
                     $temp_this_robot->update_session();
@@ -111,7 +111,7 @@ $ability = array(
         $backup_target_robots_active = $target_player->values['robots_active'];
         foreach ($backup_target_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-            $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
             $this_ability->ability_results_reset();
             $this_ability->damage_options_update(array(
                 'kind' => 'energy',
@@ -143,7 +143,7 @@ $ability = array(
                 foreach ($backup_robots_active AS $key => $info){
                     if ($info['robot_id'] == $this_robot->robot_id){ continue; }
                     $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
-                    $temp_this_robot = new rpg_robot($this_battle, $this_player, $info2);
+                    $temp_this_robot = rpg_game::get_robot($this_battle, $this_player, $info2);
                     $temp_this_robot->robot_frame = 'base';
                     unset($temp_this_robot->robot_attachments[$temp_attachment_token]);
                     $temp_this_robot->update_session();
@@ -165,7 +165,7 @@ $ability = array(
         foreach ($backup_target_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
             $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
-            $temp_target_robot = new rpg_robot($this_battle, $target_player, $info2);
+            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info2);
             if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
                 $temp_target_robot->trigger_disabled($this_robot);
             }

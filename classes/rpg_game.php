@@ -67,6 +67,17 @@ class rpg_game {
         if (isset($this_playerinfo['player_id'])){
             $player_id = $this_playerinfo['player_id'];
         }
+        // Otherwise if only a player token was defined
+        elseif (isset($this_playerinfo['player_token'])){
+            $player_id = 0;
+            $player_token = $this_playerinfo['player_token'];
+            foreach (self::$index['players'] AS $player){
+                if ($player_token == $player->player_token){
+                    $player_id = $player->player_id;
+                    break;
+                }
+            }
+        }
 
         // If this player has already been created, retrieve it
         if (!empty($player_id) && !empty(self::$index['players'][$player_id])){
@@ -87,6 +98,55 @@ class rpg_game {
         // Return the collect player object
         $this_player->update_session();
         return $this_player;
+
+    }
+
+    /**
+     * Create or retrive a robot object from the session
+     * @param array $this_robotinfo
+     * @return rpg_robot
+     */
+    public static function get_robot($this_battle, $this_player, $this_robotinfo){
+
+        // If the robot index has not been created, do so
+        if (!isset(self::$index['robots'])){ self::$index['robots'] = array(); }
+
+        // Check if a robot ID has been defined
+        if (isset($this_robotinfo['robot_id'])){
+            $robot_id = $this_robotinfo['robot_id'];
+        }
+        // Otherwise if only a robot token was defined
+        elseif (isset($this_robotinfo['robot_token'])){
+            $robot_id = 0;
+            $robot_token = $this_robotinfo['robot_token'];
+            foreach (self::$index['robots'] AS $robot){
+                if ($robot_token == $robot->robot_token
+                    && $this_player->player_id == $robot->player_id){
+                    $robot_id = $robot->robot_id;
+                    break;
+                }
+            }
+        }
+
+        // If this robot has already been created, retrieve it
+        if (!empty($robot_id) && !empty(self::$index['robots'][$robot_id])){
+
+            // Collect the robot from the index and return
+            $this_robot = self::$index['robots'][$robot_id];
+
+        }
+        // Otherwise create a new robot object in the index
+        else {
+
+            // Create and return the robot object
+            $this_robot = new rpg_robot($this_battle, $this_player, $this_robotinfo);
+            self::$index['robots'][$this_robot->robot_id] = $this_robot;
+
+        }
+
+        // Return the collect robot object
+        $this_robot->update_session();
+        return $this_robot;
 
     }
 

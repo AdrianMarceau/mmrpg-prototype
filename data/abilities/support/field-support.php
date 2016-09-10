@@ -156,7 +156,7 @@ $ability = array(
                             $this_key = 0;
                             foreach ($backup_robots_active AS $key => $info){
                                 if ($info['robot_id'] == $this_robot->robot_id){ continue; }
-                                $temp_this_robot = new rpg_robot($this_battle, $this_player, $info);
+                                $temp_this_robot = rpg_game::get_robot($this_battle, $this_player, $info);
                                 // Attach this ability attachment to the this robot temporarily
                                 $temp_this_robot->robot_frame = $temp_modify_amount > 0 ? 'taunt' : 'defend';
                                 $temp_this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
@@ -172,7 +172,7 @@ $ability = array(
                             // Loop through the target's benched robots, inflicting les and less damage to each
                             $target_key = 0;
                             foreach ($backup_robots_active AS $key => $info){
-                                $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+                                $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
                                 // Attach this ability attachment to the target robot temporarily
                                 $temp_target_robot->robot_frame = $temp_modify_amount > 0 ? 'taunt' : 'defend';
                                 $temp_target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
@@ -201,7 +201,7 @@ $ability = array(
                             $this_key = 0;
                             foreach ($backup_robots_active AS $key => $info){
                                 if ($info['robot_id'] == $this_robot->robot_id){ continue; }
-                                $temp_this_robot = new rpg_robot($this_battle, $this_player, $info);
+                                $temp_this_robot = rpg_game::get_robot($this_battle, $this_player, $info);
                                 // Attach this ability attachment to the this robot temporarily
                                 unset($temp_this_robot->robot_attachments[$this_attachment_token]);
                                 $temp_this_robot->update_session();
@@ -217,7 +217,7 @@ $ability = array(
                             $target_key = 0;
                             foreach ($backup_robots_active AS $key => $info){
                                 if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-                                $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+                                $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
                                 // Attach this ability attachment to the target robot temporarily
                                 unset($temp_target_robot->robot_attachments[$this_attachment_token]);
                                 $temp_target_robot->update_session();

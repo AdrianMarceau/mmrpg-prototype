@@ -74,7 +74,7 @@ else {
     foreach ($target_player->values['robots_active'] AS $temp_robotinfo){
         if ($temp_robotinfo['robot_position'] == 'active'){
             $temp_robotinfo = array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']);
-            $active_target_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
+            $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
             $active_target_robot->update_session();
             break;
         }
@@ -83,7 +83,7 @@ else {
         $temp_robotinfo = array_slice($target_player->values['robots_active'], 0, 1);
         $temp_robotinfo = array_shift($temp_robotinfo);
         $temp_robotinfo = array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']);
-        $active_target_robot = new rpg_robot($this_battle, $target_player, $target_player->player_robots[0]);
+        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $target_player->player_robots[0]);
         $active_target_robot->robot_position = 'active';
         $active_target_robot->update_session();
     }
@@ -215,7 +215,7 @@ if ($temp_targetability->ability_target == 'select_target'){
         $temp_targetability_targetrobot = &$this_robot;
     } else {
         $temp_targetability_targetplayer = &$this_player;
-        $temp_targetability_targetrobot = new rpg_robot($this_battle, $this_player, $temp_targetability_targetinfo);
+        $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $this_player, $temp_targetability_targetinfo);
     }
 
 } elseif ($temp_targetability->ability_target == 'select_this'){
@@ -229,7 +229,7 @@ if ($temp_targetability->ability_target == 'select_target'){
         $temp_targetability_targetrobot = $active_target_robot;
     } else {
         $temp_targetability_targetplayer = $target_player;
-        $temp_targetability_targetrobot = new rpg_robot($this_battle, $target_player, $temp_targetability_targetinfo);
+        $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $target_player, $temp_targetability_targetinfo);
     }
 
 } else {
@@ -255,7 +255,7 @@ if ($target_robot->robot_status == 'disabled'){
 foreach ($target_player->player_robots AS $temp_robotinfo){
     if ($temp_robotinfo['robot_status'] == 'disabled'
         /*&& $temp_robotinfo['robot_position'] == 'bench'*/){
-        $temp_robot = new rpg_robot($this_battle, $target_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
+        $temp_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
         $temp_robot->flags['apply_disabled_state'] = true;
         //$temp_robot->flags['hidden'] = true;
         $temp_robot->update_session();
@@ -282,7 +282,7 @@ if ($target_action == 'switch'){
             $active_target_robot->robot_position = 'active';
             $active_target_robot->update_session();
         } else {
-            $temp_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
+            $temp_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
             $temp_robot->robot_load($temp_robotinfo);
             $temp_robot->robot_position = 'bench';
             $temp_robot->update_session();

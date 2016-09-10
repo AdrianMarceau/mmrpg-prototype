@@ -137,7 +137,7 @@ $ability = array(
         if ($this_robot->robot_energy < 1 || $this_robot->robot_status == 'disabled'){
             foreach ($this_player->values['robots_active'] AS $key => $info){
                 if ($info['robot_position'] != 'bench'){
-                        $this_active_robot = new rpg_robot($this_battle, $this_player, array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']));
+                        $this_active_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']));
                     }
             }
         }

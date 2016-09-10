@@ -318,12 +318,12 @@ else {
 }
 
 // Define the current robot object using the loaded robot data
-$this_robot = new rpg_robot($this_battle, $this_player, $this_robotinfo);
+$this_robot = rpg_game::get_robot($this_battle, $this_player, $this_robotinfo);
 // Define the target robot object using the loaded robot data
 if ($target_robotinfo['robot_id'] >= MMRPG_SETTINGS_TARGET_PLAYERID){
-    $target_robot = new rpg_robot($this_battle, $target_player, $target_robotinfo);
+    $target_robot = rpg_game::get_robot($this_battle, $target_player, $target_robotinfo);
 } else {
-    $target_robot = new rpg_robot($this_battle, $this_player, $target_robotinfo);
+    $target_robot = rpg_game::get_robot($this_battle, $this_player, $target_robotinfo);
 }
 
 
@@ -445,7 +445,7 @@ if ($this_robot->robot_position != 'active'){
     // Define the variable to hold active robot info and search for it
     $temp_active_info = array();
     foreach ($this_player->player_robots AS $token => $info){
-        $temp_robot = new rpg_robot($this_battle, $this_player, $info);
+        $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info);
         if ($info['robot_status'] == 'active'){ $temp_robot->robot_frame = 'base'; }
         if ($info['robot_position'] == 'active'){ $temp_active_info = $info;  }
         $temp_robot->update_session();
@@ -462,7 +462,7 @@ if ($target_robot->robot_position != 'active'){
     // Define the variable to hold active robot info and search for it
     $temp_active_info = array();
     foreach ($target_player->player_robots AS $token => $info){
-        $temp_robot = new rpg_robot($this_battle, $target_player, $info);
+        $temp_robot = rpg_game::get_robot($this_battle, $target_player, $info);
         if ($info['robot_status'] == 'active'){ $temp_robot->robot_frame = 'base'; }
         if ($info['robot_position'] == 'active'){ $temp_active_info = $info;  }
         $temp_robot->update_session();
@@ -543,7 +543,7 @@ $canvas_refresh = false;
 $active_target_robot = false;
 foreach ($target_player->player_robots AS $temp_robotinfo){
     if (empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
-        $active_target_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
+        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
         if ($active_target_robot->robot_energy < 1){
             $active_target_robot->flags['apply_disabled_state'] = true;
             $active_target_robot->flags['hidden'] = true;
@@ -552,7 +552,7 @@ foreach ($target_player->player_robots AS $temp_robotinfo){
             $canvas_refresh = true;
         }
     } elseif (!empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
-        $temp_target_robot = new rpg_robot($this_battle, $target_player, $temp_robotinfo);
+        $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
         $temp_target_robot->robot_position = 'bench';
         $temp_target_robot->update_session();
         $canvas_refresh = true;
@@ -571,12 +571,12 @@ if (empty($active_target_robot)){
     $temp_robots_disabled_array = $target_player->values['robots_disabled'];
     if (!empty($temp_robots_active_array)){
         $temp_robots_active_info = array_shift($temp_robots_active_array);
-        $active_target_robot = new rpg_robot($this_battle, $target_player, $temp_robots_active_info);
+        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robots_active_info);
         $active_target_robot->robot_position = 'active';
         $active_target_robot->update_session();
     } elseif (!empty($temp_robots_disabled_array)){
         $temp_robots_active_info = array_shift($temp_robots_disabled_array);
-        $active_target_robot = new rpg_robot($this_battle, $target_player, $temp_robots_active_info);
+        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robots_active_info);
         $active_target_robot->robot_position = 'active';
         $active_target_robot->update_session();
     } else {

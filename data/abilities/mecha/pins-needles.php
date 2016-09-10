@@ -53,7 +53,7 @@ $ability = array(
                 if ($info['robot_id'] == $target_robot->robot_id){ continue; }
                 if (!$this_battle->critical_chance(ceil($this_ability->ability_accuracy))){ continue; }
                 $this_ability->ability_results_reset();
-                $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+                $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
                 // Update the ability options text
                 $temp_frame = 2;
                 $temp_offset = 0;
@@ -82,7 +82,7 @@ $ability = array(
         }
         foreach ($backup_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-            $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
             if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
                 $temp_target_robot->trigger_disabled($this_robot);
             }

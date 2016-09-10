@@ -50,7 +50,7 @@ foreach ($this_player->values['robots_active'] AS $key => $info){
         $this_robot->robot_detail_styles = 'display: none; ';
         $this_robot->update_session();
     } else {
-        $temp_robot = new rpg_robot($this_battle, $this_player, $info);
+        $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info);
         $temp_robot->robot_frame_styles = 'display: none; ';
         $temp_robot->robot_detail_styles = 'display: none; ';
         $temp_robot->update_session();
@@ -64,7 +64,7 @@ foreach ($target_player->values['robots_active'] AS $key => $info){
         $target_robot->robot_detail_styles = 'display: none; ';
         $target_robot->update_session();
     } else {
-        $temp_robot = new rpg_robot($this_battle, $target_player, $info);
+        $temp_robot = rpg_game::get_robot($this_battle, $target_player, $info);
         $temp_robot->robot_frame_styles = 'display: none; ';
         $temp_robot->robot_detail_styles = 'display: none; ';
         $temp_robot->update_session();
@@ -256,7 +256,7 @@ foreach ($this_player->values['robots_active'] AS $key => $info){
         $this_robot->robot_frame = 'base';
         $this_robot->update_session();
     } else {
-        $temp_robot = new rpg_robot($this_battle, $this_player, $info);
+        $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info);
         $temp_robot->robot_frame = 'taunt';
         $temp_robot->robot_frame_styles = '';
         $temp_robot->robot_detail_styles = '';

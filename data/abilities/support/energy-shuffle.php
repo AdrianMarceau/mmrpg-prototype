@@ -133,8 +133,8 @@ $ability = array(
             } else {
 
                 // Collect references to this and the target robot
-                $temp_this_robot = new rpg_robot($this_battle, $this_player, $this_player->values['robots_active'][$i]);
-                $temp_target_robot = new rpg_robot($this_battle, $target_player, $target_player->values['robots_active'][$i]);
+                $temp_this_robot = rpg_game::get_robot($this_battle, $this_player, $this_player->values['robots_active'][$i]);
+                $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $target_player->values['robots_active'][$i]);
 
                 // Attach this ability attachment to this robot temporarily
                 $temp_this_robot->robot_frame = 'defend';

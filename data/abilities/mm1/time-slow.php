@@ -84,7 +84,7 @@ $ability = array(
                 foreach ($backup_robots_active AS $key => $info){
                     if ($info['robot_id'] == $target_robot->robot_id){ continue; }
                     $this_ability->ability_results_reset();
-                    $temp_target_robot = new rpg_robot($this_battle, $target_player, $info);
+                    $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
                     // Inflict damage on the target robot
                     $this_ability->damage_options_update(array(
                         'kind' => 'speed',
