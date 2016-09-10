@@ -1246,8 +1246,8 @@ class rpg_battle extends rpg_object {
         $this_return = false;
 
         // Reload all variables to ensure values are fresh
-        $this_player = rpg_game::get_player($this_battle, array('player_id' => $this_player->player_id, 'player_token' => $this_player->player_token));
-        $target_player = rpg_game::get_player($this_battle, array('player_id' => $target_player->player_id, 'player_token' => $target_player->player_token));
+        $this_player = rpg_game::get_player($this, array('player_id' => $this_player->player_id, 'player_token' => $this_player->player_token));
+        $target_player = rpg_game::get_player($this, array('player_id' => $target_player->player_id, 'player_token' => $target_player->player_token));
         $this_robot = rpg_game::get_robot($this, $this_player, array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token));
         $target_robot = rpg_game::get_robot($this, $target_player, array('robot_id' => $target_robot->robot_id, 'robot_token' => $target_robot->robot_token));
 
@@ -1670,7 +1670,7 @@ class rpg_battle extends rpg_object {
                 }
 
                 // Switch in the player's new robot and display an event for it
-                $this_robot = rpg_game::get_robot($this_battle, $this_player, $this_robotinfo);
+                $this_robot = rpg_game::get_robot($this, $this_player, $this_robotinfo);
                 if ($this_robot->robot_position != 'active'){
                     $this_robot->robot_position = 'active';
                     $this_player->player_frame = 'command';
@@ -1862,7 +1862,7 @@ class rpg_battle extends rpg_object {
                 $this_token = $this_token['robot_id'].'_'.$this_token['robot_token'];
 
                 // Return from the battle function with the scanned robot
-                $this_return = $this_ability;
+                $this_return = true;
                 break;
 
             }
