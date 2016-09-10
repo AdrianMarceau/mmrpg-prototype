@@ -66,7 +66,7 @@ if (empty($this_robot)){
 // If the current target robot is the active one as well
 if ($this_robot->robot_id != $target_robot->robot_id
     && $target_robot->robot_position == 'active'){
-    $active_target_robot = &$target_robot;
+    $active_target_robot = $target_robot;
 }
 // Otherwise, if the target was a benched robot
 else {
@@ -215,10 +215,10 @@ if ($temp_targetability->ability_target == 'select_target'){
     shuffle($temp_activerobots);
     $temp_targetability_targetinfo = array_shift($temp_activerobots);
     if ($temp_targetability_targetinfo['robot_id'] == $this_robot->robot_id){
-        $temp_targetability_targetplayer = &$this_player;
-        $temp_targetability_targetrobot = &$this_robot;
+        $temp_targetability_targetplayer = $this_player;
+        $temp_targetability_targetrobot = $this_robot;
     } else {
-        $temp_targetability_targetplayer = &$this_player;
+        $temp_targetability_targetplayer = $this_player;
         $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $this_player, $temp_targetability_targetinfo);
     }
 
