@@ -56,7 +56,7 @@ $ability = array(
         }
 
         // Create the attachment object for this ability
-        $this_attachment = new rpg_ability($this_battle, $this_player, $this_robot, $this_attachment_info);
+        $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $this_attachment_info);
 
         // Collect the shot power counter if set, otherwise default to level one
         $shot_power = !empty($this_attachment_info['attachment_power']) ? $this_attachment_info['attachment_power'] : 0;

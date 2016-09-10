@@ -73,7 +73,7 @@ ob_start();
                 $temp_abilityinfo = $temp_abilities_index[$ability_token];
                 $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilityinfo);
                 $temp_abilityinfo['ability_id'] = $this_robot->robot_id.str_pad($temp_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
-                $temp_ability = new rpg_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
+                $temp_ability = rpg_game::get_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
                 $temp_type = $temp_ability->ability_type;
                 $temp_type2 = $temp_ability->ability_type2;
                 $temp_damage = $temp_ability->ability_damage;

@@ -162,7 +162,7 @@ foreach ($active_target_robot->robot_abilities AS $key => $token){
     // Collect the data for this ability from the index
     $info = rpg_ability::parse_index_info($temp_abilities_index[$token]);
     if (empty($info)){ unset($active_target_robot->robot_abilities[$key]); continue; }
-    $temp_ability = new rpg_ability($this_battle, $target_player, $active_target_robot, $info);
+    $temp_ability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $info);
     // Determine how much weapon energy this should take
     $temp_ability_energy = $active_target_robot->calculate_weapon_energy($temp_ability);
     // If this robot does not have enough energy for the move, remove it
@@ -205,7 +205,7 @@ $temp_ability_info = array();
 list($temp_ability_info['ability_id'], $temp_ability_info['ability_token']) = explode('_', $target_action_token);
 $temp_index_info = rpg_ability::get_index_info($temp_ability_info['ability_token']);
 $temp_ability_info = array_merge($temp_index_info, $temp_ability_info);
-$temp_targetability = new rpg_ability($this_battle, $target_player, $active_target_robot, $temp_ability_info);
+$temp_targetability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_ability_info);
 
 // If the target player's temporary ability allows target selection
 if ($temp_targetability->ability_target == 'select_target'){
@@ -316,7 +316,7 @@ if ($target_action == 'switch'){
     list($temp_ability_info['ability_id'], $temp_ability_info['ability_token']) = explode('_', $target_action_token);
     $temp_index_info = rpg_ability::get_index_info($temp_ability_info['ability_token']);
     $temp_ability_info = array_merge($temp_index_info, $temp_ability_info);
-    $temp_targetability = new rpg_ability($this_battle, $target_player, $active_target_robot, $temp_ability_info);
+    $temp_targetability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_ability_info);
 
     // If this robot was targetting itself
     if ($this_robot->robot_id == $target_robot->robot_id){
