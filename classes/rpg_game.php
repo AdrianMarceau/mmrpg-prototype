@@ -53,4 +53,41 @@ class rpg_game {
 
     }
 
+    /**
+     * Create or retrive a player object from the session
+     * @param array $this_playerinfo
+     * @return rpg_player
+     */
+    public static function get_player($this_battle, $this_playerinfo){
+
+        // If the player index has not been created, do so
+        if (!isset(self::$index['players'])){ self::$index['players'] = array(); }
+
+        // Check if a player ID has been defined
+        if (isset($this_playerinfo['player_id'])){
+            $player_id = $this_playerinfo['player_id'];
+        }
+
+        // If this player has already been created, retrieve it
+        if (!empty($player_id) && !empty(self::$index['players'][$player_id])){
+
+            // Collect the player from the index and return
+            $this_player = self::$index['players'][$player_id];
+
+        }
+        // Otherwise create a new player object in the index
+        else {
+
+            // Create and return the player object
+            $this_player = new rpg_player($this_battle, $this_playerinfo);
+            self::$index['players'][$this_player->player_id] = $this_player;
+
+        }
+
+        // Return the collect player object
+        $this_player->update_session();
+        return $this_player;
+
+    }
+
 }

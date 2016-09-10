@@ -884,7 +884,7 @@ class rpg_canvas {
             // Loop through the players index looking for this player
             foreach ($this_battle->values['players'] AS $this_player_id => $this_playerinfo){
                 if (empty($target_player_id) || $target_player_id != $this_player_id){
-                    $eventinfo['this_player'] = new rpg_player($this_battle, $this_playerinfo);
+                    $eventinfo['this_player'] = rpg_game::get_player($this_battle, $this_playerinfo);
                     break;
                 }
             }
@@ -922,7 +922,7 @@ class rpg_canvas {
             // Loop through the players index looking for this player
             foreach ($this_battle->values['players'] AS $target_player_id => $target_playerinfo){
                 if (empty($this_player_id) || $this_player_id != $target_player_id){
-                    $eventinfo['target_player'] = new rpg_player($this_battle, $target_playerinfo);
+                    $eventinfo['target_player'] = rpg_game::get_player($this_battle, $target_playerinfo);
                     break;
                 }
             }
