@@ -299,9 +299,6 @@ class rpg_battle extends rpg_object {
     // Define a public function for appending to the action array
     public function actions_append(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_action_token){
 
-        // DEBUG
-        //$this->events_create(false, false, 'DEBUG_'.__LINE__.'_BATTLE', ' $this_battle->actions_append('.$this_player->player_id.'_'.$this_player->player_token.', '.$this_robot->robot_id.'_'.$this_robot->robot_token.', '.$target_player->player_id.'_'.$target_player->player_token.', '.$target_robot->robot_id.'_'.$target_robot->robot_token.', '.$this_action.', '.$this_action_token.');');
-
         // Append the new action to the array
         $this->actions[] = array(
             'this_field' => &$this->battle_field,
