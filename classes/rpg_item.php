@@ -1589,6 +1589,10 @@ class rpg_item extends rpg_object {
         // Extract all objects into the current scope
         extract($objects);
 
+        // Update this item's damage amount based on the active robot's level
+        $this_item->item_damage = $this_robot->robot_level;
+        $this_item->update_session();
+
         // Target the opposing robot
         $this_item->target_options_update(array(
             'frame' => 'throw',
@@ -1600,23 +1604,21 @@ class rpg_item extends rpg_object {
         // Inflict damage on the opposing robot
         $this_item->damage_options_update(array(
             'kind' => 'energy',
-            'percent' => true,
             'modifiers' => true,
             'frame' => 'damage',
-            'kickback' => array(10, 5, 0),
-            'success' => array(0, 10, 0, 10, 'The '.$this_item->print_name().' damaged the target!'),
-            'failure' => array(0, -30, 0, -10, 'The '.$this_item->print_name().' missed&hellip;')
+            'kickback' => array(30, 5, 0),
+            'success' => array(0, -40, 0, 10, 'The '.$this_item->print_name().' damaged the target!'),
+            'failure' => array(0, -60, 0, -10, 'The '.$this_item->print_name().' missed&hellip;')
             ));
         $this_item->recovery_options_update(array(
             'kind' => 'energy',
-            'percent' => true,
             'modifiers' => true,
             'frame' => 'taunt',
-            'kickback' => array(0, 0, 0),
-            'success' => array(0, 10, 0, 10, 'The '.$this_item->print_name().' recovered the target!'),
-            'failure' => array(0, -30, 0, -10, 'The '.$this_item->print_name().' missed&hellip;')
+            'kickback' => array(15, 0, 0),
+            'success' => array(0, -30, 0, 10, 'The '.$this_item->print_name().' recovered the target!'),
+            'failure' => array(0, -50, 0, -10, 'The '.$this_item->print_name().' missed&hellip;')
             ));
-        $energy_damage_amount = ceil($target_robot->robot_base_energy * ($this_item->item_damage / 100));
+        $energy_damage_amount = $this_item->item_damage;
         $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => true, 'apply_position_modifiers' => true, 'apply_starforce_modifiers' => true);
         $target_robot->trigger_damage($this_robot, $this_item, $energy_damage_amount, true, $trigger_options);
 
