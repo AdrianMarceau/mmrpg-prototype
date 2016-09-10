@@ -8,6 +8,8 @@ $item_token_skip = array('large-screw', 'small-screw');
 foreach ($current_player_items AS $token => $quantity){
     if (in_array($token, $item_token_skip)){
         unset($current_player_items[$token]);
+    } elseif (strstr($token, '-shard') || strstr($token, '-star')){
+        unset($current_player_items[$token]);
     }
 }
 
