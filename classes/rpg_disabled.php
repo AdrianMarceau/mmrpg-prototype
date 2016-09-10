@@ -31,7 +31,7 @@ class rpg_disabled {
                 foreach ($this_battle->values['players'] AS $id => $info){
                     if ($this_player->player_id != $id){
                         unset($target_player, $target_robot);
-                        $target_player = new rpg_player($this_battle, $info);
+                        $target_player = rpg_game::get_player($this_battle, $info);
                         $target_robot = $this_battle->find_target_robot($target_player->player_side);
                         //$this_robot->battle->events_create(false, false, 'DEBUG', 'Assiging $this_robot->battle->values[\'players\']['.$id.'] = '.$info['player_token']);
                     }

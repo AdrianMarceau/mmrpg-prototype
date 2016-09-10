@@ -118,11 +118,9 @@ $target_playerinfo['player_side'] = 'right';
 // Only create the arrays with minimal info if NOT start
 if ($this_action != 'start'){
     // Define the current player object using the loaded player data and update session
-    $this_player = new rpg_player($this_battle, $this_playerinfo);
-    $this_player->update_session();
+    $this_player = rpg_game::get_player($this_battle, $this_playerinfo);
     // Define the target player object using the loaded player data and update session
-    $target_player = new rpg_player($this_battle, $target_playerinfo);
-    $target_player->update_session();
+    $target_player = rpg_game::get_player($this_battle, $target_playerinfo);
 }
 // Otherwise, prepopulate their robot arrays
 elseif ($this_action == 'start'){
@@ -172,8 +170,7 @@ if ($this_action == 'start'){
         // Precreate the player object using the newly defined details
         $backup_this_playerinfo = $this_playerinfo;
         $backup_this_playerinfo['player_robots'] = array();
-        $this_player = new rpg_player($this_battle, $backup_this_playerinfo);
-        $this_player->update_session();
+        $this_player = rpg_game::get_player($this_battle, $backup_this_playerinfo);
         unset($backup_this_playerinfo);
         // Break apart the allowed robots string and unset undefined robots
         $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
@@ -236,8 +233,7 @@ if ($this_action == 'start'){
         // Precreate the target player object using the newly defined details
         $backup_target_playerinfo = $target_playerinfo;
         $backup_target_playerinfo['player_robots'] = array();
-        $target_player = new rpg_player($this_battle, $backup_target_playerinfo);
-        $target_player->update_session();
+        $target_player = rpg_game::get_player($this_battle, $backup_target_playerinfo);
         unset($backup_target_playerinfo);
         // Break apart the allowed robots string and unset undefined robots
         $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');

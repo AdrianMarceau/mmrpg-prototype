@@ -1759,7 +1759,7 @@ class rpg_battle extends rpg_object {
                 // Create the temporary target player and robot objects
                 $temp_target_robot_info = !empty($this->values['robots'][$this_token['robot_id']]) ? $this->values['robots'][$this_token['robot_id']] : array();
                 $temp_target_player_info = !empty($this->values['players'][$temp_target_robot_info['player_id']]) ? $this->values['players'][$temp_target_robot_info['player_id']] : array();
-                $temp_target_player = new rpg_player($this, $temp_target_player_info);
+                $temp_target_player = rpg_game::get_player($this, $temp_target_player_info);
                 $temp_target_robot = new rpg_robot($this, $temp_target_player, $temp_target_robot_info);
                 //die('<pre>'.print_r($temp_target_robot, true).'</pre>');
 
@@ -1957,10 +1957,10 @@ class rpg_battle extends rpg_object {
         $this_field = $this->battle_field; //array_slice($this->values['fields'];
         $this_player = false;
         $this_robot = !empty($this_robot) ? $this_robot : false;
-        if (!empty($this_robot)){ $this_player = new rpg_player($this, $this->values['players'][$this_robot->player_id]); }
+        if (!empty($this_robot)){ $this_player = rpg_game::get_player($this, $this->values['players'][$this_robot->player_id]); }
         $target_player = false;
         $target_robot = !empty($target_robot) ? $target_robot : false;
-        if (!empty($target_robot)){ $target_player = new rpg_player($this, $this->values['players'][$target_robot->player_id]); }
+        if (!empty($target_robot)){ $target_player = rpg_game::get_player($this, $this->values['players'][$target_robot->player_id]); }
 
         // Increment the internal events counter
         if (!isset($this->counters['events'])){ $this->counters['events'] = 1; }
@@ -2270,7 +2270,7 @@ class rpg_battle extends rpg_object {
                 foreach ($this->values['players'] AS $player_id => $player_info){
                     // If the player matches the request side, return the player
                     if ($player_info['player_side'] == $target_side){
-                        $target_player = new rpg_player($this, $player_info);
+                        $target_player = rpg_game::get_player($this, $player_info);
                     }
                 }
             }
@@ -2286,7 +2286,7 @@ class rpg_battle extends rpg_object {
             // Otherwise collect the player info from the battle
             $player_info = $this->values['players'][$target_id];
             // Create the robot object and return to caller
-            $target_player = new rpg_player($this, $player_info);
+            $target_player = rpg_game::get_player($this, $player_info);
         }
 
         // Return the final value of the target player
