@@ -477,8 +477,8 @@ if ($target_robot->robot_position != 'active'){
 }
 
 // Refresh the settings for both robots with recent changes
-$this_robot->robot_load($temp_this_reload_robot);
-$target_robot->robot_load($temp_target_reload_robot);
+$this_robot = rpg_game::get_robot($this_battle, $this_player, $temp_this_reload_robot);
+$target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_reload_robot);
 
 // Ensure the battle is still in progress
 if (empty($this_redirect) && $this_battle->battle_status != 'complete'){

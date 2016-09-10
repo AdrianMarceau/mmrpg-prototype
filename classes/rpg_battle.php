@@ -339,12 +339,6 @@ class rpg_battle extends rpg_object {
             // Shift and collect the oldest action from the queue
             $current_action = array_shift($this->actions);
 
-            // Reload each player and robot from session to prevent bugs
-            if (!empty($current_action['this_player'])){ $current_action['this_player']->player_load(array('player_id' => $current_action['this_player']->player_id, 'player_token' => $current_action['this_player']->player_token)); }
-            if (!empty($current_action['target_player'])){ $current_action['target_player']->player_load(array('player_id' => $current_action['target_player']->player_id, 'player_token' => $current_action['target_player']->player_token)); }
-            if (!empty($current_action['this_robot'])){ $current_action['this_robot']->robot_load(array('robot_id' => $current_action['this_robot']->robot_id, 'robot_token' => $current_action['this_robot']->robot_token)); }
-            if (!empty($current_action['target_robot'])){ $current_action['target_robot']->robot_load(array('robot_id' => $current_action['target_robot']->robot_id, 'robot_token' => $current_action['target_robot']->robot_token)); }
-
             // If the robot's player is on autopilot and the action is empty, automate input
             if (empty($current_action['this_action']) && $current_action['this_player']->player_autopilot == true){
                 $current_action['this_action'] = 'ability';
@@ -1255,14 +1249,10 @@ class rpg_battle extends rpg_object {
         $this_return = false;
 
         // Reload all variables to ensure values are fresh
-        $this_player->player_load(array('player_id' => $this_player->player_id, 'player_token' => $this_player->player_token));
-        $target_player->player_load(array('player_id' => $target_player->player_id, 'player_token' => $target_player->player_token));
-        $this_robot->robot_load(array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token));
-        $target_robot->robot_load(array('robot_id' => $target_robot->robot_id, 'robot_token' => $target_robot->robot_token));
-        $this_player->update_session();
-        $target_robot->update_session();
-        $this_robot->update_session();
-        $target_robot->update_session();
+        $this_player = rpg_game::get_player($this_battle, array('player_id' => $this_player->player_id, 'player_token' => $this_player->player_token));
+        $target_player = rpg_game::get_player($this_battle, array('player_id' => $target_player->player_id, 'player_token' => $target_player->player_token));
+        $this_robot = rpg_game::get_robot($this, $this_player, array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token));
+        $target_robot = rpg_game::get_robot($this, $target_player, array('robot_id' => $target_robot->robot_id, 'robot_token' => $target_robot->robot_token));
 
         // Create the action array in the history object if not exist
         if (!isset($this_player->history['actions'])){
@@ -1683,7 +1673,7 @@ class rpg_battle extends rpg_object {
                 }
 
                 // Switch in the player's new robot and display an event for it
-                $this_robot->robot_load($this_robotinfo);
+                $this_robot = rpg_game::get_robot($this_battle, $this_player, $this_robotinfo);
                 if ($this_robot->robot_position != 'active'){
                     $this_robot->robot_position = 'active';
                     $this_player->player_frame = 'command';
@@ -2473,11 +2463,8 @@ class rpg_battle extends rpg_object {
         $temp_robot = false;
         foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
 
-            // Create the temp robot object
-            if (empty($temp_robot)){ $temp_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
-            else { $temp_robot->robot_load(array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
-            //if ($temp_robotinfo['robot_id'] == $this_robot->robot_id){ $temp_robot = &$this_robot; }
-            //else { $temp_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token'])); }
+            // Create the temp robot object for checking
+            $temp_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
 
             // Ensure this robot has not been disabled already
             if ($temp_robotinfo['robot_status'] == 'disabled'){
