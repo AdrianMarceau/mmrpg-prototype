@@ -158,6 +158,7 @@ $temp_active_target_robot_abilities = $active_target_robot->robot_abilities;
 $temp_ability_tokens = "'".implode("', '", array_values($active_target_robot->robot_abilities))."'";
 $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
 foreach ($active_target_robot->robot_abilities AS $key => $token){
+
     // Collect the data for this ability from the index
     $info = rpg_ability::parse_index_info($temp_abilities_index[$token]);
     if (empty($info)){ unset($active_target_robot->robot_abilities[$key]); continue; }
@@ -166,9 +167,12 @@ foreach ($active_target_robot->robot_abilities AS $key => $token){
     $temp_ability_energy = $active_target_robot->calculate_weapon_energy($temp_ability);
     // If this robot does not have enough energy for the move, remove it
     if ($active_target_robot->robot_weapons < $temp_ability_energy){ unset($active_target_robot->robot_abilities[$key]); continue; }
+
 }
+
 // If there are no abilities left to use, the robot will automatically enter a recharge state
 if (empty($active_target_robot->robot_abilities)){ $active_target_robot->robot_abilities[] = 'action-noweapons'; }
+
 // Update the robot's session with ability changes
 $active_target_robot->update_session();
 
@@ -246,18 +250,18 @@ $this_battle->actions_append($target_player, $active_target_robot, $temp_targeta
 // Refresh the backed up target robot
 $target_robot->robot_load(array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
 if ($target_robot->robot_status == 'disabled'){
+
     // Reset the target robot to the active one for the sake of auto targetting
     $target_robot->robot_load(array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
     $target_robot->update_session();
+
 }
 
 // Loop through the target robots and hide any disabled robots
 foreach ($target_player->player_robots AS $temp_robotinfo){
-    if ($temp_robotinfo['robot_status'] == 'disabled'
-        /*&& $temp_robotinfo['robot_position'] == 'bench'*/){
+    if ($temp_robotinfo['robot_status'] == 'disabled'){
         $temp_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
         $temp_robot->flags['apply_disabled_state'] = true;
-        //$temp_robot->flags['hidden'] = true;
         $temp_robot->update_session();
     }
 }
@@ -295,24 +299,18 @@ if ($target_action == 'switch'){
         $active_target_robot->update_session();
     }
 
-    // Decide which ability this robot will use
-    $target_action_token = '';
-
-    // Check if this robot has choice data defined
-    if (true){
-        // Collect the ability choice from the robot
-        $temp_token = rpg_robot::robot_choices_abilities(array(
-            'this_index' => $mmrpg_index,
-            'this_battle' => $this_battle,
-            'this_field' => $this_field,
-            'this_player' => $target_player,
-            'this_robot' => $active_target_robot,
-            'target_player' => $this_player,
-            'target_robot' => $this_robot
-            ));
-        $temp_id = array_search($temp_token, $active_target_robot->robot_abilities);
-        $target_action_token = $temp_id.'_'.$temp_token;
-    }
+    // Collect the ability choice from the robot
+    $temp_token = rpg_robot::robot_choices_abilities(array(
+        'this_index' => $mmrpg_index,
+        'this_battle' => $this_battle,
+        'this_field' => $this_field,
+        'this_player' => $target_player,
+        'this_robot' => $active_target_robot,
+        'target_player' => $this_player,
+        'target_robot' => $this_robot
+        ));
+    $temp_id = array_search($temp_token, $active_target_robot->robot_abilities);
+    $target_action_token = $temp_id.'_'.$temp_token;
 
     // Create the temporary ability object for the target player's robot
     $temp_ability_info = array();
@@ -398,10 +396,6 @@ if ($this_battle->battle_status != 'complete'){
     }
 
 }
-
-// Increment the battle's turn counter by 1
-//$this_battle->counters['battle_turn'] += 1;
-//$this_battle->update_session();
 
 // Unset any item use flags for this player, so they can use one again next turn
 if (isset($this_player->flags['item_used_this_turn'])){
