@@ -1423,39 +1423,39 @@ $target_robot->robot_load($temp_target_reload_robot);
 if (empty($this_redirect) && $this_battle->battle_status != 'complete'){
 
     // Require the option actions
-    require_once('actions/option.php');
+    require_once('battle/menus/option.php');
 
     // Require the ability actions
     $temp_player_ability_actions = array();
-    require_once('actions/ability.php');
+    require_once('battle/menus/ability.php');
 
     // Require the item actions
     $temp_player_item_actions = array();
-    require_once('actions/item.php');
+    require_once('battle/menus/item.php');
 
     // Require the switch actions
-    require_once('actions/switch.php');
+    require_once('battle/menus/switch.php');
 
     // Require the target actions
-    require_once('actions/target_this.php');
-    require_once('actions/target_this_disabled.php');
-    require_once('actions/target_target.php');
+    require_once('battle/menus/target_this.php');
+    require_once('battle/menus/target_this_disabled.php');
+    require_once('battle/menus/target_target.php');
 
     // Require the scan actions
-    require_once('actions/scan.php');
+    require_once('battle/menus/scan.php');
 
     // Require the battle actions
-    require_once('actions/battle.php');
+    require_once('battle/menus/battle.php');
 
 }
 // Otherwise, if the battle has ended
 elseif (empty($this_redirect) && $this_battle->battle_status == 'complete'){
 
     // Require the option actions
-    require_once('actions/option.php');
+    require_once('battle/menus/option.php');
 
     // Require the complete actions
-    require_once('actions/complete.php');
+    require_once('battle/menus/complete.php');
 
 }
 
