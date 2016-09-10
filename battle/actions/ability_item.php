@@ -12,7 +12,7 @@ $this_battle->update_session();
 // Create the temporary item object for this player's robot
 $temp_iteminfo = array();
 list($temp_iteminfo['item_id'], $temp_iteminfo['item_token']) = explode('_', $this_action_token); //array('item_token' => $this_action_token);
-$temp_thisitem = new rpg_item($this_battle, $this_player, $this_robot, $temp_iteminfo);
+$temp_thisitem = rpg_game::get_item($this_battle, $this_player, $this_robot, $temp_iteminfo);
 
 // Queue up an this robot's action first, because it's using an item
 $this_battle->actions_append($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token);

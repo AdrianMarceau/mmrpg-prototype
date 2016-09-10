@@ -1362,7 +1362,7 @@ class rpg_player extends rpg_object {
 
         // Create the temporary item object for event creation
         $item_reward_info = rpg_item::get_index_info($item_reward_token);
-        $temp_item = new rpg_item($this_battle, $target_player, $target_robot, $item_reward_info);
+        $temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_reward_info);
         $temp_item->item_name = $item_reward_info['item_name'];
         $temp_item->item_image = $item_reward_info['item_token'];
         $temp_item->item_quantity = $item_quantity_dropped;
@@ -1493,7 +1493,7 @@ class rpg_player extends rpg_object {
             // Create the temporary item object for event creation
             $item_core_info['item_id'] = $item_reward_info['item_id'] + 1;
             $item_core_info['item_token'] = $temp_core_token;
-            $temp_core = new rpg_item($this_battle, $target_player, $target_robot, $item_core_info);
+            $temp_core = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_core_info);
             $temp_core->item_name = $item_core_info['item_name'];
             $temp_core->item_image = $item_core_info['item_token'];
             $temp_core->update_session();
