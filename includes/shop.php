@@ -242,16 +242,27 @@ $this_shop_index['reggae'] = array(
     'shop_items' => array(
         'items_buying' => array(
 
-            'none-core' => 1500, 'cutter-core' => 3000,
-            'impact-core' => 3000,  'freeze-core' => 3000,
-            'explode-core' => 3000, 'flame-core' => 3000,
-            'electric-core' => 3000, 'time-core' => 3000,
-            'earth-core' => 3000, 'wind-core' => 3000,
-            'water-core' => 3000, 'swift-core' => 3000,
-            'nature-core' => 3000, 'missile-core' => 3000,
-            'crystal-core' => 3000, 'shadow-core' => 3000,
-            'space-core' => 3000, 'shield-core' => 3000,
-            'laser-core' => 3000, 'copy-core' => 6000
+
+            'cutter-shard' => 100, 'cutter-core' => 3000,
+            'impact-shard' => 100,  'impact-core' => 3000,
+            'freeze-shard' => 100, 'freeze-core' => 3000,
+            'explode-shard' => 100, 'explode-core' => 3000,
+            'flame-shard' => 100, 'flame-core' => 3000,
+            'electric-shard' => 100, 'electric-core' => 3000,
+            'time-shard' => 100, 'time-core' => 3000,
+            'earth-shard' => 100, 'earth-core' => 3000,
+            'wind-shard' => 100, 'wind-core' => 3000,
+            'water-shard' => 100, 'water-core' => 3000,
+            'swift-shard' => 100, 'swift-core' => 3000,
+            'nature-shard' => 100, 'nature-core' => 3000,
+            'missile-shard' => 100, 'missile-core' => 3000,
+            'crystal-shard' => 100, 'crystal-core' => 3000,
+            'shadow-shard' => 100, 'shadow-core' => 3000,
+            'space-shard' => 100, 'space-core' => 3000,
+            'shield-shard' => 100, 'shield-core' => 3000,
+            'laser-shard' => 100, 'laser-core' => 3000,
+            'copy-shard' => 200, 'copy-core' => 6000,
+            'none-shard' => 200, 'none-core' => 6000,
 
             )
         )
@@ -519,11 +530,15 @@ if (!empty($this_shop_index['reggae'])){
                 if (!empty($this_shop_index['reggae']['shop_items']['items_buying'])){
                         $items_list = $this_shop_index['reggae']['shop_items']['items_buying'];
                         foreach ($items_list AS $item_token => $item_price){
-                                $type_token = preg_replace('/-core$/', '', $item_token);
+                                $type_token = preg_replace('/-(shard|core)$/', '', $item_token);
                                 $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
                                 $ability_boost = !empty($global_unlocked_abilities_types[$type_token]) ? $global_unlocked_abilities_types[$type_token] : 0;
                                 $robot_price_boost = ceil($robot_boost * 100);
                                 $ability_price_boost = ceil($ability_boost * 10);
+                                if (strstr($item_token, '-shard')){
+                                    $robot_price_boost = ceil($robot_price_boost / 10);
+                                    $ability_price_boost = ceil($ability_price_boost / 10);
+                                }
                                 $item_price += $robot_price_boost;
                                 $item_price += $ability_price_boost;
                                 $this_shop_index['reggae']['shop_items']['items_buying'][$item_token] = $item_price;
