@@ -1171,7 +1171,7 @@ class rpg_canvas {
                             // Create the temporary item object using the provided data and generate its markup data
                             $attachment_info['flags']['is_attachment'] = true;
                             if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
-                            $this_item = new rpg_item($this_battle, $eventinfo['this_player'], $this_robot, $attachment_info);
+                            $this_item = rpg_game::get_item($this_battle, $eventinfo['this_player'], $this_robot, $attachment_info);
                             // Define this item data array and generate the markup data
                             $this_attachment_options = $this_options;
                             $this_attachment_options['data_sticky'] = !empty($this_options['sticky']) || !empty($attachment_info['sticky']) ? true : false;
@@ -1321,7 +1321,7 @@ class rpg_canvas {
                         elseif ($attachment_info['class'] == 'item'){
 
                             // Create the target's temporary item object using the provided data
-                            $target_item = new rpg_item($this_battle, $eventinfo['target_player'], $target_robot, $attachment_info);
+                            $target_item = rpg_game::get_item($this_battle, $eventinfo['target_player'], $target_robot, $attachment_info);
 
                             // Define this item data array and generate the markup data
                             $target_attachment_options = $target_options;

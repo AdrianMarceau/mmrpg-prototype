@@ -1460,7 +1460,7 @@ class rpg_robot extends rpg_object {
                         if ($attachment_info['attachment_destroy'] !== false){
                             $temp_item = rpg_item::parse_index_info($temp_attachments_index[$attachment_info['item_token']]);
                             $attachment_info = array_merge($temp_item, $attachment_info);
-                            $temp_attachment = new rpg_item($this->battle, $this->player, $this, $attachment_info);
+                            $temp_attachment = rpg_game::get_item($this->battle, $this->player, $this, $attachment_info);
                             $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
                             //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
@@ -1594,7 +1594,7 @@ class rpg_robot extends rpg_object {
         elseif ($attachment_info['class'] == 'item'){
 
             // Create the temporary item object
-            $this_item = new rpg_item($this->battle, $this->player, $this, array('item_token' => $attachment_info['item_token']));
+            $this_item = rpg_game::get_item($this->battle, $this->player, $this, array('item_token' => $attachment_info['item_token']));
 
             // Update this robot's history with the triggered attachment
             $this->history['triggered_attachments'][] = 'item_'.$this_item->item_token;

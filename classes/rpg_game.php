@@ -200,4 +200,54 @@ class rpg_game {
 
     }
 
+    /**
+     * Create or retrive a item object from the session
+     * @param array $this_iteminfo
+     * @return rpg_item
+     */
+    public static function get_item($this_battle, $this_player, $this_robot, $this_iteminfo){
+
+        // If the item index has not been created, do so
+        if (!isset(self::$index['items'])){ self::$index['items'] = array(); }
+
+        // Check if a item ID has been defined
+        if (isset($this_iteminfo['item_id'])){
+            $item_id = $this_iteminfo['item_id'];
+        }
+        // Otherwise if only a item token was defined
+        elseif (isset($this_iteminfo['item_token'])){
+            $item_id = 0;
+            $item_token = $this_iteminfo['item_token'];
+            foreach (self::$index['items'] AS $item){
+                if ($item_token == $item->item_token
+                    && $this_robot->robot_id == $item->robot_id
+                    && $this_player->player_id == $item->player_id){
+                    $item_id = $item->item_id;
+                    break;
+                }
+            }
+        }
+
+        // If this item has already been created, retrieve it
+        if (!empty($item_id) && !empty(self::$index['items'][$item_id])){
+
+            // Collect the item from the index and return
+            $this_item = self::$index['items'][$item_id];
+
+        }
+        // Otherwise create a new item object in the index
+        else {
+
+            // Create and return the item object
+            $this_item = new rpg_item($this_battle, $this_player, $this_robot, $this_iteminfo);
+            self::$index['items'][$this_item->item_id] = $this_item;
+
+        }
+
+        // Return the collect item object
+        $this_item->update_session();
+        return $this_item;
+
+    }
+
 }

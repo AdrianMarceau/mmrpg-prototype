@@ -1497,7 +1497,7 @@ class rpg_battle extends rpg_object {
                 }
 
                 // Define the current item object using the loaded item data
-                $this_item = new rpg_item($this, $this_player, $this_robot, $this_token);
+                $this_item = rpg_game::get_item($this, $this_player, $this_robot, $this_token);
                 // Trigger this robot's item
                 $this_item->item_results = $this_robot->trigger_item($target_robot, $this_item);
 
