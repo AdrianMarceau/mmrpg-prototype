@@ -1434,7 +1434,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     display: block;
     width: auto !important;
     height: 24px;
-    margin: 0 47px;
+    /*margin: 0 47px;*/
+    margin: 0 auto;
     padding: 1px 10px;
     text-align: center;
     veritcal-align: top;
@@ -1448,9 +1449,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     text-shadow: 0 1px 1px #161616;
     border: 0 none transparent;
     border-bottom-style: none;
-    border-radius: 0.5em 0.5em 0 0;
-    -moz-border-radius: 0.5em 0.5em 0 0;
-    -webkit-border-radius: 0.5em 0.5em 0 0;
+    -moz-border-radius: 0.4em 0.4em 0 0;
+    -webkit-border-radius: 0.4em 0.4em 0 0;
+    border-radius: 0.4em 0.4em 0 0;
     color: #FFFFFF;
     background-image: -webkit-gradient(
             linear,
@@ -1468,28 +1469,101 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
+#events #messages .event .fullsize {
+    margin: 0 auto;
+    padding: 0;
+}
+#events #messages .event table td.left,
+#events #messages .event table td.right {
+    padding: 2px;
+}
+#events #messages .event table td.left label,
+#events #messages .event table td.right label {
+    display: block;
+}
+#events #messages .event table td.left {
+    text-align: left;
+}
+#events #messages .event table td.left label {
+    float: right;
+}
+#events #messages .event table td.right {
+    text-align: right;
+}
+#events #messages .event table td.right label {
+    float: left;
+}
+#events #messages .event table td .stat {
+    display: inline-block;
+    box-sizing: content-box;
+}
+#events #messages .database_container {
+
+}
+#events #messages .database_container.layout_compact {
+    margin-bottom: 2px !important;
+}
+
+#events #messages .database_container .subbody table td.right label,
+#events #messages .database_container .subbody table td.left label {
+    display: block;
+    float: left;
+}
+#events #messages .database_container .subbody table td.right .stat,
+#events #messages .database_container .subbody table td.left .stat {
+    display: inline-block;
+}
+#events #messages .database_container .subbody table td.right .stat .robot_stat.type_empty,
+#events #messages .database_container .subbody table td.left .stat .robot_stat.type_empty {
+    display: inline-block;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    line-height: 124%;
+}
+#events #messages .database_container .subbody table td.right .stat .robot_stat .robot_stat,
+#events #messages .database_container .subbody table td.left .stat .robot_stat .robot_stat {
+    margin-right: -4px;
+    display: inline;
+    width: auto;
+}
+#events #messages .database_container .subbody table td.right .stat .robot_stat span,
+#events #messages .database_container .subbody table td.left .stat .robot_stat span {
+    display: inline-block;
+    width: 35px;
+}
+
+#events #messages .database_container .subbody .body_left {
+    margin-right: 0;
+    margin-bottom: 5px;
+    padding: 2px 0;
+    min-height: 10px;
+}
+#events #messages .database_container .subbody .body_left.fullsize {
+    margin-left: 0;
+}
+#events #messages .database_container.layout_event .subbody .body_left {
+    font-size: 10px;
+    min-height: 150px;
+}
+#events #messages .database_container .subbody .body_left table.full {
+    margin: 5px auto -2px;
+}
+#events #messages .database_container.layout_website .subbody .body_left table.full {
+    margin: 5px auto 10px;
+}
+
+#events #messages .database_container .subbody .link_top,
+#events #messages .database_container .subbody .link_permalink {
+    margin-bottom: 4px;
+}
 
 #events #messages .event .header_left {
     text-align: left;
 }
 #events #messages .event .header_right {
     text-align: right;
-}
-#events #messages .event .header_left.nomug,
-#events #messages .event .header_left.noicon {
-    margin-left: 0;
-    margin-right: 0;
-}
-#events #messages .event .header_right.nomug,
-#events #messages .event .header_right.noicon {
-    margin-left: 0;
-    margin-right: 0;
-}
-#events #messages .event .description_container {
-    white-space: normal;
-    max-width: 99%;
-    text-align: left;
-    clear: left;
 }
 
 #events #messages .event .header_left .header_core,
@@ -1508,8 +1582,6 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #events #messages .event .header_right .header_core {
     float: left;
 }
-
-
 
 #events #buttons .event_continue {
     display: block;
