@@ -59,12 +59,14 @@ $ability = array(
         extract($objects);
 
         // Update this ability's damage based on the user and target's speed
-        if ($target_robot->robot_speed > $this_robot->robot_speed){
-            $this_ability->set_name($this_ability->ability_base_name . ' Δ');
-            $this_ability->set_damage($this_ability->ability_base_damage * 2);
-        } else {
-            $this_ability->reset_name();
-            $this_ability->reset_damage();
+        if (!empty($target_robot)){
+            if ($target_robot->robot_speed > $this_robot->robot_speed){
+                $this_ability->set_name($this_ability->ability_base_name . ' Δ');
+                $this_ability->set_damage($this_ability->ability_base_damage * 2);
+            } else {
+                $this_ability->reset_name();
+                $this_ability->reset_damage();
+            }
         }
 
         // Return true on success
