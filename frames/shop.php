@@ -334,7 +334,7 @@ if (!$temp_event_shown && !empty($allowed_edit_data['auto']) && empty($temp_game
 }
 
 // If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_reggae-auto-intro';
+$temp_event_flag = 'mmrpg-event-01_shop-reggae-intro';
 if (!$temp_event_shown && !empty($allowed_edit_data['reggae']) && empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
     $temp_game_flags[$temp_event_flag] = true;
     $temp_event_shown = true;
@@ -358,7 +358,7 @@ if (!$temp_event_shown && !empty($allowed_edit_data['reggae']) && empty($temp_ga
 }
 
 // If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_kalinka-auto-intro';
+$temp_event_flag = 'mmrpg-event-01_shop-kalinka-intro';
 if (!$temp_event_shown && !empty($allowed_edit_data['kalinka']) && empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
     $temp_game_flags[$temp_event_flag] = true;
     $temp_event_shown = true;

@@ -844,39 +844,7 @@ function windowResizeFrame(){
     </div>
 <script type="text/javascript">
 $(document).ready(function(){
-<?
 
-// Define a reference to the game's session flag variable
-if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
-$temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
-
-// If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_robot-database-intro';
-if (empty($_SESSION[$session_token]['DEMO']) && empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
-    $temp_game_flags[$temp_event_flag] = true;
-    ?>
-    // Generate a first-time event canvas that explains how the editor works
-    gameSettings.windowEventsCanvas = [
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/field/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/robots/picket-man/mug_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 20px; left: 25px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/robots/bubble-man/mug_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 35px; left: 130px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/robots/mega-man/mug_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 50px; left: 240px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/robots/fire-man/mug_right_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 35px; right: 130px; width: 80px; height: 80px;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/robots/spring-head/mug_right_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: 0 0; top: 20px; right: 25px; width: 80px; height: 80px;">&nbsp;</div>'+
-        ''
-        ];
-    // Generate a first-time event message that explains how the editor works
-    gameSettings.windowEventsMessages = [
-        '<p>The <strong>Robot Database</strong> contains detailed records of all of the robot masters and support mechas that appear in the prototype.  Robots encountered in game are automatically added to the database, with more information being filled in when you scan, summon, and/or unlock the robot for use in battle.</p>'+
-        '<p>Click on any of any of the visible pages to scroll through the different generations of robots, and check the area on the right for their stats, types, class, weaknesses, abilties, records, and more. Try to fill in as many pages as you can - it might come in handy.</p>'+
-        ''
-        ];
-    // Push this event to the parent window and display to the user
-    top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-    <?
-}
-
-?>
 });
 </script>
 <?
