@@ -1239,7 +1239,7 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for triggering battle actions
-    public function actions_trigger(&$this_player, &$this_robot, &$target_player, &$target_robot, $this_action, $this_token = ''){
+    public function actions_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_token = ''){
         global $db;
 
         // Default the return variable to false

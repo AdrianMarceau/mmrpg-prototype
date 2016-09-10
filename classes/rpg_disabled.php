@@ -18,10 +18,10 @@ class rpg_disabled {
 
         // Create references to save time 'cause I'm tired
         // (rather than replace all target references to this references)
-        $this_battle = &$this_robot->battle;
-        $this_player = &$this_robot->player; // the player of the robot being disabled
-        $target_player = &$target_robot->player; // the player of the other robot
-        $target_robot = &$target_robot; // the other robot that isn't this one
+        $this_battle = $this_robot->battle;
+        $this_player = $this_robot->player; // the player of the robot being disabled
+        $target_player = $target_robot->player; // the player of the other robot
+        $target_robot = $target_robot; // the other robot that isn't this one
 
         // If the target player is the same as the current
         if ($this_player->player_id == $target_player->player_id){

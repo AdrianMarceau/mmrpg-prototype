@@ -150,4 +150,54 @@ class rpg_game {
 
     }
 
+    /**
+     * Create or retrive a ability object from the session
+     * @param array $this_abilityinfo
+     * @return rpg_ability
+     */
+    public static function get_ability($this_battle, $this_player, $this_robot, $this_abilityinfo){
+
+        // If the ability index has not been created, do so
+        if (!isset(self::$index['abilities'])){ self::$index['abilities'] = array(); }
+
+        // Check if a ability ID has been defined
+        if (isset($this_abilityinfo['ability_id'])){
+            $ability_id = $this_abilityinfo['ability_id'];
+        }
+        // Otherwise if only a ability token was defined
+        elseif (isset($this_abilityinfo['ability_token'])){
+            $ability_id = 0;
+            $ability_token = $this_abilityinfo['ability_token'];
+            foreach (self::$index['abilities'] AS $ability){
+                if ($ability_token == $ability->ability_token
+                    && $this_robot->robot_id == $ability->robot_id
+                    && $this_player->player_id == $ability->player_id){
+                    $ability_id = $ability->ability_id;
+                    break;
+                }
+            }
+        }
+
+        // If this ability has already been created, retrieve it
+        if (!empty($ability_id) && !empty(self::$index['abilities'][$ability_id])){
+
+            // Collect the ability from the index and return
+            $this_ability = self::$index['abilities'][$ability_id];
+
+        }
+        // Otherwise create a new ability object in the index
+        else {
+
+            // Create and return the ability object
+            $this_ability = new rpg_ability($this_battle, $this_player, $this_robot, $this_abilityinfo);
+            self::$index['abilities'][$this_ability->ability_id] = $this_ability;
+
+        }
+
+        // Return the collect ability object
+        $this_ability->update_session();
+        return $this_ability;
+
+    }
+
 }

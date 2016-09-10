@@ -26,7 +26,7 @@ if (empty($this_robot)){
 // If the current target robot is the active one as well
 if ($this_robot->robot_id != $target_robot->robot_id
     && $target_robot->robot_position == 'active'){
-    $active_target_robot = &$target_robot;
+    $active_target_robot = $target_robot;
 }
 // Otherwise, if the target was a benched robot
 else {
@@ -147,13 +147,13 @@ $active_target_robot->update_session();
 
 // Collect the ability choice from the robot
 $temp_token = rpg_robot::robot_choices_abilities(array(
-    'this_index' => &$mmrpg_index,
-    'this_battle' => &$this_battle,
-    'this_field' => &$this_battle->battle_field,
-    'this_player' => &$target_player,
-    'this_robot' => &$active_target_robot,
-    'target_player' => &$this_player,
-    'target_robot' => &$this_robot
+    'this_index' => $mmrpg_index,
+    'this_battle' => $this_battle,
+    'this_field' => $this_battle->battle_field,
+    'this_player' => $target_player,
+    'this_robot' => $active_target_robot,
+    'target_player' => $this_player,
+    'target_robot' => $this_robot
     ));
 $temp_id = array_search($temp_token, $active_target_robot->robot_abilities);
 $target_action_token = $temp_id.'_'.$temp_token;
@@ -187,7 +187,7 @@ if ($temp_targetability->ability_target == 'select_target'){
         $temp_targetability_targetplayer = $this_player;
         $temp_targetability_targetrobot = $this_robot;
     } else {
-        $temp_targetability_targetplayer = &$this_player;
+        $temp_targetability_targetplayer = $this_player;
         $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $this_player, $temp_targetability_targetinfo);
     }
 
@@ -208,8 +208,8 @@ if ($temp_targetability->ability_target == 'select_target'){
 
 } else {
 
-    $temp_targetability_targetplayer = &$this_player;
-    $temp_targetability_targetrobot = &$this_robot;
+    $temp_targetability_targetplayer = $this_player;
+    $temp_targetability_targetrobot = $this_robot;
 
 }
 
@@ -390,13 +390,13 @@ if ($target_action == 'switch'){
 
     // Collect the ability choice from the robot
     $temp_token = rpg_robot::robot_choices_abilities(array(
-        'this_index' => &$mmrpg_index,
-        'this_battle' => &$this_battle,
-        'this_field' => &$this_field,
-        'this_player' => &$target_player,
-        'this_robot' => &$active_target_robot,
-        'target_player' => &$this_player,
-        'target_robot' => &$this_robot
+        'this_index' => $mmrpg_index,
+        'this_battle' => $this_battle,
+        'this_field' => $this_field,
+        'this_player' => $target_player,
+        'this_robot' => $active_target_robot,
+        'target_player' => $this_player,
+        'target_robot' => $this_robot
         ));
     $temp_id = array_search($temp_token, $active_target_robot->robot_abilities);
     $target_action_token = $temp_id.'_'.$temp_token;
