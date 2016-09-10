@@ -117,12 +117,9 @@ else {
 // Then queue up an the target robot's defined action
 //$this_battle->actions_append($target_player, $target_robot, $this_player, $this_robot, $target_action, $target_action_token);
 
-// Collect the abilities index for the current robot
-$temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-
 // Create the temporary ability object for this player's robot
 list($temp_id, $temp_token) = explode('_', $this_action_token); //array('ability_token' => $this_action_token);
-$temp_abilityinfo = rpg_ability::parse_index_info($temp_abilities_index[$temp_token]);
+$temp_abilityinfo = rpg_ability::get_index_info($temp_token);
 $temp_abilityinfo['ability_id'] = $temp_id;
 $temp_thisability = new rpg_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
 
@@ -143,7 +140,8 @@ if (empty($this_robot)){
 $temp_active_target_robot_abilities = $active_target_robot->robot_abilities;
 
 // Loop through the target robot's current abilities and check weapon energy
-$temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+$temp_ability_tokens = "'".implode("', '", array_values($active_target_robot->robot_abilities))."'";
+$temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
 foreach ($active_target_robot->robot_abilities AS $key => $token){
     // Collect the data for this ability from the index
     $info = rpg_ability::parse_index_info($temp_abilities_index[$token]);
@@ -186,7 +184,7 @@ if (empty($this_robot)){
 // Create the temporary ability object for the target player's robot
 $temp_abilityinfo = array();
 list($temp_abilityinfo['ability_id'], $temp_abilityinfo['ability_token']) = explode('_', $target_action_token);
-$temp_indexinfo = rpg_ability::parse_index_info($temp_abilities_index[$temp_abilityinfo['ability_token']]);
+$temp_indexinfo = rpg_ability::get_index_info($temp_abilityinfo['ability_token']);
 $temp_abilityinfo = array_merge($temp_indexinfo, $temp_abilityinfo);
 $temp_targetability = new rpg_ability($this_battle, $target_player, $active_target_robot, $temp_abilityinfo);
 
@@ -292,10 +290,6 @@ else {
         $temp_ability_info = array('ability_id' => $temp_ability_id, 'ability_token' => $temp_ability_token);
         $temp_ability_object = new rpg_ability($this_battle, $this_player, $this_robot, $temp_ability_info);
         $temp_ability_info = $temp_ability_object->export_array();
-        //$temp_ability_info['ability_id'] = $temp_ability_id;
-        if (!isset($temp_ability_info['ability_target'])){
-            //$temp_ability_info['ability_target'] = 'auto';
-        }
     }
 
     // Define the new target robot based on the previous target
