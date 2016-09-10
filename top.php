@@ -79,6 +79,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 }
 
 // Include mandatory class files
+require('classes/rpg_game.php');
 require('classes/rpg_user.php');
 require('classes/rpg_user_role.php');
 require('classes/rpg_type.php');
