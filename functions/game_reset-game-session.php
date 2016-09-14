@@ -1,6 +1,6 @@
 <?
 // Define a function for resetting the game session
-function mmrpg_reset_game_session($this_save_filepath){
+function mmrpg_reset_game_session(){
   // Reference global variables
   global $mmrpg_index, $db;
   //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
@@ -143,8 +143,6 @@ function mmrpg_reset_game_session($this_save_filepath){
 
   }
 
-  // Destroy the cached save file
-  if (!empty($this_save_filepath) && file_exists($this_save_filepath)){ @unlink($this_save_filepath); }
   // Return true on success
   return true;
 }
