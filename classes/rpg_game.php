@@ -1270,4 +1270,33 @@ class rpg_game {
     }
 
 
+
+    // -- SESSION FUNCTIONS -- //
+
+
+    // Define a function for collecting the current GAME token
+    public static function session_token(){
+        if (defined('MMRPG_REMOTE_GAME')){ return 'REMOTE_GAME_'.MMRPG_REMOTE_GAME; }
+        else { return 'GAME'; }
+    }
+
+
+    // Define a function for resetting the game session
+    public static function reset_session(){
+        return mmrpg_reset_game_session();
+    }
+
+
+    // Define a function for saving the game session
+    public static function save_session(){
+        return mmrpg_save_game_session();
+    }
+
+
+    // Define a function for loading the game session
+    public static function load_session($this_save_filepath){
+        return mmrpg_load_game_session($this_save_filepath);
+    }
+
+
 }
