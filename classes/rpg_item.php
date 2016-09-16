@@ -1181,7 +1181,7 @@ class rpg_item extends rpg_object {
         $item_info_title_html = str_replace(' ', '&nbsp;', $item_info_name);
         $item_info_title_html .= '<span class="count">x '.$item_info_count.'</span>';
         $temp_select_options = str_replace('value="'.$item_info_token.'"', 'value="'.$item_info_token.'" selected="selected" disabled="disabled"', $item_rewards_options);
-        $item_info_title_html = '<label style="background-image: url(i/i/'.$item_info_token.'/il40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$item_info_title_html.'</label>';
+        $item_info_title_html = '<label style="background-image: url(images/items/'.$item_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$item_info_title_html.'</label>';
         //if ($global_allow_editing){ $item_info_title_html .= '<select class="item_name" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'">'.$temp_select_options.'</select>'; }
         $this_select_markup = '<a class="item_name type type_'.$item_info_class_type.'" style="'.(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-item="'.$item_info_token.'" data-count="'.$item_info_count.'" title="'.$item_info_title_plain.'" data-tooltip="'.$item_info_title_tooltip.'">'.$item_info_title_html.'</a>';
 
