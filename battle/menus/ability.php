@@ -23,37 +23,55 @@ ob_start();
 
     // Collect the abilities for this robot, by whatever means
     if ($this_robot->robot_class == 'master'){
-        $this_robot_settings = mmrpg_prototype_robot_settings($this_player->player_token, $this_robot->robot_token);
+
+        $this_robot_settings = rpg_game::robot_settings($this_player->player_token, $this_robot->robot_token);
+
         if (!empty($this_robot_settings['robot_abilities'])){ $current_robot_abilities = $this_robot_settings['robot_abilities']; }
         //elseif (!empty($this_robot->robot_abilities)){ $current_robot_abilities = $this_robot->robot_abilities; }
         else { $current_robot_abilities = array(); }
+
         // If this robot has more than eight abilities, slice to only eight
         if (count($current_robot_abilities) > 8){
             $current_robot_abilities = array_slice($current_robot_abilities, 0, 8);
             $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'] = $current_robot_abilities;
         }
+
+        // Collect the robot's held item if any
+        if (!empty($_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item'])){ $current_robot_item = $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item']; }
+        else { $current_robot_item = ''; }
+
     } elseif ($this_robot->robot_class == 'mecha'){
+
         // Collect the temp ability index
         $current_robot_abilities = array();
         foreach ($this_robot->robot_abilities AS $token){
             $current_robot_abilities[$token] = array('ability_token' => $token);
         }
+
+        // Set the robot item to nothing
+        $current_robot_item = '';
+
     }
 
     // Ensure this robot has abilities to display
     if (!empty($current_robot_abilities)){
+
         // Count the total number of abilities
         $num_abilities = count($this_robot->robot_abilities);
         $robot_direction = $this_player->player_side == 'left' ? 'right' : 'left';
+
         // Define the ability display counter
         $unlocked_abilities_count = 0;
+
         // Collect the temp ability index
         $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         $temp_robotinfo = $temp_robots_index[$this_robot->robot_token];
         $temp_robotinfo = rpg_robot::parse_index_info($temp_robotinfo);
         if ($temp_robotinfo['robot_core'] != $this_robot->robot_core){ $temp_robotinfo['robot_core'] = $this_robot->robot_core; }
-        //if (empty($temp_abilities_index)){ $temp_abilities_index = array(); }
+        $temp_robotinfo['robot_core2'] = preg_match('/-core$/i', $current_robot_item) ? preg_replace('/-core$/i', '', $current_robot_item) : '';
+        if ($temp_robotinfo['robot_core2'] == 'none'){ $temp_robotinfo['robot_core2'] = ''; }
+
         // Loop through each ability and display its button
         $ability_key = 0;
         //$temp_robot_array = $this_robot->export_array();
@@ -180,7 +198,7 @@ ob_start();
                 // If the ability is not actually compatible with this robot, disable it
                 //$temp_robot_array = $this_robot->export_array();
                 $temp_ability_array = $temp_ability->export_array();
-                $temp_button_compatible = rpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo);
+                $temp_button_compatible = rpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo, $current_robot_item);
                 if (!$temp_button_compatible){ $temp_button_enabled = false; }
 
                 // If this button is enabled, add it to the global ability options array
