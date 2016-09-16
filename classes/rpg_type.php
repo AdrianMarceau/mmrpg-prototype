@@ -128,7 +128,7 @@ class rpg_type {
 
         // Collect this type's info from the database index
         $type_fields = self::get_index_fields(true);
-        $type_index = $db->get_array_list("SELECT {$type_fields} FROM mmrpg_index_types WHERE type_token = '{$type_token}';", 'type_token');
+        $type_index = $db->get_array("SELECT {$type_fields} FROM mmrpg_index_types WHERE type_token = '{$type_token}';", 'type_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($type_index)){
