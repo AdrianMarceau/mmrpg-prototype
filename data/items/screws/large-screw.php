@@ -6,6 +6,7 @@ $item = array(
     'item_game' => 'MM07',
     'item_group' => 'MM00/Items/Screws',
     'item_class' => 'item',
+    'item_subclass' => 'treasure',
     'item_price' => 1000,
     'item_description' => 'A large metal screw dropped by a defeated master.  This item is loved by a certain robot and can be traded in for a generous amount of Zenny.',
     'item_function' => function($objects){

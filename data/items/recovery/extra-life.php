@@ -6,6 +6,7 @@ $item = array(
     'item_game' => 'MM00',
     'item_group' => 'MM00/Items/Energy',
     'item_class' => 'item',
+    'item_subclass' => 'consumable',
     'item_image_sheets' => 3,
     'item_type' => 'energy',
     'item_type2' => 'weapons',

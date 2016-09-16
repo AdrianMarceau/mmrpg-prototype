@@ -6,6 +6,7 @@ $item = array(
     'item_game' => 'MM00',
     'item_group' => 'MM00/Items/Tanks',
     'item_class' => 'item',
+    'item_subclass' => 'consumable',
     'item_type' => 'weapons',
     'item_description' => 'A large ammo tank that restores 100% weapon energy to one robot on the user\'s side of the field.',
     'item_energy' => 0,

@@ -6,6 +6,7 @@ $item = array(
     'item_game' => 'MM00',
     'item_group' => 'MM00/Items/Energy',
     'item_class' => 'item',
+    'item_subclass' => 'consumable',
     'item_type' => 'energy',
     'item_description' => 'A small health pellet that restores 20% life energy to one robot on the user\'s side of the field.',
     'item_energy' => 0,
