@@ -845,32 +845,41 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a function for checking if this robot is compatible with a specific ability
-    static public function has_ability_compatibility($robot_token, $ability_token){
+    static public function has_ability_compatibility($robot_token, $ability_token, $item_token = ''){
         global $mmrpg_index;
         if (empty($robot_token) || empty($ability_token)){ return false; }
-        $robot_info = is_array($robot_token) ? $robot_token : rpg_robot::get_index_info($robot_token);
+        $robot_info = is_array($robot_token) ? $robot_token : self::get_index_info($robot_token);
         $ability_info = is_array($ability_token) ? $ability_token : rpg_ability::get_index_info($ability_token);
+        $item_info = is_array($item_token) ? $item_token : rpg_item::get_index_info($item_token);
         if (empty($robot_info) || empty($ability_info)){ return false; }
+        $ability_token = !empty($ability_info) ? $ability_info['ability_token'] : '';
+        $item_token = !empty($item_info) ? $item_info['item_token'] : '';
         $robot_token = $robot_info['robot_token'];
-        $ability_token = $ability_info['ability_token'];
+        $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+        $robot_core2 = !empty($item_token) && preg_match('/-core$/i', $item_token) ? preg_replace('/-core$/i', '', $item_token) : '';
+        //echo 'has_ability_compatibility('.$robot_token.', '.$ability_token.', '.$robot_core.', '.$robot_core2.')'."\n";
         // Define the compatibility flag and default to false
         $temp_compatible = false;
-        // If this ability has a type, check it against this robot
-        if (!empty($ability_info['ability_type']) || !empty($ability_info['ability_type2'])){
+        // Collect the global list and return true if match is found
+        $global_abilities = rpg_ability::get_global_abilities();
+        // If this ability is in the list of globally compatible
+        if (in_array($ability_token, $global_abilities)){ $temp_compatible = true; }
+        // Else if this ability has a type, check it against this robot
+        elseif (!empty($ability_info['ability_type']) || !empty($ability_info['ability_type2'])){
             //$debug_fragment .= 'has-type '; // DEBUG
-            if (!empty($robot_info['robot_core'])){
+            if (!empty($robot_core) || !empty($robot_core2)){
             //$debug_fragment .= 'has-core '; // DEBUG
-                if ($robot_info['robot_core'] == 'copy' && !empty($ability_info['ability_type'])){
+                if ($robot_core == 'copy'){
                     //$debug_fragment .= 'copy-core '; // DEBUG
                     $temp_compatible = true;
                 }
                 elseif (!empty($ability_info['ability_type'])
-                    && $ability_info['ability_type'] == $robot_info['robot_core']){
+                    && ($ability_info['ability_type'] == $robot_core || $ability_info['ability_type'] == $robot_core2)){
                     //$debug_fragment .= 'core-match1 '; // DEBUG
                     $temp_compatible = true;
                 }
                 elseif (!empty($ability_info['ability_type2'])
-                    && $ability_info['ability_type2'] == $robot_info['robot_core']){
+                    && ($ability_info['ability_type2'] == $robot_core || $ability_info['ability_type2'] == $robot_core2)){
                     //$debug_fragment .= 'core-match2 '; // DEBUG
                     $temp_compatible = true;
                 }
@@ -892,16 +901,12 @@ class rpg_robot extends rpg_object {
             //$debug_fragment .= 'has-playeronly '; // DEBUG
             $temp_compatible = true;
         }
-        // Otherwise, see if this is a globally compatible ability
-        if (!$temp_compatible && preg_match('/^(energy|attack|defense|speed)-(boost|break|mode|swap)$/i', $ability_info['ability_token'])){
-            //$debug_fragment .= 'has-global '; // DEBUG
-            $temp_compatible = true;
-        }
         //$robot_info['robot_abilities']
         // DEBUG
         //die('Found '.$debug_fragment.' - robot '.($temp_compatible ? 'is' : 'is not').' compatible!');
         // Return the temp compatible result
         return $temp_compatible;
+
     }
 
     // Define a function for checking if this robot has a specific weakness

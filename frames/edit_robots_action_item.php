@@ -2,6 +2,11 @@
 
 // ROBOT ACTIONS : CHANGE ITEM
 
+// Include the necessary database files
+require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
+
 // Collect the item variables from the request header, if they exist
 $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
 $temp_robot = !empty($_REQUEST['robot']) ? $_REQUEST['robot'] : '';
@@ -30,9 +35,31 @@ if (!empty($temp_item)){
     $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_item'] = $temp_item;
 }
 
+// Now that we have a new item attached, we should re-evaluate compatibile abilities
+$robot_ability_settings = !empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities']) ? $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] : array();
+$player_ability_rewards = !empty($_SESSION[$session_token]['values']['battle_abilities']) ? $_SESSION[$session_token]['values']['battle_abilities']: array('buster-shot' => array('ability_token' => 'buster-shot'));
+$allowed_ability_ids = array();
+if (!empty($player_ability_rewards)){
+    foreach ($player_ability_rewards AS $key => $ability_token){
+        if (empty($ability_token)){ continue; }
+        elseif ($ability_token == '*'){ continue; }
+        elseif ($ability_token == 'ability'){ continue; }
+        elseif (!isset($mmrpg_database_abilities[$ability_token])){ continue; }
+        elseif (!rpg_robot::has_ability_compatibility($temp_robot_info['robot_token'], $ability_token, $temp_item)){
+            if (isset($robot_ability_settings[$ability_token])){ unset($robot_ability_settings[$ability_token]); }
+            continue;
+        }
+        $ability_id = $mmrpg_database_abilities[$ability_token]['ability_id'];
+        $allowed_ability_ids[] = $ability_id;
+    }
+}
+$allowed_ability_ids = implode(',', $allowed_ability_ids);
+if (empty($robot_ability_settings)){ $robot_ability_settings['buster-shot'] = array('buster-shot' => array('ability_token' => 'buster-shot')); }
+$_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] = $robot_ability_settings;
+
 // Regardless of what happened before, update this robot's item in the session and save
 rpg_game::save_session($this_save_filepath);
-exit('success|item-updated|'.$temp_item);
+exit('success|item-updated|'.$temp_item.'|'.$allowed_ability_ids);
 //exit('success|item-updated|'.$temp_item);
 
 ?>
