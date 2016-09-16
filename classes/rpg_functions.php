@@ -340,8 +340,8 @@ class rpg_functions {
      * @return int
      */
     public static function abilities_sort_for_editor($ability_one, $ability_two){
-        $ability_token_one = $ability_one['ability_token'];
-        $ability_token_two = $ability_two['ability_token'];
+        $ability_token_one = isset($ability_one['ability_token']) ? $ability_one['ability_token'] : $ability_one;
+        $ability_token_two = isset($ability_two['ability_token']) ? $ability_two['ability_token'] : $ability_two;
         if ($ability_token_one > $ability_token_two){ return 1; }
         elseif ($ability_token_one < $ability_token_two){ return -1; }
         else { return 0; }
@@ -376,27 +376,24 @@ class rpg_functions {
      */
     public static function items_sort_for_editor($item_one, $item_two){
         global $mmrpg_index;
-        $item_token_one = preg_match('/^item-([a-z0-9]+)-(a-z0-9+)$/i', $item_one['ability_token']) ? $item_one['ability_token'] : $item_one['ability_token'].'-size';
-        $item_token_two = preg_match('/^item-([a-z0-9]+)-(a-z0-9+)$/i', $item_two['ability_token']) ? $item_two['ability_token'] : $item_two['ability_token'].'-size';
-        list($x, $kind_one, $size_one) = explode('-', $item_token_one);
-        list($x, $kind_two, $size_two) = explode('-', $item_token_two);
-
+        $item_token_one = preg_match('/^([a-z0-9]+)-(a-z0-9+)$/i', $item_one['item_token']) ? $item_one['item_token'] : $item_one['item_token'].'-size';
+        $item_token_two = preg_match('/^([a-z0-9]+)-(a-z0-9+)$/i', $item_two['item_token']) ? $item_two['item_token'] : $item_two['item_token'].'-size';
+        list($kind_one, $size_one) = explode('-', $item_token_one);
+        list($kind_two, $size_two) = explode('-', $item_token_two);
         if ($kind_one == 'energy' && $kind_two != 'energy'){ return -1; }
         elseif ($kind_one != 'energy' && $kind_two == 'energy'){ return 1; }
         elseif ($kind_one == 'weapon' && $kind_two != 'weapon'){ return -1; }
         elseif ($kind_one != 'weapon' && $kind_two == 'weapon'){ return 1; }
         elseif ($kind_one == 'core' && $kind_two != 'core'){ return -1; }
         elseif ($kind_one != 'core' && $kind_two == 'core'){ return 1; }
-
         elseif ($size_one == 'pellet' && $size_two != 'pellet'){ return -1; }
         elseif ($size_one != 'pellet' && $size_two == 'pellet'){ return 1; }
         elseif ($size_one == 'capsule' && $size_two != 'capsule'){ return -1; }
         elseif ($size_one != 'capsule' && $size_two == 'capsule'){ return 1; }
         elseif ($size_one == 'tank' && $size_two != 'tank'){ return -1; }
         elseif ($size_one != 'tank' && $size_two == 'tank'){ return 1; }
-
-        elseif ($item_one['ability_token'] > $item_two['ability_token']){ return 1; }
-        elseif ($item_one['ability_token'] < $item_two['ability_token']){ return -1; }
+        elseif ($item_one['item_token'] > $item_two['item_token']){ return 1; }
+        elseif ($item_one['item_token'] < $item_two['item_token']){ return -1; }
         else { return 0; }
     }
 
