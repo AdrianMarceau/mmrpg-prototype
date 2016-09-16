@@ -997,11 +997,24 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
     // Collect this player's index info
     $this_player_info = $mmrpg_index['players'][$this_prototype_data['this_player_token']];
 
-    // Collect the robot index for calculation purposes
-    $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    // Collect the list of robot and ability tokens we'll need
+    $rtokens = array();
+    $atokens = array();
+    foreach ($this_prototype_data['robot_options'] AS $key => $info){
+        $rtokens[] = $info['robot_token'];
+        if (!empty($info['robot_abilities'])){
+            foreach ($info['robot_abilities'] AS $key => $info){
+                $atokens[] = $info['ability_token'];
+            }
+        }
+    }
+    $rtokens = array_unique($rtokens);
+    $atokens = array_unique($atokens);
 
-    // Collect the ability index for calculation purposes
-    $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    // Collect the robot, ability, and item indexes for display purposes
+    $this_robot_index = rpg_robot::get_index_custom($rtokens);
+    $this_ability_index = rpg_ability::get_index_custom($atokens);
+    $this_item_index = rpg_item::get_index();
 
     // Loop through and display the available robot options for this player
     $temp_robot_option_count = count($this_prototype_data['robot_options']);
@@ -1028,6 +1041,9 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $text_robot_special = $this_robot_level >= 100 || !empty($this_robot_rewards['flags']['reached_max_level']) ? true : false;
         $this_robot_experience = $this_robot_level >= 100 ? '<span style="position: relative; bottom: 0; font-size: 120%;">&#8734;</span>' : $this_robot_experience;
         $this_robot_experience_title = $this_robot_level >= 100 ? '&#8734;' : $this_robot_experience;
+        $this_robot_core = !empty($info['robot_core']) ? $info['robot_core'] : '';
+        $this_robot_core2 = !empty($info['robot_core2']) ? $info['robot_core2'] : '';
+        $this_robot_item = !empty($info['robot_item']) ? $info['robot_item'] : '';
 
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
         $this_robot_name .= $this_robot_favourite ? ' <span class="icons favs">&hearts;</span>' : '';
@@ -1042,6 +1058,17 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         // Update the robot's image if in the settings
         if (isset($this_robot_settings['robot_image'])){
             $this_option_image = $this_robot_settings['robot_image'];
+        }
+        // Update the robot's item if in the settings
+        if (!empty($this_robot_settings['robot_item'])){
+            $this_robot_item = $this_robot_settings['robot_item'];
+        }
+        // Update the robot's second core if they're holding one
+        if (!empty($this_robot_item) && preg_match('/-core$/i', $this_robot_item)){
+            $item_core_type = preg_replace('/-core$/i', '', $this_robot_item);
+            if (empty($this_robot_core2)){
+                $this_robot_core2 = $item_core_type;
+            }
         }
 
         $starcount = 0;
@@ -1068,6 +1095,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_title .= ' ('.(!empty($info['robot_core']) ? ucfirst($info['robot_core']).' Core' : 'Neutral Core').')';
         $this_option_title .= ' <br />Level '.$this_robot_level.($this_robot_level >= 100 ? ' &#9733;' : '');
         $this_option_title .= ' | '.$this_robot_experience_title.'/1000 Exp'.(!empty($this_robot_favourite_title) ? ' '.$this_robot_favourite_title : '');
+        if (!empty($this_robot_item) && isset($this_item_index[$this_robot_item])){ $this_option_title .= ' | + '.$this_item_index[$this_robot_item]['item_name'].' '; }
         $this_option_title .= ' <br />E: '.$this_robot_energy; //.($this_robot_stats['energy']['bonus'] >= $this_robot_stats['energy']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
         $this_option_title .= ' | A: '.$this_robot_attack.($this_robot_stats['attack']['bonus'] >= $this_robot_stats['attack']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
         $this_option_title .= ' | D: '.$this_robot_defense.($this_robot_stats['defense']['bonus'] >= $this_robot_stats['defense']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
@@ -1089,7 +1117,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_label = '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.$this_option_image.'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_top.'px; right: '.$temp_right.'px;">'.$info['robot_name'].'</span><span class="multi"><span class="maintext">'.$this_robot_name.'</span><span class="subtext">Level '.$this_robot_level.'</span><span class="subtext2">'.$this_robot_experience.'/1000 Exp</span></span><span class="arrow">&#9658;</span>';
         //$this_robots_markup .= '<a class="'.$this_option_class.'" data-child="true" data-token="'.$this_option_token.'" title="'.$this_option_title_plain.'" data-tooltip="'.$this_option_title_tooltip.'" style="'.$this_option_style.'">';
         $this_robots_markup .= '<a class="'.$this_option_class.'" data-child="true" data-token="'.$this_option_token.'" style="'.$this_option_style.'">';
-        $this_robots_markup .= '<div class="chrome chrome_type robot_type_'.(!empty($info['robot_core']) ? $info['robot_core'] : 'none').'" data-tooltip="'.$this_option_title_tooltip.'"><div class="inset"><label class="has_image">'.$this_option_label.'</label></div></div>';
+        $this_robots_markup .= '<div class="chrome chrome_type robot_type_'.(!empty($this_robot_core) ? $this_robot_core : 'none').(!empty($this_robot_core2) ? '_'.$this_robot_core2 : '').'" data-tooltip="'.$this_option_title_tooltip.'"><div class="inset"><label class="has_image">'.$this_option_label.'</label></div></div>';
         $this_robots_markup .= '</a>'."\r\n";
     }
 
