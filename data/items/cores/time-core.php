@@ -6,6 +6,7 @@ $item = array(
     'item_game' => 'MMRPG',
     'item_group' => 'MMRPG/Items/Time',
     'item_class' => 'item',
+    'item_subclass' => 'holdable',
     'item_type' => 'time',
     'item_description' => 'A mysterious elemental core that radiates with the Time type energy of a defeated robot master. When used in battle, this item can be thrown at opposing targets to deal Time type damage with a base power equal to the user\'s current level. This item is also coveted by a certain character and can be traded in for a variable amount of Zenny.',
     'item_energy' => 0,

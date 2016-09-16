@@ -6,6 +6,7 @@ $item = array(
     'item_game' => 'MMRPG',
     'item_group' => 'MM00/Items/Speed',
     'item_class' => 'item',
+    'item_subclass' => 'consumable',
     'item_type' => 'speed',
     'item_description' => 'A large mobility capsule that that boosts the speed stat of one robot on the user\'s side of the field by {RECOVERY}%. This item\'s effects appear to be permanent, though only up until the target has reached its max stat limit.',
     'item_energy' => 0,
