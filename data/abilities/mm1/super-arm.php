@@ -60,6 +60,7 @@ $ability = array(
             'sticky' => true,
             'ability_token' => $this_ability->ability_token,
             'ability_image' => 'super-arm'.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : ''),
+            'attachment_token' => $this_attachment_token,
             'attachment_sticky' => true,
             'attachment_damage_input_breaker' => $this_effect_multiplier,
             'attachment_weaknesses' => $this_object_weaknesses,
@@ -102,9 +103,9 @@ $ability = array(
             'ability_frame_offset' => array('x' => 105, 'y' => 0, 'z' => -10)
             );
 
-        // Update the ability's image in the session
-        $this_ability->ability_image = $this_attachment_info['ability_image'];
-        $this_ability->update_session();
+        // Create the attachment object for this ability
+        $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $this_attachment_info);
+        $this_attachment->set_image($this_attachment_info['ability_image']);
 
         // If the ability flag was not set, super arm resists damage
         if (!isset($this_robot->robot_attachments[$this_attachment_token])){
@@ -177,25 +178,6 @@ $ability = array(
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
-        // If this ability is being used by a robot with the same core type AND it's already summoned, allow targetting
-        if ((!empty($this_robot->robot_core) && $this_robot->robot_core == $this_ability->ability_type)
-            && isset($this_robot->robot_attachments[$this_attachment_token])
-            ){
-
-            // Update this ability's targetting setting
-            $this_ability->ability_target = 'select_target';
-            $this_ability->update_session();
-
-        }
-        // Else if the ability attachment is not there, change the target back to auto
-        else {
-
-            // Update this ability's targetting setting
-            $this_ability->ability_target = 'auto';
-            $this_ability->update_session();
-
-        }
-
         // Define this abilities internal index if not already created
         if (empty($this_ability->values['this_sprite_index'])){
             // Define the sprite sheets and the stages they contain
@@ -265,6 +247,23 @@ $ability = array(
         // If the field token has a place in the index, update values
         if (isset($this_sprite_index[$this_field_token])){
             $this_sprite_sheet = $this_sprite_index[$this_field_token][0];
+        }
+
+        // If this ability is being used by a robot with the same core type AND it's already summoned, allow targetting
+        if ($this_robot->robot_core == $this_ability->ability_type && isset($this_robot->robot_attachments[$this_attachment_token])){
+
+            // Update this ability's targetting setting
+            $this_ability->ability_target = 'select_target';
+            $this_ability->update_session();
+
+        }
+        // Else if the ability attachment is not there, change the target back to auto
+        else {
+
+            // Update this ability's targetting setting
+            $this_ability->ability_target = 'auto';
+            $this_ability->update_session();
+
         }
 
         // If the ability flag had already been set, reduce the weapon energy to zero
