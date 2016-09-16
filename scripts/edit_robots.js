@@ -701,10 +701,10 @@ $(document).ready(function(){
                         if (targetRobotCores.indexOf('copy') != -1){
 
                             // Check if the item token was a robot core, else remove any alt
-                            if (thisItemToken.match(/^item-core-/i)){
+                            if (thisItemToken.match(/-core$/i)){
 
                                 // Collect the held item's core type for alt colours
-                                var thisCoreType = thisItemToken.replace(/^item-core-/i, '');
+                                var thisCoreType = thisItemToken.replace(/-core$/i, '');
                                 // Collect the new image name (core type) and trigger function
                                 var newImageToken = thisCoreType;
                                 updateRobotImageAlt(targetPlayerToken, targetRobotToken, newImageToken);
