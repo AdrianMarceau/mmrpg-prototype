@@ -30,31 +30,9 @@ if (!empty($temp_item)){
     $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_item'] = $temp_item;
 }
 
-// Now that we have a new item attached, we should re-evaluate compatibile items
-$robot_item_settings = !empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_items']) ? $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_items'] : array();
-$player_item_rewards = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items']: array('buster-shot' => array('item_token' => 'buster-shot'));
-$allowed_item_ids = array();
-if (!empty($player_item_rewards)){
-    foreach ($player_item_rewards AS $item_token => $item_info){
-        if (empty($item_info['item_token'])){ continue; }
-        elseif ($item_info['item_token'] == '*'){ continue; }
-        elseif ($item_info['item_token'] == 'item'){ continue; }
-        elseif (!isset($mmrpg_database_items[$item_info['item_token']])){ continue; }
-        elseif (!rpg_robot::has_item_compatibility($temp_robot_info['robot_token'], $item_token, $temp_item)){
-            if (isset($robot_item_settings[$item_token])){ unset($robot_item_settings[$item_token]); }
-            continue;
-        }
-        $item_info['item_id'] = $mmrpg_database_items[$item_info['item_token']]['item_id'];
-        $allowed_item_ids[] = $item_info['item_id'];
-    }
-}
-$allowed_item_ids = implode(',', $allowed_item_ids);
-if (empty($robot_item_settings)){ $robot_item_settings['buster-shot'] = array('buster-shot' => array('item_token' => 'buster-shot')); }
-$_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_items'] = $robot_item_settings;
-
 // Regardless of what happened before, update this robot's item in the session and save
 rpg_game::save_session($this_save_filepath);
-exit('success|item-updated|'.$temp_item.'|'.$allowed_item_ids);
+exit('success|item-updated|'.$temp_item);
 //exit('success|item-updated|'.$temp_item);
 
 ?>

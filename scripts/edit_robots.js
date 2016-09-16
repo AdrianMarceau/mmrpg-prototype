@@ -676,7 +676,7 @@ $(document).ready(function(){
                         tempLink.attr('data-count', newCount).find('.count').html(newCount);
                         }
 
-                 // Decrement the old item's count if not empty (we're taking it out)
+                    // Decrement the old item's count if not empty (we're taking it out)
                     if (thisItemToken.length){
                         var tempLink = $('a.item_name[data-item='+thisItemToken+']', thisItemCanvas);
                         var oldCount = parseInt(tempLink.attr('data-count'));
