@@ -125,6 +125,7 @@ class rpg_robot extends rpg_object {
         $this->robot_resistances = isset($this_robotinfo['robot_resistances']) ? $this_robotinfo['robot_resistances'] : array();
         $this->robot_affinities = isset($this_robotinfo['robot_affinities']) ? $this_robotinfo['robot_affinities'] : array();
         $this->robot_immunities = isset($this_robotinfo['robot_immunities']) ? $this_robotinfo['robot_immunities'] : array();
+        $this->robot_item = isset($this_robotinfo['robot_item']) ? $this_robotinfo['robot_item'] : '';
         $this->robot_abilities = isset($this_robotinfo['robot_abilities']) ? $this_robotinfo['robot_abilities'] : array();
         $this->robot_attachments = isset($this_robotinfo['robot_attachments']) ? $this_robotinfo['robot_attachments'] : array();
         $this->robot_quotes = isset($this_robotinfo['robot_quotes']) ? $this_robotinfo['robot_quotes'] : array();
@@ -217,13 +218,11 @@ class rpg_robot extends rpg_object {
                 $this->robot_base_image = $this->robot_image;
             }
 
-            /*
             // If there is a held item set, apply it
             if (!empty($temp_robot_settings['robot_item'])){
                 $this->robot_item = $temp_robot_settings['robot_item'];
                 $this->robot_base_item = $this->robot_item;
             }
-            */
 
             // Set the session settings flag to true
             $this->flags['apply_session_settings'] = true;
@@ -2138,6 +2137,8 @@ class rpg_robot extends rpg_object {
             'robot_token' => $this->robot_token,
             'robot_field' => $this->robot_field,
             'robot_class' => $this->robot_class,
+            //'robot_gender' => $this->robot_gender,
+            'robot_item' => $this->robot_item,
             'robot_image' => $this->robot_image,
             'robot_image_size' => $this->robot_image_size,
             'robot_image_overlay' => $this->robot_image_overlay,
