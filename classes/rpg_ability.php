@@ -953,16 +953,22 @@ class rpg_ability extends rpg_object {
     }
 
 
-    // -- PRINT FUNCTIONS -- //
+    // -- PRINT FUNCTIONS -- /
 
     // Define a static function for printing out the ability's title markup
     public static function print_editor_title_markup($robot_info, $ability_info, $print_options = array()){
 
+        // Pull in global variables
+        $session_token = rpg_game::session_token();
+
+        // Collect the types index for reference
+        $mmrpg_types = rpg_type::get_index();
+
         // Require the function file
         $temp_ability_title = '';
-        // Pull in global variables
-        global $mmrpg_index;
-        $session_token = mmrpg_game_token();
+
+        // Collect values for potentially missing global variables
+        if (!isset($session_token)){  }
 
         if (empty($robot_info)){ return false; }
         if (empty($ability_info)){ return false; }
@@ -972,8 +978,8 @@ class rpg_ability extends rpg_object {
 
         $robot_flag_copycore = !empty($robot_info['robot_core']) && $robot_info['robot_core'] == 'copy' ? true : false;
         $temp_ability_token = $ability_info['ability_token'];
-        $temp_ability_type = !empty($ability_info['ability_type']) ? $mmrpg_index['types'][$ability_info['ability_type']] : false;
-        $temp_ability_type2 = !empty($ability_info['ability_type2']) ? $mmrpg_index['types'][$ability_info['ability_type2']] : false;
+        $temp_ability_type = !empty($ability_info['ability_type']) ? $mmrpg_types[$ability_info['ability_type']] : false;
+        $temp_ability_type2 = !empty($ability_info['ability_type2']) ? $mmrpg_types[$ability_info['ability_type2']] : false;
         $temp_ability_energy = rpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
         $temp_ability_damage = !empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0;
         $temp_ability_damage2 = !empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0;
@@ -1000,19 +1006,21 @@ class rpg_ability extends rpg_object {
 
         if ($ability_info['ability_class'] != 'item'){
             if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
-            if (!empty($ability_info['ability_damage'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage'; }
-            if (!empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_recovery'].' Recovery'; }
+            elseif (empty($ability_info['ability_damage']) && empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
+            if (!empty($ability_info['ability_damage']) && !empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage | '.$ability_info['ability_recovery'].' Recovery'; }
+            elseif (!empty($ability_info['ability_damage'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage'; }
+            elseif (!empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_recovery'].' Recovery '; }
+            if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  | '; }
         }
-
-        //if (empty($ability_info['ability_damage']) && empty($ability_info['ability_recovery'])){ $temp_ability_title .= 'Special'; }
 
         // If show accuracy or quantity
         if (($ability_info['ability_class'] != 'item' && $print_options['show_accuracy'])
             || ($ability_info['ability_class'] == 'item' && $print_options['show_quantity'])){
 
-            if ($ability_info['ability_class'] != 'item' && !empty($ability_info['ability_accuracy'])){ $temp_ability_title .= ' | '.$ability_info['ability_accuracy'].'% Accuracy'; }
-            elseif ($ability_info['ability_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token])){ $temp_ability_title .= ' | '.($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token] == 1 ? '1 Unit' : $_SESSION[$session_token]['values']['battle_items'][$temp_ability_token].' Units'); }
-            elseif ($ability_info['ability_class'] == 'item' ){ $temp_ability_title .= ' | 0 Units'; }
+            $temp_ability_title .= '  | ';
+            if ($ability_info['ability_class'] != 'item' && !empty($ability_info['ability_accuracy'])){ $temp_ability_title .= ' '.$ability_info['ability_accuracy'].'% Accuracy'; }
+            elseif ($ability_info['ability_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token])){ $temp_ability_title .= ' '.($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token] == 1 ? '1 Unit' : $_SESSION[$session_token]['values']['battle_items'][$temp_ability_token].' Units'); }
+            elseif ($ability_info['ability_class'] == 'item' ){ $temp_ability_title .= ' 0 Units'; }
 
         }
 
@@ -1036,8 +1044,7 @@ class rpg_ability extends rpg_object {
     public static function print_editor_option_markup($robot_info, $ability_info){
 
         // Pull in global variables
-        global $mmrpg_index;
-        $session_token = mmrpg_game_token();
+        $session_token = rpg_game::session_token();
 
         // Require the function file
         $this_option_markup = '';
@@ -1045,19 +1052,21 @@ class rpg_ability extends rpg_object {
         // Generate the ability option markup
         if (empty($robot_info)){ return false; }
         if (empty($ability_info)){ return false; }
-        //$ability_info = self::get_index_info($temp_ability_token);
+        //$ability_info = rpg_ability::get_index_info($temp_ability_token);
         $temp_robot_token = $robot_info['robot_token'];
         $temp_ability_token = $ability_info['ability_token'];
         $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
         $robot_flag_copycore = !empty($robot_info['robot_core']) && $robot_info['robot_core'] == 'copy' ? true : false;
-        $temp_ability_type = !empty($ability_info['ability_type']) ? $mmrpg_index['types'][$ability_info['ability_type']] : false;
-        $temp_ability_type2 = !empty($ability_info['ability_type2']) ? $mmrpg_index['types'][$ability_info['ability_type2']] : false;
+        $temp_ability_type = !empty($ability_info['ability_type']) ? rpg_type::get_index_info($ability_info['ability_type']) : false;
+        $temp_ability_type2 = !empty($ability_info['ability_type2']) ? rpg_type::get_index_info($ability_info['ability_type2']) : false;
         $temp_ability_energy = rpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
         $temp_type_array = array();
         $temp_incompatible = false;
+        $temp_global_abilities = self::get_global_abilities();
         $temp_index_abilities = !empty($robot_info['robot_index_abilities']) ? $robot_info['robot_index_abilities'] : array();
         $temp_current_abilities = !empty($robot_info['robot_abilities']) ? array_keys($robot_info['robot_abilities']) : array();
-        $temp_compatible_abilities = array_merge($temp_index_abilities, $temp_current_abilities);
+        $temp_compatible_abilities = array_merge($temp_global_abilities, $temp_index_abilities, $temp_current_abilities);
+        //while (!in_array($temp_ability_token, $robot_info['robot_abilities'])){
         while (!in_array($temp_ability_token, $temp_compatible_abilities)){
             if (!$robot_flag_copycore){
                 if (empty($robot_ability_core)){ $temp_incompatible = true; break; }
@@ -1072,7 +1081,7 @@ class rpg_ability extends rpg_object {
         }
         if ($temp_incompatible == true){ return false; }
         $temp_ability_label = $ability_info['ability_name'];
-        $temp_ability_title = self::print_editor_title_markup($robot_info, $ability_info);
+        $temp_ability_title = rpg_ability::print_editor_title_markup($robot_info, $ability_info);
         $temp_ability_title_plain = strip_tags(str_replace('<br />', '&#10;', $temp_ability_title));
         $temp_ability_title_tooltip = htmlentities($temp_ability_title, ENT_QUOTES, 'UTF-8');
         $temp_ability_option = $ability_info['ability_name'];
@@ -1091,6 +1100,106 @@ class rpg_ability extends rpg_object {
         // Return the generated option markup
         return $this_option_markup;
 
+    }
+
+
+    // Define a static function for printing out the ability's select options markup
+    public static function print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info){
+
+        // Define the global variables
+        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
+        global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
+        global $key_counter, $player_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
+        global $mmrpg_database_abilities;
+        $session_token = rpg_game::session_token();
+
+        if (empty($player_info)){ return false; }
+        if (empty($robot_info)){ return false; }
+
+        // Define the options markup variable
+        $this_options_markup = '';
+
+        $player_ability_options = array();
+        $player_abilities_unlocked = array_keys($player_ability_rewards);
+        if (!empty($mmrpg_database_abilities)){
+            $temp_category = 'special-weapons';
+            foreach ($mmrpg_database_abilities AS $ability_token => $ability_info){
+                if ($ability_token == 'energy-boost'){ $temp_category = 'support-abilities'; }
+                if (!in_array($ability_token, $player_abilities_unlocked)){ continue; }
+                $ability_info = rpg_ability::parse_index_info($ability_info);
+                $option_markup = rpg_ability::print_editor_option_markup($robot_info, $ability_info);
+                $player_ability_options[$temp_category][] = $option_markup;
+            }
+        }
+        if (!empty($player_ability_options)){
+            foreach ($player_ability_options AS $category_token => $ability_options){
+                $category_name = ucwords(str_replace('-', ' ', $category_token));
+                $this_options_markup .= '<optgroup label="'.$category_name.'">'.implode('', $ability_options).'</optgroup>';
+            }
+        }
+
+        // Add an option at the bottom to remove the ability
+        $this_options_markup .= '<optgroup label="Ability Actions">';
+        $this_options_markup .= '<option value="" title="">- Remove Ability -</option>';
+        $this_options_markup .= '</optgroup>';
+
+        // Return the generated select markup
+        return $this_options_markup;
+
+    }
+
+
+    // Define a static function for printing out the ability's select markup
+    public static function print_editor_select_markup($ability_rewards_options, $player_info, $robot_info, $ability_info, $ability_key = 0){
+
+        // Define the global variables
+        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
+        global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
+        global $key_counter, $player_rewards, $player_ability_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
+        global $mmrpg_database_abilities;
+        $session_token = rpg_game::session_token();
+
+        if (empty($robot_info)){ return false; }
+        if (empty($ability_info)){ return false; }
+
+        // Define the select markup variable
+        $this_select_markup = '';
+
+        $ability_info_id = $ability_info['ability_id'];
+        $ability_info_token = $ability_info['ability_token'];
+        $ability_info_name = $ability_info['ability_name'];
+        $ability_info_energy = isset($ability_info['ability_energy']) ? $ability_info['ability_energy'] : 4;
+        $ability_info_damage = !empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0;
+        $ability_info_damage2 = !empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0;
+        $ability_info_damage_percent = !empty($ability_info['ability_damage_percent']) ? true : false;
+        $ability_info_damage2_percent = !empty($ability_info['ability_damage2_percent']) ? true : false;
+        if ($ability_info_damage_percent && $ability_info_damage > 100){ $ability_info_damage = 100; }
+        if ($ability_info_damage2_percent && $ability_info_damage2 > 100){ $ability_info_damage2 = 100; }
+        $ability_info_recovery = !empty($ability_info['ability_recovery']) ? $ability_info['ability_recovery'] : 0;
+        $ability_info_recovery2 = !empty($ability_info['ability_recovery2']) ? $ability_info['ability_recovery2'] : 0;
+        $ability_info_recovery_percent = !empty($ability_info['ability_recovery_percent']) ? true : false;
+        $ability_info_recovery2_percent = !empty($ability_info['ability_recovery2_percent']) ? true : false;
+        if ($ability_info_recovery_percent && $ability_info_recovery > 100){ $ability_info_recovery = 100; }
+        if ($ability_info_recovery2_percent && $ability_info_recovery2 > 100){ $ability_info_recovery2 = 100; }
+        $ability_info_accuracy = !empty($ability_info['ability_accuracy']) ? $ability_info['ability_accuracy'] : 0;
+        $ability_info_description = !empty($ability_info['ability_description']) ? $ability_info['ability_description'] : '';
+        $ability_info_description = str_replace('{DAMAGE}', $ability_info_damage, $ability_info_description);
+        $ability_info_description = str_replace('{RECOVERY}', $ability_info_recovery, $ability_info_description);
+        $ability_info_description = str_replace('{DAMAGE2}', $ability_info_damage2, $ability_info_description);
+        $ability_info_description = str_replace('{RECOVERY2}', $ability_info_recovery2, $ability_info_description);
+        $ability_info_title = rpg_ability::print_editor_title_markup($robot_info, $ability_info);
+        $ability_info_title_plain = strip_tags(str_replace('<br />', '//', $ability_info_title));
+        $ability_info_title_tooltip = htmlentities($ability_info_title, ENT_QUOTES, 'UTF-8');
+        $ability_info_title_html = str_replace(' ', '&nbsp;', $ability_info_name);
+        $temp_select_options = str_replace('value="'.$ability_info_token.'"', 'value="'.$ability_info_token.'" selected="selected" disabled="disabled"', $ability_rewards_options);
+        $ability_info_title_html = '<label style="background-image: url(i/a/'.$ability_info_token.'/il40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$ability_info_title_html.'<span class="arrow">&#8711;</span></label>';
+        //if ($global_allow_editing){ $ability_info_title_html .= '<select class="ability_name" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'">'.$temp_select_options.'</select>'; }
+        $this_select_markup = '<a class="ability_name ability_type ability_type_'.(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '').'" style="'.(!$global_allow_editing ? 'cursor: default; ' : '').'" data-id="'.$ability_info_id.'" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-ability="'.$ability_info_token.'" data-type="'.(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').'" data-type2="'.(!empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : '').'" title="'.$ability_info_title_plain.'" data-tooltip="'.$ability_info_title_tooltip.'">'.$ability_info_title_html.'</a>';
+
+        // Return the generated select markup
+        return $this_select_markup;
     }
 
 
