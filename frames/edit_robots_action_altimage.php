@@ -1,5 +1,7 @@
 <?php
 
+// ROBOT ACTIONS : CHANGE ALTIMAGE
+
 // Collect the ability variables from the request header, if they exist
 $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
 $temp_robot = !empty($_REQUEST['robot']) ? $_REQUEST['robot'] : '';
@@ -18,7 +20,7 @@ if (empty($temp_player_info) || empty($temp_robot_info)){ die('error|request-not
 // Regardless of what happened before, update this robot's image in the session and save
 $temp_image_full = $temp_robot.($temp_image != 'base' ? '_'.$temp_image : '');
 $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_image'] = $temp_image_full;
-mmrpg_save_game_session($this_save_filepath);
+rpg_game::save_session($this_save_filepath);
 exit('success|image-updated|'.$temp_image_full);
 
 ?>

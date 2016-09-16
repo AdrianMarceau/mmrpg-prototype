@@ -10,10 +10,8 @@ $temp_ability = !empty($_REQUEST['ability']) ? $_REQUEST['ability']: '';
 // If key variables are not provided, kill the script in error
 if (empty($temp_player) || empty($temp_robot)){ die('error|request-error|'.preg_replace('/\s+/', ' ', print_r($_REQUEST, true))); }
 
-//die(print_r($_REQUEST, true));
-
 // Collect the current settings for the requested robot
-$temp_settings = mmrpg_prototype_robot_settings($temp_player, $temp_robot);
+$temp_settings = rpg_game::robot_settings($temp_player, $temp_robot);
 // Create a key-based array to hold the ability settings in and populate it
 $temp_abilities = array();
 foreach ($temp_settings['robot_abilities'] AS $temp_info){ $temp_abilities[] = $temp_info['ability_token']; }
@@ -32,7 +30,7 @@ if (empty($temp_ability)){
     // Update the new ability settings in the session variable
     $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] = $temp_abilities_new;
     // Save, produce the success message with the new ability order
-    mmrpg_save_game_session($this_save_filepath);
+    rpg_game::save_session($this_save_filepath);
     exit('success|ability-removed|'.implode(',', $temp_abilities));
 }
 // Otherwise, if there was a new ability provided, update it in the array
@@ -45,7 +43,7 @@ elseif (!in_array($temp_ability, $temp_abilities)){
     // Update the new ability settings in the session variable
     $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] = $temp_abilities_new;
     // Save, produce the success message with the new ability order
-    mmrpg_save_game_session($this_save_filepath);
+    rpg_game::save_session($this_save_filepath);
     exit('success|ability-updated|'.implode(',', $temp_abilities));
 }
 // Otherwise, if ability is already equipped, swap positions in the array
@@ -65,13 +63,11 @@ elseif (in_array($temp_ability, $temp_abilities)){
     // Update the new ability settings in the session variable
     $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] = $temp_abilities_new;
     // Save, produce the success message with the new ability order
-    mmrpg_save_game_session($this_save_filepath);
+    rpg_game::save_session($this_save_filepath);
     exit('success|ability-updated|'.implode(',', $temp_abilities));
 } else {
     // Produce an error show this ability has already been selected
     exit('error|ability-exists|'.implode(',', $temp_abilities));
 }
-
-
 
 ?>

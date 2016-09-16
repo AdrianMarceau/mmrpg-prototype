@@ -5,27 +5,61 @@
   background-color: transparent;
   width: 762px;
 }
-#mmrpg.windowFlag_landscapeMode,
-#mmrpg.mobileFlag_landscapeMode,
-#mmrpg.windowFlag_landscapeMode #prototype,
-#mmrpg.mobileFlag_landscapeMode #prototype {
-  width: 1024px;
-}
 #edit .header {
   width: 100%;
 }
-#edit #canvas {
-  /* width: 100%; */
-  /* height: 41px; */
+#edit #canvas,
+#edit #canvas .robot_canvas,
+#edit #canvas .ability_canvas,
+#edit #canvas .item_canvas {
   display: block;
   float: none;
   margin: 0 auto 2px;
   height: auto;
   width: 100%;
+  color: #FFFFFF;
   overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+#edit #canvas .robot_canvas,
+#edit #canvas .ability_canvas,
+#edit #canvas .item_canvas {
+
+}
+#edit #canvas .robot_canvas.hidden,
+#edit #canvas .ability_canvas.hidden,
+#edit #canvas .item_canvas.hidden {
+  display: none;
+}
+#edit td.canvas {
+  vertical-align: top;
+  overflow: hidden;
+  height: auto;
+  min-height: 0;
+}
+#edit #canvas .robot_canvas table.links,
+#edit #canvas .ability_canvas div.links,
+#edit #canvas .item_canvas div.links {
+  width: 100%;
+}
+#edit #canvas .ability_canvas div.links,
+#edit #canvas .item_canvas div.links {
+  width: 100%;
+  min-height: 90px;
+}
+#edit #canvas .robot_canvas table.links td,
+#edit #canvas .ability_canvas div.links a,
+#edit #canvas .item_canvas div.links a {
+  vertical-align: top;
 }
 #edit #canvas .wrapper {
   display: block;
+  float: left;
   position: relative;
   border: 1px solid #1A1A1A !important;
   border-radius: 0.5em;
@@ -46,27 +80,48 @@
   background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
   background-size: 100% 100%;
   background-position: 0 0;
-  min-height: 142px;
-  min-width: 118px;
+  min-height: 54px;
+  min-width: 158px;
   width: auto;
-  padding: 4px;
+  padding: 4px 4px 4px;
   margin: 0;
   top: auto;
   bottom: auto;
   left: auto;
   right: auto;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
   -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
 }
-#edit #canvas.player_counter_1 .wrapper {
-
+#edit #canvas .ability_canvas .wrapper,
+#edit #canvas .item_canvas .wrapper {
+  width: 99%;
 }
-#edit #canvas.player_counter_2 .wrapper {
-
+#edit #canvas .wrapper .wrapper_overflow {
+  display: block;
+  position: relative;
+  /*max-height: 150px;*/
+  max-height: 100px;
+  overflow: hidden;
+  padding-bottom: 4px;
+  margin: 4px 2px 14px 2px;
 }
-#edit #canvas.player_counter_3 .wrapper {
-
+#edit #canvas .robot_canvas .wrapper .wrapper_overflow {
+  max-height: 68px;
+}
+#edit #canvas .ability_canvas .wrapper .wrapper_overflow,
+#edit #canvas .item_canvas .wrapper .wrapper_overflow {
+  max-height: 90px;
+  padding-right: 8px;
+}
+#edit #canvas .ps-container:hover>.ps-scrollbar-y-rail:hover {
+  background-color: #363636;
+}
+#edit #canvas .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail {
+  background-color: #696969;
+}
+#edit #canvas .ps-container:hover>.ps-scrollbar-y-rail:hover>.ps-scrollbar-y {
+  background-color: #969696;
 }
 #edit #canvas .wrapper_header {
   display: block;
@@ -75,7 +130,7 @@
   padding: 0 6px;
   font-size: 10px;
   line-height: 16px;
-  text-align: center;
+  text-align: left;
   background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid #1A1A1A;
   border-radius: 0.3em;
@@ -90,30 +145,38 @@
   font-weight: bold;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
 }
+#edit #canvas .wrapper_header .count {
+  float: right;
+  font-size: 9px;
+  position: relative;
+  bottom: 1px;
+}
 #edit #canvas .wrapper .sort_wrapper {
   display: block;
   position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 100px;
+  bottom: 3px;
+  right: 3px;
+  left: 3px;
+  width: auto;
   height: 8px;
-  padding: 2px 4px 2px 8px;
+  text-align: center;
+  padding: 2px 4px;
   font-size: 8px;
   line-height: 8px;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #FFFFFF;
   border: 0 none transparent;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 0.3em;
-  -moz-border-radius: 0.3em;
-  -webkit-border-radius: 0.3em;
+  background-color: #242424;
+  -webkit-border-radius: 0 0 5px 5px;
+  -moz-border-radius: 0 0 5px 5px;
+  border-radius: 0 0 5px 5px;
 }
 #edit #canvas .wrapper .sort_wrapper .label,
 #edit #canvas .wrapper .sort_wrapper .sort {
-  display: block;
+  display: inline-block;
   position: static;
-  float: left;
+  float: none;
   font-size: 7px;
   line-height: 7px;
   text-transform: uppercase;
@@ -139,20 +202,6 @@
   /*float: left;
   margin-left: 2px;*/
 }
-/*
-#edit #canvas .wrapper_dr-light {
-  background-color: rgb(0, 0, 100);
-  background-color: rgba(0, 0, 255, 0.1);
-}
-#edit #canvas .wrapper_dr-wily {
-  background-color: rgb(100, 0, 0);
-  background-color: rgba(255, 0, 0, 0.1);
-}
-#edit #canvas .wrapper_dr-cossack {
-  background-color: rgb(80, 0, 80);
-  background-color: rgba(160, 0, 160, 0.1);
-}
-*/
 #edit #edit_overlay {
   border-radius: 0.5em;
   -moz-border-radius: 0.5em;
@@ -161,8 +210,9 @@
   position: absolute;
   top: 50px;
   left: 6px;
-  right: 12px;
-  height: 390px;
+  right: 6px;
+  bottom: 3px;
+  height: auto;
   z-index: 9999;
   display: none;
 }
@@ -173,22 +223,25 @@
   position: static;
   float: left;
   height: 24px;
-  width: 28px;
+  width: 22px;
   background-color: #000000;
   border: 2px solid transparent;
   border-color: transparent !important;
   border-radius: 0.25em;
   -moz-border-radius: 0.25em;
   -webkit-border-radius: 0.25em;
-  margin: 4px 3px 3px 4px;
+  margin: 0 6px 6px 0;
   background-position: -8px -12px;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
   -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
   opacity: 0.30;
 }
+#edit #canvas .sprite_robot.notloaded {
+  opacity: 0.15 !important;
+}
 #edit #canvas .sprite_robot:hover {
-  opacity: 0.90;
+  opacity: 0.90 !important;
 }
 #edit #canvas .sprite_robot_current,
 #edit #canvas .sprite_robot_current:hover {
@@ -264,6 +317,11 @@
   width: 100% !important;
   min-height: 230px;
 }
+#edit td.console {
+  overflow: hidden;
+  height: auto;
+  min-height: 0;
+}
 #edit #console .event {
   margin: 0;
   min-height: 224px;
@@ -292,7 +350,6 @@
 #edit #console .event label.original_player_dr-cossack span.current_player_dr-cossack {
   color: rgb(190, 141, 223) !important;
 }
-
 
 
 #edit #console .event .event_robot_mugshot,
@@ -406,7 +463,6 @@
   color: #B0B0B0;
 }
 
-
 #edit #console .event .event_robot_core .robot_core,
 #edit #console .event .event_robot_core2 .robot_core2 {
   display: block;
@@ -455,12 +511,14 @@
 }
 
 
-#edit #console .event a.player_name {
+
+#edit #console .event a.player_name,
+#edit #console .event a.item_name {
   display: block;
   float: right;
   padding: 1px 0;
   margin: 2px 0 0;
-  width: 135px;
+  width: 155px;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -469,13 +527,19 @@
   cursor: pointer;
   _cursor: hand;
 }
-#edit #console .event a.player_name:hover {
+#edit #console .event a.item_name {
+
+}
+#edit #console .event a.player_name:hover,
+#edit #console .event a.item_name:hover {
   background-color: #515151;
 }
-#edit #console .event a.player_name label {
+#edit #console .event a.player_name label,
+#edit #console .event a.item_name label {
   display: block;
   margin: 0;
-  padding-left: 10px;
+  padding-left: 16px;
+  padding-right: 16px;
   width: auto;
   text-align: center;
   overflow: hidden;
@@ -489,13 +553,20 @@
   background-repeat: no-repeat;
   background-position: 0 -3px;
   background-size: 17px 17px;
+  position: relative;
+  bottom: -1px;
+}
+#edit #console .event a.item_name label {
+
 }
 #edit #console .event select.player_name,
-#edit #console .event select.player_name:hover {
+#edit #console .event select.player_name:hover,
+#edit #console .event select.item_name,
+#edit #console .event select.item_name:hover {
   display: block;
   margin: 0;
   padding: 2px 3px 2px 8px;
-  width: 135px;
+  width: 155px;
   text-align: left;
   overflow: hidden;
   white-space: nowrap;
@@ -519,10 +590,17 @@
   opacity: 0.30;
   */
 }
-#edit #console .event select.player_name option {
+#edit #console .event select.item_name,
+#edit #console .event select.item_name:hover {
+
+}
+#edit #console .event select.player_name option,
+#edit #console .event select.item_name option {
   text-align: center;
 }
-#edit #console .event a.player_name label .arrow {
+#edit #console .event a.player_name label .arrow,
+#edit #console .event a.ability_name label .arrow,
+#edit #console .event a.item_name label .arrow {
   display: block;
   width: auto;
   height: auto;
@@ -535,12 +613,22 @@
   right: 4px;
   font-size: 8px;
   line-height: 8px;
-  opacity: 0.75;
-  filter: alpha(opacity=75);
+  opacity: 0.10;
+  filter: alpha(opacity=10);
 }
-#edit #console .event a.player_name:hover label .arrow {
-  opacity: 1.00;
-  filter: alpha(opacity=100);
+#edit #console .event a.player_name:hover label .arrow,
+#edit #console .event a.ability_name:hover label .arrow,
+#edit #console .event a.item_name:hover label .arrow,
+#edit #console .event a.player_name[data-status=pending] label .arrow,
+#edit #console .event a.ability_name[data-status=pending] label .arrow,
+#edit #console .event a.item_name[data-status=pending] label .arrow {
+  opacity: 0.90;
+  filter: alpha(opacity=90);
+}
+#edit #canvas .wrapper a.player_name label .arrow,
+#edit #canvas .wrapper a.ability_name label .arrow,
+#edit #canvas .wrapper a.item_name label .arrow {
+  display: none;
 }
 
 #edit #console .event a.robot_level_reset {
@@ -563,16 +651,21 @@
   color: rgb(190, 141, 223) !important;
 }
 
-#edit #console .event .ability_container {
+#edit #console .event .ability_container,
+#edit #canvas .ability_canvas .ability_container,
+#edit #canvas .item_canvas .item_container {
   display: block;
   float: right;
   padding-top: 2px;
-  width: 610px;
+  width: auto;
+  min-width: 98%;
   text-align: left;
   overflow: hidden;
-  height: 50px;
+  height: auto;
 }
-#edit #console .event a.ability_name {
+#edit #console .event a.ability_name,
+#edit #canvas .ability_canvas a.ability_name,
+#edit #canvas .item_canvas a.item_name {
   display: block;
   float: left;
   padding: 2px 3px;
@@ -585,15 +678,46 @@
   height: 13px;
   cursor: pointer;
   _cursor: hand;
+  background-clip: padding-box;
 }
-#edit #console .event a.ability_name:hover {
+#edit #console .event a.ability_name,
+#edit #canvas .ability_canvas a.ability_name,
+#edit #canvas .item_canvas a.item_name {
+  margin: 0 0.4% 0.4% 0;
+  width: 23.4%;
+}
+#edit #console .event a.ability_name:hover,
+#edit #canvas .ability_canvas a.ability_name:hover,
+#edit #canvas .item_canvas a.item_name:hover {
   background-color: #515151;
 }
-#edit #console .event a.ability_name label {
+#edit #canvas .ability_canvas a.ability_name,
+#edit #canvas .item_canvas a.item_name {
+  opacity: 0.80;
+  filter: alpha(opacity=80);
+}
+#edit #canvas .ability_canvas a.ability_name:hover,
+#edit #canvas .item_canvas a.item_name:hover {
+  opacity: 1.0;
+  filter: alpha(opacity=100);
+}
+#edit #console .event a.ability_name[data-status=disabled] {
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+#edit #canvas .ability_canvas a.ability_name[data-status=disabled],
+#edit #canvas .item_canvas a.item_name[data-status=disabled] {
+  opacity: 0.2;
+  filter: alpha(opacity=20);
+  cursor: default;
+}
+#edit #console .event a.ability_name label,
+#edit #canvas .ability_canvas a.ability_name label,
+#edit #canvas .item_canvas a.item_name label {
   display: block;
   margin: 0;
   padding-left: 15px;
-  width: 125px;
+  width: auto;
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -607,8 +731,23 @@
   background-position: -4px -4px;
   background-size: 20px 20px;
 }
+#edit #canvas .ability_canvas a.ability_name label,
+#edit #canvas .item_canvas a.item_name label {
+
+}
+#edit #canvas .item_canvas a.item_name label .count {
+  float: right;
+  font-size: 80%;
+  margin-right: 2px;
+}
 #edit #console .event select.ability_name,
-#edit #console .event select.ability_name:hover {
+#edit #console .event select.ability_name:hover,
+#edit #console .event select.item_name,
+#edit #console .event select.item_name:hover,
+#edit #canvas .ability_canvas select.ability_name,
+#edit #canvas .ability_canvas select.ability_name:hover,
+#edit #canvas .item_canvas select.item_name,
+#edit #canvas .item_canvas select.item_name:hover {
   display: block;
   margin: 0;
   padding: 2px 3px;
@@ -637,7 +776,9 @@
   opacity: 0.30;
   */
 }
-#edit #console .event select.ability_name option {
+#edit #console .event select.ability_name option,
+#edit #canvas .ability_canvas select.ability_name option,
+#edit #canvas .item_canvas select.item_name option {
   text-align: left;
 }
 
@@ -681,6 +822,7 @@
 #edit #console .header .robot_type .text {
 
 }
+
 
 #edit .section {
   float: left;

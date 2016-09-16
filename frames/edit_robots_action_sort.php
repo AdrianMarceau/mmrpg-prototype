@@ -1,4 +1,7 @@
 <?php
+
+// ROBOT ACTIONS : SORT ROBOTS
+//
 // Collect the ability variables from the request header, if they exist
 $temp_token = !empty($_REQUEST['token']) ? $_REQUEST['token'] : '';
 $temp_order = !empty($_REQUEST['order']) ? $_REQUEST['order'] : '';
@@ -206,7 +209,5 @@ else {
     exit('error|robots-undefined|false');
 
 }
-
-
 
 ?>
