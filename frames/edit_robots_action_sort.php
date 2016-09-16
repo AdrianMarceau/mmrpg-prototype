@@ -1,6 +1,10 @@
 <?php
 
 // ROBOT ACTIONS : SORT ROBOTS
+
+// Include the necessary database files
+require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
+require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 //
 // Collect the ability variables from the request header, if they exist
 $temp_token = !empty($_REQUEST['token']) ? $_REQUEST['token'] : '';
@@ -118,10 +122,10 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
                 //die($temp_token_order.' ('.$robot1_token.' vs '.$robot2_token.') ('.$robot1_core.' vs '.$robot2_core.') <pre>'.print_r(implode(',', $mmrpg_database_types_keys), true).'</pre>');
                 if ($robot1_core_position === false && $robot2_core_position !== false){ return -1; }
                 elseif ($robot1_core_position !== false && $robot2_core_position === false){ return 1; }
-                elseif ($robot1_number_position === false && $robot2_number_position !== false){ return -1; }
-                elseif ($robot1_number_position !== false && $robot2_number_position === false){ return 1; }
                 elseif ($robot1_core_position < $robot2_core_position){ return -1; }
                 elseif ($robot1_core_position > $robot2_core_position){ return 1; }
+                elseif ($robot1_number_position === false && $robot2_number_position !== false){ return -1; }
+                elseif ($robot1_number_position !== false && $robot2_number_position === false){ return 1; }
                 elseif ($robot1_number_position < $robot2_number_position){ return -1; }
                 elseif ($robot1_number_position > $robot2_number_position){ return 1; }
                 else { return 0; }
@@ -145,10 +149,10 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
                 //die($temp_token_order.' ('.$robot1_token.' vs '.$robot2_token.') ('.$robot1_core.' vs '.$robot2_core.') <pre>'.print_r(implode(',', $mmrpg_database_types_keys), true).'</pre>');
                 if ($robot1_core_position === false && $robot2_core_position !== false){ return 1; }
                 elseif ($robot1_core_position !== false && $robot2_core_position === false){ return -1; }
-                elseif ($robot1_number_position === false && $robot2_number_position !== false){ return 1; }
-                elseif ($robot1_number_position !== false && $robot2_number_position === false){ return -1; }
                 elseif ($robot1_core_position < $robot2_core_position){ return 1; }
                 elseif ($robot1_core_position > $robot2_core_position){ return -1; }
+                elseif ($robot1_number_position === false && $robot2_number_position !== false){ return 1; }
+                elseif ($robot1_number_position !== false && $robot2_number_position === false){ return -1; }
                 elseif ($robot1_number_position < $robot2_number_position){ return 1; }
                 elseif ($robot1_number_position > $robot2_number_position){ return -1; }
                 else { return 0; }
