@@ -827,28 +827,8 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
     return '<a class="option option_1x4 option_this-'.$player_token.'-select option_message "><div class="chrome"><div class="inset"><label class="'.(!empty($sprites) ? 'has_image' : '').'">'.$sprites.$temp_optiontext.'</label></div></div></a>'."\n";
 }
 
-
-/*
- * MISSION GENERATION
- */
-
 // Define a function for generating an ability set for a given robot
 require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_generate-abilities.php');
-
-// Define a function for generating the STARTER missions
-require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-starter.php');
-
-// Define a function for generating the SINGLES missions
-require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-single.php');
-
-// Define a function for generating the DOUBLES missions
-require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-double.php');
-
-// Define a function for generating the PLAYER missions
-require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-player.php');
-
-// Define a function for generating the BONUS missions
-require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-bonus.php');
 
 // Define a function for sorting the omega player robots
 function mmrpg_prototype_sort_player_robots($info1, $info2){
