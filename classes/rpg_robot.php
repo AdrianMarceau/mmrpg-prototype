@@ -132,22 +132,13 @@ class rpg_robot extends rpg_object {
         $this->robot_position = isset($this_robotinfo['robot_position']) ? $this_robotinfo['robot_position'] : 'bench';
         $this->robot_stance = isset($this_robotinfo['robot_stance']) ? $this_robotinfo['robot_stance'] : 'base';
         $this->robot_rewards = isset($this_robotinfo['robot_rewards']) ? $this_robotinfo['robot_rewards'] : array();
-        $this->robot_functions = isset($this_robotinfo['robot_functions']) ? $this_robotinfo['robot_functions'] : 'robots/robot.php';
         $this->robot_frame = isset($this_robotinfo['robot_frame']) ? $this_robotinfo['robot_frame'] : 'base';
-        //$this->robot_frame_index = isset($this_robotinfo['robot_frame_index']) ? $this_robotinfo['robot_frame_index'] : array('base','taunt','victory','defeat','shoot','throw','summon','slide','defend','damage','base2');
         $this->robot_frame_offset = !empty($this_robotinfo['robot_frame_offset']) ? $this_robotinfo['robot_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
         $this->robot_frame_classes = isset($this_robotinfo['robot_frame_classes']) ? $this_robotinfo['robot_frame_classes'] : '';
         $this->robot_frame_styles = isset($this_robotinfo['robot_frame_styles']) ? $this_robotinfo['robot_frame_styles'] : '';
         $this->robot_detail_styles = isset($this_robotinfo['robot_detail_styles']) ? $this_robotinfo['robot_detail_styles'] : '';
         $this->robot_original_player = isset($this_robotinfo['robot_original_player']) ? $this_robotinfo['robot_original_player'] : $this->player_token;
         $this->robot_string = isset($this_robotinfo['robot_string']) ? $this_robotinfo['robot_string'] : $this->robot_id.'_'.$this->robot_token;
-
-        // Collect any functions associated with this ability
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->robot_functions) ? $this->robot_functions : 'robots/functions.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
-        $this->robot_function = isset($ability['robot_function']) ? $ability['robot_function'] : function(){};
-        $this->robot_function_onload = isset($ability['robot_function_onload']) ? $ability['robot_function_onload'] : function(){};
-        unset($ability);
 
         // Define the internal robot base values using the robots index array
         $this->robot_base_name = isset($this_robotinfo['robot_base_name']) ? $this_robotinfo['robot_base_name'] : $this->robot_name;
@@ -199,6 +190,14 @@ class rpg_robot extends rpg_object {
         if ($this->robot_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_speed = MMRPG_SETTINGS_STATS_MAX; }
         if ($this->robot_base_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_speed = MMRPG_SETTINGS_STATS_MAX; }
 
+        // Collect any functions associated with this robot
+        $this->robot_functions = isset($this_robotinfo['robot_functions']) ? $this_robotinfo['robot_functions'] : 'robots/robot.php';
+        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->robot_functions) ? $this->robot_functions : 'robots/robot.php';
+        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
+        $this->robot_function = isset($robot['robot_function']) ? $robot['robot_function'] : function(){};
+        $this->robot_function_onload = isset($robot['robot_function_onload']) ? $robot['robot_function_onload'] : function(){};
+        unset($robot);
+
         // If this is a player-controlled robot, load settings from session
         if ($this->player->player_side == 'left' && empty($this->flags['apply_session_settings'])){
 
@@ -247,6 +246,20 @@ class rpg_robot extends rpg_object {
         }
 
         // Trigger the onload function if it exists
+        $this->trigger_onload();
+
+        // Update the session variable
+        $this->update_session();
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for refreshing this robot and running onload actions
+    public function trigger_onload(){
+
+        // Trigger the onload function if it exists
         $temp_function = $this->robot_function_onload;
         $temp_result = $temp_function(array(
             'this_field' => isset($this->battle->battle_field) ? $this->battle->battle_field : false,
@@ -254,12 +267,6 @@ class rpg_robot extends rpg_object {
             'this_player' => $this->player,
             'this_robot' => $this
             ));
-
-        // Update the session variable
-        $this->update_session();
-
-        // Return true on success
-        return true;
 
     }
 

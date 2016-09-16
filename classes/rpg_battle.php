@@ -207,11 +207,33 @@ class rpg_battle extends rpg_object {
         $this->battle_base_points = isset($this_battleinfo['battle_base_points']) ? $this_battleinfo['battle_base_points'] : $this->battle_points;
         $this->battle_base_level = isset($this_battleinfo['battle_base_level']) ? $this_battleinfo['battle_base_level'] : $this->battle_level;
 
+        // Collect any functions associated with this battle
+        $this->battle_functions = isset($this_battleinfo['battle_functions']) ? $this_battleinfo['battle_functions'] : 'battles/battle.php';
+        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->battle_functions) ? $this->battle_functions : 'battles/battle.php';
+        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
+        $this->battle_function = isset($battle['battle_function']) ? $battle['battle_function'] : function(){};
+        $this->battle_function_onload = isset($battle['battle_function_onload']) ? $battle['battle_function_onload'] : function(){};
+        unset($battle);
+
+        // Trigger the onload function if it exists
+        $this->trigger_onload();
+
         // Update the session variable
         $this->update_session();
 
         // Return true on success
         return true;
+
+    }
+
+    // Define a function for refreshing this battle and running onload actions
+    public function trigger_onload(){
+
+        // Trigger the onload function if it exists
+        $temp_function = $this->battle_function_onload;
+        $temp_result = $temp_function(array(
+            'this_battle' => $this
+            ));
 
     }
 

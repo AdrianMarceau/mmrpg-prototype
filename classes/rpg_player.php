@@ -103,6 +103,14 @@ class rpg_player extends rpg_object {
         $this->player_base_points = isset($this_playerinfo['player_base_points']) ? $this_playerinfo['player_base_points'] : $this->player_points;
         $this->player_base_switch = isset($this_playerinfo['player_base_switch']) ? $this_playerinfo['player_base_switch'] : $this->player_switch;
 
+        // Collect any functions associated with this player
+        $this->player_functions = isset($this_playerinfo['player_functions']) ? $this_playerinfo['player_functions'] : 'players/player.php';
+        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->player_functions) ? $this->player_functions : 'players/player.php';
+        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
+        $this->player_function = isset($player['player_function']) ? $player['player_function'] : function(){};
+        $this->player_function_onload = isset($player['player_function_onload']) ? $player['player_function_onload'] : function(){};
+        unset($player);
+
         // Remove any abilities that do not exist in the index
         if (!empty($this->player_abilities)){
             foreach ($this->player_abilities AS $key => $token){
@@ -128,11 +136,27 @@ class rpg_player extends rpg_object {
             }
         }
 
+        // Trigger the onload function if it exists
+        $this->trigger_onload();
+
         // Update the session variable
         $this->update_session();
 
         // Return true on success
         return true;
+
+    }
+
+    // Define a function for refreshing this player and running onload actions
+    public function trigger_onload(){
+
+        // Trigger the onload function if it exists
+        $temp_function = $this->player_function_onload;
+        $temp_result = $temp_function(array(
+            'this_field' => isset($this->battle->battle_field) ? $this->battle->battle_field : false,
+            'this_battle' => $this->battle,
+            'this_player' => $this
+            ));
 
     }
 

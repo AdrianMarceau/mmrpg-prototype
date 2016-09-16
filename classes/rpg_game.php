@@ -40,6 +40,7 @@ class rpg_game {
 
             // Collect the battle from the index and return
             $this_battle = self::$index['battles'][$battle_id];
+            $this_battle->trigger_onload();
 
         }
         // Otherwise create a new battle object in the index
@@ -88,6 +89,7 @@ class rpg_game {
 
             // Collect the player from the index and return
             $this_player = self::$index['players'][$player_id];
+            $this_player->trigger_onload();
 
         }
         // Otherwise create a new player object in the index
@@ -137,6 +139,7 @@ class rpg_game {
 
             // Collect the robot from the index and return
             $this_robot = self::$index['robots'][$robot_id];
+            $this_robot->trigger_onload();
 
         }
         // Otherwise create a new robot object in the index
@@ -187,6 +190,7 @@ class rpg_game {
 
             // Collect the ability from the index and return
             $this_ability = self::$index['abilities'][$ability_id];
+            $this_ability->trigger_onload();
 
         }
         // Otherwise create a new ability object in the index
@@ -237,6 +241,7 @@ class rpg_game {
 
             // Collect the item from the index and return
             $this_item = self::$index['items'][$item_id];
+            $this_item->trigger_onload();
 
         }
         // Otherwise create a new item object in the index

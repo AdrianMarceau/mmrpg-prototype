@@ -82,11 +82,34 @@ class rpg_field extends rpg_object {
         $this->field_base_foreground_attachments = isset($this_fieldinfo['field_base_foreground_attachments']) ? $this_fieldinfo['field_base_foreground_attachments'] : $this->field_foreground_attachments;
         $this->field_base_music = isset($this_fieldinfo['field_base_music']) ? $this_fieldinfo['field_base_music'] : $this->field_music;
 
+        // Collect any functions associated with this field
+        $this->field_functions = isset($this_fieldinfo['field_functions']) ? $this_fieldinfo['field_functions'] : 'fields/field.php';
+        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->field_functions) ? $this->field_functions : 'fields/field.php';
+        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
+        $this->field_function = isset($field['field_function']) ? $field['field_function'] : function(){};
+        $this->field_function_onload = isset($field['field_function_onload']) ? $field['field_function_onload'] : function(){};
+        unset($field);
+
+        // Trigger the onload function if it exists
+        $this->trigger_onload();
+
         // Update the session variable
         $this->update_session();
 
         // Return true on success
         return true;
+
+    }
+
+    // Define a function for refreshing this field and running onload actions
+    public function trigger_onload(){
+
+        // Trigger the onload function if it exists
+        $temp_function = $this->field_function_onload;
+        $temp_result = $temp_function(array(
+            'this_battle' => isset($this->battle) ? $this->battle : false,
+            'this_field' => $this
+            ));
 
     }
 
