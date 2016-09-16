@@ -836,110 +836,19 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
 require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_generate-abilities.php');
 
 // Define a function for generating the STARTER missions
-function mmrpg_prototype_mission_starter($this_prototype_data, $this_robot_token = 'met', $this_start_level = 1, $this_rescue_token = 'roll'){
-    // Pull in global variables for this function
-    global $mmrpg_index, $db;
-    global $this_omega_factors_one;
-    global $this_omega_factors_two;
-    global $this_omega_factors_three;
-    global $this_omega_factors_four;
-    global $this_omega_factors_five;
-    global $this_omega_factors_six;
-    global $this_omega_factors_seven;
-    global $this_omega_factors_eight;
-    global $this_omega_factors_eight_two;
-    global $this_omega_factors_nine;
-    global $this_omega_factors_ten;
-    // Require the definition file
-    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-starter.php');
-    // Return the generated omega battle data
-    return $temp_battle_omega;
-}
+require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-starter.php');
 
 // Define a function for generating the SINGLES missions
-function mmrpg_prototype_mission_single($this_prototype_data, $this_robot_token, $this_field_token, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true, $this_addon_abilities = 0){
-    // Pull in global variables for this function
-    global $mmrpg_index, $db;
-    global $this_omega_factors_one;
-    global $this_omega_factors_two;
-    global $this_omega_factors_three;
-    global $this_omega_factors_four;
-    global $this_omega_factors_five;
-    global $this_omega_factors_six;
-    global $this_omega_factors_seven;
-    global $this_omega_factors_eight;
-    global $this_omega_factors_eight_two;
-    global $this_omega_factors_nine;
-    global $this_omega_factors_ten;
-    // Require the actual code file
-    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-single.php');
-    // Return the generated battle data
-    return $temp_battle_omega;
-}
+require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-single.php');
 
 // Define a function for generating the DOUBLES missions
-function mmrpg_prototype_mission_double($this_prototype_data, $this_robot_tokens, $this_field_tokens, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true){
-    // Pull in global variables for this function
-    global $mmrpg_index, $db;
-    global $this_omega_factors_one;
-    global $this_omega_factors_two;
-    global $this_omega_factors_three;
-    global $this_omega_factors_four;
-    global $this_omega_factors_five;
-    global $this_omega_factors_six;
-    global $this_omega_factors_seven;
-    global $this_omega_factors_eight;
-    global $this_omega_factors_eight_two;
-    global $this_omega_factors_nine;
-    global $this_omega_factors_ten;
-    // Require the actual code file
-    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-double.php');
-    // Return the generated battle data
-    return $temp_battle_omega;
-
-}
+require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-double.php');
 
 // Define a function for generating the PLAYER missions
-function mmrpg_prototype_mission_player($this_prototype_data, $this_user_info, $this_max_robots, &$field_factors_one, &$field_factors_two, &$field_factors_three){
-    // Pull in global variables for this function
-    global $mmrpg_index, $db;
-    global $this_omega_factors_one;
-    global $this_omega_factors_two;
-    global $this_omega_factors_three;
-    global $this_omega_factors_four;
-    global $this_omega_factors_five;
-    global $this_omega_factors_six;
-    global $this_omega_factors_seven;
-    global $this_omega_factors_eight;
-    global $this_omega_factors_eight_two;
-    global $this_omega_factors_nine;
-    global $this_omega_factors_ten;
-    // Require the actual code file
-    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-player.php');
-    // Return the generated battle data
-    return $temp_battle_omega;
-}
+require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-player.php');
 
 // Define a function for generating the BONUS missions
-function mmrpg_prototype_mission_bonus($this_prototype_data, $this_robot_count = 8, $this_robot_class = 'master'){
-    // Pull in global variables for this function
-    global $mmrpg_index, $db;
-    global $this_omega_factors_one;
-    global $this_omega_factors_two;
-    global $this_omega_factors_three;
-    global $this_omega_factors_four;
-    global $this_omega_factors_five;
-    global $this_omega_factors_six;
-    global $this_omega_factors_seven;
-    global $this_omega_factors_eight;
-    global $this_omega_factors_eight_two;
-    global $this_omega_factors_nine;
-    global $this_omega_factors_ten;
-    // Require the actual code file
-    require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-bonus.php');
-    // Return the generated battle data
-    return $temp_battle_omega;
-}
+require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_mission-bonus.php');
 
 // Define a function for sorting the omega player robots
 function mmrpg_prototype_sort_player_robots($info1, $info2){
