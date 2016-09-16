@@ -124,7 +124,6 @@ class rpg_ability extends rpg_object {
         //$this->ability_recovery_modifiers = isset($this_abilityinfo['ability_recovery_modifiers']) ? $this_abilityinfo['ability_recovery_modifiers'] : true;
         $this->ability_accuracy = isset($this_abilityinfo['ability_accuracy']) ? $this_abilityinfo['ability_accuracy'] : 0;
         $this->ability_target = isset($this_abilityinfo['ability_target']) ? $this_abilityinfo['ability_target'] : 'auto';
-        $this->ability_functions = isset($this_abilityinfo['ability_functions']) ? $this_abilityinfo['ability_functions'] : 'abilities/ability.php';
         $this->ability_frame = isset($this_abilityinfo['ability_frame']) ? $this_abilityinfo['ability_frame'] : 'base';
         $this->ability_frame_span = isset($this_abilityinfo['ability_frame_span']) ? $this_abilityinfo['ability_frame_span'] : 1;
         $this->ability_frame_animate = isset($this_abilityinfo['ability_frame_animate']) ? $this_abilityinfo['ability_frame_animate'] : array($this->ability_frame);
@@ -144,14 +143,6 @@ class rpg_ability extends rpg_object {
         $this->recovery_options = array();
         $this->attachment_options = array();
 
-        // Collect any functions associated with this ability
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->ability_functions) ? $this->ability_functions : 'abilities/ability.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
-        $this->ability_function = isset($ability['ability_function']) ? $ability['ability_function'] : function(){};
-        $this->ability_function_onload = isset($ability['ability_function_onload']) ? $ability['ability_function_onload'] : function(){};
-        $this->ability_function_attachment = isset($ability['ability_function_attachment']) ? $ability['ability_function_attachment'] : function(){};
-        unset($ability);
-
         // Define the internal robot base values using the robots index array
         $this->ability_base_name = isset($this_abilityinfo['ability_base_name']) ? $this_abilityinfo['ability_base_name'] : $this->ability_name;
         $this->ability_base_token = isset($this_abilityinfo['ability_base_token']) ? $this_abilityinfo['ability_base_token'] : $this->ability_token;
@@ -169,6 +160,15 @@ class rpg_ability extends rpg_object {
         $this->ability_base_accuracy = isset($this_abilityinfo['ability_base_accuracy']) ? $this_abilityinfo['ability_base_accuracy'] : $this->ability_accuracy;
         $this->ability_base_target = isset($this_abilityinfo['ability_base_target']) ? $this_abilityinfo['ability_base_target'] : $this->ability_target;
 
+        // Collect any functions associated with this ability
+        $this->ability_functions = isset($this_abilityinfo['ability_functions']) ? $this_abilityinfo['ability_functions'] : 'abilities/ability.php';
+        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->ability_functions) ? $this->ability_functions : 'abilities/ability.php';
+        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
+        $this->ability_function = isset($ability['ability_function']) ? $ability['ability_function'] : function(){};
+        $this->ability_function_onload = isset($ability['ability_function_onload']) ? $ability['ability_function_onload'] : function(){};
+        $this->ability_function_attachment = isset($ability['ability_function_attachment']) ? $ability['ability_function_attachment'] : function(){};
+        unset($ability);
+
         // Define a the default ability results
         $this->ability_results_reset();
 
@@ -176,6 +176,20 @@ class rpg_ability extends rpg_object {
         $this->target_options_reset();
         $this->damage_options_reset();
         $this->recovery_options_reset();
+
+        // Trigger the onload function if it exists
+        $this->trigger_onload();
+
+        // Update the session variable
+        $this->update_session();
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for refreshing this ability and running onload actions
+    public function trigger_onload(){
 
         // Trigger the onload function if it exists
         $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
@@ -190,12 +204,6 @@ class rpg_ability extends rpg_object {
             'target_robot' => $temp_target_robot,
             'this_ability' => $this
             ));
-
-        // Update the session variable
-        $this->update_session();
-
-        // Return true on success
-        return true;
 
     }
 

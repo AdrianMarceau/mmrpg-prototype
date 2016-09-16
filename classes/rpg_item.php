@@ -122,7 +122,6 @@ class rpg_item extends rpg_object {
         //$this->item_recovery_modifiers = isset($this_iteminfo['item_recovery_modifiers']) ? $this_iteminfo['item_recovery_modifiers'] : true;
         $this->item_accuracy = isset($this_iteminfo['item_accuracy']) ? $this_iteminfo['item_accuracy'] : 0;
         $this->item_target = isset($this_iteminfo['item_target']) ? $this_iteminfo['item_target'] : 'auto';
-        $this->item_functions = isset($this_iteminfo['item_functions']) ? $this_iteminfo['item_functions'] : 'items/item.php';
         $this->item_frame = isset($this_iteminfo['item_frame']) ? $this_iteminfo['item_frame'] : 'base';
         $this->item_frame_span = isset($this_iteminfo['item_frame_span']) ? $this_iteminfo['item_frame_span'] : 1;
         $this->item_frame_animate = isset($this_iteminfo['item_frame_animate']) ? $this_iteminfo['item_frame_animate'] : array($this->item_frame);
@@ -142,14 +141,6 @@ class rpg_item extends rpg_object {
         $this->recovery_options = array();
         $this->attachment_options = array();
 
-        // Collect any functions associated with this item
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->item_functions) ? $this->item_functions : 'items/item.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
-        $this->item_function = isset($item['item_function']) ? $item['item_function'] : function(){};
-        $this->item_function_onload = isset($item['item_function_onload']) ? $item['item_function_onload'] : function(){};
-        $this->item_function_attachment = isset($item['item_function_attachment']) ? $item['item_function_attachment'] : function(){};
-        unset($item);
-
         // Define the internal robot base values using the robots index array
         $this->item_base_name = isset($this_iteminfo['item_base_name']) ? $this_iteminfo['item_base_name'] : $this->item_name;
         $this->item_base_token = isset($this_iteminfo['item_base_token']) ? $this_iteminfo['item_base_token'] : $this->item_token;
@@ -167,6 +158,14 @@ class rpg_item extends rpg_object {
         $this->item_base_accuracy = isset($this_iteminfo['item_base_accuracy']) ? $this_iteminfo['item_base_accuracy'] : $this->item_accuracy;
         $this->item_base_target = isset($this_iteminfo['item_base_target']) ? $this_iteminfo['item_base_target'] : $this->item_target;
 
+        // Collect any functions associated with this item
+        $this->item_functions = isset($this_iteminfo['item_functions']) ? $this_iteminfo['item_functions'] : 'items/item.php';
+        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->item_functions) ? $this->item_functions : 'items/item.php';
+        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
+        $this->item_function = isset($item['item_function']) ? $item['item_function'] : function(){};
+        $this->item_function_onload = isset($item['item_function_onload']) ? $item['item_function_onload'] : function(){};
+        unset($item);
+
         // Define a the default item results
         $this->item_results_reset();
 
@@ -174,6 +173,20 @@ class rpg_item extends rpg_object {
         $this->target_options_reset();
         $this->damage_options_reset();
         $this->recovery_options_reset();
+
+        // Trigger the onload function if it exists
+        $this->trigger_onload();
+
+        // Update the session variable
+        $this->update_session();
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for refreshing this item and running onload actions
+    public function trigger_onload(){
 
         // Trigger the onload function if it exists
         $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
@@ -188,12 +201,6 @@ class rpg_item extends rpg_object {
             'target_robot' => $temp_target_robot,
             'this_item' => $this
             ));
-
-        // Update the session variable
-        $this->update_session();
-
-        // Return true on success
-        return true;
 
     }
 
