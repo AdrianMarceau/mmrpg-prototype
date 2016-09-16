@@ -5,6 +5,10 @@
  */
 class rpg_game {
 
+    // Define global class variables
+    public static $index = array();
+
+
     /**
      * Create a new RPG game object.
      * This is a wrapper class for static functions,
