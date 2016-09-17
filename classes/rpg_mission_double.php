@@ -79,10 +79,10 @@ class rpg_mission_double extends rpg_mission {
 
         // Define the fusion star token in case we need to test for it
         $temp_field_star_token = preg_replace('/^([-_a-z0-9\s]+)-([-_a-z0-9]+)$/i', '$1', $temp_option_field['field_token']).'-'.preg_replace('/^([-_a-z0-9\s]+)-([-_a-z0-9]+)$/i', '$2', $temp_option_field2['field_token']);
-        $temp_field_star_present = $this_prototype_data['prototype_complete'] && empty($_SESSION['GAME']['values']['battle_stars'][$temp_field_star_token]) ? true : false;
+        $temp_fusion_star_present = $this_prototype_data['prototype_complete'] && empty($_SESSION['GAME']['values']['battle_stars'][$temp_field_star_token]) ? true : false;
 
         // If a fusion star is preent on the field, fill the empty spots with like-typed robots
-        if ($temp_field_star_present){
+        if ($temp_fusion_star_present){
 
             $temp_option_battle['battle_target_player']['player_switch'] = 2;
             $temp_robot_tokens = array();
@@ -170,7 +170,7 @@ class rpg_mission_double extends rpg_mission {
         if (true){
             $temp_option_battle['battle_target_player']['player_switch'] = 1.5;
             $bonus_robot_count = $temp_target_count; // - count($temp_option_battle['battle_target_player']['player_robots']);
-            //if ($temp_field_star_present){ $bonus_robot_count += 2; }
+            //if ($temp_fusion_star_present){ $bonus_robot_count += 2; }
             //$bonus_robot_count = $bonus_robot_count; //mt_rand(2, $bonus_robot_count);
             $temp_mook_options = array();
             $temp_mook_letters = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H');
@@ -344,7 +344,7 @@ class rpg_mission_double extends rpg_mission {
         }
 
         // Check to see if we should be adding a field star to this battle
-        if ($temp_field_star_present){
+        if ($temp_fusion_star_present){
 
             // Generate the necessary field star variables and add them to the battle data
             $temp_field_star = array();

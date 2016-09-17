@@ -63,7 +63,7 @@ ob_start();
         // Define the ability display counter
         $unlocked_abilities_count = 0;
 
-        // Collect the temp ability index
+        // Collect the temp ability and robot indexes
         $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         $temp_robotinfo = $temp_robots_index[$this_robot->robot_token];
