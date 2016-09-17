@@ -113,6 +113,11 @@ $ability = array(
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
+        // If this ability is already summoned, allow targetting
+        if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->set_target('select_target'); }
+        // Else if the ability attachment is not there, change the target back to auto
+        else { $this_ability->set_target('auto'); }
+
         // If the ability flag had already been set, reduce the weapon energy to zero
         if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->set_energy(0); }
         // Otherwise, return the weapon energy back to default
