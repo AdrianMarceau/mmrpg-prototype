@@ -259,6 +259,76 @@ class rpg_game {
 
     }
 
+    /**
+     * Request a reference to existing player data in the battle object via filters
+     * @param array $filters
+     * @return rpg_player
+     */
+    public static function find_player($filters, $invert = false){
+        if (empty(self::$index['players']) || empty($filters)){ return false; }
+        foreach (self::$index['players'] AS $player_id => $this_player){
+            $is_match = true;
+            foreach ($filters AS $field_name => $field_value){
+                if ($invert == false && $this_player->$field_name != $field_value){
+                    $is_match = false;
+                    break;
+                } elseif ($invert == true && $this_player->$field_name == $field_value){
+                    $is_match = false;
+                    break;
+                }
+            }
+            if ($is_match){
+                return $this_player;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Request a reference to existing robot data in the battle object via filters
+     * @param array $filters
+     * @return rpg_robot
+     */
+    public static function find_robot($filters){
+        if (empty(self::$index['robots']) || empty($filters)){ return false; }
+        foreach (self::$index['robots'] AS $robot_id => $this_robot){
+            $is_match = true;
+            foreach ($filters AS $field_name => $field_value){
+                if ($this_robot->$field_name != $field_value){
+                    $is_match = false;
+                    break;
+                }
+            }
+            if ($is_match){
+                return $this_robot;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Request a list of references to existing robot data in the battle object via filters
+     * @param array $filters
+     * @return rpg_robot
+     */
+    public static function find_robots($filters){
+        if (empty(self::$index['robots']) || empty($filters)){ return false; }
+        $robots = array();
+        foreach (self::$index['robots'] AS $robot_id => $this_robot){
+            $is_match = true;
+            foreach ($filters AS $field_name => $field_value){
+                if ($this_robot->$field_name != $field_value){
+                    $is_match = false;
+                    break;
+                }
+            }
+            if ($is_match){
+                $robots[] = $this_robot;
+            }
+        }
+        return $robots;
+    }
+
 
 
     // -- MODE FUNCTIONS -- //
