@@ -106,7 +106,10 @@ class rpg_mission_bonus extends rpg_mission {
             // Use a random alt image for this robot if available
             if (!empty($index['robot_image_alts'])){
                 $images = array($info['robot_token']);
-                foreach ($index['robot_image_alts'] AS $alt){ $images[] = $info['robot_token'].'_'.$alt['token']; }
+                foreach ($index['robot_image_alts'] AS $alt){
+                    if ($alt['token'] == 'alt9'){ continue; }
+                    $images[] = $info['robot_token'].'_'.$alt['token'];
+                }
                 shuffle($images);
                 $info['robot_image'] = array_shift($images);
             }
@@ -146,7 +149,7 @@ class rpg_mission_bonus extends rpg_mission {
 
         // Update the field music to a random boss theme from MM1-10 + MM&B
         $temp_music_number = mt_rand(1, 11);
-        $temp_music_name = 'prototype-complete'.($temp_music_number > 1 ? '-'.$temp_music_number : '');
+        $temp_music_name = 'boss-theme-mm'.str_pad($temp_music_number, 2, '0', STR_PAD_LEFT);
         $temp_battle_omega['battle_field_base']['field_music'] = $temp_music_name;
 
         // Add some random item drops to the starter battle
