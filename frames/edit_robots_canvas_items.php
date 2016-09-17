@@ -41,7 +41,7 @@ echo '<div class="wrapper">';
 
             foreach ($mmrpg_database_items AS $item_token => $item_info){
                 if (!isset($player_item_rewards[$item_token])){ continue; }
-                if ($item_info['item_subclass'] != 'holdable'){ continue; }
+                if ($item_info['item_subclass'] != 'holdable' && $item_info['item_subclass'] != 'consumable'){ continue; }
                 //if ($key_counter > 0 && $key_counter % 5 == 0){ echo '</tr><tr>'; }
                 //echo '<td>';
 
