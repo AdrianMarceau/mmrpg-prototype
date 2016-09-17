@@ -454,17 +454,32 @@ if ($this_battle->battle_status != 'complete'){
         die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
     }
 
+    // Collect both player's active pokemon
+    $this_robots_active = $this_player->get_robots_active();
+    $target_robots_active = $target_player->get_robots_active();
 
-    // Loop through all this player's robots and carry out any end-turn events
-    rpg_battle::temp_check_robot_attachments($this_battle, $this_player, $this_robot, $target_player, $target_robot);
-    rpg_battle::temp_check_robot_weapons($this_battle, $this_player, $this_robot, $target_player, $target_robot);
+    // Loop through this player's robots and apply end-turn checks
+    foreach ($this_robots_active AS $key => $active_robot){
+        if ($active_robot->get_id() == $this_robot->get_id()){ $active_robot = $this_robot; }
+        $active_robot->check_items($target_player, $target_robot);
+        $active_robot->check_attachments($target_player, $target_robot);
+        $active_robot->check_weapons($target_player, $target_robot);
+    }
 
-    // Loop through all the target player's robots and carry out any end-turn events
-    rpg_battle::temp_check_robot_attachments($this_battle, $target_player, $target_robot, $this_player, $this_robot);
-    rpg_battle::temp_check_robot_weapons($this_battle, $target_player, $target_robot, $this_player, $this_robot);
+    // Loop through the target player's robots and apply end-turn checks
+    foreach ($target_robots_active AS $key => $active_robot){
+        if ($active_robot->get_id() == $target_robot->get_id()){ $active_robot = $target_robot; }
+        $active_robot->check_items($this_player, $this_robot);
+        $active_robot->check_attachments($this_player, $this_robot);
+        $active_robot->check_weapons($this_player, $this_robot);
+    }
+
+    // Re-collect both player's active pokemon
+    $this_robots_active = $this_player->get_robots_active();
+    $target_robots_active = $target_player->get_robots_active();
 
     // Create an empty field to remove any leftover frames
-    $this_battle->events_create(false, false, '', '');
+    $this_battle->events_create();
 
     // If this the player's last robot
     if ($this_player->counters['robots_active'] == 0){

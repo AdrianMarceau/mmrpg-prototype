@@ -33,6 +33,16 @@ class rpg_battle extends rpg_object {
 
     }
 
+    /**
+     * Return a reference to the global battle object
+     * @return rpg_battle
+     */
+    public static function get_battle(){
+        $this_battle = isset($GLOBALS['this_battle']) ? $GLOBALS['this_battle'] : new rpg_battle();
+        $this_battle->trigger_onload();
+        return $this_battle;
+    }
+
     // Define a public function for updating index info
     public static function update_index_info($battle_token, $battle_info){
         global $db;
@@ -1954,7 +1964,7 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a publicfunction for adding to the event array
-    public function events_create($this_robot, $target_robot, $event_header, $event_body, $event_options = array()){
+    public function events_create($this_robot = false, $target_robot = false, $event_header = '', $event_body = '', $event_options = array()){
 
         // Clone or define the event objects
         $this_battle = $this;
@@ -2343,186 +2353,6 @@ class rpg_battle extends rpg_object {
         // Return the final value of the target robot
         return $target_robot;
     }
-
-
-    // -- CHECK ATTACHMENTS FUNCTION -- //
-
-    // Define a function for checking attachment status
-    public static function temp_check_robot_attachments($this_battle, $this_player, $this_robot, $target_player, $target_robot){
-
-        // Loop through all the target player's robots and carry out any end-turn events
-        foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
-
-            // Create the temp robot object
-            if (isset($temp_robot)){ unset($temp_robot); }
-            $temp_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
-
-            // Hide any disabled robots that have not been hidden yet
-            if ($temp_robotinfo['robot_energy'] == 0 || $temp_robotinfo['robot_status'] == 'disabled'){
-                // Hide robot and update session
-                $temp_robot->robot_status = 'disabled';
-                $temp_robot->flags['apply_disabled_state'] = true;
-                //$temp_robot->flags['hidden'] = true;
-                $temp_robot->update_session();
-                // Create an empty field to remove any leftover frames
-                $this_battle->events_create(false, false, '', '');
-                // Continue
-                continue;
-            }
-
-            // If this robot has any attachments, loop through them
-            if (!empty($temp_robot->robot_attachments)){
-                //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has attachments');
-                foreach ($temp_robot->robot_attachments AS $attachment_token => $attachment_info){
-                    //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has attachments '.$attachment_token);
-
-                    // If this attachment has a duration set
-                    if (isset($attachment_info['attachment_duration'])){
-                        //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has attachments '.$attachment_token.' duration '.$attachment_info['attachment_duration']);
-
-                        // If the duration is not empty, decrement it and continue
-                        if ($attachment_info['attachment_duration'] > 0){
-
-                            // Decrement the duration for this attachment and update session
-                            $attachment_info['attachment_duration'] = $attachment_info['attachment_duration'] - 1;
-                            $temp_robot->robot_attachments[$attachment_token] = $attachment_info;
-                            $temp_robot->update_session();
-                            //$this_battle->events_create(false, false, 'DEBUG_'.__LINE__, $temp_robot->robot_token.' checkpoint has attachments '.$attachment_token.' duration '.$temp_robot->robot_attachments[$attachment_token]['attachment_duration']);
-
-                        }
-                        // Otherwise, trigger the destory action for this attachment
-                        else {
-
-                            // Remove this attachment before we inflict damage/recovery on the robot
-                            unset($temp_robot->robot_attachments[$attachment_token]);
-                            $temp_robot->update_session();
-
-                            // If this attachment has a DESTROY action defined
-                            if ($attachment_info['attachment_destroy'] !== false){
-
-                                // Create the attachment object from available data
-                                $attachment_info['flags']['is_attachment'] = true;
-                                if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
-                                $temp_attachment = rpg_game::get_ability($this_battle, $this_player, $temp_robot, $attachment_info);
-
-                                // Collect the attachment trigger type before processing
-                                $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
-
-                                // If this destory action deals DAMAGAE to the holder
-                                if ($temp_trigger_type == 'damage'){
-                                    $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
-                                    $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
-                                    $temp_attachment->update_session();
-                                    $temp_damage_kind = $attachment_info['attachment_destroy']['kind'];
-                                    $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array('apply_modifiers' => false);
-                                    if (isset($attachment_info['attachment_'.$temp_damage_kind])){
-                                        $temp_damage_amount = $attachment_info['attachment_'.$temp_damage_kind];
-                                        $temp_robot->trigger_damage($temp_robot, $temp_attachment, $temp_damage_amount, true, $temp_trigger_options);
-                                    }
-                                }
-                                // Else if this destroy action deals RECOVERY to the holder
-                                elseif ($temp_trigger_type == 'recovery'){
-                                    $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
-                                    $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
-                                    $temp_attachment->update_session();
-                                    $temp_recovery_kind = $attachment_info['attachment_destroy']['kind'];
-                                    $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array('apply_modifiers' => false);
-                                    if (isset($attachment_info['attachment_'.$temp_recovery_kind])){
-                                        $temp_recovery_amount = $attachment_info['attachment_'.$temp_recovery_kind];
-                                        $temp_robot->trigger_recovery($temp_robot, $temp_attachment, $temp_recovery_amount, true, $temp_trigger_options);
-                                    }
-                                }
-                                // Otherwise if this destroy action has SPECIAL properties
-                                elseif ($temp_trigger_type == 'special'){
-                                    $temp_attachment->target_options_update($attachment_info['attachment_destroy']);
-                                    $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
-                                    $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
-                                    $temp_attachment->update_session();
-                                    $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array();
-                                    $temp_robot->trigger_damage($temp_robot, $temp_attachment, 0, false, $temp_trigger_options);
-                                }
-
-                                // If this player no longer has active robots
-                                if ($this_player->counters['robots_active'] < 1){
-                                    // Trigger the battle complete event
-                                    $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
-                                }
-
-                                // Create an empty field to remove any leftover frames
-                                $this_battle->events_create(false, false, '', '');
-
-                            }
-                        }
-                    }
-
-                }
-            }
-
-        }
-
-        // Return true on success
-        return true;
-
-    }
-
-    // -- CHECK WEAPONS FUNCTION -- //
-
-    // Define a function for checking weapons status
-    public static function temp_check_robot_weapons($this_battle, $this_player, $this_robot, $target_player, $target_robot, $regen_weapons = true){
-
-        // Loop through all the target player's robots and carry out any end-turn events
-        $temp_robot = false;
-        foreach ($this_player->values['robots_active'] AS $temp_robotinfo){
-
-            // Create the temp robot object for checking
-            $temp_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
-
-            // Ensure this robot has not been disabled already
-            if ($temp_robotinfo['robot_status'] == 'disabled'){
-                // Hide robot and update session
-                $temp_robot->flags['apply_disabled_state'] = true;
-                //$temp_robot->flags['hidden'] = true;
-                $temp_robot->update_session();
-                // Create an empty field to remove any leftover frames
-                $this_battle->events_create(false, false, '', '');
-                // Continue
-                continue;
-            }
-
-            // If this robot is not at full weapon energy, increase it by one
-            if ($temp_robot->robot_weapons < $temp_robot->robot_base_weapons
-                || $temp_robot->robot_attack < $temp_robot->robot_base_attack
-                || $temp_robot->robot_defense < $temp_robot->robot_base_defense
-                || $temp_robot->robot_speed < $temp_robot->robot_base_speed){
-                // Ensure the regen weapons flag has been set to true
-                if ($regen_weapons){
-                    // Define the multiplier based on position
-                    $temp_multiplier = $temp_robot->robot_position == 'bench' ? 2 : 1;
-                    // Increment this robot's weapons by one point and update
-                    $temp_robot->robot_weapons += MMRPG_SETTINGS_RECHARGE_WEAPONS * $temp_multiplier;
-                    // If any of this robot's stats are in break, recover by one
-                    if ($temp_robot->robot_attack <= 0){ $temp_robot->robot_attack += MMRPG_SETTINGS_RECHARGE_ATTACK * $temp_multiplier; }
-                    if ($temp_robot->robot_defense <= 0){ $temp_robot->robot_defense += MMRPG_SETTINGS_RECHARGE_DEFENSE * $temp_multiplier; }
-                    if ($temp_robot->robot_speed <= 0){ $temp_robot->robot_speed += MMRPG_SETTINGS_RECHARGE_SPEED * $temp_multiplier; }
-                    // If this robot is over its base, zero it out
-                    if ($temp_robot->robot_weapons > $temp_robot->robot_base_weapons){ $temp_robot->robot_weapons = $temp_robot->robot_base_weapons; }
-                }
-                // Update just to be sure
-                $temp_robot->update_session();
-                // If this robot was in the active position, create a frame
-                if ($temp_robot->robot_position == 'active'){
-                    // Create an empty field to remove any leftover frames
-                    //$this_battle->events_create(false, false, '', '');
-                }
-            }
-
-        }
-
-        // Return true on success
-        return true;
-
-    }
-
 
     // Define a function for generating star console variables
     public function star_console_markup($options, $player_data, $robot_data){

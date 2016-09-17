@@ -689,6 +689,23 @@ class rpg_robot extends rpg_object {
 
         }
 
+        // If this robot is holder a relavant item, apply stat upgrades
+        $this_robot_item = $this->get_item();
+        switch ($this_robot_item){
+            // If this robot is holding an Energy Upgrade, double the life energy stat
+            case 'energy-upgrade' : {
+                $this->robot_energy = $this->robot_energy * 2;
+                $this->robot_base_energy = $this->robot_base_energy * 2;
+                break;
+            }
+            // Else if this robot is holding a Weapon Upgrade, double the weapon energy stat
+            case 'weapon-upgrade' : {
+                $this->robot_weapons = $this->robot_weapons * 2;
+                $this->robot_base_weapons = $this->robot_base_weapons * 2;
+                break;
+            }
+        }
+
         // Create the stat boost flag
         $this->flags['apply_stat_bonuses'] = true;
 
@@ -3994,6 +4011,524 @@ class rpg_robot extends rpg_object {
     public static function calculate_level_boosted_stat($base, $level){
         $stat_boost = round( $base + ($base * 0.05 * ($level - 1)) );
         return $stat_boost;
+    }
+
+
+    // -- END-OF-TURN CHECK FUNCTIONS -- //
+
+    // Define a function for checking attachment status
+    public function check_attachments(rpg_player $target_player, rpg_robot $target_robot){
+
+        // Collect references to global objects
+        $db = cms_database::get_database();
+        $this_battle = rpg_battle::get_battle();
+        $this_field = rpg_field::get_field();
+
+        // Collect references to relative player and robot objects
+        $this_player = $this->player;
+        $this_robot = $this;
+
+        // Hide any disabled robots and return
+        if ($this_robot->get_status() == 'disabled'){
+            $this_robot->set_flag('apply_disabled_state', true);
+            $this_battle->events_create();
+            return;
+        }
+
+        // If this robot has any attachments, loop through them
+        if ($this_robot->has_attachments()){
+            $attachment_action_flag = false;
+            $attachment_key = 0;
+            $robot_attachments = $this_robot->get_attachments();
+            foreach ($robot_attachments AS $attachment_token => $attachment_info){
+
+                $attachment_debug_token = str_replace('ability_', '', $attachment_token);
+                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has attachment '.$attachment_debug_token);
+
+                // Collect or load the attachment into memory
+                $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $attachment_info);
+
+                // ATTACHMENT DURATION
+                // If this attachment has DURATION counter
+                if (isset($attachment_info['attachment_duration'])){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' has duration '.$attachment_info['attachment_duration']);
+
+                    // DURATION COUNT -1
+                    // If the duration is not empty, decrement it and continue
+                    if ($attachment_info['attachment_duration'] > 0){
+
+                        $attachment_info['attachment_duration'] = $attachment_info['attachment_duration'] - 1;
+                        $this_robot->set_attachment($attachment_token, $attachment_info);
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' duration decreased to '.$attachment_info['attachment_duration']);
+
+                    }
+                    // DURATION EXPIRED
+                    // Otherwise, trigger the destroy action for this attachment
+                    else {
+
+                        // Remove this attachment and inflict damage on the robot
+                        $this_robot->unset_attachment($attachment_token);
+
+                        // ATTACHMENT DESTROY
+                        if ($attachment_info['attachment_destroy'] !== false){
+
+                            $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
+                            $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' duration ended and has '.$temp_trigger_type.' trigger!');
+
+                            // DESTORY DAMAGE
+                            if ($temp_trigger_type == 'damage'){
+
+                                $this_attachment->damage_options_update($attachment_info['attachment_destroy']);
+                                $this_attachment->recovery_options_update($attachment_info['attachment_destroy']);
+                                $temp_damage_kind = $attachment_info['attachment_destroy']['kind'];
+                                $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array('apply_modifiers' => false);
+                                if (isset($attachment_info['attachment_'.$temp_damage_kind])){
+
+                                    // Collect the base damage amount
+                                    $temp_damage_amount = $attachment_info['attachment_'.$temp_damage_kind];
+                                    $temp_stat_amount = $this_robot->get_stat($temp_damage_kind);
+                                    $temp_stat_base_amount = $this_robot->get_base_stat($temp_damage_kind);
+
+                                    // If an attachment damage percent was provided, recalculate from current stat
+                                    if (isset($attachment_info['attachment_'.$temp_damage_kind.'_percent'])){
+                                        $temp_damage_amount = ceil($temp_stat_amount * ($attachment_info['attachment_'.$temp_damage_kind.'_percent'] / 100));
+                                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_damage_kind.' damage of '.$attachment_info['attachment_'.$temp_damage_kind.'_percent'].'% of current <br /> ceil('.$temp_stat_amount.' * ('.$attachment_info['attachment_'.$temp_damage_kind.'_percent'].' / 100)) = '.$temp_damage_amount.'');
+                                    }
+                                    // Else if an attachment damage base percent was provided, recalculate from base stat
+                                    elseif (isset($attachment_info['attachment_'.$temp_damage_kind.'_base_percent'])){
+                                        $temp_damage_amount = ceil($temp_stat_base_amount * ($attachment_info['attachment_'.$temp_damage_kind.'_base_percent'] / 100));
+                                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_damage_kind.' damage of '.$attachment_info['attachment_'.$temp_damage_kind.'_base_percent'].'% of base <br /> ceil('.$temp_stat_base_amount.' * ('.$attachment_info['attachment_'.$temp_damage_kind.'_base_percent'].' / 100)) = '.$temp_damage_amount.'');
+                                    }
+                                    // Otherwise attachment damage should be calculated normally
+                                    else {
+                                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_damage_kind.' damage of '.$temp_damage_amount.'!');
+                                    }
+
+                                    // If this is energy we're dealing with, we must respect min and max limits
+                                    if ($temp_damage_kind == 'energy' && ($temp_stat_amount - $temp_damage_amount) < 0){
+                                        $temp_damage_amount = $temp_stat_amount;
+                                        $attachment_info['attachment_'.$temp_damage_kind.'_base_percent'] = round(($temp_damage_amount / $temp_stat_base_amount) * 100);
+                                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' '.$temp_damage_kind.' damage too high, changed to '.$attachment_info['attachment_'.$temp_damage_kind.'_base_percent'].'% of base or '.$temp_damage_amount.' / '.$temp_stat_base_amount);
+                                    }
+
+                                    // Only deal damage if the amount was greater than zero
+                                    if ($temp_damage_amount > 0){ $this_robot->trigger_damage($this_robot, $this_attachment, $temp_damage_amount, false, $temp_trigger_options); }
+                                    if ($this_attachment->ability_results['this_result'] != 'failure' && $this_attachment->ability_results['this_amount'] > 0){ $attachment_action_flag = true; }
+
+                                } else {
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' '.$temp_damage_kind.' damage amount not found!');
+                                }
+
+                            }
+                            // DESTROY RECOVERY
+                            elseif ($temp_trigger_type == 'recovery'){
+
+                                $this_attachment->recovery_options_update($attachment_info['attachment_destroy']);
+                                $this_attachment->damage_options_update($attachment_info['attachment_destroy']);
+                                $temp_recovery_kind = $attachment_info['attachment_destroy']['kind'];
+                                $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array('apply_modifiers' => false);
+                                if (isset($attachment_info['attachment_'.$temp_recovery_kind])){
+
+                                    // Collect the base recovery amount
+                                    $temp_recovery_amount = $attachment_info['attachment_'.$temp_recovery_kind];
+                                    $temp_stat_amount = $this_robot->get_stat($temp_recovery_kind);
+                                    $temp_stat_base_amount = $this_robot->get_base_stat($temp_recovery_kind);
+
+                                    // If an attachment recovery percent was provided, recalculate from current stat
+                                    if (isset($attachment_info['attachment_'.$temp_recovery_kind.'_percent'])){
+                                        $temp_recovery_amount = ceil($temp_stat_amount * ($attachment_info['attachment_'.$temp_recovery_kind.'_percent'] / 100));
+                                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_recovery_kind.' recovery of '.$attachment_info['attachment_'.$temp_recovery_kind.'_percent'].'% of current <br /> ceil('.$temp_stat_amount.' * ('.$attachment_info['attachment_'.$temp_recovery_kind.'_percent'].' / 100)) = '.$temp_recovery_amount.'');
+                                    }
+                                    // Else if an attachment recovery base percent was provided, recalculate from base stat
+                                    elseif (isset($attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'])){
+                                        $temp_recovery_amount = ceil($temp_stat_base_amount * ($attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'] / 100));
+                                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_recovery_kind.' recovery of '.$attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'].'% of base <br /> ceil('.$temp_stat_base_amount.' * ('.$attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'].' / 100)) = '.$temp_recovery_amount.'');
+                                    }
+                                    // Otherwise attachment recovery should be calculated normally
+                                    else {
+                                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_recovery_kind.' recovery of '.$temp_recovery_amount.'!');
+                                    }
+
+                                    // If this is energy we're dealing with, we must respect min and max limits
+                                    if ($temp_recovery_kind == 'energy' && ($temp_stat_amount + $temp_recovery_amount) > $temp_stat_base_amount){
+                                        $temp_recovery_amount = $temp_stat_base_amount - $temp_stat_amount;
+                                        $attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'] = round(($temp_recovery_amount / $temp_stat_base_amount) * 100);
+                                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' '.$temp_recovery_kind.' recovery too high, changed to '.$attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'].'% of base or '.$temp_recovery_amount.' / '.$temp_stat_base_amount);
+                                    }
+
+                                    // Only deal recovery if the amount was greater than zero
+                                    if ($temp_recovery_amount > 0){ $this_robot->trigger_recovery($this_robot, $this_attachment, $temp_recovery_amount, false, $temp_trigger_options); }
+                                    $temp_results = $this_attachment->get_results();
+                                    if ($temp_results['this_result'] != 'failure' && $temp_results['this_amount'] > 0){ $attachment_action_flag = true; }
+
+                                } else {
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' '.$temp_recovery_kind.' recovery amount not found!');
+                                }
+
+                            }
+                            // DESTROY SPECIAL
+                            elseif ($temp_trigger_type == 'special'){
+
+                                $this_attachment->target_options_update($attachment_info['attachment_destroy']);
+                                $this_attachment->recovery_options_update($attachment_info['attachment_destroy']);
+                                $this_attachment->damage_options_update($attachment_info['attachment_destroy']);
+                                $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array();
+                                $this_robot->trigger_damage($this_robot, $this_attachment, 0, false, $temp_trigger_options);
+                                $attachment_action_flag = true;
+
+                            }
+
+                            // If the temp robot was disabled, trigger the event
+                            if ($this_robot->get_energy() < 1){
+                                $this_robot->trigger_disabled($target_robot, $this_attachment);
+                                // If this the player's last robot
+                                $active_robots = $this_player->get_robots_active();
+                                if (empty($active_robots)){
+                                    // Trigger the battle complete event
+                                    $this_battle->trigger_complete($target_player, $target_robot, $this_player, $this_robot);
+                                    $attachment_action_flag = true;
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+
+                // ATTACHMENT REPEAT
+                // If this attachment has REPEAT effects
+                if (!empty($attachment_info['attachment_repeat'])){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' has repeat!');
+
+                        $temp_trigger_type = !empty($attachment_info['attachment_repeat']['trigger']) ? $attachment_info['attachment_repeat']['trigger'] : 'damage';
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' has '.$temp_trigger_type.' trigger!');
+
+                        // REPEAT DAMAGE
+                        if ($temp_trigger_type == 'damage'){
+
+                            // Define the system word based on the stat kind
+                            $temp_damage_kind = $attachment_info['attachment_repeat']['kind'];
+                            $temp_damage_words = rpg_functions::get_stat_damage_words($temp_damage_kind);
+
+                            // Update the success message to reflect the current target
+                            $attachment_info['attachment_repeat']['success'] = array(9, -10, -10, -10, 'The '.$this_attachment->print_name().' '.$temp_damage_words['action'].' '.$this_robot->print_name().'&#39;s '.$temp_damage_words['object'].' systems!');
+                            $this_attachment->damage_options_update($attachment_info['attachment_repeat']);
+                            $this_attachment->recovery_options_update($attachment_info['attachment_repeat']);
+                            $temp_trigger_options = isset($attachment_info['attachment_repeat']['options']) ? $attachment_info['attachment_repeat']['options'] : array('apply_modifiers' => false);
+                            if (isset($attachment_info['attachment_'.$temp_damage_kind])){
+
+                                // Collect the base damage amount
+                                $temp_damage_amount = $attachment_info['attachment_'.$temp_damage_kind];
+                                $temp_stat_amount = $this_robot->get_stat($temp_damage_kind);
+                                $temp_stat_base_amount = $this_robot->get_base_stat($temp_damage_kind);
+
+                                // If an attachment damage percent was provided, recalculate from current stat
+                                if (isset($attachment_info['attachment_'.$temp_damage_kind.'_percent'])){
+                                    $temp_damage_amount = ceil($temp_stat_amount * ($attachment_info['attachment_'.$temp_damage_kind.'_percent'] / 100));
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_damage_kind.' damage of '.$attachment_info['attachment_'.$temp_damage_kind.'_percent'].'% of current <br /> ceil('.$temp_stat_amount.' * ('.$attachment_info['attachment_'.$temp_damage_kind.'_percent'].' / 100)) = '.$temp_damage_amount.'');
+                                }
+                                // Else if an attachment damage base percent was provided, recalculate from base stat
+                                elseif (isset($attachment_info['attachment_'.$temp_damage_kind.'_base_percent'])){
+                                    $temp_damage_amount = ceil($temp_stat_base_amount * ($attachment_info['attachment_'.$temp_damage_kind.'_base_percent'] / 100));
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_damage_kind.' damage of '.$attachment_info['attachment_'.$temp_damage_kind.'_base_percent'].'% of base <br /> ceil('.$temp_stat_base_amount.' * ('.$attachment_info['attachment_'.$temp_damage_kind.'_base_percent'].' / 100)) = '.$temp_damage_amount.'');
+                                }
+                                // Otherwise attachment damage should be calculated normally
+                                else {
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_damage_kind.' damage of '.$temp_damage_amount.'!');
+                                }
+
+                                // If this is energy we're dealing with, we must respect min and max limits
+                                if ($temp_damage_kind == 'energy' && ($temp_stat_amount - $temp_damage_amount) < 0){
+                                    $temp_damage_amount = $temp_stat_amount;
+                                    $attachment_info['attachment_'.$temp_damage_kind.'_base_percent'] = round(($temp_damage_amount / $temp_stat_base_amount) * 100);
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' '.$temp_damage_kind.' damage too high, changed to '.$attachment_info['attachment_'.$temp_damage_kind.'_base_percent'].'% of base or '.$temp_damage_amount.' / '.$temp_stat_base_amount);
+                                }
+
+                                // Only deal damage if the amount was greater than zero
+                                if ($temp_damage_amount > 0){ $this_robot->trigger_damage($this_robot, $this_attachment, $temp_damage_amount, false, $temp_trigger_options); }
+                                $temp_results = $this_attachment->get_results();
+                                if ($temp_results['this_result'] != 'failure' && $temp_results['this_amount'] > 0){ $attachment_action_flag = true; }
+
+                            } else {
+                                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' '.$temp_damage_kind.' damage amount not found!');
+                            }
+
+                        }
+                        // REPEAT RECOVERY
+                        elseif ($temp_trigger_type == 'recovery'){
+
+                            // Define the system word based on the stat kind
+                            $temp_recovery_kind = $attachment_info['attachment_repeat']['kind'];
+                            $temp_recovery_words = rpg_functions::get_stat_recovery_words($temp_recovery_kind);
+
+                            // Update the success message to reflect the current target
+                            $attachment_info['attachment_repeat']['success'] = array(9, -10, -10, -10, 'The '.$this_attachment->print_name().' '.$temp_recovery_words['action'].' '.$this_robot->print_name().'&#39;s '.$temp_recovery_words['object'].' systems!');
+                            $this_attachment->recovery_options_update($attachment_info['attachment_repeat']);
+                            $this_attachment->damage_options_update($attachment_info['attachment_repeat']);
+                            $temp_trigger_options = isset($attachment_info['attachment_repeat']['options']) ? $attachment_info['attachment_repeat']['options'] : array('apply_modifiers' => false);
+                            if (isset($attachment_info['attachment_'.$temp_recovery_kind])){
+
+                                // Collect the base recovery amount
+                                $temp_recovery_amount = $attachment_info['attachment_'.$temp_recovery_kind];
+                                $temp_stat_amount = $this_robot->get_stat($temp_recovery_kind);
+                                $temp_stat_base_amount = $this_robot->get_base_stat($temp_recovery_kind);
+
+                                // If an attachment recovery percent was provided, recalculate from current stat
+                                if (isset($attachment_info['attachment_'.$temp_recovery_kind.'_percent'])){
+                                    $temp_recovery_amount = ceil($temp_stat_amount * ($attachment_info['attachment_'.$temp_recovery_kind.'_percent'] / 100));
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_recovery_kind.' recovery of '.$attachment_info['attachment_'.$temp_recovery_kind.'_percent'].'% of current <br /> ceil('.$temp_stat_amount.' * ('.$attachment_info['attachment_'.$temp_recovery_kind.'_percent'].' / 100)) = '.$temp_recovery_amount.'');
+                                }
+                                // Else if an attachment recovery base percent was provided, recalculate from base stat
+                                elseif (isset($attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'])){
+                                    $temp_recovery_amount = ceil($temp_stat_base_amount * ($attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'] / 100));
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_recovery_kind.' recovery of '.$attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'].'% of base <br /> ceil('.$temp_stat_base_amount.' * ('.$attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'].' / 100)) = '.$temp_recovery_amount.'');
+                                }
+                                // Otherwise attachment recovery should be calculated normally
+                                else {
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers '.$temp_recovery_kind.' recovery of '.$temp_recovery_amount.'!');
+                                }
+
+                                // If this is energy we're dealing with, we must respect min and max limits
+                                if ($temp_recovery_kind == 'energy' && ($temp_stat_amount + $temp_recovery_amount) > $temp_stat_base_amount){
+                                    $temp_recovery_amount = $temp_stat_base_amount - $temp_stat_amount;
+                                    $attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'] = round(($temp_recovery_amount / $temp_stat_base_amount) * 100);
+                                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' '.$temp_recovery_kind.' recovery too high, changed to '.$attachment_info['attachment_'.$temp_recovery_kind.'_base_percent'].'% of base or '.$temp_recovery_amount.' / '.$temp_stat_base_amount);
+                                }
+
+                                // Only deal recovery if the amount was greater than zero
+                                if ($temp_recovery_amount > 0){ $this_robot->trigger_recovery($this_robot, $this_attachment, $temp_recovery_amount, false, $temp_trigger_options); }
+                                $temp_results = $this_attachment->get_results();
+                                if ($temp_results['this_result'] != 'failure' && $temp_results['this_amount'] > 0){ $attachment_action_flag = true; }
+
+                            } else {
+                                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' '.$temp_recovery_kind.' recovery amount not found!');
+                            }
+
+                        }
+                        // REPEAT SPECIAL
+                        elseif ($temp_trigger_type == 'special'){
+
+                            $this_attachment->target_options_update($attachment_info['attachment_repeat']);
+                            $this_attachment->recovery_options_update($attachment_info['attachment_repeat']);
+                            $this_attachment->damage_options_update($attachment_info['attachment_repeat']);
+                            $this_attachment->update_session();
+                            $temp_trigger_options = isset($attachment_info['attachment_repeat']['options']) ? $attachment_info['attachment_repeat']['options'] : array();
+                            $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers special!');
+                            $this_robot->trigger_damage($this_robot, $this_attachment, 0, false, $temp_trigger_options);
+                            $attachment_action_flag = true;
+
+                        }
+
+                        // If the temp robot was disabled, trigger the event
+                        if ($temp_stat_amount < 1){
+                            $this_robot->trigger_disabled($target_robot, $this_attachment);
+                            // If this the player's last robot
+                            if ($this_player->counters['robots_active'] < 1){
+                                // Trigger the battle complete event
+                                $this_battle->trigger_complete($target_player, $target_robot, $this_player, $this_robot);
+                                $attachment_action_flag = true;
+                            }
+                        }
+
+                }
+
+                $attachment_key++;
+
+            }
+
+            // Create an empty field to remove any leftover frames
+            if ($attachment_action_flag){ $this_battle->events_create(); }
+
+        }
+
+    }
+
+    // Define a function for checking ttem status
+    public function check_items(rpg_player $target_player, rpg_robot $target_robot){
+
+        // Collect references to global objects
+        $db = cms_database::get_database();
+        $this_battle = rpg_battle::get_battle();
+        $this_field = rpg_field::get_field();
+
+        // Collect references to relative player and robot objects
+        $this_player = $this->player;
+        $this_robot = $this;
+
+        // Hide any disabled robots and return
+        if ($this_robot->get_status() == 'disabled'){
+            $this_robot->set_flag('apply_disabled_state', true);
+            $this_battle->events_create();
+            return;
+        }
+
+        // If this robot has an item attached, process actions
+        if ($this_robot->has_item()){
+            $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has item '.$this_robot->get_item());
+
+            // Define the item info based on token and load into memory
+            $item_token = $this_robot->get_item();
+            $item_info = array(
+                'flags' => array('is_part' => true),
+                'part_token' => 'item_'.$item_token,
+                'item_token' => $item_token
+                );
+            //$this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has item '.$item_token.'<br /> $item_info:'.preg_replace('/\s+/', ' ', print_r($item_info, true)));
+            $this_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_info);
+            //$this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has item '.$item_token.'<br /> $this_item:'.preg_replace('/\s+/', ' ', print_r($this_item->export_array(), true)));
+
+            // If the robot is holding a Field Booster item, increase multiplier
+            if ($item_token == 'field-booster'){
+
+                // Define the item object and trigger info
+                $temp_core_type = $this_robot->get_core();
+                $temp_field_type = $this_field->get_type();
+                if (empty($temp_core_type)){ $temp_boost_type = 'recovery'; }
+                elseif ($temp_core_type == 'empty'){ $temp_boost_type = 'damage'; }
+                else { $temp_boost_type = $temp_core_type; }
+                if (!isset($this_field->field_multipliers[$temp_boost_type]) || $this_field->field_multipliers[$temp_boost_type] < MMRPG_SETTINGS_MULTIPLIER_MAX){
+
+                    // Define this item's attachment token
+                    $this_star_index = rpg_prototype::star_image(!empty($temp_boost_type) ? $temp_boost_type : 'none');
+                    $this_sprite_sheet = 'field-support';
+                    $this_attachment_token = 'item_field-booster';
+                    $this_attachment_info = array(
+                        'class' => 'item',
+                        'attachment_token' => $this_attachment_token,
+                        'item_token' => $item_token,
+                        'item_image' => $this_sprite_sheet.($this_star_index['sheet'] > 1 ? '-'.$this_star_index['sheet'] : ''),
+                        'item_frame' => $this_star_index['frame'],
+                        'item_frame_animate' => array($this_star_index['frame']),
+                        'item_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
+                        );
+
+                    // Attach this item attachment to this robot temporarily
+                    $this_robot->set_frame('taunt');
+                    $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
+
+                    // Create or increase the elemental booster for this field
+                    $temp_change_percent = round($this_item->get_recovery2() / 100, 1);
+                    $new_multiplier_value = $this_field->get_multiplier($temp_boost_type) + $temp_change_percent;
+                    if ($new_multiplier_value >= MMRPG_SETTINGS_MULTIPLIER_MAX){
+                        $temp_change_percent = $new_multiplier_value - MMRPG_SETTINGS_MULTIPLIER_MAX;
+                        $new_multiplier_value = MMRPG_SETTINGS_MULTIPLIER_MAX;
+                    }
+                    $this_field->set_multiplier($temp_boost_type, $new_multiplier_value);
+
+                    // Create the event to show this element boost
+                    if ($temp_change_percent > 0){
+                        $this_battle->events_create($this_robot, false, $this_field->field_name.' Multipliers',
+                            'The '.$this_item->print_name().' amplified the power of <span class="item_name item_type item_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).'</span> type moves!<br />'.
+                            'The <span class="item_name item_type item_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).'</span> field multiplier rose by <span class="item_name item_type">'.ceil($temp_change_percent * 100).'%</span>!',
+                            array('canvas_show_this_item_overlay' => true)
+                            );
+                    }
+
+                    // Remove this item attachment from this robot
+                    $this_robot->unset_attachment($this_attachment_token);
+
+                }
+
+            }
+            // Else the robot is holding an Attack Booster item, apply boosts
+            elseif ($item_token == 'attack-booster'){
+
+                // Define the item object and trigger info
+                $temp_recovery_amount = round($this_robot->get_base_attack() * ($this_item->get_recovery2() / 100));
+                $this_item->recovery_options_update(array(
+                    'kind' => 'attack',
+                    'frame' => 'taunt',
+                    'percent' => true,
+                    'modifiers' => false,
+                    'kickback' => array(0, 0, 0),
+                    'success' => array(9, -10, -10, -10, 'The '.$this_item->print_name().' improved '.$this_robot->print_name().'&#39;s weapon systems!'),
+                    'failure' => array(9, -10, -10, -10, '')
+                    ));
+
+
+                // Trigger stat recovery for the holding robot
+                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts attack by '.$temp_recovery_amount.' ('.$this_item->get_recovery2().'%)');
+                if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
+
+            }
+            // Else if the robot is holding an Defense Booster item, apply boosts
+            elseif ($item_token == 'defense-booster'){
+
+                // Define the item object and trigger info
+                $temp_recovery_amount = round($this_robot->get_base_defense() * ($this_item->get_recovery2() / 100));
+                $this_item->recovery_options_update(array(
+                    'kind' => 'defense',
+                    'frame' => 'taunt',
+                    'percent' => true,
+                    'modifiers' => false,
+                    'kickback' => array(0, 0, 0),
+                    'success' => array(9, -10, -10, -10, 'The '.$this_item->print_name().' improved '.$this_robot->print_name().'&#39;s shield systems!'),
+                    'failure' => array(9, -10, -10, -10, '')
+                    ));
+
+                // Trigger stat recovery for the holding robot
+                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts defense by '.$temp_recovery_amount.' ('.$this_item->get_recovery2().'%)');
+                if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
+
+            }
+            // Else if the robot is holding an Defense Booster item, apply boosts
+            elseif ($item_token == 'speed-booster'){
+
+                // Define the item object and trigger info
+                $temp_recovery_amount = round($this_robot->get_base_speed() * ($this_item->get_recovery2() / 100));
+                $this_item->recovery_options_update(array(
+                    'kind' => 'speed',
+                    'frame' => 'taunt',
+                    'percent' => true,
+                    'modifiers' => false,
+                    'kickback' => array(0, 0, 0),
+                    'success' => array(9, -10, -10, -10, 'The '.$this_item->print_name().' improved '.$this_robot->print_name().'&#39;s mobility systems!'),
+                    'failure' => array(9, -10, -10, -10, '')
+                    ));
+
+                // Trigger stat recovery for the holding robot
+                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts speed by '.$temp_recovery_amount.' ('.$this_item->get_recovery2().'%)');
+                if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
+
+            }
+
+        }
+
+    }
+
+    // Define a function for checking weapons status
+    public function check_weapons(rpg_player $target_player, rpg_robot $target_robot, $regen_weapons = true){
+
+        // Collect references to global objects
+        $db = cms_database::get_database();
+        $this_battle = rpg_battle::get_battle();
+        $this_field = rpg_field::get_field();
+
+        // Collect references to relative player and robot objects
+        $this_player = $this->player;
+        $this_robot = $this;
+
+        // Hide any disabled robots and return
+        if ($this_robot->get_status() == 'disabled'){
+            $this_robot->set_flag('apply_disabled_state', true);
+            $this_battle->events_create();
+            return;
+        }
+
+        // If this robot is not at full weapon energy, increase it by one
+        $temp_weapons = $this_robot->get_weapons();
+        $temp_base_weapons = $this_robot->get_base_weapons();
+        if ($temp_weapons < $temp_base_weapons){
+            // Ensure the regen weapons flag has been set to true
+            if ($regen_weapons){
+                // Define the multiplier based on position
+                $temp_multiplier = $this_robot->get_position() == 'bench' ? 2 : 1;
+                // Increment this robot's weapons by one point and update
+                $temp_weapons += MMRPG_SETTINGS_RECHARGE_WEAPONS * $temp_multiplier;
+                $this_robot->set_weapons($temp_weapons);
+            }
+        }
+
     }
 
 
