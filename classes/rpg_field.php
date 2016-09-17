@@ -34,6 +34,17 @@ class rpg_field extends rpg_object {
 
     }
 
+    /**
+     * Return a reference to the global field object
+     * @return rpg_field
+     */
+    public static function get_field(){
+        $this_battle = rpg_battle::get_battle();
+        $this_field = isset($GLOBALS['this_field']) ? $GLOBALS['this_field'] : new rpg_field($this_battle);
+        $this_field->trigger_onload();
+        return $this_field;
+    }
+
     // Define a public function for manually loading data
     public function field_load($this_fieldinfo){
         // Pull in the global index
@@ -386,6 +397,565 @@ class rpg_field extends rpg_object {
             'history' => $this->history
             );
 
+    }
+
+
+    // -- ID FUNCTIONS -- //
+
+    /**
+     * Get the ID of this field object
+     * @return integer
+     */
+    public function get_id(){
+        return intval($this->get_info('field_id'));
+    }
+
+    /**
+     * Set the ID of this field object
+     * @param int $value
+     */
+    public function set_id($value){
+        $this->set_info('field_id', intval($value));
+    }
+
+    // -- NAME FUNCTIONS -- //
+
+    /**
+     * Get the name of this field object
+     * @return string
+     */
+    public function get_name(){
+        return $this->get_info('field_name');
+    }
+
+    /**
+     * Set the name of this field object
+     * @param string $value
+     */
+    public function set_name($name){
+        $this->set_info('field_name', $name);
+    }
+
+    /**
+     * Get the base name of this field object
+     * @return string value
+     */
+    public function get_base_name(){
+        return $this->get_info('field_base_name');
+    }
+
+    /**
+     * Set the base name of this field object
+     * @param string $value
+     */
+    public function set_base_name($name){
+        $this->set_info('field_base_name', $name);
+    }
+
+
+    // -- TOKEN FUNCTIONS -- //
+
+    /**
+     * Get the token of this field object
+     * @return string
+     */
+    public function get_token(){
+        return $this->get_info('field_token');
+    }
+
+    /**
+     * Set the token of this field object
+     * @param string $value
+     */
+    public function set_token($token){
+        $this->set_info('field_token', $token);
+    }
+
+
+    // -- DESCRIPTION FUNCTIONS -- //
+
+    /**
+     * Get the description of this field object
+     * @return string
+     */
+    public function get_description(){
+        return $this->get_info('field_description');
+    }
+
+    /**
+     * Set the description of this field object
+     * @param string $description
+     */
+    public function set_description($description){
+        $this->set_info('field_description', $description);
+    }
+
+    /**
+     * Get the base description of this field object
+     * @return string
+     */
+    public function get_base_description(){
+        return $this->get_info('field_base_description');
+    }
+
+    /**
+     * Set the base description of this field object
+     * @param string $description
+     */
+    public function set_base_description($description){
+        $this->set_info('field_base_description', $description);
+    }
+
+
+    // -- TYPE FUNCTIONS -- //
+
+    /**
+     * Get the elemental type of this field object
+     * @return string
+     */
+    public function get_type(){
+        return $this->get_info('field_type');
+    }
+
+    /**
+     * Set the elemental type of this field object
+     * @param string $type
+     */
+    public function set_type($type){
+        $this->set_info('field_type', $type);
+    }
+
+    /**
+     * Get the base elemental type of this field object
+     * @return string
+     */
+    public function get_base_type(){
+        return $this->get_info('field_base_type');
+    }
+
+    /**
+     * Set the base elemental type of this field object
+     * @param string $type
+     */
+    public function set_base_type($type){
+        $this->set_info('field_base_type', $type);
+    }
+
+    /**
+     * Get the elemental type2 of this field object
+     * @return string
+     */
+    public function get_type2(){
+        return $this->get_info('field_type2');
+    }
+
+    /**
+     * Set the elemental type2 of this field object
+     * @param string $type2
+     */
+    public function set_type2($type2){
+        $this->set_info('field_type2', $type2);
+    }
+
+    /**
+     * Get the base elemental type2 of this field object
+     * @return string
+     */
+    public function get_base_type2(){
+        return $this->get_info('field_base_type2');
+    }
+
+    /**
+     * Set the base elemental type2 of this field object
+     * @param string $type2
+     */
+    public function set_base_type2($type2){
+        $this->set_info('field_base_type2', $type2);
+    }
+
+
+    // -- GROUP FUNCTIONS -- //
+
+    /**
+     * Get the group token of this field object
+     * @return string
+     */
+    public function get_group(){
+        return $this->get_info('field_group');
+    }
+
+    /**
+     * Set the group token of this field object
+     * @param string $type2
+     */
+    public function set_group($token){
+        $this->set_info('field_group', $token);
+    }
+
+    // -- MULTIPLIER FUNCTIONS -- //
+
+    /**
+     * Get the elemental multipliers for this field object
+     * @return array
+     */
+    public function get_multipliers(){
+        return $this->get_info('field_multipliers');
+    }
+
+    /**
+     * Set the elemental multipliers for this field object
+     * @param array $multipliers
+     */
+    public function set_multipliers($multipliers){
+        $this->set_info('field_multipliers', $multipliers);
+    }
+
+    /**
+     * Get the base elemental multipliers for this field object
+     * @return array
+     */
+    public function get_base_multipliers(){
+        return $this->get_info('field_base_multipliers');
+    }
+
+    /**
+     * Set the base elemental multipliers for this field object
+     * @param array $multipliers
+     */
+    public function set_base_multipliers($multipliers){
+        $this->set_info('field_base_multipliers', $multipliers);
+    }
+
+    /**
+     * Get the value of one of this field object's elemental multipliers
+     * @param string $type
+     * @return float
+     */
+    public function get_multiplier($type){
+        $multiplier = $this->get_info('field_multipliers', $type);
+        return !empty($multiplier) ? $multiplier : 1;
+    }
+
+    /**
+     * Set the value of one of this field objects's elemental multipliers
+     * @param string $type
+     * @param float $value
+     */
+    public function set_multiplier($type, $value){
+        $this->set_info('field_multipliers', $type, $value);
+        $new_value = $this->get_info('field_multipliers', $type);
+        if ($new_value > MMRPG_SETTINGS_MULTIPLIER_MAX){ $this->set_info('field_multipliers', $type, MMRPG_SETTINGS_MULTIPLIER_MAX); }
+        elseif ($new_value < MMRPG_SETTINGS_MULTIPLIER_MIN){ $this->set_info('field_multipliers', $type, MMRPG_SETTINGS_MULTIPLIER_MIN); }
+    }
+
+    /**
+     * Get the value of one of this field objects's base elemental multipliers
+     * @param string $type
+     * @return float
+     */
+    public function get_base_multiplier($type){
+        $multiplier = $this->get_info('field_base_multipliers', $type);
+        return !empty($multiplier) ? $multiplier : 1;
+    }
+
+    /**
+     * Set the value of one of this field object's base elemental multipliers
+     * @param string $type
+     * @param float $value
+     */
+    public function set_base_multiplier($type, $value){
+        $this->set_info('field_base_multipliers', $type, $value);
+        $new_value = $this->get_info('field_base_multipliers', $type);
+        if ($new_value > MMRPG_SETTINGS_MULTIPLIER_MAX){ $this->set_info('field_base_multipliers', $type, MMRPG_SETTINGS_MULTIPLIER_MAX); }
+        elseif ($new_value < MMRPG_SETTINGS_MULTIPLIER_MIN){ $this->set_info('field_base_multipliers', $type, MMRPG_SETTINGS_MULTIPLIER_MIN); }
+    }
+
+    /**
+     * Reset the value of one of this field's base elemental multipliers by type token
+     * @param string $type
+     */
+    public function reset_multiplier($type){
+        $multiplier = $this->get_base_multiplier($type);
+        $this->set_info('field_multipliers', $type, $multiplier);
+    }
+
+    // -- OVERLAY FUNCTIONS -- //
+
+    /**
+     * Get the list of image overlays for this field object
+     * @return array
+     */
+    public function get_overlays(){
+        return $this->get_info('field_overlays');
+    }
+
+    /**
+     * Set the list of image overlays for this field object
+     * @param array $overlays
+     */
+    public function set_overlays($overlays){
+        $this->set_info('field_overlays', $overlays);
+    }
+
+    /**
+     * Get the base list of image overlays for this field object
+     * @return array
+     */
+    public function get_base_overlays(){
+        return $this->get_info('field_base_overlays');
+    }
+
+    /**
+     * Set the base list of image overlays for this field object
+     * @param array $overlays
+     */
+    public function set_base_overlays($overlays){
+        $this->set_info('field_base_overlays', $overlays);
+    }
+
+    // -- MECHA FUNCTIONS -- //
+
+    /**
+     * Get the list of support mechas for this field object
+     * @return array
+     */
+    public function get_mechas(){
+        return $this->get_info('field_mechas');
+    }
+
+    /**
+     * Set the list of support mechas for this field object
+     * @param array $overlays
+     */
+    public function set_mechas($value){
+        $this->set_info('field_mechas', $value);
+    }
+
+    /**
+     * Get the base list of support mechas for this field object
+     * @return array
+     */
+    public function get_base_mechas(){
+        return $this->get_info('field_base_mechas');
+    }
+
+    /**
+     * Set the base list of support mechas for this field object
+     * @param array $overlays
+     */
+    public function set_base_mechas($value){
+        $this->set_info('field_base_mechas', $value);
+    }
+
+    // -- BACKGROUND FUNCTIONS -- //
+
+    /**
+     * Get the background image of this field object
+     * @return string
+     */
+    public function get_background(){
+        return $this->get_info('field_background');
+    }
+
+    /**
+     * Set the background image of this field object
+     * @param string $background
+     */
+    public function set_background($background){
+        $this->set_info('field_background', $background);
+    }
+
+    /**
+     * Get the base background image of this field object
+     * @return string
+     */
+    public function get_base_background(){
+        return $this->get_info('field_base_background');
+    }
+
+    /**
+     * Set the base background image of this field object
+     * @param string $background
+     */
+    public function set_base_background($background){
+        $this->set_info('field_base_background', $background);
+    }
+
+    /**
+     * Get the list of background attachments for this field object
+     * @return array
+     */
+    public function get_background_attachments(){
+        return $this->get_info('field_background_attachments');
+    }
+
+    /**
+     * Set the list of background attachments for this field object
+     * @param array $attachments
+     */
+    public function set_background_attachments($attachments){
+        $this->set_info('field_background_attachments', $attachments);
+    }
+
+    /**
+     * Get the base list of background attachments for this field object
+     * @return array
+     */
+    public function get_base_background_attachments(){
+        return $this->get_info('field_base_background_attachments');
+    }
+
+    /**
+     * Set the base list of background attachments for this field object
+     * @param array $attachments
+     */
+    public function set_base_background_attachments($attachments){
+        $this->set_info('field_base_background_attachments', $attachments);
+    }
+
+
+    // -- FOREGROUND FUNCTIONS -- //
+
+    /**
+     * Get the foreground image of this field object
+     * @return string
+     */
+    public function get_foreground(){
+        return $this->get_info('field_foreground');
+    }
+
+    /**
+     * Set the foreground image of this field object
+     * @param array $foreground
+     */
+    public function set_foreground($foreground){
+        $this->set_info('field_foreground', $foreground);
+    }
+
+    /**
+     * Get the base foreground image of this field object
+     * @return string
+     */
+    public function get_base_foreground(){
+        return $this->get_info('field_base_foreground');
+    }
+
+    /**
+     * Set the base foreground image of this field object
+     * @param array $foreground
+     */
+    public function set_base_foreground($value){
+        $this->set_info('field_base_foreground', $value);
+    }
+
+    /**
+     * Get the list of foreground attachments for this field object
+     * @return array
+     */
+    public function get_foreground_attachments(){
+        return $this->get_info('field_foreground_attachments');
+    }
+
+    /**
+     * Set the list of foreground attachments for this field object
+     * @param array $attachments
+     */
+    public function set_foreground_attachments($attachments){
+        $this->set_info('field_foreground_attachments', $attachments);
+    }
+
+    /**
+     * Get the base list of foreground attachments for this field object
+     * @return array
+     */
+    public function get_base_foreground_attachments(){
+        return $this->get_info('field_base_foreground_attachments');
+    }
+
+    /**
+     * Set the base list of foreground attachments for this field object
+     * @param array $attachments
+     */
+    public function set_base_foreground_attachments($attachments){
+        $this->set_info('field_base_foreground_attachments', $attachments);
+    }
+
+
+    // -- MUSIC FUNCTIONS -- //
+
+    /**
+     * Get the music track for this field object
+     * @return string
+     */
+    public function get_music(){
+        return $this->get_info('field_music');
+    }
+
+    /**
+     * Set the music track for this field object
+     * @param string $music
+     */
+    public function set_music($music){
+        $this->set_info('field_music', $music);
+    }
+
+    /**
+     * Get the base music track for this field object
+     * @return string
+     */
+    public function get_base_music(){
+        return $this->get_info('field_base_music');
+    }
+
+    /**
+     * Set the base music track for this field object
+     * @param string $music
+     */
+    public function set_base_music($music){
+        $this->set_info('field_base_music', $music);
+    }
+
+    // -- PRINT FUNCTIONS -- /
+
+    /**
+     * Get the formatted name of this field object
+     * @return string
+     */
+    public function print_name(){
+        return '<span class="field_name field_type field_type_'.(!empty($this->field_type) ? $this->field_type : 'none').'">'.$this->field_name.'</span>';
+    }
+
+    /**
+     * Get the formatted token of this field object
+     * @return string
+     */
+    public function print_token(){
+        return '<span class="field_token">'.$this->field_token.'</span>';
+    }
+
+    /**
+     * Get the formatted type of this field object
+     * @return string
+     */
+    public function print_type(){
+        return '<span class="field_type field_type_'.(!empty($this->field_type) ? $this->field_type : 'none').'">'.!empty($this->field_type) ? ucfirst($this->field_type) : 'Neutral'.'</span>';
+    }
+
+    /**
+     * Get the formatted type of this field object
+     * @return string
+     */
+    public function print_group(){
+        $temp_index = array('MMRPG' => 'Mega Man RPG Fields', 'MM00' => 'Mega Man 0 Fields', 'MM01' => 'Mega Man 1 Fields', 'MM02' => 'Mega Man 2 Fields', 'MM03' => 'Mega Man 3 Fields', 'MM04' => 'Mega Man 4 Fields');
+        return '<span class="field_group field_group_'.(!empty($this->field_group) ? $this->field_group : 'MMRPG').'">'.!empty($this->field_group) ? $temp_index[$this->field_group] : 'Unknown'.'</span>';
+    }
+
+    /**
+     * Get the formatted description of this field object
+     * @return string
+     */
+    public function print_description(){
+        return '<span class="field_description">'.$this->field_description.'</span>';
     }
 
     // Define a static function for printing out the field's database markup
