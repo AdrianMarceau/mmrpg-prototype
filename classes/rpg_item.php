@@ -54,6 +54,9 @@ class rpg_item extends rpg_object {
     // Define a public function for manually loading data
     public function item_load($this_iteminfo){
 
+        // Collect item index info in case we need it
+        $this_indexinfo = self::get_index_info($this_iteminfo['item_token']);
+
         // If the item info was not an array, return false
         if (!is_array($this_iteminfo)){ return false; }
         // If the item ID was not provided, return false
@@ -67,13 +70,17 @@ class rpg_item extends rpg_object {
         if (in_array($this_iteminfo['item_token'], $temp_system_items)){
             $this_iteminfo['item_id'] = $this->player_id.'000';
         }
-        // Else if this is an item, tweak it's ID as well
-        elseif (in_array($this_iteminfo['item_token'], $this->player->player_items)){
-            $this_iteminfo['item_id'] = $this->player_id.str_pad($this_iteminfo['item_id'], 3, '0', STR_PAD_LEFT);
-        }
         // Otherwise base the ID off of the robot
-        elseif (!preg_match('/^'.$this->robot->robot_id.'/', $this_iteminfo['item_id'])){
-            $this_iteminfo['item_id'] = $this->robot_id.str_pad($this_iteminfo['item_id'], 3, '0', STR_PAD_LEFT);
+        else {
+            $item_id = $this->robot_id.str_pad($this_indexinfo['item_id'], 3, '0', STR_PAD_LEFT);
+            if (!empty($this_iteminfo['flags']['is_part'])){
+                if (isset($this_iteminfo['part_token'])){ $item_id .= 'x'.strtoupper(substr(md5($this_iteminfo['part_token']), 0, 3)); }
+                else { $item_id .= substr(md5($this_iteminfo['item_token']), 0, 3); }
+            } elseif (!empty($this_iteminfo['flags']['is_attachment'])){
+                if (isset($this_iteminfo['attachment_token'])){ $item_id .= 'x'.strtoupper(substr(md5($this_iteminfo['attachment_token']), 0, 3)); }
+                else { $item_id .= substr(md5($this_iteminfo['item_token']), 0, 3); }
+            }
+            $this_iteminfo['item_id'] = $item_id;
         }
 
         // Collect current item data from the session if available
@@ -85,11 +92,7 @@ class rpg_item extends rpg_object {
         elseif (!in_array($this_iteminfo['item_token'], $temp_system_items)){
             $temp_backup_id = $this_iteminfo['item_id'];
             if (empty($this_iteminfo_backup['_parsed'])){
-                $this_iteminfo = self::get_index_info($this_iteminfo_backup['item_token']);
-                if (empty($this_iteminfo['item_id'])){
-                    exit();
-                }
-                $this_iteminfo = array_replace($this_iteminfo, $this_iteminfo_backup);
+                $this_iteminfo = array_replace($this_indexinfo, $this_iteminfo_backup);
             }
         }
 
