@@ -70,6 +70,7 @@ $_SESSION['FIELDS'] = array();
 $_SESSION['PLAYERS'] = array();
 $_SESSION['ROBOTS'] = array();
 $_SESSION['ABILITIES'] = array();
+$_SESSION['ITEMS'] = array();
 
 
 // Define the flag that toggles the game's online/offline status
