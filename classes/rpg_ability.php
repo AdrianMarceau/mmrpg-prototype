@@ -78,8 +78,6 @@ class rpg_ability extends rpg_object {
                 else { $ability_id .= substr(md5($this_abilityinfo['ability_token']), 0, 3); }
             }
             $this_abilityinfo['ability_id'] = $ability_id;
-            //echo("ability_id for {$this->robot->robot_token}:{$this_abilityinfo['ability_token']} is {$this_abilityinfo['ability_id']} \n");
-            //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint ability auto-assigned an ID from '.$this_abilityinfo['ability_token'].' on '.$this->robot->robot_token.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($this_abilityinfo['ability_id'], true), ENT_QUOTES, 'UTF-8', true)));
         }
 
         // Collect current ability data from the session if available
@@ -91,8 +89,7 @@ class rpg_ability extends rpg_object {
         elseif (!in_array($this_abilityinfo['ability_token'], $temp_system_abilities)){
             $temp_backup_id = $this_abilityinfo['ability_id'];
             if (empty($this_abilityinfo_backup['_parsed'])){
-                $this_abilityinfo = self::get_index_info($this_abilityinfo_backup['ability_token']);
-                $this_abilityinfo = array_replace($this_abilityinfo, $this_abilityinfo_backup);
+                $this_abilityinfo = array_replace($this_indexinfo, $this_abilityinfo_backup);
             }
         }
 
