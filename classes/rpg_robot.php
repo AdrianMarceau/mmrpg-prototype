@@ -4790,6 +4790,7 @@ class rpg_robot extends rpg_object {
                     $this_robot->set_item('');
 
                     // Define the item object and trigger info
+                    $temp_base_attack = $this_robot->get_base_attack();
                     $temp_recovery_amount = round($temp_base_attack * ($temp_item_recovery / 100));
                     $this_item->recovery_options_update(array(
                         'kind' => 'attack',
@@ -4806,6 +4807,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Define the item object and trigger info
+                    $temp_base_defense = $this_robot->get_base_defense();
                     $temp_recovery_amount = round($temp_base_defense * ($temp_item_recovery / 100));
                     $this_item->recovery_options_update(array(
                         'kind' => 'defense',
@@ -4818,6 +4820,7 @@ class rpg_robot extends rpg_object {
                         ));
 
                     // Trigger stat recovery for the holding robot
+                    $temp_base_speed = $this_robot->get_base_speed();
                     $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores defense by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
@@ -4897,6 +4900,7 @@ class rpg_robot extends rpg_object {
                     $this_robot->set_item('');
 
                     // Define the item object and trigger info
+                    $temp_base_energy = $this_robot->get_base_energy();
                     $temp_recovery_amount = round($temp_base_energy * ($temp_item_recovery / 100));
                     $this_item->recovery_options_update(array(
                         'kind' => 'energy',
@@ -4913,6 +4917,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Define the item object and trigger info
+                    $temp_base_weapons = $this_robot->get_base_weapons();
                     $temp_recovery_amount = round($temp_base_weapons * ($temp_item_recovery / 100));
                     $this_item->recovery_options_update(array(
                         'kind' => 'weapons',
