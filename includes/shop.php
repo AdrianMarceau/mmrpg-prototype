@@ -139,11 +139,6 @@ $this_shop_index['auto'] = array(
 
                         'extra-life' => 1600, 'yashichi' => 1600,
 
-                        /*
-                        'red-score-ball' => 5000, 'blue-score-ball' => 10000,
-                        'green-score-ball' => 5000, 'purple-score-ball' => 10000
-                        */
-
                         ),
                 'items_buying' => array(
 
@@ -161,9 +156,6 @@ $this_shop_index['auto'] = array(
                         'extra-life' => 800, 'yashichi' => 800,
 
                         /*
-                        'red-score-ball-' => 1750, 'blue-score-ball' => 2500,
-                        'green-score-ball' => 1750, 'purple-score-ball' => 2500,
-
                         'energy-upgrade' => 4000, 'weapon-upgrade' => 4000,
                         'attack-booster' => 4000, 'defense-booster' => 4000,
                         'speed-booster' => 4000, 'field-booster' => 4000,
@@ -565,16 +557,9 @@ if (!empty($this_shop_index['reggae'])){
 // Only continue if the shop has been unlocked
 if (!empty($this_shop_index['kalinka'])){
 
-        // Do not allow Kalinka to sell items yet
-        $this_shop_index['kalinka']['shop_kind_selling'] = array();
-        unset($this_shop_index['kalinka']['shop_quote_selling']['items']);
-        unset($this_shop_index['kalinka']['shop_items']);
-
-        /*
         // If Kalinka's Shop has reached sufficient levels, expand the inventory
         if ($this_shop_index['kalinka']['shop_level'] >= 30){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
         unset($this_shop_index['kalinka']['shop_items']['items_selling2']);
-        */
 
         // If the player has completed the prototype, Kalinka's Shop also sells fields
         if (mmrpg_prototype_complete()){
@@ -592,7 +577,6 @@ if (!empty($this_shop_index['kalinka'])){
         if ($this_shop_index['kalinka']['shop_level'] > 1){
                 $level_discount = $this_battle_shops['kalinka']['shop_level'] / 100;
 
-                /*
                 // If her shop is selling items, discount their prices
                 if (!empty($this_shop_index['kalinka']['shop_items']['items_selling'])){
                         foreach ($this_shop_index['kalinka']['shop_items']['items_selling'] AS $field_kind => $field_price){
@@ -600,7 +584,6 @@ if (!empty($this_shop_index['kalinka'])){
                                 $this_shop_index['kalinka']['shop_items']['items_selling'][$field_kind] = $field_price;
                         }
                 }
-                */
 
                 // If her shop is selling fields, discount their prices
                 if (!empty($this_shop_index['kalinka']['shop_fields']['fields_selling'])){
