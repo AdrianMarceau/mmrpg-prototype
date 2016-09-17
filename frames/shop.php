@@ -37,11 +37,13 @@ $allowed_edit_data = $this_shop_index;
 $prototype_player_counter = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
 $prototype_complete_counter = mmrpg_prototype_complete();
 $prototype_battle_counter = mmrpg_prototype_battles_complete('dr-light');
-if ($prototype_player_counter < 3 || $prototype_complete_counter < 3){ unset($allowed_edit_data['kalinka']); }
-if ($prototype_player_counter < 2){ unset($allowed_edit_data['reggae']); }
-if ($prototype_battle_counter < 1){ unset($allowed_edit_data['auto']); }
+foreach ($allowed_edit_data AS $shop_token => $shop_info){
+    $allowed = true;
+    if (!rpg_game::player_unlocked($shop_info['shop_player'])){ $allowed = false; }
+    elseif (rpg_prototype::battles_complete($shop_info['shop_player']) >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT){ $allowed = false; }
+    if ($allowed){ unset($allowed_edit_data[$shop_token]); }
+}
 $allowed_edit_data_count = count($allowed_edit_data);
-//die('$prototype_player_counter = '.$prototype_player_counter.'; $allowed_edit_data = <pre>'.print_r($allowed_edit_data, true).'</pre>');
 
 // HARD-CODE ZENNY FOR TESTING
 //$_SESSION[$session_token]['counters']['battle_zenny'] = 500000;
@@ -143,9 +145,11 @@ if (true){
 
                         // Loop through the selling tokens and display tabs for them
                         foreach ($shop_selling_tokens AS $selling_token){
+                            if ($selling_token == 'items' && $shop_token == 'kalinka'){ $selling_name = 'Parts'; }
+                            else { $selling_name = ucfirst($selling_token); }
                             ?>
                                 <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
-                                <a class="tab_link tab_link_selling" href="#" data-tab="selling" data-tab-type="<?= $selling_token ?>"><span class="inset">Buy <?= ucfirst($selling_token) ?></span></a>
+                                <a class="tab_link tab_link_selling" href="#" data-tab="selling" data-tab-type="<?= $selling_token ?>"><span class="inset">Buy <?= $selling_name ?></span></a>
                             <?
                             $tab_counter++;
                         }
