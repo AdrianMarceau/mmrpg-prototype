@@ -4526,7 +4526,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && !isset($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -4573,7 +4573,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && !isset($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -4620,7 +4620,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && !isset($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -4667,7 +4667,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && !isset($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -4714,7 +4714,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && !isset($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -4838,7 +4838,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && !isset($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -4929,7 +4929,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && !isset($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
