@@ -502,7 +502,7 @@ class rpg_canvas {
                     $details_data['item_class'] = 'sprite size40 mugshot '.$details_data['robot_float'].' ';
                     $details_data['item_style'] = 'background-image: url('.$details_data['item_file'].'); ';
                     if (!empty($details_data['item_type2'])){
-                        if ($details_data['item_title_type'] != 'none'){ $details_data['item_title_type'] .= ' '.$details_data['item_type2']; }
+                        if ($details_data['item_title_type'] != 'none'){ $details_data['item_title_type'] .= '_'.$details_data['item_type2']; }
                         else { $details_data['item_title_type'] = $details_data['item_type2']; }
                     }
                     $item_markup = '<div class="robot_item">';
