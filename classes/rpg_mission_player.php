@@ -96,6 +96,7 @@ class rpg_mission_player extends rpg_mission {
                 $temp_robot_level = !empty($temp_robotinfo['robot_level']) ? $temp_robotinfo['robot_level'] : 1;
                 $temp_robot_favourite = in_array($temp_robot_token, $temp_player_favourites) ? 1 : 0;
                 $temp_robot_image = !empty($temp_settings_array['robot_image']) ? $temp_settings_array['robot_image'] : $temp_robotinfo['robot_token'];
+                $temp_robot_item = !empty($temp_settings_array['robot_item']) ? $temp_settings_array['robot_item'] : '';
                 //$temp_robot_rewards = $temp_player_rewards[$target_player_token];
                 $temp_robot_rewards = $temp_rewards_array;
                 // Collect this robot's abilities, format them, and crop if necessary
@@ -103,7 +104,18 @@ class rpg_mission_player extends rpg_mission {
                 foreach ($temp_settings_array['robot_abilities'] AS $key2 => $temp_abilityinfo){ $temp_robot_abilities[] = $temp_abilityinfo['ability_token'] != 'copy-shot' ? $temp_abilityinfo['ability_token'] : 'buster-shot'; }
                 $temp_robot_abilities = count($temp_robot_abilities) > 8 ? array_slice($temp_robot_abilities, 0, 8) : $temp_robot_abilities;
                 // Create the new robot info array to be added to the omega battle options
-                $temp_new_array = array('values' => array('flag_favourite' => $temp_robot_favourite,'robot_rewards' => $temp_robot_rewards), 'robot_id' => $temp_robot_id, 'robot_token' => $temp_robot_token, 'robot_level' => $temp_robot_level, 'robot_image' => $temp_robot_image, 'robot_abilities' => $temp_robot_abilities);
+                $temp_new_array = array(
+                    'values' => array(
+                        'flag_favourite' => $temp_robot_favourite,
+                        'robot_rewards' => $temp_robot_rewards
+                        ),
+                    'robot_id' => $temp_robot_id,
+                    'robot_token' => $temp_robot_token,
+                    'robot_level' => $temp_robot_level,
+                    'robot_image' => $temp_robot_image,
+                    'robot_item' => $temp_robot_item,
+                    'robot_abilities' => $temp_robot_abilities
+                    );
                 // Add this robot to the omega array and increment the counter
                 $temp_battle_omega_robots[] = $temp_new_array;
                 $temp_counter++;
