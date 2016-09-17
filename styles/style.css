@@ -2730,6 +2730,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     height: 68px;
     line-height: 68px;
     margin: 0 3px 3px 0;
+    letter-spacing: 2px;
 }
 #actions .actions_option .action_option label,
 #actions .actions_settings .action_setting label,
@@ -2983,6 +2984,18 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     font-size: 11px;
     line-height: 14px;
     font-weight: bold;
+}
+#actions .actions_switch .action_switch label .maintext sup,
+#actions .actions_scan .action_scan label .maintext sup,
+#actions .actions_target .action_target label .maintext sup,
+#actions .actions_ability .action_ability label .maintext sup,
+#actions .actions_item .action_item label .maintext sup {
+    font-size: 8px;
+    line-height: 8px;
+    font-weight: normal;
+    position: relative;
+    bottom: 2px;
+    left: 2px;
 }
 #actions .actions_switch .action_switch label .subtext,
 #actions .actions_scan .action_scan label .subtext,
