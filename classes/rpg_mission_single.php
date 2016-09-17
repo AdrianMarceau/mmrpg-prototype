@@ -44,12 +44,22 @@ class rpg_mission_single extends rpg_mission {
         $temp_battle_omega['battle_target_player']['player_robots'][0] = array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => $this_robot_token);
         $temp_option_completed = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_omega['battle_token']);
         if (!empty($temp_option_completed)){ $temp_battle_omega['battle_complete'] = $temp_option_completed; }
+
+        // Determine the amount of targets and their ability counts
         $temp_target_count = 1;
         $temp_ability_count = 1;
+        $temp_limit_count = 4;
         $temp_battle_count = 0;
-        if (!empty($temp_battle_omega['battle_complete']['battle_count'])){ $temp_battle_count = $temp_battle_omega['battle_complete']['battle_count']; $temp_target_count += $temp_battle_count; }
-        if ($temp_target_count > 4){ $temp_target_count = 4; }
-        $temp_ability_count = $temp_target_count;
+        if (!empty($temp_battle_omega['battle_complete']['battle_count'])){
+            $temp_battle_count = $temp_battle_omega['battle_complete']['battle_count'];
+            if ($temp_battle_count <= $temp_limit_count){
+                $temp_target_count += $temp_battle_count;
+                $temp_ability_count += $temp_battle_count;
+            } else {
+                $temp_target_count += $temp_limit_count;
+                $temp_ability_count += $temp_limit_count;
+            }
+        }
 
         // Define the fusion star token in case we need to test for it
         $temp_field_star_token = $temp_option_field['field_token'];
@@ -266,8 +276,21 @@ class rpg_mission_single extends rpg_mission {
                 if ($ability_count > 2){ $ability_count = 2; }
             }
 
+            // Randomly assign this robot a hold item if applicable
+            $temp_item = '';
+            if (rpg_game::player_unlocked('dr-cossack')
+                && $robot['robot_class'] == 'master'){
+                $rand = mt_rand(1, 4);
+                if ($rand == 1){
+                    $stats = array('energy', 'weapon', 'attack', 'defense', 'speed');
+                    $items = array('pellet', 'capsule');
+                    $temp_item = $stats[mt_rand(0, (count($stats) - 1))].'-'.$items[mt_rand(0, (count($items) - 1))];
+                }
+                $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_item'] = $temp_item;
+            }
+
             // Generate abilities and update the omega robot array
-            $temp_abilities = mmrpg_prototype_generate_abilities($robot, $omega_robot_level, $ability_count);
+            $temp_abilities = mmrpg_prototype_generate_abilities($robot, $omega_robot_level, $ability_count, $temp_item);
             $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_abilities'] = $temp_abilities;
 
             // If this is a mecha with alt images, randomly assign one
