@@ -95,13 +95,14 @@ if ($this_action == 'start'){
 
 // Define the battle object using the loaded battle data
 $this_battleinfo = array('battle_id' => $this_battle_id, 'battle_token' => $this_battle_token);
-$this_battleinfo['flags']['wap'] = $flag_wap ? true : false;
 
 // Define the current field object using the loaded field data
 $this_fieldinfo = array('field_id' => $this_field_id, 'field_token' => $this_field_token);
 
 // Define the battle object using the loaded battle data and update session
 $this_battle = rpg_game::get_battle($this_battleinfo);
+$this_battle->flags['wap'] = $flag_wap ? true : false;
+$this_battle->update_session();
 
 // Define the current field object using the loaded field data and update session
 $this_field = new rpg_field($this_battle, $this_fieldinfo);
