@@ -18,6 +18,7 @@ $_SESSION['FIELDS'] = array();
 $_SESSION['PLAYERS'] = array();
 $_SESSION['ROBOTS'] = array();
 $_SESSION['ABILITIES'] = array();
+$_SESSION['ITEMS'] = array();
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Define the animate flag for debug purposes

@@ -29,6 +29,8 @@ if ($flag_battle_counts){
 
 $first_event_body .= '<br />';
 
+//$first_event_body .= '$this_battle->flags = '.preg_replace('/\s+/', ' ', print_r($this_battle->flags, true)).'<br />';
+
 // Update the summon counts for all this player's robots
 foreach ($this_player->values['robots_active'] AS $key => $info){
     if (!isset($_SESSION['GAME']['values']['robot_database'][$info['robot_token']])){ $_SESSION['GAME']['values']['robot_database'][$info['robot_token']] = array('robot_token' => $info['robot_token']); }

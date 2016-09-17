@@ -8,6 +8,7 @@ $_SESSION['FIELDS'] = array();
 $_SESSION['PLAYERS'] = array();
 $_SESSION['ROBOTS'] = array();
 $_SESSION['ABILITIES'] = array();
+$_SESSION['ITEMS'] = array();
 
 // Redirect the user back to the prototype screen
 $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : '');
