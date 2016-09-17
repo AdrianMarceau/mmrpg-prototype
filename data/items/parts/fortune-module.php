@@ -1,0 +1,23 @@
+<?
+// ITEM : FORTUNE MODULE
+$item = array(
+    'item_name' => 'Fortune Module',
+    'item_token' => 'fortune-module',
+    'item_game' => 'MM00',
+    'item_group' => 'MM00/Items/Modules',
+    'item_class' => 'item',
+    'item_subclass' => 'holdable',
+    'item_type' => '',
+    'item_type2' => 'electric',
+    'item_description' => 'A mysterious chip that improves holder\'s luck in battle.  When held by a robot master, this item greatly increases the chance of a critical hit and causes enemies to drop items more frequently.',
+    'item_energy' => 0,
+    'item_speed' => 10,
+    'item_accuracy' => 100,
+    'item_function' => function($objects){
+
+        // Return true on success
+        return true;
+
+    }
+    );
+?>
