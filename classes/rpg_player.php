@@ -554,7 +554,7 @@ class rpg_player extends rpg_object {
      */
     public function get_robots_active(){
         $filters = array('player_id' => $this->player_id, 'robot_status' => 'active');
-        $robots = $this->battle->find_robots($filters);
+        $robots = rpg_game::find_robots($filters);
         return $robots;
     }
 
@@ -564,7 +564,7 @@ class rpg_player extends rpg_object {
      */
     public function get_robots_disabled(){
         $filters = array('player_id' => $this->player_id, 'robot_status' => 'disabled');
-        $robots = $this->battle->find_robots($filters);
+        $robots = rpg_game::find_robots($filters);
         return $robots;
     }
 
