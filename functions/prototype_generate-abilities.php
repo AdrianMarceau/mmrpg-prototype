@@ -2,11 +2,13 @@
 // Define a function for generating an ability set for a given robot
 function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $ability_num = 1, $robot_item = ''){
     global $db;
+
     // Define the static variables for the ability lists
     static $mmrpg_prototype_core_abilities;
     static $mmrpg_prototype_master_support_abilities;
     static $mmrpg_prototype_mecha_support_abilities;
     static $mmrpg_prototype_darkness_abilities;
+
     // Define all the core and support abilities to be used in generating
     if (empty($mmrpg_prototype_core_abilities)){
         $mmrpg_prototype_core_abilities = array(
@@ -69,9 +71,6 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 'attack-assault', 'defense-assault', 'speed-assault', 'energy-assault',
                 ),
             array(
-                'attack-shuffle', 'defense-shuffle', 'speed-shuffle', 'energy-shuffle'
-                ),
-            array(
                 'mecha-support', 'field-support'
                 ),
             array(
@@ -87,12 +86,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 ),
             array(
                 'attack-break', 'defense-break', 'speed-break', 'energy-break',
-                )
-            /*,
+                ),
             array(
                 'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',
                 )
-                */
             );
     }
     if (empty($mmrpg_prototype_darkness_abilities)){
@@ -144,7 +141,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         if (empty($this_ability_index)){ $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token'); }
 
         // Check if this robot is holding a core
-        $robot_item_core = !empty($robot_item) && preg_match('/^item-core-/i', $robot_item) ? preg_replace('/^item-core-/i', '', $robot_item) : '';
+        $robot_item_core = !empty($robot_item) && preg_match('/-core$/i', $robot_item) ? preg_replace('/-core$/i', '', $robot_item) : '';
 
         // Define the number of core and support abilities for the robot
         if ($this_robot_index['robot_class'] == 'master'){
@@ -288,7 +285,6 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
     // Return the ability array, whatever it was
     return $this_robot_abilities;
-
 }
 
 ?>
