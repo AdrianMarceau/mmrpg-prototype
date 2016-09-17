@@ -282,12 +282,12 @@ class rpg_ability_recovery extends rpg_recovery {
                 $this_ability->recovery_options['success_rate'] = $this_ability->ability_accuracy;
             }
             // Otherwise, if this robot is in speed break or ability accuracy 100%
-            elseif ($target_robot_stats['robot_speed'] <= 0 && $this_robot_stats['robot_speed'] > 0){
+            elseif ($target_robot_stats['robot_speed'] <= 0 && $this_robot->robot_speed > 0){
                 // Hard-code the success rate at 100% accuracy
                     $this_ability->recovery_options['success_rate'] = 0;
             }
             // Otherwise, if this robot is in speed break or ability accuracy 100%
-            elseif ($this_robot_stats['robot_speed'] <= 0 || $this_ability->ability_accuracy == 100){
+            elseif ($this_robot->robot_speed <= 0 || $this_ability->ability_accuracy == 100){
                 // Hard-code the success rate at 100% accuracy
                     $this_ability->recovery_options['success_rate'] = 100;
             }
@@ -296,9 +296,9 @@ class rpg_ability_recovery extends rpg_recovery {
                 // Collect this ability's accuracy stat for modification
                 $this_ability_accuracy = $this_ability->ability_accuracy;
                 // If the target was faster/slower, boost/lower the ability accuracy
-                if ($target_robot_stats['robot_speed'] > $this_robot_stats['robot_speed']
-                    || $target_robot_stats['robot_speed'] < $this_robot_stats['robot_speed']){
-                    $this_modifier = $target_robot_stats['robot_speed'] / $this_robot_stats['robot_speed'];
+                if ($target_robot_stats['robot_speed'] > $this_robot->robot_speed
+                    || $target_robot_stats['robot_speed'] < $this_robot->robot_speed){
+                    $this_modifier = $target_robot_stats['robot_speed'] / $this_robot->robot_speed;
                     //$this_ability_accuracy = ceil($this_ability_accuracy * $this_modifier);
                     $this_ability_accuracy = ceil($this_ability_accuracy * 0.95) + ceil(($this_ability_accuracy * 0.05) * $this_modifier);
                     if ($this_ability_accuracy > 100){ $this_ability_accuracy = 100; }
@@ -320,7 +320,7 @@ class rpg_ability_recovery extends rpg_recovery {
         }
 
         // If this robot is in speed break, increase success rate, reduce failure
-        if ($this_robot_stats['robot_speed'] == 0 && $this_ability->recovery_options['success_rate'] > 0){
+        if ($this_robot->robot_speed == 0 && $this_ability->recovery_options['success_rate'] > 0){
             $this_ability->recovery_options['success_rate'] = ceil($this_ability->recovery_options['success_rate'] * 2);
             $this_ability->recovery_options['failure_rate'] = ceil($this_ability->recovery_options['failure_rate'] / 2);
         }
@@ -357,22 +357,22 @@ class rpg_ability_recovery extends rpg_recovery {
             $this_ability->ability_results['this_result'] = 'failure';
         }
         // If this is WEAPONS recovery and this robot is already at full ammo
-        elseif ($this_ability->recovery_options['recovery_kind'] == 'weapons' && $this_robot_stats['robot_weapons'] >= $this_robot->robot_base_weapons){
+        elseif ($this_ability->recovery_options['recovery_kind'] == 'weapons' && $this_robot->robot_weapons >= $this_robot->robot_base_weapons){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
         // Otherwise if ATTACK recovery but attack is already at 9999
-        elseif ($this_ability->recovery_options['recovery_kind'] == 'attack' && $this_robot_stats['robot_attack'] >= MMRPG_SETTINGS_STATS_MAX){
+        elseif ($this_ability->recovery_options['recovery_kind'] == 'attack' && $this_robot->robot_attack >= MMRPG_SETTINGS_STATS_MAX){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
         // Otherwise if DEFENSE recovery but defense is already at 9999
-        elseif ($this_ability->recovery_options['recovery_kind'] == 'defense' && $this_robot_stats['robot_defense'] >= MMRPG_SETTINGS_STATS_MAX){
+        elseif ($this_ability->recovery_options['recovery_kind'] == 'defense' && $this_robot->robot_defense >= MMRPG_SETTINGS_STATS_MAX){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
         // Otherwise if SPEED recovery but speed is already at 9999
-        elseif ($this_ability->recovery_options['recovery_kind'] == 'speed' && $this_robot_stats['robot_speed'] >= MMRPG_SETTINGS_STATS_MAX){
+        elseif ($this_ability->recovery_options['recovery_kind'] == 'speed' && $this_robot->robot_speed >= MMRPG_SETTINGS_STATS_MAX){
             // Hard code the result to failure
             $this_ability->ability_results['this_result'] = 'failure';
         }
@@ -470,15 +470,15 @@ class rpg_ability_recovery extends rpg_recovery {
                     $temp_amount_backup = $this_ability->ability_results['this_amount'];
 
                     // If this robot's defense is at absolute zero, and the target's attack isnt, OHKO
-                    if ($this_robot_stats['robot_defense'] <= 0 && $target_robot_stats['robot_attack'] >= 1){
+                    if ($this_robot->robot_defense <= 0 && $target_robot_stats['robot_attack'] >= 1){
                         // Set the new recovery amount to OHKO this robot
                         $temp_new_amount = $this_robot->robot_base_energy;
-                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$this_robot->robot_token.'_defense_break | D:'.$this_robot_stats['robot_defense'].' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$this_robot->robot_token.'_defense_break | D:'.$this_robot->robot_defense.' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                     // Elseif the target robot's attack is at absolute zero, and the this's defense isnt, NOKO
-                    elseif ($target_robot_stats['robot_attack'] <= 0 && $this_robot_stats['robot_defense'] >= 1){
+                    elseif ($target_robot_stats['robot_attack'] <= 0 && $this_robot->robot_defense >= 1){
                         // Set the new recovery amount to NOKO this robot
                         $temp_new_amount = 0;
                         $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break | A:'.$target_robot_stats['robot_attack'].' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
@@ -486,18 +486,18 @@ class rpg_ability_recovery extends rpg_recovery {
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                     // Elseif this robot's defense is at absolute zero and the target's attack is too, NOKO
-                    elseif ($this_robot_stats['robot_defense'] <= 0 && $target_robot_stats['robot_attack'] <= 0){
+                    elseif ($this_robot->robot_defense <= 0 && $target_robot_stats['robot_attack'] <= 0){
                         // Set the new recovery amount to NOKO this robot
                         $temp_new_amount = 0;
-                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break and '.$this_robot->robot_token.'_defense_break | A:'.$target_robot_stats['robot_attack'].' D:'.$this_robot_stats['robot_defense'].' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | '.$target_robot->robot_token.'_attack_break and '.$this_robot->robot_token.'_defense_break | A:'.$target_robot_stats['robot_attack'].' D:'.$this_robot->robot_defense.' | '.$this_ability->ability_results['this_amount'].' = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
                     // Otherwise if both robots have normal stats, calculate the new amount normally
                     else {
                         // Set the new recovery amount relative to this robot's defense and the target robot's attack
-                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * ($target_robot_stats['robot_attack'] / $this_robot_stats['robot_defense']));
-                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | normal_recovery | A:'.$target_robot_stats['robot_attack'].' D:'.$this_robot_stats['robot_defense'].' | '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * ('.$target_robot_stats['robot_attack'].' / '.$this_robot_stats['robot_defense'].')) = '.$temp_new_amount.'');
+                        $temp_new_amount = round($this_ability->ability_results['this_amount'] * ($target_robot_stats['robot_attack'] / $this_robot->robot_defense));
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | normal_recovery | A:'.$target_robot_stats['robot_attack'].' D:'.$this_robot->robot_defense.' | '.$this_ability->ability_results['this_amount'].' = round('.$this_ability->ability_results['this_amount'].' * ('.$target_robot_stats['robot_attack'].' / '.$this_robot->robot_defense.')) = '.$temp_new_amount.'');
                         // Update the amount with the new calculation
                         $this_ability->ability_results['this_amount'] = $temp_new_amount;
                     }
@@ -801,13 +801,13 @@ class rpg_ability_recovery extends rpg_recovery {
                 // If this is an ATTACK type recovery trigger
                 case 'robot_attack': {
                     // Inflict attack recovery on the target's internal stat
-                    $this_robot->robot_attack = $this_robot_stats['robot_attack'] + $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_attack = $this_robot->robot_attack + $this_ability->ability_results['this_amount'];
                     // If the recovery put the robot's attack above 9999
-                    if ($this_robot_stats['robot_attack'] > MMRPG_SETTINGS_STATS_MAX){
-                        // Calculate the overkill amount
-                        $this_ability->ability_results['this_overkill'] = (MMRPG_SETTINGS_STATS_MAX - $this_robot_stats['robot_attack']) * -1;
+                    if ($this_robot->robot_attack > MMRPG_SETTINGS_STATS_MAX){
+                        // Calculate the overboost amount
+                        $this_ability->ability_results['this_overboost'] = (MMRPG_SETTINGS_STATS_MAX - $this_robot->robot_attack) * -1;
                         // Calculate the actual recovery amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overkill'];
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overboost'];
                         // Max out the robots attack
                         $this_robot->robot_attack = MMRPG_SETTINGS_STATS_MAX;
                     }
@@ -817,13 +817,13 @@ class rpg_ability_recovery extends rpg_recovery {
                 // If this is an DEFENSE type recovery trigger
                 case 'robot_defense': {
                     // Inflict defense recovery on the target's internal stat
-                    $this_robot->robot_defense = $this_robot_stats['robot_defense'] + $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_defense = $this_robot->robot_defense + $this_ability->ability_results['this_amount'];
                     // If the recovery put the robot's defense above 9999
-                    if ($this_robot_stats['robot_defense'] > MMRPG_SETTINGS_STATS_MAX){
-                        // Calculate the overkill amount
-                        $this_ability->ability_results['this_overkill'] = (MMRPG_SETTINGS_STATS_MAX - $this_robot_stats['robot_defense']) * -1;
+                    if ($this_robot->robot_defense > MMRPG_SETTINGS_STATS_MAX){
+                        // Calculate the overboost amount
+                        $this_ability->ability_results['this_overboost'] = (MMRPG_SETTINGS_STATS_MAX - $this_robot->robot_defense) * -1;
                         // Calculate the actual recovery amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overkill'];
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overboost'];
                         // Max out the robots defense
                         $this_robot->robot_defense = MMRPG_SETTINGS_STATS_MAX;
                     }
@@ -833,13 +833,13 @@ class rpg_ability_recovery extends rpg_recovery {
                 // If this is an SPEED type recovery trigger
                 case 'robot_speed': {
                     // Inflict speed recovery on the target's internal stat
-                    $this_robot->robot_speed = $this_robot_stats['robot_speed'] + $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_speed = $this_robot->robot_speed + $this_ability->ability_results['this_amount'];
                     // If the recovery put the robot's speed above 9999
-                    if ($this_robot_stats['robot_speed'] > MMRPG_SETTINGS_STATS_MAX){
-                        // Calculate the overkill amount
-                        $this_ability->ability_results['this_overkill'] = (MMRPG_SETTINGS_STATS_MAX - $this_robot_stats['robot_speed']) * -1;
+                    if ($this_robot->robot_speed > MMRPG_SETTINGS_STATS_MAX){
+                        // Calculate the overboost amount
+                        $this_ability->ability_results['this_overboost'] = (MMRPG_SETTINGS_STATS_MAX - $this_robot->robot_speed) * -1;
                         // Calculate the actual recovery amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overkill'];
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overboost'];
                         // Max out the robots speed
                         $this_robot->robot_speed = MMRPG_SETTINGS_STATS_MAX;
                     }
@@ -849,13 +849,13 @@ class rpg_ability_recovery extends rpg_recovery {
                 // If this is a WEAPONS type recovery trigger
                 case 'robot_weapons': {
                     // Inflict weapon recovery on the target's internal stat
-                    $this_robot->robot_weapons = $this_robot_stats['robot_weapons'] + $this_ability->ability_results['this_amount'];
+                    $this_robot->robot_weapons = $this_robot->robot_weapons + $this_ability->ability_results['this_amount'];
                     // If the recovery put the robot's weapons above the base
-                    if ($this_robot_stats['robot_weapons'] > $this_robot->robot_base_weapons){
+                    if ($this_robot->robot_weapons > $this_robot->robot_base_weapons){
                         // Calculate the overcure amount
-                        $this_ability->ability_results['this_overkill'] = ($this_robot->robot_base_weapons - $this_robot_stats['robot_weapons']) * -1;
+                        $this_ability->ability_results['this_overboost'] = ($this_robot->robot_base_weapons - $this_robot->robot_weapons) * -1;
                         // Calculate the actual recovery amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overkill'];
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overboost'];
                         // Max out the robots weapons
                         $this_robot->robot_weapons = $this_robot->robot_base_weapons;
                     }
@@ -869,9 +869,9 @@ class rpg_ability_recovery extends rpg_recovery {
                     // If the recovery put the robot into overboost, recalculate the recovery
                     if ($this_robot->robot_energy > $this_robot->robot_base_energy){
                         // Calculate the overcure amount
-                        $this_ability->ability_results['this_overkill'] = ($this_robot->robot_base_energy - $this_robot->robot_energy) * -1;
+                        $this_ability->ability_results['this_overboost'] = ($this_robot->robot_base_energy - $this_robot->robot_energy) * -1;
                         // Calculate the actual recovery amount
-                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overkill'];
+                        $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] - $this_ability->ability_results['this_overboost'];
                         // Max out the robots energy
                         $this_robot->robot_energy = $this_robot->robot_base_energy;
                     }
@@ -897,12 +897,12 @@ class rpg_ability_recovery extends rpg_recovery {
             $this_ability->ability_results['print_misses'] = '<span class="recovery_misses">'.(!empty($this_ability->ability_results['total_misses']) ? $this_ability->ability_results['total_misses'] : 0).'</span>';
             $this_ability->ability_results['print_result'] = '<span class="recovery_result">'.(!empty($this_ability->ability_results['total_result']) ? $this_ability->ability_results['total_result'] : 0).'</span>';
             $this_ability->ability_results['print_amount'] = '<span class="recovery_amount">'.(!empty($this_ability->ability_results['this_amount']) ? $this_ability->ability_results['this_amount'] : 0).'</span>';
-            $this_ability->ability_results['print_overkill'] = '<span class="recovery_overkill">'.(!empty($this_ability->ability_results['this_overkill']) ? $this_ability->ability_results['this_overkill'] : 0).'</span>';
+            $this_ability->ability_results['print_overboost'] = '<span class="recovery_overboost">'.(!empty($this_ability->ability_results['this_overboost']) ? $this_ability->ability_results['this_overboost'] : 0).'</span>';
 
             // Add the final recovery text showing the amount based on life energy recovery
             if ($this_ability->recovery_options['recovery_kind'] == 'energy'){
                 $this_ability->ability_results['this_text'] .= "{$this_robot->print_name()} recovers {$this_ability->ability_results['print_amount']} life energy";
-                //$this_ability->ability_results['this_text'] .= ($this_ability->ability_results['this_overkill'] > 0 ? " and {$this_ability->ability_results['print_overkill']} overkill" : '');
+                //$this_ability->ability_results['this_text'] .= ($this_ability->ability_results['this_overboost'] > 0 ? " and {$this_ability->ability_results['print_overboost']} overboost" : '');
                 $this_ability->ability_results['this_text'] .= '!<br />';
             }
             // Otherwise add the final recovery text showing the amount based on weapon energy recovery
@@ -943,9 +943,9 @@ class rpg_ability_recovery extends rpg_recovery {
             $this_ability->ability_frame_span = $this_ability->recovery_options['ability_failure_frame_span'];
             $this_ability->ability_frame_offset = $this_ability->recovery_options['ability_failure_frame_offset'];
 
-            // Update the recovery and overkilll amounts to reflect zero recovery
+            // Update the recovery and overboostl amounts to reflect zero recovery
             $this_ability->ability_results['this_amount'] = 0;
-            $this_ability->ability_results['this_overkill'] = 0;
+            $this_ability->ability_results['this_overboost'] = 0;
 
             // Display the failure text, if text has been provided
             if (!$this_ability->ability_results['flag_immunity'] && !empty($this_ability->recovery_options['failure_text'])){
@@ -968,7 +968,7 @@ class rpg_ability_recovery extends rpg_recovery {
 
         // Update the recovery result total variables
         $this_ability->ability_results['total_amount'] += !empty($this_ability->ability_results['this_amount']) ? $this_ability->ability_results['this_amount'] : 0;
-        $this_ability->ability_results['total_overkill'] += !empty($this_ability->ability_results['this_overkill']) ? $this_ability->ability_results['this_overkill'] : 0;
+        $this_ability->ability_results['total_overboost'] += !empty($this_ability->ability_results['this_overboost']) ? $this_ability->ability_results['this_overboost'] : 0;
         if ($this_ability->ability_results['this_result'] == 'success'){ $this_ability->ability_results['total_strikes']++; }
         else { $this_ability->ability_results['total_misses']++; }
         $this_ability->ability_results['total_actions'] = $this_ability->ability_results['total_strikes'] + $this_ability->ability_results['total_misses'];
