@@ -906,6 +906,17 @@ class rpg_disabled {
                 }
             }
 
+            // If the target holds a Fortune Module, increase the chance of dropps
+            $temp_fortune_module = false;
+            if ($target_robot->robot_item == 'item-fortune-module'){
+                $temp_fortune_module = true;
+                $temp_chance_multiplier = ceil($temp_chance_multiplier * 2);
+                foreach ($target_player_rewards['items'] AS $key => $info){
+                    if ($info['min'] < $info['max']){ $info['min'] = $info['max'] - 1; }
+                    $target_player_rewards['items'][$key] = $info;
+                }
+            }
+
             // Shuffle the rewards so it doesn't look to formulaic
             shuffle($target_player_rewards['items']);
 
