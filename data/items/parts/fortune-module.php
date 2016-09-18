@@ -3,8 +3,8 @@
 $item = array(
     'item_name' => 'Fortune Module',
     'item_token' => 'fortune-module',
-    'item_game' => 'MM00',
-    'item_group' => 'MM00/Items/Modules',
+    'item_game' => 'MMRPG',
+    'item_group' => 'MMRPG/Items/Modules',
     'item_class' => 'item',
     'item_subclass' => 'holdable',
     'item_type' => '',
