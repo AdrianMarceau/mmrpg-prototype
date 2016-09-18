@@ -3,8 +3,8 @@
 $item = array(
     'item_name' => 'Field Booster',
     'item_token' => 'field-booster',
-    'item_game' => 'MM00',
-    'item_group' => 'MM00/Items/StatBoosters',
+    'item_game' => 'MMRPG',
+    'item_group' => 'MMRPG/Items/StatBoosters',
     'item_class' => 'item',
     'item_subclass' => 'holdable',
     'item_type' => 'copy',
