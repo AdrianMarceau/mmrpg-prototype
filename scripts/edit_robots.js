@@ -3,6 +3,7 @@ var thisBody = false;
 var thisPrototype = false;
 var thisWindow = false;
 var thisRobotCanvas = false;
+var thisPlayerCanvas = false;
 var thisAbilityCanvas = false;
 var thisItemCanvas = false;
 var thisEditor = false;
@@ -22,6 +23,7 @@ $(document).ready(function(){
     thisConsole = $('#console', thisEditor);
     thisCanvas = $('#canvas', thisEditor);
     thisRobotCanvas = $('div[data-canvas=robots]', gameCanvas);
+    thisPlayerCanvas = $('div[data-canvas=players]', gameCanvas);
     thisAbilityCanvas = $('div[data-canvas=abilities]', gameCanvas);
     thisItemCanvas = $('div[data-canvas=items]', gameCanvas);
 
@@ -98,6 +100,45 @@ $(document).ready(function(){
             //$('.header', thisEditor).html('Robot Editor ('+countRobotsLoaded+' Robots)')
 
             });
+
+        };
+
+    // Define the batch function for loading all unlocked player data
+    loadCanvasPlayersMarkup = function(onComplete){
+
+        //console.log('calling the loadCanvasPlayersMarkup() function');
+
+        if (onComplete == undefined){
+            onComplete = function(){
+                var thisContainer = $(this);
+                thisContainer.attr('data-player', '');
+                thisContainer.attr('data-key', '');
+                };
+            }
+
+        // If the links have not been loaded, do so now
+        if ($('#canvas .player_canvas .links').is(':empty')){
+            $.post('frames/edit_robots.php', {
+                action: 'canvas_players_markup',
+                wap: gameSettings.wapFlag,
+                edit: gameSettings.allowEditing ? 'true' : 'false',
+                user_id: gameSettings.userNumber
+                }, function(data, status){
+                //console.log('console player data received, appending...');
+                //console.log(data);
+                // Append the link markup to the canvas
+                $('#canvas .player_canvas .links').empty().append(data);
+                // Trigger scrollbars on any overflow containers
+                $('#canvas .player_canvas .wrapper_overflow', thisEditor).perfectScrollbar();
+                // Trigger the on complete function
+                onComplete.call($('#canvas .player_canvas'));
+                });
+            } else {
+                // Fix scrollbars on any overflow containers
+                $('#canvas .player_canvas .wrapper_overflow', thisEditor).scrollTop(0).perfectScrollbar('update');
+                // Trigger the on complete function
+                onComplete.call($('#canvas .player_canvas'));
+            }
 
         };
 
@@ -1152,6 +1193,11 @@ function robotEditorCanvasInit(){
             });
 
 
+    // Load the player canvas in the background
+    thisPlayerCanvas.addClass('hidden');
+    loadCanvasPlayersMarkup();
+
+
     // Load the ability canvas in the background
     thisAbilityCanvas.addClass('hidden');
     loadCanvasAbilitiesMarkup();
@@ -1628,11 +1674,18 @@ function resetEditorMenus(robotEvent, onComplete){
     $('a.item_name', robotEvent).css({opacity:''}).removeAttr('data-status');
     $('a.ability_name', robotEvent).css({opacity:''}).removeAttr('data-status');
 
+    thisPlayerCanvas.attr('data-robot', '');
+    thisPlayerCanvas.addClass('hidden');
+    thisPlayerCanvas.find('.wrapper_header').html('Select Player');
+
+    thisItemCanvas.attr('data-player', '');
+    thisItemCanvas.attr('data-robot', '');
+    thisItemCanvas.addClass('hidden');
+    thisItemCanvas.find('.wrapper_header').html('Select Item');
+
     thisAbilityCanvas.attr('data-player', '');
     thisAbilityCanvas.attr('data-robot', '');
     thisAbilityCanvas.attr('data-key', '');
-
-    thisItemCanvas.addClass('hidden');
     thisAbilityCanvas.addClass('hidden');
     thisAbilityCanvas.find('.wrapper_header').html('Select Ability');
 

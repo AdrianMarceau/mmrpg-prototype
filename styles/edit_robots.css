@@ -1,261 +1,269 @@
 #mmrpg,
 #prototype {
-  margin: 0;
-  padding: 0;
-  background-color: transparent;
-  width: 762px;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    width: 762px;
 }
 #edit .header {
-  width: 100%;
+    width: 100%;
 }
 #edit #canvas,
 #edit #canvas .robot_canvas,
+#edit #canvas .player_canvas,
 #edit #canvas .ability_canvas,
 #edit #canvas .item_canvas {
-  display: block;
-  float: none;
-  margin: 0 auto 2px;
-  height: auto;
-  width: 100%;
-  color: #FFFFFF;
-  overflow: hidden;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+    display: block;
+    float: none;
+    margin: 0 auto 2px;
+    height: auto;
+    width: 100%;
+    color: #FFFFFF;
+    overflow: hidden;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 #edit #canvas .robot_canvas,
+#edit #canvas .player_canvas,
 #edit #canvas .ability_canvas,
 #edit #canvas .item_canvas {
 
 }
 #edit #canvas .robot_canvas.hidden,
+#edit #canvas .player_canvas.hidden,
 #edit #canvas .ability_canvas.hidden,
 #edit #canvas .item_canvas.hidden {
-  display: none;
+    display: none;
 }
 #edit td.canvas {
-  vertical-align: top;
-  overflow: hidden;
-  height: auto;
-  min-height: 0;
+    vertical-align: top;
+    overflow: hidden;
+    height: auto;
+    min-height: 0;
 }
 #edit #canvas .robot_canvas table.links,
+#edit #canvas .player_canvas div.links,
 #edit #canvas .ability_canvas div.links,
 #edit #canvas .item_canvas div.links {
-  width: 100%;
+    width: 100%;
 }
+#edit #canvas .player_canvas div.links,
 #edit #canvas .ability_canvas div.links,
 #edit #canvas .item_canvas div.links {
-  width: 100%;
-  min-height: 90px;
+    width: 100%;
+    min-height: 90px;
 }
 #edit #canvas .robot_canvas table.links td,
+#edit #canvas .aplayer_canvas div.links a,
 #edit #canvas .ability_canvas div.links a,
 #edit #canvas .item_canvas div.links a {
-  vertical-align: top;
+    vertical-align: top;
 }
 #edit #canvas .wrapper {
-  display: block;
-  float: left;
-  position: relative;
-  border: 1px solid #1A1A1A !important;
-  border-radius: 0.5em;
-  -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;
-  background-color: #222222;
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    color-stop(0, rgba(0, 0, 0, 0.05)),
-    color-stop(1, rgba(255, 255, 255, 0.05))
-  );
-  background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
-  background-image: -moz-linear-gradient(bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
-  background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
-  background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
-  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
-  background-size: 100% 100%;
-  background-position: 0 0;
-  min-height: 54px;
-  min-width: 158px;
-  width: auto;
-  padding: 4px 4px 4px;
-  margin: 0;
-  top: auto;
-  bottom: auto;
-  left: auto;
-  right: auto;
-  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    display: block;
+    float: left;
+    position: relative;
+    border: 1px solid #1A1A1A !important;
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    background-color: #222222;
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, rgba(0, 0, 0, 0.05)),
+        color-stop(1, rgba(255, 255, 255, 0.05))
+    );
+    background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
+    background-image: -moz-linear-gradient(bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
+    background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
+    background-size: 100% 100%;
+    background-position: 0 0;
+    min-height: 54px;
+    min-width: 158px;
+    width: auto;
+    padding: 4px 4px 4px;
+    margin: 0;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
 }
+#edit #canvas .player_canvas .wrapper,
 #edit #canvas .ability_canvas .wrapper,
 #edit #canvas .item_canvas .wrapper {
-  width: 99%;
+    width: 99%;
 }
 #edit #canvas .wrapper .wrapper_overflow {
-  display: block;
-  position: relative;
-  /*max-height: 150px;*/
-  max-height: 100px;
-  overflow: hidden;
-  padding-bottom: 4px;
-  margin: 4px 2px 14px 2px;
+    display: block;
+    position: relative;
+    /*max-height: 150px;*/
+    max-height: 100px;
+    overflow: hidden;
+    padding-bottom: 4px;
+    margin: 4px 2px 14px 2px;
 }
 #edit #canvas .robot_canvas .wrapper .wrapper_overflow {
-  max-height: 68px;
+    max-height: 68px;
 }
+#edit #canvas .player_canvas .wrapper .wrapper_overflow,
 #edit #canvas .ability_canvas .wrapper .wrapper_overflow,
 #edit #canvas .item_canvas .wrapper .wrapper_overflow {
-  max-height: 90px;
-  padding-right: 8px;
+    max-height: 90px;
+    padding-right: 8px;
 }
 #edit #canvas .ps-container:hover>.ps-scrollbar-y-rail:hover {
-  background-color: #363636;
+    background-color: #363636;
 }
 #edit #canvas .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail {
-  background-color: #696969;
+    background-color: #696969;
 }
 #edit #canvas .ps-container:hover>.ps-scrollbar-y-rail:hover>.ps-scrollbar-y {
-  background-color: #969696;
+    background-color: #969696;
 }
 #edit #canvas .wrapper_header {
-  display: block;
-  clear: both;
-  margin: 0 auto 2px;
-  padding: 0 6px;
-  font-size: 10px;
-  line-height: 16px;
-  text-align: left;
-  background-color: rgba(0, 0, 0, 0.8);
-  border: 1px solid #1A1A1A;
-  border-radius: 0.3em;
-  -moz-border-radius: 0.3em;
-  -webkit-border-radius: 0.3em;
-  color: #FFFFFF;
-  position: relative;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  font-weight: bold;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    display: block;
+    clear: both;
+    margin: 0 auto 2px;
+    padding: 0 6px;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: left;
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid #1A1A1A;
+    border-radius: 0.3em;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+    color: #FFFFFF;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
 }
 #edit #canvas .wrapper_header .count {
-  float: right;
-  font-size: 9px;
-  position: relative;
-  bottom: 1px;
+    float: right;
+    font-size: 9px;
+    position: relative;
+    bottom: 1px;
 }
 #edit #canvas .wrapper .sort_wrapper {
-  display: block;
-  position: absolute;
-  bottom: 3px;
-  right: 3px;
-  left: 3px;
-  width: auto;
-  height: 8px;
-  text-align: center;
-  padding: 2px 4px;
-  font-size: 8px;
-  line-height: 8px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #FFFFFF;
-  border: 0 none transparent;
-  background-color: #242424;
-  -webkit-border-radius: 0 0 5px 5px;
-  -moz-border-radius: 0 0 5px 5px;
-  border-radius: 0 0 5px 5px;
+    display: block;
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    left: 3px;
+    width: auto;
+    height: 8px;
+    text-align: center;
+    padding: 2px 4px;
+    font-size: 8px;
+    line-height: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #FFFFFF;
+    border: 0 none transparent;
+    background-color: #242424;
+    -webkit-border-radius: 0 0 5px 5px;
+    -moz-border-radius: 0 0 5px 5px;
+    border-radius: 0 0 5px 5px;
 }
 #edit #canvas .wrapper .sort_wrapper .label,
 #edit #canvas .wrapper .sort_wrapper .sort {
-  display: inline-block;
-  position: static;
-  float: none;
-  font-size: 7px;
-  line-height: 7px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  text-decoration: none;
+    display: inline-block;
+    position: static;
+    float: none;
+    font-size: 7px;
+    line-height: 7px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
 }
 #edit #canvas .wrapper .sort_wrapper .label {
-  color: rgba(255, 255, 255, 0.90);
+    color: rgba(255, 255, 255, 0.90);
 }
 #edit #canvas .wrapper .sort_wrapper .sort {
-  margin-left: 4px;
-  color: rgba(255, 255, 255, 0.60);
-  cursor: pointer;
+    margin-left: 4px;
+    color: rgba(255, 255, 255, 0.60);
+    cursor: pointer;
 
 }
 #edit #canvas .wrapper .sort_wrapper .sort:hover {
-  color: rgba(255, 255, 255, 0.90);
+    color: rgba(255, 255, 255, 0.90);
 }
 #edit #canvas .wrapper_left {
-  /*float: left;*/
+    /*float: left;*/
 }
 #edit #canvas .wrapper_right {
-  /*float: left;
-  margin-left: 2px;*/
+    /*float: left;
+    margin-left: 2px;*/
 }
 #edit #edit_overlay {
-  border-radius: 0.5em;
-  -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;
-  background-color: rgba(0, 0, 0, 0.75);
-  position: absolute;
-  top: 50px;
-  left: 6px;
-  right: 6px;
-  bottom: 3px;
-  height: auto;
-  z-index: 9999;
-  display: none;
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    background-color: rgba(0, 0, 0, 0.75);
+    position: absolute;
+    top: 50px;
+    left: 6px;
+    right: 6px;
+    bottom: 3px;
+    height: auto;
+    z-index: 9999;
+    display: none;
 }
 #edit #canvas .wrapper .event {
-  width: 100%;
+    width: 100%;
 }
 #edit #canvas .sprite_robot {
-  position: static;
-  float: left;
-  height: 24px;
-  width: 22px;
-  background-color: #000000;
-  border: 2px solid transparent;
-  border-color: transparent !important;
-  border-radius: 0.25em;
-  -moz-border-radius: 0.25em;
-  -webkit-border-radius: 0.25em;
-  margin: 0 6px 6px 0;
-  background-position: -8px -12px;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-  opacity: 0.30;
+    position: static;
+    float: left;
+    height: 24px;
+    width: 22px;
+    background-color: #000000;
+    border: 2px solid transparent;
+    border-color: transparent !important;
+    border-radius: 0.25em;
+    -moz-border-radius: 0.25em;
+    -webkit-border-radius: 0.25em;
+    margin: 0 6px 6px 0;
+    background-position: -8px -12px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    opacity: 0.30;
 }
 #edit #canvas .sprite_robot.notloaded {
-  opacity: 0.15 !important;
+    opacity: 0.15 !important;
 }
 #edit #canvas .sprite_robot:hover {
-  opacity: 0.90 !important;
+    opacity: 0.90 !important;
 }
 #edit #canvas .sprite_robot_current,
 #edit #canvas .sprite_robot_current:hover {
-  opacity: 1.0;
+    opacity: 1.0;
 }
 /*
 #edit #canvas .sprite_robot_dr-light_current {
-  border-color: rgb(80, 100, 255) !important;
+    border-color: rgb(80, 100, 255) !important;
 }
 #edit #canvas .sprite_robot_dr-wily_current {
-  border-color: rgb(255, 100, 100) !important;
+    border-color: rgb(255, 100, 100) !important;
 }
 #edit #canvas .sprite_robot_dr-cossack_current {
-  border-color: rgb(144, 61, 190) !important;
+    border-color: rgb(144, 61, 190) !important;
 }
 */
 
@@ -267,88 +275,88 @@
 }
 
 #edit #canvas .options {
-  display: block;
-  position: absolute;
-  bottom: -2px;
-  left: -2px;
-  width: 46px;
-  height: 17px;
-  border: 1px solid rgb(36,36,36);
-  border-width: 1px 0 0 1px;
-  font-size: 6px;
-  line-height: 12px;
-  letter-spacing: 2px;
-  text-align: right;
-  text-transform: none;
-  padding: 1px 16px 1px 6px;
-  border-radius: 0 5em 0 0;
-  -moz-border-radius: 0 5em 0 0;
-  -webkit-border-radius: 0 5em 0 0;
-  background-color: rgb(43,43,43);
-  background-image: -webkit-gradient(
-      linear,
-      left bottom,
-      left top,
-      color-stop(0.15, rgb(43,43,43)),
-      color-stop(0.75, rgb(41,41,41))
-  );
-  background-image: -moz-linear-gradient(
-      center bottom,
-      rgb(43,43,43) 15%,
-      rgb(41,41,41) 75%
-  );
-  text-shadow: 1px 1px 4px #333333;
-  cursor: pointer;
-  _cursor: hand;
-  box-shadow: 0 1px 2px #191919;
-  -moz-box-shadow: 0 1px 2px #191919;
-  -webkit-box-shadow: 0 1px 2px #191919;
-  overflow: hidden;
-  z-index: 30;
-  text-decoration: none;
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    left: -2px;
+    width: 46px;
+    height: 17px;
+    border: 1px solid rgb(36,36,36);
+    border-width: 1px 0 0 1px;
+    font-size: 6px;
+    line-height: 12px;
+    letter-spacing: 2px;
+    text-align: right;
+    text-transform: none;
+    padding: 1px 16px 1px 6px;
+    border-radius: 0 5em 0 0;
+    -moz-border-radius: 0 5em 0 0;
+    -webkit-border-radius: 0 5em 0 0;
+    background-color: rgb(43,43,43);
+    background-image: -webkit-gradient(
+            linear,
+            left bottom,
+            left top,
+            color-stop(0.15, rgb(43,43,43)),
+            color-stop(0.75, rgb(41,41,41))
+    );
+    background-image: -moz-linear-gradient(
+            center bottom,
+            rgb(43,43,43) 15%,
+            rgb(41,41,41) 75%
+    );
+    text-shadow: 1px 1px 4px #333333;
+    cursor: pointer;
+    _cursor: hand;
+    box-shadow: 0 1px 2px #191919;
+    -moz-box-shadow: 0 1px 2px #191919;
+    -webkit-box-shadow: 0 1px 2px #191919;
+    overflow: hidden;
+    z-index: 30;
+    text-decoration: none;
 }
 
 #edit #console {
-  /* width: 100% !important; */
-  overflow: visible;
-  height: auto;
-  float: none;
-  margin: 0 auto 2px;
-  width: 100% !important;
-  min-height: 230px;
+    /* width: 100% !important; */
+    overflow: visible;
+    height: auto;
+    float: none;
+    margin: 0 auto 2px;
+    width: 100% !important;
+    min-height: 230px;
 }
 #edit td.console {
-  overflow: hidden;
-  height: auto;
-  min-height: 0;
+    overflow: hidden;
+    height: auto;
+    min-height: 0;
 }
 #edit #console .event {
-  margin: 0;
-  min-height: 224px;
+    margin: 0;
+    min-height: 224px;
 }
 #edit #console .event_hidden {
-  display: none;
+    display: none;
 }
 #edit #console .event_visible {
 
 }
 #edit #console .event table td.right {
-  line-height: 21px;
+    line-height: 21px;
 }
 #edit #console .event label.original_player_dr-light span.current_player_dr-light,
 #edit #console .event label.original_player_dr-light span.current_player_dr-wily,
 #edit #console .event label.original_player_dr-light span.current_player_dr-cossack {
-  color: rgb(126, 157, 221) !important;
+    color: rgb(126, 157, 221) !important;
 }
 #edit #console .event label.original_player_dr-wily span.current_player_dr-light,
 #edit #console .event label.original_player_dr-wily span.current_player_dr-wily,
 #edit #console .event label.original_player_dr-wily span.current_player_dr-cossack {
-  color: rgb(255, 171, 171) !important;
+    color: rgb(255, 171, 171) !important;
 }
 #edit #console .event label.original_player_dr-cossack span.current_player_dr-light,
 #edit #console .event label.original_player_dr-cossack span.current_player_dr-wily,
 #edit #console .event label.original_player_dr-cossack span.current_player_dr-cossack {
-  color: rgb(190, 141, 223) !important;
+    color: rgb(190, 141, 223) !important;
 }
 
 
@@ -361,59 +369,59 @@
 
 }
 #edit #console .event .event_robot_mugshot {
-  height: 40px;
+    height: 40px;
 }
 #edit #console .event .event_robot_core {
-  margin-top: 46px;
-  height: 14px;
-  z-index: 100;
-  overflow: hidden;
+    margin-top: 46px;
+    height: 14px;
+    z-index: 100;
+    overflow: hidden;
 }
 #edit #console .event .event_robot_core2 {
-  margin-top: 68px;
-  height: 12px;
-  z-index: 95;
-  overflow: hidden;
+    margin-top: 68px;
+    height: 12px;
+    z-index: 95;
+    overflow: hidden;
 }
 
 #edit #console .event .event_robot_images {
-  margin-top: 48px;
-  height: 48px;
-  z-index: 90;
+    margin-top: 48px;
+    height: 48px;
+    z-index: 90;
 }
 #edit #console .event .event_robot_summons {
-  margin-top: 104px;
-  height: 21px;
-  text-align: center;
-  line-height: 10px;
-  z-index: 80;
+    margin-top: 104px;
+    height: 21px;
+    text-align: center;
+    line-height: 10px;
+    z-index: 80;
 }
 #edit #console .event .event_robot_summons .summons_count {
-  font-size: 11px;
-  font-weight: bold;
-  line-height: 12px;
-  color: #DEDEDE;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 12px;
+    color: #DEDEDE;
 }
 #edit #console .event .event_robot_summons .summons_label {
-  font-size: 8px;
-  line-height: 8px;
-  color: #CECECE;
+    font-size: 8px;
+    line-height: 8px;
+    color: #CECECE;
 }
 #edit #console .event .event_robot_favourite {
-  margin-top: 133px;
-  height: 14px;
-  z-index: 70;
+    margin-top: 133px;
+    height: 14px;
+    z-index: 70;
 }
 
 
 #edit #console .event_has_subcore .event_robot_images {
-  margin-top: 88px;
+    margin-top: 88px;
 }
 #edit #console .event_has_subcore .event_robot_summons {
-  margin-top: 144px;
+    margin-top: 144px;
 }
 #edit #console .event_has_subcore .event_robot_favourite {
-  margin-top: 173px;
+    margin-top: 173px;
 }
 
 #edit #console .event .event_robot_mugshot .sprite_wrapper,
@@ -421,140 +429,140 @@
 #edit #console .event .event_robot_favourite .sprite_wrapper,
 #edit #console .event .event_robot_core .sprite_wrapper,
 #edit #console .event .event_robot_core2 .sprite_wrapper {
-  margin: 0;
-  width: 40px;
-  height: 40px;
-  position: relative;
-  display: block;
+    margin: 0;
+    width: 40px;
+    height: 40px;
+    position: relative;
+    display: block;
 }
 #edit #console .event .event_robot_mugshot .sprite_wrapper .sprite,
 #edit #console .event .event_robot_images .sprite_wrapper .sprite {
-  margin: 0;
-  position: absolute;
+    margin: 0;
+    position: absolute;
 }
 
 
 #edit #console .event .event_robot_images span.robot_image_alts {
-  cursor: default;
-  display: block;
+    cursor: default;
+    display: block;
 }
 #edit #console .event .event_robot_images a.robot_image_alts {
-  cursor: pointer;
-  display: block;
+    cursor: pointer;
+    display: block;
 }
 
 #edit #console .event .event_robot_images .sprite_wrapper .token {
-  position: absolute;
-  bottom: -12px;
-  left: 2px;
-  color: #606060;
-  font-size: 14px;
-  line-height: 14px;
-  height: 14px;
-  width: 14px;
+    position: absolute;
+    bottom: -12px;
+    left: 2px;
+    color: #606060;
+    font-size: 14px;
+    line-height: 14px;
+    height: 14px;
+    width: 14px;
 }
 #edit #console .event .event_robot_images .sprite_wrapper .token_enabled {
-  color: #606060;
+    color: #606060;
 }
 #edit #console .event .event_robot_images .sprite_wrapper .token_disabled {
-  color: #202020;
+    color: #202020;
 }
 #edit #console .event .event_robot_images .sprite_wrapper .token_active {
-  color: #B0B0B0;
+    color: #B0B0B0;
 }
 
 #edit #console .event .event_robot_core .robot_core,
 #edit #console .event .event_robot_core2 .robot_core2 {
-  display: block;
-  font-size: 20px;
-  line-height: 20px;
-  margin: -11px auto 0;
-  text-align: center;
-  text-decoration: none;
-  color: #2A2A2A;
-  background-color: transparent !important;
-  border-color: transparent !important;
-  background-position: center top;
-  padding: 0;
+    display: block;
+    font-size: 20px;
+    line-height: 20px;
+    margin: -11px auto 0;
+    text-align: center;
+    text-decoration: none;
+    color: #2A2A2A;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    background-position: center top;
+    padding: 0;
 }
 #edit #console .event .event_robot_core a.robot_core,
 #edit #console .event .event_robot_core2 .robot_core2 {
-  cursor: pointer;
+    cursor: pointer;
 }
 #edit #console .event .event_robot_core2 .robot_core2 .sprite {
-  background-position: center 4px;
-  background-size: 70%;
+    background-position: center 4px;
+    background-size: 70%;
 }
 
 #edit #console .event .robot_favourite {
-  display: block;
-  font-size: 20px;
-  line-height: 20px;
-  margin: -2px auto 0;
-  text-align: center;
-  cursor: pointer;
-  text-decoration: none;
-  color: #2A2A2A;
+    display: block;
+    font-size: 20px;
+    line-height: 20px;
+    margin: -2px auto 0;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    color: #2A2A2A;
 }
 #edit #console .event .robot_favourite:hover,
 #edit #console .event .robot_favourite_active {
-  color: #DEDEDE;
+    color: #DEDEDE;
 }
 #edit #console .event span.robot_favourite,
 #edit #console .event span.robot_favourite:hover {
-  cursor: default;
-  color: #2A2A2A;
+    cursor: default;
+    color: #2A2A2A;
 }
 #edit #console .event span.robot_favourite_active,
 #edit #console .event span.robot_favourite_active:hover {
-  color: #DEDEDE;
+    color: #DEDEDE;
 }
 
 
 
 #edit #console .event a.player_name,
 #edit #console .event a.item_name {
-  display: block;
-  float: right;
-  padding: 1px 0;
-  margin: 2px 0 0;
-  width: 155px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  height: 13px;
-  cursor: pointer;
-  _cursor: hand;
+    display: block;
+    float: right;
+    padding: 1px 0;
+    margin: 2px 0 0;
+    width: 155px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 13px;
+    cursor: pointer;
+    _cursor: hand;
 }
 #edit #console .event a.item_name {
 
 }
 #edit #console .event a.player_name:hover,
 #edit #console .event a.item_name:hover {
-  background-color: #515151;
+    background-color: #515151;
 }
 #edit #console .event a.player_name label,
 #edit #console .event a.item_name label {
-  display: block;
-  margin: 0;
-  padding-left: 16px;
-  padding-right: 16px;
-  width: auto;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  height: 13px;
-  cursor: pointer;
-  _cursor: hand;
-  pointer-events:none;
-  background-image: none;
-  background-repeat: no-repeat;
-  background-position: 0 -3px;
-  background-size: 17px 17px;
-  position: relative;
-  bottom: -1px;
+    display: block;
+    margin: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+    width: auto;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 13px;
+    cursor: pointer;
+    _cursor: hand;
+    pointer-events:none;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: 0 -3px;
+    background-size: 17px 17px;
+    position: relative;
+    bottom: -1px;
 }
 #edit #console .event a.item_name label {
 
@@ -563,32 +571,32 @@
 #edit #console .event select.player_name:hover,
 #edit #console .event select.item_name,
 #edit #console .event select.item_name:hover {
-  display: block;
-  margin: 0;
-  padding: 2px 3px 2px 8px;
-  width: 155px;
-  text-align: left;
-  overflow: hidden;
-  white-space: nowrap;
-  height: 13px;
-  position: relative;
-  top: -16px;
-  left: -2px;
-  border: 0 none transparent;
-  background-color: rgb(43,43,43);
-  color: #FFFFFF;
-  opacity: 0;
-  font-size: 12px;
-  line-height: 19px;
-  height: 19px;
-  cursor: pointer;
-  _cursor: hand;
-  text-decoration: none;
-  font-weight: normal;
-  /*
-  background-color: red;
-  opacity: 0.30;
-  */
+    display: block;
+    margin: 0;
+    padding: 2px 3px 2px 8px;
+    width: 155px;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 13px;
+    position: relative;
+    top: -16px;
+    left: -2px;
+    border: 0 none transparent;
+    background-color: rgb(43,43,43);
+    color: #FFFFFF;
+    opacity: 0;
+    font-size: 12px;
+    line-height: 19px;
+    height: 19px;
+    cursor: pointer;
+    _cursor: hand;
+    text-decoration: none;
+    font-weight: normal;
+    /*
+    background-color: red;
+    opacity: 0.30;
+    */
 }
 #edit #console .event select.item_name,
 #edit #console .event select.item_name:hover {
@@ -596,25 +604,25 @@
 }
 #edit #console .event select.player_name option,
 #edit #console .event select.item_name option {
-  text-align: center;
+    text-align: center;
 }
 #edit #console .event a.player_name label .arrow,
 #edit #console .event a.ability_name label .arrow,
 #edit #console .event a.item_name label .arrow {
-  display: block;
-  width: auto;
-  height: auto;
-  text-align: center;
-  cursor: pointer;
-  _cursor: hand;
-  color: #FFFFFF;
-  position: absolute;
-  top: 3px;
-  right: 4px;
-  font-size: 8px;
-  line-height: 8px;
-  opacity: 0.10;
-  filter: alpha(opacity=10);
+    display: block;
+    width: auto;
+    height: auto;
+    text-align: center;
+    cursor: pointer;
+    _cursor: hand;
+    color: #FFFFFF;
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    font-size: 8px;
+    line-height: 8px;
+    opacity: 0.10;
+    filter: alpha(opacity=10);
 }
 #edit #console .event a.player_name:hover label .arrow,
 #edit #console .event a.ability_name:hover label .arrow,
@@ -622,202 +630,222 @@
 #edit #console .event a.player_name[data-status=pending] label .arrow,
 #edit #console .event a.ability_name[data-status=pending] label .arrow,
 #edit #console .event a.item_name[data-status=pending] label .arrow {
-  opacity: 0.90;
-  filter: alpha(opacity=90);
+    opacity: 0.90;
+    filter: alpha(opacity=90);
 }
 #edit #canvas .wrapper a.player_name label .arrow,
 #edit #canvas .wrapper a.ability_name label .arrow,
 #edit #canvas .wrapper a.item_name label .arrow {
-  display: none;
+    display: none;
 }
 
 #edit #console .event a.robot_level_reset {
-  color: #FFFFFF !important;
-  text-decoration: none;
-  cursor: pointer;
+    color: #FFFFFF !important;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 
 #edit #console .event .statboost_robot {
-  color: rgb(213, 255, 202) !important;
+    color: rgb(213, 255, 202) !important;
 }
 #edit #console .event .statboost_player_dr-light {
-  color: rgb(171, 228, 255) !important;
+    color: rgb(171, 228, 255) !important;
 }
 #edit #console .event .statboost_player_dr-wily {
-  color: rgb(255, 171, 171) !important;
+    color: rgb(255, 171, 171) !important;
 }
 #edit #console .event .statboost_player_dr-cossack {
-  color: rgb(190, 141, 223) !important;
+    color: rgb(190, 141, 223) !important;
 }
 
 #edit #console .event .ability_container,
+#edit #canvas .player_canvas .player_container,
 #edit #canvas .ability_canvas .ability_container,
 #edit #canvas .item_canvas .item_container {
-  display: block;
-  float: right;
-  padding-top: 2px;
-  width: auto;
-  min-width: 99%;
-  text-align: left;
-  overflow: hidden;
-  height: auto;
+    display: block;
+    float: right;
+    padding-top: 2px;
+    width: auto;
+    min-width: 99%;
+    text-align: left;
+    overflow: hidden;
+    height: auto;
 }
 #edit #console .event a.ability_name,
+#edit #canvas .player_canvas a.player_name,
 #edit #canvas .ability_canvas a.ability_name,
 #edit #canvas .item_canvas a.item_name {
-  display: block;
-  float: left;
-  padding: 2px 3px;
-  margin: 0 5px 5px 0;
-  width: 140px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  height: 13px;
-  cursor: pointer;
-  _cursor: hand;
-  background-clip: padding-box;
+    display: block;
+    float: left;
+    padding: 2px 3px;
+    margin: 0 5px 5px 0;
+    width: 140px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 13px;
+    cursor: pointer;
+    _cursor: hand;
+    background-clip: padding-box;
 }
 #edit #console .event a.ability_name,
+#edit #canvas .player_canvas a.player_name,
 #edit #canvas .ability_canvas a.ability_name,
 #edit #canvas .item_canvas a.item_name {
-  margin: 0 0.4% 0.4% 0;
-  width: 23.4%;
+    margin: 0 0.4% 0.4% 0;
+    width: 23.4%;
 }
 #edit #console .event a.ability_name:hover,
+#edit #canvas .player_canvas a.player_name:hover,
 #edit #canvas .ability_canvas a.ability_name:hover,
 #edit #canvas .item_canvas a.item_name:hover {
-  background-color: #515151;
+    background-color: #515151;
 }
+#edit #canvas .player_canvas a.player_name,
 #edit #canvas .ability_canvas a.ability_name,
 #edit #canvas .item_canvas a.item_name {
-  opacity: 0.80;
-  filter: alpha(opacity=80);
+    opacity: 0.80;
+    filter: alpha(opacity=80);
 }
+#edit #canvas .player_canvas a.player_name:hover,
 #edit #canvas .ability_canvas a.ability_name:hover,
 #edit #canvas .item_canvas a.item_name:hover {
-  opacity: 1.0;
-  filter: alpha(opacity=100);
+    opacity: 1.0;
+    filter: alpha(opacity=100);
 }
-#edit #console .event a.ability_name[data-status=disabled] {
-  opacity: 0.3;
-  filter: alpha(opacity=30);
+#edit #console .event a.player_name[data-status=disabled],
+#edit #console .event a.ability_name[data-status=disabled],
+#edit #console .event a.item_name[data-status=disabled] {
+    opacity: 0.3;
+    filter: alpha(opacity=30);
 }
+#edit #canvas .player_canvas a.player_name[data-status=disabled],
 #edit #canvas .ability_canvas a.ability_name[data-status=disabled],
 #edit #canvas .item_canvas a.item_name[data-status=disabled] {
-  opacity: 0.2;
-  filter: alpha(opacity=20);
-  cursor: default;
+    opacity: 0.2;
+    filter: alpha(opacity=20);
+    cursor: default;
 }
 #edit #console .event a.ability_name label,
+#edit #canvas .player_canvas a.player_name label,
 #edit #canvas .ability_canvas a.ability_name label,
 #edit #canvas .item_canvas a.item_name label {
-  display: block;
-  margin: 0;
-  padding-left: 15px;
-  width: auto;
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  height: 13px;
-  cursor: pointer;
-  _cursor: hand;
-  pointer-events:none;
-  background-image: none;
-  background-repeat: no-repeat;
-  background-position: -4px -4px;
-  background-size: 20px 20px;
+    display: block;
+    margin: 0;
+    padding-left: 15px;
+    width: auto;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 13px;
+    line-height: 13px;
+    cursor: pointer;
+    _cursor: hand;
+    pointer-events:none;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: -4px -4px;
+    background-size: 20px 20px;
 }
+#edit #canvas .player_canvas a.player_name label,
 #edit #canvas .ability_canvas a.ability_name label,
 #edit #canvas .item_canvas a.item_name label {
 
 }
-#edit #canvas .item_canvas a.item_name label .count {
-  float: right;
-  font-size: 80%;
-  margin-right: 2px;
+#edit #canvas .player_canvas a.player_name label {
+
 }
+#edit #canvas .item_canvas a.item_name label .count {
+    float: right;
+    font-size: 80%;
+    margin-right: 2px;
+}
+#edit #console .event select.player_name,
+#edit #console .event select.player_name:hover,
 #edit #console .event select.ability_name,
 #edit #console .event select.ability_name:hover,
 #edit #console .event select.item_name,
 #edit #console .event select.item_name:hover,
+#edit #canvas .player_canvas select.player_name,
+#edit #canvas .player_canvas select.player_name:hover,
 #edit #canvas .ability_canvas select.ability_name,
 #edit #canvas .ability_canvas select.ability_name:hover,
 #edit #canvas .item_canvas select.item_name,
 #edit #canvas .item_canvas select.item_name:hover {
-  display: block;
-  margin: 0;
-  padding: 2px 3px;
-  width: auto;
-  min-width: 100px;
-  text-align: center;
-  overflow: hidden;
-  white-space: nowrap;
-  height: 13px;
-  position: relative;
-  top: -16px;
-  left: -2px;
-  border: 0 none transparent;
-  background-color: rgb(43,43,43);
-  color: #FFFFFF;
-  opacity: 0;
-  font-size: 12px;
-  line-height: 19px;
-  height: 19px;
-  cursor: pointer;
-  _cursor: hand;
-  text-decoration: none;
-  font-weight: normal;
-  /*
-  background-color: red;
-  opacity: 0.30;
-  */
+    display: block;
+    margin: 0;
+    padding: 2px 3px;
+    width: auto;
+    min-width: 100px;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 13px;
+    position: relative;
+    top: -16px;
+    left: -2px;
+    border: 0 none transparent;
+    background-color: rgb(43,43,43);
+    color: #FFFFFF;
+    opacity: 0;
+    font-size: 12px;
+    line-height: 19px;
+    height: 19px;
+    cursor: pointer;
+    _cursor: hand;
+    text-decoration: none;
+    font-weight: normal;
+    /*
+    background-color: red;
+    opacity: 0.30;
+    */
 }
 #edit #console .event select.ability_name option,
+#edit #canvas .player_canvas select.player_name option,
 #edit #canvas .ability_canvas select.ability_name option,
 #edit #canvas .item_canvas select.item_name option {
-  text-align: left;
+    text-align: left;
 }
 
 
 #edit #console .header {
-  height: auto;
-  width: auto;
-  float: none;
-  box-shadow: 0 0 0 transparent;
-  background-image: none;
-  font-size: 10px;
-  padding: 5px 8px;
-  color: #FFFFFF;
-  position: relative;
-  line-height: 12px;
+    height: auto;
+    width: auto;
+    float: none;
+    box-shadow: 0 0 0 transparent;
+    background-image: none;
+    font-size: 10px;
+    padding: 5px 8px;
+    color: #FFFFFF;
+    position: relative;
+    line-height: 12px;
 }
 #edit #console .header .title,
 #edit #console .header .core {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  padding: 2px 6px;
-  background-color: rgba(0, 0, 0, 0.25) !important;
-  border-color: rgba(0, 0, 0, 0.25) !important;
-  line-height: 12px;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    padding: 2px 6px;
+    background-color: rgba(0, 0, 0, 0.25) !important;
+    border-color: rgba(0, 0, 0, 0.25) !important;
+    line-height: 12px;
 }
 #edit #console .header .title {
-  position: static;
-  font-size: 11px;
+    position: static;
+    font-size: 11px;
 }
 #edit #console .header .robot_type .wrap {
-  padding-right: 18px;
-  position: relative;
+    padding-right: 18px;
+    position: relative;
 }
 #edit #console .header .robot_type .wrap .sprite {
-  position: absolute;
-  background-position: center center;
-  top: -12px;
-  left: -14px;
+    position: absolute;
+    background-position: center center;
+    top: -12px;
+    left: -14px;
 }
 #edit #console .header .robot_type .text {
 
@@ -825,11 +853,11 @@
 
 
 #edit .section {
-  float: left;
-  width: 100%;
+    float: left;
+    width: 100%;
 }
 #edit .section .formatter {
-  width: 100%;
+    width: 100%;
 }
 
 
@@ -841,12 +869,12 @@
 /* -- Landscape Mode -- */
 @media (min-width: 1024px){
 
-  #mmrpg #prototype {
-    width: 1024px;
-  }
+    #mmrpg #prototype {
+        width: 1024px;
+    }
 
-  #prototype #canvas {
-    width: 100% !important;
-  }
+    #prototype #canvas {
+        width: 100% !important;
+    }
 
 }

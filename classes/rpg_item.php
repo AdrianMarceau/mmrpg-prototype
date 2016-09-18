@@ -963,7 +963,7 @@ class rpg_item extends rpg_object {
     }
 
 
-    // -- PRINT FUNCTIONS -- /
+    // -- PRINT FUNCTIONS -- //
 
     // Define a static function for printing out the item's title markup
     public static function print_editor_title_markup($robot_info, $item_info, $print_options = array()){
@@ -1140,13 +1140,12 @@ class rpg_item extends rpg_object {
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_rewards, $player_item_rewards, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
         global $mmrpg_database_items;
-        global $session_token;
+
+        // Collect the current session token
+        $session_token = rpg_game::session_token();
 
         // Require the function file
         $this_select_markup = '';
-
-        // Collect values for potentially missing global variables
-        if (!isset($session_token)){ $session_token = rpg_game::session_token(); }
 
         if (empty($robot_info)){ return false; }
         if (empty($item_info)){ return false; }
