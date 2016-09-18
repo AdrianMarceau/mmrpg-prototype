@@ -587,6 +587,7 @@ $(document).ready(function(){
         var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
         var thisLinkStatus = thisLink.attr('data-status') != undefined ? thisLink.attr('data-status') : 'enabled';
         var thisRobotEvent = thisLink.parents('.event[data-player][data-robot]');
+
         //console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus);
         if (thisContainerStatus == 'disabled'){
 
@@ -624,12 +625,19 @@ $(document).ready(function(){
                 thisPlayerCanvas.find('.wrapper_header').html('Select Player for '+thisRobotName);
                 thisPlayerCanvas.removeClass('hidden');
 
+                var playerRobotWrapper = $('.wrapper[data-player="'+thisPlayerToken+'"]', thisRobotCanvas);
+                var playerRobotCount = playerRobotWrapper.find('.sprite_robot[data-player][data-robot]').length;
+                //console.log('current player '+thisPlayerToken+' has '+playerRobotCount+' robots left');
+
                 $('.wrapper_overflow', thisPlayerCanvas).scrollTop(0).perfectScrollbar('update');
 
                 $('.player_name', thisPlayerCanvas).each(function(index, element){
                     var thisPlayer = $(this).attr('data-player');
                     if (thisPlayer == thisPlayerToken){
                         //console.log('Player '+thisPlayer+' is already selected');
+                        $(this).attr('data-status', 'disabled');
+                        } else if (playerRobotCount <= 1){
+                        //console.log('Player '+thisPlayer+' is on last robot');
                         $(this).attr('data-status', 'disabled');
                         } else {
                         //console.log('Player '+thisPlayer+' is available for transfer');
