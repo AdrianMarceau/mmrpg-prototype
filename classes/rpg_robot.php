@@ -623,6 +623,7 @@ class rpg_robot extends rpg_object {
 
         // Only continue if this hasn't been done already
         if (!empty($this->flags['apply_stat_bonuses'])){ return false; }
+
         /*
          * ROBOT CLASS FUNCTION APPLY STAT BONUSES
          * public function apply_stat_bonuses(){}
