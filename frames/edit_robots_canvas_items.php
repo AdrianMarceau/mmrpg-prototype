@@ -9,10 +9,9 @@ require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
 // Start the output buffer
 ob_start();
 
-echo '<div class="wrapper">';
+echo '<div class="wrapper no_sort">';
     echo '<div class="wrapper_header player_type player_type_experience">Select Item</div>';
     echo '<div class="wrapper_overflow">';
-        //echo '<table><tr>';
 
         // Print out the remove item option
         echo '<a class="item_name" style="" data-id="0" data-key="0" data-player="player" data-robot="robot" data-item="" title="" data-tooltip=""><label>- Remove Item -</label></a>';
@@ -28,13 +27,11 @@ echo '<div class="wrapper">';
             elseif (!empty($player_rewards['player_items'])){ $player_item_rewards = array(); }
 
             // Create a fake player and robot to pass the info check
-            $player_info = $mmrpg_index['players']['player']; //rpg_player::get_index_info('player'); //array('player_token' => 'player', 'player_name' => 'Player');
-            $robot_info = rpg_robot::get_index_info('robot'); //array('robot_token' => 'robot', 'robot_name' => 'Robot');
+            $player_info = $mmrpg_index['players']['player'];
+            $robot_info = rpg_robot::get_index_info('robot');
 
             // Sort the item rewards based on item number and such
             uasort($player_item_rewards, array('rpg_functions', 'items_sort_for_editor'));
-
-            //die(print_r($player_item_rewards, true));
 
             // Collect the item reward options to be used on all selects
             $item_rewards_options = $global_allow_editing ? rpg_item::print_editor_options_list_markup($player_item_rewards, null, $player_info, $robot_info) : '';
@@ -42,23 +39,17 @@ echo '<div class="wrapper">';
             foreach ($mmrpg_database_items AS $item_token => $item_info){
                 if (!isset($player_item_rewards[$item_token])){ continue; }
                 if ($item_info['item_subclass'] != 'holdable' && $item_info['item_subclass'] != 'consumable'){ continue; }
-                //if ($key_counter > 0 && $key_counter % 5 == 0){ echo '</tr><tr>'; }
-                //echo '<td>';
 
                 $temp_select_markup = rpg_item::print_editor_select_markup($item_rewards_options, $player_info, $robot_info, $item_info, $key_counter);
 
-                //echo $item_token.'<br />';
-                //echo $item_info['item_subclass'].'<br />';
                 echo $temp_select_markup.' ';
 
-
-                //echo '</td>';
                 $key_counter++;
             }
         }
-
-        //echo '</tr></table>';
     echo '</div>';
+
+    /*
     if ($global_allow_editing){
         ?>
         <div class="sort_wrapper">
@@ -69,6 +60,8 @@ echo '<div class="wrapper">';
         </div>
         <?php
     }
+    */
+
 echo '</div>';
 
 // Collect the contents of the buffer

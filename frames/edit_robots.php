@@ -100,28 +100,25 @@ refresh_editor_arrays(
 
 // -- GENERATE EDITOR MARKUP -- //
 
-// CANVAS ROBOTS MARKUP
-
 // Generate the canvas robots markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_markup'){
     require('edit_robots_canvas_robots.php');
 }
 
-// CANVAS ABILITIES MARKUP
+// Generate the canvas players markup for this page
+if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_players_markup'){
+    require('edit_robots_canvas_players.php');
+}
 
 // Generate the canvas abilities markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_abilities_markup'){
     require('edit_robots_canvas_abilities.php');
 }
 
-// CANVAS ITEMS MARKUP
-
 // Generate the canvas items markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'canvas_items_markup'){
     require('edit_robots_canvas_items.php');
 }
-
-// CONSOLE ROBOTS MARKUP
 
 // Generate the console markup for this page
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'console_markup'){
@@ -176,6 +173,9 @@ $first_robot_token = $allowed_edit_robots[0];
                                 <td class="canvas">
                                     <div id="canvas">
                                         <div class="robot_canvas" data-canvas="robots">
+                                            <div class="links"></div>
+                                        </div>
+                                        <div class="player_canvas" data-canvas="players">
                                             <div class="links"></div>
                                         </div>
                                         <div class="ability_canvas" data-canvas="abilities">

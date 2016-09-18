@@ -1982,6 +1982,9 @@ class rpg_player extends rpg_object {
 
     }
 
+
+    // -- PRINT FUNCTIONS -- //
+
     // Define a static function for printing out the player's database markup
     public static function print_database_markup($player_info, $print_options = array()){
 
@@ -3020,6 +3023,79 @@ class rpg_player extends rpg_object {
 
         // Return the generated markup
         return $this_markup;
+
+    }
+
+    // Define a static function for printing out the player's title markup
+    public static function print_editor_title_markup($player_info, $print_options = array()){
+
+        // Pull in global variables
+        $session_token = rpg_game::session_token();
+
+        // Collect the types index for reference
+        $mmrpg_types = rpg_type::get_index(true);
+
+        // Generta the basic player fields for display
+        $temp_player_title = '';
+        $temp_player_token = $player_info['player_token'];
+        $temp_player_name = $player_info['player_name'];
+        $temp_player_type = !empty($player_info['player_type']) ? $mmrpg_types[$player_info['player_type']] : false;
+
+        // Generate the player title based on available info
+        $temp_player_title = $player_info['player_name'];
+
+        // Generate the player description based on stat boosts
+        $temp_description = '';
+        if (!empty($temp_player_type)){
+            $bonus_stat_token = $temp_player_type['type_token'];
+            $bonus_stat_name = $temp_player_type['type_name'];
+            $bonus_stat_value = !empty($player_info['player_'.$bonus_stat_token]) ? $player_info['player_'.$bonus_stat_token] : 0;
+            $temp_description .= 'Bonus : +'.$bonus_stat_value.'% '.$bonus_stat_name.'';
+        }
+
+        $temp_player_title .= ' // '.$temp_description;
+
+        // Return the generated option markup
+        return $temp_player_title;
+
+    }
+
+
+    // Define a static function for printing out the item select markup
+    public static function print_editor_select_markup($player_info, $player_key = 0, $player_rewards = array(), $player_settings = array()){
+
+        // Define the global variables
+        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $allowed_edit_players;
+        global $allowed_edit_data_count, $allowed_edit_player_count, $first_player_token, $global_allow_editing;
+        global $key_counter;
+
+        // Collect the current session token
+        $session_token = rpg_game::session_token();
+
+        // Collect the types index for reference
+        $mmrpg_types = rpg_type::get_index(true);
+
+        // Require the function file
+        $this_select_markup = '';
+
+        // Collect basic info about this player
+        $player_info_token = $player_info['player_token'];
+        $player_info_name = $player_info['player_name'];
+        $player_info_type = !empty($player_info['player_type']) ? $mmrpg_types[$player_info['player_type']] : false;
+        $player_info_class_type = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
+
+        // Generate the player title and tooltip markup
+        $player_info_title = rpg_player::print_editor_title_markup($player_info);
+        $player_info_title_plain = strip_tags(str_replace('<br />', '//', $player_info_title));
+        $player_info_title_tooltip = htmlentities($player_info_title, ENT_QUOTES, 'UTF-8');
+        $player_info_title_html = str_replace(' ', '&nbsp;', $player_info_name);
+        $player_info_title_html = '<label style="background-image: url(images/players/'.$player_info_token.'/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$player_info_title_html.'</label>';
+        $this_select_markup = '<a class="player_name type type_'.$player_info_class_type.'" style="'.(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$player_key.'" data-player="'.$player_info['player_token'].'" title="'.$player_info_title_plain.'" data-tooltip="'.$player_info_title_tooltip.'">'.$player_info_title_html.'</a>';
+
+        // Return the generated select markup
+        return $this_select_markup;
+
 
     }
 
