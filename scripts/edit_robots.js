@@ -573,6 +573,130 @@ $(document).ready(function(){
         });
 
 
+    // -- PLAYER TRANSFER EVENTS -- //
+
+    // Create the event for player buttons in the console (clicking the player slot itself)
+    $('a.player_name', gameConsole).live('click', function(e){
+        e.preventDefault();
+        if (thisBody.hasClass('loading')){ return false; }
+        if (!gameSettings.allowEditing){ return false; }
+        //console.log('gameConsole > a.player_name clicked');
+
+        var thisLink = $(this);
+        var thisContainer = thisLink.parent();
+        var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
+        var thisLinkStatus = thisLink.attr('data-status') != undefined ? thisLink.attr('data-status') : 'enabled';
+        var thisRobotEvent = thisLink.parents('.event[data-player][data-robot]');
+        //console.log('thisContainerStatus = '+thisContainerStatus+', thisLinkStatus = '+thisLinkStatus);
+        if (thisContainerStatus == 'disabled'){
+
+            //console.log('container is disabled');
+
+            return false;
+
+            } else if (thisLinkStatus == 'pending'){
+
+            //console.log('player already selected, revert to normal menu');
+
+            return resetEditorMenus(thisRobotEvent);
+
+            } else {
+
+            var thisPlayerToken = thisRobotEvent.attr('data-player');
+            var thisRobotToken = thisRobotEvent.attr('data-robot');
+            var thisRobotName = thisRobotEvent.find('.header .title').html();
+
+            thisLink.css({opacity:''});
+            thisLink.attr('data-status', 'pending');
+            $('a.player_name', thisRobotEvent).not(thisLink).css({opacity:0.3}).attr('data-status', 'disabled');
+            $('a.ability_name', thisRobotEvent).css({opacity:0.3}).attr('data-status', 'disabled');
+
+            loadCanvasPlayersMarkup(function(){
+
+                //console.log('custom complete function!');
+
+                thisPlayerCanvas.attr('data-player', thisPlayerToken);
+                thisPlayerCanvas.attr('data-robot', thisRobotToken);
+
+                thisAbilityCanvas.addClass('hidden');
+                thisItemCanvas.addClass('hidden');
+                thisRobotCanvas.addClass('hidden');
+                thisPlayerCanvas.find('.wrapper_header').html('Select Player for '+thisRobotName);
+                thisPlayerCanvas.removeClass('hidden');
+
+                $('.wrapper_overflow', thisPlayerCanvas).scrollTop(0).perfectScrollbar('update');
+
+                $('.player_name', thisPlayerCanvas).each(function(index, element){
+                    var thisPlayer = $(this).attr('data-player');
+                    if (thisPlayer == thisPlayerToken){
+                        //console.log('Player '+thisPlayer+' is already selected');
+                        $(this).attr('data-status', 'disabled');
+                        } else {
+                        //console.log('Player '+thisPlayer+' is available for transfer');
+                        $(this).removeAttr('data-status');
+                        }
+                    });
+
+                });
+
+            }
+        });
+
+    // Create the click event for the player buttons in the canvas (select a new player from the list)
+    $('a.player_name', thisPlayerCanvas).live('click', function(e){
+        e.preventDefault();
+        if (thisBody.hasClass('loading')){ return false; }
+        if (!gameSettings.allowEditing){ return false; }
+        //console.log('thisPlayerCanvas > a.player_name clicked');
+
+        // Collect the robot token from the canvas
+        var thisRobotToken =  thisPlayerCanvas.attr('data-robot') != undefined ? thisPlayerCanvas.attr('data-robot') : '';
+
+        // Collect the old player token from the canvas
+        var oldPlayerToken =  thisPlayerCanvas.attr('data-player') != undefined ? thisPlayerCanvas.attr('data-player') : '';
+
+        // Collect the new player token from the link
+        var newPlayerLink = $(this);
+        var newPlayerStatus = newPlayerLink.attr('data-status') != undefined ? newPlayerLink.attr('data-status') : 'enabled';
+        var newPlayerToken =  newPlayerLink.attr('data-player') != undefined ? newPlayerLink.attr('data-player') : '';
+
+        // Collect referneces to the initiator link
+        var thisRobotEvent = $('.event[data-player='+oldPlayerToken+'][data-robot='+newPlayerToken+']', gameConsole);
+        var thisPlayerLink = $('.player_name', thisRobotEvent);
+
+        //console.log('player name in selection canvas clicked');
+        //console.log('robot:'+thisRobotToken+' | old-player:'+oldPlayerToken+' | new-player:'+newPlayerToken+' ('+newPlayerStatus+')');
+
+        // Ensure all data was provided before continuing
+        if (newPlayerStatus == 'disabled'){
+            //console.log('link status disabled');
+            return false;
+            } else if (!thisRobotToken.length){
+            //console.log('robot token empty');
+            return false;
+            } else if (!oldPlayerToken.length){
+            //console.log('old player token empty');
+            return false;
+            } else if (!newPlayerToken.length){
+            //console.log('new player token empty');
+            return false;
+            }
+
+        // Trigger the player transfer function for this robot
+        thisBody.addClass('loading');
+        return transferRobotToPlayer(thisRobotToken, oldPlayerToken, newPlayerToken, true, true, function(){
+
+            //console.log('robot transfer complete');
+
+            thisBody.removeClass('loading');
+            resetEditorMenus(thisRobotEvent);
+            //thisPlayerLink.trigger('click');
+
+            });
+
+        });
+
+
     // -- ITEM EQUIPPING EVENTS -- //
 
     // Create the event for item buttons in the console (clicking the item slot itself)
@@ -619,6 +743,7 @@ $(document).ready(function(){
                 thisItemCanvas.attr('data-player', thisPlayerToken);
                 thisItemCanvas.attr('data-robot', thisRobotToken);
 
+                thisPlayerCanvas.addClass('hidden');
                 thisAbilityCanvas.addClass('hidden');
                 thisRobotCanvas.addClass('hidden');
                 thisItemCanvas.find('.wrapper_header').html('Select Hold Item for '+thisRobotName);
