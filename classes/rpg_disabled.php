@@ -65,6 +65,100 @@ class rpg_disabled {
         $this_robot->update_session();
         $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, array('console_show_target' => false, 'canvas_show_disabled_bench' => $this_robot->robot_id.'_'.$this_robot->robot_token));
 
+        // Check to see if this robot is holding an Extra Life before disabling
+        if ($this_robot->has_item()){
+
+            // Define the item info based on token and load into memory
+            $item_token = $this_robot->get_item();
+            $item_info = array(
+                'flags' => array('is_part' => true),
+                'part_token' => 'item_'.$item_token,
+                'item_token' => $item_token
+                );
+            $this_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_info);
+            $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has item '.$item_token);
+
+            // If this robot is holding an Extra Life, prevented it from being disabled
+            if ($item_token == 'extra-life'){
+
+                // Allow this robot to show on the canvas again so we can revive it
+                unset($this_robot->flags['apply_disabled_state']);
+                unset($this_robot->flags['hidden']);
+                unset($this_robot->robot_attachments['ability_attachment-defeat']);
+                unset($this_robot->robot_attachments['item_attachment-defeat']);
+                $this_robot->robot_frame = 'defeat';
+                $this_robot->update_session();
+
+                // Restore the target robot's health and weapons back to their full amounts
+                $this_robot->robot_status = 'active';
+                $this_robot->robot_energy = 0; //$target_robot->robot_base_energy;
+                $this_robot->robot_weapons = 0; //$target_robot->robot_base_weapons;
+                $this_robot->robot_attack = $target_robot->robot_base_attack;
+                $this_robot->robot_defense = $target_robot->robot_base_defense;
+                $this_robot->robot_speed = $target_robot->robot_base_speed;
+                $this_robot->update_session();
+
+                // Update the target player's session
+                $this_player->update_session();
+
+                // Collect the base recovery amount for this item
+                $temp_item_recovery = $this_item->get_recovery();
+
+                // Remove the robot's current item now that it's used up in battle
+                $this_robot->set_item('');
+
+                // Define the item object and trigger info
+                $temp_base_energy = $this_robot->get_base_energy();
+                $temp_recovery_amount = round($temp_base_energy * ($temp_item_recovery / 100));
+                $this_item->recovery_options_update(array(
+                    'kind' => 'energy',
+                    'frame' => 'taunt',
+                    'percent' => true,
+                    'modifiers' => false,
+                    'frame' => 'taunt',
+                    'success' => array(9, 0, 0, -9999, 'The held '.$this_item->print_name().' restored '.$this_robot->print_name().'&#39;s life energy!'),
+                    'failure' => array(9, 0, 0, -9999, '')
+                    ));
+
+                // Trigger stat recovery for the holding robot
+                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$item_token.' restores energy by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
+                if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
+
+                // Define the item object and trigger info
+                $temp_base_weapons = $this_robot->get_base_weapons();
+                $temp_recovery_amount = round($temp_base_weapons * ($temp_item_recovery / 100));
+                $this_item->recovery_options_update(array(
+                    'kind' => 'weapons',
+                    'frame' => 'taunt',
+                    'percent' => true,
+                    'modifiers' => false,
+                    'frame' => 'taunt',
+                    'success' => array(9, 0, 0, -9999, 'The held '.$this_item->print_name().' restored '.$this_robot->print_name().'&#39;s weapon energy!'),
+                    'failure' => array(9, 0, 0, -9999, '')
+                    ));
+
+                // Trigger stat recovery for the holding robot
+                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$item_token.' restores weapons by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
+                if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
+
+                // Also remove this robot's item from the session, we're done with it
+                if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                    $ptoken = $this_player->player_token;
+                    $rtoken = $this_robot->robot_token;
+                    if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+                        $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                    }
+                }
+
+                // Update the target player's session
+                $this_player->update_session();
+
+                // Return false as we're not really disabled
+                return false;
+
+            }
+
+        }
 
         /*
          * EFFORT VALUES / STAT BOOST BONUSES

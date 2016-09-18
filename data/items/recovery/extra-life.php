@@ -31,6 +31,7 @@ $item = array(
         // Allow this robot to show on the canvas again so we can revive it
         unset($target_robot->flags['apply_disabled_state']);
         unset($target_robot->flags['hidden']);
+        unset($target_robot->robot_attachments['ability_attachment-defeat']);
         unset($target_robot->robot_attachments['item_attachment-defeat']);
         $target_robot->robot_frame = 'defeat';
         $target_robot->update_session();
