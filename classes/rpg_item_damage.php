@@ -518,7 +518,10 @@ class rpg_item_damage extends rpg_damage {
                 }
 
                 // If this is a critical hit (random chance)
-                if ($this_robot->battle->critical_chance($this_item->damage_options['critical_rate'])){
+                $critical_rate = $this_item->damage_options['critical_rate'];
+                // Double the critical hit ratio if the target is holding a Fortune Module
+                if ($target_robot->has_item() && $target_robot->get_item() == 'fortune-module'){ $critical_rate = $critical_rate * 2; }
+                if ($this_robot->battle->critical_chance($critical_rate)){
                     $this_item->item_results['this_amount'] = $this_item->item_results['this_amount'] * $this_item->damage_options['critical_multiplier'];
                     $this_item->item_results['flag_critical'] = true;
                     $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | flag_critical | x '.$this_item->damage_options['critical_multiplier'].' = '.$this_item->item_results['this_amount'].'');
