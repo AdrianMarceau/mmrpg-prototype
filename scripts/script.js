@@ -24,7 +24,7 @@ gameSettings.eventAutoPlay = true; // whether or not to automatically advance ev
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
-gameSettings.autoScrollTop = true; // default to true to prevent too much scrolling
+gameSettings.autoScrollTop = false; // default to true to prevent too much scrolling
 gameSettings.autoResizeWidth = true; // allow auto reszing of the game window width
 gameSettings.autoResizeHeight = true; // allow auto reszing of the game window height
 gameSettings.currentBodyWidth = 0; // collect the current window width and update when necessary
@@ -546,15 +546,15 @@ function windowResizeUpdate(updateType){
         gameConsole.find('.wrapper').css({overflow:'scroll',width:(gameConsole.width() + 18)+'px',height:(gameConsole.height() + 18)+'px'})
         }
 
-        // If height reszing is allowed, update the window height
-        if (gameSettings.autoResizeHeight != false){
-            //console.log('gameSettings.autoResizeHeight != false;\ngameWindow.height('+newGameHeight+');');
-            gameWindow.height(newGameHeight);
-            $('iframe', gameWindow).height(newGameHeight - 6);
-            }
+    // If height reszing is allowed, update the window height
+    if (gameSettings.autoResizeHeight != false){
+        //console.log('gameSettings.autoResizeHeight != false;\ngameWindow.height('+newGameHeight+');');
+        gameWindow.height(newGameHeight);
+        $('iframe', gameWindow).height(newGameHeight - 6);
+        }
 
     // Reset the window scroll to center elements properly
-    if (gameSettings.autoScrollTop == true){
+    if (gameSettings.autoScrollTop === true && updateType != 'onscroll'){
         //console.log('gameSettings.autoScrollTop == true;\nwindow.scrollTo(0, 1);');
         window.scrollTo(0, 1);
         if (window !== window.top){ parent.window.scrollTo(0, 1); }
@@ -594,9 +594,14 @@ function orientationModeUpdate(updateType){
         $('body').removeClass('mobileFlag_portraitMode').addClass('mobileFlag_landscapeMode');
         if (notFullscreenMode){ $('body').removeClass('mobileFlag_portraitMode_notFullscreen').addClass('mobileFlag_landscapeMode_notFullscreen');   }
         }
+
     // Reset the window scroll to center elements properly
-    window.scrollTo(0, 1);
-    if (window !== window.top){ parent.window.scrollTo(0, 1); }
+    if (gameSettings.autoScrollTop === true && updateType != 'onscroll'){
+        //console.log('gameSettings.autoScrollTop == true;\nwindow.scrollTo(0, 1);');
+        window.scrollTo(0, 1);
+        if (window !== window.top){ parent.window.scrollTo(0, 1); }
+        }
+
     //$('body').css('border', '10px solid red').animate({borderWidth : '0'}, 1000, 'swing');
     // DEBUG
     //alert('<body class="'+$('body').attr('class')+'">\n'+updateType+'\n</body>');
