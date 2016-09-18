@@ -909,9 +909,9 @@ class rpg_game {
         // Define the game session helper var
         $session_token = self::session_token();
         // If the combined array exists and we're not being specific, check that first
-        if (empty($player_token) && empty($robot_token) && isset($_SESSION[$session_token]['values']['battle_abilities'][$ability_token])){
+        if (empty($player_token) && empty($robot_token) && isset($_SESSION[$session_token]['values']['battle_abilities'])){
             // Check if this ability exists in the array, and return true if it does
-            return !empty($_SESSION[$session_token]['values']['battle_abilities'][$ability_token]) ? $_SESSION[$session_token]['values']['battle_abilities'][$ability_token] : false;
+            return in_array($ability_token, $_SESSION[$session_token]['values']['battle_abilities']) ? true : false;
         }
         // Otherwise, check the old way by looking through individual arrays
         else {
