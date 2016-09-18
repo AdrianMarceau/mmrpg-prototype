@@ -201,6 +201,13 @@ class rpg_disabled {
                     $this_stat_overboost = 0;
                     $this_stat_boost = 0;
                 }
+
+                // If the target robot is holding a Growth Module, double the stat bonuses
+                if ($target_robot->has_item() && $target_robot->get_item() == 'growth-module'){
+                    $this_stat_boost = $this_stat_boost * 2;
+                }
+
+                // Round the stat boost to get an int value
                 $this_stat_boost = round($this_stat_boost);
 
                 // If the stat was not empty, process it
@@ -430,9 +437,12 @@ class rpg_disabled {
 
                     // If this robot has been traded, give it an additional experience boost
                     $temp_experience_boost = 0;
+                    $temp_robot_boost_kinds = array();
                     $temp_robot_boost_text = $temp_boost_text;
+                    $temp_player_boosted = false;
                     if ($temp_robot->player_token != $temp_robot->robot_original_player){
-                        $temp_robot_boost_text = 'a player boosted ';
+                        $temp_robot_boost_kinds[] = 'player';
+                        $temp_player_boosted = true;
                         $temp_experience_bak = $target_robot_experience;
                         $target_robot_experience = $target_robot_experience * 2;
                         $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
@@ -443,10 +453,24 @@ class rpg_disabled {
                     //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; ');
                     //$this_battle->events_create(false, false, 'DEBUG', $event_body);
 
+                    // If the target robot is holding a Growth Module, double the experience bonus
+                    $temp_experience_boost = 0;
+                    if ($temp_robot->has_item() && $temp_robot->get_item() == 'growth-module'){
+                        $temp_robot_boost_kinds[] = 'module';
+                        $temp_experience_bak = $target_robot_experience;
+                        $target_robot_experience = $target_robot_experience * 2;
+                        $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
+                    }
+
+                    // DEBUG
+                    //$event_body = 'MODULE BOOSTED | ';
+                    //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; $temp_robot->robot_item = '.$temp_robot->robot_item.'; ');
+                    //$this_battle->events_create(false, false, 'DEBUG', $event_body);
+
                     // If there are field multipliers in place, apply them now
                     $temp_experience_boost = 0;
                     if (isset($this_robot->field->field_multipliers['experience'])){
-                        //$temp_robot_boost_text = '(and '.$target_robot_experience.' multiplied by '.number_format($this_robot->field->field_multipliers['experience'], 1).') ';
+                        $temp_robot_boost_kinds[] = 'field';
                         $temp_experience_bak = $target_robot_experience;
                         $target_robot_experience = ceil($target_robot_experience * $this_robot->field->field_multipliers['experience']);
                         $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
@@ -460,8 +484,7 @@ class rpg_disabled {
                     // If this robot has any overkill, add that to the temp experience modifier
                     $temp_experience_boost = 0;
                     if (!empty($this_robot->counters['defeat_overkill'])){
-                        if (empty($temp_robot_boost_text)){ $temp_robot_boost_text = 'an overkill boosted '; }
-                        else { $temp_robot_boost_text = 'a player and overkill boosted '; }
+                        $temp_robot_boost_kinds[] = 'overkill';
                         $temp_experience_bak = $target_robot_experience;
                         $target_robot_experience += ceil($this_robot->counters['defeat_overkill'] / $temp_robots_active_num2);
                         $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
@@ -474,10 +497,7 @@ class rpg_disabled {
 
                     // If the target robot's core type has been boosted by starforce
                     if (!empty($temp_robot->robot_core) && !empty($_SESSION['GAME']['values']['star_force'][$temp_robot->robot_core])){
-                        if (empty($temp_robot_boost_text)){ $temp_robot_boost_text = 'a starforce boosted '; }
-                        elseif ($temp_robot_boost_text == 'an overkill boosted '){ $temp_robot_boost_text = 'an overkill and starforce boosted '; }
-                        elseif ($temp_robot_boost_text == 'a player boosted '){ $temp_robot_boost_text = 'a player and starforce boosted '; }
-                        else { $temp_robot_boost_text = 'a player, overkill, and starforce boosted '; }
+                        $temp_robot_boost_kinds[] = 'starforce';
                         $temp_starforce = $_SESSION['GAME']['values']['star_force'][$temp_robot->robot_core];
                         $temp_experience_bak = $target_robot_experience;
                         $target_robot_experience += ceil($target_robot_experience * ($temp_starforce / 10));
@@ -488,6 +508,13 @@ class rpg_disabled {
                     //$event_body = 'STARFORCE BONUS | ';
                     //$event_body .= preg_replace('/\s+/', ' ', $temp_robot->robot_token.' : '.$temp_robot->robot_core.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; ');
                     //$this_battle->events_create(false, false, 'DEBUG', $event_body);
+
+                    // Update the boost text based on applied multiplier kinds
+                    if (!empty($temp_robot_boost_kinds)){
+                        $temp_robot_boost_text = implode(', ', $temp_robot_boost_kinds);
+                        $temp_robot_boost_text = preg_replace('/,\s([a-z]+)$/i', ', and $1', $temp_robot_boost_text);
+                        $temp_robot_boost_text = (preg_match('/^(a|e|i|o|y)/', $temp_robot_boost_text) ? 'an ' : 'a ').$temp_robot_boost_text.' boosted ';
+                    }
 
                     // If the experience is greater then the max, level it off at the max (sorry guys!)
                     if ($target_robot_experience > MMRPG_SETTINGS_STATS_MAX){ $target_robot_experience = MMRPG_SETTINGS_STATS_MAX; }
