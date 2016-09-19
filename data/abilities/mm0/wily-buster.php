@@ -39,8 +39,11 @@ $ability = array(
         // Loop through each existing attachment and alter the start frame by one
         foreach ($this_robot->robot_attachments AS $key => $info){ array_push($this_attachment_info['ability_frame_animate'], array_shift($this_attachment_info['ability_frame_animate'])); }
 
+        // Check if this ability is already charged
+        $is_charged = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+
         // If the ability flag was not set, this ability begins charging
-        if (!isset($this_robot->robot_attachments[$this_attachment_token])){
+        if (!$is_charged){
 
             // Target this robot's self
             $this_ability->target_options_update(array(
@@ -101,6 +104,24 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Define this ability's attachment token
+        $this_attachment_token = 'ability_'.$this_ability->ability_token;
+
+        // Check if this ability is already charged
+        $is_charged = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+
+        // If the ability flag had already been set, reduce the weapon energy to zero
+        if ($is_charged){ $this_ability->set_energy(0); }
+        // Otherwise, return the weapon energy back to default
+        else { $this_ability->reset_energy(); }
+
+        // If the user is holding a Charge Module, auto-charge the ability
+        if ($this_robot->has_item('charge-module')){ $is_charged = true; }
+
+        // If the ability is already charged, allow bench targeting
+        if ($is_charged){ $this_ability->set_target('select_target'); }
+        else { $this_ability->set_target('auto'); }
+
         // If this ability is being used by a robot of a matching original player, boost power
         if (!empty($this_robot->robot_original_player) && $this_robot->robot_original_player == 'dr-wily'){
             $this_ability->set_name($this_ability->ability_base_name . ' Δ');
@@ -109,20 +130,6 @@ $ability = array(
             $this_ability->reset_name();
             $this_ability->reset_damage();
         }
-
-        // Define this ability's attachment token
-        $this_attachment_token = 'ability_'.$this_ability->ability_token;
-
-        // If this ability is already summoned, allow targetting
-        if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->set_target('select_target'); }
-        // Else if the ability attachment is not there, change the target back to auto
-        else { $this_ability->set_target('auto'); }
-
-        // If the ability flag had already been set, reduce the weapon energy to zero
-        if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->set_energy(0); }
-        // Otherwise, return the weapon energy back to default
-        else { $this_ability->reset_energy(); }
-
         // Return true on success
         return true;
 
