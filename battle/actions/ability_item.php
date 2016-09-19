@@ -139,11 +139,30 @@ if ($active_target_robot->robot_status != 'disabled' && !empty($active_target_ro
 if (!$temp_switch_disabled
     && $target_player->counters['robots_active'] > 1
     && $target_energy_damage_percent > 0
+    && $target_weapons_damage_percent > 0
     && !in_array('start', $this_recent_actions)
-    && !in_array('switch', $this_recent_actions)
-    && $this_battle->critical_chance($temp_critical_chance)){
-    // Set the target action to the switch type
-    $target_action = 'switch';
+    && !in_array('switch', $this_recent_actions)){
+
+    // Multiply the switch chance if the target is low on life energy
+    if ($target_energy_damage_percent >= 60){ $temp_critical_chance = $temp_critical_chance * 1.50; }
+    elseif ($target_energy_damage_percent >= 30){ $temp_critical_chance = $temp_critical_chance * 1.25; }
+
+    // Multiply the switch chance if the target is low on weapon energy
+    if ($target_weapons_damage_percent >= 60){ $temp_critical_chance = $temp_critical_chance * 1.50; }
+    elseif ($target_weapons_damage_percent >= 30){ $temp_critical_chance = $temp_critical_chance * 1.25; }
+
+    // Round the chance and ensure it's not over 100
+    $temp_critical_chance = round($temp_critical_chance);
+    if ($temp_critical_chance > 100){ $temp_critical_chance = 100; }
+
+    // Switch only on weighted critical chance
+    if ($this_battle->critical_chance($temp_critical_chance)){
+
+        // Set the target action to the switch type
+        $target_action = 'switch';
+
+    }
+
 }
 // Otherwise default to ability
 else {
