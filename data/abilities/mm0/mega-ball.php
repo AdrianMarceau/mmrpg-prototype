@@ -32,14 +32,14 @@ $ability = array(
         // Create the attachment object for this ability
         $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $this_attachment_info);
 
-        // Check if this ability is already charged
-        $is_charged = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+        // Check if this ability is already summoned
+        $is_summoned = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
 
-        // If the user is holding a Charge Module, auto-charge the ability
-        if ($this_robot->has_item('charge-module')){ $is_charged = true; }
+        // If the user is holding a Charge Module, auto-summon the ability
+        if ($this_robot->has_item('charge-module')){ $is_summoned = true; }
 
         // If the ability flag was not set, this ability begins charging
-        if (!$is_charged){
+        if (!$is_summoned){
 
             // Target this robot's self
             $this_ability->target_options_update(array(
@@ -100,19 +100,19 @@ $ability = array(
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
-        // Check if this ability is already charged
-        $is_charged = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+        // Check if this ability is already summoned
+        $is_summoned = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
 
         // If the ability flag had already been set, reduce the weapon energy to zero
-        if ($is_charged){ $this_ability->set_energy(0); }
+        if ($is_summoned){ $this_ability->set_energy(0); }
         // Otherwise, return the weapon energy back to default
         else { $this_ability->reset_energy(); }
 
         // If the user is holding a Charge Module, auto-charge the ability
-        if ($this_robot->has_item('charge-module')){ $is_charged = true; }
+        if ($this_robot->has_item('charge-module')){ $is_summoned = true; }
 
-        // If the ability is already charged, allow bench targeting
-        if ($is_charged){ $this_ability->set_target('select_target'); }
+        // If the ability is already summoned, allow bench targeting
+        if ($is_summoned){ $this_ability->set_target('select_target'); }
         else { $this_ability->set_target('auto'); }
 
         // Return true on success
