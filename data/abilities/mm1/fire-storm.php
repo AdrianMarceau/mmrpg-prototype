@@ -5,11 +5,11 @@ $ability = array(
     'ability_token' => 'fire-storm',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/007',
-    'ability_description' => 'The user unleashes a blast of fire at the target, dealing damage and raising the user\'s defense by {RECOVERY2}%! This ability has three levels of charge, with damage multiplying on each successive blast until the limit is reached or another technique is used.',
+    'ability_description' => 'The user unleashes a blast of fire at the target, dealing damage and raising the user\'s defense by {RECOVERY2}%! This ability has three levels of power, with damage multiplying on each successive blast until the limit is reached or another technique is used.',
     'ability_type' => 'flame',
     'ability_energy' => 4,
-    'ability_damage' => 12,
-    'ability_recovery2' => 8,
+    'ability_damage' => 10,
+    'ability_recovery2' => 12,
     'ability_recovery2_percent' => true,
     'ability_accuracy' => 95,
     'ability_function' => function($objects){
@@ -145,16 +145,21 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // If the user is holding a Target Module, allow bench targeting
+        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
+
         // Update this ability's damage if it's already attached to the robot
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         if (isset($this_robot->robot_attachments[$this_attachment_token])){
             $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
             $shot_power = !empty($this_attachment_info['attachment_power']) ? $this_attachment_info['attachment_power'] + 1 : 1;
+            $shot_numeral = $shot_power == 3 ? 'III' : 'II';
             $ability_damage = ceil($this_ability->ability_base_damage * $shot_power);
             $ability_recovery2 = ceil($this_ability->ability_base_recovery2 * $shot_power);
             $this_ability->set_damage($ability_damage);
             $this_ability->set_recovery2($ability_recovery2);
-            if ($shot_power > 1){ $this_ability->set_name($this_ability->ability_base_name.' '.$shot_power); }
+            if ($shot_power > 1){ $this_ability->set_name($this_ability->ability_base_name.' '.$shot_numeral); }
             else { $this_ability->set_name($this_ability->ability_base_name); }
         } else {
             $this_ability->set_damage($this_ability->ability_base_damage);
