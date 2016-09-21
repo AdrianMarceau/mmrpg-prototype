@@ -1150,6 +1150,7 @@ class rpg_item extends rpg_object {
         if (empty($robot_info)){ return false; }
         if (empty($item_info)){ return false; }
 
+        $item_info_id = $item_info['item_id'];
         $item_info_token = $item_info['item_token'];
         $item_info_count = !empty($_SESSION[$session_token]['values']['battle_items'][$item_info_token]) ? $_SESSION[$session_token]['values']['battle_items'][$item_info_token] : 0;
         $item_info_name = $item_info['item_name'];
@@ -1185,14 +1186,25 @@ class rpg_item extends rpg_object {
         $item_info_class_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
         if (!empty($item_info['item_type2'])){ $item_info_class_type = $item_info_class_type != 'none' ? $item_info_class_type.'_'.$item_info['item_type2'] : $item_info['item_type2']; }
         $item_info_title = rpg_item::print_editor_title_markup($robot_info, $item_info);
-        $item_info_title_plain = strip_tags(str_replace('<br />', '//', $item_info_title));
+        //$item_info_title_plain = strip_tags(str_replace('<br />', '//', $item_info_title));
         $item_info_title_tooltip = htmlentities($item_info_title, ENT_QUOTES, 'UTF-8');
         $item_info_title_html = str_replace(' ', '&nbsp;', $item_info_name);
         $item_info_title_html .= '<span class="count">x '.$item_info_count.'</span>';
         $temp_select_options = str_replace('value="'.$item_info_token.'"', 'value="'.$item_info_token.'" selected="selected" disabled="disabled"', $item_rewards_options);
         $item_info_title_html = '<label style="background-image: url(images/items/'.$item_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$item_info_title_html.'</label>';
-        //if ($global_allow_editing){ $item_info_title_html .= '<select class="item_name" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'">'.$temp_select_options.'</select>'; }
-        $this_select_markup = '<a class="item_name type type_'.$item_info_class_type.'" style="'.(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-item="'.$item_info_token.'" data-count="'.$item_info_count.'" title="'.$item_info_title_plain.'" data-tooltip="'.$item_info_title_tooltip.'">'.$item_info_title_html.'</a>';
+        $this_select_markup = '<a '.
+            'class="item_name type type_'.$item_info_class_type.'" '.
+            'data-id="'.$item_info_id.'" '.
+            'data-key="'.$item_key.'" '.
+            'data-player="'.$player_info['player_token'].'" '.
+            'data-robot="'.$robot_info['robot_token'].'" '.
+            'data-item="'.$item_info_token.'" '.
+            'data-type="'.(!empty($item_info['item_type']) ? $item_info['item_type'] : 'none').'" '.
+            'data-type2="'.(!empty($item_info['item_type2']) ? $item_info['item_type2'] : '').'" '.
+            'data-count="'.$item_info_count.'" '.
+            //'title="'.$item_info_title_plain.'" '.
+            'data-tooltip="'.$item_info_title_tooltip.'"'.
+            '>'.$item_info_title_html.'</a>';
 
         // Return the generated select markup
         return $this_select_markup;
