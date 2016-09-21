@@ -1194,14 +1194,26 @@ class rpg_ability extends rpg_object {
         $ability_info_description = str_replace('{RECOVERY}', $ability_info_recovery, $ability_info_description);
         $ability_info_description = str_replace('{DAMAGE2}', $ability_info_damage2, $ability_info_description);
         $ability_info_description = str_replace('{RECOVERY2}', $ability_info_recovery2, $ability_info_description);
+        $ability_info_class_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
+        if (!empty($ability_info['ability_type2'])){ $ability_info_class_type = $ability_info_class_type != 'none' ? $ability_info_class_type.'_'.$ability_info['ability_type2'] : $ability_info['ability_type2']; }
         $ability_info_title = rpg_ability::print_editor_title_markup($robot_info, $ability_info);
-        $ability_info_title_plain = strip_tags(str_replace('<br />', '//', $ability_info_title));
+        //$ability_info_title_plain = strip_tags(str_replace('<br />', '//', $ability_info_title));
         $ability_info_title_tooltip = htmlentities($ability_info_title, ENT_QUOTES, 'UTF-8');
         $ability_info_title_html = str_replace(' ', '&nbsp;', $ability_info_name);
         $temp_select_options = str_replace('value="'.$ability_info_token.'"', 'value="'.$ability_info_token.'" selected="selected" disabled="disabled"', $ability_rewards_options);
         $ability_info_title_html = '<label style="background-image: url(images/abilities/'.$ability_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$ability_info_title_html.'<span class="arrow">&#8711;</span></label>';
-        //if ($global_allow_editing){ $ability_info_title_html .= '<select class="ability_name" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'">'.$temp_select_options.'</select>'; }
-        $this_select_markup = '<a class="ability_name ability_type ability_type_'.(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '').'" style="'.(!$global_allow_editing ? 'cursor: default; ' : '').'" data-id="'.$ability_info_id.'" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-ability="'.$ability_info_token.'" data-type="'.(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').'" data-type2="'.(!empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : '').'" title="'.$ability_info_title_plain.'" data-tooltip="'.$ability_info_title_tooltip.'">'.$ability_info_title_html.'</a>';
+        $this_select_markup = '<a '.
+            'class="ability_name type type_'.$ability_info_class_type.'" '.
+            'data-id="'.$ability_info_id.'" '.
+            'data-key="'.$ability_key.'" '.
+            'data-player="'.$player_info['player_token'].'" '.
+            'data-robot="'.$robot_info['robot_token'].'" '.
+            'data-ability="'.$ability_info_token.'" '.
+            'data-type="'.(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').'" '.
+            'data-type2="'.(!empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : '').'" '.
+            //'title="'.$ability_info_title_plain.'" '.
+            'data-tooltip="'.$ability_info_title_tooltip.'"'.
+            '>'.$ability_info_title_html.'</a>';
 
         // Return the generated select markup
         return $this_select_markup;
