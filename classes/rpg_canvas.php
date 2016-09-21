@@ -36,16 +36,21 @@ class rpg_canvas {
             $this_data['player_image'] = 'images/players/'.$this_data['player_token'].'/sprite_'.$this_data['player_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
             $this_data['player_class'] = 'sprite sprite_player sprite_player_'.$this_data['image_type'].' sprite_75x75 sprite_75x75_'.$this_data['player_frame'];
 
+            // Calculate the canvas offset variables for this robot
+            $temp_data = $this_player->battle->canvas_markup_offset(0, 'active', 40, $this_player->counters['robots_total']);
+            $this_data['player_scale'] = $temp_data['canvas_scale'];
+            $this_data['canvas_offset_x'] = ($this_data['player_scale'] * 30) + $temp_data['canvas_offset_x'] + round($this_player->player_frame_offset['x'] * $temp_data['canvas_scale']);
+            $this_data['canvas_offset_y'] = ($this_data['player_scale'] * 10) + $temp_data['canvas_offset_y'] + round($this_player->player_frame_offset['y'] * $temp_data['canvas_scale']);
+            $this_data['canvas_offset_z'] = -1 + $temp_data['canvas_offset_z'] + round($this_player->player_frame_offset['z'] * $temp_data['canvas_scale']);
 
-            $this_data['player_scale'] = 0.5 + ((7 / 8) * 0.5);
             $this_data['player_sprite_size'] = ceil($this_data['player_scale'] * 80);
             $this_data['player_sprite_width'] = ceil($this_data['player_scale'] * 80);
             $this_data['player_sprite_height'] = ceil($this_data['player_scale'] * 80);
             $this_data['player_image_width'] = ceil($this_data['player_scale'] * 800);
             $this_data['player_image_height'] = ceil($this_data['player_scale'] * 80);
-            $this_data['canvas_offset_z'] = 4900;
-            $this_data['canvas_offset_x'] = 200;
-            $this_data['canvas_offset_y'] = 60;
+            //$this_data['canvas_offset_z'] = 4900;
+            //$this_data['canvas_offset_x'] = 200;
+            //$this_data['canvas_offset_y'] = 60;
 
             $frame_position = array_search($this_data['player_frame'], $this_data['player_frame_index']);
             if ($frame_position === false){ $frame_position = 0; }
@@ -129,7 +134,7 @@ class rpg_canvas {
         $this_data['robot_title'] .= ' | '.ucfirst($this_data['robot_position']).' Position';
 
         // Calculate the canvas offset variables for this robot
-        $temp_data = $this_robot->battle->canvas_markup_offset($this_data['robot_key'], $this_data['robot_position'], $this_data['robot_size']);
+        $temp_data = $this_robot->battle->canvas_markup_offset($this_data['robot_key'], $this_data['robot_position'], $this_data['robot_size'], $this_robot->player->counters['robots_total']);
         $this_data['canvas_offset_x'] = $temp_data['canvas_offset_x'] + round($this_robot->robot_frame_offset['x'] * $temp_data['canvas_scale']);
         $this_data['canvas_offset_y'] = $temp_data['canvas_offset_y'] + round($this_robot->robot_frame_offset['y'] * $temp_data['canvas_scale']);
         $this_data['canvas_offset_z'] = $temp_data['canvas_offset_z'] + round($this_robot->robot_frame_offset['z'] * $temp_data['canvas_scale']);
@@ -1409,7 +1414,8 @@ class rpg_canvas {
                 else { $multiplier_markup_right .= $temp_markup; }
             }
             if (!empty($multiplier_markup_left) || !empty($multiplier_markup_right)){
-                $this_markup .= '<div class="canvas_overlay_footer"><strong class="overlay_label">Field Multipliers</strong><span class="overlay_multiplier_count_'.$temp_multipliers_count.'">'.$multiplier_markup_left.$multiplier_markup_right.'</div></div>';
+                $overlay_footer = '<div class="canvas_overlay_footer"><strong class="overlay_label">Field Multipliers</strong><span class="overlay_multiplier_count_'.$temp_multipliers_count.'">'.$multiplier_markup_left.$multiplier_markup_right.'</div></div>';
+                $this_markup .= $overlay_footer;
             }
 
         }
@@ -1427,7 +1433,7 @@ class rpg_canvas {
             if (!empty($this_markup) && $this_battle->battle_status == 'complete' || $this_battle->battle_result == 'defeat'){
                 $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left">&nbsp;</div>';
                 $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right">&nbsp;</div>';
-                $this_markup =  '<div class="sprite canvas_ability_details ability_type ability_type_'.$result_class.'">'.$this_mugshot_markup_left.'<div class="ability_name">'.$result_text.'</div>'.$this_mugshot_markup_right.'</div>'.$this_markup;
+                $this_markup = '<div class="sprite canvas_ability_details ability_type ability_type_'.$result_class.'">'.$this_mugshot_markup_left.'<div class="ability_name">'.$result_text.'</div>'.$this_mugshot_markup_right.'</div>'.$this_markup;
             }
         }
 

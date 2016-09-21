@@ -66,6 +66,11 @@ if (!defined('MMRPG_CONFIG_DEBUG_MODE')){
     define('MMRPG_CONFIG_DEBUG_MODE', !empty($_SESSION['GAME']['debug_mode']) ? true : false);
 }
 
+// Define the perspective mode flag based on session flag if not already set
+if (!defined('MMRPG_CONFIG_PERSPECTIVE_MODE')){
+    define('MMRPG_CONFIG_PERSPECTIVE_MODE', isset($_SESSION['GAME']['perspective_mode']) && empty($_SESSION['GAME']['perspective_mode']) ? false : true);
+}
+
 // Create the global database object
 if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG'] = array(); }

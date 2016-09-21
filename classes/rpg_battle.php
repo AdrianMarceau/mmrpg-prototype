@@ -2030,7 +2030,19 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for calculating canvas markup offsets
-    public function canvas_markup_offset($sprite_key, $sprite_position, $sprite_size){
+    public function canvas_markup_offset($sprite_key, $sprite_position, $sprite_size, $bench_size = 1){
+
+        // Generate with perspective mode if the user has requested it, otherwise legacy
+        if (MMRPG_CONFIG_PERSPECTIVE_MODE === true){
+            return $this->canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $bench_size);
+        } else {
+            return $this->canvas_markup_offset_legacy($sprite_key, $sprite_position, $sprite_size);
+        }
+
+    }
+
+    // Define a public function for calculating canvas markup offsets
+    public function canvas_markup_offset_legacy($sprite_key, $sprite_position, $sprite_size){
 
         // Define the data array to be returned later
         $this_data = array();
@@ -2043,6 +2055,7 @@ class rpg_battle extends rpg_object {
 
         // If the robot is on the bench, calculate position offsets based on key
         if ($sprite_position == 'bench'){
+
             $this_data['canvas_offset_z'] -= 100 * $sprite_key;
             $position_modifier = ($sprite_key + 1) / 8;
             $position_modifier_2 = 1 - $position_modifier;
@@ -2067,12 +2080,91 @@ class rpg_battle extends rpg_object {
             //$temp_seed_3 = ceil($temp_seed_3 * 0.5);
             $this_data['canvas_offset_x'] += $temp_seed_3;
             $this_data['canvas_offset_x'] += 20;
+
         }
         // Otherwise, if the robot is in active position
         elseif ($sprite_position == 'active'){
+
             if ($sprite_size > 80){
                 $this_data['canvas_offset_x'] -= 60;
             }
+
+        }
+
+        // Return the generated canvas data for this robot
+        return $this_data;
+
+    }
+
+
+    // Define a public function for calculating canvas markup offsets
+    public function canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $bench_size = 1){
+
+        // Collect the max bench size
+        $max_bench_size = MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX;
+        $current_max_bench_size = $this->counters['robots_perside_max'];
+
+        // Calculate the half-key representing the middle of this side of the field
+        $half_key = -1 + ceil($current_max_bench_size / 2);
+
+        // Define the data array to be returned later
+        $this_data = array();
+
+        // Define the base canvas offsets for this sprite
+        $this_data['canvas_offset_x'] = 165;
+        $this_data['canvas_offset_y'] = 55;
+        $this_data['canvas_offset_z'] = $sprite_position == 'active' ? 5100 : 4900;
+
+        // If the robot is on the bench, calculate position offsets based on key
+        if ($sprite_position == 'bench'){
+
+            // If this bench is smaller than 8, we should offset a bit
+            if ($bench_size < $current_max_bench_size){
+                $bench_diff = $current_max_bench_size - $bench_size;
+                $sprite_key += ceil($bench_diff / 2);
+            }
+            $this_data['canvas_offset_z'] -= 100 * $sprite_key;
+
+            // Base the scale on this robot's position on the bench
+            $this_data['canvas_scale'] = 0.5 + ((($max_bench_size - $sprite_key) / $max_bench_size) * 0.5);
+
+            $position_modifier = ($sprite_key + 1) / $max_bench_size;
+            $position_modifier_2 = 1 - $position_modifier;
+
+            $temp_seed_1 = 40;
+            $temp_seed_2 = 20;
+            $this_data['canvas_offset_x'] = (-1 * $temp_seed_2) + ceil(($sprite_key + 1) * ($temp_seed_1 + 2)) - ceil(($sprite_key + 1) * $temp_seed_2);
+            $temp_seed_1 = $sprite_size;
+            $temp_seed_2 = ceil($sprite_size / 2);
+            $this_data['canvas_offset_y'] = ($temp_seed_1 + 6) + ceil(($sprite_key + 1) * 14) - ceil(($sprite_key + 1) * 7) - ($sprite_size - 40);
+
+            $temp_seed_3 = 0;
+            if ($sprite_key == 0){ $temp_seed_3 = -10; }
+            elseif ($sprite_key == 1){ $temp_seed_3 = 0; }
+            elseif ($sprite_key == 2){ $temp_seed_3 = 10; }
+            elseif ($sprite_key == 3){ $temp_seed_3 = 20; }
+            elseif ($sprite_key == 4){ $temp_seed_3 = 30; }
+            elseif ($sprite_key == 5){ $temp_seed_3 = 40; }
+            elseif ($sprite_key == 6){ $temp_seed_3 = 50; }
+            elseif ($sprite_key == 7){ $temp_seed_3 = 60; }
+            if ($sprite_size > 40){ $temp_seed_3 -= ceil(40 * $this_data['canvas_scale']); }
+            $this_data['canvas_offset_x'] += $temp_seed_3;
+            $this_data['canvas_offset_x'] += 64 - ($max_bench_size * 4);
+
+        }
+        // Otherwise, if the robot is in active position
+        elseif ($sprite_position == 'active'){
+
+            // Base the scale on the half-way position of robots on this side of the field
+            $this_data['canvas_scale'] = 0.5 + ((($max_bench_size - $half_key) / $max_bench_size) * 0.5); //1;
+
+            $this_data['canvas_offset_x'] += round(($half_key * (40 * $this_data['canvas_scale'])) * $this_data['canvas_scale']);
+            $this_data['canvas_offset_y'] += $half_key * 6;
+
+            if ($sprite_size > 80){
+                $this_data['canvas_offset_x'] -= round(60 * $this_data['canvas_scale']);
+            }
+
         }
 
         // Return the generated canvas data for this robot
@@ -2402,7 +2494,14 @@ class rpg_battle extends rpg_object {
     public function update_variables(){
 
         // Calculate this battle's count variables
-        //$this->counters['thing'] = count($this->robot_stuff);
+        $perside_max = 0;
+        if (!empty($this->values['players'])){
+            foreach ($this->values['players'] AS $id => $player){
+                $max = $player['counters']['robots_total'];
+                if ($max > $perside_max){ $perside_max = $max; }
+            }
+        }
+        $this->counters['robots_perside_max'] = $perside_max;
 
         // Return true on success
         return true;
