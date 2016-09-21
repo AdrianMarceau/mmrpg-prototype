@@ -8,6 +8,7 @@ var thisAbilityCanvas = false;
 var thisItemCanvas = false;
 var thisEditor = false;
 var thisEditorData = {playerTotal:0,robotTotal:0};
+var thisScrollbarSettings = {wheelSpeed:0.3};
 var resizePlayerWrapper = function(){};
 var loadConsoleRobotMarkup = function(thisSprite, index, complete){};
 var loadCanvasAbilitiesMarkup = function(){};
@@ -129,7 +130,7 @@ $(document).ready(function(){
                 // Append the link markup to the canvas
                 $('#canvas .player_canvas .links').empty().append(data);
                 // Trigger scrollbars on any overflow containers
-                $('#canvas .player_canvas .wrapper_overflow', thisEditor).perfectScrollbar();
+                $('#canvas .player_canvas .wrapper_overflow', thisEditor).perfectScrollbar(thisScrollbarSettings);
                 // Trigger the on complete function
                 onComplete.call($('#canvas .player_canvas'));
                 });
@@ -169,7 +170,7 @@ $(document).ready(function(){
                 // Append the link markup to the canvas
                 $('#canvas .ability_canvas .links').empty().append(data);
                 // Trigger scrollbars on any overflow containers
-                $('#canvas .ability_canvas .wrapper_overflow', thisEditor).perfectScrollbar();
+                $('#canvas .ability_canvas .wrapper_overflow', thisEditor).perfectScrollbar(thisScrollbarSettings);
                 // Trigger the on complete function
                 onComplete.call($('#canvas .ability_canvas'));
                 });
@@ -209,7 +210,7 @@ $(document).ready(function(){
                 // Append the link markup to the canvas
                 $('#canvas .item_canvas .links').empty().append(data);
                 // Trigger scrollbars on any overflow containers
-                $('#canvas .item_canvas .wrapper_overflow', thisEditor).perfectScrollbar();
+                $('#canvas .item_canvas .wrapper_overflow', thisEditor).perfectScrollbar(thisScrollbarSettings);
                 // Trigger the on complete function
                 onComplete.call($('#canvas .item_canvas'));
                 });
@@ -1321,7 +1322,7 @@ function robotEditorCanvasInit(){
             resizePlayerWrapper();
 
             // Trigger scrollbars on any overflow containers
-            $('.robot_canvas .wrapper_overflow', thisEditor).perfectScrollbar();
+            $('.robot_canvas .wrapper_overflow', thisEditor).perfectScrollbar(thisScrollbarSettings);
 
             });
 
