@@ -3555,7 +3555,7 @@ class rpg_robot extends rpg_object {
                 }
 
                 // Check to see if the player has unlocked the item to hold items
-                $temp_item_hold_unlocked = rpg_game::player_unlocked('dr-cossack'); // rpg_prototype::event_complete('completed-chapter_dr-cossack_one');
+                $temp_item_hold_unlocked = true; //rpg_game::player_unlocked('dr-cossack'); // rpg_prototype::event_complete('completed-chapter_dr-cossack_one');
                 $current_item_token = '';
                 // If this player has unlocked the item to let robots hold items
                 if ($temp_item_hold_unlocked){
@@ -4181,7 +4181,7 @@ class rpg_robot extends rpg_object {
 
                             // If the temp robot was disabled, trigger the event
                             if ($this_robot->get_energy() < 1){
-                                $this_robot->trigger_disabled($target_robot, $this_attachment);
+                                $this_robot->trigger_disabled($target_robot);
                                 // If this the player's last robot
                                 $active_robots = $this_player->get_robots_active();
                                 if (empty($active_robots)){
@@ -4322,7 +4322,7 @@ class rpg_robot extends rpg_object {
 
                         // If the temp robot was disabled, trigger the event
                         if ($temp_stat_amount < 1){
-                            $this_robot->trigger_disabled($target_robot, $this_attachment);
+                            $this_robot->trigger_disabled($target_robot);
                             // If this the player's last robot
                             if ($this_player->counters['robots_active'] < 1){
                                 // Trigger the battle complete event

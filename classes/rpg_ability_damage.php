@@ -181,8 +181,7 @@ class rpg_ability_damage extends rpg_damage {
                 // If this robot is not in the active position
                 if ($this_robot->robot_position != 'active'){
                     // Collect the current key of the robot and apply damage mods
-                    $temp_damage_key = $this_robot->robot_key + 1;
-                    $temp_damage_resistor = (10 - $temp_damage_key) / 10;
+                    $temp_damage_resistor = 1 /2;
                     $new_damage_amount = round($damage_amount * $temp_damage_resistor);
                     $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | position_modifier_damage | '.$damage_amount.' = round('.$damage_amount.' * '.$temp_damage_resistor.') = '.$new_damage_amount.'');
                     $damage_amount = $new_damage_amount;
