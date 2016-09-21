@@ -1,3 +1,6 @@
+#mmrpg {
+
+}
 #mmrpg,
 #prototype {
     margin: 0;
@@ -5,6 +8,21 @@
     background-color: transparent;
     width: 762px;
 }
+
+#mmrpg[data-mode="editor"] {
+
+}
+#mmrpg[data-mode="viewer"] {
+    width: 100% !important;
+    max-width: 1000px !important;
+}
+
+#mmrpg[data-mode="viewer"] #prototype {
+    width: 100% !important;
+}
+
+
+
 #edit .header {
     width: 100%;
 }
@@ -115,11 +133,13 @@
 }
 #edit #canvas .robot_canvas .wrapper .wrapper_overflow {
     max-height: 68px;
+    max-height: calc(100vh - 370px);
 }
 #edit #canvas .player_canvas .wrapper .wrapper_overflow,
 #edit #canvas .ability_canvas .wrapper .wrapper_overflow,
 #edit #canvas .item_canvas .wrapper .wrapper_overflow {
     max-height: 90px;
+    max-height: calc(100vh - 370px);
     padding-right: 8px;
 }
 #edit #canvas .ps-container:hover>.ps-scrollbar-y-rail:hover {
@@ -708,6 +728,11 @@
 #edit #canvas .item_canvas a.item_name {
     opacity: 0.80;
     filter: alpha(opacity=80);
+}
+#mmrpg[data-mode="viewer"] #edit #canvas .player_canvas a.player_name,
+#mmrpg[data-mode="viewer"] #edit #canvas .ability_canvas a.ability_name,
+#mmrpg[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
+    cursor: default;
 }
 #edit #canvas .player_canvas a.player_name:hover,
 #edit #canvas .ability_canvas a.ability_name:hover,
