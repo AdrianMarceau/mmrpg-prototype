@@ -1776,6 +1776,28 @@ function mmrpg_toggle_debug_mode(element){
     return true;
 }
 
+// Define a function for updating the loaded status of the main index page
+function mmrpg_toggle_perspective_mode(element){
+    // Collect the object references to the button and internal label
+    var thisButton = $(element);
+    var thisLabel = $('.multi', thisButton);
+    // Pull the current value and use it to calculate new ones
+    var thisValue = parseInt(thisButton.attr('data-value'));
+    var newValue = thisValue != 1 ? 1 : 0;
+    var newValueText = newValue == 1 ? 'ON' : 'OFF';
+    var newValueClass = 'value type type_';
+    newValueClass += newValue == 1 ? 'nature' : 'flame';
+    //console.log('Toggle the perspective mode!', {thisValue:thisValue,newValue:newValue,newValueText:newValueText,newValueClass:newValueClass});
+    // Update the button value and label text/colour
+    thisButton.attr('data-value', newValue);
+    thisLabel.find('.value').html(newValueText).removeClass().addClass(newValueClass);
+    // Send the new value to the server to update the session
+    var thisRequestType = 'session';
+    var thisRequestData = 'perspective_mode,'+newValue;
+    $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+    return true;
+}
+
 
 /**
  * Function : dump()
