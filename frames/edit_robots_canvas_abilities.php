@@ -66,8 +66,8 @@ echo '<div class="wrapper">';
         ?>
         <div class="sort_wrapper">
             <label class="label">sort</label>
-            <a class="sort sort_level" data-sort="power" data-order="asc">power</a>
             <a class="sort sort_number" data-sort="number" data-order="asc">number</a>
+            <a class="sort sort_level" data-sort="power" data-order="asc">power</a>
             <a class="sort sort_core" data-sort="type" data-order="asc">type</a>
         </div>
         <?php
