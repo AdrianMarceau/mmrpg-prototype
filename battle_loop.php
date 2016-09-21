@@ -381,6 +381,14 @@ elseif ($this_action == 'ability'){
     require_once('battle/actions/ability.php');
 
 }
+// Else if the player's robot is using an item
+elseif ($this_action == 'item'){
+
+    // Require the ability-item action file
+    require_once('battle/actions/ability_item.php');
+
+}
+/*
 // Else if the player's robot is using an ability-item
 elseif ($this_action == 'item' && strstr($this_action_token, '-core')){
 
@@ -395,6 +403,7 @@ elseif ($this_action == 'item'){
     require_once('battle/actions/item.php');
 
 }
+*/
 
 // Now execute the stored actions (and any created in the process of executing them!)
 $this_battle->actions_execute();
