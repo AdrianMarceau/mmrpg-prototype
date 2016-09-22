@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'hard-knuckle',
     'ability_game' => 'MM03',
     'ability_group' => 'MM03/Weapons/020',
-    'ability_description' => 'The user fires a slow but powerful fist at the target that deals massive damage when it connects and lowers defense by {DAMAGE2}% without fail!',
+    'ability_description' => 'The user fires a slow but powerful fist at the target that deals massive damage and lowers defense by {DAMAGE2}% without fail!',
     'ability_type' => 'impact',
     'ability_energy' => 4,
     'ability_speed' => -2,
@@ -61,8 +61,8 @@ $ability = array(
 
         // Trigger a defense break if the ability was successful
         if ($target_robot->robot_status != 'disabled'
-            && $target_robot->robot_defense > 0
-            && $this_ability->ability_results['this_result'] != 'failure' && $this_ability->ability_results['this_amount'] > 0){
+            && $this_ability->ability_results['this_result'] != 'failure'
+            && $this_ability->ability_results['this_amount'] > 0){
             // Decrease the target robot's defense stat
             $this_ability->damage_options_update(array(
                 'kind' => 'defense',
@@ -89,6 +89,19 @@ $ability = array(
         // Return true on success
         return true;
 
-    }
+        },
+    'ability_function_onload' => function($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // If the user is holding a Target Module, allow bench targeting
+        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
+
+        // Return true on success
+        return true;
+
+        }
     );
 ?>

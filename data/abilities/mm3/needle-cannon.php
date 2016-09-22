@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'needle-cannon',
     'ability_game' => 'MM03',
     'ability_group' => 'MM03/Weapons/017',
-    'ability_description' => 'The user fires a volley of three needle-like projectiles that piece the target\'s defenses and inflict damage!',
+    'ability_description' => 'The user fires a volley of three needle-like projectiles that piece the target\'s defenses and repeatedly inflict damage!',
     'ability_type' => 'cutter',
     'ability_type2' => 'missile',
     'ability_energy' => 4,
@@ -16,7 +16,7 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Attach three whirlwind attachments to the robot
+        // Attach three needle attachments to the robot
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         $this_attachment_info = array(
             'class' => 'ability',
@@ -38,7 +38,7 @@ $ability = array(
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
-        // Update the two whirlwind's animation frames
+        // Update the two needle's animation frames
         $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame'] = 0;
         $this_robot->robot_attachments[$this_attachment_token.'_2']['ability_frame'] = 0;
         $this_robot->update_session();
@@ -71,13 +71,13 @@ $ability = array(
             if ($this_ability->ability_results['total_strikes'] == 1){ $success_text = 'Another needle hit!'; }
             if ($this_ability->ability_results['total_misses'] == 1){ $failure_text = 'Another needle missed!'; }
 
-            // Remove the second extra whirlwind attached to the robot
+            // Remove the second extra needle attached to the robot
             if (isset($this_robot->robot_attachments[$this_attachment_token.'_2'])){
                 unset($this_robot->robot_attachments[$this_attachment_token.'_2']);
                 $this_robot->update_session();
             }
 
-            // Update the remaining whirlwind's animation frame
+            // Update the remaining needle's animation frame
             $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame'] = 0;
             $this_robot->update_session();
 
@@ -106,7 +106,7 @@ $ability = array(
                 if ($this_ability->ability_results['total_misses'] == 1){ $failure_text = 'Another needle missed!'; }
                 elseif ($this_ability->ability_results['total_misses'] == 2){ $failure_text = 'A third needle missed!'; }
 
-                // Remove the first extra whirlwind
+                // Remove the first extra needle
                 if (isset($this_robot->robot_attachments[$this_attachment_token.'_1'])){
                     unset($this_robot->robot_attachments[$this_attachment_token.'_1']);
                     $this_robot->update_session();
@@ -132,13 +132,13 @@ $ability = array(
 
         }
 
-        // Remove the second whirlwind
+        // Remove the second needle
         if (isset($this_robot->robot_attachments[$this_attachment_token.'_2'])){
             unset($this_robot->robot_attachments[$this_attachment_token.'_2']);
             $this_robot->update_session();
         }
 
-        // Remove the third whirlwind
+        // Remove the third needle
         if (isset($this_robot->robot_attachments[$this_attachment_token.'_1'])){
             unset($this_robot->robot_attachments[$this_attachment_token.'_1']);
             $this_robot->update_session();
@@ -147,6 +147,19 @@ $ability = array(
         // Return true on success
         return true;
 
-    }
+        },
+    'ability_function_onload' => function($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // If the user is holding a Target Module, allow bench targeting
+        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
+
+        // Return true on success
+        return true;
+
+        }
     );
 ?>
