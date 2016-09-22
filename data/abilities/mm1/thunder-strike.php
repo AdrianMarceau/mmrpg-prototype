@@ -5,11 +5,12 @@ $ability = array(
     'ability_token' => 'thunder-strike',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/008',
-    'ability_description' => 'The user summons a powerful bolt of electricity that crashes into the target to inflict massive damage!',
+    'ability_description' => 'The user summons a powerful bolt of electricity from above that crashes into any target to inflict massive damage!',
     'ability_type' => 'electric',
     'ability_energy' => 4,
-    'ability_damage' => 16,
+    'ability_damage' => 14,
     'ability_accuracy' => 100,
+    'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -66,6 +67,6 @@ $ability = array(
         // Return true on success
         return true;
 
-    }
+        }
     );
 ?>

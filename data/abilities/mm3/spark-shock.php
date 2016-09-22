@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'spark-shock',
     'ability_game' => 'MM03',
     'ability_group' => 'MM03/Weapons/023',
-    'ability_description' => 'The user looses a large ball of electricity at the target, inflicting damage and occasionally lowering its defense by {DAMAGE2}%!',
+    'ability_description' => 'The user looses a large ball of electricity at the target that disrupts internal systems to inflict damage and lower defense by {DAMAGE2}%!',
     'ability_type' => 'electric',
     'ability_energy' => 4,
     'ability_damage' => 16,
@@ -43,9 +43,8 @@ $ability = array(
 
         // Randomly trigger a defense break if the ability was successful
         if ($target_robot->robot_status != 'disabled'
-            && $target_robot->robot_speed > 0
-            && $this_ability->ability_results['this_result'] != 'failure' && $this_ability->ability_results['this_amount'] > 0
-            && $this_battle->critical_chance(50)){
+            && $this_ability->ability_results['this_result'] != 'failure'
+            && $this_ability->ability_results['this_amount'] > 0){
             // Decrease the target robot's speed stat
             $this_ability->damage_options_update(array(
                 'kind' => 'defense',
@@ -72,6 +71,19 @@ $ability = array(
         // Return true on success
         return true;
 
+
+        },
+    'ability_function_onload' => function($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // If the user is holding a Target Module, allow bench targeting
+        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
+
+        // Return true on success
+        return true;
 
         }
     );
