@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'crash-bomber',
     'ability_game' => 'MM02',
     'ability_group' => 'MM02/Weapons/013',
-    'ability_description' => 'The user fires a small explosive that seeks out and latches onto the target, building power for two turns and then exploding to deal damage equal to {DAMAGE}% of the target\'s base life energy! Manually triggering this ability early appears to weaken its power...',
+    'ability_description' => 'The user fires a small explosive that seeks out and latches onto the target, building power for one turn before exploding to deal massive damage! Manually triggering this ability early is possible but appears to weaken its power...',
     'ability_type' => 'explode',
     'ability_energy' => 4,
     'ability_damage' => 32,
@@ -74,6 +74,12 @@ $ability = array(
         $this_ability->ability_frame_offset['y'] = $temp_y_offset;
         $this_ability->update_session();
 
+        // Define the base turn duration this attachment must charge
+        $attachment_duration = 1;
+
+        // If the user is holding a Charge Module, cut charge time in half
+        if ($this_robot->has_item('charge-module')){ $attachment_duration = 0; }
+
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         $this_attachment_info = array(
@@ -84,7 +90,7 @@ $ability = array(
             'ability_frame_animate' => array(1, 2),
             'ability_frame_offset' => array('x' => 0, 'y' => $temp_y_offset, 'z' => 10),
             'attachment_token' => $this_attachment_token,
-            'attachment_duration' => 2,
+            'attachment_duration' => $attachment_duration,
             'attachment_weaknesses' => array('electric'),
             'attachment_energy' => 0,
             'attachment_create' => array(
@@ -132,19 +138,12 @@ $ability = array(
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
-            // Define the energy mod amount for this ability based on percent
-            //$this_attachment_info['attachment_energy'] = ceil($target_robot->robot_base_energy * ($this_ability->ability_damage / 100));
-            // If this ability is being used by a CORE MATCH robot, increase the power
-            //if (!empty($this_robot->robot_core) && $this_robot->robot_core == $this_ability->ability_type){ $this_attachment_info['attachment_energy'] = round($this_attachment_info['attachment_energy'] * MMRPG_SETTINGS_COREBOOST_MULTIPLIER); }
-
             // Define the base energy damage amount for this ability attachment
             $this_attachment_info['attachment_energy'] = $this_ability->ability_damage;
 
             // Decrease this robot's speed stat if the attachment does not already exist
             $this_ability->damage_options_update($this_attachment_info['attachment_create']);
             $this_ability->update_session();
-            //$energy_damage_amount = $this_attachment_info['attachment_energy'];
-            //$target_robot->trigger_damage($this_robot, $this_ability, 0);
 
             // Attach this ability attachment to the robot using it
             $target_robot->robot_frame = !$target_robot->has_immunity($this_ability->ability_type) ? 'damage' : 'defend';
