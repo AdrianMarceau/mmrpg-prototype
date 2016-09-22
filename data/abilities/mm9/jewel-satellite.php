@@ -66,8 +66,14 @@ $ability = array(
             'ability_frame_offset' => array('x' => -10, 'y' => 0, 'z' => -10)
             );
 
-        // If the ability flag was not set, skull barrier cuts damage by half
-        if (!isset($this_robot->robot_attachments[$this_attachment_token])){
+        // Check if this ability is already summoned
+        $is_summoned = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+
+        // If the user is holding a Charge Module, auto-charge the ability
+        if ($this_robot->has_item('charge-module')){ $is_summoned = true; }
+
+        // If the ability flag was not set, this ability begins charging
+        if (!$is_summoned){
 
             // Target this robot's self
             $this_ability->target_options_update(array(
@@ -88,8 +94,6 @@ $ability = array(
         // Else if the ability flag was set, leaf shield is thrown and defense is lowered by 30%
         else {
 
-            // Collect the attachment from the robot to back up its info
-            $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
             // Remove this ability attachment to the robot using it
             unset($this_robot->robot_attachments[$this_attachment_token]);
             $this_robot->update_session();
@@ -118,10 +122,6 @@ $ability = array(
             $energy_damage_amount = $this_ability->ability_damage;
             $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
-            // Decrease this robot's defense stat
-            $this_ability->target_options_update($this_attachment_info['attachment_destroy']);
-            $this_robot->trigger_target($this_robot, $this_ability);
-
         }
 
         // Either way, update this ability's settings to prevent recovery
@@ -142,29 +142,20 @@ $ability = array(
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
+        // Check if this ability is already summoned
+        $is_summoned = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+
         // If the ability flag had already been set, reduce the weapon energy to zero
-        if (isset($this_robot->robot_attachments[$this_attachment_token])){ $this_ability->ability_energy = 0; }
+        if ($is_summoned){ $this_ability->set_energy(0); }
         // Otherwise, return the weapon energy back to default
-        else { $this_ability->ability_energy = $this_ability->ability_base_energy; }
-        // Update the ability session
-        $this_ability->update_session();
+        else { $this_ability->reset_energy(); }
 
-        // If this ability is being used by a robot with the same core type AND it's already summoned, allow targetting
-        if (isset($this_robot->robot_attachments[$this_attachment_token])){
+        // If the user is holding a Charge Module, auto-charge the ability
+        if ($this_robot->has_item('charge-module')){ $is_summoned = true; }
 
-            // Update this ability's targetting setting
-            $this_ability->ability_target = 'select_target';
-            $this_ability->update_session();
-
-        }
-        // Else if the ability attachment is not there, change the target back to auto
-        else {
-
-            // Update this ability's targetting setting
-            $this_ability->ability_target = 'auto';
-            $this_ability->update_session();
-
-        }
+        // If the user is holding a Target Module, allow bench targeting
+        if ($is_summoned && $this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
 
         // Return true on success
         return true;
