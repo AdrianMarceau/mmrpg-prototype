@@ -781,11 +781,12 @@ $(document).ready(function(){
         e.preventDefault();
         if (thisBody.hasClass('loading')){ return false; }
         if (!gameSettings.allowEditing){ return false; }
-        //console.log('thisItemCanvas > a.item_name clicked');
+        //console.log('---------------------------------------');
 
         // Collect the target data from the item canvas
         var targetPlayerToken =  thisItemCanvas.attr('data-player') != undefined ? thisItemCanvas.attr('data-player') : '';
         var targetRobotToken =  thisItemCanvas.attr('data-robot') != undefined ? thisItemCanvas.attr('data-robot') : '';
+        //console.log('thisItemCanvas > a.item_name clicked (p:'+targetPlayerToken+', r:'+targetRobotToken+')');
 
         // Collect referneces to the target objects
         var targetRobotEvent = $('.event[data-player='+targetPlayerToken+'][data-robot='+targetRobotToken+']', gameConsole);
@@ -795,6 +796,8 @@ $(document).ready(function(){
         // Collect the target robot's core type(s)
         if (targetRobotCores.match(',')){ targetRobotCores = targetRobotCores.split(','); }
         else { targetRobotCores = [targetRobotCores]; }
+
+        //console.log('targetRobotEvent.length = '+targetRobotEvent.length+' | targetItemLink.length = '+targetItemLink.length+' | targetRobotCores.length = '+targetRobotCores.length+' ;');
 
         // Collect references to this new item link
         var thisItemLink = $(this);
@@ -845,6 +848,7 @@ $(document).ready(function(){
 
                     // Increment the old item's count if not empty (we're putting it back)
                     if (oldItemToken.length){
+                        //console.log('Increment the old item\'s count if not empty (we\'re putting it back)');
                         var tempLink = $('a.item_name[data-item='+oldItemToken+']', thisItemCanvas);
                         var oldCount = parseInt(tempLink.attr('data-count'));
                         var newCount = oldCount + 1;
@@ -853,6 +857,7 @@ $(document).ready(function(){
 
                     // Decrement the old item's count if not empty (we're taking it out)
                     if (thisItemToken.length){
+                        //console.log('Decrement the old item\'s count if not empty (we\'re taking it out)');
                         var tempLink = $('a.item_name[data-item='+thisItemToken+']', thisItemCanvas);
                         var oldCount = parseInt(tempLink.attr('data-count'));
                         var newCount = oldCount - 1;
@@ -861,6 +866,7 @@ $(document).ready(function(){
 
                     // If a non-empty item token was provided, normal equip
                     if (thisItemToken.length){
+                        //console.log('If a non-empty item token was provided, normal equip');
 
                         // Update the target item link with new data
                         targetItemLink.attr('class', thisItemLink.attr('class'));
@@ -897,6 +903,7 @@ $(document).ready(function(){
                         }
                     // Otherwise if this was an item remove option, clear stuff
                     else {
+                        //console.log('Otherwise if this was an item remove option, clear stuff');
 
                         // Update the target item link with empty data
                         targetItemLink.attr('class', 'item_name type none');
@@ -1521,13 +1528,13 @@ function startDragRobot(event, ui){
 //Define a function to trigger when a robot drag has stopped
 function stopDragRobot(event, ui){
 
-console.log('robot drag has stopped');
+    //console.log('robot drag has stopped');
 
-$('.robot_canvas .wrapper_overflow', gameCanvas).each(function(){
-    var overflowPlayer = $(this).parent().attr('data-player');
-    //console.log('remove hard-coded height from '+overflowPlayer);
-    $(this).css({height:'',overflow:''});
-    });
+    $('.robot_canvas .wrapper_overflow', gameCanvas).each(function(){
+        var overflowPlayer = $(this).parent().attr('data-player');
+        //console.log('remove hard-coded height from '+overflowPlayer);
+        $(this).css({height:'',overflow:''});
+        });
 
 }
 
