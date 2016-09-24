@@ -42,23 +42,11 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // If this ability is being used by a special support robot, allow targetting
+        // If used by support robot OR the has a Target Module, allow bench targetting
         $temp_support_robots = array('roll', 'disco', 'rhythm');
-        if (in_array($this_robot->robot_token, $temp_support_robots) && $target_player->counters['robots_active'] > 1){
-
-            // Update this ability's targetting setting
-            $this_ability->ability_target = 'select_target';
-            $this_ability->update_session();
-
-        }
-        // Else if the ability attachment is not there, change the target back to auto
-        else {
-
-            // Update this ability's targetting setting
-            $this_ability->ability_target = 'auto';
-            $this_ability->update_session();
-
-        }
+        if (in_array($this_robot->robot_token, $temp_support_robots)
+            || $this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
 
         // Return true on success
         return true;
