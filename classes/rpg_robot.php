@@ -3567,12 +3567,27 @@ class rpg_robot extends rpg_object {
                     $current_item_type = !empty($current_item_info['item_type']) ? $current_item_info['item_type'] : 'none';
                     if (!empty($current_item_info['item_type2'])){ $current_item_type = $current_item_type != 'none' ?  $current_item_type.'_'.$current_item_info['item_type2'] : $current_item_info['item_type2']; }
                     if (empty($current_item_info)){ $current_item_token = ''; $current_item_image = 'item'; }
+                    $current_date_attr = '';
+                    if (!empty($current_item_info)){
+                        $title_markup = rpg_item::print_editor_title_markup($robot_info, $current_item_info, array());
+                        $title_markup_encoded = htmlentities($title_markup, ENT_QUOTES, 'UTF-8', true);
+                        $current_date_attr .= 'data-id="'.$current_item_info['item_id'].'" ';
+                        $current_date_attr .= 'data-item="'.$current_item_info['item_token'].'" ';
+                        $current_date_attr .= 'data-type="'.$current_item_info['item_type'].'" ';
+                        $current_date_attr .= 'data-type2="'.$current_item_info['item_type2'].'" ';
+                        $current_date_attr .= 'data-tooltip="'.$title_markup_encoded.'" ';
+                    } else {
+                        $current_date_attr .= 'data-id="" ';
+                        $current_date_attr .= 'data-item="" ';
+                        $current_date_attr .= 'data-type="" ';
+                        $current_date_attr .= 'data-type2="" ';
+                    }
                     ob_start();
                     ?>
                     <td  class="right">
                         <label style="display: block; float: left;">Item:</label>
                         <? if($global_allow_editing): ?>
-                            <a title="Change Item?" class="item_name type <?= $current_item_type ?>"><label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?><span class="arrow">&#8711;</span></label></a>
+                            <a title="Change Item?" class="item_name type <?= $current_item_type ?>" <?= $current_date_attr ?>><label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?><span class="arrow">&#8711;</span></label></a>
                         <? else: ?>
                             <a class="item_name type <?= $current_item_type ?>" style="opacity: 0.5; filter: alpha(opacity=50); cursor: default;"><label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?></label></a>
                         <? endif; ?>
