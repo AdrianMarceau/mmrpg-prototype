@@ -880,7 +880,9 @@ class rpg_robot extends rpg_object {
         $item_token = !empty($item_info) ? $item_info['item_token'] : '';
         $robot_token = $robot_info['robot_token'];
         $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
-        $robot_core2 = !empty($item_token) && preg_match('/-core$/i', $item_token) ? preg_replace('/-core$/i', '', $item_token) : '';
+        $robot_core2 = !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : '';
+        $item_core = !empty($item_token) && preg_match('/-core$/i', $item_token) ? preg_replace('/-core$/i', '', $item_token) : '';
+        if ($item_core == 'none' || $item_core == 'copy'){ $item_core = ''; }
         //echo 'has_ability_compatibility('.$robot_token.', '.$ability_token.', '.$robot_core.', '.$robot_core2.')'."\n";
         // Define the compatibility flag and default to false
         $temp_compatible = false;
@@ -891,19 +893,25 @@ class rpg_robot extends rpg_object {
         // Else if this ability has a type, check it against this robot
         elseif (!empty($ability_info['ability_type']) || !empty($ability_info['ability_type2'])){
             //$debug_fragment .= 'has-type '; // DEBUG
-            if (!empty($robot_core) || !empty($robot_core2)){
+            if (!empty($robot_core) || !empty($robot_core2) || !empty($robot_core3)){
             //$debug_fragment .= 'has-core '; // DEBUG
                 if ($robot_core == 'copy'){
                     //$debug_fragment .= 'copy-core '; // DEBUG
                     $temp_compatible = true;
                 }
                 elseif (!empty($ability_info['ability_type'])
-                    && ($ability_info['ability_type'] == $robot_core || $ability_info['ability_type'] == $robot_core2)){
+                    && ($ability_info['ability_type'] == $robot_core
+                        || $ability_info['ability_type'] == $robot_core2
+                        || $ability_info['ability_type'] == $item_core
+                        )){
                     //$debug_fragment .= 'core-match1 '; // DEBUG
                     $temp_compatible = true;
                 }
                 elseif (!empty($ability_info['ability_type2'])
-                    && ($ability_info['ability_type2'] == $robot_core || $ability_info['ability_type2'] == $robot_core2)){
+                    && ($ability_info['ability_type2'] == $robot_core
+                        || $ability_info['ability_type2'] == $robot_core2
+                        || $ability_info['ability_type2'] == $item_core
+                        )){
                     //$debug_fragment .= 'core-match2 '; // DEBUG
                     $temp_compatible = true;
                 }
