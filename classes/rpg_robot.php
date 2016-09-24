@@ -1753,10 +1753,10 @@ class rpg_robot extends rpg_object {
         // If this is an item the weapon energy is zero
         if (isset($this_object->item_token)){
 
-            // Define the return to the item variable
-            $this_item = $this_object;
-
             // Return zero as items are free
+            $energy_new = 0;
+            $energy_base = 0;
+            $energy_mods = 0;
             return 0;
 
         }
@@ -1765,33 +1765,25 @@ class rpg_robot extends rpg_object {
 
             // Define the return to the ability variable
             $this_ability = $this_object;
+            $ability_info = $this_ability->export_array();
 
-            // Determine how much weapon energy this should take
-            $energy_new = $this_ability->ability_energy;
-            $energy_base = $energy_new;
-            $energy_mods = 0;
-            if ($this_ability->ability_token != 'action-noweapons'){
-                if (!empty($this->robot_core) && ($this->robot_core == $this_ability->ability_type || $this->robot_core == $this_ability->ability_type2)){
-                    $energy_mods++;
-                    $energy_new = ceil($energy_new * 0.5);
-                } elseif (empty($this->robot_core) && empty($this_ability->ability_type) && empty($this_ability->ability_type2)){
-                    $energy_mods++;
-                    $energy_new = ceil($energy_new * 0.5);
-                }
-                if (!empty($this->robot_rewards['abilities'])){
-                    foreach ($this->robot_rewards['abilities'] AS $key => $info){
-                        if ($info['token'] == $this_ability->ability_token){
-                            $energy_mods++;
-                            $energy_new = ceil($energy_new * 0.5);
-                            break;
-                        }
-                    }
-                }
-            } else {
-                $this_ability->ability_energy = 0;
+            // Define basic robot info for caluclations
+            $robot_info = array();
+            $robot_info['robot_token'] = $this->robot_token;
+            $robot_info['robot_core'] = $this->robot_core;
+            $robot_info['robot_core2'] = $this->robot_core2;
+            $robot_info['robot_item'] = $this->robot_item;
+
+            // If this was the noweapons action, everything is zero
+            if ($this_ability->ability_token == 'action-noweapons'){
+                $energy_new = 0;
+                $energy_base = 0;
+                $energy_mods = 0;
+                return 0;
             }
 
-            // Return the resulting weapon energy
+            // Pass along variables to the static function and return
+            $energy_new = self::calculate_weapon_energy_static($robot_info, $ability_info, $energy_base, $energy_mods);
             return $energy_new;
 
         }
@@ -1799,32 +1791,63 @@ class rpg_robot extends rpg_object {
 
     // Define a function for calculating required weapon energy without using objects
     static function calculate_weapon_energy_static($this_robot, $this_ability, &$energy_base = 0, &$energy_mods = 0){
+
         // Determine how much weapon energy this should take
         $energy_new = isset($this_ability['ability_energy']) ? $this_ability['ability_energy'] : 0;
         $energy_base = $energy_new;
         $energy_mods = 0;
-        if (!isset($this_robot['robot_core'])){ $this_robot['robot_core'] = ''; }
-        if (!isset($this_ability['ability_type'])){ $this_ability['ability_type'] = ''; }
-        if (!isset($this_ability['ability_type2'])){ $this_ability['ability_type2'] = ''; }
-        if ($this_ability['ability_token'] != 'action-noweapons'){
-            if (!empty($this_robot['robot_core']) && ($this_robot['robot_core'] == $this_ability['ability_type'] || $this_robot['robot_core'] == $this_ability['ability_type2'])){
-                $energy_mods++;
-                $energy_new = ceil($energy_new * 0.5);
-            }
-            if (!empty($this_robot['robot_rewards']['abilities'])){
-                foreach ($this_robot['robot_rewards']['abilities'] AS $key => $info){
-                    if ($info['token'] == $this_ability['ability_token']){
-                        $energy_mods++;
-                        $energy_new = ceil($energy_new * 0.5);
-                        break;
-                    }
-                }
-            }
-        } else {
-            $this_ability['ability_energy'] = 0;
+
+        // If this was the noweapons action, everything is zero
+        if ($this_ability['ability_token'] == 'action-noweapons'){
+            $energy_new = 0;
+            $energy_base = 0;
+            $energy_mods = 0;
+            return 0;
         }
+
+        // Collect this ability's type tokens if they exist
+        $ability_type_token = !empty($this_ability['ability_type']) ? $this_ability['ability_type'] : 'none';
+        $ability_type_token2 = !empty($this_ability['ability_type2']) ? $this_ability['ability_type2'] : '';
+
+        // Collect this robot's core type tokens if they exist
+        $core_type_token = !empty($this_robot['robot_core']) ? $this_robot['robot_core'] : 'none';
+        $core_type_token2 = !empty($this_robot['robot_core2']) ? $this_robot['robot_core2'] : '';
+
+        // Collect this robot's held robot core if it exists
+        $core_type_token3 = '';
+        if (!empty($this_robot['robot_item']) && strstr($this_robot['robot_item'], '-core')){
+            $core_type_token3 = str_replace('-core', '', $this_robot['robot_item']);
+        }
+
+        // Check this ability's FIRST type for multiplier matches
+        if (!empty($ability_type_token)){
+
+            // Apply primary robot core multipliers if they exist
+            if ($ability_type_token == $core_type_token){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
+            // Apply secondary robot core multipliers if they exist
+            elseif ($ability_type_token == $core_type_token2){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
+
+            // Apply held robot core multipliers if they exist
+            if ($ability_type_token == $core_type_token3){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER); $energy_mods++; }
+
+        }
+
+        // Check this ability's SECOND type for multiplier matches
+        if (!empty($ability_type_token2)){
+
+            // Apply primary robot core multipliers if they exist
+            if ($ability_type_token2 == $core_type_token){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
+            // Apply secondary robot core multipliers if they exist
+            elseif ($ability_type_token2 == $core_type_token2){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
+
+            // Apply held robot core multipliers if they exist
+            if ($ability_type_token2 == $core_type_token3){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER); $energy_mods++; }
+
+        }
+
         // Return the resulting weapon energy
         return $energy_new;
+
     }
 
     // Define a function for generating robot canvas variables

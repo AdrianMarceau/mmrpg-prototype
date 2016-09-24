@@ -155,17 +155,72 @@ class rpg_item_recovery extends rpg_recovery {
             // Apply core boosts if allowed to
             if ($trigger_options['apply_core_modifiers'] != false){
 
-                // If the target robot is using an item that it is the same type as its core
-                if (!empty($target_robot->robot_core) && $target_robot->robot_core == $this_item->recovery_options['recovery_type']){
-                    $this_item->item_results['counter_coreboosts'] += 1;
-                    $this_item->item_results['flag_coreboost'] = true;
-                } else {
-                    $this_item->item_results['flag_coreboost'] = false;
+                // Collect this item's type tokens if they exist
+                $item_type_token = !empty($this_item->recovery_options['recovery_type']) ? $this_item->recovery_options['recovery_type'] : 'none';
+                $item_type_token2 = !empty($this_item->recovery_options['recovery_type2']) ? $this_item->recovery_options['recovery_type2'] : '';
+
+                // Collect this robot's core type tokens if they exist
+                $core_type_token = !empty($target_robot->robot_core) ? $target_robot->robot_core : 'none';
+                $core_type_token2 = !empty($target_robot->robot_core2) ? $target_robot->robot_core2 : '';
+
+                // Collect this robot's held robot core if it exists
+                $core_type_token3 = '';
+                if (!empty($target_robot->robot_item) && strstr($target_robot->robot_item, '-core')){
+                    $core_type_token3 = str_replace('-core', '', $target_robot->robot_item);
                 }
 
-                // If the target robot is using an item that it is the same type as its core
-                if (!empty($target_robot->robot_core) && $target_robot->robot_core == $this_item->recovery_options['recovery_type2']){
-                    $this_item->item_results['counter_coreboosts'] += 1;
+                // Define the coreboost flag and default to false
+                $this_item->item_results['flag_coreboost'] = false;
+
+                // Define an array to hold individual coreboost values
+                $item_coreboost_multipliers = array();
+
+                // Check this item's FIRST type for multiplier matches
+                if (!empty($item_type_token)){
+
+                    // Apply primary robot core multipliers if they exist
+                    if ($item_type_token == $core_type_token){
+                        $this_item->item_results['counter_coreboosts']++;
+                        $item_coreboost_multipliers[] = MMRPG_SETTINGS_COREBOOST_MULTIPLIER;
+                    }
+                    // Apply secondary robot core multipliers if they exist
+                    elseif ($item_type_token == $core_type_token2){
+                        $this_item->item_results['counter_coreboosts']++;
+                        $item_coreboost_multipliers[] = MMRPG_SETTINGS_COREBOOST_MULTIPLIER;
+                    }
+
+                    // Apply held robot core multipliers if they exist
+                    if ($item_type_token == $core_type_token3){
+                        $this_item->item_results['counter_coreboosts']++;
+                        $item_coreboost_multipliers[] = MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER;
+                    }
+
+                }
+
+                // Check this item's SECOND type for multiplier matches
+                if (!empty($item_type_token2)){
+
+                    // Apply primary robot core multipliers if they exist
+                    if ($item_type_token2 == $core_type_token){
+                        $this_item->item_results['counter_coreboosts']++;
+                        $item_coreboost_multipliers[] = MMRPG_SETTINGS_COREBOOST_MULTIPLIER;
+                    }
+                    // Apply secondary robot core multipliers if they exist
+                    elseif ($item_type_token2 == $core_type_token2){
+                        $this_item->item_results['counter_coreboosts']++;
+                        $item_coreboost_multipliers[] = MMRPG_SETTINGS_COREBOOST_MULTIPLIER;
+                    }
+
+                    // Apply held robot core multipliers if they exist
+                    if ($item_type_token2 == $core_type_token3){
+                        $this_item->item_results['counter_coreboosts']++;
+                        $item_coreboost_multipliers[] = MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER;
+                    }
+
+                }
+
+                // If any coreboosts were present, update the flag
+                if (!empty($this_item->item_results['counter_coreboosts'])){
                     $this_item->item_results['flag_coreboost'] = true;
                 }
 
@@ -453,9 +508,10 @@ class rpg_item_recovery extends rpg_recovery {
 
                 // If target robot has core boost for the item (based on type)
                 if ($this_item->item_results['flag_coreboost']){
-                    $temp_multiplier = MMRPG_SETTINGS_COREBOOST_MULTIPLIER;
-                    $this_item->item_results['this_amount'] = ceil($this_item->item_results['this_amount'] * $temp_multiplier);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | apply_core_modifiers | x '.$temp_multiplier.' = '.$this_item->item_results['this_amount'].'');
+                    foreach ($item_coreboost_multipliers AS $temp_multiplier){
+                        $this_item->item_results['this_amount'] = ceil($this_item->item_results['this_amount'] * $temp_multiplier);
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | apply_core_modifiers | x '.$temp_multiplier.' = '.$this_item->item_results['this_amount'].'');
+                    }
                 }
 
             }

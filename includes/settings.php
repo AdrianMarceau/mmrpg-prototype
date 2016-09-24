@@ -86,7 +86,12 @@ define('MMRPG_SETTINGS_WEAKNESS_MULTIPLIER', 2.0); // Core boosted abilites shou
 define('MMRPG_SETTINGS_RESISTANCE_MULTIPLIER', 0.5); // Core boosted abilites should recive a 50% boost
 define('MMRPG_SETTINGS_AFFINITY_MULTIPLIER', -1.0); // Core boosted abilites should recive a 50% boost
 define('MMRPG_SETTINGS_IMMUNITY_MULTIPLIER', 0.0); // Core boosted abilites should recive a 50% boost
-define('MMRPG_SETTINGS_COREBOOST_MULTIPLIER', 1.5); // Core boosted abilites should recive a 50% boost
+
+// Define the global values for core boosts and bonuses
+define('MMRPG_SETTINGS_COREBOOST_MULTIPLIER', 1.5); // Core matched abilites should recive a 50% damage/recovery boost
+define('MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER', 1.25); // Sub-Core matched abilites should recive a 25% damage/recovery boost
+define('MMRPG_SETTINGS_COREBONUS_MULTIPLIER', 0.5); // Core matched abilites should recive a 50% weapon enery reduction
+define('MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER', 0.75); // Sub-Core matched abilites should recive a 25% weapon energy reduction
 
 // Define the global comment size limit for characters
 define('MMRPG_SETTINGS_COMMENT_MINLENGTH', 10); // Prevent spam comments
