@@ -114,31 +114,73 @@ ob_start();
                 $temp_multiplier = 1;
                 if (!empty($temp_damage) || !empty($temp_recovery)){
 
-                    if (!empty($this_robot->robot_core) && ($this_robot->robot_core == $temp_type || $this_robot->robot_core == $temp_type2)){ $temp_multiplier = $temp_multiplier * 1.5; }
-                    if (!empty($temp_type) && !empty($this_battle->battle_field->field_multipliers[$temp_type])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$temp_type]; }
-                    elseif (!empty($this_battle->battle_field->field_multipliers['none'])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers['none']; }
-                    if (!empty($temp_type2) && !empty($this_battle->battle_field->field_multipliers[$temp_type2])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$temp_type2]; }
+                    // Collect this ability's type tokens if they exist
+                    $ability_type_token = !empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none';
+                    $ability_type_token2 = !empty($temp_ability->ability_type2) ? $temp_ability->ability_type2 : '';
 
-                    // Apply starforce multipliers if they exist ($_SESSION['GAME']['values']['star_force'])
-                    if (!empty($temp_type) && !empty($this_starforce_modified[$temp_type])){ $temp_multiplier += $temp_multiplier * ($this_starforce_modified[$temp_type] / 10); }
-                    elseif (empty($temp_type) && !empty($this_starforce_modified['none'])){ $temp_multiplier += $temp_multiplier * ($this_starforce_modified['none'] / 10); }
-                    if (!empty($temp_type2) && !empty($this_starforce_modified[$temp_type2])){ $temp_multiplier += $temp_multiplier * ($this_starforce_modified[$temp_type2] / 10); }
+                    // Collect this robot's core type tokens if they exist
+                    $core_type_token = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
+                    $core_type_token2 = !empty($this_robot->robot_core2) ? $this_robot->robot_core2 : '';
 
+                    // Collect this robot's held robot core if it exists
+                    $core_type_token3 = '';
+                    if (!empty($this_robot->robot_item) && strstr($this_robot->robot_item, '-core')){
+                        $core_type_token3 = str_replace('-core', '', $this_robot->robot_item);
+                    }
+
+                    // Check this ability's FIRST type for multiplier matches
+                    if (!empty($ability_type_token)){
+
+                        // Apply primary robot core multipliers if they exist
+                        if ($ability_type_token == $core_type_token){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_COREBOOST_MULTIPLIER; }
+                        // Apply secondary robot core multipliers if they exist
+                        elseif ($ability_type_token == $core_type_token2){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_COREBOOST_MULTIPLIER; }
+
+                        // Apply held robot core multipliers if they exist
+                        if ($ability_type_token == $core_type_token3){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER; }
+
+                        // Apply any field multiplier matches if they exist
+                        if (!empty($this_battle->battle_field->field_multipliers[$ability_type_token])){
+                            $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$ability_type_token];
+                        }
+
+                        // Apply any starforce multiplier matches if they exist
+                        if (!empty($this_starforce_modified[$ability_type_token])){
+                            $temp_multiplier += $temp_multiplier * ($this_starforce_modified[$ability_type_token] / 10);
+                        }
+
+                    }
+
+                    // Check this ability's SECOND type for multiplier matches
+                    if (!empty($ability_type_token2)){
+
+                        // Apply primary robot core multipliers if they exist
+                        if ($ability_type_token2 == $core_type_token){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_COREBOOST_MULTIPLIER; }
+                        // Apply secondary robot core multipliers if they exist
+                        elseif ($ability_type_token2 == $core_type_token2){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_COREBOOST_MULTIPLIER; }
+
+                        // Apply held robot core multipliers if they exist
+                        if ($ability_type_token2 == $core_type_token3){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER; }
+
+                        // Apply any field multiplier matches if they exist
+                        if (!empty($this_battle->battle_field->field_multipliers[$ability_type_token2])){
+                            $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$ability_type_token2];
+                        }
+
+                        // Apply any starforce multiplier matches if they exist
+                        if (!empty($this_starforce_modified[$ability_type_token2])){
+                            $temp_multiplier += $temp_multiplier * ($this_starforce_modified[$ability_type_token2] / 10);
+                        }
+
+                    }
+
+                    // Apply any overall damage multipliers if applicable
                     $temp_damage = ceil($temp_damage * $temp_multiplier);
                     if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage = ceil($temp_damage * $this_battle->battle_field->field_multipliers['damage']); }
-                    //if ($temp_damage_unit == '%' && $temp_damage > 100){ $temp_damage = 100; }
 
-                    //$temp_damage2 = ceil($temp_damage2 * $temp_multiplier);
-                    //if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage2 = ceil($temp_damage2 * $this_battle->battle_field->field_multipliers['damage']); }
-                    //if ($temp_damage2_unit == '%' && $temp_damage2 > 100){ $temp_damage2 = 100; }
-
+                    // Apply any overall recovery multipliers if applicable
                     $temp_recovery = ceil($temp_recovery * $temp_multiplier);
                     if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['recovery'])){ $temp_recovery = ceil($temp_recovery * $this_battle->battle_field->field_multipliers['recovery']); }
-                    //if ($temp_recovery_unit == '%' && $temp_recovery > 100){ $temp_recovery = 100; }
-
-                    //$temp_recovery2 = ceil($temp_recovery2 * $temp_multiplier);
-                    //if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['recovery'])){ $temp_recovery2 = ceil($temp_recovery2 * $this_battle->battle_field->field_multipliers['recovery']); }
-                    //if ($temp_recovery2_unit == '%' && $temp_recovery2 > 100){ $temp_recovery2 = 100; }
 
                 }
 
