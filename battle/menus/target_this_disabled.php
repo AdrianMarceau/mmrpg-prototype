@@ -19,20 +19,8 @@ ob_start();
 		$num_robots = count($this_player->player_robots);
 		$robot_direction = $this_player->player_side == 'left' ? 'right' : 'left';
 
-		// Define the sorting function for the target robots
-		if (!function_exists('mmrpg_action_sort_target')){
-			function mmrpg_action_sort_target($info1, $info2){
-				if ($info1['robot_position'] == 'active'){ return -1; }
-				elseif ($info2['robot_position'] == 'active'){ return 1; }
-				elseif ($info1['robot_key'] < $info2['robot_key']){ return -1; }
-				elseif ($info1['robot_key'] > $info2['robot_key']){ return 1; }
-				else { return 0; }
-			}
-		}
-
 		// Collect the target robot options and sort them
 		$this_player_robots = $this_player->player_robots;
-		usort($this_player_robots, 'mmrpg_action_sort_target');
 
 		// Loop through each robot and display its target button
 		foreach ($this_player_robots AS $robot_key => $scan_robotinfo){
