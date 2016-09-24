@@ -284,9 +284,8 @@ class rpg_mission_double extends rpg_mission {
 
             // Randomly assign this robot a hold item if applicable
             $temp_item = '';
-            if (rpg_game::player_unlocked('dr-cossack')
-                && $robot['robot_class'] == 'master'){
-                $rand = mt_rand(1, 4);
+            if ($robot['robot_class'] == 'master'){
+                $rand = $temp_fusion_star_present ? mt_rand(1, 4) : mt_rand(1, 8);
                 if ($rand == 1){
                     $stats = array('energy', 'weapon', 'attack', 'defense', 'speed');
                     $items = array('pellet', 'capsule');
