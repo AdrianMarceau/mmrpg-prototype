@@ -23,6 +23,15 @@ ob_start();
         $num_robots = count($this_player->player_robots);
         $robot_direction = $this_player->player_side == 'left' ? 'right' : 'left';
 
+        // Define the sorting function for the switch robots
+        function mmrpg_action_sort_switch($info1, $info2){
+            if ($info1['robot_position'] == 'active'){ return -1; }
+            elseif ($info2['robot_position'] == 'active'){ return 1; }
+            elseif ($info1['robot_key'] < $info2['robot_key']){ return -1; }
+            elseif ($info1['robot_key'] > $info2['robot_key']){ return 1; }
+            else { return 0; }
+        }
+
         // Collect the temp ability and item indexes
         $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         $temp_items_index = $db->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
@@ -30,6 +39,7 @@ ob_start();
         // Collect the target robot options and sort them
         $switch_player_robots = $this_player->player_robots;
         $switch_robots_count = $this_player->counters['robots_active'];
+        usort($switch_player_robots, 'mmrpg_action_sort_switch');
 
         // Loop through each robot and display its switch button
         foreach ($switch_player_robots AS $robot_key => $switch_robotinfo){
