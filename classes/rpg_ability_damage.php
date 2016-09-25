@@ -21,7 +21,6 @@ class rpg_ability_damage extends rpg_damage {
         if (!isset($trigger_options['apply_core_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_core_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
-        if (!isset($trigger_options['apply_starforce_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_starforce_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['referred_damage'])){ $trigger_options['referred_damage'] = false; }
         if (!isset($trigger_options['referred_damage_id'])){ $trigger_options['referred_damage_id'] = 0; }
@@ -282,48 +281,6 @@ class rpg_ability_damage extends rpg_damage {
                 }
             }
 
-
-        }
-
-        // Apply starforce multipliers preemtively if there are any
-        if ($trigger_options['apply_starforce_modifiers'] != false && $this_ability->damage_options['damage_modifiers'] && !empty($target_robot->player->player_starforce) && $this_robot->robot_id != $target_robot->robot_id){
-
-            // Collect this and the target player's starforce levels
-            $this_starforce = $this_robot->player->player_starforce;
-            $target_starforce = $target_robot->player->player_starforce;
-
-            // Loop through and neutralize target starforce levels if possible
-            $target_starforce_modified = $target_starforce;
-            foreach ($target_starforce_modified AS $type => $target_value){
-                if (!isset($this_starforce[$type])){ $this_starforce[$type] = 0; }
-                $target_value -= $this_starforce[$type];
-                if ($target_value < 0){ $target_value = 0; }
-                $target_starforce_modified[$type] = $target_value;
-            }
-
-            // Collect the ability types else "none" for multipliers
-            $temp_ability_damage_type = !empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : '';
-            $temp_ability_damage_type2 = !empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : '';
-
-            // Apply any starforce bonuses for ability type
-            if (!empty($temp_ability_damage_type) && !empty($target_starforce_modified[$temp_ability_damage_type])){
-                $temp_multiplier = 1 + ($target_starforce_modified[$temp_ability_damage_type] / 10);
-                $new_damage_amount = round($damage_amount * $temp_multiplier);
-                $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | starforce_multiplier_'.$temp_ability_damage_type.' | force:'.$target_starforce[$temp_ability_damage_type].' vs resist:'.$this_starforce[$temp_ability_damage_type].' = '.($target_starforce_modified[$temp_ability_damage_type] * 10).'% boost | '.$damage_amount.' = round('.$damage_amount.' * '.$temp_multiplier.') = '.$new_damage_amount.'');
-                $damage_amount = $new_damage_amount;
-            } elseif (!empty($temp_ability_damage_type) && isset($target_starforce_modified[$temp_ability_damage_type])){
-                $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | starforce_multiplier_'.$temp_ability_damage_type.' | force:'.$target_starforce[$temp_ability_damage_type].' vs resist:'.$this_starforce[$temp_ability_damage_type].' = no boost');
-            }
-
-            // Apply any starforce bonuses for ability type2
-            if (!empty($temp_ability_damage_type2) && !empty($target_starforce_modified[$temp_ability_damage_type2])){
-                $temp_multiplier = 1 + ($target_starforce_modified[$temp_ability_damage_type2] / 10);
-                $new_damage_amount = round($damage_amount * $temp_multiplier);
-                $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | starforce_multiplier_'.$temp_ability_damage_type2.' | force:'.$target_starforce[$temp_ability_damage_type2].' vs resist:'.$this_starforce[$temp_ability_damage_type2].' = '.($target_starforce_modified[$temp_ability_damage_type2] * 10).'% boost | '.$damage_amount.' = round('.$damage_amount.' * '.$temp_multiplier.') = '.$new_damage_amount.'');
-                $damage_amount = $new_damage_amount;
-            } elseif (!empty($temp_ability_damage_type2) && isset($target_starforce_modified[$temp_ability_damage_type2])){
-                $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | starforce_multiplier_'.$temp_ability_damage_type2.' | force:'.$target_starforce[$temp_ability_damage_type2].' vs resist:'.$this_starforce[$temp_ability_damage_type2].' = no boost');
-            }
 
         }
 
