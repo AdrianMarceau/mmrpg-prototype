@@ -116,6 +116,7 @@ foreach ($mmrpg_database_types AS $type_token => $type_info){
 }
 $temp_pattern_last[] = '/^share-program$/i';
 $temp_pattern_last[] = '/^transfer-program$/i';
+$temp_pattern_last[] = '/^starforce-program$/i';
 $temp_pattern_last[] = '/^fusion-program$/i';
 $temp_pattern_last[] = '/^energy-upgrade$/i';
 $temp_pattern_last[] = '/^weapon-upgrade$/i';
