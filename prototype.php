@@ -253,7 +253,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
                     <span class="amount zenny">
                         <?= isset($_SESSION[$session_token]['counters']['battle_zenny']) ? number_format($_SESSION[$session_token]['counters']['battle_zenny'], 0, '.', ',') : 0 ?> z
                     </span>
-                    <? if (isset($_SESSION[$session_token]['values']['battle_stars'])){ ?>
+                    <? if (!empty($_SESSION[$session_token]['values']['battle_stars'])){ ?>
                         <span class="pipe">|</span>
                         <span class="amount stars">
                             <?= number_format(count($_SESSION[$session_token]['values']['battle_stars']), 0, '.', ',') ?> &#9733;
@@ -302,7 +302,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
             $this_menu_tooltips = array();
             $this_menu_tooltips['leaderboard'] = '&laquo; Player Leaderboard &raquo; &lt;br /&gt;Live leaderboards ranking all players by their total Battle Point scores from highest to lowest. Keep an eye on your Battle Points by checking the top-right of the main menu and try to work your way up to the first page!';
             $this_menu_tooltips['database'] = '&laquo; Robot Database &raquo; &lt;br /&gt;A comprehensive list of all robots encountered in battle so far including their name and basic details. Scanning robots adds their stats and weaknesses to the database and unlocking them adds a complete list of their level-up abilities.';
-            $this_menu_tooltips['stars'] = '&laquo; Star Collection &raquo; &lt;br /&gt;A detailed list of all the Field and Fusion Stars collected on your journey so far. Collect as many different stars as you can to advance in the prototype!';
+            $this_menu_tooltips['stars'] = '&laquo; Star Collection &raquo; &lt;br /&gt;A detailed list of all the Field and Fusion Stars collected on your journey so far. Collect many different stars to advance in the prototype!';
             $this_menu_tooltips['help'] = '&laquo; Battle Tips &raquo; &lt;br /&gt;A bullet-point list covering both basic and advanced battle tips to help you progress through the game and level up faster.';
             $this_menu_tooltips['demo'] = '&laquo; Demo Menu &raquo; &lt;br /&gt;Select your mission from the demo menu and prepare for battle! Please note that progress cannot be saved in this mode.';
             $this_menu_tooltips['home'] = '&laquo; Home Menu &raquo; &lt;br /&gt;Select your mission from the home menu and prepare for battle! Complete missions in fewer turns to earn more battle points!';
