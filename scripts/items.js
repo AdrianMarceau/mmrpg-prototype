@@ -89,10 +89,6 @@ function windowResizeFrame(){
     if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
     else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 
-    thisBody.css({height:newBodyHeight+'px'});
-    thisPrototype.css({height:newBodyHeight+'px'});
-    $('.scroll_wrapper', thisPrototype).css({maxHeight:newScrollWrapperHeight+'px'});
-
     //console.log('windowWidth = '+windowWidth+'; parentWidth = '+parentWidth+'; thisTypeContainerWidth = '+thisTypeContainerWidth+'; thisStarContainerWidth = '+thisStarContainerWidth+'; ');
 
 }

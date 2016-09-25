@@ -22,14 +22,14 @@ require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
 require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 
 // Collect the editor flag if set
-$global_allow_editing = !defined('MMRPG_REMOTE_GAME_ID') ? true : false;
+$global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
 
 
 // -- GENERATE EDITOR MARKUP
 
 // Manually remove items that should not show here
 unset($mmrpg_database_items['heart']);
-unset($mmrpg_database_items['star']);
+//unset($mmrpg_database_items['star']);
 
 // Define which items we're allowed to see
 $global_battle_items = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items'] : array();
@@ -366,7 +366,7 @@ if (true){
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
-<body id="mmrpg" class="iframe" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
+<body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>">
     <div id="prototype" class="hidden" style="opacity: 0;">
         <div id="item" class="menu" style="position: relative;">
             <div id="item_overlay" style="border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background-color: rgba(0, 0, 0, 0.75); position: absolute; top: 50px; left: 6px; right: 4px; height: 340px; z-index: 9999; display: none;">&nbsp;</div>

@@ -14,7 +14,7 @@ require(MMRPG_CONFIG_ROOTDIR.'frames/remote_top.php');
 $session_token = rpg_game::session_token();
 
 // Collect the editor flag if set
-$global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
+$global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
 
 
 // -- COLLECT SETTINGS DATA -- //
