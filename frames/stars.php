@@ -27,15 +27,15 @@ $unlocked_factor_three_robots = false;
 $unlocked_factor_four_robots = false;
 $temp_omega_factor_options = array();
 $temp_omega_factor_options_unlocked = array();
-if (mmrpg_prototype_complete('dr-light')){
+if (mmrpg_prototype_player_unlocked('dr-light')){
     $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one);
     $unlocked_factor_one_robots = true;
 }
-if (mmrpg_prototype_complete('dr-wily')){
+if (mmrpg_prototype_player_unlocked('dr-wily')){
     $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two);
     $unlocked_factor_two_robots = true;
 }
-if (mmrpg_prototype_complete('dr-cossack')){
+if (mmrpg_prototype_player_unlocked('dr-cossack')){
     $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three);
     $unlocked_factor_three_robots = true;
 }
@@ -187,10 +187,10 @@ gameSettings.autoScrollTop = false;
                 </span>
             </span>
 
-            <div class="starforce">
+            <div class="starforce" data-size="<?= $temp_omega_factors_unlocked_total ?>">
                 <div class="wrapper" style="<?= $flag_wap ? 'margin-right: 0;' : '' ?>">
 
-                    <div class="page_links top_panel" data-max="15" data-key="0" data-kind="top">
+                    <div class="page_links top_panel" data-max="" data-key="0" data-kind="top">
                         <a class="arrow" data-scroll="left"><span>&nbsp;</span></a>
                         <?php
                         // Loop through the omega fields and print out their buttons
@@ -311,7 +311,7 @@ gameSettings.autoScrollTop = false;
                         </div>
                     </div>
 
-                    <div class="page_links side_panel right" data-max="9" data-key="0" data-kind="side">
+                    <div class="page_links side_panel right" data-max="" data-key="0" data-kind="side">
                         <a class="arrow" data-scroll="up"><span>&nbsp;</span></a>
                         <?php
                         // Loop through the omega fields and print out their buttons
