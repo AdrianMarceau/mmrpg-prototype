@@ -2,19 +2,6 @@
 // Generate the markup for the action ability panel
 ob_start();
 
-    // Collect this and the target player's starforce levels
-    $target_starforce = $target_player->player_starforce;
-    $this_starforce = $this_player->player_starforce;
-
-    // Loop through and neutralize target starforce levels if possible
-    $this_starforce_modified = $this_starforce;
-    foreach ($this_starforce_modified AS $type => $this_value){
-        if (!isset($target_starforce[$type])){ $target_starforce[$type] = 0; }
-        $this_value -= $target_starforce[$type];
-        if ($this_value < 0){ $this_value = 0; }
-        $this_starforce_modified[$type] = $this_value;
-    }
-
     // Define and start the order counter
     $temp_order_counter = 1;
 
@@ -144,11 +131,6 @@ ob_start();
                             $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$ability_type_token];
                         }
 
-                        // Apply any starforce multiplier matches if they exist
-                        if (!empty($this_starforce_modified[$ability_type_token])){
-                            $temp_multiplier += $temp_multiplier * ($this_starforce_modified[$ability_type_token] / 10);
-                        }
-
                     }
 
                     // Check this ability's SECOND type for multiplier matches
@@ -165,11 +147,6 @@ ob_start();
                         // Apply any field multiplier matches if they exist
                         if (!empty($this_battle->battle_field->field_multipliers[$ability_type_token2])){
                             $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$ability_type_token2];
-                        }
-
-                        // Apply any starforce multiplier matches if they exist
-                        if (!empty($this_starforce_modified[$ability_type_token2])){
-                            $temp_multiplier += $temp_multiplier * ($this_starforce_modified[$ability_type_token2] / 10);
                         }
 
                     }
