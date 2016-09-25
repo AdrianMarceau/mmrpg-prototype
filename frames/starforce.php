@@ -173,19 +173,16 @@ gameSettings.autoScrollTop = false;
         <div class="menu">
 
             <?php
-            $this_battle_stars_boost = 0;
-            foreach ($this_star_force AS $force_type => $force_count){ $this_battle_stars_boost += $force_count * MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT; }
-            $temp_total_stars_label = $this_battle_stars_count; //$this_battle_stars_count == 1 ? '1 Star' : $this_battle_stars_count.' Stars';
+            $temp_total_stars_label = $this_battle_stars_count;
             $temp_potential_count = ((temp_combination_number(2, $temp_omega_factors_unlocked_total) * 2) + $temp_omega_factors_unlocked_total);
             $temp_potential_stars_label = $temp_potential_count == 1 ? '1 Star' : $temp_potential_count.' Stars';
-            $temp_total_boost_label = '+'.number_format($this_battle_stars_boost, 0, '.', ',').'% Boost';
+
             ?>
             <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                 <span class="count">
-                    StarForce <span style="opacity: 0.25;">(
+                    Star Collection <span style="opacity: 0.25;">(
                         <span><?= $temp_total_stars_label ?></span> /
-                        <span><?= $temp_potential_stars_label ?></span> /
-                        <span><?= $temp_total_boost_label ?></span>
+                        <span><?= $temp_potential_stars_label ?></span>
                         )</span>
                 </span>
             </span>
@@ -193,36 +190,7 @@ gameSettings.autoScrollTop = false;
             <div class="starforce">
                 <div class="wrapper" style="<?= $flag_wap ? 'margin-right: 0;' : '' ?>">
 
-                    <div class="types_container" style="">
-                        <?php
-
-                        // Loop through all the field stars and print them out one-by-one
-                        if (!empty($this_star_force)){
-
-                            $temp_max_force = 0;
-                            $temp_max_padding = 30;
-                            foreach ($this_star_force AS $force_type => $force_count){
-                                $temp_padding_amount = $force_count * 2;
-                                if ($force_count > $temp_max_force){ $temp_max_force = $force_count; }
-                                if ($temp_padding_amount > 117){ $temp_max_padding = 117; }
-                            }
-
-
-                            foreach ($this_star_force AS $force_type => $force_count){
-                                $temp_padding_amount = $force_count * 2;
-                                $temp_padding_amount = ceil(($force_count / $temp_max_force) * $temp_max_padding);
-                                $force_count_strict = $this_star_force_strict[$force_type];
-                                echo '<div data-tooltip="'.ucfirst($force_type).' +'.($force_count * MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT).'% Boost | '.$force_count_strict.' / '.$this_battle_stars_count.' Stars" class="field_type field_type_'.$force_type.'" style="padding-right: '.$temp_padding_amount.'px;" data-padding="'.$temp_padding_amount.'">'.ucfirst($force_type).' +'.($force_count * MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT).'%</div>';
-                            }
-
-
-                        }
-
-
-                        ?>
-                    </div>
-
-                    <div class="page_links top_panel" data-max="19" data-key="0">
+                    <div class="page_links top_panel" data-max="15" data-key="0" data-kind="top">
                         <a class="arrow" data-scroll="left"><span>&nbsp;</span></a>
                         <?php
                         // Loop through the omega fields and print out their buttons
@@ -233,7 +201,7 @@ gameSettings.autoScrollTop = false;
                         <a class="arrow" data-scroll="right"><span>&nbsp;</span></a>
                     </div>
 
-                    <div class="page_links side_panel" data-max="9" data-key="0">
+                    <div class="page_links side_panel left" data-max="9" data-key="0" data-kind="side">
                         <a class="arrow" data-scroll="up"><span>&nbsp;</span></a>
                         <?php
                         // Loop through the omega fields and print out their buttons
@@ -341,6 +309,17 @@ gameSettings.autoScrollTop = false;
                             }
                             ?>
                         </div>
+                    </div>
+
+                    <div class="page_links side_panel right" data-max="9" data-key="0" data-kind="side">
+                        <a class="arrow" data-scroll="up"><span>&nbsp;</span></a>
+                        <?php
+                        // Loop through the omega fields and print out their buttons
+                        foreach ($temp_omega_factors_unlocked AS $key => $info){
+                            temp_print_omega_robot_links($info, $key, 'side');
+                        }
+                        ?>
+                        <a class="arrow" data-scroll="down"><span>&nbsp;</span></a>
                     </div>
 
                 </div>

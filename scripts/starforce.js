@@ -56,6 +56,8 @@ $(document).ready(function(){
     var thisArrow = $(this);
     var thisArrowScroll = thisArrow.attr('data-scroll');
     var thisPanel = thisArrow.parents('.page_links');
+    var thisPanelKind = thisPanel.attr('data-kind');
+    var thisPanels = thisPrototype.find('.page_links[data-kind="'+thisPanelKind+'"]');
     var thisPanelType = thisPanel.hasClass('top_panel') ? 'top' : 'side';
     var thisPanelKey = parseInt(thisPanel.attr('data-key'));
     var thisPanelMax = parseInt(thisPanel.attr('data-max'));
@@ -93,7 +95,7 @@ $(document).ready(function(){
 
       }
 
-    thisPanel.attr('data-key', newPanelKey);
+    thisPanels.attr('data-key', newPanelKey);
     refreshStarforceContainers();
 
     });
@@ -211,13 +213,17 @@ function windowResizeStarforce(){
 // Define a function for updating the starforce menu elements
 function refreshStarforceContainers(){
   //console.log('refreshStarforceContainers()');
+  //
+  var prototypeWidth = thisPrototype.width();
 
   // Update the max links for the top panel based on orientation
   var newSideDataMax = 9;
   var newTopDataMax = 9;
-  if (thisBrowserOrientation == 'landscape'){ newTopDataMax = 19; }
-  else if (thisBrowserOrientation == 'portrait'){ newTopDataMax = 12; }
-  //console.log('update page links top data max to '+newTopDataMax);
+  if (prototypeWidth <= 668){ newTopDataMax = 15; }
+  else if (prototypeWidth <= 750){ newTopDataMax = 17; }
+  else if (prototypeWidth <= 1000){ newTopDataMax = 24; }
+  else if (prototypeWidth > 1000){ newTopDataMax = 25; } // prototypeWidth == 1024
+  console.log('update page links top data max to '+newTopDataMax);
   thisPageLinksSide.attr('data-max', newSideDataMax);
   thisPageLinksTop.attr('data-max', newTopDataMax);
 

@@ -3,13 +3,14 @@
     margin: 0;
     padding: 0;
     background-color: transparent;
-    width: 762px;
+    width: 668px;
 }
 #prototype {
     margin-right: 10px;
 }
 #prototype .header {
     width: 100%;
+    margin-bottom: 0;
 }
 #prototype .starforce {
     display: block;
@@ -30,6 +31,7 @@
     min-height: 400px;
     width: 100%;
     overflow: hidden;
+    position: relative;
 }
 #prototype .starforce .wrapper_full {
     height: auto;
@@ -67,7 +69,6 @@
 
 
 
-#prototype .starforce .types_container,
 #prototype .starforce .stars_container {
     display: block;
     overflow: hidden;
@@ -79,37 +80,10 @@
     border-radius: 0.3em;
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
-}
-#prototype .starforce .types_container {
-    margin: 4px 4px 0 4px;
-    width: 218px;
-    height: 369px;
-}
-#prototype .starforce .types_container .field_type {
-    float: left;
-    clear: both;
-    margin: 0 4px 4px 0;
-    width: 75px;
-    padding: 0 6px;
-    border: 1px solid #131313 !important;
-    border-radius: 0.3em;
-    -moz-border-radius: 0.3em;
-    -webkit-border-radius: 0.3em;
-    color: #FFFFFF;
-    font-size: 10px;
-    line-height: 14px;
-    text-align: left;
-    box-shadow: 2px 1px 2px rgba(0, 0, 0, 0.1);
-    -webkit-box-shadow: 2px 1px 2px rgba(0, 0, 0, 0.1);
-    -moz-box-shadow: 2px 1px 2px rgba(0, 0, 0, 0.1);
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-    white-space: nowrap;
-}
-#prototype .starforce .stars_container {
     box-sizing: border-box;
     margin: 0;
-    padding: 14px;
-    width: 462px;
+    padding: 16px 0 0 14px;
+    width: 566px;
     height: 348px;
     border-color: #222222;
     background-color: #1A1A1A;
@@ -192,7 +166,7 @@
     margin-top: 4px;
     margin-left: 42px;
     height: 28px;
-    width: 444px;
+    width: 548px;
     padding-left: 16px;
     padding-right: 0;
 }
@@ -203,6 +177,9 @@
     height: 329px;
     padding-top: 16px;
     padding-bottom: 0;
+}
+#prototype .starforce .page_links.side_panel.left {
+    clear: left;
 }
 #prototype .starforce .page_links .arrow,
 #prototype .starforce .page_links .robot {
@@ -334,20 +311,17 @@
 
     #mmrpg,
     #mmrpg #prototype {
-
+        width: 750px;
     }
     #prototype {
 
     }
-    #prototype .starforce .types_container {
-
-    }
     #prototype .starforce .stars_container {
-        width: 458px;
+        width: 642px;
         padding-right: 0;
     }
     #prototype .starforce .page_links.top_panel {
-        width: 439px;
+        width: 624px;
     }
     #prototype .header,
     #prototype .option {
@@ -361,19 +335,16 @@
 
     #mmrpg,
     #mmrpg #prototype {
-        width: 100px;
+        width: 1000px;
     }
     #prototype {
         width: auto;
     }
-    #prototype .starforce .types_container {
-        width: 200px;
-    }
     #prototype .starforce .stars_container {
-        width: 714px;
+        width: 890px;
     }
     #prototype .starforce .page_links.top_panel {
-        width: 696px;
+        width: 872px;
     }
     #prototype .header,
     #prototype .option {
@@ -392,14 +363,11 @@
     #prototype {
         width: auto;
     }
-    #prototype .starforce .types_container {
-        width: 224px;
-    }
     #prototype .starforce .stars_container {
-        width: 714px;
+        width: 924px;
     }
     #prototype .starforce .page_links.top_panel {
-        width: 696px;
+        width: 906px;
     }
     #prototype .header,
     #prototype .option {
