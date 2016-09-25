@@ -24,7 +24,8 @@ echo '<div class="wrapper no_sort">';
 
             // Collect this player's item rewards and add them to the dropdown
             if (!empty($_SESSION[$session_token]['values']['battle_items'])){ $player_item_rewards = $_SESSION[$session_token]['values']['battle_items']; }
-            elseif (!empty($player_rewards['player_items'])){ $player_item_rewards = array(); }
+            elseif (!empty($player_rewards['player_items'])){ $player_item_rewards = $player_rewards['player_items']; }
+            else { $player_item_rewards = array(); }
 
             // Create a fake player and robot to pass the info check
             $player_info = $mmrpg_index['players']['player'];
