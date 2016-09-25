@@ -1,8 +1,8 @@
 <?
-// ITEM : STARFORCE PROGRAM
+// ITEM : SEARCH PROGRAM
 $item = array(
-    'item_name' => 'Starforce Program',
-    'item_token' => 'starforce-program',
+    'item_name' => 'Search Program',
+    'item_token' => 'search-program',
     'item_game' => 'MMRPG',
     'item_group' => 'MMRPG/Items/Events',
     'item_class' => 'item',
