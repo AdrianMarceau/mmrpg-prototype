@@ -203,7 +203,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     -webkit-border-radius: 0 0 0.3em 0.3em;
 }
 #prototype .banner .points,
-#prototype .banner .zenny {
+#prototype .banner .subpoints {
     display: block;
     position: absolute;
     top: 0;
@@ -238,7 +238,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     overflow: hidden;
     z-index: 30;
 }
-#prototype .banner .zenny {
+#prototype .banner .subpoints {
     top: 43px;
     width: 163px;
     height: 19px;
@@ -252,22 +252,24 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     color: #DFDFDF;
 }
 #prototype .banner .points .amount,
-#prototype .banner .zenny .amount {
+#prototype .banner .subpoints .amount {
     display: block;
     font-size: 12px;
     line-height: 12px;
     color: #CFCFCF;
 }
-#prototype .banner .zenny .amount {
+#prototype .banner .subpoints .amount {
     font-size: 10px;
     letter-spacing: 2px;
     color: #ABABAB;
+    display: inline-block;
 }
 #prototype .banner .points .amount .padding {
     color: #4F4F4F;
     color: rgba(255, 255, 255, 0.25);
 }
-#prototype .banner .points .amount .pipe {
+#prototype .banner .points .pipe,
+#prototype .banner .subpoints .pipe {
     padding: 0;
     font-size: 8px;
     font-weight: normal;
@@ -275,7 +277,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     text-transform: none;
     position: relative;
     top: -2px;
-    margin: 0 -4px;
+    margin: 0 -2px;
 }
 #prototype .banner .points .amount .place {
     padding-left: 0;
@@ -421,7 +423,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     background-image: linear-gradient(to bottom,  rgba(0,0,0,0.40) 0%,rgba(0,0,0,0.50) 100%) !important; /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ) !important; /* IE6-9 */
 }
-#prototype .banner .zenny .wrapper {
+#prototype .banner .subpoints .wrapper {
     display: block;
     margin: 0;
     padding: 3px 5px;

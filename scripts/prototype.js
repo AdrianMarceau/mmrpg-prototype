@@ -532,7 +532,7 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
         if (hasBlank && stepName == 'leaderboard'){ switchTimeoutDuration = 3000; }
         else if (hasBlank && stepName == 'database'){ switchTimeoutDuration = 2000; }
         else if (hasBlank && stepName == 'help'){ switchTimeoutDuration = 1000; }
-        else if (hasBlank && stepName == 'starforce'){ switchTimeoutDuration = 1000; }
+        else if (hasBlank && stepName == 'stars'){ switchTimeoutDuration = 1000; }
 
     }
 
