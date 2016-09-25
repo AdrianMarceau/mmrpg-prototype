@@ -116,11 +116,18 @@ define('MMRPG_SETTINGS_POSTS_PERPAGE', 20); // How many discussion threads shoul
 define('MMRPG_SETTINGS_THREADS_PERPAGE', 50); // How many comment posts should be displayed per page
 
 // Define the global counters for missions in each campaign
-define('MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT', 1);                                         // 1
-define('MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT + 8);  // 9
-define('MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT + 1);  // 10
-define('MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT + 4);  // 14
-define('MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 3);  // 17
+define('MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT', 1);                                         // 1   (Intro)
+define('MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT + 8);  // 9   (Masters)
+define('MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT + 1);  // 10  (Rivals)
+define('MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT + 4);  // 14  (Fusions)
+define('MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 3);  // 17  (Finals)
+
+// Define the global star counters for missions in each campaign
+define('MMRPG_SETTINGS_CHAPTER1_STARLOCK', 0);                                                // 0   (Intro)
+define('MMRPG_SETTINGS_CHAPTER2_STARLOCK', MMRPG_SETTINGS_CHAPTER1_STARLOCK + 0);             // 0   (Masters)
+define('MMRPG_SETTINGS_CHAPTER3_STARLOCK', MMRPG_SETTINGS_CHAPTER2_STARLOCK + 0);             // 0   (Rivals)
+define('MMRPG_SETTINGS_CHAPTER4_STARLOCK', MMRPG_SETTINGS_CHAPTER3_STARLOCK + (3 * 8));       // 24  (Fusions)
+define('MMRPG_SETTINGS_CHAPTER5_STARLOCK', MMRPG_SETTINGS_CHAPTER4_STARLOCK + ((3 * 4) * 2)); // 48  (Finals)
 
 // Back-up definiation in case COPPA is not defined
 if (!defined('MMRPG_CONFIG_COPPA_PERMISSIONS')){
