@@ -436,12 +436,12 @@ ob_start();
 
             <?
         }
-        // Else if this is the View Starforce page, show the appropriate content
-        elseif ($this_current_token == 'starforce'){
+        // Else if this is the View Stars page, show the appropriate content
+        elseif ($this_current_token == 'stars'){
             ?>
 
             <div id="game_frames" class="field" style="height: 600px;">
-                <iframe name="view_starforce" src="frames/starforce.php?1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+                <iframe name="view_stars" src="frames/stars.php?1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
             </div>
 
             <?

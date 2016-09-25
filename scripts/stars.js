@@ -223,7 +223,7 @@ function refreshStarforceContainers(){
     else if (prototypeWidth <= 750){ newTopDataMax = 17; }
     else if (prototypeWidth <= 1000){ newTopDataMax = 24; }
     else if (prototypeWidth > 1000){ newTopDataMax = 25; } // prototypeWidth == 1024
-    console.log('update page links top data max to '+newTopDataMax);
+    //console.log('update page links top data max to '+newTopDataMax);
     thisPageLinksSide.attr('data-max', newSideDataMax);
     thisPageLinksTop.attr('data-max', newTopDataMax);
 
