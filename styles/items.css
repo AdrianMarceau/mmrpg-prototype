@@ -5,6 +5,24 @@
     background-color: transparent;
     width: 762px;
 }
+body.windowFlag_portraitMode #prototype,
+body.windowFlag_landscapeMode #prototype {
+    width: auto !important;
+}
+
+#mmrpg[data-mode="editor"] {
+
+}
+#mmrpg[data-mode="viewer"] {
+    width: 100% !important;
+    max-width: 1000px !important;
+}
+
+#mmrpg[data-mode="viewer"] #prototype {
+    width: 100% !important;
+}
+
+
 #item .header {
     width: 100%;
 }
@@ -248,9 +266,13 @@
 
 #item #console .event .scroll_wrapper {
     max-height: 230px;
+    max-height: calc(100vh - 160px);
     overflow: hidden;
     position: relative;
     padding-right: 9px;
+}
+#mmrpg[data-mode="editor"] #item #console .event .scroll_wrapper {
+    max-height: calc(100vh - 190px);
 }
 
 #item #console .event .item_cell,
