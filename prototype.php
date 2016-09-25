@@ -337,7 +337,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
                     <? if(!empty($_SESSION[$session_token]['values']['battle_items'])): ?>
                         <a class="link link_items" data-step="items" data-index="<?= $temp_data_index++ ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>items</label></a> <span class="pipe">|</span>
                     <? endif; ?>
-                    <? if($temp_prototype_complete): ?>
+                    <? if(!empty($_SESSION[$session_token]['values']['battle_stars'])): ?>
                         <a class="link link_stars" data-step="stars" data-index="<?= $temp_data_index++ ?>" data-source="frames/stars.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>stars</label></a> <span class="pipe">|</span>
                     <? endif; ?>
                     <? if(!empty($_SESSION[$session_token]['values']['battle_items'])): ?>
@@ -471,7 +471,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 
 </div>
 
-<div id="falloff" class="falloff_bottom">&nbsp;</div>
+<div id="falloff" class="falloff_bottom"></div>
 <?
 ?>
 <script type="text/javascript" src="scripts/jquery.js"></script>

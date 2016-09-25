@@ -213,19 +213,72 @@ function windowResizeStarforce(){
 // Define a function for updating the starforce menu elements
 function refreshStarforceContainers(){
     //console.log('refreshStarforceContainers()');
-    //
+
     var prototypeWidth = thisPrototype.width();
+    var maxSizeCount = thisContainer.attr('data-size');
 
     // Update the max links for the top panel based on orientation
     var newSideDataMax = 9;
     var newTopDataMax = 9;
+
     if (prototypeWidth <= 668){ newTopDataMax = 15; }
     else if (prototypeWidth <= 750){ newTopDataMax = 17; }
     else if (prototypeWidth <= 1000){ newTopDataMax = 24; }
     else if (prototypeWidth > 1000){ newTopDataMax = 25; } // prototypeWidth == 1024
+
+    if (newSideDataMax > maxSizeCount){ newSideDataMax = maxSizeCount; }
+    if (newTopDataMax > maxSizeCount){ newTopDataMax = maxSizeCount; }
+
+    var sideLinkHeight = -6 + (newSideDataMax * 38);
+    var topLinkWidth = -6 + (newTopDataMax * 38);
+    var starContainerHeight = 12 + (newSideDataMax * 38);
+    var starContainerWidth = 12 + (newTopDataMax * 38);
+
+    if (maxSizeCount >= 16){
+        sideLinkHeight -= 6;
+    }
+
+    if (newTopDataMax >= 16){
+        topLinkWidth -= 16;
+        starContainerWidth -= 16;
+    }
+
+    if (newTopDataMax >= 25){
+        topLinkWidth -= 18;
+        starContainerWidth -= 22;
+    }
+
     //console.log('update page links top data max to '+newTopDataMax);
-    thisPageLinksSide.attr('data-max', newSideDataMax);
-    thisPageLinksTop.attr('data-max', newTopDataMax);
+    thisPageLinksSide
+        .attr('data-max', newSideDataMax)
+        .css({height:sideLinkHeight+'px'});
+    thisPageLinksTop
+        .attr('data-max', newTopDataMax)
+        .css({width:topLinkWidth+'px'});
+
+    thisStarContainer
+        .css({height:starContainerHeight+'px',width:starContainerWidth+'px'});
+
+    if (true){
+
+        var borderSize = Math.floor((prototypeWidth - starContainerWidth - (thisPageLinksSide.width() * 2) - 46) / 2);
+        var marginLeft = borderSize + 42;
+        if (borderSize < 0){ borderSize = 0; }
+        console.log('borderSize = ' + borderSize);
+
+        thisPageLinksSide
+            .filter('.left')
+            .css({borderLeft:borderSize+'px solid #1a1a1a'});
+        thisPageLinksSide
+            .filter('.right')
+            .css({borderRight:borderSize+'px solid #1a1a1a'});
+
+        thisPageLinksTop
+            .css({marginLeft:0})
+            .css({borderLeft:marginLeft+'px solid #1a1a1a'})
+            .css({borderRight:marginLeft+'px solid #1a1a1a'});
+
+        }
 
     // Define a variable to hold the allowed top and side keys
     var allowedTopKeys = [];

@@ -16,7 +16,7 @@
     display: block;
     float: none;
     clear: left;
-    text-align: left;
+    text-align: center;
     height: 400px;
     overflow: hidden;
     -webkit-touch-callout: none;
@@ -27,11 +27,13 @@
     user-select: none;
 }
 #prototype .starforce .wrapper {
-    display: block;
+    display: inline-block;
     min-height: 400px;
-    width: 100%;
+    width: auto;
     overflow: hidden;
     position: relative;
+    margin: 0 auto;
+    text-align: left;
 }
 #prototype .starforce .wrapper_full {
     height: auto;
@@ -299,6 +301,10 @@
 }
 #prototype .starforce .page_links.side_panel span:last-of-type {
     margin-bottom: 0;
+}
+
+#prototype .starforce[data-size="8"] {
+
 }
 
 
