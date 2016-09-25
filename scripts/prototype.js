@@ -440,7 +440,7 @@ function prototype_menu_loaded(){
             gameSettings.nextSlideDirection = false;
             // Fade out the overlay to prevent clicking other banner links
             bannerOverlay.stop().css({opacity:0.75}).animate({opacity:0.0},{duration:1000,easing:'swing',queue:false,complete:function(){ $(this).addClass('overlay_hidden'); }});
-            $('.banner .points, .banner .zenny, .banner .options, .banner .tooltip', thisPrototype).stop().animate({opacity:1},500,'swing');
+            $('.banner .points, .banner .subpoints, .banner .options, .banner .tooltip', thisPrototype).stop().animate({opacity:1},500,'swing');
             }});
         }
 }
@@ -553,7 +553,7 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
         bannerOverlay.stop().css({opacity:0.00}).removeClass('overlay_hidden').animate({opacity:0.75},{duration:1000,easing:'swing',queue:false});
         var thisBanner = $('.banner', thisPrototype);
         $('.canvas_overlay_footer', thisBanner).remove();
-        $('.points, .zenny, .options, .tooltip', thisBanner).stop().animate({opacity:0},500,'swing');
+        $('.points, .subpoints, .options, .tooltip', thisBanner).stop().animate({opacity:0},500,'swing');
 
     }
     // Switch to the loading menu, and wait for the next menu to finish loading
@@ -1432,6 +1432,6 @@ function prototype_menu_switch(switchOptions){
 
 // Define a function for updating the zenny amount in the menu
 function prototype_update_zenny(newZenny){
-    var thisZennyContainer = $('.banner .zenny .amount', thisPrototype);
+    var thisZennyContainer = $('.banner .subpoints .amount.zenny', thisPrototype);
     thisZennyContainer.html(newZenny);
 }
