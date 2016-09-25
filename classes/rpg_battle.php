@@ -1184,7 +1184,7 @@ class rpg_battle extends rpg_object {
             $temp_name_markup = '<span class="field_name field_type field_type_'.(!empty($temp_field_star['star_type']) ? $temp_field_star['star_type'] : 'none').(!empty($temp_field_star['star_type2']) ? '_'.$temp_field_star['star_type2'] : '').'">'.$temp_field_star['star_name'].' Star</span>';
             $temp_event_header = $this_player->player_name.'&#39;s '.ucfirst($temp_field_star['star_kind']).' Star';
             $temp_event_body = $this_player->print_name().' collected the '.$temp_name_markup.'!<br />';
-            $temp_event_body .= 'The new '.ucfirst($temp_field_star['star_kind']).' Star amplifies your Star Force!';
+            $temp_event_body .= 'The new '.ucfirst($temp_field_star['star_kind']).' Star was added to your collection!';
             $temp_event_options = array();
             $temp_event_options['console_show_this_player'] = false;
             $temp_event_options['console_show_target_player'] = false;
