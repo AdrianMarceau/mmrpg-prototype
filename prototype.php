@@ -334,17 +334,19 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
                 ?>
                 <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $temp_data_index++ ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>home</label></a> <span class="pipe">|</span>
                 <? if (mmrpg_prototype_battles_complete('dr-light') >= 1): ?>
-                    <? if(!empty($_SESSION[$session_token]['values']['battle_items'])): ?>
+                    <? if (mmrpg_prototype_items_unlocked() > 0): ?>
                         <a class="link link_items" data-step="items" data-index="<?= $temp_data_index++ ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>items</label></a> <span class="pipe">|</span>
                     <? endif; ?>
-                    <? if(!empty($_SESSION[$session_token]['values']['battle_stars'])): ?>
+                    <? if (mmrpg_prototype_stars_unlocked() > 0): ?>
                         <a class="link link_stars" data-step="stars" data-index="<?= $temp_data_index++ ?>" data-source="frames/stars.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>stars</label></a> <span class="pipe">|</span>
                     <? endif; ?>
-                    <? if(!empty($_SESSION[$session_token]['values']['battle_items'])): ?>
+                    <? if (mmrpg_prototype_item_unlocked('auto-link') || mmrpg_prototype_item_unlocked('reggae-link') || mmrpg_prototype_item_unlocked('kalinka-link')): ?>
                         <a class="link link_shop" data-step="shop" data-index="<?= $temp_data_index++ ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>shop</label></a> <span class="pipe">|</span>
                     <? endif; ?>
-                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>robots</label></a> <span class="pipe">|</span>
-                    <? if($temp_prototype_complete): ?>
+                    <? if (true): ?>
+                        <a class="link link_robots" data-step="edit_robots" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>robots</label></a> <span class="pipe">|</span>
+                    <? endif; ?>
+                    <? if (mmrpg_prototype_item_unlocked('cossack-program')): ?>
                         <a class="link link_players" data-step="edit_players" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>"><label>players</label></a> <span class="pipe">|</span>
                     <? endif; ?>
                 <? endif; ?>
