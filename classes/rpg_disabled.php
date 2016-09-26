@@ -871,8 +871,8 @@ class rpg_disabled {
             if ($this_robot->robot_class == 'mecha'){
 
                 // Append the Tier I item drops
-                $target_player_rewards['items'][] =  array('chance' => 1, 'token' => 'energy-pellet', 'min' => 1, 'max' => 3);
-                $target_player_rewards['items'][] =  array('chance' => 1, 'token' => 'weapon-pellet', 'min' => 1, 'max' => 3);
+                //$target_player_rewards['items'][] =  array('chance' => 1, 'token' => 'energy-pellet', 'min' => 1, 'max' => 3);
+                //$target_player_rewards['items'][] =  array('chance' => 1, 'token' => 'weapon-pellet', 'min' => 1, 'max' => 3);
 
                 // Append the Tier I screw drops
                 $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 1, 'max' => 3);
@@ -882,8 +882,8 @@ class rpg_disabled {
             elseif ($this_robot->robot_class == 'master'){
 
                 // Append the Tier II item drops
-                $target_player_rewards['items'][] =  array('chance' => 2, 'token' => 'energy-capsule', 'min' => 2, 'max' => 6);
-                $target_player_rewards['items'][] =  array('chance' => 2, 'token' => 'weapon-capsule', 'min' => 2, 'max' => 6);
+                //$target_player_rewards['items'][] =  array('chance' => 2, 'token' => 'energy-capsule', 'min' => 2, 'max' => 6);
+                //$target_player_rewards['items'][] =  array('chance' => 2, 'token' => 'weapon-capsule', 'min' => 2, 'max' => 6);
 
                 // Append the Tier I screw drops
                 $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 3, 'max' => 6);
@@ -895,8 +895,8 @@ class rpg_disabled {
             elseif ($this_robot->robot_class == 'boss'){
 
                 // Append the Tier III item drops
-                $target_player_rewards['items'][] =  array('chance' => 3, 'token' => 'energy-tank', 'min' => 3, 'max' => 9);
-                $target_player_rewards['items'][] =  array('chance' => 3, 'token' => 'weapon-tank', 'min' => 3, 'max' => 9);
+                //$target_player_rewards['items'][] =  array('chance' => 3, 'token' => 'energy-tank', 'min' => 3, 'max' => 9);
+                //$target_player_rewards['items'][] =  array('chance' => 3, 'token' => 'weapon-tank', 'min' => 3, 'max' => 9);
 
                 // Append the Tier I screw drops
                 $target_player_rewards['items'][] =  array('chance' => 60, 'token' => 'small-screw', 'min' => 6, 'max' => 9);
