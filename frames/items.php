@@ -229,7 +229,7 @@ if (true){
 
                                             }
                                             // Otherwise if this is a star, use the total number as quantity
-                                            elseif ($item_is_star && isset($this_battle_stars_count)){
+                                            elseif ($item_is_star && !empty($this_battle_stars_count)){
 
                                                 // Collect the items details and current quantity
                                                 $item_info_quantity = !empty($this_battle_stars_count) ? $this_battle_stars_count : 0;
