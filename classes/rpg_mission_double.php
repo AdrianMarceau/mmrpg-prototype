@@ -91,7 +91,7 @@ class rpg_mission_double extends rpg_mission {
 
         // Define the fusion star token in case we need to test for it
         $temp_field_star_token = preg_replace('/^([-_a-z0-9\s]+)-([-_a-z0-9]+)$/i', '$1', $temp_option_field['field_token']).'-'.preg_replace('/^([-_a-z0-9\s]+)-([-_a-z0-9]+)$/i', '$2', $temp_option_field2['field_token']);
-        $temp_fusion_star_present = $this_prototype_data['prototype_complete'] && empty($_SESSION['GAME']['values']['battle_stars'][$temp_field_star_token]) ? true : false;
+        $temp_fusion_star_present = mmrpg_prototype_item_unlocked('cossack-program') && empty($_SESSION['GAME']['values']['battle_stars'][$temp_field_star_token]) ? true : false;
 
         // If a fusion star is preent on the field, fill the empty spots with like-typed robots
         if ($temp_fusion_star_present){
@@ -406,16 +406,16 @@ class rpg_mission_double extends rpg_mission {
         //$temp_description_target_robots = ($temp_option_field['field_type'] != $temp_option_field2['field_type'] ? ucfirst($temp_option_field['field_type']).' and '.ucfirst($temp_option_field2['field_type']) : ucfirst($temp_option_field['field_type'])).' core';
         $temp_description_target_robots = $temp_option_robot['robot_name'].' and '.$temp_option_robot2['robot_name'];
         if (!empty($temp_battle_omega['values']['field_star'])){
-            $temp_battle_omega['battle_description'] = 'Defeat the starforce boosted '.$temp_description_target_robots.' and collect their Fusion Star!';
-            $temp_battle_omega['battle_description2'] = 'The extra energy appears to have attracted more robots to the field...';
+            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and collect their Fusion Star!';
+            $temp_battle_omega['battle_description2'] = 'The star\'s energy appears to have attracted more robots to the field...';
         } elseif (!empty($this_unlock_abilities_count)){
-            $temp_battle_omega['battle_description'] = 'Defeat the '.$temp_description_target_robots.' and download their special weapons!';
+            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and download their special weapons!';
             $temp_battle_omega['battle_description2'] = 'Once we\'ve acquired them, we may be able to equip the abilities to other robots...';
         } elseif (!empty($this_unlock_robots_count)){
-            $temp_battle_omega['battle_description'] = 'Defeat the '.$temp_description_target_robots.' and download their robot data!';
+            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and download their robot data!';
             $temp_battle_omega['battle_description2'] = 'If we use only Neutral type abilities on the targets we may be able to save them...';
         } else {
-            $temp_battle_omega['battle_description'] = 'Defeat the '.$temp_description_target_robots.'!';
+            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.'!';
         }
 
         // Add some random item drops to the starter battle
