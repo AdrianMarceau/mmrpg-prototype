@@ -3586,7 +3586,7 @@ class rpg_robot extends rpg_object {
                 }
 
                 // Check to see if the player has unlocked the item to hold items
-                $temp_item_hold_unlocked = true; //rpg_game::player_unlocked('dr-cossack'); // rpg_prototype::event_complete('completed-chapter_dr-cossack_one');
+                $temp_item_hold_unlocked = mmrpg_prototype_item_unlocked('equip-codes');
                 $current_item_token = '';
                 // If this player has unlocked the item to let robots hold items
                 if ($temp_item_hold_unlocked){
@@ -3616,7 +3616,7 @@ class rpg_robot extends rpg_object {
                     ob_start();
                     ?>
                     <td  class="right">
-                        <label style="display: block; float: left;">Item:</label>
+                        <label style="display: block; float: left;">Item :</label>
                         <? if($global_allow_editing): ?>
                             <a title="Change Item?" class="item_name type <?= $current_item_type ?>" <?= $current_date_attr ?>><label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?><span class="arrow">&#8711;</span></label></a>
                         <? else: ?>
