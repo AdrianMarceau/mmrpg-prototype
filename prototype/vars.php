@@ -84,43 +84,59 @@ else {
         $_SESSION[$session_token]['flags']['prototype_events']['dr-cossack']['prototype_complete'] = $prototype_complete_flag_cossack = true;
     }
 
+    // Collect the global star count for everyone
+    $battle_star_counter = mmrpg_prototype_stars_unlocked();
 
+    // Define an unline function for checking campaign progress of a player
+    function temp_calculate_player_progress(&$chapters_unlocked, &$battle_complete_counter, &$prototype_complete_flag){
+        global $battle_star_counter;
+
+        // Intro
+        $chapters_unlocked['0'] = true;
+
+        // Masters
+        $chapters_unlocked['1'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;
+
+        // Rivals
+        $chapters_unlocked['2'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
+
+        // Fusions
+        if (MMRPG_SETTINGS_CHAPTER4_STARLOCK || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT){
+            $chapters_unlocked['3'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
+        } else {
+            $chapters_unlocked['3'] = false;
+        }
+
+        // Finals
+        if (MMRPG_SETTINGS_CHAPTER5_STARLOCK || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
+            $chapters_unlocked['4a'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
+            $chapters_unlocked['4b'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
+            $chapters_unlocked['4c'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
+        } else {
+            $chapters_unlocked['4a'] = false;
+            $chapters_unlocked['4b'] = false;
+            $chapters_unlocked['4c'] = false;
+        }
+
+        // Bonus
+        $chapters_unlocked['5'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
+
+        // Player
+        $chapters_unlocked['6'] = $prototype_complete_flag ? true : false;
+
+    }
 
     // Define which chapters should be unlocked for Dr. Light based on missions complete
     $chapters_unlocked_light = array();
-    $chapters_unlocked_light['0'] = true;
-    $chapters_unlocked_light['1'] = $battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_light['2'] = $battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_light['3'] = $battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_light['4a'] = $battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_light['4b'] = $battle_complete_counter_light >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
-    $chapters_unlocked_light['4c'] = $battle_complete_counter_light >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
-    $chapters_unlocked_light['5'] = $prototype_complete_flag_light || $battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_light['6'] = $prototype_complete_flag_light ? true : false;
+    temp_calculate_player_progress($chapters_unlocked_light, $battle_complete_counter_light, $prototype_complete_flag_light);
 
     // Define which chapters should be unlocked for Dr. Wily based on missions complete
     $chapters_unlocked_wily = array();
-    $chapters_unlocked_wily['0'] = true;
-    $chapters_unlocked_wily['1'] = $battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_wily['2'] = $battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_wily['3'] = $battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_wily['4a'] = $battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_wily['4b'] = $battle_complete_counter_wily >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
-    $chapters_unlocked_wily['4c'] = $battle_complete_counter_wily >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
-    $chapters_unlocked_wily['5'] = $prototype_complete_flag_wily || $battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_wily['6'] = $prototype_complete_flag_wily ? true : false;
+    temp_calculate_player_progress($chapters_unlocked_wily, $battle_complete_counter_wily, $prototype_complete_flag_wily);
 
     // Define which chapters should be unlocked for Dr. Cossack based on missions complete
     $chapters_unlocked_cossack = array();
-    $chapters_unlocked_cossack['0'] = true;
-    $chapters_unlocked_cossack['1'] = $battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_cossack['2'] = $battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_cossack['3'] = $battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_cossack['4a'] = $battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_cossack['4b'] = $battle_complete_counter_cossack >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
-    $chapters_unlocked_cossack['4c'] = $battle_complete_counter_cossack >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
-    $chapters_unlocked_cossack['5'] = $prototype_complete_flag_cossack || $battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
-    $chapters_unlocked_cossack['6'] = $prototype_complete_flag_cossack ? true : false;
+    temp_calculate_player_progress($chapters_unlocked_cossack, $battle_complete_counter_cossack, $prototype_complete_flag_cossack);
 
     // If the player has manually unlocked any Dr. Light chapters via password, update their flags
     if (!$chapters_unlocked_light['6']){
