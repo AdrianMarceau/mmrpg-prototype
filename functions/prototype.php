@@ -334,6 +334,43 @@ function mmrpg_prototype_ability_unlocked($player_token, $robot_token = '', $abi
 
 }
 
+// Define a function for checking if a prototype item has been unlocked
+function mmrpg_prototype_item_unlocked($item_token){
+
+    // Define the game session helper var
+    $session_token = mmrpg_game_token();
+
+    // If items are not yet loaded, return false
+    if (empty($_SESSION[$session_token]['values']['battle_items'])){ return false; }
+
+    // If this specific item has not been unlocked, return false
+    if (!isset($_SESSION[$session_token]['values']['battle_items'][$item_token])){ return false; }
+
+    // Otherwise return true
+    return true;
+
+}
+
+// Define a function for checking how many prototype items have been unlock
+function mmrpg_prototype_items_unlocked($unique = true){
+
+    // Define the game session helper var
+    $session_token = mmrpg_game_token();
+
+    // If items are not yet loaded, return false
+    if (empty($_SESSION[$session_token]['values']['battle_items'])){ return 0; }
+
+    // If unique item count was requested, simply return the array size
+    if ($unique){ return count($_SESSION[$session_token]['values']['battle_items']); }
+
+    // Otherwise if they want all items total, return the sum of array values
+    elseif (!$unique){ return array_sum($_SESSION[$session_token]['values']['battle_items']); }
+
+    // Otherwise return 0
+    return 0;
+
+}
+
 // Define a function for checking if a prototype alt image has been unlocked
 function mmrpg_prototype_altimage_unlocked($robot_token, $alt_token = ''){
 
