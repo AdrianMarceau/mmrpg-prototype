@@ -1449,9 +1449,14 @@ class rpg_item extends rpg_object {
                                 <tr>
                                     <td  class="right">
                                         <label style="display: block; float: left;">Name :</label>
-                                        <span class="item_type item_type_"><?= $item_info['item_name']?></span>
+                                        <span class="item_type item_type_"><?= $item_info['item_name'] ?></span>
                                     </td>
                                     <td class="center">&nbsp;</td>
+                                    <td  class="right">
+                                        <label style="display: block; float: left;">Type :</label>
+                                        <span class="item_type item_type_"><?= ucfirst($item_info['item_subclass']) ?></span>
+                                    </td>
+                                    <? /*
                                     <td class="right">
                                         <label style="display: block; float: left;">Type :</label>
                                         <?php if($print_options['layout_style'] != 'event'): ?>
@@ -1492,6 +1497,7 @@ class rpg_item extends rpg_object {
                                             ?>
                                         <?php endif; ?>
                                     </td>
+                                    */ ?>
                                 </tr>
                                 <tr>
                                     <td  class="right">
