@@ -1,10 +1,10 @@
 <?
-// ITEM : SHARE PROGRAM
+// ITEM : LIGHT PROGRAM
 $item = array(
-    'item_name' => 'Share Program',
-    'item_token' => 'share-program',
+    'item_name' => 'Light Program',
+    'item_token' => 'light-program',
     'item_game' => 'MMRPG',
-    'item_group' => 'MMRPG/Items/Events',
+    'item_group' => 'MMRPG/Items/LightEvents',
     'item_class' => 'item',
     'item_subclass' => 'event',
     'item_type' => '',

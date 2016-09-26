@@ -114,10 +114,9 @@ foreach ($mmrpg_database_types AS $type_token => $type_info){
     $temp_pattern_last[] = '/^'.$type_token.'-shard$/i';
     $temp_pattern_last[] = '/^'.$type_token.'-core$/i';
 }
-$temp_pattern_last[] = '/^share-program$/i';
-$temp_pattern_last[] = '/^transfer-program$/i';
-$temp_pattern_last[] = '/^starforce-program$/i';
-$temp_pattern_last[] = '/^fusion-program$/i';
+
+$temp_pattern_last[] = '/^star$/i';
+
 $temp_pattern_last[] = '/^energy-upgrade$/i';
 $temp_pattern_last[] = '/^weapon-upgrade$/i';
 $temp_pattern_last[] = '/^attack-booster$/i';
@@ -128,7 +127,22 @@ $temp_pattern_last[] = '/^target-module$/i';
 $temp_pattern_last[] = '/^charge-module$/i';
 $temp_pattern_last[] = '/^growth-module$/i';
 $temp_pattern_last[] = '/^fortune-module$/i';
-$temp_pattern_last[] = '/^star$/i';
+
+$temp_pattern_last[] = '/^light-program$/i';
+$temp_pattern_last[] = '/^auto-link$/i';
+$temp_pattern_last[] = '/^item-codes$/i';
+$temp_pattern_last[] = '/^dress-codes$/i';
+
+$temp_pattern_last[] = '/^wily-program$/i';
+$temp_pattern_last[] = '/^reggae-link$/i';
+$temp_pattern_last[] = '/^ability-codes$/i';
+$temp_pattern_last[] = '/^weapon-codes$/i';
+
+$temp_pattern_last[] = '/^cossack-program$/i';
+$temp_pattern_last[] = '/^kalinka-link$/i';
+$temp_pattern_last[] = '/^equip-codes$/i';
+$temp_pattern_last[] = '/^field-codes$/i';
+
 $temp_pattern_last[] = '/^([a-z]+)-star$/i';
 //$temp_pattern_last[] = '/^heart$/i';
 $temp_pattern_last = array_reverse($temp_pattern_last);
