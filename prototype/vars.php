@@ -87,7 +87,7 @@ else {
     // Collect the global star count for everyone
     $battle_star_counter = mmrpg_prototype_stars_unlocked();
 
-    // Define an unline function for checking campaign progress of a player
+    // Define an inline function for calculating campaign progress for a given player
     function temp_calculate_player_progress(&$chapters_unlocked, &$battle_complete_counter, &$prototype_complete_flag){
         global $battle_star_counter;
 
