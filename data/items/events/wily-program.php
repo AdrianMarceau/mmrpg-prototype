@@ -1,10 +1,10 @@
 <?
-// ITEM : TRANSFER PROGRAM
+// ITEM : WILY PROGRAM
 $item = array(
-    'item_name' => 'Transfer Program',
-    'item_token' => 'transfer-program',
+    'item_name' => 'Wily Program',
+    'item_token' => 'wily-program',
     'item_game' => 'MMRPG',
-    'item_group' => 'MMRPG/Items/Events',
+    'item_group' => 'MMRPG/Items/WilyEvents',
     'item_class' => 'item',
     'item_subclass' => 'event',
     'item_type' => '',

@@ -1,10 +1,10 @@
 <?
-// ITEM : SEARCH PROGRAM
+// ITEM : COSSACK PROGRAM
 $item = array(
-    'item_name' => 'Search Program',
-    'item_token' => 'search-program',
+    'item_name' => 'Cossack Program',
+    'item_token' => 'cossack-program',
     'item_game' => 'MMRPG',
-    'item_group' => 'MMRPG/Items/Events',
+    'item_group' => 'MMRPG/Items/CossackEvents',
     'item_class' => 'item',
     'item_subclass' => 'event',
     'item_type' => '',
