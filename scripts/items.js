@@ -4,6 +4,7 @@ var thisPrototype = false;
 var thisWindow = false;
 var thisItem = false;
 var thisItemData = {itemTotal:0,itemQuantities:{},allowEdit:true};
+var thisScrollbarSettings = {wheelSpeed:0.3,suppressScrollX:true,scrollYMarginOffset:6};
 var resizePlayerWrapper = function(){};
 $(document).ready(function(){
 
@@ -39,7 +40,7 @@ $(document).ready(function(){
     $('#console #items').append(itemConsoleMarkup);
 
     // Attach the scrollbar to the battle events container
-    $('#console .scroll_wrapper', thisItem).perfectScrollbar({suppressScrollX: true, scrollYMarginOffset: 6});
+    $('#console .scroll_wrapper', thisItem).perfectScrollbar(thisScrollbarSettings);
 
     //console.log('updating perfect scrollbar 3');
     $('#console .scroll_wrapper', thisItem).perfectScrollbar('update');
