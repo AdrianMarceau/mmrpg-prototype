@@ -212,6 +212,9 @@ if (!empty($mmrpg_index['items'])){
         $temp_insert_array['item_type2'] = !empty($item_data['item_type2']) ? $item_data['item_type2'] : '';
         $temp_insert_array['item_description'] = !empty($item_data['item_description']) && $item_data['item_description'] != '...' ? $item_data['item_description'] : '';
         $temp_insert_array['item_description2'] = !empty($item_data['item_description2']) && $item_data['item_description2'] != '...' ? $item_data['item_description2'] : '';
+        $temp_insert_array['item_description_use'] = !empty($item_data['item_description_use']) && $item_data['item_description_use'] != '...' ? $item_data['item_description_use'] : '';
+        $temp_insert_array['item_description_hold'] = !empty($item_data['item_description_hold']) && $item_data['item_description_hold'] != '...' ? $item_data['item_description_hold'] : '';
+        $temp_insert_array['item_description_shop'] = !empty($item_data['item_description_shop']) && $item_data['item_description_shop'] != '...' ? $item_data['item_description_shop'] : '';
         $temp_insert_array['item_speed'] = !empty($item_data['item_speed']) ? $item_data['item_speed'] : 1;
         $temp_insert_array['item_energy'] = isset($item_data['item_energy']) ? $item_data['item_energy'] : 1;
         $temp_insert_array['item_energy_percent'] = !empty($item_data['item_energy_percent']) ? 1 : 0;

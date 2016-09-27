@@ -8,7 +8,8 @@ $item = array(
     'item_class' => 'item',
     'item_subclass' => 'treasure',
     'item_price' => 100,
-    'item_description' => 'A small metal screw dropped by a defeated mecha.  This item is loved by a certain robot and can be traded in for a moderate amount of Zenny. ',
+    'item_description' => 'A small metal screw dropped by a defeated mecha.',
+    'item_description_shop' => 'This item is loved by a certain robot and can be traded in for a moderate amount of Zenny.',
     'item_function' => function($objects){
 
         // Extract all objects into the current scope
