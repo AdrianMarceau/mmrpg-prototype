@@ -2571,23 +2571,6 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     line-height: 56px;
 }
 
-#actions .action_back {
-    width: auto;
-    height: auto;
-    position: absolute;
-    line-height: 40px;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    margin: 0;
-}
-#actions .action_back label {
-    width: auto;
-    height: 24px;
-    line-height: 24px;
-}
-
 #actions .actions_resend {
     position: absolute;
     text-indent: -9999px;
@@ -2690,20 +2673,17 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     height: 132px;
     line-height: 132px;
 }
-#actions .actions_battle .action_scan,
-#actions .actions_battle .action_item,
-#actions .actions_battle .action_target,
-#actions .actions_battle .action_option,
-#actions .actions_battle .action_switch {
+#actions .sub_actions .button,
+#actions .actions_battle .action_target {
     width: 181px;
     height: 48px;
     line-height: 48px;
 }
-#actions .actions_battle .action_scan label,
-#actions .actions_battle .action_item label,
-#actions .actions_battle .action_target label,
-#actions .actions_battle .action_option label,
-#actions .actions_battle .action_switch label {
+#actions .sub_actions[data-size="3"] .button {
+    width: 244px;
+}
+#actions .sub_actions .button label,
+#actions .actions_battle .action_target label {
     width: auto;
     height: 36px;
     line-height: 36px;
@@ -2713,6 +2693,23 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #actions .actions_battle .action_switch label {
     width: auto;
+}
+
+#actions .sub_actions .action_back {
+    width: auto;
+    height: auto;
+    position: absolute;
+    line-height: 40px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+}
+#actions .sub_actions .action_back label {
+    width: auto;
+    height: 24px;
+    line-height: 24px;
 }
 
 #actions .actions_option .main_actions,
@@ -3153,17 +3150,19 @@ body.windowFlag_landscapeMode #actions .actions_loading .action_loading label {
 body.windowFlag_landscapeMode #actions .actions_event .action_continue label {
     width: auto;
 }
-body.windowFlag_landscapeMode #actions .actions_battle .action_scan,
-body.windowFlag_landscapeMode #actions .actions_battle .action_item,
-body.windowFlag_landscapeMode #actions .actions_battle .action_target,
-body.windowFlag_landscapeMode #actions .actions_battle .action_option,
-body.windowFlag_landscapeMode #actions .actions_battle .action_switch {
+body.windowFlag_landscapeMode #actions .sub_actions .button,
+body.windowFlag_landscapeMode #actions .actions_battle .action_target {
     width: 245px;
 }
-body.windowFlag_landscapeMode #actions .actions_battle .action_scan label,
-body.windowFlag_landscapeMode #actions .actions_battle .action_target label,
-body.windowFlag_landscapeMode #actions .actions_battle .action_option label,
-body.windowFlag_landscapeMode #actions .actions_battle .action_switch label {
+body.windowFlag_landscapeMode #actions .sub_actions[data-size="3"] .button {
+    width: 330px;
+}
+body.windowFlag_landscapeMode #actions .sub_actions .action_back,
+body.windowFlag_landscapeMode #actions .sub_actions[data-size="3"] .action_back {
+    width: auto;
+}
+body.windowFlag_landscapeMode #actions .sub_actions .button label,
+body.windowFlag_landscapeMode #actions .actions_battle .action_target label {
     width: auto;
 }
 body.windowFlag_landscapeMode #actions .actions_battle .action_switch label {
@@ -3195,8 +3194,7 @@ body.windowFlag_landscapeMode #actions .actions_scan .action_switch label {
     width: auto;
 }
 
-body.windowFlag_landscapeMode #actions .actions_battle .action_ability label,
-body.windowFlag_landscapeMode #actions .actions_battle .action_item label {
+body.windowFlag_landscapeMode #actions .actions_battle .action_ability label {
     width: auto;
 }
 

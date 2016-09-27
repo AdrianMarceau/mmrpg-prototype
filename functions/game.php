@@ -747,6 +747,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
         // Generate the attributes and text variables for this ability unlock
         global $db;
         $this_player_token = $player_info['player_token'];
+        $player_info = rpg_player::get_index_info($this_player_token);
         $ability_info_size = isset($ability_info['ability_image_size']) ? $ability_info['ability_image_size'] * 2 : 40 * 2;
         $ability_info_size_token = $ability_info_size.'x'.$ability_info_size;
         $this_name = $ability_info['ability_name'];
