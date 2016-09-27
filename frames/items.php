@@ -219,12 +219,22 @@ if (true){
                                             $item_is_core = strstr($item_token, '-core') ? true : false;
                                             $item_is_star = $item_token == 'star' ? true : false;
 
+                                            // Define the editor title markup print options
+                                            $item_print_options = array('show_quantity' => false);
+                                            if (!mmrpg_prototype_item_unlocked('item-codes')){
+                                                $item_print_options['show_use_desc'] = false;
+                                                $item_print_options['show_shop_desc'] = false;
+                                            }
+                                            if (!mmrpg_prototype_item_unlocked('equip-codes')){
+                                                $item_print_options['show_hold_desc'] = false;
+                                            }
+
                                             // Only collect detailed info if this item has been seen
                                             if (isset($global_battle_items[$item_token])){
 
                                                 // Collect the items details and current quantity
                                                 $item_info_quantity = !empty($global_battle_items[$item_token]) ? $global_battle_items[$item_token] : 0;
-                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
+                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                                             }
@@ -233,7 +243,7 @@ if (true){
 
                                                 // Collect the items details and current quantity
                                                 $item_info_quantity = !empty($this_battle_stars_count) ? $this_battle_stars_count : 0;
-                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
+                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                                             }

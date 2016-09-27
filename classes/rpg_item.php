@@ -769,6 +769,9 @@ class rpg_item extends rpg_object {
             'item_type2',
             'item_description',
             'item_description2',
+            'item_description_use',
+            'item_description_hold',
+            'item_description_shop',
             'item_speed',
             'item_energy',
             'item_energy_percent',
@@ -985,6 +988,9 @@ class rpg_item extends rpg_object {
 
         $print_options['show_accuracy'] = isset($print_options['show_accuracy']) ? $print_options['show_accuracy'] : true;
         $print_options['show_quantity'] = isset($print_options['show_quantity']) ? $print_options['show_quantity'] : true;
+        $print_options['show_use_desc'] = isset($print_options['show_use_desc']) ? $print_options['show_use_desc'] : true;
+        $print_options['show_hold_desc'] = isset($print_options['show_hold_desc']) ? $print_options['show_hold_desc'] : true;
+        $print_options['show_shop_desc'] = isset($print_options['show_shop_desc']) ? $print_options['show_shop_desc'] : true;
 
         $robot_flag_copycore = !empty($robot_info['robot_core']) && $robot_info['robot_core'] == 'copy' ? true : false;
         $temp_item_token = $item_info['item_token'];
@@ -1028,7 +1034,11 @@ class rpg_item extends rpg_object {
         if (!empty($item_info['item_description'])){
             $temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');
             $temp_replace = array($temp_item_recovery, $temp_item_recovery2, $temp_item_damage, $temp_item_damage2);
-            $temp_description = str_replace($temp_find, $temp_replace, $item_info['item_description']);
+            $temp_description = trim($item_info['item_description']);
+            if ($print_options['show_use_desc']){ $temp_description .= ' '.trim($item_info['item_description_use']); }
+            if ($print_options['show_hold_desc']){ $temp_description .= ' '.trim($item_info['item_description_hold']); }
+            if ($print_options['show_shop_desc']){ $temp_description .= ' '.trim($item_info['item_description_shop']); }
+            $temp_description = str_replace($temp_find, $temp_replace, $temp_description);
             $temp_item_title .= ' // '.$temp_description;
         }
 
@@ -1338,6 +1348,9 @@ class rpg_item extends rpg_object {
         if (!isset($print_options['layout_style'])){ $print_options['layout_style'] = 'website'; }
         if ($print_options['layout_style'] == 'website'){
             if (!isset($print_options['show_basics'])){ $print_options['show_basics'] = true; }
+            if (!isset($print_options['show_use_desc'])){ $print_options['show_use_desc'] = true; }
+            if (!isset($print_options['show_hold_desc'])){ $print_options['show_hold_desc'] = true; }
+            if (!isset($print_options['show_shop_desc'])){ $print_options['show_shop_desc'] = true; }
             if (!isset($print_options['show_icon'])){ $print_options['show_icon'] = true; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = true; }
             if (!isset($print_options['show_robots'])){ $print_options['show_robots'] = true; }
@@ -1346,6 +1359,9 @@ class rpg_item extends rpg_object {
             if (!isset($print_options['show_key'])){ $print_options['show_key'] = false; }
         } elseif ($print_options['layout_style'] == 'website_compact'){
             if (!isset($print_options['show_basics'])){ $print_options['show_basics'] = true; }
+            if (!isset($print_options['show_use_desc'])){ $print_options['show_use_desc'] = true; }
+            if (!isset($print_options['show_hold_desc'])){ $print_options['show_hold_desc'] = true; }
+            if (!isset($print_options['show_shop_desc'])){ $print_options['show_shop_desc'] = true; }
             if (!isset($print_options['show_icon'])){ $print_options['show_icon'] = true; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = false; }
             if (!isset($print_options['show_robots'])){ $print_options['show_robots'] = false; }
@@ -1354,6 +1370,9 @@ class rpg_item extends rpg_object {
             if (!isset($print_options['show_key'])){ $print_options['show_key'] = false; }
         } elseif ($print_options['layout_style'] == 'event'){
             if (!isset($print_options['show_basics'])){ $print_options['show_basics'] = true; }
+            if (!isset($print_options['show_use_desc'])){ $print_options['show_use_desc'] = true; }
+            if (!isset($print_options['show_hold_desc'])){ $print_options['show_hold_desc'] = true; }
+            if (!isset($print_options['show_shop_desc'])){ $print_options['show_shop_desc'] = true; }
             if (!isset($print_options['show_icon'])){ $print_options['show_icon'] = false; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = false; }
             if (!isset($print_options['show_robots'])){ $print_options['show_robots'] = false; }
@@ -1541,10 +1560,14 @@ class rpg_item extends rpg_object {
                                             (!empty($item_info['item_damage']) ? number_format($item_info['item_damage'], 0, '.', ',') : 0), // {DAMAGE}
                                             (!empty($item_info['item_recovery']) ? number_format($item_info['item_recovery'], 0, '.', ',') : 0), // {RECOVERY}
                                             (!empty($item_info['item_damage2']) ? number_format($item_info['item_damage2'], 0, '.', ',') : 0), // {DAMAGE2}
-                                            (!empty($item_info['item_recovery2']) ? number_format($item_info['item_recovery2'], 0, '.', ',') : 0), // {RECOVERY2}
-                                            '' // {}
+                                            (!empty($item_info['item_recovery2']) ? number_format($item_info['item_recovery2'], 0, '.', ',') : 0) // {RECOVERY2}
                                             );
-                                        echo !empty($item_info['item_description']) ? str_replace($temp_find, $temp_replace, $item_info['item_description']) : '&hellip;'
+                                        $temp_description = trim($item_info['item_description']);
+                                        if ($print_options['show_use_desc']){ $temp_description .= ' '.trim($item_info['item_description_use']); }
+                                        if ($print_options['show_hold_desc']){ $temp_description .= ' '.trim($item_info['item_description_hold']); }
+                                        if ($print_options['show_shop_desc']){ $temp_description .= ' '.trim($item_info['item_description_shop']); }
+                                        $temp_description = str_replace($temp_find, $temp_replace, $temp_description);
+                                        echo !empty($temp_description) ? $temp_description : '&hellip;'
                                         ?></div>
                                     </td>
                                 </tr>
