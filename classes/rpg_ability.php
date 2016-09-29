@@ -2480,11 +2480,8 @@ class rpg_ability extends rpg_object {
         // Extract all objects into the current scope
         extract($objects);
 
-        // Update this abilities weapon energy to whatever the user currently has
-        $ability_weapon_energy = $this_robot->robot_weapons;
-        if ($ability_weapon_energy < 1){ $ability_weapon_energy = 1; }
-        if ($this_ability->ability_type == $this_robot->robot_core){ $ability_weapon_energy = $ability_weapon_energy * 2; }
-        $this_ability->set_energy($ability_weapon_energy);
+        // Update this abilities weapon energy to whatever the user's max is
+        $this_ability->set_energy($this_robot->robot_base_weapons);
 
         // Calculate the user's current life damage percent for calculations
         $robot_energy_damage = $this_robot->robot_base_energy - $this_robot->robot_energy;
