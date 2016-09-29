@@ -103,8 +103,6 @@ if (!empty($mmrpg_index['abilities'])){
 }
 
 
-
-
 // -- MMRPG IMPORT ABILTIIES -- //
 
 // Sort the ability index based on ability number
@@ -133,7 +131,12 @@ $temp_element_types = implode('|', array_keys($mmrpg_database_types));
 $temp_pattern_last[] = '/^light-buster$/i';
 $temp_pattern_last[] = '/^wily-buster$/i';
 $temp_pattern_last[] = '/^cossack-buster$/i';
-$temp_pattern_last[] = '/^('.$temp_element_types.')-(shot|buster|overdrive)$/i';
+foreach ($mmrpg_database_types AS $type_token => $type_info){
+    if (!empty($type_info['type_class']) && $type_info['type_class'] == 'special'){ continue; }
+    $temp_pattern_last[] = '/^'.$type_token.'-shot$/i';
+    $temp_pattern_last[] = '/^'.$type_token.'-buster$/i';
+    $temp_pattern_last[] = '/^'.$type_token.'-overdrive$/i';
+}
 $temp_pattern_last[] = '/^copy-shot$/i';
 $temp_pattern_last[] = '/^copy-soul$/i';
 $temp_pattern_last[] = '/^copy-shield$/i';
