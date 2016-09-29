@@ -41,7 +41,7 @@ uasort($mmrpg_database_types, function($t1, $t2){
 $hidden_database_items = array();
 foreach ($mmrpg_database_types AS $type_token => $type_info){
     $hidden_database_items[] = $type_token.'-star';
-    if (!empty($type_info['type_class']) && $type_info['type_class'] == 'special'){
+    if (!empty($type_info['type_class']) && $type_info['type_class'] == 'special' && $type_token != 'none'){
         $hidden_database_items[] = $type_token.'-core';
         $hidden_database_items[] = $type_token.'-shard';
     }
@@ -115,8 +115,6 @@ foreach ($mmrpg_database_types AS $type_token => $type_info){
     $temp_pattern_last[] = '/^'.$type_token.'-core$/i';
 }
 
-$temp_pattern_last[] = '/^star$/i';
-
 $temp_pattern_last[] = '/^energy-upgrade$/i';
 $temp_pattern_last[] = '/^weapon-upgrade$/i';
 $temp_pattern_last[] = '/^attack-booster$/i';
@@ -142,6 +140,8 @@ $temp_pattern_last[] = '/^cossack-program$/i';
 $temp_pattern_last[] = '/^kalinka-link$/i';
 $temp_pattern_last[] = '/^equip-codes$/i';
 $temp_pattern_last[] = '/^field-codes$/i';
+
+$temp_pattern_last[] = '/^star$/i';
 
 $temp_pattern_last[] = '/^([a-z]+)-star$/i';
 //$temp_pattern_last[] = '/^heart$/i';
