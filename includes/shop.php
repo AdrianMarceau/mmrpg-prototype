@@ -93,78 +93,78 @@ $this_shop_index['auto'] = array(
             'items' => 'So you wanna sell something, eh? Let\'s see what you\'ve collected so far! Hopefully lots of screws!'
             ),
         'shop_items' => array(
-                'items_selling' => array(
+            'items_selling' => array(
 
-                        'energy-pellet' => 200, 'weapon-pellet' => 200,
-                        'energy-capsule' => 400, 'weapon-capsule' => 400,
-                        'energy-tank' => 800, 'weapon-tank' => 800
+                'energy-pellet' => 200, 'weapon-pellet' => 200,
+                'energy-capsule' => 400, 'weapon-capsule' => 400,
+                'energy-tank' => 800, 'weapon-tank' => 800
 
-                        ),
-                'items_selling2' => array(
+                ),
+            'items_selling2' => array(
 
-                        'energy-pellet' => 200, 'weapon-pellet' => 200,
-                        'energy-capsule' => 400, 'weapon-capsule' => 400,
-                        'energy-tank' => 800, 'weapon-tank' => 800,
+                'energy-pellet' => 200, 'weapon-pellet' => 200,
+                'energy-capsule' => 400, 'weapon-capsule' => 400,
+                'energy-tank' => 800, 'weapon-tank' => 800,
 
-                        'attack-pellet' => 900, 'defense-pellet' => 900,
-                        'attack-capsule' => 1800, 'defense-capsule' => 1800,
-                        'speed-pellet' => 900, 'super-pellet' => 2700,
-                        'speed-capsule' => 1800, 'super-capsule' => 5400
+                'attack-pellet' => 900, 'defense-pellet' => 900,
+                'attack-capsule' => 1800, 'defense-capsule' => 1800,
+                'speed-pellet' => 900, 'super-pellet' => 2700,
+                'speed-capsule' => 1800, 'super-capsule' => 5400
 
-                        ),
-                'items_selling3' => array(
+                ),
+            'items_selling3' => array(
 
-                        'energy-pellet' => 200, 'weapon-pellet' => 200,
-                        'energy-capsule' => 400, 'weapon-capsule' => 400,
-                        'energy-tank' => 800, 'weapon-tank' => 800,
+                'energy-pellet' => 200, 'weapon-pellet' => 200,
+                'energy-capsule' => 400, 'weapon-capsule' => 400,
+                'energy-tank' => 800, 'weapon-tank' => 800,
 
-                        'attack-pellet' => 900, 'defense-pellet' => 900,
-                        'attack-capsule' => 1800, 'defense-capsule' => 1800,
-                        'speed-pellet' => 900, 'super-pellet' => 2700,
-                        'speed-capsule' => 1800, 'super-capsule' => 5400,
+                'attack-pellet' => 900, 'defense-pellet' => 900,
+                'attack-capsule' => 1800, 'defense-capsule' => 1800,
+                'speed-pellet' => 900, 'super-pellet' => 2700,
+                'speed-capsule' => 1800, 'super-capsule' => 5400,
 
-                        'extra-life' => 1600, 'yashichi' => 1600
+                'extra-life' => 1600, 'yashichi' => 1600
 
-                        ),
-                'items_selling4' => array(
+                ),
+            'items_selling4' => array(
 
-                        'energy-pellet' => 200, 'weapon-pellet' => 200,
-                        'energy-capsule' => 400, 'weapon-capsule' => 400,
-                        'energy-tank' => 800, 'weapon-tank' => 800,
+                'energy-pellet' => 200, 'weapon-pellet' => 200,
+                'energy-capsule' => 400, 'weapon-capsule' => 400,
+                'energy-tank' => 800, 'weapon-tank' => 800,
 
-                        'attack-pellet' => 900, 'defense-pellet' => 900,
-                        'attack-capsule' => 1800, 'defense-capsule' => 1800,
-                        'speed-pellet' => 900, 'super-pellet' => 2700,
-                        'speed-capsule' => 1800, 'super-capsule' => 5400,
+                'attack-pellet' => 900, 'defense-pellet' => 900,
+                'attack-capsule' => 1800, 'defense-capsule' => 1800,
+                'speed-pellet' => 900, 'super-pellet' => 2700,
+                'speed-capsule' => 1800, 'super-capsule' => 5400,
 
-                        'extra-life' => 1600, 'yashichi' => 1600,
+                'extra-life' => 1600, 'yashichi' => 1600,
 
-                        ),
-                'items_buying' => array(
+                ),
+            'items_buying' => array(
 
-                        'small-screw' => 100, 'large-screw' => 1000,
+                'small-screw' => 100, 'large-screw' => 1000,
 
-                        'energy-pellet' => 100, 'weapon-pellet' => 100,
-                        'energy-capsule' => 200, 'weapon-capsule' => 200,
-                        'energy-tank' => 400, 'weapon-tank' => 400,
+                'energy-pellet' => 100, 'weapon-pellet' => 100,
+                'energy-capsule' => 200, 'weapon-capsule' => 200,
+                'energy-tank' => 400, 'weapon-tank' => 400,
 
-                        'attack-pellet' => 450, 'defense-pellet' => 450,
-                        'attack-capsule' => 900, 'defense-capsule' => 900,
-                        'speed-pellet' => 450, 'super-pellet' => 1350,
-                        'speed-capsule' => 900, 'super-capsule' => 2800,
+                'attack-pellet' => 450, 'defense-pellet' => 450,
+                'attack-capsule' => 900, 'defense-capsule' => 900,
+                'speed-pellet' => 450, 'super-pellet' => 1350,
+                'speed-capsule' => 900, 'super-capsule' => 2800,
 
-                        'extra-life' => 800, 'yashichi' => 800,
+                'extra-life' => 800, 'yashichi' => 800,
 
-                        /*
-                        'energy-upgrade' => 4000, 'weapon-upgrade' => 4000,
-                        'attack-booster' => 4000, 'defense-booster' => 4000,
-                        'speed-booster' => 4000, 'field-booster' => 4000,
-                        'target-module' => 4000, 'charge-module' => 4000,
-                        'growth-module' => 4000, 'fortune-module' => 4000
-                        */
+                /*
+                'energy-upgrade' => 4000, 'weapon-upgrade' => 4000,
+                'attack-booster' => 4000, 'defense-booster' => 4000,
+                'speed-booster' => 4000, 'field-booster' => 4000,
+                'target-module' => 4000, 'charge-module' => 4000,
+                'growth-module' => 4000, 'fortune-module' => 4000
+                */
 
-                        )
                 )
+            )
         );
 
 // REGGAE'S SHOP
@@ -233,29 +233,26 @@ $this_shop_index['reggae'] = array(
         ),
     'shop_items' => array(
         'items_buying' => array(
-
-
-            'cutter-shard' => 100, 'cutter-core' => 3000,
-            'impact-shard' => 100,  'impact-core' => 3000,
-            'freeze-shard' => 100, 'freeze-core' => 3000,
-            'explode-shard' => 100, 'explode-core' => 3000,
-            'flame-shard' => 100, 'flame-core' => 3000,
-            'electric-shard' => 100, 'electric-core' => 3000,
-            'time-shard' => 100, 'time-core' => 3000,
-            'earth-shard' => 100, 'earth-core' => 3000,
-            'wind-shard' => 100, 'wind-core' => 3000,
-            'water-shard' => 100, 'water-core' => 3000,
-            'swift-shard' => 100, 'swift-core' => 3000,
-            'nature-shard' => 100, 'nature-core' => 3000,
-            'missile-shard' => 100, 'missile-core' => 3000,
-            'crystal-shard' => 100, 'crystal-core' => 3000,
-            'shadow-shard' => 100, 'shadow-core' => 3000,
-            'space-shard' => 100, 'space-core' => 3000,
-            'shield-shard' => 100, 'shield-core' => 3000,
-            'laser-shard' => 100, 'laser-core' => 3000,
-            'copy-shard' => 200, 'copy-core' => 6000,
-            'none-shard' => 200, 'none-core' => 6000,
-
+            'cutter-core' => 3000,
+            'impact-core' => 3000,
+            'freeze-core' => 3000,
+            'explode-core' => 3000,
+            'flame-core' => 3000,
+            'electric-core' => 3000,
+            'time-core' => 3000,
+            'earth-core' => 3000,
+            'wind-core' => 3000,
+            'water-core' => 3000,
+            'swift-core' => 3000,
+            'nature-core' => 3000,
+            'missile-core' => 3000,
+            'crystal-core' => 3000,
+            'shadow-core' => 3000,
+            'space-core' => 3000,
+            'shield-core' => 3000,
+            'laser-core' => 3000,
+            'copy-core' => 6000,
+            'none-core' => 6000,
             )
         )
     );
@@ -278,25 +275,25 @@ $this_shop_index['kalinka'] = array(
         'shop_quote_selling' => array('items' => 'Greetings and welcome to Kalinka\'s Shop! I think you\'ll enjoy the new hold items I\'m developing.'),
         'shop_quote_buying' => array('stars' => 'Do you have any field or fusion stars? I\'m studying the effects of starforce and need some samples.'),
         'shop_items' => array(
-                'items_selling' => array(
-                        'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,
-                        'attack-booster' => 32000, 'defense-booster' => 32000,
-                        'target-module' => 32000, 'growth-module' => 32000
-                        ),
-                'items_selling2' => array(
-                        'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,
-                        'attack-booster' => 32000, 'defense-booster' => 32000,
-                        'speed-booster' => 32000, 'field-booster' => 32000,
-                        'target-module' => 32000, 'charge-module' => 32000,
-                        'growth-module' => 32000, 'fortune-module' => 32000
-                        )
+            'items_selling' => array(
+                'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,
+                'attack-booster' => 32000, 'defense-booster' => 32000,
+                'target-module' => 32000, 'growth-module' => 32000
                 ),
-        'shop_stars' => array(
-                'stars_buying' => array(
-                        'field' => 6000,
-                        'fusion' => 9000
-                        )
+            'items_selling2' => array(
+                'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,
+                'attack-booster' => 32000, 'defense-booster' => 32000,
+                'speed-booster' => 32000, 'field-booster' => 32000,
+                'target-module' => 32000, 'charge-module' => 32000,
+                'growth-module' => 32000, 'fortune-module' => 32000
                 )
+            ),
+        'shop_stars' => array(
+            'stars_buying' => array(
+                'field' => 6000,
+                'fusion' => 9000
+                )
+            )
         );
 
 
@@ -306,13 +303,17 @@ $this_shop_index['kalinka'] = array(
 $this_shop_index_raw = $this_shop_index;
 if (!empty($this_shop_index)){
     foreach ($this_shop_index AS $shop_token => $shop_info){
+
         // Default this shop's level to zero for later
         $this_shop_index[$shop_token]['shop_level'] = 0;
         // Unlock the shop if the associated doctor has completed chapter one
         $shop_player = $shop_info['shop_player'];
         $shop_selling = $shop_info['shop_kind_selling'];
         $shop_buying = $shop_info['shop_kind_buying'];
-        if (mmrpg_prototype_battles_complete($shop_player) >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT){
+
+        // Only show this shop if the appropriate link has been established
+        if (mmrpg_prototype_item_unlocked($shop_token.'-link')){
+
             // If the shop has not been created, define its defaults
             if (!isset($this_battle_shops[$shop_token])){
                 $shop_array = array();
@@ -338,13 +339,16 @@ if (!empty($this_shop_index)){
             }
             // Either way, update this shop's level from the session
             $this_shop_index[$shop_token]['shop_level'] = $this_battle_shops[$shop_token]['shop_level'];
+
         }
         // Otherwise set the shop level to zero, it's not unlocked yet
         else {
+
             // Remove this shop from the index to prevent errors
             unset($this_shop_index[$shop_token]);
             // Update this shop's level in the index
             //$this_shop_index[$shop_token]['shop_level'] = 0;
+            //
         }
 
     }
@@ -370,8 +374,8 @@ if (!empty($this_shop_index['auto'])){
         unset($this_shop_index['auto']['shop_items']['items_selling4']);
     }
 
-    // If the player has completed the prototype, Auto's Shop also sells alts
-    if (mmrpg_prototype_complete()){
+    // If the player has unlocked the Dress Codes, Auto's Shop also sells alts
+    if (mmrpg_prototype_item_unlocked('dress-codes')){
 
         // Generate the max tier of alts to sell based on level
         $max_alt_tier_key = floor($this_shop_index['auto']['shop_level'] / 10);
@@ -475,78 +479,84 @@ if (!empty($this_shop_index['reggae'])){
         unset($this_shop_index['reggae']['shop_abilities']['abilities_selling3']);
         //unset($this_shop_index['reggae']['shop_abilities']['abilities_selling4']);
 
-        /*
-        // If the player has X, Reggae's Shop also sells weapons
-        if (!empty($this_battle_shops['reggae']['cores_bought'])){
-                array_unshift($this_shop_index['reggae']['shop_kind_selling'], 'weapons');
-                $this_shop_index['reggae']['shop_quote_selling']['weapons'] = 'Reggae use cores make new weapons! Squaaak! Heroes use weapons defeat bad guys! Squaaak!';
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
+        // If the player has unlocked the Weapon Codes, Reggae's Shop also sells weapons
+        if (mmrpg_prototype_item_unlocked('weapon-codes')){
+            // Update the shop parameters to include code-based weapons
+            array_unshift($this_shop_index['reggae']['shop_kind_selling'], 'weapons');
+            $this_shop_index['reggae']['shop_quote_selling']['weapons'] = 'Reggae use cores make new weapons! Squaaak! Heroes use weapons defeat bad guys! Squaaak!';
+            // Define the weapon selling array and start it empty
+            $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
+            // Manually append some starter abilities as the first items in the list
+            $this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-charge'] = 3000;
+            $this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-relay'] = 3000;
+            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-shot'] = 3000;
         }
-        */
 
-        /*
-        // Loop through all the sold cores and add associated abilities
+        // If the player has sold any cores, loop through them and add associated abilities
         if (!empty($this_battle_shops['reggae']['cores_bought'])){
-                foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
-                        $type_token = preg_replace('/-core$/i', '', $item_token);
-                        $type_info = $mmrpg_index['types'][$type_token];
-                        $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 100 : 0;
-                        if ($type_token == 'none'){ continue; }
-                        // Unlock the Elemental Shot ability if at least one core
-                        if ($item_quantity >= 1){
-                                $ability_price = 6000;
-                                $ability_token = $type_token.'-shot';
-                                if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
-                                $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
-                        }
-                        // Unlock the Elemental Buster ability if at least three cores
-                        if ($item_quantity >= 3){
-                                $ability_price = 9000;
-                                $ability_token = $type_token.'-buster';
-                                if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
-                                $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
-                        }
-                        // Unlock the Elemental Overdrive ability if at least nine cores
-                        if ($item_quantity >= 9){
-                                $ability_price = 12000;
-                                $ability_token = $type_token.'-overdrive';
-                                if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
-                                $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
-                        }
+            foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
+                $type_token = preg_replace('/-core$/i', '', $item_token);
+                $type_info = $mmrpg_index['types'][$type_token];
+                $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 100 : 0;
+                if ($type_token == 'none'){ continue; }
+
+                // Unlock the Elemental Shot ability if at least one core
+                if ($item_quantity >= 1){
+                    $ability_price = 6000;
+                    $ability_token = $type_token.'-shot';
+                    if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
+                    $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
                 }
+
+                // Unlock the Elemental Buster ability if at least three cores
+                if ($item_quantity >= 3){
+                    $ability_price = 9000;
+                    $ability_token = $type_token.'-buster';
+                    if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
+                    $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
+                }
+
+                // Unlock the Elemental Overdrive ability if at least nine cores
+                if ($item_quantity >= 9){
+                    $ability_price = 12000;
+                    $ability_token = $type_token.'-overdrive';
+                    if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
+                    $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
+                }
+
+            }
         }
-        */
 
         // If Robots or Abilities have been unlocked, increase the core selling prices
         if (!empty($global_unlocked_robots_cores) || !empty($global_unlocked_abilities_types)){
-                if (!empty($this_shop_index['reggae']['shop_items']['items_buying'])){
-                        $items_list = $this_shop_index['reggae']['shop_items']['items_buying'];
-                        foreach ($items_list AS $item_token => $item_price){
-                                $type_token = preg_replace('/-(shard|core)$/', '', $item_token);
-                                $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
-                                $ability_boost = !empty($global_unlocked_abilities_types[$type_token]) ? $global_unlocked_abilities_types[$type_token] : 0;
-                                $robot_price_boost = ceil($robot_boost * 100);
-                                $ability_price_boost = ceil($ability_boost * 10);
-                                if (strstr($item_token, '-shard')){
-                                    $robot_price_boost = ceil($robot_price_boost / 10);
-                                    $ability_price_boost = ceil($ability_price_boost / 10);
-                                }
-                                $item_price += $robot_price_boost;
-                                $item_price += $ability_price_boost;
-                                $this_shop_index['reggae']['shop_items']['items_buying'][$item_token] = $item_price;
-                        }
+            if (!empty($this_shop_index['reggae']['shop_items']['items_buying'])){
+                $items_list = $this_shop_index['reggae']['shop_items']['items_buying'];
+                foreach ($items_list AS $item_token => $item_price){
+                    $type_token = preg_replace('/-(shard|core)$/', '', $item_token);
+                    $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
+                    $ability_boost = !empty($global_unlocked_abilities_types[$type_token]) ? $global_unlocked_abilities_types[$type_token] : 0;
+                    $robot_price_boost = ceil($robot_boost * 100);
+                    $ability_price_boost = ceil($ability_boost * 10);
+                    if (strstr($item_token, '-shard')){
+                        $robot_price_boost = ceil($robot_price_boost / 10);
+                        $ability_price_boost = ceil($ability_price_boost / 10);
+                    }
+                    $item_price += $robot_price_boost;
+                    $item_price += $ability_price_boost;
+                    $this_shop_index['reggae']['shop_items']['items_buying'][$item_token] = $item_price;
                 }
+            }
         }
 
         // If Reggae's Shop has reached sufficient levels, decrease his selling prices
         if ($this_shop_index['reggae']['shop_level'] > 1){
-                $level_discount = $this_battle_shops['reggae']['shop_level'] / 100;
-                if (!empty($this_shop_index['reggae']['shop_abilities']['abilities_selling'])){
-                        foreach ($this_shop_index['reggae']['shop_abilities']['abilities_selling'] AS $ability_kind => $ability_price){
-                                $ability_price -= round(($ability_price / 2) * $level_discount);
-                                $this_shop_index['reggae']['shop_abilities']['abilities_selling'][$ability_kind] = $ability_price;
-                        }
+            $level_discount = $this_battle_shops['reggae']['shop_level'] / 100;
+            if (!empty($this_shop_index['reggae']['shop_abilities']['abilities_selling'])){
+                foreach ($this_shop_index['reggae']['shop_abilities']['abilities_selling'] AS $ability_kind => $ability_price){
+                    $ability_price -= round(($ability_price / 2) * $level_discount);
+                    $this_shop_index['reggae']['shop_abilities']['abilities_selling'][$ability_kind] = $ability_price;
                 }
+            }
         }
 
 }
@@ -562,36 +572,36 @@ if (!empty($this_shop_index['kalinka'])){
         unset($this_shop_index['kalinka']['shop_items']['items_selling2']);
 
         // If the player has completed the prototype, Kalinka's Shop also sells fields
-        if (mmrpg_prototype_complete()){
-                $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
-                $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I think I\'ve discoved a way to generate new starforce, but it\'ll require additional research. Interested?';
-                $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
-                        'construction-site' => 48000, 'magnetic-generator' => 48000,
-                        'reflection-chamber' => 48000, 'rocky-plateau' => 48000,
-                        'spinning-greenhouse' => 48000, 'serpent-column' => 48000,
-                        'power-plant' => 48000, 'septic-system' => 48000
-                        );
+        if (mmrpg_prototype_item_unlocked('field-codes')){
+            $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
+            $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I think I\'ve discoved a way to generate new starforce, but it\'ll require additional research. Interested?';
+            $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
+                'construction-site' => 48000, 'magnetic-generator' => 48000,
+                'reflection-chamber' => 48000, 'rocky-plateau' => 48000,
+                'spinning-greenhouse' => 48000, 'serpent-column' => 48000,
+                'power-plant' => 48000, 'septic-system' => 48000
+                );
         }
 
         // If Kalinka's Shop has reached sufficient levels, decrease her selling prices
         if ($this_shop_index['kalinka']['shop_level'] > 1){
-                $level_discount = $this_battle_shops['kalinka']['shop_level'] / 100;
+            $level_discount = $this_battle_shops['kalinka']['shop_level'] / 100;
 
-                // If her shop is selling items, discount their prices
-                if (!empty($this_shop_index['kalinka']['shop_items']['items_selling'])){
-                        foreach ($this_shop_index['kalinka']['shop_items']['items_selling'] AS $field_kind => $field_price){
-                                $field_price -= round(($field_price / 2) * $level_discount);
-                                $this_shop_index['kalinka']['shop_items']['items_selling'][$field_kind] = $field_price;
-                        }
+            // If her shop is selling items, discount their prices
+            if (!empty($this_shop_index['kalinka']['shop_items']['items_selling'])){
+                foreach ($this_shop_index['kalinka']['shop_items']['items_selling'] AS $field_kind => $field_price){
+                    $field_price -= round(($field_price / 2) * $level_discount);
+                    $this_shop_index['kalinka']['shop_items']['items_selling'][$field_kind] = $field_price;
                 }
+            }
 
-                // If her shop is selling fields, discount their prices
-                if (!empty($this_shop_index['kalinka']['shop_fields']['fields_selling'])){
-                        foreach ($this_shop_index['kalinka']['shop_fields']['fields_selling'] AS $field_kind => $field_price){
-                                $field_price -= round(($field_price / 2) * $level_discount);
-                                $this_shop_index['kalinka']['shop_fields']['fields_selling'][$field_kind] = $field_price;
-                        }
+            // If her shop is selling fields, discount their prices
+            if (!empty($this_shop_index['kalinka']['shop_fields']['fields_selling'])){
+                foreach ($this_shop_index['kalinka']['shop_fields']['fields_selling'] AS $field_kind => $field_price){
+                    $field_price -= round(($field_price / 2) * $level_discount);
+                    $this_shop_index['kalinka']['shop_fields']['fields_selling'][$field_kind] = $field_price;
                 }
+            }
 
         }
 
