@@ -538,7 +538,7 @@ if (!empty($this_shop_index['reggae'])){
 
                 // If the user has not sold enough cores, skip this ability
                 $cores_sold = !empty($core_level_index[$ability_info['ability_type']]) ? $core_level_index[$ability_info['ability_type']] : 0;
-                //if ($cores_sold < $cores_required){ continue; }
+                if ($cores_sold < $cores_required){ continue; }
 
                 // Apply a discount to the price if the shop is a high enough level
                 if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
