@@ -4,6 +4,7 @@ $ability = array(
     'ability_name' => 'Buster Shot',
     'ability_token' => 'buster-shot',
     'ability_game' => 'MM00',
+    'ability_group' => 'MM00/Weapons/T0',
     'ability_description' => 'The user fires a small plasma shot at the target to inflict damage. This ability\'s power increases if the user if holding a buster charge.',
     'ability_energy' => 0,
     'ability_speed' => 2,
