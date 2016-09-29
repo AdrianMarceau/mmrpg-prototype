@@ -37,12 +37,6 @@ $allowed_edit_data = $this_shop_index;
 $prototype_player_counter = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
 $prototype_complete_counter = mmrpg_prototype_complete();
 $prototype_battle_counter = mmrpg_prototype_battles_complete('dr-light');
-foreach ($allowed_edit_data AS $shop_token => $shop_info){
-    $allowed = true;
-    if (!rpg_game::player_unlocked($shop_info['shop_player'])){ $allowed = false; }
-    elseif (rpg_prototype::battles_complete($shop_info['shop_player']) >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT){ $allowed = false; }
-    if ($allowed){ unset($allowed_edit_data[$shop_token]); }
-}
 $allowed_edit_data_count = count($allowed_edit_data);
 
 // HARD-CODE ZENNY FOR TESTING
@@ -304,88 +298,6 @@ thisShopData.itemQuantities = <?= json_encode($global_item_quantities) ?>;
 // Define the global arrays to hold the shop console and canvas markup
 var shopCanvasMarkup = '<?= str_replace("'", "\'", $shop_canvas_markup) ?>';
 var shopConsoleMarkup = '<?= str_replace("'", "\'", $shop_console_markup) ?>';
-
-<?
-
-// Define a reference to the game's session flag variable
-if (empty($_SESSION[$session_token]['flags']['events'])){ $_SESSION[$session_token]['flags']['events'] = array(); }
-$temp_game_flags = &$_SESSION[$session_token]['flags']['events'];
-$temp_event_shown = false;
-
-// If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_shop-auto-intro';
-if (!$temp_event_shown && !empty($allowed_edit_data['auto']) && empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
-    $temp_game_flags[$temp_event_flag] = true;
-    $temp_event_shown = true;
-    ?>
-    // Generate a first-time event canvas that explains how the editor works
-    gameSettings.windowEventsCanvas = [
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/light-laboratory/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/shops/auto/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 20px; left: 250px; width: 80px; height: 80px;">&nbsp;</div>'+
-        ''
-        ];
-    // Generate a first-time event message that explains how the editor works
-    gameSettings.windowEventsMessages = [
-        '<p>Congratulations! <strong>Auto\'s Shop</strong> has been unlocked! Items can be purchased and sold in Auto\'s Shop using a digital currency called Zenny, and the only way to earn Zenny is by selling the items you find in battle.</p>'+
-        '<p>Use the Buy or Sell tabs to switch between modes, and then click any of the Buy or Sell buttons to make your selection.  A confirmation box will appear below to finalize your request.  Clicking a button multiple times will increase the quantity, helpful for bulk transactions.</p>'+
-        '<p>Auto has made himself available to our players out of devotion to his creator Dr. Light, but he\'s also on a secret mission to find more of his favourite thing - screws.  Bring him any screws you find and he\'ll likely pay a premium price.</p>'+
-        ''
-        ];
-    // Push this event to the parent window and display to the user
-    top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-    <?
-}
-
-// If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_shop-reggae-intro';
-if (!$temp_event_shown && !empty($allowed_edit_data['reggae']) && empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
-    $temp_game_flags[$temp_event_flag] = true;
-    $temp_event_shown = true;
-    ?>
-    // Generate a first-time event canvas that explains how the editor works
-    gameSettings.windowEventsCanvas = [
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/shops/reggae/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 20px; left: 250px; width: 80px; height: 80px;">&nbsp;</div>'+
-        ''
-        ];
-    // Generate a first-time event message that explains how the editor works
-    gameSettings.windowEventsMessages = [
-        '<p>Congratulations! <strong>Reggae\'s Shop</strong> has been unlocked! Abilities can be purchased in Reggae\'s Shop using a digital currency called Zenny, and the only way to earn Zenny is by selling the items or cores you find in battle.</p>'+
-        '<p>Reggae has made himself available to our players out of devotion to his creator Dr. Wily, but he\'s also on a secret mission to collect robot cores - something he believes will be a very lucrative business in the near future.  Bring him any cores you find and he\'ll likely pay a premium price for them.</p>'+
-        ''
-        ];
-    // Push this event to the parent window and display to the user
-    top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-    <?
-}
-
-// If this is the first time using the editor, display the introductory area
-$temp_event_flag = 'mmrpg-event-01_shop-kalinka-intro';
-if (!$temp_event_shown && !empty($allowed_edit_data['kalinka']) && empty($temp_game_flags[$temp_event_flag]) && $global_allow_editing){
-    $temp_game_flags[$temp_event_flag] = true;
-    $temp_event_shown = true;
-    ?>
-    // Generate a first-time event canvas that explains how the editor works
-    gameSettings.windowEventsCanvas = [
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/cossack-citadel/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80" style="background-image: url(images/fields/cossack-citadel/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">&nbsp;</div>'+
-        '<div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/shops/kalinka/sprite_left_80x80.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); top: 20px; left: 250px; width: 80px; height: 80px;">&nbsp;</div>'+
-        ''
-        ];
-    // Generate a first-time event message that explains how the editor works
-    gameSettings.windowEventsMessages = [
-        '<p>Congratulations! <strong>Kalinka\'s Shop</strong> has been unlocked! New battle fields can be purchased in Kalinka\'s Shop using a digital currency called Zenny, and the only way to earn Zenny is by selling the items, cores, or stars you find in battle.</p>'+
-        '<p>Kalinka has made herself available to our players out of devotion to her father Dr. Cossack, but she\'s also on a secret mission to collect field and fusion stars as she believes the mysterious starforce energy warrants further study.  Check back each day to see which stars she is currently seeking.</p>'+
-        ''
-        ];
-    // Push this event to the parent window and display to the user
-    top.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-    <?
-}
-
-?>
 
 </script>
 <?
