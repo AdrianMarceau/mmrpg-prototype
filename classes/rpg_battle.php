@@ -256,7 +256,7 @@ class rpg_battle extends rpg_object {
 
     // Define a static public function for encouraging battle words
     public static function random_positive_word(){
-        $temp_text_options = array('Awesome!', 'Nice!', 'Fantastic!', 'Yeah!', 'Yay!', 'Yes!', 'Great!', 'Super!', 'Rock on!', 'Amazing!', 'Fabulous!', 'Wild!', 'Sweet!', 'Wow!', 'Oh my!');
+        $temp_text_options = array('Awesome!', 'Nice!', 'Fantastic!', 'Yeah!', 'Yay!', 'Yes!', 'Great!', 'Super!', 'Rock on!', 'Amazing!', 'Fabulous!', 'Wild!', 'Sweet!', 'Wow!', 'Oh my!', 'Excellent!', 'Wonderful!');
         $temp_text = $temp_text_options[array_rand($temp_text_options)];
         return $temp_text;
     }
