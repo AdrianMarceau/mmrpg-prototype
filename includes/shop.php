@@ -481,50 +481,74 @@ if (!empty($this_shop_index['reggae'])){
 
         // If the player has unlocked the Weapon Codes, Reggae's Shop also sells weapons
         if (mmrpg_prototype_item_unlocked('weapon-codes')){
+
             // Update the shop parameters to include code-based weapons
             array_unshift($this_shop_index['reggae']['shop_kind_selling'], 'weapons');
             $this_shop_index['reggae']['shop_quote_selling']['weapons'] = 'Reggae use cores make new weapons! Squaaak! Heroes use weapons defeat bad guys! Squaaak!';
+
             // Define the weapon selling array and start it empty
             $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
+
             // Manually append some starter abilities as the first items in the list
             $this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-charge'] = 3000;
             $this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-relay'] = 3000;
-            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-shot'] = 3000;
-        }
 
-        // If the player has sold any cores, loop through them and add associated abilities
-        if (!empty($this_battle_shops['reggae']['cores_bought'])){
-            foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
-                $type_token = preg_replace('/-core$/i', '', $item_token);
-                $type_info = $mmrpg_index['types'][$type_token];
-                $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 100 : 0;
-                if ($type_token == 'none'){ continue; }
+            // If the player has sold any cores, loop through them and add associated abilities
+            $core_level_index = array();
+            $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 100 : 0;
+            if (!empty($this_battle_shops['reggae']['cores_bought'])){
+                foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
+                    $type_token = preg_replace('/-core$/i', '', $item_token);
+                    $type_info = $mmrpg_index['types'][$type_token];
+                    if ($type_token == 'none'){ continue; }
+                    $core_level_index[$type_token] = $item_quantity;
+                }
+            }
 
-                // Unlock the Elemental Shot ability if at least one core
-                if ($item_quantity >= 1){
+            // Pull any other sellable elemental abilities from the database
+            foreach ($mmrpg_database_abilities AS $ability_token => $ability_info){
+
+                // Skip if this ability is incomplete
+                if (!$ability_info['ability_flag_complete']){ continue; }
+                // Skip if this ability is not of the master class
+                elseif ($ability_info['ability_class'] != 'master'){ continue; }
+                // Skip if this ability has no primary type
+                elseif (empty($ability_info['ability_type'])){ continue; }
+                // Skip if this is a hero ability from MM00 group
+                elseif (strstr($ability_info['ability_group'], 'MM00/')){ continue; }
+
+                // Calculate this ability's tier based on weapon energy
+                $ability_tier = 1;
+                if ($ability_info['ability_energy'] > 4){ $ability_tier += 1; }
+                if ($ability_info['ability_energy'] > 8){ $ability_tier += 1; }
+
+                // Define the core required and price based on it's tier
+                $ability_price = 0;
+                $cores_required = 0;
+                if ($ability_tier == 1){
                     $ability_price = 6000;
-                    $ability_token = $type_token.'-shot';
-                    if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
-                    $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
-                }
-
-                // Unlock the Elemental Buster ability if at least three cores
-                if ($item_quantity >= 3){
+                    $cores_required = 1;
+                } elseif ($ability_tier == 2){
                     $ability_price = 9000;
-                    $ability_token = $type_token.'-buster';
-                    if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
-                    $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
+                    $cores_required = 3;
+                } elseif ($ability_tier == 3){
+                    $ability_price = 12000;
+                    $cores_required = 9;
                 }
 
-                // Unlock the Elemental Overdrive ability if at least nine cores
-                if ($item_quantity >= 9){
-                    $ability_price = 12000;
-                    $ability_token = $type_token.'-overdrive';
-                    if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
-                    $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
-                }
+                // If the user has not sold enough cores, skip this ability
+                $cores_sold = !empty($core_level_index[$ability_info['ability_type']]) ? $core_level_index[$ability_info['ability_type']] : 0;
+                //if ($cores_sold < $cores_required){ continue; }
+
+                // Apply a discount to the price if the shop is a high enough level
+                if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
+
+                // Append this ability to the parent weapon selling array
+                $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
 
             }
+
+
         }
 
         // If Robots or Abilities have been unlocked, increase the core selling prices
