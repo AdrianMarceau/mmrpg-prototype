@@ -822,6 +822,170 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
 
 // -- ITEM FUNCTIONS -- //
 
+// Define a function for unlocking a game item for use in battle
+function mmrpg_game_unlock_item($item_token, $print_options = array()){
+    $session_token = mmrpg_game_token();
+
+    // Define or collect the various print options
+    if (!isset($print_options['player_token'])){ $print_options['player_token'] = ''; }
+    if (!isset($print_options['shop_token'])){ $print_options['shop_token'] = ''; }
+    if (!isset($print_options['event_text'])){ $print_options['event_text'] = 'The {item} was unlocked!'; }
+    if (!isset($print_options['positive_word'])){ $print_options['positive_word'] = rpg_battle::random_positive_word(); }
+    if (!isset($print_options['show_images'])){
+        $print_options['show_images'] = array();
+        if (!empty($print_options['player_token'])){ $print_options['show_images'][] = 'player'; }
+        if (!empty($print_options['shop_token'])){ $print_options['shop_token'][] = 'shop'; }
+    } elseif (!in_array('item', $print_options['show_images'])){
+        $print_options['show_images'][] = 'item';
+    }
+
+    // Define a reference to the game's session flag variable
+    if (empty($_SESSION[$session_token]['flags'])){ $_SESSION[$session_token]['flags'] = array(); }
+    $temp_game_flags = &$_SESSION[$session_token]['flags'];
+
+    // If the item token is empty, return false
+    if (empty($item_token)){ return false; }
+
+    // Turn off the event if it's been turned on and shouldn't be
+    if (mmrpg_prototype_item_unlocked($item_token)){ $print_options['event_text'] = ''; }
+    if (rpg_game::is_demo()){ $print_options['event_text'] = ''; }
+
+    // Attempt to collect info for this item
+    $item_info = rpg_item::get_index_info($item_token);
+
+    // If this item does not exist in the global index, return false
+    if (empty($item_info)){ return false; }
+
+    // Automatically unlock this item for use in battle
+    $this_reward = $this_setting = array('item_token' => $item_token);
+
+    // No matter what, always unlock new items in the main array
+    if (!isset($_SESSION[$session_token]['values']['battle_items'])){ $_SESSION[$session_token]['values']['battle_items'] = array(); }
+    if (!isset($_SESSION[$session_token]['values']['battle_items'][$item_token])){ $_SESSION[$session_token]['values']['battle_items'][$item_token] = 1; }
+    else { $_SESSION[$session_token]['values']['battle_items'][$item_token] += 1; }
+
+    // Only show the event if allowed by the function args and not empty
+    if (!empty($print_options['event_text'])){
+
+        // Generate the attributes and text variables for this item unlock
+        $item_info_size = isset($item_info['item_image_size']) ? $item_info['item_image_size'] * 2 : 40 * 2;
+        $item_info_size_token = $item_info_size.'x'.$item_info_size;
+        $this_name = $item_info['item_name'];
+        $this_type_token = !empty($item_info['item_type']) ? $item_info['item_type'] : '';
+        if (!empty($this_type_token) && !empty($item_info['item_type2'])){ $this_type_token .= '_'.$item_info['item_type2']; }
+        elseif (!empty($item_info['item_type2'])){ $this_type_token = $item_info['item_type2']; }
+        if (empty($this_type_token)){ $this_type_token = 'none'; }
+        $this_description = !empty($item_info['item_description']) && $item_info['item_description'] != '...' ? $item_info['item_description'] : '';
+
+        // If not empty, collect details about this player
+        $player_token = !empty($print_options['player_token']) ? $print_options['player_token'] : 'player';
+        $player_info = rpg_player::get_index_info($player_token);
+
+        // If not empty, collect details about this shop
+        $shop_token = !empty($print_options['shop_token']) ? $print_options['shop_token'] : 'shop';
+        $shop_info = array('shop_token' => $shop_token, 'shop_name' => ucfirst($shop_token));
+
+        // Define basic details about the intro field background
+        $this_field = array('field_token' => 'intro-field', 'field_name' => 'Intro Field');
+
+        // Generate the window event's canvas and message markup then append to the global array
+        $temp_canvas_markup = '';
+
+        // Append the field background markup to the canvas
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+
+        // Count the number of character images to displau
+        $display_image_count = 0;
+        if (in_array('player', $print_options['show_images'])){ $display_image_count += 1; }
+        if (in_array('shop', $print_options['show_images'])){ $display_image_count += 1; }
+
+        // Append the player image to the canvas markup if allowed
+        if (in_array('player', $print_options['show_images'])){
+            $offset = $display_image_count > 1 ? 170 : 220;;
+            $direction = 'right';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_'.$direction.'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: '.$offset.'px;">'.$player_info['player_name'].'</div>';
+        }
+
+        // Append the shop image to the canvas markup if allowed
+        if (in_array('shop', $print_options['show_images'])){
+            $offset = $display_image_count > 1 ? 330 : 220;
+            $direction = $display_image_count > 1 ? 'left' : 'right';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/shops/'.$shop_token.'/sprite_'.$direction.'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: '.$offset.'px;">'.ucfirst($shop_token).'</div>';
+        }
+
+        // Append a buster glow background depending on the current player
+        $offset = $display_image_count > 1 ? 250 : 200;
+        if ($player_token != 'player'){
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/abilities/'.str_replace('dr-', '', $player_info['player_token']).'-buster/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: '.$offset.'px;">&nbsp;</div>';
+        }
+
+        // Append the actual item markup to the canvas
+        $offset = $display_image_count > 1 ? 262 : 212;
+        $temp_canvas_markup .= '<div class="item_type item_type_'.$this_type_token.' sprite sprite_40x40 sprite_40x40_00" style="
+            position: absolute;
+            bottom: 52px;
+            right: '.$offset.'px;
+            padding: 4px;
+            -moz-border-radius: 10px;
+            -webkit-border-radius: 10px;
+            border-radius: 10px;
+            border-style: solid;
+            border-color: #181818;
+            border-width: 4px;
+            box-shadow: inset 1px 1px 6px rgba(0, 0, 0, 0.8);
+            ">&nbsp;</div>';
+        $temp_canvas_markup .= '<div class="sprite" style="
+            bottom: 57px;
+            right: '.($offset + 5).'px;
+            width: 44px;
+            height: 44px;
+            overflow: hidden;
+            background-color: rgba(13,13,13,0.33);
+            -moz-border-radius: 6px;
+            -webkit-border-radius: 6px;
+            border-radius: 6px;
+            border-style: solid;
+            border-color: #292929;
+            border-width: 1px;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+            "><div class="sprite sprite_'.$item_info_size_token.' sprite_'.$item_info_size_token.'_base" style="
+            background-image: url(images/items/'.$item_info['item_token'].'/icon_right_'.$item_info_size_token.'.png?'.MMRPG_CONFIG_CACHE_DATE.');
+            bottom: -18px;
+            right: -18px;
+            ">'.$item_info['item_name'].'</div></div>';
+
+        // Generate the search and replace arrays for the console event text
+        $console_search = array('{item}');
+        $console_replace = array('<strong>'.$this_name.'</strong>');
+        $console_search[] = '{player}';
+        $console_replace[] = '<strong>'.ucfirst($player_info['player_name']).'</strong>';
+        $console_search[] = '{shop}';
+        $console_replace[] = '<strong>'.ucfirst($shop_info['shop_name']).'</strong>';
+
+        // Print out the parsed event text and the item database markup
+        $temp_console_markup = '<p>';
+            $temp_console_markup .= $print_options['positive_word'].' ';
+            $temp_console_markup .= str_replace($console_search, $console_replace, $print_options['event_text']);
+        $temp_console_markup .= '</p>';
+        $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', rpg_item::print_database_markup($item_info, array('layout_style' => 'event'))).'</div></div></div>';
+
+        // Append this event to the global events array for display
+        $_SESSION[$session_token]['EVENTS'][] = array(
+            'canvas_markup' => preg_replace('/\s+/', ' ', $temp_canvas_markup),
+            'console_markup' => $temp_console_markup
+            );
+
+    }
+
+    // Create the event flag for unlocking this item
+    $temp_game_flags['events']['unlocked-item_'.$item_token] = true;
+    if (!empty($player_token)){ $temp_game_flags['events']['unlocked-item_'.$player_token.'_'.$item_token] = true; }
+
+    // Return true on success
+    return true;
+}
+
 
 // Define a function for checking how many items have been unlocked by a player
 function mmrpg_game_items_unlocked(){

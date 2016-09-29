@@ -1445,7 +1445,7 @@ class rpg_item extends rpg_object {
                         <?php if($print_options['layout_style'] == 'website_compact'): ?>
                             <a href="<?= 'database/items/'.$item_info['item_token'].'/' ?>"><?= $item_info['item_name'] ?></a>
                         <?php else: ?>
-                            <?= $item_info['item_name'] ?>&#39;s Data
+                            <?= $item_info['item_name'] ?>&#39;<?= !preg_match('/s$/i', $item_info['item_name']) ? 's' : '' ?> Data
                         <?php endif; ?>
                         <?php if (!empty($item_info['item_type_special'])){ ?>
                             <div class="header_core item_type"><?= ucfirst($item_info['item_type_special']) ?> Type</div>
