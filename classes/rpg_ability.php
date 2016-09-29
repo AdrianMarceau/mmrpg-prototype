@@ -1009,28 +1009,23 @@ class rpg_ability extends rpg_object {
         if (!empty($temp_ability_type)){ $temp_ability_title .= ' ('.$temp_ability_type['type_name'].' Type)'; }
         if (!empty($temp_ability_type2)){ $temp_ability_title = str_replace('Type', '/ '.$temp_ability_type2['type_name'].' Type', $temp_ability_title); }
 
-        if ($ability_info['ability_class'] != 'item'){
-            if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
-            elseif (empty($ability_info['ability_damage']) && empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
-            if (!empty($ability_info['ability_damage']) && !empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage | '.$ability_info['ability_recovery'].' Recovery'; }
-            elseif (!empty($ability_info['ability_damage'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage'; }
-            elseif (!empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_recovery'].' Recovery '; }
-            if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  | '; }
-        }
+        if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
+        elseif (empty($ability_info['ability_damage']) && empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
+        if (!empty($ability_info['ability_damage']) && !empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage | '.$ability_info['ability_recovery'].' Recovery'; }
+        elseif (!empty($ability_info['ability_damage'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage'; }
+        elseif (!empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_recovery'].' Recovery '; }
+        if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  | '; }
 
         // If show accuracy or quantity
-        if (($ability_info['ability_class'] != 'item' && $print_options['show_accuracy'])
-            || ($ability_info['ability_class'] == 'item' && $print_options['show_quantity'])){
+        if ($print_options['show_accuracy']){
 
             $temp_ability_title .= '  | ';
-            if ($ability_info['ability_class'] != 'item' && !empty($ability_info['ability_accuracy'])){ $temp_ability_title .= ' '.$ability_info['ability_accuracy'].'% Accuracy'; }
-            elseif ($ability_info['ability_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token])){ $temp_ability_title .= ' '.($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token] == 1 ? '1 Unit' : $_SESSION[$session_token]['values']['battle_items'][$temp_ability_token].' Units'); }
-            elseif ($ability_info['ability_class'] == 'item' ){ $temp_ability_title .= ' 0 Units'; }
+            if (!empty($ability_info['ability_accuracy'])){ $temp_ability_title .= ' '.$ability_info['ability_accuracy'].'% Accuracy'; }
 
         }
 
-        if ($ability_info['ability_class'] != 'item' && !empty($temp_ability_energy)){ $temp_ability_title .= ' | '.$temp_ability_energy.' Energy'; }
-        if ($ability_info['ability_class'] != 'item' && $temp_ability_target != 'auto'){ $temp_ability_title .= ' | Select Target'; }
+        if (!empty($temp_ability_energy)){ $temp_ability_title .= ' | '.$temp_ability_energy.' Energy'; }
+        if ($temp_ability_target != 'auto'){ $temp_ability_title .= ' | Select Target'; }
 
         if (!empty($ability_info['ability_description'])){
             $temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');
@@ -1094,7 +1089,7 @@ class rpg_ability extends rpg_object {
         if (!empty($temp_ability_type2)){ $temp_ability_option .= ' / '.$temp_ability_type2['type_name']; }
         if (!empty($ability_info['ability_damage'])){ $temp_ability_option .= ' | D:'.$ability_info['ability_damage']; }
         if (!empty($ability_info['ability_recovery'])){ $temp_ability_option .= ' | R:'.$ability_info['ability_recovery']; }
-        if ($ability_info['ability_class'] != 'item' && !empty($ability_info['ability_accuracy'])){ $temp_ability_option .= ' | A:'.$ability_info['ability_accuracy']; }
+        if (!empty($ability_info['ability_accuracy'])){ $temp_ability_option .= ' | A:'.$ability_info['ability_accuracy']; }
         elseif ($ability_info['ability_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token])){ $temp_ability_option .= ' | U:'.$_SESSION[$session_token]['values']['battle_items'][$temp_ability_token]; }
         elseif ($ability_info['ability_class'] == 'item'){ $temp_ability_option .= ' | U:0'; }
         if (!empty($temp_ability_energy)){ $temp_ability_option .= ' | E:'.$temp_ability_energy; }
@@ -1382,9 +1377,6 @@ class rpg_ability extends rpg_object {
         if ($ability_type_class != 'none' && !empty($ability_info['ability_type2'])){ $ability_type_class .= '_'.$ability_info['ability_type2']; }
         elseif ($ability_type_class == 'none' && !empty($ability_info['ability_type2'])){ $ability_type_class = $ability_info['ability_type2'];  }
         $ability_header_types = 'ability_type_'.$ability_type_class.' ';
-        // If this is a special category of item, it's a special type
-        if (preg_match('/^item-score-ball-(red|blue|green|purple)$/i', $ability_info['ability_token'])){ $ability_info['ability_type_special'] = 'bonus'; }
-        elseif (preg_match('/^item-super-(pellet|capsule)$/i', $ability_info['ability_token'])){ $ability_info['ability_type_special'] = 'multi'; }
 
         // Define the sprite sheet alt and title text
         $ability_sprite_size = $ability_image_size * 2;
@@ -1434,7 +1426,7 @@ class rpg_ability extends rpg_object {
 
                     <h2 class="header header_left <?= $ability_header_types ?> <?= (!$print_options['show_icon']) ? 'noicon' : '' ?>">
                         <?php if($print_options['layout_style'] == 'website_compact'): ?>
-                            <a href="<?= preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/'.preg_replace('/^item-/i', '', $ability_info['ability_token']).'/' : 'database/abilities/'.$ability_info['ability_token'].'/' ?>"><?= $ability_info['ability_name'] ?></a>
+                            <a href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>"><?= $ability_info['ability_name'] ?></a>
                         <?php else: ?>
                             <?= $ability_info['ability_name'] ?>&#39;s Data
                         <?php endif; ?>
@@ -1467,19 +1459,19 @@ class rpg_ability extends rpg_object {
                                         <?php if($print_options['layout_style'] != 'event'): ?>
                                             <?php
                                             if (!empty($ability_info['ability_type_special'])){
-                                                echo '<a href="'.((preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/' : 'database/abilities/').$ability_info['ability_type_special'].'/').'" class="ability_type '.$ability_header_types.'">'.ucfirst($ability_info['ability_type_special']).'</a>';
+                                                echo '<a href="database/abilities/'.$ability_info['ability_type_special'].'/" class="ability_type '.$ability_header_types.'">'.ucfirst($ability_info['ability_type_special']).'</a>';
                                             }
                                             elseif (!empty($ability_info['ability_type'])){
                                                 $temp_string = array();
                                                 $ability_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
-                                                $temp_string[] = '<a href="'.((preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/' : 'database/abilities/').$ability_type.'/').'" class="ability_type ability_type_'.$ability_type.'">'.$mmrpg_types[$ability_type]['type_name'].'</a>';
+                                                $temp_string[] = '<a href="database/abilities/'.$ability_type.'/" class="ability_type ability_type_'.$ability_type.'">'.$mmrpg_types[$ability_type]['type_name'].'</a>';
                                                 if (!empty($ability_info['ability_type2'])){
                                                     $ability_type2 = !empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : 'none';
-                                                    $temp_string[] = '<a href="'.((preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/' : 'database/abilities/').$ability_type2.'/').'" class="ability_type ability_type_'.$ability_type2.'">'.$mmrpg_types[$ability_type2]['type_name'].'</a>';
+                                                    $temp_string[] = '<a href="'.(('database/abilities/').$ability_type2.'/').'" class="ability_type ability_type_'.$ability_type2.'">'.$mmrpg_types[$ability_type2]['type_name'].'</a>';
                                                 }
                                                 echo implode(' ', $temp_string);
                                             } else {
-                                                echo '<a href="'.((preg_match('/^item-/', $ability_info['ability_token']) ? 'database/items/' : 'database/abilities/').'none/').'" class="ability_type ability_type_none">Neutral</a>';
+                                                echo '<a href="'.(('database/abilities/').'none/').'" class="ability_type ability_type_none">Neutral</a>';
                                             }
                                             ?>
                                         <?php else: ?>
@@ -1503,7 +1495,7 @@ class rpg_ability extends rpg_object {
                                         <?php endif; ?>
                                     </td>
                                 </tr>
-                                <?php if($ability_info['ability_class'] != 'item'): ?>
+                                <?php if(true): ?>
 
                                     <?php if($ability_image_token != 'ability'): ?>
 
@@ -1736,7 +1728,7 @@ class rpg_ability extends rpg_object {
 
                 <?php endif; ?>
 
-                <?php if($print_options['show_robots'] && $ability_info['ability_class'] != 'item'): ?>
+                <?php if($print_options['show_robots']): ?>
 
                     <h2 class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left;">
                         <?= $ability_info['ability_name']?>&#39;s Robots
@@ -2168,6 +2160,342 @@ class rpg_ability extends rpg_object {
     // Define a static function to use as the common action for all multi-target attack type abilities
     public static function ability_function_spread_attack($objects, $options = array()){
 
+
+    }
+
+    // Define a static function to use as the common action for all ____-shot abilities
+    public static function ability_function_shot($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Update the ability's target options and trigger
+        $this_ability->target_options_update(array(
+            'frame' => 'shoot',
+            'success' => array(0, 105, 0, 10, $this_robot->print_name().' fires '.(preg_match('/^(a|e|i|o|u)/i', $this_ability->ability_token) ? 'an' : 'a').'  '.$this_ability->print_name().'!')
+            ));
+        $this_robot->trigger_target($target_robot, $this_ability);
+
+        // Inflict damage on the opposing robot
+        $this_ability->damage_options_update(array(
+            'kind' => 'energy',
+            'kickback' => array(10, 0, 0),
+            'success' => array(0, -60, 0, 10, 'The '.$shot_text.' shot '.$damage_text.' the target!'),
+            'failure' => array(0, -60, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
+            ));
+        $this_ability->recovery_options_update(array(
+            'kind' => 'energy',
+            'kickback' => array(10, 0, 0),
+            'success' => array(0, -60, 0, 10, 'The '.$shot_text.' shot '.$recovery_text.' the target!'),
+            'failure' => array(0, -60, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
+            ));
+        $energy_damage_amount = $this_ability->ability_damage;
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a static onload function to use as the common action for all ____-shot abilities
+    public static function ability_function_onload_shot($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Loop through any attachments and boost power for each buster charge
+        $temp_new_damage = $this_ability->ability_base_damage;
+        foreach ($this_robot->robot_attachments AS $this_attachment_token => $this_attachment_info){
+            if ($this_attachment_token == 'ability_'.$this_ability->ability_type.'-buster'){
+                $temp_new_damage += 2;
+            }
+        }
+        // Update the ability's damage with the new amount
+        $this_ability->set_damage($temp_new_damage);
+
+        // If this robot is holding a Target Module, allow target selection
+        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a static function to use as the common action for all ____-buster abilities
+    public static function ability_function_buster($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Define this ability's attachment token
+        $this_attachment_offset = array('x' => -10, 'y' => -10, 'z' => -20);
+        $this_attachment_boost_modifier = 1 + ($this_ability->ability_recovery2 / 100);
+        $this_attachment_break_modifier = 1 - ($this_ability->ability_recovery2 / 100);
+        $this_attachment_token = 'ability_'.$this_ability->ability_token;
+        $this_attachment_info = array(
+            'class' => 'ability',
+            'ability_id' => $this_ability->ability_id,
+            'ability_token' => $this_ability->ability_token,
+            'ability_frame' => 0,
+            'ability_frame_animate' => array(1, 2, 1, 0),
+            'ability_frame_offset' => $this_attachment_offset,
+            'attachment_damage_output_booster_'.$this_ability->ability_type => $this_attachment_boost_modifier,
+            'attachment_damage_input_breaker_'.$this_ability->ability_type => $this_attachment_break_modifier,
+            'attachment_recovery_output_booster_'.$this_ability->ability_type => $this_attachment_boost_modifier,
+            'attachment_recovery_input_breaker_'.$this_ability->ability_type => $this_attachment_break_modifier
+            );
+
+        // Loop through each existing attachment and alter the start frame by one
+        foreach ($this_robot->robot_attachments AS $key => $info){
+            // Move the start frame to the end of the queue so it doesn't overlay with others
+            $temp_first = array_shift($this_attachment_info['ability_frame_animate']);
+            array_push($this_attachment_info['ability_frame_animate'], $temp_first);
+            // Move this attachment's x, y, and z positionslightly left and up for the same reason
+            $this_attachment_offset['x'] -= 2;
+            $this_attachment_offset['y'] -= 2;
+            $this_attachment_offset['z'] -= 1;
+            $this_attachment_info['ability_frame_offset'] = $this_attachment_offset;
+        }
+
+        // Define the charge required flag based on existing attachments of this ability
+        $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+        // If this robot is holding a charge module, bypass changing and set to false
+        if ($this_robot->has_item('charge-module')){ $this_charge_required = false; }
+
+        // If the ability flag was not set, this ability begins charging
+        if ($this_charge_required){
+
+            // Target this robot's self
+            $this_ability->target_options_update(array(
+                'frame' => 'defend',
+                'success' => array(1, -10, 0, -10, $this_robot->print_name().' charges the '.$this_ability->print_name().'&hellip;')
+                ));
+            $this_robot->trigger_target($this_robot, $this_ability);
+
+            // Attach this ability attachment to the robot using it
+            $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
+
+        }
+        // Else if the ability flag was set, the ability is released at the target
+        else {
+
+            // Update this ability's target options and trigger
+            $this_ability->target_options_update(array(
+                'frame' => 'shoot',
+                'kickback' => array(-5, 0, 0),
+                'success' => array(3, 100, -15, 10, $this_robot->print_name().' fires the '.$this_ability->print_name().'!'),
+                ));
+            $this_robot->trigger_target($target_robot, $this_ability);
+
+            // Remove this ability attachment to the robot using it
+            $this_attachment_info = $this_robot->get_attachment($this_attachment_token);
+            $this_attachment_info['ability_frame'] = 0;
+            $this_attachment_info['ability_frame_animate'] = array(1, 0);
+            $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
+
+            // Inflict damage on the opposing robot
+            $this_ability->damage_options_update(array(
+                'kind' => 'energy',
+                'kickback' => array(20, 0, 0),
+                'success' => array(3, -110, -15, 10, 'A powerful '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$damage_text.' the target!'),
+                'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_name().' shot missed&hellip;')
+                ));
+            $this_ability->recovery_options_update(array(
+                'kind' => 'energy',
+                'kickback' => array(20, 0, 0),
+                'success' => array(3, -110, -15, 10, 'The '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$recovery_text.' the target!'),
+                'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_name().' shot missed&hellip;')
+                ));
+            $energy_damage_amount = $this_ability->ability_damage;
+            $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+            // Remove this ability attachment to the robot using it
+            $this_robot->unset_attachment($this_attachment_token);
+
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a static onload function to use as the common action for all ____-buster abilities
+    public static function ability_function_onload_buster($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Define this ability's attachment token
+        $this_attachment_token = 'ability_'.$this_ability->ability_token;
+
+        // Define the charge required flag based on existing attachments of this ability
+        $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+        // If this robot is holding a Charge Module, bypass changing and set to false
+        if ($this_robot->has_item('charge-module')){ $this_charge_required = false; }
+
+        // If the ability flag had already been set, reduce the weapon energy to zero
+        if (!$this_charge_required){ $this_ability->set_energy(0); }
+        // Otherwise, return the weapon energy back to default
+        else { $this_ability->reset_energy(); }
+
+        // If this robot is holding a Target Module, allow target selection
+        if ($this_robot->has_item('target-module')){
+            if (!$this_charge_required){ $this_ability->set_target('select_target'); }
+            else { $this_ability->reset_target(); }
+        } else {
+            $this_ability->reset_target();
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a static function to use as the common action for all ____-overdrive abilities
+    public static function ability_function_overdrive($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Decrease this robot's weapon energy to zero
+        $this_robot->set_weapons(0);
+
+        // Target the opposing robot
+        $this_ability->target_options_update(array(
+            'kickback' => array(-5, 0, 0),
+            'frame' => 'defend',
+            'success' => array(0, 15, 45, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
+            ));
+        $this_robot->trigger_target($target_robot, $this_ability);
+
+        // Define this ability's attachment token
+        $crest_attachment_token = 'ability_'.$this_ability->ability_token;
+        $crest_attachment_info = array(
+            'class' => 'ability',
+            'sticky' => true,
+            'ability_id' => $this_ability->ability_id,
+            'ability_token' => $this_ability->ability_token,
+            'ability_image' => $this_ability->ability_token,
+            'ability_frame' => 0,
+            'ability_frame_animate' => array(1,2),
+            'ability_frame_offset' => array('x' => 20, 'y' => 50, 'z' => 10),
+            'ability_frame_classes' => ' ',
+            'ability_frame_styles' => ' '
+            );
+
+        // Add the ability crest attachment
+        $this_robot->set_frame('summon');
+        $this_robot->set_attachment($crest_attachment_token, $crest_attachment_info);
+
+
+        // Define this ability's attachment token
+        $overlay_attachment_token = 'system_fullscreen-black';
+        $overlay_attachment_info = array(
+            'class' => 'ability',
+            'sticky' => true,
+            'ability_id' => $this_ability->ability_id,
+            'ability_token' => $this_ability->ability_token,
+            'ability_image' => 'fullscreen-black',
+            'ability_frame' => 0,
+            'ability_frame_animate' => array(0, 1),
+            'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -12),
+            'ability_frame_classes' => 'sprite_fullscreen '
+            );
+
+        // Add the black overlay attachment
+        $target_robot->set_attachment($overlay_attachment_token, $overlay_attachment_info);
+
+        // prepare the ability options
+        $this_ability->damage_options_update(array(
+            'kind' => 'energy',
+            'kickback' => array(20, 0, 0),
+            'success' => array(3, -60, -15, 10, 'A powerful '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$damage_text.' '.$target_robot->print_name().'!'),
+            'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_name().' shot missed '.$target_robot->print_name().'&hellip;')
+            ));
+        $this_ability->recovery_options_update(array(
+            'kind' => 'energy',
+            'frame' => 'taunt',
+            'kickback' => array(20, 0, 0),
+            'success' => array(3, -60, -15, 10, 'The '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$recovery_text.' '.$target_robot->print_name().'!'),
+            'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_name().' shot missed '.$target_robot->print_name().'&hellip;')
+            ));
+        // Inflict damage on the opposing robot
+        $energy_damage_amount = $this_ability->ability_damage;
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+        // Remove the black overlay attachment
+        $target_robot->unset_attachment($overlay_attachment_token);
+
+        // Loop through the target's benched robots, inflicting half base damage to each
+        $backup_robots_active = $target_player->values['robots_active'];
+        foreach ($backup_robots_active AS $key => $info){
+            if ($info['robot_id'] == $target_robot->robot_id){ continue; }
+            $this_ability->ability_results_reset();
+            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
+            // Add the black overlay attachment
+            $overlay_attachment_info['ability_frame_offset']['z'] -= 2;
+            $temp_target_robot->set_attachment($overlay_attachment_token, $overlay_attachment_info);
+            // Update the ability options
+            $this_ability->damage_options_update(array(
+                'kind' => 'energy',
+                'kickback' => array(20, 0, 0),
+                'success' => array(3, -60, -15, 10, 'A powerful '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$damage_text.' '.$temp_target_robot->print_name().'!'),
+                'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_name().' shot missed '.$temp_target_robot->print_name().'&hellip;')
+                ));
+            $this_ability->recovery_options_update(array(
+                'kind' => 'energy',
+                'frame' => 'taunt',
+                'kickback' => array(20, 0, 0),
+                'success' => array(3, -60, -15, 10, 'The '.($shot_text != 'energy' ? $shot_text.' energy' : 'energy').' shot '.$recovery_text.' '.$temp_target_robot->print_name().'!'),
+                'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_name().' shot missed '.$temp_target_robot->print_name().'&hellip;')
+                ));
+            //$energy_damage_amount = ceil($this_ability->ability_damage / $target_robots_active);
+            $energy_damage_amount = $this_ability->ability_damage;
+            $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+            $temp_target_robot->unset_attachment($overlay_attachment_token);
+        }
+
+        // Remove the black background attachment
+        $this_robot->set_frame('base');
+        $this_robot->unset_attachment($crest_attachment_token);
+
+        // Trigger the disabled event on the targets now if necessary
+        if ($target_robot->robot_energy <= 0 || $target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot, $this_ability); }
+        foreach ($backup_robots_active AS $key => $info){
+            if ($info['robot_id'] == $target_robot->robot_id){ continue; }
+            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
+            if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
+                $temp_target_robot->trigger_disabled($this_robot);
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a static onload function to use as the common action for all ____-overdrive abilities
+    public static function ability_function_onload_overdrive($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Update this abilities weapon energy to whatever the user currently has
+        $ability_weapon_energy = $this_robot->robot_weapons;
+        if ($ability_weapon_energy < 1){ $ability_weapon_energy = 1; }
+        if ($this_ability->ability_type == $this_robot->robot_core){ $ability_weapon_energy = $ability_weapon_energy * 2; }
+        $this_ability->set_energy($ability_weapon_energy);
+
+        // Calculate the user's current life damage percent for calculations
+        $robot_energy_damage = $this_robot->robot_base_energy - $this_robot->robot_energy;
+        $robot_energy_damage_percent = !empty($robot_energy_damage) ? ceil(($robot_energy_damage / $this_robot->robot_base_energy) * 100) : 0;
+
+        // Multiply the user's damage by the remaining weapon energy for damage total
+        $ability_damage_amount = $robot_energy_damage_percent + 1;
+        $this_ability->set_damage($ability_damage_amount);
+
+        // Return true on success
+        return true;
 
     }
 
