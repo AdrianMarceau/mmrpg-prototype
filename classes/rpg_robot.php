@@ -2942,14 +2942,12 @@ class rpg_robot extends rpg_object {
                         $temp_editor_title = 'Undefined';
                         $temp_final_divider = '<span style="color: #565656;"> | </span>';
                         if (!empty($robot_info['robot_image_editor'])){
-                            $temp_break = false;
                             if ($robot_info['robot_image_editor'] == 412){ $temp_editor_title = 'Adrian Marceau / Ageman20XX'; }
-                            elseif ($robot_info['robot_image_editor'] == 110){ $temp_break = true; $temp_editor_title = 'MetalMarioX100 / EliteP1</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
-                            elseif ($robot_info['robot_image_editor'] == 18){ $temp_break = true; $temp_editor_title = 'Sean Adamson / MetalMan</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
-                            elseif ($robot_info['robot_image_editor'] == 4117){ $temp_break = true; $temp_editor_title = 'Jonathan Backstrom / Rhythm_BCA</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
-                            elseif ($robot_info['robot_image_editor'] == 3842){ $temp_break = true; $temp_editor_title = 'Miki Bossman / MegaBossMan</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
-                            elseif ($robot_info['robot_image_editor'] == 5161){ $temp_break = true; $temp_editor_title = 'The Zion / maistir1234</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
-                            if ($temp_break){ $temp_final_divider = '<br />'; }
+                            elseif ($robot_info['robot_image_editor'] == 110){ $temp_editor_title = 'MetalMarioX100 / EliteP1'; }
+                            elseif ($robot_info['robot_image_editor'] == 18){ $temp_editor_title = 'Sean Adamson / MetalMan'; }
+                            elseif ($robot_info['robot_image_editor'] == 4117){ $temp_editor_title = 'Jonathan Backstrom / Rhythm_BCA'; }
+                            elseif ($robot_info['robot_image_editor'] == 3842){ $temp_editor_title = 'Miki Bossman / MegaBossMan'; }
+                            elseif ($robot_info['robot_image_editor'] == 5161){ $temp_editor_title = 'The Zion / maistir1234'; }
                         }
                         $temp_is_capcom = true;
                         $temp_is_original = array('disco', 'rhythm', 'flutter-fly', 'flutter-fly-2', 'flutter-fly-3');
