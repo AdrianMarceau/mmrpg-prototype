@@ -2460,7 +2460,7 @@ class rpg_ability extends rpg_object {
         $this_robot->unset_attachment($crest_attachment_token);
 
         // Trigger the disabled event on the targets now if necessary
-        if ($target_robot->robot_energy <= 0 || $target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot, $this_ability); }
+        if ($target_robot->robot_energy <= 0 || $target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot); }
         foreach ($backup_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
             $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
