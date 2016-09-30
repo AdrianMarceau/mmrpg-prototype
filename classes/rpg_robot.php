@@ -764,6 +764,20 @@ class rpg_robot extends rpg_object {
         $this_markup = implode(', ', $this_markup);
         return $this_markup;
     }
+    public function print_abilities(){
+        $this_markup = array();
+        if (empty($this->robot_abilities)){ return false; }
+        $ability_index = rpg_ability::get_index_custom($this->robot_abilities);
+        foreach ($this->robot_abilities AS $ability_token){
+            $ability_info = $ability_index[$ability_token];
+            $ability_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : '';
+            if (!empty($ability_type) && !empty($ability_info['ability_type2'])){ $ability_type .= '_'.$ability_info['ability_type2']; }
+            if (empty($ability_type)){ $ability_type = 'none'; }
+            $this_markup[] = '<span class="ability_name ability_type type_'.$ability_type.'">'.$ability_info['ability_name'].'</span>';
+        }
+        $this_markup = implode(', ', $this_markup);
+        return $this_markup;
+    }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
         global $mmrpg_index;
         // Define the quote text variable
@@ -884,16 +898,19 @@ class rpg_robot extends rpg_object {
         $item_core = !empty($item_token) && preg_match('/-core$/i', $item_token) ? preg_replace('/-core$/i', '', $item_token) : '';
         if ($item_core == 'none' || $item_core == 'copy'){ $item_core = ''; }
         //echo 'has_ability_compatibility('.$robot_token.', '.$ability_token.', '.$robot_core.', '.$robot_core2.')'."\n";
+
         // Define the compatibility flag and default to false
         $temp_compatible = false;
+
         // Collect the global list and return true if match is found
         $global_abilities = rpg_ability::get_global_abilities();
+
         // If this ability is in the list of globally compatible
         if (in_array($ability_token, $global_abilities)){ $temp_compatible = true; }
         // Else if this ability has a type, check it against this robot
         elseif (!empty($ability_info['ability_type']) || !empty($ability_info['ability_type2'])){
             //$debug_fragment .= 'has-type '; // DEBUG
-            if (!empty($robot_core) || !empty($robot_core2) || !empty($robot_core3)){
+            if (!empty($robot_core) || !empty($robot_core2) || !empty($item_core)){
             //$debug_fragment .= 'has-core '; // DEBUG
                 if ($robot_core == 'copy'){
                     //$debug_fragment .= 'copy-core '; // DEBUG
@@ -917,6 +934,7 @@ class rpg_robot extends rpg_object {
                 }
             }
         }
+
         // Otherwise, check to see if this ability is in the robot's level up set
         if (!$temp_compatible && !empty($robot_info['robot_rewards']['abilities'])){
             //$debug_fragment .= 'has-levelup '; // DEBUG
@@ -928,11 +946,13 @@ class rpg_robot extends rpg_object {
                 }
             }
         }
+
         // Otherwise, see if this robot can be taught vis player only
         if (!$temp_compatible && in_array($ability_info['ability_token'], $robot_info['robot_abilities'])){
             //$debug_fragment .= 'has-playeronly '; // DEBUG
             $temp_compatible = true;
         }
+
         //$robot_info['robot_abilities']
         // DEBUG
         //die('Found '.$debug_fragment.' - robot '.($temp_compatible ? 'is' : 'is not').' compatible!');
