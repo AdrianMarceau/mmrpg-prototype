@@ -29,7 +29,7 @@ $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
 
 // Manually remove items that should not show here
 unset($mmrpg_database_items['heart']);
-//unset($mmrpg_database_items['star']);
+unset($mmrpg_database_items['star']);
 
 // Define which items we're allowed to see
 $global_battle_items = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items'] : array();
@@ -217,7 +217,7 @@ if (true){
                                             // Check to see if this is a special item type
                                             $item_is_shard = strstr($item_token, '-shard') ? true : false;
                                             $item_is_core = strstr($item_token, '-core') ? true : false;
-                                            $item_is_star = $item_token == 'star' ? true : false;
+                                            $item_is_star = strstr($item_token, '-star') ? true : false;
 
                                             // Define the editor title markup print options
                                             $item_print_options = array('show_quantity' => false);
@@ -238,11 +238,20 @@ if (true){
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                                             }
-                                            // Otherwise if this is a star, use the total number as quantity
-                                            elseif ($item_is_star && !empty($this_battle_stars_count)){
+                                            // Otherwise if this is a Field Star, use the total number as quantity
+                                            elseif ($item_token == 'field-star' && !empty($this_battle_stars_field_count)){
 
                                                 // Collect the items details and current quantity
-                                                $item_info_quantity = !empty($this_battle_stars_count) ? $this_battle_stars_count : 0;
+                                                $item_info_quantity = !empty($this_battle_stars_field_count) ? $this_battle_stars_field_count : 0;
+                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
+                                                $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
+
+                                            }
+                                            // Otherwise if this is a Fusion Star, use the total number as quantity
+                                            elseif ($item_token == 'fusion-star' && !empty($this_battle_stars_fusion_count)){
+
+                                                // Collect the items details and current quantity
+                                                $item_info_quantity = !empty($this_battle_stars_fusion_count) ? $this_battle_stars_fusion_count : 0;
                                                 $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
