@@ -12,6 +12,7 @@ $item = array(
     'item_description' => 'A mysterious chip that improves the targeting capabilities of the holder.  When held by a robot master, this item allows abilities that typically only reach the front row to target benched robots as well.',
     'item_energy' => 0,
     'item_speed' => 10,
+    'item_price' => 32000,
     'item_accuracy' => 100,
     'item_function' => function($objects){
 
