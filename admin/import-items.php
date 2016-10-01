@@ -46,7 +46,7 @@ foreach ($mmrpg_database_types AS $type_token => $type_info){
         $hidden_database_items[] = $type_token.'-shard';
     }
 }
-$hidden_database_items = array_merge($hidden_database_items, array('heart'));
+$hidden_database_items = array_merge($hidden_database_items, array('heart', 'star'));
 $hidden_database_items_count = !empty($hidden_database_items) ? count($hidden_database_items) : 0;
 
 // Truncate any robots currently in the database
@@ -115,16 +115,8 @@ foreach ($mmrpg_database_types AS $type_token => $type_info){
     $temp_pattern_last[] = '/^'.$type_token.'-core$/i';
 }
 
-$temp_pattern_last[] = '/^energy-upgrade$/i';
-$temp_pattern_last[] = '/^weapon-upgrade$/i';
-$temp_pattern_last[] = '/^attack-booster$/i';
-$temp_pattern_last[] = '/^defense-booster$/i';
-$temp_pattern_last[] = '/^speed-booster$/i';
-$temp_pattern_last[] = '/^field-booster$/i';
-$temp_pattern_last[] = '/^target-module$/i';
-$temp_pattern_last[] = '/^charge-module$/i';
-$temp_pattern_last[] = '/^growth-module$/i';
-$temp_pattern_last[] = '/^fortune-module$/i';
+$temp_pattern_last[] = '/^field-star$/i';
+$temp_pattern_last[] = '/^fusion-star$/i';
 
 $temp_pattern_last[] = '/^light-program$/i';
 $temp_pattern_last[] = '/^auto-link$/i';
@@ -141,10 +133,22 @@ $temp_pattern_last[] = '/^kalinka-link$/i';
 $temp_pattern_last[] = '/^equip-codes$/i';
 $temp_pattern_last[] = '/^field-codes$/i';
 
-$temp_pattern_last[] = '/^star$/i';
+$temp_pattern_last[] = '/^energy-upgrade$/i';
+$temp_pattern_last[] = '/^weapon-upgrade$/i';
+$temp_pattern_last[] = '/^attack-booster$/i';
+$temp_pattern_last[] = '/^defense-booster$/i';
+$temp_pattern_last[] = '/^speed-booster$/i';
+$temp_pattern_last[] = '/^field-booster$/i';
+$temp_pattern_last[] = '/^target-module$/i';
+$temp_pattern_last[] = '/^charge-module$/i';
+$temp_pattern_last[] = '/^growth-module$/i';
+$temp_pattern_last[] = '/^fortune-module$/i';
 
-$temp_pattern_last[] = '/^([a-z]+)-star$/i';
+$types = implode('|', array_keys($mmrpg_database_types));
+$temp_pattern_last[] = '/^('.$types.')-star$/i';
+
 //$temp_pattern_last[] = '/^heart$/i';
+//
 $temp_pattern_last = array_reverse($temp_pattern_last);
 //die('$temp_pattern_last = <pre>'.print_r($temp_pattern_last, true).'</pre>');
 function mmrpg_index_sort_items($item_one, $item_two){
