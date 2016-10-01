@@ -12,6 +12,7 @@ $item = array(
     'item_description' => 'A mysterious chip that improves holder\'s luck in battle.  When held by a robot master, this item greatly increases the chance of a critical hit and causes enemies to drop items more frequently.',
     'item_energy' => 0,
     'item_speed' => 10,
+    'item_price' => 32000,
     'item_accuracy' => 100,
     'item_function' => function($objects){
 

@@ -12,7 +12,6 @@ $item = array(
     'item_energy' => 0,
     'item_speed' => 10,
     'item_accuracy' => 100,
-    'item_price' => 200,
     'item_target' => 'auto',
     'item_function' => function($objects){
         return rpg_item::item_function_shard($objects);
