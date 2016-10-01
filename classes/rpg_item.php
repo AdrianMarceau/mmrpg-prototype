@@ -1591,10 +1591,10 @@ class rpg_item extends rpg_object {
                         $temp_alts_array = array_merge($temp_alts_array, $item_info['item_image_alts']);
                     }
                     // Otherwise, if this is a copy item, append based on all the types in the index
-                    elseif ($item_info['item_type'] == 'copy' && preg_match('/^(mega-man|proto-man|bass)$/i', $item_info['item_token'])){
+                    elseif ($item_info['item_type'] == 'copy' || preg_match('/^(field|fusion)-star$/i', $item_info['item_token'])){
                         foreach ($mmrpg_database_types AS $type_token => $type_info){
                             if (empty($type_token) || $type_token == 'none' || $type_token == 'copy'){ continue; }
-                            $temp_alts_array[] = array('token' => $type_token, 'name' => $item_info['item_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0);
+                            $temp_alts_array[] = array('token' => $type_token, 'name' => $item_info['item_name'].' ('.ucfirst($type_token).' Type)', 'summons' => 0);
                         }
                     }
                     // Otherwise, if this robot has multiple sheets, add them as alt options
@@ -1666,23 +1666,26 @@ class rpg_item extends rpg_object {
                         <span class="header_links image_link_container">
                             <span class="images" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>"><?php
                                 // Loop though and print links for the alts
+                                $alt_type_base = 'item_type type_'.(!empty($item_info['item_type']) ? $item_info['item_type'] : 'none').' ';
                                 foreach ($temp_alts_array AS $alt_key => $alt_info){
                                     $alt_type = '';
                                     $alt_style = '';
                                     $alt_title = $alt_info['name'];
-                                    if (preg_match('/^(?:[-_a-z0-9\s]+)\s\(([a-z0-9]+)\sCore\)$/i', $alt_info['name'])){
-                                        $alt_type = strtolower(preg_replace('/^(?:[-_a-z0-9\s]+)\s\(([a-z0-9]+)\sCore\)$/i', '$1', $alt_info['name']));
+                                    $alt_title_type = $alt_type_base;
+                                    if (preg_match('/^(?:[-_a-z0-9\s]+)\s\(([a-z0-9]+)\sType\)$/i', $alt_info['name'])){
+                                        $alt_type = strtolower(preg_replace('/^(?:[-_a-z0-9\s]+)\s\(([a-z0-9]+)\sType\)$/i', '$1', $alt_info['name']));
                                         $alt_name = '&bull;'; //ucfirst($alt_type); //substr(ucfirst($alt_type), 0, 2);
+                                        $alt_title_type = 'item_type type_'.$alt_type.' ';
                                         $alt_type = 'item_type item_type_'.$alt_type.' core_type ';
                                         $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; ';
                                     }
                                     else {
-                                        $alt_name = $alt_key + 1; //$alt_key == 0 ? $item_info['item_name'] : 'Alt'.($alt_key > 1 ? ' '.$alt_key : ''); //$alt_key == 0 ? $item_info['item_name'] : $item_info['item_name'].' Alt'.($alt_key > 1 ? ' '.$alt_key : '');
+                                        $alt_name = $alt_key == 0 ? 'Base' : ($alt_key > 1 ? ' '.$alt_key : '');
                                         $alt_type = 'item_type item_type_empty ';
                                         $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ';
                                         //if ($item_info['item_type'] == 'copy' && $alt_key == 0){ $alt_type = 'item_type item_type_empty '; }
                                     }
-                                    echo '<a href="#" data-tooltip="'.$alt_title.'" class="link link_image '.($alt_key == 0 ? 'link_active ' : '').'" data-image="'.$alt_info['image'].'">';
+                                    echo '<a href="#" data-tooltip="'.$alt_title.'" data-tooltip-type="'.$alt_title_type.'" class="link link_image '.($alt_key == 0 ? 'link_active ' : '').'" data-image="'.$alt_info['image'].'">';
                                     echo '<span class="'.$alt_type.'" style="'.$alt_style.'">'.$alt_name.'</span>';
                                     echo '</a>';
                                 }
