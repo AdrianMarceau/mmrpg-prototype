@@ -353,31 +353,20 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         else { $temp_star_text = ucfirst($temp_field_type_1).' / '.ucfirst($temp_field_type_1).' Type | '; }
                         $temp_star_text .= ucfirst($temp_star_kind).' Class';
 
-                        // Collect the star image info from the index based on type
-                        $temp_star_back_info = mmrpg_prototype_star_image($temp_field_type_2);
-                        $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
+                        // Generate the star image info based on the kind and type(s)
+                        $temp_star_image = $temp_star_kind.'-star';
+                        if (!empty($temp_field_type_1)){ $temp_star_image .= '_'.$temp_field_type_1; }
+                        if (!empty($temp_field_type_2) && $temp_field_type_2 != $temp_field_type_1){ $temp_star_image .= '-'.$temp_field_type_2; }
 
                         // Append the new field star to the foreground attachment array
-                        $this_field_data['field_foreground_attachments']['field-star-back'] = array(
+                        $this_field_data['field_foreground_attachments']['field-star'] = array(
                             'class' => 'item',
                             'size' => 80,
                             'offset_x' => 325,
                             'offset_y' => 75,
                             'item_token' => 'star',
-                            'item_image' => 'star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'],
-                            'item_frame' => array($temp_star_back_info['frame'], $temp_star_back_info['frame'], $temp_star_back_info['frame'], $temp_star_back_info['frame']),
-                            'item_frame_shift' => array('325,75', '325,80', '325,85', '325,80'),
-                            'item_direction' => 'left',
-                            'item_text' => $temp_star_text
-                            );
-                        $this_field_data['field_foreground_attachments']['field-star-front'] = array(
-                            'class' => 'item',
-                            'size' => 80,
-                            'offset_x' => 325,
-                            'offset_y' => 75,
-                            'item_token' => 'star',
-                            'item_image' => 'star-base-'.$temp_star_front_info['sheet'],
-                            'item_frame' => array($temp_star_front_info['frame'], $temp_star_front_info['frame'], $temp_star_front_info['frame'], $temp_star_front_info['frame']),
+                            'item_image' => $temp_star_image,
+                            'item_frame' => array(0, 0, 0, 0),
                             'item_frame_shift' => array('325,75', '325,80', '325,85', '325,80'),
                             'item_direction' => 'left',
                             'item_text' => $temp_star_text

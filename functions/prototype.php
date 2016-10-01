@@ -667,12 +667,14 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 // Collect the star image info from the index based on type
                 $temp_field_type_1 = !empty($temp_star_data['star_type']) ? $temp_star_data['star_type'] : 'none';
                 $temp_field_type_2 = !empty($temp_star_data['star_type2']) ? $temp_star_data['star_type2'] : $temp_field_type_1;
-                $temp_star_back_info = mmrpg_prototype_star_image($temp_field_type_2);
-                $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
-                $temp_star_back = array('path' => 'items/star-base-'.$temp_star_front_info['sheet'], 'size' => 40, 'frame' => $temp_star_front_info['frame']);
-                $temp_star_front = array('path' => 'items/star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'], 'size' => 40, 'frame' => $temp_star_back_info['frame']);
-                //if ($temp_field_type_1 == 'wind'){ die('<pre>'.print_r($temp_star_back, true).' '.print_r($temp_star_front, true).'</pre>'); }
-                array_unshift($this_battleinfo['battle_sprite'], $temp_star_back, $temp_star_front);
+                if ($temp_star_kind == 'field'){
+                    $temp_star_front = array('path' => 'items/field-star_'.$temp_field_type_1, 'frame' => '02', 'size' => 40);
+                    $temp_star_back = array('path' => 'items/field-star_'.$temp_field_type_2, 'frame' => '01', 'size' => 40);
+                } elseif ($temp_star_kind == 'fusion'){
+                    $temp_star_front = array('path' => 'items/fusion-star_'.$temp_field_type_1, 'frame' => '02', 'size' => 40);
+                    $temp_star_back = array('path' => 'items/fusion-star_'.$temp_field_type_2, 'frame' => '01', 'size' => 40);
+                }
+                array_unshift($this_battleinfo['battle_sprite'], $temp_star_front, $temp_star_back);
 
             }
             // Loop through the battle sprites and display them
