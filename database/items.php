@@ -91,10 +91,11 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
     }
 
     // Collect the item sprite dimensions
+    $item_token = $item_info['item_token'];
     $item_flag_complete = !empty($item_info['item_flag_complete']) ? true : false;
     $item_image_size = !empty($item_info['item_image_size']) ? $item_info['item_image_size'] : 40;
     $item_image_size_text = $item_image_size.'x'.$item_image_size;
-    $item_image_token = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
+    $item_image_token = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_token;
     $item_image_incomplete = $item_image_token == 'item' ? true : false;
     $item_is_active = !empty($this_current_token) && $this_current_token == $item_info['item_token'] ? true : false;
     $item_title_text = $item_info['item_name']; //.' | '.$item_info['item_game'].' | '.$item_info['item_group'];;
