@@ -699,7 +699,7 @@ html {
     overflow: hidden;
 }
 #window .page .body .subbody_databaselinks[data-class="items"] .iconwrap {
-    padding-right: 8%;
+    padding-right: 5%;
 }
 #window .page .body .subbody .text {
     display: block;

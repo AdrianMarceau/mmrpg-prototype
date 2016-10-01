@@ -2465,8 +2465,13 @@ class rpg_battle extends rpg_object {
         $temp_star_kind = $options['star_kind'];
         $temp_field_type_1 = !empty($options['star_type']) ? $options['star_type'] : 'none';
         $temp_field_type_2 = !empty($options['star_type2']) ? $options['star_type2'] : $temp_field_type_1;
-        $temp_star_back_info = mmrpg_prototype_star_image($temp_field_type_2);
-        $temp_star_front_info = mmrpg_prototype_star_image($temp_field_type_1);
+        if ($temp_star_kind == 'field'){
+            $temp_star_front = array('path' => 'images/items/field-star_'.$temp_field_type_1.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '02', 'size' => 40);
+            $temp_star_back = array('path' => 'images/items/field-star_'.$temp_field_type_2.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '01', 'size' => 40);
+        } elseif ($temp_star_kind == 'fusion'){
+            $temp_star_front = array('path' => 'images/items/fusion-star_'.$temp_field_type_1.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '02', 'size' => 40);
+            $temp_star_back = array('path' => 'images/items/fusion-star_'.$temp_field_type_2.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '01', 'size' => 40);
+        }
 
         // Define and calculate the simpler markup and positioning variables for this star
         $this_data['star_name'] = isset($options['star_name']) ? $options['star_name'] : 'Battle Star';
@@ -2476,15 +2481,13 @@ class rpg_battle extends rpg_object {
         $this_data['container_style'] = '';
 
         // Define the back star's markup
-        $this_data['star_image'] = 'images/items/star-'.$temp_star_kind.'-'.$temp_star_back_info['sheet'].'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
-        $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.str_pad($temp_star_back_info['frame'], 2, '0', STR_PAD_LEFT).' ';
-        $this_data['star_markup_style'] = 'background-image: url('.$this_data['star_image'].'); margin-top: 5px; ';
+        $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.$temp_star_back['frame'].' ';
+        $this_data['star_markup_style'] = 'background-image: url('.$temp_star_back['path'].'); margin-top: 5px; ';
         $temp_back_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" title="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
 
         // Define the back star's markup
-        $this_data['star_image'] = 'images/items/star-base-'.$temp_star_front_info['sheet'].'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
-        $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.str_pad($temp_star_front_info['frame'], 2, '0', STR_PAD_LEFT).' ';
-        $this_data['star_markup_style'] = 'background-image: url('.$this_data['star_image'].'); margin-top: -42px; ';
+        $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.$temp_star_front['frame'].' ';
+        $this_data['star_markup_style'] = 'background-image: url('.$temp_star_front['path'].'); margin-top: -42px; ';
         $temp_front_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" title="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
 
         // Generate the final markup for the console star
