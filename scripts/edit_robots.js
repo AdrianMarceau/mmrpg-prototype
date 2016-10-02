@@ -34,7 +34,7 @@ $(document).ready(function(){
     // Automatically hide the console and canvas areas until we're ready
     thisConsole.css({height:0,minHeight:0});
 
-    //console.log(thisEditorData);
+    //console.log( thisEditorData);
 
 
     // -- RESIZE WRAPPER FUNCTIONS -- //
@@ -51,8 +51,8 @@ $(document).ready(function(){
             tempPlayerCell.css({width:''});
             if (tempRobotCount < 2){ tempPlayerWrapper.find('.sort_wrapper').css({display:'none'}); }
             else { tempPlayerWrapper.find('.sort_wrapper').css({display:''}); }
-            //console.log(thisEditorData);
-            //console.log(tempPlayerToken+' has '+tempRobotCount+' robots which is '+tempRobotPercent+'% of the total');
+            //console.log( thisEditorData);
+            //console.log( tempPlayerToken+' has '+tempRobotCount+' robots which is '+tempRobotPercent+'% of the total');
             tempPlayerWrapper.find('.wrapper_header .count').html(tempRobotCount);
             });
         };
@@ -93,7 +93,7 @@ $(document).ready(function(){
             $('#console #robots').append(data);
 
             thisSprite.animate({opacity:0.3},{duration:300,queue:false,easing:'swing',complete:function(){
-                //console.log(thisPlayerToken+' '+thisRobotToken+' sprite animation complete');
+                //console.log( thisPlayerToken+' '+thisRobotToken+' sprite animation complete');
                 $(this).removeClass('notloaded').css({opacity:''});
                 thisBody.removeClass('loading');
                 complete();
@@ -129,7 +129,7 @@ $(document).ready(function(){
                 user_id: gameSettings.userNumber
                 }, function(data, status){
                 //console.log('console player data received, appending...');
-                //console.log(data);
+                //console.log( data);
                 // Append the link markup to the canvas
                 $('#canvas .player_canvas .links').empty().append(data);
                 // Trigger scrollbars on any overflow containers
@@ -169,7 +169,7 @@ $(document).ready(function(){
                 user_id: gameSettings.userNumber
                 }, function(data, status){
                 //console.log('console ability data received, appending...');
-                //console.log(data);
+                //console.log( data);
                 // Append the link markup to the canvas
                 $('#canvas .ability_canvas .links').empty().append(data);
                 // Trigger scrollbars on any overflow containers
@@ -209,7 +209,7 @@ $(document).ready(function(){
                 user_id: gameSettings.userNumber
                 }, function(data, status){
                 //console.log('console item data received, appending...');
-                //console.log(data);
+                //console.log( data);
                 // Append the link markup to the canvas
                 $('#canvas .item_canvas .links').empty().append(data);
                 // Trigger scrollbars on any overflow containers
@@ -315,18 +315,18 @@ $(document).ready(function(){
                 // If there was an error, reset select, otherwise, refresh the page
                 if (dataStatus == 'error'){
                     //console.log('error');
-                    //console.log(data);
+                    //console.log( data);
                     thisBody.removeClass('loading');
                     return false;
                     } else if (dataStatus == 'success'){
                     //console.log('success');
-                    //console.log(data);
+                    //console.log( data);
                     // check if the array is the same
                     //if (dataContent == thisPlayerRobotsTokens){ //console.log('dataContent == thisPlayerRobotsTokens'); }
                     //else { //console.log('dataContent != thisPlayerRobotsTokens'); }
                     // split the new order
                     var myArrayOrder = dataContent.split(',');
-                    //console.log(myArrayOrder);
+                    //console.log( myArrayOrder);
                     // get array of elements
                     var myArray = thisPlayerRobots;
                     // sort based on timestamp attribute
@@ -350,7 +350,7 @@ $(document).ready(function(){
                     return true;
                     } else {
                     //console.log('ummmm');
-                    //console.log(data);
+                    //console.log( data);
                     thisBody.removeClass('loading');
                     return false;
                     }
@@ -1076,7 +1076,7 @@ $(document).ready(function(){
 
                 // DEBUG
                 //alert('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
-                //console.log(data);
+                //console.log( data);
                 //console.log('dataStatus:'+dataStatus);
                 //console.log('dataMessage:'+dataMessage);
                 //console.log('dataContent:'+dataContent);
@@ -1086,7 +1086,7 @@ $(document).ready(function(){
 
 
                     //console.log('success! now let\'s update the robot favourite marker...');
-                    //console.log(data);
+                    //console.log( data);
 
                     if (dataContent == 'added'){ thisLink.addClass('robot_favourite_active'); }
                     else if (dataContent == 'removed'){ thisLink.removeClass('robot_favourite_active'); }
@@ -1160,7 +1160,7 @@ $(document).ready(function(){
 
                             // DEBUG
                             //alert('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
-                            //console.log(data);
+                            //console.log( data);
                             //console.log('dataStatus:'+dataStatus);
                             //console.log('dataMessage:'+dataMessage);
                             //console.log('dataContent:'+dataContent);
@@ -1170,7 +1170,7 @@ $(document).ready(function(){
 
 
                                 //console.log('success! now let\'s move the robot...');
-                                //console.log(data);
+                                //console.log( data);
                                 // Collect the container and token references and prepare the move
                                 var consoleEvent = $('.event[data-token='+thisPlayerToken+'_'+thisRobotToken+']', gameConsole);
                                 // Remove this robot from the console
@@ -1441,10 +1441,10 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
     updateSpriteFrame(thisSprite, 'victory');
 
     // DEBUG
-    //console.log({robotSize:robotSize,robotSizeText:robotSizeText,robotSizeClass:robotSizeClass});
-    //console.log({robotImageIndex:robotImageIndex,thisCurrentImageToken:thisCurrentImageToken,thisCurrentImageIndex:thisCurrentImageIndex,thisCurrentFilePath:thisCurrentFilePath});
-    //console.log({newImageIndex:newImageIndex,newImageToken:newImageToken,newFilePath:newFilePath});
-    //console.log({thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});
+    //console.log( {robotSize:robotSize,robotSizeText:robotSizeText,robotSizeClass:robotSizeClass});
+    //console.log( {robotImageIndex:robotImageIndex,thisCurrentImageToken:thisCurrentImageToken,thisCurrentImageIndex:thisCurrentImageIndex,thisCurrentFilePath:thisCurrentFilePath});
+    //console.log( {newImageIndex:newImageIndex,newImageToken:newImageToken,newFilePath:newFilePath});
+    //console.log( {thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});
 
     // Define a function for when all the background sprites have been updated
     var afterBackgroundUpdateComplete = function(nextGroup){
@@ -1476,14 +1476,14 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
                  var dataContent = data[2] != undefined ? data[2] : false;
                  // DEBUG
                  //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+',\n dataContent = '+dataContent+'; ');
-                 //console.log(data);
+                 //console.log( data);
                  //console.log('dataStatus:'+dataStatus);
                  //console.log('dataMessage:'+dataMessage);
                  //console.log('dataContent:'+dataContent);
                  // If the ability change was a success, flash the box green
                  if (dataStatus == 'success'){
                      //console.log('success! this robot alt image has been updated');
-                     //console.log(data);
+                     //console.log( data);
                      return true;
                      }
 
@@ -1504,7 +1504,7 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
      var thisParent = thisSprite.parent();
      var thisCurrentBackgroundImage = thisSprite.css('background-image');
      var newBackgroundImage = thisCurrentBackgroundImage.replace(thisCurrentFilePath, newFilePath);
-     //console.log({thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});
+     //console.log( {thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});
 
      // If this sprite's parent element was a wrapper
      if (thisParent.is('.sprite_wrapper')){
@@ -1658,18 +1658,18 @@ function updatePlayerSortOrder(sortPlayer){
          // If there was an error, reset select, otherwise, refresh the page
          if (dataStatus == 'error'){
              //console.log('error');
-             //console.log(data);
+             //console.log( data);
              thisBody.removeClass('loading');
              return false;
              } else if (dataStatus == 'success'){
              //console.log('success');
-             //console.log(data);
+             //console.log( data);
              // check if the array is the same
              //if (dataContent == thisPlayerRobotsTokens){ //console.log('dataContent == thisPlayerRobotsTokens'); }
              //else { //console.log('dataContent != thisPlayerRobotsTokens'); }
              // split the new order
              var myArrayOrder = dataContent.split(',');
-             //console.log(myArrayOrder);
+             //console.log( myArrayOrder);
              // get array of elements
              var myArray = thisPlayerRobots;
              // sort based on timestamp attribute
@@ -1693,7 +1693,7 @@ function updatePlayerSortOrder(sortPlayer){
              return true;
              } else {
              //console.log('ummmm');
-             //console.log(data);
+             //console.log( data);
              thisBody.removeClass('loading');
              return false;
              }
@@ -1724,7 +1724,6 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
     // Count the number of other options for this player
     var thisParentWrapper = $('.wrapper_'+currentPlayerToken, gameCanvas);
     var countRobotOptions = $('a[data-token]', thisParentWrapper).length;
-    if (countRobotOptions < 2){ return false; }
 
     // Define the post options for the ajax call
     var postData = {action:'player',robot:thisRobotToken,player1:currentPlayerToken,player2:newPlayerToken};
@@ -1734,11 +1733,13 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
         //$('#edit_overlay', thisPrototype).css({display:'block'});
         thisBody.addClass('loading');
         // Post the transfer request to the server
+        //console.log('posting robot transfer request...', postData);
         $.ajax({
             type: 'POST',
             url: 'frames/edit_robots.php',
             data: postData,
             success: function(data, status){
+                //console.log('robot transfer response received!', data);
 
                 // DEBUG
                 //alert(data);
@@ -1755,7 +1756,7 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
                     // -- POST STATUS ERROR -- //
 
                     // Reset the select button's position and return false
-                    //console.log(data);
+                    //console.log('there was an error...', data);
                     //$('#edit_overlay', thisPrototype).css({display:'none'});
                     thisBody.removeClass('loading');
                     return false;
@@ -1765,7 +1766,7 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
                     // -- POST STATUS SUCCESS -- //
 
                     //console.log('success! now let\'s move the robot...');
-                    //console.log(data);
+                    //console.log( data);
                     var newData = data.slice(2);
                     newData = newData.join('|');
                     if (showInConsole){ $('#console #robots').append(newData); }
