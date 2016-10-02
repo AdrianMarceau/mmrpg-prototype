@@ -84,7 +84,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 'attack-break', 'defense-break', 'speed-break', 'energy-break',
                 ),
             array(
-                'attack-swap', 'defense-swap', 'speed-swap', 'energy-swap',
+                'attack-mode', 'defense-mode', 'speed-mode', 'energy-mode',
                 )
             );
     }
@@ -104,20 +104,20 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
     // Loop through this robot's level-up abilities looking for one
     $this_robot_index = $robot_info;
-    if ($this_robot_index['robot_class'] == 'master'){
-        if (!empty($this_robot_index['robot_rewards']['abilities'])){
-            foreach ($this_robot_index['robot_rewards']['abilities'] AS $info){
-                // If this is the buster shot or too high of a level, continue
-                if ($info['token'] == 'buster-shot' || $info['level'] > $robot_level){ continue; }
-                // If this is an incomplete master ability, continue
+    if (!empty($this_robot_index['robot_rewards']['abilities'])){
+        foreach ($this_robot_index['robot_rewards']['abilities'] AS $info){
+            // If this is the buster shot or too high of a level, continue
+            if ($info['level'] > $robot_level){ continue; }
+            // If this is an incomplete master ability, continue
+            if ($this_robot_index['robot_class'] == 'master'){
                 if (!in_array($info['token'], $mmrpg_prototype_core_abilities[0])
                     && !in_array($info['token'], $mmrpg_prototype_core_abilities[1])
                     && !in_array($info['token'], $mmrpg_prototype_core_abilities[2])){
                     continue;
                 }
-                // Add this ability token the list
-                $this_robot_abilities[] = $info['token'];
             }
+            // Add this ability token the list
+            $this_robot_abilities[] = $info['token'];
         }
     }
 
@@ -200,7 +200,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         // Define the number of core and mecha support abilities for the robot
         elseif ($this_robot_index['robot_class'] == 'mecha' && $this_robot_index['robot_core'] != 'empty'){
             foreach ($mmrpg_prototype_mecha_support_abilities AS $group_key => $group_abilities){
-                if (!empty($this_robot_abilities) && floor($robot_level / 10) < ($group_key + 1)){ continue; }
+                if (!empty($this_robot_abilities) && floor($robot_level / 20) < ($group_key + 1)){ continue; }
                 foreach ($group_abilities AS $ability_key => $ability_token){
                     if (in_array($ability_token, $this_robot_abilities)){ continue; }
                     $ability_info = $this_ability_index[$ability_token];
