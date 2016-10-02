@@ -3572,7 +3572,7 @@ class rpg_robot extends rpg_object {
                 $right_column_markup = array();
 
                 // Check to see if the player has unlocked the ability to swap players
-                $temp_player_swap_unlocked = rpg_game::player_unlocked('dr-wily'); // && rpg_prototype::event_unlocked('dr-wily', 'chapter_one_complete');
+                $temp_player_swap_unlocked = mmrpg_prototype_item_unlocked('wily-program'); // && rpg_prototype::event_unlocked('dr-wily', 'chapter_one_complete');
                 // If this player has unlocked the ability to let robots swap players
                 if ($temp_player_swap_unlocked){
                     ob_start();
@@ -4250,7 +4250,7 @@ class rpg_robot extends rpg_object {
                                 $active_robots = $this_player->get_robots_active();
                                 if (empty($active_robots)){
                                     // Trigger the battle complete event
-                                    $this_battle->trigger_complete($target_player, $target_robot, $this_player, $this_robot);
+                                    $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot);
                                     $attachment_action_flag = true;
                                 }
                             }
@@ -5049,6 +5049,29 @@ class rpg_robot extends rpg_object {
                 $temp_weapons += MMRPG_SETTINGS_RECHARGE_WEAPONS * $temp_multiplier;
                 $this_robot->set_weapons($temp_weapons);
             }
+        }
+
+        // If this robot is on the bench, slowly recovery any lowered stats
+        if ($this_robot->get_position() == 'bench'){
+
+            // If this robot's attack is less than base, recover by 1%
+            if ($this_robot->robot_attack < $this_robot->robot_base_attack){
+                $recovery = ceil($this_robot->robot_base_attack * 0.01);
+                $this_robot->robot_attack += $recovery;
+            }
+
+            // If this robot's defense is less than base, recover by 1%
+            if ($this_robot->robot_defense < $this_robot->robot_base_defense){
+                $recovery = ceil($this_robot->robot_base_defense * 0.01);
+                $this_robot->robot_defense += $recovery;
+            }
+
+            // If this robot's speed is less than base, recover by 1%
+            if ($this_robot->robot_speed < $this_robot->robot_base_speed){
+                $recovery = ceil($this_robot->robot_base_speed * 0.01);
+                $this_robot->robot_speed += $recovery;
+            }
+
         }
 
     }
