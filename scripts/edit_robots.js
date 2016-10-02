@@ -14,6 +14,9 @@ var loadConsoleRobotMarkup = function(thisSprite, index, complete){};
 var loadCanvasAbilitiesMarkup = function(){};
 var loadCanvasItemsMarkup = function(){};
 var loadedConsoleRobotTokens = [];
+gameSettings.shareProgramUnlocked = false;
+gameSettings.transferProgramUnlocked = false;
+gameSettings.searchProgramUnlocked = false;
 $(document).ready(function(){
 
     // Update global reference variables
@@ -1243,8 +1246,6 @@ function windowResizeFrame(){
     thisBody.css({height:newBodyHeight+'px'});
     thisPrototype.css({height:newBodyHeight+'px'});
 
-    //console.log('windowWidth = '+windowWidth+'; parentWidth = '+parentWidth+'; thisTypeContainerWidth = '+thisTypeContainerWidth+'; thisStarContainerWidth = '+thisStarContainerWidth+'; ');
-
 }
 
 // Define an initialization function to run when document ready
@@ -1304,24 +1305,63 @@ function robotEditorCanvasInit(){
                 }
 
             if (gameSettings.allowEditing){
-                robotCanvas.sortable({
-                    items: '.sprite[data-robot]',
-                    cancel: '.sprite:only-of-type',
-                    containment: robotCanvas, //'parent',
-                    connectWidth: robotCanvasPlayerWrappers, //'.wrapper[data-player]',
-                    opacity: 0.7,
-                    //axis: 'y',
-                    //handle: '.sprite',
-                    start: function(event, ui) {
-                        return startDragRobot(event, ui);
-                        },
-                    stop: function(event, ui) {
-                        return stopDragRobot(event, ui);
-                        },
-                    update: function(event, ui) {
-                        return completeDragRobot(event, ui);
-                        }
-                    });
+
+                // If the transfer program is unlocked allow free movement, else restrict to parent
+                if (gameSettings.transferProgramUnlocked){
+                    //console.log('transfer program unlocked, allowing free movement');
+
+                    // Allow trasfering between players and free movement of robots
+                    robotCanvas.sortable({
+                        items: '.sprite[data-robot]',
+                        cancel: '.sprite:only-of-type',
+                        containment: robotCanvas, //'parent',
+                        connectWidth: robotCanvasPlayerWrappers, //'.wrapper[data-player]',
+                        opacity: 0.7,
+                        //axis: 'y',
+                        //handle: '.sprite',
+                        start: function(event, ui) {
+                            return startDragRobot(event, ui);
+                            },
+                        stop: function(event, ui) {
+                            return stopDragRobot(event, ui);
+                            },
+                        update: function(event, ui) {
+                            return completeDragRobot(event, ui);
+                            }
+                        });
+
+
+                    } else {
+                    //console.log('transfer program NOT unlocked, restricting movement');
+
+                    // Restrict robot dragging to within each individual player only
+                    robotCanvasPlayerWrappers.each(function(){
+                        var thisPlayerWrapper = $(this);
+                        thisPlayerWrapper.sortable({
+                            items: '.sprite[data-robot]',
+                            cancel: '.sprite:only-of-type',
+                            containment: 'parent',
+                            connectWidth: '.wrapper[data-player]',
+                            opacity: 0.7,
+                            //axis: 'y',
+                            //handle: '.sprite',
+                            start: function(event, ui) {
+                                return startDragRobot(event, ui);
+                                },
+                            stop: function(event, ui) {
+                                return stopDragRobot(event, ui);
+                                },
+                            update: function(event, ui) {
+                                return completeDragRobot(event, ui);
+                                }
+                            });
+
+
+
+                        });
+
+
+                    }
 
                 }
 
@@ -1547,9 +1587,6 @@ function completeDragRobot(event, ui){
     var thisSortParentPlayer = thisSortRobot.parents('.wrapper').attr('data-player');
     var thisSortRobotActive = thisSortRobot.hasClass('sprite_robot_current') ? true : false;
 
-    //var data = thisSortRobot.attr('class'); //sortable('serialize');
-    //console.log(data)
-
     thisBody.addClass('loading');
 
     // -- SORT ROBOT WITHIN SAME PARENT -- //
@@ -1564,7 +1601,7 @@ function completeDragRobot(event, ui){
 
     // -- TRANSFER ROBOT THEN SORT BOTH PARENTS -- //
 
-    // Else if the robot player and parent player are not the same, we've got some work cut out...
+    // Else if the robot player and parent player are not the same, we've got some work to do
     else if (thisSortRobotPlayer != thisSortParentPlayer){
 
         var showInConsole = thisSortRobotActive ? true : false;
