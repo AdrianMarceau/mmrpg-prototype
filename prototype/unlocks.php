@@ -289,8 +289,6 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$
         $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/bass/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 160px;">Bass</div>';
         $temp_console_markup = '<p>Congratulations!  <strong>Dr. Wily</strong> has been unlocked as a playable character!</p>';
         $temp_console_markup .= '<p>Play through the game as <strong>Dr. Wily</strong> and <strong>Bass</strong> to experience the events from their perspective, and unlock new robots and abilities as you fight your way through an army of robot opponents&hellip; again!</p>';
-        $temp_console_markup .= '<p>Use the <strong>robots</strong> option in the main menu to transfer robots between <strong>Dr. Light</strong> and <strong>Dr. Wily</strong> to gain access to even more abilities and battle combinations! Robots receive twice the experience points in battle when used by another player, so don\'t be afraid to mix it up and have fun!</p>';
-        $temp_console_markup .= '<p style="font-size: 10px;">Note : Dr. Wily may take part in robot transfers only after completing the Intro Field on his own</p>';
         array_unshift($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
             'console_markup' => $temp_console_markup
@@ -555,8 +553,6 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$u
         $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/proto-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 160px;">Proto Man</div>';
         $temp_console_markup = '<p>Congratulations!  <strong>Dr. Cossack</strong> has been unlocked as a playable character!</p>';
         $temp_console_markup .= '<p>Play through the game as <strong>Dr. Cossack</strong> and <strong>Proto Man</strong> to experience the events from their perspective, and unlock new robots and abilities as you fight your way through an army of robot opponents&hellip; again!</p>';
-        $temp_console_markup .= '<p>Use the <strong>robots</strong> option in the main menu to transfer robots between <strong>Dr. Light</strong>, <strong>Dr. Wily</strong> and <strong>Dr. Cossack</strong> and gain access to even more abilities and battle combinations! Robots receive twice the experience points in battle when used by another player, so don\'t be afraid to mix it up and have fun!</p>';
-        $temp_console_markup .= '<p style="font-size: 10px;">Note : Dr. Cossack may take part in robot transfers only after completing the Intro Field on his own</p>';
         array_unshift($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
             'console_markup' => $temp_console_markup
@@ -765,6 +761,219 @@ if ($battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
             ));
 
     }
+
+}
+
+
+/*
+ * DR. LIGHT EVENT ITEMS
+ */
+
+// Unlock the AUTO LINK after Dr. Light has completed at least half of Chapter Two
+$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
+$required_missions += round(MMRPG_SETTINGS_CHAPTER2_MISSIONS / 2);
+if (!mmrpg_prototype_item_unlocked('auto-link')
+    && mmrpg_prototype_battles_complete('dr-light') >= $required_missions
+    ){
+
+    // Unlock the Auto Link and generate the required event details
+    mmrpg_game_unlock_item('auto-link', array(
+        'event_text' => '{player} made contact! The {item} has been established!',
+        'player_token' => 'dr-light',
+        'shop_token' => 'auto',
+        'show_images' => array('player', 'shop')
+        ));
+
+    // Unlock the ITEM CODES immediately after the Auto Link has been unlocked
+    if (!mmrpg_prototype_item_unlocked('item-codes')){
+
+        // Unlock the Item Codes and generate the required event details
+        mmrpg_game_unlock_item('item-codes', array(
+            'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
+            'player_token' => 'dr-light',
+            'shop_token' => 'auto',
+            'show_images' => array('shop')
+            ));
+
+    }
+
+}
+
+// Unlock the LIGHT/SHARE PROGRAM after Dr. Light has finished Chapter Three
+$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
+if (!mmrpg_prototype_item_unlocked('light-program')
+    && mmrpg_prototype_battles_complete('dr-light') >= $required_missions
+    ){
+
+    // Unlock the Light Program and generate the required event details
+    mmrpg_game_unlock_item('light-program', array(
+        'event_text' => '{player} discovered how to share! The {item} has been activated!',
+        'player_token' => 'dr-light',
+        'show_images' => array('player')
+        ));
+
+}
+
+// Unlock the DRESS CODES after Dr. Light has completed at least half of Chapter Four
+$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
+$required_missions += round(MMRPG_SETTINGS_CHAPTER4_MISSIONS / 2);
+if (!mmrpg_prototype_item_unlocked('dress-codes')
+    && mmrpg_prototype_battles_complete('dr-light') >= $required_missions
+    ){
+
+    // Unlock the Dress Codes and generate the required event details
+    mmrpg_game_unlock_item('dress-codes', array(
+        'event_text' => '{shop} made another discovery! The {item} have been unlocked!',
+        'player_token' => 'dr-light',
+        'shop_token' => 'auto',
+        'show_images' => array('shop')
+        ));
+
+}
+
+
+/*
+ * DR. WILY EVENT ITEMS
+ */
+
+// Unlock the REGGAE LINK after Dr. Wily has completed at least half of Chapter Two
+$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
+$required_missions += round(MMRPG_SETTINGS_CHAPTER2_MISSIONS / 2);
+if (!mmrpg_prototype_item_unlocked('reggae-link')
+    && mmrpg_prototype_battles_complete('dr-wily') >= $required_missions
+    ){
+
+    // Unlock the Reggae Link and generate the required event details
+    mmrpg_game_unlock_item('reggae-link', array(
+        'event_text' => '{player} made contact! The {item} has been established!',
+        'player_token' => 'dr-wily',
+        'shop_token' => 'reggae',
+        'show_images' => array('player', 'shop')
+        ));
+
+    // Unlock the ABILITY CODES immediately after the Reggae Link has been unlocked
+    if (!mmrpg_prototype_item_unlocked('ability-codes')){
+
+        // Unlock the Ability Codes and generate the required event details
+        mmrpg_game_unlock_item('ability-codes', array(
+            'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
+            'player_token' => 'dr-wily',
+            'shop_token' => 'reggae',
+            'show_images' => array('shop')
+            ));
+
+    }
+
+}
+
+// Unlock the WILY/TRANSFER PROGRAM after Dr. Wily has finished Chapter Three
+$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
+if (!mmrpg_prototype_item_unlocked('wily-program')
+    && mmrpg_prototype_battles_complete('dr-wily') >= $required_missions
+    ){
+
+    // Unlock the Wily Program and generate the required event details
+    mmrpg_game_unlock_item('wily-program', array(
+        'event_text' => '{player} discovered how to transfer! The {item} has been activated!',
+        'player_token' => 'dr-wily',
+        'show_images' => array('player')
+        ));
+
+}
+
+// Unlock the WEAPON CODES after Dr. Wily has completed at least half of Chapter Four
+$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
+$required_missions += round(MMRPG_SETTINGS_CHAPTER4_MISSIONS / 2);
+if (!mmrpg_prototype_item_unlocked('weapon-codes')
+    && mmrpg_prototype_battles_complete('dr-wily') >= $required_missions
+    ){
+
+    // Unlock the Weapon Codes and generate the required event details
+    mmrpg_game_unlock_item('weapon-codes', array(
+        'event_text' => '{shop} made another discovery! The {item} have been unlocked!',
+        'player_token' => 'dr-wily',
+        'shop_token' => 'reggae',
+        'show_images' => array('shop')
+        ));
+
+}
+
+
+/*
+ * DR. COSSACK EVENT ITEMS
+ */
+
+// Unlock the KALINKA LINK after Dr. Cossack has completed at least half of Chapter Two
+$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
+$required_missions += round(MMRPG_SETTINGS_CHAPTER2_MISSIONS / 2);
+if (!mmrpg_prototype_item_unlocked('kalinka-link')
+    && mmrpg_prototype_battles_complete('dr-cossack') >= $required_missions
+    ){
+
+    // Unlock the Kalinka Link and generate the required event details
+    mmrpg_game_unlock_item('kalinka-link', array(
+        'event_text' => '{player} made contact! The {item} has been established!',
+        'player_token' => 'dr-cossack',
+        'shop_token' => 'kalinka',
+        'show_images' => array('player', 'shop')
+        ));
+
+    // Unlock the EQUIP CODES immediately after the Kalinka Link has been unlocked
+    if (!mmrpg_prototype_item_unlocked('equip-codes')){
+
+        // Unlock the Equip Codes and generate the required event details
+        mmrpg_game_unlock_item('equip-codes', array(
+            'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
+            'player_token' => 'dr-cossack',
+            'shop_token' => 'kalinka',
+            'show_images' => array('shop')
+            ));
+
+    }
+
+}
+
+// Unlock the COSSACK/SEARCH PROGRAM after Dr. Cossack has finished Chapter Three
+$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
+if (!mmrpg_prototype_item_unlocked('cossack-program')
+    && mmrpg_prototype_battles_complete('dr-cossack') >= $required_missions
+    ){
+
+    // Unlock the Cossack Program and generate the required event details
+    mmrpg_game_unlock_item('cossack-program', array(
+        'event_text' => '{player} discovered how to transfer! The {item} has been activated!',
+        'player_token' => 'dr-cossack',
+        'show_images' => array('player')
+        ));
+
+}
+
+// Unlock the FIELD CODES after Dr. Cossack has completed at least half of Chapter Four
+$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
+$required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
+$required_missions += round(MMRPG_SETTINGS_CHAPTER4_MISSIONS / 2);
+if (!mmrpg_prototype_item_unlocked('field-codes')
+    && mmrpg_prototype_battles_complete('dr-cossack') >= $required_missions
+    ){
+
+    // Unlock the Field Codes and generate the required event details
+    mmrpg_game_unlock_item('field-codes', array(
+        'event_text' => '{shop} made another discovery! The {item} have been unlocked!',
+        'player_token' => 'dr-cossack',
+        'shop_token' => 'kalinka',
+        'show_images' => array('shop')
+        ));
 
 }
 
