@@ -951,7 +951,7 @@ if (!mmrpg_prototype_item_unlocked('cossack-program')
 
     // Unlock the Cossack Program and generate the required event details
     mmrpg_game_unlock_item('cossack-program', array(
-        'event_text' => '{player} discovered how to transfer! The {item} has been activated!',
+        'event_text' => '{player} discovered how to search! The {item} has been activated!',
         'player_token' => 'dr-cossack',
         'show_images' => array('player')
         ));
