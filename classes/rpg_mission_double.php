@@ -181,9 +181,10 @@ class rpg_mission_double extends rpg_mission {
         // Also, fill the empty spots with minor enemy robots
         if (true){
             $temp_option_battle['battle_target_player']['player_switch'] = 1.5;
-            $bonus_robot_count = $temp_target_count; // - count($temp_option_battle['battle_target_player']['player_robots']);
-            //if ($temp_fusion_star_present){ $bonus_robot_count += 2; }
-            //$bonus_robot_count = $bonus_robot_count; //mt_rand(2, $bonus_robot_count);
+            $bonus_robot_count = $temp_target_count;
+            if ($this_prototype_data['this_player_token'] == 'dr-light'){ $bonus_robot_count += 0; }
+            elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){ $bonus_robot_count += 1; }
+            elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $bonus_robot_count += 2; }
             $temp_mook_options = array();
             $temp_mook_letters = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H');
             $temp_mook_counts = array();
