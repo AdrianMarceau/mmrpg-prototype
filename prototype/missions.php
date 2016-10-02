@@ -34,6 +34,7 @@ else {
     function temp_generate_player_mission_markup($player_token, &$chapters_unlocked, &$prototype_data){
         global $session_token;
         global $prototype_start_link;
+        $battle_complete_counter = mmrpg_prototype_battles_complete($player_token);
 
         // DEBUG
         //echo 'checkpoint_'.__LINE__.('$prototype_start_link = '.$prototype_start_link.'').'<br />';
@@ -142,8 +143,8 @@ else {
                 echo '<a class="chapter_link '.($temp_last_chapter === '3' ? 'chapter_link_active ' : '').'" href="#" data-chapter="3">Chapter Four</a>';
             } else {
                 $chapters_display_count++;
-                if ($chapters_unlocked['3']){
-                    $text = '<span title="Collect '.MMRPG_SETTINGS_CHAPTER4_STARLOCK.' different stars to unlock this chapter.">'.
+                if ($chapters_unlocked['2'] && $battle_complete_counter > MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT){
+                    $text = '<span>'.
                     '&#9733; &times; '.MMRPG_SETTINGS_CHAPTER4_STARLOCK.
                     '</span>';
                 } else {
@@ -159,7 +160,7 @@ else {
             } else {
                 $chapters_display_count++;
                 if ($chapters_unlocked['3']){
-                    $text = '<span title="Collect '.MMRPG_SETTINGS_CHAPTER5_STARLOCK.' different stars to unlock this chapter.">'.
+                    $text = '<span>'.
                     '&#9733; &times; '.MMRPG_SETTINGS_CHAPTER5_STARLOCK.
                     '</span>';
                 } else {
@@ -196,7 +197,7 @@ else {
 
                 echo $prototype_data[$player_token]['missions_markup']."\n";
             }
-            elseif ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && !empty($_SESSION[$session_token]['battle_settings']['this_player_token']) && $_SESSION[$session_token]['battle_settings']['this_player_token'] == 'dr-light'){
+            elseif ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && !empty($_SESSION[$session_token]['battle_settings']['this_player_token']) && $_SESSION[$session_token]['battle_settings']['this_player_token'] == $player_token){
                 // DEBUG
                 //echo 'checkpoint_'.__LINE__.'<br />';
 
