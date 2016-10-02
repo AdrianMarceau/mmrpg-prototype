@@ -742,7 +742,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
     if (!in_array($this_ability_token, $_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'][] = $this_ability_token; }
 
     // Only show the event if allowed by the function args
-    if ($events_create != false){
+    if ($events_create != false && !empty($player_info)){
 
         // Generate the attributes and text variables for this ability unlock
         global $db;

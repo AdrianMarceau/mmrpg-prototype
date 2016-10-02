@@ -101,14 +101,14 @@ else {
         $chapters_unlocked['2'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
 
         // Fusions
-        if (MMRPG_SETTINGS_CHAPTER4_STARLOCK || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT){
+        if ($battle_star_counter >= MMRPG_SETTINGS_CHAPTER4_STARLOCK || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT){
             $chapters_unlocked['3'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
         } else {
             $chapters_unlocked['3'] = false;
         }
 
         // Finals
-        if (MMRPG_SETTINGS_CHAPTER5_STARLOCK || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
+        if ($battle_star_counter >= MMRPG_SETTINGS_CHAPTER5_STARLOCK || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
             $chapters_unlocked['4a'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
             $chapters_unlocked['4b'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
             $chapters_unlocked['4c'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
