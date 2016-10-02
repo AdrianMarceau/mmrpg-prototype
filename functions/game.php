@@ -348,12 +348,24 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         if (in_array($robot_info['robot_token'], array('roll', 'disco', 'rhythm'))){ $this_congrats = '<strong>'.$this_name.'</strong> to the rescue!'; }
         if (in_array($robot_info['robot_token'], array('roll', 'disco', 'rhythm', 'splash-woman'))){ $this_pronoun = 'she'; $this_posessive = 'her'; }
         elseif (in_array($robot_info['robot_token'], array('met'))){ $this_pronoun = 'it'; $this_posessive = 'its'; }
-        $this_best_stat = $robot_info['robot_energy'];
-        $this_best_attribute = 'a support';
-        if ($robot_info['robot_attack'] > $this_best_stat){ $this_best_stat = $robot_info['robot_attack']; $this_best_attribute = 'a powerful'; }
-        elseif ($robot_info['robot_defense'] > $this_best_stat){ $this_best_stat = $robot_info['robot_defense']; $this_best_attribute = 'a defensive'; }
-        elseif ($robot_info['robot_speed'] > $this_best_stat){ $this_best_stat = $robot_info['robot_speed']; $this_best_attribute = 'a speedy'; }
-        if ($robot_info['robot_token'] == 'met'){ $this_best_attribute = 'bonus'; }
+        $this_best_stat_value = 0;
+        $this_best_stat_kind = '';
+        $stat_kinds = array('attack', 'defense', 'speed', 'energy');
+        foreach ($stat_kinds AS $kind){
+            if ($robot_info['robot_'.$kind] > $this_best_stat_value){
+                $this_best_stat_value = $robot_info['robot_'.$kind];
+                $this_best_stat_kind = $kind;
+            }
+        }
+        $this_best_attribute = 'a ';
+        if ($robot_info['robot_token'] == 'met'){ $this_best_attribute = 'a bonus'; }
+        elseif ($robot_info['robot_token'] == 'roll'){ $this_best_attribute = 'a support'; }
+        elseif ($robot_info['robot_token'] == 'disco'){ $this_best_attribute = 'an assault'; }
+        elseif ($robot_info['robot_token'] == 'rhythm'){ $this_best_attribute = 'a technical'; }
+        elseif ($this_best_stat_kind == 'energy'){ $this_best_attribute = 'a support'; }
+        elseif ($this_best_stat_kind == 'attack'){ $this_best_attribute = 'a powerful'; }
+        elseif ($this_best_stat_kind == 'defense'){ $this_best_attribute = 'a defensive'; }
+        elseif ($this_best_stat_kind == 'speed'){ $this_best_attribute = 'a speedy'; }
         $this_first_ability = array('level' => 0, 'token' => 'buster-shot');
         $this_count_abilities = count($robot_info['robot_rewards']['abilities']);
         //die('<pre>'.print_r($robot_info['robot_rewards']['abilities'], true).'</pre>');

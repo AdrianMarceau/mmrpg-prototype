@@ -1399,46 +1399,48 @@ class rpg_ability extends rpg_object {
         ?>
         <div class="database_container database_<?= $ability_info['ability_class'] == 'item' ? 'item' : 'ability' ?>_container" data-token="<?= $ability_info['ability_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
 
-            <?php if($print_options['layout_style'] == 'website' || $print_options['layout_style'] == 'website_compact'): ?>
+            <? if($print_options['layout_style'] == 'website' || $print_options['layout_style'] == 'website_compact'): ?>
                 <a class="anchor" id="<?= $ability_info['ability_token']?>">&nbsp;</a>
-            <?php endif; ?>
+            <? endif; ?>
 
             <div class="subbody event event_triple event_visible" data-token="<?= $ability_info['ability_token']?>" style="<?= ($print_options['layout_style'] == 'event' ? 'margin: 0 !important; ' : '').($print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important; ' : '') ?>">
 
-                <?php if($print_options['show_icon']): ?>
+                <? if($print_options['show_icon']): ?>
 
                     <div class="this_sprite sprite_left" style="height: 40px;">
-                        <?php if($print_options['show_icon']): ?>
-                            <?php if($print_options['show_key'] !== false): ?>
+                        <? if($print_options['show_icon']): ?>
+                            <? if($print_options['show_key'] !== false): ?>
                                 <div class="icon ability_type <?= $ability_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$ability_info['ability_key'] ?></div>
-                            <?php endif; ?>
-                            <?php if ($ability_image_token != 'ability'){ ?>
+                            <? endif; ?>
+                            <? if ($ability_image_token != 'ability'){ ?>
                                 <div class="icon ability_type <?= $ability_header_types ?>"><div style="background-image: url(images/abilities/<?= $ability_image_token ?>/icon_right_<?= $ability_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_ability sprite_40x40 sprite_40x40_icon sprite_size_<?= $ability_image_size_text ?> sprite_size_<?= $ability_image_size_text ?>_icon"><?= $ability_info['ability_name']?>'s Icon</div></div>
-                            <?php } else { ?>
+                            <? } else { ?>
                                 <div class="icon ability_type <?= $ability_header_types ?>"><div style="background-image: none; background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_ability sprite_40x40 sprite_40x40_icon sprite_size_<?= $ability_image_size_text ?> sprite_size_<?= $ability_image_size_text ?>_icon">No Image</div></div>
-                            <?php } ?>
-                        <?php endif; ?>
+                            <? } ?>
+                        <? endif; ?>
                     </div>
 
-                <?php endif; ?>
+                <? endif; ?>
 
-                <?php if($print_options['show_basics']): ?>
+                <? if($print_options['show_basics']): ?>
 
                     <h2 class="header header_left <?= $ability_header_types ?> <?= (!$print_options['show_icon']) ? 'noicon' : '' ?>">
-                        <?php if($print_options['layout_style'] == 'website_compact'): ?>
+                        <? if($print_options['layout_style'] == 'website_compact'): ?>
                             <a href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>"><?= $ability_info['ability_name'] ?></a>
-                        <?php else: ?>
+                        <? else: ?>
                             <?= $ability_info['ability_name'] ?>&#39;s Data
-                        <?php endif; ?>
-                        <?php if (!empty($ability_info['ability_type_special'])){ ?>
-                            <div class="header_core ability_type"><?= ucfirst($ability_info['ability_type_special']) ?> Type</div>
-                        <?php } elseif (!empty($ability_info['ability_type']) && !empty($ability_info['ability_type2'])){ ?>
-                            <div class="header_core ability_type"><?= ucfirst($ability_info['ability_type']).' / '.ucfirst($ability_info['ability_type2']) ?> Type</div>
-                        <?php } elseif (!empty($ability_info['ability_type'])){ ?>
-                            <div class="header_core ability_type"><?= ucfirst($ability_info['ability_type']) ?> Type</div>
-                        <?php } else { ?>
-                            <div class="header_core ability_type">Neutral Type</div>
-                        <?php } ?>
+                        <? endif; ?>
+                        <? if ($print_options['layout_style'] != 'event'){ ?>
+                            <? if (!empty($ability_info['ability_type_special'])){ ?>
+                                <div class="header_core ability_type"><?= ucfirst($ability_info['ability_type_special']) ?> Type</div>
+                            <? } elseif (!empty($ability_info['ability_type']) && !empty($ability_info['ability_type2'])){ ?>
+                                <div class="header_core ability_type"><?= ucfirst($ability_info['ability_type']).' / '.ucfirst($ability_info['ability_type2']) ?> Type</div>
+                            <? } elseif (!empty($ability_info['ability_type'])){ ?>
+                                <div class="header_core ability_type"><?= ucfirst($ability_info['ability_type']) ?> Type</div>
+                            <? } else { ?>
+                                <div class="header_core ability_type">Neutral Type</div>
+                            <? } ?>
+                        <? } ?>
                     </h2>
                     <div class="body body_left" style="margin-right: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px; <?= (!$print_options['show_icon']) ? 'margin-left: 0; ' : '' ?><?= $print_options['layout_style'] == 'event' ? 'font-size: 10px; min-height: 150px; ' : '' ?>">
                         <table class="full" style="margin: 5px auto 10px;">
@@ -1456,7 +1458,7 @@ class rpg_ability extends rpg_object {
                                     <td class="center">&nbsp;</td>
                                     <td class="right">
                                         <label style="display: block; float: left;">Type :</label>
-                                        <?php if($print_options['layout_style'] != 'event'): ?>
+                                        <? if($print_options['layout_style'] != 'event'): ?>
                                             <?php
                                             if (!empty($ability_info['ability_type_special'])){
                                                 echo '<a href="database/abilities/'.$ability_info['ability_type_special'].'/" class="ability_type '.$ability_header_types.'">'.ucfirst($ability_info['ability_type_special']).'</a>';
@@ -1474,7 +1476,7 @@ class rpg_ability extends rpg_object {
                                                 echo '<a href="'.(('database/abilities/').'none/').'" class="ability_type ability_type_none">Neutral</a>';
                                             }
                                             ?>
-                                        <?php else: ?>
+                                        <? else: ?>
                                             <?php
                                             if (!empty($ability_info['ability_type_special'])){
                                                 echo '<span class="ability_type '.$ability_header_types.'">'.ucfirst($ability_info['ability_type_special']).'</span>';
@@ -1492,22 +1494,22 @@ class rpg_ability extends rpg_object {
                                                 echo '<span class="ability_type ability_type_none">Neutral</span>';
                                             }
                                             ?>
-                                        <?php endif; ?>
+                                        <? endif; ?>
                                     </td>
                                 </tr>
-                                <?php if(true): ?>
+                                <? if(true): ?>
 
-                                    <?php if($ability_image_token != 'ability'): ?>
+                                    <? if($ability_image_token != 'ability'): ?>
 
                                         <tr>
                                             <td  class="right">
                                                 <label style="display: block; float: left;">Power :</label>
-                                                <?php if(!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])): ?>
-                                                    <?php if(!empty($ability_info['ability_damage'])){ ?><span class="ability_stat"><?= $ability_info['ability_damage'].(!empty($ability_info['ability_damage_percent']) ? '%' : '') ?> Damage</span><?php } ?>
-                                                    <?php if(!empty($ability_info['ability_recovery'])){ ?><span class="ability_stat"><?= $ability_info['ability_recovery'].(!empty($ability_info['ability_recovery_percent']) ? '%' : '') ?> Recovery</span><?php } ?>
-                                                <?php else: ?>
+                                                <? if(!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])): ?>
+                                                    <? if(!empty($ability_info['ability_damage'])){ ?><span class="ability_stat"><?= $ability_info['ability_damage'].(!empty($ability_info['ability_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
+                                                    <? if(!empty($ability_info['ability_recovery'])){ ?><span class="ability_stat"><?= $ability_info['ability_recovery'].(!empty($ability_info['ability_recovery_percent']) ? '%' : '') ?> Recovery</span><? } ?>
+                                                <? else: ?>
                                                     <span class="ability_stat">-</span>
-                                                <?php endif; ?>
+                                                <? endif; ?>
                                             </td>
                                             <td class="center">&nbsp;</td>
                                             <td class="right">
@@ -1527,7 +1529,7 @@ class rpg_ability extends rpg_object {
                                             </td>
                                         </tr>
 
-                                    <?php else: ?>
+                                    <? else: ?>
 
                                         <tr>
                                             <td  class="right">
@@ -1552,9 +1554,9 @@ class rpg_ability extends rpg_object {
                                             </td>
                                         </tr>
 
-                                    <?php endif; ?>
+                                    <? endif; ?>
 
-                                <?php endif; ?>
+                                <? endif; ?>
                             </tbody>
                         </table>
                         <table class="full" style="margin: 5px auto 10px;">
@@ -1564,9 +1566,9 @@ class rpg_ability extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <?php if($print_options['layout_style'] != 'event'): ?>
+                                        <? if($print_options['layout_style'] != 'event'): ?>
                                             <label style="display: block; float: left;">Description :</label>
-                                        <?php endif; ?>
+                                        <? endif; ?>
                                         <div class="description_container" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?php
                                         // Define the search/replace pairs for the description
                                         $temp_find = array('{DAMAGE}', '{RECOVERY}', '{DAMAGE2}', '{RECOVERY2}', '{}');
@@ -1585,9 +1587,9 @@ class rpg_ability extends rpg_object {
                         </table>
                     </div>
 
-                <?php endif; ?>
+                <? endif; ?>
 
-                <?php if($print_options['show_sprites'] && (!isset($ability_info['ability_image_sheets']) || $ability_info['ability_image_sheets'] !== 0) && $ability_image_token != 'ability' ): ?>
+                <? if($print_options['show_sprites'] && (!isset($ability_info['ability_image_sheets']) || $ability_info['ability_image_sheets'] !== 0) && $ability_image_token != 'ability' ): ?>
 
                     <?php
                     // Start the output buffer and prepare to collect sprites
@@ -1726,9 +1728,9 @@ class rpg_ability extends rpg_object {
                         <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span style="color: #565656;"> | </span> Original Artwork by <strong>Capcom</strong></p>
                     </div>
 
-                <?php endif; ?>
+                <? endif; ?>
 
-                <?php if($print_options['show_robots']): ?>
+                <? if($print_options['show_robots']): ?>
 
                     <h2 class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left;">
                         <?= $ability_info['ability_name']?>&#39;s Robots
@@ -1902,19 +1904,19 @@ class rpg_ability extends rpg_object {
                         </table>
                     </div>
 
-                <?php endif; ?>
+                <? endif; ?>
 
-                <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
                     <a class="link link_permalink permalink" href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>" rel="permalink">+ Permalink</a>
 
-                <?php elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
+                <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
                     <a class="link link_permalink permalink" href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>" rel="permalink">+ View More</a>
 
-                <?php endif; ?>
+                <? endif; ?>
 
             </div>
         </div>
