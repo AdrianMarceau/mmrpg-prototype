@@ -982,6 +982,7 @@ class rpg_item_damage extends rpg_damage {
 
         // Update this robot's history with the triggered damage amount
         $this_robot->history['triggered_damage'][] = $this_item->item_results['this_amount'];
+
         // Update the robot's history with the triggered damage types
         if (!empty($this_item->item_results['damage_type'])){
             $temp_types = array();
@@ -991,9 +992,27 @@ class rpg_item_damage extends rpg_damage {
         } else {
             $this_robot->history['triggered_damage_types'][] = array();
         }
-        // Update this robot's history with the overkill if applicable
+
+        // Check to see if damage overkill was inflicted by the target
         if (!empty($this_item->item_results['this_overkill'])){
-            $this_robot->counters['defeat_overkill'] = isset($this_robot->counters['defeat_overkill']) ? $this_robot->counters['defeat_overkill'] + $this_item->item_results['this_overkill'] : $this_item->item_results['this_overkill'];
+
+            // Collect the overkill amount to boost
+            $overkill_value = $this_item->item_results['this_overkill'];
+
+            $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' | item overkill | value : '.$overkill_value);
+
+            // Update this robot's history with the overkill if applicable
+            if (isset($this_robot->counters['defeat_overkill'])){ $this_robot->counters['defeat_overkill'] += $overkill_value; }
+            else { $this_robot->counters['defeat_overkill'] = $overkill_value; }
+
+            $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' | robot default overkill | mod : +'.$overkill_value.' | new_value : '.$this_robot->counters['defeat_overkill']);
+
+            // Update the other player's history with the overkill bonus if applicable
+            if (isset($target_robot->player->counters['overkill_bonus'])){ $target_robot->player->counters['overkill_bonus'] += $overkill_value; }
+            else { $target_robot->player->counters['overkill_bonus'] = $overkill_value; }
+
+            $this_battle->events_debug(__FILE__, __LINE__, $target_robot->player->player_token.' | player overkill bonus | mod : +'.$overkill_value.' | new_value : '.$target_robot->player->counters['overkill_bonus']);
+
         }
 
         // Update the damage result total variables

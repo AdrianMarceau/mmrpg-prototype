@@ -1238,12 +1238,31 @@ class rpg_battle extends rpg_object {
 
             }
 
-            // Print out the final reward amounts after mods (points or zenny)
-            if (!$force_zenny_rewards){
-                $first_event_body .= 'Points : '.number_format($temp_human_rewards['battle_points'], 0, '.', ',').' ';
-            } else {
-                $first_event_body .= 'Zenny : '.number_format($temp_human_rewards['battle_points'], 0, '.', ',').'z ';
-                $_SESSION['GAME']['counters']['battle_zenny'] += $temp_human_rewards['battle_points'];
+            // Define the zenny reward amount if not empty
+            $total_zenny_rewards = 0;
+            $total_points_rewards = $temp_human_rewards['battle_points'];
+
+            // If zenny rewards are forced for this mission, use the battle point amount
+            if ($force_zenny_rewards){
+                $total_zenny_rewards += $total_points_rewards;
+                $total_points_rewards = 0;
+            }
+
+            // If the winning player had any overkill bonuses, award zenny as well
+            if (!empty($this_player->counters['overkill_bonus'])){
+                $total_zenny_rewards += $this_player->counters['overkill_bonus'];
+            }
+
+            // Print out the final point reward amounts after mods (if it applies)
+            if (!empty($total_points_rewards)){
+                $first_event_body .= 'Points : '.number_format($total_points_rewards, 0, '.', ',').' ';
+            }
+
+            // Print out the final zenny reward amounts after mods (if not empty)
+            if (!empty($total_zenny_rewards)){
+                if (!empty($total_points_rewards)){ $first_event_body .= '<span style="opacity:0.25;">|</span> '; }
+                $first_event_body .= 'Zenny : '.number_format($total_zenny_rewards, 0, '.', ',').'z ';
+                $_SESSION['GAME']['counters']['battle_zenny'] += $total_zenny_rewards;
             }
 
         }
