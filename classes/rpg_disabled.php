@@ -230,9 +230,13 @@ class rpg_disabled {
                         if ($temp_stat_boost + $target_robot->$prop_stat > MMRPG_SETTINGS_STATS_MAX){ $temp_stat_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->$prop_stat; }
                         if ($temp_stat_base_boost + $target_robot->$prop_stat_base > MMRPG_SETTINGS_STATS_MAX){ $temp_stat_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->$prop_stat_base; }
 
-                        // Increment this robot's stat by the calculated amount and display an event
+                        // Increment this robot's stat by the calculated amount
                         $target_robot->$prop_stat = ceil($target_robot->$prop_stat + $temp_stat_boost);
                         $target_robot->$prop_stat_base = ceil($target_robot->$prop_stat_base + $temp_stat_base_boost);
+                        $target_robot->update_session();
+                        $target_player->update_session();
+
+                        // Display an event showing the recovery increase
                         $event_options = array();
                         $event_options['this_ability_results']['trigger_kind'] = 'recovery';
                         $event_options['this_ability_results']['recovery_kind'] = $stat;
@@ -247,9 +251,12 @@ class rpg_disabled {
                         $event_body = $target_robot->print_name().' downloads '.$stat_system[$stat].' data from the target robot! ';
                         $event_body .= '<br />';
                         $event_body .= $target_robot->print_name().'&#39;s '.$stat.' grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
-                        $target_robot->robot_frame = 'shoot';
-                        $target_robot->update_session();
-                        $target_player->update_session();
+                        $frame = 'taunt';
+                        if ($stat == 'energy'){ $frame = 'summon'; }
+                        elseif ($stat == 'attack'){ $frame = 'shoot'; }
+                        elseif ($stat == 'defense'){ $frame = 'defend'; }
+                        elseif ($stat == 'speed'){ $frame = 'slide'; }
+                        $target_robot->set_frame($frame);
                         $this_battle->events_create($target_robot, $this_robot, $event_header, $event_body, $event_options);
 
                         // Update the session variables with the rewarded stat boost if not mecha
@@ -686,16 +693,18 @@ class rpg_disabled {
                     $temp_robot->robot_energy += $temp_energy_boost;
                     $temp_base_energy_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_energy']));
                     $temp_robot->robot_base_energy += $temp_base_energy_boost;
-                    $event_options['this_ability_results']['recovery_kind'] = 'energy';
-                    $event_options['this_ability_results']['this_amount'] = $temp_energy_boost;
-                    $event_options['this_ability_results']['total_actions']++;
-                    $event_body = $temp_robot->print_name().'&#39;s health improved! ';
-                    $event_body .= '<br />';
-                    $event_body .= $temp_robot->print_name().'&#39;s energy grew by <span class="recovery_amount">'.$temp_energy_boost.'</span>! ';
-                    $temp_robot->robot_frame = 'summon';
                     $temp_robot->update_session();
                     $target_player->update_session();
-                    $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                    if ($temp_robot->robot_position == 'active'){
+                        $event_options['this_ability_results']['recovery_kind'] = 'energy';
+                        $event_options['this_ability_results']['this_amount'] = $temp_energy_boost;
+                        $event_options['this_ability_results']['total_actions']++;
+                        $event_body = $temp_robot->print_name().'&#39;s health improved! ';
+                        $event_body .= '<br />';
+                        $event_body .= $temp_robot->print_name().'&#39;s energy grew by <span class="recovery_amount">'.$temp_energy_boost.'</span>! ';
+                        $temp_robot->set_frame('summon');
+                        $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                    }
 
 
                     // Define the base attack boost based on robot base stats
@@ -714,16 +723,18 @@ class rpg_disabled {
                     $temp_robot->robot_attack += $temp_stat_boost;
                     $temp_base_attack_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_attack']));
                     $temp_robot->robot_base_attack += $temp_base_attack_boost;
-                    $event_options['this_ability_results']['recovery_kind'] = 'attack';
-                    $event_options['this_ability_results']['this_amount'] = $temp_stat_boost;
-                    $event_options['this_ability_results']['total_actions']++;
-                    $event_body = $temp_robot->print_name().'&#39;s weapons improved! ';
-                    $event_body .= '<br />';
-                    $event_body .= $temp_robot->print_name().'&#39;s attack grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
-                    $temp_robot->robot_frame = 'shoot';
                     $temp_robot->update_session();
                     $target_player->update_session();
-                    $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                    if ($temp_robot->robot_position == 'active'){
+                        $event_options['this_ability_results']['recovery_kind'] = 'attack';
+                        $event_options['this_ability_results']['this_amount'] = $temp_stat_boost;
+                        $event_options['this_ability_results']['total_actions']++;
+                        $event_body = $temp_robot->print_name().'&#39;s weapons improved! ';
+                        $event_body .= '<br />';
+                        $event_body .= $temp_robot->print_name().'&#39;s attack grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
+                        $temp_robot->set_frame('shoot');
+                        $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                    }
 
 
                     // Define the base defense boost based on robot base stats
@@ -742,16 +753,18 @@ class rpg_disabled {
                     $temp_robot->robot_defense += $temp_defense_boost;
                     $temp_base_defense_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_defense']));
                     $temp_robot->robot_base_defense += $temp_base_defense_boost;
-                    $event_options['this_ability_results']['recovery_kind'] = 'defense';
-                    $event_options['this_ability_results']['this_amount'] = $temp_defense_boost;
-                    $event_options['this_ability_results']['total_actions']++;
-                    $event_body = $temp_robot->print_name().'&#39;s shields improved! ';
-                    $event_body .= '<br />';
-                    $event_body .= $temp_robot->print_name().'&#39;s defense grew by <span class="recovery_amount">'.$temp_defense_boost.'</span>! ';
-                    $temp_robot->robot_frame = 'defend';
                     $temp_robot->update_session();
                     $target_player->update_session();
-                    $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                    if ($temp_robot->robot_position == 'active'){
+                        $event_options['this_ability_results']['recovery_kind'] = 'defense';
+                        $event_options['this_ability_results']['this_amount'] = $temp_defense_boost;
+                        $event_options['this_ability_results']['total_actions']++;
+                        $event_body = $temp_robot->print_name().'&#39;s shields improved! ';
+                        $event_body .= '<br />';
+                        $event_body .= $temp_robot->print_name().'&#39;s defense grew by <span class="recovery_amount">'.$temp_defense_boost.'</span>! ';
+                        $temp_robot->set_frame('defend');
+                        $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                    }
 
 
                     // Define the base speed boost based on robot base stats
@@ -768,18 +781,20 @@ class rpg_disabled {
 
                     // Increment this robot's speed by the calculated amount and display an event
                     $temp_robot->robot_speed += $temp_speed_boost;
-                    $event_options['this_ability_results']['recovery_kind'] = 'speed';
-                    $event_options['this_ability_results']['this_amount'] = $temp_speed_boost;
-                    $event_options['this_ability_results']['total_actions']++;
                     $temp_base_speed_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_speed']));
                     $temp_robot->robot_base_speed += $temp_base_speed_boost;
-                    $event_body = $temp_robot->print_name().'&#39;s mobility improved! ';
-                    $event_body .= '<br />';
-                    $event_body .= $temp_robot->print_name().'&#39;s speed grew by <span class="recovery_amount">'.$temp_speed_boost.'</span>! ';
-                    $temp_robot->robot_frame = 'slide';
                     $temp_robot->update_session();
                     $target_player->update_session();
-                    $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                    if ($temp_robot->robot_position == 'active'){
+                        $event_options['this_ability_results']['recovery_kind'] = 'speed';
+                        $event_options['this_ability_results']['this_amount'] = $temp_speed_boost;
+                        $event_options['this_ability_results']['total_actions']++;
+                        $event_body = $temp_robot->print_name().'&#39;s mobility improved! ';
+                        $event_body .= '<br />';
+                        $event_body .= $temp_robot->print_name().'&#39;s speed grew by <span class="recovery_amount">'.$temp_speed_boost.'</span>! ';
+                        $temp_robot->set_frame('slide');
+                        $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                    }
 
                     // Update the robot frame
                     $temp_robot->robot_frame = 'base';
