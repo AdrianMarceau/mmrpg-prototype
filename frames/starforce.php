@@ -305,13 +305,13 @@ gameSettings.autoScrollTop = false;
                                             $temp_star_title .= ' | '.ucfirst($temp_star_kind).' Star';
                                             if ($temp_field_type_1 != 'none'){
                                                 if ($temp_star_kind == 'field'){
-                                                    $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
+                                                    $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +1';
                                                 } elseif ($temp_star_kind == 'fusion'){
                                                     if ($temp_field_type_1 != $temp_field_type_2){
-                                                        $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
-                                                        $temp_star_title .= ' | '.ucfirst($temp_field_type_2).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
+                                                        $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +1';
+                                                        $temp_star_title .= ' | '.ucfirst($temp_field_type_2).' +1';
                                                     } else {
-                                                        $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT * 2);
+                                                        $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +2';
                                                     }
                                                 }
                                             }
