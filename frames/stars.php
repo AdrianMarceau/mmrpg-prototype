@@ -247,6 +247,7 @@ gameSettings.autoScrollTop = false;
                                             $temp_star_date = !empty($star_data['star_date']) ? $star_data['star_date']: 0;
                                             $temp_field_type_1 = !empty($star_data['star_type']) ? $star_data['star_type'] : 'none';
                                             $temp_field_type_2 = !empty($star_data['star_type2']) ? $star_data['star_type2'] : $temp_field_type_1;
+                                            /*
                                             if ($temp_star_kind == 'field'){
                                                 $temp_star_front = array('path' => 'images/items/field-star_'.$temp_field_type_1.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '02', 'size' => 40);
                                                 $temp_star_back = array('path' => 'images/items/field-star_'.$temp_field_type_2.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '01', 'size' => 40);
@@ -254,11 +255,23 @@ gameSettings.autoScrollTop = false;
                                                 $temp_star_front = array('path' => 'images/items/fusion-star_'.$temp_field_type_1.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '02', 'size' => 40);
                                                 $temp_star_back = array('path' => 'images/items/fusion-star_'.$temp_field_type_2.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '01', 'size' => 40);
                                             }
+                                            */
+                                            if ($temp_star_kind == 'field'){
+                                                $type = $temp_field_type_1;
+                                                $temp_star_back = array('class' => 'back', 'path' => 'images/items/field-star_'.$type.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '00', 'size' => 40);
+                                                //$temp_star_front = array('class' => 'front', 'path' => 'images/items/field-star_'.$type.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '00', 'size' => 40);
+                                            } elseif ($temp_star_kind == 'fusion'){
+                                                $type = $temp_field_type_1;
+                                                if ($temp_field_type_1 != $temp_field_type_2){ $type .= '-'.$temp_field_type_2; }
+                                                $temp_star_back = array('class' => 'back', 'path' => 'images/items/fusion-star_'.$type.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '00', 'size' => 40);
+                                                //$temp_star_front = array('class' => 'front', 'path' => 'images/items/fusion-star_'.$type.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '00', 'size' => 40);
+                                            }
                                             $temp_star_title = $star_data['star_name'].' Star <br />';
                                             $temp_star_title .= '<span style="font-size:80%;">';
                                             if ($temp_field_type_1 != $temp_field_type_2){ $temp_star_title .= ''.ucfirst($temp_field_type_1).(!empty($temp_field_type_2) ? ' / '.ucfirst($temp_field_type_2) : '').' Type'; }
                                             else { $temp_star_title .= ''.ucfirst($temp_field_type_1).' Type'; }
                                             $temp_star_title .= ' | '.ucfirst($temp_star_kind).' Star';
+                                            /*
                                             if ($temp_field_type_1 != 'none'){
                                                 if ($temp_star_kind == 'field'){
                                                     $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
@@ -271,6 +284,7 @@ gameSettings.autoScrollTop = false;
                                                     }
                                                 }
                                             }
+                                            */
                                             if (!empty($temp_star_date)){
                                                 $temp_star_title .= ' <br />Found '.date('Y/m/d', $temp_star_date);
                                             }
@@ -280,7 +294,7 @@ gameSettings.autoScrollTop = false;
                                             // Print out the markup for the field or fusion star
                                             echo '<a href="#" data-side-key="'.$side_key.'" data-top-key="'.$top_key.'" data-tooltip="'.$temp_star_title.'" data-tooltip-type="field_type field_type_'.$temp_field_type_1.(!empty($temp_field_type_2) && ($temp_field_type_1 != $temp_field_type_2) ? '_'.$temp_field_type_2 : '').'" class="sprite sprite_40x40 sprite_star" style="">';
                                                 echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_back['frame'].'" style="background-image: url('.$temp_star_back['path'].'); z-index: 10;">&nbsp;</div>';
-                                                echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_front['frame'].'" style="background-image: url('.$temp_star_front['path'].'); z-index: 20;">&nbsp;</div>';
+                                                //echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_front['frame'].'" style="background-image: url('.$temp_star_front['path'].'); z-index: 20;">&nbsp;</div>';
                                             echo '</a>';
 
 
