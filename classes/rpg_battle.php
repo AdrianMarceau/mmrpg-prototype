@@ -549,12 +549,6 @@ class rpg_battle extends rpg_object {
             if ($target_battle_points == 0){ $target_battle_points = 1; }
             elseif ($target_battle_points < 0){ $target_battle_points = -1 * $target_battle_points; }
 
-            // Recalculate the main game's points total with the battle points
-            $_SESSION['GAME']['counters']['battle_points'] = mmrpg_prototype_calculate_battle_points();
-
-            // Increment this player's points total with the battle points
-            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_points'] += $target_battle_points;
-
             // Update the global variable with the points reward
             $temp_human_rewards['battle_points'] = $target_battle_points;
 
@@ -571,6 +565,9 @@ class rpg_battle extends rpg_object {
                 $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token] = $new_session_array;
                 $temp_human_rewards['battle_failure'] = $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token]['battle_count'];
             }
+
+            // Recalculate the overall battle points total with new values
+            mmrpg_prototype_calculate_battle_points(true);
 
         }
         // (GHOST/COMPUTER) TARGET DEFEATED
@@ -822,17 +819,15 @@ class rpg_battle extends rpg_object {
             // Collect the battle points from the function
             $this_battle_points = $this->calculate_battle_points($this_player, $this->battle_points, $this->battle_turns);
 
-            // Increment the main game's points total with the battle points
-            $_SESSION['GAME']['counters']['battle_points'] = mmrpg_prototype_calculate_battle_points();
+            // Recalculate the overall battle points total with new values
+            mmrpg_prototype_calculate_battle_points(true);
 
             // Reference the number of points this player gets
             $this_player_points = $this_battle_points;
 
-            // Increment this player's points total with the battle points
+            // Collect the player token and export array as reference
             $player_token = $this_player->player_token;
             $player_info = $this_player->export_array();
-            if (!isset($_SESSION['GAME']['values']['battle_rewards'][$player_token]['player_points'])){ $_SESSION['GAME']['values']['battle_rewards'][$player_token]['player_points'] = 0; }
-            $_SESSION['GAME']['values']['battle_rewards'][$player_token]['player_points'] = mmrpg_prototype_calculate_player_points($player_token);
 
             // Update the global variable with the points reward
             $temp_human_rewards['battle_points'] = $this_player_points;
@@ -1018,8 +1013,10 @@ class rpg_battle extends rpg_object {
             if ($this->battle_counts){
                 // DEBUG
                 //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
+
                 // Back up the current session array for this battle complete counter
                 $bak_session_array = isset($_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] : array();
+
                 // Create the new session array from scratch to ensure all values exist
                 $new_session_array = array(
                     'battle_token' => $this->battle_token,
@@ -1033,6 +1030,7 @@ class rpg_battle extends rpg_object {
                     'battle_min_robots' => 0,
                     'battle_max_robots' => 0
                     );
+
                 // Recollect applicable battle values from the backup session array
                 if (!empty($bak_session_array['battle_count'])){ $new_session_array['battle_count'] = $bak_session_array['battle_count']; }
                 if (!empty($bak_session_array['battle_level'])){ $new_session_array['battle_min_level'] = $bak_session_array['battle_level']; } // LEGACY
@@ -1044,6 +1042,7 @@ class rpg_battle extends rpg_object {
                 if (!empty($bak_session_array['battle_max_points'])){ $new_session_array['battle_max_points'] = $bak_session_array['battle_max_points']; }
                 if (!empty($bak_session_array['battle_min_robots'])){ $new_session_array['battle_min_robots'] = $bak_session_array['battle_min_robots']; }
                 if (!empty($bak_session_array['battle_max_robots'])){ $new_session_array['battle_max_robots'] = $bak_session_array['battle_max_robots']; }
+
                 // Update and/or increment the appropriate battle variables in the new array
                 if ($new_session_array['battle_max_level'] == 0 || $this->battle_level > $new_session_array['battle_max_level']){ $new_session_array['battle_max_level'] = $this->battle_level; }
                 if ($new_session_array['battle_min_level'] == 0 || $this->battle_level < $new_session_array['battle_min_level']){ $new_session_array['battle_min_level'] = $this->battle_level; }
@@ -1054,11 +1053,14 @@ class rpg_battle extends rpg_object {
                 if ($new_session_array['battle_max_robots'] == 0 || $this_player->counters['robots_total'] > $new_session_array['battle_max_robots']){ $new_session_array['battle_max_robots'] = $this_player->counters['robots_total']; }
                 if ($new_session_array['battle_min_robots'] == 0 || $this_player->counters['robots_total'] < $new_session_array['battle_min_robots']){ $new_session_array['battle_min_robots'] = $this_player->counters['robots_total']; }
                 $new_session_array['battle_count']++;
+
                 // Update the session variable for this player with the updated battle values
                 $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] = $new_session_array;
                 $temp_human_rewards['battle_complete'] = $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token]['battle_count'];
-                // Update the main game's points total with the new battle points
-                $_SESSION['GAME']['counters']['battle_points'] = mmrpg_prototype_calculate_battle_points();
+
+                // Recalculate the overall battle points total with new values
+                mmrpg_prototype_calculate_battle_points(true);
+
             }
 
             // Collect or define the player variables

@@ -194,14 +194,8 @@ require('prototype_awards.php');
 
 // If possible, attempt to save the game to the session
 if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
-    // Recalculate battle points for all players
-    $_SESSION[$session_token]['counters']['battle_points'] = mmrpg_prototype_calculate_battle_points();
-    if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
-            foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_rewards){
-                    $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_points'] = mmrpg_prototype_calculate_player_points($player_token);
-                    //echo($player_token.'_battle_points='.$_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_points'].'<br />');
-            }
-    }
+    // Recalculate the overall battle points total with new values
+    mmrpg_prototype_calculate_battle_points(true);
     // Save the game session
     mmrpg_save_game_session($this_save_filepath);
 }
