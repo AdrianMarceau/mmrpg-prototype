@@ -200,11 +200,11 @@ define('MMRPG_SKIP_MARKUP', true);
 define('MMRPG_SHOW_MARKUP_'.$this_playerinfo['user_id'], true);
 require(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
 
-// Define whether or not the players or starforce tabs should be open
+// Define whether or not the players or star tabs should be open
 $temp_remote_session = $this_playerinfo['user_id'] != $_SESSION['GAME']['USER']['userid'] ? true : false;
 $temp_show_players = true;
 $temp_show_items = !empty($this_playerinfo['save_values_battle_items']) ? true : false;
-$temp_show_starforce = $this_playerinfo['save_values_battle_stars'] > 0 ? true : false;
+$temp_show_stars = $this_playerinfo['save_values_battle_stars'] > 0 ? true : false;
 
 // Define the prototype complete flags for this player
 $this_playerinfo['board_battles_dr_light'] = !empty($this_playerinfo['board_battles_dr_light']) ? explode(',', $this_playerinfo['board_battles_dr_light']) : array();
@@ -320,9 +320,9 @@ ob_start();
             <a class="link_button field_type <?= empty($this_current_token) ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/' ?>">Profile</a>
             <a class="link_button field_type <?= $this_current_token == 'robots' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/robots/' ?>">Robots</a>
             <? if(!empty($temp_show_players)): ?><a class="link_button field_type <?= $this_current_token == 'players' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/players/' ?>">Players</a><? endif; ?>
-            <? if(!empty($temp_show_items)): ?><a class="link_button field_type <?= $this_current_token == 'items' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/items/' ?>">Items</a><? endif; ?>
-            <? if(!empty($temp_show_starforce)): ?><a class="link_button field_type <?= $this_current_token == 'starforce' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/starforce/' ?>">Starforce</a><? endif; ?>
             <a class="link_button field_type <?= $this_current_token == 'database' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/database/' ?>">Database</a>
+            <? if(!empty($temp_show_stars)): ?><a class="link_button field_type <?= $this_current_token == 'stars' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/stars/' ?>">Stars</a><? endif; ?>
+            <? if(!empty($temp_show_items)): ?><a class="link_button field_type <?= $this_current_token == 'items' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/items/' ?>">Items</a><? endif; ?>
             <? if ($this_playerinfo['board_missions'] > 1): ?>
                 <a class="link_button field_type <?= $this_current_token == 'missions' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/missions/' ?>">Missions</a>
             <? endif; ?>
@@ -341,7 +341,7 @@ ob_start();
         // -- LEADERBOARD PAGES -- //
 
         // Define the allowable pages
-        $temp_allowed_pages = array('robots', 'players', 'items', 'starforce', 'database', 'missions');
+        $temp_allowed_pages = array('robots', 'players', 'database', 'stars','items',  'missions');
 
         // If this is the View Profile page, show the appropriate content
         if (empty($this_current_token) || !in_array($this_current_token, $temp_allowed_pages)){

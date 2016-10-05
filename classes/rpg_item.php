@@ -1780,7 +1780,7 @@ class rpg_item extends rpg_object {
             'failure' => array(0, -50, 0, -10, 'The '.$this_item->print_name().' missed&hellip;')
             ));
         $energy_damage_amount = $this_item->item_damage;
-        $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => true, 'apply_position_modifiers' => true, 'apply_starforce_modifiers' => true);
+        $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => true, 'apply_position_modifiers' => true);
         $target_robot->trigger_damage($this_robot, $this_item, $energy_damage_amount, true, $trigger_options);
 
         // Return true on success

@@ -25,7 +25,7 @@ $(document).ready(function(){
     thisBody = $('#mmrpg');
     thisPrototype = $('#prototype', thisBody);
     thisWindow = $(window);
-    thisContainer = $('.starforce', thisPrototype);
+    thisContainer = $('.stars', thisPrototype);
     thisTypeContainer = $('.types_container', thisPrototype);
     thisStarContainer = $('.stars_container', thisPrototype);
     thisPageLinks = $('.page_links', thisPrototype);
@@ -100,7 +100,7 @@ $(document).ready(function(){
 
         });
 
-    // Add mouse-wheel scrolling to the starforce container for easier browsing
+    // Add mouse-wheel scrolling to the stars container for easier browsing
     thisStarContainer.bind('mousewheel', function(e){
         e.preventDefault();
         //console.log('event.originalEvent.wheelDeltaX = '+e.originalEvent.wheelDeltaX+' | event.originalEvent.wheelDeltaY = '+e.originalEvent.wheelDeltaY);
@@ -203,14 +203,14 @@ function windowResizeStarforce(){
     thisBody.css({height:windowHeight+'px'});
     thisPrototype.css({height:windowHeight+'px'});
 
-    // Refresh the starforce elements
+    // Refresh the star elements
     thisPageLinksSide.attr('data-key', 0);
     thisPageLinksTop.attr('data-key', 0);
     refreshStarforceContainers();
 
 }
 
-// Define a function for updating the starforce menu elements
+// Define a function for updating the star menu elements
 function refreshStarforceContainers(){
     //console.log('refreshStarforceContainers()');
 

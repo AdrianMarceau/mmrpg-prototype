@@ -26,15 +26,6 @@ ob_start();
     $target_starforce = $target_player->player_starforce;
     $this_starforce = $this_player->player_starforce;
 
-    // Loop through and neutralize target starforce levels if possible
-    $this_starforce_modified = $this_starforce;
-    foreach ($this_starforce_modified AS $type => $this_value){
-        if (!isset($target_starforce[$type])){ $target_starforce[$type] = 0; }
-        $this_value -= $target_starforce[$type];
-        if ($this_value < 0){ $this_value = 0; }
-        $this_starforce_modified[$type] = $this_value;
-    }
-
     // Define and start the order counter
     $temp_order_counter = 1;
 
@@ -127,11 +118,6 @@ ob_start();
                 if (!empty($this_robot->robot_core) && ($this_robot->robot_core == $temp_type || $this_robot->robot_core == $temp_type2)){ $temp_multiplier = $temp_multiplier * 1.5; }
                 if (!empty($this_battle->battle_field->field_multipliers[$temp_type])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$temp_type]; }
                 if (!empty($this_battle->battle_field->field_multipliers[$temp_type2])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$temp_type2]; }
-
-                // Apply starforce multipliers if they exist ($_SESSION['GAME']['values']['star_force'])
-                if (!empty($temp_type) && !empty($this_starforce_modified[$temp_type])){ $temp_multiplier += $temp_multiplier * ($this_starforce_modified[$temp_type] / 10); }
-                elseif (empty($temp_type) && !empty($this_starforce_modified['none'])){ $temp_multiplier += $temp_multiplier * ($this_starforce_modified['none'] / 10); }
-                if (!empty($temp_type2) && !empty($this_starforce_modified[$temp_type2])){ $temp_multiplier += $temp_multiplier * ($this_starforce_modified[$temp_type2] / 10); }
 
                 $temp_damage = ceil($temp_damage * $temp_multiplier);
                 $temp_recovery = ceil($temp_recovery * $temp_multiplier);

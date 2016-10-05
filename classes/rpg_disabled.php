@@ -488,42 +488,6 @@ class rpg_disabled {
                     //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; ');
                     //$this_battle->events_create(false, false, 'DEBUG', $event_body);
 
-                    /*
-
-                        // REMOVED
-
-                        // If this robot has any overkill, add that to the temp experience modifier
-                        $temp_experience_boost = 0;
-                        if (!empty($this_robot->counters['defeat_overkill'])){
-                            $temp_robot_boost_kinds[] = 'overkill';
-                            $temp_experience_bak = $target_robot_experience;
-                            $target_robot_experience += ceil($this_robot->counters['defeat_overkill'] / $temp_robots_active_num2);
-                            $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
-                        }
-
-                        // DEBUG
-                        //$event_body = 'OVERKILL BONUS | ';
-                        //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; ');
-                        //$this_battle->events_create(false, false, 'DEBUG', $event_body);
-
-                        // REMOVED
-
-                        // If the target robot's core type has been boosted by starforce
-                        if (!empty($temp_robot->robot_core) && !empty($_SESSION['GAME']['values']['star_force'][$temp_robot->robot_core])){
-                            $temp_robot_boost_kinds[] = 'starforce';
-                            $temp_starforce = $_SESSION['GAME']['values']['star_force'][$temp_robot->robot_core];
-                            $temp_experience_bak = $target_robot_experience;
-                            $target_robot_experience += ceil($target_robot_experience * ($temp_starforce / 10));
-                            $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
-                        }
-
-                        // DEBUG
-                        //$event_body = 'STARFORCE BONUS | ';
-                        //$event_body .= preg_replace('/\s+/', ' ', $temp_robot->robot_token.' : '.$temp_robot->robot_core.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; ');
-                        //$this_battle->events_create(false, false, 'DEBUG', $event_body);
-
-                    */
-
                     // Update the boost text based on applied multiplier kinds
                     if (!empty($temp_robot_boost_kinds)){
                         $temp_robot_boost_text = implode(', ', $temp_robot_boost_kinds);

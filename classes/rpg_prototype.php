@@ -226,7 +226,6 @@ class rpg_prototype {
                 }
                 $this_option_min_level = false;
                 $this_option_max_level = false;
-                $this_option_star_boost = !empty($this_targetinfo['player_starforce']) ? array_sum($this_targetinfo['player_starforce']) : 0;
                 $this_battleinfo['battle_sprite'] = array();
                 $this_targetinfo = !empty($mmrpg_index['players'][$this_targetinfo['player_token']]) ? array_merge($mmrpg_index['players'][$this_targetinfo['player_token']], $this_targetinfo) : $mmrpg_index['players']['player'];
                 if ($this_targetinfo['player_token'] != 'player'){
@@ -419,7 +418,6 @@ class rpg_prototype {
                 if ($this_option_min_level < 1){ $this_option_min_level = 1; }
                 if ($this_option_max_level > 100){ $this_option_max_level = 100; }
                 $this_option_level_range = $this_option_min_level == $this_option_max_level ? 'Level '.$this_option_min_level : 'Levels '.$this_option_min_level.'-'.$this_option_max_level;
-                $this_option_star_force = !empty($this_targetinfo['player_starforce']) ? ' | +'.number_format(($this_option_star_boost * MMRPG_SETTINGS_STARS_ATTACKBOOST), 0, '.', ',').' Boost' : '';
                 $this_option_point_amount = number_format($this_option_points, 0, '.', ',').' Point'.($this_option_points != 1 ? 's' : '');
                 //$this_option_label .= (!empty($this_option_button_text) ? '<span class="multi"><span class="maintext">'.$this_option_button_text.'</span><span class="subtext">'.$this_option_level_range.str_replace('|', '<span class="pipe">|</span>', $this_option_star_force).'</span><span class="subtext2">'.$this_option_point_amount.'</span></span>'.(!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore)) ? '<span class="arrow"> &#9658;</span>' : '') : '<span class="single">???</span>');
                 if (!empty($this_option_button_text)){ $this_option_label .= '<span class="multi"><span class="maintext">'.$this_option_button_text.'</span><span class="subtext">'.$this_option_point_amount.'</span><span class="subtext2">'.$this_option_level_range.'</span></span>'.(!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore)) ? '<span class="arrow"> &#9658;</span>' : ''); }
@@ -436,7 +434,7 @@ class rpg_prototype {
                     if (!empty($this_fieldinfo['field_type2'])){ $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' / '.ucfirst($this_fieldinfo['field_type2']).' Type'; }
                     else { $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' Type'; }
                 }
-                $this_option_title .= ' | '.$this_option_level_range.' <br />'; //.$this_option_star_force;
+                $this_option_title .= ' | '.$this_option_level_range.' <br />';
                 $this_option_title .= 'Target : '.($this_battleinfo['battle_turns_limit'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns_limit'].' Turns').' with '.($this_battleinfo['battle_robots_limit'] == 1 ? '1 Robot' : $this_battleinfo['battle_robots_limit'].' Robots').' <br />';
                 $this_option_title .= 'Reward : '.($this_battleinfo['battle_points'] == 1 ? '1 Point' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Points').' and '.($this_battleinfo['battle_zenny'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_zenny'], 0, '.', ',').' Zenny');
 

@@ -978,8 +978,8 @@ ob_start();
     // Define the temp game flags
     $this_playerinfo = $this_userinfo;
     $temp_show_players = mmrpg_prototype_players_unlocked() > 1 ? true : false;
-    $temp_show_items = mmrpg_prototype_items_unlocked() > 1 ? true : false;
-    $temp_show_starforce = mmrpg_prototype_complete() ? true : false;
+    $temp_show_items = mmrpg_prototype_items_unlocked() > 0 ? true : false;
+    $temp_show_stars = mmrpg_prototype_stars_unlocked() > 0 ? true : false;
     $temp_colour_token = !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none';
     ?>
 
@@ -995,7 +995,7 @@ ob_start();
             <a class="link_button field_type <?= empty($this_current_token) || $this_current_token == 'robots' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/robots/' ?>">View Robots</a>
             <? if(!empty($temp_show_players)): ?><a class="link_button field_type <?= $this_current_token == 'players' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/players/' ?>">View Players</a><? endif; ?>
             <? if(!empty($temp_show_items)): ?><a class="link_button field_type <?= $this_current_token == 'items' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/items/' ?>">View Items</a><? endif; ?>
-            <? if(!empty($temp_show_starforce)): ?><a class="link_button field_type <?= $this_current_token == 'starforce' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/starforce/' ?>">View Starforce</a><? endif; ?>
+            <? if(!empty($temp_show_stars)): ?><a class="link_button field_type <?= $this_current_token == 'stars' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/stars/' ?>">View Stars</a><? endif; ?>
             <a class="link_button field_type <?= $this_current_token == 'database' ? 'field_type_'.$temp_colour_token.' link_button_active' : 'field_type_empty' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'file/game/database/' ?>">View Database</a>
         </div>
 
@@ -1004,7 +1004,7 @@ ob_start();
         // -- LEADERBOARD PAGES -- //
 
         // Define the allowable pages
-        $temp_allowed_pages = array('robots', 'players', 'items', 'starforce', 'database');
+        $temp_allowed_pages = array('robots', 'players', 'items', 'stars', 'database');
 
         // If this is the View Robots page, show the appropriate content
         if (empty($this_current_token) || !in_array($this_current_token, $temp_allowed_pages) || $this_current_token == 'robots'){

@@ -627,7 +627,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             }
             $this_option_min_level = false;
             $this_option_max_level = false;
-            $this_option_star_boost = !empty($this_targetinfo['player_starforce']) ? array_sum($this_targetinfo['player_starforce']) : 0;
             $this_battleinfo['battle_sprite'] = array();
             $this_targetinfo = !empty($mmrpg_index['players'][$this_targetinfo['player_token']]) ? array_merge($mmrpg_index['players'][$this_targetinfo['player_token']], $this_targetinfo) : $mmrpg_index['players']['player'];
             if ($this_targetinfo['player_token'] != 'player'){  $this_battleinfo['battle_sprite'][] = array('path' => 'players/'.$this_targetinfo['player_token'], 'size' => !empty($this_targetinfo['player_image_size']) ? $this_targetinfo['player_image_size'] : 40);  }
