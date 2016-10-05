@@ -84,9 +84,6 @@ class rpg_player extends rpg_object {
         $this->player_points = isset($this_playerinfo['player_points']) ? $this_playerinfo['player_points'] : 0;
         $this->player_switch = isset($this_playerinfo['player_switch']) ? $this_playerinfo['player_switch'] : 1;
         $this->player_next_action = isset($this_playerinfo['player_next_action']) ? $this_playerinfo['player_next_action'] : 'auto';
-//    if (empty($this->player_id)){
-//      $this->player_id = md5(substr(md5($this->player_side), 0, 10));
-//    }
 
         // Define the internal player base values using the players index array
         $this->player_base_name = isset($this_playerinfo['player_base_name']) ? $this_playerinfo['player_base_name'] : $this->player_name;

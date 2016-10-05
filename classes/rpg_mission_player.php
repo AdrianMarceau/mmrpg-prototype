@@ -146,22 +146,13 @@ class rpg_mission_player extends rpg_mission {
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-3');
             $temp_battle_omega['flags']['player_battle'] = true;
             $temp_challenge_type = $temp_max_robots.'-on-'.$temp_max_robots;
-            $temp_star_boost = !empty($temp_player_starforce) ? array_sum($temp_player_starforce) : 0;
             $temp_battle_omega['battle_token'] = $temp_battle_token;
             $temp_battle_omega['battle_size'] = '1x2';
             $temp_battle_omega['battle_counts'] = false;
             $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
             $temp_battle_omega['battle_name'] = 'Player Battle vs '.$temp_battle_username;
-            if (!empty($temp_star_boost)){
-                reset($temp_player_starforce);
-                $temp_most_powerful = key($temp_player_starforce);
-                $temp_most_powerful_value = $temp_player_starforce[$temp_most_powerful];
-                $temp_battle_omega['battle_description'] = 'Defeat '.ucfirst($temp_battle_username).'&#39;'.(!preg_match('/s$/i', $temp_battle_username) ? 's' : '').' starforce boosted player data in a '.$temp_challenge_type.' battle!';
-                $temp_battle_omega['battle_description2'] = 'The '.ucfirst($temp_most_powerful).' type appears to be '.$temp_battle_userpronoun.' most powerful element, with '.($temp_most_powerful_value * 10).'&nbsp;/&nbsp;'.($temp_star_boost * 10).'% of the total boost!';
-            } else {
-                $temp_battle_omega['battle_description'] = 'Defeat '.ucfirst($temp_battle_username).'&#39;'.(!preg_match('/s$/i', $temp_battle_username) ? 's' : '').' player data in a '.$temp_challenge_type.' battle!';
-                $temp_battle_omega['battle_description2'] = '';
-            }
+            $temp_battle_omega['battle_description'] = 'Defeat '.ucfirst($temp_battle_username).'&#39;'.(!preg_match('/s$/i', $temp_battle_username) ? 's' : '').' player data in a '.$temp_challenge_type.' battle!';
+            $temp_battle_omega['battle_description2'] = '';
             $temp_battle_omega['battle_turns'] = ceil(MMRPG_SETTINGS_BATTLETURNS_PERROBOT * $temp_robots_num * MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER);
             $temp_battle_omega['battle_robot_limit'] = $this_max_robots;
             $temp_battle_omega['battle_points'] = 0;
@@ -173,7 +164,6 @@ class rpg_mission_player extends rpg_mission {
                 if (!empty($temp_robot_rewards['robot_defense'])){ $temp_stat_counter += $temp_robot_rewards['robot_defense']; }
                 if (!empty($temp_robot_rewards['robot_speed'])){ $temp_stat_counter += $temp_robot_rewards['robot_speed']; }
                 $temp_battle_omega['battle_points'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * $info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER) + $temp_stat_counter;
-                $temp_battle_omega['battle_points'] += !empty($temp_star_boost) ? $temp_star_boost * $temp_stat_counter : 0;
             }
 
             // Define the fusion field properties

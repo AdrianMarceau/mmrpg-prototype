@@ -356,7 +356,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
                 <span class="pipe">|</span>
                 <? if (mmrpg_prototype_stars_unlocked() > 0): ?>
                     <a class="link link_stars" data-step="stars" data-index="<?= $temp_data_index++ ?>" data-source="frames/stars.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                        <label>starforce</label>
+                        <label>stars</label>
                     </a>
                     <span class="pipe">|</span>
                 <? endif; ?>

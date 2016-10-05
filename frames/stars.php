@@ -187,7 +187,7 @@ gameSettings.autoScrollTop = false;
                 </span>
             </span>
 
-            <div class="starforce" data-size="<?= $temp_omega_factors_unlocked_total ?>">
+            <div class="stars" data-size="<?= $temp_omega_factors_unlocked_total ?>">
                 <div class="wrapper" style="<?= $flag_wap ? 'margin-right: 0;' : '' ?>">
 
                     <div class="page_links top_panel" data-max="" data-key="0" data-kind="top">
