@@ -5,6 +5,9 @@ if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
 
 // -- COLLECT ENVIRONMENT VARIABLES -- //
 
+// Include the starforce values so we can alter shop prices
+require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
+
 // Collect the field stars from the session variable
 if (!isset($_SESSION[$session_token]['values']['battle_shops'])){ $_SESSION[$session_token]['values']['battle_shops'] = array(); }
 $this_battle_shops = !empty($_SESSION[$session_token]['values']['battle_shops']) ? $_SESSION[$session_token]['values']['battle_shops'] : array();
@@ -538,7 +541,8 @@ if (!empty($this_shop_index['reggae'])){
             $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 100 : 0;
             if (!empty($this_battle_shops['reggae']['cores_bought'])){
                 foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
-                    $type_token = preg_replace('/-core$/i', '', $item_token);
+                    if (preg_match('/^item-core-/i', $item_token)){ $type_token = preg_replace('/^item-core-/i', '', $item_token); }
+                    else { $type_token = preg_replace('/-core$/i', '', $item_token); }
                     $type_info = $mmrpg_index['types'][$type_token];
                     if ($type_token == 'none'){ continue; }
                     $core_level_index[$type_token] = $item_quantity;
@@ -588,23 +592,21 @@ if (!empty($this_shop_index['reggae'])){
 
             }
 
-
         }
 
         // If Robots or Abilities have been unlocked, increase the core selling prices
-        if (!empty($global_unlocked_robots_cores) || !empty($global_unlocked_abilities_types)){
+        if (!empty($global_unlocked_robots_cores) || !empty($global_unlocked_abilities_types) || !empty($this_star_force)){
             if (!empty($this_shop_index['reggae']['shop_items']['items_buying'])){
                 $items_list = $this_shop_index['reggae']['shop_items']['items_buying'];
                 foreach ($items_list AS $item_token => $item_price){
-                    $type_token = preg_replace('/-(shard|core)$/', '', $item_token);
+                    $type_token = preg_replace('/-core$/', '', $item_token);
+                    $star_boost = !empty($this_star_force[$type_token]) ? $this_star_force[$type_token] : 0;
                     $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
                     $ability_boost = !empty($global_unlocked_abilities_types[$type_token]) ? $global_unlocked_abilities_types[$type_token] : 0;
+                    $star_price_boost = ceil($star_boost * 25);
+                    $ability_price_boost = ceil($ability_boost * 50);
                     $robot_price_boost = ceil($robot_boost * 100);
-                    $ability_price_boost = ceil($ability_boost * 10);
-                    if (strstr($item_token, '-shard')){
-                        $robot_price_boost = ceil($robot_price_boost / 10);
-                        $ability_price_boost = ceil($ability_price_boost / 10);
-                    }
+                    $item_price += $star_price_boost;
                     $item_price += $robot_price_boost;
                     $item_price += $ability_price_boost;
                     $this_shop_index['reggae']['shop_items']['items_buying'][$item_token] = $item_price;
