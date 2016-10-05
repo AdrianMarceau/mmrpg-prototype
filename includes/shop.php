@@ -511,11 +511,11 @@ if (!empty($this_shop_index['auto'])){
 if (!empty($this_shop_index['reggae'])){
 
         // If Reggae's Shop has reached sufficient levels, expand the inventory
-        if ($this_shop_index['reggae']['shop_level'] >= 10){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling2']; }
-        if ($this_shop_index['reggae']['shop_level'] >= 20){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling3']; }
-        if ($this_shop_index['reggae']['shop_level'] >= 30){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling4']; }
-        if ($this_shop_index['reggae']['shop_level'] >= 40){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling5']; }
-        if ($this_shop_index['reggae']['shop_level'] >= 50){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling6']; }
+        if ($this_shop_index['reggae']['shop_level'] >= 20){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling2']; }
+        if ($this_shop_index['reggae']['shop_level'] >= 30){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling3']; }
+        if ($this_shop_index['reggae']['shop_level'] >= 40){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling4']; }
+        if ($this_shop_index['reggae']['shop_level'] >= 50){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling5']; }
+        if ($this_shop_index['reggae']['shop_level'] >= 60){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling6']; }
         unset($this_shop_index['reggae']['shop_abilities']['abilities_selling2']);
         unset($this_shop_index['reggae']['shop_abilities']['abilities_selling3']);
         unset($this_shop_index['reggae']['shop_abilities']['abilities_selling4']);
@@ -533,8 +533,9 @@ if (!empty($this_shop_index['reggae'])){
             $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
 
             // Manually append some starter abilities as the first items in the list
-            $this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-charge'] = 3000;
-            $this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-relay'] = 3000;
+            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-shot'] = 3000;
+            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-charge'] = 3000;
+            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-relay'] = 3000;
 
             // If the player has sold any cores, loop through them and add associated abilities
             $core_level_index = array();
@@ -591,6 +592,9 @@ if (!empty($this_shop_index['reggae'])){
                 $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
 
             }
+
+            // Manually append some starter abilities as the first items in the list
+            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-shot'] = 3000;
 
         }
 
