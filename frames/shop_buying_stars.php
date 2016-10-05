@@ -45,7 +45,7 @@
                     $star_list_array_raw['today'] = array();
 
                     // Collect all the star tokens sorted by their kind
-                    $temp_star_tokens = array();
+                    $star_list_tokens = array();
 
                     // Collect each player's current field selection from the omega session
                     $temp_base_tokens = array();
@@ -77,40 +77,91 @@
 
                     }
 
+                    // Make sure the base tokens are all unique values
+                    $temp_base_tokens = array_unique($temp_base_tokens);
+                    $temp_fusion_tokens = array_unique($temp_fusion_tokens);
+
+                    /*
+                    echo('<pre>$temp_base_tokens(count) = '.count($temp_base_tokens).'</pre>');
+                    echo('<pre>$temp_base_tokens = array('."\n".implode(",\t\n", $temp_base_tokens)."\t\n".')</pre>');
+                    echo('<pre>$temp_fusion_tokens(count) = '.count($temp_fusion_tokens).'</pre>');
+                    echo('<pre>$temp_fusion_tokens = array('."\n".implode(",\n", $temp_fusion_tokens)."\n".')</pre>');
+                    */
+
                     // Shuffle the list of base and fusion tokens
                     shuffle($temp_base_tokens);
                     shuffle($temp_fusion_tokens);
 
                     // Define the first eight field and fusion star tokens
+                    $temp_limit = ceil(($shop_info['shop_level'] / 100) * 64);
+                    if ($temp_limit % 2 != 0){ $temp_limit += 1; }
                     $temp_fusion_star_tokens = array_slice($temp_fusion_tokens, 0, 10);
-                    $temp_field_star_tokens = array_slice($temp_base_tokens, 0, count($temp_fusion_star_tokens));
+                    $temp_required = $temp_limit - count($temp_fusion_star_tokens);
+                    $temp_field_star_tokens = array_slice($temp_base_tokens, 0, $temp_required);
+
+                    /*
+                    echo('<hr />');
+                    echo('<pre>$shop_token = '.$shop_token.'</pre>');
+                    echo('<pre>$shop_info[\'shop_level\'] = '.$shop_info['shop_level'].'</pre>');
+                    echo('<pre>$temp_limit = '.$temp_limit.'</pre>');
+
+                    echo('<hr />');
+                    echo('<pre>$temp_field_star_tokens(count) = '.count($temp_field_star_tokens).'</pre>');
+                    echo('<pre>$temp_field_star_tokens = array('."\n".implode(",\t\n", $temp_field_star_tokens)."\t\n".')</pre>');
+                    echo('<pre>$temp_fusion_star_tokens(count) = '.count($temp_fusion_star_tokens).'</pre>');
+                    echo('<pre>$temp_fusion_star_tokens = array('."\n".implode(",\t\n", $temp_fusion_star_tokens)."\t\n".')</pre>');
+                    */
+
+                    // Combine the two sets of tokens into one master list
+                    $temp_star_tokens = array_merge($temp_fusion_star_tokens, $temp_field_star_tokens);
+
+                    /*
+                    echo('<hr />');
+                    echo('<pre>$temp_star_tokens(count) = '.count($temp_star_tokens).'</pre>');
+                    echo('<pre>$temp_star_tokens = array('."\n".implode(",\t\n", $temp_star_tokens)."\t\n".')</pre>');
+                    */
 
                     // Loop through and index collected field star info
-                    foreach ($temp_field_star_tokens AS $key => $token){
+                    foreach ($temp_star_tokens AS $key => $token){
 
-                        // Collect the info for this base field and create the star
-                        $field_info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
-                        if (isset($_SESSION[$session_token]['values']['battle_stars'][$token])){ $star_info = $_SESSION[$session_token]['values']['battle_stars'][$token]; }
-                        else { $star_info = array('star_token' => $token, 'star_name' => $field_info['field_name'], 'star_kind' => 'field', 'star_type' => $field_info['field_type'], 'star_type2' => '', 'star_player' => '', 'star_date' => ''); }
-                        $star_list_array_raw['today'][$star_info['star_token']] = $star_info;
-                        $temp_star_tokens[] = $star_info['star_token'];
+                        // If this is a fusion star, collect info for each field
+                        if (isset($temp_fusion_tokens_index[$token])){
 
-                        // Collect the two fusion field token info and create stars
-                        $fusion = $temp_fusion_star_tokens[$key];
-                        $token2 = $temp_fusion_tokens_index[$fusion][0];
-                        $token3 = $temp_fusion_tokens_index[$fusion][1];
-                        $field_info2 = rpg_field::parse_index_info($mmrpg_database_fields[$token2]);
-                        $field_info3 = rpg_field::parse_index_info($mmrpg_database_fields[$token3]);
-                        $fusion_token = preg_replace('/-([a-z0-9]+)$/i', '', $token2).'-'.preg_replace('/^([a-z0-9]+)-/i', '', $token3);
-                        $fusion_name = preg_replace('/\s+([a-z0-9]+)$/i', '', $field_info2['field_name']).' '.preg_replace('/^([a-z0-9]+)\s+/i', '', $field_info3['field_name']);
-                        $fusion_type = !empty($field_info2['field_type']) ? $field_info2['field_type'] : '';
-                        $fusion_type2 = !empty($field_info3['field_type']) ? $field_info3['field_type'] : '';
-                        if (isset($_SESSION[$session_token]['values']['battle_stars'][$fusion_token])){ $star_info = $_SESSION[$session_token]['values']['battle_stars'][$fusion_token]; }
-                        else { $star_info = array('star_token' => $fusion_token, 'star_name' => $fusion_name, 'star_kind' => 'fusion', 'star_type' => $fusion_type, 'star_type2' => $fusion_type2, 'star_player' => '', 'star_date' => ''); }
-                        $star_list_array_raw['today'][$star_info['star_token']] = $star_info;
-                        $temp_star_tokens[] = $star_info['star_token'];
+                            // Collect the two fusion field token info and create stars
+                            $token2 = $temp_fusion_tokens_index[$token][0];
+                            $token3 = $temp_fusion_tokens_index[$token][1];
+                            $field_info2 = rpg_field::parse_index_info($mmrpg_database_fields[$token2]);
+                            $field_info3 = rpg_field::parse_index_info($mmrpg_database_fields[$token3]);
+                            $fusion_token = preg_replace('/-([a-z0-9]+)$/i', '', $token2).'-'.preg_replace('/^([a-z0-9]+)-/i', '', $token3);
+                            $fusion_name = preg_replace('/\s+([a-z0-9]+)$/i', '', $field_info2['field_name']).' '.preg_replace('/^([a-z0-9]+)\s+/i', '', $field_info3['field_name']);
+                            $fusion_type = !empty($field_info2['field_type']) ? $field_info2['field_type'] : '';
+                            $fusion_type2 = !empty($field_info3['field_type']) ? $field_info3['field_type'] : '';
+                            if (isset($_SESSION[$session_token]['values']['battle_stars'][$fusion_token])){ $star_info = $_SESSION[$session_token]['values']['battle_stars'][$fusion_token]; }
+                            else { $star_info = array('star_token' => $fusion_token, 'star_name' => $fusion_name, 'star_kind' => 'fusion', 'star_type' => $fusion_type, 'star_type2' => $fusion_type2, 'star_player' => '', 'star_date' => ''); }
+                            $star_list_array_raw['today'][$star_info['star_token']] = $star_info;
+                            $star_list_tokens[] = $star_info['star_token'];
+
+                        }
+                        // Otherwise collect field information normally
+                        else {
+
+                            // Collect the info for this base field and create the star
+                            $field_info = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
+                            if (isset($_SESSION[$session_token]['values']['battle_stars'][$token])){ $star_info = $_SESSION[$session_token]['values']['battle_stars'][$token]; }
+                            else { $star_info = array('star_token' => $token, 'star_name' => $field_info['field_name'], 'star_kind' => 'field', 'star_type' => $field_info['field_type'], 'star_type2' => '', 'star_player' => '', 'star_date' => ''); }
+                            $star_list_array_raw['today'][$star_info['star_token']] = $star_info;
+                            $star_list_tokens[] = $star_info['star_token'];
+
+                        }
 
                     }
+
+                    /*
+                    echo('<hr />');
+                    echo('<pre>$star_list_tokens(count) = '.count($star_list_tokens).'</pre>');
+                    echo('<pre>$star_list_tokens = array('."\n".implode(",\t\n", $star_list_tokens)."\t\n".')</pre>');
+                    exit();
+                    */
 
                     // Update the session with the new array in raw format
                     $_SESSION[$session_token]['SHOP'][$temp_session_key] = $star_list_array_raw;
@@ -119,6 +170,7 @@
 
                 // Reformat the list arrays to what we need them for
                 $star_list_array = array_keys($star_list_array_raw['today']);
+                shuffle($star_list_array);
 
                 // Loop through the items and print them one by one
                 $star_counter = 0;
@@ -139,16 +191,6 @@
                     $star_info_type2 = !empty($star_info['star_type2']) ? $star_info['star_type2'] : '';
                     $star_info_class = !empty($star_info_type) ? $star_info_type : 'none';
                     if (!empty($star_info_type2)){ $star_info_class .= '_'.$star_info_type2; }
-
-                    if (!empty($star_info_type) && !empty($this_star_force[$star_info_type])){
-                        $temp_force = $this_star_force[$star_info_type];
-                        $star_info_price += round($temp_force * 10);
-                    }
-
-                    if (!empty($star_info_type2) && !empty($this_star_force[$star_info_type2])){
-                        $temp_force2 = $this_star_force[$star_info_type2];
-                        $star_info_price += round($temp_force2 * 10);
-                    }
 
                     $global_item_quantities['star-'.$star_info_token] = !empty($_SESSION[$session_token]['values']['battle_stars'][$star_info_token]) ? 1 : 0;
                     $global_item_prices['sell']['star-'.$star_info_token] = $star_info_price;

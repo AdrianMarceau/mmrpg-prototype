@@ -74,8 +74,8 @@ function mmrpg_prototype_calculate_battle_points($update_session = false){
     // If the player has unlocked any stars, loop through them and add up points
     if (!empty($_SESSION[$session_token]['values']['battle_stars'])){
         foreach ($_SESSION[$session_token]['values']['battle_stars'] AS $star_key => $star_data){
-            if ($star_data['star_kind'] == 'field'){ $star_points = 5000; }
-            elseif ($star_data['star_kind'] == 'fusion'){ $star_points = 10000; }
+            if ($star_data['star_kind'] == 'field'){ $star_points = 6000; }
+            elseif ($star_data['star_kind'] == 'fusion'){ $star_points = 9000; }
             $total_battle_points += $star_points;
         }
     }
