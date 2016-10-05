@@ -241,7 +241,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 }
 #prototype .banner .subpoints {
     top: 43px;
-    width: 163px;
+    width: 190px;
     height: 19px;
     font-size: 9px;
 }
@@ -428,7 +428,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     display: block;
     margin: 0;
     padding: 3px 5px;
-    width: 153px;
+    width: 180px;
     height: 16px;
     font-size: 10px;
     line-height: 10px;
