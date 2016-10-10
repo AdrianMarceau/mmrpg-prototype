@@ -150,6 +150,7 @@ class rpg_canvas {
         $this_data['robot_file_width'] = ceil($this_data['robot_scale'] * $zoom_size * count($frame_index));
         $this_data['robot_file_height'] = ceil($this_data['robot_scale'] * $zoom_size);
 
+
         /* DEBUG
         $this_data['robot_title'] = $this_robot->robot_name
             .' | ID '.str_pad($this_robot->robot_id, 3, '0', STR_PAD_LEFT).''
@@ -327,6 +328,10 @@ class rpg_canvas {
             }
             //$this_data['robot_markup_style'] .= 'background-image: url('.$this_data['robot_file'].'); ';
             $this_data['robot_markup_style'] .= 'background-image: url('.$this_data['robot_file'].'); width: '.$this_data['robot_sprite_size'].'px; height: '.$this_data['robot_sprite_size'].'px; background-size: '.$this_data['robot_file_width'].'px '.$this_data['robot_file_height'].'px; ';
+            if ($this_data['robot_position'] != 'active'){
+                $brightness = 1 - (0.05 * $this_data['robot_key']);
+                $this_data['robot_markup_style'] .= 'filter: brightness('.$brightness.'); ';
+            }
             $this_data['robot_markup_style'] .= $this_data['robot_frame_styles'];
             $this_data['energy_class'] = 'energy';
             $this_data['energy_style'] = 'background-position: '.$this_data['energy_x_position'].'px '.$this_data['energy_y_position'].'px;';
@@ -442,6 +447,101 @@ class rpg_canvas {
                         '" data-scale="'.$this_data['robot_scale'].
                         '"></div>';
                 }
+            }
+
+            // Only append extra icons if this robot is visible
+            if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
+
+                // Calculate whether or not this robot is currently unlockable
+                $is_unlockable = false;
+                $is_corrupted = false;
+                if ($this_robot->player->player_side == 'right'){
+                    if (!empty($this_robot->battle->battle_rewards['robots'])){
+                        foreach ($this_robot->battle->battle_rewards['robots'] AS $reward){
+                            if ($this_robot->robot_token == $reward['token']){
+                                $is_unlockable = true;
+                                if (mmrpg_prototype_robot_unlocked(false, $reward['token'])){
+                                    $is_unlockable = false;
+                                    break;
+                                }
+                                if (!empty($this_robot->history['triggered_damage_types'])){
+                                    foreach ($this_robot->history['triggered_damage_types'] AS $types){
+                                        if (!empty($types)){
+                                            $is_corrupted = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // If this robot is unlockable, display the icon above its head
+                if ($is_unlockable){
+
+                    // Calculate the zoom properties for the icon sprite
+                    $icon_size = 80;
+                    $icon_scale = $this_data['robot_scale'];
+                    $icon_direction = $this_data['robot_direction'];
+                    $icon_sprite_size = ceil($icon_scale * $icon_size);
+                    $frame_index2 = explode('/', MMRPG_SETTINGS_ATTACHMENT_FRAMEINDEX);
+                    $icon_file_width = ceil($icon_scale * $icon_size * count($frame_index2));
+                    $icon_file_height = ceil($icon_scale * $icon_size);
+                    $icon_float = $this_data['robot_float'];
+
+                    // Calculate the offsets based on robot and scale
+                    $icon_offset_z = $this_data['canvas_offset_z'] + 1;
+                    $icon_offset_x = $this_data['canvas_offset_x'];
+                    $icon_offset_y = $this_data['canvas_offset_y'];
+                    $icon_offset_x -= 25;
+                    $icon_offset_y += 20;
+                    $base_multi = ceil($this_robot->robot_image_size / 40);
+                    if ($base_multi > 1){
+                        $icon_offset_x += ($base_multi - 1) * 25;
+                        $icon_offset_y += ($base_multi - 1) * 6;
+                    }
+
+                    // Define the animation frames based on corrupted or not
+                    if (!$is_corrupted){
+                        $frame_animate = array('00', '01', '00', '02');
+                    } else {
+                        $frame_animate = array('03', '04', '05');
+                    }
+                    $frame_token = $frame_animate[0];
+                    $frame_position = array_search($frame_token, $frame_index2);
+                    $frame_background_offset = -1 * ceil(($icon_sprite_size * $frame_position));
+
+
+                    // Generate the markup for the unlockable icon sprite
+                    echo '<div '.
+                        'class="'.
+                            'sprite '.
+                            'sprite_'.$icon_size.'x'.$icon_size.' '.
+                            'sprite_'.$icon_size.'x'.$icon_size.'_'.$frame_token.' '.
+                            '" '.
+                        'style="'.
+                            'background-image: url(images/assets/unlock-icon/sprite_left_'.$icon_size.'x'.$icon_size.'.png?3); '.
+                            'background-size: '.$icon_file_width.'px '.$icon_file_height.'px; '.
+                            'background-position: '.(!empty($frame_background_offset) ? $frame_background_offset.'px' : '0').' 0; '.
+                            'width: '.$icon_sprite_size.'px; '.
+                            'height: '.$icon_sprite_size.'px; '.
+                            'z-index: '.$icon_offset_z.'; '.
+                            $icon_float.': '.$icon_offset_x.'px; '.
+                            'bottom: '.$icon_offset_y.'px; '.
+                            ($is_corrupted ? 'filter: opacity(0.5); ' : '').
+                            '" '.
+                        'data-type="attachment" '.
+                        'data-size="'.$icon_sprite_size.'" '.
+                        'data-direction="'.$icon_direction.'" '.
+                        'data-frame="'.$frame_token.'" '.
+                        'data-animate="'.implode(',',$frame_animate).'" '.
+                        'data-scale="'.$icon_scale.'" '.
+                        '></div>';
+
+                }
+
             }
 
             // Check if his player has any other active robots

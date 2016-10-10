@@ -103,8 +103,11 @@ define('MMRPG_SETTINGS_THREADNAME_MAXLENGTH', 60); // Prevent wordy threadnames
 define('MMRPG_SETTINGS_DISCUSSION_MINLENGTH', 100); // Prevent spam discussions
 define('MMRPG_SETTINGS_DISCUSSION_MAXLENGTH', 20000); // Prevent wordy discussions
 
-// Define the global frame index for robot sprites
+// Define the global frame index for robot / ability / item sprites
 define('MMRPG_SETTINGS_ROBOT_FRAMEINDEX', 'base/taunt/victory/defeat/shoot/throw/summon/slide/defend/damage/base2'); // Define the sprite index
+define('MMRPG_SETTINGS_ABILITY_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); // Define the sprite index
+define('MMRPG_SETTINGS_ITEM_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); // Define the sprite index
+define('MMRPG_SETTINGS_ATTACHMENT_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); // Define the sprite index
 
 // Define the global battle point requirements for posting
 define('MMRPG_SETTINGS_THREAD_MINPOINTS', 5000); // Prevent spam comments
