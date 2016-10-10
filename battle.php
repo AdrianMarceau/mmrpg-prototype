@@ -267,7 +267,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                     $background_data_animate = count($background_animate) > 1 ? implode(',', $background_animate) : false;
                     // Display the markup of the background layer
                     //echo '<div class="animate_fadein background_canvas background background_'.$background_animate[0].'" data-frame="'.$background_animate[0].'" '.(!empty($background_data_animate) ? 'data-animate="'.$background_data_animate.'"' : '').' style="background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
-                    echo '<div class="animate_fadein background_canvas background background_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    echo '<div class="animate_fadein background_canvas background background_00" data-frame="00" style="background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
 
                     // Loop through and display the markup of any background attachments
                     if (!empty($this_field_data['field_background_attachments'])){
