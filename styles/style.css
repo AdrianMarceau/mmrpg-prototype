@@ -1756,6 +1756,11 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     margin: 3px 0 0;
     padding: 0 6px;
 }
+#events #messages .event .header_left .header_core,
+#events #messages .event .header_right .header_core {
+    border-color: rgba(0, 0, 0, 0.2) !important;
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
 #events #messages .event .header_left .header_core {
     float: right;
 }

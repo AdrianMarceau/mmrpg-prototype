@@ -35,11 +35,11 @@ $ability = array(
                 'frame' => 'taunt',
                 'rates' => array(100, 0, 0),
                 'success' => array(1, -10, 0, -10,
-                    'The '.$this_ability->print_name().' resists '.$this_ability->ability_recovery2.'% of all damage!<br /> '.
+                    'The '.$this_ability->print_name().' resists damage!<br /> '.
                     $this_robot->print_name().'\'s defenses were bolstered!'
                     ),
                 'failure' => array(1, -10, 0, -10,
-                    'The '.$this_ability->print_name().' resists '.$this_ability->ability_recovery2.'% of all damage!<br /> '.
+                    'The '.$this_ability->print_name().' resists damage!<br /> '.
                     $this_robot->print_name().'\'s defenses were bolstered!'
                     )
                 ),

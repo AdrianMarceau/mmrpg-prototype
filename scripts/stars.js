@@ -264,7 +264,7 @@ function refreshStarforceContainers(){
         var borderSize = Math.floor((prototypeWidth - starContainerWidth - (thisPageLinksSide.width() * 2) - 46) / 2);
         var marginLeft = borderSize + 42;
         if (borderSize < 0){ borderSize = 0; }
-        console.log('borderSize = ' + borderSize);
+        //console.log('borderSize = ' + borderSize);
 
         thisPageLinksSide
             .filter('.left')

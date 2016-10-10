@@ -1233,7 +1233,7 @@ class rpg_field extends rpg_object {
                     </h2>
                     <div class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
                         <div id="sprite_container" style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #191919 none scroll repeat -10px -30px; overflow: hidden; padding: 0; margin-bottom: 10px;">
-                            <div class="sprite_background" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: transparent url(images/fields/<?= $field_info['field_background'] ?>/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
+                            <div class="sprite_background" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #000000 url(images/fields/<?= $field_info['field_background'] ?>/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
                                 <div class="sprite_foreground" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: transparent url(images/fields/<?= $field_info['field_background'] ?>/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
                                     &nbsp;
                                 </div>

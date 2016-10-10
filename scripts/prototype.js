@@ -903,7 +903,7 @@ function prototype_menu_click_option(thisContext, thisOption){
             var bannerOverlay = $('.banner_overlay', thisBanner);
             //thisBanner.stop().removeClass('banner_compact').animate({height:'124px'},{duration:1000,easing:'swing',queue:false});
             bannerOverlay.stop().removeClass('overlay_hidden').animate({opacity:0.75},{duration:1000,easing:'swing',queue:false});
-            $('.points, .options, .tooltip', thisBanner).stop().animate({opacity:0},{duration:500,easing:'swing',queue:false});
+            $('.points, .subpoints, .options, .tooltip', thisBanner).stop().animate({opacity:0},{duration:500,easing:'swing',queue:false});
             // Add the canvas overlay footer to the canvas with multipliers
             var thisFieldName = thisOption.attr('data-field');
             var thisBattleDescription = thisOption.attr('data-description').replace('-', '&#8209;');
@@ -1021,7 +1021,7 @@ function prototype_menu_click_back(thisContext, thisLink){
                 newBannerForeground.insertAfter(oldBannerForeground).animate({opacity:1.0},{duration:1000,easing:'swing',queue:false,complete:function(){ oldBannerForeground.remove(); $(this).css({zIndex:''}); }});
                 // Fade out the overlay to allow clicking on banner links
                 var bannerOverlay = $('.banner_overlay', thisBanner).stop().animate({opacity:0},{duration:1000,easing:'swing',queue:false,complete:function(){ $(this).addClass('overlay_hidden'); }});
-                $('.points, .options, .tooltip', thisBanner).stop().animate({opacity:1},500,'swing');
+                $('.points, .subpoints, .options, .tooltip', thisBanner).stop().animate({opacity:1},500,'swing');
                 //alert(newBackgroundImage);
                 // Remove the field details overlay
                 $('.canvas_overlay_footer', thisBanner).remove();
