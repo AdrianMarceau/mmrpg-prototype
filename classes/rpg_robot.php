@@ -229,6 +229,34 @@ class rpg_robot extends rpg_object {
 
         }
 
+        // If this is an AI-controlled robot, check to see if unlockable
+        if ($this->player->player_side == 'right' && empty($this->flags['check_robot_unlockable'])){
+
+            // Calculate whether or not this robot is currently unlockable
+            $is_unlockable = false;
+            if ($this->player->player_side == 'right'){
+                if (!empty($this->battle->battle_rewards['robots'])){
+                    foreach ($this->battle->battle_rewards['robots'] AS $reward){
+                        if ($this->robot_token == $reward['token']){
+                            $is_unlockable = true;
+                            if (mmrpg_prototype_robot_unlocked(false, $reward['token'])){
+                                $is_unlockable = false;
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Update this robot's flag's to reflect unlockability
+            $this->flags['robot_is_unlockable'] = $is_unlockable;
+
+            // Set the session settings flag to true
+            $this->flags['check_robot_unlockable'] = true;
+
+        }
+
         // Remove any abilities that do not exist in the index
         if (!empty($this->robot_abilities)){
             foreach ($this->robot_abilities AS $key => $token){
@@ -1740,16 +1768,41 @@ class rpg_robot extends rpg_object {
     // Define a trigger for inflicting all types of ability or item damage on this robot
     public function trigger_damage($target_robot, $this_object, $damage_amount, $trigger_disabled = true, $trigger_options = array()){
 
+        // Define the return variable to pass back later
+        $trigger_return = false;
+
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
             // This was an ability so delegate to the ability class function
-            return rpg_ability_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
+            $trigger_return = rpg_ability_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
 
         } elseif (isset($this_object->item_token)){
             // This was an item so delegate to the item class function
             //return $this->trigger_item_damage($target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
-            return rpg_item_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
+            $trigger_return = rpg_item_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
         }
+
+        // Check if this unlockable robot's data has been corrupted
+        if (!empty($this->flags['robot_is_unlockable'])){
+
+            // Calculate whether or not this robot is currently corrupted
+            $is_corrupted = false;
+            if (!empty($this->history['triggered_damage_types'])){
+                foreach ($this->history['triggered_damage_types'] AS $types){
+                    if (!empty($types)){
+                        $is_corrupted = true;
+                        break;
+                    }
+                }
+            }
+
+            // Update this robot's session flags with corrupted status
+            $this->set_flag('robot_is_unlockable_corrupted', $is_corrupted);
+
+        }
+
+        // Return the trigger results
+        return $trigger_return;
 
     }
 

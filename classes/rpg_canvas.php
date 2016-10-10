@@ -328,10 +328,12 @@ class rpg_canvas {
             }
             //$this_data['robot_markup_style'] .= 'background-image: url('.$this_data['robot_file'].'); ';
             $this_data['robot_markup_style'] .= 'background-image: url('.$this_data['robot_file'].'); width: '.$this_data['robot_sprite_size'].'px; height: '.$this_data['robot_sprite_size'].'px; background-size: '.$this_data['robot_file_width'].'px '.$this_data['robot_file_height'].'px; ';
+            /*
             if ($this_data['robot_position'] != 'active'){
                 $brightness = 1 - (0.05 * $this_data['robot_key']);
                 $this_data['robot_markup_style'] .= 'filter: brightness('.$brightness.'); ';
             }
+            */
             $this_data['robot_markup_style'] .= $this_data['robot_frame_styles'];
             $this_data['energy_class'] = 'energy';
             $this_data['energy_style'] = 'background-position: '.$this_data['energy_x_position'].'px '.$this_data['energy_y_position'].'px;';
@@ -453,30 +455,8 @@ class rpg_canvas {
             if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
 
                 // Calculate whether or not this robot is currently unlockable
-                $is_unlockable = false;
-                $is_corrupted = false;
-                if ($this_robot->player->player_side == 'right'){
-                    if (!empty($this_robot->battle->battle_rewards['robots'])){
-                        foreach ($this_robot->battle->battle_rewards['robots'] AS $reward){
-                            if ($this_robot->robot_token == $reward['token']){
-                                $is_unlockable = true;
-                                if (mmrpg_prototype_robot_unlocked(false, $reward['token'])){
-                                    $is_unlockable = false;
-                                    break;
-                                }
-                                if (!empty($this_robot->history['triggered_damage_types'])){
-                                    foreach ($this_robot->history['triggered_damage_types'] AS $types){
-                                        if (!empty($types)){
-                                            $is_corrupted = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
+                $is_unlockable = isset($this_robot->flags['robot_is_unlockable']) ? $this_robot->flags['robot_is_unlockable'] : false;
+                $is_corrupted = isset($this_robot->flags['robot_is_unlockable_corrupted']) ? $this_robot->flags['robot_is_unlockable_corrupted'] : false;
 
                 // If this robot is unlockable, display the icon above its head
                 if ($is_unlockable){
