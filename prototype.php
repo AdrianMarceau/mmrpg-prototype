@@ -344,7 +344,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
                     </a>
                     <span class="pipe">|</span>
                 <? endif; ?>
-                <? if (mmrpg_prototype_item_unlocked('field-codes')): ?>
+                <? if (mmrpg_prototype_players_unlocked() > 1): ?>
                     <a class="link link_players" data-step="edit_players" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <label>players</label>
                     </a>
