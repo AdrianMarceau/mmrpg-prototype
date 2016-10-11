@@ -24,29 +24,14 @@ if (empty($this_robot)){
 }
 
 // If the current target robot is the active one as well
-if ($this_robot->robot_id != $target_robot->robot_id
-    && $target_robot->robot_position == 'active'){
-    $active_target_robot = $target_robot;
-}
-// Otherwise, if the target was a benched robot
-else {
-    $active_target_robot = false;
-    foreach ($target_player->values['robots_active'] AS $temp_robotinfo){
-        if ($temp_robotinfo['robot_position'] == 'active'){
-            $temp_robotinfo = array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']);
-            $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
-            $active_target_robot->update_session();
-            break;
-        }
-    }
-    if (empty($active_target_robot)){
-        $temp_robotinfo = array_slice($target_player->values['robots_active'], 0, 1);
-        $temp_robotinfo = array_shift($temp_robotinfo);
-        $temp_robotinfo = array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']);
-        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $target_player->player_robots[0]);
-        $active_target_robot->robot_position = 'active';
-        $active_target_robot->update_session();
-    }
+$active_target_robot = $target_player->get_active_robot();
+if (empty($active_target_robot)){
+    $temp_active = $target_player->values['robots_active'];
+    $temp_info = array_shift($temp_active);
+    $temp_robotinfo = array('robot_id' => $temp_info['robot_id'], 'robot_token' => $temp_info['robot_token']);
+    $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
+    $active_target_robot->robot_position = 'active';
+    $active_target_robot->update_session();
 }
 
 // DEBUG
@@ -325,7 +310,7 @@ else {
     elseif ($backup_target_robot_position == 'active' || (!empty($temp_ability_info) && $temp_ability_info['ability_target'] == 'auto')){
 
         // Define the new target robot which is the current active target robot
-        $new_target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
+        $new_target_robot = $target_player->get_active_robot(); //rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
         // Update the target robot's session
         $new_target_robot->update_session();
         // Queue up an this robot's action second, because its slower
