@@ -2540,7 +2540,7 @@ class rpg_player extends rpg_object {
         elseif (!empty($player_info['player_speed'])){ $player_info['player_stat_type'] = 'speed'; }
 
         // Define whether or not field switching is enabled
-        $temp_allow_field_switch = mmrpg_prototype_complete($player_info['player_token']) || mmrpg_prototype_complete();
+        $temp_allow_field_switch = mmrpg_prototype_item_unlocked('field-codes');
 
         // Collect a temp robot object for printing items
         if ($player_info['player_token'] == 'dr-light'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['mega-man']); }
@@ -2551,7 +2551,7 @@ class rpg_player extends rpg_object {
         ob_start();
 
         // DEBUG
-        //die(print_r($player_field_rewards, true));
+        //echo(print_r($player_field_rewards, true));
 
             ?>
             <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$player_info['player_token']?>">
@@ -2656,187 +2656,7 @@ class rpg_player extends rpg_object {
                         </tbody>
                     </table>
 
-
-
-                    <? if(false && !empty($player_item_rewards)){ ?>
-
-                        <table class="full">
-                            <colgroup>
-                                <col width="100%" />
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <td class="right" style="padding-top: 4px;">
-                                    <label class="item_header">Player Items :</label>
-                                        <div class="item_container" style="height: auto;">
-                                        <?
-
-                                        // Define the array to hold ALL the reward option markup
-                                        $item_rewards_options = '';
-
-                                        // Collect this player's item rewards and add them to the dropdown
-                                        //$player_item_rewards = !empty($player_rewards['player_items']) ? $player_rewards['player_items'] : array();
-                                        //if (!empty($player_item_rewards)){ sort($player_item_rewards); }
-
-                                        // DEBUG
-                                        //$debug_tokens = array();
-                                        //foreach ($player_item_rewards AS $info){ $debug_tokens[] = $info['ability_token']; }
-                                        //echo 'before:'.implode(',', array_keys($debug_tokens)).'<br />';
-
-                                        // Sort the item index based on item group
-                                        uasort($player_item_rewards, array('rpg_player', 'items_sort_for_editor'));
-
-                                        // DEBUG
-                                        //echo 'after:'.implode(',', array_keys($player_item_rewards)).'<br />';
-
-                                        // DEBUG
-                                        //$debug_tokens = array();
-                                        //foreach ($player_item_rewards AS $info){ $debug_tokens[] = $info['ability_token']; }
-                                        //echo 'after:'.implode(',', $debug_tokens).'<br />';
-
-                                        // Dont' bother generating option dropdowns if editing is disabled
-                                        if ($global_allow_editing){
-                                            $player_item_rewards_options = array();
-                                            foreach ($player_item_rewards AS $temp_item_key => $temp_item_info){
-                                                if (empty($temp_item_info['ability_token'])){ continue; }
-                                                $temp_token = $temp_item_info['ability_token'];
-                                                $temp_item_info = rpg_ability::parse_index_info($mmrpg_database_items[$temp_token]);
-                                                $temp_option_markup = rpg_ability::print_editor_option_markup($robot_info, $temp_item_info);
-                                                if (!empty($temp_option_markup)){ $player_item_rewards_options[] = $temp_option_markup; }
-                                            }
-                                            $player_item_rewards_options = '<optgroup label="Player Items">'.implode('', $player_item_rewards_options).'</optgroup>';
-                                            $item_rewards_options .= $player_item_rewards_options;
-
-                                            /*
-                                            // Collect this robot's item rewards and add them to the dropdown
-                                            $player_item_rewards = !empty($player_rewards['player_items']) ? $player_rewards['player_items'] : array();
-                                            $player_item_settings = !empty($player_settings['player_items']) ? $player_settings['player_items'] : array();
-                                            foreach ($player_item_settings AS $token => $info){ if (empty($player_item_rewards[$token])){ $player_item_rewards[$token] = $info; } }
-                                            if (!empty($player_item_rewards)){ sort($player_item_rewards); }
-                                            $player_item_rewards_options = array();
-                                            foreach ($player_item_rewards AS $temp_item_info){
-                                                if (empty($temp_item_info['ability_token'])){ continue; }
-                                                $temp_token = $temp_item_info['ability_token'];
-                                                $temp_item_info = rpg_ability::parse_index_info($mmrpg_database_items[$temp_token]);
-                                                $temp_option_markup = rpg_ability::print_editor_option_markup($robot_info, $temp_item_info);
-                                                if (!empty($temp_option_markup)){ $player_item_rewards_options[] = $temp_option_markup; }
-                                            }
-                                            $player_item_rewards_options = '<optgroup label="Player Items">'.implode('', $player_item_rewards_options).'</optgroup>';
-                                            $item_rewards_options .= $player_item_rewards_options;
-                                            */
-
-                                            // Add an option at the bottom to remove the ability
-                                            $item_rewards_options .= '<optgroup label="Item Actions">';
-                                            $item_rewards_options .= '<option value="" title="">- Remove Item -</option>';
-                                            $item_rewards_options .= '</optgroup>';
-
-                                        }
-
-                                        // Loop through the robot's current items and list them one by one
-                                        $empty_item_counter = 0;
-                                        $temp_string = array();
-                                        $temp_inputs = array();
-                                        $item_key = 0;
-                                        if (!empty($player_info['player_items_current'])){
-
-                                            // DEBUG
-                                            //echo 'robot-ability:';
-                                            foreach ($player_info['player_items_current'] AS $key => $player_item){
-                                                if (empty($player_item['item_token'])){ continue; }
-                                                elseif ($player_item['item_token'] == '*'){ continue; }
-                                                elseif ($player_item['item_token'] == 'item'){ continue; }
-                                                elseif ($item_key > 7){ continue; }
-                                                $this_item = rpg_item::parse_index_info($mmrpg_database_items[$player_item['item_token']]);
-                                                if (empty($this_item)){ continue; }
-                                                $this_item_token = $this_item['item_token'];
-                                                $this_item_name = $this_item['item_name'];
-                                                $this_item_type = !empty($this_item['item_type']) ? $this_item['item_type'] : false;
-                                                $this_item_type2 = !empty($this_item['item_type2']) ? $this_item['item_type2'] : false;
-                                                if (!empty($this_item_type) && !empty($mmrpg_index['types'][$this_item_type])){
-                                                    $this_item_type = $mmrpg_index['types'][$this_item_type]['type_name'].' Type';
-                                                    if (!empty($this_item_type2) && !empty($mmrpg_index['types'][$this_item_type2])){
-                                                        $this_item_type = str_replace(' Type', ' / '.$mmrpg_index['types'][$this_item_type2]['type_name'].' Type', $this_item_type);
-                                                    }
-                                                } else {
-                                                    $this_item_type = '';
-                                                }
-                                                $this_item_energy = isset($this_item['item_energy']) ? $this_item['item_energy'] : 4;
-                                                $this_item_damage = !empty($this_item['item_damage']) ? $this_item['item_damage'] : 0;
-                                                $this_item_damage2 = !empty($this_item['item_damage2']) ? $this_item['item_damage2'] : 0;
-                                                $this_item_damage_percent = !empty($this_item['item_damage_percent']) ? true : false;
-                                                $this_item_damage2_percent = !empty($this_item['item_damage2_percent']) ? true : false;
-                                                if ($this_item_damage_percent && $this_item_damage > 100){ $this_item_damage = 100; }
-                                                if ($this_item_damage2_percent && $this_item_damage2 > 100){ $this_item_damage2 = 100; }
-                                                $this_item_recovery = !empty($this_item['item_recovery']) ? $this_item['item_recovery'] : 0;
-                                                $this_item_recovery2 = !empty($this_item['item_recovery2']) ? $this_item['item_recovery2'] : 0;
-                                                $this_item_recovery_percent = !empty($this_item['item_recovery_percent']) ? true : false;
-                                                $this_item_recovery2_percent = !empty($this_item['item_recovery2_percent']) ? true : false;
-                                                if ($this_item_recovery_percent && $this_item_recovery > 100){ $this_item_recovery = 100; }
-                                                if ($this_item_recovery2_percent && $this_item_recovery2 > 100){ $this_item_recovery2 = 100; }
-                                                $this_item_accuracy = !empty($this_item['item_accuracy']) ? $this_item['item_accuracy'] : 0;
-                                                $this_item_description = !empty($this_item['item_description']) ? $this_item['item_description'] : '';
-                                                $this_item_description = str_replace('{DAMAGE}', $this_item_damage, $this_item_description);
-                                                $this_item_description = str_replace('{RECOVERY}', $this_item_recovery, $this_item_description);
-                                                $this_item_description = str_replace('{DAMAGE2}', $this_item_damage2, $this_item_description);
-                                                $this_item_description = str_replace('{RECOVERY2}', $this_item_recovery2, $this_item_description);
-                                                $this_item_title = rpg_item::print_editor_title_markup($robot_info, $this_item);
-                                                $this_item_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_item_title));
-                                                $this_item_title_tooltip = htmlentities($this_item_title, ENT_QUOTES, 'UTF-8');
-                                                $this_item_title_html = str_replace(' ', '&nbsp;', $this_item_name);
-                                                $temp_select_options = str_replace('value="'.$this_item_token.'"', 'value="'.$this_item_token.'" selected="selected" disabled="disabled"', $item_rewards_options);
-                                                $this_item_title_html = '<label style="background-image: url(images/items/'.$this_item_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_item_title_html.'</label>';
-                                                if ($global_allow_editing){ $this_item_title_html .= '<select class="item_name" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
-                                                $temp_string[] = '<a class="item_name item_type item_type_'.(!empty($this_item['item_type']) ? $this_item['item_type'] : 'none').(!empty($this_item['item_type2']) ? '_'.$this_item['item_type2'] : '').'" style="'.(($item_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-item="'.$this_item_token.'" title="'.$this_item_title_plain.'" data-tooltip="'.$this_item_title_tooltip.'">'.$this_item_title_html.'</a>';
-                                                $item_key++;
-                                            }
-
-                                            if ($item_key <= 7){
-                                                for ($item_key; $item_key <= 7; $item_key++){
-                                                    $empty_item_counter++;
-                                                    if ($empty_item_counter >= 2){ $empty_item_disable = true; }
-                                                    else { $empty_item_disable = false; }
-                                                    $temp_select_options = str_replace('value=""', 'value="" selected="selected" disabled="disabled"', $item_rewards_options);
-                                                    $this_item_title_html = '<label>-</label>';
-                                                    if ($global_allow_editing){ $this_item_title_html .= '<select class="ability_name" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" '.($empty_item_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>'; }
-                                                    $temp_string[] = '<a class="ability_name " style="'.(($item_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_item_disable ? 'opacity:0.25; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-item="" title="" data-tooltip="">'.$this_item_title_html.'</a>';
-                                                }
-                                            }
-
-
-                                        } else {
-
-                                            for ($item_key = 0; $item_key <= 7; $item_key++){
-                                                $empty_item_counter++;
-                                                if ($empty_item_counter >= 2){ $empty_item_disable = true; }
-                                                else { $empty_item_disable = false; }
-                                                $temp_select_options = str_replace('value=""', 'value="" selected="selected"', $item_rewards_options);
-                                                $this_item_title_html = '<label>-</label>';
-                                                if ($global_allow_editing){ $this_item_title_html .= '<select class="ability_name" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" '.($empty_item_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>'; }
-                                                $temp_string[] = '<a class="ability_name " style="'.(($item_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_item_disable ? 'opacity:0.25; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$item_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-ability="">'.$this_item_title_html.'</a>';
-                                            }
-
-                                        }
-                                        // DEBUG
-                                        //echo 'temp-string:';
-                                        echo !empty($temp_string) ? implode(' ', $temp_string) : '';
-                                        // DEBUG
-                                        //echo '<br />temp-inputs:';
-                                        echo !empty($temp_inputs) ? implode(' ', $temp_inputs) : '';
-                                        // DEBUG
-                                        //echo '<br />';
-
-
-
-                                        ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                    <? } ?>
-
-                    <? if(!empty($player_field_rewards) && mmrpg_prototype_complete($player_info['player_token'])){ ?>
+                    <? if(mmrpg_prototype_item_unlocked('field-codes')){ ?>
 
                         <table class="full">
                             <colgroup>

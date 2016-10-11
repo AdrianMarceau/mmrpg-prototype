@@ -459,7 +459,7 @@ class rpg_canvas {
                 $is_corrupted = isset($this_robot->flags['robot_is_unlockable_corrupted']) ? $this_robot->flags['robot_is_unlockable_corrupted'] : false;
 
                 // If this robot is unlockable, display the icon above its head
-                if ($is_unlockable){
+                if ($is_unlockable && $this_robot->robot_status != 'disabled'){
 
                     // Calculate the zoom properties for the icon sprite
                     $icon_size = 80;

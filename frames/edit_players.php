@@ -28,9 +28,9 @@ $global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false
 //require_once(MMRPG_CONFIG_ROOTDIR.'prototype/include.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php');
 $temp_omega_factor_options = array();
-if (mmrpg_prototype_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
-if (mmrpg_prototype_complete('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
-if (mmrpg_prototype_complete('dr-cossack')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); }
+if (mmrpg_prototype_player_unlocked('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
+if (mmrpg_prototype_player_unlocked('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
+if (mmrpg_prototype_player_unlocked('dr-cossack')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); }
 $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
 // Loop through the unlockable MM3 fields (from omega factor four)
 foreach ($this_omega_factors_four AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_omega_factor_options[] = $factor; } }
