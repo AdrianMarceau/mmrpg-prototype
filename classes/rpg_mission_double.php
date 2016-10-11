@@ -56,7 +56,7 @@ class rpg_mission_double extends rpg_mission {
 
         // Determine the amount of targets and their ability counts
         $temp_target_count = 1;
-        $temp_ability_count = 1;
+        $temp_ability_count = 2;
         $temp_limit_count = 8;
         $temp_battle_count = 0;
         if (!empty($temp_battle_omega['battle_complete']['battle_count'])){
