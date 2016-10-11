@@ -546,6 +546,18 @@ class rpg_player extends rpg_object {
     */
 
     /**
+     * Get the currently active robot owned by this player object
+     * @return array
+     */
+    public function get_active_robot(){
+        $filters = array('player_id' => $this->player_id, 'robot_position' => 'active');
+        $robots = rpg_game::find_robots($filters);
+        if (!empty($robots)){ $robot = array_shift($robots); }
+        else { $robot = false; }
+        return $robot;
+    }
+
+    /**
      * Get the list of active status robots owned by this player object
      * @return array
      */
