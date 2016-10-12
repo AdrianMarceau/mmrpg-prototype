@@ -1470,6 +1470,8 @@ class rpg_battle extends rpg_object {
 
                 // Define the current ability object using the loaded ability data
                 $this_ability = rpg_game::get_ability($this, $this_player, $this_robot, $this_token);
+                $this_ability->reset_all();
+
                 // Trigger this robot's ability
                 $this_ability->ability_results = $this_robot->trigger_ability($target_robot, $this_ability);
 

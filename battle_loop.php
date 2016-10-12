@@ -35,6 +35,9 @@ $this_action_token = isset($_REQUEST['this_action_token']) ? $_REQUEST['this_act
 $target_action = isset($_REQUEST['target_action']) ? $_REQUEST['target_action'] : 'start';
 $target_action_token = isset($_REQUEST['target_action_token']) ? $_REQUEST['target_action_token'] : '';
 
+// If the player is not starting, the target shouldn't either
+if ($target_action == 'start' && $this_action != 'start'){ $target_action = 'ability'; }
+
 // Define a variable to track the verified state and any errors in data processing
 $this_verified = true;
 $this_errors = array();
