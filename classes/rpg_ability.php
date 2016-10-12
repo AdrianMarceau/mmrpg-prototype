@@ -399,6 +399,17 @@ class rpg_ability extends rpg_object {
     public function print_accuracy(){ return '<span class="ability_accuracy">'.$this->ability_accuracy.'%</span>'; }
 
     // Define a trigger for using one of this robot's abilities
+    public function reset_all(){
+
+        // Reset this ability's results and options
+        $this->ability_results_reset();
+        $this->target_options_reset();
+        $this->damage_options_reset();
+        $this->recovery_options_reset();
+        return true;
+    }
+
+    // Define a trigger for using one of this robot's abilities
     public function reset_ability($target_robot, $this_ability){
 
         // Update internal variables

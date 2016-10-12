@@ -107,12 +107,21 @@ if (!$temp_switch_disabled
         $target_action = 'switch';
 
     }
+    // Otherwise the target will use an ability
+    else {
+
+        // Set the target action to the ability type
+        $target_action = 'ability';
+
+    }
 
 }
 // Otherwise default to ability
 else {
+
     // Set the target action to the ability type
     $target_action = 'ability';
+
 }
 
 // Create the temporary ability object for this player's robot
