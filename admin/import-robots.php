@@ -270,27 +270,10 @@ if (!empty($mmrpg_index['robots'])){
 
 
         // Collect applicable spreadsheets for this robot
-        if ($temp_insert_array['robot_class'] == 'master'){
-            $robot_data['robot_class'] = 'master';
-            $spreadsheet_stats = !empty($spreadsheet_robot_stats[$robot_data['robot_token']]) ? $spreadsheet_robot_stats[$robot_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$robot_data['robot_token']]) ? $spreadsheet_robot_quotes[$robot_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$robot_data['robot_token']]) ? $spreadsheet_robot_descriptions[$robot_data['robot_token']] : array();
-        } elseif ($temp_insert_array['robot_class'] == 'mecha'){
-            $robot_data['robot_class'] = 'mecha';
-            $spreadsheet_stats = !empty($spreadsheet_mecha_stats[$robot_data['robot_token']]) ? $spreadsheet_mecha_stats[$robot_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_mecha_quotes[$robot_data['robot_token']]) ? $spreadsheet_mecha_quotes[$robot_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_mecha_descriptions[$robot_data['robot_token']]) ? $spreadsheet_mecha_descriptions[$robot_data['robot_token']] : array();
-        } elseif ($temp_insert_array['robot_class'] == 'boss'){
-            $robot_data['robot_class'] = 'boss';
-            $spreadsheet_stats = !empty($spreadsheet_robot_stats[$robot_data['robot_token']]) ? $spreadsheet_robot_stats[$robot_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$robot_data['robot_token']]) ? $spreadsheet_robot_quotes[$robot_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$robot_data['robot_token']]) ? $spreadsheet_robot_descriptions[$robot_data['robot_token']] : array();
-        }
-        /*elseif ($temp_insert_array['robot_class'] == 'boss'){
-            $spreadsheet_stats = !empty($spreadsheet_boss_stats[$robot_data['robot_token']]) ? $spreadsheet_boss_stats[$robot_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_boss_quotes[$robot_data['robot_token']]) ? $spreadsheet_boss_quotes[$robot_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_boss_descriptions[$robot_data['robot_token']]) ? $spreadsheet_boss_descriptions[$robot_data['robot_token']] : array();
-        }*/
+        $robot_data['robot_class'] = 'master';
+        $spreadsheet_stats = !empty($spreadsheet_robot_stats[$robot_data['robot_token']]) ? $spreadsheet_robot_stats[$robot_data['robot_token']] : array();
+        $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$robot_data['robot_token']]) ? $spreadsheet_robot_quotes[$robot_data['robot_token']] : array();
+        $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$robot_data['robot_token']]) ? $spreadsheet_robot_descriptions[$robot_data['robot_token']] : array();
 
         // Collect any user-contributed data for this robot
         if (!empty($spreadsheet_stats['energy'])){ $temp_insert_array['robot_energy'] = $spreadsheet_stats['energy']; }
@@ -508,27 +491,10 @@ if (!empty($mmrpg_index['mechas'])){
 
 
         // Collect applicable spreadsheets for this robot
-        if ($temp_insert_array['robot_class'] == 'master'){
-            $mecha_data['robot_class'] = 'master';
-            $spreadsheet_stats = !empty($spreadsheet_robot_stats[$mecha_data['robot_token']]) ? $spreadsheet_robot_stats[$mecha_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$mecha_data['robot_token']]) ? $spreadsheet_robot_quotes[$mecha_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$mecha_data['robot_token']]) ? $spreadsheet_robot_descriptions[$mecha_data['robot_token']] : array();
-        } elseif ($temp_insert_array['robot_class'] == 'mecha'){
-            $mecha_data['robot_class'] = 'mecha';
-            $spreadsheet_stats = !empty($spreadsheet_mecha_stats[$mecha_data['robot_token']]) ? $spreadsheet_mecha_stats[$mecha_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_mecha_quotes[$mecha_data['robot_token']]) ? $spreadsheet_mecha_quotes[$mecha_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_mecha_descriptions[$mecha_data['robot_token']]) ? $spreadsheet_mecha_descriptions[$mecha_data['robot_token']] : array();
-        } elseif ($temp_insert_array['robot_class'] == 'boss'){
-            $mecha_data['robot_class'] = 'boss';
-            $spreadsheet_stats = !empty($spreadsheet_robot_stats[$mecha_data['robot_token']]) ? $spreadsheet_robot_stats[$mecha_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$mecha_data['robot_token']]) ? $spreadsheet_robot_quotes[$mecha_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$mecha_data['robot_token']]) ? $spreadsheet_robot_descriptions[$mecha_data['robot_token']] : array();
-        }
-        /*elseif ($temp_insert_array['robot_class'] == 'boss'){
-            $spreadsheet_stats = !empty($spreadsheet_boss_stats[$mecha_data['robot_token']]) ? $spreadsheet_boss_stats[$mecha_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_boss_quotes[$mecha_data['robot_token']]) ? $spreadsheet_boss_quotes[$mecha_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_boss_descriptions[$mecha_data['robot_token']]) ? $spreadsheet_boss_descriptions[$mecha_data['robot_token']] : array();
-        }*/
+        $mecha_data['robot_class'] = 'mecha';
+        $spreadsheet_stats = !empty($spreadsheet_mecha_stats[$mecha_data['robot_token']]) ? $spreadsheet_mecha_stats[$mecha_data['robot_token']] : array();
+        $spreadsheet_quotes = !empty($spreadsheet_mecha_quotes[$mecha_data['robot_token']]) ? $spreadsheet_mecha_quotes[$mecha_data['robot_token']] : array();
+        $spreadsheet_descriptions = !empty($spreadsheet_mecha_descriptions[$mecha_data['robot_token']]) ? $spreadsheet_mecha_descriptions[$mecha_data['robot_token']] : array();
 
         // Collect any user-contributed data for this robot
         if (!empty($spreadsheet_stats['energy'])){ $temp_insert_array['robot_energy'] = $spreadsheet_stats['energy']; }
@@ -747,27 +713,10 @@ if (!empty($mmrpg_index['bosses'])){
 
 
         // Collect applicable spreadsheets for this robot
-        if ($temp_insert_array['robot_class'] == 'master'){
-            $boss_data['robot_class'] = 'master';
-            $spreadsheet_stats = !empty($spreadsheet_robot_stats[$boss_data['robot_token']]) ? $spreadsheet_robot_stats[$boss_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$boss_data['robot_token']]) ? $spreadsheet_robot_quotes[$boss_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$boss_data['robot_token']]) ? $spreadsheet_robot_descriptions[$boss_data['robot_token']] : array();
-        } elseif ($temp_insert_array['robot_class'] == 'mecha'){
-            $boss_data['robot_class'] = 'mecha';
-            $spreadsheet_stats = !empty($spreadsheet_mecha_stats[$boss_data['robot_token']]) ? $spreadsheet_mecha_stats[$boss_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_mecha_quotes[$boss_data['robot_token']]) ? $spreadsheet_mecha_quotes[$boss_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_mecha_descriptions[$boss_data['robot_token']]) ? $spreadsheet_mecha_descriptions[$boss_data['robot_token']] : array();
-        } elseif ($temp_insert_array['robot_class'] == 'boss'){
-            $boss_data['robot_class'] = 'boss';
-            $spreadsheet_stats = !empty($spreadsheet_robot_stats[$boss_data['robot_token']]) ? $spreadsheet_robot_stats[$boss_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_robot_quotes[$boss_data['robot_token']]) ? $spreadsheet_robot_quotes[$boss_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_robot_descriptions[$boss_data['robot_token']]) ? $spreadsheet_robot_descriptions[$boss_data['robot_token']] : array();
-        }
-        /*elseif ($temp_insert_array['robot_class'] == 'boss'){
-            $spreadsheet_stats = !empty($spreadsheet_boss_stats[$boss_data['robot_token']]) ? $spreadsheet_boss_stats[$boss_data['robot_token']] : array();
-            $spreadsheet_quotes = !empty($spreadsheet_boss_quotes[$boss_data['robot_token']]) ? $spreadsheet_boss_quotes[$boss_data['robot_token']] : array();
-            $spreadsheet_descriptions = !empty($spreadsheet_boss_descriptions[$boss_data['robot_token']]) ? $spreadsheet_boss_descriptions[$boss_data['robot_token']] : array();
-        }*/
+        $boss_data['robot_class'] = 'boss';
+        $spreadsheet_stats = !empty($spreadsheet_boss_stats[$boss_data['robot_token']]) ? $spreadsheet_boss_stats[$boss_data['robot_token']] : array();
+        $spreadsheet_quotes = !empty($spreadsheet_boss_quotes[$boss_data['robot_token']]) ? $spreadsheet_boss_quotes[$boss_data['robot_token']] : array();
+        $spreadsheet_descriptions = !empty($spreadsheet_boss_descriptions[$boss_data['robot_token']]) ? $spreadsheet_boss_descriptions[$boss_data['robot_token']] : array();
 
         // Collect any user-contributed data for this robot
         if (!empty($spreadsheet_stats['energy'])){ $temp_insert_array['robot_energy'] = $spreadsheet_stats['energy']; }
