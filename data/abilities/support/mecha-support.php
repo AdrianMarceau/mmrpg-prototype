@@ -43,15 +43,14 @@ $ability = array(
             global $mmrpg_index;
             $this_field_mechas = array();
             if (!empty($this_robot->robot_core)){
-                $special_boss_robots = array('enker', 'punk', 'ballade');
-                if ($this_robot->robot_core == 'copy' || in_array($this_robot->robot_token, $special_boss_robots)){
+                if ($this_robot->robot_core == 'copy'){
                     // Collect the current robots available for this current field
                     $this_field_mechas = !empty($this_battle->battle_field->field_mechas) ? $this_battle->battle_field->field_mechas : array();
                 } elseif (!empty($this_robot->robot_field)){
-                    // Collect the current robots available for this robot's home field
                     // Collect the current mechas available for this robot's home field
-                    $temp_field = !empty($mmrpg_index_fields[$this_robot->robot_field]) ? $mmrpg_index_fields[$this_robot->robot_field] : array();
-                    $this_field_info = rpg_field::parse_index_info($temp_field);
+                    //$temp_field = !empty($mmrpg_index_fields[$this_robot->robot_field]) ? $mmrpg_index_fields[$this_robot->robot_field] : array();
+                    //$this_field_info = rpg_field::parse_index_info($temp_field);
+                    $this_field_info = rpg_field::get_index_info($this_robot->robot_field);
                     $this_field_mechas = !empty($this_field_info['field_mechas']) ? $this_field_info['field_mechas'] : array();
                 }
             }
