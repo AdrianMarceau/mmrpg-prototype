@@ -13,7 +13,7 @@ $ability = array(
 
         // Extract all objects into the current scope
         extract($objects);
-        $mmrpg_index_fields = rpg_field::get_index();
+        //$mmrpg_index_fields = rpg_field::get_index();
 
         // Update the ability's target options and trigger
         $this_ability->target_options_update(array(
