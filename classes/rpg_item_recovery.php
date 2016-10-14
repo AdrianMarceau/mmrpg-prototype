@@ -1123,6 +1123,18 @@ class rpg_item_recovery extends rpg_recovery {
 
         }
 
+        // If this robot has an onrecovery function, trigger it
+        $this_onrecovery_function = $this_robot->robot_function_onrecovery;
+        $temp_result = $this_onrecovery_function(array(
+            'this_battle' => $this_battle,
+            'this_field' => $this_battle->battle_field,
+            'this_player' => $this_robot->player,
+            'this_robot' => $this_robot,
+            'target_player' => $this_robot->player,
+            'target_robot' => $target_robot,
+            'this_item' => $this_item
+            ));
+
         // Return the final recovery results
         return $this_item->item_results;
 

@@ -1173,6 +1173,18 @@ class rpg_item_damage extends rpg_damage {
 
         }
 
+        // If this robot has an ondamage function, trigger it
+        $this_ondamage_function = $this_robot->robot_function_ondamage;
+        $temp_result = $this_ondamage_function(array(
+            'this_battle' => $this_battle,
+            'this_field' => $this_battle->battle_field,
+            'this_player' => $this_robot->player,
+            'this_robot' => $this_robot,
+            'target_player' => $this_robot->player,
+            'target_robot' => $target_robot,
+            'this_item' => $this_item
+            ));
+
         // Return the final damage results
         return $this_item->item_results;
 
