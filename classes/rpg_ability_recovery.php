@@ -363,6 +363,8 @@ class rpg_ability_recovery extends rpg_recovery {
                 );
         }
 
+        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | rates | success:'.$this_ability->recovery_options['success_rate'].' | failure:'.$this_ability->recovery_options['failure_rate'].' | result: '.$this_ability->ability_results['this_result'].' ');
+
         // If this is ENERGY recovery and this robot is already at full health
         if ($this_ability->recovery_options['recovery_kind'] == 'energy' && $this_robot->robot_energy >= $this_robot->robot_base_energy){
             // Hard code the result to failure
@@ -1124,6 +1126,18 @@ class rpg_ability_recovery extends rpg_recovery {
             }
 
         }
+
+        // If this robot has an onrecovery function, trigger it
+        $this_onrecovery_function = $this_robot->robot_function_onrecovery;
+        $temp_result = $this_onrecovery_function(array(
+            'this_battle' => $this_battle,
+            'this_field' => $this_battle->battle_field,
+            'this_player' => $this_robot->player,
+            'this_robot' => $this_robot,
+            'target_player' => $this_robot->player,
+            'target_robot' => $target_robot,
+            'this_ability' => $this_ability
+            ));
 
         // Return the final recovery results
         return $this_ability->ability_results;

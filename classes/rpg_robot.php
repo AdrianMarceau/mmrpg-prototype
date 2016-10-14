@@ -197,6 +197,9 @@ class rpg_robot extends rpg_object {
         require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
         $this->robot_function = isset($robot['robot_function']) ? $robot['robot_function'] : function(){};
         $this->robot_function_onload = isset($robot['robot_function_onload']) ? $robot['robot_function_onload'] : function(){};
+        $this->robot_function_ondamage = isset($robot['robot_function_ondamage']) ? $robot['robot_function_ondamage'] : function(){};
+        $this->robot_function_onrecovery = isset($robot['robot_function_onrecovery']) ? $robot['robot_function_onrecovery'] : function(){};
+        $this->robot_function_ondisabled = isset($robot['robot_function_ondisabled']) ? $robot['robot_function_ondisabled'] : function(){};
         unset($robot);
 
         // If this is a player-controlled robot, load settings from session
@@ -312,6 +315,7 @@ class rpg_robot extends rpg_object {
     public function set_name($value){ $this->set_info('robot_name', $value); }
     public function get_base_name(){ return $this->get_info('robot_base_name'); }
     public function set_base_name($value){ $this->set_info('robot_base_name', $value); }
+    public function reset_name(){ $this->set_info('robot_name', $this->get_info('robot_base_name')); }
 
     public function get_token(){ return $this->get_info('robot_token'); }
     public function set_token($value){ $this->set_info('robot_token', $value); }
@@ -380,7 +384,7 @@ class rpg_robot extends rpg_object {
         if ($energy < 0){ $energy = 0; }
         $this->set_info('robot_base_energy', $energy);
     }
-    public function reset_energy($value){
+    public function reset_energy(){
         $this->set_info('robot_energy', $this->get_info('robot_base_energy'));
     }
 
