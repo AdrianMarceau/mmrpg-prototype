@@ -1264,6 +1264,7 @@ class rpg_battle extends rpg_object {
             if (!empty($total_zenny_rewards)){
                 if (!empty($total_points_rewards)){ $first_event_body .= '<span style="opacity:0.25;">|</span> '; }
                 $first_event_body .= 'Zenny : '.number_format($total_zenny_rewards, 0, '.', ',').'z ';
+                if (!isset($_SESSION['GAME']['counters']['battle_zenny'])){ $_SESSION['GAME']['counters']['battle_zenny'] = 0; }
                 $_SESSION['GAME']['counters']['battle_zenny'] += $total_zenny_rewards;
             }
 
