@@ -1483,7 +1483,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #events .event_wrapper {
     position: absolute;
-    top: 60px;
+    top: 46px;
     left: 85px;
     right: auto;
     bottom: auto;
