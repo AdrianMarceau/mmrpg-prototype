@@ -1569,7 +1569,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     padding-right: 15px;
     width: 576px;
     height: auto;
-    max-height: 290px;
+    max-height: 300px;
 }
 #events #buttons {
     margin: 10px 0 0;
