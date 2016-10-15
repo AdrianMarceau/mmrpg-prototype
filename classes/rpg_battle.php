@@ -1255,6 +1255,15 @@ class rpg_battle extends rpg_object {
                 $total_zenny_rewards += $this_player->counters['overkill_bonus'];
             }
 
+            // If any of this players robots are holding a FORTUNE MODULE item
+            $total_zenny_rewards_base = $total_zenny_rewards;
+            $active_robots = $this_player->get_robots_active();
+            foreach ($active_robots AS $key => $robot){
+                if ($robot->has_item('fortune-module')){
+                    $total_zenny_rewards += $total_zenny_rewards_base;
+                }
+            }
+
             // Print out the final point reward amounts after mods (if it applies)
             if (!empty($total_points_rewards)){
                 $first_event_body .= 'Points : '.number_format($total_points_rewards, 0, '.', ',').' ';
