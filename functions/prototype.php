@@ -56,24 +56,25 @@ function mmrpg_prototype_complete($player_token = ''){
 }
 
 // Define a function for calculating the battle's prototype points total
-function mmrpg_prototype_calculate_battle_points($update_session = false){
+function mmrpg_prototype_calculate_battle_points($update_session = false, $_GAME = false){
 
     // Return the current point total for thisgame
     $session_token = mmrpg_game_token();
+    if (empty($_GAME)){ $_GAME = &$_SESSION[$session_token]; }
 
     // Start the battle points value at zero and increment
     $total_battle_points = 0;
 
     // If the player has completed battles, loop through them and add up points
-    if (!empty($_SESSION[$session_token]['values']['battle_complete'])){
-        foreach ($_SESSION[$session_token]['values']['battle_complete'] AS $player_token => $player_battles){
-            $total_battle_points += mmrpg_prototype_player_points($player_token, $update_session);
+    if (!empty($_GAME['values']['battle_complete'])){
+        foreach ($_GAME['values']['battle_complete'] AS $player_token => $player_battles){
+            $total_battle_points += mmrpg_prototype_calculate_player_points($player_token, $update_session, $_GAME);
         }
     }
 
     // If the player has unlocked any stars, loop through them and add up points
-    if (!empty($_SESSION[$session_token]['values']['battle_stars'])){
-        foreach ($_SESSION[$session_token]['values']['battle_stars'] AS $star_key => $star_data){
+    if (!empty($_GAME['values']['battle_stars'])){
+        foreach ($_GAME['values']['battle_stars'] AS $star_key => $star_data){
             if ($star_data['star_kind'] == 'field'){ $star_points = 6000; }
             elseif ($star_data['star_kind'] == 'fusion'){ $star_points = 9000; }
             $total_battle_points += $star_points;
@@ -82,7 +83,7 @@ function mmrpg_prototype_calculate_battle_points($update_session = false){
 
     // If requested, update the session variable with the new total
     if ($update_session){
-        $_SESSION[$session_token]['counters']['battle_points'] = $total_battle_points;
+        $_GAME['counters']['battle_points'] = $total_battle_points;
     }
 
     // Return the collected battle points
@@ -90,17 +91,18 @@ function mmrpg_prototype_calculate_battle_points($update_session = false){
 }
 
 // Define a function for calculating a player's prototype points total
-function mmrpg_prototype_calculate_player_points($player_token, $update_session = false){
+function mmrpg_prototype_calculate_player_points($player_token, $update_session = false, $_GAME = false){
 
     // Return the current point total for this player
     $session_token = mmrpg_game_token();
+    if (empty($_GAME)){ $_GAME = &$_SESSION[$session_token]; }
 
     // Start the battle points value at zero and increment
     $player_battle_points = 0;
 
     // If the player has completed battles, loop through them and add up points
-    if (!empty($_SESSION[$session_token]['values']['battle_complete'][$player_token])){
-        foreach ($_SESSION[$session_token]['values']['battle_complete'][$player_token] AS $battle_token => $battle_records){
+    if (!empty($_GAME['values']['battle_complete'][$player_token])){
+        foreach ($_GAME['values']['battle_complete'][$player_token] AS $battle_token => $battle_records){
             if (!empty($battle_records['battle_max_points'])){
                 $player_battle_points += $battle_records['battle_max_points'];
             }
@@ -109,7 +111,7 @@ function mmrpg_prototype_calculate_player_points($player_token, $update_session 
 
     // If requested, update the session variable with new player rewards
     if ($update_session){
-        $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_points'] = $player_battle_points;
+        $_GAME['values']['battle_rewards'][$player_token]['player_points'] = $player_battle_points;
     }
 
     // Return the collected battle points
