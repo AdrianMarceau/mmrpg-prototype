@@ -8,8 +8,8 @@ $ability = array(
     'ability_description' => 'The user unleashes a barrage of fire at the target, dealing damage and raising the user\'s attack by {RECOVERY2}%! This ability has three levels of power, with damage multiplying on each successive barrage until the limit is reached or another technique is used.',
     'ability_type' => 'flame',
     'ability_energy' => 4,
-    'ability_damage' => 12,
-    'ability_recovery2' => 10,
+    'ability_damage' => 10,
+    'ability_recovery2' => 8,
     'ability_recovery2_percent' => true,
     'ability_accuracy' => 95,
     'ability_function' => function($objects){
@@ -118,7 +118,7 @@ $ability = array(
 
         // Trigger an attack boost if the ability was successful
         if ($this_robot->robot_status != 'disabled' && $this_ability->ability_results['this_result'] == 'success'){
-            $attack_recovery_amount = ceil($this_robot->robot_attack * ($this_ability->ability_recovery2 / 100));
+            $attack_recovery_amount = ceil($this_robot->robot_base_attack * ($this_ability->ability_recovery2 / 100));
             $trigger_options = array('apply_modifiers' => false);
             $this_robot->trigger_recovery($this_robot, $this_ability, $attack_recovery_amount, true, $trigger_options);
         }
