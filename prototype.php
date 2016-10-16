@@ -1,18 +1,7 @@
 <?php
+
 // Include the TOP file
 require_once('top.php');
-
-/*
-// MAINTENANCE
-if (!in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.226.238.61'))){
-    die('<div style="margin: 0; padding: 10px 25%; background-color: rgb(122, 0, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
-        ATTENTION!<br /> The Mega Man RPG Prototype is currently being updated.  Please stand by until further notice.  Several parts of the website are being taken offline during this process and any progress made during will likely be lost, so please hold tight before trying to log in again.  I apologize for the inconvenience.  Thank you and look forward to lots of new stuff!<br /> - Adrian
-        </div>');
-}
-*/
-
-// Require the robot database for... stuff?
-//require_once('database/include.php');
 
 // Collect the game's session token
 $session_token = mmrpg_game_token();
@@ -25,9 +14,6 @@ $_SESSION['ROBOTS'] = array();
 $_SESSION['ABILITIES'] = array();
 $_SESSION['ITEMS'] = array();
 $_SESSION['PROTOTYPE_TEMP'] = array();
-
-// MAINTENANCE
-//if ($_SERVER['REMOTE_ADDR'] != '99.255.218.123'){ die('Emergency Maintainence.'); }
 
 // Collect the prototype start link if provided
 $prototype_start_link = !empty($_GET['start']) ? $_GET['start'] : 'home';
@@ -206,16 +192,27 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 <head>
 <meta charset="UTF-8" />
 <title>Mega Man RPG Prototype | Prototype Menu | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
+
 <meta name="robots" content="noindex,nofollow" />
+
 <meta name="format-detection" content="telephone=no" />
+
+<link rel="shortcut icon" type="image/x-icon" href="images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
+
 <link type="text/css" href="styles/reset.css" rel="stylesheet" />
+
+<style type="text/css"> html, body { background-color: #262626; } </style>
+
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<?if($flag_wap):?>
-<link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<?endif;?>
+<link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+
+<meta name="format-detection" content="telephone=no" />
+<link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
+<meta name="viewport" content="user-scalable=yes, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, width=768, height=1004">
+
 </head>
 <body id="mmrpg" class="prototype">
 
