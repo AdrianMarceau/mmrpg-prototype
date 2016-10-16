@@ -243,6 +243,29 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 if (!empty($temp_field_info['field_mechas'])){ $temp_support_mechas[] = array_pop($temp_field_info['field_mechas']); }
             }
 
+            // Define randomized hold item options based on player
+            $item_tier = 0;
+            $item_options = array();
+            if ($this_prototype_data['this_player_token'] == 'dr-light'){ $item_tier = 1; }
+            elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){ $item_tier = 2; }
+            elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $item_tier = 3; }
+            if ($item_tier >= 1){
+                $item_options = array_merge($item_options,
+                    array('energy-capsule', 'weapon-capsule', 'attack-capsule', 'defense-capsule', 'speed-capsule')
+                    );
+            }
+            if ($item_tier >= 2){
+                $item_options = array_merge($item_options,
+                    array('energy-tank', 'weapon-tank', 'attack-booster', 'defense-booster', 'speed-booster')
+                    );
+            }
+            if ($item_tier >= 3){
+                $item_options = array_merge($item_options,
+                    array('energy-upgrade', 'weapon-upgrade', 'yashichi', 'super-capsule')
+                    );
+            }
+            $item_max_key = count($item_options) - 1;
+
             // Add the masters info into the omega battle
             //foreach ($temp_final_option['battle_target_player']['player_robots'] AS $key => $info){
             $temp_final_option['battle_target_player']['player_robots'] = array();
@@ -256,6 +279,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $info['robot_image'] = $token.'_alt9';
                 $info['robot_level'] = $temp_final_option['battle_level'];
                 $info['robot_core'] = 'empty';
+                if (!empty($item_options)){ $info['robot_item'] = $item_options[mt_rand(0, $item_max_key)]; }
                 $info['robot_abilities'] = array();
                 $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
                 $info['values']['robot_rewards'] = array();
