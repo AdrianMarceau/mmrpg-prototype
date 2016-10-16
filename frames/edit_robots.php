@@ -16,6 +16,9 @@ $session_token = rpg_game::session_token();
 // Collect the editor flag if set
 $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
 
+// Collect the sorted type index for better sorting
+$mmrpg_database_types = rpg_type::get_index(true);
+
 
 // -- COLLECT SETTINGS DATA -- //
 
@@ -209,6 +212,7 @@ gameSettings.allowEditing = <?= $global_allow_editing ? 'true' : 'false' ?>;
 gameSettings.shareProgramUnlocked = <?= mmrpg_prototype_item_unlocked('light-program') ? 'true' : 'false' ?>;
 gameSettings.transferProgramUnlocked = <?= mmrpg_prototype_item_unlocked('wily-program') ? 'true' : 'false' ?>;
 gameSettings.searchProgramUnlocked = <?= mmrpg_prototype_item_unlocked('cossack-program') ? 'true' : 'false' ?>;
+gameSettings.mmrpgIndexTypes = [<?= "'".implode("','", array_keys($mmrpg_database_types))."'" ?>];
 var countRobotLinks = false;
 var countRobotsTriggered = 0;
 var countRobotsLoaded = 0;
