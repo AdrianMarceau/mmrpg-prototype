@@ -680,6 +680,61 @@ function mmrpg_patch_ability_item_split_2k16($_GAME){
 }
 
 
+// -- STAR FORCE REBOOT 2k16 -- //
+
+// Define a patch function for applying the next update
+$token = 'star_force_reboot_2k16';
+$update_patch_tokens[] = $token;
+$update_patch_names[$token] = 'Star Force Reboot of 2016';
+$update_patch_details[$token] = "Field and Fusion stars now boost battle points instead of boosting elemental \n";
+$update_patch_details[$token] .= "damage and recovery power in battle.  As a result, battle points for all players \n";
+$update_patch_details[$token] .= "must be recalculated. ";
+function mmrpg_patch_star_force_reboot_2k16($_GAME){
+
+    // Pull in global variables
+    global $db;
+
+    // Collect the player's items array
+    $battle_points_total = !empty($_GAME['counters']['battle_points']) ? $_GAME['counters']['battle_points'] : 0;
+    $battle_stars = !empty($_GAME['values']['battle_stars']) ? $_GAME['values']['battle_stars'] : array();
+    $battle_stars_count = !empty($battle_stars) ? count($battle_stars) : 0;
+
+    echo("Recalculating player battle points...\n\n");
+
+    // Only bother with parsing if the player actually has stars
+    if (!empty($battle_stars_count)){
+
+        // Print out the current battle points and star counts
+        echo("--------------------\n\n");
+        echo("Current Battle Points : ".number_format($battle_points_total, 0, '.', ',')."\n\n");
+        echo("Current Star Count : ".number_format($battle_stars_count, 0, '.', ',')."\n\n");
+
+        // Recalculate battle points and print out the new totals
+        echo("--------------------\n\n");
+        $battle_points_new = mmrpg_prototype_calculate_battle_points(true, $_GAME);
+        echo("New Battle Points : ".number_format($battle_points_new, 0, '.', ',')."\n\n");
+        echo("--------------------\n\n");
+
+    }
+    // Otherwise, if no items, the player does not need parsing
+    else {
+
+        // Print out the end of scan message an empty result
+        echo("--------------------\n\n");
+        echo("...oh, you don't have any stars.  Sorry to bother you!\n\n");
+
+    }
+
+    // Print out debug info and exit now
+    //header('Content-type: text/plain;');
+    //exit('star_force_reboot_2k16()');
+
+    // Return the updated game array
+    return $_GAME;
+
+}
+
+
 /*
 
 // -- PATCH FUNCTION TEMPLATE -- //
