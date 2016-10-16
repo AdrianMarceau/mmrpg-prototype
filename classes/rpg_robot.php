@@ -1311,7 +1311,7 @@ class rpg_robot extends rpg_object {
         $temp_image_changed = false;
         $temp_ability_type = !empty($this_ability->ability_type) ? $this_ability->ability_type : '';
         $temp_ability_type2 = !empty($this_ability->ability_type2) ? $this_ability->ability_type2 : $temp_ability_type;
-        if (!empty($temp_ability_type) && $this->robot_base_core == 'copy'){
+        if (!empty($temp_ability_type) && $this->robot_base_core == 'copy' && !strstr($this->robot_base_image, '_')){
             $this->robot_image_overlay['copy_type1'] = $this->robot_base_image.'_'.$temp_ability_type.'2';
             $this->robot_image_overlay['copy_type2'] = $this->robot_base_image.'_'.$temp_ability_type2.'3';
             $this->update_session();
