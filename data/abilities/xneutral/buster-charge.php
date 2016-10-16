@@ -8,8 +8,8 @@ $ability = array(
     'ability_image_sheets' => 0,
     'ability_description' => 'The user takes a defensive stance and charges themselves to restore depleted weapon energy by up to {RECOVERY}%.',
     'ability_energy' => 0,
-    'ability_recovery' => 100,
-    'ability_recovery_percent' => true,
+    'ability_recovery2' => 100,
+    'ability_recovery_percent2' => true,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -31,7 +31,7 @@ $ability = array(
             'success' => array(0, 0, 0, -10, 'The '.$this_ability->print_name().' restored depleted power!'),
             'failure' => array(0, 0, 0, -10, 'The '.$this_ability->print_name().' had no effect&hellip;')
             ));
-        $weapons_recovery_amount = ceil($this_robot->robot_base_weapons * ($this_ability->ability_recovery / 100));
+        $weapons_recovery_amount = ceil($this_robot->robot_base_weapons * ($this_ability->ability_recovery2 / 100));
         $this_robot->trigger_recovery($this_robot, $this_ability, $weapons_recovery_amount);
 
         // Return true on success

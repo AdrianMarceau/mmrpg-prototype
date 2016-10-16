@@ -1030,7 +1030,7 @@ class rpg_ability extends rpg_object {
         // If show accuracy or quantity
         if ($print_options['show_accuracy']){
 
-            $temp_ability_title .= '  | ';
+            if (preg_match('/(damage|recovery)/i', $temp_ability_title)){ $temp_ability_title .= '  | '; }
             if (!empty($ability_info['ability_accuracy'])){ $temp_ability_title .= ' '.$ability_info['ability_accuracy'].'% Accuracy'; }
 
         }
@@ -1181,7 +1181,9 @@ class rpg_ability extends rpg_object {
         $ability_info_id = $ability_info['ability_id'];
         $ability_info_token = $ability_info['ability_token'];
         $ability_info_name = $ability_info['ability_name'];
+
         $ability_info_energy = isset($ability_info['ability_energy']) ? $ability_info['ability_energy'] : 4;
+
         $ability_info_damage = !empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0;
         $ability_info_damage2 = !empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0;
         $ability_info_damage_percent = !empty($ability_info['ability_damage_percent']) ? true : false;
@@ -1194,6 +1196,11 @@ class rpg_ability extends rpg_object {
         $ability_info_recovery2_percent = !empty($ability_info['ability_recovery2_percent']) ? true : false;
         if ($ability_info_recovery_percent && $ability_info_recovery > 100){ $ability_info_recovery = 100; }
         if ($ability_info_recovery2_percent && $ability_info_recovery2 > 100){ $ability_info_recovery2 = 100; }
+
+        $ability_power = 0;
+        if (!empty($ability_info_damage) && $ability_info_damage > $ability_power){ $ability_power = $ability_info_damage; }
+        if (!empty($ability_info_recovery) && $ability_info_recovery > $ability_power){ $ability_power = $ability_info_recovery; }
+
         $ability_info_accuracy = !empty($ability_info['ability_accuracy']) ? $ability_info['ability_accuracy'] : 0;
         $ability_info_description = !empty($ability_info['ability_description']) ? $ability_info['ability_description'] : '';
         $ability_info_description = str_replace('{DAMAGE}', $ability_info_damage, $ability_info_description);
@@ -1217,6 +1224,7 @@ class rpg_ability extends rpg_object {
             'data-ability="'.$ability_info_token.'" '.
             'data-type="'.(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').'" '.
             'data-type2="'.(!empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : '').'" '.
+            'data-power="'.$ability_power.'" '.
             //'title="'.$ability_info_title_plain.'" '.
             'data-tooltip="'.$ability_info_title_tooltip.'"'.
             '>'.$ability_info_title_html.'</a>';

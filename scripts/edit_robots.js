@@ -273,7 +273,7 @@ $(document).ready(function(){
 
             });
 
-    // Create the click event for canvas sort button
+    // Create the click event for robot canvas sort button
     $('div[data-canvas=robots] .sort', gameCanvas).live('click', function(e){
         e.preventDefault();
         if (thisBody.hasClass('loading')){ return false; }
@@ -360,6 +360,180 @@ $(document).ready(function(){
 
                 }
             });
+
+        });
+
+    // Create the click event for ability canvas sort button
+    $('div[data-canvas=abilities] .sort', gameCanvas).live('click', function(e){
+        e.preventDefault();
+        if (thisBody.hasClass('loading')){ return false; }
+        if (!gameSettings.allowEditing){ return false; }
+
+        var thisSortButton = $(this);
+        var thisSortToken = thisSortButton.attr('data-sort');
+        var thisSortOrder = thisSortButton.attr('data-order');
+        var thisAbilityWrapper = $('.ability_canvas', gameCanvas);
+        var thisAbilities = $('.ability_name[data-id!="0"]', thisAbilityWrapper);
+        var thisAbilitiesTokens = [];
+        thisAbilities.each(function(){ thisAbilitiesTokens.push($(this).attr('data-ability')); });
+        thisAbilitiesTokens.join(',');
+        //console.log('clicked sort; ability tokens = '+thisAbilitiesTokens);
+
+        // Reverse the sort direction for next click
+        if (thisSortOrder == 'asc'){ thisSortButton.attr('data-order', 'desc'); }
+        else if (thisSortOrder == 'desc'){ thisSortButton.attr('data-order', 'asc'); }
+
+        // Post the sort request to the server
+        thisBody.addClass('loading');
+
+        // get array of ability elements
+        var myArray = thisAbilities;
+
+        // sort based on requested attribute
+        myArray.sort(function (a, b){
+
+            // predefine keys as false
+            var robotKey1 = 0;
+            var robotKey2 = 0;
+            var robotKey1B = 0;
+            var robotKey2B = 0;
+
+            // collect sort keys based on parameter
+            if (thisSortToken == 'number'){
+
+                // sort abilities by KEY if number clicked
+                robotKey1 = parseInt($(a).attr('data-key'));
+                robotKey2 = parseInt($(b).attr('data-key'));
+
+                } else if (thisSortToken == 'power'){
+
+                // sort abilities by POWER if power clicked
+                robotKey1 = parseInt($(a).attr('data-power'));
+                robotKey2 = parseInt($(b).attr('data-power'));
+
+                } else if (thisSortToken == 'type'){
+
+                // sort abilities by TYPE if type clicked
+                robotKey1 = gameSettings.mmrpgIndexTypes.indexOf($(a).attr('data-type'));
+                robotKey2 = gameSettings.mmrpgIndexTypes.indexOf($(b).attr('data-type'));
+                robotKey1B = gameSettings.mmrpgIndexTypes.indexOf($(a).attr('data-type2'));
+                robotKey2B = gameSettings.mmrpgIndexTypes.indexOf($(b).attr('data-type2'));
+
+                }
+
+            // compare key values and return
+            if (thisSortOrder == 'asc'){
+                if (robotKey1 > robotKey2) { return 1; }
+                else if (robotKey1 < robotKey2) { return -1; }
+                else {
+                    if (robotKey1B > robotKey2B) { return 1; }
+                    else if (robotKey1B < robotKey2B) { return -1; }
+                    else { return 0; }
+                    }
+                } else if (thisSortOrder == 'desc'){
+                if (robotKey1 > robotKey2) { return -1; }
+                else if (robotKey1 < robotKey2) { return 1; }
+                else {
+                    if (robotKey1B > robotKey2B) { return -1; }
+                    else if (robotKey1B < robotKey2B) { return 1; }
+                    else { return 0; }
+                    }
+                }
+
+            });
+
+        // put sorted results back on page
+        thisAbilityWrapper.find('.ability_name[data-id!="0"]').remove();
+        thisAbilityWrapper.find('.wrapper_overflow').append(myArray);
+        thisBody.removeClass('loading');
+        return true;
+
+        });
+
+    // Create the click event for item canvas sort button
+    $('div[data-canvas=items] .sort', gameCanvas).live('click', function(e){
+        e.preventDefault();
+        if (thisBody.hasClass('loading')){ return false; }
+        if (!gameSettings.allowEditing){ return false; }
+
+        var thisSortButton = $(this);
+        var thisSortToken = thisSortButton.attr('data-sort');
+        var thisSortOrder = thisSortButton.attr('data-order');
+        var thisAbilityWrapper = $('.item_canvas', gameCanvas);
+        var thisAbilities = $('.item_name[data-id!="0"]', thisAbilityWrapper);
+        var thisAbilitiesTokens = [];
+        thisAbilities.each(function(){ thisAbilitiesTokens.push($(this).attr('data-item')); });
+        thisAbilitiesTokens.join(',');
+        //console.log('clicked sort; item tokens = '+thisAbilitiesTokens);
+
+        // Reverse the sort direction for next click
+        if (thisSortOrder == 'asc'){ thisSortButton.attr('data-order', 'desc'); }
+        else if (thisSortOrder == 'desc'){ thisSortButton.attr('data-order', 'asc'); }
+
+        // Post the sort request to the server
+        thisBody.addClass('loading');
+
+        // get array of item elements
+        var myArray = thisAbilities;
+
+        // sort based on requested attribute
+        myArray.sort(function (a, b){
+
+            // predefine keys as false
+            var robotKey1 = 0;
+            var robotKey2 = 0;
+            var robotKey1B = 0;
+            var robotKey2B = 0;
+
+            // collect sort keys based on parameter
+            if (thisSortToken == 'number'){
+
+                // sort items by KEY if number clicked
+                robotKey1 = $(a).attr('data-key');
+                robotKey2 = $(b).attr('data-key');
+
+                } else if (thisSortToken == 'amount'){
+
+                // sort items by COUNT if amount clicked
+                robotKey1 = $(a).attr('data-count');
+                robotKey2 = $(b).attr('data-count');
+
+                } else if (thisSortToken == 'type'){
+
+                // sort items by TYPE if type clicked
+                robotKey1 = gameSettings.mmrpgIndexTypes.indexOf($(a).attr('data-type'));
+                robotKey2 = gameSettings.mmrpgIndexTypes.indexOf($(b).attr('data-type'));
+                robotKey1B = gameSettings.mmrpgIndexTypes.indexOf($(a).attr('data-type2'));
+                robotKey2B = gameSettings.mmrpgIndexTypes.indexOf($(b).attr('data-type2'));
+
+                }
+
+            // compare key values and return
+            if (thisSortOrder == 'asc'){
+                if (robotKey1 > robotKey2) { return 1; }
+                else if (robotKey1 < robotKey2) { return -1; }
+                else {
+                    if (robotKey1B > robotKey2B) { return 1; }
+                    else if (robotKey1B < robotKey2B) { return -1; }
+                    else { return 0; }
+                    }
+                } else if (thisSortOrder == 'desc'){
+                if (robotKey1 > robotKey2) { return -1; }
+                else if (robotKey1 < robotKey2) { return 1; }
+                else {
+                    if (robotKey1B > robotKey2B) { return -1; }
+                    else if (robotKey1B < robotKey2B) { return 1; }
+                    else { return 0; }
+                    }
+                }
+
+            });
+
+        // put sorted results back on page
+        thisAbilityWrapper.find('.item_name[data-id!="0"]').remove();
+        thisAbilityWrapper.find('.wrapper_overflow').append(myArray);
+        thisBody.removeClass('loading');
+        return true;
 
         });
 
