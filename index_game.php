@@ -96,42 +96,43 @@ if (count($matches)>1){
 
 ?>
 <!DOCTYPE html>
-<html<?/* not-manifest="manifest.php?<?=MMRPG_CONFIG_CACHE_DATE?>" */?> lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
+<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
 <head>
+
 <meta charset="UTF-8" />
+
 <title><?= $this_seo_title ?></title>
+
 <meta name="keywords" content="<?= $this_seo_keywords ?>" />
 <meta name="description" content="<?= $this_seo_description ?>" />
 <meta name="robots" content="index,follow,noodp" />
-<link rel="sitemap" type="application/xml" title="Sitemap" href="<?= MMRPG_CONFIG_ROOTURL ?>sitemap.xml" />
-<meta name="format-detection" content="telephone=no" />
+
 <base href="<?= MMRPG_CONFIG_ROOTURL ?>">
-<? foreach ($this_graph_data AS $token => $value){ echo '<meta property="og:'.str_replace('__', ':', $token).'" content="'.$value.'"/>'."\n"; } ?>
+
+<link rel="sitemap" type="application/xml" title="Sitemap" href="<?= MMRPG_CONFIG_ROOTURL ?>sitemap.xml" />
+
+<? if(!defined('MMRPG_CRITICAL_ERROR')){  foreach ($this_graph_data AS $token => $value){ echo '<meta property="og:'.str_replace('__', ':', $token).'" content="'.$value.'"/>'."\n"; } } ?>
+
 <link rel="browser-game-info" href="<?= MMRPG_CONFIG_ROOTURL ?>mmrpg-info.xml" />
-<link rel="shortcut icon" type="image/x-icon" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
-<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/reset.css" rel="stylesheet" />
-<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<?if($flag_wap):?>
-<meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, width=768, height=1004">
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="format-detection" content="telephone=no">
-<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<link rel="apple-touch-icon" sizes="72x72" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/ipad-icon_72x72.png" />
-<link rel="apple-touch-startup-image" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/ipad-startup_768x1004_portrait.png?<?=MMRPG_CONFIG_CACHE_DATE?>" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)" />
-<link rel="apple-touch-startup-image" href="<?= MMRPG_CONFIG_ROOTURL ?>images/assets/ipad-startup_748x1024_landscape.png?<?=MMRPG_CONFIG_CACHE_DATE?>" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)" />
-<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<?elseif($flag_iphone):?>
-<meta name="viewport" content="user-scalable=yes, width=768, height=1004">
-<link type="text/css" href="<?= MMRPG_CONFIG_ROOTURL ?>styles/style-mobile-iphone.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<?endif;?>
+
+<link rel="shortcut icon" type="image/x-icon" href="images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
+
+<link type="text/css" href="styles/reset.css" rel="stylesheet" />
+
+<style type="text/css"> html, body { background-color: #262626; } </style>
+
+<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+
+<meta name="format-detection" content="telephone=no" />
+<link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
+<meta name="viewport" content="user-scalable=yes, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, width=768, height=1004">
+
 </head>
 <? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
 <body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?>">
-<?/*
-<div style="margin: 0; padding: 10px 25%; background-color: rgb(122, 0, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
-ATTENTION!<br /> The Mega Man RPG Prototype will be updating very soon.  Please, please log off from your accounts as soon as possible and stand by until further notice.  Several parts of the website will be taken offline during this process and any progress made during or directly before will likely be lost.  Thank you and look forward to lots of new stuff!<br /> - Adrian
-</div>
-*/?>
+
 <h1 id="header">Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></h1>
 <div id="window" style="position: relative; ">
 
