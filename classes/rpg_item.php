@@ -1832,6 +1832,13 @@ class rpg_item extends rpg_object {
         if (strstr($this_item->item_token, 'super')){ $stat_boost_tokens = array('attack', 'defense', 'speed'); }
         else { $stat_boost_tokens[] = $this_item->item_type; }
 
+        // Create the robot rewards variable if it doesn't already exist in the session
+        if (!isset($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token])){
+            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token] = array();
+        }
+        // Collect a reference to this robot session variable for updating
+        $robot_session_rewards = &$_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token];
+
         // Loop through each stat boost token and raise it
         foreach ($stat_boost_tokens AS $stat_token){
 
@@ -1858,23 +1865,21 @@ class rpg_item extends rpg_object {
             if ($this_item->item_results['this_result'] == 'success' && $this_item->item_results['total_amount'] > 0){
 
                 // Create the stat boost variable if it doesn't already exist in the session
-                if (!isset($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_'.$stat_token])){
-                    $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_'.$stat_token] = 0;
-                }
+                if (!isset($robot_session_rewards['robot_'.$stat_token])){ $robot_session_rewards['robot_'.$stat_token] = 0; }
 
                 // Collect this robot's stat calculations
                 $robot_info = rpg_robot::get_index_info($target_robot->robot_token);
                 $robot_stats = rpg_robot::calculate_stat_values(
                     $target_robot->robot_level,
                     $robot_info,
-                    $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]
+                    $robot_session_rewards
                     );
 
                 // If this robot is not already over their stat limit, increment pending boosts
                 if ($target_player->player_side == 'left' && $robot_stats[$stat_token]['bonus'] < $robot_stats[$stat_token]['bonus_max']){
 
                     // Calculate the actual amount to permanently boost in case it goes over max
-                    $stat_boost_amount = $this_item->item_results['total_amount'];
+                    $stat_boost_amount = $this_item->item_recovery;
                     if (($robot_stats[$stat_token]['bonus'] + $stat_boost_amount) > $robot_stats[$stat_token]['bonus_max']){
                         $stat_boost_amount = $robot_stats[$stat_token]['bonus_max'] - $robot_stats[$stat_token]['bonus'];
                     }
@@ -1883,7 +1888,7 @@ class rpg_item extends rpg_object {
                     if (!empty($stat_boost_amount)){
 
                         // Update the session variables with the incremented stat boost
-                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]['robot_'.$stat_token] += $stat_boost_amount;
+                        $robot_session_rewards['robot_'.$stat_token] += $stat_boost_amount;
                         $target_robot->$stat_base_prop += $stat_boost_amount;
                         $target_robot->update_session();
 
@@ -1891,7 +1896,7 @@ class rpg_item extends rpg_object {
                         $robot_stats = rpg_robot::calculate_stat_values(
                             $target_robot->robot_level,
                             $robot_info,
-                            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token]
+                            $robot_session_rewards
                             );
 
                         // Check if this robot has now reached max stats
@@ -1902,7 +1907,7 @@ class rpg_item extends rpg_object {
                             $this_battle->events_create($target_robot, false,
                                 "{$target_robot->robot_name}'s {$stat_name} Stat",
                                 $target_robot->print_name().'\'s '.$stat_token.' stat bonuses have been raised to the max of '.
-                                '<span class="robot_type robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['max'].' &#9733;</span>!<br />'.
+                                '<span class="robot_type robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['bonus_max'].' &#9733;</span>!<br />'.
                                 'Congratulations and '.lcfirst(rpg_battle::random_victory_quote()).' '
                                 );
                             $target_robot->robot_frame = 'base';
