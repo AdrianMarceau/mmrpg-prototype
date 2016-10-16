@@ -13,8 +13,8 @@ $battle = array(
     'player_token' => 'dr-wily',
     'player_switch' => 1.5,
     'player_robots' => array(
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'bass', 'robot_level' => 10, 'robot_abilities' => array('bass-buster', 'bass-crush', 'bass-baroque', 'buster-shot', 'leaf-shield', 'atomic-fire', 'bubble-lead', 'metal-blade', 'quick-boomerang', 'flash-stopper', 'crash-bomber', 'air-shooter')),
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'disco', 'robot_level' => 10, 'robot_abilities' => array('disco-buster', 'buster-shot', 'attack-break', 'defense-break', 'speed-break', 'energy-break'))
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'bass', 'robot_level' => 10, 'robot_item' => 'weapon-pellet', 'robot_abilities' => array('bass-buster', 'bass-crush', 'bass-baroque', 'buster-shot', 'leaf-shield', 'atomic-fire', 'bubble-lead', 'metal-blade', 'quick-boomerang', 'flash-stopper', 'crash-bomber', 'air-shooter')),
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2), 'robot_token' => 'disco', 'robot_level' => 10, 'robot_item' => 'energy-pellet', 'robot_abilities' => array('disco-buster', 'buster-shot', 'attack-break', 'defense-break', 'speed-break', 'energy-break'))
       )
     ),
   'battle_rewards' => array(
