@@ -106,25 +106,30 @@ $ability = array(
 
                         //$this_battle->events_create(false, false, 'debug', 'player side left!', $event_options);
 
-                        // Remove the copy shot from this robot's battle settings and replace with new ability
-                        $temp_ability_settings = $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'];
-                        $temp_new_ability_settings = array();
-                        if (!isset($temp_ability_settings[$this_new_ability->ability_token])){
-                            foreach ($temp_ability_settings AS $array){ $temp_new_ability_settings[] = $array['ability_token']; }
-                            $temp_overwrite_position = array_search($this_ability->ability_token, $temp_new_ability_settings);
-                            $temp_new_ability_settings[$temp_overwrite_position] = $this_new_ability->ability_token;
-                            $temp_ability_settings = array();
-                            foreach ($temp_new_ability_settings AS $token){ $temp_ability_settings[$token] = array('ability_token' => $token); }
-                            $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'] = $temp_ability_settings;
-                            // Unset this ability in the robot's settings
-                            //unset($_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'][$this_ability->ability_token]);
+                        // Only equip this ability to the session IF NATIVE COPY CORE
+                        $this_robot_index = rpg_robot::get_index_info($this_robot->robot_token);
+                        if ($this_robot_index['robot_core'] == 'copy'){
+
+                            // Remove the copy shot from this robot's battle settings and replace with new ability
+                            $temp_ability_settings = $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'];
+                            $temp_new_ability_settings = array();
+                            if (!isset($temp_ability_settings[$this_new_ability->ability_token])){
+                                foreach ($temp_ability_settings AS $array){ $temp_new_ability_settings[] = $array['ability_token']; }
+                                $temp_overwrite_position = array_search($this_ability->ability_token, $temp_new_ability_settings);
+                                $temp_new_ability_settings[$temp_overwrite_position] = $this_new_ability->ability_token;
+                                $temp_ability_settings = array();
+                                foreach ($temp_new_ability_settings AS $token){ $temp_ability_settings[$token] = array('ability_token' => $token); }
+                                $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'] = $temp_ability_settings;
+                                // Unset this ability in the robot's settings
+                                //unset($_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'][$this_ability->ability_token]);
+                            }
+
                         }
 
                         // Unlock this ability for the player permanently
                         $temp_player_info = array('player_token' => $this_player->player_token);
                         $temp_robot_info = array('robot_token' => $this_robot->robot_token);
                         $temp_ability_info = array('ability_token' => $this_new_ability->ability_token);
-                        //mmrpg_game_unlock_ability($temp_player_info, $temp_robot_info, $temp_ability_info);
                         mmrpg_game_unlock_ability($temp_player_info, false, $temp_ability_info, true);
 
                     }
