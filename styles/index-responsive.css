@@ -283,11 +283,12 @@ body:before {
         padding: 0;
     }
 
-    #window #header_social_facebook {
-
-    }
     #window #header_social_github {
 
+    }
+    #window #header_social_facebook {
+        right: 8px;
+        top: 36px;
     }
 
     #window .banner {
@@ -346,6 +347,14 @@ body:before {
     }
     #window .banner .userinfo .expand:hover {
         background-color: #292929;
+    }
+    #window .banner .userinfo .expand span {
+        display: inline-block;
+        transform: rotate(0);
+        transition: transform 0.3s;
+    }
+    #window .banner .userinfo .expand.expanded span {
+        transform: rotate(45deg);
     }
     #window .banner .userinfo .avatar {
         margin-right: 0;
