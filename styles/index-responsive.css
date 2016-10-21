@@ -1,0 +1,682 @@
+
+/* -- RESPONSIVE STYLESHEET (INDEX) -- */
+
+body:before {
+    content: "Z";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    background-color: magenta;
+    border: 1px solid magenta;
+    border-top: 0 none transparent;
+    border-left: 0 none transparent;
+    color: #FFFFFF;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    font-family: "Courier New";
+    font-size: 26px;
+    line-height: 50px;
+    z-index: 9999;
+}
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+
+    body:before {
+        content: "01";
+    }
+
+    #window .page .leaderboard .subbody .player_stats {
+        width: 468px;
+    }
+    #window .page .event .option_this-team-select .chrome label {
+        margin-left: 560px !important;
+    }
+    #window .page_home .gallery .wrapper {
+        max-height: 160px;
+    }
+    #window .page .gallery .dateblock,
+    #window .page .gallery .screenshot {
+        width: 120px;
+        height: 70px;
+        margin: 0 4px 4px 0;
+    }
+    #window .page .gallery .screenshot img {
+        width: 120px;
+    }
+    #window .page .subbody .float_link .sprite,
+    #window .page .subbody .float.link .sprite {
+        width: 29px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+    #window .page .subbody .float_link .sprite_size_40x40 span,
+    #window .page .subbody .float_link .sprite_size_40x40 img,
+    #window .page .subbody .float.link .sprite_size_40x40 span,
+    #window .page .subbody .float.link .sprite_size_40x40 img,
+    #window .page .subbody .float.link .sprite.size40 span,
+    #window .page .subbody .float.link .sprite.size40 img {
+        margin-top: -4px;
+        margin-left: -6px;
+    }
+    #window .page .body .subbody .float_link_group,
+    #window .page .body .subbody .float.link.group {
+        margin: 0 8px 8px 0 !important;
+        padding: 2px 2px 4px 4px;
+    }
+    #window .page .subbody .float_link .sprite_size_80x80 span,
+    #window .page .subbody .float_link .sprite_size_80x80 img,
+    #window .page .subbody .float.link .sprite_size_80x80 span,
+    #window .page .subbody .float.link .sprite_size_80x80 img,
+    #window .page .subbody .float.link .sprite.size80 span,
+    #window .page .subbody .float.link .sprite.size80 img {
+        margin-top: -24px;
+        margin-left: -26px;
+    }
+    #window .page .type_block {
+        width: 86px;
+    }
+    #window .page .body .community .thread_subbody_compact {
+        width: 490px;
+    }
+    #window .page .body .community .thread_name .thread_namewrapper {
+        width: 700px;
+    }
+    #window .page_community .form .field_thread_body input.text,
+    #window .page_community .form .field_thread_body select.select2,
+    #window .page_community .form .field_thread_body .textarea,
+    #window .page_community .form .field_post_body .textarea,
+    #window .page_file .form .field_post_body .textarea {
+        width: 862px;
+    }
+    #game_frames iframe,
+    #game_frames iframe {
+        width: 1000px !important;
+        left: -14px !important;
+    }
+    #window .page .event .robot_container .robot_name,
+    #window .page .event .ability_container .ability_name {
+        width: 48.30%;
+    }
+    #window .page #robots .event .robot_name,
+    #window .page #abilities .event .ability_name {
+        width: auto;
+    }
+    #window .banner .event {
+        left: auto;
+        right: 123px;
+        overflow: visible;
+    }
+    #window {
+        width: 1024px;
+    }
+    #window .banner,
+    #window .menu {
+        width: 1004px;
+    }
+    #window .header,
+    #window .option {
+        width: 1004px;
+    }
+    #window .option_scroll {
+        width: 34px;
+    }
+    #window .option_1x1,
+    #window .option_1x2,
+    #window .option_1x3,
+    #window .option_1x4 {
+        height: 73px;
+        line-height: 73px;
+    }
+    #window .option_1x1 {
+        width: 245px;
+    }
+    #window .option_1x2 {
+        width: 497px;
+    }
+    #window .option_1x3 {
+        width: 741px;
+    }
+    #window .option_1x1 div,
+    #window .option_1x2 div,
+    #window .option_1x3 div,
+    #window .option_1x4 div {
+        height: 48px;
+        line-height: 48px;
+    }
+    #window .option_1x1 div label,
+    #window .option_1x2 div label,
+    #window .option_1x3 div label,
+    #window .option_1x4 div label {
+        background-color: transparent;
+        border-color: transparent;
+        box-shadow: none;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+    }
+    #window .page .body .subwrap .image_1x5 {
+        width: 18.40%;
+    }
+
+}
+
+/* -- Portrait Mode -- */
+@media (max-width: 1060px){
+
+    body:before {
+        content: "02";
+    }
+
+    #mmrpg #window .menu {
+        width: auto;
+    }
+    #window .header {
+        width: auto;
+    }
+    #window .page .type_block {
+        width: 86px;
+    }
+
+}
+
+/* -- Slightly Less than Portrait Mode -- */
+@media (max-width: 1000px){
+
+    body:before {
+        content: "03";
+    }
+
+
+}
+
+/* -- Less than Portrait Mode -- */
+@media (max-width: 970px){
+
+    body:before {
+        content: "04";
+    }
+
+    #window {
+        width: auto;
+        max-width: 640px;
+    }
+
+    #window .banner,
+    #mmrpg #window .menu,
+    #window .page {
+        margin-left: 0;
+        margin-right: 0;
+        width: auto;
+    }
+    #window .banner {
+        margin-top: 0;
+    }
+
+
+}
+
+/* -- Even Less than Portrait Mode -- */
+@media (max-width: 760px){
+
+    body:before {
+        content: "05";
+    }
+
+
+}
+
+/* -- Almost iPhone Portrait Mode -- */
+@media (max-width: 560px){
+
+    body:before {
+        content: "06";
+    }
+
+    #window .page .iconwrap.preview {
+        max-width: 400px;
+    }
+    #window .page .iconwrap.preview .type_block {
+        width: 68px;
+    }
+
+}
+
+/* -- So Close to iPhone Portrait Mode -- */
+@media (max-width: 460px){
+
+    body:before {
+        content: "07";
+    }
+
+    #window .page .iconwrap.preview {
+        max-width: 300px;
+    }
+    #window .page .iconwrap.preview .type_block {
+        width: 62px;
+    }
+
+}
+
+
+/* -- iPhone Portrait Mode -- */
+@media (max-width: 350px){
+
+    body:before {
+        content: "08";
+    }
+
+    #mmrpg {
+        background-color: magenta;
+        background-color: #262626;
+        background-image: none;
+        padding-bottom: 10px;
+    }
+    #mmrpg #window {
+        background-color: transparent;
+        border-bottom: 0 none transparent;
+        box-shadow: 0 0 0 transparent;
+        min-width: 320px;
+        padding: 0;
+    }
+
+    #window #header_social_facebook {
+
+    }
+    #window #header_social_github {
+
+    }
+
+    #window .banner {
+        height: 164px;
+    }
+
+    #window .banner .event {
+        width: auto;
+    }
+    #window .banner .event .sprite[data-type=attachment] {
+        display: none;
+    }
+
+    #window .banner .userinfo {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 6px 6px;
+        border-top-width: 2px;
+        border-style: solid none none;
+        -moz-border-radius: 0;
+        -webkit-border-radius: 0;
+        border-radius: 0;
+    }
+    #window .banner .userinfo .expand {
+        display: block;
+        position: absolute;
+        left: 3px;
+        bottom: 3px;
+        font-size: 34px;
+        line-height: 34px;
+        border: 1px solid #1A1A1A;
+        width: 34px;
+        height: 34px;
+        cursor: pointer;
+        border-radius: 3px;
+        text-decoration: none;
+        color: #FFFFFF;
+        background-color: #222222;
+        background-image: -webkit-gradient(
+                linear,
+                left bottom,
+                left top,
+                color-stop(0.15, rgba(0, 0, 0, 0.05)),
+                color-stop(0.75, rgba(255, 255, 255, 0.05))
+        );
+        background-image: -moz-linear-gradient(
+                center bottom,
+                rgba(0, 0, 0, 0.05) 15%,
+                rgba(255, 255, 255, 0.05) 75%
+        );
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+        -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+        -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    }
+    #window .banner .userinfo .expand:hover {
+        background-color: #292929;
+    }
+    #window .banner .userinfo .avatar {
+        margin-right: 0;
+        margin-left: 0;
+    }
+    #window .banner .userinfo .info {
+        height: auto;
+        text-align: right;
+        float: right;
+        width: 70%;
+        width: calc(100% - 72px);
+    }
+    #window .banner .userinfo .info .username {
+        font-size: 12px;
+        line-height: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    #window .banner .userinfo .info .username .pipe {
+        display: none;
+    }
+    #window .banner .userinfo .info .username .place {
+        display: none;
+    }
+    #window .banner .userinfo .info .username .place span {
+        display: none;
+    }
+    #window .banner .userinfo .info .file {
+        font-size: 11px;
+        line-height: 13px;
+    }
+    #window .banner .userinfo .field_type {
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        border: 0 none transparent;
+    }
+
+    #window .menu .main {
+        height: 0;
+    }
+    #window .menu .main.expanded {
+        height: auto;
+    }
+    #window .menu .link {
+        display: block;
+        float: none;
+        clear: both;
+        -moz-border-radius: 0;
+        -webkit-border-radius: 0;
+        border-radius: 0;
+        border-bottom: 1px solid #090909;
+        line-height: 30px;
+    }
+    #window .menu .link:last-child {
+        border-bottom: 0 none transparent;
+    }
+    #window .menu .sub {
+        display: none;
+    }
+    #window .menu .sub .link {
+        line-height: 20px;
+    }
+    #window .menu .link:after {
+        display: none;
+    }
+
+    #window .header {
+        height: auto;
+        font-size: 16px;
+    }
+    #window .header .header_wrapper {
+        overflow: hidden;
+        line-height: 24px;
+        padding: 9px 10px;
+    }
+    #window .header .count_header {
+        float: none;
+        display: block;
+        clear: both;
+        font-size: 12px;
+        line-height: 12px;
+        margin-top: 6px;
+        padding-bottom: 6px;
+    }
+
+    #window .page .subbody .float.link .sprite {
+        width: 25px;
+    }
+    #window .page .subbody .float.link .sprite.size40 span,
+    #window .page .subbody .float.link .sprite.size40 img {
+        margin-left: -8px;
+    }
+    #window .page .subbody .float.link .sprite.size80 span,
+    #window .page .subbody .float.link .sprite.size80 img {
+        margin-left: -28px;
+    }
+    #window .page .subbody[data-class="bosses"] .float.link.group[data-game=MM30] .sprite {
+        width: 19px;
+    }
+    #window .page .subbody[data-class="bosses"] .float.link.group[data-game=MM30] .sprite.size40 span,
+    #window .page .subbody[data-class="bosses"] .float.link.group[data-game=MM30] .sprite.size40 img {
+        margin-left: -6px;
+    }
+
+    #window .page .body .subbody[data-class="abilities"] .float.link.group {
+        margin-right: 4px !important;
+        margin-bottom: 4px !important;
+    }
+    #window .page .subbody[data-class="abilities"] .float.link .sprite {
+        width: 22px;
+    }
+    #window .page .subbody[data-class="abilities"] .float.link .sprite.size40 span,
+    #window .page .subbody[data-class="abilities"] .float.link .sprite.size40 img {
+        margin-left: -9px;
+    }
+
+
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MM00/Weapons/"] .sprite {
+        width: 24px;
+    }
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MM00/Weapons/"] .sprite.size40 span,
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MM00/Weapons/"] .sprite.size40 img {
+        margin-left: -8px;
+    }
+
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game="MM30/Weapons/Stardroid"] .sprite {
+        width: 19px;
+    }
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game="MM30/Weapons/Stardroid"] .sprite.size40 img {
+        margin-left: -12px;
+    }
+
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Weapons/"] .sprite {
+        width: 20px;
+    }
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Weapons/"] .sprite.size40 span,
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Weapons/"] .sprite.size40 img {
+        margin-left: -10px;
+    }
+
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Support/"] .sprite {
+        width: 20px;
+    }
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Support/"] .sprite.size40 span,
+    #window .page .subbody[data-class="abilities"] .float.link.group[data-game^="MMRPG/Support/"] .sprite.size40 img {
+        margin-left: -10px;
+    }
+
+    #window .page .subbody[data-class="items"] .float.link.group[data-game^="MM00/Items/"] .sprite {
+        width: 20px;
+    }
+    #window .page .subbody[data-class="items"] .float.link.group[data-game^="MM00/Items/"] .sprite.size40 span,
+    #window .page .subbody[data-class="items"] .float.link.group[data-game^="MM00/Items/"] .sprite.size40 img {
+        margin-left: -10px;
+    }
+
+    #window .page .subbody[data-class="items"] .float.link.group[data-game^="MMRPG/Items/"] .sprite {
+        width: 18px;
+    }
+    #window .page .subbody[data-class="items"] .float.link.group[data-game^="MMRPG/Items/"] .sprite.size40 span,
+    #window .page .subbody[data-class="items"] .float.link.group[data-game^="MMRPG/Items/"] .sprite.size40 img {
+        margin-left: -11px;
+    }
+
+    #window .page .body .subbody_databaselinks[data-class="items"] .iconwrap {
+        padding-right: 3%;
+    }
+
+    #window .page_database .type_block {
+        width: 45%;
+    }
+
+    #window .page .body .header_typewrapper,
+    #window .page .body .subheader_typewrapper {
+        display: block;
+        overflow: hidden;
+        line-height: 16px;
+        padding-top: 3px;
+        padding-bottom: 6px;
+    }
+    #window .page .body .subheader .inline_link {
+        font-size: 14px;
+        line-height: 16px;
+    }
+    #window .page .body .header .count,
+    #window .page .body .subheader .count {
+        float: none;
+        display: block;
+        clear: both;
+        font-size: 12px;
+        line-height: 12px;
+        margin-top: 6px;
+        padding: 0;
+    }
+    #window .page .body .subheader .float_link,
+    #window .page .body .subheader .float_link2 {
+        display: none;
+    }
+
+    #window .page .event table td.right {
+        display: block;
+        float: none;
+        clear: none;
+        width: auto;
+        padding: 2px 5px;
+    }
+    #window .page .event table td:not([class]) {
+        display: none;
+    }
+
+    #window .page .event .robot_container .robot_name,
+    #window .page .event .ability_container .ability_name {
+        display: block;
+        float: none;
+        width: auto;
+        clear: both;
+    }
+    #window .page .event .robot_container .robot_name .label,
+    #window .page .event .ability_container .ability_name .label {
+        width: 75%;
+        width: calc(100% - 42px);
+    }
+
+    #window .page .body .community .thread_subbody_compact {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    #window .page .body .community .thread_subbody .thread_linkblock .link,
+    #window .page .body .community .thread_subbody .thread_linkblock .info,
+    #window .page .body .community .thread_subbody .thread_linkblock .count {
+        width: 98%;
+        width: calc(100% - 10px);
+        line-height: 16px;
+    }
+    #window .page .body .community .thread_subbody .thread_linkblock .link {
+        white-space: normal;
+        text-align: left;
+    }
+    #window .page .body .community .thread_subbody .thread_linkblock .count {
+        margin-top: -2px;
+        padding-top: 3px;
+    }
+    #window .page .body .community .thread_subbody .thread_linkblock .count .comments,
+    #window .page .body .community .thread_subbody .thread_linkblock .count .newpost {
+        display: block;
+        float: left;
+        clear: none;
+    }
+    #window .page .body .community .thread_subbody .thread_linkblock .count .newpost {
+
+    }
+    #window .page .body .community .thread_subbody .thread_linkblock .count .newpost + .newpost {
+
+    }
+
+    #window .page_home #youtube_playlist,
+    #window .page_home #youtube_playlist iframe {
+        width: auto;
+        margin: 0 auto 9px;
+    }
+
+
+    #window .page .leaderboard .file .inset {
+        min-height: 80px;
+    }
+    #window .page .leaderboard .file .place {
+        position: absolute;
+        top: 9px;
+        left: 9px;
+        margin: 0;
+        padding: 0;
+        text-align: left;
+    }
+    #window .page .leaderboard .file .points {
+        position: absolute;
+        top: 9px;
+        right: 9px;
+        margin: 0;
+        padding: 0;
+        text-align: right;
+    }
+    #window .page .leaderboard .file .userinfo {
+        display: block;
+        float: none;
+        position: static;
+        width: auto;
+        text-align: left;
+        white-space: normal;
+        margin: 34px 12px 6px;
+        padding: 0;
+    }
+    #window .page .leaderboard .file .records {
+        display: none;
+        float: none;
+        position: static;
+        width: auto;
+        text-align: left;
+        white-space: normal;
+        margin: 0;
+        padding: 0;
+    }
+    #window .page .leaderboard .file .avatar {
+        float: right;
+        left: auto;
+        right: 36px;
+        bottom: 16px;
+    }
+
+    #window .page .gallery .dateblock,
+    #window .page .gallery .screenshot {
+        width: 93px;
+    }
+
+    #mmrpg #credits {
+        margin: -12px 10px 0;
+        padding: 6px 26px;
+        background-color: rgb(30, 30, 30);
+        color: #464646;
+        text-shadow: 0 0 0 transparent;
+        border-radius: 0.3em;
+    }
+
+    #window .devbuild_warning {
+
+    }
+    #window .devbuild_warning br {
+        display: none;
+    }
+
+
+}

@@ -211,7 +211,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 
 <meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
-<meta name="viewport" content="user-scalable=yes, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, width=768, height=1004">
+<meta name="viewport" content="user-scalable=yes, width=768, height=1004">
 
 </head>
 <body id="mmrpg" class="prototype">

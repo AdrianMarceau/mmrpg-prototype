@@ -1,3 +1,16 @@
+html,
+body,
+* {
+    -webkit-text-size-adjust: none !important;
+    text-size-adjust: none !important;
+}
+html,
+body {
+    min-height: 100vh;
+}
+
+* { max-height: 100000px; }
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -1086,7 +1099,6 @@ body.index #header {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-    -webkit-text-size-adjust: none;
 }
 #window iframe {
     margin: 0 auto;
