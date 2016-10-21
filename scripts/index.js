@@ -2,6 +2,8 @@
 var thisBody = false;
 var thisPrototype = false;
 var thisWindow = false;
+var thisHeaderBanner = false;
+var thisHeaderMenu = false;
 var websiteSettings = {};
 $(document).ready(function(){
 
@@ -9,6 +11,8 @@ $(document).ready(function(){
     thisBody = $('#mmrpg');
     thisIndex = $('#window', thisBody);
     thisWindow = $(window);
+    thisHeaderBanner = $('.banner', thisIndex);
+    thisHeaderMenu = $('.menu', thisIndex);
 
     // Create the window resize events to ensure scrolling works
     /*
@@ -37,6 +41,34 @@ $(document).ready(function(){
         var thisAnchorOffset = $('#'+thisAnchorToken).offset();
         $('html, body').animate({scrollTop: (thisAnchorOffset.top - 5)+'px'}, 'fast');
         return false;
+        });
+
+
+    /*
+     * MAIN MENU EVENTS
+     */
+
+    // Capture and clicks to the main menu expand toggle
+    $('.userinfo .expand', thisHeaderBanner).click(function(e){
+        console.log('expand clicked!');
+        e.preventDefault();
+        var menuButton = $(this);
+        var menuContainer = $('.main', thisHeaderMenu);
+        if (!menuContainer.hasClass('expanded')){
+
+            menuContainer.addClass('expanded');
+            //menuButton.find('span').html('×');
+            menuButton.addClass('expanded');
+
+            } else {
+
+                menuContainer.removeClass('expanded');
+                //menuButton.find('span').html('+');
+                menuButton.removeClass('expanded');
+
+            }
+
+
         });
 
     /*

@@ -235,6 +235,7 @@ require_once('pages/'.$this_current_page.'.php');
 
             <? if(!defined('MMRPG_CRITICAL_ERROR')): ?>
                 <div class="userinfo" style="">
+                    <a class="expand" rel="nofollow"><span>+</span></a>
                     <div class="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="">&nbsp;</div>
                     <?/*
                     <? if($this_userid == MMRPG_SETTINGS_GUEST_ID || !MMRPG_CONFIG_ADMIN_MODE): ?>
