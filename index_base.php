@@ -89,7 +89,13 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     $temp_viewing_community = mmrpg_website_sessions_active('community/', 3, true);
 
     // Collect the number of people currently in chat
-    $chat_online = $db->get_array_list("SELECT * FROM ajax_chat_online WHERE 1 = 1;");
+    $chat_online = $db->get_array_list("SELECT userID, userName, userRole, channel, dateTime, ip FROM ajax_chat_online WHERE 1 = 1;");
+    // Increment the community count by the number in the chat room
+    if (!empty($chat_online)){
+        foreach ($chat_online AS $online){
+            $temp_viewing_community[] = array('user_id' => $online['userID'], 'session_href' => 'chat/');
+        }
+    }
 
 }
 
@@ -133,7 +139,7 @@ require_once('pages/'.$this_current_page.'.php');
 
 <meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
-<meta name="viewport" content="user-scalable=yes, width=320">
+<meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1.0">
 
 </head>
 <? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
@@ -333,26 +339,12 @@ require_once('pages/'.$this_current_page.'.php');
                             $item_class = 'item '.($active ? 'item_active ' : '');
                             $link_class = 'link '.($active ? 'link_active field_type_empty' : '');
 
-                            // If this the COMMUNITY link, dynamically collect sub-pages
+                            // If this the COMMUNITY link, dynamically collect update counts
                             if ($token == 'community'){
-                                // Loop through the community index and print out links
-                                $this_categories_index = mmrpg_website_community_index();
-                                if (!empty($this_categories_index)){
-                                    foreach ($this_categories_index AS $temp_token => $temp_category){
-                                        $temp_id = $temp_category['category_id'];
-                                        if (($temp_id == 0) && $this_userid == MMRPG_SETTINGS_GUEST_ID){ continue; }
-                                        if (($temp_token == 'personal' || $temp_token == 'chat') && empty($this_userinfo['user_flag_postprivate'])){ continue; }
-                                        $temp_update_count = !empty($temp_new_threads_categories[$temp_id]) ? $temp_new_threads_categories[$temp_id] : 0;
-                                        $temp_viewing_list = $temp_token != 'personal' ? mmrpg_website_sessions_active('community/'.$temp_category['category_token'].'/', 3, true) : array();
-                                        if ($temp_token == 'chat' && !empty($chat_online)){ $temp_viewing_list = $chat_online; }
-                                        $temp_viewing_count = !empty($temp_viewing_list) ? count($temp_viewing_list) : 0;
-                                        $after = '';
-                                        if ($temp_update_count > 0){ $after .= '<sup class="sup field_type field_type_electric" title="'.($temp_update_count == 1 ? '1 Updated Thread' : $temp_update_count.' Updated Threads').'">'.$temp_update_count.'</sup>'; }
-                                        if ($temp_viewing_count > 0){ $after .= '<sup class="sup field_type field_type_nature" title="'.($temp_viewing_count == 1 ? '1 Member Viewing' : $temp_viewing_count.' Members Viewing').'" style="'.($temp_viewing_count > 0 ? 'margin-left: -3px;' : '').'">'.$temp_viewing_count.'</sup>'; }
-                                        $sub_link = array('name' => ucfirst($temp_token), 'after' => $after);
-                                        $sub_menu_links[$temp_token] = $sub_link;
-                                    }
-                                }
+                                // Generate update count markup for this page's after string
+                                $after .= '';
+                                if (!empty($temp_new_threads)){ $after .= '<sup class="sup field_type field_type_electric" title="'.count($temp_new_threads).' New Comments">'.count($temp_new_threads).'</sup>'; }
+                                if (!empty($temp_viewing_community)){ $after .= '<sup class="sup field_type field_type_nature" title="'.count($temp_viewing_community).' Members Viewing" style="'.(!empty($temp_new_threads) ? 'margin-left: -3px;' : '').'">'.count($temp_viewing_community).'</sup>'; }
                             }
 
                             // Print out the menu item markup
@@ -362,6 +354,28 @@ require_once('pages/'.$this_current_page.'.php');
                                     <?= $before ?><span><?= $name ?></span><?= $after ?>
                                 </a>
                                 <?
+
+                                // If this the COMMUNITY link, dynamically collect sub-pages
+                                if ($token == 'community'){
+                                    // Loop through the community index and print out links
+                                    $this_categories_index = mmrpg_website_community_index();
+                                    if (!empty($this_categories_index)){
+                                        foreach ($this_categories_index AS $temp_token => $temp_category){
+                                            $temp_id = $temp_category['category_id'];
+                                            if (($temp_id == 0) && $this_userid == MMRPG_SETTINGS_GUEST_ID){ continue; }
+                                            if (($temp_token == 'personal' || $temp_token == 'chat') && empty($this_userinfo['user_flag_postprivate'])){ continue; }
+                                            $temp_update_count = !empty($temp_new_threads_categories[$temp_id]) ? $temp_new_threads_categories[$temp_id] : 0;
+                                            $temp_viewing_list = $temp_token != 'personal' ? mmrpg_website_sessions_active('community/'.$temp_category['category_token'].'/', 3, true) : array();
+                                            if ($temp_token == 'chat' && !empty($chat_online)){ $temp_viewing_list = $chat_online; }
+                                            $temp_viewing_count = !empty($temp_viewing_list) ? count($temp_viewing_list) : 0;
+                                            $after = '';
+                                            if ($temp_update_count > 0){ $after .= '<sup class="sup field_type field_type_electric" title="'.($temp_update_count == 1 ? '1 Updated Thread' : $temp_update_count.' Updated Threads').'">'.$temp_update_count.'</sup>'; }
+                                            if ($temp_viewing_count > 0){ $after .= '<sup class="sup field_type field_type_nature" title="'.($temp_viewing_count == 1 ? '1 Member Viewing' : $temp_viewing_count.' Members Viewing').'" style="'.($temp_viewing_count > 0 ? 'margin-left: -3px;' : '').'">'.$temp_viewing_count.'</sup>'; }
+                                            $sub_link = array('name' => ucfirst($temp_token), 'after' => $after);
+                                            $sub_menu_links[$temp_token] = $sub_link;
+                                        }
+                                    }
+                                }
 
                                 // If there were sub-pages to display, loop through and generate markup
                                 if (!empty($sub_menu_links)){

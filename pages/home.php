@@ -144,13 +144,16 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
 
     // Loop through the thread array and display its contents
     if (!empty($this_threads_array)){
+        $temp_display_limit = 6;
+        $temp_display_count = 0;
         foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
-
-            // Break if over the limit
-            if ($this_thread_key > 13){ break; }
 
             // Print out the thread link block
             echo mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread_info, true, true);
+            $temp_display_count++;
+
+            // Break if over the limit
+            if ($temp_display_count >= $temp_display_limit){ break; }
 
         }
     }

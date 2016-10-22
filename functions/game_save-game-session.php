@@ -475,11 +475,11 @@ function mmrpg_save_game_session(){
     $this_save_content['user_id'] = $this_user['userid'];
     $this_save_content['user_name'] = $this_user['username'];
     $this_save_content['user_name_clean'] = $this_user['username_clean'];
-    $this_save_content['user_omega'] = $this_user['omega'];
+    $this_save_content['user_omega'] = !empty($this_user['omega']) ? $this_user['omega'] : md5($this_user['username_clean']);
     $this_save_content = json_encode($this_save_content);
 
     // Save the user's data to a flat text file
-    $this_save_file = fopen($this_base_dir.$this_user['omega'].'.sav', 'w');
+    $this_save_file = fopen($this_base_dir.$this_save_content['user_omega'].'.sav', 'w');
     fwrite($this_save_file, $this_save_content);
     fclose($this_save_file);
 
