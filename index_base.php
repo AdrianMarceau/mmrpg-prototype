@@ -88,6 +88,9 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Collect any members that are currently viewing the community page
     $temp_viewing_community = mmrpg_website_sessions_active('community/', 3, true);
 
+    // Collect the number of people currently in chat
+    $chat_online = $db->get_array_list("SELECT * FROM ajax_chat_online WHERE 1 = 1;");
+
 }
 
 // Include the required page logic files
@@ -210,7 +213,7 @@ require_once('pages/'.$this_current_page.'.php');
             <div class="sprite credits banner_credits" style="background-image: url(images/menus/menu-banner_credits.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
             <div class="sprite overlay banner_overlay" style="">&nbsp;</div>
 
-            <? if(true || !defined('MMRPG_CRITICAL_ERROR') && MMRPG_CONFIG_IS_LIVE): ?>
+            <? if(!defined('MMRPG_CRITICAL_ERROR') && MMRPG_CONFIG_IS_LIVE): ?>
                 <? if($this_current_page != 'file'): ?>
 
                 <!-- FACEBOOK -->
@@ -282,67 +285,137 @@ require_once('pages/'.$this_current_page.'.php');
             <? endif; ?>
 
         </div>
-        <?
-        ?>
+
+
         <div class="menu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-            <? if(!defined('MMRPG_CRITICAL_ERROR')): ?>
-                <div class="main">
-                    <a href="<?= MMRPG_CONFIG_ROOTURL ?>" class="link <?= $this_current_page == 'home' ? 'link_active field_type_empty' : '' ?>"><span>Home</span></a>
-                    <a href="<?= MMRPG_CONFIG_ROOTURL ?>about/" class="link <?= $this_current_page == 'about' ? 'link_active field_type_empty' : '' ?>"><span>About</span></a>
-                    <?/*<a href="<?= MMRPG_CONFIG_ROOTURL ?>updates/" class="link <?= $this_current_page == 'updates' ? 'link_active field_type_empty' : '' ?>"><span>Updates</span></a>*/?>
-                    <a href="<?= MMRPG_CONFIG_ROOTURL ?>gallery/" class="link <?= $this_current_page == 'gallery' ? 'link_active field_type_empty' : '' ?>"><span>Gallery</span></a>
-                    <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/" class="link <?= $this_current_page == 'database' ? 'link_active field_type_empty' : '' ?>"><span>Database</span></a>
-                    <a href="<?= MMRPG_CONFIG_ROOTURL ?>community/" class="link <?= $this_current_page == 'community' ? 'link_active field_type_empty' : '' ?>"><span>Community</span><?= !empty($temp_new_threads) ? '<sup class="sup field_type field_type_electric" title="'.count($temp_new_threads).' New Comments">'.count($temp_new_threads).'</sup>' : '' ?><?= !empty($temp_viewing_community) ? '<sup class="sup field_type field_type_nature" title="'.count($temp_viewing_community).' Members Viewing" style="'.(!empty($temp_new_threads) ? 'margin-left: -3px;' : '').'">'.count($temp_viewing_community).'</sup>' : '' ?></a>
-                    <a href="<?= MMRPG_CONFIG_ROOTURL ?>leaderboard/" class="link <?= $this_current_page == 'leaderboard' ? 'link_active field_type_empty' : '' ?>"><span>Leaderboard</span><?= !empty($temp_leaderboard_online) ? '<sup class="sup field_type field_type_nature" title="'.count($temp_leaderboard_online).' Players Online">'.count($temp_leaderboard_online).'</sup>' : '' ?></a>
-                    <a href="<?= MMRPG_CONFIG_ROOTURL ?>prototype/" target="_blank" class="link <?= $this_current_page == 'prototype' ? 'link_active field_type_empty' : '' ?>"><span>Prototype</span></a>
-                    <a href="<?= MMRPG_CONFIG_ROOTURL ?>credits/" class="link <?= $this_current_page == 'credits' ? 'link_active field_type_empty' : '' ?>"><span>Credits</span></a>
-                    <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/" class="link <?= $this_current_page == 'contact' ? 'link_active field_type_empty' : '' ?>"><span>Contact</span></a>
-                </div>
-                <? if (in_array($this_current_page, array('database', 'community'))): ?>
-                <div class="sub">
-                    <? if ($this_current_page == 'database'): ?>
-                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/players/" class="link <?= $this_current_sub == 'players' ? 'link_active field_type_empty' : '' ?>"><span>Players</span></a>
-                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/robots/" class="link <?= $this_current_sub == 'robots' ? 'link_active field_type_empty' : '' ?>"><span>Robots</span></a>
-                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/mechas/" class="link <?= $this_current_sub == 'mechas' ? 'link_active field_type_empty' : '' ?>"><span>Mechas</span></a>
-                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/bosses/" class="link <?= $this_current_sub == 'bosses' ? 'link_active field_type_empty' : '' ?>"><span>Bosses</span></a>
-                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/abilities/" class="link <?= $this_current_sub == 'abilities' ? 'link_active field_type_empty' : '' ?>"><span>Abilities</span></a>
-                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/items/" class="link <?= $this_current_sub == 'items' ? 'link_active field_type_empty' : '' ?>"><span>Items</span></a>
-                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/fields/" class="link <?= $this_current_sub == 'fields' ? 'link_active field_type_empty' : '' ?>"><span>Fields</span></a>
-                        <a href="<?= MMRPG_CONFIG_ROOTURL ?>database/types/" class="link <?= $this_current_sub == 'types' ? 'link_active field_type_empty' : '' ?>"><span>Types</span></a>
-                    <? endif; ?>
-                    <?
-                    // Print out the community links if applicable
-                    if ($this_current_page == 'community'){
-                        // Collect the number of people currently in chat
-                        $chat_online = $db->get_array_list("SELECT * FROM ajax_chat_online WHERE 1 = 1;");
-                        // Loop through the community index and print out links
-                        if (!empty($this_categories_index)){
-                            foreach ($this_categories_index AS $temp_token => $temp_category){
-                                $temp_id = $temp_category['category_id'];
-                                if (($temp_id == 0) && $this_userid == MMRPG_SETTINGS_GUEST_ID){ continue; }
-                                //if (($temp_id == 0 || $temp_token == 'chat') && $this_userid == MMRPG_SETTINGS_GUEST_ID){ continue; }
-                                if (($temp_token == 'personal' || $temp_token == 'chat') && empty($this_userinfo['user_flag_postprivate'])){ continue; }
-                                $temp_link = MMRPG_CONFIG_ROOTURL.'community/'.$temp_category['category_token'].'/';
-                                $temp_active = $this_current_cat == $temp_category['category_token'] ? true : false;
-                                $temp_count = !empty($temp_new_threads_categories[$temp_id]) ? $temp_new_threads_categories[$temp_id] : 0;
-                                $temp_viewing = $temp_token != 'personal' ? mmrpg_website_sessions_active('community/'.$temp_category['category_token'].'/', 3, true) : array();
-                                if ($temp_token == 'chat' && !empty($chat_online)){ $temp_viewing = $chat_online; }
-                                $temp_viewing = !empty($temp_viewing) ? count($temp_viewing) : 0;
-                                //die('<pre>$temp_id('.$temp_id.'); $temp_count('.$temp_count.'); $temp_new_threads_categories = '.print_r($temp_new_threads_categories, true).'</pre>');
-                                echo '<a href="'.$temp_link.'" class="link '.($temp_active ? 'link_active field_type_empty' : '').'">';
-                                echo '<span>'.ucfirst($temp_token).'</span>';
-                                if ($temp_count > 0){ echo  '<sup class="sup field_type field_type_electric" title="'.($temp_count == 1 ? '1 Updated Thread' : $temp_count.' Updated Threads').'">'.$temp_count.'</sup>'; }
-                                if ($temp_viewing > 0){ echo  '<sup class="sup field_type field_type_nature" title="'.($temp_viewing == 1 ? '1 Member Viewing' : $temp_viewing.' Members Viewing').'" style="'.($temp_count > 0 ? 'margin-left: -3px;' : '').'">'.$temp_viewing.'</sup>'; }
-                                echo '</a>';
-                            }
-                        }
-                    }
+            <?
+                // Only generate the menu if we're NOT in critical error mode
+                if (!defined('MMRPG_CRITICAL_ERROR')){
+
+                    // Define the basic array of pages to show in the main menu (we'll do subs later)
+                    $main_menu_links = array();
+                    $main_menu_links['home'] = array('name' => 'Home', 'url' => '/');
+                    $main_menu_links['about'] = array('name' => 'About');
+                    $main_menu_links['gallery'] = array('name' => 'Gallery');
+                    $main_menu_links['database'] = array('name' => 'Database', 'subs' => array(
+                        'players' => array('name' => 'Players'),
+                        'robots' => array('name' => 'Robots'),
+                        'mechas' => array('name' => 'Mechas'),
+                        'bosses' => array('name' => 'Bosses'),
+                        'abilities' => array('name' => 'Abilities'),
+                        'items' => array('name' => 'Items'),
+                        'types' => array('name' => 'Types')
+                        ));
+                    $main_menu_links['community'] = array('name' => 'Community');
+                    $main_menu_links['leaderboard'] = array('name' => 'Leaderboard');
+                    $main_menu_links['prototype'] = array('name' => 'Prototype', 'target' => '_blank');
+                    $main_menu_links['credits'] = array('name' => 'Credits');
+                    $main_menu_links['contact'] = array('name' => 'Contact');
+
                     ?>
-                </div>
-                <? endif; ?>
-            <? else: ?>
+                    <ul class="main">
+                        <?
+
+                        // Loop through the main menu links and print their markup
+                        ob_start();
+                        foreach ($main_menu_links AS $token => $info){
+
+                            // Collect basic info about this link
+                            $name = !empty($info['name']) ? $info['name'] : ucfirst($token);
+                            $url = !empty($info['url']) ? MMRPG_CONFIG_ROOTURL.ltrim($info['url'], '/') : $token.'/';
+                            $target = !empty($info['target']) ? $info['target'] : '_self';
+                            $active = $this_current_page == $token ? true : false;
+                            $before = !empty($info['before']) ? $info['before'] : '';
+                            $after = !empty($info['after']) ? $info['after'] : '';
+                            $sub_menu_links = !empty($info['subs']) ? $info['subs'] : array();
+
+                            // Define menu item and link classes for styling
+                            $item_class = 'item '.($active ? 'item_active ' : '');
+                            $link_class = 'link '.($active ? 'link_active field_type_empty' : '');
+
+                            // If this the COMMUNITY link, dynamically collect sub-pages
+                            if ($token == 'community'){
+                                // Loop through the community index and print out links
+                                $this_categories_index = mmrpg_website_community_index();
+                                if (!empty($this_categories_index)){
+                                    foreach ($this_categories_index AS $temp_token => $temp_category){
+                                        $temp_id = $temp_category['category_id'];
+                                        if (($temp_id == 0) && $this_userid == MMRPG_SETTINGS_GUEST_ID){ continue; }
+                                        if (($temp_token == 'personal' || $temp_token == 'chat') && empty($this_userinfo['user_flag_postprivate'])){ continue; }
+                                        $temp_update_count = !empty($temp_new_threads_categories[$temp_id]) ? $temp_new_threads_categories[$temp_id] : 0;
+                                        $temp_viewing_list = $temp_token != 'personal' ? mmrpg_website_sessions_active('community/'.$temp_category['category_token'].'/', 3, true) : array();
+                                        if ($temp_token == 'chat' && !empty($chat_online)){ $temp_viewing_list = $chat_online; }
+                                        $temp_viewing_count = !empty($temp_viewing_list) ? count($temp_viewing_list) : 0;
+                                        $after = '';
+                                        if ($temp_update_count > 0){ $after .= '<sup class="sup field_type field_type_electric" title="'.($temp_update_count == 1 ? '1 Updated Thread' : $temp_update_count.' Updated Threads').'">'.$temp_update_count.'</sup>'; }
+                                        if ($temp_viewing_count > 0){ $after .= '<sup class="sup field_type field_type_nature" title="'.($temp_viewing_count == 1 ? '1 Member Viewing' : $temp_viewing_count.' Members Viewing').'" style="'.($temp_viewing_count > 0 ? 'margin-left: -3px;' : '').'">'.$temp_viewing_count.'</sup>'; }
+                                        $sub_link = array('name' => ucfirst($temp_token), 'after' => $after);
+                                        $sub_menu_links[$temp_token] = $sub_link;
+                                    }
+                                }
+                            }
+
+                            // Print out the menu item markup
+                            ?>
+                            <li class="<?= $item_class ?>">
+                                <a href="<?= $url ?>" class="<?= $link_class ?>" target="<?= $target ?>">
+                                    <?= $before ?><span><?= $name ?></span><?= $after ?>
+                                </a>
+                                <?
+
+                                // If there were sub-pages to display, loop through and generate markup
+                                if (!empty($sub_menu_links)){
+                                    $base_url = $url;
+                                    $base_active = $active;
+                                    ?>
+                                    <ul class="subs field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                                        <?
+                                        foreach ($sub_menu_links AS $token => $info){
+
+                                            // Collect basic info about this link
+                                            $name = !empty($info['name']) ? $info['name'] : ucfirst($token);
+                                            $url = !empty($info['url']) ? MMRPG_CONFIG_ROOTURL.ltrim($info['url'], '/') : $base_url.$token.'/';
+                                            $target = !empty($info['target']) ? $info['target'] : '_self';
+                                            $before = !empty($info['before']) ? $info['before'] : '';
+                                            $after = !empty($info['after']) ? $info['after'] : '';
+                                            $active = $this_current_sub == $token ? true : false;
+
+                                            // Define menu item and link classes for styling
+                                            $item_class = 'item '.($active ? 'item_active ' : '');
+                                            $link_class = 'link '.($active ? 'link_active field_type_empty' : '');
+
+                                            // Print out the menu item markup
+                                            ?>
+                                            <li class="<?= $item_class ?>">
+                                                <a href="<?= $url ?>" class="<?= $link_class ?>" target="<?= $target ?>">
+                                                    <?= $before ?><span><?= $name ?></span><?= $after ?>
+                                                </a>
+                                            </li>
+                                            <?
+
+                                        }
+                                        ?>
+                                    </ul>
+                                    <?
+                                }
+
+                                ?>
+                            </li>
+                            <?
+
+                        }
+                        // Collect link markup and format for easier debugging
+                        $menu_links_markup = trim(ob_get_clean());
+                        $menu_links_markup = preg_replace('/\s+/', ' ', $menu_links_markup);
+                        $menu_links_markup = str_replace('<ul', PHP_EOL.'<ul', $menu_links_markup);
+                        $menu_links_markup = str_replace('</ul>', PHP_EOL.'</ul>', $menu_links_markup);
+                        echo PHP_EOL.$menu_links_markup.PHP_EOL;
+
+                        ?>
+                    </ul>
+            <? } else { ?>
                 &hellip;&gt;_&lt;&hellip;
-            <? endif; ?>
+            <? } ?>
         </div>
 
         <div class="page page_<?= $this_current_page ?>">
@@ -351,6 +424,7 @@ require_once('pages/'.$this_current_page.'.php');
             <div class="body"><div class="body_wrapper"><?= $this_markup_body ?></div></div>
             <?= false ? '<pre>'.print_r($_GET, true).'</pre>' : '' ?>
         </div>
+
     </div>
     <div id="credits">
         Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.<br />

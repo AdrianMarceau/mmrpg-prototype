@@ -350,7 +350,8 @@ html {
 
 
 
-#window .menu {
+#window .menu,
+#window .menu .subs {
     display: block;
     position: relative;
     margin: 0 8px 8px;
@@ -392,10 +393,13 @@ html {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
     -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
     -website-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
+    overflow: visible;
     background-clip: padding-box;
     -moz-background-clip: padding;
     -webkit-background-clip: padding;
+}
+#window .menu .subs {
+    width: auto;
 }
 #mmrpg #window .menu {
     border-color: #1A1A1A !important;
@@ -412,6 +416,46 @@ html {
         color-stop(1, rgba(0,0,0,0.20))
     );
 }
+
+#window .menu .main,
+#window .menu .subs {
+
+}
+#window .menu .main {
+    display: block;
+    position: relative;
+}
+#window .menu .subs {
+    display: none;
+    position: absolute;
+    z-index: 10;
+    top: 30px;
+    margin: 0 auto 0 -25px;
+    padding: 5px 10px;
+    width: auto;
+    min-width: 130px;
+}
+
+
+#window .menu .item {
+    display: inline-block;
+}
+#window .menu .subs .item {
+    display: block;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(0,0,0,0.09);
+}
+#window .menu .subs .item:first-child {
+    border-top: 0 none transparent;
+}
+#window .menu .subs .item:last-child {
+    border-bottom: 0 none transparent;
+}
+#window .menu .item:hover .subs,
+#window .menu .subs.active {
+    display: block;
+}
+
 #window .menu .link,
 #window .menu .modified {
     color: #F2F2F2;
@@ -420,6 +464,8 @@ html {
     border-radius: 0.5em;
     -moz-border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
+    display: inline-block;
+    line-height: 14px;
 }
 #window .menu .link:hover,
 #window .menu .link_active,
@@ -443,7 +489,8 @@ html {
 #window .menu .link_active:hover span {
     text-decoration: none !important;
 }
-#window .menu .link:after {
+/*
+#window .menu .item:after {
     position: absolute;
     content: " | ";
     color: #181818;
@@ -451,11 +498,12 @@ html {
     padding-left: 5px;
     text-decoration: none;
 }
-#window .menu .link:last-child:after {
+#window .menu .link:last-child:item {
     content: "";
     color: transparent;
     padding: 0;
 }
+*/
 #window .menu .field_type_empty {
     padding-right: 2px;
 }
