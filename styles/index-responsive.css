@@ -20,6 +20,8 @@ body:before {
     font-size: 26px;
     line-height: 50px;
     z-index: 9999;
+
+    display: none;
 }
 
 /* -- Landscape Mode -- */
@@ -235,6 +237,53 @@ body:before {
         content: "05";
     }
 
+    #window .menu .item {
+        letter-spacing: 2px;
+    }
+    #window .menu .link,
+    #window .menu .modified {
+        padding: 2px 3px;
+    }
+
+
+}
+
+/* -- Even More Less than Portrait Mode -- */
+@media (max-width: 700px){
+
+    body:before {
+        content: "06";
+    }
+
+    #mmrpg #window .menu {
+        position: relative;
+    }
+    #mmrpg #window .menu:before {
+        content: " ";
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        border-top: 1px solid #1A1A1A;
+        height: 0;
+        width: auto;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 29px;
+    }
+    #window .menu .main {
+        padding: 0 18%;
+    }
+    #window .menu .item {
+        position: relative;
+    }
+    #window .menu .item:hover .subs,
+    #window .menu .subs.active {
+        border-top: 0 none transparent;
+        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100 */
+        background: -moz-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+    }
 
 }
 
@@ -242,7 +291,11 @@ body:before {
 @media (max-width: 560px){
 
     body:before {
-        content: "06";
+        content: "07";
+    }
+
+    #window .menu .main {
+        padding: 0 8%;
     }
 
     #window .page .iconwrap.preview {
@@ -258,7 +311,11 @@ body:before {
 @media (max-width: 460px){
 
     body:before {
-        content: "07";
+        content: "08";
+    }
+
+    #window .menu .main {
+        padding: 0 1%;
     }
 
     #window .page .iconwrap.preview {
@@ -270,12 +327,37 @@ body:before {
 
 }
 
+/* -- Even Closer to iPhone Portrait Mode -- */
+@media (max-width: 400px){
+
+    body:before {
+        content: "09";
+    }
+
+    #mmrpg #window .menu:after {
+        content: " ";
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        border-top: 1px solid #1A1A1A;
+        height: 0;
+        width: auto;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 59px;
+    }
+
+    #window .menu .main {
+        padding: 0 6%;
+    }
+
+}
+
 
 /* -- iPhone Portrait Mode -- */
 @media (max-width: 350px){
 
     body:before {
-        content: "08";
+        content: "10";
     }
 
     #mmrpg {
@@ -404,6 +486,12 @@ body:before {
         border: 0 none transparent;
     }
 
+    #mmrpg #window .menu:before,
+    #mmrpg #window .menu:after {
+        content: "";
+        display: none;
+    }
+
     #window .menu .main {
         display: none;
     }
@@ -444,18 +532,25 @@ body:before {
         border: 0 none transparent;
         background-color: #222222 !important;
         box-shadow: inset 0px 0px 6px rgba(0,0,0,0.3);
-        border-radius: 0;
+        -moz-border-radius: 6px;
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
     }
 
 
     #window .header {
         height: auto;
         font-size: 16px;
+        line-height: 20px;
+        padding: 0;
     }
     #window .header .header_wrapper {
+        display: block;
         overflow: hidden;
-        line-height: 24px;
-        padding: 9px 10px;
+        font-size: inherit;
+        line-height: inherit;
+        padding: 9px 13px;
+        margin: 0;
     }
     #window .header .count_header {
         float: none;
@@ -465,6 +560,11 @@ body:before {
         line-height: 12px;
         margin-top: 6px;
         padding-bottom: 6px;
+    }
+
+    #window .page_home .header .count {
+        display: block;
+        margin: 0;
     }
 
     #window .page .subbody .float.link .sprite {
