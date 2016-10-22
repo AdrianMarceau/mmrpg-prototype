@@ -29,6 +29,10 @@ body:before {
         content: "01";
     }
 
+    #window {
+        width: auto;
+        max-width: auto;
+    }
     #window .page .leaderboard .subbody .player_stats {
         width: 468px;
     }
@@ -171,6 +175,16 @@ body:before {
         content: "02";
     }
 
+    #window {
+        width: auto;
+        max-width: auto;
+    }
+    #window .banner,
+    #window .menu {
+        width: auto;
+        max-width: auto;
+    }
+
     #mmrpg #window .menu {
         width: auto;
     }
@@ -198,11 +212,6 @@ body:before {
 
     body:before {
         content: "04";
-    }
-
-    #window {
-        width: auto;
-        max-width: 640px;
     }
 
     #window .banner,
@@ -396,22 +405,26 @@ body:before {
     }
 
     #window .menu .main {
-        height: 0;
+        display: none;
     }
     #window .menu .main.expanded {
-        height: auto;
+        display: block;
     }
-    #window .menu .link {
+    #window .menu .item {
         display: block;
         float: none;
         clear: both;
         -moz-border-radius: 0;
         -webkit-border-radius: 0;
         border-radius: 0;
-        border-bottom: 1px solid #090909;
         line-height: 30px;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        border-top: 1px solid rgba(0,0,0,0.09);
     }
-    #window .menu .link:last-child {
+    #window .menu .item:first-child {
+        border-top: 0 none transparent;
+    }
+    #window .menu .item:last-child {
         border-bottom: 0 none transparent;
     }
     #window .menu .sub {
@@ -423,6 +436,17 @@ body:before {
     #window .menu .link:after {
         display: none;
     }
+    #window .menu .item:hover .subs,
+    #window .menu .subs.active {
+        display: block;
+        position: static;
+        margin: 0;
+        border: 0 none transparent;
+        background-color: #222222 !important;
+        box-shadow: inset 0px 0px 6px rgba(0,0,0,0.3);
+        border-radius: 0;
+    }
+
 
     #window .header {
         height: auto;
