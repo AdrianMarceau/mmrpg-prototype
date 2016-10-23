@@ -20,6 +20,7 @@ body:before {
     font-size: 26px;
     line-height: 50px;
     z-index: 9999;
+    display: none;
 }
 
 /* -- Landscape Mode -- */
@@ -281,6 +282,37 @@ body:before {
         background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
         background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+    }
+
+    #window .page .database_container .subbody .body table.full.basic,
+    #window .page .database_container .subbody .body table.full.stats,
+    #window .page .database_container .subbody .body table.full.extras,
+    #window .page .database_container .subbody .body table.full.types {
+        float: none;
+        width: 100%;
+    }
+    #window .page .database_container .subbody .body table.full.quotes label
+    #window .page .database_container .subbody .body table.full.records label {
+        float: none;
+        clear: both;
+        text-align: left;
+        line-height: 25px;
+        margin-top: -4px;
+    }
+    #window .page .database_container .subbody .body table.full.quotes .player_quote,
+    #window .page .database_container .subbody .body table.full.quotes .robot_quote,
+    #window .page .database_container .subbody .body table.full.records .player_record,
+    #window .page .database_container .subbody .body table.full.records .robot_record,
+    #window .page .database_container .subbody .body table.full.records .ability_record,
+    #window .page .database_container .subbody .body table.full.records .item_record {
+        float: none;
+        text-align: left;
+        clear: both;
+        white-space: normal;
+        display: block;
+        line-height: 25px;
+        padding: 0 3px;
+        border: 0 none transparent;
     }
 
 }
@@ -677,6 +709,20 @@ body:before {
         padding-right: 3%;
     }
 
+    #window .page .database_container .subbody .body.sprites_body .grid {
+        padding: 10px;
+    }
+
+    #window .page .event .player_quote,
+    #window .page .event .robot_quote {
+        float: none;
+        text-align: left;
+        clear: both;
+        white-space: normal;
+        display: block;
+        line-height: 25px;
+    }
+
     #window .page_database .type_block {
         width: 45%;
     }
@@ -695,7 +741,7 @@ body:before {
     }
     #window .page .body .header .count,
     #window .page .body .subheader .count {
-        float: none;
+        float: none !important;
         display: block;
         clear: both;
         font-size: 12px;
@@ -779,6 +825,55 @@ body:before {
         margin-left: 0;
     }
 
+    #window .page .event .section_tabs {
+        font-size: 13px;
+        line-height: 16px;
+        padding: 6px 0 0;
+    }
+    #window .page .event .section_tabs .link_inline {
+        display: inline-block;
+        padding: 2px 6px;
+        margin: 0 1% 6px 0;
+        width: 32%;
+        background-color: #282828;
+        border: 1px solid #212121;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        box-sizing: border-box;
+    }
+    #window .page .event .section_tabs .link_inline:after {
+        display: none;
+    }
+    #window .page .event .section_tabs .link_inline:hover,
+    #window .page .event .section_tabs .link_inline.active {
+        background-color: #3d3d3d;
+    }
+    #window .page .event .section_tabs .link_inline:hover .wrap,
+    #window .page .event .section_tabs .link_inline.active .wrap {
+        text-decoration: none;
+    }
+
+    #window .page .event .image_link_container {
+        float: none;
+        clear: both;
+        margin: 0 -3px;
+        padding: 0 0 2px;
+        text-align: left;
+    }
+    #window .page .event .image_link_container .images,
+    #window .page .event .image_link_container .directions {
+        display: block;
+        float: none;
+        clear: both;
+        margin: 0;
+        padding: 0 0 2px;
+        text-align: left;
+    }
+    #window .page .event .image_link_container .pipe {
+        display: none;
+    }
+
     #window .page .body .community .thread_subbody_compact {
         width: 100%;
         box-sizing: border-box;
@@ -813,7 +908,8 @@ body:before {
 
     #window .page_home #youtube_playlist,
     #window .page_home #youtube_playlist iframe {
-        width: auto;
+        width: 100%;
+        height: 165px;
         margin: 0 auto 9px;
     }
 

@@ -77,14 +77,17 @@ $(document).ready(function(){
 
     // Capture any gallery links and ensure they function with the colorbox
     if ($('.gallery', thisIndex).length){
-        $('.gallery .screenshot', thisIndex).colorbox({
-            rel:'screenshots',
-            maxWidth:'800px',
-            maxHeight:'600px',
-            current:'Screenshot {current} of {total}',
-            title:function(){ return $(this).find('.title').html()+' <span style="padding-left: 20px; opacity: 0.50; font-size: 80%;">('+$(this).find('.date').html().replace(/^([0-9]{4})\/([0-9]{2})\/([0-9]{2})$/g, ' $1 / $2 / $3 ')+')</span>'; }
-            });
-    }
+        var windowWidth = thisWindow.width();
+        if (windowWidth > 320){
+            $('.gallery .screenshot', thisIndex).colorbox({
+                rel:'screenshots',
+                maxWidth:'800px',
+                maxHeight:'600px',
+                current:'Screenshot {current} of {total}',
+                title:function(){ return $(this).find('.title').html()+' <span style="padding-left: 20px; opacity: 0.50; font-size: 80%;">('+$(this).find('.date').html().replace(/^([0-9]{4})\/([0-9]{2})\/([0-9]{2})$/g, ' $1 / $2 / $3 ')+')</span>'; }
+                });
+            }
+        }
 
     /*
      * GENREAL PAGE EVENTS

@@ -132,7 +132,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
                 else { $background_class = 'fields'; $background_token = 'intro-field'; }
                 $avatar_size = $avatar_size * 2;
                 echo '<span class="avatar"><span class="avatar_wrapper">';
-                echo '<span class="sprite sprite_shadow sprite_'.$avatar_size.'x'.$avatar_size.' sprite_shadow_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.($place_counter > 3 ? 'base' : 'victory').'" style="background-image: url(images/'.$avatar_class.'_shadows/'.preg_replace('/^([-a-z0-9]+)(_[a-z]+)?$/i', '$1', $avatar_token).'/sprite_left_'.$avatar_size.'x'.$avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_username.'</span>';
+                echo '<span class="sprite sprite_shadow sprite_'.$avatar_size.'x'.$avatar_size.' sprite_shadow_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.($place_counter > 3 ? 'base' : 'victory').'" style="background-image: url(images/'.$avatar_class.'_shadows/'.preg_replace('/^([-a-z0-9]+)(_[a-z0-9]+)?$/i', '$1', $avatar_token).'/sprite_left_'.$avatar_size.'x'.$avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_username.'</span>';
                 echo '<span class="sprite sprite_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.($place_counter > 3 ? 'base' : 'victory').'" style="background-image: url(images/'.$avatar_class.'/'.$avatar_token.'/sprite_left_'.$avatar_size.'x'.$avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_username.'</span>';
                 echo '</span></span>'."\n";
             echo '</a>'."\n";
