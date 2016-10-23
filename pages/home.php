@@ -43,7 +43,7 @@ ob_start();
 </div>
 <div class="subbody" style="position: relative; ">
     <div id="youtube_playlist" style="">
-        <iframe width="356" height="200" src="//www.youtube.com/embed/videoseries?list=PL2yhjPks7HSo_vJNq02ls_DwhmrA2pmU5" frameborder="0" allowfullscreen></iframe>
+        <iframe width="356" height="200" src="//www.youtube.com/embed/videoseries?list=PL2yhjPks7HSo_vJNq02ls_DwhmrA2pmU5&index=<?= mt_rand(1, 9) ?>" frameborder="0" allowfullscreen></iframe>
     </div>
     <p class="text">
         <span class="float float_right"><span class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png);">Mega Man</span></span>

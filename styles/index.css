@@ -248,6 +248,9 @@ html {
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
+#window .banner .userinfo .expand {
+    display: none;
+}
 
 #window .banner .userinfo .field_type {
     display: block;
@@ -899,11 +902,70 @@ html {
     font-size: 10px;
     min-height: 150px;
 }
-#window .page .database_container .subbody .body_left table.full {
-    margin: 5px auto -2px;
+
+
+#window .page .database_container .subbody .body_left,
+#window .page .database_container .subbody .body_full:not(.solid) {
+    background: linear-gradient(
+        to bottom,
+        #212121,
+        #212121 50%,
+        #282828 50%,
+        #282828
+        );
+    background-size: 100% 50px;
+    padding: 0;
 }
-#window .page .database_container.layout_website .subbody .body_left table.full {
-    margin: 5px auto 10px;
+
+#window .page .database_container .subbody .body.sprites_body {
+    margin: 0;
+    padding: 10px;
+    min-height: 10px;
+}
+#window .page .database_container .subbody .body.sprites_body .grid {
+    border: 1px solid #DEDEDE;
+    border-color: rgba(0, 0, 0, 0.20);
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    border-radius: 0.5em;
+    background: #4d4d4d url(../images/sprite-grid.gif) scroll repeat -10px -30px;
+    overflow: hidden; padding: 10px 30px;
+}
+
+#window .page .database_container .subbody .body table.full {
+    margin: 0;
+}
+#window .page .database_container.layout_website .subbody .body table.full {
+    margin: 0;
+}
+#window .page .database_container .subbody .body table.full.basic,
+#window .page .database_container .subbody .body table.full.stats {
+    float: left;
+    width: 50%;
+}
+#window .page .database_container .subbody .body table.full.extras,
+#window .page .database_container .subbody .body table.full.types {
+    float: right;
+    width: 50%;
+}
+#window .page .database_container .subbody .body table.full.quotes
+#window .page .database_container .subbody .body table.full.description {
+    line-height: 25px;
+}
+#window .page .database_container .subbody .body table.full.description td {
+    line-height: 25px;
+}
+#window .page .database_container .subbody .body table.full.quotes label,
+#window .page .database_container .subbody .body table.full.records label {
+
+}
+#window .page .database_container .subbody .body table.full.quotes .player_quote,
+#window .page .database_container .subbody .body table.full.quotes .robot_quote,
+#window .page .database_container .subbody .body table.full.records .player_record,
+#window .page .database_container .subbody .body table.full.records .robot_record,
+#window .page .database_container .subbody .body table.full.records .ability_record,
+#window .page .database_container .subbody .body table.full.records .item_record {
+
 }
 
 #window .page .database_container .subbody .link_top,
@@ -1224,6 +1286,10 @@ html {
 #window .page .event table tr:nth-child(odd) {
     background-color: rgba(0, 0, 0, 0.05);
 }
+#window .page .database_container .event table tr:nth-child(odd),
+#window .page .database_container .event table tr:nth-child(even) {
+    background-color: transparent;
+}
 #window .page .event table td {
     padding: 2px 5px;
     text-align: center;
@@ -1390,10 +1456,12 @@ html {
 #window .page .event .player_number,
 #window .page .event .player_type,
 #window .page .event .player_quote,
+#window .page .event .player_record,
 #window .page .event .robot_number,
 #window .page .event .robot_name,
 #window .page .event .robot_type,
 #window .page .event .robot_quote,
+#window .page .event .robot_record,
 #window .page .event .robot_stat,
 #window .page .event .robot_weakness,
 #window .page .event .robot_resistance,
@@ -1401,8 +1469,10 @@ html {
 #window .page .event .robot_immunity,
 #window .page .event .ability_name,
 #window .page .event .ability_type,
+#window .page .event .ability_record,
 #window .page .event .item_name,
 #window .page .event .item_type,
+#window .page .event .item_record,
 #window .page .event .damage_strikes,
 #window .page .event .damage_misses,
 #window .page .event .damage_result,
@@ -1426,7 +1496,11 @@ html {
     text-decoration: none;
 }
 #window .page .event .player_quote,
-#window .page .event .robot_quote {
+#window .page .event .robot_quote,
+#window .page .event .player_record,
+#window .page .event .robot_record,
+#window .page .event .ability_record,
+#window .page .event .item_record {
     background-color: rgba(65,65,65,0.5);
     border-color: rgba(70,70,700.1);
 }
