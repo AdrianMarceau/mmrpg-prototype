@@ -3074,9 +3074,6 @@ class rpg_robot extends rpg_object {
                     </h2>
                     <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 0 0 2px; min-height: 10px;">
                         <table class="full description">
-                            <colgroup>
-                                <col width="100%" />
-                            </colgroup>
                             <tbody>
                                 <tr>
                                     <td class="right">
