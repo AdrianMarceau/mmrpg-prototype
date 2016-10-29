@@ -3107,7 +3107,6 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
     width: 98%;
 }
 
-
 #window .page .event .robot_container .robot_name .label .name,
 #window .page .event .robot_container .robot_name .label .level,
 #window .page .event .robot_container .robot_name .label .points,
@@ -3161,8 +3160,7 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
     line-height: 16px;
     margin: 0 2px 6px auto;
 }
-#window .page .event .robot_container .robot_name .label .points,
-#window .page .event .ability_container .ability_name .label .points {
+#window .page .event .robot_container .robot_name .label .points {
     position: absolute;
     top: -1px;
     right: 0;

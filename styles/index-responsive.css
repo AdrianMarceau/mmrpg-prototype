@@ -20,7 +20,7 @@ body:before {
     font-size: 26px;
     line-height: 50px;
     z-index: 9999;
-    display: none;
+    display: block;
 }
 
 /* -- Landscape Mode -- */
@@ -254,6 +254,39 @@ body:before {
         content: "06";
     }
 
+    #mmrpg .tooltip {
+        max-width: 99vw;
+    }
+
+    #window .header {
+        height: auto;
+        font-size: 16px;
+        line-height: 20px;
+        padding: 0;
+    }
+    #window .header .header_wrapper {
+        display: block;
+        overflow: hidden;
+        font-size: inherit;
+        line-height: inherit;
+        padding: 9px 13px;
+        margin: 0;
+    }
+    #window .header .count_header {
+        float: none;
+        display: block;
+        clear: both;
+        font-size: 12px;
+        line-height: 12px;
+        margin-top: 6px;
+        padding-bottom: 6px;
+    }
+
+    #window .page_home .header .count {
+        display: block;
+        margin: 0;
+    }
+
     #mmrpg #window .menu {
         position: relative;
     }
@@ -313,6 +346,39 @@ body:before {
         line-height: 25px;
         padding: 0 3px;
         border: 0 none transparent;
+    }
+
+    #window .page .event .robot_container .robot_name,
+    #window .page .event .ability_container .ability_name {
+        display: block;
+        float: none;
+        width: auto;
+        clear: both;
+    }
+    #window .page .event .robot_container .robot_name .label,
+    #window .page .event .ability_container .ability_name .label {
+        width: 75%;
+        width: calc(100% - 42px);
+    }
+
+    #window .page .event .image_link_container {
+        float: none;
+        clear: both;
+        margin: 0 -3px;
+        padding: 0 0 2px;
+        text-align: left;
+    }
+    #window .page .event .image_link_container .images,
+    #window .page .event .image_link_container .directions {
+        display: block;
+        float: none;
+        clear: both;
+        margin: 0;
+        padding: 0 0 2px;
+        text-align: left;
+    }
+    #window .page .event .image_link_container .pipe {
+        display: none;
     }
 
 }
@@ -592,36 +658,6 @@ body:before {
         border-radius: 6px;
     }
 
-
-    #window .header {
-        height: auto;
-        font-size: 16px;
-        line-height: 20px;
-        padding: 0;
-    }
-    #window .header .header_wrapper {
-        display: block;
-        overflow: hidden;
-        font-size: inherit;
-        line-height: inherit;
-        padding: 9px 13px;
-        margin: 0;
-    }
-    #window .header .count_header {
-        float: none;
-        display: block;
-        clear: both;
-        font-size: 12px;
-        line-height: 12px;
-        margin-top: 6px;
-        padding-bottom: 6px;
-    }
-
-    #window .page_home .header .count {
-        display: block;
-        margin: 0;
-    }
-
     #mmrpg #window .menu, #window .page {
         padding: 0 6px;
     }
@@ -765,19 +801,6 @@ body:before {
         display: none;
     }
 
-    #window .page .event .robot_container .robot_name,
-    #window .page .event .ability_container .ability_name {
-        display: block;
-        float: none;
-        width: auto;
-        clear: both;
-    }
-    #window .page .event .robot_container .robot_name .label,
-    #window .page .event .ability_container .ability_name .label {
-        width: 75%;
-        width: calc(100% - 42px);
-    }
-
     #window .page .event .sprite_left {
         top: 3px;
     }
@@ -852,26 +875,6 @@ body:before {
     #window .page .event .section_tabs .link_inline:hover .wrap,
     #window .page .event .section_tabs .link_inline.active .wrap {
         text-decoration: none;
-    }
-
-    #window .page .event .image_link_container {
-        float: none;
-        clear: both;
-        margin: 0 -3px;
-        padding: 0 0 2px;
-        text-align: left;
-    }
-    #window .page .event .image_link_container .images,
-    #window .page .event .image_link_container .directions {
-        display: block;
-        float: none;
-        clear: both;
-        margin: 0;
-        padding: 0 0 2px;
-        text-align: left;
-    }
-    #window .page .event .image_link_container .pipe {
-        display: none;
     }
 
     #window .page .body .community .thread_subbody_compact {

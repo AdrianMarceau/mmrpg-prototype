@@ -2993,7 +2993,8 @@ class rpg_robot extends rpg_object {
                                 ?></span>
                         </span>
                     </h2>
-                    <div id="sprites_body" class="body body_full sprites_body">
+
+                    <div id="sprites_body" class="body body_full sprites_body solid">
                         <div class="grid">
                             <?= $this_sprite_markup ?>
                         </div>
