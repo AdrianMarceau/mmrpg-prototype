@@ -1461,7 +1461,7 @@ class rpg_ability extends rpg_object {
                             <? } ?>
                         <? } ?>
                     </h2>
-                    <div class="body body_left" style="margin-right: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px; <?= (!$print_options['show_icon']) ? 'margin-left: 0; ' : '' ?><?= $print_options['layout_style'] == 'event' ? 'font-size: 10px; min-height: 150px; ' : '' ?>">
+                    <div class="body body_left" style="margin-right: 0; margin-bottom: 5px; padding: 0 0 2px; min-height: 10px; <?= (!$print_options['show_icon']) ? 'margin-left: 0; ' : '' ?><?= $print_options['layout_style'] == 'event' ? 'font-size: 10px; min-height: 150px; ' : '' ?>">
 
                         <table class="full basic">
                             <tbody>

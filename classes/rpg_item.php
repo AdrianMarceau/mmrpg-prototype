@@ -1457,67 +1457,28 @@ class rpg_item extends rpg_object {
                             <div class="header_core item_type">Neutral Type</div>
                         <?php } ?>
                     </h2>
-                    <div class="body body_left" style="margin-right: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px; <?= (!$print_options['show_icon']) ? 'margin-left: 0; ' : '' ?><?= $print_options['layout_style'] == 'event' ? 'font-size: 10px; min-height: 150px; ' : '' ?>">
-                        <table class="full" style="margin: 5px auto 10px;">
-                            <colgroup>
-                                <col width="48%" />
-                                <col width="1%" />
-                                <col width="48%" />
-                            </colgroup>
+
+                    <div class="body body_left" style="margin-right: 0; margin-bottom: 5px; padding: 0 0 2px; min-height: 10px; <?= (!$print_options['show_icon']) ? 'margin-left: 0; ' : '' ?><?= $print_options['layout_style'] == 'event' ? 'font-size: 10px; min-height: 150px; ' : '' ?>">
+
+                        <table class="full basic">
                             <tbody>
                                 <tr>
                                     <td  class="right">
                                         <label style="display: block; float: left;">Name :</label>
                                         <span class="item_type item_type_"><?= $item_info['item_name'] ?></span>
                                     </td>
-                                    <td class="center">&nbsp;</td>
+                                </tr>
+                                <tr>
                                     <td  class="right">
                                         <label style="display: block; float: left;">Type :</label>
                                         <span class="item_type item_type_"><?= ucfirst($item_info['item_subclass']) ?></span>
                                     </td>
-                                    <? /*
-                                    <td class="right">
-                                        <label style="display: block; float: left;">Type :</label>
-                                        <?php if($print_options['layout_style'] != 'event'): ?>
-                                            <?php
-                                            if (!empty($item_info['item_type_special'])){
-                                                echo '<a href="database/items/'.$item_info['item_type_special'].'/" class="item_type '.$item_header_types.'">'.ucfirst($item_info['item_type_special']).'</a>';
-                                            }
-                                            elseif (!empty($item_info['item_type'])){
-                                                $temp_string = array();
-                                                $item_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
-                                                $temp_string[] = '<a href="database/items/'.$item_type.'/" class="item_type item_type_'.$item_type.'">'.$mmrpg_types[$item_type]['type_name'].'</a>';
-                                                if (!empty($item_info['item_type2'])){
-                                                    $item_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : 'none';
-                                                    $temp_string[] = '<a href="database/items/'.$item_type2.'/" class="item_type item_type_'.$item_type2.'">'.$mmrpg_types[$item_type2]['type_name'].'</a>';
-                                                }
-                                                echo implode(' ', $temp_string);
-                                            } else {
-                                                echo '<a href="database/items/none/" class="item_type item_type_none">Neutral</a>';
-                                            }
-                                            ?>
-                                        <?php else: ?>
-                                            <?php
-                                            if (!empty($item_info['item_type_special'])){
-                                                echo '<span class="item_type '.$item_header_types.'">'.ucfirst($item_info['item_type_special']).'</span>';
-                                            }
-                                            elseif (!empty($item_info['item_type'])){
-                                                $temp_string = array();
-                                                $item_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
-                                                $temp_string[] = '<span class="item_type item_type_'.$item_type.'">'.$mmrpg_types[$item_type]['type_name'].'</span>';
-                                                if (!empty($item_info['item_type2'])){
-                                                    $item_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : 'none';
-                                                    $temp_string[] = '<span class="item_type item_type_'.$item_type2.'">'.$mmrpg_types[$item_type2]['type_name'].'</span>';
-                                                }
-                                                echo implode(' ', $temp_string);
-                                            } else {
-                                                echo '<span class="item_type item_type_none">Neutral</span>';
-                                            }
-                                            ?>
-                                        <?php endif; ?>
-                                    </td>
-                                    */ ?>
                                 </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="full extras">
+                            <tbody>
                                 <tr>
                                     <td  class="right">
                                         <label style="display: block; float: left;">Power :</label>
@@ -1531,7 +1492,8 @@ class rpg_item extends rpg_object {
                                             <span class="item_stat">-</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="center">&nbsp;</td>
+                                </tr>
+                                <tr>
                                     <td class="right">
                                         <label style="display: block; float: left;">Value :</label>
                                         <?php if(!empty($item_info['item_price'])): ?>
@@ -1543,17 +1505,15 @@ class rpg_item extends rpg_object {
                                 </tr>
                             </tbody>
                         </table>
-                        <table class="full" style="margin: 5px auto 10px;">
+
+                        <table class="full description">
                             <colgroup>
                                 <col width="100%" />
                             </colgroup>
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <?php if($print_options['layout_style'] != 'event'): ?>
-                                            <label style="display: block; float: left;">Description :</label>
-                                        <?php endif; ?>
-                                        <div class="description_container" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?php
+                                        <div class="item_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?php
                                         // Define the search/replace pairs for the description
                                         $temp_find = array('{DAMAGE}', '{RECOVERY}', '{DAMAGE2}', '{RECOVERY2}', '{}');
                                         $temp_replace = array(
@@ -1573,6 +1533,7 @@ class rpg_item extends rpg_object {
                                 </tr>
                             </tbody>
                         </table>
+
                     </div>
 
                 <?php endif; ?>
@@ -1661,10 +1622,10 @@ class rpg_item extends rpg_object {
 
                     ?>
 
-                    <h2 id="sprites" class="header header_full <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left;">
+                    <h2 id="sprites" class="header header_full <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left; height: auto;">
                         <?= $item_info['item_name']?>&#39;s Sprites
                         <span class="header_links image_link_container">
-                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>"><?php
+                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?php
                                 // Loop though and print links for the alts
                                 $alt_type_base = 'item_type type_'.(!empty($item_info['item_type']) ? $item_info['item_type'] : 'none').' ';
                                 foreach ($temp_alts_array AS $alt_key => $alt_info){
@@ -1701,8 +1662,9 @@ class rpg_item extends rpg_object {
                                 ?></span>
                         </span>
                     </h2>
-                    <div id="sprites_body" class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
-                        <div style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #4d4d4d url(images/sprite-grid.gif) scroll repeat -10px -30px; overflow: hidden; padding: 10px 30px;">
+
+                    <div id="sprites_body" class="body body_full sprites_body solid">
+                        <div class="grid">
                             <?= $this_sprite_markup ?>
                         </div>
                         <?php
@@ -1716,7 +1678,7 @@ class rpg_item extends rpg_object {
                             $temp_editor_title = 'Adrian Marceau / Ageman20XX';
                         }
                         ?>
-                        <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span style="color: #565656;"> | </span> Original Artwork by <strong>Capcom</strong></p>
+                        <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span class="pipe"> | </span> Original Artwork by <strong>Capcom</strong></p>
                     </div>
 
                 <?php endif; ?>
@@ -1724,12 +1686,10 @@ class rpg_item extends rpg_object {
                 <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="<?= 'database/items/'.$item_info['item_token'].'/' ?>" rel="permalink">+ Permalink</a>
 
                 <?php elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="<?= 'database/items/'.$item_info['item_token'].'/' ?>" rel="permalink">+ View More</a>
 
                 <?php endif; ?>
 
