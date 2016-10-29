@@ -918,7 +918,7 @@ html {
 }
 
 #window .page .database_container .subbody .body.sprites_body {
-    margin: 0;
+    margin: 0 auto 4px;
     padding: 10px;
     min-height: 10px;
 }
