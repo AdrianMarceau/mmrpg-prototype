@@ -2515,21 +2515,6 @@ class rpg_robot extends rpg_object {
 
         // Define the variable to hold compact footer link markup
         $compact_footer_link_markup = array();
-        //$compact_footer_link_markup[] = '<a class="link link_permalink" href="'.$database_category_robot_url.'">+ Huh?</a>';
-
-        /*
-        // Add a link to the sprites in the compact footer markup
-        if (!in_array($robot_image_token, $default_robot_class_tokens)){ $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#sprites">#Sprites</a>'; }
-        if (!empty($robot_info['robot_quotes']['battle_start'])){ $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#quotes">#Quotes</a>'; }
-        if (!empty($robot_info['robot_description2'])){ $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#description">#Description</a>'; }
-        if (!empty($robot_info['robot_abilities'])){ $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#abilities">#Abilities</a>'; }
-        $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#stats">#Stats</a>';
-        $compact_footer_link_markup[] = '<a class="link" href="'.$database_category_robot_url.'#records">#Records</a>';
-        */
-
-        /*
-        $compact_footer_link_markup[] = '<a class="link '.$robot_header_types.'" href="'.$database_category_robot_url.'">View More</a>';
-        */
 
         // Start the output buffer
         ob_start();
@@ -2856,7 +2841,7 @@ class rpg_robot extends rpg_object {
                     $temp_url .= $robot_info['robot_token'].'/';
                     ?>
 
-                    <div class="section_tabs">
+                    <div id="tabs" class="section_tabs">
                         <?php
                         foreach($section_tabs AS $tab){
                             echo '<a class="link_inline link_'.$tab[0].'" href="'.$temp_url.'#'.$tab[0].'" data-anchor="#'.$tab[0].'"><span class="wrap">'.$tab[1].'</span></a>';
@@ -2933,13 +2918,14 @@ class rpg_robot extends rpg_object {
                                 $temp_direction2 = substr($temp_direction, 0, 1);
                                 $temp_embed = '[robot:'.$temp_direction.':'.$frame_relative.']{'.$temp_robot_image_token.'}';
                                 $temp_title = $temp_robot_image_name.' | '.$frame_relative_text.' Sprite '.ucfirst($temp_direction);
+                                $temp_imgalt = $temp_title;
                                 $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
                                 $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
                                 $temp_label = $frame_relative_text.' '.ucfirst(substr($temp_direction, 0, 1));
                                 //$image_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
                                 //if ($temp_sheet > 1){ $temp_robot_image_token .= '-'.$temp_sheet; }
                                 echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_robot_image_token.'" data-frame="'.$frame_relative.'" style="padding-top: 20px; float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$robot_sprite_size.'px; height: '.$robot_sprite_size.'px; overflow: hidden;">';
-                                    echo '<img style="margin-left: '.$margin_left.'px;" title="'.$temp_title.'" alt="'.$temp_title.'" src="images/robots/'.$temp_robot_image_token.'/sprite_'.$temp_direction.'_'.$robot_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                    echo '<img style="margin-left: '.$margin_left.'px;" data-tooltip="'.$temp_title.'" alt="'.$temp_imgalt.'" src="images/robots/'.$temp_robot_image_token.'/sprite_'.$temp_direction.'_'.$robot_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
                                     echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
                                 echo '</div>';
                             }
@@ -2955,7 +2941,7 @@ class rpg_robot extends rpg_object {
                     <h2 id="sprites" class="header header_full <?= $robot_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
                         <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>&#39;s Sprites
                         <span class="header_links image_link_container">
-                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>"><?php
+                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?php
                                 // Loop though and print links for the alts
                                 $alt_type_base = 'robot_type type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').' ';
                                 foreach ($temp_alts_array AS $alt_key => $alt_info){
@@ -3001,7 +2987,7 @@ class rpg_robot extends rpg_object {
                         <?php
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
-                        $temp_final_divider = '<span style="color: #565656;"> | </span>';
+                        $temp_final_divider = '<span class="pipe"> | </span>';
                         if (!empty($robot_info['robot_image_editor'])){
                             if ($robot_info['robot_image_editor'] == 412){ $temp_editor_title = 'Adrian Marceau / Ageman20XX'; }
                             elseif ($robot_info['robot_image_editor'] == 110){ $temp_editor_title = 'MetalMarioX100 / EliteP1'; }
@@ -3114,7 +3100,7 @@ class rpg_robot extends rpg_object {
                     <h2 id="abilities" class="header header_full <?= $robot_header_types ?>" style="margin: 10px 0 0; text-align: left;">
                         <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>&#39;s Abilities
                     </h2>
-                    <div class="body body_full solid" style="margin: 0; padding: 2px 3px; min-height: 10px;">
+                    <div class="body body_full solid" style="margin: 0 auto 4px; padding: 2px 3px; min-height: 10px;">
                         <table class="full abilities" style="margin: 5px auto 10px;">
                             <colgroup>
                                 <col width="100%" />
@@ -3345,7 +3331,6 @@ class rpg_robot extends rpg_object {
 
                     <div class="link_wrapper">
                         <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                        <a class="link link_permalink" href="<?= $database_category_robot_url ?>" rel="permalink">+ View More</a>
                     </div>
                     <span class="link_container">
                         <?= !empty($compact_footer_link_markup) ? implode("\n", $compact_footer_link_markup) : ''  ?>

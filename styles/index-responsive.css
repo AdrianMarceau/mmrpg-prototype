@@ -257,6 +257,11 @@ body:before {
     #mmrpg .tooltip {
         max-width: 99vw;
     }
+    #window .page .body .pipe {
+        display: block;
+        height: 3px;
+        visibility: hidden;
+    }
 
     #window .header {
         height: auto;
@@ -761,6 +766,21 @@ body:before {
 
     #window .page_database .type_block {
         width: 45%;
+    }
+
+    #window .page .database_container .subbody .link_top {
+        font-size: 10px;
+        line-height: 12px;
+        padding: 4px 8px;
+        background-color: rgba(0,0,0,0.2);
+        display: inline-block;
+        margin: 0;
+        -moz-border-radius: 6px;
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+    }
+    #window .page .database_container .subbody .link_top:hover {
+        text-decoration: none;
     }
 
     #window .page .body .header_typewrapper,

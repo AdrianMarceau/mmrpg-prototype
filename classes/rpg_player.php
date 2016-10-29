@@ -2104,7 +2104,7 @@ class rpg_player extends rpg_object {
                             </tbody>
                         </table>
 
-                        <?php if($print_options['show_quotes']): ?>
+                        <?php if($print_options['show_quotes'] && $print_options['layout_style'] == 'website_compact'): ?>
                             <table class="full quotes">
                                 <tbody>
                                     <tr>
@@ -2136,6 +2136,33 @@ class rpg_player extends rpg_object {
                         <?php endif; ?>
 
                     </div>
+                <?php endif; ?>
+
+                <?php if($print_options['layout_style'] == 'website'): ?>
+
+                    <?php
+                    // Define the various tabs we are able to scroll to
+                    $section_tabs = array();
+                    if ($print_options['show_sprites']){ $section_tabs[] = array('sprites', 'Sprites', false); }
+                    if ($print_options['show_quotes']){ $section_tabs[] = array('quotes', 'Quotes', false); }
+                    if ($print_options['show_description']){ $section_tabs[] = array('description', 'Description', false); }
+                    if ($print_options['show_abilities']){ $section_tabs[] = array('abilities', 'Abilities', false); }
+                    //if ($print_options['show_records']){ $section_tabs[] = array('records', 'Records', false); }
+                    // Automatically mark the first element as true or active
+                    $section_tabs[0][2] = true;
+                    // Define the current URL for this player or mecha page
+                    $temp_url = 'database/players/';
+                    $temp_url .= $player_info['player_token'].'/';
+                    ?>
+
+                    <div id="tabs" class="section_tabs">
+                        <?php
+                        foreach($section_tabs AS $tab){
+                            echo '<a class="link_inline link_'.$tab[0].'" href="'.$temp_url.'#'.$tab[0].'" data-anchor="#'.$tab[0].'"><span class="wrap">'.$tab[1].'</span></a>';
+                        }
+                        ?>
+                    </div>
+
                 <?php endif; ?>
 
                 <?php if($print_options['show_sprites'] && (!isset($player_info['player_image_sheets']) || $player_info['player_image_sheets'] !== 0) && $player_image_token != 'player' ): ?>
@@ -2270,14 +2297,72 @@ class rpg_player extends rpg_object {
                             $temp_editor_title = 'Adrian Marceau / Ageman20XX';
                         }
                         ?>
-                        <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span style="color: #565656;"> | </span> Original Artwork by <strong>Capcom</strong></p>
+                        <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span class="pipe"> | </span> Original Artwork by <strong>Capcom</strong></p>
                     </div>
+
+                    <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <?php endif; ?>
+
+                <?php endif; ?>
+
+                <?php if ($print_options['show_quotes'] && $print_options['layout_style'] == 'website'): ?>
+
+                    <h2 id="quotes" class="header player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
+                        <?= $player_info['player_name'] ?>&#39;s Quotes
+                    </h2>
+                    <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px;">
+                        <?php
+                        // Define the search and replace arrays for the player quotes
+                        $temp_find = array('{this_player}', '{this_player}', '{target_player}', '{target_player}');
+                        $temp_replace = array('Doctor', $player_info['player_name'], 'Doctor', 'Robot');
+                        ?>
+                        <table class="full quotes">
+                            <colgroup>
+                                <col width="100%" />
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td class="right">
+                                        <label>Start Quote : </label>
+                                        <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_start']) ? str_replace($temp_find, $temp_replace, $player_info['player_quotes']['battle_start']) : '&hellip;' ?>&quot;</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Taunt Quote : </label>
+                                        <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_taunt']) ? str_replace($temp_find, $temp_replace, $player_info['player_quotes']['battle_taunt']) : '&hellip;' ?>&quot;</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Victory Quote : </label>
+                                        <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_victory']) ? str_replace($temp_find, $temp_replace, $player_info['player_quotes']['battle_victory']) : '&hellip;' ?>&quot;</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Defeat Quote : </label>
+                                        <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_defeat']) ? str_replace($temp_find, $temp_replace, $player_info['player_quotes']['battle_defeat']) : '&hellip;' ?>&quot;</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <?php endif; ?>
 
                 <?php endif; ?>
 
                 <?php if($print_options['show_description'] && !empty($player_info['player_description2'])): ?>
 
-                    <h2 class="header header_left player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
+                    <h2 id="description" class="header player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
                         <?= $player_info['player_name'] ?>&#39;s Description
                     </h2>
                     <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 0 0 2px; min-height: 10px;">
@@ -2294,6 +2379,12 @@ class rpg_player extends rpg_object {
                             </tbody>
                         </table>
                     </div>
+
+                    <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <?php endif; ?>
 
                 <?php endif; ?>
 
@@ -2433,12 +2524,10 @@ class rpg_player extends rpg_object {
                 <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="database/players/<?= $player_info['player_token'] ?>/" rel="permalink">+ Permalink</a>
 
                 <?php elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="database/players/<?= $player_info['player_token'] ?>/" rel="permalink">+ View More</a>
 
                 <?php endif; ?>
 

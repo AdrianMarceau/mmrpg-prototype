@@ -26,10 +26,17 @@ $(document).ready(function(){
      */
 
     // Capture any "top" links and ensure they function correctly
-    $('a[href=#top],a[data-href=#top]', thisIndex).live('click', function(e){
+    $('a[href^="#"],a[data-href^="#"]', thisIndex).live('click', function(e){
+        var thisLink = $(this);
+        if (thisLink.is('[data-href^="#"]')){ var thisHref = thisLink.attr('data-href'); }
+        else { var thisHref = thisLink.attr('href'); }
+        if (thisHref == '#'){ return false; }
         e.preventDefault();
-        $('html, body').animate({scrollTop: 0}, 'fast');
-        return false;
+        var thisElement = $(thisHref);
+        if (thisHref == '#top' || !thisElement.length){ var scrollTop = 0; }
+        else { var scrollTop = thisElement.offset().top; }
+        //console.log('thisHref = '+thisHref+' | thisElement = '+thisElement.length+' | scrollTop = '+scrollTop+' | thisElementClass = '+thisElement.attr('class'));
+        $('html, body').animate({scrollTop: scrollTop}, 'fast');
         });
 
     // Capture any "top" links and ensure they function correctly

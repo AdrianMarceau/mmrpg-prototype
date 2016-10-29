@@ -472,7 +472,7 @@ require_once('pages/'.$this_current_page.'.php');
     <script type="text/javascript">
 
     // Define a function for fading in social buttons
-    function fadeInSocial(){
+    window.fadeInSocial = function(){
         $('#header_social_facebook')
             .css({opacity:0})
             .removeClass('fadein')
