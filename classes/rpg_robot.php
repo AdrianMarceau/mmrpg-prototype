@@ -2555,6 +2555,7 @@ class rpg_robot extends rpg_object {
                         <?php endif; ?>
                         <div class="header_core robot_type"><?= !empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')) : 'Neutral' ?><?= $robot_info['robot_class'] == 'mecha' ? ' Type' : ' Core' ?></div>
                     </h2>
+
                     <div class="body body_left <?= !$print_options['show_mugshot'] ? 'fullsize' : '' ?>">
 
                         <table class="full basic">

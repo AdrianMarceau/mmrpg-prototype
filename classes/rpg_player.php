@@ -2073,7 +2073,8 @@ class rpg_player extends rpg_object {
                             <span class="header_core ability_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($player_info['player_type']) ?> Type</span>
                         <?php endif; ?>
                     </h2>
-                    <div class="body body_left" style="margin-right: 0; padding: 2px 3px;">
+
+                    <div class="body body_left" style="margin-right: 0; padding: 0 0 2px;">
 
                         <table class="full basic">
                             <tbody>
