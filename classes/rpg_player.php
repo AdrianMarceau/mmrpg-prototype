@@ -2074,19 +2074,21 @@ class rpg_player extends rpg_object {
                         <?php endif; ?>
                     </h2>
                     <div class="body body_left" style="margin-right: 0; padding: 2px 3px;">
-                        <table class="full" style="margin: 5px auto 10px;">
-                            <colgroup>
-                                <col width="48%" />
-                                <col width="1%" />
-                                <col width="48%" />
-                            </colgroup>
+
+                        <table class="full basic">
                             <tbody>
                                 <tr>
                                     <td class="right">
                                         <label style="display: block; float: left;">Name :</label>
                                         <span class="player_name player_type"><?= $player_info['player_name']?></span>
                                     </td>
-                                    <td class="middle">&nbsp;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="full basic">
+                            <tbody>
+                                <tr>
                                     <td class="right">
                                         <label style="display: block; float: left;">Bonus :</label>
                                         <?php
@@ -2101,11 +2103,9 @@ class rpg_player extends rpg_object {
                                 </tr>
                             </tbody>
                         </table>
+
                         <?php if($print_options['show_quotes']): ?>
-                            <table class="full" style="margin: 5px auto 10px;">
-                                <colgroup>
-                                    <col width="100%" />
-                                </colgroup>
+                            <table class="full quotes">
                                 <tbody>
                                     <tr>
                                         <td class="right">
@@ -2134,6 +2134,7 @@ class rpg_player extends rpg_object {
                                 </tbody>
                             </table>
                         <?php endif; ?>
+
                     </div>
                 <?php endif; ?>
 
@@ -2216,10 +2217,10 @@ class rpg_player extends rpg_object {
 
                     ?>
 
-                    <h2 id="sprites" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left;">
+                    <h2 id="sprites" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
                         <?= $player_info['player_name']?>&#39;s Sprites
                         <span class="header_links image_link_container">
-                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>"><?php
+                            <span class="images" style="<?= count($temp_alts_array) >= 1 ? 'display: none;' : '' ?>"><?php
                                 // Loop though and print links for the alts
                                 foreach ($temp_alts_array AS $alt_key => $alt_info){
                                     $alt_type = '';
@@ -2253,8 +2254,9 @@ class rpg_player extends rpg_object {
                                 ?></span>
                         </span>
                     </h2>
-                    <div id="sprites_body" class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
-                        <div style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #4d4d4d url(images/sprite-grid.gif) scroll repeat -10px -30px; overflow: hidden; padding: 10px 30px;">
+
+                    <div id="sprites_body" class="body body_full sprites_body solid">
+                        <div class="grid">
                             <?= $this_sprite_markup ?>
                         </div>
                         <?php
@@ -2278,8 +2280,8 @@ class rpg_player extends rpg_object {
                     <h2 class="header header_left player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
                         <?= $player_info['player_name'] ?>&#39;s Description
                     </h2>
-                    <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px;">
-                        <table class="full" style="margin: 5px auto 10px;">
+                    <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 0 0 2px; min-height: 10px;">
+                        <table class="full description">
                             <colgroup>
                                 <col width="100%" />
                             </colgroup>
@@ -2299,8 +2301,8 @@ class rpg_player extends rpg_object {
                     <h2 id="abilities" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left;">
                         <?=$player_info['player_name']?>&#39;s Abilities
                     </h2>
-                    <div class="body body_full" style="margin: 0; padding: 2px 3px;">
-                        <table class="full" style="margin: 5px auto 10px;">
+                    <div class="body body_full solid" style="margin: 0; padding: 2px 3px; min-height: 10px;">
+                        <table class="full abilities" style="margin: 5px auto 10px;">
                             <colgroup>
                                 <col width="100%" />
                             </colgroup>
