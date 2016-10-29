@@ -1462,19 +1462,16 @@ class rpg_ability extends rpg_object {
                         <? } ?>
                     </h2>
                     <div class="body body_left" style="margin-right: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px; <?= (!$print_options['show_icon']) ? 'margin-left: 0; ' : '' ?><?= $print_options['layout_style'] == 'event' ? 'font-size: 10px; min-height: 150px; ' : '' ?>">
-                        <table class="full" style="margin: 5px auto 10px;">
-                            <colgroup>
-                                <col width="48%" />
-                                <col width="1%" />
-                                <col width="48%" />
-                            </colgroup>
+
+                        <table class="full basic">
                             <tbody>
                                 <tr>
                                     <td  class="right">
                                         <label style="display: block; float: left;">Name :</label>
                                         <span class="ability_type ability_type_"><?= $ability_info['ability_name']?></span>
                                     </td>
-                                    <td class="center">&nbsp;</td>
+                                </tr>
+                                <tr>
                                     <td class="right">
                                         <label style="display: block; float: left;">Type :</label>
                                         <? if($print_options['layout_style'] != 'event'): ?>
@@ -1516,94 +1513,96 @@ class rpg_ability extends rpg_object {
                                         <? endif; ?>
                                     </td>
                                 </tr>
-                                <? if(true): ?>
-
-                                    <? if($ability_image_token != 'ability'): ?>
-
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Power :</label>
-                                                <? if(!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])): ?>
-                                                    <? if(!empty($ability_info['ability_damage'])){ ?><span class="ability_stat"><?= $ability_info['ability_damage'].(!empty($ability_info['ability_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
-                                                    <? if(!empty($ability_info['ability_recovery'])){ ?><span class="ability_stat"><?= $ability_info['ability_recovery'].(!empty($ability_info['ability_recovery_percent']) ? '%' : '') ?> Recovery</span><? } ?>
-                                                <? else: ?>
-                                                    <span class="ability_stat">-</span>
-                                                <? endif; ?>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Accuracy :</label>
-                                                <span class="ability_stat"><?= $ability_info['ability_accuracy'].'%' ?></span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Energy :</label>
-                                                <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'] : '-' ?></span>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Speed :</label>
-                                                <span class="ability_stat"><?= !empty($ability_info['ability_speed']) ? $ability_info['ability_speed'] : '1' ?></span>
-                                            </td>
-                                        </tr>
-
-                                    <? else: ?>
-
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Power :</label>
-                                                <span class="ability_stat">-</span>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Accuracy :</label>
-                                                <span class="ability_stat">-</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td  class="right">
-                                                <label style="display: block; float: left;">Energy :</label>
-                                                <span class="ability_stat">-</span>
-                                            </td>
-                                            <td class="center">&nbsp;</td>
-                                            <td class="right">
-                                                <label style="display: block; float: left;">Speed :</label>
-                                                <span class="ability_stat">-</span>
-                                            </td>
-                                        </tr>
-
-                                    <? endif; ?>
-
+                                <? if($ability_image_token != 'ability'): ?>
+                                    <tr>
+                                        <td  class="right">
+                                            <label style="display: block; float: left;">Energy :</label>
+                                            <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'] : '-' ?></span>
+                                        </td>
+                                    </tr>
+                                <? else: ?>
+                                    <tr>
+                                        <td  class="right">
+                                            <label style="display: block; float: left;">Energy :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                    </tr>
                                 <? endif; ?>
                             </tbody>
                         </table>
-                        <table class="full" style="margin: 5px auto 10px;">
-                            <colgroup>
-                                <col width="100%" />
-                            </colgroup>
+
+                        <table class="full extras">
                             <tbody>
-                                <tr>
-                                    <td class="right">
-                                        <? if($print_options['layout_style'] != 'event'): ?>
-                                            <label style="display: block; float: left;">Description :</label>
-                                        <? endif; ?>
-                                        <div class="description_container" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?php
-                                        // Define the search/replace pairs for the description
-                                        $temp_find = array('{DAMAGE}', '{RECOVERY}', '{DAMAGE2}', '{RECOVERY2}', '{}');
-                                        $temp_replace = array(
-                                            (!empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0), // {DAMAGE}
-                                            (!empty($ability_info['ability_recovery']) ? $ability_info['ability_recovery'] : 0), // {RECOVERY}
-                                            (!empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0), // {DAMAGE2}
-                                            (!empty($ability_info['ability_recovery2']) ? $ability_info['ability_recovery2'] : 0), // {RECOVERY2}
-                                            '' // {}
-                                            );
-                                        echo !empty($ability_info['ability_description']) ? str_replace($temp_find, $temp_replace, $ability_info['ability_description']) : '&hellip;'
-                                        ?></div>
-                                    </td>
-                                </tr>
+                                <? if($ability_image_token != 'ability'): ?>
+                                    <tr>
+                                        <td  class="right">
+                                            <label style="display: block; float: left;">Power :</label>
+                                            <? if(!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])): ?>
+                                                <? if(!empty($ability_info['ability_damage'])){ ?><span class="ability_stat"><?= $ability_info['ability_damage'].(!empty($ability_info['ability_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
+                                                <? if(!empty($ability_info['ability_recovery'])){ ?><span class="ability_stat"><?= $ability_info['ability_recovery'].(!empty($ability_info['ability_recovery_percent']) ? '%' : '') ?> Recovery</span><? } ?>
+                                            <? else: ?>
+                                                <span class="ability_stat">-</span>
+                                            <? endif; ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Accuracy :</label>
+                                            <span class="ability_stat"><?= $ability_info['ability_accuracy'].'%' ?></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Speed :</label>
+                                            <span class="ability_stat"><?= !empty($ability_info['ability_speed']) ? $ability_info['ability_speed'] : '1' ?></span>
+                                        </td>
+                                    </tr>
+                                <? else: ?>
+                                    <tr>
+                                        <td  class="right">
+                                            <label style="display: block; float: left;">Power :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Accuracy :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Speed :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                    </tr>
+                                <? endif; ?>
                             </tbody>
                         </table>
+
+                        <? if (!empty($ability_info['ability_description'])): ?>
+                            <table class="full description">
+                                <tbody>
+                                    <tr>
+                                        <td class="right">
+                                            <div class="ability_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?php
+                                            // Define the search/replace pairs for the description
+                                            $temp_find = array('{DAMAGE}', '{RECOVERY}', '{DAMAGE2}', '{RECOVERY2}', '{}');
+                                            $temp_replace = array(
+                                                (!empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0), // {DAMAGE}
+                                                (!empty($ability_info['ability_recovery']) ? $ability_info['ability_recovery'] : 0), // {RECOVERY}
+                                                (!empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0), // {DAMAGE2}
+                                                (!empty($ability_info['ability_recovery2']) ? $ability_info['ability_recovery2'] : 0), // {RECOVERY2}
+                                                '' // {}
+                                                );
+                                            echo !empty($ability_info['ability_description']) ? str_replace($temp_find, $temp_replace, $ability_info['ability_description']) : '&hellip;'
+                                            ?></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        <? endif; ?>
+
                     </div>
 
                 <? endif; ?>
@@ -1692,10 +1691,10 @@ class rpg_ability extends rpg_object {
 
                     ?>
 
-                    <h2 id="sprites" class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left;">
+                    <h2 id="sprites" class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
                         <?= $ability_info['ability_name']?>&#39;s Sprites
                         <span class="header_links image_link_container">
-                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>"><?php
+                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?php
                                 // Loop though and print links for the alts
                                 foreach ($temp_alts_array AS $alt_key => $alt_info){
                                     $alt_type = '';
@@ -1729,8 +1728,8 @@ class rpg_ability extends rpg_object {
                                 ?></span>
                         </span>
                     </h2>
-                    <div id="sprites_body" class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
-                        <div style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #4d4d4d url(images/sprite-grid.gif) scroll repeat -10px -30px; overflow: hidden; padding: 10px 30px;">
+                    <div id="sprites_body" class="body body_full sprites_body solid">
+                        <div class="grid">
                             <?= $this_sprite_markup ?>
                         </div>
                         <?php
@@ -1744,7 +1743,7 @@ class rpg_ability extends rpg_object {
                             $temp_editor_title = 'Adrian Marceau / Ageman20XX';
                         }
                         ?>
-                        <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span style="color: #565656;"> | </span> Original Artwork by <strong>Capcom</strong></p>
+                        <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span class="pipe"> | </span> Original Artwork by <strong>Capcom</strong></p>
                     </div>
 
                 <? endif; ?>
@@ -1754,8 +1753,8 @@ class rpg_ability extends rpg_object {
                     <h2 class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left;">
                         <?= $ability_info['ability_name']?>&#39;s Robots
                     </h2>
-                    <div class="body body_full" style="margin: 0; padding: 2px 3px;">
-                        <table class="full" style="margin: 5px auto 10px;">
+                    <div class="body body_full solid" style="margin: 0 auto 4px; padding: 2px 3px; min-height: 10px;">
+                        <table class="full robots" style="margin: 5px auto 10px;">
                             <colgroup>
                                 <col width="100%" />
                             </colgroup>
@@ -1928,12 +1927,10 @@ class rpg_ability extends rpg_object {
                 <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>" rel="permalink">+ Permalink</a>
 
                 <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>" rel="permalink">+ View More</a>
 
                 <? endif; ?>
 

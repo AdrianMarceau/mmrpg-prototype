@@ -3206,6 +3206,7 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
 #window .page .event .robot_container .robot_name .label .defense,
 #window .page .event .robot_container .robot_name .label .speed {
     padding: 0 2px;
+    margin-right: 1%;
     color: #EFEFEF;
     line-height: 9px;
     position: relative;
