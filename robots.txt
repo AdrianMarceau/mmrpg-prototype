@@ -1,5 +1,5 @@
 User-agent: *
-Disallow: 
+Disallow:
 Disallow: /cgi-bin/
 Disallow: /_developer/
 Disallow: /_ext/
@@ -11,8 +11,6 @@ Disallow: /_tmp/
 Disallow: /data/
 Disallow: /pages/
 Disallow: /frames/
-Disallow: /scripts/
-Disallow: /styles/
 Disallow: /sounds/
 Disallow: /images/gallery/screenshots/_thumbs/
 Disallow: /images/gallery/screenshots/thumbs/
