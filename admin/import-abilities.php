@@ -89,6 +89,8 @@ require(MMRPG_CONFIG_ROOTDIR.'data/abilities/_index.php');
 // Fill in potentially missing fields with defaults for sorting
 if (!empty($mmrpg_index['abilities'])){
     foreach ($mmrpg_index['abilities'] AS $token => $ability){
+
+        // Collect or define mandatory key info for each of the abilities
         $ability['ability_class'] = isset($ability['ability_class']) ? $ability['ability_class'] : 'master';
         $ability['ability_subclass'] = isset($ability['ability_subclass']) ? $ability['ability_subclass'] : '';
         $ability['ability_game'] = isset($ability['ability_game']) ? $ability['ability_game'] : 'MMRPG';
@@ -98,6 +100,25 @@ if (!empty($mmrpg_index['abilities'])){
         $ability['ability_energy'] = isset($ability['ability_energy']) ? $ability['ability_energy'] : 1;
         $ability['ability_type'] = isset($ability['ability_type']) ? $ability['ability_type'] : '';
         $ability['ability_type2'] = isset($ability['ability_type2']) ? $ability['ability_type2'] : '';
+
+        // Compensate for missing ability masters and/or numbers
+        if (empty($ability['ability_master']) || empty($ability['ability_number'])){
+            if (isset($ability_master_index[$ability['ability_class']][$ability['ability_token']])){
+                $temp_master_info = $ability_master_index[$ability['ability_class']][$ability['ability_token']];
+                $ability['ability_master'] = $temp_master_info['master'];
+                $ability['ability_number'] = $temp_master_info['number'];
+            } else {
+                foreach ($ability_master_index AS $ability_class => $master_list){
+                    if (isset($master_list[$ability['ability_token']])){
+                        $temp_master_info = $master_list[$ability['ability_token']];
+                        $ability['ability_master'] = $temp_master_info['master'];
+                        $ability['ability_number'] = $temp_master_info['number'];
+                    }
+                }
+            }
+        }
+
+        // Update this ability in the parent array
         $mmrpg_index['abilities'][$token] = $ability;
     }
 }
@@ -371,15 +392,6 @@ if (!empty($mmrpg_index['abilities'])){
             $ability_order++;
         } else {
             $temp_insert_array['ability_order'] = 0;
-        }
-
-        // Compensate for missing ability masters and/or numbers
-        if (empty($temp_insert_array['ability_master']) || empty($temp_insert_array['ability_number'])){
-            if (isset($ability_master_index[$temp_insert_array['ability_class']][$temp_insert_array['ability_token']])){
-                $temp_master_info = $ability_master_index[$temp_insert_array['ability_class']][$temp_insert_array['ability_token']];
-                $temp_insert_array['ability_master'] = $temp_master_info['master'];
-                $temp_insert_array['ability_number'] = $temp_master_info['number'];
-            }
         }
 
         // Check if this ability already exists in the database
