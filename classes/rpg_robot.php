@@ -2342,8 +2342,11 @@ class rpg_robot extends rpg_object {
 
         // Define the global variables
         global $mmrpg_index, $this_current_uri, $this_current_url, $db;
-        global $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_fields, $mmrpg_database_types;
+        global $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_types;
         global $mmrpg_stat_base_max_value;
+
+        // Define any local static variables
+        static $mmrpg_database_fields;
 
         // Collect the approriate database indexes
         if (empty($mmrpg_database_players)){ $mmrpg_database_players = rpg_player::get_index(true); }
@@ -2673,59 +2676,6 @@ class rpg_robot extends rpg_object {
                             </tbody>
                         </table>
 
-                        <table class="full stats">
-                            <tbody>
-                                <tr>
-                                    <td  class="right">
-                                        <label>Energy :</label>
-                                        <span class="stat" style="width: <?= $stat_container_percent ?>%;">
-                                            <?php if(false && $print_options['layout_style'] == 'website_compact'): ?>
-                                                <span class="robot_stat type_energy" style="padding-left: <?= round( ( ($robot_info['robot_energy'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_energy'] ?></span></span>
-                                            <?php else: ?>
-                                                <span class="robot_stat type_energy" style="padding-left: <?= round( ( ($robot_info['robot_energy'] / $robot_info['robot_max_stat_value']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_energy'] ?></span></span>
-                                            <?php endif; ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td  class="right">
-                                        <label>Attack :</label>
-                                        <span class="stat" style="width: <?= $stat_container_percent ?>%;">
-                                            <?php if(false && $print_options['layout_style'] == 'website_compact'): ?>
-                                                <span class="robot_stat type_attack" style="padding-left: <?= round( ( ($robot_info['robot_attack'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_attack'] ?></span></span>
-                                            <?php else: ?>
-                                                <span class="robot_stat type_attack" style="padding-left: <?= round( ( ($robot_info['robot_attack'] / $robot_info['robot_max_stat_value']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_attack'] ?></span></span>
-                                            <?php endif; ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td  class="right">
-                                        <label>Defense :</label>
-                                        <span class="stat" style="width: <?= $stat_container_percent ?>%;">
-                                            <?php if(false && $print_options['layout_style'] == 'website_compact'): ?>
-                                                <span class="robot_stat type_defense" style="padding-left: <?= round( ( ($robot_info['robot_defense'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_defense'] ?></span></span>
-                                            <?php else: ?>
-                                                <span class="robot_stat type_defense" style="padding-left: <?= round( ( ($robot_info['robot_defense'] / $robot_info['robot_max_stat_value']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_defense'] ?></span></span>
-                                            <?php endif; ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="right">
-                                        <label>Speed :</label>
-                                        <span class="stat" style="width: <?= $stat_container_percent ?>%;">
-                                            <?php if(false && $print_options['layout_style'] == 'website_compact'): ?>
-                                                <span class="robot_stat type_speed" style="padding-left: <?= round( ( ($robot_info['robot_speed'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_speed'] ?></span></span>
-                                            <?php else: ?>
-                                                <span class="robot_stat type_speed" style="padding-left: <?= round( ( ($robot_info['robot_speed'] / $robot_info['robot_max_stat_value']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_speed'] ?></span></span>
-                                            <?php endif; ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
                         <table class="full types">
                             <tbody>
                                 <tr>
@@ -2794,6 +2744,59 @@ class rpg_robot extends rpg_object {
                                             echo '<span class="robot_immunity robot_type type_none">None</span>';
                                         }
                                         ?>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="full stats">
+                            <tbody>
+                                <tr>
+                                    <td  class="right">
+                                        <label>Energy :</label>
+                                        <span class="stat" style="width: <?= $stat_container_percent ?>%;">
+                                            <?php if(false && $print_options['layout_style'] == 'website_compact'): ?>
+                                                <span class="robot_stat type_energy" style="padding-left: <?= round( ( ($robot_info['robot_energy'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_energy'] ?></span></span>
+                                            <?php else: ?>
+                                                <span class="robot_stat type_energy" style="padding-left: <?= round( ( ($robot_info['robot_energy'] / $robot_info['robot_max_stat_value']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_energy'] ?></span></span>
+                                            <?php endif; ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td  class="right">
+                                        <label>Attack :</label>
+                                        <span class="stat" style="width: <?= $stat_container_percent ?>%;">
+                                            <?php if(false && $print_options['layout_style'] == 'website_compact'): ?>
+                                                <span class="robot_stat type_attack" style="padding-left: <?= round( ( ($robot_info['robot_attack'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_attack'] ?></span></span>
+                                            <?php else: ?>
+                                                <span class="robot_stat type_attack" style="padding-left: <?= round( ( ($robot_info['robot_attack'] / $robot_info['robot_max_stat_value']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_attack'] ?></span></span>
+                                            <?php endif; ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td  class="right">
+                                        <label>Defense :</label>
+                                        <span class="stat" style="width: <?= $stat_container_percent ?>%;">
+                                            <?php if(false && $print_options['layout_style'] == 'website_compact'): ?>
+                                                <span class="robot_stat type_defense" style="padding-left: <?= round( ( ($robot_info['robot_defense'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_defense'] ?></span></span>
+                                            <?php else: ?>
+                                                <span class="robot_stat type_defense" style="padding-left: <?= round( ( ($robot_info['robot_defense'] / $robot_info['robot_max_stat_value']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_defense'] ?></span></span>
+                                            <?php endif; ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Speed :</label>
+                                        <span class="stat" style="width: <?= $stat_container_percent ?>%;">
+                                            <?php if(false && $print_options['layout_style'] == 'website_compact'): ?>
+                                                <span class="robot_stat type_speed" style="padding-left: <?= round( ( ($robot_info['robot_speed'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_speed'] ?></span></span>
+                                            <?php else: ?>
+                                                <span class="robot_stat type_speed" style="padding-left: <?= round( ( ($robot_info['robot_speed'] / $robot_info['robot_max_stat_value']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_speed'] ?></span></span>
+                                            <?php endif; ?>
+                                        </span>
                                     </td>
                                 </tr>
                             </tbody>

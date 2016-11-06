@@ -1069,20 +1069,25 @@ class rpg_field extends rpg_object {
                             <span class="header_core ability_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;">Neutral Type</span>
                         <? endif; ?>
                     </h2>
-                    <div class="body body_left" style="margin-right: 0; padding: 2px 3px; min-height: 100px;">
-                        <table class="full" style="margin: 5px auto 10px;">
-                            <colgroup>
-                                <col width="48%" />
-                                <col width="1%" />
-                                <col width="48%" />
-                            </colgroup>
+
+                    <div class="body body_left" style="margin-right: 0; padding: 0 2px 3px;">
+
+
+                        <table class="full basic">
                             <tbody>
                                 <tr>
                                     <td class="right">
                                         <label style="display: block; float: left;">Name :</label>
                                         <span class="field_type"><?= $field_info['field_name'] ?></span>
                                     </td>
-                                    <td class="middle">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label style="display: block; float: left;">Type :</label>
+                                        <a href="database/fields/<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>/" class="field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><?= !empty($field_info['field_type']) ? ucfirst($field_info['field_type']) : 'Neutral' ?> Type</a>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td class="right">
                                         <?
                                         // Define the source game string
@@ -1099,13 +1104,14 @@ class rpg_field extends rpg_object {
                                         <span class="field_type"><?= $temp_source_string ?></span>
                                     </td>
                                 </tr>
+                            </tbody>
+                        </table>
+
+
+                        <table class="full extras">
+                            <tbody>
                                 <tr>
-                                    <td class="right">
-                                        <label style="display: block; float: left;">Type :</label>
-                                        <a href="database/fields/<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>/" class="field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><?= !empty($field_info['field_type']) ? ucfirst($field_info['field_type']) : 'Neutral' ?> Type</a>
-                                    </td>
-                                    <td class="middle">&nbsp;</td>
-                                    <td class="right">
+                                    <td class="right music">
                                         <label style="display: block; float: left;">Music :</label>
                                         <? if(!empty($field_info['field_music_name']) && !empty($field_info['field_music_link'])): ?>
                                             <? if(is_array($field_info['field_music_link'])):?>
@@ -1149,7 +1155,8 @@ class rpg_field extends rpg_object {
                                         }
                                         ?>
                                     </td>
-                                    <td class="center">&nbsp;</td>
+                                </tr>
+                                <tr>
                                     <td  class="right">
                                         <label style="display: block; float: left;"><?= count($robot_mecha_info_array) == 1 ? 'Mecha' : 'Mechas' ?> :</label>
                                         <?
@@ -1179,8 +1186,13 @@ class rpg_field extends rpg_object {
                                         ?>
                                     </td>
                                 </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="full multipliers">
+                            <tbody>
                                 <tr>
-                                    <td class="right" colspan="3" style="padding: 8px 5px;">
+                                    <td class="right" colspan="3">
                                         <label style="display: block; float: left;">Multipliers :</label>
                                         <?
                                         if (!empty($field_info['field_multipliers'])){
@@ -1188,39 +1200,18 @@ class rpg_field extends rpg_object {
                                             asort($field_info['field_multipliers']);
                                             $field_info['field_multipliers'] = array_reverse($field_info['field_multipliers']);
                                             foreach ($field_info['field_multipliers'] AS $temp_token => $temp_value){
-                                                $temp_string[] = '<span style="padding: 4px 8px; line-height: 24px; " class="field_multiplier field_type field_type_'.$temp_token.'">'.$mmrpg_index['types'][$temp_token]['type_name'].' x '.number_format($temp_value, 1).'</span>';
+                                                $temp_string[] = '<span class="field_multiplier field_type field_type_'.$temp_token.'">'.$mmrpg_index['types'][$temp_token]['type_name'].' x '.number_format($temp_value, 1).'</span>';
                                             }
                                             echo implode(' ', $temp_string);
                                         } else {
-                                            echo '<span style="padding: 4px 8px; line-height: 24px; " class="field_multiplier field_type field_type_none">None</span>';
+                                            echo '<span class="field_multiplier field_type field_type_none">None</span>';
                                         }
                                         ?>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
 
-                <? endif; ?>
-
-                <? if($print_options['show_description'] && !empty($field_info['field_description2'])): ?>
-
-                    <h2 class="header header_left field_type_<?= $field_type_token ?>" style="margin-right: 0;">
-                        <?= $field_info['field_name'] ?>&#39;s Description
-                    </h2>
-                    <div class="body body_left" style="margin-right: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px;">
-                        <table class="full" style="margin: 5px auto 10px;">
-                            <colgroup>
-                                <col width="100%" />
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <td class="right">
-                                        <div class="field_description" style="text-align: justify; padding: 0 4px;"><?= $field_info['field_description2'] ?></div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
 
                 <? endif; ?>
@@ -1231,7 +1222,7 @@ class rpg_field extends rpg_object {
                     <h2 class="header header_full field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
                         <?= $field_info['field_name'].(!preg_match('/s$/i', $field_info['field_name']) ? '&#39;s' : '&#39;') ?> Sprites
                     </h2>
-                    <div class="body body_full" style="margin: 0; padding: 10px; min-height: auto;">
+                    <div class="body body_full solid" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 4px; min-height: 10px;">
                         <div id="sprite_container" style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #191919 none scroll repeat -10px -30px; overflow: hidden; padding: 0; margin-bottom: 10px;">
                             <div class="sprite_background" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #000000 url(images/fields/<?= $field_info['field_background'] ?>/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
                                 <div class="sprite_foreground" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: transparent url(images/fields/<?= $field_info['field_background'] ?>/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
@@ -1242,7 +1233,7 @@ class rpg_field extends rpg_object {
                         <?
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
-                        $temp_final_divider = '<span style="color: #565656;"> | </span>';
+                        $temp_final_divider = '<span class="pipe"> | </span>';
                         if (empty($field_info['field_image_editor'])){ $field_info['field_image_editor'] = 412; }
                         if (!empty($field_info['field_image_editor'])){
                             $temp_break = false;
@@ -1263,17 +1254,43 @@ class rpg_field extends rpg_object {
                         ?>
                     </div>
 
+                    <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <?php endif; ?>
+
+                <? endif; ?>
+
+                <? if($print_options['show_description'] && !empty($field_info['field_description2'])): ?>
+
+                    <h2 class="header field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
+                        <?= $field_info['field_name'] ?>&#39;s Description
+                    </h2>
+                    <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 0 0 2px; min-height: 10px;">
+                        <table class="full description">
+                            <colgroup>
+                                <col width="100%" />
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td class="right">
+                                        <div class="field_description" style="text-align: justify; padding: 0 4px;"><?= $field_info['field_description2'] ?></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                 <? endif; ?>
 
                 <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="database/fields/<?= $field_info['field_token'] ?>/" rel="permalink">+ Permalink</a>
 
                 <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                    <a class="link link_permalink permalink" href="database/fields/<?= $field_info['field_token'] ?>/" rel="permalink">+ View More</a>
 
                 <? endif; ?>
 

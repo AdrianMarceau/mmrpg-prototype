@@ -310,6 +310,7 @@ require_once('pages/'.$this_current_page.'.php');
                         'bosses' => array('name' => 'Bosses'),
                         'abilities' => array('name' => 'Abilities'),
                         'items' => array('name' => 'Items'),
+                        'fields' => array('name' => 'Fields'),
                         'types' => array('name' => 'Types')
                         ));
                     $main_menu_links['community'] = array('name' => 'Community');
