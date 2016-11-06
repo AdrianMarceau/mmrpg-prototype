@@ -82,6 +82,7 @@ body:before {
         margin-top: -24px;
         margin-left: -26px;
     }
+
     #window .page .type_block {
         width: 86px;
     }
@@ -325,10 +326,19 @@ body:before {
     #window .page .database_container .subbody .body table.full.basic,
     #window .page .database_container .subbody .body table.full.stats,
     #window .page .database_container .subbody .body table.full.extras,
-    #window .page .database_container .subbody .body table.full.types {
+    #window .page .database_container .subbody .body table.full.types,
+    #window .page .database_container .subbody .body table.full.multipliers {
         float: none;
         width: 100%;
     }
+
+    #window .page .database_container table.full.types td[count="4"] a.robot_type {
+        max-width: 12%;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     #window .page .database_container .subbody .body table.full.quotes label
     #window .page .database_container .subbody .body table.full.records label {
         float: none;
@@ -336,6 +346,28 @@ body:before {
         text-align: left;
         line-height: 25px;
         margin-top: -4px;
+    }
+    #window .page .database_container .subbody .body table.full.multipliers td {
+        text-align: left;
+    }
+    #window .page .database_container .subbody .body table.full.multipliers label {
+        float: none !important;
+        width: 100%;
+        text-align: left;
+        padding-bottom: 4px;
+    }
+    #window .page .database_container .subbody .body table.full.multipliers .field_multiplier {
+        display: inline-block;
+        width: 46%;
+        clear: left;
+        text-align: center;
+    }
+    #window .page .database_container .subbody .body table.full.extras .music .field_type {
+        max-width: 74%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
     }
     #window .page .database_container .subbody .body table.full.quotes .player_quote,
     #window .page .database_container .subbody .body table.full.quotes .robot_quote,
@@ -449,16 +481,6 @@ body:before {
 
     #window .menu .main {
         padding: 0 6%;
-    }
-
-}
-
-
-/* -- iPhone Portrait Mode -- */
-@media (max-width: 350px){
-
-    body:before {
-        content: "10";
     }
 
     #mmrpg {
@@ -691,11 +713,11 @@ body:before {
         margin-bottom: 4px !important;
     }
     #window .page .subbody[data-class="abilities"] .float.link .sprite {
-        width: 22px;
+        width: 26px;
     }
     #window .page .subbody[data-class="abilities"] .float.link .sprite.size40 span,
     #window .page .subbody[data-class="abilities"] .float.link .sprite.size40 img {
-        margin-left: -9px;
+        margin-left: -7px;
     }
 
 
@@ -748,6 +770,32 @@ body:before {
 
     #window .page .body .subbody_databaselinks[data-class="items"] .iconwrap {
         padding-right: 3%;
+    }
+
+    #window .page .subbody .float.link[data-anchor="nitron-r"] .sprite,
+    #window .page .subbody .float.link[data-anchor="nitron-b"] .sprite,
+    #window .page .subbody .float.link[data-anchor="nitron-y"] .sprite {
+        width: 3px;
+    }
+
+    #window .page .subbody .float_link_group[data-game="MM00/Weapons/Roll"] {
+        clear: left;
+    }
+
+    #window .page .subbody .float_link_group[data-game^="MMRPG/Weapons/"] .float.link .sprite,
+    #window .page .subbody .float_link_group[data-game^="MMRPG/Support/"] .float.link .sprite {
+        width: 19px;
+    }
+    #window .page .subbody .float_link_group[data-game^="MMRPG/Weapons/"] .float.link .sprite img,
+    #window .page .subbody .float_link_group[data-game^="MMRPG/Support/"] .float.link .sprite img {
+        margin-left: -11px;
+    }
+
+    #window .page .subbody .float_link_group[data-game="MMAZ/T2/Weapons/MM30"] .float.link .sprite {
+        width: 18px;
+    }
+    #window .page .subbody .float_link_group[data-game="MMAZ/T2/Weapons/MM30"] .float.link .sprite img {
+        margin-left: -12px;
     }
 
     #window .page .database_container .subbody .body.sprites_body .grid {
@@ -1002,6 +1050,16 @@ body:before {
     }
     #window .devbuild_warning br {
         display: none;
+    }
+
+}
+
+
+/* -- iPhone Portrait Mode -- */
+@media (max-width: 350px){
+
+    body:before {
+        content: "10";
     }
 
 

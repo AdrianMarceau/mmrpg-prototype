@@ -945,8 +945,12 @@ html {
 }
 #window .page .database_container .subbody .body table.full.extras,
 #window .page .database_container .subbody .body table.full.types {
-    float: right;
+    float: left;
     width: 50%;
+}
+#window .page .database_container .subbody .body table.full.multipliers {
+    float: none;
+    width: 100%;
 }
 #window .page .database_container .subbody .body table.full.quotes
 #window .page .database_container .subbody .body table.full.description {

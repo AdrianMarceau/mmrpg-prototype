@@ -2105,37 +2105,6 @@ class rpg_player extends rpg_object {
                             </tbody>
                         </table>
 
-                        <?php if($print_options['show_quotes'] && $print_options['layout_style'] == 'website_compact'): ?>
-                            <table class="full quotes">
-                                <tbody>
-                                    <tr>
-                                        <td class="right">
-                                            <label style="display: block; float: left;">Start Quote : </label>
-                                            <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_start']) ? $player_info['player_quotes']['battle_start'] : '&hellip;' ?>&quot;</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="right">
-                                            <label style="display: block; float: left;">Taunt Quote : </label>
-                                            <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_taunt']) ? $player_info['player_quotes']['battle_taunt'] : '&hellip;' ?>&quot;</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="right">
-                                            <label style="display: block; float: left;">Victory Quote : </label>
-                                            <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_victory']) ? $player_info['player_quotes']['battle_victory'] : '&hellip;' ?>&quot;</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="right">
-                                            <label style="display: block; float: left;">Defeat Quote : </label>
-                                            <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_defeat']) ? $player_info['player_quotes']['battle_defeat'] : '&hellip;' ?>&quot;</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        <?php endif; ?>
-
                     </div>
                 <?php endif; ?>
 
