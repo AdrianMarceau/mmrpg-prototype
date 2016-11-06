@@ -1858,6 +1858,7 @@ class rpg_robot extends rpg_object {
             $robot_info['robot_core'] = $this->robot_core;
             $robot_info['robot_core2'] = $this->robot_core2;
             $robot_info['robot_item'] = $this->robot_item;
+            $robot_info['robot_rewards'] = $this->robot_rewards;
 
             // If this was the noweapons action, everything is zero
             if ($this_ability->ability_token == 'action-noweapons'){
@@ -1928,6 +1929,16 @@ class rpg_robot extends rpg_object {
             // Apply held robot core multipliers if they exist
             if ($ability_type_token2 == $core_type_token3){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER); $energy_mods++; }
 
+        }
+
+        // If this ability is in the list of robot rewards, apply LEVEL UP bonuses
+        if (!empty($this_robot['robot_rewards']['abilities'])){
+            foreach ($this_robot['robot_rewards']['abilities'] AS $key => $reward){
+                if ($reward['token'] == $this_ability['ability_token']){
+                    $energy_new = ceil($energy_new * MMRPG_SETTINGS_NATIVEBONUS_MULTIPLIER);
+                    $energy_mods++;
+                }
+            }
         }
 
         // Return the resulting weapon energy
