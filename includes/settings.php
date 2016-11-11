@@ -92,6 +92,7 @@ define('MMRPG_SETTINGS_COREBOOST_MULTIPLIER', 1.5); // Core matched abilites sho
 define('MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER', 1.25); // Sub-Core matched abilites should recive a 25% damage/recovery boost
 define('MMRPG_SETTINGS_COREBONUS_MULTIPLIER', 0.5); // Core matched abilites should recive a 50% weapon enery reduction
 define('MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER', 0.75); // Sub-Core matched abilites should recive a 25% weapon energy reduction
+define('MMRPG_SETTINGS_NATIVEBONUS_MULTIPLIER', 0.5); // Level-up abilites should recive a 50% weapon enery reduction
 
 // Define the global comment size limit for characters
 define('MMRPG_SETTINGS_COMMENT_MINLENGTH', 10); // Prevent spam comments
