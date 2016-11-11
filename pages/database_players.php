@@ -39,6 +39,7 @@ if (!empty($this_current_token)){
 
     // Loop through the player database and display the appropriate data
     $key_counter = 0;
+    $this_current_key = false;
     foreach($mmrpg_database_players AS $player_key => $player_info){
 
         // If a specific player has been requested and it's not this one
@@ -47,6 +48,7 @@ if (!empty($this_current_token)){
 
         // If this is THE specific player requested (and one was specified)
         if (!empty($this_current_token) && $this_current_token == $player_info['player_token']){
+            $this_current_key = $player_key;
 
             $this_player_image = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
             if ($this_player_image == 'player'){ $this_seo_robots = 'noindex'; }
@@ -86,22 +88,61 @@ if (empty($this_current_token)){
 ?>
 
 <div class="subbody subbody_databaselinks <?= empty($this_current_token) ? 'subbody_databaselinks_noajax' : '' ?>" data-class="players" data-class-single="player" data-basetitle="<?= isset($this_seo_title_backup) ? $this_seo_title_backup : $this_seo_title ?>" data-current="<?= !empty($this_current_token) ? $this_current_token : '' ?>">
-    <div class="<?= !empty($this_current_token) ? 'toggle_body' : '' ?>" style="<?= !empty($this_current_token) ? 'display: none;' : '' ?>">
-        <?php if(empty($this_current_token)): ?>
+
+    <? if(empty($this_current_token)): ?>
+
+        <div class="<?= !empty($this_current_token) ? 'toggle_body' : '' ?>" style="<?= !empty($this_current_token) ? 'display: none;' : '' ?>">
             <p class="text" style="clear: both;">
                 The player database contains detailed information on <?= $mmrpg_database_players_links_counter == 1 ? 'the' : 'all' ?> <?= isset($this_current_filter) ? $mmrpg_database_players_links_counter.' <span class="type_span player_type player_type_'.$this_current_filter.'">'.$this_current_filter_name.' Type</span> ' : $mmrpg_database_players_links_counter.' ' ?><?= $mmrpg_database_players_links_counter == 1 ? 'playable character that appears ' : 'playable characters that appear ' ?> in the prototype, including <?= $mmrpg_database_players_links_counter == 1 ? 'its' : 'each player\'s' ?> unlockable abilities, battle quotes, sprite sheets, and more.
                 Click <?= $mmrpg_database_players_links_counter == 1 ? 'the mugshot below to scroll to the' : 'any of the mugshots below to scroll to a' ?> player's summarized database entry and click the more link to see its full page with sprites and extended info. <?= isset($this_current_filter) ? 'If you wish to reset the player type filter, <a href="database/players/">please click here</a>.' : '' ?>
             </p>
             <div class="text iconwrap"><?= preg_replace('/data-token="([-_a-z0-9]+)"/', 'data-anchor="$1"', $mmrpg_database_players_links) ?></div>
-        <?php else: ?>
-            <div class="text iconwrap"><?= $mmrpg_database_players_links ?></div>
-        <?php endif; ?>
-    </div>
-    <?php if(!empty($this_current_token)): ?>
-        <a class="link link_toggle" data-state="collapsed">- Show Player Index -</a>
-    <?php else: ?>
+        </div>
         <div style="clear: both;">&nbsp;</div>
-    <?php endif; ?>
+
+    <? else: ?>
+
+        <?
+        // Collect the prev and next player tokens
+        $prev_link = false;
+        $next_link = false;
+        if (!empty($this_current_key)){
+            $key_index = array_keys($mmrpg_database_players);
+            $min_key = 0;
+            $max_key = count($key_index) - 1;
+            $current_key_position = array_search($this_current_key, $key_index);
+            $prev_key_position = $current_key_position - 1;
+            $next_key_position = $current_key_position + 1;
+            // If prev key was in range, generate
+            if ($prev_key_position >= $min_key){
+                $prev_key = $key_index[$prev_key_position];
+                $prev_info = $mmrpg_database_players[$prev_key];
+                $prev_link = 'database/players/'.$prev_info['player_token'].'/';
+                $prev_link_title = $prev_info['player_name'];
+            }
+            // If next key was in range, generate
+            if ($next_key_position <= $max_key){
+                $next_key = $key_index[$next_key_position];
+                $next_info = $mmrpg_database_players[$next_key];
+                $next_link = 'database/players/'.$next_info['player_token'].'/';
+                $next_link_title = $next_info['player_name'];
+            }
+
+        }
+
+        ?>
+
+        <div class="link_nav">
+            <? if (!empty($prev_link)): ?>
+                <a class="link link_prev" href="<?= $prev_link ?>">&laquo; <?= $prev_link_title ?></a>
+            <? endif; ?>
+            <? if (!empty($next_link)): ?>
+                <a class="link link_next" href="<?= $next_link ?>"><?= $next_link_title ?> &raquo;</a>
+            <? endif; ?>
+            <a class="link link_return" href="database/players/">Return to Player Index</a>
+        </div>
+
+    <? endif; ?>
 </div>
 
 <?php
