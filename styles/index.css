@@ -841,7 +841,10 @@ html {
 }
 #window .page .body .subbody .link_top,
 #window .page .body .subbody .link_permalink,
-#window .page .body .subbody .link_toggle {
+#window .page .body .subbody .link_toggle,
+#window .page .body .subbody .link_return,
+#window .page .body .subbody .link_next,
+#window .page .body .subbody .link_prev {
     float: right;
     color: rgb(100, 100, 100);
     font-size: 10px;
@@ -980,7 +983,10 @@ html {
     overflow: hidden;
     padding-bottom: 5px;
 }
-#window .page .body .subbody .link_toggle {
+#window .page .body .subbody .link_toggle,
+#window .page .body .subbody .link_return,
+#window .page .body .subbody .link_next,
+#window .page .body .subbody .link_prev {
     float: none;
     clear: both;
     color: rgb(100, 100, 100);
@@ -989,6 +995,30 @@ html {
     padding: 0;
     text-align: center;
     margin: 0 auto;
+}
+#window .page .body .subbody .link_toggle {
+    clear: both;
+}
+#window .page .body .subbody .link_nav {
+    text-align: center;
+    position: relative;
+}
+#window .page .body .subbody .link_return,
+#window .page .body .subbody .link_next,
+#window .page .body .subbody .link_prev {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 19px;
+}
+#window .page .body .subbody .link_next,
+#window .page .body .subbody .link_prev {
+    position: absolute;
+}
+#window .page .body .subbody .link_next {
+    right: 0;
+}
+#window .page .body .subbody .link_prev {
+    left: 0;
 }
 
 #window .page .body .subwrap {
@@ -1489,7 +1519,7 @@ html {
 #window .page .event .recovery_overkill {
     background: rgb(65,65,65) none scroll no-repeat 0 0;
     border: 1px solid rgb(70,70,70);
-    padding: 2px 3px;
+    padding: 1px 3px;
     border-radius: 0.5em;
     -moz-border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
