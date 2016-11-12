@@ -2435,8 +2435,9 @@ class rpg_robot extends rpg_object {
         if (!empty($robot_info['robot_field2'])){ $temp_robot_fields = array_merge($temp_robot_fields, $robot_info['robot_field2']); }
         if ($temp_robot_fields){
             foreach ($temp_robot_fields AS $key => $token){
-                if (!empty($mmrpg_database_fields[$token])){
-                    $field_info_array[] = rpg_field::parse_index_info($mmrpg_database_fields[$token]);
+                $index_info = rpg_field::get_index_info($token);
+                if (!empty($index_info)){
+                    $field_info_array[] = $index_info;
                 }
             }
         }

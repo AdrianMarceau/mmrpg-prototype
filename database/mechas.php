@@ -118,6 +118,7 @@ $mmrpg_stat_base_max_value['mecha'] = 0;
 $key_counter = 0;
 $last_game_code = '';
 $mmrpg_database_mechas_links = '';
+$mmrpg_database_mechas_links_index = array();
 $mmrpg_database_mechas_links_counter = 0;
 $mmrpg_database_mechas_count_complete = 0;
 
@@ -170,7 +171,9 @@ foreach ($mmrpg_database_mechas AS $mecha_key => $mecha_info){
     </div>
     <?php
     if ($mecha_flag_complete){ $mmrpg_database_mechas_count_complete++; }
-    $mmrpg_database_mechas_links .= ob_get_clean();
+    $temp_markup = ob_get_clean();
+    $mmrpg_database_mechas_links_index[$mecha_key] = $temp_markup;
+    $mmrpg_database_mechas_links .= $temp_markup;
     $mmrpg_database_mechas_links_counter++;
     $key_counter++;
 

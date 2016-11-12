@@ -113,19 +113,23 @@ if (empty($this_current_token)){
             $current_key_position = array_search($this_current_key, $key_index);
             $prev_key_position = $current_key_position - 1;
             $next_key_position = $current_key_position + 1;
+            $find = array('href="', '<a ', '</a>', '<div ', '</div>');
+            $replace = array('data-href="', '<span ', '</span>', '<span ', '</span>');
             // If prev key was in range, generate
             if ($prev_key_position >= $min_key){
                 $prev_key = $key_index[$prev_key_position];
                 $prev_info = $mmrpg_database_players[$prev_key];
                 $prev_link = 'database/players/'.$prev_info['player_token'].'/';
-                $prev_link_title = $prev_info['player_name'];
+                $prev_link_image = $mmrpg_database_players_links_index[$prev_key];
+                $prev_link_image = str_replace($find, $replace, $prev_link_image);
             }
             // If next key was in range, generate
             if ($next_key_position <= $max_key){
                 $next_key = $key_index[$next_key_position];
                 $next_info = $mmrpg_database_players[$next_key];
                 $next_link = 'database/players/'.$next_info['player_token'].'/';
-                $next_link_title = $next_info['player_name'];
+                $next_link_image = $mmrpg_database_players_links_index[$next_key];
+                $next_link_image = str_replace($find, $replace, $next_link_image);
             }
 
         }
@@ -134,10 +138,10 @@ if (empty($this_current_token)){
 
         <div class="link_nav">
             <? if (!empty($prev_link)): ?>
-                <a class="link link_prev" href="<?= $prev_link ?>">&laquo; <?= $prev_link_title ?></a>
+                <a class="link link_prev" href="<?= $prev_link ?>"><?= $prev_link_image ?></a>
             <? endif; ?>
             <? if (!empty($next_link)): ?>
-                <a class="link link_next" href="<?= $next_link ?>"><?= $next_link_title ?> &raquo;</a>
+                <a class="link link_next" href="<?= $next_link ?>"><?= $next_link_image ?></a>
             <? endif; ?>
             <a class="link link_return" href="database/players/">Return to Player Index</a>
         </div>

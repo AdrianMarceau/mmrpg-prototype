@@ -1017,9 +1017,9 @@ class rpg_field extends rpg_object {
         if (!empty($field_info['field_master2'])){ $temp_robot_masters = array_merge($temp_robot_masters, $field_info['field_master2']); }
         if (!empty($temp_robot_masters)){
             foreach ($temp_robot_masters AS $key => $token){
-                if (!empty($mmrpg_database_robots[$token])){
-                    $robot_master_info = $mmrpg_database_robots[$token];
-                    $robot_master_info_array[] = $robot_master_info;
+                $index_info = rpg_robot::get_index_info($token);
+                if (!empty($index_info)){
+                    $robot_master_info_array[] = $index_info;
                 }
             }
         }
@@ -1028,9 +1028,9 @@ class rpg_field extends rpg_object {
         $robot_mecha_info_array = array();
         if (!empty($field_info['field_mechas'])){
             foreach ($field_info['field_mechas'] AS $key => $token){
-                if (!empty($mmrpg_database_mechas[$token])){
-                    $robot_mecha_info = $mmrpg_database_mechas[$token];
-                    $robot_mecha_info_array[] = $robot_mecha_info;
+                $index_info = rpg_robot::get_index_info($token);
+                if (!empty($index_info)){
+                    $robot_mecha_info_array[] = $index_info;
                 }
             }
         }

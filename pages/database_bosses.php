@@ -77,6 +77,7 @@ if (!empty($this_current_token)){
 
     // Loop through the boss database and display the appropriate data
     $key_counter = 0;
+    $this_current_key = false;
     foreach($mmrpg_database_bosses AS $boss_key => $boss_info){
         //die('<pre>$mmrpg_database_bosses[$boss_key] = '.print_r($mmrpg_database_bosses[$boss_key], true).'</pre>');
 
@@ -86,6 +87,7 @@ if (!empty($this_current_token)){
 
         // If this is THE specific boss requested (and one was specified)
         if (!empty($this_current_token) && $this_current_token == $boss_info['robot_token']){
+            $this_current_key = $boss_key;
 
             $this_boss_image = !empty($boss_info['robot_image']) ? $boss_info['robot_image'] : $boss_info['robot_token'];
             $this_boss_image_size = (!empty($boss_info['robot_image_size']) ? $boss_info['robot_image_size'] : 40) * 2;
@@ -140,22 +142,64 @@ if (empty($this_current_token)){
 ?>
 
 <div class="subbody subbody_databaselinks <?= empty($this_current_token) ? 'subbody_databaselinks_noajax' : '' ?>" data-class="bosses" data-class-single="boss" data-basetitle="<?= isset($this_seo_title_backup) ? $this_seo_title_backup : $this_seo_title ?>" data-current="<?= !empty($this_current_token) ? $this_current_token : '' ?>">
-    <div class="<?= !empty($this_current_token) ? 'toggle_body' : '' ?>" style="<?= !empty($this_current_token) ? 'display: none;' : '' ?>">
-        <?php if(empty($this_current_token)): ?>
+    <? if(empty($this_current_token)): ?>
+
+        <div class="<?= !empty($this_current_token) ? 'toggle_body' : '' ?>" style="<?= !empty($this_current_token) ? 'display: none;' : '' ?>">
             <p class="text" style="clear: both;">
                 The boss database contains detailed information on <?= $mmrpg_database_bosses_links_counter == 1 ? 'the' : 'all' ?> <?= isset($this_current_filter) ? $mmrpg_database_bosses_links_counter.' <span class="type_span robot_type robot_type_'.$this_current_filter.'">'.$this_current_filter_name.' Type</span> ' : $mmrpg_database_bosses_links_counter.' ' ?><?= $mmrpg_database_bosses_links_counter == 1 ? 'fortress boss that appears ' : 'fortress bosses that appear ' ?> or will appear in the prototype, including <?= $mmrpg_database_bosses_links_counter == 1 ? 'its' : 'each boss\'s' ?> base stats, weaknesses, resistances, affinities, immunities, signature abilities, battle quotes, sprite sheets, and more.
                 Click <?= $mmrpg_database_bosses_links_counter == 1 ? 'the mugshot below to scroll to the' : 'any of the mugshots below to scroll to a' ?> boss's summarized database entry and click the more link to see its full page with sprites and extended info. <?= isset($this_current_filter) ? 'If you wish to reset the boss type filter, <a href="database/bosses/">please click here</a>.' : '' ?>
             </p>
             <div class="text iconwrap"><?= preg_replace('/data-token="([-_a-z0-9]+)"/', 'data-anchor="$1"', $mmrpg_database_bosses_links) ?></div>
-        <?php else: ?>
-            <div class="text iconwrap"><?= $mmrpg_database_bosses_links ?></div>
-        <?php endif; ?>
-    </div>
-    <?php if(!empty($this_current_token)): ?>
-        <a class="link link_toggle" data-state="collapsed">- Show Boss Index -</a>
-    <?php else: ?>
+        </div>
         <div style="clear: both;">&nbsp;</div>
-    <?php endif; ?>
+
+    <? else: ?>
+
+        <?
+        // Collect the prev and next robot tokens
+        $prev_link = false;
+        $next_link = false;
+        if (!empty($this_current_key)){
+            $key_index = array_keys($mmrpg_database_bosses);
+            $min_key = 0;
+            $max_key = count($key_index) - 1;
+            $current_key_position = array_search($this_current_key, $key_index);
+            $prev_key_position = $current_key_position - 1;
+            $next_key_position = $current_key_position + 1;
+            $find = array('href="', '<a ', '</a>', '<div ', '</div>');
+            $replace = array('data-href="', '<span ', '</span>', '<span ', '</span>');
+            // If prev key was in range, generate
+            if ($prev_key_position >= $min_key){
+                $prev_key = $key_index[$prev_key_position];
+                $prev_info = $mmrpg_database_bosses[$prev_key];
+                $prev_link = 'database/bosses/'.$prev_info['robot_token'].'/';
+                $prev_link_image = $mmrpg_database_bosses_links_index[$prev_key];
+                $prev_link_image = str_replace($find, $replace, $prev_link_image);
+            }
+            // If next key was in range, generate
+            if ($next_key_position <= $max_key){
+                $next_key = $key_index[$next_key_position];
+                $next_info = $mmrpg_database_bosses[$next_key];
+                $next_link = 'database/bosses/'.$next_info['robot_token'].'/';
+                $next_link_image = $mmrpg_database_bosses_links_index[$next_key];
+                $next_link_image = str_replace($find, $replace, $next_link_image);
+            }
+
+        }
+
+        ?>
+
+        <div class="link_nav">
+            <? if (!empty($prev_link)): ?>
+                <a class="link link_prev" href="<?= $prev_link ?>"><?= $prev_link_image ?></a>
+            <? endif; ?>
+            <? if (!empty($next_link)): ?>
+                <a class="link link_next" href="<?= $next_link ?>"><?= $next_link_image ?></a>
+            <? endif; ?>
+            <a class="link link_return" href="database/bosses/">Return to Boss Index</a>
+        </div>
+
+    <? endif; ?>
 </div>
 
 <?php

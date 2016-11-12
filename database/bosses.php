@@ -113,6 +113,7 @@ $mmrpg_stat_base_max_value['boss'] = 0;
 $key_counter = 0;
 $last_game_code = '';
 $mmrpg_database_bosses_links = '';
+$mmrpg_database_bosses_links_index = array();
 $mmrpg_database_bosses_links_counter = 0;
 $mmrpg_database_bosses_count_complete = 0;
 
@@ -164,7 +165,9 @@ foreach ($mmrpg_database_bosses AS $boss_key => $boss_info){
     </div>
     <?php
     if ($boss_flag_complete){ $mmrpg_database_bosses_count_complete++; }
-    $mmrpg_database_bosses_links .= ob_get_clean();
+    $temp_markup = ob_get_clean();
+    $mmrpg_database_bosses_links_index[$boss_key] = $temp_markup;
+    $mmrpg_database_bosses_links .= $temp_markup;
     $mmrpg_database_bosses_links_counter++;
     $key_counter++;
 
