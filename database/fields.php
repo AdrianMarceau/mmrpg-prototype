@@ -57,6 +57,7 @@ foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
 $key_counter = 0;
 $last_game_code = '';
 $mmrpg_database_fields_links = '';
+$mmrpg_database_fields_links_index = array();
 $mmrpg_database_fields_links_counter = 0;
 $mmrpg_database_fields_count_complete = 0;
 
@@ -103,7 +104,9 @@ foreach ($mmrpg_database_fields AS $field_key => $field_info){
     </div>
     <?php
     if ($field_flag_complete){ $mmrpg_database_fields_count_complete++; }
-    $mmrpg_database_fields_links .= ob_get_clean();
+    $temp_markup = ob_get_clean();
+    $mmrpg_database_fields_links_index[$field_key] = $temp_markup;
+    $mmrpg_database_fields_links .= $temp_markup;
     $mmrpg_database_fields_links_counter++;
     $key_counter++;
 

@@ -851,6 +851,11 @@ html {
     line-height: 10px;
     padding-left: 10px;
 }
+#window .page .body .subbody .link_return:hover,
+#window .page .body .subbody .link_next:hover,
+#window .page .body .subbody .link_pre:hover {
+    color: #CACACA;
+}
 #window .page .body .subbody .link_top,
 #window .page .body .subbody .link_permalink {
     margin-bottom: 16px;
@@ -1004,22 +1009,77 @@ html {
     position: relative;
 }
 #window .page .body .subbody .link_return,
-#window .page .body .subbody .link_next,
-#window .page .body .subbody .link_prev {
+#window .page .body .subbody .link_prev,
+#window .page .body .subbody .link_next {
     display: inline-block;
     vertical-align: middle;
     line-height: 19px;
 }
-#window .page .body .subbody .link_next,
-#window .page .body .subbody .link_prev {
-    position: absolute;
-}
+#window .page .body .subbody .link_prev,
 #window .page .body .subbody .link_next {
-    right: 0;
+    position: absolute;
+    top: -5px;
+}
+#window .page .body .subbody .link_prev,
+#window .page .body .subbody .link_next,
+#window .page .body .subbody .link_prev:hover,
+#window .page .body .subbody .link_next:hover {
+    text-decoration: none;
 }
 #window .page .body .subbody .link_prev {
     left: 0;
 }
+#window .page .body .subbody .link_next {
+    right: 0;
+}
+#window .page .body .subbody .link_prev:before,
+#window .page .body .subbody .link_next:after {
+    content: " ";
+    color: #696969;
+    font-size: 24px;
+    line-height: 19px;
+    vertical-align: baseline;
+    display: inline-block;
+    position: relative;
+    top: -6px;
+    margin: 0;
+}
+#window .page .body .subbody .link_prev:hover:before,
+#window .page .body .subbody .link_next:hover:after {
+    color: #CACACA;
+}
+#window .page .body .subbody .link_prev:before {
+    content: "\0ab";
+    margin: 0 3px 0 0;
+}
+#window .page .body .subbody .link_next:after {
+    content: "\0bb";
+}
+
+#window .page .subbody .link_nav .float_link,
+#window .page .subbody .link_nav .float.link {
+    position: relative;
+    display: inline-block;
+    float: none;
+}
+#window .page .subbody .link_nav .float_link .sprite,
+#window .page .subbody .link_nav .float.link .sprite {
+    height: 20px;
+    width: 20px;
+}
+#window .page .subbody .link_nav .float.link .sprite.size40 img {
+    margin-top: -5px;
+    margin-left: -5px;
+    width: 30px;
+    height: 30px;
+}
+#window .page .subbody .link_nav .float.link .sprite.size80 img {
+    margin-top: -20px;
+    margin-left: -20px;
+    width: 60px;
+    height: 60px;
+}
+
 
 #window .page .body .subwrap {
     display: block;

@@ -51,6 +51,7 @@ foreach ($mmrpg_database_players AS $temp_token => $temp_info){
 // Loop through the database and generate the links for these players
 $key_counter = 0;
 $mmrpg_database_players_links = '';
+$mmrpg_database_players_links_index = array();
 $mmrpg_database_players_links .= '<div class="float link group" data-game="MM00">';
 $mmrpg_database_players_links_counter = 0;
 $mmrpg_database_players_count_complete = 0;
@@ -88,7 +89,9 @@ foreach ($mmrpg_database_players AS $player_key => $player_info){
     </div>
     <?php
     if ($player_flag_complete){ $mmrpg_database_players_count_complete++; }
-    $mmrpg_database_players_links .= ob_get_clean();
+    $temp_markup = ob_get_clean();
+    $mmrpg_database_players_links_index[$player_key] = $temp_markup;
+    $mmrpg_database_players_links .= $temp_markup;
     $mmrpg_database_players_links_counter++;
     $key_counter++;
 
