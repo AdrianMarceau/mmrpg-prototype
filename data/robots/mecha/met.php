@@ -9,7 +9,6 @@ $robot = array(
     'robot_image_editor' => 412,
     'robot_core' => '',
     'robot_field' => 'intro-field',
-    'robot_field2' => array('light-laboratory', 'wily-castle', 'cossack-citadel'),
     'robot_description' => 'Hard Helmet Mecha',
     'robot_energy' => 100,
     'robot_attack' => 100,

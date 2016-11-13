@@ -227,6 +227,13 @@ body:before {
         margin-top: 0;
     }
 
+    #window .page .database_container .subbody .body table td.music a > span:first-child {
+        padding: 0 3px;
+    }
+    #window .page .database_container .subbody .body table td.music a > span:last-child {
+        display: none;
+    }
+
 
 }
 
@@ -362,13 +369,6 @@ body:before {
         clear: left;
         text-align: center;
     }
-    #window .page .database_container .subbody .body table.full.extras .music .field_type {
-        max-width: 74%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        display: inline-block;
-    }
     #window .page .database_container .subbody .body table.full.quotes .player_quote,
     #window .page .database_container .subbody .body table.full.quotes .robot_quote,
     #window .page .database_container .subbody .body table.full.records .player_record,
@@ -396,6 +396,10 @@ body:before {
     #window .page .event .ability_container .ability_name .label {
         width: 75%;
         width: calc(100% - 42px);
+    }
+    #window .page .event .ability_container .ability_class_mecha .label,
+    #window .page .event .ability_container .ability_class_boss .label {
+        width: 98%;
     }
 
     #window .page .event .image_link_container {
@@ -455,7 +459,7 @@ body:before {
         max-width: 300px;
     }
     #window .page .iconwrap.preview .type_block {
-        width: 62px;
+        width: 28%;
     }
 
 }
@@ -712,11 +716,11 @@ body:before {
         margin-right: 4px !important;
         margin-bottom: 4px !important;
     }
-    #window .page .subbody[data-class="abilities"] .float.link .sprite {
+    #window .subbody[data-class="abilities"] div:not(.link_nav) .float.link .sprite {
         width: 26px;
     }
-    #window .page .subbody[data-class="abilities"] .float.link .sprite.size40 span,
-    #window .page .subbody[data-class="abilities"] .float.link .sprite.size40 img {
+    #window .subbody[data-class="abilities"] div:not(.link_nav) .float.link .size40 span,
+    #window .subbody[data-class="abilities"] div:not(.link_nav) .float.link .size40 img {
         margin-left: -7px;
     }
 
@@ -802,6 +806,13 @@ body:before {
         padding: 10px;
     }
 
+    #window .page .database_container .subbody .body table.types td[data-count="4"] a:not(:first-of-type) > span:first-child {
+        padding: 0 3px;
+    }
+    #window .page .database_container .subbody .body table.types td[data-count="4"] a:not(:first-of-type) > span:last-child {
+        display: none;
+    }
+
     #window .page .event .player_quote,
     #window .page .event .robot_quote {
         float: none;
@@ -812,9 +823,7 @@ body:before {
         line-height: 25px;
     }
 
-    #window .page_database .type_block {
-        width: 45%;
-    }
+    #window .page .event table td.right
 
     #window .page .database_container .subbody .link_top {
         font-size: 10px;
@@ -919,7 +928,8 @@ body:before {
     #window .page .event .section_tabs {
         font-size: 13px;
         line-height: 16px;
-        padding: 6px 0 0;
+        padding: 12px 0 6px;
+        margin-bottom: 6px;
     }
     #window .page .event .section_tabs .link_inline {
         display: inline-block;
@@ -927,11 +937,18 @@ body:before {
         margin: 0 1% 6px 0;
         width: 32%;
         background-color: #282828;
-        border: 1px solid #212121;
+        border: 1px solid #303030;
         -moz-border-radius: 3px;
         -webkit-border-radius: 3px;
         border-radius: 3px;
         box-sizing: border-box;
+        background-image: -moz-linear-gradient(top,  rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.05) 100%); /* FF3.6+ */
+        background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.05)), color-stop(100%,rgba(0,0,0,0.05))); /* Chrome,Safari4+ */
+        background-image: -webkit-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* Chrome10+,Safari5.1+ */
+        background-image: -o-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* Opera 11.10+ */
+        background-image: -ms-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* IE10+ */
+        background-image: linear-gradient(to bottom,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.05) 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ); /* IE6-9 */
     }
     #window .page .event .section_tabs .link_inline:after {
         display: none;

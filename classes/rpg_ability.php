@@ -1364,6 +1364,7 @@ class rpg_ability extends rpg_object {
             if (!isset($print_options['show_basics'])){ $print_options['show_basics'] = true; }
             if (!isset($print_options['show_icon'])){ $print_options['show_icon'] = true; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = true; }
+            if (!isset($print_options['show_description'])){ $print_options['show_description'] = true; }
             if (!isset($print_options['show_robots'])){ $print_options['show_robots'] = true; }
             if (!isset($print_options['show_records'])){ $print_options['show_records'] = true; }
             if (!isset($print_options['show_footer'])){ $print_options['show_footer'] = true; }
@@ -1372,6 +1373,7 @@ class rpg_ability extends rpg_object {
             if (!isset($print_options['show_basics'])){ $print_options['show_basics'] = true; }
             if (!isset($print_options['show_icon'])){ $print_options['show_icon'] = true; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = false; }
+            if (!isset($print_options['show_description'])){ $print_options['show_description'] = true; }
             if (!isset($print_options['show_robots'])){ $print_options['show_robots'] = false; }
             if (!isset($print_options['show_records'])){ $print_options['show_records'] = false; }
             if (!isset($print_options['show_footer'])){ $print_options['show_footer'] = true; }
@@ -1380,6 +1382,7 @@ class rpg_ability extends rpg_object {
             if (!isset($print_options['show_basics'])){ $print_options['show_basics'] = true; }
             if (!isset($print_options['show_icon'])){ $print_options['show_icon'] = false; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = false; }
+            if (!isset($print_options['show_description'])){ $print_options['show_description'] = true; }
             if (!isset($print_options['show_robots'])){ $print_options['show_robots'] = false; }
             if (!isset($print_options['show_records'])){ $print_options['show_records'] = false; }
             if (!isset($print_options['show_footer'])){ $print_options['show_footer'] = false; }
@@ -1447,7 +1450,7 @@ class rpg_ability extends rpg_object {
                         <? if($print_options['layout_style'] == 'website_compact'): ?>
                             <a href="<?= 'database/abilities/'.$ability_info['ability_token'].'/' ?>"><?= $ability_info['ability_name'] ?></a>
                         <? else: ?>
-                            <?= $ability_info['ability_name'] ?>&#39;s Data
+                            <?= $ability_info['ability_name'] ?>
                         <? endif; ?>
                         <? if ($print_options['layout_style'] != 'event'){ ?>
                             <? if (!empty($ability_info['ability_type_special'])){ ?>
@@ -1475,7 +1478,7 @@ class rpg_ability extends rpg_object {
                                     <td class="right">
                                         <label style="display: block; float: left;">Type :</label>
                                         <? if($print_options['layout_style'] != 'event'): ?>
-                                            <?php
+                                            <?
                                             if (!empty($ability_info['ability_type_special'])){
                                                 echo '<a href="database/abilities/'.$ability_info['ability_type_special'].'/" class="ability_type '.$ability_header_types.'">'.ucfirst($ability_info['ability_type_special']).'</a>';
                                             }
@@ -1493,7 +1496,7 @@ class rpg_ability extends rpg_object {
                                             }
                                             ?>
                                         <? else: ?>
-                                            <?php
+                                            <?
                                             if (!empty($ability_info['ability_type_special'])){
                                                 echo '<span class="ability_type '.$ability_header_types.'">'.ucfirst($ability_info['ability_type_special']).'</span>';
                                             }
@@ -1585,7 +1588,7 @@ class rpg_ability extends rpg_object {
                                 <tbody>
                                     <tr>
                                         <td class="right">
-                                            <div class="ability_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?php
+                                            <div class="ability_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?
                                             // Define the search/replace pairs for the description
                                             $temp_find = array('{DAMAGE}', '{RECOVERY}', '{DAMAGE2}', '{RECOVERY2}', '{}');
                                             $temp_replace = array(
@@ -1607,9 +1610,36 @@ class rpg_ability extends rpg_object {
 
                 <? endif; ?>
 
+                <? if ($print_options['layout_style'] == 'website'): ?>
+
+                    <?
+                    // Define the various tabs we are able to scroll to
+                    $section_tabs = array();
+                    //if ($print_options['show_description']){ $section_tabs[] = array('description', 'Description', false); }
+                    if ($print_options['show_sprites']){ $section_tabs[] = array('sprites', 'Sprites', false); }
+                    if ($print_options['show_robots']){ $section_tabs[] = array('robots', 'Robots', false); }
+                    //if ($print_options['show_records']){ $section_tabs[] = array('records', 'Records', false); }
+                    // Automatically mark the first element as true or active
+                    $section_tabs[0][2] = true;
+                    // Define the current URL for this ability page
+                    $temp_url = 'database/abilities/';
+                    $temp_url .= $ability_info['ability_token'].'/';
+                    ?>
+
+                    <div id="tabs" class="section_tabs">
+                        <?
+                        foreach($section_tabs AS $tab){
+                            echo '<a class="link_inline link_'.$tab[0].'" href="'.$temp_url.'#'.$tab[0].'" data-anchor="#'.$tab[0].'"><span class="wrap">'.$tab[1].'</span></a>';
+                        }
+                        ?>
+                    </div>
+
+                <? endif; ?>
+
+
                 <? if($print_options['show_sprites'] && (!isset($ability_info['ability_image_sheets']) || $ability_info['ability_image_sheets'] !== 0) && $ability_image_token != 'ability' ): ?>
 
-                    <?php
+                    <?
                     // Start the output buffer and prepare to collect sprites
                     ob_start();
 
@@ -1692,9 +1722,9 @@ class rpg_ability extends rpg_object {
                     ?>
 
                     <h2 id="sprites" class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
-                        <?= $ability_info['ability_name']?>&#39;s Sprites
+                        Sprite Sheets
                         <span class="header_links image_link_container">
-                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?php
+                            <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?
                                 // Loop though and print links for the alts
                                 foreach ($temp_alts_array AS $alt_key => $alt_info){
                                     $alt_type = '';
@@ -1718,7 +1748,7 @@ class rpg_ability extends rpg_object {
                                 }
                                 ?></span>
                             <span class="pipe" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>">|</span>
-                            <span class="directions"><?php
+                            <span class="directions"><?
                                 // Loop though and print links for the alts
                                 foreach (array('right', 'left') AS $temp_key => $temp_direction){
                                     echo '<a href="#" data-tooltip="'.ucfirst($temp_direction).' Facing Sprites" class="link link_direction '.($temp_key == 0 ? 'link_active' : '').'" data-direction="'.$temp_direction.'">';
@@ -1732,7 +1762,7 @@ class rpg_ability extends rpg_object {
                         <div class="grid">
                             <?= $this_sprite_markup ?>
                         </div>
-                        <?php
+                        <?
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
                         if (!empty($ability_info['ability_image_editor'])){
@@ -1746,12 +1776,18 @@ class rpg_ability extends rpg_object {
                         <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span class="pipe"> | </span> Original Artwork by <strong>Capcom</strong></p>
                     </div>
 
+                    <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <?php endif; ?>
+
                 <? endif; ?>
 
                 <? if($print_options['show_robots']): ?>
 
-                    <h2 class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left;">
-                        <?= $ability_info['ability_name']?>&#39;s Robots
+                    <h2 id="robots" class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left;">
+                        Robot Compatibility
                     </h2>
                     <div class="body body_full solid" style="margin: 0 auto 4px; padding: 2px 3px; min-height: 10px;">
                         <table class="full robots" style="margin: 5px auto 10px;">
@@ -1762,7 +1798,7 @@ class rpg_ability extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <div class="robot_container">
-                                        <?php
+                                        <?
 
                                         // Collect the full robot index to loop through
                                         $ability_type_one = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : false;
@@ -1936,7 +1972,7 @@ class rpg_ability extends rpg_object {
 
             </div>
         </div>
-        <?php
+        <?
         // Collect the outbut buffer contents
         $this_markup = trim(ob_get_clean());
 
