@@ -1061,7 +1061,7 @@ class rpg_field extends rpg_object {
                         <? if($print_options['layout_style'] == 'website_compact'): ?>
                             <a href="database/fields/<?= $field_info['field_token'] ?>/"><?= $field_info['field_name'] ?></a>
                         <? else: ?>
-                            <?= $field_info['field_name'].(!preg_match('/s$/i', $field_info['field_name']) ? '&#39;s' : '&#39;') ?> Data
+                            <?= $field_info['field_name'] ?>
                         <? endif; ?>
                         <? if (!empty($field_info['field_type'])): ?>
                             <span class="header_core ability_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($field_info['field_type']) ?> Type</span>
@@ -1111,15 +1111,27 @@ class rpg_field extends rpg_object {
                         <table class="full extras">
                             <tbody>
                                 <tr>
-                                    <td class="right music">
+                                    <td class="right music" data-count="<?= count($field_info['field_music_link']) ?>">
                                         <label style="display: block; float: left;">Music :</label>
                                         <? if(!empty($field_info['field_music_name']) && !empty($field_info['field_music_link'])): ?>
+                                            <?
+                                            // Break up the field name for responsive styles
+                                            $name = $field_info['field_music_name'];
+                                            if (strstr('(', $name)){
+                                                $name1 = $name;
+                                                $name2 = '';
+                                            } else {
+                                                list($name1, $name2) = explode(' (', trim($field_info['field_music_name'], ')'));
+                                                $name1 = '<span>'.$name1.'</span>';
+                                                $name2 = '<span> ('.$name2.')</span>';
+                                            }
+                                            ?>
                                             <? if(is_array($field_info['field_music_link'])):?>
                                                 <? foreach($field_info['field_music_link'] AS $key => $link): ?>
-                                                    <a href="<?= $link ?>" target="_blank" class="field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><?= $key == 0 ? $field_info['field_music_name'] : $key + 1 ?></a>
+                                                    <a href="<?= $link ?>" target="_blank" class="field_type field_type_none"><?= $key == 0 ? $name1.$name2 : $key + 1 ?></a>
                                                 <? endforeach; ?>
                                             <? else: ?>
-                                                <a href="<?= $field_info['field_music_link'] ?>" target="_blank" class="field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><?= $field_info['field_music_name'] ?></a>
+                                                <a href="<?= $field_info['field_music_link'] ?>" target="_blank" class="field_type field_type_none"><?= $name1.$name2 ?></a>
                                             <? endif; ?>
                                         <? else: ?>
                                             <span class="field_type">???</span>
@@ -1216,11 +1228,36 @@ class rpg_field extends rpg_object {
 
                 <? endif; ?>
 
+                <? if($print_options['layout_style'] == 'website'): ?>
+
+                    <?
+                    // Define the various tabs we are able to scroll to
+                    $section_tabs = array();
+                    if ($print_options['show_sprites']){ $section_tabs[] = array('sprites', 'Sprites', false); }
+                    if ($print_options['show_description']){ $section_tabs[] = array('description', 'Description', false); }
+                    //if ($print_options['show_records']){ $section_tabs[] = array('records', 'Records', false); }
+                    // Automatically mark the first element as true or active
+                    $section_tabs[0][2] = true;
+                    // Define the current URL for this field page
+                    $temp_url = 'database/fields/';
+                    $temp_url .= $field_info['field_token'].'/';
+                    ?>
+
+                    <div id="tabs" class="section_tabs">
+                        <?
+                        foreach($section_tabs AS $tab){
+                            echo '<a class="link_inline link_'.$tab[0].'" href="'.$temp_url.'#'.$tab[0].'" data-anchor="#'.$tab[0].'"><span class="wrap">'.$tab[1].'</span></a>';
+                        }
+                        ?>
+                    </div>
+
+                <? endif; ?>
+
 
                 <? if($print_options['show_sprites'] && $field_image_token != 'field'): ?>
 
-                    <h2 class="header header_full field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
-                        <?= $field_info['field_name'].(!preg_match('/s$/i', $field_info['field_name']) ? '&#39;s' : '&#39;') ?> Sprites
+                    <h2 id="sprites" class="header header_full field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
+                        Sprite Sheets
                     </h2>
                     <div class="body body_full solid" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 4px; min-height: 10px;">
                         <div id="sprite_container" style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #191919 none scroll repeat -10px -30px; overflow: hidden; padding: 0; margin-bottom: 10px;">
@@ -1264,8 +1301,8 @@ class rpg_field extends rpg_object {
 
                 <? if($print_options['show_description'] && !empty($field_info['field_description2'])): ?>
 
-                    <h2 class="header field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
-                        <?= $field_info['field_name'] ?>&#39;s Description
+                    <h2 id="description" class="header field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
+                        Description Text
                     </h2>
                     <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 0 0 2px; min-height: 10px;">
                         <table class="full description">

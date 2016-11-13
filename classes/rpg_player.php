@@ -2052,26 +2052,26 @@ class rpg_player extends rpg_object {
             <a class="anchor" id="<?= $player_info['player_token']?>">&nbsp;</a>
             <div class="subbody event event_triple event_visible" data-token="<?= $player_info['player_token']?>" style="<?= $print_options['layout_style'] == 'website_compact' ? 'margin-bottom: 2px !important;' : '' ?>">
 
-                <?php if($print_options['show_mugshot']): ?>
+                <? if($print_options['show_mugshot']): ?>
                     <div class="this_sprite sprite_left" style="height: 40px;">
-                        <?php if($print_options['show_key'] !== false): ?>
+                        <? if($print_options['show_key'] !== false): ?>
                             <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$player_info['player_key'] ?></div>
-                        <?php endif; ?>
+                        <? endif; ?>
                         <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>"><div style="background-image: url(images/players/<?= $player_image_token ?>/mug_right_<?= $player_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_player sprite_40x40 sprite_40x40_mug sprite_size_<?= $player_image_size_text ?> sprite_size_<?= $player_image_size_text ?>_mug player_status_active player_position_active"><?= $player_info['player_name']?>'s Mugshot</div></div>
                     </div>
-                <?php endif; ?>
+                <? endif; ?>
 
 
-                <?php if($print_options['show_basics']): ?>
+                <? if($print_options['show_basics']): ?>
                     <h2 class="header header_left player_type_<?= $player_type_token ?>" style="margin-right: 0;">
-                        <?php if($print_options['layout_style'] == 'website_compact'): ?>
+                        <? if($print_options['layout_style'] == 'website_compact'): ?>
                             <a href="database/players/<?= $player_info['player_token'] ?>/"><?= $player_info['player_name'] ?></a>
-                        <?php else: ?>
-                            <?= $player_info['player_name'] ?>&#39;s Data
-                        <?php endif; ?>
-                        <?php if (!empty($player_info['player_type'])): ?>
+                        <? else: ?>
+                            <?= $player_info['player_name'] ?>
+                        <? endif; ?>
+                        <? if (!empty($player_info['player_type'])): ?>
                             <span class="header_core ability_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($player_info['player_type']) ?> Type</span>
-                        <?php endif; ?>
+                        <? endif; ?>
                     </h2>
 
                     <div class="body body_left" style="margin-right: 0; padding: 0 0 2px;">
@@ -2092,7 +2092,7 @@ class rpg_player extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <label style="display: block; float: left;">Bonus :</label>
-                                        <?php
+                                        <?
                                             // Display any special boosts this player has
                                             if (!empty($player_info['player_energy'])){ echo '<span class="player_name player_type player_type_energy">Robot Energy +'.$player_info['player_energy'].'%</span>'; }
                                             elseif (!empty($player_info['player_attack'])){ echo '<span class="player_name player_type player_type_attack">Robot Attack +'.$player_info['player_attack'].'%</span>'; }
@@ -2106,38 +2106,38 @@ class rpg_player extends rpg_object {
                         </table>
 
                     </div>
-                <?php endif; ?>
+                <? endif; ?>
 
-                <?php if($print_options['layout_style'] == 'website'): ?>
+                <? if($print_options['layout_style'] == 'website'): ?>
 
-                    <?php
+                    <?
                     // Define the various tabs we are able to scroll to
                     $section_tabs = array();
                     if ($print_options['show_sprites']){ $section_tabs[] = array('sprites', 'Sprites', false); }
-                    if ($print_options['show_quotes']){ $section_tabs[] = array('quotes', 'Quotes', false); }
                     if ($print_options['show_description']){ $section_tabs[] = array('description', 'Description', false); }
+                    if ($print_options['show_quotes']){ $section_tabs[] = array('quotes', 'Quotes', false); }
                     if ($print_options['show_abilities']){ $section_tabs[] = array('abilities', 'Abilities', false); }
                     //if ($print_options['show_records']){ $section_tabs[] = array('records', 'Records', false); }
                     // Automatically mark the first element as true or active
                     $section_tabs[0][2] = true;
-                    // Define the current URL for this player or mecha page
+                    // Define the current URL for this player page
                     $temp_url = 'database/players/';
                     $temp_url .= $player_info['player_token'].'/';
                     ?>
 
                     <div id="tabs" class="section_tabs">
-                        <?php
+                        <?
                         foreach($section_tabs AS $tab){
                             echo '<a class="link_inline link_'.$tab[0].'" href="'.$temp_url.'#'.$tab[0].'" data-anchor="#'.$tab[0].'"><span class="wrap">'.$tab[1].'</span></a>';
                         }
                         ?>
                     </div>
 
-                <?php endif; ?>
+                <? endif; ?>
 
-                <?php if($print_options['show_sprites'] && (!isset($player_info['player_image_sheets']) || $player_info['player_image_sheets'] !== 0) && $player_image_token != 'player' ): ?>
+                <? if($print_options['show_sprites'] && (!isset($player_info['player_image_sheets']) || $player_info['player_image_sheets'] !== 0) && $player_image_token != 'player' ): ?>
 
-                    <?php
+                    <?
                     // Start the output buffer and prepare to collect sprites
                     ob_start();
 
@@ -2215,9 +2215,9 @@ class rpg_player extends rpg_object {
                     ?>
 
                     <h2 id="sprites" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
-                        <?= $player_info['player_name']?>&#39;s Sprites
+                        Sprite Sheets
                         <span class="header_links image_link_container">
-                            <span class="images" style="<?= count($temp_alts_array) >= 1 ? 'display: none;' : '' ?>"><?php
+                            <span class="images" style="<?= count($temp_alts_array) >= 1 ? 'display: none;' : '' ?>"><?
                                 // Loop though and print links for the alts
                                 foreach ($temp_alts_array AS $alt_key => $alt_info){
                                     $alt_type = '';
@@ -2241,7 +2241,7 @@ class rpg_player extends rpg_object {
                                 }
                                 ?></span>
                             <span class="pipe" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>">|</span>
-                            <span class="directions"><?php
+                            <span class="directions"><?
                                 // Loop though and print links for the alts
                                 foreach (array('right', 'left') AS $temp_key => $temp_direction){
                                     echo '<a href="#" data-tooltip="'.ucfirst($temp_direction).' Facing Sprites" class="link link_direction '.($temp_key == 0 ? 'link_active' : '').'" data-direction="'.$temp_direction.'">';
@@ -2256,7 +2256,7 @@ class rpg_player extends rpg_object {
                         <div class="grid">
                             <?= $this_sprite_markup ?>
                         </div>
-                        <?php
+                        <?
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
                         if (!empty($player_info['player_image_editor'])){
@@ -2270,21 +2270,49 @@ class rpg_player extends rpg_object {
                         <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span class="pipe"> | </span> Original Artwork by <strong>Capcom</strong></p>
                     </div>
 
-                    <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                    <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
                         <div class="link_wrapper">
                             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
                         </div>
-                    <?php endif; ?>
+                    <? endif; ?>
 
-                <?php endif; ?>
+                <? endif; ?>
 
-                <?php if ($print_options['show_quotes'] && $print_options['layout_style'] == 'website'): ?>
+                <? if($print_options['show_description'] && !empty($player_info['player_description2'])): ?>
+
+                    <h2 id="description" class="header player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
+                        Description Text
+                    </h2>
+                    <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 0 0 2px; min-height: 10px;">
+                        <table class="full description">
+                            <colgroup>
+                                <col width="100%" />
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td class="right">
+                                        <div class="player_description" style="text-align: justify; padding: 0 4px;"><?= $player_info['player_description2'] ?></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <? endif; ?>
+
+                <? endif; ?>
+
+                <? if ($print_options['show_quotes'] && $print_options['layout_style'] == 'website'): ?>
 
                     <h2 id="quotes" class="header player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
-                        <?= $player_info['player_name'] ?>&#39;s Quotes
+                        Battle Quotes
                     </h2>
                     <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 2px 0; min-height: 10px;">
-                        <?php
+                        <?
                         // Define the search and replace arrays for the player quotes
                         $temp_find = array('{this_player}', '{this_player}', '{target_player}', '{target_player}');
                         $temp_replace = array('Doctor', $player_info['player_name'], 'Doctor', 'Robot');
@@ -2322,45 +2350,17 @@ class rpg_player extends rpg_object {
                         </table>
                     </div>
 
-                    <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                    <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
                         <div class="link_wrapper">
                             <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
                         </div>
-                    <?php endif; ?>
+                    <? endif; ?>
 
-                <?php endif; ?>
-
-                <?php if($print_options['show_description'] && !empty($player_info['player_description2'])): ?>
-
-                    <h2 id="description" class="header player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
-                        <?= $player_info['player_name'] ?>&#39;s Description
-                    </h2>
-                    <div class="body body_left" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 0 0 2px; min-height: 10px;">
-                        <table class="full description">
-                            <colgroup>
-                                <col width="100%" />
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <td class="right">
-                                        <div class="player_description" style="text-align: justify; padding: 0 4px;"><?= $player_info['player_description2'] ?></div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
-                        <div class="link_wrapper">
-                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
-                        </div>
-                    <?php endif; ?>
-
-                <?php endif; ?>
+                <? endif; ?>
 
                 <? if($print_options['show_abilities']): ?>
                     <h2 id="abilities" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left;">
-                        <?=$player_info['player_name']?>&#39;s Abilities
+                        Ability Rewards
                     </h2>
                     <div class="body body_full solid" style="margin: 0; padding: 2px 3px; min-height: 10px;">
                         <table class="full abilities" style="margin: 5px auto 10px;">
@@ -2491,19 +2491,19 @@ class rpg_player extends rpg_object {
 
                 <? endif; ?>
 
-                <?php if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
 
-                <?php elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
+                <? elseif($print_options['show_footer'] && $print_options['layout_style'] == 'website_compact'): ?>
 
                     <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
 
-                <?php endif; ?>
+                <? endif; ?>
 
             </div>
         </div>
-        <?php
+        <?
         // Collect the outbut buffer contents
         $this_markup = trim(ob_get_clean());
         // Return the generated markup
