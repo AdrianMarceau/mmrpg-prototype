@@ -27,7 +27,7 @@ $this_graph_data['description'] = 'The item database contains detailed informati
 
 // Define the MARKUP variables for this page
 $this_markup_header = 'Mega Man RPG Prototype Item Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_items_links_counter) ? ($mmrpg_database_items_links_counter == 1 ? '1 Item' : $mmrpg_database_items_links_counter.' Items') : '0 Items').' )</span>';
+//$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_items_links_counter) ? ($mmrpg_database_items_links_counter == 1 ? '1 Item' : $mmrpg_database_items_links_counter.' Items') : '0 Items').' )</span>';
 
 // If a specific item has NOT been defined, show the quick-switcher
 reset($mmrpg_database_items);
@@ -64,8 +64,6 @@ if (!empty($this_current_token)){
             $this_seo_title_backup = $this_seo_title;
             $this_seo_title = $item_info['item_name'].' | '.$this_seo_title;
             $this_seo_description = $this_temp_description.'  '.$item_info['item_description'].'  '.$this_seo_description;
-            // Update the markup header with the robot
-            $this_markup_header = '<span class="hideme">'.$item_info['item_name'].' | </span>'.$this_markup_header;
             // Define the Open Graph variables for this page
             $this_graph_data['title'] .= ' | '.$item_info['item_name'];
             $this_graph_data['description'] = $this_temp_description.'  '.$item_info['item_description'].'  '.$this_graph_data['description'];

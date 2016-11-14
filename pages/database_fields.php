@@ -27,7 +27,7 @@ $this_graph_data['description'] = 'The field database contains detailed informat
 
 // Define the MARKUP variables for this page
 $this_markup_header = 'Mega Man RPG Prototype Field Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_fields_links_counter) ? ($mmrpg_database_fields_links_counter == 1 ? '1 Field' : $mmrpg_database_fields_links_counter.' Fields') : '0 Fields').' )</span>';
+//$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_fields_links_counter) ? ($mmrpg_database_fields_links_counter == 1 ? '1 Field' : $mmrpg_database_fields_links_counter.' Fields') : '0 Fields').' )</span>';
 
 // If a specific field has NOT been defined, show the quick-switcher
 reset($mmrpg_database_fields);
@@ -56,8 +56,6 @@ if (!empty($this_current_token)){
             $this_seo_title_backup = $this_seo_title;
             $this_seo_title = $field_info['field_name'].' | '.$this_seo_title;
             $this_seo_description = $field_info['field_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_seo_description;
-            // Update the markup header with the robot
-            $this_markup_header = '<span class="hideme">'.$field_info['field_name'].' | </span>'.$this_markup_header;
             // Define the Open Graph variables for this page
             $this_graph_data['title'] .= ' | '.$field_info['field_name'];
             $this_graph_data['description'] = $field_info['field_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_graph_data['description'];

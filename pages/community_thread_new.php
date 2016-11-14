@@ -18,8 +18,8 @@ if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
 // Update the SEO variables for this page
 $this_seo_title = (!empty($_REQUEST['thread_id']) ? 'Edit' : 'New').' Discussion | '.$this_category_info['category_name'].' | '.$this_seo_title;
 
-// Update the MARKUP variables for this page
-//$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
+// Define the MARKUP variables for this page
+$this_markup_header = 'Mega Man RPG Prototype '.$this_category_info['category_name'];
 
 //die('<pre>'.print_r($this_thread_info, true).'</pre>');
 

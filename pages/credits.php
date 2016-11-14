@@ -14,7 +14,7 @@ $this_graph_data['description'] = 'The Mega Man RPG Prototype was created and is
 //$this_graph_data['type'] = 'website';
 
 // Define the MARKUP variables for this page
-$this_markup_header = 'Mega Man RPG Prototype Credits';
+$this_markup_header = 'Mega Man RPG Prototype Credits & Contributors';
 
 // Collect user data for all contributors in the database
 $contributor_ids = array(

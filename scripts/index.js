@@ -103,6 +103,7 @@ $(document).ready(function(){
     // Capture any header objects and move them around the document for better visual understanding
     if ($('.page', thisIndex).length){
 
+        /*
         // Find any counter and move them to the header area visually
         if ($('.count_header', thisIndex).length){
             var tempHeader = $('h1.header', thisIndex);
@@ -111,6 +112,7 @@ $(document).ready(function(){
             }
         // Find any hideme classes in the headers and... hide them
         $('.header', thisIndex).find('.hideme').css({display:'none'});
+        */
 
         // Find any link-blocks and ensure clicking anywhere in them leads to the link
         /*

@@ -133,6 +133,9 @@ body.index #header {
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
     border-radius: 0.3em;
+    -webkit-box-decoration-break: clone;
+    -o-box-decoration-break: clone;
+    box-decoration-break: clone;
 }
 #mmrpg .tooltip .typelist .title {
     display: block;
@@ -435,13 +438,14 @@ body.index #header {
     cursor: pointer;
 }
 
-
+#mmrpg .player_type,
+#mmrpg .robot_type,
+#mmrpg .mecha_type,
+#mmrpg .boss_type,
 #mmrpg .ability_type,
 #mmrpg .item_type,
 #mmrpg .battle_type,
-#mmrpg .field_type,
-#mmrpg .player_type,
-#mmrpg .robot_type {
+#mmrpg .field_type {
     border-color: #464646 !important;
     background-color: #414141 !important;
     background-image: -moz-linear-gradient(top,  rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.05) 100%); /* FF3.6+ */
@@ -453,6 +457,9 @@ body.index #header {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ); /* IE6-9 */
     position: relative;
     background-repeat: no-repeat !important;
+    -webkit-box-decoration-break: clone;
+    -o-box-decoration-break: clone;
+    box-decoration-break: clone;
 }
 #mmrpg .item_type a,
 #mmrpg .ability_type a,
@@ -1599,6 +1606,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -webkit-border-radius: 0.3em;
     white-space: nowrap;
     font-weight: normal;
+    -webkit-box-decoration-break: clone;
+    -o-box-decoration-break: clone;
+    box-decoration-break: clone;
 }
 
 
@@ -2338,6 +2348,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     border-radius: 0.5em;
     -moz-border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
+    -webkit-box-decoration-break: clone;
+    -o-box-decoration-break: clone;
+    box-decoration-break: clone;
     line-height: 11px;
     font-weight: bold;
     white-space: nowrap;

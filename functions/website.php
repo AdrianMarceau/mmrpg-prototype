@@ -559,6 +559,130 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
 
 }
 
+// Define a function for selecting a list of threads in a category
+function mmrpg_website_community_category_threads_count($this_category_info, $filter_locked = false, $filter_recent = false, $filter_ids = array()){
+
+    // Pull in global variables
+    global $db, $this_userinfo;
+
+    // Collect the recently updated posts for this player / guest
+    if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $temp_last_login = $this_userinfo['user_backup_login']; }
+    else { $temp_last_login = time() - MMRPG_SETTINGS_UPDATE_TIMEOUT; }
+
+    // Define the ORDER BY string based on category key
+    if ($this_category_info['category_token'] != 'news'){ $temp_order_by = 'threads.thread_sticky DESC, threads.thread_mod_date DESC, threads.thread_date DESC'; }
+    else { $temp_order_by = 'threads.thread_sticky DESC, threads.thread_date DESC'; }
+
+    // Define the extra WHERE string based on arguments
+    $temp_where_filter = array();
+
+    // Append to where query if locked threads should be excluded
+    if ($filter_locked == true){
+        $temp_where_filter[] = "threads.thread_locked = 0";
+    }
+    // Append to where query if filtering by recent threads only
+    if ($filter_recent == true){
+        $temp_where_filter[] = "threads.thread_mod_date > {$temp_last_login}";
+        $temp_where_filter[] = "threads.thread_mod_user <> {$this_userinfo['user_id']}";
+    }
+    // Append to where query if a list of filter IDs has been provided
+    if (!empty($filter_ids)){
+        $temp_where_filter[] = "threads.thread_id NOT IN(".implode(',', $filter_ids).")";
+    }
+    // Append a default to the where query if empty
+    if (empty($temp_where_filter)){
+        $temp_where_filter[] = "1 = 1";
+    }
+
+    // Implode generated where query into a string
+    $temp_where_filter = implode(" AND \n", $temp_where_filter)."\n";
+
+    // Generate the query for collecting discussion threads for a given category
+    $this_threads_query = "SELECT
+
+        COUNT(*) AS thread_count
+
+        FROM mmrpg_threads AS threads
+
+        LEFT JOIN mmrpg_users AS users
+            ON threads.user_id = users.user_id
+
+        LEFT JOIN mmrpg_roles AS roles
+            ON roles.role_id = users.role_id
+
+        LEFT JOIN (
+            SELECT
+            user_id AS mod_user_id,
+            user_name AS mod_user_name,
+            user_name_clean AS mod_user_name_clean,
+            user_name_public AS mod_user_name_public,
+            user_colour_token AS mod_user_colour_token,
+            user_image_path AS mod_user_image_path,
+            user_background_path AS mod_user_background_path
+            FROM mmrpg_users
+            ) AS users2
+            ON threads.thread_mod_user = users2.mod_user_id
+
+        LEFT JOIN (
+            SELECT
+            user_id AS target_user_id,
+            user_name AS target_user_name,
+            user_name_clean AS target_user_name_clean,
+            user_name_public AS target_user_name_public,
+            user_colour_token AS target_user_colour_token,
+            user_image_path AS target_user_image_path,
+            user_background_path AS target_user_background_path
+            FROM mmrpg_users
+            ) AS users3
+            ON threads.thread_target = users3.target_user_id
+
+        LEFT JOIN mmrpg_categories
+            AS categories
+            ON threads.category_id = categories.category_id
+
+        LEFT JOIN (
+            SELECT
+            posts.thread_id,
+            count(*) AS post_count
+            FROM mmrpg_posts AS posts
+            GROUP BY posts.thread_id
+            ) AS posts
+            ON threads.thread_id = posts.thread_id
+
+          LEFT JOIN (
+            SELECT
+            posts2.thread_id,
+            posts2.post_mod,
+            count(*) AS new_post_count
+            FROM mmrpg_posts AS posts2
+            WHERE posts2.post_mod > {$temp_last_login}
+            GROUP BY posts2.thread_id
+            ) AS posts_new
+            ON threads.thread_id = posts_new.thread_id
+
+        WHERE
+            threads.category_id = {$this_category_info['category_id']} AND
+            threads.thread_published = 1 AND
+            (threads.thread_target = 0 OR
+                threads.thread_target = {$this_userinfo['user_id']} OR
+                threads.user_id = {$this_userinfo['user_id']}
+                ) AND
+            {$temp_where_filter}
+
+        ORDER BY
+            threads.thread_locked ASC,
+            {$temp_order_by}
+
+            ;";
+
+    // Collect all the threads for this category from the database
+    $this_threads_array = $db->get_array($this_threads_query);
+
+    // Return the threads array if not empty
+    return !empty($this_threads_array['thread_count']) ? $this_threads_array['thread_count'] : 0;
+
+}
+
 // Define a function for generating a community thread block
 function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread_info, $header_mode = false, $compact_mode = false){
 

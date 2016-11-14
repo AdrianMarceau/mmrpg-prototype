@@ -63,13 +63,15 @@ foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
     if (!empty($temp_info['ability_type'])){
         if (!isset($mmrpg_database_abilities_types[$temp_info['ability_type']])){ $mmrpg_database_abilities_types[$temp_info['ability_type']] = 0; }
         $mmrpg_database_abilities_types[$temp_info['ability_type']]++;
+
+        // Increment the corresponding type2 counter for this ability if not empty
+        if (!empty($temp_info['ability_type2'])){
+            if (!isset($mmrpg_database_abilities_types[$temp_info['ability_type2']])){ $mmrpg_database_abilities_types[$temp_info['ability_type2']] = 0; }
+            $mmrpg_database_abilities_types[$temp_info['ability_type2']]++;
+        }
+
     } else {
         $mmrpg_database_abilities_types['none']++;
-    }
-
-    // Increment the corresponding type2 counter for this ability if not empty
-    if (!empty($temp_info['ability_type2'])){
-        $mmrpg_database_abilities_types[$temp_info['ability_type2']]++;
     }
 
     // Update the main database array with the changes
