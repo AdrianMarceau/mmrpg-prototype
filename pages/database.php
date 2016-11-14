@@ -46,9 +46,13 @@ if ($this_current_sub != 'fields'){
 
 
 // Require the database top include file
-if ($this_current_sub == 'mechas' || $this_current_sub == 'fields'){ define('DATA_DATABASE_SHOW_MECHAS', true); }
-if ($this_current_sub == 'bosses' || $this_current_sub == 'fields'){ define('DATA_DATABASE_SHOW_BOSSES', true); }
-require_once('database/include.php');
+if ($this_current_sub != 'types'){
+    if ($this_current_sub == 'mechas' || $this_current_sub == 'fields'){ define('DATA_DATABASE_SHOW_MECHAS', true); }
+    if ($this_current_sub == 'bosses' || $this_current_sub == 'fields'){ define('DATA_DATABASE_SHOW_BOSSES', true); }
+    require_once('database/include.php');
+} elseif ($this_current_sub == 'types'){
+    require_once('database/types.php');
+}
 
 //die('<pre>'.print_r($_REQUEST, true).'</pre>');
 

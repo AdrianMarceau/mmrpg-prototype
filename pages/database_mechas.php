@@ -28,7 +28,7 @@ $this_graph_data['description'] = 'The mecha database contains detailed informat
 // Define the MARKUP variables for this page
 //$this_markup_header = 'Mega Man RPG Prototype Mecha Database <span class="count">( '.(!empty($mmrpg_database_mechas_count) ? ($mmrpg_database_mechas_count == 1 ? '1 Mecha' : $mmrpg_database_mechas_count.' Mechas') : '0 Mechas').' )';
 $this_markup_header = 'Mega Man RPG Prototype Mecha Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_mechas_links_counter) ? ($mmrpg_database_mechas_links_counter == 1 ? '1 Mecha' : $mmrpg_database_mechas_links_counter.' Mechas') : '0 Mechas').' )</span>';
+//$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_mechas_links_counter) ? ($mmrpg_database_mechas_links_counter == 1 ? '1 Mecha' : $mmrpg_database_mechas_links_counter.' Mechas') : '0 Mechas').' )</span>';
 
 // If a specific mecha has NOT been defined, show the quick-switcher
 reset($mmrpg_database_mechas);
@@ -93,8 +93,6 @@ if (!empty($this_current_token)){
             $this_mecha_image_size = (!empty($mecha_info['robot_image_size']) ? $mecha_info['robot_image_size'] : 40) * 2;
             $this_mecha_image_size_text = $this_mecha_image_size.'x'.$this_mecha_image_size;
             if ($this_mecha_image == 'mecha'){ $this_seo_mechas = 'noindex'; }
-            // Update the markup header with the mecha
-            $this_markup_header = '<span class="hideme">'.$mecha_info['robot_number'].' '.$mecha_info['robot_name'].' | </span>'.$this_markup_header;
             // Check if this is a mecha and prepare extra text
             $mecha_info['robot_name_append'] = '';
             if (!empty($mecha_info['robot_class']) && $mecha_info['robot_class'] == 'mecha'){

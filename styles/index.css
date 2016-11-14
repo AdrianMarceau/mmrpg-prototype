@@ -578,12 +578,12 @@ html {
 
 #window .header {
     display: block;
-    height: 32px;
+    height: auto;
     width: 748px;
     margin: 0 0 6px 0;
-    veritcal-align: top;
+    vertical-align: top;
     font-size: 14px;
-    line-height: 32px;
+    line-height: 18px;
     letter-spacing: 2px;
     text-align: center;
     text-transform: none;
@@ -614,6 +614,10 @@ html {
 }
 #window .header .header_wrapper {
     padding: 0 10px;
+}
+
+#window .header .title {
+    line-height: 32px;
 }
 
 #window .page .body,
@@ -692,7 +696,10 @@ html {
     cursor: default;
 }
 #window .page .header .count {
+    display: block;
     font-size: 13px;
+    line-height: 16px;
+    margin: -3px 0 9px;
 }
 
 #window .page .body .subheader .float_link,
@@ -3312,14 +3319,65 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
     clear: left;
 }
 
+#window .page .body .type_chart_filters {
+    margin: 10px auto 0;
+    font-size: 10px;
+    line-height: 12px;
+    overflow: hidden;
+    padding: 10px 0 5px;
+    border-bottom: 1px solid #1a1a1a;
+}
+#window .page .body .type_chart_filters .link {
+    display: inline-block;
+    float: none;
+    clear: none;
+    margin: 0;
+    color: #CACACA;
+    text-decoration: none;
+}
+#window .page .body .type_chart_filters .link:hover,
+#window .page .body .type_chart_filters .link.active {
+    color: #DEDEDE;
+    text-decoration: underline;
+}
+#window .page .body .type_chart_filters .classes,
+#window .page .body .type_chart_filters .flags {
+
+}
+#window .page .body .type_chart_filters .classes {
+    float: left;
+    text-align: left;
+}
+#window .page .body .type_chart_filters .flags {
+    float: right;
+    text-align: right;
+}
+#window .page .body .type_chart_filters .classes .pipe,
+#window .page .body .type_chart_filters .classes .link {
+    margin-right: 6px;
+}
+#window .page .body .type_chart_filters .flags .pipe,
+#window .page .body .type_chart_filters .flags .link {
+    margin-left: 6px;
+}
+
+#window .page .body .type_chart_wrapper {
+    overflow: hidden;
+    padding-top: 10px;
+}
 
 #window .page .type_chart {
     margin: 0 auto 10px;
 }
 #window .page .type_chart .category {
-    display: block;
+    display: inline-block;
     font-weight: bold;
     margin-bottom: 2px;
+}
+#window .page .type_chart .counter {
+    float: right;
+    font-size: 10px;
+    color: #CACACA;
 }
 #window .page .type_chart .wrapper {
     border: 1px solid rgba(0, 0, 0, 0.25);
@@ -3328,6 +3386,7 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
     -moz-border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
     overflow: hidden;
+    clear: both;
 }
 #window .page .type_chart .wrapper table {
     table-layout: fixed;
@@ -3343,9 +3402,12 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+#window .page .type_chart .type_percent .details {
+    display: none;
+}
 #window .page .type_chart .type_label {
     padding: 0 4px;
-    font-size: 8px;
+    font-size: 9px;
     line-height: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -4442,7 +4504,8 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
     font-size: 16px;
     line-height: 23px;
 }
-#window .page .body .bodytext .line_divider {
+#window .page .body .line_divider,
+#window .page .body .line_divider_bigger {
     display: block;
     clear: both;
     margin: 6px auto;
@@ -4453,7 +4516,7 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
     border-bottom: 1px solid #252424;
     border-color: rgba(0, 0, 0, 0.2);
 }
-#window .page .body .bodytext .line_divider_bigger {
+#window .page .body .line_divider_bigger {
     margin: 18px auto;
 }
 

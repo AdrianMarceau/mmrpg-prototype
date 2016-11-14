@@ -26,7 +26,7 @@ $this_graph_data['description'] = 'The ability database contains detailed inform
 
 // Define the MARKUP variables for this page
 $this_markup_header = 'Mega Man RPG Prototype Ability Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_abilities_links_counter) ? ($mmrpg_database_abilities_links_counter == 1 ? '1 Ability' : $mmrpg_database_abilities_links_counter.' Abilities') : '0 Abilities').' )</span>';
+//$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_abilities_links_counter) ? ($mmrpg_database_abilities_links_counter == 1 ? '1 Ability' : $mmrpg_database_abilities_links_counter.' Abilities') : '0 Abilities').' )</span>';
 
 // If a specific ability has NOT been defined, show the quick-switcher
 reset($mmrpg_database_abilities);
@@ -63,8 +63,6 @@ if (!empty($this_current_token)){
             $this_seo_title_backup = $this_seo_title;
             $this_seo_title = $ability_info['ability_name'].' | '.$this_seo_title;
             $this_seo_description = $this_temp_description.'  '.$ability_info['ability_description'].'  '.$this_seo_description;
-            // Update the markup header with the robot
-            $this_markup_header = '<span class="hideme">'.$ability_info['ability_name'].' | </span>'.$this_markup_header;
             // Define the Open Graph variables for this page
             $this_graph_data['title'] .= ' | '.$ability_info['ability_name'];
             $this_graph_data['description'] = $this_temp_description.'  '.$ability_info['ability_description'].'  '.$this_graph_data['description'];

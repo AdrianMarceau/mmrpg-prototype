@@ -229,7 +229,6 @@ $_GET['start'] = 0 + ($this_num_offset * 50);
 $_GET['limit'] = 50 + ($this_num_offset * 50);
 
 // Define the MARKUP variables for this page
-$this_markup_header = '<span class="hideme">'.$temp_display_name.' | </span>';
 $this_markup_header .= 'Mega Man RPG Prototype Leaderboard';
 $this_markup_counter = '<span class="count count_header">( '.(!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').($this_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$this_leaderboard_online_count.' Online</span>' : '').' )</span>';
 

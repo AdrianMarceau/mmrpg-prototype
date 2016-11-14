@@ -27,7 +27,7 @@ $this_graph_data['description'] = 'The player database contains detailed informa
 
 // Define the MARKUP variables for this page
 $this_markup_header = 'Mega Man RPG Prototype Player Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_players_links_counter) ? ($mmrpg_database_players_links_counter == 1 ? '1 Player' : $mmrpg_database_players_links_counter.' Players') : '0 Players').' )</span>';
+//$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_players_links_counter) ? ($mmrpg_database_players_links_counter == 1 ? '1 Player' : $mmrpg_database_players_links_counter.' Players') : '0 Players').' )</span>';
 
 // If a specific player has NOT been defined, show the quick-switcher
 reset($mmrpg_database_players);
@@ -56,8 +56,6 @@ if (!empty($this_current_token)){
             $this_seo_title_backup = $this_seo_title;
             $this_seo_title = $player_info['player_name'].' | '.$this_seo_title;
             $this_seo_description = $player_info['player_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_seo_description;
-            // Update the markup header with the robot
-            $this_markup_header = '<span class="hideme">'.$player_info['player_name'].' | </span>'.$this_markup_header;
             // Define the Open Graph variables for this page
             $this_graph_data['title'] .= ' | '.$player_info['player_name'];
             $this_graph_data['description'] = $player_info['player_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_graph_data['description'];
@@ -78,7 +76,7 @@ if (!empty($this_current_token)){
 // Only show the header if a specific player has not been selected
 if (empty($this_current_token)){
     ?>
-    <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+    <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         Player Index
         <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
     </h2>

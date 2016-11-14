@@ -27,7 +27,7 @@ $this_graph_data['description'] = 'The boss database contains detailed informati
 // Define the MARKUP variables for this page
 //$this_markup_header = 'Mega Man RPG Prototype Boss Database <span class="count">( '.(!empty($mmrpg_database_bosses_count) ? ($mmrpg_database_bosses_count == 1 ? '1 Boss' : $mmrpg_database_bosses_count.' Bosses') : '0 Bosses').' )';
 $this_markup_header = 'Mega Man RPG Prototype Boss Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_bosses_links_counter) ? ($mmrpg_database_bosses_links_counter == 1 ? '1 Boss' : $mmrpg_database_bosses_links_counter.' Bosses') : '0 Bosses').' )</span>';
+//$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_bosses_links_counter) ? ($mmrpg_database_bosses_links_counter == 1 ? '1 Boss' : $mmrpg_database_bosses_links_counter.' Bosses') : '0 Bosses').' )</span>';
 
 // If a specific boss has NOT been defined, show the quick-switcher
 reset($mmrpg_database_bosses);
@@ -93,8 +93,6 @@ if (!empty($this_current_token)){
             $this_boss_image_size = (!empty($boss_info['robot_image_size']) ? $boss_info['robot_image_size'] : 40) * 2;
             $this_boss_image_size_text = $this_boss_image_size.'x'.$this_boss_image_size;
             if ($this_boss_image == 'boss'){ $this_seo_bosses = 'noindex'; }
-            // Update the markup header with the boss
-            $this_markup_header = '<span class="hideme">'.$boss_info['robot_number'].' '.$boss_info['robot_name'].' | </span>'.$this_markup_header;
             // Check if this is a boss and prepare extra text
             $boss_info['robot_name_append'] = '';
             /*

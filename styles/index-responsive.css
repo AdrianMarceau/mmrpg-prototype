@@ -294,9 +294,26 @@ body:before {
         margin-top: 6px;
         padding-bottom: 6px;
     }
-
-    #window .page_home .header .count {
+    #window .header .title .brand {
+        display: inline-block;
+        text-indent: -9999px;
+        line-height: 0;
+        white-space: nowrap;
+    }
+    #window .header .title .brand:after {
+        content: "MMRPG";
+        text-indent: 0;
+        line-height: initial;
         display: block;
+    }
+
+    #window .page .header .title {
+        line-height: inherit;
+    }
+    #window .page .header .count {
+        line-height: inherit;
+        font-size: 12px;
+        padding: 0;
         margin: 0;
     }
 
@@ -328,6 +345,10 @@ body:before {
         background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
         background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+    }
+
+    #window .page .body .subbody .text {
+        text-align: left;
     }
 
     #window .page .database_container .subbody .body table.full.basic,
@@ -441,6 +462,28 @@ body:before {
     #window .page .iconwrap.preview .type_block {
         width: 68px;
     }
+
+    #window .page .type_block {
+        width: 28%;
+    }
+
+    #window .page .body .subbody .type_chart .wrapper table td {
+        display: block;
+        width: 90vw;
+    }
+    #window .page .body .subbody .type_chart .type_percent {
+        margin: 0;
+    }
+    #window .page .type_chart .type_percent .details {
+        display: inline;
+    }
+    #window .page .body .subbody .type_chart .type_label {
+        margin: 0;
+        padding: 2px 4px;
+        font-size: 10px;
+        line-height: 18px;
+    }
+
 
 }
 

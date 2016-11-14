@@ -6,6 +6,7 @@
 
 // Loop through the different categories and collect their threads one by one
 $this_category_key = 0;
+$total_threads_count = 0;
 foreach ($this_categories_index AS $this_category_id => $this_category_info){
 
     // If this is the personal message center, do not display on index
@@ -13,8 +14,9 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
 
     // Collect a list of recent threads for this category
     $this_threads_array = mmrpg_website_community_category_threads($this_category_info, true, false, MMRPG_SETTINGS_THREADS_RECENT);
-    $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
+    $this_threads_count = mmrpg_website_community_category_threads_count($this_category_info, true, false);
     $this_threads_count_more = $this_threads_count - MMRPG_SETTINGS_THREADS_RECENT;
+    $total_threads_count += $this_threads_count;
 
     // If this is the news category, ensure the threads are arranged by date only
     if ($this_category_info['category_token'] == 'news'){
@@ -68,45 +70,32 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
         <?= !empty($temp_header_links) ? implode("\n", $temp_header_links) : '' ?>
     </h2>
     <div style="overflow: hidden; margin-bottom: 25px;">
-    <?
+        <?
 
-    // Define the current date group
-    $this_date_group = '';
+        // Define the current date group
+        $this_date_group = '';
 
-    // Define the temporary timeout variables
-    $this_time = time();
-    $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
+        // Define the temporary timeout variables
+        $this_time = time();
+        $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
 
-    // Loop through the thread array and display its contents
-    if (!empty($this_threads_array)){
-        foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
+        // Loop through the thread array and display its contents
+        if (!empty($this_threads_array)){
+            foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
 
-            // Print out the thread link block
-            echo mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread_info, true, true);
+                // Print out the thread link block
+                echo mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread_info, true, true);
 
-        }
-    }
-
-    // Close the container tag
-    ?>
-    </div>
-    <? if(false){ ?>
-        <div class="subbody" style="margin-bottom: 6px; background-color: transparent; padding-right: 0;">
-            <?/*<div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_0<?= mt_rand(0, 2) ?>" style="background-image: url(images/robots/<?= MMRPG_SETTINGS_CURRENT_FIELDMECHA ?>/sprite_left_80x80.png);">Met</div></div>*/?>
-            <?/*<p class="text"><?= $this_category_info['category_description'] ?></p>*/?>
-            <?
-            // Add a new thread option to the end of the list if allowed
-            if($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_userinfo['role_level'] >= $this_category_info['category_level'] && $community_battle_points > 10000){
-                ?>
-                <div class="subheader thread_name" style="float: right; margin: 0; overflow: hidden; text-align: center; border: 1px solid rgba(0, 0, 0, 0.30); ">
-                    <a class="link" href="community/<?= $this_category_info['category_token'] ?>/0/new/" style="margin-top: 0;">Create New <?= $this_category_info['category_id'] != 0 ? 'Discussion' : 'Message' ?> &raquo;</a>
-                </div>
-                <?
             }
-            ?>
-        </div>
-    <? } ?>
+        }
+
+        ?>
+    </div>
     <?
     $this_category_key++;
 }
+
+// Define the MARKUP count variable for this page
+//$this_markup_counter = '<span class="count count_header">( '.($total_threads_count == 1 ? '1 Discussion' : $total_threads_count.' Discussions').' )</span>';
+
 ?>

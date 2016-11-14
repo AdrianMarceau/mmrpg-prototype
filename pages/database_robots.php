@@ -26,9 +26,8 @@ $this_graph_data['description'] = 'The robot database contains detailed informat
 //$this_graph_data['type'] = 'website';
 
 // Define the MARKUP variables for this page
-//$this_markup_header = 'Mega Man RPG Prototype Robot Database <span class="count">( '.(!empty($mmrpg_database_robots_count) ? ($mmrpg_database_robots_count == 1 ? '1 Robot' : $mmrpg_database_robots_count.' Robots') : '0 Robots').' )';
 $this_markup_header = 'Mega Man RPG Prototype Robot Database';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_robots_links_counter) ? ($mmrpg_database_robots_links_counter == 1 ? '1 Robot' : $mmrpg_database_robots_links_counter.' Robots') : '0 Robots').' )</span>';
+//$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_robots_links_counter) ? ($mmrpg_database_robots_links_counter == 1 ? '1 Robot' : $mmrpg_database_robots_links_counter.' Robots') : '0 Robots').' )</span>';
 
 // If a specific robot has NOT been defined, show the quick-switcher
 reset($mmrpg_database_robots);
@@ -93,8 +92,6 @@ if (!empty($this_current_token)){
             $this_robot_image_size = (!empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40) * 2;
             $this_robot_image_size_text = $this_robot_image_size.'x'.$this_robot_image_size;
             if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
-            // Update the markup header with the robot
-            $this_markup_header = '<span class="hideme">'.$robot_info['robot_number'].' '.$robot_info['robot_name'].' | </span>'.$this_markup_header;
             // Check if this is a mecha and prepare extra text
             $robot_info['robot_name_append'] = '';
             if (!empty($robot_info['robot_class']) && $robot_info['robot_class'] == 'mecha'){

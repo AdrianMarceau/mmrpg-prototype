@@ -49,8 +49,8 @@ article:section - string - A high-level section name. E.g. Technology
 article:tag - string array - Tag words associated with this article.
 */
 
-// Update the MARKUP variables for this page
-//$this_markup_header = $this_thread_info['thread_name']; //.' | '.$this_markup_header;
+// Define the MARKUP variables for this page
+$this_markup_header = 'Mega Man RPG Prototype '.$this_category_info['category_name'].'';
 
 // Define this thread's session tracker token
 $thread_session_token = $this_thread_info['thread_id'].'_';

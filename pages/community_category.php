@@ -13,11 +13,14 @@ $this_graph_data['title'] = 'Community Forums | '.$this_category_info['category_
 $this_graph_data['description'] = strip_tags($this_category_info['category_description']);
 //$this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo.png?'.MMRPG_CONFIG_CACHE_DATE;
 //$this_graph_data['type'] = 'website';
-
 // Collect a list and count of all threads in this category
 $this_threads_array = mmrpg_website_community_category_threads($this_category_info);
 $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
 //die('<pre>'.print_r($this_threads_array, true).'</pre>');
+
+// Define the MARKUP variables for this page
+$this_markup_header = 'Mega Man RPG Prototype '.$this_category_info['category_name'].'';
+
 
 ?>
 <h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">

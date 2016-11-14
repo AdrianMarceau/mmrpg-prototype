@@ -434,10 +434,17 @@ require_once('pages/'.$this_current_page.'.php');
         </div>
 
         <div class="page page_<?= $this_current_page ?>">
-            <h1 class="header"><span class="header_wrapper"><?= $this_markup_header ?></span></h1>
-            <span style="display: none;"><?= !empty($this_markup_counter) ? $this_markup_counter."\n" : '' ?></span>
-            <div class="body"><div class="body_wrapper"><?= $this_markup_body ?></div></div>
-            <?= false ? '<pre>'.print_r($_GET, true).'</pre>' : '' ?>
+            <div class="header">
+                <div class="header_wrapper">
+                    <h1 class="title"><?= $this_current_page != 'home' ? preg_replace('/((?:the )?Mega Man RPG Prototype)/', '<span class="brand">$1</span>', $this_markup_header) : $this_markup_header ?></h1>
+                    <?= !empty($this_markup_counter) ? $this_markup_counter."\n" : '' ?>
+                </div>
+            </div>
+            <div class="body">
+                <div class="body_wrapper">
+                    <?= $this_markup_body ?>
+                </div>
+            </div>
         </div>
 
     </div>
