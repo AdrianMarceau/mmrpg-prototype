@@ -226,7 +226,15 @@ foreach ($type_stats_index AS $category_token => $category_counts){
 <div id="types">
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Types Overview</h2>
     <div class="subbody">
-        <p class="text">The robots, abilities, fields, and many other aspects of the Mega Man RPG are designed around <?= $mmrpg_database_types_count ?> predefined &quot;types&quot; that represent various elemental affinities and/or methods of attack in the game.  The <span class="type_span ability_type ability_type_cutter">Cutter</span> type is generally used to describe robots or abilities that cut or slice in some way, the <span class="type_span ability_type ability_type_freeze">Freeze</span> type is used to describe things that have a freezing action or are otherwise cold, and so on. These typing distinctions play a central role in battle, where each robot has a different set of weakness and/or resistance to specific abilities.  Using <span class="type_span ability_type ability_type_flame">Fire Storm</span> on a robot with a weakness to <span class="type_span ability_type ability_type_flame">Flame</span> would deal twice the amount of damage it would normally, while using <span class="type_span ability_type ability_type_water">Bubble Lead</span> on a robot with a resistance to <span class="type_span ability_type ability_type_water">Water</span> would only do half as much damage.  Knowing these types can mean the difference between victory and defeat in certain situations, so using this database and the in-game &quot;Scan&quot; option are encouraged. Below, please find an alphabetized list of all the types in the game:</p>
+        <p class="text">
+            Robots, abilities, and even locations in the <strong>Mega Man RPG Prototype</strong> are represented by and categorized into <?= $mmrpg_database_types_count ?> different elemental types.  These types play an important role in the game and have notable effects in and out of battle.  Some types are more common than others, but all have their uses.
+        </p>
+        <p class="text">
+            A robot's core type determines which abilities it can equip and its proficiency with those abilities in battle.  Ability types can trigger target weaknesses, resistances, and even field conditions to influence damage and recovery amounts in battle. Even fields have their own elemental affinities!
+        </p>
+        <p class="text">
+            While many robots and abilities fall under one type it is not uncommon for a character or weapon to have a secondary element. Diverse type combos and matchups are at the heart of the <strong>Prototype</strong> and experimentation is highly encouraged.
+        </p>
         <ul style="overflow: hidden; padding: 4px 0 6px;">
             <?
             // Loop through and display all the types to the user
