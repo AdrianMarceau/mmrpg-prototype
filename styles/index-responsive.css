@@ -443,6 +443,17 @@ body:before {
         display: none;
     }
 
+    #window .page .type_chart_cores,
+    #window .page .type_chart_abilities {
+        width: 99%;
+    }
+    #window .page .type_chart_weaknesses,
+    #window .page .type_chart_resistances,
+    #window .page .type_chart_affinities,
+    #window .page .type_chart_immunities {
+        width: 49%;
+    }
+
 }
 
 /* -- Almost iPhone Portrait Mode -- */
@@ -473,6 +484,9 @@ body:before {
     }
     #window .page .body .subbody .type_chart .type_percent {
         margin: 0;
+    }
+    #window .page .type_chart .type_percent .percent {
+        display: none;
     }
     #window .page .type_chart .type_percent .details {
         display: inline;

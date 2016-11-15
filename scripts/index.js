@@ -268,6 +268,24 @@ $(document).ready(function(){
                 });
 
 
+            // -- DATABASE TYPE CHARTS -- //
+
+            // Create a reference to the type chart page
+            var typeChart = $('.type_chart', thisDatabase);
+            if (typeChart.length && typeof typeChartData != undefined){
+
+                var chartCanvases = $(".chart_canvas");
+                chartCanvases.each(function(){
+                    var thisCanvas = $(this);
+                    var thisCanvasKind = thisCanvas.attr('data-kind');
+                    var thisCanvasData = typeChartData[thisCanvasKind];
+                    if (typeof thisCanvasData == undefined){ return true; }
+                    var thisChart = new Chart(thisCanvas, thisCanvasData);
+                    });
+
+                }
+
+
 
         }
 

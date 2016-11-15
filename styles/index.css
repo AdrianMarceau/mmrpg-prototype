@@ -3367,7 +3367,24 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
 }
 
 #window .page .type_chart {
-    margin: 0 auto 10px;
+    margin: 0 1% 10px 0;
+    width: 99%;
+    box-sizing: border-box;
+    float: left;
+}
+#window .page .type_chart_cores,
+#window .page .type_chart_abilities {
+    width: 49%;
+}
+#window .page .type_chart_weaknesses,
+#window .page .type_chart_resistances,
+#window .page .type_chart_affinities,
+#window .page .type_chart_immunities {
+    width: 24%;
+}
+
+#window .page .type_chart .chart_wrapper {
+    padding-top: 15px;
 }
 #window .page .type_chart .category {
     display: inline-block;
@@ -3401,6 +3418,9 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
     height: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+#window .page .type_chart .type_percent .percent {
+    display: inline;
 }
 #window .page .type_chart .type_percent .details {
     display: none;

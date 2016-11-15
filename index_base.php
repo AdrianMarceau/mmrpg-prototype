@@ -453,12 +453,15 @@ require_once('pages/'.$this_current_page.'.php');
         This game is fan-made by <a href="https://plus.google.com/113336469005774860291?rel=author" target="_blank">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/">feedback</a> is appreciated. :)
     </div>
     <script type="text/javascript" src="scripts/jquery.js"></script>
-    <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-    <script type="text/javascript" src="scripts/index.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
     <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
     <? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
         <script type="text/javascript" src="_ext/colorbox/jquery.colorbox.js"></script>
     <? endif; ?>
+    <? if($this_current_page == 'database' && $this_current_sub == 'types'): ?>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <? endif; ?>
+    <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <script type="text/javascript" src="scripts/index.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
     <script type="text/javascript">
     // Define the key client variables
     gameSettings.baseHref = '<?= MMRPG_CONFIG_ROOTURL ?>';
