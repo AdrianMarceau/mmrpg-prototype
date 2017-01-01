@@ -9,10 +9,10 @@ $this_import_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']
 // Print out the menu header so we know where we are
 ob_start();
 ?>
-<div style="margin: 0 auto 20px; font-weight: bold;">
-<a href="admin.php">Admin Panel</a> &raquo;
-<a href="admin.php?action=import-fields&limit=<?= $this_import_limit?>">Update Field Database</a> &raquo;
-</div>
+    <div style="margin: 0 auto 20px; font-weight: bold;">
+        <a href="admin.php">Admin Panel</a> &raquo;
+        <a href="admin.php?action=import-fields&limit=<?= $this_import_limit?>">Update Field Database</a> &raquo;
+    </div>
 <?php
 $this_page_markup .= ob_get_clean();
 
@@ -85,8 +85,8 @@ function mmrpg_index_sort_fields($field_one, $field_two){
     }
     if ($field_one['field_game'] > $field_two['field_game']){ return 1; }
     elseif ($field_one['field_game'] < $field_two['field_game']){ return -1; }
-    elseif ($field_one['field_token'] > $field_two['field_token']){ return 1; }
-    elseif ($field_one['field_token'] < $field_two['field_token']){ return -1; }
+    elseif ($field_one['field_number'] > $field_two['field_number']){ return 1; }
+    elseif ($field_one['field_number'] < $field_two['field_number']){ return -1; }
     elseif ($field_one['field_token'] > $field_two['field_token']){ return 1; }
     elseif ($field_one['field_token'] < $field_two['field_token']){ return -1; }
     else { return 0; }
