@@ -5,7 +5,7 @@ $field = array(
   'field_token' => 'pipe-station',
   'field_type' => 'explode',
   'field_game' => 'MM02',
-  'field_number' => 'DLN-006',
+  'field_number' => 'DWN-013',
   'field_multipliers' => array('explode' => 2.0, 'missile' => 0.7, 'flame' => 0.6),
   'field_description' => 'Crash Man\'s Favourite Field',
   'field_background' => 'pipe-station',
