@@ -232,14 +232,20 @@ else { $this_thread_info['post_count'] = false; }
 //die('<pre>'.print_r($this_thread_info, true).'</pre>');
 
 ?>
-<h2 class="subheader thread_name field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="">
-    <span class="thread_namewrapper" style="">
+<div class="subheader thread_path" style="">
+    <div class="path">
         <a class="link" style="" href="<?= str_replace($this_category_info['category_token'].'/'.$this_current_id.'/'.$this_current_token.'/', '', $_GET['this_current_url']) ?>">Community</a> <span class="pipe">&nbsp;&raquo;&nbsp;</span>
         <a class="link" style="" href="<?= str_replace($this_current_id.'/'.$this_current_token.'/', '', $_GET['this_current_url']) ?>"><?= $this_category_info['category_name'] ?></a> <span class="pipe">&nbsp;&raquo;&nbsp;</span>
-        <a class="link" style="" href="<?= $_GET['this_current_url'] ?>" title="<?= $temp_thread_name ?>"><?= $temp_thread_name ?></a>
-    </span>
-    <span style="float: right; opacity: 0.50;"><?= $temp_thread_date ?></span>
-</h2>
+    </div>
+</div>
+<div class="subheader thread_title field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="">
+    <h2 class="name">
+        <a class="link title" style="" href="<?= $_GET['this_current_url'] ?>" title="<?= $temp_thread_name ?>"><?= $temp_thread_name ?></a>
+    </h2>
+    <div class="date">
+        <?= $temp_thread_date ?>
+    </div>
+</div>
 <div class="subbody thread_subbody thread_subbody_full thread_subbody_full_<?= $is_personal_message_creator ? 'left' : 'right' ?> thread_<?= $is_personal_message_creator ? 'left' : 'right' ?>" style="text-align: left; position: relative; padding-bottom: 60px;">
 
     <? if ($is_personal_message_creator){ ?>
@@ -354,14 +360,14 @@ else { $this_thread_info['post_count'] = false; }
             // Generate a PREV link if applicable
             if ($this_current_num > 1){
                 $num = $this_current_num - 1;
-                $link = ' href="'.$base_uri.($num > 1 ? $num.'/' : '').'"';
+                $link = ' href="'.$base_uri.($num > 1 ? $num.'/' : '').'#comment-listing"';
                 $class = ' class="prev"';
                 $comment_header_links[] = "<a {$class}{$link}>&laquo;</a>";
             }
 
             // Generate links for each individual page
             for ($num = 1; $num <= $comment_post_pages; $num++){
-                $link = ' href="'.$base_uri.($num > 1 ? $num.'/' : '').'"';
+                $link = ' href="'.$base_uri.($num > 1 ? $num.'/' : '').'#comment-listing"';
                 $class = $this_current_num == $num ? ' class="active"' : '';
                 $comment_header_links[] = "<a {$class}{$link}>{$num}</a>";
             }
@@ -369,7 +375,7 @@ else { $this_thread_info['post_count'] = false; }
             // Generate a PREV link if applicable
             if ($this_current_num < $comment_post_pages){
                 $num = $this_current_num + 1;
-                $link = ' href="'.$base_uri.($num > 1 ? $num.'/' : '').'"';
+                $link = ' href="'.$base_uri.($num > 1 ? $num.'/' : '').'#comment-listing"';
                 $class = ' class="next"';
                 $comment_header_links[] = "<a {$class}{$link}>&raquo;</a>";
             }
@@ -385,7 +391,8 @@ else { $this_thread_info['post_count'] = false; }
             <h3 class="thread_posts_total"><?= $comment_header_title ?></h3>
             <? if (!empty($comment_header_links)){ ?>
                 <div class="thread_posts_pages">
-                    Page : <?= implode("\n", $comment_header_links) ?>
+                    <span class="label">Page :</span>
+                    <span class="links"><?= implode("\n", $comment_header_links) ?></span>
                 </div>
             <? } ?>
         </div>
@@ -414,9 +421,11 @@ else { $this_thread_info['post_count'] = false; }
             $temp_post_guest = $this_post_info['user_id'] == MMRPG_SETTINGS_GUEST_ID ? true : false;
             $temp_post_author = !empty($this_post_info['user_name_public']) ? $this_post_info['user_name_public'] : $this_post_info['user_name'];
             $temp_post_date = !empty($this_post_info['post_date']) ? $this_post_info['post_date'] : mktime(0, 0, 1, 1, 1, 2011);
-            $temp_post_date = date('F jS, Y', $temp_post_date).' at '.date('g:ia', $temp_post_date);
+            $temp_post_date_full = 'Posted on '.date('F jS, Y', $temp_post_date).' at '.date('g:ia', $temp_post_date);
+            $temp_post_date_short = 'Posted '.date('Y/m/d', $temp_post_date).' at '.date('g:ia', $temp_post_date);
             $temp_post_mod = !empty($this_post_info['post_mod']) && $this_post_info['post_mod'] != $this_post_info['post_date'] ? $this_post_info['post_mod'] : false;
-            $temp_post_mod = !empty($temp_post_mod) ? '( Edited : '.date('Y/m/d', $temp_post_mod).' at '.date('g:ia', $temp_post_mod).' )' : false;
+            $temp_post_mod_full = !empty($temp_post_mod) ? 'Edited on '.date('Y/m/d', $temp_post_mod).' at '.date('g:ia', $temp_post_mod).'' : false;
+            $temp_post_mod_short = !empty($temp_post_mod) ? 'Edited '.date('Y/m/d', $temp_post_mod).' at '.date('g:ia', $temp_post_mod).'' : false;
             $temp_post_body = $this_post_info['post_body'];
             $temp_post_title = '#'.$this_post_info['user_id'].' : '.$temp_post_author;
             $temp_post_timestamp = !empty($this_post_info['post_mod']) ? $this_post_info['post_mod'] : $this_post_info['post_date'];
@@ -511,14 +520,18 @@ else { $this_thread_info['post_count'] = false; }
                         </div>
                     <? } ?>
                     <div class="postblock">
-                        <div
-                            class="published"
-                            title="<?= $temp_post_author.' on '.str_replace(' ', '&nbsp;', $temp_post_date) ?>"
-                            style="<?= $is_system_post ? 'margin-left: 0; ' : '' ?>"
-                            >
-                            <strong>Posted on <?= $temp_post_date ?></strong> <span style="float: <?= $this_post_direction ?>; color: #565656; padding-left: 6px;">#<?= $this_post_key + 1 ?></span>
-                            <?= !empty($temp_post_mod) ? '<span style="padding-left: 20px; color: rgb(119, 119, 119); letter-spacing: 1px; font-size: 10px;">'.$temp_post_mod.'</span>' : '' ?>
-                            <?= $temp_is_new ? '<strong style="padding-left: 10px; color: rgb(187, 184, 115); letter-spacing: 1px;">(New!)</strong>' : '' ?>
+                        <div class="published" title="<?= $temp_post_author.' on '.str_replace(' ', '&nbsp;', $temp_post_date) ?>" style="<?= $is_system_post ? 'margin-left: 0; ' : '' ?>">
+                            <div class="full">
+                                <strong class="date"><?= $temp_post_date_full ?></strong>
+                                <?= !empty($temp_post_mod) ? '<span class="modified">'.$temp_post_mod_full.'</span>' : '' ?>
+                                <?= $temp_is_new ? '<strong class="new">New!</strong>' : '' ?>
+                            </div>
+                            <div class="short">
+                                <strong class="date"><?= $temp_post_date_short ?></strong>
+                                <?= !empty($temp_post_mod) ? '<span class="modified">'.$temp_post_mod_short.'</span>' : '' ?>
+                                <?= $temp_is_new ? '<strong class="new">New!</strong>' : '' ?>
+                            </div>
+                            <span class="key right">#<?= $this_post_key + 1 ?></span>
                             <? if(!$temp_post_guest && (COMMUNITY_VIEW_MODERATOR || $this_userinfo['user_id'] == $this_post_info['user_id'])): ?>
                                 <? if($this_thread_info['thread_target'] == 0): ?>
                                     <span class="options">[ <a class="edit" rel="noindex,nofollow" href="<?= $_GET['this_current_url'].'action=edit&amp;post_id='.$this_post_info['post_id'].'#comment-form' ?>">edit</a> | <a class="delete" rel="noindex,nofollow" href="<?= $_GET['this_current_url'] ?>" data-href="<?= $_GET['this_current_url'].'action=delete&amp;post_id='.$this_post_info['post_id'].'#comment-form' ?>">delete</a> ]</span>
@@ -544,7 +557,8 @@ else { $this_thread_info['post_count'] = false; }
             <strong class="thread_posts_total"><?= $comment_header_title ?></strong>
             <? if (!empty($comment_header_links)){ ?>
                 <div class="thread_posts_pages">
-                    Page : <?= implode("\n", $comment_header_links) ?>
+                    <span class="label">Page :</span>
+                    <span class="links"><?= implode("\n", $comment_header_links) ?></span>
                 </div>
             <? } ?>
         </div>
