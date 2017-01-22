@@ -100,6 +100,9 @@ while ($this_formaction == 'contact'){
     if (empty($formdata['contact_name'])){
         $this_formerrors[] = "Your name was not provided.";
         $verified = false;
+    } else {
+        $formdata['contact_name'] = strip_tags($formdata['contact_name']);
+        $formdata['contact_name'] = preg_replace('/^[-_a-z0-9\s\.\']/i', '?', $formdata['contact_name']);        
     }
     if (empty($formdata['contact_email'])){
         $this_formerrors[] = "Your email was not provided.";
@@ -129,7 +132,7 @@ while ($this_formaction == 'contact'){
     // Populate the relevant header fields
     $emailinfo['email_sender'] = "{$formdata['contact_name']} <{$formdata['contact_email']}>";
     $emailinfo['email_receiver'] = '"Adrian Marceau" <adrian.marceau@gmail.com>'; //Mega Man RPG Prototype <info@megamanpoweredup.net>";
-    $emailinfo['email_subject'] = "Contact Message From Mega Man RPG Prototype";
+    $emailinfo['email_subject'] = "Contact Message from {$formdata['contact_name']} via Mega Man RPG Prototype";
     ob_start();
     ?>
     <p style="margin: 0 auto 10px;"><strong>Mega Man RPG Prototype,</strong></p>
