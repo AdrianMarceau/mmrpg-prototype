@@ -102,7 +102,7 @@ while ($this_formaction == 'contact'){
         $verified = false;
     } else {
         $formdata['contact_name'] = strip_tags($formdata['contact_name']);
-        $formdata['contact_name'] = preg_replace('/[-_a-z0-9\s\.\']/i', '?', $formdata['contact_name']);        
+        $formdata['contact_name'] = preg_replace('/[^-_a-z0-9\s\.\']/i', '?', $formdata['contact_name']);        
     }
     if (empty($formdata['contact_email'])){
         $this_formerrors[] = "Your email was not provided.";
