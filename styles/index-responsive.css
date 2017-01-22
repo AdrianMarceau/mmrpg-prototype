@@ -87,7 +87,7 @@ body:before {
         width: 86px;
     }
     #window .page .body .community .thread_subbody_compact {
-        width: 490px;
+
     }
     #window .page .body .community .thread_name .thread_namewrapper {
         width: 700px;
@@ -252,6 +252,15 @@ body:before {
         padding: 2px 3px;
     }
 
+    #window .page .body .community .thread_subbody_compact,
+    #window .page .body .community .thread_subbody_compact:nth-child(odd),
+    #window .page .body .community .thread_subbody_compact:nth-child(even) {
+        float: none;
+        width: 100%;
+        margin-right: 0;
+        clear: both;
+    }
+
 
 }
 
@@ -265,7 +274,12 @@ body:before {
     #mmrpg .tooltip {
         max-width: 99vw;
     }
+
     #window .page .body .pipe {
+
+    }
+
+    #window .page .database_container .pipe {
         display: block;
         height: 3px;
         visibility: hidden;
@@ -443,15 +457,11 @@ body:before {
         display: none;
     }
 
-    #window .page .type_chart_cores,
-    #window .page .type_chart_abilities {
-        width: 99%;
-    }
-    #window .page .type_chart_weaknesses,
-    #window .page .type_chart_resistances,
-    #window .page .type_chart_affinities,
-    #window .page .type_chart_immunities {
-        width: 49%;
+    #window .page .body .community .link_image img,
+    #window .page .body .community .link_image_inline img {
+        max-width: 100%;
+        max-height: none;
+        height: auto;
     }
 
 }
@@ -498,6 +508,17 @@ body:before {
         line-height: 18px;
     }
 
+    #window .page .type_chart_cores,
+    #window .page .type_chart_abilities {
+        width: 99%;
+    }
+    #window .page .type_chart_weaknesses,
+    #window .page .type_chart_resistances,
+    #window .page .type_chart_affinities,
+    #window .page .type_chart_immunities {
+        width: 49%;
+    }
+
 
 }
 
@@ -517,15 +538,6 @@ body:before {
     }
     #window .page .iconwrap.preview .type_block {
         width: 28%;
-    }
-
-}
-
-/* -- Even Closer to iPhone Portrait Mode -- */
-@media (max-width: 400px){
-
-    body:before {
-        content: "09";
     }
 
     #mmrpg #window .menu:after {
@@ -982,6 +994,46 @@ body:before {
         margin-left: 0;
     }
 
+    #window .page .body .type_chart_filters .classes,
+    #window .page .body .type_chart_filters .flags {
+        margin: 0 auto 6px;
+        overflow: hidden;
+    }
+    #window .page .body .type_chart_filters .classes {
+        float: left;
+    }
+    #window .page .body .type_chart_filters .flags {
+        float: right;
+    }
+    #window .page .body .type_chart_filters .classes .pipe,
+    #window .page .body .type_chart_filters .flags .pipe {
+        display: none;
+    }
+    #window .page .body .type_chart_filters .classes .link {
+        display: block;
+        float: left;
+        margin: 0 6px 3px 0;
+        padding: 2px 6px;
+        border: 1px solid #111111;
+        background-color: #161616;
+        -webkit-border-radius: 0.5em;
+        -moz-border-radius: 0.5em;
+        border-radius: 0.5em;
+    }
+    #window .page .body .type_chart_filters .classes .link span:not([class]),
+    #window .page .body .type_chart_filters .flags .link span:not([class]) {
+        display: none;
+    }
+    #window .page .body .type_chart_filters .flags .link,
+    #window .page .body .type_chart_filters .flags .link:hover {
+        display: block;
+        float: right;
+        clear: left;
+        margin: 0 0 3px 6px;
+        padding: 3px 2px;
+        text-decoration: none;
+    }
+
     #window .page .event .section_tabs {
         font-size: 13px;
         line-height: 16px;
@@ -1124,6 +1176,184 @@ body:before {
     }
     #window .devbuild_warning br {
         display: none;
+    }
+
+    #window .page .body .community .thread_posts_count {
+        overflow: hidden;
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_total,
+    #window .page .body .community .thread_posts_count .thread_posts_pages {
+        display: block;
+        float: none;
+        clear: both;
+        margin: 0 auto;
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_total:after,
+    #window .page .body .community .thread_posts_count .thread_posts_pages:after {
+        display: none;
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_total {
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+        border-bottom: 1px solid #1e1e1e;
+        font-weight: bold;
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_pages {
+
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_pages .label {
+        display: none;
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_pages .links {
+        display: block;
+        margin: 0 auto;
+        text-align: left;
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_pages a {
+        display: inline-block;
+        margin: 0 0 4px 0;
+        background-color: #262626;
+        padding: 3px 6px;
+        border-radius: 3px;
+        text-align: center;
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_pages a.next,
+    #window .page .body .community .thread_posts_count .thread_posts_pages a.prev {
+
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_pages a.next {
+
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_pages a.prev {
+
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_pages a.next:before {
+        content: "Next";
+        padding-right: 2px;
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_pages a.prev:after {
+        content: "Prev";
+        padding-left: 2px;
+    }
+
+    #window .page .body .community .post_subbody {
+        padding: 4px 4px;
+    }
+    #window .page .body .community .post_subbody .userblock {
+        width: 96px;
+    }
+    #window .page .body .community .post_subbody .userblock .name,
+    #window .page .body .community .post_subbody .userblock .counter,
+    #window .page .body .community .post_subbody .userblock .avatar {
+        margin-left: 3px;
+        margin-right: 3px;
+    }
+    #window .page .body .community .post_subbody .published {
+        line-height: 14px;
+        position: relative;
+    }
+    #window .page .body .community .post_subbody_left .published {
+        margin-left: 92px;
+    }
+    #window .page .body .community .post_subbody_right .published {
+        margin-right: 92px;
+    }
+
+    #window .page .body .community .post_subbody .published .full {
+        display: none;
+    }
+    #window .page .body .community .post_subbody .published .short {
+        display: block;
+    }
+
+    #window .page .body .community .post_subbody .published .key,
+    #window .page .body .community .post_subbody .published .date,
+    #window .page .body .community .post_subbody .published .modified,
+    #window .page .body .community .post_subbody .published .new {
+
+    }
+    #window .page .body .community .post_subbody .published .key {
+        position: absolute;
+        float: none;
+        margin: 0;
+        top: 1px;
+        font-size: 10px;
+        border: 1px solid #252525;
+        background-color: #282828;
+        padding: 1px 2px;
+        border-radius: 3px;
+    }
+    #window .page .body .community .post_subbody .published .key.right {
+        right: 6px;
+    }
+    #window .page .body .community .post_subbody .published .key.left {
+        left: 6px;
+    }
+    #window .page .body .community .post_subbody .published .date {
+        display: block;
+    }
+    #window .page .body .community .post_subbody .published .modified {
+        padding: 0;
+    }
+    #window .page .body .community .post_subbody .published .modified:before,
+    #window .page .body .community .post_subbody .published .modified:after {
+        display: none;
+    }
+    #window .page .body .community .post_subbody .published .new {
+
+    }
+
+    #window .page_community .form .field_thread_body .textarea,
+    #window .page_community .form .field_post_body .textarea,
+    #window .page_file .form .field_body .textarea {
+        box-sizing: border-box;
+    }
+
+    #window .page_community .form .field_post_body .textarea {
+        width: 200px;
+        height: 145px;
+        width: calc(100% - 100px);
+    }
+
+    #window .page .body .community .thread_subbody .form .avatar_selector,
+    #window .page .body .community .post_subbody .form .avatar_selector {
+        width: 80px;
+    }
+
+    #window .page .body .community .thread_subbody .form .avatar_selector .sprite_80x80,
+    #window .page .body .community .post_subbody .form .avatar_selector .sprite_80x80 {
+        right: 0;
+    }
+
+    #window .page .body .community .thread_subbody .form .avatar_selector .sprite_160x160,
+    #window .page .body .community .post_subbody .form .avatar_selector .sprite_160x160 {
+        right: -5px;
+    }
+
+    #window .page_community .form .buttons .button {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    #window .page_community .form .buttons .counter {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    #window .page .body .community .formatting {
+        margin-bottom: 0;
+    }
+    #window .page .body .community .formatting.formatting_expanded {
+        margin-bottom: 13px;
+    }
+
+
+
+}
+
+/* -- Even Closer to iPhone Portrait Mode -- */
+@media (max-width: 400px){
+
+    body:before {
+        content: "09";
     }
 
 }

@@ -675,8 +675,11 @@ html {
 #window .page .body .subheader .link:hover {
     text-decoration: underline;
 }
-#window .page .body h2.subheader > .link:hover {
+#window .page .body h2.subheader > .link {
     text-decoration: none;
+}
+#window .page .body h2.subheader > .link:hover {
+    text-decoration: underline;
 }
 #window .page .body .subheader .inline_link {
     display: inline-block;
@@ -700,6 +703,10 @@ html {
     font-size: 13px;
     line-height: 16px;
     margin: -3px 0 9px;
+}
+#window .page .header .count.float,
+#window .page .body .subheader .count.float {
+    float: right;
 }
 
 #window .page .body .subheader .float_link,
@@ -755,6 +762,9 @@ html {
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
     overflow: hidden;
+}
+#window .page .body .subbody.threads {
+    padding: 5px 10px;
 }
 #window .page .body .subbody_databaselinks {
     margin-bottom: 4px;
@@ -866,6 +876,9 @@ html {
 #window .page .body .subbody .link_top,
 #window .page .body .subbody .link_permalink {
     margin-bottom: 16px;
+}
+#window .page .body .subbody.threads .link_top {
+    margin-bottom: 5px;
 }
 #window .page .database_container {
 
@@ -1203,17 +1216,20 @@ html {
 
 }
 
+#window .page .community .link_wrapper,
 #window .page .event .link_wrapper,
 #window .page .event .link_container {
     float: right;
     clear: none;
     overflow: hidden;
 }
+#window .page .community .link_wrapper {
+    margin-top: 5px;
+    clear: both;
+    float: none;
+}
 #window .page .event .link_wrapper {
     margin-bottom: 10px;
-}
-#window .page .layout_compact .event .link_wrapper {
-    margin-bottom: 0;
 }
 #window .page .event .link_container {
     margin-left: 50px;
@@ -3360,6 +3376,13 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
 #window .page .body .type_chart_filters .flags .link {
     margin-left: 6px;
 }
+#window .page .body .type_chart_filters .flags .link:hover {
+    text-decoration: none;
+}
+#window .page .body .type_chart_filters .flags .link span.check {
+    font-size: 16px;
+    vertical-align: middle;
+}
 
 #window .page .body .type_chart_wrapper {
     overflow: hidden;
@@ -3397,11 +3420,11 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
     color: #CACACA;
 }
 #window .page .type_chart .wrapper {
-    border: 1px solid rgba(0, 0, 0, 0.25);
-    background-color: rgba(0, 0, 0, 0.25);
-    border-radius: 0.5em;
-    -moz-border-radius: 0.5em;
+    border: 1px solid #111111;
+    background-color: #161616;
     -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    border-radius: 0.5em;
     overflow: hidden;
     clear: both;
 }
@@ -4133,17 +4156,19 @@ body.windowFlag_landscapeMode #window .page .type_block {
     overflow: hidden;
     text-align: left;
     margin: 2px 2px 0 0;
-    width: 362px;
+    box-sizing: border-box;
+    width: 48%;
+    width: calc(50% - 2px);
     min-height: 56px;
     opacity: 0.50;
     cursor: default;
 }
+#window .page .body .community .thread_subbody_compact:nth-child(even) {
+    margin-right: 0;
+    width: 50%;
+}
 #window .page .body .community:hover .thread_subbody_compact:hover {
     opacity: 1.00;
-}
-body.windowFlag_landscapeMode #window .page .body .community .thread_subbody_compact,
-body.mobileFlag_landscapeMode #window .page .body .community .thread_subbody_compact {
-    width: 490px;
 }
 #window .page .body .community .thread_subbody .thread_linkblock {
     padding: 3px 0 5px 60px;
@@ -4182,21 +4207,30 @@ body.mobileFlag_landscapeMode #window .page .body .community .thread_subbody_com
 #window .page .body .community .thread_subbody .thread_linkblock .link span:hover {
     text-decoration: underline;
 }
-#window .page .body .community .thread_name {
+#window .page .body .community .thread_path,
+#window .page .body .community .thread_title {
     overflow: hidden;
 }
-#window .page .body .community .thread_name .thread_namewrapper {
-    float: left;
-    width: 500px;
+#window .page .body .community .thread_path .wrap,
+#window .page .body .community .thread_title .name,
+#window .page .body .community .thread_title .date {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-body.windowFlag_landscapeMode #window .page .body .community .thread_name .thread_namewrapper {
-    width: 700px;
+#window .page .body .community .thread_path .link,
+#window .page .body .community .thread_path .pipe {
+    display: inline-block;
+    float: left;
 }
-#window .page .body .community .thread_name .thread_namewrapper .link {
-    display: inline;
+#window .page .body .community .thread_title .name {
+    font-size: 120%;
+    line-height: 120%;
+    white-space: normal;
+    margin: 0 auto;
+}
+#window .page .body .community .thread_title .date {
+    font-size: 80%;
 }
 #window .page .body .community .thread_subbody .thread_linkblock .info {
     margin: 0 0 3px;
@@ -4315,8 +4349,8 @@ body.windowFlag_landscapeMode #window .page .body .community .thread_name .threa
 }
 #window .page .body .community .post_subbody .published {
     margin: 0;
-    border: 1px solid rgba(0, 0, 0, 0.10);
-    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid #252525;
+    background-color: #282828;
     border-radius: 0;
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
@@ -4338,6 +4372,53 @@ body.windowFlag_landscapeMode #window .page .body .community .thread_name .threa
     -moz-border-radius: 0.3em 0 0 0.3em;
     -webkit-border-radius: 0.3em 0 0 0.3em;
 }
+
+#window .page .body .community .post_subbody .published .full {
+    display: block;
+}
+#window .page .body .community .post_subbody .published .short {
+    display: none;
+}
+#window .page .body .community .post_subbody .published .key,
+#window .page .body .community .post_subbody .published .date,
+#window .page .body .community .post_subbody .published .modified,
+#window .page .body .community .post_subbody .published .new {
+
+}
+#window .page .body .community .post_subbody .published .key {
+    float: none;
+    color: #565656;
+    padding-left: 6px;
+}
+#window .page .body .community .post_subbody .published .key.right {
+    float: right;
+}
+#window .page .body .community .post_subbody .published .key.left {
+    float: left;
+}
+#window .page .body .community .post_subbody .published .date {
+
+}
+#window .page .body .community .post_subbody .published .modified {
+    padding-left: 20px;
+    color: rgb(119, 119, 119);
+    font-size: 10px;
+}
+#window .page .body .community .post_subbody .published .new {
+    padding-left: 10px;
+    color: rgb(187, 184, 115);
+    letter-spacing: 1px;
+}
+#window .page .body .community .post_subbody .published .modified:before,
+#window .page .body .community .post_subbody .published .new:before {
+    content: "(";
+    padding-right: 2px;
+}
+#window .page .body .community .post_subbody .published .modified:after,
+#window .page .body .community .post_subbody .published .new:after {
+    content: ")";
+    padding-left: 2px;
+}
 #window .page .body .community .bodytext {
     margin: 0 0 6px;
     padding-left: 100px;
@@ -4352,6 +4433,10 @@ body.windowFlag_landscapeMode #window .page .body .community .thread_name .threa
 #window .page .body .community .thread_right .bodytext {
     padding-left: 0;
     padding-right: 121px;
+}
+#window .page .body .community .thread_subbody_full .bodytext {
+    padding-right: 0;
+    padding-left: 0;
 }
 #window .page .body .community .post_left .bodytext {
     padding-left: 100px;

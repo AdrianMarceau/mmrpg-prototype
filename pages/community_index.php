@@ -66,10 +66,11 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
 
     ?>
     <h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="clear: both; <?= $this_category_key > 0 ? 'margin-top: 6px; ' : '' ?>">
-        <a class="link" href="<?= 'community/'.$this_category_info['category_token'].'/' ?>" style="display: inline;"><?= $this_category_info['category_name'] ?>  <span class="count">( <?= ($this_threads_count > MMRPG_SETTINGS_THREADS_RECENT  ? MMRPG_SETTINGS_THREADS_RECENT.' of ' : '').($this_threads_count == '1' ? '1 '.($this_category_info['category_id'] != 0 ? 'Discussion' : 'Message') : $this_threads_count.' '.($this_category_info['category_id'] != 0 ? 'Discussions' : 'Messages'))  ?> )</span></a>
+        <a class="link" href="<?= 'community/'.$this_category_info['category_token'].'/' ?>" style="display: inline;"><?= $this_category_info['category_name'] ?></a>
+        <span class="count">( <?= ($this_threads_count > MMRPG_SETTINGS_THREADS_RECENT  ? MMRPG_SETTINGS_THREADS_RECENT.' of ' : '').($this_threads_count == '1' ? '1 '.($this_category_info['category_id'] != 0 ? 'Discussion' : 'Message') : $this_threads_count.' '.($this_category_info['category_id'] != 0 ? 'Discussions' : 'Messages'))  ?> )</span>
         <?= !empty($temp_header_links) ? implode("\n", $temp_header_links) : '' ?>
     </h2>
-    <div style="overflow: hidden; margin-bottom: 25px;">
+    <div class="subbody threads" style="overflow: hidden; margin-bottom: 25px;">
         <?
 
         // Define the current date group
@@ -90,6 +91,9 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
         }
 
         ?>
+        <div class="link_wrapper">
+            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+        </div>
     </div>
     <?
     $this_category_key++;

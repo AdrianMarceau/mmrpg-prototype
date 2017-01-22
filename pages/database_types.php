@@ -230,7 +230,7 @@ foreach ($type_stats_index AS $category_token => $category_counts){
             Robots, abilities, and even locations in the <strong>Mega Man RPG Prototype</strong> are represented by and categorized into <?= $mmrpg_database_types_count ?> different elemental types.  These types play an important role in the game and have notable effects in and out of battle.  Some types are more common than others, but all have their uses.
         </p>
         <p class="text">
-            A robot's core type determines which abilities it can equip and its proficiency with those abilities in battle.  Ability types can trigger target weaknesses, resistances, and even field conditions to influence damage and recovery amounts in battle. Even fields have their own elemental affinities!
+            A robot's core type determines which abilities it can equip and its proficiency with those abilities in battle.  Ability types can trigger the weaknesses, resistances, and even immunities of target robots to influence damage and recovery amounts in battle. Even fields have their own elemental affinities!
         </p>
         <p class="text">
             While many robots and abilities fall under one type it is not uncommon for a character or weapon to have a secondary element. Diverse type combos and matchups are at the heart of the <strong>Prototype</strong> and experimentation is highly encouraged.
@@ -246,9 +246,10 @@ foreach ($type_stats_index AS $category_token => $category_counts){
             ?>
         </ul>
     </div>
+    <a class="anchor" id="charts"></a>
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Type Distributions</h2>
     <div class="subbody">
-        <p class="text">Given the importance of these elemental types, knowing their in-game distribution may be useful.  The charts and graphs below pull their data directly from the game's database and can be used as a reference when preparing for battle.</p>
+        <p class="text">Given the importance of these elemental types, knowing their in-game distribution may be useful.  The stats and values in the graphs below pull directly from the game's database and can be used as a reference when preparing for battle.</p>
         <?
         // Define a function for generating filter URLs
         function get_filter_url($args){
@@ -263,6 +264,7 @@ foreach ($type_stats_index AS $category_token => $category_counts){
             if (!$args['incomplete']){ $filter_url .= '&incomplete=include'; }
             //if (!$args['neutral']){ $filter_url .= '&neutral=show'; }
             if (!empty($args['class'])){$filter_url .= '&class='.$args['class'];  }
+            $filter_url .= '#charts';
             return $filter_url;
         }
         ?>
@@ -271,19 +273,19 @@ foreach ($type_stats_index AS $category_token => $category_counts){
         </script>
         <div class="type_chart_filters">
             <div class="classes">
-                <a class="link <?= $filter_class == 'all' ? 'active' : '' ?>" href="<?= get_filter_url(array('class' => 'all')) ?>" rel="noindex,nofollow">Show All</a>
+                <a class="link <?= $filter_class == 'all' ? 'active' : '' ?>" href="<?= get_filter_url(array('class' => 'all')) ?>" rel="noindex,nofollow"><span>Show</span> All</a>
                 <span class="pipe">|</span>
-                <a class="link <?= $filter_class == 'master' ? 'active' : '' ?>" href="<?= get_filter_url(array('class' => 'master')) ?>" rel="noindex,nofollow">Robot Masters</a>
+                <a class="link <?= $filter_class == 'master' ? 'active' : '' ?>" href="<?= get_filter_url(array('class' => 'master')) ?>" rel="noindex,nofollow"><span>Robot</span> Masters</a>
                 <span class="pipe">|</span>
-                <a class="link <?= $filter_class == 'mecha' ? 'active' : '' ?>" href="<?= get_filter_url(array('class' => 'mecha')) ?>" rel="noindex,nofollow">Support Mechas</a>
+                <a class="link <?= $filter_class == 'mecha' ? 'active' : '' ?>" href="<?= get_filter_url(array('class' => 'mecha')) ?>" rel="noindex,nofollow"><span>Support</span> Mechas</a>
                 <span class="pipe">|</span>
-                <a class="link <?= $filter_class == 'boss' ? 'active' : '' ?>" href="<?= get_filter_url(array('class' => 'boss')) ?>" rel="noindex,nofollow">Fortress Bosses</a>
+                <a class="link <?= $filter_class == 'boss' ? 'active' : '' ?>" href="<?= get_filter_url(array('class' => 'boss')) ?>" rel="noindex,nofollow"><span>Fortress</span> Bosses</a>
             </div>
             <div class="flags">
                 <? if ($filter_incomplete == true): ?>
-                    <a class="link" href="<?= get_filter_url(array('incomplete' => false)) ?>" rel="noindex,nofollow">Include Incomplete</a>
+                    <a class="link" href="<?= get_filter_url(array('incomplete' => false)) ?>" rel="noindex,nofollow"><span class="check">&#9744;</span> <span>Include</span> Incomplete</a>
                 <? else: ?>
-                    <a class="link" href="<?= get_filter_url(array('incomplete' => true)) ?>" rel="noindex,nofollow">Exclude Incomplete</a>
+                    <a class="link" href="<?= get_filter_url(array('incomplete' => true)) ?>" rel="noindex,nofollow"><span class="check">&#9745;</span> <span>Include</span> Incomplete</a>
                 <? endif; ?>
             </div>
         </div>
