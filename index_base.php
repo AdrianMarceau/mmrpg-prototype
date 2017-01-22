@@ -139,7 +139,23 @@ require_once('pages/'.$this_current_page.'.php');
 
 <meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
-<meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1.0">
+<?
+// Define whether not this page/subpage combination require the legacy viewport settings
+$legacy_viewport_required = false;
+if ($this_current_page == 'leaderboard' // Leaderboard sub-pages
+    && in_array($this_current_token, array('robots', 'players', 'database', 'items', 'stars', 'missions'))){
+    $legacy_viewport_required = true;
+}
+if ($this_current_page == 'file' // File sub-pages
+    && $this_current_sub == 'game'){
+    $legacy_viewport_required = true;
+}
+?>
+<? if ($legacy_viewport_required): ?>
+    <meta name="viewport" content="user-scalable=yes, width=768, height=1004">
+<? else: ?>
+    <meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1.0">
+<? endif; ?>
 
 </head>
 <? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>

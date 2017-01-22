@@ -19,7 +19,7 @@ body:before {
     font-family: "Courier New";
     font-size: 26px;
     line-height: 50px;
-    z-index: 9999;
+    z-index: 99999;
     display: block;
 }
 
@@ -27,11 +27,19 @@ body:before {
 /* -- Landscape Mode -- */
 @media (min-width: 1024px){
 
+    body:before {
+        content: "01";
+    }
+
 
 }
 
 /* -- Portrait Mode -- */
 @media (max-width: 1060px){
+
+    body:before {
+        content: "02";
+    }
 
 
 }
@@ -39,16 +47,37 @@ body:before {
 /* -- Slightly Less than Portrait Mode -- */
 @media (max-width: 1000px){
 
+    body:before {
+        content: "03";
+    }
+
 }
 
 /* -- Less than Portrait Mode -- */
 @media (max-width: 970px){
 
+    body:before {
+        content: "04";
+    }
 
 }
 
 /* -- Even Less than Portrait Mode -- */
-@media (max-width: 760px){
+@media (max-width: 780px){
+
+    body:before {
+        content: "05";
+    }
+
+    #mmrpg.index #window,
+    #mmrpg.index #window iframe {
+        border-left: 0 none transparent !important;
+        border-right: 0 none transparent !important;
+        -moz-border-radius: 0 !important;
+        -webkit-border-radius: 0 !important;
+        border-radius: 0 !important;
+        height: 1004px;
+    }
 
 
 }
@@ -56,11 +85,19 @@ body:before {
 /* -- Even More Less than Portrait Mode -- */
 @media (max-width: 700px){
 
+    body:before {
+        content: "06";
+    }
+
 
 }
 
 /* -- Almost iPhone Portrait Mode -- */
 @media (max-width: 560px){
+
+    body:before {
+        content: "07";
+    }
 
 
 }
@@ -68,11 +105,22 @@ body:before {
 /* -- So Close to iPhone Portrait Mode -- */
 @media (max-width: 460px){
 
+    body:before {
+        content: "08";
+    }
+
+    body.index {
+        min-height: 100vh;
+    }
 
 }
 
 /* -- Even Closer to iPhone Portrait Mode -- */
 @media (max-width: 400px){
+
+    body:before {
+        content: "09";
+    }
 
 
 }
@@ -80,6 +128,10 @@ body:before {
 
 /* -- iPhone Portrait Mode -- */
 @media (max-width: 350px){
+
+    body:before {
+        content: "10";
+    }
 
 
 }
