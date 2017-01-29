@@ -34,7 +34,7 @@ $(document).ready(function(){
     var windowHeight = $(window).height();
     var htmlHeight = $('html').height();
     var htmlScroll = $('html').scrollTop();
-    console.log('windowHeight = '+windowHeight+'; htmlHeight = '+htmlHeight+'; htmlScroll = '+htmlScroll+'; ');
+    //console.log('windowHeight = '+windowHeight+'; htmlHeight = '+htmlHeight+'; htmlScroll = '+htmlScroll+'; ');
 
     // Hijack any href links for ipad fixing
     $('a[href]', thisBody).click(function(e){
@@ -75,6 +75,19 @@ $(document).ready(function(){
 
         });
 
+    // Create a reference to the starforce chart element
+    var starForceChart = $('.starforce', thisBody);
+    if (starForceChart.length && typeof thisStarSettings.starData != 'undefined'){
+
+        var chartCanvases = $(".chart_canvas");
+        chartCanvases.each(function(){
+            var thisCanvas = $(this);
+            var thisCanvasSource = thisCanvas.attr('data-source');
+            var thisCanvasChart = new Chart(thisCanvas, thisStarSettings[thisCanvasSource]);
+            });
+
+        }
+
     // Fade in the leaderboard screen slowly
     thisBody.waitForImages(function(){
         var tempTimeout = setTimeout(function(){
@@ -90,7 +103,7 @@ $(document).ready(function(){
 
 // Create the windowResize event for this page
 function windowResizeStarforce(){
-    console.log('windowResizeStarforce()');
+    //console.log('windowResizeStarforce()');
 
 
 
@@ -101,7 +114,7 @@ function windowResizeStarforce(){
 
 // Define a function for updating the star menu elements
 function refreshStarchart(){
-    console.log('refreshStarchart()');
+    //console.log('refreshStarchart()');
 
     // Collect reference to key starchart objects
     var thisStarchart = $('.starchart', thisBody);
@@ -129,8 +142,8 @@ function refreshStarchart(){
 
         });
 
-    console.log('visibleTopKeys', visibleTopKeys);
-    console.log('visibleSideKeys', visibleSideKeys);
+    //console.log('visibleTopKeys', visibleTopKeys);
+    //console.log('visibleSideKeys', visibleSideKeys);
 
     // Remove the visible class from all star containers
     var starSprites = $('.sprite_star', thisStarchart);
