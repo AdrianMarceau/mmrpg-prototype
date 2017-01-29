@@ -69,6 +69,16 @@ body:before {
         content: "05";
     }
 
+
+}
+
+/* -- Even More Less than Portrait Mode -- */
+@media (max-width: 700px){
+
+    body:before {
+        content: "06";
+    }
+
     #prototype .menu {
         padding: 0;
     }
@@ -90,16 +100,6 @@ body:before {
         float: none;
         margin: 0 auto;
         border-width: 1px calc(50vw - (400px / 2));
-    }
-
-
-}
-
-/* -- Even More Less than Portrait Mode -- */
-@media (max-width: 700px){
-
-    body:before {
-        content: "06";
     }
 
 
