@@ -26,12 +26,6 @@ $(document).ready(function(){
     thisPrototype = $('#prototype', thisBody);
     thisWindow = $(window);
     thisContainer = $('.stars', thisPrototype);
-    thisTypeContainer = $('.types_container', thisPrototype);
-    thisStarContainer = $('.stars_container', thisPrototype);
-    thisPageLinks = $('.page_links', thisPrototype);
-    thisPageLinksTop = $('.page_links.top_panel', thisPrototype);
-    thisPageLinksSide = $('.page_links.side_panel', thisPrototype);
-    thisBrowserOrientation = 'portrait';
 
     thisWindow.resize(function(){ windowResizeStarforce(); });
     setTimeout(function(){ windowResizeStarforce(); }, 1000);
@@ -40,7 +34,7 @@ $(document).ready(function(){
     var windowHeight = $(window).height();
     var htmlHeight = $('html').height();
     var htmlScroll = $('html').scrollTop();
-    //alert('windowHeight = '+windowHeight+'; htmlHeight = '+htmlHeight+'; htmlScroll = '+htmlScroll+'; ');
+    console.log('windowHeight = '+windowHeight+'; htmlHeight = '+htmlHeight+'; htmlScroll = '+htmlScroll+'; ');
 
     // Hijack any href links for ipad fixing
     $('a[href]', thisBody).click(function(e){
@@ -49,124 +43,36 @@ $(document).ready(function(){
         window.location.href = $(this).attr('href');
         });
 
-    // Define a click function for the arrow links
-    $('.arrow', thisPageLinks).click(function(e){
+    // Define click events for the prev and next buttons
+    var groupLists = $('.starchart .grouplist', thisBody);
+    $('.arrow[data-dir]', groupLists).click(function(e){
         e.preventDefault();
 
+        // Collect key object references and values
         var thisArrow = $(this);
-        var thisArrowScroll = thisArrow.attr('data-scroll');
-        var thisPanel = thisArrow.parents('.page_links');
-        var thisPanelKind = thisPanel.attr('data-kind');
-        var thisPanels = thisPrototype.find('.page_links[data-kind="'+thisPanelKind+'"]');
-        var thisPanelType = thisPanel.hasClass('top_panel') ? 'top' : 'side';
-        var thisPanelKey = parseInt(thisPanel.attr('data-key'));
-        var thisPanelMax = parseInt(thisPanel.attr('data-max'));
-        var thisPanelTotal = thisPanel.find('.robot').length;
+        var thisDirection = thisArrow.attr('data-dir');
+        var thisGrouplist = thisArrow.closest('.grouplist');
+        var currentGroupToken = thisGrouplist.attr('data-current');
+        var currentGroupContainer = thisGrouplist.find('.group[data-group="'+currentGroupToken+'"]');
 
-        //console.log('arrow | type:'+thisPanelType+' | scroll:'+thisArrowScroll+' | key:'+thisPanelKey+' | max:'+thisPanelMax+' | total = '+thisPanelTotal);
-
-        if (thisPanelType == 'top' && thisArrowScroll == 'right'){
-
-            // Scroll to the RIGHT / FORWARD and increment key by one
-            if ((thisPanelMax + thisPanelKey) >= thisPanelTotal){ return false; }
-            newPanelKey = thisPanelKey + 1;
-            //console.log('scroll right / forward to '+newPanelKey);
-
-            } else if (thisPanelType == 'top' && thisArrowScroll == 'left'){
-
-            // Scroll to the LEFT / BACKWARD and decrement key by one
-            if (thisPanelKey <= 0){ return false; }
-            newPanelKey = thisPanelKey - 1;
-            //console.log('scroll left / backward to '+newPanelKey);
-
-            } else if (thisPanelType == 'side' && thisArrowScroll == 'down'){
-
-            // Scroll to the DOWN / FORWARD and increment key by one
-            if ((thisPanelMax + thisPanelKey) >= thisPanelTotal){ return false; }
-            newPanelKey = thisPanelKey + 1;
-            //console.log('scroll down / forward to '+newPanelKey);
-
-            } else if (thisPanelType == 'side' && thisArrowScroll == 'up'){
-
-            // Scroll to the UP / BACKWARD and increment key by one
-            if (thisPanelKey <= 0){ return false; }
-            newPanelKey = thisPanelKey - 1;
-            //console.log('scroll up / backward to '+newPanelKey);
-
-            }
-
-        thisPanels.attr('data-key', newPanelKey);
-        refreshStarforceContainers();
-
-        });
-
-    // Add mouse-wheel scrolling to the stars container for easier browsing
-    thisStarContainer.bind('mousewheel', function(e){
-        e.preventDefault();
-        //console.log('event.originalEvent.wheelDeltaX = '+e.originalEvent.wheelDeltaX+' | event.originalEvent.wheelDeltaY = '+e.originalEvent.wheelDeltaY);
-        if ((e.originalEvent.wheelDeltaY / 120) > 0){
-            //console.log('scrolling up !');
-            $('.arrow[data-scroll="up"]', thisPageLinks).trigger('click');
-            } else if ((e.originalEvent.wheelDeltaY / 120) < 0) {
-            //console.log('scrolling down !');
-            $('.arrow[data-scroll="down"]', thisPageLinks).trigger('click');
-            } else if ((e.originalEvent.wheelDeltaX / 120) > 0){
-            //console.log('scrolling left !');
-            $('.arrow[data-scroll="left"]', thisPageLinks).trigger('click');
-            } else if ((e.originalEvent.wheelDeltaX / 120) < 0) {
-            //console.log('scrolling right !');
-            $('.arrow[data-scroll="right"]', thisPageLinks).trigger('click');
-            }
-        });
-
-    // Count the number of stars present and creat page links if necessary
-    thisStarSprites = $('.sprite_star', thisStarContainer);
-    thisStarSettings.starCount = thisStarSprites.length ? thisStarSprites.length : 0;
-    if (thisStarSettings.starCount > thisStarSettings.containerLimit){
-
-        // Calculate the number of pages based on count
-        thisStarSettings.containerPages = Math.ceil(thisStarSettings.starCount / thisStarSettings.containerLimit);
-
-        // Append the appropriate number of links to the container
-        var thisPageLinksWrapper = $('.page_links .wrapper', thisContainer); //$('<div class="page_links"><label class="label">Page</label></div>');
-        for (var i = 1; i <= thisStarSettings.containerPages; i++){ thisPageLinksWrapper.append('<a href="#" class="page'+(i == 1 ? ' page_active' : '')+'" data-page="'+i+'">'+i+'</a>');  }
-        //$('.wrapper', thisContainer).append(thisPageLinks);
-
-        // Create the click event for all these new page buttons
-        $('.page', thisContainer).click(function(e){
-            e.preventDefault();
-            //console.log('page clicked!');
-            var thisLink = $(this);
-            var thisCurrentPage = $('.page_active', thisContainer);
-            var thisNewPage = thisLink.attr('data-page');
-            var thisNewKeyMax = (thisNewPage * thisStarSettings.containerLimit) - 1;
-            var thisNewKeyMin = (thisNewKeyMax + 1) - thisStarSettings.containerLimit;
-            thisCurrentPage.removeClass('page_active');
-            thisLink.addClass('page_active');
-            // Automatically hide all the stars that are out of range
-            thisStarSprites.each(function(){
-                var thisSprite = $(this);
-                var thisKey = thisSprite.attr('data-key');
-                if (thisKey > thisNewKeyMax || thisKey < thisNewKeyMin){ thisSprite.css({display:'none'}); }
-                else { thisSprite.css({display:'block'}); }
-                });
-            });
-        // Trigger a click on page one automatically
-        $('.page', thisContainer).first().trigger('click');
-        //console.log(thisStarSettings);
-
+        // Generate the new prev/next object references and values
+        if (thisDirection == 'prev'){
+            var newGroupContainer = currentGroupContainer.prev('.group');
+            if (!newGroupContainer.length){ newGroupContainer = thisGrouplist.find('.group[data-group]').last(); }
+        } else if (thisDirection == 'next'){
+            var newGroupContainer = currentGroupContainer.next('.group');
+            if (!newGroupContainer.length){ newGroupContainer = thisGrouplist.find('.group[data-group]').first(); }
         }
+        var newGroupToken = newGroupContainer.attr('data-group');
 
-    // Create the hover event for the star sprites
-    thisStarSprites.hover(function(){
-        var thisSprite = $(this);
-        var thisSideKey = thisSprite.attr('data-side-key');
-        var thisTopKey = thisSprite.attr('data-top-key');
-        thisStarSprites.removeClass('highlight');
-        thisStarSprites.filter('[data-side-key='+thisSideKey+']').addClass('highlight');
-        thisStarSprites.filter('[data-top-key='+thisTopKey+']').addClass('highlight');
-        }, function(){
-        thisStarSprites.removeClass('highlight');
+        // Swap the current group with the new one
+        thisGrouplist.attr('data-current', newGroupToken);
+        currentGroupContainer.removeClass('current');
+        newGroupContainer.addClass('current');
+
+        // Trigger a refresh of the visible stars
+        return refreshStarchart();
+
         });
 
     // Fade in the leaderboard screen slowly
@@ -184,149 +90,60 @@ $(document).ready(function(){
 
 // Create the windowResize event for this page
 function windowResizeStarforce(){
+    console.log('windowResizeStarforce()');
 
-    var windowWidth = thisWindow.width();
-    var windowHeight = thisWindow.height();
-    var headerHeight = $('.header', thisBody).outerHeight(true);
-    //var thisTypeContainerWidth = thisTypeContainer.outerWidth(true);
-    //var thisStarContainerWidth = thisStarContainer.outerWidth(true);
-    //var thisPageLinksTopWidth = thisPageLinksTop.outerWidth(true);
-    //var thisPageLinksSideWidth = thisPageLinksSide.outerWidth(true);
 
-    // Update the browser orientation
-    var menuWidth = $('.menu', thisPrototype).width();
-    if (menuWidth > 800){ thisBrowserOrientation = 'landscape'; thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
-    else { thisBrowserOrientation = 'portrait'; thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
-    //console.log('update orientation to '+thisBrowserOrientation);
 
-    // Update the body and prototype to full height
-    thisBody.css({height:windowHeight+'px'});
-    thisPrototype.css({height:windowHeight+'px'});
-
-    // Refresh the star elements
-    thisPageLinksSide.attr('data-key', 0);
-    thisPageLinksTop.attr('data-key', 0);
-    refreshStarforceContainers();
+    refreshStarchart();
+    return true;
 
 }
 
 // Define a function for updating the star menu elements
-function refreshStarforceContainers(){
-    //console.log('refreshStarforceContainers()');
+function refreshStarchart(){
+    console.log('refreshStarchart()');
 
-    var prototypeWidth = thisPrototype.width();
-    var maxSizeCount = thisContainer.attr('data-size');
+    // Collect reference to key starchart objects
+    var thisStarchart = $('.starchart', thisBody);
+    var currentGroups = $('.grouplist .group.current', thisStarchart);
 
-    // Update the max links for the top panel based on orientation
-    var newSideDataMax = 9;
-    var newTopDataMax = 9;
+    // Define arrays to hold visible keys
+    var visibleTopKeys = [];
+    var visibleSideKeys = [];
 
-    if (prototypeWidth <= 668){ newTopDataMax = 15; }
-    else if (prototypeWidth <= 750){ newTopDataMax = 17; }
-    else if (prototypeWidth <= 1000){ newTopDataMax = 24; }
-    else if (prototypeWidth > 1000){ newTopDataMax = 25; } // prototypeWidth == 1024
-
-    if (newSideDataMax > maxSizeCount){ newSideDataMax = maxSizeCount; }
-    if (newTopDataMax > maxSizeCount){ newTopDataMax = maxSizeCount; }
-
-    var sideLinkHeight = -6 + (newSideDataMax * 38);
-    var topLinkWidth = -6 + (newTopDataMax * 38);
-    var starContainerHeight = 12 + (newSideDataMax * 38);
-    var starContainerWidth = 12 + (newTopDataMax * 38);
-
-    if (maxSizeCount >= 16){
-        sideLinkHeight -= 6;
-    }
-
-    if (newTopDataMax >= 16){
-        topLinkWidth -= 16;
-        starContainerWidth -= 16;
-    }
-
-    if (newTopDataMax >= 25){
-        topLinkWidth -= 18;
-        starContainerWidth -= 22;
-    }
-
-    //console.log('update page links top data max to '+newTopDataMax);
-    thisPageLinksSide
-        .attr('data-max', newSideDataMax)
-        .css({height:sideLinkHeight+'px'});
-    thisPageLinksTop
-        .attr('data-max', newTopDataMax)
-        .css({width:topLinkWidth+'px'});
-
-    thisStarContainer
-        .css({height:starContainerHeight+'px',width:starContainerWidth+'px'});
-
-    if (true){
-
-        var borderSize = Math.floor((prototypeWidth - starContainerWidth - (thisPageLinksSide.width() * 2) - 46) / 2);
-        var marginLeft = borderSize + 42;
-        if (borderSize < 0){ borderSize = 0; }
-        //console.log('borderSize = ' + borderSize);
-
-        thisPageLinksSide
-            .filter('.left')
-            .css({borderLeft:borderSize+'px solid #1a1a1a'});
-        thisPageLinksSide
-            .filter('.right')
-            .css({borderRight:borderSize+'px solid #1a1a1a'});
-
-        thisPageLinksTop
-            .css({marginLeft:0})
-            .css({borderLeft:marginLeft+'px solid #1a1a1a'})
-            .css({borderRight:marginLeft+'px solid #1a1a1a'});
-
-        }
-
-    // Define a variable to hold the allowed top and side keys
-    var allowedTopKeys = [];
-    var allowedSideKeys = [];
-
-    // Loop through the link panels and limit robot display
-    thisPageLinks.each(function(index, panel){
-
-        // Collect robot limits from the panel and define the range
-        var linkPanel = $(this);
-        var linkPanelKind = linkPanel.hasClass('top_panel') ? 'top' : 'side';
-        var displayMax = parseInt(linkPanel.attr('data-max'));
-        var currentKey = parseInt(linkPanel.attr('data-key'));
-        var firstVisibleKey = currentKey;
-        var lastVisibleKey = currentKey + displayMax - 1;
-        //console.log('parsing linkPanel '+linkPanel.attr('class'));
-        //console.log('displayMax = '+displayMax+' currentKey = '+currentKey+' firstVisibleKey = '+firstVisibleKey+' lastVisibleKey = '+lastVisibleKey);
-
-        // Hide all robots links in both menus, then show only up to max
-        $('.robot', linkPanel).each(function(index2, robot){
-            var robotLink = $(this);
-            if (index2 >= firstVisibleKey && index2 <= lastVisibleKey){
-                robotLink.removeClass('hidden');
-                if (linkPanelKind == 'top'){ allowedTopKeys.push(robotLink.attr('data-top-key')); }
-                else if (linkPanelKind == 'side'){ allowedSideKeys.push(robotLink.attr('data-side-key')); }
-                } else {
-                robotLink.addClass('hidden');
-                }
+    // Loop through current groups and collect keys
+    currentGroups.each(function(){
+        var thisGroup = $(this);
+        var thisGroupRobots = thisGroup.find('.robot');
+        thisGroupRobots.each(function(){
+            var thisRobot = $(this);
+            var thisRobotIcon = thisRobot.find('.icon');
+            if (thisRobotIcon.attr('data-top-key') != undefined){
+                var topKey = parseInt(thisRobotIcon.attr('data-top-key'));
+                visibleTopKeys.push(topKey);
+            } else if (thisRobotIcon.attr('data-side-key') != undefined){
+                var sideKey = parseInt(thisRobotIcon.attr('data-side-key'));
+                visibleSideKeys.push(sideKey);
+            }
             });
 
         });
 
-    //console.log('allowedTopKeys = ', allowedTopKeys);
-    //console.log('allowedSideKeys = ', allowedSideKeys);
+    console.log('visibleTopKeys', visibleTopKeys);
+    console.log('visibleSideKeys', visibleSideKeys);
 
-    // Loop through all the star containers and hide ones that are not relevant
-    $('.sprite_star', thisStarContainer).each(function(){
+    // Remove the visible class from all star containers
+    var starSprites = $('.sprite_star', thisStarchart);
+    starSprites.removeClass('visible');
+    starSprites.each(function(){
 
         var thisStar = $(this);
-        var thisTopKey = thisStar.attr('data-top-key');
-        var thisSideKey = thisStar.attr('data-side-key');
-
-        if (allowedTopKeys.indexOf(thisTopKey) != -1 && allowedSideKeys.indexOf(thisSideKey) != -1){
-            thisStar.removeClass('hidden');
-            } else {
-            thisStar.addClass('hidden');
-            }
+        var thisStarTopKey = parseInt(thisStar.attr('data-top-key'));
+        var thisStarSideKey = parseInt(thisStar.attr('data-side-key'));
+        var thisStarVisible = visibleTopKeys.indexOf(thisStarTopKey) != -1 && visibleSideKeys.indexOf(thisStarSideKey) != -1 ? true : false;
+        if (thisStarVisible){ thisStar.addClass('visible'); }
 
         });
 
+    return true;
 }

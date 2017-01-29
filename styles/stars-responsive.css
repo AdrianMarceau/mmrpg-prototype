@@ -1,0 +1,127 @@
+
+/* -- RESPONSIVE STYLESHEET (STARS) -- */
+
+body:before {
+    content: "Z";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    background-color: magenta;
+    border: 1px solid magenta;
+    border-top: 0 none transparent;
+    border-left: 0 none transparent;
+    color: #FFFFFF;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    font-family: "Courier New";
+    font-size: 26px;
+    line-height: 50px;
+    z-index: 99999;
+    display: block;
+}
+
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+
+    body:before {
+        content: "01";
+    }
+
+
+}
+
+/* -- Portrait Mode -- */
+@media (max-width: 1060px){
+
+    body:before {
+        content: "02";
+    }
+
+
+}
+
+/* -- Slightly Less than Portrait Mode -- */
+@media (max-width: 1000px){
+
+    body:before {
+        content: "03";
+    }
+
+}
+
+/* -- Less than Portrait Mode -- */
+@media (max-width: 970px){
+
+    body:before {
+        content: "04";
+    }
+
+}
+
+/* -- Even Less than Portrait Mode -- */
+@media (max-width: 768px){
+
+    body:before {
+        content: "05";
+    }
+
+
+}
+
+/* -- Even More Less than Portrait Mode -- */
+@media (max-width: 700px){
+
+    body:before {
+        content: "06";
+    }
+
+
+}
+
+/* -- Almost iPhone Portrait Mode -- */
+@media (max-width: 560px){
+
+    body:before {
+        content: "07";
+    }
+
+
+}
+
+/* -- So Close to iPhone Portrait Mode -- */
+@media (max-width: 460px){
+
+    body:before {
+        content: "08";
+    }
+
+    body.index {
+        min-height: 100vh;
+    }
+
+}
+
+/* -- Even Closer to iPhone Portrait Mode -- */
+@media (max-width: 400px){
+
+    body:before {
+        content: "09";
+    }
+
+
+}
+
+
+/* -- iPhone Portrait Mode -- */
+@media (max-width: 350px){
+
+    body:before {
+        content: "10";
+    }
+
+
+}
