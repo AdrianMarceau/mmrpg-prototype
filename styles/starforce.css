@@ -65,10 +65,16 @@
 #prototype .stars .starchart > .wrapper,
 #prototype .stars .starforce > .wrapper  {
     width: auto;
-    height: 0;
-    padding-bottom: 100%;
+    height: auto;
     overflow: hidden;
     position: relative;
+}
+#prototype .stars .starchart > .wrapper  {
+    height: 0;
+    padding-bottom: 100%;
+}
+#prototype .stars .starforce > .wrapper  {
+    padding: 10px 5px 0;
 }
 
 #prototype .stars .starchart .corner,
@@ -229,15 +235,15 @@
     content: "+";
     width: 13px;
     height: 13px;
-    font-size: 10px;
-    line-height: 13px;
+    font-size: 30px;
+    line-height: 8px;
     text-align: center;
 }
 #prototype .stars .starchart .grouplist .arrow.prev:before {
-    content: "\25c0";
+    content: "\2039";
 }
 #prototype .stars .starchart .grouplist .arrow.next:after {
-    content: "\25b6";
+    content: "\203a";
 }
 
 
@@ -425,6 +431,13 @@
 
 #prototype .stars .starchart .starlist .sprite_star:not(.visible) {
     display: none;
+}
+
+
+
+#prototype .stars .starforce .chart_wrapper {
+    width: 100%;
+    height: 180px;
 }
 
 

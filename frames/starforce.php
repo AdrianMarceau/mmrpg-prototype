@@ -62,7 +62,8 @@ foreach ($temp_omega_factor_options AS $key => $factor){
     $temp_omega_factor_options_unlocked[] = $factor['field'];
 }
 
-// Require the starforce data file
+// Require the types and starforce data files
+require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 
 // Collect the editor flag if set
@@ -179,6 +180,7 @@ function temp_combination_number($k,$n){
 <link type="text/css" href="styles/starforce.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/starforce-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <script type="text/javascript" src="scripts/jquery.js"></script>
+<script type="text/javascript" src="scripts/Chart-2.4.0.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/starforce.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
@@ -213,6 +215,161 @@ gameSettings.autoScrollTop = false;
 
             <div class="stars">
                 <div class="wrapper">
+
+                    <div class="starforce">
+                        <div class="wrapper">
+
+                            <?
+
+                            // Define the chart type and options
+                            $chart_type = 'bar';
+                            $chart_options = '{
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        fontColor: \'rgb(200, 200, 200)\',
+                                        generateLabels: function(chart) {
+                                            labels = Chart.defaults.global.legend.labels.generateLabels(chart);
+                                            var fillVal = 180;
+                                            for (i in labels){
+                                                labels[i].fillStyle = \'rgb(\'+fillVal+\', \'+fillVal+\', \'+fillVal+\')\';
+                                                fillVal -= 20;
+                                            }
+                                            return labels;
+                                            }
+                                        }
+                                    },
+                                scales: {
+                                    xAxes: [{
+                                        stacked:true,
+                                        ticks: {
+                                            beginAtZero:true
+                                            }
+                                        }],
+                                    yAxes: [{
+                                        stacked:true,
+                                        ticks: {
+                                            beginAtZero:true
+                                            }
+                                        }]
+                                    },
+                                maintainAspectRatio: false
+
+                                }';
+
+                            // Collect the data for this type chart
+                            $type_labels = array();
+
+                            $star_type_counts = array();
+                            $star_type_backgrounds = array();
+                            $star_type_borders = array();
+
+                            $force_type_counts = array();
+                            $force_type_backgrounds = array();
+                            $force_type_borders = array();
+
+                            $ordered_type_tokens = $this_star_force_strict;
+                            asort($ordered_type_tokens, SORT_NUMERIC);
+                            $ordered_type_tokens = array_keys($ordered_type_tokens);
+                            $ordered_type_tokens = array_reverse($ordered_type_tokens);
+
+                            $star_kind_tokens = array('field', 'fusion');
+
+                            foreach($ordered_type_tokens AS $type_key => $type_token){
+
+                                $type_info = $mmrpg_database_types[$type_token];
+
+                                $star_count = $this_star_force_strict[$type_token];
+                                $star_force = $this_star_force[$type_token];
+
+                                $light_colour = implode(', ', $type_info['type_colour_light']);
+                                $dark_colour = implode(', ', $type_info['type_colour_dark']);
+
+                                $star_background = 'rgba('.$light_colour.', 0.9)';
+                                $star_border = 'rgba('.$dark_colour.', 1.0)';
+
+                                $force_background = 'rgba('.$light_colour.', 0.9)';
+                                $force_border = 'rgba('.$dark_colour.', 1.0)';
+
+                                $type_labels[] = $type_info['type_name'];
+
+                                foreach ($star_kind_tokens AS $kind_token){
+
+                                    $star_kind_count = !empty($this_star_kind_counts[$kind_token][$type_token]) ? $this_star_kind_counts[$kind_token][$type_token] : 0;
+
+                                    $star_type_counts[$kind_token][] = $star_kind_count;
+                                    $star_type_backgrounds[$kind_token][] = $star_background;
+                                    $star_type_borders[$kind_token][] = $star_border;
+
+                                }
+
+                                $force_type_counts[] = $star_force;
+                                $force_type_backgrounds[] = $force_background;
+                                $force_type_borders[] = $force_border;
+
+                            }
+
+                            ?>
+
+                            <div class="chart_wrapper">
+                                <canvas class="chart_canvas" data-source="starData" width="350" height="180"></canvas>
+                                <script type="text/javascript">
+
+                                    thisStarSettings.starData = {
+                                        type: '<?= $chart_type ?>',
+                                        data: {
+                                            labels: <?= json_encode($type_labels) ?>,
+                                            datasets: [{
+                                                label: 'Field Stars',
+                                                data: <?= json_encode($star_type_counts['field']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['field']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['field']) ?>,
+                                                borderWidth: 1
+                                                },{
+                                                label: 'Fusion Stars',
+                                                data: <?= json_encode($star_type_counts['fusion']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['fusion']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['fusion']) ?>,
+                                                borderWidth: 1
+                                                }]
+                                            },
+                                        options: <?= $chart_options ?>
+                                        };
+
+                                </script>
+                            </div>
+
+                            <div class="chart_wrapper">
+                                <canvas class="chart_canvas" data-source="forceData" width="350" height="180"></canvas>
+                                <script type="text/javascript">
+
+                                    thisStarSettings.forceData = {
+                                        type: '<?= $chart_type ?>',
+                                        data: {
+                                            labels: <?= json_encode($type_labels) ?>,
+                                            datasets: [{
+                                                label: 'Starforce Boost',
+                                                data: <?= json_encode($force_type_counts) ?>,
+                                                backgroundColor: <?= json_encode($force_type_backgrounds) ?>,
+                                                borderColor: <?= json_encode($force_type_borders) ?>,
+                                                borderWidth: 1
+                                                }]
+                                            },
+                                        options: <?= $chart_options ?>
+                                        };
+
+                                </script>
+                            </div>
+
+                            <?
+
+                            //echo('<pre>$this_star_force = '.print_r($this_star_force, true).'</pre>');
+                            //echo('<pre>$this_star_force_strict = '.print_r($this_star_force_strict, true).'</pre>');
+
+                            ?>
+
+                        </div>
+                    </div>
 
                     <div class="starchart">
                         <div class="wrapper">
@@ -397,21 +554,6 @@ gameSettings.autoScrollTop = false;
 
                                 </div>
                             </div>
-
-                        </div>
-                    </div>
-
-                    <div class="starforce">
-                        <div class="wrapper">
-
-                            star force list
-
-                            <?
-
-                            echo('<pre>$this_star_force = '.print_r($this_star_force, true).'</pre>');
-                            echo('<pre>$this_star_force_strict = '.print_r($this_star_force_strict, true).'</pre>');
-
-                            ?>
 
                         </div>
                     </div>

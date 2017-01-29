@@ -20,7 +20,7 @@ body:before {
     font-size: 26px;
     line-height: 50px;
     z-index: 99999;
-    display: block;
+    display: none;
 }
 
 
@@ -67,6 +67,29 @@ body:before {
 
     body:before {
         content: "05";
+    }
+
+    #prototype .menu {
+        padding: 0;
+    }
+
+    #prototype .stars .starforce {
+        clear: left;
+        width: 100%;
+        margin-top: 0;
+        height: auto;
+        margin-bottom: 5px;
+    }
+    #prototype .stars .starforce .chart_wrapper {
+        width: 49%;
+        margin-right: 1%;
+        float: left;
+    }
+
+    #prototype .stars .starchart {
+        float: none;
+        margin: 0 auto;
+        border-width: 1px calc(50vw - (400px / 2));
     }
 
 
