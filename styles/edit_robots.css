@@ -671,6 +671,46 @@ body.windowFlag_landscapeMode #prototype {
 }
 
 
+#edit #console .event .robot_stat {
+
+}
+#edit #console .event .robot_stat .maxed,
+#edit #console .event .robot_stat .details,
+#edit #console .event .robot_stat .total,
+#edit #console .event .robot_stat .unit {
+    display: inline-block;
+}
+#edit #console .event .robot_stat .maxed {
+    font-weight: normal;
+    font-size: 10px;
+    position: relative;
+    bottom: 1px;
+}
+#edit #console .event .robot_stat .details {
+    font-weight: normal;
+    font-size: 9px;
+    position: relative;
+    bottom: 1px;
+    padding-left: 2px;
+}
+#edit #console .event .robot_stat .total {
+    min-width: 38px;
+}
+#edit #console .event .robot_stat .unit {
+    min-width: 18px;
+    font-weight: normal;
+    font-size: 9px;
+    position: relative;
+    bottom: 1px;
+    text-align: left;
+    padding-left: 4px;
+}
+#edit #console .event .robot_stat .numpad {
+    color: rgba(255, 255, 255, 0.05);
+    text-shadow: 0 0 0 transparent;
+}
+
+
 #edit #console .event .statboost_robot {
     color: rgb(213, 255, 202) !important;
 }
@@ -682,6 +722,9 @@ body.windowFlag_landscapeMode #prototype {
 }
 #edit #console .event .statboost_player_dr-cossack {
     color: rgb(190, 141, 223) !important;
+}
+#edit #console .event .statboost_force {
+    color: rgb(227, 218, 145) !important;
 }
 
 #edit #console .event .ability_container,

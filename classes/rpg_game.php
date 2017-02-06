@@ -1214,6 +1214,67 @@ class rpg_game {
         }
     }
 
+    // Define a function for calculating starforce values given the loaded game
+    public static function starforce_unlocked($type_filter = '', $strict = false){
+        // Define the game session helper var
+        $session_token = self::session_token();
+        if (empty($_SESSION[$session_token]['values']['battle_stars'])){ return false; }
+        else {
+
+            // Collect the field stars from the session variable
+            $this_battle_stars = !empty($_SESSION[$session_token]['values']['battle_stars']) ? $_SESSION[$session_token]['values']['battle_stars'] : array();
+            $this_battle_stars_count = !empty($this_battle_stars) ? count($this_battle_stars) : 0;
+            $this_battle_stars_field_count = 0;
+            $this_battle_stars_fusion_count = 0;
+
+            // Loop through the star index and increment the various type counters
+            $this_star_force = array();
+            $this_star_force_strict = array();
+            $this_star_force_total = 0;
+            $this_star_kind_counts = array();
+            foreach ($this_battle_stars AS $temp_key => $temp_data){
+                $star_kind = $temp_data['star_kind'];
+                $star_type = !empty($temp_data['star_type']) ? $temp_data['star_type'] : '';
+                $star_type2 = !empty($temp_data['star_type2']) ? $temp_data['star_type2'] : '';
+                if ($star_kind == 'field'){ $this_battle_stars_field_count++; }
+                elseif ($star_kind == 'fusion'){ $this_battle_stars_fusion_count++; }
+                if (!empty($star_type)){
+                    if (!isset($this_star_force[$star_type])){ $this_star_force[$star_type] = 0; }
+                    if (!isset($this_star_force_strict[$star_type])){ $this_star_force_strict[$star_type] = 0; }
+                    if (!isset($this_star_kind_counts[$star_kind][$star_type])){ $this_star_kind_counts[$star_kind][$star_type] = 0; }
+                    $this_star_force[$star_type]++;
+                    $this_star_force_strict[$star_type]++;
+                    $this_star_kind_counts[$star_kind][$star_type]++;
+                    $this_star_force_total++;
+                }
+                if (!empty($star_type2)){
+                    if (!isset($this_star_force[$star_type2])){ $this_star_force[$star_type2] = 0; }
+                    if (!isset($this_star_force_strict[$star_type2])){ $this_star_force_strict[$star_type2] = 0; }
+                    if (!isset($this_star_kind_counts[$star_kind][$star_type2])){ $this_star_kind_counts[$star_kind][$star_type2] = 0; }
+                    $this_star_force[$star_type2]++;
+                    if ($star_type != $star_type2){
+                        $this_star_force_strict[$star_type2]++;
+                        $this_star_kind_counts[$star_kind][$star_type2]++;
+                    }
+                    $this_star_force_total++;
+                }
+            }
+            asort($this_star_force);
+            $this_star_force = array_reverse($this_star_force);
+
+            // Return the entire or filtered force array based on request
+            $return_array = $strict == true ? $this_star_force_strict : $this_star_force;
+            if (empty($type_filter)){
+                if (!empty($return_array)){ return $return_array; }
+                else { return array(); }
+            } else {
+                if (isset($return_array[$type_filter])){ return $return_array[$type_filter]; }
+                else { return array(); }
+            }
+
+        }
+    }
+
     // Define a function for checking a player's prototype settings array
     public static function stars_available($player_token){
         // Return the current rewards array for this player

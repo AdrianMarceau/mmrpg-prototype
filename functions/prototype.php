@@ -986,8 +986,11 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
         $this_robot_name .= $this_robot_favourite ? ' <span class="icons favs">&hearts;</span>' : '';
 
+        // Collect starforce values for the current player
+        $player_starforce = rpg_game::starforce_unlocked();
+
         // Calculate this robot's current and max stat values
-        $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards, true);
+        $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards, true, $this_robot_core, $player_starforce);
         $this_robot_energy = $this_robot_stats['energy']['current'];
         $this_robot_attack = $this_robot_stats['attack']['current'];
         $this_robot_defense = $this_robot_stats['defense']['current'];

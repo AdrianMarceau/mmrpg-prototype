@@ -174,7 +174,7 @@ class rpg_disabled {
             // Collect this robot's stat details for reference
             $temp_index_info = rpg_robot::get_index_info($target_robot->robot_token);
             $temp_reward_info = mmrpg_prototype_robot_rewards($target_player->player_token, $target_robot->robot_token);
-            $temp_robot_stats = rpg_robot::calculate_stat_values($target_robot->robot_level, $temp_index_info, $temp_reward_info);
+            $temp_robot_stats = rpg_robot::calculate_stat_values($target_robot->robot_level, $temp_index_info, $temp_reward_info, $target_robot->robot_core, $target_robot->player->player_starforce);
 
             // Define the stats to loop through and alter
             //$stat_tokens = array('energy', 'attack', 'defense', 'speed');

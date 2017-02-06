@@ -700,7 +700,7 @@ class rpg_robot extends rpg_object {
 
         // Collect this robot's stat values for later reference
         $this_index_info = self::get_index_info($this->robot_token);
-        $this_robot_stats = self::calculate_stat_values($this->robot_level, $this_index_info, $this_rewards, true);
+        $this_robot_stats = self::calculate_stat_values($this->robot_level, $this_index_info, $this_rewards, true, $this->robot_core, $this->player->player_starforce);
 
         // Update the robot's stat values with calculated totals
         $stat_tokens = array('energy', 'attack', 'defense', 'speed');
@@ -3422,6 +3422,9 @@ class rpg_robot extends rpg_object {
             $counter_player_missions = rpg_prototype::battles_complete($player_info['player_token']);
             $allow_player_selector = $allowed_edit_player_count > 1 ? true : false;
 
+            // Collect starforce values for the current player
+            $player_starforce = rpg_game::starforce_unlocked();
+
             // Update the robot key to the current counter
             $robot_key = $key_counter;
             // Make a backup of the player selector
@@ -3440,10 +3443,10 @@ class rpg_robot extends rpg_object {
             $robot_settings = rpg_game::robot_settings($player_token, $robot_token);
             // Collect the database for this robot
             $robot_database = !empty($player_robot_database[$robot_token]) ? $player_robot_database[$robot_token] : array(); //rpg_game::robot_database($robot_token);
-            // Collect the stat details for this robot
-            $robot_stats = rpg_robot::calculate_stat_values($robot_info['robot_level'], $robot_info, $robot_rewards, true);
             // Collect the robot ability core if it exists
             $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : false;
+            // Collect the stat details for this robot
+            $robot_stats = rpg_robot::calculate_stat_values($robot_info['robot_level'], $robot_info, $robot_rewards, true, $robot_ability_core, $player_starforce);
             // Check if this robot has the copy shot ability
             $robot_flag_copycore = $robot_ability_core == 'copy' ? true : false;
 
@@ -3462,38 +3465,125 @@ class rpg_robot extends rpg_object {
             }
 
             // Define a temp function for printing out robot stat blocks
+            $maxed_robot_stats = 0;
             $print_robot_stat_function = function($stat_token) use($robot_info, $robot_stats, $player_info){
 
                 $level_max = $robot_stats['level'] >= 100 ? true : false;
                 $is_maxed = $robot_stats[$stat_token]['bonus'] >= $robot_stats[$stat_token]['bonus_max'] ? true : false;
 
-                if ($stat_token == 'energy' || $stat_token == 'weapons'){ echo '<span class="robot_stat robot_type_'.$stat_token.'"> '; }
-                elseif ($level_max && $is_maxed){ echo '<span class="robot_stat robot_type_'.$stat_token.'"> '; }
+                $base_text = '';
+                $base_text .= 'Base '.ucfirst($stat_token).' <br /> <span style="font-size: 10px">'.
+                    number_format($robot_stats[$stat_token]['base'], 0, '.', ',').
+                    ' <span style="font-size:9px">@</span> '.($stat_token != 'weapons' ? 'Lv. '.$robot_stats['level'] : 'Any Lv.').' = '.
+                    number_format($robot_stats[$stat_token]['current_noboost'], 0, '.', ',').
+                    '</span>';
+                $base_text = htmlentities($base_text, ENT_QUOTES, 'UTF-8', true);
+
+                $robot_bonus_text = '';
+                if (!empty($robot_stats[$stat_token]['bonus'])){
+                    $robot_bonus_text .= 'Knockout Bonuses <br /> <span style="font-size: 10px">+ '.
+                        number_format($robot_stats[$stat_token]['bonus'], 0, '.', ',').' = '.
+                        number_format((
+                            $robot_stats[$stat_token]['current_noboost'] +
+                            $robot_stats[$stat_token]['bonus']
+                            ), 0, '.', ',').
+                        '</span>';
+                    $robot_bonus_text = htmlentities($robot_bonus_text, ENT_QUOTES, 'UTF-8', true);
+                }
+
+                $starforce_bonus_text = '';
+                if (!empty($robot_stats[$stat_token]['starforce'])){
+                    $starforce_bonus_text .= 'Starforce Boost <br /> <span style="font-size: 10px">+ '.
+                        number_format($robot_stats[$stat_token]['starforce'], 0, '.', ',').' = '.
+                        number_format((
+                            $robot_stats[$stat_token]['current_noboost'] +
+                            $robot_stats[$stat_token]['bonus'] +
+                            $robot_stats[$stat_token]['starforce']
+                            ), 0, '.', ',').
+                        '</span>';
+                    $starforce_bonus_text = htmlentities($starforce_bonus_text, ENT_QUOTES, 'UTF-8', true);
+                }
+
+                $player_bonus_text = '';
+                if (!empty($robot_stats[$stat_token]['player'])){
+                    $player_bonus_text .= 'Player Bonuses <br /> <span style="font-size: 10px">'.
+                        ' +'.$player_info['player_'.$stat_token].'% = '.
+                        number_format((
+                            $robot_stats[$stat_token]['current_noboost'] +
+                            $robot_stats[$stat_token]['bonus'] +
+                            $robot_stats[$stat_token]['starforce'] +
+                            $robot_stats[$stat_token]['player']
+                            ), 0, '.', ',').
+                        '</span>';
+                    $player_bonus_text = htmlentities($player_bonus_text, ENT_QUOTES, 'UTF-8', true);
+                }
+
+                //if ($stat_token == 'energy' || $stat_token == 'weapons'){ echo '<span class="robot_stat robot_type_'.$stat_token.'"> '; }
+                if ($level_max && $is_maxed){ echo '<span class="robot_stat robot_type_'.$stat_token.'"> '; }
                 else { echo '<span class="robot_stat"> '; }
 
-                    if ($stat_token != 'energy' && $stat_token != 'weapons'){
-                        echo $is_maxed ? ($level_max ? '<span>&#9733;</span> ' : '<span>&bull;</span> ') : '';
-                        echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;">';
-                            $base_text = 'Base '.ucfirst($stat_token).' <br /> <span style="font-size: 90%">'.number_format($robot_stats[$stat_token]['base'], 0, '.', ',').' <span style="font-size: 90%">@</span>  Lv.'.$robot_stats['level'].' = '.number_format($robot_stats[$stat_token]['current_noboost'], 0, '.', ',').'</span>';
-                            echo '<span data-tooltip="'.htmlentities($base_text, ENT_QUOTES, 'UTF-8', true).'" data-tooltip-type="robot_type robot_type_none">'.$robot_stats[$stat_token]['current_noboost'].'</span> ';
+                    // If the this stat has any boosts, show them
+                    if (
+                        !empty($robot_stats[$stat_token]['bonus'])
+                        || !empty($robot_stats[$stat_token]['starforce'])
+                        || !empty($robot_stats[$stat_token]['player'])
+                        ){
+
+                        echo '<span class="details">';
+
+
+                            echo '<span data-tooltip="'.$base_text.'" data-tooltip-type="robot_type robot_type_none">'.$robot_stats[$stat_token]['current_noboost'].'</span> ';
+
+
                             if (!empty($robot_stats[$stat_token]['bonus'])){
-                                $robot_bonus_text = 'Robot Bonuses <br /> <span style="font-size: 90%">'.number_format($robot_stats[$stat_token]['bonus'], 0, '.', ',').' / '.number_format($robot_stats[$stat_token]['bonus_max'], 0, '.', ',').' Max</span>';
-                                echo '+ <span data-tooltip="'.htmlentities($robot_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_shield">'.$robot_stats[$stat_token]['bonus'].'</span> ';
+                                echo '+ <span data-tooltip="'.$robot_bonus_text.'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_none">'.$robot_stats[$stat_token]['bonus'].'</span> ';
                             }
+
+                            if (!empty($robot_stats[$stat_token]['starforce'])){
+                                echo '+ <span data-tooltip="'.$starforce_bonus_text.'" class="statboost_force" data-tooltip-type="robot_stat robot_type_none">'.$robot_stats[$stat_token]['starforce'].'</span> ';
+                            }
+
                             if (!empty($robot_stats[$stat_token]['player'])){
-                                $player_bonus_text = 'Player Bonuses <br /> <span style="font-size: 90%">'.number_format(($robot_stats[$stat_token]['current']), 0, '.', ',').' x '.$player_info['player_'.$stat_token].'% = '.number_format($robot_stats[$stat_token]['player'], 0, '.', ',').'</span>';
-                                echo '+ <span data-tooltip="'.htmlentities($player_bonus_text, ENT_QUOTES, 'UTF-8', true).'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['player'].'</span> ';
+                                echo '+ <span data-tooltip="'.$player_bonus_text.'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['player'].'</span> ';
                             }
+
                         echo ' = </span>';
-                        echo preg_replace('/^(0+)/', '<span style="color: rgba(255, 255, 255, 0.05); text-shadow: 0 0 0 transparent; ">$1</span>', str_pad($robot_info['robot_'.$stat_token], 4, '0', STR_PAD_LEFT));
-                    } else {
-                        echo $robot_info['robot_'.$stat_token];
+
+                        echo '<span class="total">';
+                            echo $robot_info['robot_'.$stat_token];
+                            /*
+                            echo preg_replace('/^(0+)/', '<span class="numpad">$1</span>', str_pad($robot_info['robot_'.$stat_token], 4, '0', STR_PAD_LEFT));
+                            if ($stat_token != 'energy' && $stat_token != 'weapons'){
+                                echo preg_replace('/^(0+)/', '<span class="numpad">$1</span>', str_pad($robot_info['robot_'.$stat_token], 4, '0', STR_PAD_LEFT));
+                            } else {
+                                echo $robot_info['robot_'.$stat_token];
+                            }
+                            */
+                        echo '</span>';
+
+                    }
+                    // Otherwise display as one block
+                    else {
+
+                        echo '<span class="total" data-tooltip="'.$base_text.'">';
+                            echo $robot_info['robot_'.$stat_token];
+                        echo '</span>';
+
                     }
 
-                    if ($stat_token == 'energy'){ echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;"> LE</span>'; }
-                    elseif ($stat_token == 'weapons'){ echo '<span style="font-weight: normal; font-size: 9px; position: relative; bottom: 1px;"> WE</span>'; }
+                    if ($stat_token == 'energy'){ echo '<span class="unit"> LE</span>'; }
+                    elseif ($stat_token == 'weapons'){ echo '<span class="unit"> WE</span>'; }
+                    elseif ($stat_token == 'attack'){ echo '<span class="unit"> AT</span>'; }
+                    elseif ($stat_token == 'defense'){ echo '<span class="unit"> DF</span>'; }
+                    elseif ($stat_token == 'speed'){ echo '<span class="unit"> SP</span>'; }
 
                 echo '</span>'."\n";
+
+
+                // Return positive increment if maxed
+                if ($level_max && $is_maxed && !empty($robot_stats[$stat_token]['bonus'])){ return 1; }
+                else { return 0; }
+
                 };
 
             // Collect this robot's ability rewards and add them to the dropdown
@@ -3801,6 +3891,47 @@ class rpg_robot extends rpg_object {
                     <td  class="right">
                         <label style="display: block; float: left;">Level :</label>
                         <? if($robot_info['robot_level'] >= 100){ ?>
+                            <a class="robot_stat robot_type_electric" title="Max Level!">
+                                <span class="unit">Lv.</span>
+                                <?= $robot_info['robot_level'] ?>
+                            </a>
+                        <? } else { ?>
+                            <span
+                                class="robot_stat">
+                                <span class="unit">Lv.</span>
+                                <?= $robot_info['robot_level'] ?>
+                            </span>
+                        <? } ?>
+                        &nbsp;
+                        <? if($robot_info['robot_level'] >= 100): ?>
+                            <span class="robot_stat robot_type_experience" title="Max Experience!">
+                                <span class="details">
+                                    <span>&#8734;</span> / 1000
+                                </span>
+                                <span class="unit">Exp</span>
+                            </span>
+                        <? else: ?>
+                            <span class="robot_stat">
+                                <span class="details">
+                                    <?= $robot_info['robot_experience'] ?> / 1000
+                                </span>
+                                <span class="unit">Exp</span>
+                            </span>
+                        <? endif; ?>
+                    </td>
+                    <?
+                    $right_column_markup[] = ob_get_clean();
+                }
+
+                /*
+
+                // Define the markup for the level
+                if (true){
+                    ob_start();
+                    ?>
+                    <td  class="right">
+                        <label style="display: block; float: left;">Level :</label>
+                        <? if($robot_info['robot_level'] >= 100){ ?>
                             <a data-tooltip-align="center" data-tooltip="<?= htmlentities(('Congratulations! '.$robot_info['robot_name'].' has reached Level 100!<br /> <span style="font-size: 90%;">Stat bonuses will now be awarded immediately when this robot lands the finishing blow on a target! Try to max out each stat to its full potential!</span>'), ENT_QUOTES, 'UTF-8') ?>" class="robot_stat robot_type_electric"><?= $robot_info['robot_level'] ?> <span>&#9733;</span></a>
                         <? } else { ?>
                             <span class="robot_stat robot_level_reset robot_type_<?= !empty($robot_rewards['flags']['reached_max_level']) ? 'electric' : 'none' ?>"><?= !empty($robot_rewards['flags']['reached_max_level']) ? '<span>&#9733;</span>' : '' ?> <?= $robot_info['robot_level'] ?></span>
@@ -3835,6 +3966,38 @@ class rpg_robot extends rpg_object {
                         <?
                         // Print out the energy stat breakdown
                         $print_robot_stat_function('energy');
+                        $print_robot_stat_function('weapons');
+                        ?>
+                    </td>
+                    <?
+                    $right_column_markup[] = ob_get_clean();
+                }
+
+                */
+
+                // Define the markup for the energy
+                if (true){
+                    ob_start();
+                    ?>
+                    <td class="right">
+                        <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Energy :</label>
+                        <?
+                        // Print out the energy stat breakdown
+                        $print_robot_stat_function('energy');
+                        ?>
+                    </td>
+                    <?
+                    $right_column_markup[] = ob_get_clean();
+                }
+
+                // Define the markup for the weapons
+                if (true){
+                    ob_start();
+                    ?>
+                    <td class="right">
+                        <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Weapons :</label>
+                        <?
+                        // Print out the energy stat breakdown
                         $print_robot_stat_function('weapons');
                         ?>
                     </td>
@@ -3890,7 +4053,10 @@ class rpg_robot extends rpg_object {
                 ?>
 
                 <div class="header header_left robot_type robot_type_<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>" style="margin-right: 0;">
-                    <span class="title robot_type"><?= $robot_info['robot_name']?></span>
+                    <span class="title robot_type">
+                        <?= $robot_info['robot_name']?>
+                        <?= $robot_info['robot_level'] >= 100 ? '<span>&#9733;</span>' : '' ?>
+                    </span>
                     <span class="core robot_type">
                         <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>-core/icon_left_40x40.png);"></span></span>
                         <span class="text"><?= !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral' ?> Core</span>
@@ -3899,9 +4065,9 @@ class rpg_robot extends rpg_object {
                 <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
                     <table class="full" style="margin-bottom: 5px;">
                         <colgroup>
-                            <col width="64%" />
+                            <col width="49%" />
                             <col width="1%" />
-                            <col width="35%" />
+                            <col width="50%" />
                         </colgroup>
                         <tbody>
                             <tr>
@@ -4098,39 +4264,125 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a function for calculating robot stat details
-    public static function calculate_stat_values($level, $base_stats, $bonus_stats = array(), $limit = false){
+    public static function calculate_stat_values($level, $base_stats, $bonus_stats = array(), $limit = false, $core = '', $starforce_values = array()){
+
         // Define the four basic stat tokens
         $stat_tokens = array('energy', 'weapons', 'attack', 'defense', 'speed');
+
+        // Check if this is of a special core type
+        $is_copy_core = $core == 'copy' ? true : false;
+        $is_neutral_core = $core == '' ? true : false;
+        $is_elemental_core = !$is_copy_core && !$is_neutral_core ? true : false;
+
+        // Define the defaults for starforce boost and multiplier
+        if ($is_elemental_core){ $base_starforce_multiplier   = 10.0; }
+        elseif ($is_copy_core){ $base_starforce_multiplier    =  1.0; }
+        elseif ($is_neutral_core){ $base_starforce_multiplier =  0.1; }
+
         // Define the robot stats array to return
         $robot_stats = array();
+
         // Collect the robot's current level
         $robot_stats['level'] = $level;
         $robot_stats['level_max'] = 100;
+
         // Loop through each stat and calculate values
         foreach ($stat_tokens AS $key => $stat){
             $robot_stats[$stat]['base'] = $base_stats['robot_'.$stat];
-            if ($stat != 'weapons'){
+
+            // Define the defaults for starforce boost and multiplier
+            $starforce_multiplier = 0;
+            if ($is_elemental_core){ $starforce_multiplier          = 10.00; }
+            elseif ($is_copy_core){ $starforce_multiplier           = 01.00; }
+            elseif ($is_neutral_core){
+                if ($stat == 'energy'){ $starforce_multiplier       = 00.10; }
+                elseif ($stat == 'weapons'){ $starforce_multiplier  = 00.01; }
+            }
+
+            // If starforce values were not empty, calculate boosts
+            $starforce_boost = 0;
+            if (!empty($starforce_values)){
+                // Use all types if neutral or copy core, otherwise be more selective
+                if ($is_copy_core || $is_neutral_core){
+                    foreach ($starforce_values AS $boost_value){
+                        $starforce_boost += $boost_value * $starforce_multiplier;
+                    }
+                } elseif ($is_elemental_core && isset($starforce_values[$core])){
+                    $boost_value = $starforce_values[$core];
+                    $starforce_boost += $boost_value * $starforce_multiplier;
+                }
+                // Round up the starforce boost to a full number
+                $starforce_boost = floor($starforce_boost);
+            }
+
+            // Calculate the individual stat values based on their type and multipliers
+            if ($stat == 'energy'){
+
+                // If this is the ENERGY stat
                 $robot_stats[$stat]['base_max'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level_max']);
+
                 $robot_stats[$stat]['bonus'] = isset($bonus_stats['robot_'.$stat]) ? $bonus_stats['robot_'.$stat] : 0;
-                $robot_stats[$stat]['bonus_max'] = $stat != 'energy' ? round($robot_stats[$stat]['base_max'] * MMRPG_SETTINGS_STATS_BONUS_MAX) : 0;
+                if ($stat != 'energy'){ $robot_stats[$stat]['bonus_max'] = round($robot_stats[$stat]['base_max'] * MMRPG_SETTINGS_STATS_BONUS_MAX); }
+                else { $robot_stats[$stat]['bonus_max'] = 0; }
                 if ($limit && $robot_stats[$stat]['bonus'] > $robot_stats[$stat]['bonus_max']){ $robot_stats[$stat]['bonus'] = $robot_stats[$stat]['bonus_max']; }
-                $robot_stats[$stat]['current'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level']) + $robot_stats[$stat]['bonus'];
+
+                if ($is_neutral_core){ $robot_stats[$stat]['starforce'] = $starforce_boost; }
+                else { $robot_stats[$stat]['starforce'] = 0; }
+
+                $robot_stats[$stat]['current'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level']) + $robot_stats[$stat]['bonus'] + $robot_stats[$stat]['starforce'];
                 $robot_stats[$stat]['current_noboost'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $level);
-                $robot_stats[$stat]['max'] = $robot_stats[$stat]['base_max'] + $robot_stats[$stat]['bonus_max'];
+
+                $robot_stats[$stat]['max'] = $robot_stats[$stat]['base_max'] + $robot_stats[$stat]['bonus_max'] + $robot_stats[$stat]['starforce'];
+
                 if ($robot_stats[$stat]['current'] > $robot_stats[$stat]['max']){
                     $robot_stats[$stat]['over'] = $robot_stats[$stat]['current'] - $robot_stats[$stat]['max'];
                 }
-            } else {
+
+            } elseif ($stat == 'weapons'){
+
+                // Else if this is the WEAPONS stat
                 $robot_stats[$stat]['base_max'] = $robot_stats[$stat]['base'];
+
                 $robot_stats[$stat]['bonus'] = 0;
                 $robot_stats[$stat]['bonus_max'] = 0;
-                $robot_stats[$stat]['current'] = $robot_stats[$stat]['base'];
+
+                if ($is_neutral_core){ $robot_stats[$stat]['starforce'] = $starforce_boost; }
+                else { $robot_stats[$stat]['starforce'] = 0; }
+
+                $robot_stats[$stat]['current'] = $robot_stats[$stat]['base'] + $robot_stats[$stat]['starforce'];
                 $robot_stats[$stat]['current_noboost'] = $robot_stats[$stat]['base'];
+
                 $robot_stats[$stat]['max'] = $robot_stats[$stat]['base'];
+                $robot_stats[$stat]['over'] = 0;
+
+            } else {
+
+                // If this is ATTACK, DEFENSE, or SPEED stats
+                $robot_stats[$stat]['base_max'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level_max']);
+
+                $robot_stats[$stat]['bonus'] = isset($bonus_stats['robot_'.$stat]) ? $bonus_stats['robot_'.$stat] : 0;
+                $robot_stats[$stat]['bonus_max'] = round($robot_stats[$stat]['base_max'] * MMRPG_SETTINGS_STATS_BONUS_MAX);
+                if ($limit && $robot_stats[$stat]['bonus'] > $robot_stats[$stat]['bonus_max']){ $robot_stats[$stat]['bonus'] = $robot_stats[$stat]['bonus_max']; }
+
+                if (!$is_neutral_core){ $robot_stats[$stat]['starforce'] = $starforce_boost; }
+                else { $robot_stats[$stat]['starforce'] = 0; }
+
+                $robot_stats[$stat]['current'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level']) + $robot_stats[$stat]['bonus'] + $robot_stats[$stat]['starforce'];
+                $robot_stats[$stat]['current_noboost'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $level);
+
+                $robot_stats[$stat]['max'] = $robot_stats[$stat]['base_max'] + $robot_stats[$stat]['bonus_max'] + $robot_stats[$stat]['starforce'];
+
+                if ($robot_stats[$stat]['current'] > $robot_stats[$stat]['max']){
+                    $robot_stats[$stat]['over'] = $robot_stats[$stat]['current'] - $robot_stats[$stat]['max'];
+                }
 
             }
+
         }
+
+        // Return calculated robot stats
         return $robot_stats;
+
     }
 
     // Define a function for calculating a robot stat level boost
