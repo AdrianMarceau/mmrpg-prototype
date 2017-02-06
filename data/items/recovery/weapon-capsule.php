@@ -11,10 +11,10 @@ $item = array(
     'item_description' => 'A large ammo capsule that restores 40% weapon energy to one robot on the user\'s side of the field.',
     'item_energy' => 0,
     'item_speed' => 10,
-    'item_recovery' => 40,
+    'item_recovery' => 50,
     'item_recovery_percent' => true,
     'item_accuracy' => 100,
-    'item_price' => 400,
+    'item_price' => 600,
     'item_target' => 'select_this',
     'item_function' => function($objects){
 

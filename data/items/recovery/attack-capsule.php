@@ -11,10 +11,10 @@ $item = array(
     'item_description' => 'A large weapon capsule that that boosts the attack stat of one robot on the user\'s side of the field by {RECOVERY}%. This item\'s effects appear to be permanent, though only up until the target has reached its max stat limit.',
     'item_energy' => 0,
     'item_speed' => 10,
-    'item_recovery' => 30,
+    'item_recovery' => 50,
     'item_recovery_percent' => true,
     'item_accuracy' => 100,
-    'item_price' => 1800,
+    'item_price' => 2700,
     'item_target' => 'select_this',
     'item_function' => function($objects){
 
