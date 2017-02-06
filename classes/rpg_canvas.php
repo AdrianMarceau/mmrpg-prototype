@@ -309,7 +309,7 @@ class rpg_canvas {
             // Precalculate this robot's stat for later comparrison
             $index_info = rpg_robot::get_index_info($this_robot->robot_token);
             $reward_info = mmrpg_prototype_robot_rewards($this_robot->player->player_token, $this_robot->robot_token);
-            $this_stats = rpg_robot::calculate_stat_values($this_robot->robot_level, $index_info, $reward_info);
+            $this_stats = rpg_robot::calculate_stat_values($this_robot->robot_level, $index_info, $reward_info, $this_robot->robot_core, $this_robot->player->player_starforce);
 
             // Define the rest of the display variables
             //$this_data['robot_file'] = 'images/robots/'.$this_data['robot_image'].'/sprite_'.$this_data['robot_direction'].'_'.$this_data['robot_size'].'x'.$this_data['robot_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
