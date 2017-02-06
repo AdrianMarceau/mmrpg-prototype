@@ -102,6 +102,11 @@ body:before {
         border-width: 1px calc(50vw - (400px / 2));
     }
 
+    #prototype .stars.xforce .starforce .chart_wrapper {
+        width: 99%;
+        height: 280px;
+    }
+
 
 }
 
