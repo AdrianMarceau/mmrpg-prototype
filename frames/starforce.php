@@ -218,44 +218,9 @@ gameSettings.autoScrollTop = false;
 
                     <div class="starforce">
                         <div class="wrapper">
+                            <a class="size_toggle"><span>X</span></a>
 
                             <?
-
-                            // Define the chart type and options
-                            $chart_type = 'bar';
-                            $chart_options = '{
-                                legend: {
-                                    display: true,
-                                    labels: {
-                                        fontColor: \'rgb(200, 200, 200)\',
-                                        generateLabels: function(chart) {
-                                            labels = Chart.defaults.global.legend.labels.generateLabels(chart);
-                                            var fillVal = 180;
-                                            for (i in labels){
-                                                labels[i].fillStyle = \'rgb(\'+fillVal+\', \'+fillVal+\', \'+fillVal+\')\';
-                                                fillVal -= 20;
-                                            }
-                                            return labels;
-                                            }
-                                        }
-                                    },
-                                scales: {
-                                    xAxes: [{
-                                        stacked:true,
-                                        ticks: {
-                                            beginAtZero:true
-                                            }
-                                        }],
-                                    yAxes: [{
-                                        stacked:true,
-                                        ticks: {
-                                            beginAtZero:true
-                                            }
-                                        }]
-                                    },
-                                maintainAspectRatio: false
-
-                                }';
 
                             // Collect the data for this type chart
                             $type_labels = array();
@@ -265,6 +230,7 @@ gameSettings.autoScrollTop = false;
                             $star_type_borders = array();
 
                             $force_type_counts = array();
+                            $force_type_counts_total = 0;
                             $force_type_backgrounds = array();
                             $force_type_borders = array();
 
@@ -273,7 +239,7 @@ gameSettings.autoScrollTop = false;
                             $ordered_type_tokens = array_keys($ordered_type_tokens);
                             $ordered_type_tokens = array_reverse($ordered_type_tokens);
 
-                            $star_kind_tokens = array('field', 'fusion');
+                            $star_kind_tokens = array('field', 'fusion', 'perfect-fusion');
 
                             foreach($ordered_type_tokens AS $type_key => $type_token){
 
@@ -285,15 +251,24 @@ gameSettings.autoScrollTop = false;
                                 $light_colour = implode(', ', $type_info['type_colour_light']);
                                 $dark_colour = implode(', ', $type_info['type_colour_dark']);
 
-                                $star_background = 'rgba('.$light_colour.', 0.9)';
-                                $star_border = 'rgba('.$dark_colour.', 1.0)';
-
                                 $force_background = 'rgba('.$light_colour.', 0.9)';
                                 $force_border = 'rgba('.$dark_colour.', 1.0)';
 
                                 $type_labels[] = $type_info['type_name'];
 
+                                $force_type_counts[] = $star_force;
+                                $force_type_counts_total += $star_force;
+                                $force_type_backgrounds[] = $force_background;
+                                $force_type_borders[] = $force_border;
+
                                 foreach ($star_kind_tokens AS $kind_token){
+
+                                    if ($kind_token == 'field'){ $alpha = '0.6'; }
+                                    elseif ($kind_token == 'fusion'){ $alpha = '0.7'; }
+                                    elseif ($kind_token == 'perfect-fusion'){ $alpha = '1.0'; }
+
+                                    $star_background = 'rgba('.$light_colour.', '.$alpha.')';
+                                    $star_border = 'rgba('.$dark_colour.', 1.0)';
 
                                     $star_kind_count = !empty($this_star_kind_counts[$kind_token][$type_token]) ? $this_star_kind_counts[$kind_token][$type_token] : 0;
 
@@ -303,20 +278,96 @@ gameSettings.autoScrollTop = false;
 
                                 }
 
-                                $force_type_counts[] = $star_force;
-                                $force_type_backgrounds[] = $force_background;
-                                $force_type_borders[] = $force_border;
-
                             }
 
                             ?>
+
+                            <script type="text/javascript">
+                                var baseChartOptions = {
+                                    title: {
+                                        display: true,
+                                        text: '<title>'
+                                        },
+                                    legend: {
+                                        display: false,
+                                        },
+                                    scales: {
+                                        xAxes: [{
+                                            stacked:true,
+                                            ticks: {
+                                                beginAtZero:true
+                                                }
+                                            }],
+                                        yAxes: [{
+                                            stacked:true,
+                                            ticks: {
+                                                beginAtZero:true
+                                                }
+                                            }]
+                                        },
+                                    responsive: true,
+                                    maintainAspectRatio: false
+                                    };
+
+                            </script>
+
+                            <div class="chart_wrapper">
+                                <canvas class="chart_canvas" data-source="forceData" width="350" height="180"></canvas>
+                                <script type="text/javascript">
+
+                                    var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
+                                    thisChartOptions.title.text = 'Starforce Level <?= $force_type_counts_total ?>';
+                                    thisStarSettings.forceData = {
+                                        type: 'bar',
+                                        data: {
+                                            labels: <?= json_encode($type_labels) ?>,
+                                            datasets: [{
+                                                label: 'Level',
+                                                data: <?= json_encode($force_type_counts) ?>,
+                                                backgroundColor: <?= json_encode($force_type_backgrounds) ?>,
+                                                borderColor: <?= json_encode($force_type_borders) ?>,
+                                                borderWidth: 1
+                                                }]
+                                            },
+                                        options: thisChartOptions
+                                        };
+
+                                </script>
+                            </div>
 
                             <div class="chart_wrapper">
                                 <canvas class="chart_canvas" data-source="starData" width="350" height="180"></canvas>
                                 <script type="text/javascript">
 
+                                    var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
+                                    thisChartOptions.title.text = '<?= $temp_total_stars_label.' / '.$temp_potential_stars_label ?>';
+                                    thisChartOptions.tooltips = {
+                                        callbacks: {
+                                            title: function (tooltipItem, data) {
+                                                //console.log('-------------------------');
+                                                //console.log('TITLE');
+                                                //console.log('tooltipItem[0]', tooltipItem[0]);
+                                                //console.log('data.datasets', data.datasets);
+                                                //console.log('data.datasets[0].label', data.datasets[0].label);
+                                                var returnText = data.labels[tooltipItem[0].index];
+                                                //if (tooltipItem[0].datasetIndex == 0){ returnText += ' +1'; }
+                                                //else if (tooltipItem[0].datasetIndex == 1){ returnText += ' +1'; }
+                                                //else if (tooltipItem[0].datasetIndex == 2){ returnText += ' +2'; }
+                                                //console.log('returnText', returnText);
+                                                return returnText;
+                                                },
+                                            label: function(tooltipItems, data) {
+                                                //console.log('LABEL');
+                                                //console.log('tooltipItems', tooltipItems);
+                                                //console.log('data.datasets', data.datasets);
+                                                var returnText =  'x' + tooltipItems.yLabel + ' ' + data.datasets[tooltipItems.datasetIndex].label;
+                                                //console.log('returnText', returnText);
+                                                return returnText;
+                                                }
+                                            }
+                                        };
                                     thisStarSettings.starData = {
-                                        type: '<?= $chart_type ?>',
+                                        type: 'bar',
                                         data: {
                                             labels: <?= json_encode($type_labels) ?>,
                                             datasets: [{
@@ -326,36 +377,20 @@ gameSettings.autoScrollTop = false;
                                                 borderColor: <?= json_encode($star_type_borders['field']) ?>,
                                                 borderWidth: 1
                                                 },{
-                                                label: 'Fusion Stars',
+                                                label: 'Fusion Star Halves',
                                                 data: <?= json_encode($star_type_counts['fusion']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['fusion']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['fusion']) ?>,
                                                 borderWidth: 1
-                                                }]
-                                            },
-                                        options: <?= $chart_options ?>
-                                        };
-
-                                </script>
-                            </div>
-
-                            <div class="chart_wrapper">
-                                <canvas class="chart_canvas" data-source="forceData" width="350" height="180"></canvas>
-                                <script type="text/javascript">
-
-                                    thisStarSettings.forceData = {
-                                        type: '<?= $chart_type ?>',
-                                        data: {
-                                            labels: <?= json_encode($type_labels) ?>,
-                                            datasets: [{
-                                                label: 'Starforce Boost',
-                                                data: <?= json_encode($force_type_counts) ?>,
-                                                backgroundColor: <?= json_encode($force_type_backgrounds) ?>,
-                                                borderColor: <?= json_encode($force_type_borders) ?>,
+                                                },{
+                                                label: 'Whole Fusion Stars',
+                                                data: <?= json_encode($star_type_counts['perfect-fusion']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['perfect-fusion']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['perfect-fusion']) ?>,
                                                 borderWidth: 1
                                                 }]
                                             },
-                                        options: <?= $chart_options ?>
+                                        options: thisChartOptions
                                         };
 
                                 </script>
@@ -374,7 +409,23 @@ gameSettings.autoScrollTop = false;
                     <div class="starchart">
                         <div class="wrapper">
 
-                            <div class="corner"></div>
+                            <div class="corner">
+                                <?
+                                // Generate and print out group bullets for the corner wedge
+                                $bullets = '';
+                                $bullcount = count($temp_omega_groups_unlocked);
+                                foreach ($temp_omega_groups_unlocked AS $key => $group){
+                                    $group_token = $group['token'];
+                                    $group_class = 'bull ';
+                                    $group_style = '';
+                                    $group_current = $key == 0 ? true : false;
+                                    if ($group_current){ $group_class .= 'current '; }
+                                    $bullets .= '<span class="'.$group_class.'" data-group="'.$group_token.'">&nbsp;</span>';
+                                }
+                                echo '<div class="bullets topbar" data-count="'.$bullcount.'">'.$bullets.'</div>'.PHP_EOL;
+                                echo '<div class="bullets sidebar" data-count="'.$bullcount.'">'.$bullets.'</div>'.PHP_EOL;
+                                ?>
+                            </div>
 
                             <?
                             // Loop through the top and side bar sections
@@ -466,10 +517,17 @@ gameSettings.autoScrollTop = false;
                                                 if (!empty($star_data)){
 
                                                     // Collect the star image info from the index based on type
-                                                    $temp_star_kind = $star_data['star_kind'];
                                                     $temp_star_date = !empty($star_data['star_date']) ? $star_data['star_date']: 0;
                                                     $temp_field_type_1 = !empty($star_data['star_type']) ? $star_data['star_type'] : 'none';
                                                     $temp_field_type_2 = !empty($star_data['star_type2']) ? $star_data['star_type2'] : $temp_field_type_1;
+
+                                                    // Collect the star kind and determine its name
+                                                    $temp_star_kind = $star_data['star_kind'];
+                                                    $temp_star_kind_name = ucfirst($temp_star_kind);
+                                                    if ($temp_star_kind == 'fusion' && $temp_field_type_1 == $temp_field_type_2){
+                                                        //$temp_star_kind_name = 'Perfect '.$temp_star_kind_name;
+                                                    }
+
                                                     /*
                                                     if ($temp_star_kind == 'field'){
                                                         $temp_star_front = array('path' => 'images/items/field-star_'.$temp_field_type_1.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '02', 'size' => 40);
@@ -479,6 +537,7 @@ gameSettings.autoScrollTop = false;
                                                         $temp_star_back = array('path' => 'images/items/fusion-star_'.$temp_field_type_2.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '01', 'size' => 40);
                                                     }
                                                     */
+
                                                     if ($temp_star_kind == 'field'){
                                                         $type = $temp_field_type_1;
                                                         $temp_star_back = array('class' => 'back', 'path' => 'images/items/field-star_'.$type.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '00', 'size' => 40);
@@ -491,26 +550,37 @@ gameSettings.autoScrollTop = false;
                                                     }
                                                     $temp_star_title = $star_data['star_name'].' Star <br />';
                                                     $temp_star_title .= '<span style="font-size:80%;">';
-                                                    if ($temp_field_type_1 != $temp_field_type_2){ $temp_star_title .= ''.ucfirst($temp_field_type_1).(!empty($temp_field_type_2) ? ' / '.ucfirst($temp_field_type_2) : '').' Type'; }
-                                                    else { $temp_star_title .= ''.ucfirst($temp_field_type_1).' Type'; }
-                                                    $temp_star_title .= ' | '.ucfirst($temp_star_kind).' Star';
-                                                    /*
-                                                    if ($temp_field_type_1 != 'none'){
-                                                        if ($temp_star_kind == 'field'){
-                                                            $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
-                                                        } elseif ($temp_star_kind == 'fusion'){
-                                                            if ($temp_field_type_1 != $temp_field_type_2){
+
+                                                        if ($temp_field_type_1 != $temp_field_type_2){
+                                                            $temp_star_title .= '+1 '.ucfirst($temp_field_type_1).(!empty($temp_field_type_2) ? ' / +1 '.ucfirst($temp_field_type_2) : '').'';
+                                                        } else {
+                                                            if ($temp_star_kind == 'field'){ $temp_star_title .= '+1 '.ucfirst($temp_field_type_1).''; }
+                                                            elseif ($temp_star_kind == 'fusion'){ $temp_star_title .= '+2 '.ucfirst($temp_field_type_1).''; }
+
+                                                        }
+
+
+                                                        $temp_star_title .= ' | '.$temp_star_kind_name.' Star';
+
+                                                        /*
+                                                        if ($temp_field_type_1 != 'none'){
+                                                            if ($temp_star_kind == 'field'){
                                                                 $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
-                                                                $temp_star_title .= ' | '.ucfirst($temp_field_type_2).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
-                                                            } else {
-                                                                $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT * 2);
+                                                            } elseif ($temp_star_kind == 'fusion'){
+                                                                if ($temp_field_type_1 != $temp_field_type_2){
+                                                                    $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
+                                                                    $temp_star_title .= ' | '.ucfirst($temp_field_type_2).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
+                                                                } else {
+                                                                    $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT * 2);
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                    */
-                                                    if (!empty($temp_star_date)){
-                                                        $temp_star_title .= ' <br />Found '.date('Y/m/d', $temp_star_date);
-                                                    }
+                                                        */
+
+                                                        if (!empty($temp_star_date)){
+                                                            $temp_star_title .= ' <br />Found '.date('Y/m/d', $temp_star_date);
+                                                        }
+
                                                     $temp_star_title .= '</span>';
                                                     $temp_star_title = htmlentities($temp_star_title, ENT_QUOTES, 'UTF-8');
 

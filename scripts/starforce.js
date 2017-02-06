@@ -58,14 +58,20 @@ $(document).ready(function(){
         // Generate the new prev/next object references and values
         if (thisDirection == 'prev'){
             var newGroupContainer = currentGroupContainer.prev('.group');
-            if (!newGroupContainer.length){ newGroupContainer = thisGrouplist.find('.group[data-group]').last(); }
+            if (!newGroupContainer.length){
+                return false;
+                newGroupContainer = thisGrouplist.find('.group[data-group]').last();
+            }
         } else if (thisDirection == 'next'){
             var newGroupContainer = currentGroupContainer.next('.group');
-            if (!newGroupContainer.length){ newGroupContainer = thisGrouplist.find('.group[data-group]').first(); }
+            if (!newGroupContainer.length){
+                return false;
+                newGroupContainer = thisGrouplist.find('.group[data-group]').first();
+            }
         }
         var newGroupToken = newGroupContainer.attr('data-group');
 
-        // Swap the current group with the new one
+        // Swap the current group with the new one in the group list
         thisGrouplist.attr('data-current', newGroupToken);
         currentGroupContainer.removeClass('current');
         newGroupContainer.addClass('current');
@@ -75,18 +81,34 @@ $(document).ready(function(){
 
         });
 
-    // Create a reference to the starforce chart element
+    // Loop through chart placeholders and initialize canvases
     var starForceChart = $('.starforce', thisBody);
+    var starForceChartCanvases = [];
     if (starForceChart.length && typeof thisStarSettings.starData != 'undefined'){
-
         var chartCanvases = $(".chart_canvas");
+        chartCanvases.empty();
         chartCanvases.each(function(){
             var thisCanvas = $(this);
             var thisCanvasSource = thisCanvas.attr('data-source');
             var thisCanvasChart = new Chart(thisCanvas, thisStarSettings[thisCanvasSource]);
+            starForceChartCanvases.push(thisCanvasChart);
             });
-
         }
+
+    // Define a click event for the full-screen toggle button
+    var resizeTimeout = false;
+    var xforceToggleFunction = function(e){
+        if (typeof e != 'undefined'){ e.preventDefault(); }
+        var expanded = thisContainer.hasClass('xforce') ? true : false;
+        if (expanded){ thisContainer.removeClass('xforce'); }
+        else { thisContainer.addClass('xforce'); }
+        for (i in starForceChartCanvases){
+            var thisCanvasChart = starForceChartCanvases[i];
+            thisCanvasChart.resize();
+            }
+        };
+    var xforceToggle = $('.starforce .size_toggle', thisContainer);
+    xforceToggle.bind('click', function(e){ return xforceToggleFunction(e); });
 
     // Fade in the leaderboard screen slowly
     thisBody.waitForImages(function(){
@@ -119,6 +141,15 @@ function refreshStarchart(){
     // Collect reference to key starchart objects
     var thisStarchart = $('.starchart', thisBody);
     var currentGroups = $('.grouplist .group.current', thisStarchart);
+
+    // Collect the current top and side groups
+    var currentTopGroup = $('.grouplist.topbar', thisStarchart).attr('data-current');
+    var currentSideGroup = $('.grouplist.sidebar', thisStarchart).attr('data-current');
+
+    // Update the bullet containers with the new top and side
+    $('.bullets .bull', thisStarchart).removeClass('current');
+    $('.bullets.topbar .bull[data-group="'+currentTopGroup+'"]', thisStarchart).addClass('current');
+    $('.bullets.sidebar .bull[data-group="'+currentSideGroup+'"]', thisStarchart).addClass('current');
 
     // Define arrays to hold visible keys
     var visibleTopKeys = [];
