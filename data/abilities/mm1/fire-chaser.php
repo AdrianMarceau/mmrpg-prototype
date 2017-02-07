@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'fire-chaser',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/007',
-    'ability_description' => 'The user a unleashes a powerful wave of fire that chases the target, inflicting twice as much damage if the target has higher speed than the user!',
+    'ability_description' => 'The user a unleashes a powerful wave of fire that chases the target to inflict damage. The slower the user is compared to the target, the greater this ability\'s power.',
     'ability_type' => 'flame',
     'ability_type2' => 'swift',
     'ability_energy' => 8,
@@ -17,9 +17,14 @@ $ability = array(
         extract($objects);
 
         // Update this ability's damage based on the user and target's speed
-        if ($target_robot->robot_speed > $this_robot->robot_speed){
-            $this_ability->set_name($this_ability->ability_base_name . ' Δ');
-            $this_ability->set_damage($this_ability->ability_base_damage * 2);
+        if ($target_robot->robot_speed != $this_robot->robot_speed){
+            $name_symbol = $target_robot->robot_speed > $this_robot->robot_speed ? 'Δ' : '∇';
+            $relative_speed = $target_robot->robot_speed / $this_robot->robot_speed;
+            $new_damage_amount = ceil($this_ability->ability_base_damage * $relative_speed);
+            if ($new_damage_amount < 1){ $new_damage_amount = 1; }
+            elseif ($new_damage_amount > 100){ $new_damage_amount = 100; }
+            $this_ability->set_name($this_ability->ability_base_name.' '.$name_symbol);
+            $this_ability->set_damage($new_damage_amount);
         } else {
             $this_ability->reset_name();
             $this_ability->reset_damage();
@@ -60,9 +65,14 @@ $ability = array(
 
         // Update this ability's damage based on the user and target's speed
         if (!empty($target_robot)){
-            if ($target_robot->robot_speed > $this_robot->robot_speed){
-                $this_ability->set_name($this_ability->ability_base_name . ' Δ');
-                $this_ability->set_damage($this_ability->ability_base_damage * 2);
+            if ($target_robot->robot_speed != $this_robot->robot_speed){
+                $name_symbol = $target_robot->robot_speed > $this_robot->robot_speed ? 'Δ' : '∇';
+                $relative_speed = $target_robot->robot_speed / $this_robot->robot_speed;
+                $new_damage_amount = ceil($this_ability->ability_base_damage * $relative_speed);
+                if ($new_damage_amount < 1){ $new_damage_amount = 1; }
+                elseif ($new_damage_amount > 100){ $new_damage_amount = 100; }
+                $this_ability->set_name($this_ability->ability_base_name.' '.$name_symbol);
+                $this_ability->set_damage($new_damage_amount);
             } else {
                 $this_ability->reset_name();
                 $this_ability->reset_damage();
