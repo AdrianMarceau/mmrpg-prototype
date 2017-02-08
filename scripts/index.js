@@ -57,7 +57,7 @@ $(document).ready(function(){
 
     // Capture and clicks to the main menu expand toggle
     $('.userinfo .expand', thisHeaderBanner).click(function(e){
-        console.log('expand clicked!');
+        //console.log('expand clicked!');
         e.preventDefault();
         var menuButton = $(this);
         var menuContainer = $('.main', thisHeaderMenu);
@@ -304,7 +304,7 @@ $(document).ready(function(){
         var formattingToggleFunction = function(e){
             e.preventDefault();
 
-            console.log('formattingToggleFunction');
+            //console.log('formattingToggleFunction');
 
             // Collect a reference to this link and the parent and wrapper
             var thisLink = $(this);
@@ -313,7 +313,7 @@ $(document).ready(function(){
 
             // If this is the first time the element was clicked
             if (formattingToggleFirstClick){
-                console.log('formattingToggleFunction first click, let\'s hide');
+                //console.log('formattingToggleFunction first click, let\'s hide');
                 thisParent.removeClass('formatting_expanded');
                 thisWrapper.css({display:'none',height:'',opacity:1});
                 thisLink.html('+ Show Formatting Options');
@@ -323,7 +323,7 @@ $(document).ready(function(){
 
             // If the wrapper is already expanded, let's collapse it
             if (thisParent.hasClass('formatting_expanded')){
-                console.log('formattingToggleFunction is expanded, closing now... to 0 height');
+                //console.log('formattingToggleFunction is expanded, closing now... to 0 height');
                 thisWrapper.stop().animate({height:0,opacity:0},600,'swing',function(){
                     thisParent.removeClass('formatting_expanded');
                     thisLink.html('+ Show Formatting Options');
@@ -334,7 +334,7 @@ $(document).ready(function(){
             // Otherwise if the wrapper is not yet expanded, let's do so now
             else {
                 var maxHeight = thisWrapper.attr('data-maxheight');
-                console.log('formattingToggleFunction is collapsed, opening now... to '+maxHeight+' height');
+                //console.log('formattingToggleFunction is collapsed, opening now... to '+maxHeight+' height');
                 thisWrapper.css({display:'',height:0,opacity:0});
                 thisWrapper.stop().animate({height:maxHeight+'px',opacity:1},600,'swing',function(){
                     thisParent.addClass('formatting_expanded');
