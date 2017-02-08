@@ -234,8 +234,8 @@ else { $this_thread_info['post_count'] = false; }
 ?>
 <div class="subheader thread_path" style="">
     <div class="path">
-        <a class="link" style="" href="<?= str_replace($this_category_info['category_token'].'/'.$this_current_id.'/'.$this_current_token.'/', '', $_GET['this_current_url']) ?>">Community</a> <span class="pipe">&nbsp;&raquo;&nbsp;</span>
-        <a class="link" style="" href="<?= str_replace($this_current_id.'/'.$this_current_token.'/', '', $_GET['this_current_url']) ?>"><?= $this_category_info['category_name'] ?></a> <span class="pipe">&nbsp;&raquo;&nbsp;</span>
+        <a class="link" style="" href="<?= 'community/' ?>">Community</a> <span class="pipe">&nbsp;&raquo;&nbsp;</span>
+        <a class="link" style="" href="<?= 'community/'.$this_category_info['category_token'].'/' ?>"><?= $this_category_info['category_name'] ?></a> <span class="pipe">&nbsp;&raquo;&nbsp;</span>
     </div>
 </div>
 <div class="subheader thread_title field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="">
