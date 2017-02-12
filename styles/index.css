@@ -353,6 +353,67 @@ html {
 
 
 
+#window .banner .adminlink {
+    position: absolute;
+    display: block;
+    top: 4px;
+    right: 4px;
+    width: 19px;
+    height: 19px;
+    z-index: 100;
+}
+#window .banner .adminlink .link {
+    display: block;
+    box-sizing: border-box;
+    margin: 0;
+    width: 19px;
+    height: 19px;
+    font-size: 13px;
+    line-height: 13px;
+    padding: 2px;
+    border: 1px solid #751f1f;
+    background-color: #8c2525;
+    color: #8c2525;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+#window .banner .adminlink .link:hover {
+    text-decoration: none;
+    background-color: #a52c2c;
+    color: #a52c2c;
+}
+#window .banner .adminlink .link:before {
+    content: " ";
+    display: block;
+    box-sizing: border-box;
+    width: 9px;
+    height: 9px;
+    font-size: 9px;
+    line-height: 9px;
+    text-decoration: none;
+    padding: 2px;
+    margin: 2px;
+    border: 0 none transparent;
+    background-color: #EFEFEF;
+    color: #EFEFEF;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+#window .banner .adminlink .link:hover:before {
+    text-decoration: none;
+    background-color: #FFFFFF;
+    color: #FFFFFF;
+}
+#window .banner .adminlink .link span {
+    display: none;
+}
+
+
 #window .menu,
 #window .menu .subs {
     display: block;
@@ -566,6 +627,7 @@ html {
     margin-left: -4px;
     margin-right: 4px;
 }
+
 
 
 #window .page {
