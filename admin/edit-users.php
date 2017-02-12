@@ -2,17 +2,62 @@
 
     <?
 
+
+    /* -- Form Setup Actions -- */
+
+    // Define the form messages and collect any from session
+    $form_messages = array();
+    if (!empty($_SESSION['mmrpg_admin']['form_messages'])){
+        $form_messages = $_SESSION['mmrpg_admin']['form_messages'];
+    }
+
+    // Define a function for saving form messages to session
+    function backup_form_messages(){
+        global $form_messages;
+        $_SESSION['mmrpg_admin']['form_messages'] = $form_messages;
+    }
+
+    // Define a function for exiting a form action
+    function exit_form_action($output = ''){
+        backup_form_messages();
+        exit($output);
+    }
+
+    // Define a function for exiting a user edit action
+    function exit_user_edit_action($user_id = 0){
+        if (!empty($user_id)){ $location = 'admin.php?action=edit_users&subaction=editor&user_id='.$user_id; }
+        else { $location = 'admin.php?action=edit_users&subaction=search'; }
+        header('Location: '.$location);
+        exit_form_action();
+    }
+
+
+    /* -- Admin Subpage Processing -- */
+
     // Collect or define current subaction
     $sub_action =  !empty($_GET['subaction']) ? $_GET['subaction'] : 'search';
+
+    // If we're in delete mode, we need to remove some data
+    $delete_data = array();
+    if ($sub_action == 'delete' && !empty($_GET['user_id'])){
+
+        // Collect form data for processing
+        $delete_data['user_id'] = !empty($_GET['user_id']) && is_numeric($_GET['user_id']) ? trim($_GET['user_id']) : '';
+
+        // Let's delete all of this user's data from the database
+        $db->delete('mmrpg_users', array('user_id' => $delete_data['user_id']));
+        $db->delete('mmrpg_saves', array('user_id' => $delete_data['user_id']));
+        $form_messages[] = array('success', 'The requested user has been deleted from the database');
+        exit_form_action('success');
+
+    }
 
     // If we're in search mode, we might need to scan for results
     $search_data = array();
     $search_query = '';
     $search_results = array();
     $search_results_count = 0;
-    if ($sub_action == 'search'
-        && (!empty($_GET['user_id']) || !empty($_GET['user_name'])|| !empty($_GET['user_email']))
-        ){
+    if ($sub_action == 'search' && (!empty($_GET['user_id']) || !empty($_GET['user_name'])|| !empty($_GET['user_email']))){
 
         // Collect form data for processing
         $search_data['user_id'] = !empty($_GET['user_id']) && is_numeric($_GET['user_id']) ? trim($_GET['user_id']) : '';
@@ -110,33 +155,13 @@
         $user_fields = rpg_user::get_fields(true);
         $user_data = $db->get_array("SELECT {$user_fields} FROM mmrpg_users WHERE user_id = {$editor_data['user_id']};");
 
+        // If user data could not be found, produce error and exit
+        if (empty($user_data)){ exit_user_edit_action(); }
+
         // Collect the user's name(s) for display
         $user_name_display = $user_data['user_name'];
         if (!empty($user_data['user_name_public']) && $user_data['user_name_public'] != $user_data['user_name']){
             $user_name_display = $user_data['user_name_public'] .' / '. $user_name_display;
-        }
-
-
-        /* -- Process Form Actions -- */
-
-        // Define the form messages and collect any from session
-        $form_messages = array();
-        if (!empty($_SESSION['mmrpg_admin']['form_messages'])){
-            $form_messages = $_SESSION['mmrpg_admin']['form_messages'];
-        }
-
-        // DEBUG
-        //$form_messages[] = array('success', 'This is a success message!');
-        //$form_messages[] = array('warning', 'This is a warning message!');
-        //$form_messages[] = array('alert', 'This is an alert message!');
-        //$form_messages[] = array('error', 'This is an error message!');
-
-        // Define a function for breaking early from a form submission
-        function exit_user_edit_action($user_id){
-            global $form_messages;
-            $_SESSION['mmrpg_admin']['form_messages'] = $form_messages;
-            header('Location: admin.php?action=edit_users&subaction=editor&user_id='.$user_id);
-            exit();
         }
 
         // If form data has been submit for this user, we should process it
@@ -316,6 +341,7 @@
 
             // Loop through fields to create an update string
             $update_data = $form_data;
+            $update_data['user_date_modified'] = time();
             unset($update_data['user_id']);
             $update_results = $db->update('mmrpg_users', $update_data, array('user_id' => $form_data['user_id']));
 
@@ -336,24 +362,23 @@
 
         }
 
+    }
 
-        /* -- Generate Form Messages -- */
+    /* -- Generate Form Messages -- */
 
-        // If there were form messages, generate the message markup
-        $this_message_markup = '';
-        if (!empty($form_messages)){
-            $this_message_markup .= '<ul class="list">'.PHP_EOL;
-            foreach ($form_messages AS $key => $message){
-                list($type, $text) = $message;
-                $this_message_markup .= '<li class="message '.$type.'">';
-                    //$this_message_markup .= ucfirst($type).' : ';
-                    $this_message_markup .= $text;
-                $this_message_markup .= '</li>'.PHP_EOL;
-            }
-            $this_message_markup .= '</ul>'.PHP_EOL;
-            $_SESSION['mmrpg_admin']['form_messages'] = array();
+    // If there were form messages, generate the message markup
+    $this_message_markup = '';
+    if (!empty($form_messages)){
+        $this_message_markup .= '<ul class="list">'.PHP_EOL;
+        foreach ($form_messages AS $key => $message){
+            list($type, $text) = $message;
+            $this_message_markup .= '<li class="message '.$type.'">';
+                //$this_message_markup .= ucfirst($type).' : ';
+                $this_message_markup .= $text;
+            $this_message_markup .= '</li>'.PHP_EOL;
         }
-
+        $this_message_markup .= '</ul>'.PHP_EOL;
+        $_SESSION['mmrpg_admin']['form_messages'] = array();
     }
 
 
@@ -378,6 +403,8 @@
             <div class="search">
 
                 <h3 class="header">Search Users</h3>
+
+                <?= !empty($this_message_markup) ? '<div class="messages">'.$this_message_markup.'</div>' : '' ?>
 
                 <form class="form" method="get">
 
@@ -466,11 +493,10 @@
                                 }
 
                                 $user_edit = 'admin.php?action=edit_users&subaction=editor&user_id='.$user_id;
-                                $user_delete = 'admin.php?action=edit_users&subaction=delete&user_id='.$user_id;
 
                                 $user_actions = '';
                                 $user_actions .= '<a class="link edit" href="'.$user_edit.'"><span>edit</span></a>';
-                                $user_actions .= '<a class="link delete" href="#"><span>delete</span></a>';
+                                $user_actions .= '<a class="link delete" data-delete="users" data-user-id="'.$user_id.'"><span>delete</span></a>';
 
                                 $user_name = '<a class="link" href="'.$user_edit.'">'.$user_name_display.'</a>';
 
@@ -757,7 +783,7 @@
 
                         <div class="buttons">
                             <input class="button save" type="submit" value="Save Changes" />
-                            <input class="button delete" type="submit" value="Delete User" />
+                            <input class="button delete" type="button" value="Delete User" data-delete="users" data-user-id="<?= $user_data['user_id'] ?>" />
                         </div>
 
                         <div class="metadata">

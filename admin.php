@@ -108,6 +108,7 @@ unset($db);
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 <script type="text/javascript" src="scripts/jquery.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/admin.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 </head>
 <body id="mmrpg">
     <div id="admin">
