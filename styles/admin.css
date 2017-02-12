@@ -350,8 +350,12 @@ tr:nth-child(odd) td {
 .adminform .search .form {
     padding: 0 6px 6px;
 }
+.adminform .search .field {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
 .adminform .search .buttons {
-    padding-top: 0;
+    padding-top: 5px;
     clear: both;
 }
 .adminform .search .buttons .button {
@@ -370,10 +374,11 @@ tr:nth-child(odd) td {
 }
 
 .adminform .results .list .id {
-
+    padding-left: 6px;
 }
 .adminform .results .list .actions {
     text-align: right;
+    padding-right: 6px;
 }
 .adminform .results .list .created,
 .adminform .results .list .modified,
@@ -387,6 +392,7 @@ tr:nth-child(odd) td {
     margin-left: 6px;
     text-decoration: none;
     background-color: #FAFAFA;
+    cursor: pointer;
 }
 .adminform .results .list .actions .link.edit {
     color: #11ab00;
@@ -414,16 +420,16 @@ tr:nth-child(odd) td {
     margin: 0 auto 20px;
 }
 
-.adminform .editor .messages {
+.adminform .messages {
     display: block;
     margin: 0 auto 20px;
 }
-.adminform .editor .messages .list {
+.adminform .messages .list {
     list-style-type: none;
     margin: 0 auto;
     padding: 0;
 }
-.adminform .editor .messages .list .message {
+.adminform .messages .list .message {
     display: block;
     margin: 0 auto 3px 0;
     padding: 3px;
@@ -437,10 +443,10 @@ tr:nth-child(odd) td {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-.adminform .editor .messages .list .message.success:before,
-.adminform .editor .messages .list .message.warning:before,
-.adminform .editor .messages .list .message.alert:before,
-.adminform .editor .messages .list .message.error:before {
+.adminform .messages .list .message.success:before,
+.adminform .messages .list .message.warning:before,
+.adminform .messages .list .message.alert:before,
+.adminform .messages .list .message.error:before {
     content: "*";
     display: inline-block;
     box-sizing: border-box;
@@ -458,31 +464,31 @@ tr:nth-child(odd) td {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-.adminform .editor .messages .list .message.success {
+.adminform .messages .list .message.success {
     color: #005d07;
 }
-.adminform .editor .messages .list .message.warning {
+.adminform .messages .list .message.warning {
     color: #c35a00;
 }
-.adminform .editor .messages .list .message.alert {
+.adminform .messages .list .message.alert {
     color: #005da0;
 }
-.adminform .editor .messages .list .message.error {
+.adminform .messages .list .message.error {
     color: #8c2525;
 }
-.adminform .editor .messages .list .message.success:before {
+.adminform .messages .list .message.success:before {
     content: "\2714";
     background-color: #005d07;
 }
-.adminform .editor .messages .list .message.warning:before {
+.adminform .messages .list .message.warning:before {
     content: "\26a0";
     background-color: #c35a00;
 }
-.adminform .editor .messages .list .message.alert:before {
+.adminform .messages .list .message.alert:before {
     content: "\0021";
     background-color: #005da0;
 }
-.adminform .editor .messages .list .message.error:before {
+.adminform .messages .list .message.error:before {
     content: "\00d7";
     background-color: #8c2525;
 }

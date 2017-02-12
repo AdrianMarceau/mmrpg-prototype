@@ -90,6 +90,11 @@ body:before {
         width: 50%;
     }
 
+    .adminform .results .list .created,
+    .adminform .results .list .modified {
+        display: none;
+    }
+
 }
 
 /* -- Almost iPhone Portrait Mode -- */
@@ -118,6 +123,17 @@ body:before {
         display: block;
         float: none;
         width: auto;
+    }
+
+    .adminform .search .form {
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+    .adminform .results .list .id {
+        padding-left: 3px;
+    }
+    .adminform .results .list .actions {
+        padding-right: 3px;
     }
 
     .adminform .results .list .email,
