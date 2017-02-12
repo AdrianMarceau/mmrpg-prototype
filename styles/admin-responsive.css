@@ -68,6 +68,17 @@ body:before {
 
     }
 
+    .adminform .formfoot .metadata {
+        float: none;
+        clear: both;
+        text-align: left;
+        margin: 0 auto;
+        padding: 20px 0 0;
+    }
+    .adminform .formfoot .metadata .date {
+        margin: 0 20px 0 0;
+    }
+
 }
 
 /* -- Even Less than Portrait Mode -- */
@@ -175,7 +186,6 @@ body:before {
         text-align: left;
     }
     .adminform .formfoot .metadata {
-        margin-top: 20px;
         padding-right: 0;
     }
     .adminform .formfoot .metadata .date {
