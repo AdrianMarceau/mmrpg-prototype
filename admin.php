@@ -1,8 +1,8 @@
 <?
+
 // Require the application top file
+define('MMRPG_ADMIN_PANEL', true);
 require_once('top.php');
-// If someone is not supposed to be here...
-if (!MMRPG_CONFIG_ADMIN_MODE){ die('You shouldn\'t be here...'); }
 
 // Define the page title and markup variables
 $this_page_title = 'MMRPG Admin Panel';
@@ -20,8 +20,61 @@ $this_page_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : 'home';
 @ini_set('memory_limit', '128M'); //100MB
 @ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 
-// If this is an EMPTY request
-if ($this_page_action == 'home'){
+// Define the form messages and collect any from session
+$form_messages = array();
+if (!empty($_SESSION['mmrpg_admin']['form_messages'])){
+    $form_messages = $_SESSION['mmrpg_admin']['form_messages'];
+}
+
+// Define a function for saving form messages to session
+function backup_form_messages(){
+    global $form_messages;
+    $_SESSION['mmrpg_admin']['form_messages'] = $form_messages;
+}
+
+// Define a function for generating form messages
+function print_form_messages($print = true, $clear = true){
+    global $form_messages;
+    $this_message_markup = '';
+    if (!empty($form_messages)){
+        $this_message_markup .= '<ul class="list">'.PHP_EOL;
+        foreach ($form_messages AS $key => $message){
+            list($type, $text) = $message;
+            $this_message_markup .= '<li class="message '.$type.'">';
+                //$this_message_markup .= ucfirst($type).' : ';
+                $this_message_markup .= $text;
+            $this_message_markup .= '</li>'.PHP_EOL;
+        }
+        $this_message_markup .= '</ul>'.PHP_EOL;
+        if ($clear){ $_SESSION['mmrpg_admin']['form_messages'] = array(); }
+    }
+    if (!empty($this_message_markup)){
+        $this_message_markup = '<div class="messages">'.$this_message_markup.'</div>';
+    }
+    if ($print){ echo $this_message_markup; }
+    else { return $this_message_markup; }
+}
+
+// Define a function for exiting a form action
+function exit_form_action($output = ''){
+    backup_form_messages();
+    if (empty($output)){ header('Location: admin.php'); exit(); }
+    else { exit($output); }
+}
+
+// If we're not logged in yet
+if (!MMRPG_CONFIG_ADMIN_MODE){
+    // Require the admin home file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/login.php');
+}
+// Else if we're logging out now
+elseif ($this_page_action == 'exit'){
+    // Unset session variables and refresh page
+    unset($_SESSION['admin_id'], $_SESSION['admin_username'], $_SESSION['admin_username_display']);
+    exit_form_action();
+}
+// If this is the HOME request
+elseif ($this_page_action == 'home'){
     // Require the admin home file
     require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
 }
@@ -77,7 +130,7 @@ elseif ($this_page_action == 'edit_users'){
 }
 // Otherwise, not a valid page
 else {
-    // Print out error 404 text
+    // Define error 404 text to print
     $this_error_markup = '<strong>Error 404</strong><br />Page Not Found';
     // Require the admin home file
     require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
@@ -114,6 +167,13 @@ unset($db);
     <div id="admin">
         <h1 class="header"><?= $this_page_title ?></h1>
         <div class="content">
+            <? if (!empty($_SESSION['admin_username_display'])): ?>
+                <div class="userinfo">
+                    <strong class="welcome">Welcome, <?= $_SESSION['admin_username_display'] ?></strong>
+                    <span class="pipe">|</span>
+                    <a class="link" href="admin.php?action=exit">Exit</a>
+                </div>
+            <? endif; ?>
             <?= $this_page_markup ?>
         </div>
     </div>

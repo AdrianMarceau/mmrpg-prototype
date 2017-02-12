@@ -2,26 +2,7 @@
 
     <?
 
-
     /* -- Form Setup Actions -- */
-
-    // Define the form messages and collect any from session
-    $form_messages = array();
-    if (!empty($_SESSION['mmrpg_admin']['form_messages'])){
-        $form_messages = $_SESSION['mmrpg_admin']['form_messages'];
-    }
-
-    // Define a function for saving form messages to session
-    function backup_form_messages(){
-        global $form_messages;
-        $_SESSION['mmrpg_admin']['form_messages'] = $form_messages;
-    }
-
-    // Define a function for exiting a form action
-    function exit_form_action($output = ''){
-        backup_form_messages();
-        exit($output);
-    }
 
     // Define a function for exiting a user edit action
     function exit_user_edit_action($user_id = 0){
@@ -364,23 +345,6 @@
 
     }
 
-    /* -- Generate Form Messages -- */
-
-    // If there were form messages, generate the message markup
-    $this_message_markup = '';
-    if (!empty($form_messages)){
-        $this_message_markup .= '<ul class="list">'.PHP_EOL;
-        foreach ($form_messages AS $key => $message){
-            list($type, $text) = $message;
-            $this_message_markup .= '<li class="message '.$type.'">';
-                //$this_message_markup .= ucfirst($type).' : ';
-                $this_message_markup .= $text;
-            $this_message_markup .= '</li>'.PHP_EOL;
-        }
-        $this_message_markup .= '</ul>'.PHP_EOL;
-        $_SESSION['mmrpg_admin']['form_messages'] = array();
-    }
-
 
     ?>
 
@@ -404,7 +368,7 @@
 
                 <h3 class="header">Search Users</h3>
 
-                <?= !empty($this_message_markup) ? '<div class="messages">'.$this_message_markup.'</div>' : '' ?>
+                <? print_form_messages() ?>
 
                 <form class="form" method="get">
 
@@ -536,7 +500,7 @@
 
                 <h3 class="header">Edit User &quot;<?= $user_name_display ?>&quot;</h3>
 
-                <?= !empty($this_message_markup) ? '<div class="messages">'.$this_message_markup.'</div>' : '' ?>
+                <? print_form_messages() ?>
 
                 <form class="form" method="post">
 

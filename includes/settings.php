@@ -5,10 +5,6 @@
 define('MMRPG_CONFIG_DOMAIN', (isset($THIS_DOMAIN[0]) ? $THIS_DOMAIN[0] : false));
 unset($THIS_DOMAIN);
 
-// Define whether or not we're being viewed by an admin
-$is_admin = in_array($_SERVER['REMOTE_ADDR'], explode(',', MMRPG_CONFIG_ADMIN_LIST)) ? true : false;
-define('MMRPG_CONFIG_ADMIN_MODE', $is_admin);
-
 // Define the cache and save paths on this system
 define('MMRPG_CONFIG_SAVES_PATH', MMRPG_CONFIG_ROOTDIR.'_saves/');
 define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'_cache/');

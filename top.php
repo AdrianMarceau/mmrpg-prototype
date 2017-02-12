@@ -6,33 +6,6 @@ define('MMRPG_VERSION', '2.3.4');
 require('includes/config.php');
 require('includes/settings.php');
 
-// Turn ON error reporting if admin
-if (MMRPG_CONFIG_ADMIN_MODE){
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    ini_set('xdebug.max_nesting_level', 32);
-    error_reporting(-1);
-}
-
-// Turn OFF error reporting if live
-if (!MMRPG_CONFIG_ADMIN_MODE && MMRPG_CONFIG_IS_LIVE){
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    error_reporting(0);
-}
-
-// Stop BANNED users from accessing the website
-if (MMRPG_CONFIG_BANNED_LIST){
-    $current_ip = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
-    $banned_list = explode(',', MMRPG_CONFIG_BANNED_LIST);
-    foreach ($banned_list AS $ip_key => $ip_start){
-        $ip_start_pattern = '/^'.str_replace('.', '\\.', $ip_start).'/';
-        if (preg_match($ip_start_pattern, $current_ip)){
-            exit('No thank you ['.$ip_key.']');
-        }
-    }
-}
-
 // Update the timezone before starting the session
 @date_default_timezone_set('Canada/Eastern');
 //@ini_set('session.gc_maxlifetime', 24*60*60);
@@ -81,6 +54,77 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
         define('MMRPG_CRITICAL_ERROR', true);
         $_GET = array();
         $_GET['page'] = 'error';
+    }
+}
+
+// Collect or generate the developer whitelist for the admin panel
+$dev_whitelist = !empty($_SESSION['dev_whitelist']) ? $_SESSION['dev_whitelist'] : array();
+if (defined('MMRPG_ADMIN_PANEL') || empty($_SESSION['dev_whitelist'])){
+
+    // Define some defaults for the whitelist
+    $dev_whitelist = array();
+    if (MMRPG_CONFIG_IS_LIVE === false){ $dev_whitelist[] = '127.0.0.1'; }
+
+    // Attempt to collect a list of developers from the database
+    $dev_userdata = $db->get_array_list("SELECT
+        users.user_id,
+        users.user_name_clean,
+        users.user_ip_addresses,
+        roles.role_id,
+        roles.role_name,
+        roles.role_level
+        FROM mmrpg_users AS users
+        LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+        WHERE
+        users.user_ip_addresses <> ''
+        AND roles.role_level >= 4
+        ORDER BY
+        user_id ASC
+        ;", 'user_id');
+
+    // If developers were found, loop through and collect IPs
+    if (!empty($dev_userdata)){
+        foreach ($dev_userdata AS $uid => $udata){
+            $ip_list = $udata['user_ip_addresses'];
+            $ip_list = strstr($ip_list, ',') ? explode(',', $ip_list) : array($ip_list);
+            $ip_list = array_filter(array_map('trim', $ip_list));
+            foreach ($ip_list AS $ip){ $dev_whitelist[] = $ip; }
+        }
+    }
+
+    // Update the session whitelist with values
+    $_SESSION['dev_whitelist'] = $dev_whitelist;
+
+}
+
+// Define whether or not we're being viewed by an admin
+$is_admin_mode = !empty($_SESSION['admin_id']) ? true : false;
+define('MMRPG_CONFIG_ADMIN_MODE', $is_admin_mode);
+
+// Turn ON error reporting if admin
+if (MMRPG_CONFIG_ADMIN_MODE){
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    ini_set('xdebug.max_nesting_level', 32);
+    error_reporting(-1);
+}
+
+// Turn OFF error reporting if live
+if (!MMRPG_CONFIG_ADMIN_MODE && MMRPG_CONFIG_IS_LIVE){
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(0);
+}
+
+// Stop BANNED users from accessing the website
+if (MMRPG_CONFIG_BANNED_LIST){
+    $current_ip = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
+    $banned_list = explode(',', MMRPG_CONFIG_BANNED_LIST);
+    foreach ($banned_list AS $ip_key => $ip_start){
+        $ip_start_pattern = '/^'.str_replace('.', '\\.', $ip_start).'/';
+        if (preg_match($ip_start_pattern, $current_ip)){
+            exit('No thank you ['.$ip_key.']');
+        }
     }
 }
 

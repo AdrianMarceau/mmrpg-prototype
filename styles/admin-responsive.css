@@ -112,6 +112,22 @@ body:before {
         padding: 10px;
     }
 
+
+    .userinfo {
+        position: static;
+        text-align: left;
+        margin-bottom: 6px;
+    }
+    .userinfo .welcome {
+        margin-left: 0;
+    }
+    .userinfo .pipe {
+        display: none;
+    }
+    .userinfo .link {
+        float: right;
+    }
+
     .adminhome {
         padding-left: 0;
     }
@@ -146,6 +162,7 @@ body:before {
     .adminform .field {
         width: 100%;
     }
+    .adminform .login .field,
     .adminform .options .field {
         width: 100%;
     }
