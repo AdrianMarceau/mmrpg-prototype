@@ -1118,7 +1118,8 @@ body.index #header {
     background-color: transparent;
 }
 #credits {
-    margin: 0 auto 10px;
+    margin: 0 auto;
+    padding-bottom: 10px;
     font-size: 10px;
     color: #414141;
 }
