@@ -257,7 +257,7 @@ while ($this_action == 'profile'){
 
     // Robot Avatar
     $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
-        $html_form_fields .= '<label class="label label_imagepath" style="width: 230px; ">Robot Avatar :</label>';
+        $html_form_fields .= '<label class="label label_imagepath" style="width: 230px; ">Player Avatar :</label>';
         $html_avatar_options = array();
         $html_avatar_options[] = '<option value="">- Select Robot -</option>';
         // Print the optgroup opening tag
