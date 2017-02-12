@@ -55,7 +55,8 @@ class rpg_user {
             'user_backup_login',
             'user_flag_approved',
             'user_flag_postpublic',
-            'user_flag_postprivate'
+            'user_flag_postprivate',
+            'user_flag_allowchat'
             );
 
         // Add table name to each field string if requested
