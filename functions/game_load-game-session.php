@@ -118,11 +118,22 @@ function mmrpg_load_game_session($this_save_filepath){
         // Unset the player selection to restart at the player select screen
         if (mmrpg_prototype_players_unlocked() > 1){ $_SESSION[$session_token]['battle_settings']['this_player_token'] = false; }
 
+        // Expand user's current IP list, then add a new entry and filter unique
+        $local_ips = array('0.0.0.0', '127.0.0.1');
+        $ip_list = !empty($this_database_user['user_ip_addresses']) ? $this_database_user['user_ip_addresses'] : '';
+        $ip_list = strstr($ip_list, ',') ? explode(',', $ip_list) : array($ip_list);
+        $ip_list = array_filter(array_map('trim', $ip_list));
+        $ip_list[] = $_SERVER['REMOTE_ADDR'];
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){ $ip_list[] = array_pop(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])); }
+        foreach ($ip_list AS $k => $ip){ if (empty($ip) || in_array($ip, $local_ips)){ unset($ip_list[$k]); } }
+        $ip_list = array_unique($ip_list);
+
         // Update the user table in the database if not done already
         if (empty($_SESSION[$session_token]['DEMO'])){
             $db->update('mmrpg_users', array(
                 'user_last_login' => time(),
                 'user_backup_login' => $this_database_user['user_last_login'],
+                'user_ip_addresses' => implode(',', $ip_list)
                 ), "user_id = {$this_database_user['user_id']}");
         }
 
