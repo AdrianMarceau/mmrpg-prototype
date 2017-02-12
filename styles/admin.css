@@ -53,6 +53,35 @@ a:hover {
     background-color: #F6F6F6;
     text-align: left;
     padding: 20px;
+    position: relative;
+}
+
+
+.userinfo {
+    display: block;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 12px;
+    line-height: 15px;
+}
+.userinfo .welcome {
+    display: inline-block;
+    font-weight: normal;
+    margin: 0 0 0 5px;
+}
+.userinfo .pipe {
+    display: inline-block;
+    font-weight: normal;
+    margin: 0 0 0 5px;
+    color: #DEDEDE;
+}
+.userinfo .link {
+    display: inline-block;
+    font-weight: normal;
+    margin: 0 0 0 5px;
 }
 
 .breadcrumb {
@@ -64,6 +93,79 @@ a:hover {
 .breadcrumb a {
     display: inline-block;
     white-space: nowrap;
+}
+
+.messages {
+    display: block;
+    margin: 0 auto 20px;
+}
+.messages .list {
+    list-style-type: none;
+    margin: 0 auto;
+    padding: 0;
+}
+.messages .list .message {
+    display: block;
+    margin: 0 auto 3px 0;
+    padding: 3px;
+    font-size: 12px;
+    line-height: 16px;
+    min-height: 16px;
+    color: #262626;
+    border: 1px solid #DEDEDE;
+    background-color: #FAFAFA;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.messages .list .message.success:before,
+.messages .list .message.warning:before,
+.messages .list .message.alert:before,
+.messages .list .message.error:before {
+    content: "*";
+    display: inline-block;
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    font-size: 13px;
+    line-height: 16px;
+    text-align: center;
+    padding: 0 3px;
+    margin-right: 6px;
+    border: 0 none transparent;
+    background-color: #262626;
+    color: #FFFFFF;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.messages .list .message.success {
+    color: #005d07;
+}
+.messages .list .message.warning {
+    color: #c35a00;
+}
+.messages .list .message.alert {
+    color: #005da0;
+}
+.messages .list .message.error {
+    color: #8c2525;
+}
+.messages .list .message.success:before {
+    content: "\2714";
+    background-color: #005d07;
+}
+.messages .list .message.warning:before {
+    content: "\26a0";
+    background-color: #c35a00;
+}
+.messages .list .message.alert:before {
+    content: "\0021";
+    background-color: #005da0;
+}
+.messages .list .message.error:before {
+    content: "\00d7";
+    background-color: #8c2525;
 }
 
 .adminhome {
@@ -335,6 +437,7 @@ tr:nth-child(odd) td {
 
 .adminform .search,
 .adminform .results,
+.adminform .login,
 .adminform .editor {
     display: block;
     margin: 0 auto 20px;
@@ -365,6 +468,32 @@ tr:nth-child(odd) td {
 }
 .adminform .search .buttons .button:hover {
     background-color: #5d97b6;
+}
+
+.adminform .login {
+    margin-bottom: 10px;
+    padding: 0;
+}
+.adminform .login .header {
+    margin-bottom: 5px;
+}
+.adminform .login .form {
+    padding: 0 6px 6px;
+}
+.adminform .login .field {
+    width: 50%;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+.adminform .login .buttons {
+    padding-top: 5px;
+    clear: both;
+}
+.adminform .login .buttons .button {
+
+}
+.adminform .login .buttons .button:hover {
+
 }
 
 .adminform .results {
@@ -419,79 +548,6 @@ tr:nth-child(odd) td {
 .adminform .editor {
     display: block;
     margin: 0 auto 20px;
-}
-
-.adminform .messages {
-    display: block;
-    margin: 0 auto 20px;
-}
-.adminform .messages .list {
-    list-style-type: none;
-    margin: 0 auto;
-    padding: 0;
-}
-.adminform .messages .list .message {
-    display: block;
-    margin: 0 auto 3px 0;
-    padding: 3px;
-    font-size: 12px;
-    line-height: 16px;
-    min-height: 16px;
-    color: #262626;
-    border: 1px solid #DEDEDE;
-    background-color: #FAFAFA;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-}
-.adminform .messages .list .message.success:before,
-.adminform .messages .list .message.warning:before,
-.adminform .messages .list .message.alert:before,
-.adminform .messages .list .message.error:before {
-    content: "*";
-    display: inline-block;
-    box-sizing: border-box;
-    width: 16px;
-    height: 16px;
-    font-size: 13px;
-    line-height: 16px;
-    text-align: center;
-    padding: 0 3px;
-    margin-right: 6px;
-    border: 0 none transparent;
-    background-color: #262626;
-    color: #FFFFFF;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-}
-.adminform .messages .list .message.success {
-    color: #005d07;
-}
-.adminform .messages .list .message.warning {
-    color: #c35a00;
-}
-.adminform .messages .list .message.alert {
-    color: #005da0;
-}
-.adminform .messages .list .message.error {
-    color: #8c2525;
-}
-.adminform .messages .list .message.success:before {
-    content: "\2714";
-    background-color: #005d07;
-}
-.adminform .messages .list .message.warning:before {
-    content: "\26a0";
-    background-color: #c35a00;
-}
-.adminform .messages .list .message.alert:before {
-    content: "\0021";
-    background-color: #005da0;
-}
-.adminform .messages .list .message.error:before {
-    content: "\00d7";
-    background-color: #8c2525;
 }
 
 .adminform .editor .buttons .save {

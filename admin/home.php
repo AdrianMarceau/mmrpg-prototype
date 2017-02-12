@@ -1,9 +1,13 @@
 <? ob_start(); ?>
+
     <div class="breadcrumb">
         <a href="admin.php">Admin Panel</a>
         &raquo; <a href="admin.php?action=home">Home</a>
     </div>
+
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
+
+    <? print_form_messages() ?>
 
     <ul class="adminhome">
         <li class="top">
