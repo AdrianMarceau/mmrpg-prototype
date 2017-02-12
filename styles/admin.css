@@ -262,6 +262,7 @@ tr:nth-child(odd) td {
 
 }
 .adminform .field input[type="text"],
+.adminform .field input[type="password"],
 .adminform .field select,
 .adminform .field textarea {
     display: block;
