@@ -18,7 +18,20 @@ ob_start();
 $this_page_markup .= ob_get_clean();
 
 // Collect any save files that have a cache date less than the current one
-$this_purge_query = "SELECT mmrpg_users.*, mmrpg_saves.save_file_path, mmrpg_saves.save_file_name, mmrpg_leaderboard.board_points FROM mmrpg_users LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id INNER JOIN mmrpg_leaderboard ON mmrpg_users.user_id = mmrpg_leaderboard.user_id WHERE mmrpg_users.user_date_created = mmrpg_users.user_date_modified AND mmrpg_users.user_name_clean <> 'guest' LIMIT {$this_purge_limit}";
+$this_purge_query = "SELECT
+  mmrpg_users.*,
+  mmrpg_saves.save_file_path,
+  mmrpg_saves.save_file_name,
+  mmrpg_leaderboard.board_points
+  FROM mmrpg_users
+  LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id
+  INNER JOIN mmrpg_leaderboard ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
+  WHERE
+  mmrpg_users.user_date_created = mmrpg_users.user_last_login
+  AND mmrpg_users.user_name_clean <> 'guest'
+  AND mmrpg_leaderboard.board_points = 0
+  LIMIT {$this_purge_limit}
+  ;";
 $this_purge_list = $db->get_array_list($this_purge_query);
 //die($this_purge_query);
 
