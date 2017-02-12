@@ -59,7 +59,8 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 
 // Collect or generate the developer whitelist for the admin panel
 $dev_whitelist = !empty($_SESSION['dev_whitelist']) ? $_SESSION['dev_whitelist'] : array();
-if (defined('MMRPG_ADMIN_PANEL') || empty($_SESSION['dev_whitelist'])){
+if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')
+    && (defined('MMRPG_ADMIN_PANEL') || empty($_SESSION['dev_whitelist']))){
 
     // Define some defaults for the whitelist
     $dev_whitelist = array();
