@@ -1,0 +1,367 @@
+
+/* -- BASE STYLESHEET (ADMIN) -- */
+
+#mmrpg {
+    width: auto;
+    max-width: 1024px;
+    background-color: #E0E0E0;
+    color: #262626;
+}
+
+#admin {
+    margin: 20px;
+}
+
+a,
+a:hover {
+    color: #008aab;
+}
+
+#mmrpg #admin > .header {
+    display: block;
+    padding: 9px;
+    margin: 0 auto 10px 0;
+    font-size: 18px;
+    line-height: 22px;
+    text-align: center;
+    background-color: #262626;
+    color: #FFFFFF;
+    position: relative;
+}
+#mmrpg #admin > .header:before,
+#mmrpg #admin > .header:after {
+    content: " ";
+    display: block;
+    position: absolute;
+    height: 3px;
+    right: 0;
+    left: 0;
+    background-image: url(../images/fields/intro-field/battle-field_background_base.gif);
+    background-repeat: repeat-x;
+}
+#mmrpg #admin > .header:before {
+    top: 0;
+    background-position: center -103px;
+}
+#mmrpg #admin > .header:after {
+    bottom: 0;
+    background-position: center -106px;
+}
+
+#mmrpg #admin > .content {
+    display: block;
+    background-color: #F6F6F6;
+    text-align: left;
+    padding: 20px;
+}
+
+.breadcrumb {
+    display: block;
+    margin: 0 auto 20px;
+    font-weight: bold;
+    clear: both;
+}
+.breadcrumb a {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.adminhome {
+    margin: 0 auto 20px;
+    padding: 0;
+    font-weight: bold;
+}
+.adminhome li {
+    padding: 6px 0;
+    margin: 0 auto 0 0;
+    border-bottom: 1px solid #E0E0E0;
+    overflow: hidden;
+}
+.adminhome li:first-child {
+    border-top: 1px solid #E0E0E0;
+}
+.adminhome li a {
+
+}
+.adminhome li em {
+    font-weight: normal;
+    float: right;
+    width: 60%;
+}
+
+.adminform {
+    display: block;
+    margin: 0 auto;
+}
+
+.adminform hr {
+    display: block;
+    height: 1px;
+    padding-top: 20px;
+    margin: 0 auto 20px;
+    clear: both;
+    border: 0 none transparent;
+    background-color: transparent;
+    border-bottom: 1px solid #E0E0E0;
+}
+
+.adminform pre {
+    max-width: 100%;
+    overflow: auto;
+    margin: 0 auto 10px;
+    padding: 9px;
+    border: 1px solid #EFEFEF;
+    -moz-box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.02);
+    -webkit-box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.02);
+    box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.02);
+    background-color: #FAFAFA;
+}
+.adminform pre:last-child {
+    margin-bottom: 0;
+}
+
+.adminform .header {
+    display: block;
+    margin: 0 auto 10px 0;
+    text-align: left;
+    clear: both;
+    font-size: 16px;
+    line-height: 19px;
+    font-weight: bold;
+}
+
+
+.adminform table {
+    margin: 0 auto 10px;
+    border-spacing: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+    text-align: left;
+    font-size: 13px;
+    line-height: 19px;
+}
+.adminform table th,
+.adminform table td {
+    padding: 6px 3px;
+    text-align: left;
+}
+tr:nth-child(even) td {
+    background-color: #FAFAFA;
+}
+tr:nth-child(odd) td {
+    background-color: #F0F0F0;
+}
+
+.adminform table thead th {
+    background-color: #262626;
+    font-weight: bold;
+    color: #FFFFFF;
+    font-size: 12px;
+    line-height: 16px;
+}
+.adminform table tfoot td {
+    text-align: right;
+    background-color: #262626;
+    font-weight: bold;
+    color: #FFFFFF;
+    font-size: 12px;
+    line-height: 16px;
+}
+.adminform table tbody td {
+    color: #262626;
+    font-size: 11px;
+    line-height: 15px;
+
+}
+.adminform table tbody td .wrap {
+    width: 95%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.adminform .field,
+.adminform .options,
+.adminform .formfoot {
+    display: block;
+    margin: 0 auto 5px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.adminform .field {
+    width: 33%;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    float: left;
+    font-size: 12px;
+    line-height: 16px;
+    min-height: 50px;
+}
+.adminform .field.fullsize {
+    width: 100%;
+    float: none;
+    clear: both;
+}
+.adminform .options {
+    padding-top: 10px;
+    clear: both;
+}
+.adminform .formfoot {
+    padding-top: 10px;
+    clear: both;
+}
+.adminform .formfoot .buttons {
+    display: block;
+    margin: 0 10px 0 0;
+    float: left;
+}
+.adminform .formfoot .metadata {
+    display: block;
+    margin: 0 0 0 10px;
+    float: right;
+    font-size: 11px;
+    line-height: 16px;
+    text-align: right;
+}
+.adminform .formfoot .metadata .date {
+    display: inline-block;
+    margin: 0 0 0 20px;
+}
+
+.adminform .field .label {
+    display: block;
+    margin: 0 auto 4px 0;
+    font-weight: bold;
+}
+.adminform .field input[type="text"],
+.adminform .field select,
+.adminform .field textarea {
+    display: block;
+    margin: 0 auto 0 0;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #DEDEDE;
+    background-color: #FFFFFF;
+    padding: 3px 6px;
+}
+
+.adminform .field input[disabled] {
+    border: 1px solid #DEDEDE;
+    background-color: #EFEFEF;
+}
+
+
+.adminform .options .field {
+    width: 25%;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    float: left;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 13px;
+    min-height: 0;
+}
+.adminform .options .field .label {
+    display: inline-block;
+    margin: 0 6px 0 0;
+    cursor: pointer;
+}
+.adminform .options .field .label strong {
+    display: inline-block;
+    margin: 0 6px 0 0;
+}
+.adminform .options .field label input {
+    display: inline-block;
+    margin: 0 6px 0 0;
+    position: relative;
+    top: 2px;
+
+}
+.adminform .options .field .subtext {
+    display: block;
+    margin: 2px 0 0;
+
+}
+
+.adminform .search,
+.adminform .results,
+.adminform .editor {
+    display: block;
+    margin: 0 auto 20px;
+    overflow: hidden;
+}
+
+.adminform .search {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #FAFAFA;
+    border: 1px dotted #E0E0E0;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+.adminform .search .buttons {
+    padding-top: 0;
+}
+
+.adminform .results {
+
+}
+.adminform .results .list {
+
+}
+
+.adminform .results .list .id {
+
+}
+.adminform .results .list .actions {
+    text-align: right;
+}
+.adminform .results .list .created,
+.adminform .results .list .modified,
+.adminform .results .list .role {
+    text-align: center;
+}
+
+
+.adminform .results .list .actions .link {
+    display: inline-block;
+    margin-left: 6px;
+    text-decoration: none;
+    background-color: #FAFAFA;
+}
+.adminform .results .list .actions .link.edit {
+    color: #11ab00;
+}
+.adminform .results .list .actions .link.delete {
+    color: #ab0000;
+}
+.adminform .results .list .actions .link:before {
+    content: "[";
+    padding-right: 2px;
+    color: #cccccc;
+}
+.adminform .results .list .actions .link:after {
+    content: "]";
+    padding-left: 2px;
+    color: #cccccc;
+}
+.adminform .results .list .actions .link:hover span {
+    text-decoration: underline;
+}
+
+
+.adminform .editor {
+    display: block;
+    margin: 0 auto 20px;
+}
+
+
+
+.adminform .editor .field input[name="user_omega"] {
+    font-family: "Courier New";
+}

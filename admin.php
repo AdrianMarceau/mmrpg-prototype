@@ -5,7 +5,7 @@ require_once('top.php');
 if (!MMRPG_CONFIG_ADMIN_MODE){ die('You shouldn\'t be here...'); }
 
 // Define the page title and markup variables
-$this_page_title = 'Admin Panel';
+$this_page_title = 'MMRPG Admin Panel';
 $this_page_markup = '';
 
 // Collect the current action from the URL if set
@@ -70,6 +70,11 @@ elseif ($this_page_action == 'clear_sessions'){
     // Require the delete cache file
     require(MMRPG_CONFIG_ROOTDIR.'admin/clear-sessions.php');
 }
+// Else if this is an EDIT USERS request
+elseif ($this_page_action == 'edit_users'){
+    // Require the delete cache file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-users.php');
+}
 // Otherwise, not a valid page
 else {
     // Print out error 404 text
@@ -91,23 +96,26 @@ unset($db);
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
+<link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
+<meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1.0">
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/file.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/admin.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/admin-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 <script type="text/javascript" src="scripts/jquery.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 </head>
-<body id="mmrpg" style="background-color: #F2F2F2;">
-    <div id="admin" style="margin: 20px;">
-        <h1 class="header" style="font-size: 20px; line-height: 40px; "><?= $this_page_title ?></h1>
-        <div class="content" style="text-align: left; padding: 20px; background-color: #FFFFFF;">
+<body id="mmrpg">
+    <div id="admin">
+        <h1 class="header"><?= $this_page_title ?></h1>
+        <div class="content">
             <?= $this_page_markup ?>
         </div>
     </div>
-    &nbsp;
     <? if(false){ ?>
         <pre style="text-align: left; padding: 20px;">
         <? foreach ($_SESSION['GAME']['values']['battle_settings'] AS $player_token => $battle_settings){
@@ -117,6 +125,5 @@ unset($db);
         <?= htmlentities(print_r($_REQUEST), ENT_QUOTES, 'UTF-8', true) ?>
         </pre>
     <? } ?>
-    &nbsp;
 </body>
 </html>

@@ -1,0 +1,180 @@
+
+/* -- RESPONSIVE STYLESHEET (ADMIN) -- */
+
+body:before {
+    content: "Z";
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    background-color: magenta;
+    border: 1px solid magenta;
+    border-top: 0 none transparent;
+    border-left: 0 none transparent;
+    color: #FFFFFF;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    font-family: "Courier New";
+    font-size: 26px;
+    line-height: 50px;
+    z-index: 9999;
+}
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+
+    body:before {
+        content: "01";
+    }
+
+}
+
+/* -- Portrait Mode -- */
+@media (max-width: 1060px){
+
+    body:before {
+        content: "02";
+    }
+
+}
+
+/* -- Slightly Less than Portrait Mode -- */
+@media (max-width: 1000px){
+
+    body:before {
+        content: "03";
+    }
+
+
+}
+
+/* -- Less than Portrait Mode -- */
+@media (max-width: 970px){
+
+    body:before {
+        content: "04";
+    }
+
+    #admin {
+        margin: 10px;
+    }
+
+    .adminform .field {
+        width: 50%;
+    }
+    .adminform .options .field {
+
+    }
+
+}
+
+/* -- Even Less than Portrait Mode -- */
+@media (max-width: 760px){
+
+    body:before {
+        content: "05";
+    }
+
+}
+
+/* -- Even More Less than Portrait Mode -- */
+@media (max-width: 700px){
+
+    body:before {
+        content: "06";
+    }
+
+    .adminform .options .field {
+        width: 50%;
+    }
+
+}
+
+/* -- Almost iPhone Portrait Mode -- */
+@media (max-width: 560px){
+
+    body:before {
+        content: "07";
+    }
+
+    #admin {
+        margin: 5px;
+    }
+
+    #mmrpg #admin > .content {
+        padding: 10px;
+    }
+
+    .adminhome {
+        padding-left: 0;
+    }
+    .adminhome li a {
+        display: block;
+        margin: 0 auto 4px 0;
+    }
+    .adminhome li em {
+        display: block;
+        float: none;
+        width: auto;
+    }
+
+    .adminform .results .list .email,
+    .adminform .results .list .role,
+    .adminform .results .list .created,
+    .adminform .results .list .modified {
+        display: none;
+    }
+
+    .adminform .field {
+        width: 100%;
+    }
+    .adminform .options .field {
+        width: 100%;
+    }
+
+    .adminform .formfoot .buttons,
+    .adminform .formfoot .metadata {
+        float: none;
+        clear: both;
+        margin: 0 auto;
+        text-align: left;
+    }
+    .adminform .formfoot .metadata {
+        margin-top: 20px;
+    }
+    .adminform .formfoot .metadata .date {
+        display: block;
+        margin: 0 auto 5px;
+    }
+
+}
+
+/* -- So Close to iPhone Portrait Mode -- */
+@media (max-width: 460px){
+
+    body:before {
+        content: "08";
+    }
+
+}
+
+/* -- Even Closer to iPhone Portrait Mode -- */
+@media (max-width: 400px){
+
+    body:before {
+        content: "09";
+    }
+
+}
+
+
+/* -- iPhone Portrait Mode -- */
+@media (max-width: 350px){
+
+    body:before {
+        content: "10";
+    }
+
+}
