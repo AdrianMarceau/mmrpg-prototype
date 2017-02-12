@@ -892,7 +892,9 @@ body:before {
         line-height: 25px;
     }
 
-    #window .page .event table td.right
+    #window .page .event table td.right {
+
+    }
 
     #window .page .database_container .subbody .link_top {
         font-size: 10px;
@@ -930,6 +932,9 @@ body:before {
         line-height: 12px;
         margin-top: 6px;
         padding: 0;
+    }
+    #window .page .body .subheader .count {
+        margin-bottom: 2px;
     }
     #window .page .body .subheader .float_link,
     #window .page .body .subheader .float_link2 {
@@ -1097,7 +1102,9 @@ body:before {
         clear: none;
     }
     #window .page .body .community .thread_subbody .thread_linkblock .count .newpost {
-
+        max-width: 115px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     #window .page .body .community .thread_subbody .thread_linkblock .count .newpost + .newpost {
 
@@ -1257,6 +1264,13 @@ body:before {
     }
     #window .page .body .community .post_subbody_right .published {
         margin-right: 92px;
+    }
+    #window .page .body .community .thread_subbody .options {
+
+    }
+    #window .page .body .community .post_subbody .options {
+        margin: 4px 0 2px 0;
+        float: left;
     }
 
     #window .page .body .community .post_subbody .published .full {

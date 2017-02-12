@@ -4357,6 +4357,8 @@ body.windowFlag_landscapeMode #window .page .type_block {
     padding: 3px 10px;
 }
 #window .page .body .community .post_subbody_left .published {
+    display: block;
+    overflow: hidden;
     margin: 0 0 6px 91px;
     padding-left: 10px;
     border-left: 0 none transparent;
