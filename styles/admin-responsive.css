@@ -143,6 +143,7 @@ body:before {
     }
     .adminform .formfoot .metadata {
         margin-top: 20px;
+        padding-right: 0;
     }
     .adminform .formfoot .metadata .date {
         display: block;
