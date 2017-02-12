@@ -220,10 +220,12 @@ tr:nth-child(odd) td {
 .adminform .formfoot .metadata {
     display: block;
     margin: 0 0 0 10px;
+    padding-right: 20px;
     float: right;
     font-size: 11px;
     line-height: 16px;
     text-align: right;
+    color: #696969;
 }
 .adminform .formfoot .metadata .date {
     display: inline-block;
@@ -234,6 +236,23 @@ tr:nth-child(odd) td {
     display: block;
     margin: 0 auto 4px 0;
     font-weight: bold;
+}
+.adminform .field .label em {
+    display: inline-block;
+    margin: 0 auto 0 10px;
+    font-weight: normal;
+    color: #969696;
+    font-size: 11px;
+    line-height: 11px;
+    position: relative;
+    bottom: 1px;
+}
+.adminform .field .label em:before {
+    content: "(";
+}
+.adminform .field .label em:after {
+    content: ")";
+
 }
 .adminform .field input[type="text"],
 .adminform .field select,
@@ -358,6 +377,79 @@ tr:nth-child(odd) td {
 .adminform .editor {
     display: block;
     margin: 0 auto 20px;
+}
+
+.adminform .editor .messages {
+    display: block;
+    margin: 0 auto 20px;
+}
+.adminform .editor .messages .list {
+    list-style-type: none;
+    margin: 0 auto;
+    padding: 0;
+}
+.adminform .editor .messages .list .message {
+    display: block;
+    margin: 0 auto 3px 0;
+    padding: 3px;
+    font-size: 12px;
+    line-height: 16px;
+    min-height: 16px;
+    color: #262626;
+    border: 1px solid #DEDEDE;
+    background-color: #FAFAFA;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.adminform .editor .messages .list .message.success:before,
+.adminform .editor .messages .list .message.warning:before,
+.adminform .editor .messages .list .message.alert:before,
+.adminform .editor .messages .list .message.error:before {
+    content: "*";
+    display: inline-block;
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    font-size: 13px;
+    line-height: 16px;
+    text-align: center;
+    padding: 0 3px;
+    margin-right: 6px;
+    border: 0 none transparent;
+    background-color: #262626;
+    color: #FFFFFF;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.adminform .editor .messages .list .message.success {
+    color: #005d07;
+}
+.adminform .editor .messages .list .message.warning {
+    color: #c35a00;
+}
+.adminform .editor .messages .list .message.alert {
+    color: #005da0;
+}
+.adminform .editor .messages .list .message.error {
+    color: #8c2525;
+}
+.adminform .editor .messages .list .message.success:before {
+    content: "\2714";
+    background-color: #005d07;
+}
+.adminform .editor .messages .list .message.warning:before {
+    content: "\26a0";
+    background-color: #c35a00;
+}
+.adminform .editor .messages .list .message.alert:before {
+    content: "\0021";
+    background-color: #005da0;
+}
+.adminform .editor .messages .list .message.error:before {
+    content: "\00d7";
+    background-color: #8c2525;
 }
 
 
