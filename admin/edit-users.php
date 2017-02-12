@@ -727,12 +727,12 @@
                             <strong>Change Password</strong>
                             <em>6 - 18 characters</em>
                         </div>
-                        <input class="textbox" type="text" name="user_password_new" value="" maxlength="16" />
+                        <input class="textbox" type="password" name="user_password_new" value="" maxlength="16" />
                     </div>
 
                     <div class="field">
                         <strong class="label">Retype Password</strong>
-                        <input class="textbox" type="text" name="user_password_new2" value="" maxlength="16" />
+                        <input class="textbox" type="password" name="user_password_new2" value="" maxlength="16" />
                     </div>
 
                     <hr />
@@ -787,9 +787,9 @@
                         </div>
 
                         <div class="metadata">
+                            <div class="date"><strong>Last Login</strong>: <?= !empty($user_data['user_last_login']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_last_login'])) : '-' ?></div>
                             <div class="date"><strong>Created</strong>: <?= !empty($user_data['user_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_date_created'])): '-' ?></div>
                             <div class="date"><strong>Modified</strong>: <?= !empty($user_data['user_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_date_modified'])) : '-' ?></div>
-                            <div class="date"><strong>Last Login</strong>: <?= !empty($user_data['user_last_login']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_last_login'])) : '-' ?></div>
                         </div>
 
                     </div>
