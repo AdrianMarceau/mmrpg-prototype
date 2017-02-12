@@ -49,19 +49,23 @@ elseif (
 
     // Ensure there is a save file to load
     if (!empty($this_save_filepath) && file_exists($this_save_filepath)){
+
         // Load the save file into memory and overwrite the session
         mmrpg_load_game_session($this_save_filepath);
+
     }
     // Otherwise, simply reset the game
     else {
+
         // Reset the game session
         mmrpg_reset_game_session($this_save_filepath);
     }
 
     // Update the cache date to reflect the reload
     $_SESSION['GAME']['CACHE_DATE'] = MMRPG_CONFIG_CACHE_DATE;
+
     // Save the updated file back to the system
-    mmrpg_save_game_session($this_save_filepath);
+    mmrpg_save_game_session();
 
 }
 // Automatically empty all temporary battle variables

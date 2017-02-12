@@ -10,6 +10,10 @@ function mmrpg_save_game_session(){
     // Do NOT load, save, or otherwise alter the game file while viewing remote
     if (defined('MMRPG_REMOTE_GAME')){ return true; }
 
+    // If the required USER or FILE arrays do not exist, reset
+    if (!isset($_SESSION[$session_token]['USER'])){ mmrpg_reset_game_session(); }
+    if (!isset($_SESSION[$session_token]['FILE'])){ mmrpg_reset_game_session(); }
+
     // Update the last saved value
     $_SESSION[$session_token]['values']['last_save'] = time();
 
@@ -466,23 +470,28 @@ function mmrpg_save_game_session(){
     // Update or create the user save file with basic info
     // We also need the folder created for future user generated content
 
-    // Generate the base directory for this request
-    $this_base_dir = MMRPG_CONFIG_SAVES_PATH.$this_file['path'].'/';
-    if (!file_exists($this_base_dir)){ @mkdir($this_base_dir); }
+    // Only save data to the system if not demo
+    if (!empty($this_file['path'])){
 
-    // Generate the save data by serializing the session variable
-    $this_save_content = array();
-    $this_save_content['user_id'] = $this_user['userid'];
-    $this_save_content['user_name'] = $this_user['username'];
-    $this_save_content['user_name_clean'] = $this_user['username_clean'];
-    $this_save_content['user_omega'] = !empty($this_user['omega']) ? $this_user['omega'] : md5($this_user['username_clean']);
-    $this_save_content_omega = $this_save_content['user_omega'];
-    $this_save_content = json_encode($this_save_content);
+        // Generate the base directory for this request
+        $this_base_dir = MMRPG_CONFIG_SAVES_PATH.$this_file['path'].'/';
+        if (!file_exists($this_base_dir)){ @mkdir($this_base_dir); }
 
-    // Save the user's data to a flat text file
-    $this_save_file = fopen($this_base_dir.$this_save_content_omega.'.sav', 'w');
-    fwrite($this_save_file, $this_save_content);
-    fclose($this_save_file);
+        // Generate the save data by serializing the session variable
+        $this_save_content = array();
+        $this_save_content['user_id'] = $this_user['userid'];
+        $this_save_content['user_name'] = $this_user['username'];
+        $this_save_content['user_name_clean'] = $this_user['username_clean'];
+        $this_save_content['user_omega'] = !empty($this_user['omega']) ? $this_user['omega'] : md5($this_user['username_clean']);
+        $this_save_content_omega = $this_save_content['user_omega'];
+        $this_save_content = json_encode($this_save_content);
+
+        // Save the user's data to a flat text file
+        $this_save_file = fopen($this_base_dir.$this_save_content_omega.'.sav', 'w');
+        fwrite($this_save_file, $this_save_content);
+        fclose($this_save_file);
+
+    }
 
     // Return true on success
     return true;

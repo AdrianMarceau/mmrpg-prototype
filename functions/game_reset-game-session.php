@@ -1,10 +1,16 @@
 <?
 // Define a function for resetting the game session
 function mmrpg_reset_game_session(){
+
     // Reference global variables
     global $mmrpg_index, $db;
     //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
     $session_token = mmrpg_game_token();
+
+    // Create variables that don't exist yet
+    if (!isset($_SESSION[$session_token]['DEMO'])){ $_SESSION[$session_token]['DEMO'] = 1; }
+    if (!isset($_SESSION[$session_token]['USER'])){ $_SESSION[$session_token]['USER'] = array(); }
+    if (!isset($_SESSION[$session_token]['FILE'])){ $_SESSION[$session_token]['FILE'] = array(); }
 
     // Back up the user and file info from the session
     $this_demo = $_SESSION[$session_token]['DEMO'];

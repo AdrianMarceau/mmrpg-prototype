@@ -293,165 +293,6 @@ while ($this_action == 'save'){
     // Break from the SAVE loop
     break;
 }
-// Else, if the NEW action was requested
-while ($this_action == 'new'){
-
-    // If the form has already been submit, process input
-    while (!empty($_POST['submit']) && $_POST['submit'] == 'true'){
-
-        // If both the username or password are empty, produce an error
-        if (empty($_REQUEST['username']) && empty($_REQUEST['emailaddress']) && empty($_REQUEST['password'])){
-            $html_form_messages .= '<span class="error">(!) A username, email address, and password must be provided.</span>';
-            break;
-        }
-        // Otherwise, if at least one of them was provided, validate
-        else {
-            // Trim spaces off the end and beginning
-            $_REQUEST['username'] = trim($_REQUEST['username']);
-            $temp_username_clean = preg_replace('/[^-a-z0-9]+/i', '', strtolower($_REQUEST['username']));
-            $temp_file_path = $this_save_dir.$temp_username_clean.'/';
-            $_REQUEST['password'] = trim($_REQUEST['password']);
-
-            // Define the is verfied and default to true
-            $html_form_verified = true;
-            // Ensure the username is valid
-            if (empty($_REQUEST['username'])){
-                $html_form_messages .= '<span class="error">(!) A username was not provided.</span>';
-                $html_form_verified = false;
-            } elseif ($_REQUEST['username'] == 'demo' || file_exists($temp_file_path)){
-                $html_form_messages .= '<span class="error">(!) The requested username is already in use - please select another.</span>';
-                $html_form_verified = false;
-            } elseif (strlen($_REQUEST['username']) < 6 || strlen($_REQUEST['username']) > 18){
-                $html_form_messages .= '<span class="error">(!) The username must be between 6 and 18 characters.</span>';
-                $html_form_verified = false;
-            } elseif (!preg_match('/^[-_a-z0-9\.]+$/i', $_REQUEST['username'])){
-                $html_form_messages .= '<span class="error">(!) The username must only contain letters and numbers.</span>';
-                $html_form_verified = false;
-            }
-            // Ensure the email is valid
-            if (empty($_REQUEST['emailaddress'])){
-                $html_form_messages .= '<span class="error">(!) The email address was not provided.</span>';
-                $html_form_verified = false;
-            } elseif (!preg_match('/^([^@]+)@([-a-z0-9]+)\.(.*)$/i', $_REQUEST['emailaddress'])){
-                $html_form_messages .= '<span class="error">(!) The email address provided was not valid.</span>';
-                $html_form_verified = false;
-            } elseif (strlen($_REQUEST['emailaddress']) < 6 || strlen($_REQUEST['emailaddress']) > 100){
-                $html_form_messages .= '<span class="error">(!) The email address either much too long, or much too short.</span>';
-                $html_form_verified = false;
-            }
-            // Ensure the password is valid
-            if (empty($_REQUEST['password'])){
-                $html_form_messages .= '<span class="error">(!) The password was not provided.</span>';
-                $html_form_verified = false;
-            } elseif (strlen($_REQUEST['password']) < 6 || strlen($_REQUEST['password']) > 18){
-                $html_form_messages .= '<span class="error">(!) The password must be between 6 and 18 characters.</span>';
-                $html_form_verified = false;
-            }
-            // If not verified, break
-            if (!$html_form_verified){ break; }
-            // Ensure the captcha code was entered properly
-            if (empty($_REQUEST['captcha'])){
-                $html_form_messages .= '<span class="error">(!) The security code was not provided.</span>';
-                $html_form_verified = false;
-            } elseif (empty($_SESSION['captcha'])){
-                $html_form_messages .= '<span class="error">(!) Please enable cookies to proceed.</span>';
-                $html_form_verified = false;
-            } elseif (strtolower($_REQUEST['captcha']) != $_SESSION['captcha']){
-                $html_form_messages .= '<span class="error">(!) The security code was not entered correctly.</span>';
-                $html_form_verified = false;
-            }
-            // If not verified, break
-            if (!$html_form_verified){ break; }
-
-        }
-
-        // Collect the user details and generate the file ones as well
-        $this_user = array();
-        $this_user['username'] = trim($_REQUEST['username']);
-        $this_user['username_clean'] = preg_replace('/[^-a-z0-9]+/i', '', strtolower($this_user['username']));
-        $this_user['password'] = trim($_REQUEST['password']);
-        $this_user['password_encoded'] = md5($this_user['password']);
-        $this_user['emailaddress'] = trim(strtolower($_REQUEST['emailaddress']));
-        $this_file = array();
-        $this_file['path'] = $this_user['username_clean'].'/';
-        $this_file['name'] = $this_user['password_encoded'].'.sav';
-
-        // Update the save path with the filename
-        $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
-        // Update the necessary game session variables
-        $_SESSION[$session_token]['DEMO'] = 0;
-        $_SESSION[$session_token]['USER'] = $this_user;
-        $_SESSION[$session_token]['FILE'] = $this_file;
-        // Reset the game session to start fresh
-        mmrpg_reset_game_session($this_save_filepath);
-        // Save this new game session into the file
-        mmrpg_save_game_session($this_save_filepath);
-        // Load the save file back into memory and overwrite the session
-        mmrpg_load_game_session($this_save_filepath);
-        // Update the form markup, then break from the loop
-        $file_has_updated = true;
-
-        // Break from the POST loop
-        break;
-
-    }
-
-    // Update the header markup title
-    $html_header_title .= 'Create New Game File';
-    // Update the header markup text
-    $html_header_text .= 'Please select a username and password combo for your new save file below. ';
-    $html_header_text .= 'You will be required to enter this combo each time you load your save file. ';
-    $html_header_text .= 'Usernames and passwords must be between 6 and 18 characters. ';
-    $html_header_text .= 'You must be at least 13 years of age to play this game, else have express persmission from a parent or guardian as required by <a href="http://www.coppa.org/" target="_blank">COPPA</a> law. ';
-
-    // Update the form messages with notice text
-    if (empty($html_form_messages)){
-        $html_form_messages .= '<span class="help">(!) The Username and Password must be from 6 - 18 characters and can <u>only</u> contain letters and numbers!</span>';
-        $html_form_messages .= '<span class="help">(!) The Username and Password combo you select for this file <u>cannot</u> be changed, so please remember it!</span>';
-    }
-
-
-    // Update the form markup fields
-    $html_form_fields .= '<div class="field" style="float: left; width: 48%; overflow: hidden; ">';
-        $html_form_fields .= '<label class="label label_username">Username : *</label>';
-        $html_form_fields .= '<input class="text text_username" type="text" name="username" value="'.(!empty($_REQUEST['username']) ? htmlentities(trim($_REQUEST['username']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
-        $html_form_fields .= '<label class="label label_emailaddress">Email : *</label>';
-        $html_form_fields .= '<input class="text text_emailaddress" type="text" name="emailaddress" value="'.(!empty($_REQUEST['emailaddress']) ? htmlentities(trim($_REQUEST['emailaddress']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="100" />';
-        $html_form_fields .= '<label class="label label_password">Password : *</label>';
-        $html_form_fields .= '<input class="text text_password" type="text" name="password" value="'.(!empty($_REQUEST['password']) ? htmlentities(trim($_REQUEST['password']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
-        $html_form_fields .= '<div style="float: left; clear: both;">';
-            $html_form_fields .= '<input class="checkbox checkbox_ageofconsent" type="checkbox" name="user_flag_ageofconsent" value="true" '.(!empty($_REQUEST['user_flag_ageofconsent']) ? 'checked="checked" ' : '').'" />';
-            $html_form_fields .= '<label class="label label_checkbox">I confirm that I am at least 13 years of age</label>';
-    $html_form_fields .= '</div>';
-    $html_form_fields .= '<div class="field" style="float: left; width: 50%; overflow: hidden; ">';
-        $html_form_fields .= '<label class="label label_captcha">Security : *</label>';
-        $html_form_fields .= '<div class="field" style="float: left; width: 230px; overflow: hidden; ">';
-            $html_form_fields .= '<img class="captcha captcha_image" src="_ext/captcha/captcha.php?'.time().'" width="200" height="70" alt="Security Code" />';
-            $html_form_fields .= '<input class="text text_captcha" type="text" name="captcha" style="width: 125px; " value="'.(!empty($_REQUEST['captcha']) ? htmlentities(trim($_REQUEST['captcha']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
-        $html_form_fields .= '</div>';
-    $html_form_fields .= '</div>';
-
-
-
-    // Update the form markup buttons
-    $html_form_buttons .= '<input class="button button_submit" type="submit" value="New Game" />';
-    //$html_form_buttons .= '<input class="button button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
-
-    // If the file has been updated, update the data
-    if ($file_has_updated){
-
-        // Update the form messages markup text
-        $html_form_messages = '<span class="success">(!) Thank you.  Your new game has been created.</span>';
-        // Clear the form fields markup
-        $html_form_fields = '<script type="text/javascript"> reloadParent = true; </script>';
-        // Update the form markup buttons
-        $html_form_buttons = ''; //<input class="button button_continue" type="button" value="Continue" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
-
-    }
-
-    // Break from the NEW loop
-    break;
-}
 // Else, if the LOAD action was requested
 while ($this_action == 'load'){
 
@@ -471,6 +312,7 @@ while ($this_action == 'load'){
             // Trim spaces off the end and beginning
             $_REQUEST['username'] = trim($_REQUEST['username']);
             $_REQUEST['password'] = trim($_REQUEST['password']);
+
             // Ensure the username is valid
             if (empty($_REQUEST['username'])){
                 $html_form_messages .= '<span class="error">(!) The username was not provided.</span>';
@@ -482,11 +324,13 @@ while ($this_action == 'load'){
                 $html_form_messages .= '<span class="error">(!) The provided username contains invalid characters.</span>';
                 break;
             }
+
             // Ensure the password is valid
             if (empty($_REQUEST['password'])){
                 $html_form_messages .= '<span class="error">(!) The password was not provided.</span>';
                 break;
             }
+
         }
 
         // Collect the user details and generate the file ones as well
@@ -497,7 +341,6 @@ while ($this_action == 'load'){
         $this_user['password_encoded'] = md5($this_user['password']);
         $this_file = array();
         $this_file['path'] = $this_user['username_clean'].'/';
-        $this_file['name'] = $this_user['password_encoded'].'.sav';
 
         // Check if the requested save file path exists
         $temp_save_filepath = $this_save_dir.$this_file['path'];
@@ -505,6 +348,7 @@ while ($this_action == 'load'){
 
             // The file exists, so let's collect this user's info from teh database
             $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
+            $this_file['name'] = $temp_database_user['user_omega'].'.sav';
 
             // The file exists, so let's check the password
             $temp_save_filepath .= $this_file['name'];
