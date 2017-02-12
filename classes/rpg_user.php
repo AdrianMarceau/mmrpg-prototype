@@ -26,7 +26,7 @@ class rpg_user {
      * @param string $table (optional)
      * @return mixed
      */
-    public static function get_fields($implode = false, $table = ''){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various table fields for user objects
         $user_fields = array(
@@ -40,11 +40,13 @@ class rpg_user {
             'user_profile_text',
             'user_credit_text',
             'user_credit_line',
+            'user_admin_text',
             'user_image_path',
             'user_background_path',
             'user_colour_token',
             'user_email_address',
             'user_website_address',
+            'user_ip_addresses',
             'user_date_created',
             'user_date_accessed',
             'user_date_modified',
@@ -71,6 +73,11 @@ class rpg_user {
         // Return the table fields, array or string
         return $user_fields;
 
+    }
+
+    // Define an alias function name for the above
+    public static function get_fields($implode = false, $table = ''){
+        return self::get_index_fields($implode, $table);
     }
 
     /**

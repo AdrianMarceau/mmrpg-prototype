@@ -26,7 +26,7 @@ class rpg_user_role {
      * @param string $table (optional)
      * @return mixed
      */
-    public static function get_fields($implode = false, $table = ''){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various table fields for role objects
         $role_fields = array(
@@ -54,6 +54,12 @@ class rpg_user_role {
         return $role_fields;
 
     }
+
+    // Define an alias function name for the above
+    public static function get_fields($implode = false, $table = ''){
+        return self::get_index_fields($implode, $table);
+    }
+
 
     /**
      * Get the entire user role index as an array with parsed info
