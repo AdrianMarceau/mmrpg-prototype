@@ -72,13 +72,15 @@ a:hover {
     font-weight: bold;
 }
 .adminhome li {
-    padding: 6px 0;
+    padding: 6px;
     margin: 0 auto 0 0;
     border-bottom: 1px solid #E0E0E0;
     overflow: hidden;
 }
-.adminhome li:first-child {
+.adminhome li.top {
     border-top: 1px solid #E0E0E0;
+    background-color: #262626;
+    color: #FFFFFF;
 }
 .adminhome li a {
 
@@ -123,11 +125,16 @@ a:hover {
 .adminform .header {
     display: block;
     margin: 0 auto 10px 0;
+    padding: 6px;
     text-align: left;
     clear: both;
-    font-size: 16px;
+    font-size: 13px;
     line-height: 19px;
     font-weight: bold;
+    border-top: 1px solid #E0E0E0;
+    border-bottom: 1px solid #E0E0E0;
+    background-color: #262626;
+    color: #FFFFFF;
 }
 
 
@@ -273,6 +280,25 @@ tr:nth-child(odd) td {
     background-color: #EFEFEF;
 }
 
+.adminform .buttons input[type="button"],
+.adminform .buttons input[type="submit"] {
+    display: inline-block;
+    margin: 0 5px 0 0;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: auto;
+    min-width: 100px;
+    background-color: #2B2B2B;
+    border: 1px solid #262626;
+    color: #FFFFFF;
+    padding: 5px 10px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
 
 .adminform .options .field {
     width: 25%;
@@ -325,6 +351,14 @@ tr:nth-child(odd) td {
 }
 .adminform .search .buttons {
     padding-top: 0;
+    clear: both;
+}
+.adminform .search .buttons .button {
+    background-color: #4c8aab;
+    border-color: #427794;
+}
+.adminform .search .buttons .button:hover {
+    background-color: #5d97b6;
 }
 
 .adminform .results {
@@ -452,7 +486,20 @@ tr:nth-child(odd) td {
     background-color: #8c2525;
 }
 
-
+.adminform .editor .buttons .save {
+    background-color: #005d07;
+    border-color: #003d05;
+}
+.adminform .editor .buttons .save:hover {
+    background-color: #007a0a;
+}
+.adminform .editor .buttons .delete {
+    background-color: #8c2525;
+    border-color: #751f1f;
+}
+.adminform .editor .buttons .delete:hover {
+    background-color: #a52c2c;
+}
 
 .adminform .editor .field input[name="user_omega"] {
     font-family: "Courier New";

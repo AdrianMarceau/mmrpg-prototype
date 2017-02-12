@@ -146,11 +146,14 @@
         if ($form_action == 'edit_users'){
 
             // Collect form data from the request and parse out simple rules
+
             $form_data['user_id'] = !empty($_POST['user_id']) && is_numeric($_POST['user_id']) ? trim($_POST['user_id']) : 0;
             $form_data['role_id'] = !empty($_POST['role_id']) && is_numeric($_POST['role_id']) ? trim($_POST['role_id']) : 0;
+
             $form_data['user_name_clean'] = !empty($_POST['user_name_clean']) && preg_match('/^[-_0-9a-z\.\*]+$/i', $_POST['user_name_clean']) ? trim(strtolower($_POST['user_name_clean'])) : '';
             $form_data['user_name'] = !empty($_POST['user_name']) && preg_match('/^[-_0-9a-z\.\*]+$/i', $_POST['user_name']) ? trim($_POST['user_name']) : '';
             $form_data['user_name_public'] = !empty($_POST['user_name_public']) && preg_match('/^[-_0-9a-z\.\s]+$/i', $_POST['user_name_public']) ? trim($_POST['user_name_public']) : '';
+
             $form_data['user_date_birth'] = !empty($_POST['user_date_birth']) && preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $_POST['user_date_birth']) ? trim($_POST['user_date_birth']) : '';
             $form_data['user_gender'] = !empty($_POST['user_gender']) && preg_match('/^(male|female|other)$/', $_POST['user_gender']) ? trim(strtolower($_POST['user_gender'])) : '';
 
@@ -162,22 +165,41 @@
             $form_data['user_website_address'] = !empty($_POST['user_website_address']) && preg_match('/^(https?:\/\/)?[-_0-9a-z\.]+\.[-_0-9a-z\.]+/i', $_POST['user_website_address']) ? trim(strtolower($_POST['user_website_address'])) : '';
             $form_data['user_ip_addresses'] = !empty($_POST['user_ip_addresses']) && preg_match('/^((([0-9]{1,3}\.){3}([0-9]{1,3}){1}),?\s?)+$/i', $_POST['user_ip_addresses']) ? trim($_POST['user_ip_addresses']) : '';
 
-            // DEBUG
-            $form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
+            $form_data['user_profile_text'] = !empty($_POST['user_profile_text']) ? trim(strip_tags($_POST['user_profile_text'])) : '';
+            $form_data['user_credit_line'] = !empty($_POST['user_credit_line']) ? trim(strip_tags($_POST['user_credit_line'])) : '';
+            $form_data['user_credit_text'] = !empty($_POST['user_credit_text']) ? trim(strip_tags($_POST['user_credit_text'])) : '';
+            $form_data['user_admin_text'] = !empty($_POST['user_admin_text']) ? trim(strip_tags($_POST['user_admin_text'])) : '';
 
-            // If any of the required fields are empty, complete form failure
+            $form_data['user_flag_approved'] = isset($_POST['user_flag_approved']) && is_numeric($_POST['user_flag_approved']) ? trim($_POST['user_flag_approved']) : 0;
+            $form_data['user_flag_postpublic'] = isset($_POST['user_flag_postpublic']) && is_numeric($_POST['user_flag_postpublic']) ? trim($_POST['user_flag_postpublic']) : 0;
+            $form_data['user_flag_postprivate'] = isset($_POST['user_flag_postprivate']) && is_numeric($_POST['user_flag_postprivate']) ? trim($_POST['user_flag_postprivate']) : 0;
+            $form_data['user_flag_allowchat'] = isset($_POST['user_flag_allowchat']) && is_numeric($_POST['user_flag_allowchat']) ? trim($_POST['user_flag_allowchat']) : 0;
+
+            $user_password_new = !empty($_POST['user_password_new']) ? trim($_POST['user_password_new']) : '';
+            $user_password_new2 = !empty($_POST['user_password_new2']) ? trim($_POST['user_password_new2']) : '';
+
+            // DEBUG
+            //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
+
+            // If the required USER ID field was empty, complete form failure
             if (empty($form_data['user_id'])){
                 $form_messages[] = array('error', 'User ID was not provided');
                 $form_success = false;
             }
+
+            // If the required ACCOUNT TYPE field was empty, complete form failure
             if (empty($form_data['role_id'])){
                 $form_messages[] = array('error', 'Account Type was not provided');
                 $form_success = false;
             }
+
+            // If the required USERNAME TOKEN field was empty, complete form failure
             if (empty($form_data['user_name_clean'])){
                 $form_messages[] = array('error', 'Username token was not provided or was invalid');
                 $form_success = false;
             }
+
+            // If the required LOGIN USERNAME field was empty, complete form failure
             if (empty($form_data['user_name'])){
                 $form_messages[] = array('error', 'Login username was not provided or was invalid');
                 $form_success = false;
@@ -186,42 +208,87 @@
             // If there were errors, we should exit now
             if (!$form_success){ exit_user_edit_action($form_data['user_id']); }
 
-            // If any of the optional fields are empty, remove from update data and/or warning
+            // If trying to update the PUBLIC USER NAME but it was invalid, do not update
             if (empty($form_data['user_name_public']) && !empty($_POST['user_name_public'])){
                 $form_messages[] = array('warning', 'Public username was invalid and will not be updated');
                 unset($form_data['user_name_public']);
             }
+
+            // If trying to update the DATE OF BIRTH but it was invalid, do not update
             if (empty($form_data['user_date_birth']) && !empty($_POST['user_date_birth'])){
                 $form_messages[] = array('warning', 'Date of birth was invalid and will not be updated');
                 unset($form_data['user_date_birth']);
             }
+
+            // If trying to update the GENDER but it was invalid, do not update
             if (empty($form_data['user_gender']) && !empty($_POST['user_gender'])){
                 $form_messages[] = array('warning', 'Gender identity was invalid and will not be updated');
                 unset($form_data['user_gender']);
             }
+
+            // If trying to update the PLAYER COLOUR but it was invalid, do not update
             if (empty($form_data['user_colour_token']) && !empty($_POST['user_colour_token'])){
                 $form_messages[] = array('warning', 'Player colour was invalid and will not be updated');
                 unset($form_data['user_colour_token']);
             }
+
+            // If trying to update the PLAYER BACKGROUND but it was invalid, do not update
             if (empty($form_data['user_background_path']) && !empty($_POST['user_background_path'])){
                 $form_messages[] = array('warning', 'Player background was invalid and will not be updated');
                 unset($form_data['user_background_path']);
             }
+
+            // If trying to update the PLAYER AVATAR but it was invalid, do not update
             if (empty($form_data['user_image_path']) && !empty($_POST['user_image_path'])){
                 $form_messages[] = array('warning', 'Player avatar was invalid and will not be updated');
                 unset($form_data['user_image_path']);
             }
+
+            // If trying to update the EMAIL ADDRESS but it was invalid, do not update
             if (empty($form_data['user_email_address']) && !empty($_POST['user_email_address'])){
                 $form_messages[] = array('warning', 'Email address was invalid and will not be updated');
                 unset($form_data['user_email_address']);
             }
+
+            // If trying to update the WEBSITE ADDRESS but it was invalid, do not update
             if (empty($form_data['user_website_address']) && !empty($_POST['user_website_address'])){
                 $form_messages[] = array('warning', 'Website address was invalid and will not be updated');
                 unset($form_data['user_website_address']);
             }
+
+            // If trying to update the IP ADDRESSES but it was invalid, do not update
             if (empty($form_data['user_ip_addresses']) && !empty($_POST['user_ip_addresses'])){
                 $form_messages[] = array('warning', 'IP addresses were invalid and will not be updated');
                 unset($form_data['user_ip_addresses']);
+            }
+
+            // Validate a password change request with special care
+            if (!empty($user_password_new)){
+
+                // Default password success to true
+                $update_password = true;
+
+                // If any issues with new password, password change failure
+                if ($user_password_new != $user_password_new2){
+                    $form_messages[] = array('warning', 'The passwords were not the same and will not be updated');
+                    $update_password = false;
+                } elseif ($user_password_new == $user_password_new2){
+                    if (strlen($user_password_new) < 6){
+                        $form_messages[] = array('warning', 'The new password was too short and will not be updated');
+                        $update_password = false;
+                    } elseif (strlen($user_password_new) > 18){
+                        $form_messages[] = array('warning', 'The new password was too long and will not be updated');
+                        $update_password = false;
+                    }
+                }
+
+                // If password update successful, we can save details
+                if ($update_password){
+                    $form_data['user_password'] = $user_password_new;
+                    $form_data['user_password_encoded'] = md5($user_password_new);
+                    $form_messages[] = array('alert', 'The account password was updated successfully');
+                }
+
             }
 
             // If there were errors, we should exit now
@@ -253,11 +320,11 @@
             $update_results = $db->update('mmrpg_users', $update_data, array('user_id' => $form_data['user_id']));
 
             // DEBUG
-            $form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
+            //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
             // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_messages[] = array('success', 'Updated user details have been saved to the database'); }
-            else { $form_messages[] = array('error', 'Updated user details could not be saved to the database'); }
+            if ($update_results !== false){ $form_messages[] = array('success', 'User details were successfully updated in the database'); }
+            else { $form_messages[] = array('error', 'User details could not be updated to the database'); }
 
             // We're done processing the form, we can exit
             exit_user_edit_action($form_data['user_id']);
@@ -278,7 +345,10 @@
             $this_message_markup .= '<ul class="list">'.PHP_EOL;
             foreach ($form_messages AS $key => $message){
                 list($type, $text) = $message;
-                $this_message_markup .= '<li class="message '.$type.'">'.ucfirst($type).' : '.$text.'</li>'.PHP_EOL;
+                $this_message_markup .= '<li class="message '.$type.'">';
+                    //$this_message_markup .= ucfirst($type).' : ';
+                    $this_message_markup .= $text;
+                $this_message_markup .= '</li>'.PHP_EOL;
             }
             $this_message_markup .= '</ul>'.PHP_EOL;
             $_SESSION['mmrpg_admin']['form_messages'] = array();
@@ -315,7 +385,7 @@
                     <input type="hidden" name="subaction" value="search" />
 
                     <div class="field">
-                        <strong class="label">By ID</strong>
+                        <strong class="label">By User ID</strong>
                         <input class="textbox" type="text" name="user_id" value="<?= !empty($search_data['user_id']) ? $search_data['user_id'] : '' ?>" />
                     </div>
 
@@ -629,14 +699,14 @@
                     <div class="field">
                         <div class="label">
                             <strong>Change Password</strong>
-                            <em>optional</em>
+                            <em>6 - 18 characters</em>
                         </div>
-                        <input class="textbox" type="text" name="user_password_new" value="" maxlength="64" />
+                        <input class="textbox" type="text" name="user_password_new" value="" maxlength="16" />
                     </div>
 
                     <div class="field">
                         <strong class="label">Retype Password</strong>
-                        <input class="textbox" type="text" name="user_password_new2" value="" maxlength="64" />
+                        <input class="textbox" type="text" name="user_password_new2" value="" maxlength="16" />
                     </div>
 
                     <hr />
@@ -686,8 +756,8 @@
                     <div class="formfoot">
 
                         <div class="buttons">
-                            <input class="button" type="submit" value="Save Changes" />
-                            <input class="button" type="submit" value="Delete User" />
+                            <input class="button save" type="submit" value="Save Changes" />
+                            <input class="button delete" type="submit" value="Delete User" />
                         </div>
 
                         <div class="metadata">
