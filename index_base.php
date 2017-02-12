@@ -163,7 +163,9 @@ if ($this_current_page == 'file' // File sub-pages
 
 <div id="fb-root"></div>
     <div id="window" style="position: relative; height: auto !important;">
+
         <div class="banner">
+
             <?
             // Collect the current user's info from the database
             //$this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
@@ -306,34 +308,48 @@ if ($this_current_page == 'file' // File sub-pages
                 </div>
             <? endif; ?>
 
-        </div>
+            <?
+            // Check if an admin-compatible user is viewing (by IP)
+            $is_admin = in_array($_SERVER['REMOTE_ADDR'], $dev_whitelist) ? true : false;
+            if ($is_admin && rpg_game::is_demo()){
+                ?>
+                <div class="adminlink">
+                    <a class="link" href="admin.php" target="_blank"><span>Admin</span></a>
+                </div>
+                <?
+            }
+            ?>
 
+        </div>
 
         <div class="menu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <?
                 // Only generate the menu if we're NOT in critical error mode
                 if (!defined('MMRPG_CRITICAL_ERROR')){
 
-                    // Define the basic array of pages to show in the main menu (we'll do subs later)
+                    // Define the basic array of pages to show in the main menu (we'll do more subs later)
                     $main_menu_links = array();
                     $main_menu_links['home'] = array('name' => 'Home', 'url' => '/');
                     $main_menu_links['about'] = array('name' => 'About');
                     $main_menu_links['gallery'] = array('name' => 'Gallery');
-                    $main_menu_links['database'] = array('name' => 'Database', 'subs' => array(
-                        'players' => array('name' => 'Players'),
-                        'robots' => array('name' => 'Robots'),
-                        'mechas' => array('name' => 'Mechas'),
-                        'bosses' => array('name' => 'Bosses'),
-                        'abilities' => array('name' => 'Abilities'),
-                        'items' => array('name' => 'Items'),
-                        'fields' => array('name' => 'Fields'),
-                        'types' => array('name' => 'Types')
-                        ));
+                    $main_menu_links['database'] = array('name' => 'Database');
                     $main_menu_links['community'] = array('name' => 'Community');
                     $main_menu_links['leaderboard'] = array('name' => 'Leaderboard');
                     $main_menu_links['prototype'] = array('name' => 'Prototype', 'target' => '_blank');
                     $main_menu_links['credits'] = array('name' => 'Credits');
                     $main_menu_links['contact'] = array('name' => 'Contact');
+
+                    // Hard-code some sub-pages we know about beforehand
+                    $database_subs = array();
+                    $database_subs['players'] = array('name' => 'Players');
+                    $database_subs['robots'] = array('name' => 'Robots');
+                    $database_subs['mechas'] = array('name' => 'Mechas');
+                    $database_subs['bosses'] = array('name' => 'Bosses');
+                    $database_subs['abilities'] = array('name' => 'Abilities');
+                    $database_subs['items'] = array('name' => 'Items');
+                    $database_subs['fields'] = array('name' => 'Fields');
+                    $database_subs['types'] = array('name' => 'Types');
+                    $main_menu_links['database']['subs'] = $database_subs;
 
                     ?>
                     <ul class="main">
@@ -366,7 +382,7 @@ if ($this_current_page == 'file' // File sub-pages
 
                             // Print out the menu item markup
                             ?>
-                            <li class="<?= $item_class ?>">
+                            <li class="<?= $item_class ?>" data-token="<?= $token ?>">
                                 <a href="<?= $url ?>" class="<?= $link_class ?>" target="<?= $target ?>">
                                     <?= $before ?><span><?= $name ?></span><?= $after ?>
                                 </a>
