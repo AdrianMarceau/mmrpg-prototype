@@ -26,7 +26,7 @@ class rpg_user_role {
      * @param string $table (optional)
      * @return mixed
      */
-    public static function get_fields($implode = false, $table = ''){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various table fields for role objects
         $role_fields = array(
@@ -55,6 +55,11 @@ class rpg_user_role {
 
     }
 
+    // Define an alias for the above function
+    public static function get_fields($implode = false, $table = ''){
+        return self::get_index_fields($implode, $table);
+    }
+
     /**
      * Get the entire user role index as an array with parsed info
      * @param string $index_field (optional)
@@ -66,7 +71,7 @@ class rpg_user_role {
         $db = cms_database::get_database();
 
         // Collect every role's info from the database index
-        $role_fields = self::get_fields(true);
+        $role_fields = self::get_index_fields(true);
         $role_index = $db->get_array_list("SELECT {$role_fields} FROM mmrpg_roles WHERE role_id <> 0;", $index_field);
 
         // Parse and return the data if not empty, else nothing
@@ -102,7 +107,7 @@ class rpg_user_role {
         $where_string = implode(' OR ', $where_string);
 
         // Collect the requested role's info from the database index
-        $role_fields = self::get_fields(true);
+        $role_fields = self::get_index_fields(true);
         $role_index = $db->get_array_list("SELECT {$role_fields} FROM mmrpg_roles WHERE role_id <> 0 AND ({$where_string});", $index_field);
 
         // Parse and return the data if not empty, else nothing

@@ -26,7 +26,7 @@ class rpg_user {
      * @param string $table (optional)
      * @return mixed
      */
-    public static function get_fields($implode = false, $table = ''){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various table fields for user objects
         $user_fields = array(
@@ -39,12 +39,14 @@ class rpg_user {
             'user_gender',
             'user_profile_text',
             'user_credit_text',
+            'user_admin_text',
             'user_credit_line',
             'user_image_path',
             'user_background_path',
             'user_colour_token',
             'user_email_address',
             'user_website_address',
+            'user_ip_addresses',
             'user_date_created',
             'user_date_accessed',
             'user_date_modified',
@@ -53,7 +55,8 @@ class rpg_user {
             'user_backup_login',
             'user_flag_approved',
             'user_flag_postpublic',
-            'user_flag_postprivate'
+            'user_flag_postprivate',
+            'user_flag_allowchat'
             );
 
         // Add table name to each field string if requested
@@ -73,6 +76,12 @@ class rpg_user {
 
     }
 
+    // Define an alias for the above function
+    public static function get_fields($implode = false, $table = ''){
+        return self::get_index_fields($implode, $table);
+    }
+
+
     /**
      * Get the entire user index as an array with parsed info
      * @param bool $include_nologin (optional)
@@ -91,7 +100,7 @@ class rpg_user {
         if (!$include_unapproved){ $temp_where .= 'AND user_flag_approved = 1 '; }
 
         // Collect every user's info from the database index
-        $user_fields = self::get_fields(true);
+        $user_fields = self::get_index_fields(true);
         $user_index = $db->get_array_list("SELECT {$user_fields} FROM mmrpg_users WHERE user_id <> 0 {$temp_where};", $index_field);
 
         // Parse and return the data if not empty, else nothing
@@ -127,7 +136,7 @@ class rpg_user {
         $where_string = implode(' OR ', $where_string);
 
         // Collect the requested user's info from the database index
-        $user_fields = self::get_fields(true);
+        $user_fields = self::get_index_fields(true);
         $user_index = $db->get_array_list("SELECT {$user_fields} FROM mmrpg_users WHERE user_id <> 0 AND ({$where_string});", $index_field);
 
         // Parse and return the data if not empty, else nothing
@@ -208,7 +217,7 @@ class rpg_user {
 
         // Collect this user's info from the database index
         $lookup = !is_numeric($user_lookup) ? "user_name_clean = '{$user_lookup}'" : "user_id = {$user_lookup}";
-        $user_fields = self::get_fields(true);
+        $user_fields = self::get_index_fields(true);
         $user_index = $db->get_array("SELECT {$user_fields} FROM mmrpg_index_users WHERE {$lookup};");
 
         // Parse and return the data if not empty, else nothing
