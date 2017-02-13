@@ -348,10 +348,15 @@ class cms_database {
         $insert_query = "INSERT INTO {$table_name} {$insert_string}";
         // Execute the insert query against the database
         $affected_rows = 0;
-        $this->query($insert_query, $affected_rows);
+        $return = $this->query($insert_query, $affected_rows);
         // If success, return the affected number of rows
-        if ($this->MYSQL_RESULT !== false){ $this->clear(); return $affected_rows; }
-        else { $this->clear(); return false; }
+        if ($this->MYSQL_RESULT !== false){
+            $this->clear();
+            return $return;
+        } else {
+            $this->clear();
+            return false;
+        }
     }
 
     // Define a function for updating a record in the database
