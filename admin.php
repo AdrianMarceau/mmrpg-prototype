@@ -56,10 +56,16 @@ function print_form_messages($print = true, $clear = true){
 }
 
 // Define a function for exiting a form action
+function redirect_form_action($location){
+    backup_form_messages();
+    if (!empty($location)){ header('Location: '.$location); }
+    exit_form_action();
+}
+
+// Define a function for exiting a form action
 function exit_form_action($output = ''){
     backup_form_messages();
-    if (empty($output)){ header('Location: admin.php'); exit(); }
-    else { exit($output); }
+    exit($output);
 }
 
 // If we're not logged in yet
@@ -70,8 +76,10 @@ if (!MMRPG_CONFIG_ADMIN_MODE){
 // Else if we're logging out now
 elseif ($this_page_action == 'exit'){
     // Unset session variables and refresh page
-    unset($_SESSION['admin_id'], $_SESSION['admin_username'], $_SESSION['admin_username_display']);
-    exit_form_action();
+    unset($_SESSION['admin_id']);
+    unset($_SESSION['admin_username']);
+    unset($_SESSION['admin_username_display']);
+    redirect_form_action('admin.php');
 }
 // If this is the HOME request
 elseif ($this_page_action == 'home'){
