@@ -818,6 +818,7 @@ while ($this_action == 'load'){
         $html_header_text .= '<br /> Your date of birth must now be confirmed in accordance with <a href="http://www.coppa.org/" target="_blank">COPPA</a> guidelines.';
     }
     // Update the form markup fields
+    $html_form_fields .= '<input type="hidden" name="return" value="'.(!empty($_REQUEST['return']) ? htmlentities(trim($_REQUEST['return']), ENT_QUOTES, 'UTF-8', true) : '').'" />';
     $html_form_fields .= '<div class="field">';
         $html_form_fields .= '<label class="label label_username" style="width: 230px; ">Username : </label>';
         $html_form_fields .= '<input class="text text_username" type="text" name="username" style="width: 330px; " value="'.(!empty($_REQUEST['username']) ? htmlentities(trim($_REQUEST['username']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
