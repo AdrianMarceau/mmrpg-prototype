@@ -152,7 +152,7 @@ a:hover {
     color: #8c2525;
 }
 .messages .list .message.success:before {
-    content: "\2714";
+    content: "\2713";
     background-color: #005d07;
 }
 .messages .list .message.warning:before {
@@ -376,6 +376,9 @@ tr:nth-child(odd) td {
     border: 1px solid #DEDEDE;
     background-color: #FFFFFF;
     padding: 3px 6px;
+    -webkit-appearance: none;
+   -moz-appearance: none;
+   appearance: none;
 }
 
 .adminform .field input[disabled] {
@@ -400,6 +403,9 @@ tr:nth-child(odd) td {
     -webkit-border-radius: 3px;
     border-radius: 3px;
     cursor: pointer;
+    -webkit-appearance: none;
+   -moz-appearance: none;
+   appearance: none;
 }
 
 

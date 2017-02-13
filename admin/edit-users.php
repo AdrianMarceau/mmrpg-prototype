@@ -8,8 +8,7 @@
     function exit_user_edit_action($user_id = 0){
         if (!empty($user_id)){ $location = 'admin.php?action=edit_users&subaction=editor&user_id='.$user_id; }
         else { $location = 'admin.php?action=edit_users&subaction=search'; }
-        header('Location: '.$location);
-        exit_form_action();
+        redirect_form_action($location);
     }
 
 
@@ -330,8 +329,8 @@
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
             // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_messages[] = array('success', 'User details were successfully updated in the database'); }
-            else { $form_messages[] = array('error', 'User details could not be updated to the database'); }
+            if ($update_results !== false){ $form_messages[] = array('success', 'User details were updated successfully'); }
+            else { $form_messages[] = array('error', 'User details could not be updated'); }
 
             // We're done processing the form, we can exit
             exit_user_edit_action($form_data['user_id']);
