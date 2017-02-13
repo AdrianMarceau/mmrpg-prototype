@@ -518,6 +518,15 @@ body:before {
         width: 49%;
     }
 
+    #window .page_file .form .field {
+        width: 100%;
+    }
+    #window .page_file .form .field input[type="text"],
+    #window .page_file .form .field input[type="password"] {
+        max-width: 98% !important;
+        box-sizing: border-box;
+    }
+
 
 }
 
@@ -1101,7 +1110,7 @@ body:before {
         clear: none;
     }
     #window .page .body .community .thread_subbody .thread_linkblock .count .newpost {
-        max-width: 115px;
+        max-width: 105px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -1169,7 +1178,7 @@ body:before {
     }
 
     #mmrpg #credits {
-        margin: -12px 10px 0;
+        margin: -12px 6px 0;
         padding: 6px 26px;
         background-color: rgb(30, 30, 30);
         color: #464646;
@@ -1187,6 +1196,10 @@ body:before {
     #window .page .body .community .thread_posts_count {
         overflow: hidden;
     }
+    #window .page .body .community #comment-form {
+        overflow: hidden;
+        margin: 0 auto 10px;
+    }
     #window .page .body .community .thread_posts_count .thread_posts_total,
     #window .page .body .community .thread_posts_count .thread_posts_pages {
         display: block;
@@ -1203,6 +1216,11 @@ body:before {
         margin-bottom: 5px;
         border-bottom: 1px solid #1e1e1e;
         font-weight: bold;
+    }
+    #window .page .body .community .thread_posts_count .thread_posts_total:only-child {
+        padding-bottom: 0;
+        margin-bottom: 0;
+        border-bottom: 0 none transparent;
     }
     #window .page .body .community .thread_posts_count .thread_posts_pages {
 
