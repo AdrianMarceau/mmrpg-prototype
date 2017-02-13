@@ -1,5 +1,6 @@
 // Initialize the MMRPG global variables
 var mmrpgBody = mmrpgBody;
+var gameWindow = false;
 var gameEngine = false;
 var gameConnect = false;
 var gameCanvas = false;
