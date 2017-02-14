@@ -708,7 +708,7 @@ html {
     font-size: 14px;
     line-height: 16px;
     text-align: left;
-    background-color: rgba(0, 0, 0, 0.30);
+    background-color: #3f3f3f;
     border: 1px solid transparent !important;
     border-color: #1A1A1A !important;
     border-radius: 0.3em;
@@ -5034,4 +5034,46 @@ body.windowFlag_landscapeMode #game_frames iframe,
 body.mobileFlag_landscapeMode #game_frames iframe {
     width: 1000px !important;
     left: -14px !important;
+}
+
+/* MISC UI STYLES */
+
+#topscroll {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    right: 10px;
+    width: 42px;
+    height: 32px;
+    background-color: #3f3f3f;
+    border: 1px solid #1A1A1A;
+    text-decoration: none;
+    color: #EFEFEF;
+    font-size: 20px;
+    line-height: 20px;
+    -webkit-border-radius: 6px 6px 0 0;
+    -moz-border-radius: 6px 6px 0 0;
+    border-radius: 6px 6px 0 0;
+    background-image: linear-gradient(bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 100%);
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 100%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 100%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 100%);
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0, rgba(0,0,0,0.35)),
+        color-stop(1, rgba(0,0,0,0.25))
+        );
+    background-position: 0 0;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 9999;
+}
+#topscroll:before {
+    content: "\25b2";
+    display: block;
+    text-align: center;
+    padding-top: 4px;
 }

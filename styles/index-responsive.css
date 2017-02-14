@@ -270,6 +270,16 @@ body:before {
         content: "06";
     }
 
+
+    #topscroll {
+        display: block;
+        opacity: 0;
+        transition: 0.3s;
+    }
+    .scrolled #topscroll {
+        opacity: 1;
+    }
+
     #mmrpg .tooltip {
         max-width: 99vw;
     }

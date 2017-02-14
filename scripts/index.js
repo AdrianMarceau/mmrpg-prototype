@@ -25,6 +25,12 @@ $(document).ready(function(){
      * ANCHOR LINK EVENTS
      */
 
+    // Capture the "topscroll" mobile button and ensure it functions correctly
+    $('#topscroll').live('click', function(e){
+        e.preventDefault();
+        $('html, body').animate({scrollTop: 0}, 'fast');
+        });
+
     // Capture any "top" links and ensure they function correctly
     $('a[href^="#"],a[data-href^="#"]', thisIndex).live('click', function(e){
         var thisLink = $(this);
@@ -49,6 +55,22 @@ $(document).ready(function(){
         $('html, body').animate({scrollTop: (thisAnchorOffset.top - 5)+'px'}, 'fast');
         return false;
         });
+
+
+    /* -- SCROLL EVENTS -- */
+
+    // Define a function for checking scroll state when the user scrolls
+    var checkScrollState = function(e){
+        var scrollTop = $(window).scrollTop();
+        if (scrollTop > 0){ $('body').addClass('scrolled'); }
+        else { $('body').removeClass('scrolled'); }
+        };
+
+    // Attach the scroll state function to the window scroll event
+    $(window).scroll(function(){
+        return checkScrollState();
+        });
+
 
 
     /*
