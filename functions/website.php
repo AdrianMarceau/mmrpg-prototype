@@ -867,7 +867,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                         <?= !empty($temp_posts_count) ? ($temp_posts_count == 1 ? '1 Comment' : $temp_posts_count.' Comments ') : 'No Comments ' ?>
                     </a>
                     <?= $temp_is_new ? '<strong class="newpost field_type field_type_electric">New!</strong> ' : '' ?>
-                    <?= !empty($temp_thread_mod_date) ? '<span class="newpost" style="letter-spacing: 0;">'.$temp_thread_mod_date.'</span> ' : '' ?>
+                    <?= !empty($temp_thread_mod_date) ? '<span class="newpost author">'.$temp_thread_mod_date.'</span> ' : '' ?>
                 </div>
             </div>
         </div>

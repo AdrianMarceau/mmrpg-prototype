@@ -346,9 +346,9 @@ if (!empty($this_threads_array)){
                             <div class="bodytext"><?= mmrpg_formatting_decode($temp_post_body) ?></div>
                         </div>
                         <? if($this_userid != MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked']) && $community_battle_points > 5000): ?>
-                            <a class="postreply" rel="nofollow" href="<?= 'community/'.$this_category_info['category_token'].'/'.$this_thread_info['thread_id'].'/'.$this_thread_info['thread_token'].'/#comment-form:'.$temp_reply_name.':'.$temp_reply_colour ?>" style="right: 46px;">@ Reply</a>
+                            <a class="postreply right" rel="nofollow" href="<?= 'community/'.$this_category_info['category_token'].'/'.$this_thread_info['thread_id'].'/'.$this_thread_info['thread_token'].'/#comment-form:'.$temp_reply_name.':'.$temp_reply_colour ?>">@ Reply</a>
                         <? endif; ?>
-                        <a class="postscroll" href="#top" style="right: 12px;">^ Top</a>
+                        <a class="postscroll right" href="#top">^ Top</a>
                     <? else: ?>
                         <span style="color: #464646;">- deleted -</span>
                     <? endif; ?>

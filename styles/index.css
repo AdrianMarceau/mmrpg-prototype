@@ -4049,10 +4049,15 @@ body.windowFlag_landscapeMode #window .page .type_block {
 #window .page .body .community .post_subbody .postreply {
     color: #565656;
     position: absolute;
-    right: 46px;
     bottom: 4px;
     text-decoration: none;
     font-size: 10px;
+}
+#window .page .body .community .post_subbody .postreply.right {
+    right: 46px;
+}
+#window .page .body .community .post_subbody .postreply.left {
+    left: 46px;
 }
 #window .page .body .community .post_subbody .postscroll {
     color: #565656;
@@ -4060,6 +4065,12 @@ body.windowFlag_landscapeMode #window .page .type_block {
     bottom: 4px;
     text-decoration: none;
     font-size: 10px;
+}
+#window .page .body .community .post_subbody .postscroll.right {
+    right: 12px;
+}
+#window .page .body .community .post_subbody .postscroll.left {
+    left: 12px;
 }
 #window .page .body .community .link_inline {
     display: inline;
@@ -4340,6 +4351,9 @@ body.windowFlag_landscapeMode #window .page .type_block {
     color: rgb(255, 251, 158);
     color: #FFFFFF;
     letter-spacing: 1px;
+}
+#window .page .body .community .thread_subbody .thread_linkblock .newpost.author {
+    letter-spacing: 0;
 }
 
 #window .page .body .community .thread_posts_count {
