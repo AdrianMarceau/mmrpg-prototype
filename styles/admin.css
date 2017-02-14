@@ -307,6 +307,7 @@ tr:nth-child(odd) td {
     font-size: 12px;
     line-height: 16px;
     min-height: 50px;
+    position: relative;
 }
 .adminform .field.fullsize {
     width: 100%;
@@ -379,6 +380,31 @@ tr:nth-child(odd) td {
     -webkit-appearance: none;
    -moz-appearance: none;
    appearance: none;
+}
+.adminform .field select + span {
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+    background-color: transparent;
+    color: #262626;
+    bottom: 9px;
+    right: 12px;
+    width: 19px;
+    height: 19px;
+    padding: 0px;
+    pointer-events: none;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+.adminform .field select + span:before {
+    content: "\25bc";
+    font-size: 13px;
+    line-height: 16px;
+    display: block;
+    text-align: center;
+    padding: 2px;
 }
 
 .adminform .field input[disabled] {

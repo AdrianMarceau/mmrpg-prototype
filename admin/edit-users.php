@@ -541,7 +541,7 @@
                             <option value="male" <?= $user_data['user_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
                             <option value="female" <?= $user_data['user_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
                             <option value="other" <?= $user_data['user_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
-                        </select>
+                        </select><span></span>
                     </div>
 
                     <div class="field">
@@ -554,7 +554,7 @@
                                 echo('<option value="'.$role_id.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                             }
                             ?>
-                        </select>
+                        </select><span></span>
                     </div>
 
                     <div class="field">
@@ -568,7 +568,7 @@
                                 echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                             }
                             ?>
-                        </select>
+                        </select><span></span>
                     </div>
 
                     <div class="field">
@@ -583,7 +583,7 @@
                                 echo('<option value="'.$field_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                             }
                             ?>
-                        </select>
+                        </select><span></span>
                     </div>
 
                     <div class="field">
@@ -616,7 +616,7 @@
                                 echo('<option value="'.$player_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                             }
                             ?>
-                        </select>
+                        </select><span></span>
                     </div>
 
                     <div class="field">
