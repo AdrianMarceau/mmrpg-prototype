@@ -541,9 +541,9 @@ else { $this_thread_info['post_count'] = false; }
                         <div class="bodytext" style="<?= $is_system_post ? 'padding-left: 0; ' : '' ?>"><?= mmrpg_formatting_decode($temp_post_body) ?></div>
                     </div>
                     <? if($this_userid != MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked']) && $community_battle_points > MMRPG_SETTINGS_POST_MINPOINTS && $this_category_info['category_token'] != 'personal'): ?>
-                        <a class="postreply" rel="nofollow" href="<?= 'community/'.$this_category_info['category_token'].'/'.$this_thread_info['thread_id'].'/'.$this_thread_info['thread_token'].'/#comment-form:'.$temp_reply_name.':'.$temp_reply_colour ?>" style="<?= $this_post_direction ?>: 46px;">@ Reply</a>
+                        <a class="postreply <?= $this_post_direction ?>" rel="nofollow" href="<?= 'community/'.$this_category_info['category_token'].'/'.$this_thread_info['thread_id'].'/'.$this_thread_info['thread_token'].'/#comment-form:'.$temp_reply_name.':'.$temp_reply_colour ?>">@ Reply</a>
                     <? endif; ?>
-                    <a class="postscroll" href="#top" style="<?= $this_post_direction ?>: 12px;">^ Top</a>
+                    <a class="postscroll <?= $this_post_direction ?>" href="#top">^ Top</a>
                 <? } else { ?>
                     <span style="color: #464646;">- deleted -</span>
                 <? } ?>

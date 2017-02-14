@@ -270,19 +270,10 @@ body:before {
         content: "06";
     }
 
-
-    #topscroll {
-        display: block;
-        opacity: 0;
-        transition: 0.3s;
-    }
-    .scrolled #topscroll {
-        opacity: 1;
-    }
-
     #mmrpg .tooltip {
         max-width: 99vw;
     }
+
 
     #window .page .body .pipe {
 
@@ -471,6 +462,27 @@ body:before {
         max-width: 100%;
         max-height: none;
         height: auto;
+    }
+
+    /* Show top-scroll button and hide other top-scrolls links */
+    #topscroll {
+        display: block;
+        opacity: 0;
+        transition: 0.3s;
+    }
+    .scrolled #topscroll {
+        opacity: 1;
+    }
+    #window .page .body .subbody.threads .link_top,
+    #window .page .database_container .subbody .link_top,
+    #window .page .body .community .post_subbody .postscroll {
+        display: none !important;
+    }
+    #window .page .body .community .post_subbody .postreply.right {
+        right: 12px;
+    }
+    #window .page .body .community .post_subbody .postreply.left {
+        left: 12px;
     }
 
 }
@@ -1120,12 +1132,18 @@ body:before {
         clear: none;
     }
     #window .page .body .community .thread_subbody .thread_linkblock .count .newpost {
-        max-width: 105px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+
     }
     #window .page .body .community .thread_subbody .thread_linkblock .count .newpost + .newpost {
 
+    }
+    #window .page .body .community .thread_subbody .thread_linkblock .count .newpost.author {
+        display: block;
+        clear: left;
+        max-width: 96%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 4px 0 0;
     }
 
     #window .page_home #youtube_playlist,
