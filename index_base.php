@@ -484,6 +484,7 @@ if ($this_current_page == 'file' // File sub-pages
         Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.<br />
         This game is fan-made by <a href="https://plus.google.com/113336469005774860291?rel=author" target="_blank">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/">feedback</a> is appreciated. :)
     </div>
+    <a id="topscroll" href="<?= $this_current_url ?>"></a>
     <script type="text/javascript" src="scripts/jquery.js"></script>
     <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
     <? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
