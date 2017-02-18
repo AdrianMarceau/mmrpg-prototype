@@ -32,6 +32,7 @@ class rpg_user_role {
         $role_fields = array(
             'role_id',
             'role_name',
+            'role_name_full',
             'role_token',
             'role_level',
             'role_icon',
