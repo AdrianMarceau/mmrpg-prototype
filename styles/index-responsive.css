@@ -270,6 +270,12 @@ body:before {
         content: "06";
     }
 
+    #window .page .body .subbody .text a,
+    #window .page .body .subbody .text span {
+        white-space: normal;
+        word-break: break-all;
+    }
+
     #mmrpg .tooltip {
         max-width: 99vw;
     }
@@ -464,6 +470,21 @@ body:before {
         height: auto;
     }
 
+    /* -- Credit Page Styles -- */
+
+    #window .page_credits .body .creditblock .text .details .label {
+        display: block;
+        clear: both;
+    }
+
+    /* -- Contact Page Styles -- */
+
+    #window .page_contact .form .field {
+        float: none;
+        clear: both;
+        width: auto;
+    }
+
     /* Show top-scroll button and hide other top-scrolls links */
     #topscroll {
         display: block;
@@ -471,7 +492,7 @@ body:before {
         transition: 0.3s;
     }
     .scrolled #topscroll {
-        opacity: 1;
+        opacity: 0.9;
     }
     #window .page .body .subbody.threads .link_top,
     #window .page .database_container .subbody .link_top,

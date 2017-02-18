@@ -24,6 +24,15 @@ html, body {
 html {
     background-image: url(../images/assets/index-background.gif);
 }
+input[type="text"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+select,
+textarea,
+button {
+    box-sizing: border-box;
+}
 #window {
     margin: 0 auto;
     background-color: #262626;
@@ -1716,6 +1725,103 @@ html {
     line-height: 11px;
     font-weight: bold;
     white-space: nowrap;
+}
+
+
+#window .page_credits .body .creditblock {
+    position: relative;
+    padding-left: 60px;
+    margin-bottom: 2px;
+}
+#window .page_credits .body .creditblock.compact {
+    padding-left: 10px;
+}
+#window .page_credits .body .creditblock .float_left {
+    background-position: center center;
+    background-image: none;
+    position: absolute;
+    left: 5px;
+    top: 8px;
+    height: 25px;
+    width: 40px;
+    padding-top: 15px;
+}
+#window .page_credits .body .creditblock .text {
+    display: block;
+    margin: 0 auto 6px;
+    padding-top: 4px;
+}
+#window .page_credits .body .creditblock .text .details {
+    display: block;
+    margin: 0 auto 2px;
+    overflow: hidden;
+    color: #dedede;
+}
+
+#window .page_credits .body .creditblock .text .details .label {
+    font-weight: bold;
+    display: inline-block;
+    min-width: 60px;
+    color: #FFFFFF;
+}
+#window .page_credits .body .creditblock .text .details .link_inline {
+    color: inherit;
+}
+#window .page_credits .body .creditblock .text .details .link_inline:hover {
+    color: #FFFFFF;
+}
+#window .page_credits .body .creditblock .text .details .name,
+#window .page_credits .body .creditblock .text .details .website,
+#window .page_credits .body .creditblock .text .details .title,
+#window .page_credits .body .creditblock .text .details .credits,
+#window .page_credits .body .creditblock .text .details .date {
+    display: block;
+    margin: 0 auto 4px 0;
+}
+#window .page_credits .body .creditblock .text .details .name {
+    margin-bottom: 6px;
+}
+#window .page_credits .body .creditblock .text .details .name .link_inline {
+    min-height: 20px;
+    line-height: 20px;
+    padding: 2px 6px 2px 22px;
+    background: transparent none scroll no-repeat -10px -10px;
+    text-decoration: none;
+    box-sizing: border-box;
+    text-decoration: none;
+    color: #FFFFFF;
+}
+#window .page_credits .body .creditblock .text .details .name .link_inline:hover strong {
+    text-decoration: underline;
+}
+#window .page_credits .body .creditblock .text .details .website {
+    font-size: 12px;
+    line-height: 16px;
+}
+#window .page_credits .body .creditblock .text .details .website .link_inline {
+
+}
+#window .page_credits .body .creditblock .text .details .title {
+
+}
+#window .page_credits .body .creditblock .text .details .credits {
+
+}
+#window .page_credits .body .creditblock .text .details .date {
+
+}
+#window .page_credits .body .creditblock .text .description {
+    padding-top: 0;
+}
+#window .page_credits .body .creditblock .text .description p,
+#window .page_credits .body .creditblock .text .description div {
+
+}
+#window .page_credits .body .creditblock .text .description .subtext {
+    display: block;
+    font-size: 10px;
+    line-height: 12px;
+    margin-top: 2px;
 }
 
 
@@ -5056,18 +5162,19 @@ body.mobileFlag_landscapeMode #game_frames iframe {
     display: none;
     position: fixed;
     bottom: 0;
-    right: 10px;
-    width: 42px;
-    height: 32px;
-    background-color: #3f3f3f;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    background-color: #3F3F3F;
     border: 1px solid #1A1A1A;
+    border-width: 1px 0 0 1px;
     text-decoration: none;
     color: #EFEFEF;
-    font-size: 20px;
-    line-height: 20px;
-    -webkit-border-radius: 6px 6px 0 0;
-    -moz-border-radius: 6px 6px 0 0;
-    border-radius: 6px 6px 0 0;
+    font-size: 26px;
+    line-height: 30px;
+    -webkit-border-radius: 6px 0 0 0;
+    -moz-border-radius: 6px 0 0 0;
+    border-radius: 6px 0 0 0;
     background-image: linear-gradient(bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 100%);
     background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 100%);
     background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.25) 100%);
@@ -5081,7 +5188,8 @@ body.mobileFlag_landscapeMode #game_frames iframe {
         color-stop(1, rgba(0,0,0,0.25))
         );
     background-position: 0 0;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: -1px -1px 3px rgba(0, 0, 0, 0.2);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     z-index: 9999;
 }
@@ -5089,5 +5197,5 @@ body.mobileFlag_landscapeMode #game_frames iframe {
     content: "\25b2";
     display: block;
     text-align: center;
-    padding-top: 4px;
+    padding-top: 10px;
 }
