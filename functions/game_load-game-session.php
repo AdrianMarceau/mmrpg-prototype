@@ -38,7 +38,7 @@ function mmrpg_load_game_session($this_save_filepath){
         $new_game_data['USER']['username_clean'] = $this_database_user['user_name_clean'];
         $new_game_data['USER']['password'] = '';
         $new_game_data['USER']['password_encoded'] = '';
-        $new_game_data['USER']['omega'] = $this_database_user['user_omega'];
+        $new_game_data['USER']['omega'] = rpg_game::generate_omega_string($this_database_user['user_name_clean']);
         $new_game_data['USER']['profiletext'] = $this_database_user['user_profile_text'];
         $new_game_data['USER']['creditstext'] = $this_database_user['user_credit_text'];
         $new_game_data['USER']['creditsline'] = $this_database_user['user_credit_line'];

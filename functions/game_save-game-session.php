@@ -80,7 +80,7 @@ function mmrpg_save_game_session(){
                 $this_user_array['user_name_public'] = !empty($this_user['displayname']) ? $this_user['displayname'] : '';
                 if (!empty($this_user['password'])){ $this_user_array['user_password'] = $this_user['password']; }
                 if (!empty($this_user['password_encoded'])){ $this_user_array['user_password_encoded'] = $this_user['password_encoded']; }
-                $this_user_array['user_omega'] = $this_user['omega'];
+                $this_user_array['user_omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
                 $this_user_array['user_profile_text'] = !empty($this_user['profiletext']) ? $this_user['profiletext'] : '';
                 $this_user_array['user_credit_text'] = !empty($this_user['creditstext']) ? $this_user['creditstext'] : '';
                 $this_user_array['user_credit_line'] = !empty($this_user['creditsline']) ? $this_user['creditsline'] : '';
@@ -269,7 +269,7 @@ function mmrpg_save_game_session(){
         $this_user_array['user_name'] = $this_user['username'];
         $this_user_array['user_name_clean'] = $this_user['username_clean'];
         $this_user_array['user_name_public'] = !empty($this_user['displayname']) ? $this_user['displayname'] : '';
-        $this_user_array['user_omega'] = $this_user['omega'];
+        $this_user_array['user_omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
         $this_user_array['user_profile_text'] = !empty($this_user['profiletext']) ? $this_user['profiletext'] : '';
         $this_user_array['user_credit_text'] = !empty($this_user['creditstext']) ? $this_user['creditstext'] : '';
         $this_user_array['user_credit_line'] = !empty($this_user['creditsline']) ? $this_user['creditsline'] : '';
@@ -482,7 +482,7 @@ function mmrpg_save_game_session(){
         $this_save_content['user_id'] = $this_user['userid'];
         $this_save_content['user_name'] = $this_user['username'];
         $this_save_content['user_name_clean'] = $this_user['username_clean'];
-        $this_save_content['user_omega'] = !empty($this_user['omega']) ? $this_user['omega'] : md5($this_user['username_clean']);
+        $this_save_content['user_omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
         $this_save_content_omega = $this_save_content['user_omega'];
         $this_save_content = json_encode($this_save_content);
 

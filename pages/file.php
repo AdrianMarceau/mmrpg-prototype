@@ -545,7 +545,7 @@ while ($this_action == 'new'){
         $this_user['gender'] = 'male';
         $this_user['password'] = trim($_REQUEST['password']);
         $this_user['password_encoded'] = md5($this_user['password']);
-        $this_user['omega'] = $this_user['password_encoded'];
+        $this_user['omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
         $this_file = array();
         $this_file['path'] = $this_user['username_clean'].'/';
         $this_file['name'] = $this_user['omega'].'.sav';
@@ -858,7 +858,6 @@ while ($this_action == 'load'){
 while ($this_action == 'exit'){
 
     // Auto-generate the user and file info based on their IP
-    $omega = md5(!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo');
     $this_user = array();
     $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
     $this_user['username'] = 'demo';
@@ -869,7 +868,7 @@ while ($this_action == 'exit'){
     $this_user['gender'] = 'male';
     $this_user['password'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo';
     $this_user['password_encoded'] = md5($this_user['password']);
-    $this_user['omega'] = $omega;
+    $this_user['omega'] = rpg_game::generate_omega_string($this_user['username_clean']);;
     $this_file = array();
     $this_file['path'] = $this_user['username_clean'].'/';
     $this_file['name'] = $this_user['omega'].'.sav';

@@ -74,16 +74,19 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
         !empty($_SESSION['GAME']['USER']) && !empty($_SESSION['GAME']['USER']['username']) && !empty($_SESSION['GAME']['USER']['omega'])
         && !empty($_SESSION['GAME']['FILE']) && !empty($_SESSION['GAME']['FILE']['path']) && !empty($_SESSION['GAME']['FILE']['name'])
         ){
+
         // Pull the user and file info from the session
         $this_user = $_SESSION['GAME']['USER'];
         $this_file = $_SESSION['GAME']['FILE'];
+
         // Update the save filepath with the file path and name
         $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
+
     }
     // Otherwise, if we're in demo mode, populate manually
     else {
+
         // Auto-generate the user and file info based on their IP
-        $omega = md5(!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo');
         $this_user = array();
         $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
         $this_user['username'] = 'demo';
@@ -93,18 +96,22 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
         $this_user['gender'] = '';
         $this_user['password'] = '';
         $this_user['password_encoded'] = '';
-        $this_user['omega'] = $omega;
+        $this_user['omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
         $this_file = array();
         $this_file['path'] = $this_user['username_clean'].'/';
         $this_file['name'] = $this_user['omega'].'.sav';
+
         // Update the session with these demo variables
         $_SESSION['GAME']['DEMO'] = 1;
         $_SESSION['GAME']['USER'] = $this_user;
         $_SESSION['GAME']['FILE'] = $this_file;
+
         // Update the first load to indicate true
         $this_first_load = true;
+
         // Update the global save path variable
         $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
+
     }
 
     //  DEBUG DEBUG DEBUG
