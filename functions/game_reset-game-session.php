@@ -60,7 +60,7 @@ function mmrpg_reset_game_session(){
     // -- DEMO MODE UNLOCKS -- //
     if (!empty($_SESSION[$session_token]['DEMO'])){
 
-        // Reset the demo flag and user id to defaul
+        // Reset the demo flag and user id to default
         $_SESSION[$session_token]['USER']['userid'] = MMRPG_SETTINGS_GUEST_ID;
         $_SESSION[$session_token]['DEMO'] = 1;
 
