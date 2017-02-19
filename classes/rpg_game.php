@@ -1369,6 +1369,58 @@ class rpg_game {
     }
 
 
+    // -- OMEGA STRING FUNCTIONS -- //
+
+
+    // Define a function for generating an omega string for a given user or robot
+    public static function generate_omega_string($user_string, $robot_string = ''){
+
+        // Concatenate seed values to form the raw omega string
+        $omega_seed = MMRPG_SETTINGS_OMEGA_SEED;
+        $raw_omega_string = rtrim('mmrpg_'.$omega_seed.'_'.$user_string.'_'.$robot_string, '_');
+
+        // Calculate the MD5 hash of the raw omega string and crop
+        $complete_omega_string = md5($raw_omega_string);
+        $final_omega_string = substr($complete_omega_string, 0, 32);
+
+        // Return the finalized omega string value
+        return $final_omega_string;
+
+    }
+
+    // Define a function that selects from a group of values given an omega string
+    public static function select_omega_value($omega_string, $omega_values){
+
+        // Re-index the values to be sure of zero-index and then count
+        $indexed_omega_values = array_values($omega_values);
+        $omega_value_count = count($indexed_omega_values);
+
+        // Calculate the min and max range for the index keys
+        $index_range_min = 0;
+        $index_range_max = $omega_value_count - 1;
+
+        // Calculate how many characters to crop from the omega string given max value
+        $index_range_max_hex = dechex($index_range_max);
+        $required_string_length = strlen($index_range_max_hex);
+
+        // Make a copy of the omega string, reversed if value count not even (for variety)
+        if ($omega_value_count % 2 != 0){ $base_omega_string = strrev($omega_string); }
+        else { $base_omega_string = $omega_string; }
+
+        // Crop the base omega string to the required length and calculate it's decimal value
+        $cropped_omega_string = substr($base_omega_string, 0, $required_string_length);
+        $cropped_string_value = hexdec($cropped_omega_string);
+
+        // Calculate the index key using the above and then collect the final value
+        $this_index_key = $cropped_string_value % $omega_value_count;
+        $this_omega_value = $indexed_omega_values[$this_index_key];
+
+        // Return the finalized omega value given available options
+        return $this_omega_value;
+
+    }
+
+
 
     // -- DATABASE FUNCTIONS -- //
 
