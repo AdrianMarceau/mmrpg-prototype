@@ -22,6 +22,7 @@ require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 
 // Collect the editor flag if set
 $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
+if (isset($_GET['edit']) && $_GET['edit'] == 'false'){ $global_allow_editing = false; }
 $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'prototype';
 
 
