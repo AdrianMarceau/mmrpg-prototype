@@ -17,9 +17,9 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 // Collect the session token
 $session_token = mmrpg_game_token();
 
-
 // Collect the editor flag if set
-$global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
+$global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
+$global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'prototype';
 
 // Collect the number of completed battles for each player
 $unlock_flag_light = mmrpg_prototype_player_unlocked('dr-light');
@@ -833,8 +833,8 @@ function windowResizeFrame(){
 }
 </script>
 </head>
-<body id="mmrpg" class="iframe hidden" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
-    <div id="prototype" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
+<body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
+    <div id="prototype" class="hidden" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
         <div id="database" class="menu">
 
             <?= $this_database_markup ?>

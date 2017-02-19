@@ -540,6 +540,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     position: relative;
+    box-sizing: border-box;
     width: auto;
     float: none;
     clear: both;
@@ -955,11 +956,11 @@ body.mobileFlag_landscapeMode #prototype .option_this-team-select .chrome label 
 }
 #prototype .menu {
     overflow: hidden;
-    padding: 0 6px 0 6px;
-}
-body.windowFlag_landscapeMode #prototype .menu,
-body.mobileFlag_landscapeMode #prototype .menu {
     padding: 0 10px 0 5px;
+}
+body[data-source="website"] #prototype .menu {
+    overflow: hidden;
+    padding: 0;
 }
 #prototype .menu_hide {
     display: none;

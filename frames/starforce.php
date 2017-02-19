@@ -16,8 +16,9 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 // Collect the session token
 $session_token = mmrpg_game_token();
 
-// Require the prototype data file
-//require_once('../prototype/include.php');
+// Collect the editor flag if set
+$global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
+$global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'prototype';
 
 // Require the prototype omega data file
 require_once('../prototype/omega.php');
@@ -65,9 +66,6 @@ foreach ($temp_omega_factor_options AS $key => $factor){
 // Require the types and starforce data files
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
-
-// Collect the editor flag if set
-$global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
 
 // Collect the robot's index for names and fields
 $rpg_robots_index = rpg_robot::get_index();
@@ -192,9 +190,9 @@ gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE ?>';
 gameSettings.autoScrollTop = false;
 </script>
 </head>
-<body id="mmrpg" class="iframe" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
+<body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
 
-    <div id="prototype" class="<?= empty($this_start_key) ? 'hidden' : '' ?>" style="<?= !$global_allow_editing ? 'width: 100% !important; ' : '' ?>">
+    <div id="prototype" class="hidden" style="<?= !$global_allow_editing ? 'width: 100% !important; ' : '' ?>">
 
         <div class="menu">
 
