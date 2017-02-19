@@ -5,12 +5,6 @@
   background-color: transparent;
   width: 762px;
 }
-#mmrpg.windowFlag_landscapeMode,
-#mmrpg.mobileFlag_landscapeMode,
-#mmrpg.windowFlag_landscapeMode #prototype,
-#mmrpg.mobileFlag_landscapeMode #prototype {
-  width: 1024px;
-}
 #edit .header {
   width: 100%;
 }
@@ -20,7 +14,7 @@
   margin: 0 auto 2px;
   height: auto;
   width: 100%;
-  overflow: hidden; 
+  overflow: hidden;
 }
 #edit #canvas .wrapper {
   display: block;
@@ -75,7 +69,7 @@
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 0.3em;
   -moz-border-radius: 0.3em;
-  -webkit-border-radius: 0.3em;  
+  -webkit-border-radius: 0.3em;
 }
 #edit #console .field_stars {
   float: left;
@@ -227,17 +221,17 @@
   float: none;
   margin: 0 auto 2px;
   width: 100% !important;
-  min-height: 230px;  
+  min-height: 230px;
 }
 #edit #console .event {
   margin: 0;
-  min-height: 272px;  
+  min-height: 272px;
 }
 #edit #console .event_hidden {
   display: none;
 }
 #edit #console .event_visible {
-  
+
 }
 #edit #console .event table td.right {
   line-height: 21px;
@@ -248,22 +242,22 @@
 }
 #edit #console .event label.original_player_dr-wily span.current_player_dr-light,
 #edit #console .event label.original_player_dr-wily span.current_player_dr-cossack {
-  color: rgb(255, 171, 171) !important; 
+  color: rgb(255, 171, 171) !important;
 }
 #edit #console .event label.original_player_dr-cossack span.current_player_dr-light,
 #edit #console .event label.original_player_dr-cossack span.current_player_dr-wily {
   color: rgb(190, 141, 223) !important;
 }
 #edit #console .event a.player_name {
-  display: block; 
+  display: block;
   float: right;
-  padding: 1px 0; 
+  padding: 1px 0;
   margin: 2px 0 0;
-  width: 135px; 
-  text-align: center; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
+  width: 135px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   height: 13px;
   cursor: pointer;
   _cursor: hand;
@@ -272,14 +266,14 @@
   background-color: #515151;
 }
 #edit #console .event a.player_name label {
-  display: block; 
+  display: block;
   margin: 0;
   padding-left: 10px;
-  width: auto; 
-  text-align: center; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
+  width: auto;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   height: 13px;
   cursor: pointer;
   _cursor: hand;
@@ -291,12 +285,12 @@
 }
 #edit #console .event select.player_name,
 #edit #console .event select.player_name:hover {
-  display: block; 
+  display: block;
   margin: 0;
-  padding: 2px 3px 2px 8px; 
-  width: 135px; 
+  padding: 2px 3px 2px 8px;
+  width: 135px;
   text-align: left;
-  overflow: hidden; 
+  overflow: hidden;
   white-space: nowrap;
   height: 13px;
   position: relative;
@@ -310,24 +304,24 @@
   line-height: 19px;
   height: 19px;
   cursor: pointer;
-  _cursor: hand; 
+  _cursor: hand;
   text-decoration: none;
   font-weight: normal;
   /*
   background-color: red;
   opacity: 0.30;
-  */ 
+  */
 }
 #edit #console .event select.player_name option {
   text-align: center;
 }
 #edit #console .event a.player_name label .arrow {
-  display: block; 
+  display: block;
   width: auto;
   height: auto;
-  text-align: center; 
+  text-align: center;
   cursor: pointer;
-  _cursor: hand;  
+  _cursor: hand;
   color: #FFFFFF;
   position: absolute;
   top: 3px;
@@ -337,7 +331,7 @@
   opacity: 0.75;
   filter: alpha(opacity=75);
 }
-#edit #console .event a.player_name:hover label .arrow {   
+#edit #console .event a.player_name:hover label .arrow {
   opacity: 1.00;
   filter: alpha(opacity=100);
 }
@@ -356,7 +350,7 @@
   color: rgb(171, 228, 255) !important;
 }
 #edit #console .event .statboost_player_dr-wily {
-  color: rgb(255, 171, 171) !important; 
+  color: rgb(255, 171, 171) !important;
 }
 #edit #console .event .statboost_player_dr-cossack {
   color: rgb(190, 141, 223) !important;
@@ -364,34 +358,35 @@
 
 #edit #console .event .item_header,
 #edit #console .event .field_header {
-  display: block; 
+  display: block;
   float: none;
-  clear: both; 
+  clear: both;
   text-align: left;
   font-size: 12px;
 }
 #edit #console .event .item_container,
 #edit #console .event .field_container {
-  display: block; 
+  display: block;
   float: none;
-  clear: both; 
+  clear: both;
   padding-top: 2px;
-  width: auto; 
-  text-align: left; 
-  overflow: hidden; 
+  width: auto;
+  text-align: left;
+  overflow: hidden;
   height: 50px;
 }
 #edit #console .event a.field_name {
-  display: block; 
+  display: block;
   float: left;
-  padding: 3px; 
+  padding: 3px;
   margin: 0 5px 5px 0;
-  width: 23.0%; 
-  text-align: center; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
-  height: 19px;
+  width: 23.0%;
+  width: calc((100% / 4) - 5px);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 27px;
   cursor: pointer;
   _cursor: hand;
   background-image: none;
@@ -399,22 +394,20 @@
   background-position: -4px -4px;
   background-size: 100.1% auto;
   border-color: rgb(22,22,22) !important;
-}
-body.windowFlag_landscapeMode #edit #console .event a.field_name {
-  width: 23.6%;
+  box-sizing: border-box;
 }
 #edit #console .event a.field_name:hover {
   background-color: #515151;
 }
 #edit #console .event a.field_name label {
-  display: block; 
+  display: block;
   margin: 0;
   padding: 2px 0;
-  width: auto; 
-  text-align: center; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
+  width: auto;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   height: 13px;
   cursor: pointer;
   _cursor: hand;
@@ -431,13 +424,13 @@ body.windowFlag_landscapeMode #edit #console .event a.field_name {
 }
 #edit #console .event select.field_name,
 #edit #console .event select.field_name:hover {
-  display: block; 
+  display: block;
   margin: 0;
-  padding: 2px 0; 
-  width: auto; 
+  padding: 2px 0;
+  width: auto;
   min-width: 100px;
   text-align: center;
-  overflow: hidden; 
+  overflow: hidden;
   white-space: nowrap;
   height: 13px;
   position: relative;
@@ -451,27 +444,27 @@ body.windowFlag_landscapeMode #edit #console .event a.field_name {
   line-height: 19px;
   height: 13px;
   cursor: pointer;
-  _cursor: hand; 
+  _cursor: hand;
   text-decoration: none;
   font-weight: normal;
   /*
   background-color: red;
   opacity: 0.30;
-  */ 
+  */
 }
 #edit #console .event select.field_name option {
   text-align: left;
 }
 #edit #console .event a.ability_name {
-  display: block; 
+  display: block;
   float: left;
-  padding: 2px 3px; 
+  padding: 2px 3px;
   margin: 0 5px 5px 0;
-  width: 23.0%; 
-  text-align: center; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
+  width: 23.0%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   height: 13px;
   cursor: pointer;
   _cursor: hand;
@@ -483,14 +476,14 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
   background-color: #515151;
 }
 #edit #console .event a.ability_name label {
-  display: block; 
+  display: block;
   margin: 0;
   padding-left: 15px;
-  width: 125px; 
-  text-align: left; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
+  width: 125px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   height: 13px;
   cursor: pointer;
   _cursor: hand;
@@ -502,13 +495,13 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
 }
 #edit #console .event select.ability_name,
 #edit #console .event select.ability_name:hover {
-  display: block; 
+  display: block;
   margin: 0;
-  padding: 2px 3px; 
-  width: auto; 
+  padding: 2px 3px;
+  width: auto;
   min-width: 100px;
   text-align: center;
-  overflow: hidden; 
+  overflow: hidden;
   white-space: nowrap;
   height: 13px;
   position: relative;
@@ -522,13 +515,13 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
   line-height: 19px;
   height: 19px;
   cursor: pointer;
-  _cursor: hand; 
+  _cursor: hand;
   text-decoration: none;
   font-weight: normal;
   /*
   background-color: red;
   opacity: 0.30;
-  */ 
+  */
 }
 #edit #console .event select.ability_name option {
   text-align: left;
@@ -549,7 +542,7 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
   position: absolute;
   top: 2px;
   right: 2px;
-  padding: 2px 6px;  
+  padding: 2px 6px;
   background-color: rgba(0, 0, 0, 0.25) !important;
   border-color: rgba(0, 0, 0, 0.25) !important;
 }
@@ -557,8 +550,8 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
 /*
  * MOBILE OVERRIDE STYLES
  */
- 
+
 body.mobileFlag_portraitMode #prototype #canvas,
 body.mobileFlag_landscapeMode #prototype #canvas {
   width: 100% !important;
-} 
+}

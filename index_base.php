@@ -134,6 +134,7 @@ require_once('pages/'.$this_current_page.'.php');
 <? endif; ?>
 
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/jquery.scrollbar.min.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/index.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/index-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
@@ -264,29 +265,6 @@ if ($this_current_page == 'file' // File sub-pages
                 <div class="userinfo" style="">
                     <a class="expand" rel="nofollow"><span>+</span></a>
                     <div class="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="">&nbsp;</div>
-                    <?/*
-                    <? if($this_userid == MMRPG_SETTINGS_GUEST_ID || !MMRPG_CONFIG_ADMIN_MODE): ?>
-                        <div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>
-                        <div class="info" style="">
-                            <strong class="username" style="">Welcome, Guest</strong>
-                            <? if(MMRPG_CONFIG_ADMIN_MODE): ?>
-                                <a class="file file_new <?= $this_current_page == 'file' && $this_current_sub == 'new' ? 'file_active ' : '' ?>" href="file/new/" rel="nofollow" style="">new game</a> <span class="pipe">|</span>
-                                <a class="file file_load <?= $this_current_page == 'file' && $this_current_sub == 'load' ? 'file_active ' : '' ?>" href="file/load/" rel="nofollow" style="">load game</a>
-                            <? else: ?>
-                                <a class="file file_new <?= $this_current_page == 'file' && $this_current_sub == 'new' ? 'file_active ' : '' ?>" style="text-decoration: line-through;">new game</a> <span class="pipe">|</span>
-                                <a class="file file_load <?= $this_current_page == 'file' && $this_current_sub == 'load' ? 'file_active ' : '' ?>" style="text-decoration: line-through;">load game</a>
-                            <? endif; ?>
-                        </div>
-                    <? else: ?>
-                        <div class="<?= $temp_avatar_class ?>" style=""><div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_user_name ?></div></div>
-                        <div class="info" style="">
-                            <strong class="username" style="">Welcome, <?= $temp_user_name ?> <span class="pipe">|</span> <a class="place <?= $this_current_page == 'leaderboard' && $this_current_sub == $this_userinfo['user_name_clean'] ? 'place_active ' : '' ?>" href="leaderboard/<?= $this_userinfo['user_name_clean'] ?>/" rel="nofollow"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?> Place</a></strong>
-                            <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'game' ? 'file_active ' : '' ?>" href="file/game/" rel="nofollow" style="">view game</a> <span class="pipe">|</span>
-                            <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'profile' ? 'file_active ' : '' ?>" href="file/profile/" rel="nofollow" style="">edit profile</a> <span class="pipe">|</span>
-                            <a class="file file_exit <?= $this_current_page == 'file' && $this_current_sub == 'exit' ? 'file_active ' : '' ?>" href="file/exit/" rel="nofollow" style="">exit game</a>
-                        </div>
-                    <? endif; ?>
-                    */?>
 
                     <? if($this_userid == MMRPG_SETTINGS_GUEST_ID): ?>
                         <div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>
@@ -299,8 +277,8 @@ if ($this_current_page == 'file' // File sub-pages
                         <div class="<?= $temp_avatar_class ?>" style=""><div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_user_name ?></div></div>
                         <div class="info" style="">
                             <strong class="username" style="">Welcome, <?= $temp_user_name ?> <span class="pipe">|</span> <a class="place <?= $this_current_page == 'leaderboard' && $this_current_sub == $this_userinfo['user_name_clean'] ? 'place_active ' : '' ?>" href="leaderboard/<?= $this_userinfo['user_name_clean'] ?>/" rel="nofollow"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?> Place</a></strong>
-                            <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'game' ? 'file_active ' : '' ?>" href="file/game/" rel="nofollow" style="">view game</a> <span class="pipe">|</span>
-                            <a class="file file_save <?= $this_current_page == 'file' && $this_current_sub == 'profile' ? 'file_active ' : '' ?>" href="file/profile/" rel="nofollow" style="">edit profile</a> <span class="pipe">|</span>
+                            <a class="file file_view <?= $this_current_page == 'file' && $this_current_sub == 'game' ? 'file_active ' : '' ?>" href="file/game/" rel="nofollow" style="">view game</a> <span class="pipe">|</span>
+                            <a class="file file_edit <?= $this_current_page == 'file' && $this_current_sub == 'profile' ? 'file_active ' : '' ?>" href="file/profile/" rel="nofollow" style="">edit profile</a> <span class="pipe">|</span>
                             <a class="file file_exit <?= $this_current_page == 'file' && $this_current_sub == 'exit' ? 'file_active ' : '' ?>" href="file/exit/" rel="nofollow" style="">exit game</a>
                         </div>
                     <? endif; ?>
@@ -493,6 +471,7 @@ if ($this_current_page == 'file' // File sub-pages
     <a id="topscroll" href="<?= $this_current_url ?>"></a>
 
     <script type="text/javascript" src="scripts/jquery.js"></script>
+<script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
     <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
     <? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
         <script type="text/javascript" src="_ext/colorbox/jquery.colorbox.js"></script>

@@ -649,6 +649,12 @@ body.windowFlag_landscapeMode #prototype {
     opacity: 0.10;
     filter: alpha(opacity=10);
 }
+body[data-mode="viewer"] #edit #console .event a.player_name label .arrow,
+body[data-mode="viewer"] #edit #console .event a.ability_name label .arrow,
+body[data-mode="viewer"] #edit #console .event a.item_name label .arrow {
+    display: none;
+    cursor: default;
+}
 #edit #console .event a.player_name:hover label .arrow,
 #edit #console .event a.ability_name:hover label .arrow,
 #edit #console .event a.item_name:hover label .arrow,
@@ -757,6 +763,12 @@ body.windowFlag_landscapeMode #prototype {
     cursor: pointer;
     _cursor: hand;
     background-clip: padding-box;
+}
+body[data-mode="viewer"] #edit #console .event a.ability_name,
+body[data-mode="viewer"] #edit #canvas .player_canvas a.player_name,
+body[data-mode="viewer"] #edit #canvas .ability_canvas a.ability_name,
+body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
+    cursor: default;
 }
 #edit #console .event a.ability_name,
 #edit #canvas .player_canvas a.player_name,

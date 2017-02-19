@@ -84,6 +84,7 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     LEFT JOIN mmrpg_saves ON mmrpg_saves.user_id = mmrpg_users.user_id
     WHERE mmrpg_users.user_name_clean LIKE \''.$this_current_sub.'\';';
   $this_playerinfo = $db->get_array($temp_playerquery);
+
   // If the userinfo exists in the database, display it
   if (!empty($this_playerinfo)){
     // Collect this player's info from the database... all of it
@@ -108,5 +109,6 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     header('Location: '.MMRPG_CONFIG_ROOTURL.'leaderboard/');
     exit();
   }
+
 }
 ?>

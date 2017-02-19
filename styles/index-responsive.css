@@ -100,8 +100,7 @@ body:before {
     }
     #game_frames iframe,
     #game_frames iframe {
-        width: 1000px !important;
-        left: -14px !important;
+
     }
     #window .page .event .robot_container .robot_name,
     #window .page .event .ability_container .ability_name {
@@ -245,7 +244,7 @@ body:before {
 }
 
 /* -- Even Less than Portrait Mode -- */
-@media (max-width: 760px){
+@media (max-width: 820px){
 
     body:before {
         content: "05";
@@ -296,6 +295,42 @@ body:before {
         background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
         background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+    }
+
+    #window .banner .userinfo .info .file_view {
+        opacity: 0.3;
+        text-decoration: line-through;
+        pointer-events: none;
+    }
+    #window .banner .userinfo .info .file_view + .pipe {
+        opacity: 0.3;
+    }
+
+    #window .menu .item[data-token="prototype"] .link span,
+    #window .menu .item[data-token="prototype"] .link:hover span {
+        opacity: 0.3;
+        text-decoration: line-through;
+    }
+
+    #mmrpg #game_frames.ps-container > .ps-scrollbar-x-rail {
+        opacity: 0.6;
+    }
+
+    #mmrpg #game_container:after {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 35px;
+        right: 0;
+        bottom: 0;
+        width: 20px;
+        background-color: transparent;
+        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#1e1e1e+0,1e1e1e+100&0+0,1+51,1+100 */
+        background: -moz-linear-gradient(left,  rgba(30,30,30,0) 0%, rgba(30,30,30,1) 51%, rgba(30,30,30,1) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(left,  rgba(30,30,30,0) 0%,rgba(30,30,30,1) 51%,rgba(30,30,30,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to right,  rgba(30,30,30,0) 0%,rgba(30,30,30,1) 51%,rgba(30,30,30,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#001e1e1e', endColorstr='#1e1e1e',GradientType=1 ); /* IE6-9 */
+        z-index: 100;
     }
 
     #mmrpg #game_buttons .link_button.robots,
@@ -613,6 +648,7 @@ body:before {
         width: calc((100% / 4) - 10px);
         max-width: none;
         margin-bottom: 4px;
+        font-size: 11px;
     }
 
 }
@@ -625,7 +661,7 @@ body:before {
     }
 
     #window .menu .main {
-        padding: 0 6%;
+        padding: 0 5%;
     }
 
     #window .page .iconwrap.preview {

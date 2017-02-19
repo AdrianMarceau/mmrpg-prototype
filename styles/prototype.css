@@ -498,11 +498,10 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     opacity: 0;
 }
 
-
 #prototype .header {
     display: block;
     float: left;
-    height: 45px;
+    height: 50px;
     width: 750px;
     margin: 0 0 3px 0;
     vertical-align: top;
@@ -960,7 +959,7 @@ body.mobileFlag_landscapeMode #prototype .option_this-team-select .chrome label 
 }
 body[data-source="website"] #prototype .menu {
     overflow: hidden;
-    padding: 0;
+    padding-left: 0;
 }
 #prototype .menu_hide {
     display: none;
@@ -1611,6 +1610,16 @@ body.windowFlag_landscapeMode #prototype .block_10 {
 
 
 /* -- MEDIA QUERIES // LANDSCAPE MODE -- */
+
+@media (max-width: 1024px){
+
+    body,
+    #mmrpg,
+    #prototype {
+        width: auto !important;
+    }
+
+}
 
 @media (max-width: 768px){
 
