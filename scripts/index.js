@@ -550,48 +550,6 @@ $(document).ready(function(){
 
 
     /*
-     * LEADERBOARD EVENTS
-     */
-
-    // Create a reference to this form
-    var thisLeaderboard = $('.page_leaderboard');
-    // Ensure there is actually a community page wrapper to work with
-    if (thisLeaderboard.length){/*
-
-        // Create the click-event for all the separator toggles
-        var boardObjects = ['robot','ability','mission'];
-        for (i in boardObjects){
-            var objectClass = '.'+boardObjects[i]+'_separator';
-            //console.log(objectClass);
-            $(objectClass, thisLeaderboard).click(function(e){
-                // Prevent the default action
-                e.preventDefault();
-                //alert('clicked!');
-                // Create a reference to the current button
-                var thisToggle = $(this);
-                var thisContainer = thisToggle.parent();
-                // Check if this has been collapsed or not
-                var isCollapsed = thisToggle.hasClass('toggle_collapsed') ? true : false;
-                if (!isCollapsed){
-                    // Toggle has not been collapsed yet, so let us close it now
-                    thisToggle.addClass('toggle_collapsed').css({margin:0});
-                    thisContainer.css({minHeight:0,height:'24px'});
-                    $('.toggle', thisToggle).html('+');
-                    $('.object_name', thisContainer).css({display:'none'});
-                    } else {
-                    // Toggle has already been collapsed, so let's open it back up
-                    thisToggle.removeClass('toggle_collapsed').css({margin:''});
-                    thisContainer.css({minHeight:'',height:''});
-                    $('.toggle', thisToggle).html('-');
-                    $('.object_name', thisContainer).css({display:''});
-                    }
-                }).trigger('click');
-            }
-
-        */}
-
-
-    /*
      * FILE EVENTS
      */
 
@@ -600,15 +558,6 @@ $(document).ready(function(){
     var gameFrames = $('#mmrpg #game_frames');
     // Ensure there is actually a community page wrapper to work with
     if (gameButtons.length){
-
-        // Attach events to the file viewer/editor buttons
-        var gameButtonsType = 'field_type_'+gameButtons.attr('data-fieldtype');
-        // Manually define the hover events for the buttons due to field-type themes
-        $('a.link_button', gameButtons).hover(function(){
-            if (!$(this).hasClass('link_button_active')){ $(this).removeClass('field_type_empty').addClass(gameButtonsType); }
-            },function(){
-            if (!$(this).hasClass('link_button_active')){ $(this).removeClass(gameButtonsType).addClass('field_type_empty'); }
-            });
 
         // Define the click action for the game buttons
         if (gameFrames.length){
@@ -621,8 +570,8 @@ $(document).ready(function(){
                 var thisToken = thisButton.attr('data-token');
                 var thisFrame = $('iframe[name='+thisToken+']', gameFrames);
 
-                $('.link_button_active', gameButtons).removeClass('link_button_active').removeClass(gameButtonsType).addClass('field_type_empty');
-                thisButton.addClass('link_button_active').removeClass('field_type_empty').addClass(gameButtonsType);
+                $('.link_button_active', gameButtons).removeClass('link_button_active');
+                thisButton.addClass('link_button_active');
 
                 var frameIsReady = true;
                 if (thisFrame.attr('src') == 'blank.php'){
@@ -637,12 +586,8 @@ $(document).ready(function(){
                     if (frameIsReady){ prototype_menu_loaded(); }
                     });
 
-                //thisFrame.attr('src', thisFrame.attr('data-src')).css({display:'block'});
-                }); //.first().trigger('click');
+                });
             }
-
-        // Preload the first frame
-        //$('iframe', gameFrames).each(function(){ $(this).attr('src', $(this).attr('data-src')); });
 
     }
 

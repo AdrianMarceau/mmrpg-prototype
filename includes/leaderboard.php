@@ -78,10 +78,10 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
             $this_missions_count = $this_missions_count == 1 ? '1 Mission' : $this_missions_count.' Missions';
 
             //$this_points_html = preg_replace('#^([0]+)([0-9]+)$#', '<span class="padding">$1</span><span class="value">$2</span>', str_pad((!empty($this_points) ? $this_points : 0), 13, '0', STR_PAD_LEFT)).' BP';
-            $this_records_html = '<span class="count">'.$this_missions_count.'</span>';
-            $this_records_html .= ' <span class="pipe">|</span> <span class="count">'.$this_robots_count.'</span>';
-            $this_records_html .= ' <span class="pipe">|</span> <span class="count">'.$this_abilities_count.'</span>';
-            $this_records_html .= ' <span class="pipe">|</span> <span class="count">'.$this_stars_count.'</span>';
+            $this_records_html = '<span class="count missions">'.$this_missions_count.'</span>';
+            $this_records_html .= ' <span class="pipe">|</span> <span class="count robots">'.$this_robots_count.'</span>';
+            $this_records_html .= ' <span class="pipe">|</span> <span class="count abilities">'.$this_abilities_count.'</span>';
+            $this_records_html .= ' <span class="pipe">|</span> <span class="count stars">'.$this_stars_count.'</span>';
             $this_points_html = '<span class="value">'.(!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0).'</span>'.' BP';
             $this_points_plain = (!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0).' BP';
 

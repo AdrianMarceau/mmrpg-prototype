@@ -3,7 +3,7 @@
 
 body:before {
     content: "Z";
-    display: none;
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
@@ -234,6 +234,14 @@ body:before {
     }
 
 
+    #window .page .body .leaderboard .subbody .bodytext.community_stats {
+
+    }
+    #window .page .leaderboard .subbody .bodytext .player_stats {
+        width: calc(50% - 4px);
+    }
+
+
 }
 
 /* -- Even Less than Portrait Mode -- */
@@ -260,6 +268,46 @@ body:before {
         clear: both;
     }
 
+    #mmrpg #window .menu {
+        position: relative;
+    }
+    #mmrpg #window .menu:before {
+        content: " ";
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        border-top: 1px solid #1A1A1A;
+        height: 0;
+        width: auto;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 29px;
+    }
+    #window .menu .main {
+        padding: 0 15%;
+    }
+    #window .menu .item {
+        position: relative;
+    }
+    #window .menu .item:hover .subs,
+    #window .menu .subs.active {
+        border-top: 0 none transparent;
+        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100 */
+        background: -moz-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+    }
+
+    #mmrpg #game_buttons .link_button.robots,
+    #mmrpg #game_buttons .link_button.players,
+    #mmrpg #game_buttons .link_button.database,
+    #mmrpg #game_buttons .link_button.stars,
+    #mmrpg #game_buttons .link_button.items,
+    #mmrpg #game_buttons .link_button.missions {
+        opacity: 0.3;
+        text-decoration: line-through;
+        pointer-events: none;
+    }
 
 }
 
@@ -335,36 +383,6 @@ body:before {
         font-size: 12px;
         padding: 0;
         margin: 0;
-    }
-
-    #mmrpg #window .menu {
-        position: relative;
-    }
-    #mmrpg #window .menu:before {
-        content: " ";
-        border-bottom: 1px solid rgba(255,255,255,0.03);
-        border-top: 1px solid #1A1A1A;
-        height: 0;
-        width: auto;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 29px;
-    }
-    #window .menu .main {
-        padding: 0 18%;
-    }
-    #window .menu .item {
-        position: relative;
-    }
-    #window .menu .item:hover .subs,
-    #window .menu .subs.active {
-        border-top: 0 none transparent;
-        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100 */
-        background: -moz-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
-        background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
-        background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
     }
 
     #window .page .body .subbody .text {
@@ -470,6 +488,63 @@ body:before {
         height: auto;
     }
 
+    /* -- Leaderboard Page Styles -- */
+
+    #window .page .leaderboard .file .inset {
+        min-height: 80px;
+    }
+    #window .page .leaderboard .file .place {
+        position: absolute;
+        top: 9px;
+        left: 12px;
+        margin: 0;
+        padding: 0;
+        text-align: left;
+        font-size: 26px;
+        line-height: 26px;
+    }
+    #window .page .leaderboard .file .points {
+        position: absolute;
+        top: 9px;
+        right: 12px;
+        margin: 0;
+        padding: 0;
+        text-align: right;
+        font-size: 20px;
+        line-height: 26px;
+    }
+    #window .page .leaderboard .file .userinfo {
+        display: block;
+        float: none;
+        position: static;
+        width: auto;
+        text-align: left;
+        white-space: normal;
+        margin: 34px 12px 6px;
+        padding: 0;
+    }
+    #window .page .leaderboard .file .records {
+        display: block;
+        float: none;
+        position: static;
+        width: auto;
+        width: calc(100% - 62px);
+        text-align: left;
+        white-space: normal;
+        margin: 0 62px 6px 12px;
+        line-height: 14px;
+        padding: 0;
+    }
+    #window .page .leaderboard .file .records .count {
+        white-space: nowrap;
+    }
+    #window .page .leaderboard .file .avatar {
+        float: right;
+        left: auto;
+        right: 36px;
+        bottom: 16px;
+    }
+
     /* -- Credit Page Styles -- */
 
     #window .page_credits .body .creditblock .text .details .label {
@@ -506,6 +581,32 @@ body:before {
         left: 12px;
     }
 
+
+    #window .page .leaderboard .pagelinks .link.bullet {
+        min-width: 5px;
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+    #window .page .leaderboard .pagelinks .link.bullet:before {
+        content: ".";
+    }
+    #window .page .leaderboard .pagelinks .link.bullet span {
+        display: none;
+    }
+
+    #window .page .leaderboard .subbody .bodytext .player_stats {
+        float: none;
+        clear: both;
+        width: auto;
+        margin: 0 auto 4px;
+    }
+
+    #mmrpg #game_buttons .link_button {
+        width: calc((100% / 4) - 10px);
+        max-width: none;
+        margin-bottom: 4px;
+    }
+
 }
 
 /* -- Almost iPhone Portrait Mode -- */
@@ -516,7 +617,7 @@ body:before {
     }
 
     #window .menu .main {
-        padding: 0 8%;
+        padding: 0 6%;
     }
 
     #window .page .iconwrap.preview {
@@ -568,249 +669,6 @@ body:before {
     #window .page_file .form .field input[type="password"] {
         max-width: 98% !important;
         box-sizing: border-box;
-    }
-
-
-}
-
-/* -- So Close to iPhone Portrait Mode -- */
-@media (max-width: 460px){
-
-    body:before {
-        content: "08";
-    }
-
-    #window .menu .main {
-        padding: 0 1%;
-    }
-
-    #window .page .iconwrap.preview {
-        max-width: 300px;
-    }
-    #window .page .iconwrap.preview .type_block {
-        width: 28%;
-    }
-
-    #mmrpg #window .menu:after {
-        content: " ";
-        border-bottom: 1px solid rgba(255,255,255,0.03);
-        border-top: 1px solid #1A1A1A;
-        height: 0;
-        width: auto;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 59px;
-    }
-
-    #window .menu .main {
-        padding: 0 6%;
-    }
-
-    #mmrpg {
-        background-color: magenta;
-        background-color: #262626;
-        background-image: none;
-        padding-bottom: 10px;
-    }
-    #mmrpg #window {
-        background-color: transparent;
-        border: 0 none transparent;
-        box-shadow: 0 0 0 transparent;
-        min-width: 320px;
-        padding: 0;
-    }
-
-    #window #header_social_github {
-
-    }
-    #window #header_social_facebook {
-        right: 8px;
-        top: 36px;
-    }
-
-    #window .banner {
-        height: 164px;
-        border-top: 0 none transparent;
-        border-left: 0 none transparent;
-        border-right: 0 none transparent;
-        -moz-border-radius: 0;
-        -webkit-border-radius: 0;
-        border-radius: 0;
-    }
-
-    #window .banner .event {
-        width: auto;
-    }
-    #window .banner .event .sprite[data-type=attachment] {
-        display: none;
-    }
-    #window .banner .background,
-    #window .banner .foreground,
-    #window .banner .credits,
-    #window .banner .overlay {
-        -moz-border-radius: 0;
-        -webkit-border-radius: 0;
-        border-radius: 0;
-    }
-
-    #window .banner .userinfo {
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 6px 6px;
-        border-top-width: 2px;
-        border-style: solid none none;
-        -moz-border-radius: 0;
-        -webkit-border-radius: 0;
-        border-radius: 0;
-    }
-    #window .banner .userinfo .expand {
-        display: block;
-        position: absolute;
-        left: 3px;
-        bottom: 3px;
-        font-size: 34px;
-        line-height: 34px;
-        border: 1px solid #1A1A1A;
-        width: 34px;
-        height: 34px;
-        cursor: pointer;
-        border-radius: 3px;
-        text-decoration: none;
-        color: #FFFFFF;
-        background-color: #222222;
-        background-image: -webkit-gradient(
-                linear,
-                left bottom,
-                left top,
-                color-stop(0.15, rgba(0, 0, 0, 0.05)),
-                color-stop(0.75, rgba(255, 255, 255, 0.05))
-        );
-        background-image: -moz-linear-gradient(
-                center bottom,
-                rgba(0, 0, 0, 0.05) 15%,
-                rgba(255, 255, 255, 0.05) 75%
-        );
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-        -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-        -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-    }
-    #window .banner .userinfo .expand:hover {
-        background-color: #292929;
-    }
-    #window .banner .userinfo .expand span {
-        display: inline-block;
-        transform: rotate(0);
-        transition: transform 0.3s;
-    }
-    #window .banner .userinfo .expand.expanded span {
-        transform: rotate(45deg);
-    }
-    #window .banner .userinfo .avatar {
-        margin-right: 0;
-        margin-left: 0;
-    }
-    #window .banner .userinfo .info {
-        height: auto;
-        text-align: right;
-        float: right;
-        width: 70%;
-        width: calc(100% - 72px);
-    }
-    #window .banner .userinfo .info .username {
-        font-size: 12px;
-        line-height: 16px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    #window .banner .userinfo .info .username .pipe {
-        display: none;
-    }
-    #window .banner .userinfo .info .username .place {
-        display: none;
-    }
-    #window .banner .userinfo .info .username .place span {
-        display: none;
-    }
-    #window .banner .userinfo .info .file {
-        font-size: 11px;
-        line-height: 13px;
-    }
-    #window .banner .userinfo .field_type {
-        top: 0;
-        right: 0;
-        left: 0;
-        bottom: 0;
-        border: 0 none transparent;
-        -moz-border-radius: 0;
-        -webkit-border-radius: 0;
-        border-radius: 0;
-    }
-
-    #mmrpg #window .menu {
-        border-left: 0 none transparent;
-        border-right: 0 none transparent;
-        -moz-border-radius: 0;
-        -webkit-border-radius: 0;
-        border-radius: 0;
-    }
-
-    #mmrpg #window .menu:before,
-    #mmrpg #window .menu:after {
-        content: "";
-        display: none;
-    }
-
-    #window .menu .main {
-        display: none;
-    }
-    #window .menu .main.expanded {
-        display: block;
-    }
-    #window .menu .item {
-        display: block;
-        float: none;
-        clear: both;
-        -moz-border-radius: 0;
-        -webkit-border-radius: 0;
-        border-radius: 0;
-        line-height: 30px;
-        border-bottom: 1px solid rgba(255,255,255,0.03);
-        border-top: 1px solid rgba(0,0,0,0.09);
-    }
-    #window .menu .item:first-child {
-        border-top: 0 none transparent;
-    }
-    #window .menu .item:last-child {
-        border-bottom: 0 none transparent;
-    }
-    #window .menu .sub {
-        display: none;
-    }
-    #window .menu .sub .link {
-        line-height: 20px;
-    }
-    #window .menu .link:after {
-        display: none;
-    }
-    #window .menu .item:hover .subs,
-    #window .menu .subs.active {
-        display: block;
-        position: static;
-        margin: 0;
-        border: 0 none transparent;
-        background-color: #222222 !important;
-        box-shadow: inset 0px 0px 6px rgba(0,0,0,0.3);
-        -moz-border-radius: 6px;
-        -webkit-border-radius: 6px;
-        border-radius: 6px;
-    }
-
-    #mmrpg #window .menu, #window .page {
-        padding: 0 6px;
     }
 
     #window .page .subbody .float.link .sprite {
@@ -1174,53 +1032,6 @@ body:before {
         margin: 0 auto 9px;
     }
 
-
-    #window .page .leaderboard .file .inset {
-        min-height: 80px;
-    }
-    #window .page .leaderboard .file .place {
-        position: absolute;
-        top: 9px;
-        left: 9px;
-        margin: 0;
-        padding: 0;
-        text-align: left;
-    }
-    #window .page .leaderboard .file .points {
-        position: absolute;
-        top: 9px;
-        right: 9px;
-        margin: 0;
-        padding: 0;
-        text-align: right;
-    }
-    #window .page .leaderboard .file .userinfo {
-        display: block;
-        float: none;
-        position: static;
-        width: auto;
-        text-align: left;
-        white-space: normal;
-        margin: 34px 12px 6px;
-        padding: 0;
-    }
-    #window .page .leaderboard .file .records {
-        display: none;
-        float: none;
-        position: static;
-        width: auto;
-        text-align: left;
-        white-space: normal;
-        margin: 0;
-        padding: 0;
-    }
-    #window .page .leaderboard .file .avatar {
-        float: right;
-        left: auto;
-        right: 36px;
-        bottom: 16px;
-    }
-
     #window .page .gallery .dateblock,
     #window .page .gallery .screenshot {
         width: 93px;
@@ -1423,6 +1234,258 @@ body:before {
     }
     #window .page .body .community .formatting.formatting_expanded {
         margin-bottom: 13px;
+    }
+
+
+}
+
+/* -- So Close to iPhone Portrait Mode -- */
+@media (max-width: 460px){
+
+    body:before {
+        content: "08";
+    }
+
+    #window .menu .main {
+        padding: 0 1%;
+    }
+
+    #window .page .iconwrap.preview {
+        max-width: 300px;
+    }
+    #window .page .iconwrap.preview .type_block {
+        width: 28%;
+    }
+
+    #mmrpg #window .menu:after {
+        content: " ";
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        border-top: 1px solid #1A1A1A;
+        height: 0;
+        width: auto;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 59px;
+    }
+
+    #window .menu .main {
+        padding: 0 6%;
+    }
+
+    #mmrpg {
+        background-color: magenta;
+        background-color: #262626;
+        background-image: none;
+        padding-bottom: 10px;
+    }
+    #mmrpg #window {
+        background-color: transparent;
+        border: 0 none transparent;
+        box-shadow: 0 0 0 transparent;
+        min-width: 320px;
+        padding: 0;
+    }
+
+    #window #header_social_github {
+
+    }
+    #window #header_social_facebook {
+        right: 8px;
+        top: 36px;
+    }
+
+    #window .banner {
+        height: 164px;
+        border-top: 0 none transparent;
+        border-left: 0 none transparent;
+        border-right: 0 none transparent;
+        -moz-border-radius: 0;
+        -webkit-border-radius: 0;
+        border-radius: 0;
+    }
+
+    #window .banner .event {
+        width: auto;
+    }
+    #window .banner .event .sprite[data-type=attachment] {
+        display: none;
+    }
+    #window .banner .background,
+    #window .banner .foreground,
+    #window .banner .credits,
+    #window .banner .overlay {
+        -moz-border-radius: 0;
+        -webkit-border-radius: 0;
+        border-radius: 0;
+    }
+
+    #window .banner .userinfo {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 6px 6px;
+        border-top-width: 2px;
+        border-style: solid none none;
+        -moz-border-radius: 0;
+        -webkit-border-radius: 0;
+        border-radius: 0;
+    }
+    #window .banner .userinfo .expand {
+        display: block;
+        position: absolute;
+        left: 3px;
+        bottom: 3px;
+        font-size: 34px;
+        line-height: 34px;
+        border: 1px solid #1A1A1A;
+        width: 34px;
+        height: 34px;
+        cursor: pointer;
+        border-radius: 3px;
+        text-decoration: none;
+        color: #FFFFFF;
+        background-color: #222222;
+        background-image: -webkit-gradient(
+                linear,
+                left bottom,
+                left top,
+                color-stop(0.15, rgba(0, 0, 0, 0.05)),
+                color-stop(0.75, rgba(255, 255, 255, 0.05))
+        );
+        background-image: -moz-linear-gradient(
+                center bottom,
+                rgba(0, 0, 0, 0.05) 15%,
+                rgba(255, 255, 255, 0.05) 75%
+        );
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+        -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+        -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    }
+    #window .banner .userinfo .expand:hover {
+        background-color: #292929;
+    }
+    #window .banner .userinfo .expand span {
+        display: inline-block;
+        transform: rotate(0);
+        transition: transform 0.3s;
+    }
+    #window .banner .userinfo .expand.expanded span {
+        transform: rotate(45deg);
+    }
+    #window .banner .userinfo .avatar {
+        margin-right: 0;
+        margin-left: 0;
+    }
+    #window .banner .userinfo .info {
+        height: auto;
+        text-align: right;
+        float: right;
+        width: 70%;
+        width: calc(100% - 72px);
+    }
+    #window .banner .userinfo .info .username {
+        font-size: 12px;
+        line-height: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    #window .banner .userinfo .info .username .pipe {
+        display: none;
+    }
+    #window .banner .userinfo .info .username .place {
+        display: none;
+    }
+    #window .banner .userinfo .info .username .place span {
+        display: none;
+    }
+    #window .banner .userinfo .info .file {
+        font-size: 11px;
+        line-height: 13px;
+    }
+    #window .banner .userinfo .field_type {
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        border: 0 none transparent;
+        -moz-border-radius: 0;
+        -webkit-border-radius: 0;
+        border-radius: 0;
+    }
+
+    #mmrpg #window .menu {
+        border-left: 0 none transparent;
+        border-right: 0 none transparent;
+        -moz-border-radius: 0;
+        -webkit-border-radius: 0;
+        border-radius: 0;
+    }
+
+    #mmrpg #window .menu:before,
+    #mmrpg #window .menu:after {
+        content: "";
+        display: none;
+    }
+
+    #window .menu .main {
+        display: none;
+    }
+    #window .menu .main.expanded {
+        display: block;
+    }
+    #window .menu .item {
+        display: block;
+        float: none;
+        clear: both;
+        -moz-border-radius: 0;
+        -webkit-border-radius: 0;
+        border-radius: 0;
+        line-height: 30px;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        border-top: 1px solid rgba(0,0,0,0.09);
+    }
+    #window .menu .item:first-child {
+        border-top: 0 none transparent;
+    }
+    #window .menu .item:last-child {
+        border-bottom: 0 none transparent;
+    }
+    #window .menu .sub {
+        display: none;
+    }
+    #window .menu .sub .link {
+        line-height: 20px;
+    }
+    #window .menu .link:after {
+        display: none;
+    }
+    #window .menu .item:hover .subs,
+    #window .menu .subs.active {
+        display: block;
+        position: static;
+        margin: 0;
+        border: 0 none transparent;
+        background-color: #222222 !important;
+        box-shadow: inset 0px 0px 6px rgba(0,0,0,0.3);
+        -moz-border-radius: 6px;
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+    }
+
+    #mmrpg #window .menu, #window .page {
+        padding: 0 6px;
+    }
+
+
+    #window .page .leaderboard .file .records .count.robots + .pipe {
+        display: block;
+        height: 0px;
+        clear: both;
+        margin: 2px auto;
+        text-indent: -9999px;
     }
 
 
