@@ -309,6 +309,10 @@ body:before {
         pointer-events: none;
     }
 
+    #window .page .body .bodytext .type {
+        white-space: normal;
+    }
+
 }
 
 /* -- Even More Less than Portrait Mode -- */
@@ -321,6 +325,10 @@ body:before {
     #window .page .body .subbody .text a,
     #window .page .body .subbody .text span {
         white-space: normal;
+        word-break: break-word;
+    }
+
+    #window .page_credits .body .creditblock .text .details .website .link_inline {
         word-break: break-all;
     }
 
