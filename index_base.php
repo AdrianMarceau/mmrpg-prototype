@@ -333,11 +333,11 @@ if ($this_current_page == 'file' // File sub-pages
                     $main_menu_links['about'] = array('name' => 'About');
                     $main_menu_links['gallery'] = array('name' => 'Gallery');
                     $main_menu_links['database'] = array('name' => 'Database');
+                    $main_menu_links['prototype'] = array('name' => ('Play the '.(rpg_game::is_user() ? 'Prototype' : 'Demo')), 'target' => '_blank');
                     $main_menu_links['community'] = array('name' => 'Community');
                     $main_menu_links['leaderboard'] = array('name' => 'Leaderboard');
-                    $main_menu_links['prototype'] = array('name' => 'Prototype', 'target' => '_blank');
                     $main_menu_links['credits'] = array('name' => 'Credits');
-                    $main_menu_links['contact'] = array('name' => 'Contact');
+                    //$main_menu_links['contact'] = array('name' => 'Contact');
 
                     // Hard-code some sub-pages we know about beforehand
                     $database_subs = array();
@@ -480,11 +480,18 @@ if ($this_current_page == 'file' // File sub-pages
         </div>
 
     </div>
+
     <div id="credits">
-        Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.<br />
-        This game is fan-made by <a href="https://plus.google.com/113336469005774860291?rel=author" target="_blank">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/">feedback</a> is appreciated. :)
+        <? if ($this_current_page != 'home'): ?>
+            <a href="<?= MMRPG_CONFIG_ROOTURL ?>">&laquo; Back to Home</a> |
+        <? endif; ?>
+        Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.
+        | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback &raquo;</a><?= !$flag_iphone ? '<br />' : '' ?>
+        This game is fan-made by <a href="https://plus.google.com/113336469005774860291?rel=author" target="_blank">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
     </div>
+
     <a id="topscroll" href="<?= $this_current_url ?>"></a>
+
     <script type="text/javascript" src="scripts/jquery.js"></script>
     <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
     <? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
