@@ -34,7 +34,7 @@ button {
     box-sizing: border-box;
 }
 #window {
-    margin: 0 auto;
+    margin: 0 auto 10px;
     background-color: #262626;
     border-color: #262626;
 }
@@ -435,7 +435,7 @@ button {
     height: auto;
     font-size: 10px;
     line-height: 30px;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     text-transform: none;
     padding: 0;
     border-radius: 0 0 0.75em 0.75em;
@@ -531,6 +531,7 @@ button {
 
 #window .menu .item {
     display: inline-block;
+    padding: 0 2px;
 }
 #window .menu .subs .item {
     display: block;
@@ -581,6 +582,30 @@ button {
 #window .menu .link_active:hover span {
     text-decoration: none !important;
 }
+
+#window .menu .item[data-token="prototype"] .link,
+#window .menu .item[data-token="prototype"] .link:hover,
+#window .menu .item[data-token="prototype"] .link:hover span {
+    text-decoration: none;
+}
+#window .menu .item[data-token="prototype"] .link span {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.1);
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    padding: 0 6px;
+    text-align: center;
+    text-shadow: 0 0 0 transparent;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+}
+
+#window .menu .item[data-token="prototype"] .link:hover span {
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+
 /*
 #window .menu .item:after {
     position: absolute;
@@ -829,7 +854,7 @@ button {
     font-size: 13px;
     line-height: 19px;
     text-align: left;
-    background-color: rgba(0, 0, 0, 0.20);
+    background-color: #1e1e1e;
     border: 1px solid transparent;
     border-radius: 0.3em;
     -moz-border-radius: 0.3em;
@@ -2175,6 +2200,7 @@ button {
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
     overflow: hidden;
 }
+/*
 #window .page .leaderboard .file .robots {
     display: block;
     float: none;
@@ -2186,6 +2212,7 @@ button {
     border: 0 none transparent;
     overflow: hidden;
 }
+*/
 #window .page .leaderboard .file .points,
 #window .page .leaderboard .file .records {
     position: absolute;
@@ -2244,48 +2271,89 @@ button {
     background-position: -8px -8px;
 }
 
-#window .page .leaderboard .more {
-    border: 0 none transparent;
-    background-color: transparent;
-    background-image: none;
+
+#window .page .leaderboard .pagelinks {
+    display: block;
+    margin: 0 auto;
+    overflow: hidden;
+    text-align: center;
+    position: relative;
+}
+#window .page .leaderboard .pagelinks.head {
+    margin-bottom: 10px;
+}
+#window .page .leaderboard .pagelinks.foot {
+    margin-top: 10px;
+}
+#window .page .leaderboard .pagelinks .link {
+    display: inline-block;
+    margin: 0 4px 4px 0;
+    padding: 3px 6px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #1e1e1e;
+    color: #DEDEDE;
+    min-width: 20px;
+    box-sizing: border-box;
     text-align: center;
     text-decoration: none;
-    cursor: pointer;
-    _cursor: hand;
-    box-shadow: 0 0 0 transparent;
-    -moz-box-shadow: 0 0 0 transparent;
-    -webkit-box-shadow: 0 0 0 transparent;
-    font-size: 12px;
-    line-height: 26px;
-    height: auto;
-    padding: 0 20px;
-    color: #CACACA;
 }
-#window .page .leaderboard .more:hover {
-    color: #FAFAFA;
-}
-#window .page .leaderboard .container {
-    display: block;
-    margin: 5px auto 0;
-}
-#window .page .leaderboard .container .number,
-#window .page .leaderboard .container .bullet {
-    float: none;
-    display: inline;
-    padding-left: 4px;
-    padding-right: 4px;
-}
-#window .page .leaderboard .container .bullet {
-    padding-left: 2px;
-    padding-right: 2px;
-}
-#window .page .leaderboard .container .number.active,
-#window .page .leaderboard .container .bullet.active {
-    cursor: default;
-    opacity: 0.50;
-    filter: alpha(opacity=50);
+#window .page .leaderboard .pagelinks .link.active,
+#window .page .leaderboard .pagelinks .link:hover {
+    background-color: #4e4e4e;
     text-decoration: underline;
 }
+#window .page .leaderboard .pagelinks .link.prev,
+#window .page .leaderboard .pagelinks .link.next {
+    min-width: 50px;
+    font-size: 11px;
+    border: 1px solid #1A1A1A;
+    background-color: #222222;
+    background-image: -webkit-gradient(
+            linear,
+            left bottom,
+            left top,
+            color-stop(0.15, rgba(0, 0, 0, 0.05)),
+            color-stop(0.75, rgba(255, 255, 255, 0.05))
+    );
+    background-image: -moz-linear-gradient(
+            center bottom,
+            rgba(0, 0, 0, 0.05) 15%,
+            rgba(255, 255, 255, 0.05) 75%
+    );
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+}
+#window .page .leaderboard .pagelinks .link.prev {
+    float: left;
+}
+#window .page .leaderboard .pagelinks .link.next {
+    float: right;
+}
+#window .page .leaderboard .pagelinks .link.number,
+#window .page .leaderboard .pagelinks .link.bullet {
+    min-height: 22px;
+    line-height: 20px;
+}
+#window .page .leaderboard .pagelinks .link.number {
+
+}
+#window .page .leaderboard .pagelinks .link.bullet {
+
+}
+
+
+#window .page .leaderboard .playerlinks {
+    display: block;
+    margin: 0 auto;
+    overflow: hidden;
+    text-align: center;
+}
+
+
 
 #window .page .leaderboard .subbody {
 
@@ -2309,6 +2377,14 @@ button {
 #window .page .body .leaderboard .thread_right .bodytext {
     padding-right: 0 !important;
 }
+#window .page .body .leaderboard .subbody .bodytext.community_stats {
+    display: block;
+    float: none;
+    clear: both;
+    margin: 0 auto 10px;
+    overflow: hidden;
+    padding-top: 0;
+}
 #window .page .leaderboard .subbody .bodytext .player_stats {
     display: block;
     float: left;
@@ -2320,9 +2396,10 @@ button {
     border: 1px solid rgb(39, 39, 39);
     background-color: rgb(36, 36, 36);
     padding: 4px 8px;
-    border-radius: 6px;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
+    border-radius: 6px;
+    box-sizing: border-box;
 }
 #window .page .leaderboard .subbody .player_stats .label {
     display: block;
@@ -3936,7 +4013,8 @@ body.windowFlag_landscapeMode #window .page .type_block {
     margin-left: -52px;
 }
 #window .page .body .community .thread_subbody_full {
-    padding: 10px 10px 10px 15px;
+    /*padding: 10px 10px 10px 15px;*/
+    padding: 10px;
     min-height: 160px;
     _height: 160px;
 }
@@ -5115,38 +5193,50 @@ body.windowFlag_landscapeMode #window .page_file .form .field_post_body .textare
     overflow: visible;
 }
 #mmrpg #game_buttons {
-    padding-bottom: 20px;
+    padding-bottom: 10px;
+    overflow: hidden;
 }
 #mmrpg #game_buttons .link_button {
     display: block;
     float: left;
+    width: 65px;
+    width: calc((100% / 8) - 10px);
+    max-width: 110px;
     font-size: 13px;
     line-height: 19px;
+    text-align: center;
     margin: 0 10px 0 0;
     padding: 0 4px;
     color: #FFFFFF;
     text-decoration: none;
     border: 1px solid #161616;
+    box-sizing: border-box;
     border-radius: 0.3em;
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
 }
-#mmrpg #game_buttons .link_button_active {
+#mmrpg #game_buttons .active {
     text-decoration: none;
 }
+
+#mmrpg #game_buttons .link_button:not(.active):not(:hover) {
+    border: 1px solid #141414 !important;
+    background-color: #1a1a1a !important;
+}
+
 #mmrpg #game_frames {
     position: relative;
     margin: 0 auto 20px;
     min-height: 10px;
-    max-height: 473px;
+    height: 600px;
 }
 #mmrpg #game_frames iframe {
     display: block;
-    position: absolute;
-    top: 0;
-    left: -18px;
+    box-sizing: border-box;
+    margin: 0 -1px 10px;
     height: 473px;
-    width: 752px;
+    min-width: 752px;
+    width: 100%;
     border-color: transparent !important;
     overflow: visible;
 }
