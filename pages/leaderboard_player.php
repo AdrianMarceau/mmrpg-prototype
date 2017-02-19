@@ -313,7 +313,7 @@ ob_start();
         ?></span>
     </h2>
 
-    <div class="subbody thread_subbody thread_subbody_full thread_subbody_full_right thread_right event event_triple event_visible" style="text-align: left; position: relative; padding-bottom: 6px; margin-bottom: 4px;">
+    <div id="game_container" class="subbody thread_subbody thread_subbody_full thread_subbody_full_right thread_right event event_triple event_visible" style="text-align: left; position: relative; padding-bottom: 6px; margin-bottom: 4px;">
 
         <div id="game_buttons" data-fieldtype="<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>" class="field">
 
@@ -327,12 +327,11 @@ ob_start();
 
             <a class="link_button database field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'database' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/database/' ?>">Database</a>
 
-            <? if(!empty($temp_show_stars)): ?>
-                <a class="link_button stars field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'stars' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/stars/' ?>">Stars</a>
-            <? endif; ?>
-
             <? if(!empty($temp_show_items)): ?>
                 <a class="link_button items field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'items' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/items/' ?>">Items</a>
+            <? endif; ?>
+            <? if(!empty($temp_show_stars)): ?>
+                <a class="link_button stars field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'stars' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/stars/' ?>">Stars</a>
             <? endif; ?>
 
             <? if ($this_playerinfo['board_missions'] > 1): ?>
@@ -426,7 +425,7 @@ ob_start();
             ?>
 
             <div id="game_frames" class="field view_robots">
-                <iframe name="view_robots" src="frames/edit_robots.php?source=website&amp;action=robots&amp;1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+                <iframe name="view_robots" src="frames/edit_robots.php?source=website&amp;action=robots&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
             </div>
 
             <?
@@ -436,7 +435,7 @@ ob_start();
             ?>
 
             <div id="game_frames" class="field view_players">
-                <iframe name="view_players" src="frames/edit_players.php?source=website&amp;action=players&amp;1=1&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+                <iframe name="view_players" src="frames/edit_players.php?source=website&amp;action=players&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
             </div>
 
             <?
@@ -645,5 +644,5 @@ ob_start();
 
 <?
 // Collect the buffer and define the page markup
-$this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
+$this_markup_body = trim(ob_get_clean());
 ?>

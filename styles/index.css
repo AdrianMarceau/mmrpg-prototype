@@ -5189,9 +5189,10 @@ body.windowFlag_landscapeMode #window .page_file .form .field_post_body .textare
 
 /* GAME / PROFILE STYLES */
 
-#mmrpg #window .page_file .body .subbody {
-    overflow: visible;
+#mmrpg #game_container {
+    position: relative;
 }
+
 #mmrpg #game_buttons {
     padding-bottom: 10px;
     overflow: hidden;
@@ -5240,10 +5241,20 @@ body.windowFlag_landscapeMode #window .page_file .form .field_post_body .textare
     border-color: transparent !important;
     overflow: visible;
 }
-body.windowFlag_landscapeMode #game_frames iframe,
-body.mobileFlag_landscapeMode #game_frames iframe {
-    width: 1000px !important;
-    left: -14px !important;
+
+#mmrpg #game_frames.ps-container {
+    padding-top: 16px;
+}
+#mmrpg #game_frames.ps-container:not(.ps-active-x) {
+    padding-top: 0;
+}
+#mmrpg #game_frames.ps-container > .ps-scrollbar-x-rail {
+    top: 3px;
+    bottom: auto;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+#mmrpg #game_frames.ps-container:not(.ps-active-x) > .ps-scrollbar-x-rail {
+    opacity: 0;
 }
 
 /* MISC UI STYLES */

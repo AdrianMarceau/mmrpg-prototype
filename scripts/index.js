@@ -5,6 +5,7 @@ var thisWindow = false;
 var thisHeaderBanner = false;
 var thisHeaderMenu = false;
 var websiteSettings = {};
+var thisScrollbarSettings = {wheelSpeed:0.3};
 $(document).ready(function(){
 
     // Update global reference variables
@@ -556,6 +557,7 @@ $(document).ready(function(){
     // Create a reference to this form
     var gameButtons = $('#mmrpg #game_buttons');
     var gameFrames = $('#mmrpg #game_frames');
+
     // Ensure there is actually a community page wrapper to work with
     if (gameButtons.length){
 
@@ -589,7 +591,16 @@ $(document).ready(function(){
                 });
             }
 
-    }
+        }
+
+    // Attach scrollable events to the game frames if exist
+    if (gameFrames.length){
+
+        // Trigger perfect scrollbars on the frame containers
+        gameFrames.perfectScrollbar(thisScrollbarSettings);
+        $(window).resize(function(){ gameFrames.perfectScrollbar('update'); });
+
+        }
 
 
 });
