@@ -23,11 +23,27 @@ body:before {
 }
 
 
+/* -- Right-before Landscape Mode -- */
+@media (max-width: 1048px){
+
+    body:before {
+        content: "12";
+    }
+
+    body,
+    #mmrpg,
+    #prototype {
+        width: auto !important;
+        min-width: 768px;
+    }
+
+}
+
 /* -- Landscape Mode -- */
 @media (min-width: 1024px){
 
     body:before {
-        content: "01";
+        content: "11";
     }
 
 
@@ -37,7 +53,7 @@ body:before {
 @media (max-width: 1060px){
 
     body:before {
-        content: "02";
+        content: "10";
     }
 
 
@@ -47,7 +63,7 @@ body:before {
 @media (max-width: 1000px){
 
     body:before {
-        content: "03";
+        content: "09";
     }
 
 }
@@ -56,7 +72,23 @@ body:before {
 @media (max-width: 970px){
 
     body:before {
-        content: "04";
+        content: "08";
+    }
+
+}
+
+@media (max-width: 800px){
+
+    body:before {
+        content: "07";
+    }
+
+    #window {
+        border-width: 0 0 2px;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        border-radius: 0;
+        padding: 2px 0;
     }
 
 }
@@ -65,7 +97,7 @@ body:before {
 @media (max-width: 780px){
 
     body:before {
-        content: "05";
+        content: "06";
     }
 
     #mmrpg.index #window,
@@ -81,11 +113,23 @@ body:before {
 
 }
 
+@media (max-width: 768px){
+
+    body:before {
+        content: "05";
+    }
+
+    #prototype .option_1x1 div label .maintext .icons.stats {
+        display: none;
+    }
+
+}
+
 /* -- Even More Less than Portrait Mode -- */
 @media (max-width: 700px){
 
     body:before {
-        content: "06";
+        content: "04";
     }
 
 
@@ -95,7 +139,7 @@ body:before {
 @media (max-width: 560px){
 
     body:before {
-        content: "07";
+        content: "03";
     }
 
 
@@ -105,7 +149,7 @@ body:before {
 @media (max-width: 460px){
 
     body:before {
-        content: "08";
+        content: "02";
     }
 
     body.index {
@@ -118,7 +162,7 @@ body:before {
 @media (max-width: 400px){
 
     body:before {
-        content: "09";
+        content: "01";
     }
 
 
@@ -129,7 +173,7 @@ body:before {
 @media (max-width: 350px){
 
     body:before {
-        content: "10";
+        content: "00";
     }
 
 

@@ -1607,25 +1607,3 @@ body.windowFlag_landscapeMode #prototype .block_8,
 body.windowFlag_landscapeMode #prototype .block_10 {
     /*width: 499px;*/
 }
-
-
-/* -- MEDIA QUERIES // LANDSCAPE MODE -- */
-
-@media (max-width: 1024px){
-
-    body,
-    #mmrpg,
-    #prototype {
-        width: auto !important;
-    }
-
-}
-
-@media (max-width: 768px){
-
-
-    #prototype .option_1x1 div label .maintext .icons.stats {
-        display: none;
-    }
-
-}
