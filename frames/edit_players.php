@@ -14,15 +14,14 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
-//require_once('../database/include.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
-//require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
-//require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+
 // Collect the editor flag if set
-$global_allow_editing = isset($_GET['edit']) && $_GET['edit'] == 'false' ? false : true;
+$global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
+$global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'prototype';
 
 // Include the prototype data for getting omega factors
 //require_once(MMRPG_CONFIG_ROOTDIR.'prototype/include.php');
@@ -473,7 +472,7 @@ if (true){
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
-<body id="mmrpg" class="iframe" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
+<body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
     <div id="prototype" class="hidden" style="opacity: 0; <?= !$global_allow_editing ? 'width: 100% !important; ' : '' ?>">
         <div id="edit" class="menu" style="position: relative;">
             <div id="edit_overlay" style="border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background-color: rgba(0, 0, 0, 0.75); position: absolute; top: 50px; left: 6px; right: 4px; height: 340px; z-index: 9999; display: none;">&nbsp;</div>

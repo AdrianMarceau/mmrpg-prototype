@@ -15,6 +15,7 @@ $session_token = rpg_game::session_token();
 
 // Collect the editor flag if set
 $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
+$global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'prototype';
 
 // Collect the sorted type index for better sorting
 $mmrpg_database_types = rpg_type::get_index(true);
@@ -149,7 +150,7 @@ $first_robot_token = $allowed_edit_robots[0];
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
-<body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>">
+<body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>">
     <div id="prototype" class="hidden" style="opacity: 0;">
         <div id="edit" class="menu" style="position: relative;">
             <div id="edit_overlay" style="">&nbsp;</div>
