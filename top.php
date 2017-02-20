@@ -78,7 +78,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')
         LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
         WHERE
         users.user_ip_addresses <> ''
-        AND roles.role_level >= 4
+        AND roles.role_level >= 5
         ORDER BY
         user_id ASC
         ;", 'user_id');
