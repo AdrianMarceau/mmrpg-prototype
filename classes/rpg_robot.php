@@ -1092,6 +1092,18 @@ class rpg_robot extends rpg_object {
             $weights[] = $this_robot->robot_token == 'met' ? 90 : 1;
         }
 
+        // Define the freency of the omega pulse ability if set
+        if ($this_robot->has_ability('omega-pulse')){
+            $options[] = 'omega-pulse';
+            $weights[] = 24 * $support_multiplier;
+        }
+
+        // Define the freency of the omega wave ability if set
+        if ($this_robot->has_ability('omega-wave')){
+            $options[] = 'omega-wave';
+            $weights[] = 12 * $support_multiplier;
+        }
+
         // Define the frequency of the energy boost ability if set
         if ($this_robot->has_ability('energy-boost')){
             $options[] = 'energy-boost';
