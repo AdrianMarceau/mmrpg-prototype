@@ -2581,7 +2581,8 @@ class rpg_ability extends rpg_object {
             'energy-break', 'attack-break', 'defense-break', 'speed-break',
             'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
             'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
-            'field-support', 'mecha-support'
+            'field-support', 'mecha-support',
+            'omega-pulse', 'omega-wave'
             );
         // Return the list of global abilities
         return $temp_global_abilities;

@@ -199,6 +199,7 @@ $temp_pattern_last[] = '/^('.$temp_stat_types.')-('.$temp_boost_types.'|'.$temp_
 $temp_pattern_last[] = '/^(damage|recovery)-(booster|breaker)$/i';
 $temp_pattern_last[] = '/^(experience|item)-(booster|breaker)$/i';
 $temp_pattern_last[] = '/^(mecha|field)-(support|assault)$/i';
+$temp_pattern_last[] = '/^(omega)-(wave|pulse)?$/i';
 
 $temp_energy_pattern = '/^(energy|repair)-('.$temp_boost_types.'|'.$temp_break_types.')$/i';
 $temp_attack_pattern = '/^(attack|weapon)-('.$temp_boost_types.'|'.$temp_break_types.')$/i';
