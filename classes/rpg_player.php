@@ -2563,6 +2563,14 @@ class rpg_player extends rpg_object {
         $player_token = $player_info['player_token'];
         if (!isset($first_player_token)){ $first_player_token = $player_token; }
 
+        // Collect the player username for omega calculations
+        $player_username = rpg_game::get_user_string();
+
+        // Check to see if any omega abilities have been unlocked
+        $omega_abilities_unlocked = false;
+        if (rpg_game::ability_unlocked('', '', 'omega-pulse')){ $omega_abilities_unlocked = true; }
+        if (rpg_game::ability_unlocked('', '', 'omega-wave')){ $omega_abilities_unlocked = true; }
+
         // Define the player's image and size if not defined
         $player_info['player_image'] = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
         $player_info['player_image_size'] = !empty($player_info['player_image_size']) ? $player_info['player_image_size'] : 40;
@@ -2656,11 +2664,14 @@ class rpg_player extends rpg_object {
 
             ?>
             <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$player_info['player_token']?>">
+
                 <div class="this_sprite sprite_left" style="height: 40px;">
                     <? $temp_margin = -1 * ceil(($player_info['player_image_size'] - 40) * 0.5); ?>
                     <div style="margin-top: <?= $temp_margin ?>px; margin-bottom: <?= $temp_margin * 3 ?>px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/mug_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_mug player_status_active player_position_active"><?=$player_info['player_name']?></div>
                 </div>
+
                 <div class="header header_left player_type player_type_<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'] : 'none' ?>" style="margin-right: 0;"><?=$player_info['player_name']?>&#39;s Data <span class="player_type"><?= !empty($player_info['player_stat_type']) ? ucfirst($player_info['player_stat_type']) : 'Neutral' ?> Type</span></div>
+
                 <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
                     <table class="full" style="margin-bottom: 5px;">
                         <colgroup>
@@ -2930,6 +2941,24 @@ class rpg_player extends rpg_object {
 
                     <? }?>
 
+                <?
+
+                // Only omega indicators if the abilities have been unlocked
+                if ($omega_abilities_unlocked){
+
+                    // Collect possible hidden power types
+                    $hidden_power_types = rpg_type::get_hidden_powers();
+
+                    // Generate this player's omega string, collect it's hidden power
+                    $player_omega_string = rpg_game::generate_omega_string($player_username, $player_info['player_token'], 'robot');
+                    $player_hidden_power = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
+
+                    // Print out the omega indicators for the player
+                    echo '<span class="omega player_type type_'.$player_hidden_power.'" title="'.ucfirst($player_hidden_power).'">'.$player_hidden_power.'</span>'.PHP_EOL;
+
+                }
+
+                ?>
 
                 </div>
             </div>

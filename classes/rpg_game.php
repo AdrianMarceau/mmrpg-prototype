@@ -1337,6 +1337,7 @@ class rpg_game {
 
     // Define a function for checking if a prototype skin has been unlocked
     public static function skin_unlocked($robot_token = '', $skin_token = 'alt'){
+
         // Define the game session helper var
         $session_token = self::session_token();
 
@@ -1370,6 +1371,21 @@ class rpg_game {
 
 
     // -- OMEGA STRING FUNCTIONS -- //
+
+    // Define a function for getting the current user string from session
+    public static function get_user_string(){
+
+        // Define the game session helper var
+        $session_token = self::session_token();
+
+        // Attempt to collect the username
+        if (!empty($_SESSION[$session_token]['USER']['username_clean'])){
+            return $_SESSION[$session_token]['USER']['username_clean'];
+        } else {
+            return 'mmrpg';
+        }
+
+    }
 
 
     // Define a function for generating an omega string for a given user or robot
