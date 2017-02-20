@@ -1373,11 +1373,14 @@ class rpg_game {
 
 
     // Define a function for generating an omega string for a given user or robot
-    public static function generate_omega_string($user_string, $robot_string = ''){
+    public static function generate_omega_string($user_string, $player_string = '', $robot_string = ''){
 
         // Concatenate seed values to form the raw omega string
         $omega_seed = MMRPG_SETTINGS_OMEGA_SEED;
-        $raw_omega_string = rtrim('mmrpg_'.$omega_seed.'_'.$user_string.'_'.$robot_string, '_');
+        $raw_omega_string = 'mmrpg_'.$omega_seed.'_'.$user_string;
+        if (!empty($player_string)){ $raw_omega_string .= '_'.$player_string; }
+        if (!empty($robot_string)){ $raw_omega_string .= '_'.$robot_string; }
+        $raw_omega_string = rtrim($raw_omega_string, '_');
 
         // Calculate the MD5 hash of the raw omega string and crop
         $complete_omega_string = md5($raw_omega_string);
