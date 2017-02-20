@@ -36,8 +36,12 @@ class rpg_player extends rpg_object {
 
     // Define a public function for manually loading data
     public function player_load($this_playerinfo){
+
         // Pull in the global index
         global $mmrpg_index;
+
+        // Pull in global variables
+        $db = cms_database::get_database();
 
         // Collect current player data from the session if available
         $this_playerinfo_backup = $this_playerinfo;
@@ -56,6 +60,8 @@ class rpg_player extends rpg_object {
         $this->counters = isset($this_playerinfo['counters']) ? $this_playerinfo['counters'] : array();
         $this->values = isset($this_playerinfo['values']) ? $this_playerinfo['values'] : array();
         $this->history = isset($this_playerinfo['history']) ? $this_playerinfo['history'] : array();
+        $this->user_id = isset($this_playerinfo['user_id']) ? $this_playerinfo['user_id'] : 0;
+        $this->user_token = isset($this_playerinfo['user_token']) ? $this_playerinfo['user_token'] : '';
         $this->player_id = isset($this_playerinfo['player_id']) ? $this_playerinfo['player_id'] : 0;
         $this->player_name = isset($this_playerinfo['player_name']) ? $this_playerinfo['player_name'] : 'Robot';
         $this->player_token = isset($this_playerinfo['player_token']) ? $this_playerinfo['player_token'] : 'player';
@@ -75,6 +81,7 @@ class rpg_player extends rpg_object {
         $this->player_items = isset($this_playerinfo['player_items']) ? $this_playerinfo['player_items'] : array();
         $this->player_side = isset($this_playerinfo['player_side']) ? $this_playerinfo['player_side'] : 'left';
         $this->player_autopilot = isset($this_playerinfo['player_autopilot']) ? $this_playerinfo['player_autopilot'] : false;
+        $this->player_controller = isset($this_playerinfo['player_controller']) ? $this_playerinfo['player_controller'] : 'system';
         $this->player_quotes = isset($this_playerinfo['player_quotes']) ? $this_playerinfo['player_quotes'] : array();
         $this->player_rewards = isset($this_playerinfo['player_rewards']) ? $this_playerinfo['player_rewards'] : array();
         $this->player_starforce = isset($this_playerinfo['player_starforce']) ? $this_playerinfo['player_starforce'] : array();
@@ -131,6 +138,24 @@ class rpg_player extends rpg_object {
             if (!empty($_SESSION['GAME']['values']['star_force'])){
                 $this->player_starforce = $_SESSION['GAME']['values']['star_force'];
             }
+        }
+
+        // If the user token is empty, collect from data
+        if (empty($this->user_token)){
+
+            // Start off the user as mmrpg unless proven otherwise
+            $this->user_token = 'mmrpg';
+
+            // If this is the currently logged-in user, collect their username token
+            if ($this->player_id == $_SESSION['GAME']['USER']['userid']){
+                $this->user_token = $_SESSION['GAME']['USER']['username_clean'];
+                $this->player_controller = 'human';
+            }
+            // Otherwise if different human player, collect username token from db
+            elseif ($this->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
+                $this->user_token = $db->get_value("SELECT user_name_clean FROM mmrpg_users WHERE user_id = 412", 'user_name_clean');
+            }
+
         }
 
         // Trigger the onload function if it exists
@@ -1942,6 +1967,8 @@ class rpg_player extends rpg_object {
         return array(
             'battle_id' => $this->battle_id,
             'battle_token' => $this->battle_token,
+            'user_id' => $this->user_id,
+            'user_token' => $this->user_token,
             'player_id' => $this->player_id,
             'player_name' => $this->player_name,
             'player_token' => $this->player_token,
@@ -1980,6 +2007,7 @@ class rpg_player extends rpg_object {
             'player_base_switch' => $this->player_base_switch,
             'player_side' => $this->player_side,
             'player_autopilot' => $this->player_autopilot,
+            'player_controller' => $this->player_controller,
             'player_frame' => $this->player_frame,
             'player_frame_index' => $this->player_frame_index,
             'player_frame_offset' => $this->player_frame_offset,
