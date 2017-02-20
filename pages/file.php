@@ -483,7 +483,7 @@ while ($this_action == 'new'){
             }
 
             // Define the data of birth checking variables
-            $min_dateofbirth = date('Y/m/d', strtotime('13 years ago'));
+            $min_dateofbirth = date('Y-m-d', strtotime('13 years ago'));
             $bypass_dateofbirth = false;
 
             // Allow bypassing date-of-birth if pre-approved via email
@@ -491,11 +491,11 @@ while ($this_action == 'new'){
             if (in_array(strtolower($_REQUEST['emailaddress']), $bypass_emails)){ $bypass_dateofbirth = true; }
 
             // Ensure the dateofbirth is valid
-            //die('$min_dateofbirth = '.$min_dateofbirth);
+            $_REQUEST['dateofbirth'] = str_replace(array('\/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']);
             if (empty($_REQUEST['dateofbirth'])){
                 $html_form_messages .= '<span class="error">(!) The date of birth was not provided.</span>';
                 $html_form_verified = false;
-            } elseif (!preg_match('/^[0-9]{4}\/[0-9]{2}\/[0-9]{2}$/', $_REQUEST['dateofbirth'])){
+            } elseif (!preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $_REQUEST['dateofbirth'])){
                 $html_form_messages .= '<span class="error">(!) The date of birth provided was not valid.</span>';
                 $html_form_verified = false;
             } elseif ($_REQUEST['dateofbirth'] > $min_dateofbirth && !$bypass_dateofbirth){
@@ -604,7 +604,7 @@ while ($this_action == 'new'){
         <input class="text text_emailadddress" type="text" name="emailaddress" style="width: 330px; " value="<?= !empty($_REQUEST['emailaddress']) ? htmlentities(trim($_REQUEST['emailaddress']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="100" />
     </div>
     <div class="field">
-        <label class="label label_dateofbirth" style="width: 230px; " title="Your date of birth is required to verify your age and does not appear anywhere on your profile.  Users 13 years of age or younger may not register without a parent or guardian's permission.">Date of Birth : * <span style="padding-left: 20px; color: #969696; font-size: 10px; letter-spacing: 1px;  ">YYYY/MM/DD</span></label>
+        <label class="label label_dateofbirth" style="width: 230px; " title="Your date of birth is required to verify your age and does not appear anywhere on your profile.  Users 13 years of age or younger may not register without a parent or guardian's permission.">Date of Birth : * <span style="padding-left: 20px; color: #969696; font-size: 10px; letter-spacing: 1px;  ">YYYY-MM-DD</span></label>
         <input class="text text_dateofbirth" type="text" name="dateofbirth" style="width: 230px; " value="<?= !empty($_REQUEST['dateofbirth']) ? htmlentities(trim($_REQUEST['dateofbirth']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="10" />
     </div>
     <div class="field">
@@ -729,7 +729,7 @@ while ($this_action == 'load'){
                 else {
 
                     // Define the data of birth checking variables
-                    $min_dateofbirth = date('Y/m/d', strtotime('13 years ago'));
+                    $min_dateofbirth = date('Y-m-d', strtotime('13 years ago'));
                     $bypass_dateofbirth = false;
 
                     // Allow bypassing date-of-birth if pre-approved via email
@@ -738,13 +738,13 @@ while ($this_action == 'load'){
                     elseif (!empty($temp_database_user['user_flag_approved'])){ $bypass_dateofbirth = true; }
 
                     // Ensure the dateofbirth is valid
-                    //die('$min_dateofbirth = '.$min_dateofbirth);
+                    $_REQUEST['dateofbirth'] = str_replace(array('\/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']);
                     if (empty($_REQUEST['dateofbirth'])){
                         $html_form_messages .= '<span class="error">(!) Your date of birth must be confirmed in order to continue.</span>';
                         $html_form_verified = false;
                         $html_form_show_coppa = true;
                         break;
-                    } elseif (!preg_match('/^[0-9]{4}\/[0-9]{2}\/[0-9]{2}$/', $_REQUEST['dateofbirth'])){
+                    } elseif (!preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $_REQUEST['dateofbirth'])){
                         $html_form_messages .= '<span class="error">(!) The date of birth provided was not valid.</span>';
                         $html_form_verified = false;
                         $html_form_show_coppa = true;
@@ -829,7 +829,7 @@ while ($this_action == 'load'){
     $html_form_fields .= '</div>';
     if ($html_form_show_coppa){
         $html_form_fields .= '<div class="field">';
-            $html_form_fields .= '<label class="label label_dateofbirth" style="width: 230px; ">Date of Birth : <span style="padding-left: 20px; color: #969696; font-size: 10px; letter-spacing: 1px;  ">YYYY/MM/DD</span></label>';
+            $html_form_fields .= '<label class="label label_dateofbirth" style="width: 230px; ">Date of Birth : <span style="padding-left: 20px; color: #969696; font-size: 10px; letter-spacing: 1px;  ">YYYY-MM-DD</span></label>';
             $html_form_fields .= '<input class="text text_dateofbirth" type="text" name="dateofbirth" style="width: 230px; " value="'.(!empty($_REQUEST['dateofbirth']) ? htmlentities(trim($_REQUEST['dateofbirth']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="10" />';
         $html_form_fields .= '</div>';
     }
