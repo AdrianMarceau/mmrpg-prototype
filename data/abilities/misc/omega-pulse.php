@@ -44,7 +44,7 @@ $ability = array(
         $hidden_power_types = rpg_type::get_hidden_powers();
 
         // Generate this robot's omega string, collect it's hidden power, and update type1
-        $robot_omega_string = rpg_game::generate_omega_string($this_player->user_token, $this_player->player_token, $this_robot->robot_token);
+        $robot_omega_string = rpg_game::generate_omega_string($this_player->user_token, 'player', $this_robot->robot_token);
         $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
         $this_ability->set_type($robot_hidden_power);
 
