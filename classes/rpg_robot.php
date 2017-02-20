@@ -4273,7 +4273,7 @@ class rpg_robot extends rpg_object {
                 <?
 
                 // Only omega indicators if the abilities have been unlocked
-                if ($omega_abilities_unlocked){
+                if (true || $omega_abilities_unlocked){
 
                     // Collect possible hidden power types
                     $hidden_power_types = rpg_type::get_hidden_powers();
@@ -4283,7 +4283,7 @@ class rpg_robot extends rpg_object {
                     $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
 
                     // Print out the omega indicators for the robot
-                    echo '<span class="omega robot_type type_'.$robot_hidden_power.'" title="'.ucfirst($robot_hidden_power).'">'.$robot_hidden_power.'</span>'.PHP_EOL;
+                    echo '<span class="omega robot_type type_'.$robot_hidden_power.'" data-tooltip="Omega Seed || [['.ucfirst($robot_hidden_power).' Type]]">'.$robot_hidden_power.'</span>'.PHP_EOL;
 
                 }
 

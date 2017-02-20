@@ -5,9 +5,9 @@ $ability = array(
     'ability_token' => 'omega-wave',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Weapons/Xtra',
-    'ability_description' => 'The user taps into its hidden powers to generate a wave of elemental energy, sending it toward the target to inflict massive damage on contact. This ability\'s elemental types appear to be unique for each player robot combo.',
+    'ability_description' => 'The user taps into its hidden powers to generate a wave of elemental energy, sending it toward the target to inflict massive damage. This ability\'s elemental types appear to be unique for each player robot combo.',
     'ability_energy' => 8,
-    'ability_damage' => 24,
+    'ability_damage' => 28,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
