@@ -139,16 +139,27 @@ elseif ($this_action == 'start'){
         $this_playerinfo['player_robots'][] = array('robot_id' => $temp_id, 'robot_token' => $temp_token, 'robot_abilities' => $temp_abilities);
         unset($temp_rewards, $temp_abilities);
     }
+
+    // Collect any important player details over
+    if (!empty($this_battle->battle_target_player['user_id'])){
+        $target_playerinfo['user_id'] = $this_battle->battle_target_player['user_id'];
+    }
+    if (!empty($this_battle->battle_target_player['player_controller'])){
+        $target_playerinfo['player_controller'] = $this_battle->battle_target_player['player_controller'];
+    }
+
     // Break apart and filter the target player's robots
     $target_playerinfo['player_robots'] = array();
     if (!empty($this_battle->battle_target_player['player_robots'])){
         $target_playerinfo['player_robots'] = $this_battle->battle_target_player['player_robots'];
     }
+
     // Break apart and filter the target player's starforce
     $target_playerinfo['player_starforce'] = array();
     if (!empty($this_battle->battle_target_player['player_starforce'])){
         $target_playerinfo['player_starforce'] = $this_battle->battle_target_player['player_starforce'];
     }
+
 }
 
 //echo 'memory_limit() = '.ini_get('memory_limit')."\n";

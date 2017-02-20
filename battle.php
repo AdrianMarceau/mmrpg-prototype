@@ -85,13 +85,14 @@ else {
 // Collect this player's index data if available
 if (!empty($this_player_token) && isset($mmrpg_index['players'][$this_player_token])){
     $this_player_data = $mmrpg_index['players'][$this_player_token];
-    if (empty($this_player_data['user_id'])){
-        $this_player_data['user_id'] = 1;
-    }
+
+
     if (empty($this_player_data['player_id'])){
         $this_player_id = !empty($this_player_id) ? $this_player_id : 1;
         $this_player_data['player_id'] = $this_player_id;
     }
+    $this_player_data['user_id'] = $this_player_data['player_id'];
+
     if (!empty($this_player_robots)){
         $allowed_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
         foreach ($this_player_data['player_robots'] AS $key => $data){
@@ -116,23 +117,23 @@ else {
 // Collect the target player's index data if available
 if (!empty($target_player_token) && isset($mmrpg_index['players'][$target_player_token])){
     $target_player_data = $mmrpg_index['players'][$target_player_token];
-    if (empty($target_player_data['user_id'])){
-        $target_player_data['user_id'] = 2;
-    }
+
     if (empty($target_player_data['player_id'])){
         $target_player_id = !empty($target_player_id) ? $target_player_id : 2;
         $target_player_data['player_id'] = $target_player_id;
     }
+    $target_player_data['user_id'] = $target_player_data['player_id'];
+
 }
 elseif (!empty($this_battle_data['battle_target_player']['player_token']) && isset($mmrpg_index['players'][$this_battle_data['battle_target_player']['player_token']])){
     $target_player_data = array_merge($mmrpg_index['players'][$this_battle_data['battle_target_player']['player_token']], $this_battle_data['battle_target_player']);
-    if (empty($target_player_data['user_id'])){
-        $target_player_data['user_id'] = 2;
-    }
+
     if (empty($target_player_data['player_id'])){
         $target_player_id = !empty($target_player_id) ? $target_player_id : 2;
         $target_player_data['player_id'] = $target_player_id;
     }
+    $target_player_data['user_id'] = $target_player_data['player_id'];
+
     if (empty($target_player_robots) && !empty($this_battle_data['battle_target_player'])){
         //die('<pre>'.print_r($this_battle_data, true).'</pre>');
         $target_player_data['player_robots'] = array();
@@ -141,6 +142,7 @@ elseif (!empty($this_battle_data['battle_target_player']['player_token']) && iss
         }
         //die('<pre>'.print_r($target_player_data, true).'</pre>');
     }
+
 }
 else {
     $target_player_id = 0;
