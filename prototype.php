@@ -116,20 +116,33 @@ require_once('prototype/include.php');
 // Collect the game flags for easier password processing
 $temp_flags = !empty($_SESSION[$session_token]['flags']) ? $_SESSION[$session_token]['flags'] : array();
 
+// Filter out the password flags for easier looping
+$temp_password_flags = array();
+if (!empty($temp_flags)){
+    foreach ($temp_flags AS $flag_token => $flag_value){
+        if (strstr($flag_token, '_password_')){
+            $temp_password_flags[$flag_token] = $flag_value;
+        }
+    }
+}
+
 //die('wtf1-'.time());
 //die('$temp_flags = <pre>'.print_r($temp_flags, true).'</pre>');
 
 // Only proceed if there are actually flags to check
-if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
+$is_admin = in_array($_SERVER['REMOTE_ADDR'], $dev_whitelist) ? true : false;
+if ($is_admin && !empty($temp_password_flags)){
 
     // DEBUG PLAYERS / ABILITIES
     $mmrpg_index_players = $mmrpg_index['players'];
 
     // Collect the robot index for calculation purposes
-    $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $robot_fields = rpg_robot::get_index_fields(true);
+    $this_robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
     // Collect the ability index for calculation purposes
-    $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    $ability_fields = rpg_ability::get_index_fields(true);
+    $this_ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
     // DEBUG PLAYERS / ABILITIES
     foreach ($mmrpg_index_players AS $player_token => $player_info){
@@ -139,27 +152,35 @@ if (MMRPG_CONFIG_ADMIN_MODE && !empty($temp_flags)){
 
         // DEBUG ABILITY UNLOCKS
         foreach ($this_ability_index AS $ability_token => $ability_info){
-            if (mmrpg_prototype_ability_unlocked($player_token, false, $ability_token)){ continue; }
             $ability_info = rpg_ability::parse_index_info($ability_info);
             $ability_string = str_replace('-', '', $ability_token);
-            if ($ability_token != 'ability' && !empty($temp_flags[$player_string.'_password_ability'.$ability_string.$player_pass])){
+            $flag_token = $player_string.'_password_ability'.$ability_string.$player_pass;
+            if ($ability_token != 'ability' && !empty($temp_password_flags[$flag_token])){
+                // Unlock the requested ability
                 if (!mmrpg_prototype_ability_unlocked($player_token, false, $ability_token)){
                     mmrpg_game_unlock_ability($player_info, false, $ability_info, true);
-                    // And now redirect to the same page
-                    header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
-                    exit();
                 }
+                // Unset this flag's value from the session
+                unset($_SESSION[$session_token]['flags'][$flag_token]);
+                // And now redirect to the same page
+                header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
+                exit();
+
             }
         }
 
         // DEBUG ROBOT UNLOCKS
         foreach ($this_robot_index AS $robot_token => $robot_info){
-            if (mmrpg_prototype_robot_unlocked(false, $robot_token)){ continue; }
             $robot_info = rpg_robot::parse_index_info($robot_info);
             $robot_string = str_replace('-', '', $robot_token);
-            if ($robot_token != 'robot' && !empty($temp_flags[$player_string.'_password_robot'.$robot_string.$player_pass])){
+            $flag_token = $player_string.'_password_robot'.$robot_string.$player_pass;
+            if ($robot_token != 'robot' && !empty($temp_password_flags[$flag_token])){
                 // Unlock the requested robot
-                mmrpg_game_unlock_robot($player_info, $robot_info, true, true);
+                if (!mmrpg_prototype_robot_unlocked(false, $robot_token)){
+                    mmrpg_game_unlock_robot($player_info, $robot_info, true, true);
+                }
+                // Unset this flag's value from the session
+                unset($_SESSION[$session_token]['flags'][$flag_token]);
                 // And now redirect to the same page
                 header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
                 exit();
