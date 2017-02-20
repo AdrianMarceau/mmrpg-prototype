@@ -191,8 +191,8 @@ class rpg_mission_double extends rpg_mission {
             if (!isset($temp_option_field['field_mechas'])){ $temp_option_field['field_mechas'] = array(); }
             if (!isset($temp_option_field2['field_mechas'])){ $temp_option_field2['field_mechas'] = array(); }
             foreach ($temp_option_field['field_mechas'] AS $key => $token){
-                $temp_mook_options[] = $temp_option_field['field_mechas'][$key];
-                $temp_mook_options[] = $temp_option_field2['field_mechas'][$key];
+                if (!empty($temp_option_field['field_mechas'][$key])){ $temp_mook_options[] = $temp_option_field['field_mechas'][$key]; }
+                if (!empty($temp_option_field2['field_mechas'][$key])){ $temp_mook_options[] = $temp_option_field2['field_mechas'][$key]; }
             }
             if (empty($temp_mook_options)){ $temp_mook_options[] = 'met'; }
             $temp_mook_options = array_slice($temp_mook_options, 0, ($temp_battle_count + 2));
