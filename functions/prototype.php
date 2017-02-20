@@ -1335,6 +1335,15 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
 }
 // Define a function for sorting the target leaderboard players
 function mmrpg_prototype_leaderboard_targets_sort($player1, $player2){
+
+    if (!isset($player1['values']['flag_online'])){ $player1['values']['flag_online'] = 0; }
+    if (!isset($player1['counters']['battle_points'])){ $player1['counters']['battle_points'] = 0; }
+    if (!isset($player1['counters']['player_robots_count'])){ $player1['counters']['player_robots_count'] = 1; }
+
+    if (!isset($player2['values']['flag_online'])){ $player2['values']['flag_online'] = 0; }
+    if (!isset($player2['counters']['battle_points'])){ $player2['counters']['battle_points'] = 0; }
+    if (!isset($player2['counters']['player_robots_count'])){ $player2['counters']['player_robots_count'] = 1; }
+
     if ($player1['values']['flag_online'] < $player2['values']['flag_online']){ return 1; }
     elseif ($player1['values']['flag_online'] > $player2['values']['flag_online']){ return -1; }
     elseif ($player1['counters']['battle_points'] < $player2['counters']['battle_points']){ return -1; }
@@ -1342,6 +1351,7 @@ function mmrpg_prototype_leaderboard_targets_sort($player1, $player2){
     elseif ($player1['counters']['player_robots_count'] < $player2['counters']['player_robots_count']){ return -1; }
     elseif ($player1['counters']['player_robots_count'] > $player2['counters']['player_robots_count']){ return 1; }
     else { return 0; }
+
 }
 // Define a function for sorting the target leaderboard players
 function mmrpg_prototype_leaderboard_targets_sort_online($player1, $player2){
