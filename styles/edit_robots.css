@@ -13,7 +13,6 @@ body.windowFlag_portraitMode #prototype,
 body.windowFlag_landscapeMode #prototype {
     width: auto !important;
 }
-
 #mmrpg[data-mode="editor"] {
 
 }
@@ -21,7 +20,6 @@ body.windowFlag_landscapeMode #prototype {
     width: 100% !important;
     max-width: 1000px !important;
 }
-
 #mmrpg[data-mode="viewer"] #prototype {
     width: 100% !important;
 }

@@ -1,10 +1,31 @@
+#mmrpg {
+
+}
 #mmrpg,
 #prototype {
     margin: 0;
     padding: 0;
     background-color: transparent;
-    width: 762px;
+    width: auto;
+    min-width: 762px;
 }
+body.windowFlag_portraitMode #prototype,
+body.windowFlag_landscapeMode #prototype {
+    width: auto !important;
+}
+#mmrpg[data-mode="editor"] {
+
+}
+#mmrpg[data-mode="viewer"] {
+    width: 100% !important;
+    max-width: 1000px !important;
+}
+#mmrpg[data-mode="viewer"] #prototype {
+    width: 100% !important;
+}
+
+
+
 #edit .header {
     width: 100%;
 }

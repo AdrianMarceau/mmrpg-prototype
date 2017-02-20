@@ -2944,7 +2944,7 @@ class rpg_player extends rpg_object {
                 <?
 
                 // Only omega indicators if the abilities have been unlocked
-                if ($omega_abilities_unlocked){
+                if (true || $omega_abilities_unlocked){
 
                     // Collect possible hidden power types
                     $hidden_power_types = rpg_type::get_hidden_powers();
@@ -2954,7 +2954,7 @@ class rpg_player extends rpg_object {
                     $player_hidden_power = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
 
                     // Print out the omega indicators for the player
-                    echo '<span class="omega player_type type_'.$player_hidden_power.'" title="'.ucfirst($player_hidden_power).'">'.$player_hidden_power.'</span>'.PHP_EOL;
+                    echo '<span class="omega player_type type_'.$player_hidden_power.'" title="Omega Seed || [['.ucfirst($player_hidden_power).' Type]]">'.$player_hidden_power.'</span>'.PHP_EOL;
 
                 }
 

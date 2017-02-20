@@ -5,9 +5,9 @@ $ability = array(
     'ability_token' => 'omega-pulse',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Weapons/Xtra',
-    'ability_description' => 'The user taps into its hidden power to generate a pulse of elemental energy, sending it toward the target to inflict massive damage on contact. This ability\'s elemental type appears to be unique for each robot.',
+    'ability_description' => 'The user taps into its hidden power to generate a pulse of elemental energy, sending it toward the target to inflict massive damage. This ability\'s elemental type appears to be unique for each robot.',
     'ability_energy' => 4,
-    'ability_damage' => 12,
+    'ability_damage' => 14,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
