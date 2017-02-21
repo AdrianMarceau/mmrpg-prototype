@@ -15,6 +15,9 @@ gameSettings.startLink = 'home';
 gameSettings.skipPlayerSelect = false;
 var battleOptions = {};
 
+// Define the perfect scrollbar settings
+var thisScrollbarSettings = {wheelSpeed:0.3};
+
 // When the document is ready, assign events
 $(document).ready(function(){
 
@@ -116,7 +119,7 @@ $(document).ready(function(){
 
 
         // DEBUG
-        $('.menu a[data-reload=true]', thisContext).live('click', function(e){
+        $('.menu a[data-reload="true"]', thisContext).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Collect the parent variables
@@ -159,8 +162,8 @@ $(document).ready(function(){
                 $('.chapter_link_active', thisChapterSelect).removeClass('chapter_link_active');
                 thisChapterLink.addClass('chapter_link_active');
                 // Hide all the other chapter links from view
-                $('.option[data-chapter!='+thisChapterToken+']', thisChapterWrapper).addClass('hidden_chapter_option');
-                $('.option[data-chapter='+thisChapterToken+']', thisChapterWrapper).removeClass('hidden_chapter_option');
+                $('.option[data-chapter!="'+thisChapterToken+'"]', thisChapterWrapper).addClass('hidden_chapter_option');
+                $('.option[data-chapter="'+thisChapterToken+'"]', thisChapterWrapper).removeClass('hidden_chapter_option');
                 // Update the battle options with the last selected chapter
                 $.post('scripts/script.php',{requestType:'session',requestData:'battle_settings,'+thisChapterPlayer+'_current_chapter,'+thisChapterToken});
                 // DEBUG DEBUG
@@ -272,7 +275,7 @@ $(document).ready(function(){
         // Trigger the prototype step function if not home
         if (gameSettings.startLink != 'home'){
             //gameSettings.skipPlayerSelect = true;
-            var thisLink = $('.banner .link[data-step='+gameSettings.startLink+']', thisContext);
+            var thisLink = $('.banner .link[data-step="'+gameSettings.startLink+'"]', thisContext);
             prototype_menu_click_step(thisContext, thisLink, thisFadeCallback, 10); //CHECKPOINT
             //prototype_menu_switch({stepName:gameSettings.startLink,onComplete:thisFadeCallback,slideDuration:600});
             } else {
@@ -450,7 +453,7 @@ function prototype_menu_banner_link(thisStep){
     // Define the prototype context
     var thisContext = $('#prototype');
     if (thisContext.length){
-        $('.banner .link[data-step='+thisStep+']', thisContext).trigger('click');
+        $('.banner .link[data-step="'+thisStep+'"]', thisContext).trigger('click');
     }
 }
 
@@ -486,7 +489,7 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
     thisLink.addClass('link_active');
     // Collect the requested step name
     var stepName = thisLink.attr('data-step');
-    var stepMenu = $('.menu[data-step='+stepName+']', thisContext);
+    var stepMenu = $('.menu[data-step="'+stepName+'"]', thisContext);
     var slideDirection = currentActiveIndex > nextActiveIndex ? 'right' : 'left';
     // Collect the requested music if set
     var stepMusic = thisLink.attr('data-music') != undefined ? thisLink.attr('data-music') : false;
@@ -587,13 +590,13 @@ function prototype_menu_click_option(thisContext, thisOption){
 
     // Collect the parent menu and option fields
     var thisOption = $(thisOption);
-    var thisParent = thisOption.parent();
-    if (thisParent.is('.option_wrapper')){ thisParent = thisParent.parent(); }
+    var thisParent = thisOption.closest('.menu[data-select]');
+    //if (thisParent.is('.option_wrapper')){ thisParent = thisParent.parent(); }
     var thisStep = parseInt(thisParent.attr('data-step'));
     var thisSelect = thisParent.attr('data-select');
     var thisToken = thisOption.attr('data-token');
     var thisComplete = function(){};
-    var nextStep = $('.menu[data-step='+(thisStep + 1)+']', thisContext);
+    var nextStep = $('.menu[data-step="'+(thisStep + 1)+'"]', thisContext);
     var nextFlag = true;
     var nextLimit = thisOption.attr('data-next-limit');
     if (nextLimit != undefined){ nextLimit = parseInt(nextLimit); }
@@ -623,7 +626,7 @@ function prototype_menu_click_option(thisContext, thisOption){
     if (thisOption.attr('data-child') != undefined){
 
         // Find the parent token container
-        var tokenParent = $('.option[data-parent]', thisOption.parent());
+        var tokenParent = $('.option[data-parent]', thisParent);
         var tokenParentLimit = thisParent.attr('data-limit');
         var tokenParentValue = tokenParent.attr('data-token');
 
@@ -641,7 +644,7 @@ function prototype_menu_click_option(thisContext, thisOption){
         else if (tempSprite.hasClass('sprite_80x80')){ var tempSize = 80; }
         else if (tempSprite.hasClass('sprite_160x160')){ var tempSize = 160; }
         var tempSpriteKey = tokenParentCount - 1;
-        var tempSpriteShift = parseInt($('.sprite[data-key='+tempSpriteKey+']', tokenParent).css('right'));
+        var tempSpriteShift = parseInt($('.sprite[data-key="'+tempSpriteKey+'"]', tokenParent).css('right'));
         if (tempSize == 80){ tempSpriteShift -= 20; }
         //console.log('tempSize = '+tempSize+'; tempSpriteKey = '+tempSpriteKey+'; tempSpriteShift = '+tempSpriteShift+'; ');
         var cloneShift = tempSpriteShift+'px'; //someValue+'px';
@@ -708,9 +711,9 @@ function prototype_menu_click_option(thisContext, thisOption){
 
             // Prevent the player from fighting themselves in battle
             var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
-            var tempMenu = $('.menu[data-select=this_battle_token]', thisContext);
-            var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition+'"]', tempMenu);
-            var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition+'"]', tempMenu);
+            var tempMenu = $('.menu[data-select="this_battle_token"]', thisContext);
+            var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
+            var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
             tempHideOptionWrapper.addClass('option_wrapper_hidden').css({border:'5px none transparent',margin:''});
             tempShowOptionWrapper.removeClass('option_wrapper_hidden').css({border:'1px solid transparent',marginLeft:'-1px'});
 
@@ -724,14 +727,15 @@ function prototype_menu_click_option(thisContext, thisOption){
 
             // Prevent the player from fighting themselves in battle
             var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
-            var tempMenu = $('.menu[data-select=this_player_robots]', thisContext);
-            var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition+'"]', tempMenu);
-            var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition+'"]', tempMenu);
+            var tempMenu = $('.menu[data-select="this_player_robots"]', thisContext);
+            var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
+            var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
             tempHideOptionWrapper.addClass('option_wrapper_hidden').css({border:'5px none transparent',margin:''});
             tempShowOptionWrapper.removeClass('option_wrapper_hidden').css({border:'1px solid transparent',marginLeft:'-1px'});
 
             // Find the parent token container
-            var tempWrapper = $('.option_wrapper[data-condition="'+tempCondition+'"]', tempMenu);
+            var tempWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
+            var tempInnerWrapper = tempWrapper.find('> .wrap');
             var tokenParent = $('.option[data-parent]', tempWrapper);
             var tokenParentLimit = tempMenu.attr('data-limit');
 
@@ -740,6 +744,13 @@ function prototype_menu_click_option(thisContext, thisOption){
             var availableRobots = $('.option[data-child]', tempWrapper);
             var selectedRobots = $('.option[data-parent]', tempWrapper);
             //alert('Battle requires '+requiredRobots+' robots, you have '+availableRobots.length+'.');
+
+            // Trigger perfect scrollbars on the frame containers
+            //console.log('tempWrapper('+tempWrapper.length+') = ', tempWrapper);
+            //console.log('tempWrapper = ', tempWrapper.html());
+
+            // Apply the perfect scrollbar if an inner wrap exists
+            if (tempInnerWrapper.length){ tempInnerWrapper.perfectScrollbar(thisScrollbarSettings); }
 
             // Update the start button's counter text
             $('.option[data-parent]', tempMenu).find('.count').html('0/'+gameSettings.nextRobotLimit+' Select');
@@ -836,7 +847,7 @@ function prototype_menu_click_option(thisContext, thisOption){
         var numOptions = $('.option', thisBanner).length;
 
         // Remove any options for the same select parent
-        var previousOption = $('.option[data-select='+thisSelect+']', thisBanner);
+        var previousOption = $('.option[data-select="'+thisSelect+'"]', thisBanner);
         if (previousOption.length){
             previousOption.animate({opacity:0},600,'swing',function(){
                 $('.option:gt('+previousOption.eq()+')', thisBanner).remove();
@@ -973,7 +984,7 @@ function prototype_menu_click_back(thisContext, thisLink){
     // Collect the parent menu and option fields
     var thisLink = $(thisLink);
     var backStep = parseInt(thisLink.attr('data-back'));
-    var backParent = $('.menu[data-step='+(backStep)+']', thisContext);
+    var backParent = $('.menu[data-step="'+(backStep)+'"]', thisContext);
     var backSelect = backParent.attr('data-select');
     // Clear the previous battleOption selection
     delete battleOptions[backSelect];
@@ -984,7 +995,7 @@ function prototype_menu_click_back(thisContext, thisLink){
         case 'this_player_token': {
             switchOptions.onComplete = function(){
                 // Re-enable all battle options
-                var tempMenu = $('.menu[data-select=this_battle_token]', thisContext);
+                var tempMenu = $('.menu[data-select="this_battle_token"]', thisContext);
                 $('.option_wrapper[data-condition]', tempMenu).css({display:''});
                 delete battleOptions['this_battle_token'];
                 }
@@ -994,7 +1005,7 @@ function prototype_menu_click_back(thisContext, thisLink){
             switchOptions.onComplete = function(){
 
                 // Re-enable all battle options
-                var tempMenu = $('.menu[data-select=this_player_robots]', thisContext);
+                var tempMenu = $('.menu[data-select="this_player_robots"]', thisContext);
                 $('.option_wrapper[data-condition]', tempMenu).css({display:''});
                 $('.option[data-child]', tempMenu).removeClass('option_disabled');
                 $('.option[data-parent]', tempMenu).addClass('option_disabled').attr('data-token', '').css({opacity:''}).find('.count').html('0/'+gameSettings.nextRobotLimit+' Select').end().find('.arrow').html('&nbsp;');
@@ -1033,7 +1044,7 @@ function prototype_menu_click_back(thisContext, thisLink){
         }
     // Clear any of this select's options in the banner
     var thisBanner = $('.banner', thisContext);
-    $('.option[data-select='+backSelect+']', thisBanner).animate({opacity:0},600,'swing',function(){
+    $('.option[data-select="'+backSelect+'"]', thisBanner).animate({opacity:0},600,'swing',function(){
         $(this).remove();
             var remainingOptions = $('.option', thisBanner).length;
             //alert(remainingOptions);
@@ -1114,7 +1125,7 @@ function prototype_menu_switch(switchOptions){
     if (switchOptions.stepNumber == 1){
         parent.mmrpg_music_load('misc/player-select', true, false);
         } else if (switchOptions.stepNumber == 2){
-        var newMusicToken = $('.select_this_player .option_this-player-select[data-token='+battleOptions['this_player_token']+']', thisContext).attr('data-music-token');
+        var newMusicToken = $('.select_this_player .option_this-player-select[data-token="'+battleOptions['this_player_token']+'"]', thisContext).attr('data-music-token');
         //console.log('newMusicToken = '+newMusicToken);
         parent.mmrpg_music_load('misc/'+newMusicToken, true, false);
         }
@@ -1143,7 +1154,7 @@ function prototype_menu_switch(switchOptions){
 
 
         // Collect a reference to the current menus
-        var currentMenu = $('.menu[data-step='+(switchOptions.stepNumber || switchOptions.stepName)+']', thisContext);
+        var currentMenu = $('.menu[data-step="'+(switchOptions.stepNumber || switchOptions.stepName)+'"]', thisContext);
         var currentMenuTitle = currentMenu.attr('data-title');
 
         // Collect the step, select, and condition for this
@@ -1247,7 +1258,13 @@ function prototype_menu_switch(switchOptions){
                                     if (markup.length){
                                         var tempMarkup = $(markup);
                                         tempMenuWrapper.find('.option').not('.option_sticky').remove();
-                                        tempMenuWrapper.append(tempMarkup.html());
+                                        var innerMenuWrapper = tempMenuWrapper.find('.wrap');
+                                        if (innerMenuWrapper.length){
+                                            innerMenuWrapper.empty();
+                                            innerMenuWrapper.append(tempMarkup.html());
+                                            } else {
+                                            tempMenuWrapper.append(tempMarkup.html());
+                                            }
                                         $('.option_message:gt(0)', tempMenuWrapper).trigger('click');
                                         }
 
@@ -1306,7 +1323,7 @@ function prototype_menu_switch(switchOptions){
                     var thisBanner = $('.banner', thisContext);
                     var thisBannerTitle = thisBanner.attr('title');
                     // Collect a reference to the current menus
-                    var thisMenu = $('.menu[data-step='+switchOptions.stepNumber+']', thisContext);
+                    var thisMenu = $('.menu[data-step="'+switchOptions.stepNumber+'"]', thisContext);
                     var thisMenuTitle = thisMenu.attr('data-title');
 
                     // Update the banner text with this menu subtitle
@@ -1331,7 +1348,7 @@ function prototype_menu_switch(switchOptions){
                     var thisBanner = $('.banner', thisContext);
                     var thisBannerTitle = thisBanner.attr('title');
                     // Collect a reference to the current menus
-                    var thisMenu = $('.menu[data-step='+switchOptions.stepName+']', thisContext);
+                    var thisMenu = $('.menu[data-step="'+switchOptions.stepName+'"]', thisContext);
                     var thisMenuTitle = thisMenu.attr('data-title');
                     // Update the banner text with this menu subtitle
                     $('.title', thisBanner).html(thisBannerTitle+' : '+thisMenuTitle);
@@ -1379,9 +1396,9 @@ function prototype_menu_switch(switchOptions){
 
                     // Prevent the player from fighting themselves in battle
                     var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
-                    var tempMenu = $('.menu[data-select=this_battle_token]', thisContext);
-                    var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition+'"]', tempMenu);
-                    var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition+'"]', tempMenu);
+                    var tempMenu = $('.menu[data-select="this_battle_token"]', thisContext);
+                    var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
+                    var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
                     var availableMissions = $('.option[data-token]', tempShowOptionWrapper);
                     $('.header', tempMenu).find('.count').html('Mission Select ('+(availableMissions.length == 1 ? '1 Mission' : availableMissions.length+' Missions')+')');
                     break;
@@ -1391,10 +1408,10 @@ function prototype_menu_switch(switchOptions){
 
                     // Prevent the player from fighting themselves in battle
                     var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
-                    var tempMenu = $('.menu[data-select=this_player_robots]', thisContext);
-                    var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition+'"]', tempMenu);
-                    var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition+'"]', tempMenu);
-                    var tempWrapper = $('.option_wrapper[data-condition="'+tempCondition+'"]', tempMenu);
+                    var tempMenu = $('.menu[data-select="this_player_robots"]', thisContext);
+                    var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
+                    var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
+                    var tempWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
                     var availableRobots = $('.option[data-child]', tempWrapper);
                     var tempMenuHeader = $('.header', tempMenu);
                     tempMenuHeader.find('.count').html('Robot Select ('+(availableRobots.length == 1 ? '1 Robot' : availableRobots.length+' Robots')+')');

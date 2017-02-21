@@ -640,14 +640,16 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     display: block;
     height: 284px;
     overflow: hidden;
-    /*margin-right: -26px; CHECKPOINT*/
 }
+#prototype .menu[data-select] .option_wrapper > .wrap {
+    display: block;
+    overflow: hidden;
+    position: relative;
+    height: inherit;
+}
+
 #prototype .select_this_player_robots .option_wrapper {
-    overflow-y: scroll;
-    margin-right: -26px;
-}
-body.windowFlag_landscapeMode #prototype .select_this_player_robots .option_wrapper {
-    margin-right: -30px;
+
 }
 #prototype .option_wrapper_full {
     height: auto;
