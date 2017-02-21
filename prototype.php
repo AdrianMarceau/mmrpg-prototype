@@ -227,6 +227,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 <style type="text/css"> html, body { background-color: #262626; } </style>
 
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/jquery.scrollbar.min.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
@@ -516,6 +517,7 @@ if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
 <?
 ?>
 <script type="text/javascript" src="scripts/jquery.js"></script>
+<script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
