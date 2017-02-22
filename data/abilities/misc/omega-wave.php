@@ -14,48 +14,40 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Define this ability's attachment token
-        $this_attachment_token = 'ability_'.$this_ability->ability_token;
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'ability_token' => $this_ability->ability_token,
-            'ability_frame' => 1,
-            'ability_frame_span' => 1,
-            'ability_frame_animate' => array(1, 0),
-            'ability_frame_offset' => array('x' => -10, 'y' => 0, 'z' => -1),
-            'attachment_token' => $this_attachment_token
-            );
-
-        // Add the background attachment to the user
-        $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
+        // Update the ability's target options and trigger
+        if ($this_robot->robot_gender == 'female'){ $pronoun = 'her'; }
+        elseif ($this_robot->robot_gender == 'male'){ $pronoun = 'his'; }
+        else { $pronoun = 'its'; }
+        $this_ability->target_options_update(array(
+            'frame' => 'summon',
+            'success' => array(0, -10, 0, -1, $this_robot->print_name().' taps into '.$pronoun.' hidden power...', 1)
+            ));
+        $target_options = array('prevent_default_text' => true);
+        $this_robot->trigger_target($target_robot, $this_ability, $target_options);
 
         // Update the ability's target options and trigger
         $this_ability->target_options_update(array(
-            'frame' => 'summon',
-            'success' => array(2, 120, -30, 10, $this_robot->print_name().' generates an '.$this_ability->print_name().'!', 3)
+            'frame' => 'throw',
+            'success' => array(2, 160, -20, 10, $this_robot->print_name().' releases an '.$this_ability->print_name().'!', 3)
             ));
-        $this_robot->trigger_target($target_robot, $this_ability);
+        $target_options = array('prevent_default_text' => true);
+        $this_robot->trigger_target($target_robot, $this_ability, $target_options);
 
         // Update ability options and trigger damage on the target
-        $this_robot->set_frame('throw');
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
-            'kickback' => array(20, 0, 0),
-            'success' => array(5, -200, -20, 10, 'The '.$this_ability->print_name().' collided with its target!', 3),
-            'failure' => array(5, -200, -20, -10, 'The '.$this_ability->print_name().' missed its target&hellip;', 3)
+            'kickback' => array(15, 0, 0),
+            'success' => array(5, -200, -20, 10, 'The '.$this_ability->print_name().' collided with the target!', 3),
+            'failure' => array(5, -200, -20, -10, 'The '.$this_ability->print_name().' missed the target...', 3)
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
-            'kickback' => array(15, 0, 0),
-            'success' => array(5, -180, -20, 10, 'The '.$this_ability->print_name().' invigorated its target!', 3),
-            'failure' => array(5, -180, -20, -10, 'The '.$this_ability->print_name().' missed its target...', 3)
+            'kickback' => array(10, 0, 0),
+            'success' => array(5, -180, -20, 10, 'The '.$this_ability->print_name().' invigorated the target!', 3),
+            'failure' => array(5, -180, -20, -10, 'The '.$this_ability->print_name().' missed the target...', 3)
             ));
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-        $this_robot->set_frame('base');
-
-        // Remove the background attachment from the user
-        $this_robot->unset_attachment($this_attachment_token);
 
         // Return true on success
         return true;
