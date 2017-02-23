@@ -4,10 +4,10 @@ $ability = array(
     'ability_name' => 'Omega Pulse',
     'ability_token' => 'omega-pulse',
     'ability_game' => 'MMRPG',
-    'ability_group' => 'MMRPG/Weapons/Xtra',
-    'ability_description' => 'The user taps into its hidden power to generate a pulse of elemental energy, sending it toward the target to inflict massive damage. This ability\'s elemental type appears to be unique for each robot.',
+    'ability_group' => 'MMRPG/Weapons/Omega',
+    'ability_description' => 'The user taps into its hidden power to generate a pulse of elemental energy. This ability\'s type appears to differ between robots.',
     'ability_energy' => 4,
-    'ability_damage' => 15,
+    'ability_damage' => 16,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -64,7 +64,9 @@ $ability = array(
         // Generate this robot's omega string, collect it's hidden power, and update type1
         $robot_omega_string = rpg_game::generate_omega_string($this_player->user_token, 'player', $this_robot->robot_token);
         $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
+        $robot_ability_image = $this_ability->get_base_image().'_'.$robot_hidden_power;
         $this_ability->set_type($robot_hidden_power);
+        $this_ability->set_image($robot_ability_image);
 
         // If the user is holding a Target Module, allow bench targeting
         if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
