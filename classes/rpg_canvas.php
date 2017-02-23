@@ -643,6 +643,7 @@ class rpg_canvas {
         $this_data['ability_token'] = $this_ability->ability_token;
         $this_data['ability_id_token'] = $this_ability->ability_id.'_'.$this_ability->ability_token;
         $this_data['ability_image'] = isset($options['ability_image']) ? $options['ability_image'] : $this_ability->ability_image;
+        $this_data['ability_image2'] = isset($options['ability_image2']) ? $options['ability_image2'] : $this_ability->ability_image2;
         $this_data['ability_status'] = $robot_data['robot_status'];
         $this_data['ability_position'] = $robot_data['robot_position'];
         $this_data['robot_id_token'] = $robot_data['robot_id'].'_'.$robot_data['robot_token'];
@@ -730,7 +731,8 @@ class rpg_canvas {
 
 
         // Define the rest of the display variables
-        if (!preg_match('/^images/i', $this_data['ability_image'])){ $this_data['ability_image'] = 'images/abilities/'.$this_data['ability_image'].'/sprite_'.$this_data['ability_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
+        if (!preg_match('/^images/i', $this_data['ability_image'])){ $this_data['ability_image_path'] = 'images/abilities/'.$this_data['ability_image'].'/sprite_'.$this_data['ability_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
+        else { $this_data['ability_image_path'] = $this_data['ability_image']; }
         $this_data['ability_markup_class'] = 'sprite sprite_ability ';
         $this_data['ability_markup_class'] .= 'sprite_'.$this_data['ability_sprite_size'].'x'.$this_data['ability_sprite_size'].' sprite_'.$this_data['ability_sprite_size'].'x'.$this_data['ability_sprite_size'].'_'.$this_data['ability_frame'].' ';
         $this_data['ability_markup_class'] .= 'ability_status_'.$this_data['ability_status'].' ability_position_'.$this_data['ability_position'].' ';
@@ -739,7 +741,7 @@ class rpg_canvas {
         $frame_background_offset = -1 * ceil(($this_data['ability_sprite_size'] * $frame_position));
         $this_data['ability_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
         $this_data['ability_markup_style'] .= 'pointer-events: none; z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['ability_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
-        $this_data['ability_markup_style'] .= 'background-image: url('.$this_data['ability_image'].'); width: '.($this_data['ability_sprite_size'] * $this_data['ability_frame_span']).'px; height: '.$this_data['ability_sprite_size'].'px; background-size: '.$this_data['ability_image_width'].'px '.$this_data['ability_image_height'].'px; ';
+        $this_data['ability_markup_style'] .= 'background-image: url('.$this_data['ability_image_path'].'); width: '.($this_data['ability_sprite_size'] * $this_data['ability_frame_span']).'px; height: '.$this_data['ability_sprite_size'].'px; background-size: '.$this_data['ability_image_width'].'px '.$this_data['ability_image_height'].'px; ';
 
         // DEBUG
         //$this_data['ability_title'] .= 'DEBUG checkpoint data sticky = '.preg_replace('/\s+/i', ' ', htmlentities(print_r($options, true), ENT_QUOTES, 'UTF-8', true));
@@ -749,7 +751,12 @@ class rpg_canvas {
         ob_start();
 
             // Display the ability's battle sprite
-            echo '<div data-ability-id="'.$this_data['ability_id_token'].'" data-robot-id="'.$robot_data['robot_id_token'].'" class="'.($this_data['ability_markup_class'].$this_data['ability_frame_classes']).'" style="'.($this_data['ability_markup_style'].$this_data['ability_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['ability_sprite_size'].'" data-direction="'.$this_data['ability_direction'].'" data-frame="'.$this_data['ability_frame'].'" data-animate="'.$this_data['ability_frame_animate'].'" data-position="'.$this_data['ability_position'].'" data-status="'.$this_data['ability_status'].'" data-scale="'.$this_data['ability_scale'].'">'.$this_data['ability_token'].'</div>';
+            $temp_markup = '<div data-ability-id="'.$this_data['ability_id_token'].'" data-robot-id="'.$robot_data['robot_id_token'].'" class="'.($this_data['ability_markup_class'].$this_data['ability_frame_classes']).'" style="'.($this_data['ability_markup_style'].$this_data['ability_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['ability_sprite_size'].'" data-direction="'.$this_data['ability_direction'].'" data-frame="'.$this_data['ability_frame'].'" data-animate="'.$this_data['ability_frame_animate'].'" data-position="'.$this_data['ability_position'].'" data-status="'.$this_data['ability_status'].'" data-scale="'.$this_data['ability_scale'].'"></div>';
+            if (!empty($this_data['ability_image2'])){
+                $temp_markup .= 'ability_image:'.$this_data['ability_image'].' vs ability_image2:'.$this_data['ability_image2'].'';
+                $temp_markup .= str_replace('/'.$this_data['ability_image'].'/', '/'.$this_data['ability_image2'].'/', $temp_markup);
+            }
+            echo $temp_markup;
 
         // Collect the generated ability markup
         $this_data['ability_markup'] .= trim(ob_get_clean());
@@ -1303,8 +1310,14 @@ class rpg_canvas {
 
                         // Display the object's mugshot sprite
                         if (empty($this_options['this_ability_results']['total_actions'])){
-                            $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left" style="background-image: url(images/abilities/'.(!empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_ability']->ability_name.'</div>';
-                            $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right" style="background-image: url(images/abilities/'.(!empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_ability']->ability_name.'</div>';
+                            $this_mugshot_image = !empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token;
+                            $this_mugshot_image2 = !empty($this_options['this_ability']->ability_image2) ? $this_options['this_ability']->ability_image2 : '';
+                            $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left" style="background-image: url(images/abilities/'.$this_mugshot_image.'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_ability']->ability_name.'</div>';
+                            $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right" style="background-image: url(images/abilities/'.$this_mugshot_image.'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_ability']->ability_name.'</div>';
+                            if (!empty($this_options['this_ability']->ability_image2)){
+                                $this_mugshot_markup_left .= str_replace('/'.$this_mugshot_image.'/', '/'.$this_mugshot_image2.'/', $this_mugshot_markup_left);
+                                $this_mugshot_markup_right .= str_replace('/'.$this_mugshot_image.'/', '/'.$this_mugshot_image2.'/', $this_mugshot_markup_right);
+                            }
                             $this_mugshot_markup_combined =  '<div class="'.$this_ability_data['ability_markup_class'].' canvas_ability_details ability_type ability_type_'.(!empty($this_options['this_ability']->ability_type) ? $this_options['this_ability']->ability_type : 'none').(!empty($this_options['this_ability']->ability_type2) ? '_'.$this_options['this_ability']->ability_type2 : '').'" style="">'.$this_mugshot_markup_left.'<div class="ability_name" style="">'.$this_ability_data['ability_title'].'</div>'.$this_mugshot_markup_right.'</div>';
                             $this_markup .=  $this_mugshot_markup_combined;
                         }
