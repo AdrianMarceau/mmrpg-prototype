@@ -103,6 +103,7 @@ class rpg_ability extends rpg_object {
         $this->ability_token = isset($this_abilityinfo['ability_token']) ? $this_abilityinfo['ability_token'] : 'ability';
         $this->ability_class = isset($this_abilityinfo['ability_class']) ? $this_abilityinfo['ability_class'] : 'master';
         $this->ability_image = isset($this_abilityinfo['ability_image']) ? $this_abilityinfo['ability_image'] : $this->ability_token;
+        $this->ability_image2 = isset($this_abilityinfo['ability_image2']) ? $this_abilityinfo['ability_image2'] : '';
         $this->ability_image_size = isset($this_abilityinfo['ability_image_size']) ? $this_abilityinfo['ability_image_size'] : 40;
         $this->ability_description = isset($this_abilityinfo['ability_description']) ? $this_abilityinfo['ability_description'] : '';
         $this->ability_type = isset($this_abilityinfo['ability_type']) ? $this_abilityinfo['ability_type'] : '';
@@ -144,6 +145,7 @@ class rpg_ability extends rpg_object {
         $this->ability_base_name = isset($this_abilityinfo['ability_base_name']) ? $this_abilityinfo['ability_base_name'] : $this->ability_name;
         $this->ability_base_token = isset($this_abilityinfo['ability_base_token']) ? $this_abilityinfo['ability_base_token'] : $this->ability_token;
         $this->ability_base_image = isset($this_abilityinfo['ability_base_image']) ? $this_abilityinfo['ability_base_image'] : $this->ability_image;
+        $this->ability_base_image2 = isset($this_abilityinfo['ability_base_image2']) ? $this_abilityinfo['ability_base_image2'] : $this->ability_image2;
         $this->ability_base_image_size = isset($this_abilityinfo['ability_base_image_size']) ? $this_abilityinfo['ability_base_image_size'] : $this->ability_image_size;
         $this->ability_base_description = isset($this_abilityinfo['ability_base_description']) ? $this_abilityinfo['ability_base_description'] : $this->ability_description;
         $this->ability_base_type = isset($this_abilityinfo['ability_base_type']) ? $this_abilityinfo['ability_base_type'] : $this->ability_type;
@@ -321,10 +323,15 @@ class rpg_ability extends rpg_object {
     public function set_functions($value){ $this->set_info('ability_functions', $value); }
 
     public function get_image(){ return $this->get_info('ability_image'); }
+    public function get_image2(){ return $this->get_info('ability_image2'); }
     public function set_image($value){ $this->set_info('ability_image', $value); }
+    public function set_image2($value){ $this->set_info('ability_image2', $value); }
     public function get_base_image(){ return $this->get_info('ability_base_image'); }
+    public function get_base_image2(){ return $this->get_info('ability_base_image2'); }
     public function set_base_image($value){ $this->set_info('ability_base_image', $value); }
-    public function reset_image(){ $this->set_info('ability_image', $this->get_base_image()); }
+    public function set_base_image2($value){ $this->set_info('ability_base_image2', $value); }
+    public function reset_image(){ $this->set_info('ability_image', $this->get_info('ability_base_image')); }
+    public function reset_image2(){ $this->set_info('ability_image2', $this->get_info('ability_base_image2')); }
 
     public function get_image_size(){ return $this->get_info('ability_image_size'); }
     public function set_image_size($value){ $this->set_info('ability_image_size', $value); }
@@ -1287,6 +1294,7 @@ class rpg_ability extends rpg_object {
             'ability_token' => $this->ability_token,
             'ability_class' => $this->ability_class,
             'ability_image' => $this->ability_image,
+            'ability_image2' => $this->ability_image2,
             'ability_image_size' => $this->ability_image_size,
             'ability_description' => $this->ability_description,
             'ability_type' => $this->ability_type,
@@ -1314,6 +1322,7 @@ class rpg_ability extends rpg_object {
             'ability_base_name' => $this->ability_base_name,
             'ability_base_token' => $this->ability_base_token,
             'ability_base_image' => $this->ability_base_image,
+            'ability_base_image2' => $this->ability_base_image2,
             'ability_base_image_size' => $this->ability_base_image_size,
             'ability_base_description' => $this->ability_base_description,
             'ability_base_type' => $this->ability_base_type,

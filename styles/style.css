@@ -1441,6 +1441,11 @@ body.index #header {
     -webkit-border-radius: 5px 0 0 5px;
     background: #000000 none scroll no-repeat -5px -5px;
 }
+#canvas .canvas_ability_details .ability_icon + .ability_icon,
+#canvas .canvas_item_details .item_icon + .item_icon {
+    border-color: transparent;
+    background-color: transparent;
+}
 #canvas .canvas_ability_details .ability_icon_right,
 #canvas .canvas_item_details .item_icon_right {
     left: auto;
@@ -2824,6 +2829,14 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     border-radius: 0.75em;
     -moz-border-radius: 0.75em;
     -webkit-border-radius: 0.75em;
+}
+#actions .actions_switch .action_switch label .sprite_40x40 + .sprite2,
+#actions .actions_scan .action_scan label .sprite_40x40 + .sprite2,
+#actions .actions_target .action_target label .sprite_40x40 + .sprite2,
+#actions .actions_ability .action_ability label .sprite_40x40 + .sprite2,
+#actions .actions_item .action_item label .sprite_40x40 + .sprite2 {
+    background-color: transparent !important;
+    border-color: transparent;
 }
 #actions .actions_ability .action_ability label .sprite_40x40_ability,
 #actions .actions_item .action_item label .sprite_40x40_item {
