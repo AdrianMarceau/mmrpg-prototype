@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'proto-shield',
     'ability_game' => 'MM03',
     'ability_group' => 'MM00/Weapons/Proto',
-    'ability_description' => 'The user creates a large reflective shield that hovers in front of its target and halves all damage received from attacks for three turns!',
+    'ability_description' => 'The user creates a large reflective shield that hovers in front of a target and bolsters its defenses.  This causes the target to receive half damage from attacks for the next six turns.',
     'ability_type' => 'shield',
     'ability_energy' => 4,
     'ability_accuracy' => 100,
@@ -15,6 +15,10 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Define the base attachment duration
+        $base_attachment_duration = 6;
+        $base_attachment_multiplier = 0.5;
+
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
         $this_attachment_info = array(
@@ -22,8 +26,8 @@ $ability = array(
             'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
             'attachment_token' => $this_attachment_token,
-            'attachment_duration' => 4,
-            'attachment_damage_input_breaker' => 0.5,
+            'attachment_duration' => $base_attachment_duration,
+            'attachment_damage_input_breaker' => $base_attachment_multiplier,
             'attachment_create' => array(
                 'trigger' => 'special',
                 'kind' => '',
@@ -100,14 +104,15 @@ $ability = array(
 
                 // Collect the attachment from the robot to back up its info
                 $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
-                $this_attachment_info['attachment_duration'] = 4;
+                $this_attachment_info['attachment_duration'] = $base_attachment_duration;
+                $this_attachment_info['attachment_damage_input_breaker'] = $this_attachment_info['attachment_damage_input_breaker'] * $base_attachment_multiplier;
                 $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
                 $this_robot->update_session();
 
                 // Target the opposing robot
                 $this_ability->target_options_update(array(
                     'frame' => 'summon',
-                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' reinforced the '.$this_ability->print_name().'!<br /> '.$this_robot->print_name().'&#39;s protection has been extended!')
+                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' amplified the effects of the '.$this_ability->print_name().'!<br /> The duration of '.$this_robot->print_name().'&#39;s protection was extended!')
                     ));
                 $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -117,14 +122,15 @@ $ability = array(
 
                 // Collect the attachment from the robot to back up its info
                 $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
-                $this_attachment_info['attachment_duration'] = 4;
+                $this_attachment_info['attachment_duration'] = $base_attachment_duration;
+                $this_attachment_info['attachment_damage_input_breaker'] = $this_attachment_info['attachment_damage_input_breaker'] * $base_attachment_multiplier;
                 $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
                 $target_robot->update_session();
 
                 // Target the opposing robot
                 $this_attachment->target_options_update(array(
                     'frame' => 'summon',
-                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' reinforced the '.$this_ability->print_name().'!<br /> '.$target_robot->print_name().'&#39;s protection has been extended!')
+                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' amplified the effects of the '.$this_ability->print_name().'!<br /> The duration of '.$target_robot->print_name().'&#39;s protection was extended!')
                     ));
                 $this_robot->trigger_target($this_robot, $this_attachment);
 
