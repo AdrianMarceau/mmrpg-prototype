@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'rhythm-satellite',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MM00/Weapons/Rhythm',
-    'ability_description' => 'The user creates a pair of orbiting satellites that hover beind their target and double all damage dealt by attacks for three turns!',
+    'ability_description' => 'The user creates a pair of orbiting satellites that hover behind a target and enhance its attacks. This causes the target to deal double damage from attacks for the next six turns.',
     'ability_type' => 'space',
     'ability_energy' => 4,
     'ability_accuracy' => 100,
@@ -14,6 +14,10 @@ $ability = array(
 
         // Extract all objects into the current scope
         extract($objects);
+
+        // Define the base attachment duration
+        $base_attachment_duration = 6;
+        $base_attachment_multiplier = 2.0;
 
         // Update the ability image if the user is in their alt image
         $alt_image_triggers = array('rhythm_alt', 'rhythm_alt3', 'rhythm_alt5');
@@ -31,8 +35,8 @@ $ability = array(
             'ability_frame_animate' => array(3, 4, 2),
             'ability_frame_offset' => array('x' => -24, 'y' => 10, 'z' => -18),
             'attachment_token' => $this_attachment_token,
-            'attachment_duration' => 4,
-            'attachment_damage_output_booster' => 2.0,
+            'attachment_duration' => $base_attachment_duration,
+            'attachment_damage_output_booster' => $base_attachment_multiplier,
             'attachment_create' => array(
                 'trigger' => 'special',
                 'kind' => '',
@@ -106,14 +110,15 @@ $ability = array(
 
                 // Collect the attachment from the robot to back up its info
                 $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
-                $this_attachment_info['attachment_duration'] = 4;
+                $this_attachment_info['attachment_duration'] = $base_attachment_duration;
+                $this_attachment_info['attachment_damage_output_booster'] = $this_attachment_info['attachment_damage_output_booster'] * $base_attachment_multiplier;
                 $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
                 $this_robot->update_session();
 
                 // Target the opposing robot
                 $this_ability->target_options_update(array(
                     'frame' => 'summon',
-                    'success' => array(9, 24, 30, 18, $this_robot->print_name().' reinforced the '.$this_ability->print_name().'!<br /> '.$this_robot->print_name().'&#39;s weapon boost has been extended!')
+                    'success' => array(9, 24, 30, 18, $this_robot->print_name().' amplified the effects of the '.$this_ability->print_name(true).'!<br /> The duration of '.$this_robot->print_name().'&#39;s reinforcement was extended!')
                     ));
                 $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -123,14 +128,15 @@ $ability = array(
 
                 // Collect the attachment from the robot to back up its info
                 $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
-                $this_attachment_info['attachment_duration'] = 4;
+                $this_attachment_info['attachment_duration'] = $base_attachment_duration;
+                $this_attachment_info['attachment_damage_output_booster'] = $this_attachment_info['attachment_damage_output_booster'] * $base_attachment_multiplier;
                 $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
                 $target_robot->update_session();
 
                 // Target the opposing robot
                 $this_ability->target_options_update(array(
                     'frame' => 'summon',
-                    'success' => array(9, 24, 30, 18, $this_robot->print_name().' reinforced the '.$this_ability->print_name().'!<br /> '.$target_robot->print_name().'&#39;s weapon boost has been extended!')
+                    'success' => array(9, 24, 30, 18, $this_robot->print_name().' amplified the effects of the '.$this_ability->print_name(true).'!<br /> The duration of '.$target_robot->print_name().'&#39;s reinforcement was extended!')
                     ));
                 $this_robot->trigger_target($this_robot, $this_ability);
 

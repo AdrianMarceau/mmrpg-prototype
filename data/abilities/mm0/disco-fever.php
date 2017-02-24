@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'disco-fever',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MM00/Weapons/Disco',
-    'ability_description' => 'The user summons a disco ball above the target to distract its attention and cause it to deal half damage from its attacks for the next three turns!',
+    'ability_description' => 'The user summons a spinning disco ball that hovers above a target and diverts its attention. This causes the target deal half damage from attacks for the next six turns.',
     'ability_type' => 'laser',
     'ability_energy' => 4,
     'ability_accuracy' => 100,
@@ -14,6 +14,10 @@ $ability = array(
 
         // Extract all objects into the current scope
         extract($objects);
+
+        // Define the base attachment duration
+        $base_attachment_duration = 6;
+        $base_attachment_multiplier = 0.5;
 
         // Define this ability's overlay effect token
         $this_overlay_token = 'effect_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
@@ -46,8 +50,8 @@ $ability = array(
             'ability_token' => $this_ability->ability_token,
             'ability_image' => $this_ability->ability_image,
             'attachment_token' => $this_attachment_token,
-            'attachment_duration' => 3,
-            'attachment_damage_output_breaker' => 0.5,
+            'attachment_duration' => $base_attachment_duration,
+            'attachment_damage_output_breaker' => $base_attachment_multiplier,
             'attachment_create' => array(
                 'trigger' => 'special',
                 'kind' => '',
@@ -107,14 +111,15 @@ $ability = array(
 
             // Collect the attachment from the robot to back up its info
             $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
-            $this_attachment_info['attachment_duration'] = 4;
+            $this_attachment_info['attachment_duration'] = $base_attachment_duration;
+            $this_attachment_info['attachment_damage_output_breaker'] = $this_attachment_info['attachment_damage_output_breaker'] * $base_attachment_multiplier;
             $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
             $target_robot->update_session();
 
             // Target the opposing robot
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array(9, -10, 0, -10, $this_robot->print_name().' intensified the '.$this_ability->print_name().'!<br /> '.$target_robot->print_name().'&#39;s trance was extended!')
+                'success' => array(9, -10, 0, -10, $this_robot->print_name().' intensified the effects of the '.$this_ability->print_name().'!<br /> The duration of '.$target_robot->print_name().'&#39;s trance was extended!')
                 ));
             $this_robot->trigger_target($this_robot, $this_ability);
 
