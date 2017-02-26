@@ -2567,14 +2567,6 @@ class rpg_player extends rpg_object {
         $player_token = $player_info['player_token'];
         if (!isset($first_player_token)){ $first_player_token = $player_token; }
 
-        // Collect the player username for omega calculations
-        $player_username = rpg_game::get_user_string();
-
-        // Check to see if any omega abilities have been unlocked
-        $omega_abilities_unlocked = false;
-        if (rpg_game::ability_unlocked('', '', 'omega-pulse')){ $omega_abilities_unlocked = true; }
-        if (rpg_game::ability_unlocked('', '', 'omega-wave')){ $omega_abilities_unlocked = true; }
-
         // Define the player's image and size if not defined
         $player_info['player_image'] = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
         $player_info['player_image_size'] = !empty($player_info['player_image_size']) ? $player_info['player_image_size'] : 40;
@@ -2945,24 +2937,25 @@ class rpg_player extends rpg_object {
 
                     <? }?>
 
-                <?
+                    <?
 
-                // Only omega indicators if the abilities have been unlocked
-                if (true || $omega_abilities_unlocked){
+                    // Only omega indicators if the abilities have been unlocked
+                    if (rpg_game::omega_abilities_unlocked()){
 
-                    // Collect possible hidden power types
-                    $hidden_power_types = rpg_type::get_hidden_powers();
+                        // Collect possible hidden power types
+                        $hidden_power_types = rpg_type::get_hidden_powers('elements');
 
-                    // Generate this player's omega string, collect it's hidden power
-                    $player_omega_string = rpg_game::generate_omega_string($player_username, $player_info['player_token'], 'robot');
-                    $player_hidden_power = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
+                        // Generate this player's omega string, collect it's hidden power
+                        $username_string = rpg_game::get_user_string();
+                        $player_omega_string = rpg_game::generate_omega_string($username_string, 'player', $player_info['player_token']);
+                        $player_hidden_power = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
 
-                    // Print out the omega indicators for the player
-                    echo '<span class="omega player_type type_'.$player_hidden_power.'" title="Omega Seed || [['.ucfirst($player_hidden_power).' Type]]">'.$player_hidden_power.'</span>'.PHP_EOL;
+                        // Print out the omega indicators for the player
+                        echo '<span class="omega player_type type_'.$player_hidden_power.'" title="Omega Seed || [['.ucfirst($player_hidden_power).' Type]]">'.$player_hidden_power.'</span>'.PHP_EOL;
 
-                }
+                    }
 
-                ?>
+                    ?>
 
                 </div>
             </div>

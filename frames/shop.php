@@ -181,8 +181,27 @@ if (true){
 
                     </div>
 
-                </div>
+                    <?
 
+                    // Only omega indicators if the abilities have been unlocked
+                    if (rpg_game::omega_abilities_unlocked()){
+
+                        // Collect possible hidden power types
+                        $hidden_power_types = rpg_type::get_hidden_powers('stats');
+
+                        // Generate this shop's omega string, collect it's hidden power
+                        $username_string = rpg_game::get_user_string();
+                        $shop_omega_string = rpg_game::generate_omega_string($username_string, 'shop', $shop_token);
+                        $shop_hidden_power = rpg_game::select_omega_value($shop_omega_string, $hidden_power_types);
+
+                        // Print out the omega indicators for the player
+                        echo '<span class="omega player_type type_'.$shop_hidden_power.'" title="Omega Seed || [['.ucfirst($shop_hidden_power).' Type]]">'.$shop_hidden_power.'</span>'.PHP_EOL;
+
+                    }
+
+                    ?>
+
+                </div>
             </div>
 
         <?
