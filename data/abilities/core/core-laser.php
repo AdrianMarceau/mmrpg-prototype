@@ -59,25 +59,28 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Collect this robot's primary type and core and change its image if necessary
-        $robot_core = $this_robot->robot_core;
-        $robot_item = $this_robot->robot_item;
-        $robot_core_type = !empty($robot_core) ? $robot_core : '';
-        $robot_item_type = !empty($robot_item) && strstr($robot_item, '-core') ? str_replace('-core', '', $robot_item) : '';
-        $base_ability_type = $this_ability->get_base_type();
-        $new_ability_type = !empty($robot_item_type) ? $robot_item_type : $robot_core_type;
-        if (!empty($new_ability_type) && $new_ability_type != $base_ability_type){
-            $new_ability_image = $this_ability->get_base_image().'_'.$new_ability_type;
-            $new_ability_image2 = $this_ability->get_base_image().'_'.$base_ability_type.'2';
-            $this_ability->set_type($new_ability_type);
-            $this_ability->set_type2($base_ability_type);
-            $this_ability->set_image($new_ability_image);
-            $this_ability->set_image2($new_ability_image2);
+        // Collect this robots core and item types
+        $ability_base_type = !empty($this_ability->ability_base_type) ? $this_ability->ability_base_type : '';
+        $robot_core_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : '';
+        $robot_item_type = !empty($this_robot->robot_item) && strstr($this_robot->robot_item, '-core') ? str_replace('-core', '', $this_robot->robot_item) : '';
+
+        // Define the types for this ability
+        $ability_types = array();
+        $ability_types[] = $ability_base_type;
+        if (!empty($robot_core_type) && $robot_core_type != 'copy'){ $ability_types[] = $robot_core_type; }
+        if (!empty($robot_item_type) && $robot_item_type != 'copy'){ $ability_types[] = $robot_item_type; }
+        $ability_types = array_reverse($ability_types);
+        $ability_types = array_slice($ability_types, 0, 2);
+
+        // Collect this robot's primary type and change its image if necessary
+        $this_ability->set_image($this_ability->ability_token.'_'.$ability_types[0]);
+        $this_ability->set_type($ability_types[0]);
+        if (!empty($ability_types[1])){
+            $this_ability->set_image2($this_ability->ability_token.'_'.$ability_types[1].'2');
+            $this_ability->set_type2($ability_types[1]);
         } else {
-            $this_ability->reset_type();
-            $this_ability->reset_type2();
-            $this_ability->reset_image();
-            $this_ability->reset_image2();
+            $this_ability->set_image2('');
+            $this_ability->set_type2('');
         }
 
         // If the user is holding a Target Module, allow bench targeting

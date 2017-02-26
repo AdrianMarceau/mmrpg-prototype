@@ -7,7 +7,7 @@ $ability = array(
     'ability_group' => 'MMRPG/Weapons/Core',
     'ability_description' => 'The user generates an elemental barrier that hovers in front of the target to protect it from damage. This ability\'s typing appears to be influenced by the energy of nearby cores.',
     'ability_type' => 'shield',
-    'ability_energy' => 4,
+    'ability_energy' => 8,
     'ability_recovery2' => 99,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
@@ -54,6 +54,7 @@ $ability = array(
         $this_attachment_info = array(
             'class' => 'ability',
             'ability_token' => $this_ability->ability_token,
+            'ability_image' => $this_ability->ability_image,
             'attachment_duration' => $base_attachment_duration,
             'attachment_damage_input_breaker_'.$base_effect_element => $base_effect_multiplier,
             'attachment_create' => array(
@@ -181,23 +182,31 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Collect this robots core and item types
+        $ability_base_type = !empty($this_ability->ability_base_type) ? $this_ability->ability_base_type : '';
+        $robot_core_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : '';
+        $robot_item_type = !empty($this_robot->robot_item) && strstr($this_robot->robot_item, '-core') ? str_replace('-core', '', $this_robot->robot_item) : '';
+
+        // Define the types for this ability
+        $ability_types = array();
+        $ability_types[] = $ability_base_type;
+        if (!empty($robot_core_type) && $robot_core_type != 'copy'){ $ability_types[] = $robot_core_type; }
+        if (!empty($robot_item_type) && $robot_item_type != 'copy'){ $ability_types[] = $robot_item_type; }
+        $ability_types = array_reverse($ability_types);
+        $ability_types = array_slice($ability_types, 0, 2);
+
         // Collect this robot's primary type and change its image if necessary
-        $robot_core = $this_robot->robot_core;
-        $robot_item = $this_robot->robot_item;
-        $robot_core_type = !empty($robot_core) ? $robot_core : '';
-        $robot_item_type = !empty($robot_item) && strstr($robot_item, '-core') ? str_replace('-core', '', $robot_item) : '';
-        $base_ability_type = $this_ability->get_base_type();
-        $new_ability_type = !empty($robot_item_type) ? $robot_item_type : $robot_core_type;
-        if (!empty($new_ability_type) && $new_ability_type != $base_ability_type){
-            $new_ability_image = $this_ability->get_base_image().'_'.$new_ability_type;
-            $this_ability->set_type($new_ability_type);
-            $this_ability->set_type2($base_ability_type);
-            $this_ability->set_image($new_ability_image);
+        $this_ability->set_image($this_ability->ability_token.'_'.$ability_types[0]);
+        $this_ability->set_type($ability_types[0]);
+        /*
+        if (!empty($ability_types[1])){
+            $this_ability->set_image2($this_ability->ability_token.'_'.$ability_types[1].'2');
+            $this_ability->set_type2($ability_types[1]);
         } else {
-            $this_ability->reset_type();
-            $this_ability->reset_type2();
-            $this_ability->reset_image();
+            $this_ability->set_image2('');
+            $this_ability->set_type2('');
         }
+        */
 
         // If the user is holding a Target Module, allow bench targeting
         if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_this'); }
