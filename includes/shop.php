@@ -535,8 +535,8 @@ if (!empty($this_shop_index['reggae'])){
             // Collect a list of all abilities already unlocked
             $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
 
-            // If Dr. Light has unlocked all of his own robots, add the Copy Abilities to the shop
-            if (rpg_game::robots_unlocked('dr-light', true) >= 10){ // 2 hero + 8 master
+            // Add the Copy Abilities to the shop if they've been unlocked
+            if (rpg_game::copy_abilities_unlocked()){
 
                 // Manually append some starter abilities as the first items in the list
                 $this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-shot'] = 3000;
@@ -544,8 +544,8 @@ if (!empty($this_shop_index['reggae'])){
 
             }
 
-            // If Dr. Wily has unlocked all of his own robots, add the Core Abilities to the shop
-            if (rpg_game::robots_unlocked('dr-wily', true) >= 10){ // 2 hero + 8 master
+            // Add the Core Abilities to the shop if they've been unlocked
+            if (rpg_game::core_abilities_unlocked()){
 
                 // Manually append some starter abilities as the first items in the list
                 $this_shop_index['reggae']['shop_weapons']['weapons_selling']['core-shield'] = 6000;
@@ -553,8 +553,8 @@ if (!empty($this_shop_index['reggae'])){
 
             }
 
-            // If Dr. Cossack has unlocked all of his own robots, add the Omega Abilities to the shop
-            if (rpg_game::robots_unlocked('dr-cossack', true) >= 10){ // 2 hero + 8 master
+            // Add the Omega Abilities to the shop if they've been unlocked
+            if (rpg_game::omega_abilities_unlocked()){
 
                 // Manually append some starter abilities as the first items in the list
                 $this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-pulse'] = 9000;

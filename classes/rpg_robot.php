@@ -3440,14 +3440,6 @@ class rpg_robot extends rpg_object {
             // Collect starforce values for the current player
             $player_starforce = rpg_game::starforce_unlocked();
 
-            // Collect the player username for omega calculations
-            $player_username = rpg_game::get_user_string();
-
-            // Check to see if any omega abilities have been unlocked
-            $omega_abilities_unlocked = false;
-            if (rpg_game::ability_unlocked('', '', 'omega-pulse')){ $omega_abilities_unlocked = true; }
-            if (rpg_game::ability_unlocked('', '', 'omega-wave')){ $omega_abilities_unlocked = true; }
-
             // Update the robot key to the current counter
             $robot_key = $key_counter;
             // Make a backup of the player selector
@@ -4276,13 +4268,14 @@ class rpg_robot extends rpg_object {
                 <?
 
                 // Only omega indicators if the abilities have been unlocked
-                if (true || $omega_abilities_unlocked){
+                if (rpg_game::omega_abilities_unlocked()){
 
                     // Collect possible hidden power types
-                    $hidden_power_types = rpg_type::get_hidden_powers();
+                    $hidden_power_types = rpg_type::get_hidden_powers('elements');
 
                     // Generate this robot's omega string, collect it's hidden power
-                    $robot_omega_string = rpg_game::generate_omega_string($player_username, 'player', $robot_info['robot_token']);
+                    $username_string = rpg_game::get_user_string();
+                    $robot_omega_string = rpg_game::generate_omega_string($username_string, 'robot', $robot_info['robot_token']);
                     $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
 
                     // Print out the omega indicators for the robot

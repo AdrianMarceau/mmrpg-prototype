@@ -529,6 +529,24 @@
     font-size: 9px;
 }
 
+#shop #console .omega.player_type {
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    font-size: 5px;
+    line-height: 5px;
+    direction: ltr;
+    text-indent: -9999px;
+    bottom: 5px;
+    padding: 0;
+}
+
+#shop #console .omega.player_type {
+    right: 4px;
+}
+
 #shop #console .event .buy_button_header,
 #shop #console .event .sell_button_header,
 #shop #console .event .confirm_button_header,
