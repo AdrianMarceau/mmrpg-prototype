@@ -245,11 +245,13 @@ class rpg_ability extends rpg_object {
     public function set_type($value){ $this->set_info('ability_type', $value); }
     public function get_base_type(){ return $this->get_info('ability_base_type'); }
     public function set_base_type($value){ $this->set_info('ability_base_type', $value); }
+    public function reset_type(){ $this->set_info('ability_type', $this->get_info('ability_base_type')); }
 
     public function get_type2(){ return $this->get_info('ability_type2'); }
     public function set_type2($value){ $this->set_info('ability_type2', $value); }
     public function get_base_type2(){ return $this->get_info('ability_base_type2'); }
     public function set_base_type2($value){ $this->set_info('ability_base_type2', $value); }
+    public function reset_type2(){ $this->set_info('ability_type2', $this->get_info('ability_base_type2')); }
 
     public function get_speed(){ return $this->get_info('ability_speed'); }
     public function set_speed($value){ $this->set_info('ability_speed', $value); }
@@ -2591,7 +2593,7 @@ class rpg_ability extends rpg_object {
             'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
             'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
             'field-support', 'mecha-support',
-            'omega-pulse', 'omega-wave'
+            'core-shield', 'core-laser', 'omega-pulse', 'omega-wave'
             );
         // Return the list of global abilities
         return $temp_global_abilities;
