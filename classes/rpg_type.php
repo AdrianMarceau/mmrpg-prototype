@@ -175,10 +175,22 @@ class rpg_type {
     }
 
     // Define a static function for collecting the possible hidden power types
-    public static function get_hidden_powers(){
+    public static function get_hidden_powers($kind = 'elements'){
 
-        // Define possible types for hidden power ability
-        $hidden_power_types = array('cutter', 'impact', 'freeze', 'explode', 'flame', 'electric', 'time', 'earth', 'wind', 'water', 'swift', 'nature', 'missile', 'crystal', 'shadow', 'space', 'shield', 'laser');
+        // If the ELEMENTS kind was requested
+        if ($kind == 'elements'){
+
+            // Define the type possibilities for elemental hidden powers
+            $hidden_power_types = array('cutter', 'impact', 'freeze', 'explode', 'flame', 'electric', 'time', 'earth', 'wind', 'water', 'swift', 'nature', 'missile', 'crystal', 'shadow', 'space', 'shield', 'laser');
+
+        }
+        // Else if the STATS kind was requested
+        elseif ($kind == 'stats'){
+
+            // Define the type possibilities for elemental hidden powers
+            $hidden_power_types = array('energy', 'weapons', 'attack', 'defense', 'speed');
+
+        }
 
         // Return the hidden power types as an array list
         return $hidden_power_types;
