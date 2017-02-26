@@ -934,6 +934,36 @@ class rpg_game {
     }
 
 
+    // -- GAME STATUS FUNCTIONS -- //
+
+    // Define a function for checking the Copy Abilities have been unlocked
+    public static function copy_abilities_unlocked(){
+
+        // If Dr. Light has unlocked all of his own robots (1 hero, 1 support, 8 master), unlock the Copy Abilities
+        if (self::robots_unlocked('dr-light', true) >= 10){ return true; }
+        else { return false; }
+
+    }
+
+    // Define a function for checking the Core Abilities have been unlocked
+    public static function core_abilities_unlocked(){
+
+        // If Dr. Wily has unlocked all of his own robots (1 hero, 1 support, 8 master), unlock the Core Abilities
+        if (self::robots_unlocked('dr-wily', true) >= 10){ return true; }
+        else { return false; }
+
+    }
+
+    // Define a function for checking the Omega Abilities have been unlocked
+    public static function omega_abilities_unlocked(){
+
+        // If Dr. Cossack has unlocked all of his own robots (1 hero, 1 support, 8 master), unlock the Omega Abilities
+        if (self::robots_unlocked('dr-cossack', true) >= 10){ return true; }
+        else { return false; }
+
+    }
+
+
 
     // -- ABILITY FUNCTIONS -- //
 
@@ -1421,18 +1451,24 @@ class rpg_game {
 
 
     // Define a function for generating an omega string for a given user or robot
-    public static function generate_omega_string($user_string, $player_string = '', $robot_string = ''){
+    public static function generate_omega_string($user_string, $string_one = '', $string_two = '', $string_three = ''){
 
         // Concatenate seed values to form the raw omega string
         $omega_seed = MMRPG_SETTINGS_OMEGA_SEED;
         $raw_omega_string = 'mmrpg_'.$omega_seed.'_'.$user_string;
-        if (!empty($player_string)){ $raw_omega_string .= '_'.$player_string; }
-        if (!empty($robot_string)){ $raw_omega_string .= '_'.$robot_string; }
+        if (!empty($string_one)){ $raw_omega_string .= '_'.$string_one; }
+        if (!empty($string_two)){ $raw_omega_string .= '_'.$string_two; }
+        if (!empty($string_three)){ $raw_omega_string .= '_'.$string_three; }
         $raw_omega_string = rtrim($raw_omega_string, '_');
 
         // Calculate the MD5 hash of the raw omega string and crop
         $complete_omega_string = md5($raw_omega_string);
         $final_omega_string = substr($complete_omega_string, 0, 32);
+        $base_rotate_amount = hexdec(substr($final_omega_string, 0, 1));
+        for ($i = 1; $i < $base_rotate_amount; $i++){
+            $left_char = substr($final_omega_string, 0, 1);
+            $final_omega_string = substr($final_omega_string.$left_char, 1, 32);
+        }
 
         // Return the finalized omega string value
         return $final_omega_string;
@@ -1455,8 +1491,7 @@ class rpg_game {
         $required_string_length = strlen($index_range_max_hex);
 
         // Make a copy of the omega string, reversed if value count not even (for variety)
-        if ($omega_value_count % 2 != 0){ $base_omega_string = strrev($omega_string); }
-        else { $base_omega_string = $omega_string; }
+        $base_omega_string = $omega_string;
 
         // Crop the base omega string to the required length and calculate it's decimal value
         $cropped_omega_string = substr($base_omega_string, 0, $required_string_length);
