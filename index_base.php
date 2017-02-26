@@ -319,6 +319,7 @@ if ($this_current_page == 'file' // File sub-pages
 
                     // Hard-code some sub-pages we know about beforehand
                     $database_subs = array();
+                    $database_subs['home'] = array('name' => 'Overview');
                     $database_subs['players'] = array('name' => 'Players');
                     $database_subs['robots'] = array('name' => 'Robots');
                     $database_subs['mechas'] = array('name' => 'Mechas');
@@ -329,29 +330,34 @@ if ($this_current_page == 'file' // File sub-pages
                     $database_subs['types'] = array('name' => 'Types');
                     $main_menu_links['database']['subs'] = $database_subs;
 
+                    // Hard-code some sub-pages we know about beforehand
+                    $community_subs = array();
+                    $community_subs['home'] = array('name' => 'Overview');
+                    $main_menu_links['community']['subs'] = $community_subs;
+
                     ?>
                     <ul class="main">
                         <?
 
                         // Loop through the main menu links and print their markup
                         ob_start();
-                        foreach ($main_menu_links AS $token => $info){
+                        foreach ($main_menu_links AS $parent_token => $parent_info){
 
                             // Collect basic info about this link
-                            $name = !empty($info['name']) ? $info['name'] : ucfirst($token);
-                            $url = !empty($info['url']) ? MMRPG_CONFIG_ROOTURL.ltrim($info['url'], '/') : $token.'/';
-                            $target = !empty($info['target']) ? $info['target'] : '_self';
-                            $active = $this_current_page == $token ? true : false;
-                            $before = !empty($info['before']) ? $info['before'] : '';
-                            $after = !empty($info['after']) ? $info['after'] : '';
-                            $sub_menu_links = !empty($info['subs']) ? $info['subs'] : array();
+                            $name = !empty($parent_info['name']) ? $parent_info['name'] : ucfirst($parent_token);
+                            $url = !empty($parent_info['url']) ? MMRPG_CONFIG_ROOTURL.ltrim($parent_info['url'], '/') : $parent_token.'/';
+                            $target = !empty($parent_info['target']) ? $parent_info['target'] : '_self';
+                            $active = $this_current_page == $parent_token ? true : false;
+                            $before = !empty($parent_info['before']) ? $parent_info['before'] : '';
+                            $after = !empty($parent_info['after']) ? $parent_info['after'] : '';
+                            $sub_menu_links = !empty($parent_info['subs']) ? $parent_info['subs'] : array();
 
                             // Define menu item and link classes for styling
                             $item_class = 'item '.($active ? 'item_active ' : '');
                             $link_class = 'link '.($active ? 'link_active field_type_empty' : '');
 
                             // If this the COMMUNITY link, dynamically collect update counts
-                            if ($token == 'community'){
+                            if ($parent_token == 'community'){
                                 // Generate update count markup for this page's after string
                                 $after .= '';
                                 if (!empty($temp_new_threads)){ $after .= '<sup class="sup field_type field_type_electric" title="'.count($temp_new_threads).' New Comments">'.count($temp_new_threads).'</sup>'; }
@@ -360,14 +366,14 @@ if ($this_current_page == 'file' // File sub-pages
 
                             // Print out the menu item markup
                             ?>
-                            <li class="<?= $item_class ?>" data-token="<?= $token ?>">
+                            <li class="<?= $item_class ?>" data-token="<?= $parent_token ?>">
                                 <a href="<?= $url ?>" class="<?= $link_class ?>" target="<?= $target ?>">
                                     <?= $before ?><span><?= $name ?></span><?= $after ?>
                                 </a>
                                 <?
 
                                 // If this the COMMUNITY link, dynamically collect sub-pages
-                                if ($token == 'community'){
+                                if ($parent_token == 'community'){
                                     // Loop through the community index and print out links
                                     $this_categories_index = mmrpg_website_community_index();
                                     if (!empty($this_categories_index)){
@@ -395,15 +401,21 @@ if ($this_current_page == 'file' // File sub-pages
                                     ?>
                                     <ul class="subs field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                                         <?
-                                        foreach ($sub_menu_links AS $token => $info){
+                                        foreach ($sub_menu_links AS $sub_token => $sub_info){
 
                                             // Collect basic info about this link
-                                            $name = !empty($info['name']) ? $info['name'] : ucfirst($token);
-                                            $url = !empty($info['url']) ? MMRPG_CONFIG_ROOTURL.ltrim($info['url'], '/') : $base_url.$token.'/';
-                                            $target = !empty($info['target']) ? $info['target'] : '_self';
-                                            $before = !empty($info['before']) ? $info['before'] : '';
-                                            $after = !empty($info['after']) ? $info['after'] : '';
-                                            $active = $this_current_sub == $token ? true : false;
+                                            $name = !empty($sub_info['name']) ? $sub_info['name'] : ucfirst($sub_token);
+                                            $url = !empty($sub_info['url']) ? MMRPG_CONFIG_ROOTURL.ltrim($sub_info['url'], '/') : $base_url.($sub_token != 'home' ? $sub_token.'/' : '');
+                                            $target = !empty($sub_info['target']) ? $sub_info['target'] : '_self';
+                                            $before = !empty($sub_info['before']) ? $sub_info['before'] : '';
+                                            $after = !empty($sub_info['after']) ? $sub_info['after'] : '';
+                                            if ($parent_token == 'community'){
+                                                $active = $this_current_cat == $sub_token ? true : false;
+                                                if ($base_active && empty($this_current_cat) && $sub_token == 'home'){ $active = true; }
+                                            } else {
+                                                $active = $this_current_sub == $sub_token ? true : false;
+                                                if ($base_active && empty($this_current_sub) && $sub_token == 'home'){ $active = true; }
+                                            }
 
                                             // Define menu item and link classes for styling
                                             $item_class = 'item '.($active ? 'item_active ' : '');
