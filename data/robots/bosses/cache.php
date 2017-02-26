@@ -28,6 +28,7 @@ $robot = array(
         'abilities' => array(
                 array('level' => 0, 'token' => 'buster-shot'),
                 array('level' => 0, 'token' => 'copy-shot'),
+                array('level' => 0, 'token' => 'copy-soul'),
                 array('level' => 0, 'token' => 'copy-vision'),
             )
         ),
