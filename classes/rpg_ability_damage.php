@@ -459,6 +459,7 @@ class rpg_ability_damage extends rpg_damage {
             $this_robot->robot_frame = $this_ability->damage_options['damage_frame'];
             $this_robot->player->player_frame = ($this_robot->robot_id != $target_robot->robot_id || $trigger_options['referred_damage']) ? 'damage' : 'base';
             $this_ability->ability_frame = $this_ability->damage_options['ability_success_frame'];
+            $this_ability->ability_frame_span = $this_ability->damage_options['ability_success_frame_span'];
             $this_ability->ability_frame_offset = $this_ability->damage_options['ability_success_frame_offset'];
 
             // Display the success text, if text has been provided

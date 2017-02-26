@@ -450,6 +450,7 @@ class rpg_item_recovery extends rpg_recovery {
             $this_robot->robot_frame = $this_item->recovery_options['recovery_frame'];
             $this_robot->player->player_frame = ($this_robot->robot_id != $target_robot->robot_id || $trigger_options['referred_recovery']) ? 'taunt' : 'base';
             $this_item->item_frame = $this_item->recovery_options['item_success_frame'];
+            $this_item->item_frame_span = $this_item->recovery_options['item_success_frame_span'];
             $this_item->item_frame_offset = $this_item->recovery_options['item_success_frame_offset'];
 
             // Display the success text, if text has been provided
