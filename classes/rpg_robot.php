@@ -927,7 +927,9 @@ class rpg_robot extends rpg_object {
         $item_token = !empty($item_info) ? $item_info['item_token'] : '';
         $robot_token = $robot_info['robot_token'];
         $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+        $robot_base_core = !empty($robot_info['robot_base_core']) ? $robot_info['robot_base_core'] : '';
         $robot_core2 = !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : '';
+        $robot_base_core2 = !empty($robot_info['robot_base_core2']) ? $robot_info['robot_base_core2'] : '';
         $item_core = !empty($item_token) && preg_match('/-core$/i', $item_token) ? preg_replace('/-core$/i', '', $item_token) : '';
         if ($item_core == 'none' || $item_core == 'copy'){ $item_core = ''; }
         //echo 'has_ability_compatibility('.$robot_token.', '.$ability_token.', '.$robot_core.', '.$robot_core2.')'."\n";
@@ -945,7 +947,7 @@ class rpg_robot extends rpg_object {
             //$debug_fragment .= 'has-type '; // DEBUG
             if (!empty($robot_core) || !empty($robot_core2) || !empty($item_core)){
             //$debug_fragment .= 'has-core '; // DEBUG
-                if ($robot_core == 'copy'){
+                if ($robot_core == 'copy' || $robot_base_core == 'copy'){
                     //$debug_fragment .= 'copy-core '; // DEBUG
                     $temp_compatible = true;
                 }

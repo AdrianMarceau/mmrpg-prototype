@@ -159,7 +159,7 @@ foreach ($mmrpg_database_types AS $type_token => $type_info){
     $temp_pattern_last[] = '/^'.$type_token.'-overdrive$/i';
 }
 $temp_pattern_last[] = '/^copy-shot$/i';
-//$temp_pattern_last[] = '/^copy-soul$/i';
+$temp_pattern_last[] = '/^copy-soul$/i';
 $temp_pattern_last[] = '/^core-shield$/i';
 $temp_pattern_last[] = '/^core-laser$/i';
 $temp_pattern_last[] = '/^omega-pulse$/i';

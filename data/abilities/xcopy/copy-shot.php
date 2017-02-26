@@ -6,10 +6,10 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Weapons/Copy',
     'ability_type' => 'copy',
-    'ability_description' => 'The user fires a small emulation device at the target that deals damage and copies its last ability for permanent use in battle! This ability appears to ignore moves by support mechas, so save it for the robot master\'s attack!',
-    'ability_energy' => 8,
+    'ability_description' => 'The user fires a small emulation device at the target that deals damage and copies its last ability to the user for the rest of the battle! This ability cannot be used to copy abilities by support mecha or fortress bosses so use with great care.',
+    'ability_energy' => 4,
     'ability_speed' => 10,
-    'ability_damage' => 16,
+    'ability_damage' => 12,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -52,6 +52,7 @@ $ability = array(
         $target_robot->trigger_damage($this_robot, $this_ability, $this_ability->ability_damage);
 
         // Check to ensure the ability was a success before continuing
+        $copy_shot_success = false;
         if ($this_ability->ability_results['this_result'] != 'failure'){
 
             // Ensure the target robot has an ability history to draw from
@@ -85,7 +86,7 @@ $ability = array(
                     // Create an event displaying the new copied ability
                     //$event_header = $this_robot->robot_name.'&#39;s '.$this_ability->ability_name;
                     $event_header = $this_new_ability->ability_name.' Unlocked';
-                    $event_body = $this_ability->print_name().' downloads the target&#39;s battle data&hellip;<br />';
+                    $event_body = $this_ability->print_name().' downloads the target\'s battle data&hellip;<br />';
                     //$event_body .= $this_robot->print_name().' learned how to use '.$this_new_ability->print_name().'!';
                     $event_body .= $this_new_ability->print_name().' can now be used in battle!';
                     $event_options = array();
@@ -96,6 +97,7 @@ $ability = array(
                     $event_options['canvas_show_this_ability'] = false;
                     $event_options['console_show_this_ability'] = true;
                     $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
+                    $copy_shot_success = true;
 
                     // Attach the ability to this robot
                     unset($this_robot->robot_attachments[$this_attachment_token]);
@@ -106,9 +108,17 @@ $ability = array(
 
                         //$this_battle->events_create(false, false, 'debug', 'player side left!', $event_options);
 
-                        // Only equip this ability to the session IF NATIVE COPY CORE
+                        // Define unlock details for this ability
+                        $temp_player_info = array('player_token' => $this_player->player_token);
+                        $temp_robot_info = array('robot_token' => $this_robot->robot_token);
+                        $temp_ability_info = array('ability_token' => $this_new_ability->ability_token);
+
+                        // Only unlock this ability for the robot IF NATIVE COPY CORE
                         $this_robot_index = rpg_robot::get_index_info($this_robot->robot_token);
                         if ($this_robot_index['robot_core'] == 'copy'){
+
+                            // Unlock this ability for the robot permanently
+                            mmrpg_game_unlock_ability($temp_player_info, $temp_robot_info, $temp_ability_info, true);
 
                             // Remove the copy shot from this robot's battle settings and replace with new ability
                             $temp_ability_settings = $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'];
@@ -120,16 +130,11 @@ $ability = array(
                                 $temp_ability_settings = array();
                                 foreach ($temp_new_ability_settings AS $token){ $temp_ability_settings[$token] = array('ability_token' => $token); }
                                 $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'] = $temp_ability_settings;
-                                // Unset this ability in the robot's settings
-                                //unset($_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'][$this_ability->ability_token]);
                             }
 
                         }
 
-                        // Unlock this ability for the player permanently
-                        $temp_player_info = array('player_token' => $this_player->player_token);
-                        $temp_robot_info = array('robot_token' => $this_robot->robot_token);
-                        $temp_ability_info = array('ability_token' => $this_new_ability->ability_token);
+                        // Always unlock this ability for the player permanently
                         mmrpg_game_unlock_ability($temp_player_info, false, $temp_ability_info, true);
 
                     }
@@ -140,6 +145,18 @@ $ability = array(
 
         }
 
+        // If the ability was a failure, print out a message saying so
+        if (!$copy_shot_success){
+
+            // Update the ability's target options and trigger
+            $this_ability->target_options_update(array(
+                'frame' => 'defend',
+                'success' => array(9, 0, 0, 10, 'The target\'s ability could not be copied...')
+                ));
+            $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
+            return;
+
+        }
 
         // Return true on success
         return true;
