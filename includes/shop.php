@@ -532,10 +532,43 @@ if (!empty($this_shop_index['reggae'])){
             // Define the weapon selling array and start it empty
             $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
 
-            // Manually append some starter abilities as the first items in the list
-            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-shot'] = 3000;
-            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-charge'] = 3000;
-            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['buster-relay'] = 3000;
+            // Collect a list of all abilities already unlocked
+            $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
+
+            // If Dr. Light has unlocked all of his own robots, add the Copy Abilities to the shop
+            if (rpg_game::robots_unlocked('dr-light', true) >= 10){ // 2 hero + 8 master
+
+                // Manually append some starter abilities as the first items in the list
+                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-shot'] = 3000;
+                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-soul'] = 6000;
+
+            }
+
+            // If Dr. Wily has unlocked all of his own robots, add the Core Abilities to the shop
+            if (rpg_game::robots_unlocked('dr-wily', true) >= 10){ // 2 hero + 8 master
+
+                // Manually append some starter abilities as the first items in the list
+                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['core-shield'] = 6000;
+                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['core-laser'] = 9000;
+
+            }
+
+            // If Dr. Cossack has unlocked all of his own robots, add the Omega Abilities to the shop
+            if (rpg_game::robots_unlocked('dr-cossack', true) >= 10){ // 2 hero + 8 master
+
+                // Manually append some starter abilities as the first items in the list
+                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-pulse'] = 9000;
+                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-wave'] = 12000;
+
+            }
+
+            /*
+            echo('<pre>rpg_game::robots_unlocked(dr-light) = '.print_r(rpg_game::robots_unlocked('dr-light'), true).'</pre><hr />');
+            echo('<pre>rpg_game::robots_unlocked(dr-wily) = '.print_r(rpg_game::robots_unlocked('dr-wily'), true).'</pre><hr />');
+            echo('<pre>rpg_game::robots_unlocked(dr-cossack) = '.print_r(rpg_game::robots_unlocked('dr-cossack'), true).'</pre><hr />');
+            echo('<pre>$this_shop_index[reggae][shop_weapons][weapons_selling] = '.print_r($this_shop_index['reggae']['shop_weapons']['weapons_selling'], true).'</pre><hr />');
+            exit();
+            */
 
             // If the player has sold any cores, loop through them and add associated abilities
             $core_level_index = array();
@@ -593,8 +626,40 @@ if (!empty($this_shop_index['reggae'])){
 
             }
 
-            // Manually append some starter abilities as the first items in the list
-            //$this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-shot'] = 3000;
+            /*
+
+            // -- SORT WEAPONS -- //
+
+            //echo('<pre>$unlocked_ability_tokens = '.print_r($unlocked_ability_tokens, true).'</pre><hr />');
+
+            //echo('<pre>$this_shop_index[reggae][shop_weapons][weapons_selling] = '.print_r($this_shop_index['reggae']['shop_weapons']['weapons_selling'], true).'</pre><hr />');
+
+            // Manually sort all abilities that have already been unlocked to the bottom of the list
+            $weapons_selling_tokens = array_keys($this_shop_index['reggae']['shop_weapons']['weapons_selling']);
+            //echo('<pre>$weapons_selling_tokens(before) = '.print_r($weapons_selling_tokens, true).'</pre><hr />');
+            uasort($weapons_selling_tokens, function($a, $b) use ($unlocked_ability_tokens){
+                if (in_array($a, $unlocked_ability_tokens) && !in_array($b, $unlocked_ability_tokens)){ return 1; }
+                elseif (!in_array($a, $unlocked_ability_tokens) && in_array($b, $unlocked_ability_tokens)){ return -1; }
+                else { return 0; }
+                });
+            //echo('<pre>$weapons_selling_tokens(after) = '.print_r($weapons_selling_tokens, true).'</pre><hr />');
+
+            // Update the parent array with the new sorting order using the generated token list
+            $new_weapons_selling_array = array();
+            //echo('<pre>$new_weapons_selling_array(before) = '.print_r($new_weapons_selling_array, true).'</pre><hr />');
+            foreach ($weapons_selling_tokens AS $key => $token){
+                $price = $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token];
+                $new_weapons_selling_array[$token] = $price;
+            }
+            //echo('<pre>$new_weapons_selling_array(after) = '.print_r($new_weapons_selling_array, true).'</pre><hr />');
+            $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = $new_weapons_selling_array;
+
+            //echo('<pre>$this_shop_index[reggae][shop_weapons][weapons_selling] = '.print_r($this_shop_index['reggae']['shop_weapons']['weapons_selling'], true).'</pre><hr />');
+
+            //exit();
+
+            */
+
 
         }
 
