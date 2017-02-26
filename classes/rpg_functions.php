@@ -213,6 +213,20 @@ class rpg_functions {
 
     }
 
+    // -- STATIC MATH FUNCTIONS -- //
+
+    /**
+     * Round a number to a full int value but ceil if > 0 and < 1
+     * @param float $amount
+     * @return int
+     */
+    public static function round_ceil($amount){
+        if ($amount > 0 && $amount < 1){ $amount = 1; }
+        else { $amount = round($amount); }
+        return $amount;
+    }
+
+
     // -- STATIC MARKUP FUNCTIONS -- //
 
     /**
