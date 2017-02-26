@@ -509,16 +509,50 @@ class rpg_game {
 
 
     // Define a function for checking robots have been unlocked
-    public static function robots_unlocked($player_token = ''){
+    public static function robots_unlocked($player_token = '', $strict = false){
         // Define the game session helper var
         $session_token = self::session_token();
-        if (!empty($player_token)){
-            // Check if this battle has been completed and return true is it was
-            return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots']) : 0;
-        } else {
+
+        // If we're filtering by player and strict mode is on, only count original player status
+        if (!empty($player_token) && $strict){
             $robot_counter = 0;
-            foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-                $robot_counter += isset($player_info['player_robots']) ? count($player_info['player_robots']) : 0;
+            $battle_rewards = $_SESSION[$session_token]['values']['battle_rewards'];
+            $battle_settings = $_SESSION[$session_token]['values']['battle_settings'];
+            $ptokens = array_keys($battle_rewards);
+            $ptokens = array_merge($ptokens, array_keys($battle_settings));
+            $ptokens = array_unique($ptokens);
+            foreach ($ptokens AS $pkey => $ptoken){
+                $prewards = !empty($battle_rewards[$ptoken]) ? $battle_rewards[$ptoken] : array();
+                $psettings = !empty($battle_settings[$ptoken]) ? $battle_settings[$ptoken] : array();
+                $rtokens = array();
+                if (!empty($prewards['player_robots'])){ $rtokens = array_merge($rtokens, array_keys($prewards['player_robots'])); }
+                if (!empty($psettings['player_robots'])){ $rtokens = array_merge($rtokens, array_keys($psettings['player_robots'])); }
+                $rtokens = array_unique($rtokens);
+                if (!empty($rtokens)){
+                    foreach ($rtokens AS $rkey => $rtoken){
+                        $rsettings = !empty($psettings['player_robots'][$rtoken]) ? $psettings['player_robots'][$rtoken] : array();
+                        if (!empty($rsettings['original_player']) && $rsettings['original_player'] == $player_token){
+                            $robot_counter++;
+                        }
+                    }
+                }
+            }
+            return $robot_counter;
+        }
+        // Otherwise if filtering player and strict mode is off, robots count toward whichever player they're with
+        elseif (!empty($player_token) && !$strict){
+            $robot_counter = 0;
+            foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $ptoken => $pinfo){
+                if ($ptoken != $player_token){ continue; }
+                $robot_counter += isset($pinfo['player_robots']) ? count($pinfo['player_robots']) : 0;
+            }
+            return $robot_counter;
+        }
+        // Otherwise we can just return the total number of robots all players have collected
+        else {
+            $robot_counter = 0;
+            foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $ptoken => $pinfo){
+                $robot_counter += isset($pinfo['player_robots']) ? count($pinfo['player_robots']) : 0;
             }
             return $robot_counter;
         }
@@ -998,12 +1032,10 @@ class rpg_game {
         // Otherwise, loop through all abilities and make sure no player has unlocked this ability
         else {
             // Loop through and collect the ability settings and rewards for all players
-            foreach ($_SESSION[$session_token]['values']['battle_abilities'] AS $player_token => $player_info){
-                if (!empty($_SESSION[$session_token]['values']['battle_abilities'])){
-                    foreach ($_SESSION[$session_token]['values']['battle_abilities'] AS $ability_token => $ability_info){
-                        if (!empty($ability_token) && !empty($ability_info) && !in_array($ability_token, $unlocked_abilities_tokens)){
-                            $unlocked_abilities_tokens[] = $ability_token;
-                        }
+            if (!empty($_SESSION[$session_token]['values']['battle_abilities'])){
+                foreach ($_SESSION[$session_token]['values']['battle_abilities'] AS $ability_key => $ability_token){
+                    if (!empty($ability_token) && !in_array($ability_token, $unlocked_abilities_tokens)){
+                        $unlocked_abilities_tokens[] = $ability_token;
                     }
                 }
             }
