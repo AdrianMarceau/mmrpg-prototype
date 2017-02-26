@@ -130,6 +130,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 $this_allowed_pages = array('home', 'about', 'gallery', 'database', 'leaderboard', 'community', 'prototype', 'credits', 'contact', 'file', 'error');
 $this_current_page = $_GET['page'] = !empty($_GET['page']) ? strtolower($_GET['page']) : false;
 $this_current_sub = $_GET['sub'] = !empty($_GET['sub']) && !is_numeric($_GET['sub']) ? strtolower($_GET['sub']) : false;
+$this_current_cat = $_GET['cat'] = !empty($_GET['cat']) && !is_numeric($_GET['cat']) ? strtolower($_GET['cat']) : false;
 $this_current_num = $_GET['num'] = !empty($_GET['num']) && is_numeric($_GET['num']) ? $_GET['num'] : 1;
 $this_current_token = $_GET['token'] = !empty($_GET['token']) ? $_GET['token'] : '';
 
