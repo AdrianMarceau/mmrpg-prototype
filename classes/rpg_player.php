@@ -62,6 +62,7 @@ class rpg_player extends rpg_object {
         $this->history = isset($this_playerinfo['history']) ? $this_playerinfo['history'] : array();
         $this->user_id = isset($this_playerinfo['user_id']) ? $this_playerinfo['user_id'] : 0;
         $this->user_token = isset($this_playerinfo['user_token']) ? $this_playerinfo['user_token'] : '';
+        $this->user_omega = isset($this_playerinfo['user_omega']) ? $this_playerinfo['user_omega'] : '';
         $this->player_id = isset($this_playerinfo['player_id']) ? $this_playerinfo['player_id'] : 0;
         $this->player_name = isset($this_playerinfo['player_name']) ? $this_playerinfo['player_name'] : 'Robot';
         $this->player_token = isset($this_playerinfo['player_token']) ? $this_playerinfo['player_token'] : 'player';
@@ -147,15 +148,19 @@ class rpg_player extends rpg_object {
 
             // Start off the user as mmrpg unless proven otherwise
             $this->user_token = 'mmrpg';
+            $this->user_omega = 'mmrpg';
 
             // If this is the currently logged-in user, collect their username token
             if ($this->player_id == $_SESSION['GAME']['USER']['userid']){
                 $this->user_token = $_SESSION['GAME']['USER']['username_clean'];
+                $this->user_omega = $_SESSION['GAME']['USER']['user_omega'];
                 $this->player_controller = 'human';
             }
             // Otherwise if different human player, collect username token from db
             elseif ($this->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
-                $this->user_token = $db->get_value("SELECT user_name_clean FROM mmrpg_users WHERE user_id = 412", 'user_name_clean');
+                $db_info = $db->get_array("SELECT user_name_clean, user_omega FROM mmrpg_users WHERE user_id = {$this->player_id};");
+                $this->user_token = $db_info['user_name_clean'];
+                $this->user_omega = $db_info['user_omega'];
             }
 
         }
@@ -1971,6 +1976,7 @@ class rpg_player extends rpg_object {
             'battle_token' => $this->battle_token,
             'user_id' => $this->user_id,
             'user_token' => $this->user_token,
+            'user_omega' => $this->user_omega,
             'player_id' => $this->player_id,
             'player_name' => $this->player_name,
             'player_token' => $this->player_token,
@@ -2946,12 +2952,11 @@ class rpg_player extends rpg_object {
                         $hidden_power_types = rpg_type::get_hidden_powers('elements');
 
                         // Generate this player's omega string, collect it's hidden power
-                        $username_string = rpg_game::get_user_string();
-                        $player_omega_string = rpg_game::generate_omega_string($username_string, 'player', $player_info['player_token']);
+                        $player_omega_string = rpg_game::generate_omega_player_string($player_info['player_token']);
                         $player_hidden_power = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
 
                         // Print out the omega indicators for the player
-                        echo '<span class="omega player_type type_'.$player_hidden_power.'" title="Omega Seed || [['.ucfirst($player_hidden_power).' Type]]">'.$player_hidden_power.'</span>'.PHP_EOL;
+                        echo '<span class="omega player_type type_'.$player_hidden_power.'" title="[[Omega '.ucfirst($player_hidden_power).']]">'.$player_hidden_power.'</span>'.PHP_EOL;
 
                     }
 

@@ -187,7 +187,7 @@ if (true){
                     if (!empty($shop_info['shop_hidden_power'])){
 
                         // Print out the omega indicators for the shop
-                        echo '<span class="omega player_type type_'.$shop_info['shop_hidden_power'].'" title="Omega Seed || [['.ucfirst($shop_info['shop_hidden_power']).' Type]]">'.$shop_info['shop_hidden_power'].'</span>'.PHP_EOL;
+                        echo '<span class="omega player_type type_'.$shop_info['shop_hidden_power'].'" title="[[Omega '.ucfirst($shop_info['shop_hidden_power']).' ]]">'.$shop_info['shop_hidden_power'].'</span>'.PHP_EOL;
                         //echo 'omega('.$shop_info['shop_omega_string'].')';
 
                     }
