@@ -1449,6 +1449,20 @@ class rpg_game {
 
     }
 
+    // Define a function for getting the current omega string from the session
+    public static function get_user_omega(){
+
+        // Define the game session helper var
+        $session_token = self::session_token();
+
+        // Attempt to collect the username
+        if (!empty($_SESSION[$session_token]['USER']['omega'])){
+            return $_SESSION[$session_token]['USER']['omega'];
+        } else {
+            return 'mmrpg';
+        }
+
+    }
 
     // Define a function for generating an omega string for a given user or robot
     public static function generate_omega_string($user_string, $string_one = '', $string_two = '', $string_three = ''){
@@ -1504,6 +1518,27 @@ class rpg_game {
         // Return the finalized omega value given available options
         return $this_omega_value;
 
+    }
+
+    // Define a function for specifically generating a shop keeper omega string
+    public static function get_omega_shop_string($shop_token, $user_omega = ''){
+        if (empty($user_omega)){ $user_omega = rpg_game::get_user_omega(); }
+        $shop_omega_string = self::generate_omega_string($user_omega, 'shop', $shop_token);
+        return $shop_omega_string;
+    }
+
+    // Define a function for specifically generating a player character omega string
+    public static function generate_omega_player_string($player_token, $user_omega = ''){
+        if (empty($user_omega)){ $user_omega = rpg_game::get_user_omega(); }
+        $player_omega_string = self::generate_omega_string($user_omega, 'player', $player_token);
+        return $player_omega_string;
+    }
+
+    // Define a function for specifically generating a robot master omega string
+    public static function generate_omega_robot_string($robot_token, $user_omega = ''){
+        if (empty($user_omega)){ $user_omega = rpg_game::get_user_omega(); }
+        $robot_omega_string = self::generate_omega_string($user_omega, 'robot', $robot_token);
+        return $robot_omega_string;
     }
 
 

@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'omega-wave',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MM00/Weapons/Omega',
-    'ability_description' => 'The user taps into its hidden powers to generate a wave of elemental energy. This ability\'s types appear to differ between robots and players.',
+    'ability_description' => 'The users taps into their hidden power to generate a wave of elemental energy. This ability\'s types appear to differ between player-robot combinations.',
     'ability_type' => '',
     'ability_energy' => 8,
     'ability_damage' => 32,
@@ -63,14 +63,14 @@ $ability = array(
         $hidden_power_types = rpg_type::get_hidden_powers();
 
         // Generate this robot's omega string, collect it's hidden power, and update type1
-        $robot_omega_string = rpg_game::generate_omega_string($this_player->user_token, 'robot', $this_robot->robot_token);
+        $robot_omega_string = rpg_game::generate_omega_robot_string($this_robot->robot_token, $this_player->user_omega);
         $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
         $robot_ability_image = $this_ability->get_base_image().'_'.$robot_hidden_power;
         $this_ability->set_type($robot_hidden_power);
         $this_ability->set_image($robot_ability_image);
 
         // Generate this player's omega string, collect their hidden power, and update type2
-        $player_omega_string = rpg_game::generate_omega_string($this_player->user_token, 'player', $this_player->player_token);
+        $player_omega_string = rpg_game::generate_omega_player_string($this_player->player_token, $this_player->user_omega);
         $player_hidden_power = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
         $player_ability_image = $this_ability->get_base_image().'_'.$player_hidden_power.'2';
         if ($player_hidden_power != $robot_hidden_power){

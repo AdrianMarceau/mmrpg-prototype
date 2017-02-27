@@ -4274,12 +4274,11 @@ class rpg_robot extends rpg_object {
                     $hidden_power_types = rpg_type::get_hidden_powers('elements');
 
                     // Generate this robot's omega string, collect it's hidden power
-                    $username_string = rpg_game::get_user_string();
-                    $robot_omega_string = rpg_game::generate_omega_string($username_string, 'robot', $robot_info['robot_token']);
+                    $robot_omega_string = rpg_game::generate_omega_robot_string($robot_info['robot_token']);
                     $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
 
                     // Print out the omega indicators for the robot
-                    echo '<span class="omega robot_type type_'.$robot_hidden_power.'" data-tooltip="Omega Seed || [['.ucfirst($robot_hidden_power).' Type]]">'.$robot_hidden_power.'</span>'.PHP_EOL;
+                    echo '<span class="omega robot_type type_'.$robot_hidden_power.'" data-tooltip="[[Omega '.ucfirst($robot_hidden_power).']]">'.$robot_hidden_power.'</span>'.PHP_EOL;
 
                 }
 

@@ -406,8 +406,7 @@ if (rpg_game::omega_abilities_unlocked()){
         $hidden_power_types = rpg_type::get_hidden_powers($hidden_power_kind);
 
         // Generate this shop's omega string, collect it's hidden power
-        $username_string = rpg_game::get_user_string();
-        $shop_omega_string = rpg_game::generate_omega_string($username_string, 'shop', $shop_token);
+        $shop_omega_string = rpg_game::get_omega_shop_string($shop_token);
         $shop_hidden_power = rpg_game::select_omega_value($shop_omega_string, $hidden_power_types);
         $this_shop_index[$shop_token]['shop_omega_string'] = $shop_omega_string;
         $this_shop_index[$shop_token]['shop_hidden_power'] = $shop_hidden_power;
