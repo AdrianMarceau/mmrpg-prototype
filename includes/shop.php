@@ -345,6 +345,7 @@ if (!empty($this_shop_index)){
 
         // Default this shop's level to zero for later
         $this_shop_index[$shop_token]['shop_level'] = 0;
+
         // Unlock the shop if the associated doctor has completed chapter one
         $shop_player = $shop_info['shop_player'];
         $shop_selling = $shop_info['shop_kind_selling'];
@@ -387,10 +388,32 @@ if (!empty($this_shop_index)){
             unset($this_shop_index[$shop_token]);
             // Update this shop's level in the index
             //$this_shop_index[$shop_token]['shop_level'] = 0;
-            //
+
         }
 
     }
+}
+
+
+// Collect omega values for each shop if applicable
+if (rpg_game::omega_abilities_unlocked()){
+
+    // Loop through the shop index and collect omega values
+    foreach ($this_shop_index AS $shop_token => $shop_info){
+
+        // Collect possible hidden power types
+        $hidden_power_kind = $shop_token == 'auto' ? 'stats' : 'elements';
+        $hidden_power_types = rpg_type::get_hidden_powers($hidden_power_kind);
+
+        // Generate this shop's omega string, collect it's hidden power
+        $username_string = rpg_game::get_user_string();
+        $shop_omega_string = rpg_game::generate_omega_string($username_string, 'shop', $shop_token);
+        $shop_hidden_power = rpg_game::select_omega_value($shop_omega_string, $hidden_power_types);
+        $this_shop_index[$shop_token]['shop_omega_string'] = $shop_omega_string;
+        $this_shop_index[$shop_token]['shop_hidden_power'] = $shop_hidden_power;
+
+    }
+
 }
 
 
@@ -498,6 +521,20 @@ if (!empty($this_shop_index['auto'])){
         foreach ($this_shop_index['auto']['shop_items']['items_buying'] AS $token => $price){
             if (!in_array($token, $key_items) && !in_array($token, $global_unlocked_items_tokens)){
                 unset($this_shop_index['auto']['shop_items']['items_buying'][$token]);
+            }
+        }
+    }
+
+    // If Robots or Abilities have been unlocked, increase the core selling prices
+    if (!empty($this_shop_index['auto']['shop_hidden_power'])){
+        if (!empty($this_shop_index['auto']['shop_items']['items_buying'])){
+            $items_list = $this_shop_index['auto']['shop_items']['items_buying'];
+            foreach ($items_list AS $item_token => $item_price){
+                $type_token = preg_replace('/-(pellet|capsule|tank)$/', '', $item_token);
+                $omega_boost = $this_shop_index['auto']['shop_hidden_power'] == $type_token ? 1 : 0;
+                $omega_price_boost = ceil($omega_boost * $item_price * 0.50);
+                $item_price += $omega_price_boost;
+                $this_shop_index['auto']['shop_items']['items_buying'][$item_token] = $item_price;
             }
         }
     }
@@ -660,7 +697,6 @@ if (!empty($this_shop_index['reggae'])){
 
             */
 
-
         }
 
         // If Robots or Abilities have been unlocked, increase the core selling prices
@@ -670,14 +706,17 @@ if (!empty($this_shop_index['reggae'])){
                 foreach ($items_list AS $item_token => $item_price){
                     $type_token = preg_replace('/-core$/', '', $item_token);
                     $star_boost = !empty($this_star_force[$type_token]) ? $this_star_force[$type_token] : 0;
-                    $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
                     $ability_boost = !empty($global_unlocked_abilities_types[$type_token]) ? $global_unlocked_abilities_types[$type_token] : 0;
+                    $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
+                    $omega_boost = !empty($this_shop_index['reggae']['shop_hidden_power']) && $this_shop_index['reggae']['shop_hidden_power'] == $type_token ? 1 : 0;
                     $star_price_boost = ceil($star_boost * 25);
                     $ability_price_boost = ceil($ability_boost * 50);
                     $robot_price_boost = ceil($robot_boost * 100);
+                    $omega_price_boost = ceil($omega_boost * $item_price * 0.50);
                     $item_price += $star_price_boost;
-                    $item_price += $robot_price_boost;
                     $item_price += $ability_price_boost;
+                    $item_price += $robot_price_boost;
+                    $item_price += $omega_price_boost;
                     $this_shop_index['reggae']['shop_items']['items_buying'][$item_token] = $item_price;
                 }
             }
@@ -702,43 +741,43 @@ if (!empty($this_shop_index['reggae'])){
 // Only continue if the shop has been unlocked
 if (!empty($this_shop_index['kalinka'])){
 
-        // If Kalinka's Shop has reached sufficient levels, expand the inventory
-        if ($this_shop_index['kalinka']['shop_level'] >= 30){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
-        unset($this_shop_index['kalinka']['shop_items']['items_selling2']);
+    // If Kalinka's Shop has reached sufficient levels, expand the inventory
+    if ($this_shop_index['kalinka']['shop_level'] >= 30){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
+    unset($this_shop_index['kalinka']['shop_items']['items_selling2']);
 
-        // If the player has completed the prototype, Kalinka's Shop also sells fields
-        if (mmrpg_prototype_item_unlocked('field-codes')){
-            $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
-            $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I think I\'ve discoved a way to generate new starforce, but it\'ll require additional research. Interested?';
-            $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
-                'construction-site' => 48000, 'magnetic-generator' => 48000,
-                'reflection-chamber' => 48000, 'rocky-plateau' => 48000,
-                'spinning-greenhouse' => 48000, 'serpent-column' => 48000,
-                'power-plant' => 48000, 'septic-system' => 48000
-                );
+    // If the player has completed the prototype, Kalinka's Shop also sells fields
+    if (mmrpg_prototype_item_unlocked('field-codes')){
+        $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
+        $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I think I\'ve discoved a way to generate new starforce, but it\'ll require additional research. Interested?';
+        $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
+            'construction-site' => 48000, 'magnetic-generator' => 48000,
+            'reflection-chamber' => 48000, 'rocky-plateau' => 48000,
+            'spinning-greenhouse' => 48000, 'serpent-column' => 48000,
+            'power-plant' => 48000, 'septic-system' => 48000
+            );
+    }
+
+    // If Kalinka's Shop has reached sufficient levels, decrease her selling prices
+    if ($this_shop_index['kalinka']['shop_level'] > 1){
+        $level_discount = $this_battle_shops['kalinka']['shop_level'] / 100;
+
+        // If her shop is selling items, discount their prices
+        if (!empty($this_shop_index['kalinka']['shop_items']['items_selling'])){
+            foreach ($this_shop_index['kalinka']['shop_items']['items_selling'] AS $field_kind => $field_price){
+                $field_price -= round(($field_price / 2) * $level_discount);
+                $this_shop_index['kalinka']['shop_items']['items_selling'][$field_kind] = $field_price;
+            }
         }
 
-        // If Kalinka's Shop has reached sufficient levels, decrease her selling prices
-        if ($this_shop_index['kalinka']['shop_level'] > 1){
-            $level_discount = $this_battle_shops['kalinka']['shop_level'] / 100;
-
-            // If her shop is selling items, discount their prices
-            if (!empty($this_shop_index['kalinka']['shop_items']['items_selling'])){
-                foreach ($this_shop_index['kalinka']['shop_items']['items_selling'] AS $field_kind => $field_price){
-                    $field_price -= round(($field_price / 2) * $level_discount);
-                    $this_shop_index['kalinka']['shop_items']['items_selling'][$field_kind] = $field_price;
-                }
+        // If her shop is selling fields, discount their prices
+        if (!empty($this_shop_index['kalinka']['shop_fields']['fields_selling'])){
+            foreach ($this_shop_index['kalinka']['shop_fields']['fields_selling'] AS $field_kind => $field_price){
+                $field_price -= round(($field_price / 2) * $level_discount);
+                $this_shop_index['kalinka']['shop_fields']['fields_selling'][$field_kind] = $field_price;
             }
-
-            // If her shop is selling fields, discount their prices
-            if (!empty($this_shop_index['kalinka']['shop_fields']['fields_selling'])){
-                foreach ($this_shop_index['kalinka']['shop_fields']['fields_selling'] AS $field_kind => $field_price){
-                    $field_price -= round(($field_price / 2) * $level_discount);
-                    $this_shop_index['kalinka']['shop_fields']['fields_selling'][$field_kind] = $field_price;
-                }
-            }
-
         }
+
+    }
 
 }
 
