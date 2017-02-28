@@ -94,7 +94,7 @@ while ($this_action == 'profile'){
                 // Update this user's accont password in the db
                 $html_form_messages .= '<span class="success">(!) Your account password has been changed.</span>';
                 $temp_password = $_POST['password_new'];
-                $temp_password_encoded = md5($temp_password);
+                $temp_password_encoded = md5(MMRPG_SETTINGS_USER_SALT.$temp_password);
                 $db->update('mmrpg_users', array(
                     'user_password' => $temp_password,
                     'user_password_encoded' => $temp_password_encoded
@@ -112,17 +112,21 @@ while ($this_action == 'profile'){
             $user_displayname = !empty($_POST['displayname']) ? preg_replace('/[^-_a-z0-9\.\s]+/i', '', trim($_POST['displayname'])) : '';
             $user_emailaddress = !empty($_POST['emailaddress']) ? preg_replace('/[^-_a-z0-9\.\+@]+/i', '', trim($_POST['emailaddress'])) : '';
             $user_websiteaddress = !empty($_POST['websiteaddress']) ? 'http://'.preg_replace('/^https?:\/\//i', '', trim($_POST['websiteaddress'])) : '';
+
             $user_profiletext = !empty($_POST['profiletext']) ? strip_tags(trim($_POST['profiletext'])) : '';
             $user_creditstext = !empty($_POST['creditstext']) ? strip_tags(trim($_POST['creditstext'])) : '';
             $user_creditsline = !empty($_POST['creditsline']) ? strip_tags(trim($_POST['creditsline'])) : '';
+
+            $user_omega_seed = !empty($_POST['omega_seed']) ? trim(preg_replace('/[^-_0-9a-z\.\s\,\?\!]+/i', '', $_POST['omega_seed'])) : '';
+            $user_omega_seed = preg_replace('/\s+/', ' ', $user_omega_seed);
+            if (!empty($user_omega_seed) && strlen($user_omega_seed) < 6){ $user_omega_seed = ''; }
+            elseif (!empty($user_omega_seed) && strlen($user_omega_seed) > 32){ $user_omega_seed = ''; }
 
             // Check if the password has changed at all
             if (true){
 
                 // Backup the current game's filename for deletion purposes
                 $backup_user = $_SESSION['GAME']['USER'];
-                $backup_file = $_SESSION['GAME']['FILE'];
-                $backup_save_filepath = $this_save_dir.$backup_file['path'].$backup_file['name'];
 
                 // Update the current game's user and file info using the new password
                 $_SESSION['GAME']['USER']['displayname'] = $user_displayname;
@@ -135,7 +139,9 @@ while ($this_action == 'profile'){
                 $_SESSION['GAME']['USER']['backgroundpath'] = $_POST['backgroundpath'];
                 $_SESSION['GAME']['USER']['colourtoken'] = $_POST['colourtoken'];
                 $_SESSION['GAME']['USER']['gender'] = $_POST['gender'];
-                $this_save_filepath = $this_save_dir.$_SESSION['GAME']['FILE']['path'].$_SESSION['GAME']['FILE']['name'];
+                if (!empty($user_omega_seed)){
+                    $_SESSION['GAME']['USER']['omega'] = md5(MMRPG_SETTINGS_OMEGA_SEED.$user_omega_seed);
+                }
 
             }
 
@@ -147,12 +153,6 @@ while ($this_action == 'profile'){
         $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
         $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
         $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
-
-        //die($this_save_filepath);
-        // If a game session's info was backup up for deletion
-        if (!empty($backup_save_filepath) && $backup_save_filepath != $this_save_filepath){
-            @unlink($backup_save_filepath);
-        }
 
         // Update the has updated flag variable
         $file_has_updated = true;
@@ -384,6 +384,16 @@ while ($this_action == 'profile'){
         $html_form_fields .= '<select class="select select_backgroundpath" style="width: 100%; " name="backgroundpath">'.$temp_select_options.'</select>';
     $html_form_fields .= '</div>';
 
+    $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px;">';
+        $html_form_fields .= '<label class="label label_omega" style="width: 230px; ">Omega Sequence :</label>';
+        $html_form_fields .= '<input class="text text_omega" style="width: 100%; opacity: 0.5;" type="text" name="omega" maxlength="32" value="'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['omega']) ? $_SESSION['GAME']['USER']['omega'] : ''), ENT_QUOTES, 'UTF-8', true).'" disabled="disabled" />';
+    $html_form_fields .= '</div>';
+
+    $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px;">';
+        $html_form_fields .= '<label class="label label_omega_seed" style="width: 230px; ">Regenerate Sequence :</label>';
+        $html_form_fields .= '<input class="text text_omega_seed" style="width: 100%; " type="text" name="omega_seed" maxlength="32" value="" />';
+    $html_form_fields .= '</div>';
+
 
     // IF CONTRIBUTOR OR ADMIN
     if (in_array($_SESSION['GAME']['USER']['roleid'], array(1, 6, 2, 7))){
@@ -401,7 +411,6 @@ while ($this_action == 'profile'){
         $html_form_fields .= '</div>';
 
     }
-
 
     $html_form_fields .= '<div class="field">';
         $html_form_fields .= '<label class="label label_profiletext" style="width: 230px; ">Profile Description :</label>';
@@ -536,7 +545,6 @@ while ($this_action == 'new'){
         $this_user['username'] = trim($_REQUEST['username']);
         $this_user['username_clean'] = preg_replace('/[^-a-z0-9]+/i', '', strtolower($this_user['username']));
         $this_user['emailaddress'] = trim(strtolower($_REQUEST['emailaddress']));
-        //$this_user['websiteaddress'] = trim(strtolower($_REQUEST['websiteaddress']));
         $this_user['dateofbirth'] = trim(strtotime($_REQUEST['dateofbirth']));
         $this_user['approved'] = 1;
         $this_user['imagepath'] = '';
@@ -544,24 +552,22 @@ while ($this_action == 'new'){
         $this_user['colourtoken'] = '';
         $this_user['gender'] = 'male';
         $this_user['password'] = trim($_REQUEST['password']);
-        $this_user['password_encoded'] = md5($this_user['password']);
-        $this_user['omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
-        $this_file = array();
-        $this_file['path'] = $this_user['username_clean'].'/';
-        $this_file['name'] = $this_user['omega'].'.sav';
+        $this_user['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$this_user['password']);
+        $this_user['omega'] = md5(MMRPG_SETTINGS_OMEGA_SEED.$this_user['username_clean']);
 
-        // Update the save path with the filename
-        $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
         // Update the necessary game session variables
         $_SESSION['GAME']['DEMO'] = 0;
         $_SESSION['GAME']['USER'] = $this_user;
-        $_SESSION['GAME']['FILE'] = $this_file;
+
         // Reset the game session to start fresh
-        mmrpg_reset_game_session($this_save_filepath);
+        mmrpg_reset_game_session();
+
         // Save this new game session into the file
-        mmrpg_save_game_session($this_save_filepath);
+        mmrpg_save_game_session();
+
         // Load the save file back into memory and overwrite the session
-        mmrpg_load_game_session($this_save_filepath);
+        mmrpg_load_game_session();
+
         // Update the form markup, then break from the loop
         $file_has_updated = true;
 
@@ -680,18 +686,13 @@ while ($this_action == 'load'){
         $this_user['username'] = trim($_REQUEST['username']);
         $this_user['username_clean'] = preg_replace('/[^-a-z0-9]+/i', '', strtolower($this_user['username']));
         $this_user['password'] = trim($_REQUEST['password']);
-        $this_user['password_encoded'] = md5($this_user['password']);
+        $this_user['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$this_user['password']);
 
         // The file exists, so let's collect this user's info from teh database
         $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
 
         // Check if the requested save file path exists
         if (!empty($temp_database_user)){
-
-            // Create the file array with save data path
-            $this_file = array();
-            $this_file['path'] = $temp_database_user['user_name_clean'].'/';
-            $this_file['name'] = $temp_database_user['user_omega'].'.sav';
 
             // And now let's let's check the password
             if ($this_user['password_encoded'] == $temp_database_user['user_password_encoded']){
@@ -706,20 +707,17 @@ while ($this_action == 'load'){
                     // The password was correct! Update the session with these credentials
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
-                    $_SESSION['GAME']['FILE'] = $this_file;
 
                     // Load the save file into memory and overwrite the session
-                    $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
-                    mmrpg_load_game_session($this_save_filepath);
+                    mmrpg_load_game_session();
                     if (empty($_SESSION['GAME']['counters']['battle_points'])){
-                        //die('battle points are empty on line '.__LINE__);
-                        mmrpg_reset_game_session($this_save_filepath);
+                        mmrpg_reset_game_session();
                     } elseif (empty($_SESSION['GAME']['values']['battle_rewards'])){
-                        //die('battle rewards are empty on line '.__LINE__);
-                        mmrpg_reset_game_session($this_save_filepath);
+                        mmrpg_reset_game_session();
                     } else {
-                        mmrpg_save_game_session($this_save_filepath);
+                        mmrpg_save_game_session();
                     }
+
                     // Update the form markup, then break from the loop
                     $file_has_updated = true;
                     break;
@@ -763,21 +761,18 @@ while ($this_action == 'load'){
                     // The password was correct! Update the session with these credentials
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
-                    $_SESSION['GAME']['FILE'] = $this_file;
 
                     // Load the save file into memory and overwrite the session
-                    $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
-                    mmrpg_load_game_session($this_save_filepath);
+                    mmrpg_load_game_session();
                     if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
-                        //die('battle points are empty 1');
-                        mmrpg_reset_game_session($this_save_filepath);
+                        mmrpg_reset_game_session();
                     }
 
                     // Update the file with the coppa approval flag and birthdate
                     $_SESSION['GAME']['USER']['dateofbirth'] = strtotime($_REQUEST['dateofbirth']);
                     $_SESSION['GAME']['USER']['approved'] = 1;
-                    //die('<pre>$_SESSION[GAME][USER] = '.print_r($_SESSION['GAME']['USER'], true).'</pre>');
-                    mmrpg_save_game_session($this_save_filepath);
+
+                    mmrpg_save_game_session();
 
                     // Update the form markup, then break from the loop
                     $file_has_updated = true;
@@ -812,6 +807,7 @@ while ($this_action == 'load'){
 
     // Update the header markup title
     $html_header_title .= 'Load Existing Game File';
+
     // Update the header markup text
     $html_header_text .= 'Please enter the username and password of your save file below. Passwords are case-sensitive, though usernames are not.';
     if ($html_form_show_coppa){
@@ -833,12 +829,13 @@ while ($this_action == 'load'){
             $html_form_fields .= '<input class="text text_dateofbirth" type="text" name="dateofbirth" style="width: 230px; " value="'.(!empty($_REQUEST['dateofbirth']) ? htmlentities(trim($_REQUEST['dateofbirth']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="10" />';
         $html_form_fields .= '</div>';
     }
+
     // Update the form markup buttons
     $html_form_buttons .= '<input class="button button_submit" type="submit" value="Load File" />';
     //$html_form_buttons .= '<input class="button button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
 
     // If the file has been updated, update the data
-    if ($file_has_updated){
+    if ($file_has_updated && !empty($temp_database_user['user_id'])){
 
         // Update the form messages markup text
         $html_form_messages .= '<span class="success">(!) Thank you.  Your game has been loaded.</span>';
@@ -846,44 +843,39 @@ while ($this_action == 'load'){
         $html_form_fields = '<script type="text/javascript"> setTimeout(function(){ window.location.href=\''.MMRPG_CONFIG_ROOTURL.'\'; }, 1000); </script>';
         // Update the form markup buttons
         $html_form_buttons = '<input class="button button_continue" type="button" value="Continue" onclick="javascript:parent.window.location.href=\''.MMRPG_CONFIG_ROOTURL.'\';" />';
+
+        // Update the session with the pending login ID
+        $_SESSION['GAME']['PENDING_LOGIN_ID'] = $temp_database_user['user_id'];
+        $_SESSION['GAME']['USER']['userid'] = $temp_database_user['user_id'];
+        mmrpg_load_game_session();
+
+        /*
+        echo('<pre>$_POST = '.print_r($_POST, true).'</pre>');
+        echo('<pre>$_SESSION[GAME][PENDING_LOGIN_ID] = '.print_r($_SESSION['GAME']['PENDING_LOGIN_ID'], true).'</pre>');
+        echo('<pre>$_SESSION[GAME][USER] = '.print_r($_SESSION['GAME']['USER'], true).'</pre>');
+        exit();
+        */
+
         // Redirect without wasting time to the home again
         header('Location: '.MMRPG_CONFIG_ROOTURL);
+        exit();
+
 
     }
 
     // Break from the LOAD loop
     break;
+
 }
 // Else, if the EXIT action was requested
 while ($this_action == 'exit'){
 
-    // Auto-generate the user and file info based on their IP
-    $this_user = array();
-    $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
-    $this_user['username'] = 'demo';
-    $this_user['username_clean'] = 'demo';
-    $this_user['imagepath'] = '';
-    $this_user['backgroundpath'] = '';
-    $this_user['colourtoken'] = '';
-    $this_user['gender'] = 'male';
-    $this_user['password'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo';
-    $this_user['password_encoded'] = md5($this_user['password']);
-    $this_user['omega'] = rpg_game::generate_omega_string($this_user['username_clean']);;
-    $this_file = array();
-    $this_file['path'] = $this_user['username_clean'].'/';
-    $this_file['name'] = $this_user['omega'].'.sav';
-    // Update the session with these demo variables
-    $_SESSION['GAME']['DEMO'] = 1;
-    $_SESSION['GAME']['USER'] = $this_user;
-    $_SESSION['GAME']['FILE'] = $this_file;
-    $_SESSION['GAME']['counters']['battle_points'] = 0;
-    // Update the global save path variable
-    $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
-    // Reset the game session and reload the page
-    mmrpg_reset_game_session($this_save_filepath);
+    // Exit the game and enter demo mode
+    rpg_game::exit_session();
 
     // Clear the community thread tracker
     $_SESSION['COMMUNITY']['threads_viewed'] = array();
+
     // Collect the recently updated posts for this player / guest
     $temp_last_login = time() - MMRPG_SETTINGS_UPDATE_TIMEOUT;
     $temp_new_threads = $db->get_array_list("SELECT CONCAT(thread_id, '_', thread_mod_date) AS thread_session_token FROM mmrpg_threads WHERE thread_mod_date > {$temp_last_login}");

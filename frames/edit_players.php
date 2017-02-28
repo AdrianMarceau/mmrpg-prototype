@@ -105,7 +105,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
         // Save, produce the success message with the new field order
-        mmrpg_save_game_session($this_save_filepath);
+        mmrpg_save_game_session();
         exit('success|field-removed|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
     }
@@ -136,7 +136,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
         // Save, produce the success message with the new field order
-        mmrpg_save_game_session($this_save_filepath);
+        mmrpg_save_game_session();
         exit('success|field-shuffled|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
 
@@ -177,7 +177,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
         // Save, produce the success message with the new field order
-        mmrpg_save_game_session($this_save_filepath);
+        mmrpg_save_game_session();
         exit('success|field-randomize|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
 
@@ -209,7 +209,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
         // Save, produce the success message with the new field order
-        mmrpg_save_game_session($this_save_filepath);
+        mmrpg_save_game_session();
         exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
     }
@@ -247,7 +247,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
         // Save, produce the success message with the new field order
-        mmrpg_save_game_session($this_save_filepath);
+        mmrpg_save_game_session();
         exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
     } else {

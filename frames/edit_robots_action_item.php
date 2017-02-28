@@ -58,7 +58,7 @@ if (empty($robot_ability_settings)){ $robot_ability_settings['buster-shot'] = ar
 $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] = $robot_ability_settings;
 
 // Regardless of what happened before, update this robot's item in the session and save
-rpg_game::save_session($this_save_filepath);
+rpg_game::save_session();
 exit('success|item-updated|'.$temp_item.'|'.$allowed_ability_ids);
 //exit('success|item-updated|'.$temp_item);
 

@@ -180,6 +180,11 @@
             $form_data['user_flag_postprivate'] = isset($_POST['user_flag_postprivate']) && is_numeric($_POST['user_flag_postprivate']) ? trim($_POST['user_flag_postprivate']) : 0;
             $form_data['user_flag_allowchat'] = isset($_POST['user_flag_allowchat']) && is_numeric($_POST['user_flag_allowchat']) ? trim($_POST['user_flag_allowchat']) : 0;
 
+            $user_omega_seed = !empty($_POST['user_omega_seed']) ? trim(preg_replace('/[^-_0-9a-z\.\s\,\?\!]+/i', '', $_POST['user_omega_seed'])) : '';
+            $user_omega_seed = preg_replace('/\s+/', ' ', $user_omega_seed);
+            if (!empty($user_omega_seed) && strlen($user_omega_seed) < 6){ $user_omega_seed = ''; }
+            elseif (!empty($user_omega_seed) && strlen($user_omega_seed) > 32){ $user_omega_seed = ''; }
+
             $user_password_new = !empty($_POST['user_password_new']) ? trim($_POST['user_password_new']) : '';
             $user_password_new2 = !empty($_POST['user_password_new2']) ? trim($_POST['user_password_new2']) : '';
 
@@ -267,6 +272,21 @@
                 unset($form_data['user_ip_addresses']);
             }
 
+            // If trying to update the OMEGA STRING but it was invalid, do not update
+            if (empty($user_omega_seed) && !empty($_POST['user_omega_seed'])){
+                $form_messages[] = array('warning', 'Omega sequence input was invalid and will not be updated');
+            }
+            // Otherwise, we should generate a new omega sequence using the new string
+            else {
+
+                // Generate the new omega sequence from the seed value and update
+                $user_omega_sequence = md5(MMRPG_SETTINGS_OMEGA_SEED.$user_omega_seed);
+                $form_data['user_omega'] = $user_omega_sequence;
+                $form_messages[] = array('alert', 'The omega sequence was regenerated successfully');
+
+            }
+
+
             // Validate a password change request with special care
             if (!empty($user_password_new)){
 
@@ -290,7 +310,7 @@
                 // If password update successful, we can save details
                 if ($update_password){
                     $form_data['user_password'] = $user_password_new;
-                    $form_data['user_password_encoded'] = md5($user_password_new);
+                    $form_data['user_password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$user_password_new);
                     $form_messages[] = array('alert', 'The account password was updated successfully');
                 }
 
@@ -679,11 +699,21 @@
                     <div class="field">
                         <div class="label">
                             <strong>Omega Sequence</strong>
-                            <em>procedural generator seed</em>
+                            <em>procedural generation string</em>
                         </div>
                         <input type="hidden" name="user_omega" value="<?= $user_data['user_omega'] ?>" />
-                        <input class="textbox" type="text" name="user_omega" value="<?= $user_data['user_omega'] ?>" maxlength="32" disabled="disabled" />
+                        <input class="textbox" type="text" name="user_omega" value="<?= $user_data['user_omega'] ?>" disabled="disabled" maxlength="32" />
                     </div>
+
+                    <div class="field">
+                        <div class="label">
+                            <strong>Regenerate Sequence</strong>
+                            <em>enter new seed value</em>
+                        </div>
+                        <input class="textbox" type="text" name="user_omega_seed" value="" maxlength="32" />
+                    </div>
+
+                    <hr />
 
                     <div class="field">
                         <div class="label">

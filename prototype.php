@@ -26,13 +26,13 @@ $prototype_window_event_messages = array();
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
 
     // Reset the game session and reload the page
-    mmrpg_reset_game_session($this_save_filepath);
+    mmrpg_reset_game_session();
+
     // Update the appropriate session variables
     $_SESSION[$session_token]['USER'] = $this_user;
-    $_SESSION[$session_token]['FILE'] = $this_file;
 
     // Load the save file into memory and overwrite the session
-    mmrpg_save_game_session($this_save_filepath);
+    mmrpg_save_game_session();
 
     // DEBUG DEBUG DEBUG
 
@@ -53,7 +53,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
     }
 
     // Load the save file into memory and overwrite the session
-    mmrpg_save_game_session($this_save_filepath);
+    mmrpg_save_game_session();
 
     //header('Location: prototype.php');
     unset($db);
@@ -64,30 +64,8 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
 // Check if a exit request has been placed
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
 
-    // Auto-generate the user and file info based on their IP
-    $omega = md5(!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo');
-    $this_user = array();
-    $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
-    $this_user['username'] = 'demo';
-    $this_user['username_clean'] = 'demo';
-    $this_user['imagepath'] = '';
-    $this_user['colourtoken'] = '';
-    $this_user['gender'] = 'male';
-    $this_user['password'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo';
-    $this_user['password_encoded'] = md5($this_user['password']);
-    $this_user['omega'] = $omega;
-    $this_file = array();
-    $this_file['path'] = $this_user['username_clean'].'/';
-    $this_file['name'] = $this_user['omega'].'.sav';
-    // Update the session with these demo variables
-    $_SESSION[$session_token]['DEMO'] = 1;
-    $_SESSION[$session_token]['USER'] = $this_user;
-    $_SESSION[$session_token]['FILE'] = $this_file;
-    $_SESSION[$session_token]['counters']['battle_points'] = 0;
-    // Update the global save path variable
-    $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
-    // Reset the game session and reload the page
-    mmrpg_reset_game_session($this_save_filepath);
+    // Exit the game and enter demo mode
+    rpg_game::exit_session();
 
     // Exit on success
     unset($db);
@@ -200,11 +178,14 @@ require('prototype_awards.php');
 
 
 // If possible, attempt to save the game to the session
-if (empty($_SESSION[$session_token]['DEMO']) && !empty($this_save_filepath)){
+if (rpg_game::is_user()){
+
     // Recalculate the overall battle points total with new values
     mmrpg_prototype_calculate_battle_points(true);
+
     // Save the game session
-    mmrpg_save_game_session($this_save_filepath);
+    mmrpg_save_game_session();
+
 }
 
 ?>

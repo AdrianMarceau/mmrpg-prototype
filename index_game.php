@@ -33,12 +33,14 @@ $this_graph_data = array(
 // If a reset was intentionally called
 if (!empty($_GET['reset']) || (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE)){
     // Reset the game session
-    mmrpg_reset_game_session($this_save_filepath);
+    mmrpg_reset_game_session();
 }
 // Else if this is an out-of-sync demo
 elseif (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE){
+
     // Reset the game session
-    mmrpg_reset_game_session($this_save_filepath);
+    mmrpg_reset_game_session();
+
 }
 // Check if the session has not been created or the cache date has changed
 elseif (
@@ -48,17 +50,17 @@ elseif (
     ){
 
     // Ensure there is a save file to load
-    if (!empty($this_save_filepath) && file_exists($this_save_filepath)){
+    if (!empty($_SESSION['GAME']['USER']['userid']) && $_SESSION['GAME']['USER']['userid'] != MMRPG_SETTINGS_GUEST_ID){
 
         // Load the save file into memory and overwrite the session
-        mmrpg_load_game_session($this_save_filepath);
+        mmrpg_load_game_session();
 
     }
     // Otherwise, simply reset the game
     else {
 
         // Reset the game session
-        mmrpg_reset_game_session($this_save_filepath);
+        mmrpg_reset_game_session();
     }
 
     // Update the cache date to reflect the reload

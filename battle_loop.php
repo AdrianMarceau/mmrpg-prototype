@@ -546,10 +546,9 @@ elseif (empty($this_redirect) && $this_battle->battle_status == 'complete'){
 }
 
 // If possible, attempt to save the game to the session with recent changes
-//if (!empty($this_save_filepath)){  // Why were we writing to the database/file soooo often?
-if (!empty($this_save_filepath) && $this_battle->battle_status == 'complete'){
+if ($this_battle->battle_status == 'complete'){
     // Save the game session
-    mmrpg_save_game_session($this_save_filepath);
+    mmrpg_save_game_session();
 }
 
 // Determine the next action based on everything that's happened

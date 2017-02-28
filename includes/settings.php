@@ -35,8 +35,9 @@ define('MMRPG_SETTINGS_ACTIVE_TIMEOUT', (60 * 60 * 24 * 90)); // In seconds (60s
 define('MMRPG_SETTINGS_LEGACY_TIMEOUT', (60 * 60 * 24 * 365)); // In seconds (60sec x 60min x 24hr x 365days)
 define('MMRPG_SETTINGS_UPDATE_TIMEOUT', (60 * 60 * 24 * 1)); // In seconds (60sec x 60min x 24hr x 1days)
 
-// Define the global omega seed for generating strings
-define('MMRPG_SETTINGS_OMEGA_SEED', 'AM19870328'); // Never change this value
+// Define the global password salt and omega seed strings if not already set
+if (!defined('MMRPG_SETTINGS_PASSWORD_SALT')){ define('MMRPG_SETTINGS_PASSWORD_SALT', 'mmrpg'); }
+if (!defined('MMRPG_SETTINGS_OMEGA_SEED')){ define('MMRPG_SETTINGS_OMEGA_SEED', 'mmrpg'); }
 
 // Define the global guest ID to prevent confusion
 define('MMRPG_SETTINGS_GUEST_ID', 888888); // Doubt we'll ever get this many users

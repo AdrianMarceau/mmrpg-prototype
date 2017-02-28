@@ -55,7 +55,7 @@
 
   // If there were save file corruptions, reset
   if (empty($this_prototype_data['robots_unlocked'])){
-    mmrpg_reset_game_session($this_save_filepath);
+    mmrpg_reset_game_session();
     header('Location: prototype.php');
     exit();
   }

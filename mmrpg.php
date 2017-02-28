@@ -62,63 +62,19 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     //ini_set('memory_limit', '128M');
     //ini_set('memory_limit', '-1');
 
-    // Define the first load boolean variable
-    $this_first_load = false;
     // Define the game cache location path
     $this_cache_dir = MMRPG_CONFIG_CACHE_PATH;
-    // Define the game save location path
-    $this_save_dir = MMRPG_CONFIG_SAVES_PATH;
 
-    // If the user and file details have already been loaded to the session
-    if (
-        !empty($_SESSION['GAME']['USER']) && !empty($_SESSION['GAME']['USER']['username']) && !empty($_SESSION['GAME']['USER']['omega'])
-        && !empty($_SESSION['GAME']['FILE']) && !empty($_SESSION['GAME']['FILE']['path']) && !empty($_SESSION['GAME']['FILE']['name'])
-        ){
+    // Reset the session completed if user ID not set
+    if (empty($_SESSION['GAME']['USER']['userid'])){
 
-        // Pull the user and file info from the session
-        $this_user = $_SESSION['GAME']['USER'];
-        $this_file = $_SESSION['GAME']['FILE'];
-
-        // Update the save filepath with the file path and name
-        $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
-
-    }
-    // Otherwise, if we're in demo mode, populate manually
-    else {
-
-        // Auto-generate the user and file info based on their IP
-        $this_user = array();
-        $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
-        $this_user['username'] = 'demo';
-        $this_user['username_clean'] = 'demo';
-        $this_user['imagepath'] = '';
-        $this_user['colourtoken'] = '';
-        $this_user['gender'] = '';
-        $this_user['password'] = '';
-        $this_user['password_encoded'] = '';
-        $this_user['omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
-        $this_file = array();
-        $this_file['path'] = $this_user['username_clean'].'/';
-        $this_file['name'] = $this_user['omega'].'.sav';
-
-        // Update the session with these demo variables
-        $_SESSION['GAME']['DEMO'] = 1;
-        $_SESSION['GAME']['USER'] = $this_user;
-        $_SESSION['GAME']['FILE'] = $this_file;
-
-        // Update the first load to indicate true
-        $this_first_load = true;
-
-        // Update the global save path variable
-        $this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
+        // Exit the game and enter demo mode
+        rpg_game::start_session();
 
     }
 
-    //  DEBUG DEBUG DEBUG
-    //mmrpg_reset_game_session($this_save_filepath);
-
-    //die('<pre>$_GET : '.print_r($_GET, true).'</pre>');
-    //die($this_save_filepath);
+    // Collect a reference to the user info for later
+    $this_user = $_SESSION['GAME']['USER'];
 
 }
 

@@ -51,32 +51,23 @@ while ($this_action == 'save'){
 
                 // Backup the current game's filename for deletion purposes
                 $backup_user = $_SESSION[$session_token]['USER'];
-                $backup_file = $_SESSION[$session_token]['FILE'];
-                $backup_save_filepath = $this_save_dir.$backup_file['path'].$backup_file['name'];
 
                 // Update the current game's user and file info using the new password
                 $_SESSION[$session_token]['USER']['displayname'] = $user_displayname;
                 $_SESSION[$session_token]['USER']['emailaddress'] = $user_emailaddress;
                 $_SESSION[$session_token]['USER']['password'] = $_POST['password_new'];
-                $_SESSION[$session_token]['USER']['password_encoded'] = md5($_SESSION[$session_token]['USER']['password']);
+                $_SESSION[$session_token]['USER']['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$_SESSION[$session_token]['USER']['password']);
                 $_SESSION[$session_token]['USER']['imagepath'] = $_POST['imagepath'];
                 $_SESSION[$session_token]['USER']['colourtoken'] = $_POST['colourtoken'];
-                $_SESSION[$session_token]['FILE']['path'] = $_SESSION[$session_token]['USER']['username_clean'].'/';
-                $_SESSION[$session_token]['FILE']['name'] = $_SESSION[$session_token]['USER']['password_encoded'].'.sav';
-                $this_save_filepath = $this_save_dir.$_SESSION[$session_token]['FILE']['path'].$_SESSION[$session_token]['FILE']['name'];
 
             }
 
         }
 
         // Save the current game session into the file
-        mmrpg_save_game_session($this_save_filepath);
+        mmrpg_save_game_session();
         $this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
         $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
-        // If a game session's info was backup up for deletion
-        if (!empty($backup_save_filepath) && $backup_save_filepath != $this_save_filepath){
-            @unlink($backup_save_filepath);
-        }
 
         // Update the has updated flag variable
         $file_has_updated = true;
@@ -338,7 +329,7 @@ while ($this_action == 'load'){
         $this_user['username'] = trim($_REQUEST['username']);
         $this_user['username_clean'] = preg_replace('/[^-a-z0-9]+/i', '', strtolower($this_user['username']));
         $this_user['password'] = trim($_REQUEST['password']);
-        $this_user['password_encoded'] = md5($this_user['password']);
+        $this_user['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$this_user['password']);
         $this_file = array();
         $this_file['path'] = $this_user['username_clean'].'/';
 
@@ -360,15 +351,13 @@ while ($this_action == 'load'){
                     // The password was correct! Update the session with these credentials
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
-                    $_SESSION['GAME']['FILE'] = $this_file;
                     // Load the save file into memory and overwrite the session
-                    $this_save_filepath = $temp_save_filepath;
-                    mmrpg_load_game_session($this_save_filepath);
+                    mmrpg_load_game_session();
                     if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
                         //die('battle points are empty 2');
-                        mmrpg_reset_game_session($this_save_filepath);
+                        mmrpg_reset_game_session();
                     }
-                    mmrpg_save_game_session($this_save_filepath);
+                    mmrpg_save_game_session();
                     // Update the form markup, then break from the loop
                     $file_has_updated = true;
                     break;
@@ -412,19 +401,17 @@ while ($this_action == 'load'){
                     // The password was correct! Update the session with these credentials
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
-                    $_SESSION['GAME']['FILE'] = $this_file;
                     // Load the save file into memory and overwrite the session
-                    $this_save_filepath = $temp_save_filepath;
-                    mmrpg_load_game_session($this_save_filepath);
+                    mmrpg_load_game_session();
                     if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
                         //die('battle points are empty 1');
-                        mmrpg_reset_game_session($this_save_filepath);
+                        mmrpg_reset_game_session();
                     }
                     // Update the file with the coppa approval flag and birthdate
                     $_SESSION['GAME']['USER']['dateofbirth'] = strtotime($_REQUEST['dateofbirth']);
                     $_SESSION['GAME']['USER']['approved'] = 1;
                     //die('<pre>$_SESSION[GAME][USER] = '.print_r($_SESSION['GAME']['USER'], true).'</pre>');
-                    mmrpg_save_game_session($this_save_filepath);
+                    mmrpg_save_game_session();
                     // Update the form markup, then break from the loop
                     $file_has_updated = true;
                     break;

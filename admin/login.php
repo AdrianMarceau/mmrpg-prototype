@@ -45,7 +45,7 @@
             $user_name_clean = preg_replace('/[^-a-z0-9]+/i', '', strtolower($form_data['user_name']));
 
             // Create the encoded password string for comparing
-            $user_password_encoded = md5($form_data['user_password']);
+            $user_password_encoded = md5(MMRPG_SETTINGS_PASSWORD_SALT.$form_data['user_password']);
 
             // Check to ensure the two fields validate in the database
             $login_data = $db->get_array("SELECT
