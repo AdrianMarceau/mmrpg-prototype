@@ -337,7 +337,7 @@ class rpg_game {
     public static function is_demo(){
         $session_token = self::session_token();
         if (!empty($_SESSION[$session_token]['DEMO'])){ return true; } // Demo flag exists, so true
-        elseif ($_SESSION[$session_token]['USER']['userid'] == MMRPG_SETTINGS_GUEST_ID){ return true; } // User ID is guest, so true
+        elseif (!empty($_SESSION[$session_token]['USER']['userid']) && $_SESSION[$session_token]['USER']['userid'] == MMRPG_SETTINGS_GUEST_ID){ return true; } // User ID is guest, so true
         else { return false; }  // Demo flag doesn't exist, must be logged in
     }
 
