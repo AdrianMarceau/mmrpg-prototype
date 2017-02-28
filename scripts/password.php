@@ -12,7 +12,7 @@ $valid_passwords = '#^([-_a-z0-9]+)$#i';
 if (!empty($password_string) && preg_match($valid_passwords, $password_string)){
 
   // Ensure the user and file details have already been loaded to the session
-  if (!empty($_SESSION['GAME']['USER']) && !empty($_SESSION['GAME']['FILE'])){
+  if (!empty($_SESSION['GAME']['USER'])){
 
     // Process the password based on a predefined list
     if (preg_match('#^(dr-light|dr-wily)_#i', $password_string)){ //($password_string == 'dr-light_proto-man'){

@@ -71,7 +71,7 @@ if (!empty($this_purge_list)){
     $this_page_markup .= '</p><hr />';
 
     // Reset everything back to default
-    mmrpg_reset_game_session($this_save_filepath);
+    mmrpg_reset_game_session();
 
   }
 

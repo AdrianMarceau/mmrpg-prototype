@@ -55,9 +55,11 @@ $_SESSION['GAME']['values'][$temp_session_key] = $this_prototype_data['target_ro
 
 
 // If possible, attempt to save the game to the session
-if ($temp_save && !empty($this_save_filepath)){
+if ($temp_save && rpg_game::is_user()){
+
   // Save the game session
-  mmrpg_save_game_session($this_save_filepath);
+  mmrpg_save_game_session();
+
 }
 
 // DEBUG DEBUG DEBUG
@@ -66,7 +68,7 @@ if ($temp_save && !empty($this_save_filepath)){
 
 // If there were save file corruptions, reset
 if (!defined('MMRPG_SCRIPT_REQUEST') && empty($this_prototype_data['robots_unlocked'])){
-  mmrpg_reset_game_session($this_save_filepath);
+  mmrpg_reset_game_session();
   header('Location: prototype.php');
   exit();
 }

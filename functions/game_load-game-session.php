@@ -1,10 +1,9 @@
 <?
 // Define a function for loading the game session
-function mmrpg_load_game_session($this_save_filepath){
+function mmrpg_load_game_session(){
 
     // Reference global variables
     global $db;
-    //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
     $session_token = mmrpg_game_token();
 
     // Do NOT load, save, or otherwise alter the game file while viewing remote
@@ -13,17 +12,23 @@ function mmrpg_load_game_session($this_save_filepath){
     // Clear the community thread tracker
     $_SESSION['COMMUNITY']['threads_viewed'] = array();
 
+    // Collect the pending login details if set
+    $login_user_id = 0;
+    if (!empty($_SESSION[$session_token]['PENDING_LOGIN_ID'])){
+        $login_user_id = $_SESSION[$session_token]['PENDING_LOGIN_ID'];
+    } elseif (!empty($_SESSION[$session_token]['USER']['userid'])){
+        $login_user_id = $_SESSION[$session_token]['USER']['userid'];
+    }
+
     // If this is NOT demo mode, load from database
-    if (empty($_SESSION[$session_token]['DEMO'])){
+    $is_demo_mode = rpg_game::is_demo();
+    if (!$is_demo_mode && !empty($login_user_id)){
 
         // LOAD DATABASE INFO
 
         // Collect the user and save info from the database
-        //$this_save_filepath = $this_save_dir.$this_file['path'].$this_file['name'];
-        $temp_matches = array();
-        preg_match('#/([-_a-z0-9]+/)([-_a-z0-9]+.sav)$#i', $this_save_filepath, $temp_matches);
-        $this_database_save = $db->get_array("SELECT * FROM mmrpg_saves WHERE save_file_name = '{$temp_matches[2]}' AND save_file_path = '{$temp_matches[1]}' LIMIT 1");
-        $this_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = '{$this_database_save['user_id']}' LIMIT 1");
+        $this_database_save = $db->get_array("SELECT * FROM mmrpg_saves WHERE user_id = {$login_user_id} LIMIT 1");
+        $this_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$login_user_id} LIMIT 1");
         if (empty($this_database_save)){ die('could not load save for file '.$temp_matches[2].' and path '.$temp_matches[1].' on line '.__LINE__); }
         if (empty($this_database_user)){ die('could not load user for '.$this_database_save['user_id'].' on line '.__LINE__); }
 
@@ -38,7 +43,7 @@ function mmrpg_load_game_session($this_save_filepath){
         $new_game_data['USER']['username_clean'] = $this_database_user['user_name_clean'];
         $new_game_data['USER']['password'] = '';
         $new_game_data['USER']['password_encoded'] = '';
-        $new_game_data['USER']['omega'] = rpg_game::generate_omega_string($this_database_user['user_name_clean']);
+        $new_game_data['USER']['omega'] = $this_database_user['user_omega'];
         $new_game_data['USER']['profiletext'] = $this_database_user['user_profile_text'];
         $new_game_data['USER']['creditstext'] = $this_database_user['user_credit_text'];
         $new_game_data['USER']['creditsline'] = $this_database_user['user_credit_line'];
@@ -51,9 +56,6 @@ function mmrpg_load_game_session($this_save_filepath){
         $new_game_data['USER']['websiteaddress'] = $this_database_user['user_website_address'];
         $new_game_data['USER']['dateofbirth'] = $this_database_user['user_date_birth'];
         $new_game_data['USER']['approved'] = $this_database_user['user_flag_approved'];
-
-        $new_game_data['FILE']['path'] = $this_database_save['save_file_path'];
-        $new_game_data['FILE']['name'] = $this_database_save['save_file_name'];
 
         $new_game_data['counters'] = !empty($this_database_save['save_counters']) ? json_decode($this_database_save['save_counters'], true) : array();
         $new_game_data['values'] = !empty($this_database_save['save_values']) ? json_decode($this_database_save['save_values'], true) : array();
@@ -137,48 +139,13 @@ function mmrpg_load_game_session($this_save_filepath){
                 ), "user_id = {$this_database_user['user_id']}");
         }
 
-    }
-    // Otherwise, load from the file
-    else {
-
-        // LOAD SAVE FILE
-
-        // Ensure the requested save path exists first
-        if (file_exists($this_save_filepath)){
-            // Read the save file into memory and collecy it's data
-            $this_save_content = file_get_contents($this_save_filepath);
-            // Ensure the save content was not empty
-            if (!empty($this_save_content)){
-                // Decode the data into a GAME array
-                $this_save_content = json_decode($this_save_content, true);
-                // Import the game content into the session
-                $_SESSION[$session_token] = $this_save_content;
-                unset($this_save_content);
-                // Update the last load and saved value
-                $_SESSION[$session_token]['values']['last_load'] = time();
-                if (empty($_SESSION[$session_token]['values']['last_save'])){
-                    $_SESSION[$session_token]['values']['last_save'] = time();
-                }
-                // Return true on success
-                return true;
-            }
-            // Otherwise, if the save content was empty
-            else {
-                // Return false on failure
-                return false;
-            }
-        }
-        // Otherwise, return false
-        else {
-            return false;
-        }
+        // Clear the pending login ID
+        unset($_SESSION[$session_token]['PENDING_LOGIN_ID']);
 
     }
 
     // Update the last saved value
     $_SESSION[$session_token]['values']['last_load'] = time();
-
-    //exit();
 
     // Return true on success
     return true;

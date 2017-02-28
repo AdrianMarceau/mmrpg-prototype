@@ -12,7 +12,6 @@ function mmrpg_save_game_session(){
 
     // If the required USER or FILE arrays do not exist, reset
     if (!isset($_SESSION[$session_token]['USER'])){ mmrpg_reset_game_session(); }
-    if (!isset($_SESSION[$session_token]['FILE'])){ mmrpg_reset_game_session(); }
 
     // Update the last saved value
     $_SESSION[$session_token]['values']['last_save'] = time();
@@ -20,13 +19,10 @@ function mmrpg_save_game_session(){
     // Collect the save info
     $save = $_SESSION[$session_token];
     $this_user = $save['USER'];
-    $this_file = $save['FILE'];
-
-    // DEBUG
-    //echo 'I\'ve been asked to save ';
 
     // If this is NOT demo mode, load from database
-    if (empty($_SESSION[$session_token]['DEMO'])){
+    $is_demo_mode = rpg_game::is_demo();
+    if (!$is_demo_mode){
 
         // UPDATE DATABASE INFO
 
@@ -80,7 +76,7 @@ function mmrpg_save_game_session(){
                 $this_user_array['user_name_public'] = !empty($this_user['displayname']) ? $this_user['displayname'] : '';
                 if (!empty($this_user['password'])){ $this_user_array['user_password'] = $this_user['password']; }
                 if (!empty($this_user['password_encoded'])){ $this_user_array['user_password_encoded'] = $this_user['password_encoded']; }
-                $this_user_array['user_omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
+                if (!empty($this_user['omega'])){ $this_user_array['user_omega'] = $this_user['omega']; }
                 $this_user_array['user_profile_text'] = !empty($this_user['profiletext']) ? $this_user['profiletext'] : '';
                 $this_user_array['user_credit_text'] = !empty($this_user['creditstext']) ? $this_user['creditstext'] : '';
                 $this_user_array['user_credit_line'] = !empty($this_user['creditsline']) ? $this_user['creditsline'] : '';
@@ -244,8 +240,6 @@ function mmrpg_save_game_session(){
                 $this_save_array['save_flags'] = json_encode($this_flags);
                 $this_save_array['save_settings'] = json_encode($this_settings);
                 $this_save_array['save_cache_date'] = $this_cache_date;
-                $this_save_array['save_file_name'] = $this_file['name'];
-                $this_save_array['save_file_path'] = $this_file['path'];
                 $this_save_array['save_date_created'] = $this_user_array['user_date_created'];
                 $this_save_array['save_date_accessed'] = $this_user_array['user_date_accessed'];
                 $this_save_array['save_date_modified'] = $this_user_array['user_date_modified'];
@@ -257,6 +251,7 @@ function mmrpg_save_game_session(){
 
                 // Update the ID in the user array and continue
                 $this_user['userid'] = $temp_user_id;
+                $_SESSION['GAME']['PENDING_LOGIN_ID'] = $temp_user_id;
 
             }
         }
@@ -269,7 +264,6 @@ function mmrpg_save_game_session(){
         $this_user_array['user_name'] = $this_user['username'];
         $this_user_array['user_name_clean'] = $this_user['username_clean'];
         $this_user_array['user_name_public'] = !empty($this_user['displayname']) ? $this_user['displayname'] : '';
-        $this_user_array['user_omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
         $this_user_array['user_profile_text'] = !empty($this_user['profiletext']) ? $this_user['profiletext'] : '';
         $this_user_array['user_credit_text'] = !empty($this_user['creditstext']) ? $this_user['creditstext'] : '';
         $this_user_array['user_credit_line'] = !empty($this_user['creditsline']) ? $this_user['creditsline'] : '';
@@ -277,12 +271,14 @@ function mmrpg_save_game_session(){
         $this_user_array['user_background_path'] = !empty($this_user['backgroundpath']) ? $this_user['backgroundpath'] : '';
         $this_user_array['user_colour_token'] = !empty($this_user['colourtoken']) ? $this_user['colourtoken'] : '';
         $this_user_array['user_gender'] = !empty($this_user['gender']) ? $this_user['gender'] : '';
+        $this_user_array['user_omega'] = !empty($this_user['omega']) ? $this_user['omega'] : md5(MMRPG_SETTINGS_OMEGA_SEED.$this_user['username_clean']);
         $this_user_array['user_email_address'] = !empty($this_user['emailaddress']) ? $this_user['emailaddress'] : '';
         $this_user_array['user_website_address'] = !empty($this_user['websiteaddress']) ? $this_user['websiteaddress'] : '';
         $this_user_array['user_date_modified'] = time();
         $this_user_array['user_date_accessed'] = time();
         $this_user_array['user_date_birth'] = !empty($this_user['dateofbirth']) ? $this_user['dateofbirth'] : 0;
         $this_user_array['user_flag_approved'] = !empty($this_user['approved']) ? 1 : 0;
+
         // Update this user's info in the database
         $db->update('mmrpg_users', $this_user_array, 'user_id = '.$this_user['userid']);
 
@@ -450,10 +446,6 @@ function mmrpg_save_game_session(){
         $this_save_array['save_flags'] = json_encode($this_flags);
         $this_save_array['save_settings'] = json_encode($this_settings);
         $this_save_array['save_cache_date'] = $this_cache_date;
-        if ($is_new_user){
-            $this_save_array['save_file_name'] = $this_file['name'];
-            $this_save_array['save_file_path'] = $this_file['path'];
-        }
         $this_save_array['save_date_modified'] = time();
 
         // Update this save's info in the database
@@ -463,33 +455,6 @@ function mmrpg_save_game_session(){
 
         // DEBUG
         //echo 'but we\'re in demo mode';
-
-    }
-
-    // UPDATE SAVE FILE
-    // Update or create the user save file with basic info
-    // We also need the folder created for future user generated content
-
-    // Only save data to the system if not demo
-    if (!empty($this_file['path'])){
-
-        // Generate the base directory for this request
-        $this_base_dir = MMRPG_CONFIG_SAVES_PATH.$this_file['path'].'/';
-        if (!file_exists($this_base_dir)){ @mkdir($this_base_dir); }
-
-        // Generate the save data by serializing the session variable
-        $this_save_content = array();
-        $this_save_content['user_id'] = $this_user['userid'];
-        $this_save_content['user_name'] = $this_user['username'];
-        $this_save_content['user_name_clean'] = $this_user['username_clean'];
-        $this_save_content['user_omega'] = rpg_game::generate_omega_string($this_user['username_clean']);
-        $this_save_content_omega = $this_save_content['user_omega'];
-        $this_save_content = json_encode($this_save_content);
-
-        // Save the user's data to a flat text file
-        $this_save_file = fopen($this_base_dir.$this_save_content_omega.'.sav', 'w');
-        fwrite($this_save_file, $this_save_content);
-        fclose($this_save_file);
 
     }
 

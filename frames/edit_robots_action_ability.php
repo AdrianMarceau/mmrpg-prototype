@@ -30,7 +30,7 @@ if (empty($temp_ability)){
     // Update the new ability settings in the session variable
     $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] = $temp_abilities_new;
     // Save, produce the success message with the new ability order
-    rpg_game::save_session($this_save_filepath);
+    rpg_game::save_session();
     exit('success|ability-removed|'.implode(',', $temp_abilities));
 }
 // Otherwise, if there was a new ability provided, update it in the array
@@ -43,7 +43,7 @@ elseif (!in_array($temp_ability, $temp_abilities)){
     // Update the new ability settings in the session variable
     $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] = $temp_abilities_new;
     // Save, produce the success message with the new ability order
-    rpg_game::save_session($this_save_filepath);
+    rpg_game::save_session();
     exit('success|ability-updated|'.implode(',', $temp_abilities));
 }
 // Otherwise, if ability is already equipped, swap positions in the array
@@ -63,7 +63,7 @@ elseif (in_array($temp_ability, $temp_abilities)){
     // Update the new ability settings in the session variable
     $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_robot]['robot_abilities'] = $temp_abilities_new;
     // Save, produce the success message with the new ability order
-    rpg_game::save_session($this_save_filepath);
+    rpg_game::save_session();
     exit('success|ability-updated|'.implode(',', $temp_abilities));
 } else {
     // Produce an error show this ability has already been selected

@@ -1468,15 +1468,14 @@ class rpg_game {
     public static function generate_omega_string($user_string, $string_one = '', $string_two = '', $string_three = ''){
 
         // Concatenate seed values to form the raw omega string
-        $omega_seed = MMRPG_SETTINGS_OMEGA_SEED;
-        $raw_omega_string = 'mmrpg_'.$omega_seed.'_'.$user_string;
+        $raw_omega_string = 'mmrpg_'.$user_string;
         if (!empty($string_one)){ $raw_omega_string .= '_'.$string_one; }
         if (!empty($string_two)){ $raw_omega_string .= '_'.$string_two; }
         if (!empty($string_three)){ $raw_omega_string .= '_'.$string_three; }
         $raw_omega_string = rtrim($raw_omega_string, '_');
 
         // Calculate the MD5 hash of the raw omega string and crop
-        $complete_omega_string = md5($raw_omega_string);
+        $complete_omega_string = md5(MMRPG_SETTINGS_OMEGA_SEED.$raw_omega_string);
         $final_omega_string = substr($complete_omega_string, 0, 32);
         $base_rotate_amount = hexdec(substr($final_omega_string, 0, 1));
         for ($i = 1; $i < $base_rotate_amount; $i++){
@@ -1593,6 +1592,59 @@ class rpg_game {
         else { return 'GAME'; }
     }
 
+    // Define a function for starting the game session
+    public static function start_session(){
+
+        // Initialize the user session
+        self::init_user_session();
+
+        // Initialize demo mode vars
+        self::init_demo_mode();
+
+        // Reset game vars to default values
+        self::reset_session();
+
+    }
+
+    // Define a function for initializing the session user
+    public static function init_user_session(){
+
+        // Auto-generate basic user info with guest info
+        $this_user = array();
+        $this_user['userid'] = MMRPG_SETTINGS_GUEST_ID;
+        $this_user['username'] = 'guest';
+        $this_user['username_clean'] = 'guest';
+        $this_user['imagepath'] = '';
+        $this_user['backgroundpath'] = '';
+        $this_user['colourtoken'] = '';
+        $this_user['gender'] = '';
+        $this_user['password'] = '';
+        $this_user['password_encoded'] = '';
+        $this_user['omega'] = '';
+
+        // Overwrite the session user with that one
+        $_SESSION['GAME']['USER'] = $this_user;
+
+    }
+
+    // Define a function for initializing the demo mode variables
+    public static function init_demo_mode(){
+
+        // Define the global demo flag value
+        $_SESSION['GAME']['DEMO'] = 1;
+
+        // Update the session user with demo values
+        $_SESSION['GAME']['USER']['userid'] = MMRPG_SETTINGS_GUEST_ID;
+        $_SESSION['GAME']['USER']['username'] = 'demo';
+        $_SESSION['GAME']['USER']['username_clean'] = 'demo';
+        $_SESSION['GAME']['USER']['password'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'demo';
+        $_SESSION['GAME']['USER']['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$_SESSION['GAME']['USER']['password']);
+        $_SESSION['GAME']['USER']['omega'] = md5(MMRPG_SETTINGS_OMEGA_SEED.$_SESSION['GAME']['USER']['username_clean']);
+
+        // Auto-generate ciritcal game values
+        $_SESSION['GAME']['counters']['battle_points'] = 0;
+
+    }
 
     // Define a function for resetting the game session
     public static function reset_session(){
@@ -1607,8 +1659,19 @@ class rpg_game {
 
 
     // Define a function for loading the game session
-    public static function load_session($this_save_filepath){
-        return mmrpg_load_game_session($this_save_filepath);
+    public static function load_session(){
+        return mmrpg_load_game_session();
+    }
+
+    // Define a function for exiting the game session
+    public static function exit_session(){
+
+        // Clear the current session objects
+        unset($_SESSION['GAME']);
+
+        // Start a new session with default variables
+        self::start_session();
+
     }
 
 

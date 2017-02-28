@@ -2,7 +2,7 @@
 
 // Define a function for updating user save files
 function mmrpg_admin_update_save_file($key, $data, $patch_token){
-    global $db, $this_save_filepath;
+    global $db;
     global $update_patch_tokens, $update_patch_names, $update_patch_details;
 
     // Start the markup variable
@@ -243,7 +243,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     $this_page_markup .= '</p><hr />';
 
     // Reset everything back to default
-    mmrpg_reset_game_session($this_save_filepath);
+    mmrpg_reset_game_session();
 
     // Return generated page markup
     return $this_page_markup;

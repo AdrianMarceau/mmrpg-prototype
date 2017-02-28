@@ -4,18 +4,15 @@ function mmrpg_reset_game_session(){
 
     // Reference global variables
     global $mmrpg_index, $db;
-    //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
     $session_token = mmrpg_game_token();
 
     // Create variables that don't exist yet
     if (!isset($_SESSION[$session_token]['DEMO'])){ $_SESSION[$session_token]['DEMO'] = 1; }
     if (!isset($_SESSION[$session_token]['USER'])){ $_SESSION[$session_token]['USER'] = array(); }
-    if (!isset($_SESSION[$session_token]['FILE'])){ $_SESSION[$session_token]['FILE'] = array(); }
 
     // Back up the user and file info from the session
     $this_demo = $_SESSION[$session_token]['DEMO'];
     $this_user = $_SESSION[$session_token]['USER'];
-    $this_file = $_SESSION[$session_token]['FILE'];
     $this_level_bonus = mmrpg_prototype_robot_level('dr-light', 'mega-man');
     $this_battle_points = !empty($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
     $this_battle_complete = !empty($_SESSION[$session_token]['values']['battle_complete']) ? $_SESSION[$session_token]['values']['battle_complete'] : array();
@@ -34,7 +31,6 @@ function mmrpg_reset_game_session(){
     // Redefine the user and file variables in the new session
     $_SESSION[$session_token]['DEMO'] = $this_demo;
     $_SESSION[$session_token]['USER'] = $this_user;
-    $_SESSION[$session_token]['FILE'] = $this_file;
     // Automatically create the battle points counter and start at zero
     $_SESSION[$session_token]['counters']['battle_points'] = (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset') ? 0 : $this_battle_points;
     // Automatically create the battle complete array and start at empty
@@ -58,11 +54,8 @@ function mmrpg_reset_game_session(){
     $_SESSION[$session_token]['values']['last_save'] = time();
 
     // -- DEMO MODE UNLOCKS -- //
-    if (!empty($_SESSION[$session_token]['DEMO'])){
-
-        // Reset the demo flag and user id to default
-        $_SESSION[$session_token]['USER']['userid'] = MMRPG_SETTINGS_GUEST_ID;
-        $_SESSION[$session_token]['DEMO'] = 1;
+    $is_demo_mode = rpg_game::is_demo();
+    if ($is_demo_mode){
 
         // Only unlock Dr. Light as a playable character
         $unlock_player_info = $mmrpg_index['players']['dr-light'];
@@ -70,6 +63,7 @@ function mmrpg_reset_game_session(){
         $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_points'] = 0;
         $_SESSION[$session_token]['values']['battle_items'] = array('energy-pellet' => 3, 'energy-capsule' => 2, 'weapon-pellet' => 3, 'weapon-capsule' => 2);
         $_SESSION[$session_token]['values']['battle_abilities'] = array('buster-shot');
+
         // Auto-select Dr. Light as the current playable character
         $_SESSION[$session_token]['battle_settings']['this_player_token'] = 'dr-light';
 
@@ -129,7 +123,7 @@ function mmrpg_reset_game_session(){
 
     }
     // -- NORMAL MODE UNLOCKS -- //
-    else {
+    elseif (!$is_demo_mode){
 
         // Create the global item and ability arrays
         $_SESSION[$session_token]['values']['battle_items'] = array();
@@ -145,7 +139,7 @@ function mmrpg_reset_game_session(){
         $_SESSION[$session_token]['battle_settings']['this_player_token'] = 'dr-light';
 
         // Unlock Mega Man as a playable character
-        $unlock_robot_info = rpg_robot::get_index_info('mega-man');;
+        $unlock_robot_info = rpg_robot::get_index_info('mega-man');
         $unlock_robot_info['robot_level'] = 1; //!empty($this_level_bonus) ? $this_level_bonus : 1;
         $unlock_robot_info['robot_experience'] = 999;
         //$unlock_robot_info['robot_experience'] = 4000;

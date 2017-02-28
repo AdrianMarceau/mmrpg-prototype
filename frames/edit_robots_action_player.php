@@ -53,7 +53,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_current_
     }
 
     // Save, produce the success message with the new ability order
-    mmrpg_save_game_session($this_save_filepath);
+    mmrpg_save_game_session();
     //exit('success|player-swapped|true');
 
     // Collect global abilities as player abilities

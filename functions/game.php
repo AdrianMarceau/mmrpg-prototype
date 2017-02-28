@@ -49,6 +49,7 @@ function mmrpg_game_players_unlocked(){
 
 // Define a function for unlocking a game player for use in battle
 function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_abilities = true){
+
     // Reference the global variables
     global $mmrpg_index, $db;
 
