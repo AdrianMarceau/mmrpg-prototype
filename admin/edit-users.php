@@ -395,11 +395,6 @@
                     <input type="hidden" name="subaction" value="search" />
 
                     <div class="field">
-                        <strong class="label">By User ID</strong>
-                        <input class="textbox" type="text" name="user_id" value="<?= !empty($search_data['user_id']) ? $search_data['user_id'] : '' ?>" />
-                    </div>
-
-                    <div class="field">
                         <strong class="label">By User Name</strong>
                         <input class="textbox" type="text" name="user_name" value="<?= !empty($search_data['user_name']) ? htmlentities($search_data['user_name'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
@@ -407,6 +402,11 @@
                     <div class="field">
                         <strong class="label">By Email Address</strong>
                         <input class="textbox" type="text" name="user_email" value="<?= !empty($search_data['user_email']) ? htmlentities($search_data['user_email'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
+                    </div>
+
+                    <div class="field">
+                        <strong class="label">By ID Number</strong>
+                        <input class="textbox" type="text" name="user_id" value="<?= !empty($search_data['user_id']) ? $search_data['user_id'] : '' ?>" />
                     </div>
 
                     <div class="buttons">
