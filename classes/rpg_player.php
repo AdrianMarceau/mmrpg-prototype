@@ -2654,9 +2654,16 @@ class rpg_player extends rpg_object {
         $temp_allow_field_switch = mmrpg_prototype_item_unlocked('field-codes');
 
         // Collect a temp robot object for printing items
-        if ($player_info['player_token'] == 'dr-light'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['mega-man']); }
-        elseif ($player_info['player_token'] == 'dr-wily'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['bass']); }
-        elseif ($player_info['player_token'] == 'dr-cossack'){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['proto-man']); }
+        if ($player_info['player_token'] == 'dr-light'){
+            $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['mega-man']);
+            $player_info['player_field'] = 'light-laboratory';
+        } elseif ($player_info['player_token'] == 'dr-wily'){
+            $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['bass']);
+            $player_info['player_field'] = 'wily-castle';
+        } elseif ($player_info['player_token'] == 'dr-cossack'){
+            $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['proto-man']);
+            $player_info['player_field'] = 'cossack-citadel';
+        }
 
         // Start the output buffer
         ob_start();
@@ -2667,12 +2674,39 @@ class rpg_player extends rpg_object {
             ?>
             <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$player_info['player_token']?>">
 
-                <div class="this_sprite sprite_left" style="height: 40px;">
+                <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/<?= $player_info['player_field'] ?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
                     <? $temp_margin = -1 * ceil(($player_info['player_image_size'] - 40) * 0.5); ?>
-                    <div style="margin-top: <?= $temp_margin ?>px; margin-bottom: <?= $temp_margin * 3 ?>px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/mug_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_mug player_status_active player_position_active"><?=$player_info['player_name']?></div>
+                    <div class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "><?= $player_info['player_name']?></div>
                 </div>
 
-                <div class="header header_left player_type player_type_<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'] : 'none' ?>" style="margin-right: 0;"><?=$player_info['player_name']?>&#39;s Data <span class="player_type"><?= !empty($player_info['player_stat_type']) ? ucfirst($player_info['player_stat_type']) : 'Neutral' ?> Type</span></div>
+                <div class="header header_left player_type player_type_<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'] : 'none' ?>" style="margin-right: 0;">
+                    <span class="title player_type">
+                        <?=$player_info['player_name']?>
+                    </span>
+                    <?
+
+                    // Only omega indicators if the abilities have been unlocked
+                    if (rpg_game::omega_abilities_unlocked()){
+
+                        // Collect possible hidden power types
+                        $hidden_power_types = rpg_type::get_hidden_powers('elements');
+
+                        // Generate this player's omega string, collect it's hidden power
+                        $player_omega_string = rpg_game::generate_omega_player_string($player_info['player_token']);
+                        $player_hidden_power = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
+
+                        // Print out the omega indicators for the shop
+                        echo '<span class="omega player_type type_'.$player_hidden_power.'"></span>'.PHP_EOL;
+                        //title="Omega Influence || [['.ucfirst($player_hidden_power).' Type]]"
+
+                    }
+
+                    ?>
+                    <span class="core player_type">
+                        <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'].'-capsule' : 'item' ?>/icon_left_40x40.png);"></span></span>
+                        <span class="text"><?= !empty($player_info['player_stat_type']) ? ucfirst($player_info['player_stat_type']) : 'Neutral' ?> Type</span>
+                    </span>
+                </div>
 
                 <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
                     <table class="full" style="margin-bottom: 5px;">
@@ -2942,25 +2976,6 @@ class rpg_player extends rpg_object {
                         </table>
 
                     <? }?>
-
-                    <?
-
-                    // Only omega indicators if the abilities have been unlocked
-                    if (rpg_game::omega_abilities_unlocked()){
-
-                        // Collect possible hidden power types
-                        $hidden_power_types = rpg_type::get_hidden_powers('elements');
-
-                        // Generate this player's omega string, collect it's hidden power
-                        $player_omega_string = rpg_game::generate_omega_player_string($player_info['player_token']);
-                        $player_hidden_power = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
-
-                        // Print out the omega indicators for the player
-                        echo '<span class="omega player_type type_'.$player_hidden_power.'" title="[[Omega '.ucfirst($player_hidden_power).']]">'.$player_hidden_power.'</span>'.PHP_EOL;
-
-                    }
-
-                    ?>
 
                 </div>
             </div>

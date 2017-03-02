@@ -269,6 +269,13 @@ body.windowFlag_landscapeMode #prototype {
 #edit #console .event label.original_player_dr-cossack span.current_player_dr-wily {
     color: rgb(190, 141, 223) !important;
 }
+#edit #console .event .this_sprite .sprite {
+    background-position: 0 0;
+}
+#edit #console .event .this_sprite:hover .sprite,
+#edit #console .event .this_sprite .sprite:hover {
+    background-position: -40px 0;
+}
 #edit #console .event a.player_name {
     display: block;
     float: right;
@@ -558,31 +565,55 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
     padding: 5px 8px;
     color: #FFFFFF;
     position: relative;
+    line-height: 12px;
 }
-#edit #console .header .player_type {
+#edit #console .header .title,
+#edit #console .header .core {
     position: absolute;
     top: 2px;
     right: 2px;
     padding: 2px 6px;
     background-color: rgba(0, 0, 0, 0.25) !important;
     border-color: rgba(0, 0, 0, 0.25) !important;
+    line-height: 12px;
+}
+#edit #console .header .title {
+    position: static;
+    font-size: 11px;
+}
+#edit #console .header .player_type .wrap {
+    padding-right: 18px;
+    position: relative;
+}
+#edit #console .header .player_type .wrap .sprite {
+    position: absolute;
+    background-position: center center;
+    top: -12px;
+    left: -14px;
+}
+#edit #console .header .player_type .text {
+
 }
 
 #edit #console .omega.player_type {
-    display: block;
+    position: relative;
+    top: -1px;
+    display: inline-block;
+    margin-left: 4px;
     box-sizing: border-box;
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    font-size: 5px;
-    line-height: 5px;
+    width: 14px;
+    height: 14px;
+    font-size: 10px;
+    line-height: 10px;
     direction: ltr;
-    text-indent: -9999px;
-    bottom: 5px;
-    padding: 0;
+    padding: 1px 0 0px 2px;
+    font-weight: normal;
+    font-family: 'Zapf Dingbats';
+    border-radius: 7px;
+    box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
 }
-#edit #console .omega.player_type {
-    right: 4px;
+#edit #console .omega.player_type:before {
+    content: "\03a9";
 }
 
 /*
