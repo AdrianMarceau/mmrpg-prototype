@@ -1197,6 +1197,7 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_fieldback {
     background-position: center center;
     background-size: 150% auto;
+    background-size: cover;
 }
 @keyframes border-pulsate {
     0%   { border-color: #1A1A1A; }
