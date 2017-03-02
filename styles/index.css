@@ -499,6 +499,8 @@ button {
 #window .menu .main {
     display: block;
     position: relative;
+    font-size: 0;
+    height: 30px;
 }
 #window .menu .subs {
     display: none;
@@ -531,6 +533,7 @@ button {
 
 #window .menu .item {
     display: inline-block;
+    font-size: 10px;
     padding: 0 2px;
 }
 #window .menu .subs .item {

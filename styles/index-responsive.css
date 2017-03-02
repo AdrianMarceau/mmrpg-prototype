@@ -250,12 +250,9 @@ body:before {
         content: "05";
     }
 
-    #window .menu .item {
-        letter-spacing: 2px;
-    }
-    #window .menu .link,
-    #window .menu .modified {
-        padding: 2px 3px;
+    #window .menu .link {
+        padding-left: 3px;
+        padding-right: 3px;
     }
 
     #window .page .body .community .thread_subbody_compact,
@@ -267,36 +264,6 @@ body:before {
         clear: both;
     }
 
-    #mmrpg #window .menu {
-        position: relative;
-    }
-    #mmrpg #window .menu:before {
-        content: " ";
-        border-bottom: 1px solid rgba(255,255,255,0.03);
-        border-top: 1px solid #1A1A1A;
-        height: 0;
-        width: auto;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 29px;
-    }
-    #window .menu .main {
-        padding: 0 15%;
-    }
-    #window .menu .item {
-        position: relative;
-    }
-    #window .menu .item:hover .subs,
-    #window .menu .subs.active {
-        border-top: 0 none transparent;
-        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100 */
-        background: -moz-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
-        background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
-        background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
-    }
-
     #window .banner .userinfo .info .file_view {
         opacity: 0.3;
         text-decoration: line-through;
@@ -304,12 +271,6 @@ body:before {
     }
     #window .banner .userinfo .info .file_view + .pipe {
         opacity: 0.3;
-    }
-
-    #window .menu .item[data-token="prototype"] .link span,
-    #window .menu .item[data-token="prototype"] .link:hover span {
-        opacity: 0.3;
-        text-decoration: line-through;
     }
 
     #mmrpg #game_frames.ps-container > .ps-scrollbar-x-rail {
@@ -350,11 +311,63 @@ body:before {
 
 }
 
+/* -- One less than standard iPad portrait mode -- */
+@media (max-width: 767px){
+
+    body:before {
+        content: "05B";
+    }
+
+    #window .menu .item[data-token="prototype"] .link span,
+    #window .menu .item[data-token="prototype"] .link:hover span {
+        opacity: 0.3;
+        text-decoration: line-through;
+    }
+
+}
+
 /* -- Even More Less than Portrait Mode -- */
 @media (max-width: 700px){
 
     body:before {
         content: "06";
+    }
+
+    #mmrpg #window .menu {
+        position: relative;
+    }
+    #mmrpg #window .menu:before {
+        content: " ";
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        border-top: 1px solid #1A1A1A;
+        height: 0;
+        width: auto;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 29px;
+    }
+    #window .menu .main {
+        padding: 0 15%;
+    }
+    #window .menu .item {
+        position: relative;
+    }
+    #window .menu .item:hover .subs,
+    #window .menu .subs.active {
+        border-top: 0 none transparent;
+        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100 */
+        background: -moz-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+    }
+    #window .menu .item {
+        letter-spacing: 2px;
+    }
+    #window .menu .link,
+    #window .menu .modified {
+        padding: 2px 3px;
     }
 
     #window .page .body .subbody .text a,
