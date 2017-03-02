@@ -201,7 +201,7 @@
                         $omega_boost = false;
                         if (!empty($star_info_type) && $star_info_type == $shop_info['shop_hidden_power']){ $omega_boost = true; }
                         elseif (!empty($star_info_type2) && $star_info_type2 != $star_info_type && $star_info_type2 == $shop_info['shop_hidden_power']){ $omega_boost = 2; }
-                        if (!empty($omega_boost)){ $star_info_price = ceil($star_info_price * 2); }
+                        if (!empty($omega_boost)){ $star_info_price = ceil($star_info_price * 1.5); }
                     }
 
                     $global_item_quantities['star-'.$star_info_token] = !empty($_SESSION[$session_token]['values']['battle_stars'][$star_info_token]) ? 1 : 0;
