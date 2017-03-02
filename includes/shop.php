@@ -545,7 +545,7 @@ if (!empty($this_shop_index['auto'])){
             foreach ($items_list AS $item_token => $item_price){
                 $type_token = preg_replace('/-(pellet|capsule|tank)$/', '', $item_token);
                 $omega_boost = $this_shop_index['auto']['shop_hidden_power'] == $type_token ? true : false;
-                if (!empty($omega_boost)){ $item_price = ceil($item_price * 2); }
+                if (!empty($omega_boost)){ $item_price = ceil($item_price * 1.5); }
                 $this_shop_index['auto']['shop_items']['items_buying'][$item_token] = $item_price;
             }
         }
@@ -732,7 +732,7 @@ if (!empty($this_shop_index['reggae'])){
                     $item_price += $ability_price_boost;
                     $item_price += $robot_price_boost;
                     $omega_boost = $this_shop_index['reggae']['shop_hidden_power'] == $type_token ? true : false;
-                    if (!empty($omega_boost)){ $item_price = ceil($item_price * 2); }
+                    if (!empty($omega_boost)){ $item_price = ceil($item_price * 1.5); }
                     $this_shop_index['reggae']['shop_items']['items_buying'][$item_token] = $item_price;
                 }
             }
