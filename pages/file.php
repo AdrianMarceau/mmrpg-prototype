@@ -117,10 +117,13 @@ while ($this_action == 'profile'){
             $user_creditstext = !empty($_POST['creditstext']) ? strip_tags(trim($_POST['creditstext'])) : '';
             $user_creditsline = !empty($_POST['creditsline']) ? strip_tags(trim($_POST['creditsline'])) : '';
 
-            $user_omega_seed = !empty($_POST['omega_seed']) ? trim(preg_replace('/[^-_0-9a-z\.\s\,\?\!]+/i', '', $_POST['omega_seed'])) : '';
-            $user_omega_seed = preg_replace('/\s+/', ' ', $user_omega_seed);
-            if (!empty($user_omega_seed) && strlen($user_omega_seed) < 6){ $user_omega_seed = ''; }
-            elseif (!empty($user_omega_seed) && strlen($user_omega_seed) > 32){ $user_omega_seed = ''; }
+            // Only process omega fields if function unlocked
+            if (rpg_game::omega_abilities_unlocked()){
+                $user_omega_seed = !empty($_POST['omega_seed']) ? trim(preg_replace('/[^-_0-9a-z\.\s\,\?\!]+/i', '', $_POST['omega_seed'])) : '';
+                $user_omega_seed = preg_replace('/\s+/', ' ', $user_omega_seed);
+                if (!empty($user_omega_seed) && strlen($user_omega_seed) < 6){ $user_omega_seed = ''; }
+                elseif (!empty($user_omega_seed) && strlen($user_omega_seed) > 32){ $user_omega_seed = ''; }
+            }
 
             // Check if the password has changed at all
             if (true){
@@ -384,15 +387,20 @@ while ($this_action == 'profile'){
         $html_form_fields .= '<select class="select select_backgroundpath" style="width: 100%; " name="backgroundpath">'.$temp_select_options.'</select>';
     $html_form_fields .= '</div>';
 
-    $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px;">';
-        $html_form_fields .= '<label class="label label_omega" style="width: 230px; ">Omega Sequence :</label>';
-        $html_form_fields .= '<input class="text text_omega" style="width: 100%; opacity: 0.5;" type="text" name="omega" maxlength="32" value="'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['omega']) ? $_SESSION['GAME']['USER']['omega'] : ''), ENT_QUOTES, 'UTF-8', true).'" disabled="disabled" />';
-    $html_form_fields .= '</div>';
+    // Only show omega sequence fields if unlocked by the player
+    if (rpg_game::omega_abilities_unlocked()){
 
-    $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px;">';
-        $html_form_fields .= '<label class="label label_omega_seed" style="width: 230px; ">Regenerate Sequence :</label>';
-        $html_form_fields .= '<input class="text text_omega_seed" style="width: 100%; " type="text" name="omega_seed" maxlength="32" value="" />';
-    $html_form_fields .= '</div>';
+        $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px;">';
+            $html_form_fields .= '<label class="label label_omega" style="width: 230px; ">Omega Sequence :</label>';
+            $html_form_fields .= '<input class="text text_omega" style="width: 100%; opacity: 0.5;" type="text" name="omega" maxlength="32" value="'.htmlentities(trim(!empty($_SESSION['GAME']['USER']['omega']) ? $_SESSION['GAME']['USER']['omega'] : ''), ENT_QUOTES, 'UTF-8', true).'" disabled="disabled" />';
+        $html_form_fields .= '</div>';
+
+        $html_form_fields .= '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px;">';
+            $html_form_fields .= '<label class="label label_omega_seed" style="width: 230px; ">Regenerate Sequence :</label>';
+            $html_form_fields .= '<input class="text text_omega_seed" style="width: 100%; " type="text" name="omega_seed" maxlength="32" value="" />';
+        $html_form_fields .= '</div>';
+
+    }
 
 
     // IF CONTRIBUTOR OR ADMIN
