@@ -4072,6 +4072,25 @@ class rpg_robot extends rpg_object {
                         <?= $robot_info['robot_name']?>
                         <?= $robot_info['robot_level'] >= 100 ? '<span>&#9733;</span>' : '' ?>
                     </span>
+                    <?
+
+                    // Only omega indicators if the abilities have been unlocked
+                    if (rpg_game::omega_abilities_unlocked()){
+
+                        // Collect possible hidden power types
+                        $hidden_power_types = rpg_type::get_hidden_powers('elements');
+
+                        // Generate this robot's omega string, collect it's hidden power
+                        $robot_omega_string = rpg_game::generate_omega_robot_string($robot_info['robot_token']);
+                        $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
+
+                        // Print out the omega indicators for the shop
+                        echo '<span class="omega robot_type type_'.$robot_hidden_power.'"></span>'.PHP_EOL;
+                        //title="Omega Influence || [['.ucfirst($robot_hidden_power).' Type]]"
+
+                    }
+
+                    ?>
                     <span class="core robot_type">
                         <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>-core/icon_left_40x40.png);"></span></span>
                         <span class="text"><?= !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral' ?> Core</span>
@@ -4264,25 +4283,6 @@ class rpg_robot extends rpg_object {
                         </tbody>
                     </table>
                 </div>
-
-                <?
-
-                // Only omega indicators if the abilities have been unlocked
-                if (rpg_game::omega_abilities_unlocked()){
-
-                    // Collect possible hidden power types
-                    $hidden_power_types = rpg_type::get_hidden_powers('elements');
-
-                    // Generate this robot's omega string, collect it's hidden power
-                    $robot_omega_string = rpg_game::generate_omega_robot_string($robot_info['robot_token']);
-                    $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
-
-                    // Print out the omega indicators for the robot
-                    echo '<span class="omega robot_type type_'.$robot_hidden_power.'" data-tooltip="[[Omega '.ucfirst($robot_hidden_power).']]">'.$robot_hidden_power.'</span>'.PHP_EOL;
-
-                }
-
-                ?>
 
             </div>
             <?

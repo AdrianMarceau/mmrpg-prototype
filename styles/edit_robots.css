@@ -936,21 +936,24 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
 }
 
 #edit #console .omega.robot_type {
-    display: block;
+    position: relative;
+    top: -1px;
+    display: inline-block;
+    margin-left: 4px;
     box-sizing: border-box;
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    font-size: 5px;
-    line-height: 5px;
+    width: 14px;
+    height: 14px;
+    font-size: 10px;
+    line-height: 10px;
     direction: ltr;
-    text-indent: -9999px;
-    bottom: 5px;
-    padding: 0;
+    padding: 1px 0 0px 2px;
+    font-weight: normal;
+    font-family: 'Zapf Dingbats';
+    border-radius: 7px;
+    box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
 }
-
-#edit #console .omega.robot_type {
-    right: 4px;
+#edit #console .omega.robot_type:before {
+    content: "\03a9";
 }
 
 

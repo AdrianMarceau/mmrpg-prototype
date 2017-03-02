@@ -124,8 +124,26 @@ if (true){
                 </div>
 
                 <div class="header header_left player_type player_type_<?= $shop_info['shop_colour'] ?>" style="margin-right: 0;">
-                    <?= $shop_info['shop_name']?>
-                    <span class="player_type"><?= ucfirst(rtrim($shop_info['shop_seeking'], 's')) ?> Seeker</span>
+                    <span class="title player_type">
+                        <?= $shop_info['shop_name']?>
+                    </span>
+                    <?
+
+                    // Only omega indicators if the abilities have been unlocked
+                    if (!empty($shop_info['shop_hidden_power'])){
+
+                        // Print out the omega indicators for the shop
+                        echo '<span class="omega player_type type_'.$shop_info['shop_hidden_power'].'"></span>'.PHP_EOL;
+                        //title="Omega Influence || [['.ucfirst($shop_info['shop_hidden_power']).' Type]]"
+                        //echo 'omega('.$shop_info['shop_omega_string'].')';
+
+                    }
+
+                    ?>
+                    <span class="core player_type">
+                        <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($shop_info['shop_seeking_image']) ? $shop_info['shop_seeking_image'] : 'item' ?>/icon_left_40x40.png);"></span></span>
+                        <span class="text"><?= ucfirst(rtrim($shop_info['shop_seeking'], 's')) ?> Seeker</span>
+                    </span>
                 </div>
 
                 <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
@@ -180,19 +198,6 @@ if (true){
                         ?>
 
                     </div>
-
-                    <?
-
-                    // Only omega indicators if the abilities have been unlocked
-                    if (!empty($shop_info['shop_hidden_power'])){
-
-                        // Print out the omega indicators for the shop
-                        echo '<span class="omega player_type type_'.$shop_info['shop_hidden_power'].'" title="[[Omega '.ucfirst($shop_info['shop_hidden_power']).' ]]">'.$shop_info['shop_hidden_power'].'</span>'.PHP_EOL;
-                        //echo 'omega('.$shop_info['shop_omega_string'].')';
-
-                    }
-
-                    ?>
 
                 </div>
             </div>
