@@ -401,15 +401,26 @@ if (rpg_game::omega_abilities_unlocked()){
     // Loop through the shop index and collect omega values
     foreach ($this_shop_index AS $shop_token => $shop_info){
 
-        // Collect possible hidden power types
-        $hidden_power_kind = $shop_token == 'auto' ? 'stats' : 'elements';
-        $hidden_power_types = rpg_type::get_hidden_powers($hidden_power_kind);
+        // Only generate a hidden power if we've unlocked them
+        if (rpg_game::omega_abilities_unlocked()){
 
-        // Generate this shop's omega string, collect it's hidden power
-        $shop_omega_string = rpg_game::get_omega_shop_string($shop_token);
-        $shop_hidden_power = rpg_game::select_omega_value($shop_omega_string, $hidden_power_types);
-        $this_shop_index[$shop_token]['shop_omega_string'] = $shop_omega_string;
-        $this_shop_index[$shop_token]['shop_hidden_power'] = $shop_hidden_power;
+            // Collect possible hidden power types
+            $hidden_power_kind = $shop_token == 'auto' ? 'stats' : 'elements';
+            $hidden_power_types = rpg_type::get_hidden_powers($hidden_power_kind);
+
+            // Generate this shop's omega string, collect it's hidden power
+            $shop_omega_string = rpg_game::get_omega_shop_string($shop_token);
+            $shop_hidden_power = rpg_game::select_omega_value($shop_omega_string, $hidden_power_types);
+            $this_shop_index[$shop_token]['shop_omega_string'] = $shop_omega_string;
+            $this_shop_index[$shop_token]['shop_hidden_power'] = $shop_hidden_power;
+
+        } else {
+
+            // Default this shop's omega string and hidden power to empty
+            $this_shop_index[$shop_token]['shop_omega_string'] = '';
+            $this_shop_index[$shop_token]['shop_hidden_power'] = '';
+
+        }
 
     }
 
