@@ -951,6 +951,7 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
     font-family: 'Zapf Dingbats';
     border-radius: 7px;
     box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.25) !important;
 }
 #edit #console .omega.robot_type:before {
     content: "\03a9";
