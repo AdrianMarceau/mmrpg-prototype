@@ -192,10 +192,16 @@
                     $star_info_class = !empty($star_info_type) ? $star_info_type : 'none';
                     if (!empty($star_info_type2)){ $star_info_class .= '_'.$star_info_type2; }
 
+                    $star_boost = !empty($this_star_force[$type_token]) ? $this_star_force[$type_token] : 0;
+                    $star_price_boost = ceil($star_boost * 250);
+                    $star_info_price += $star_price_boost;
+
                     // If Robots or Abilities have been unlocked, increase the core selling prices
                     if (!empty($shop_info['shop_hidden_power'])){
-                        if (!empty($star_info_type) && $star_info_type == $shop_info['shop_hidden_power']){ $star_info_price += ceil($star_info_price * 0.10); }
-                        if (!empty($star_info_type2) && $star_info_type2 == $shop_info['shop_hidden_power']){ $star_info_price += ceil($star_info_price * 0.10); }
+                        $omega_boost = false;
+                        if (!empty($star_info_type) && $star_info_type == $shop_info['shop_hidden_power']){ $omega_boost = true; }
+                        elseif (!empty($star_info_type2) && $star_info_type2 != $star_info_type && $star_info_type2 == $shop_info['shop_hidden_power']){ $omega_boost = 2; }
+                        if (!empty($omega_boost)){ $star_info_price = ceil($star_info_price * 2); }
                     }
 
                     $global_item_quantities['star-'.$star_info_token] = !empty($_SESSION[$session_token]['values']['battle_stars'][$star_info_token]) ? 1 : 0;
