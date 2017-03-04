@@ -914,13 +914,21 @@ body:before {
         width: 49%;
     }
 
-    #window .page_file .form .field {
+    #window .page_file .form .field,
+    #window .page_file .form .field.full {
         width: 100%;
+        padding-right: 0;
+    }
+    #window .page_file .form .field.half {
+        width: 50%;
+    }
+
+    #window .page_file .form .field.half + .half {
+        padding-left: 10px;
     }
     #window .page_file .form .field input[type="text"],
     #window .page_file .form .field input[type="password"] {
-        max-width: 98% !important;
-        box-sizing: border-box;
+
     }
 
     #window .page .subbody .float.link .sprite {
