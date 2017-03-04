@@ -4921,7 +4921,12 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
     width: 46%;
     min-height: 50px;
     margin-right: 35px;
-    }
+}
+#window .page_file .form .field.full {
+    float: none;
+    width: 100%;
+    min-height: 50px;
+    margin: 0 auto 20px;
 }
 #window .page_community .form .button,
 #window .page_file .form .button {
