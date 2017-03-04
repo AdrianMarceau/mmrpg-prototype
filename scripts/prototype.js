@@ -27,6 +27,11 @@ $(document).ready(function(){
     thisFalloff = $('#falloff', thisBody);
     thisWindow = $(window);
 
+    // If we're not in an iframe, adjust background
+    if (window.top == window.self){
+        $('html').css({backgroundColor:'#262626'});
+        }
+
     // Define the prototype context
     var thisContext = $('#prototype');
     if (thisContext.length){

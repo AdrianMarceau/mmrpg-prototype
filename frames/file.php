@@ -29,45 +29,47 @@ while ($this_action == 'save'){
     // If the form has already been submit, process input
     while (!empty($_POST['submit']) && $_POST['submit'] == 'true'){
 
-        // If the new password field was empty, produce an error
-        if (empty($_POST['password_current']) || empty($_POST['password_new'])){
-            // Update the form messages markup text
-            $html_form_messages .= '<span class="error">(!) A password must be set for your game to be saved.</span>';
-            break;
-        }
-        // Else, collect the current and new password and process them
-        elseif (!empty($_POST['password_current']) && !empty($_POST['password_new'])){
+        // Collect any profile details
+        $user_displayname = !empty($_POST['displayname']) ? preg_replace('/[^-_a-z0-9\.\s]+/i', '', trim($_POST['displayname'])) : '';
+        $user_emailaddress = !empty($_POST['emailaddress']) ? preg_replace('/[^-_a-z0-9\.\+@]+/i', '', trim($_POST['emailaddress'])) : '';
 
-            // Trim any whitespace from the passwords
-            $_POST['password_current'] = trim($_POST['password_current']);
-            $_POST['password_new'] = trim($_POST['password_new']);
+        $user_imagepath = !empty($_POST['imagepath']) && preg_match('/^[-_a-z0-9]+\/[-_a-z0-9]+$/i', $_POST['imagepath']) ? trim($_POST['imagepath']) : '';
+        $user_colourtoken = !empty($_POST['colourtoken']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['colourtoken']) ? trim($_POST['colourtoken']) : '';
 
-            // Collect any profile details
-            $user_displayname = !empty($_POST['displayname']) ? preg_replace('/[^-_a-z0-9\.\s]+/i', '', trim($_POST['displayname'])) : '';
-            $user_emailaddress = !empty($_POST['emailaddress']) ? preg_replace('/[^-_a-z0-9\.\+@]+/i', '', trim($_POST['emailaddress'])) : '';
+        $user_omegaseed = !empty($_POST['omegaseed']) ? trim($_POST['omegaseed']) : '';
 
-            // Check if the password has changed at all
-            if (true){
+        // Check if the password has changed at all
+        if (true){
 
-                // Backup the current game's filename for deletion purposes
-                $backup_user = $_SESSION[$session_token]['USER'];
+            // Backup the current game's filename for deletion purposes
+            $backup_user = $_SESSION[$session_token]['USER'];
 
-                // Update the current game's user and file info using the new password
-                $_SESSION[$session_token]['USER']['displayname'] = $user_displayname;
-                $_SESSION[$session_token]['USER']['emailaddress'] = $user_emailaddress;
-                $_SESSION[$session_token]['USER']['password'] = $_POST['password_new'];
-                $_SESSION[$session_token]['USER']['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$_SESSION[$session_token]['USER']['password']);
-                $_SESSION[$session_token]['USER']['imagepath'] = $_POST['imagepath'];
-                $_SESSION[$session_token]['USER']['colourtoken'] = $_POST['colourtoken'];
-
+            // Update the current game's user and file info using the new password
+            $_SESSION[$session_token]['USER']['displayname'] = $user_displayname;
+            $_SESSION[$session_token]['USER']['emailaddress'] = $user_emailaddress;
+            $_SESSION[$session_token]['USER']['imagepath'] = $user_imagepath;
+            $_SESSION[$session_token]['USER']['colourtoken'] = $user_colourtoken;
+            if (!empty($user_omegaseed)){
+                $_SESSION[$session_token]['USER']['omega'] = md5(MMRPG_SETTINGS_OMEGA_SEED.$user_omegaseed);
             }
 
         }
 
         // Save the current game session into the file
         mmrpg_save_game_session();
-        $this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+        $db_users_fields = rpg_user::get_index_fields(true, 'users');
+        $db_users_roles_fields = rpg_user_role::get_index_fields(true, 'roles');
+        $this_userinfo = $db->get_array("SELECT
+            {$db_users_fields},
+            {$db_users_roles_fields}
+            FROM mmrpg_users AS users
+            LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+            WHERE users.user_id = '{$this_userid}'
+            LIMIT 1
+            ;");
         $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
+        $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
+        $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
 
         // Update the has updated flag variable
         $file_has_updated = true;
@@ -100,7 +102,9 @@ while ($this_action == 'save'){
     // Update the header markup title
     $html_header_title .= 'Save Current Game File';
     // Update the header markup text
-    $html_header_text .= 'Your game is saved automatically whenever you return to the main menu and any time you interact with your file through the other sub menus.  Use the form below to make changes to your account and settings then click the save button when complete.  Your email address is used for account recovery <em>only</em> and will never be given to third parties or otherwise used for nefarious purposes.';
+    $html_header_text .= 'Your game is saved automatically whenever you return to the main menu, shop, or customize your characters.<br /> ';
+    $html_header_text .= 'Make changes to your game using the form below or <a href="'.MMRPG_CONFIG_ROOTURL.'file/profile/" target="_blank">click here</a> to update account settings. ';
+    $html_header_text .= '';
 
     // Start the output buffer to collect form fields
     ob_start();
@@ -109,132 +113,108 @@ while ($this_action == 'save'){
         $temp_password = $db->get_value("SELECT user_password FROM mmrpg_users WHERE user_id = {$this_userid} LIMIT 1;", 'user_password');
 
         // Update the form markup fields
-        echo '<div style="float: left; margin-right: 14px; ">';
 
-            // Username
-            echo '<label class="label label_username" style="width: 100px; ">Username :</label>';
-            echo '<input class="text text_username" type="text" style="width: 230px; " name="username" value="'.htmlentities(trim($_SESSION[$session_token]['USER']['username']), ENT_QUOTES, 'UTF-8', true).'" disabled="disabled" />';
-
-            // Password
-            echo '<label class="label label_password" style="width: 100px; ">Password :</label>';
-            echo '<input class="hidden hidden_password" type="hidden" name="password_current" value="'.htmlentities(trim($temp_password), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" />';
-            echo '<input class="hidden hidden_password" type="hidden" name="password_new" value="'.htmlentities(trim($temp_password), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" />';
-            echo '<input class="text text_password" type="password" style="width: 230px; " name="password_display" value="'.htmlentities(trim($_SESSION[$session_token]['USER']['password']), ENT_QUOTES, 'UTF-8', true).'" maxlength="18" disabled="disabled" />';
-
-            // Email Address
-            echo '<label class="label label_emailaddress" style="width: 100px; ">Email :</label>';
-            echo '<input class="text text_emailaddress" style="width: 230px; " type="text" name="emailaddress" maxlength="128" value="'.htmlentities(trim(!empty($_SESSION[$session_token]['USER']['emailaddress']) ? $_SESSION[$session_token]['USER']['emailaddress'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
-
+        // Username
+        echo '<div class="field field_username">';
+            echo '<label class="label label_username">Username :</label>';
+            echo '<input class="text text_username" type="text" name="username" value="'.htmlentities(trim($_SESSION[$session_token]['USER']['username']), ENT_QUOTES, 'UTF-8', true).'" disabled="disabled" />';
         echo '</div>';
 
-        echo '<div style="float: left;">';
+        // Display Name
+        echo '<div class="field field_displayname">';
+            echo '<label class="label label_displayname">Display Name :</label>';
+            echo '<input class="text text_displayname" type="text" name="displayname" maxlength="18" value="'.htmlentities(trim(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
+        echo '</div>';
 
-            // Display Name
-            echo '<label class="label label_displayname" style="width: 130px; ">Display Name :</label>';
-            echo '<input class="text text_displayname" style="width: 230px; " type="text" name="displayname" maxlength="18" value="'.htmlentities(trim(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
+        // Profile Colour
+        $mmrpg_database_type = $mmrpg_index['types'];
+        sort($mmrpg_database_type);
+        $html_colour_options = array();
+        $html_colour_options[] = '<option value="">- Select Type -</option>';
+        $html_colour_options[] = '<option value="none">Neutral Type</option>';
+        foreach ($mmrpg_database_type AS $token => $info){
+            if ($token == 'none'){ continue; }
+            $html_colour_options[] = '<option value="'.$info['type_token'].'">'.$info['type_name'].' Type</option>';
+            }
+        if ($this_userinfo['role_id'] == 1){
+            $html_colour_options[] = '<option value="energy">Energy Type</option>';
+            $html_colour_options[] = '<option value="attack">Attack Type</option>';
+            $html_colour_options[] = '<option value="defense">Defense Type</option>';
+            $html_colour_options[] = '<option value="speed">Speed Type</option>';
+            }
+        $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['colourtoken'].'"', 'value="'.$_SESSION['GAME']['USER']['colourtoken'].'" selected="selected"', implode('', $html_colour_options));
+        echo '<div class="field field_colourtoken">';
+            echo '<label class="label label_colourtoken">Profile Colour :</label>';
+            echo '<select class="select select_colourtoken" name="colourtoken">'.$temp_select_options.'</select>';
+        echo '</div>';
 
-            // Player Colour
-            $mmrpg_database_type = $mmrpg_index['types'];
-            sort($mmrpg_database_type);
-            //echo '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">';
-                echo '<label class="label label_colourtoken" style="width: 130px; ">Player Colour :</label>';
-                $html_colour_options = array();
-                $html_colour_options[] = '<option value="">- Select Type -</option>';
-                $html_colour_options[] = '<option value="none">Neutral Type</option>';
-                // Add all the robot avatars to the list
-                foreach ($mmrpg_database_type AS $token => $info){
-                    if ($token == 'none'){ continue; }
-                    $html_colour_options[] = '<option value="'.$info['type_token'].'">'.$info['type_name'].' Type</option>';
-                }
-                // Add player avatars if this is the developer
-                if ($this_userinfo['role_id'] == 1){
-                    $html_colour_options[] = '<option value="energy">Energy Type</option>';
-                    $html_colour_options[] = '<option value="attack">Attack Type</option>';
-                    $html_colour_options[] = '<option value="defense">Defense Type</option>';
-                    $html_colour_options[] = '<option value="speed">Speed Type</option>';
-                }
-                $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['colourtoken'].'"', 'value="'.$_SESSION['GAME']['USER']['colourtoken'].'" selected="selected"', implode('', $html_colour_options));
-                echo '<select class="select select_colourtoken" style="width: 230px; " name="colourtoken">'.$temp_select_options.'</select>';
-            //echo '</div>';
-
-            // Robot Avatar
-            //echo '<div class="field" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">';
-                echo '<label class="label label_imagepath" style="width: 130px; ">Robot Avatar :</label>';
-                $html_avatar_options = array();
-                $html_avatar_options[] = '<option value="">- Select Robot -</option>';
-                // Print the optgroup opening tag
-                $temp_optgroup_token = 'MM00';
-                $html_avatar_options[] = '<optgroup label="Mega Man Robots">';
-
-                // Add all the robot avatars to the list
-                foreach ($mmrpg_database_robots AS $token => $info){
-
-                    if ($token == 'robot' || strstr($token, 'copy')){ continue; }
-                    elseif (isset($info['robot_image']) && $info['robot_image'] == 'robot'){ continue; }
-                    elseif (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){ continue; }
-                    elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
-                    elseif (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
-                    if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
-
-                    // If the game has changed print the new optgroup
-                    if ($info['robot_game'] != $temp_optgroup_token){
-                        $temp_optgroup_token = $info['robot_game'];
-                        if ($temp_optgroup_token == 'MM20'){ $temp_optgroup_name = 'Mega Man Killers'; }
-                        elseif (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '0').' Robots'; }
-                        else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $temp_optgroup_token).' Robots'; }
-                        $html_avatar_options[] = '</optgroup>';
-                        $html_avatar_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
-                    }
-
-                    $size = isset($info['robot_image_size']) ? $info['robot_image_size'] : 40;
-                    $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
-
-                    // Collect the summon count for this robot and unlocked alts
-                    $temp_summon_count = mmrpg_prototype_database_summoned($token);
-                    $temp_alts_unlocked = mmrpg_prototype_altimage_unlocked($token);
-
-                    // If this is a copy core, add it's type alts
-                    if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
-                        foreach ($mmrpg_index['types'] AS $type_token => $type_info){
-                            if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
-                            if (!isset($_SESSION['GAME']['values']['battle_items'][$type_token.'-core']) && $this_userinfo['role_id'] != 1){ continue; }
-                            $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)'.'</option>';
-                        }
-                    }
-                    // Otherwise, if this ROBOT MASTER alt skin has been inlocked
-                    elseif (!empty($info['robot_image_alts'])){
-                        // Loop through each of the available alts and print if unlocked
-                        $info['robot_image_alts'] = json_decode($info['robot_image_alts'], true);
-                        foreach ($info['robot_image_alts'] AS $key => $this_altinfo){
-                            // Define the unlocked flag as false to start
-                            $alt_unlocked = false;
-                            // If this alt is unlocked via summon and we have enough
-                            if (!empty($this_altinfo['summons']) && $temp_summon_count >= $this_altinfo['summons']){ $alt_unlocked = true; }
-                            // Else if this alt is unlocked via the shop and has been purchased
-                            elseif (in_array($this_altinfo['token'], $temp_alts_unlocked)){ $alt_unlocked = true; }
-                            // Print the alt option markup if unlocked
-                            if ($alt_unlocked){
-                                $html_avatar_options[] = '<option value="robots/'.$token.'_'.$this_altinfo['token'].'/'.$size.'">'.$info['robot_number'].' : '.$this_altinfo['name'].'</option>';
-                            }
-                        }
-                    }
-
-                }
-
-                // Add player avatars if this is the developer
-                if ($this_userinfo['role_id'] == 1 || $this_userinfo['role_id'] == 6){
-                    $html_avatar_options[] = '</optgroup>';
-                    $html_avatar_options[] = '<optgroup label="Mega Man Players">';
-                    $html_avatar_options[] = '<option value="players/dr-light/40">PLAYER : Dr. Light</option>';
-                    $html_avatar_options[] = '<option value="players/dr-wily/40">PLAYER : Dr. Wily</option>';
-                    $html_avatar_options[] = '<option value="players/dr-cossack/40">PLAYER : Dr. Cossack</option>';
-                }
-
-                // Add the optgroup closing tag
+        // Robot Avatar
+        $html_avatar_options = array();
+        $html_avatar_options[] = '<option value="">- Select Robot -</option>';
+        $temp_optgroup_token = 'MM00';
+        $html_avatar_options[] = '<optgroup label="Mega Man Robots">';
+        foreach ($mmrpg_database_robots AS $token => $info){
+            if ($token == 'robot' || strstr($token, 'copy')){ continue; }
+            elseif (isset($info['robot_image']) && $info['robot_image'] == 'robot'){ continue; }
+            elseif (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){ continue; }
+            elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
+            elseif (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
+            if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
+            if ($info['robot_game'] != $temp_optgroup_token){
+                $temp_optgroup_token = $info['robot_game'];
+                if ($temp_optgroup_token == 'MM20'){ $temp_optgroup_name = 'Mega Man Killers'; }
+                elseif (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '0').' Robots'; }
+                else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $temp_optgroup_token).' Robots'; }
                 $html_avatar_options[] = '</optgroup>';
-                $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['imagepath'].'"', 'value="'.$_SESSION['GAME']['USER']['imagepath'].'" selected="selected"', implode('', $html_avatar_options));
-                echo '<select class="select select_imagepath" style="width: 230px; " name="imagepath">'.$temp_select_options.'</select>';
-            //echo '</div>';
+                $html_avatar_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
+                }
+            $size = isset($info['robot_image_size']) ? $info['robot_image_size'] : 40;
+            $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
+            $temp_summon_count = mmrpg_prototype_database_summoned($token);
+            $temp_alts_unlocked = mmrpg_prototype_altimage_unlocked($token);
+            if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
+                foreach ($mmrpg_index['types'] AS $type_token => $type_info){
+                    if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
+                    if (!isset($_SESSION['GAME']['values']['battle_items'][$type_token.'-core']) && $this_userinfo['role_id'] != 1){ continue; }
+                    $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)'.'</option>';
+                    }
+                }
+            elseif (!empty($info['robot_image_alts'])){
+                $info['robot_image_alts'] = json_decode($info['robot_image_alts'], true);
+                foreach ($info['robot_image_alts'] AS $key => $this_altinfo){
+                    $alt_unlocked = false;
+                    if (!empty($this_altinfo['summons']) && $temp_summon_count >= $this_altinfo['summons']){ $alt_unlocked = true; }
+                    elseif (in_array($this_altinfo['token'], $temp_alts_unlocked)){ $alt_unlocked = true; }
+                    if ($alt_unlocked){ $html_avatar_options[] = '<option value="robots/'.$token.'_'.$this_altinfo['token'].'/'.$size.'">'.$info['robot_number'].' : '.$this_altinfo['name'].'</option>'; }
+                    }
+                }
+            }
+        if ($this_userinfo['role_id'] == 1 || $this_userinfo['role_id'] == 6){
+            $html_avatar_options[] = '</optgroup>';
+            $html_avatar_options[] = '<optgroup label="Mega Man Players">';
+            $html_avatar_options[] = '<option value="players/dr-light/40">PLAYER : Dr. Light</option>';
+            $html_avatar_options[] = '<option value="players/dr-wily/40">PLAYER : Dr. Wily</option>';
+            $html_avatar_options[] = '<option value="players/dr-cossack/40">PLAYER : Dr. Cossack</option>';
+            }
+        $html_avatar_options[] = '</optgroup>';
+        $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['imagepath'].'"', 'value="'.$_SESSION['GAME']['USER']['imagepath'].'" selected="selected"', implode('', $html_avatar_options));
+        echo '<div class="field field_imagepath">';
+            echo '<label class="label label_imagepath">Robot Avatar :</label>';
+            echo '<select class="select select_imagepath" name="imagepath">'.$temp_select_options.'</select>';
+        echo '</div>';
+
+        // Add the omega sequence fields if applicable
+        if (mmrpg_prototype_item_unlocked('omega-seed')){
+            echo '<div class="field field_omega">';
+                echo '<label class="label label_omega">Omega Sequence :</label>';
+                echo '<input class="text text_omega" type="text" name="omega" value="'.htmlentities(trim($_SESSION[$session_token]['USER']['omega']), ENT_QUOTES, 'UTF-8', true).'" disabled="disabled" />';
+            echo '</div>';
+            echo '<div class="field field_omegaseed">';
+                echo '<label class="label label_omegaseed">Regenerate Sequence :</label>';
+                echo '<input class="text text_omegaseed" type="text" name="omegaseed" maxlength="32" value="" />';
+            echo '</div>';
+        }
+
 
     }
     $html_form_fields = ob_get_clean();
@@ -244,8 +224,8 @@ while ($this_action == 'save'){
     if (!$file_has_updated){
 
         // Update the form markup buttons
-        echo '<input class="button button_submit" type="submit" value="Save Game" />';
-        echo '<input class="button button_reset" type="button" value="Reset Game" onclick="javascript:parent.window.mmrpg_trigger_reset();" />';
+        echo '<input class="button type type_nature button_submit" type="submit" value="Save Changes" />';
+        echo '<input class="button type type_flame button_reset" type="button" value="Reset Game" onclick="javascript:parent.window.mmrpg_trigger_reset();" />';
 
         echo '<div class="extra_options">';
 
@@ -470,20 +450,24 @@ while ($this_action == 'load'){
         $html_header_text .= '<br /> Your date of birth must now be confirmed in accordance with <a href="http://www.coppa.org/" target="_blank">COPPA</a> guidelines.';
     }
     // Update the form markup fields
-    $html_form_fields .= '<label class="label label_username">Username : </label>';
-    $html_form_fields .= '<input class="text text_username" type="text" name="username" value="'.(!empty($_REQUEST['username']) ? htmlentities(trim($_REQUEST['username']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
-    $html_form_fields .= '<label class="label label_password">Password :</label>';
-    $html_form_fields .= '<input class="text text_password" type="password" name="password" value="'.(!empty($_REQUEST['password']) ? htmlentities(trim($_REQUEST['password']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
+    $html_form_fields .= '<div class="field field_username">';
+        $html_form_fields .= '<label class="label label_username">Username : </label>';
+        $html_form_fields .= '<input class="text text_username" type="text" name="username" value="'.(!empty($_REQUEST['username']) ? htmlentities(trim($_REQUEST['username']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
+    $html_form_fields .= '</div>';
+    $html_form_fields .= '<div class="field field_password">';
+        $html_form_fields .= '<label class="label label_password">Password :</label>';
+        $html_form_fields .= '<input class="text text_password" type="password" name="password" value="'.(!empty($_REQUEST['password']) ? htmlentities(trim($_REQUEST['password']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
+    $html_form_fields .= '</div>';
     if ($html_form_show_coppa){
-        $html_form_fields .= '<div style="clear: both;">';
+        $html_form_fields .= '<div class="field field_dateofbirth" style="clear: both;">';
             $html_form_fields .= '<label class="label label_dateofbirth">Date of Birth : </label>';
             $html_form_fields .= '<input class="text text_dateofbirth" type="text" name="dateofbirth" value="'.(!empty($_REQUEST['dateofbirth']) ? htmlentities(trim($_REQUEST['dateofbirth']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="10" />';
             $html_form_fields .= '<span style="padding-left: 20px; color: #969696; font-size: 10px; letter-spacing: 1px;  ">YYYY-MM-DD</span>';
         $html_form_fields .= '</div>';
     }
     // Update the form markup buttons
-    $html_form_buttons .= '<input class="button button_submit" type="submit" value="Load File" />';
-    $html_form_buttons .= '<input class="button button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
+    $html_form_buttons .= '<input class="button type type_nature button_submit" type="submit" value="Load File" />';
+    $html_form_buttons .= '<input class="button type type_flame button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
 
     // If the file has been updated, update the data
     if ($file_has_updated && !empty($temp_database_user['user_id'])){
@@ -565,7 +549,7 @@ $(document).ready(function(){
         }
 
     // If reload parent has been set to true
-    if (reloadParent == true){
+    if (reloadParent == true && window.self != window.parent){
         //alert('about to reload parent...');
         var reloadTimeout = setTimeout(function(){
             //alert('reloading parent!');
