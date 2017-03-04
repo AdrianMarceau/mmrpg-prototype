@@ -152,7 +152,16 @@ while ($this_action == 'profile'){
 
         // Save the current game session into the file
         mmrpg_save_game_session();
-        $this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+        $db_users_fields = rpg_user::get_index_fields(true, 'users');
+        $db_users_roles_fields = rpg_user_role::get_index_fields(true, 'roles');
+        $this_userinfo = $db->get_array("SELECT
+            {$db_users_fields},
+            {$db_users_roles_fields}
+            FROM mmrpg_users AS users
+            LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+            WHERE users.user_id = '{$this_userid}'
+            LIMIT 1
+            ;");
         $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
         $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
         $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
