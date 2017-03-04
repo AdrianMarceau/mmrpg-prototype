@@ -200,33 +200,33 @@ while ($this_action == 'profile'){
 
         ?>
 
-        <div class="field field_username" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">
-            <label class="label label_username" style="width: 230px; ">Username :</label>
-            <input class="text text_username" type="text" name="username" style="width: 100%; opacity: 0.50; filter: alpha(opacity = 50); " value="<?= htmlentities(trim($_SESSION['GAME']['USER']['username']), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
+        <div class="field field_username">
+            <label class="label label_username">Username :</label>
+            <input class="text text_username" type="text" name="username" value="<?= htmlentities(trim($_SESSION['GAME']['USER']['username']), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
         </div>
-        <div class="field field_password" style="float: left; width: 23%; min-height: 50px; margin-right: 0; ">
+        <div class="field field_password half">
             <label class="label label_password" style="width: auto; ">Current Password : </label>
-            <input class="text text_password" type="password" name="password_display" style="width: 90%; opacity: 0.50; filter: alpha(opacity = 50); " value="<?= htmlentities(trim($temp_password), ENT_QUOTES, 'UTF-8', true) ?>" maxlength="18" disabled="disabled" />
+            <input class="text text_password" type="password" name="password_display" value="<?= htmlentities(trim($temp_password), ENT_QUOTES, 'UTF-8', true) ?>" maxlength="18" disabled="disabled" />
         </div>
-        <div class="field field_password_new" style="float: left; width: 23%; min-height: 50px; margin-right: 0; ">
+        <div class="field field_password_new half">
             <label class="label label_password" style="width: auto; ">Change Password : <span style="font-size: 10px; padding-left: 6px; position: relative; bottom: 1px; color: #CACACA;">(6 - 18 chars)</span></label>
-            <input class="text text_password" type="text" name="password_new" style="width: 90%; float: left; margin-right: 6px;" value="" maxlength="18" />
+            <input class="text text_password" type="text" name="password_new" value="" maxlength="18" />
         </div>
-        <div class="field field_displayname" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">
-            <label class="label label_displayname" style="width: 230px; ">Display Name :</label>
-            <input class="text text_displayname" style="width: 100%; " type="text" name="displayname" maxlength="18" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+        <div class="field field_displayname">
+            <label class="label label_displayname">Display Name :</label>
+            <input class="text text_displayname" type="text" name="displayname" maxlength="18" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
         </div>
-        <div class="field field_emailaddress" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">
-            <label class="label label_emailaddress" style="width: 230px; ">Email Address :</label>
-            <input class="text text_emailaddress" style="width: 100%; " type="text" name="emailaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['emailaddress']) ? $_SESSION['GAME']['USER']['emailaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+        <div class="field field_emailaddress">
+            <label class="label label_emailaddress">Email Address :</label>
+            <input class="text text_emailaddress" type="text" name="emailaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['emailaddress']) ? $_SESSION['GAME']['USER']['emailaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
         </div>
-        <div class="field field_websiteaddress" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">
-            <label class="label label_websiteaddress" style="width: 230px; ">Website Address :</label>
-            <input class="text text_websiteaddress" style="width: 100%; " type="text" name="websiteaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+        <div class="field field_websiteaddress">
+            <label class="label label_websiteaddress">Website Address :</label>
+            <input class="text text_websiteaddress" type="text" name="websiteaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
         </div>
 
-        <div class="field field_gender" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">
-            <label class="label label_gender" style="width: 230px; ">Player Gender :</label>
+        <div class="field field_gender">
+            <label class="label label_gender">Player Gender :</label>
             <?
             $html_gender_options = array();
                 $html_gender_options[] = '<option value="male">Male</option>';
@@ -234,20 +234,20 @@ while ($this_action == 'profile'){
                 $html_gender_options[] = '<option value="other">Other</option>';
             $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['gender'].'"', 'value="'.$_SESSION['GAME']['USER']['gender'].'" selected="selected"', implode('', $html_gender_options));
             ?>
-            <select class="select select_gender" style="width: 100%; " name="gender"><?= $temp_select_options ?></select>
+            <select class="select select_gender" name="gender"><?= $temp_select_options ?></select>
         </div>
 
-        <div class="field field_roleid" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">
-            <label class="label label_roleid" style="width: 230px; ">Member Type :</label>
-            <input class="text text_roleid" style="width: 100%; opacity: 0.50; filter: alpha(opacity = 50); " type="text" name="role_id" disabled="disabled" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['roleid']) ? $this_roles_index[$_SESSION['GAME']['USER']['roleid']]['role_name'] : 'Unknown'), ENT_QUOTES, 'UTF-8', true) ?>" />
+        <div class="field field_roleid">
+            <label class="label label_roleid">Member Type :</label>
+            <input class="text text_roleid" type="text" name="role_id" disabled="disabled" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['roleid']) ? $this_roles_index[$_SESSION['GAME']['USER']['roleid']]['role_name'] : 'Unknown'), ENT_QUOTES, 'UTF-8', true) ?>" />
         </div>
 
         <?
         $mmrpg_database_type = $mmrpg_index['types'];
         sort($mmrpg_database_type);
         ?>
-        <div class="field field_colourtoken" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">
-            <label class="label label_colourtoken" style="width: 230px; ">Player Colour :</label>
+        <div class="field field_colourtoken">
+            <label class="label label_colourtoken">Player Colour :</label>
             <?
             $html_colour_options = array();
             $html_colour_options[] = '<option value="">- Select Type -</option>';
@@ -266,11 +266,11 @@ while ($this_action == 'profile'){
             }
             $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['colourtoken'].'"', 'value="'.$_SESSION['GAME']['USER']['colourtoken'].'" selected="selected"', implode('', $html_colour_options));
             ?>
-            <select class="select select_colourtoken" style="width: 100%; " name="colourtoken"><?= $temp_select_options ?></select>
+            <select class="select select_colourtoken" name="colourtoken"><?= $temp_select_options ?></select>
         </div>
 
-        <div class="field field_imagepath" style="float: left; width: 46%; min-height: 50px; margin-right: 35px; ">
-            <label class="label label_imagepath" style="width: 230px; ">Player Avatar :</label>
+        <div class="field field_imagepath">
+            <label class="label label_imagepath">Player Avatar :</label>
             <?
             $html_avatar_options = array();
             $html_avatar_options[] = '<option value="">- Select Robot -</option>';
@@ -347,7 +347,7 @@ while ($this_action == 'profile'){
             $html_avatar_options[] = '</optgroup>';
             $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['imagepath'].'"', 'value="'.$_SESSION['GAME']['USER']['imagepath'].'" selected="selected"', implode('', $html_avatar_options));
             ?>
-            <select class="select select_imagepath" style="width: 100%; " name="imagepath"><?= $temp_select_options ?></select>
+            <select class="select select_imagepath" name="imagepath"><?= $temp_select_options ?></select>
         </div>
 
         <?
@@ -366,8 +366,8 @@ while ($this_action == 'profile'){
         }
         ksort($temp_omega_factor_options);
         ?>
-        <div class="field field_backgroundpath" style="float: left; width: 46%; min-height: 50px; margin-right: 0; ">
-            <label class="label label_backgroundpath" style="width: 230px; ">Player Background :</label>
+        <div class="field field_backgroundpath">
+            <label class="label label_backgroundpath">Player Background :</label>
             <?
             $temp_optgroup_token = 'MM00';
             $html_background_options = array();
@@ -399,21 +399,21 @@ while ($this_action == 'profile'){
             $html_background_options[] = '</optgroup>';
             $temp_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['backgroundpath'].'"', 'value="'.$_SESSION['GAME']['USER']['backgroundpath'].'" selected="selected"', implode('', $html_background_options));
             ?>
-            <select class="select select_backgroundpath" style="width: 100%; " name="backgroundpath"><?= $temp_select_options ?></select>
+            <select class="select select_backgroundpath" name="backgroundpath"><?= $temp_select_options ?></select>
         </div>
 
         <?
         // Only show omega sequence fields if unlocked by the player
         if (rpg_game::omega_abilities_unlocked()){
             ?>
-            <div class="field field_omega" style="float: left; width: 46%; min-height: 50px; margin-right: 35px;">
-                <label class="label label_omega" style="width: 230px; ">Omega Sequence :</label>
-                <input class="text text_omega" style="width: 100%; opacity: 0.5;" type="text" name="omega" maxlength="32" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['omega']) ? $_SESSION['GAME']['USER']['omega'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
+            <div class="field field_omega">
+                <label class="label label_omega">Omega Sequence :</label>
+                <input class="text text_omega" type="text" name="omega" maxlength="32" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['omega']) ? $_SESSION['GAME']['USER']['omega'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
             </div>
 
-            <div class="field field_omega_seed" style="float: left; width: 46%; min-height: 50px; margin-right: 0;">
-                <label class="label label_omega_seed" style="width: 230px; ">Regenerate Sequence :</label>
-                <input class="text text_omega_seed" style="width: 100%; " type="text" name="omega_seed" maxlength="32" value="" />
+            <div class="field field_omega_seed">
+                <label class="label label_omega_seed">Regenerate Sequence :</label>
+                <input class="text text_omega_seed" type="text" name="omega_seed" maxlength="32" value="" />
             </div>
             <?
         }
@@ -424,22 +424,22 @@ while ($this_action == 'profile'){
         if (in_array($_SESSION['GAME']['USER']['roleid'], array(1, 6, 2, 7))){
             $member_role_name = trim(!empty($_SESSION['GAME']['USER']['roleid']) ? $this_roles_index[$_SESSION['GAME']['USER']['roleid']]['role_name'] : 'Unknown');
             ?>
-            <div class="field field_creditsline full" style="margin-top: 20px;">
-                <label class="label label_creditsline" style="width: 230px; "><?= $member_role_name.' Credits :' ?></label>
-                <input class="text text_creditsline" style="width: 98%; " name="creditsline" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditsline']) ? $_SESSION['GAME']['USER']['creditsline'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+            <div class="field field_creditsline full">
+                <label class="label label_creditsline"><?= $member_role_name.' Credits :' ?></label>
+                <input class="text text_creditsline" name="creditsline" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditsline']) ? $_SESSION['GAME']['USER']['creditsline'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
             </div>
 
-            <div class="field field_creditstext full" style="margin-bottom: 20px;">
-                <label class="label label_creditstext" style="width: 230px; "><?= $member_role_name.' Description : '?></label>
-                <textarea class="textarea textarea_creditstext" style="width: 98%; height: 150px; " name="creditstext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditstext']) ? $_SESSION['GAME']['USER']['creditstext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
+            <div class="field field_creditstext full">
+                <label class="label label_creditstext"><?= $member_role_name.' Description : '?></label>
+                <textarea class="textarea textarea_creditstext" style="height: 150px; " name="creditstext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditstext']) ? $_SESSION['GAME']['USER']['creditstext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
             </div>
             <?
         }
         ?>
 
         <div class="field field_profiletext full">
-            <label class="label label_profiletext" style="width: 230px; ">Profile Description :</label>
-            <textarea class="textarea textarea_profiletext" style="width: 98%; height: 250px; " name="profiletext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['profiletext']) ? $_SESSION['GAME']['USER']['profiletext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
+            <label class="label label_profiletext">Profile Description :</label>
+            <textarea class="textarea textarea_profiletext" style="height: 250px; " name="profiletext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['profiletext']) ? $_SESSION['GAME']['USER']['profiletext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
             <?= mmrpg_formatting_help() ?>
         </div>
 
@@ -638,23 +638,23 @@ while ($this_action == 'new'){
     ob_start();
     ?>
     <div class="field">
-        <label class="label label_username" style="width: 230px; " title="Your username cannot be changed and must be used when logging into your account. This name appears on your profile and leaderboard pages as well as your in-game menu.">Username : *</label>
+        <label class="label label_username" title="Your username cannot be changed and must be used when logging into your account. This name appears on your profile and leaderboard pages as well as your in-game menu.">Username : *</label>
         <input class="text text_username" type="text" name="username" style="width: 330px; " value="<?= !empty($_REQUEST['username']) ? htmlentities(trim($_REQUEST['username']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="18" />
     </div>
     <div class="field">
-        <label class="label label_emailaddress" style="width: 230px; " title="Your email address will only ever be used to verify your identity in the event you forgot your password and need help getting access to your account. It will never given to third parties for any reason.">Email Address : *</label>
+        <label class="label label_emailaddress" title="Your email address will only ever be used to verify your identity in the event you forgot your password and need help getting access to your account. It will never given to third parties for any reason.">Email Address : *</label>
         <input class="text text_emailadddress" type="text" name="emailaddress" style="width: 330px; " value="<?= !empty($_REQUEST['emailaddress']) ? htmlentities(trim($_REQUEST['emailaddress']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="100" />
     </div>
     <div class="field">
-        <label class="label label_dateofbirth" style="width: 230px; " title="Your date of birth is required to verify your age and does not appear anywhere on your profile.  Users 13 years of age or younger may not register without a parent or guardian's permission.">Date of Birth : * <span style="padding-left: 20px; color: #969696; font-size: 10px; letter-spacing: 1px;  ">YYYY-MM-DD</span></label>
+        <label class="label label_dateofbirth" title="Your date of birth is required to verify your age and does not appear anywhere on your profile.  Users 13 years of age or younger may not register without a parent or guardian's permission.">Date of Birth : * <span style="padding-left: 20px; color: #969696; font-size: 10px; letter-spacing: 1px;  ">YYYY-MM-DD</span></label>
         <input class="text text_dateofbirth" type="text" name="dateofbirth" style="width: 230px; " value="<?= !empty($_REQUEST['dateofbirth']) ? htmlentities(trim($_REQUEST['dateofbirth']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="10" />
     </div>
     <div class="field">
-        <label class="label label_password" style="width: 230px; " title="This password is used to store and encypt the data in your save file.  This password is important so please remember it.">Password : *</label>
+        <label class="label label_password" title="This password is used to store and encypt the data in your save file.  This password is important so please remember it.">Password : *</label>
         <input class="text text_password" type="text" name="password" style="width: 230px; " value="<?= !empty($_REQUEST['password']) ? htmlentities(trim($_REQUEST['password']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="18" />
     </div>
     <div class="field">
-        <label class="label label_captcha" style="width: 230px; " title="Type the security code into the box exactly as you see it below.  This is to ensure you are human and not a spam bot.">Security Code : *</label>
+        <label class="label label_captcha" title="Type the security code into the box exactly as you see it below.  This is to ensure you are human and not a spam bot.">Security Code : *</label>
         <img class="captcha captcha_image" src="_ext/captcha/captcha.php?<?= time() ?>" width="200" height="70" alt="Security Code" />
         <input class="text text_captcha" type="text" name="captcha" style="width: 165px; " value="<?= !empty($_REQUEST['captcha']) ? htmlentities(trim($_REQUEST['captcha']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="18" />
     </div>

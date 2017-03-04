@@ -4918,12 +4918,18 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
 }
 #window .page_file .form .field {
     float: left;
-    width: 46%;
+    box-sizing: border-box;
+    width: 50%;
     min-height: 50px;
-    margin-right: 35px;
+    padding-right: 10px;
+    margin: 0 auto 10px 0;
+}
+#window .page_file .form .field.half {
+    width: 25%;
 }
 #window .page_file .form .field.full {
     float: none;
+    clear: both;
     width: 100%;
     min-height: 50px;
     margin: 0 auto 20px;
@@ -4966,17 +4972,30 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
     padding: 3px;
     font-size: 13px;
     line-height: 16px;
-    width: 96%;
+    width: 98%;
     color: #F2F2F2;
     border: 1px solid rgb(60, 60, 60);
     background-color: rgb(39, 39, 39);
-    border-radius: 0.5em;
-    -moz-border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    border-radius: 0.5em;
+    box-sizing: border-box;
+}
+#window .page_file .form .field .text,
+#window .page_file .form .field .textarea,
+#window .page_file .form .field .select,
+#window .page_file .form .field .captcha {
+    width: 100%;
 }
 #window .page_file .form .field .captcha {
     width: auto;
     overflow: hidden;
+}
+#window .page_file .form .field input[disabled="disabled"],
+#window .page_file .form .field select[disabled="disabled"],
+#window .page_file .form .field textarea[disabled="disabled"] {
+    opacity: 0.50;
+    filter: alpha(opacity = 50);
 }
 
 #window .page_file .form .field_header {
