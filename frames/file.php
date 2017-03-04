@@ -318,7 +318,6 @@ while ($this_action == 'load'){
             // Trim spaces off the end and beginning
             $_REQUEST['username'] = trim($_REQUEST['username']);
             $_REQUEST['password'] = trim($_REQUEST['password']);
-
             // Ensure the username is valid
             if (empty($_REQUEST['username'])){
                 $html_form_messages .= '<span class="error">(!) The username was not provided.</span>';
@@ -330,13 +329,11 @@ while ($this_action == 'load'){
                 $html_form_messages .= '<span class="error">(!) The provided username contains invalid characters.</span>';
                 break;
             }
-
             // Ensure the password is valid
             if (empty($_REQUEST['password'])){
                 $html_form_messages .= '<span class="error">(!) The password was not provided.</span>';
                 break;
             }
-
         }
 
         // Collect the user details and generate the file ones as well
@@ -345,20 +342,19 @@ while ($this_action == 'load'){
         $this_user['username_clean'] = preg_replace('/[^-a-z0-9]+/i', '', strtolower($this_user['username']));
         $this_user['password'] = trim($_REQUEST['password']);
         $this_user['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$this_user['password']);
-        $this_file = array();
-        $this_file['path'] = $this_user['username_clean'].'/';
+
+        // The file exists, so let's collect this user's info from teh database
+        $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
 
         // Check if the requested save file path exists
-        $temp_save_filepath = $this_save_dir.$this_file['path'];
-        if (file_exists($temp_save_filepath) && is_dir($temp_save_filepath)){
+        if (!empty($temp_database_user)){
 
-            // The file exists, so let's collect this user's info from teh database
-            $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
-            $this_file['name'] = $temp_database_user['user_omega'].'.sav';
-
-            // The file exists, so let's check the password
-            $temp_save_filepath .= $this_file['name'];
+            // And now let's let's check the password
             if ($this_user['password_encoded'] == $temp_database_user['user_password_encoded']){
+
+                // Clear the password from these vars, we don't need it anymore
+                $this_user['password'] = '';
+                $this_user['password_encoded'] = '';
 
                 // The password was correct, but let's also make sure the user is old enough
                 if (!empty($temp_database_user['user_date_birth']) && !empty($temp_database_user['user_flag_approved'])){
@@ -366,13 +362,17 @@ while ($this_action == 'load'){
                     // The password was correct! Update the session with these credentials
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
+
                     // Load the save file into memory and overwrite the session
                     mmrpg_load_game_session();
-                    if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
-                        //die('battle points are empty 2');
+                    if (empty($_SESSION['GAME']['counters']['battle_points'])){
                         mmrpg_reset_game_session();
+                    } elseif (empty($_SESSION['GAME']['values']['battle_rewards'])){
+                        mmrpg_reset_game_session();
+                    } else {
+                        mmrpg_save_game_session();
                     }
-                    mmrpg_save_game_session();
+
                     // Update the form markup, then break from the loop
                     $file_has_updated = true;
                     break;
@@ -416,17 +416,19 @@ while ($this_action == 'load'){
                     // The password was correct! Update the session with these credentials
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
+
                     // Load the save file into memory and overwrite the session
                     mmrpg_load_game_session();
                     if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
-                        //die('battle points are empty 1');
                         mmrpg_reset_game_session();
                     }
+
                     // Update the file with the coppa approval flag and birthdate
                     $_SESSION['GAME']['USER']['dateofbirth'] = strtotime($_REQUEST['dateofbirth']);
                     $_SESSION['GAME']['USER']['approved'] = 1;
-                    //die('<pre>$_SESSION[GAME][USER] = '.print_r($_SESSION['GAME']['USER'], true).'</pre>');
+
                     mmrpg_save_game_session();
+
                     // Update the form markup, then break from the loop
                     $file_has_updated = true;
                     break;
@@ -448,7 +450,7 @@ while ($this_action == 'load'){
         else {
 
             // Create an error message and break out of the form
-            $html_form_messages .= '<span class="error">(!) The requested username does not exist.</span>';
+            $html_form_messages .= '<span class="error">(!) The requested username ('.$this_user['username_clean'].') does not exist.</span>';
             break;
 
         }
@@ -460,6 +462,7 @@ while ($this_action == 'load'){
 
     // Update the header markup title
     $html_header_title .= 'Load Existing Game File';
+
     // Update the header markup text
     $html_header_text .= 'Please enter the username and password of your save file below. ';
     $html_header_text .= 'Passwords are case-sensitive, though usernames are not.';
@@ -483,15 +486,27 @@ while ($this_action == 'load'){
     $html_form_buttons .= '<input class="button button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
 
     // If the file has been updated, update the data
-    if ($file_has_updated){
+    if ($file_has_updated && !empty($temp_database_user['user_id'])){
 
         // Update the form messages markup text
         $html_form_messages .= '<span class="success">(!) Thank you.  Your game has been loaded.</span>';
         // Clear the form fields markup
-        //$html_form_fields = '<script type="text/javascript"> reloadIndex = true; </script>';
         $html_form_fields = '<script type="text/javascript"> reloadParent = true; </script>';
         // Update the form markup buttons
-        $html_form_buttons = ''; //<input class="button button_continue" type="button" value="Continue" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
+        $html_form_buttons = '<input class="button button_continue" type="button" value="Continue" onclick="javascript:parent.window.location.href=\''.MMRPG_CONFIG_ROOTURL.'\';" />';
+
+        // Update the session with the pending login ID
+        $_SESSION['GAME']['PENDING_LOGIN_ID'] = $temp_database_user['user_id'];
+        $_SESSION['GAME']['USER']['userid'] = $temp_database_user['user_id'];
+        mmrpg_load_game_session();
+
+        /*
+        echo('<pre>$_POST = '.print_r($_POST, true).'</pre>');
+        echo('<pre>$_SESSION[GAME][PENDING_LOGIN_ID] = '.print_r($_SESSION['GAME']['PENDING_LOGIN_ID'], true).'</pre>');
+        echo('<pre>$_SESSION[GAME][USER] = '.print_r($_SESSION['GAME']['USER'], true).'</pre>');
+        exit();
+        */
+
 
     }
 
