@@ -118,7 +118,7 @@ while ($this_action == 'profile'){
             $user_creditsline = !empty($_POST['creditsline']) ? strip_tags(trim($_POST['creditsline'])) : '';
 
             // Only process omega fields if function unlocked
-            if (rpg_game::omega_abilities_unlocked()){
+            if (mmrpg_prototype_item_unlocked('omega-seed')){
                 $user_omega_seed = !empty($_POST['omega_seed']) ? trim(preg_replace('/[^-_0-9a-z\.\s\,\?\!]+/i', '', $_POST['omega_seed'])) : '';
                 $user_omega_seed = preg_replace('/\s+/', ' ', $user_omega_seed);
                 if (!empty($user_omega_seed) && strlen($user_omega_seed) < 6){ $user_omega_seed = ''; }
@@ -404,7 +404,7 @@ while ($this_action == 'profile'){
 
         <?
         // Only show omega sequence fields if unlocked by the player
-        if (rpg_game::omega_abilities_unlocked()){
+        if (mmrpg_prototype_item_unlocked('omega-seed')){
             ?>
             <div class="field field_omega">
                 <label class="label label_omega">Omega Sequence :</label>

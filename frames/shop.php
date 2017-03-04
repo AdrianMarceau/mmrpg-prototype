@@ -129,11 +129,11 @@ if (true){
                     </span>
                     <?
 
-                    // Only omega indicators if the abilities have been unlocked
-                    if (!empty($shop_info['shop_hidden_power'])){
+                    // Only show omega indicators if the the Omega Seed has been unlocked
+                    if (true || mmrpg_prototype_item_unlocked('omega-seed')){
 
                         // Print out the omega indicators for the shop
-                        echo '<span class="omega player_type type_'.$shop_info['shop_hidden_power'].'"></span>'.PHP_EOL;
+                        echo '<span class="omega player_type type_'.$shop_info['shop_hidden_power'].'" title="Omega Influence || [['.ucfirst($shop_info['shop_hidden_power']).' Type]]"></span>'.PHP_EOL;
                         //title="Omega Influence || [['.ucfirst($shop_info['shop_hidden_power']).' Type]]"
                         //echo 'omega('.$shop_info['shop_omega_string'].')';
 
