@@ -276,6 +276,7 @@ button {
     opacity: 0.66;
     filter: alpha(opacity = 66);
     z-index: -10;
+    background-image: none;
 }
 #window .banner .userinfo .avatar {
     display: block; float: right; margin-left: 4px;
@@ -4914,6 +4915,13 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
     display: block;
     float: none;
     margin: 0 0 10px 0;
+}
+#window .page_file .form .field {
+    float: left;
+    width: 46%;
+    min-height: 50px;
+    margin-right: 35px;
+    }
 }
 #window .page_community .form .button,
 #window .page_file .form .button {
