@@ -516,6 +516,7 @@ tr:nth-child(odd) td {
     width: 50%;
     padding-bottom: 0;
     margin-bottom: 0;
+    clear: left;
 }
 .adminform .login .buttons {
     padding-top: 5px;
