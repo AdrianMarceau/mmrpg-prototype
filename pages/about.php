@@ -22,7 +22,7 @@ ob_start();
 ?>
 
 <a name="overview" class="anchor">&nbsp;</a>
-<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Mega Man RPG Prototype Overview</h2>
+<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Prototype Overview</h2>
 <div class="subbody">
 
   <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/guts-man/sprite_left_80x80.png);">Guts Man</div></div>
@@ -36,7 +36,7 @@ ob_start();
 </div>
 
 <a name="development" class="anchor">&nbsp;</a>
-<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Mega Man RPG Prototype Mechanics &amp; Development</h2>
+<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Mechanics &amp; Development</h2>
 <div class="subbody">
 
   <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/robots/crash-man/sprite_right_80x80.png);">Crash Man</div></div>
@@ -51,7 +51,7 @@ ob_start();
 </div>
 
 <a name="links" class="anchor">&nbsp;</a>
-<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Mega Man RPG Prototype Links</h2>
+<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">External Links</h2>
 <div class="subbody">
 
   <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_05" style="background-image: url(images/robots/cut-man/sprite_left_80x80.png);">Cut Man</div></div>

@@ -22,7 +22,7 @@ $this_markup_header = 'Mega Man RPG Prototype Gallery <span class="count">( '.(!
 // Start generating the page markup
 ob_start();
 ?>
-<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Mega Man RPG Prototype Screenshots</h2>
+<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Screenshot Gallery</h2>
 <div class="subbody">
 
   <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/robots/fire-man/sprite_left_80x80.png);">Fire Man</div></div>
