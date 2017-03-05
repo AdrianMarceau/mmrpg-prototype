@@ -204,7 +204,7 @@ require(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
 $temp_remote_session = $this_playerinfo['user_id'] != $_SESSION['GAME']['USER']['userid'] ? true : false;
 $temp_show_players = true;
 $temp_show_items = !empty($this_playerinfo['save_values_battle_items']) ? true : false;
-$temp_show_stars = $this_playerinfo['save_values_battle_stars'] > 0 ? true : false;
+$temp_show_stars = !empty($this_playerinfo['save_values_battle_stars']) ? true : false;
 
 // Define the prototype complete flags for this player
 $this_playerinfo['board_battles_dr_light'] = !empty($this_playerinfo['board_battles_dr_light']) ? explode(',', $this_playerinfo['board_battles_dr_light']) : array();
