@@ -844,6 +844,7 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
     if (!isset($print_options['shop_token'])){ $print_options['shop_token'] = ''; }
     if (!isset($print_options['event_text'])){ $print_options['event_text'] = 'The {item} was unlocked!'; }
     if (!isset($print_options['positive_word'])){ $print_options['positive_word'] = rpg_battle::random_positive_word(); }
+    if (!isset($print_options['force_event'])){ $print_options['force_event'] = false; }
     if (!isset($print_options['show_images'])){
         $print_options['show_images'] = array();
         if (!empty($print_options['player_token'])){ $print_options['show_images'][] = 'player'; }
@@ -860,8 +861,8 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
     if (empty($item_token)){ return false; }
 
     // Turn off the event if it's been turned on and shouldn't be
-    if (mmrpg_prototype_item_unlocked($item_token)){ $print_options['event_text'] = ''; }
-    if (rpg_game::is_demo()){ $print_options['event_text'] = ''; }
+    if (!$print_options['force_event'] && mmrpg_prototype_item_unlocked($item_token)){ $print_options['event_text'] = ''; }
+    if (!$print_options['force_event'] && rpg_game::is_demo()){ $print_options['event_text'] = ''; }
 
     // Attempt to collect info for this item
     $item_info = rpg_item::get_index_info($item_token);
@@ -915,7 +916,7 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
 
         // Append the player image to the canvas markup if allowed
         if (in_array('player', $print_options['show_images'])){
-            $offset = $display_image_count > 1 ? 170 : 220;;
+            $offset = $display_image_count > 1 ? 170 : 220;
             $direction = 'right';
             $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_'.$direction.'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: '.$offset.'px;">'.$player_info['player_name'].'</div>';
         }
@@ -928,14 +929,16 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
         }
 
         // Append a buster glow background depending on the current player
-        $offset = $display_image_count > 1 ? 250 : 200;
         if ($player_token != 'player'){
+            if ($display_image_count == 0){ $offset = 248; }
+            elseif ($display_image_count == 1){ $offset = 200; }
+            elseif ($display_image_count >= 2){ $offset = 250; }
             $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/abilities/'.str_replace('dr-', '', $player_info['player_token']).'-buster/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: '.$offset.'px;">&nbsp;</div>';
         }
 
         // Append the actual item markup to the canvas
         if ($display_image_count == 0){ $offset = 260; }
-        elseif ($display_image_count == 1){ $offset = 292; }
+        elseif ($display_image_count == 1){ $offset = 212; }
         elseif ($display_image_count >= 2){ $offset = 262; }
         $temp_canvas_markup .= '<div class="item_type item_type_'.$this_type_token.' sprite sprite_40x40 sprite_40x40_00" style="
             position: absolute;
