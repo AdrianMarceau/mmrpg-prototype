@@ -397,16 +397,12 @@ $(document).ready(function(){
      * WINDOW RESIZE EVENTS
      */
 
-    if (!gameSettings.wapFlag){
+    // Remove the hard-coded heights for the main iframe
+    $('iframe', gameWindow).removeAttr('width').removeAttr('height');
 
-        // Remove the hard-coded heights for the main iframe
-        $('iframe', gameWindow).removeAttr('width').removeAttr('height');
-
-        // Trigger the windowResizeUpdate function automatically
-        windowResizeUpdate('startup');
-        window.onresize = function(){ return windowResizeUpdate('onresize'); }
-
-    }
+    // Trigger the windowResizeUpdate function automatically
+    windowResizeUpdate('startup');
+    window.onresize = function(){ return windowResizeUpdate('onresize'); }
 
 
     /*
@@ -487,6 +483,8 @@ $(document).ready(function(){
 
 // Define a function for updating the window sizes
 function windowResizeUpdate(updateType){
+    //alert('windowResizeUpdate('+updateType+')');
+
     // Define the base values to resize from
     var canvasHeight = 267;
     var consoleHeight = 256;
@@ -497,21 +495,38 @@ function windowResizeUpdate(updateType){
     // Check if this is the main window or if it's a child
     if (window === window.top){
         // Collect this window's width and height
+        var windowType = 'top';
         var windowWidth = $(window).width();
         var windowHeight = $(window).height();
         var gameWidth = gameWindow.width();
         var gameHeight = gameWindow.height();
         } else {
         // Collect the parent window's width and height
+        var windowType = 'child';
         var windowWidth = $(parent.window).width();
         var windowHeight = $(parent.window).height();
         var gameWidth = parent.gameWindow.width();
         var gameHeight = parent.gameWindow.height();
         }
 
+    var bodyInnerHeight = mmrpgBody.innerHeight();
+    //alert('windowType = '+windowType+' \nwindowWidth = '+windowWidth+' \nwindowHeight = '+windowHeight+' \nbodyInnerHeight = '+bodyInnerHeight);
+    if (bodyInnerHeight < windowHeight){ windowHeight = bodyInnerHeight; }
+
+    /*
+    if (window === window.top && windowHeight <= 924){
+        alert('preventOverflow');
+        $('html,body').css({height:windowHeight+'px',overflow:'hidden'});
+    } else {
+        alert('resetOverflow');
+        $('html,body').css({height:'',overflow:''});
+    }
+    */
+
     // Update the dimensions
-    gameSettings.currentBodyWidth = $(window).width(); //$(document).width(); //mmrpgBody.outerWidth();
-    gameSettings.currentBodyHeight = $(window).height(); //$(document).height(); //mmrpgBody.outerHeight();
+    gameSettings.currentBodyWidth = windowWidth; //$(document).width(); //mmrpgBody.outerWidth();
+    gameSettings.currentBodyHeight = windowHeight; //$(document).height(); //mmrpgBody.outerHeight();
+
     //console.log({windowWidth:windowWidth,windowHeight:windowHeight,gameWidth:gameWidth,gameHeight:gameHeight,gameSettings:gameSettings});
 
     // Check if the window is in landscape mode and update the session

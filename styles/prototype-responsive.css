@@ -35,6 +35,10 @@ body:before {
     #prototype {
         width: auto !important;
         min-width: 768px;
+        min-height: 924px;
+        height: auto;
+        background-color: #262626;
+        background-image: none;
     }
 
 }
@@ -84,11 +88,18 @@ body:before {
     }
 
     #window {
-        border-width: 0 0 2px;
+        border-width: 0;
         -webkit-border-radius: 0;
         -moz-border-radius: 0;
         border-radius: 0;
+        -webkit-box-shadow: 0 0 0 transparent;
+        -moz-box-shadow: 0 0 0 transparent;
+        box-shadow: 0 0 0 transparent;
         padding: 2px 0;
+    }
+
+    #music.onload {
+        bottom: -200px;
     }
 
 }
@@ -107,7 +118,6 @@ body:before {
         -moz-border-radius: 0 !important;
         -webkit-border-radius: 0 !important;
         border-radius: 0 !important;
-        height: 1004px;
     }
 
 
