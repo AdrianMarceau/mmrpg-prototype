@@ -348,7 +348,7 @@ function windowResizePrototype(){
 function mmrpg_trigger_reset(){
     // Define the confirmation text string
     var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
-    var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL progress with be lost. \nEverything. \nReset anyway?';
+    var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
     // Attempt to confirm with the user of they want to resey
     if (confirm(confirmText) && confirm(confirmText2)){
         // Redirect the user to the prototype reset page

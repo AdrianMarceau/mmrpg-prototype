@@ -224,9 +224,10 @@ while ($this_action == 'save'){
     if (!$file_has_updated){
 
         // Update the form markup buttons
-        echo '<input class="button type type_nature button_submit" type="submit" value="Save Changes" />';
-        echo '<input class="button type type_flame button_reset" type="button" value="Reset Game" onclick="javascript:parent.window.mmrpg_trigger_reset();" />';
+        echo '<input class="button type type_nature button_submit" type="submit" name="save" value="Save Changes" />';
+        echo '<input class="button type type_flame button_reset" type="button" name="reset" value="Reset Game" onclick="javascript:parent.window.mmrpg_trigger_reset();" />';
 
+        /*
         echo '<div class="extra_options">';
 
             // Ensure the player is unlocked
@@ -257,6 +258,7 @@ while ($this_action == 'save'){
             }
 
         echo '</div>';
+        */
 
         //echo '<input class="button button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
 
