@@ -2,23 +2,45 @@
 // Generate the markup for the action option panel
 ob_start();
 	// Define the markup for the option buttons
+
 	$temp_options = array();
-	// Display the option for returning to the main prototype menu
-	$temp_options[] = '<a data-order="1" class="button action_option block_1 ability_type_space" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
-	// Display an option for restarting this battle from scratch
-	$temp_options[] = '<a data-order="2" class="button action_option block_2 ability_type_space" type="button" data-action="restart"><label><span class="multi">Restart<br />Mission</span></label></a>';
-	// Display an option for changing config settings
-	//$temp_options[] = '<a class="button action_option block_3" type="button" data-panel="settings"><label><span class="multi">Settings<br />Menu</span></label></a>';
-	$temp_options[] = '<a data-order="3" class="button action_option block_3 ability_type_space" type="button" data-panel="settings_eventTimeout"><label><span class="multi">Message<br />Speed</span></label></a>';
-	$temp_options[] = '<a data-order="4" class="button action_option block_4 ability_type_space" type="button" onclick="parent.mmrpg_music_load(\'fields/'.$this_field->field_music.'/battle-field_background_music\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
+	$block_num = 0;
+
+	// Display the option for SKIP TURN
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="ability_8_action-noweapons"><label><span class="multi">Skip<br />Turn</span></label></a>';
+
+	// Display the option for CHARGE WEAPONS
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="ability_9_action-chargeweapons"><label><span class="multi">Charge<br />Weapons</span></label></a>';
+
+	// Display the option for RESTART BATTLE
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="restart"><label><span class="multi">Restart<br />Mission</span></label></a>';
+
+	// Display the option for RETURN TO MAIN MENU
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
+
+	// Display the option for MESSAGE SPEED
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_eventTimeout"><label><span class="multi">Message<br />Speed</span></label></a>';
+
+	// Display the option for RESTART MUSIC
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_music_load(\'fields/'.$this_field->field_music.'/battle-field_background_music\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
+
+	// Display the option for DEBUG MODE
+	$block_num++;
+	$current_debug_value = !empty($_SESSION['GAME']['debug_mode']) ? 1 : 0;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Debug Mode</span><br /><span class="value type type_'.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
+
 	/*
 	// Display the toggle options for perspective mode and stuff
 	$current_perspective_value = isset($_SESSION['GAME']['perspective_mode']) && empty($_SESSION['GAME']['perspective_mode']) ? 0 : 1;
 	$temp_options[] = '<a data-order="5" class="button action_option block_5 ability_type_space" type="button" onclick="mmrpg_toggle_perspective_mode(this);" data-value="'.$current_perspective_value.'"><label><span class="multi"><span class="title">Perspective Mode</span><br /><span class="value type type_'.($current_perspective_value ? 'nature' : 'flame').'">'.($current_perspective_value ? 'ON' : 'OFF').'</span></span></label></a>';
 	*/
-	// Display the toggle options for debug mode and stuff
-	$current_debug_value = !empty($_SESSION['GAME']['debug_mode']) ? 1 : 0;
-	$temp_options[] = '<a data-order="5" class="button action_option block_5 ability_type_space" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Debug Mode</span><br /><span class="value type type_'.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
+
 	/*
 	if (empty($_SESSION['GAME']['DEMO'])
 		&& $this_battle->battle_status != 'complete'

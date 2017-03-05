@@ -754,7 +754,7 @@ class rpg_canvas {
             // Display the ability's battle sprite
             $temp_markup = '<div data-ability-id="'.$this_data['ability_id_token'].'" data-robot-id="'.$robot_data['robot_id_token'].'" class="'.($this_data['ability_markup_class'].$this_data['ability_frame_classes']).'" style="'.($this_data['ability_markup_style'].$this_data['ability_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['ability_sprite_size'].'" data-direction="'.$this_data['ability_direction'].'" data-frame="'.$this_data['ability_frame'].'" data-animate="'.$this_data['ability_frame_animate'].'" data-position="'.$this_data['ability_position'].'" data-status="'.$this_data['ability_status'].'" data-scale="'.$this_data['ability_scale'].'"></div>';
             if (!empty($this_data['ability_image2'])){
-                $temp_markup .= 'ability_image:'.$this_data['ability_image'].' vs ability_image2:'.$this_data['ability_image2'].'';
+                //$temp_markup .= 'ability_image:'.$this_data['ability_image'].' vs ability_image2:'.$this_data['ability_image2'].'';
                 $temp_markup .= str_replace('/'.$this_data['ability_image'].'/', '/'.$this_data['ability_image2'].'/', $temp_markup);
             }
             echo $temp_markup;

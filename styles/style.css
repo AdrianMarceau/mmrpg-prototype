@@ -2523,6 +2523,10 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     background-image: none;
     border-color: #1A1A1A !important;
     color: #CACACA;
+    pointer-events: none;
+}
+#actions .button_continue.button_disabled {
+    text-indent: -9999px;
 }
 #actions .button_disabled:hover {
     color: #CACACA;
