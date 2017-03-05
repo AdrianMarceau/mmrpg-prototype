@@ -373,7 +373,7 @@ while ($this_action == 'load'){
                     elseif (!empty($temp_database_user['user_flag_approved'])){ $bypass_dateofbirth = true; }
 
                     // Ensure the dateofbirth is valid
-                    $_REQUEST['dateofbirth'] = str_replace(array('\/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']);
+                    $_REQUEST['dateofbirth'] = !empty($_REQUEST['dateofbirth']) ? str_replace(array('/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']) : '';
                     if (empty($_REQUEST['dateofbirth'])){
                         $html_form_messages .= '<span class="error">(!) Your date of birth must be confirmed in order to continue.</span>';
                         $html_form_verified = false;
@@ -474,13 +474,6 @@ while ($this_action == 'load'){
     // If the file has been updated, update the data
     if ($file_has_updated && !empty($temp_database_user['user_id'])){
 
-        // Update the form messages markup text
-        $html_form_messages .= '<span class="success">(!) Thank you.  Your game has been loaded.</span>';
-        // Clear the form fields markup
-        $html_form_fields = '<script type="text/javascript"> reloadParent = true; </script>';
-        // Update the form markup buttons
-        $html_form_buttons = '<input class="button button_continue" type="button" value="Continue" onclick="javascript:parent.window.location.href=\''.MMRPG_CONFIG_ROOTURL.'\';" />';
-
         // Update the session with the pending login ID
         $_SESSION['GAME']['PENDING_LOGIN_ID'] = $temp_database_user['user_id'];
         $_SESSION['GAME']['USER']['userid'] = $temp_database_user['user_id'];
@@ -493,6 +486,21 @@ while ($this_action == 'load'){
         exit();
         */
 
+        // Redirect without wasting time to the home again
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'frames/file.php?action=load&reload=true');
+        exit();
+
+    }
+
+    // Print out the success message if applicable
+    if (!empty($_REQUEST['reload']) || ($file_has_updated && !empty($temp_database_user['user_id']))){
+
+        // Update the form messages markup text
+        $html_form_messages .= '<span class="success">(!) Thank you.  Your game has been loaded.</span>';
+        // Clear the form fields markup
+        $html_form_fields = '<script type="text/javascript"> reloadParent = true; </script>';
+        // Update the form markup buttons
+        $html_form_buttons = '<input class="button button_continue" type="button" value="Continue" onclick="javascript:parent.window.location.href=\''.MMRPG_CONFIG_ROOTURL.'\';" />';
 
     }
 
