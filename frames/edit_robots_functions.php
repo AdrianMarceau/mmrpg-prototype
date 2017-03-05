@@ -37,13 +37,6 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
         if (empty($player_token) || !isset($temp_player_index[$player_token])){ continue; }
         $player_index_info = $temp_player_index[$player_token];
 
-        // If this player has not yet completed chapter one, no robot editor
-        //$intro_complete = rpg_prototype::event_complete('completed-chapter_'.$player_token.'_one');
-        $battles_complete = rpg_prototype::battles_complete($player_token, true);
-        $intro_complete = !empty($battles_complete) && count($battles_complete) >= 1 ? true : false;
-        $prototype_complete = rpg_prototype::campaign_complete($player_token);
-        if (!$intro_complete && !$prototype_complete){ continue; }
-
         // Merge the player and index info then append the token and info
         $player_info = array_merge($player_index_info, $player_info);
         $allowed_edit_players[] = $player_token;
