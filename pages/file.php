@@ -781,7 +781,7 @@ while ($this_action == 'load'){
                     elseif (!empty($temp_database_user['user_flag_approved'])){ $bypass_dateofbirth = true; }
 
                     // Ensure the dateofbirth is valid
-                    $_REQUEST['dateofbirth'] = str_replace(array('\/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']);
+                    $_REQUEST['dateofbirth'] = !empty($_REQUEST['dateofbirth']) ? str_replace(array('/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']) : '';
                     if (empty($_REQUEST['dateofbirth'])){
                         $html_form_messages .= '<span class="error">(!) Your date of birth must be confirmed in order to continue.</span>';
                         $html_form_verified = false;
