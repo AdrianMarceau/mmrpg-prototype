@@ -505,7 +505,7 @@ while ($this_action == 'new'){
             // Trim spaces off the end and beginning
             $_REQUEST['username'] = trim($_REQUEST['username']);
             $temp_username_clean = preg_replace('/[^-a-z0-9]+/i', '', strtolower($_REQUEST['username']));
-            $temp_file_path = $this_save_dir.$temp_username_clean.'/';
+            $temp_username_exists = $db->get_value("SELECT user_id FROM mmrpg_users WHERE user_name_clean LIKE '{$temp_username_clean}';", 'user_id');
             $_REQUEST['password'] = trim($_REQUEST['password']);
 
             // Define the is verfied and default to true
@@ -514,7 +514,7 @@ while ($this_action == 'new'){
             if (empty($_REQUEST['username'])){
                 $html_form_messages .= '<span class="error">(!) A username was not provided.</span>';
                 $html_form_verified = false;
-            } elseif ($_REQUEST['username'] == 'demo' || file_exists($temp_file_path)){
+            } elseif ($_REQUEST['username'] == 'demo' || !empty($temp_username_exists)){
                 $html_form_messages .= '<span class="error">(!) The requested username is already in use - please select another.</span>';
                 $html_form_verified = false;
             } elseif (strlen($_REQUEST['username']) < 6 || strlen($_REQUEST['username']) > 18){
@@ -545,7 +545,7 @@ while ($this_action == 'new'){
             if (in_array(strtolower($_REQUEST['emailaddress']), $bypass_emails)){ $bypass_dateofbirth = true; }
 
             // Ensure the dateofbirth is valid
-            $_REQUEST['dateofbirth'] = str_replace(array('\/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']);
+            $_REQUEST['dateofbirth'] = str_replace(array('/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']);
             if (empty($_REQUEST['dateofbirth'])){
                 $html_form_messages .= '<span class="error">(!) The date of birth was not provided.</span>';
                 $html_form_verified = false;
@@ -595,7 +595,7 @@ while ($this_action == 'new'){
         $this_user['imagepath'] = '';
         $this_user['backgroundpath'] = '';
         $this_user['colourtoken'] = '';
-        $this_user['gender'] = 'male';
+        $this_user['gender'] = '';
         $this_user['password'] = trim($_REQUEST['password']);
         $this_user['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$this_user['password']);
         $this_user['omega'] = md5(MMRPG_SETTINGS_OMEGA_SEED.$this_user['username_clean']);
