@@ -483,7 +483,7 @@ if ($this_current_page == 'file' // File sub-pages
     <a id="topscroll" href="<?= $this_current_url ?>"></a>
 
     <script type="text/javascript" src="scripts/jquery.js"></script>
-<script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
     <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
     <? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
         <script type="text/javascript" src="_ext/colorbox/jquery.colorbox.js"></script>

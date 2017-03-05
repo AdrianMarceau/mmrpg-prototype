@@ -1568,6 +1568,20 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -webkit-border-radius: 0.5em;
     overflow: auto;
 }
+#events #messages.ps-container {
+    position: relative;
+    overflow: hidden;
+    margin-right: 0;
+    padding-right: 10px;
+}
+#events #messages.ps-container > .ps-scrollbar-y-rail {
+    top: 3px;
+    bottom: auto;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+#events #messages.ps-container:not(.ps-active-y) > .ps-scrollbar-y-rail {
+    opacity: 0;
+}
 #events #canvas {
     overflow: hidden;
     margin: 0 0 5px;
@@ -1760,6 +1774,28 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #events #messages .database_container.layout_website .subbody .body_left table.full {
     margin: 5px auto 10px;
+}
+#events #messages .database_container .subbody .body_left table.full.basic,
+#events #messages .database_container .subbody .body_left table.full.stats {
+    float: left;
+    width: 50%;
+}
+#events #messages .database_container .subbody .body_left table.full.extras,
+#events #messages .database_container .subbody .body_left table.full.types {
+    float: left;
+    width: 50%;
+}
+#events #messages .database_container .subbody .body_left table.full td.right {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+#events #messages .database_container .subbody .body_left table.full.basic td.right,
+#events #messages .database_container .subbody .body_left table.full.types td.right {
+    padding-right: 10px;
+}
+#events #messages .database_container .subbody .body_left table.full.extras td.right,
+#events #messages .database_container .subbody .body_left table.full.stats td.right {
+    padding-left: 10px;
 }
 
 #events #messages .database_container .subbody .link_top,

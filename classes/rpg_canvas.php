@@ -505,7 +505,7 @@ class rpg_canvas {
                             'sprite_'.$icon_size.'x'.$icon_size.'_'.$frame_token.' '.
                             '" '.
                         'style="'.
-                            'background-image: url(images/assets/unlock-icon/sprite_left_'.$icon_size.'x'.$icon_size.'.png?3); '.
+                            'background-image: url(images/assets/unlock-icon/sprite_left_'.$icon_size.'x'.$icon_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.
                             'background-size: '.$icon_file_width.'px '.$icon_file_height.'px; '.
                             'background-position: '.(!empty($frame_background_offset) ? $frame_background_offset.'px' : '0').' 0; '.
                             'width: '.$icon_sprite_size.'px; '.

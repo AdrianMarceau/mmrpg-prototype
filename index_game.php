@@ -128,6 +128,7 @@ if (count($matches)>1){
 <style type="text/css"> html, body { background-color: #262626; } </style>
 
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/jquery.scrollbar.min.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
@@ -186,11 +187,13 @@ if (count($matches)>1){
 </div>
 <?endif;?>
 <script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/jquery.js"></script>
+<script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/jquery.scrollbar.min.js"></script>
 <script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Define the key client variables
 gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
 gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+var thisScrollbarSettings = {wheelSpeed:0.3};
 </script>
 <script type="text/javascript">
 // When the document is ready for event binding
@@ -247,6 +250,7 @@ function windowEventDisplay(){
     $('#canvas', eventContainer).empty().html(canvasMarkup);
     $('#messages', eventContainer).empty().html(messagesMarkup);
     eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
+    $('#messages', eventContainer).perfectScrollbar(thisScrollbarSettings);
     $(window).focus();
     //alert(eventMarkup);
 }
