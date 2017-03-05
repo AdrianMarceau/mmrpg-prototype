@@ -20,14 +20,16 @@ function mmrpg_save_game_session(){
     $save = $_SESSION[$session_token];
     $this_user = $save['USER'];
 
-    // If this is NOT demo mode, load from database
-    if (rpg_game::is_user()){
+    // -- DEMO MODE SAVE -- //
+    if (!empty($_SESSION[$session_token]['DEMO'])){
+
+        // You can't save in demo mode...
+
+    }
+    // -- NORMAL MODE SAVE -- //
+    elseif (empty($_SESSION[$session_token]['DEMO'])){
 
         // UPDATE DATABASE INFO
-
-        // DEBUG
-        //echo 'and we\'re NOT in demo mode';
-        //
 
         // Collect the save info
         $this_cache_date = !empty($save['CACHE_DATE']) ? $save['CACHE_DATE'] : MMRPG_CONFIG_CACHE_DATE;
@@ -53,6 +55,8 @@ function mmrpg_save_game_session(){
 
             // If the user ID was found, collect it and proceed as normal
             if (!empty($temp_value)){
+                //echo('!empty($temp_value) = '.$temp_value.';<br /> ');
+                //echo('$is_new_user = false;<br /> ');
 
                 // Update the ID in the user array and continue
                 $this_user['userid'] = $temp_value;
@@ -60,6 +64,8 @@ function mmrpg_save_game_session(){
             }
             // Otherwise, create database rows for this new file
             else {
+                //echo('empty($temp_value)<br />');
+                //echo('$is_new_user = true;<br /> ');
 
                 // This is a new user so update the flag
                 $is_new_user = true;
@@ -247,6 +253,10 @@ function mmrpg_save_game_session(){
                 $this_save_array['save_date_modified'] = $this_user_array['user_date_modified'];
 
                 // Insert these users into the database
+                //echo('<hr /><pre>NEW DB USER/SAVE/BOARD UPDATES ($temp_user_id = '.$temp_user_id.')</pre>');
+                //echo('<pre>$this_user_array = '.print_r($this_user_array, true).'</pre>');
+                //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
+                //echo('<pre>$this_board_array = '.print_r($this_board_array, true).'</pre>');
                 $this_user_array_return = $db->insert('mmrpg_users', $this_user_array);
                 $this_save_array_return = $db->insert('mmrpg_saves', $this_save_array);
                 $this_board_array_return = $db->insert('mmrpg_leaderboard', $this_board_array);
@@ -254,6 +264,9 @@ function mmrpg_save_game_session(){
                 // Update the ID in the user array and continue
                 $this_user['userid'] = $temp_user_id;
                 $_SESSION['GAME']['PENDING_LOGIN_ID'] = $temp_user_id;
+
+                // We're done, we should return now
+                return true;
 
             }
         }
@@ -282,6 +295,8 @@ function mmrpg_save_game_session(){
         $this_user_array['user_flag_approved'] = !empty($this_user['approved']) ? 1 : 0;
 
         // Update this user's info in the database
+        //echo('<hr /><pre>FINAL DB USER UPDATE (user_id = '.$this_user['userid'].')</pre>');
+        //echo('<pre>$this_user_array = '.print_r($this_user_array, true).'</pre>');
         $db->update('mmrpg_users', $this_user_array, 'user_id = '.$this_user['userid']);
 
         // DEBUG
@@ -379,6 +394,8 @@ function mmrpg_save_game_session(){
         //die('<pre>$this_board_array : '.print_r($this_board_array, true).'</pre>');
 
         // Update this board's info in the database
+        //echo('<hr /><pre>FINAL DB LEADERBOARD UPDATE (user_id = '.$this_user['userid'].')</pre>');
+        //echo('<pre>$this_board_array = '.print_r($this_board_array, true).'</pre>');
         $db->update('mmrpg_leaderboard', $this_board_array, 'user_id = '.$this_user['userid']);
 
         // Clear any leaderboard data that exists in the session, forcing it to recache
@@ -452,13 +469,9 @@ function mmrpg_save_game_session(){
         $this_save_array['save_date_modified'] = time();
 
         // Update this save's info in the database
+        //echo('<hr /><pre>FINAL DB SAVES UPDATE (user_id = '.$this_user['userid'].')</pre>');
         //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
         $db->update('mmrpg_saves', $this_save_array, 'user_id = '.$this_user['userid']);
-
-    } else {
-
-        // DEBUG
-        //echo 'but we\'re in demo mode';
 
     }
 

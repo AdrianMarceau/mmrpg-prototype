@@ -60,7 +60,7 @@ function mmrpg_reset_game_session(){
     $_SESSION[$session_token]['values']['last_save'] = time();
 
     // -- DEMO MODE UNLOCKS -- //
-    if (rpg_game::is_demo()){
+    if (!empty($_SESSION[$session_token]['DEMO'])){
 
         // Only unlock Dr. Light as a playable character
         $unlock_player_info = $mmrpg_index['players']['dr-light'];
@@ -133,38 +133,10 @@ function mmrpg_reset_game_session(){
 
     }
     // -- NORMAL MODE UNLOCKS -- //
-    elseif (rpg_game::is_user()){
+    elseif (empty($_SESSION[$session_token]['DEMO'])){
 
         // Define a session var to ensure full reset
         $_SESSION[$session_token]['RESET'] = true;
-
-        /*
-        // Clean out database fields with unlocked content
-        $userid = $_SESSION[$session_token]['USER']['userid'];
-        $cachedate = MMRPG_CONFIG_CACHE_DATE;
-        $resetquery = "UPDATE mmrpg_saves SET
-            save_counters = '[]',
-            save_values = '[]',
-            save_values_battle_index = '[]',
-            save_values_battle_complete = '[]',
-            save_values_battle_failure = '[]',
-            save_values_battle_rewards = '[]',
-            save_values_battle_settings = '[]',
-            save_values_battle_items = '[]',
-            save_values_battle_abilities = '[]',
-            save_values_battle_stars = '[]',
-            save_values_robot_database = '[]',
-            save_values_robot_alts = '[]',
-            save_flags = '[]',
-            save_settings = '[]',
-            save_cache_date = '{$cachedate}'
-            WHERE user_id = {$userid}
-            ;";
-        $db->query($resetquery);
-        */
-
-        //echo('<pre>$resetquery = '.htmlentities(print_r($resetquery, true), ENT_QUOTES, 'UTF-8', true).'</pre>');
-        //exit();
 
         // Create the global item and ability arrays
         $_SESSION[$session_token]['values']['battle_items'] = array();
@@ -188,7 +160,7 @@ function mmrpg_reset_game_session(){
 
     }
 
-    //echo('<pre>$_SESSION[$session_token] = '.htmlentities(print_r($_SESSION[$session_token], true), ENT_QUOTES, 'UTF-8', true).'</pre>');
+    //echo('<pre>$_SESSION[$session_token] = '.htmlentities(print_r($_SESSION[$session_token], true), ENT_QUOTES, 'UTF-8', true).'</pre><hr /> ');
     //exit();
 
     // Return true on success

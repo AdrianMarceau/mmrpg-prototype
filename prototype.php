@@ -376,7 +376,7 @@ if (rpg_game::is_user()){
                     <span class="pipe">|</span>
                 <? endif; ?>
                 <a class="link link_leaderboard" data-step="leaderboard" data-index="<?= $temp_data_index++ ?>" data-source="frames/leaderboard.php" data-music="misc/leader-board" data-tooltip="<?= $this_menu_tooltips['leaderboard'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                    <label>rank</label>
+                    <label>ranks</label>
                 </a>
                 <span class="pipe">|</span>
                 <a class="link link_save" data-step="file_save" data-index="<?= $temp_data_index++ ?>" data-source="frames/file.php?action=save" data-music="misc/file-menu" data-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
