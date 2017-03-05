@@ -256,6 +256,12 @@ if (rpg_game::is_user()){
                             <?= number_format(count($_SESSION[$session_token]['values']['battle_stars']), 0, '.', ',') ?> &#9733;
                         </span>
                     <? } ?>
+                    <? if (mmrpg_prototype_item_unlocked('omega-seed')){ ?>
+                        <span class="pipe">|</span>
+                        <span class="amount omega">
+                            &#937;
+                        </span>
+                    <? } ?>
                 </div>
             </div>
             <?
