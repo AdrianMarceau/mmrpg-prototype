@@ -172,6 +172,10 @@
                 $star_list_array = array_keys($star_list_array_raw['today']);
                 shuffle($star_list_array);
 
+                //echo('<pre>$star_list_array = '.print_r($star_list_array, true).'</pre>');
+                //echo('<pre>$star_list_array_raw[today] = '.print_r($star_list_array_raw['today'], true).'</pre>');
+                //exit();
+
                 // Loop through the items and print them one by one
                 $star_counter = 0;
                 foreach ($star_list_array AS $key => $token){
@@ -190,7 +194,13 @@
                     $star_info_type = !empty($star_info['star_type']) ? $star_info['star_type'] : '';
                     $star_info_type2 = !empty($star_info['star_type2']) ? $star_info['star_type2'] : '';
                     $star_info_class = !empty($star_info_type) ? $star_info_type : 'none';
-                    if (!empty($star_info_type2)){ $star_info_class .= '_'.$star_info_type2; }
+                    $star_info_type_title = !empty($star_info_type) ? ucfirst($star_info_type) : 'Neutral';
+                    if (!empty($star_info_type2)){
+                        $star_info_class .= '_'.$star_info_type2;
+                        if ($star_info_type2 != $star_info_type){
+                            $star_info_type_title .= ' / '.ucfirst($star_info_type2);
+                        }
+                    }
 
                     $star_boost = !empty($this_star_force[$type_token]) ? $this_star_force[$type_token] : 0;
                     $star_price_boost = ceil($star_boost * 250);
@@ -209,7 +219,7 @@
 
                     $temp_info_tooltip = $star_info_name.'<br /> ';
                     $temp_info_tooltip .= '<span style="font-size:80%;">';
-                    $temp_info_tooltip .= ucfirst($star_info['star_kind']).' Star | '.ucwords(str_replace('_', ' / ', $star_info_type)).' Type';
+                    $temp_info_tooltip .= ucfirst($star_info['star_kind']).' Star | '.$star_info_type_title.' Type';
                     if (!empty($star_info_date)){ $temp_info_tooltip .= ' <br />Found '.date('Y/m/d', $star_info_date); }
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                     $temp_info_tooltip .= '</span>';
