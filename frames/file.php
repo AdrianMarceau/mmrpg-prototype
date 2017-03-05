@@ -338,12 +338,15 @@ while ($this_action == 'load'){
                 $this_user['password'] = '';
                 $this_user['password_encoded'] = '';
 
-                // The password was correct, but let's also make sure the user is old enough
+                // The password was correct and the user has been approved for login
                 if (!empty($temp_database_user['user_date_birth']) && !empty($temp_database_user['user_flag_approved'])){
 
                     // The password was correct! Update the session with these credentials
+                    mmrpg_reset_game_session();
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
+                    $_SESSION['GAME']['USER']['userid'] = $temp_database_user['user_id'];
+                    $_SESSION['GAME']['PENDING_LOGIN_ID'] = $temp_database_user['user_id'];
 
                     // Load the save file into memory and overwrite the session
                     mmrpg_load_game_session();
@@ -351,8 +354,6 @@ while ($this_action == 'load'){
                         mmrpg_reset_game_session();
                     } elseif (empty($_SESSION['GAME']['values']['battle_rewards'])){
                         mmrpg_reset_game_session();
-                    } else {
-                        mmrpg_save_game_session();
                     }
 
                     // Update the form markup, then break from the loop
@@ -395,21 +396,27 @@ while ($this_action == 'load'){
                         $html_form_show_coppa = true;
                     }
 
+                    // If the account is not verified, break now
+                    if (!$html_form_verified){ break; }
+
                     // The password was correct! Update the session with these credentials
+                    mmrpg_reset_game_session();
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
+                    $_SESSION['GAME']['USER']['userid'] = $temp_database_user['user_id'];
+                    $_SESSION['GAME']['USER']['dateofbirth'] = strtotime($_REQUEST['dateofbirth']);
+                    $_SESSION['GAME']['USER']['approved'] = 1;
+                    $_SESSION['GAME']['PENDING_LOGIN_ID'] = $temp_database_user['user_id'];
 
                     // Load the save file into memory and overwrite the session
                     mmrpg_load_game_session();
-                    if (empty($_SESSION['GAME']['counters']['battle_points']) || empty($_SESSION['GAME']['values']['battle_rewards'])){
+                    if (empty($_SESSION['GAME']['counters']['battle_points'])){
                         mmrpg_reset_game_session();
+                    } elseif (empty($_SESSION['GAME']['values']['battle_rewards'])){
+                        mmrpg_reset_game_session();
+                    } else {
+                        mmrpg_save_game_session();
                     }
-
-                    // Update the file with the coppa approval flag and birthdate
-                    $_SESSION['GAME']['USER']['dateofbirth'] = strtotime($_REQUEST['dateofbirth']);
-                    $_SESSION['GAME']['USER']['approved'] = 1;
-
-                    mmrpg_save_game_session();
 
                     // Update the form markup, then break from the loop
                     $file_has_updated = true;
