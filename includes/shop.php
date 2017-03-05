@@ -402,7 +402,7 @@ if (!empty($this_shop_index)){
 foreach ($this_shop_index AS $shop_token => $shop_info){
 
     // Only generate a hidden power if we've unlocked them
-    if (rpg_game::omega_abilities_unlocked()){
+    if (mmrpg_prototype_item_unlocked('omega-seed') || rpg_game::omega_abilities_unlocked()){
 
         // Collect possible hidden power types
         $hidden_power_kind = $shop_token == 'auto' ? 'stats' : 'elements';
@@ -538,7 +538,9 @@ if (!empty($this_shop_index['auto'])){
         if (!empty($this_shop_index['auto']['shop_items']['items_buying'])){
             $items_list = $this_shop_index['auto']['shop_items']['items_buying'];
             foreach ($items_list AS $item_token => $item_price){
-                $type_token = preg_replace('/-(pellet|capsule|tank)$/', '', $item_token);
+                if (!isset($mmrpg_database_items[$item_token])){ continue; }
+                $item_info = $mmrpg_database_items[$item_token];
+                $type_token = !empty($item_info['item_type']) ? $item_info['item_type'] : '';
                 $omega_boost = $this_shop_index['auto']['shop_hidden_power'] == $type_token ? true : false;
                 if (!empty($omega_boost)){ $item_price = ceil($item_price * 1.5); }
                 $this_shop_index['auto']['shop_items']['items_buying'][$item_token] = $item_price;
@@ -716,7 +718,9 @@ if (!empty($this_shop_index['reggae'])){
             if (!empty($this_shop_index['reggae']['shop_items']['items_buying'])){
                 $items_list = $this_shop_index['reggae']['shop_items']['items_buying'];
                 foreach ($items_list AS $item_token => $item_price){
-                    $type_token = preg_replace('/-core$/', '', $item_token);
+                    if (!isset($mmrpg_database_items[$item_token])){ continue; }
+                    $item_info = $mmrpg_database_items[$item_token];
+                    $type_token = !empty($item_info['item_type']) ? $item_info['item_type'] : '';
                     $star_boost = !empty($this_star_force[$type_token]) ? $this_star_force[$type_token] : 0;
                     $ability_boost = !empty($global_unlocked_abilities_types[$type_token]) ? $global_unlocked_abilities_types[$type_token] : 0;
                     $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
@@ -791,6 +795,10 @@ if (!empty($this_shop_index['kalinka'])){
     }
 
 }
+
+//echo('<pre>$this_shop_index = '.print_r($this_shop_index, true).'</pre>');
+//echo('<pre>$this_battle_shops = '.print_r($this_battle_shops, true).'</pre>');
+//exit();
 
 // Update the session with any changes to the character shops
 $_SESSION[$session_token]['values']['battle_shops'] = $this_battle_shops;
