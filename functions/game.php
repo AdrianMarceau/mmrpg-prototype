@@ -934,7 +934,9 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
         }
 
         // Append the actual item markup to the canvas
-        $offset = $display_image_count > 1 ? 262 : 260;
+        if ($display_image_count == 0){ $offset = 260; }
+        elseif ($display_image_count == 1){ $offset = 292; }
+        elseif ($display_image_count >= 2){ $offset = 262; }
         $temp_canvas_markup .= '<div class="item_type item_type_'.$this_type_token.' sprite sprite_40x40 sprite_40x40_00" style="
             position: absolute;
             bottom: 52px;
