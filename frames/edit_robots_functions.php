@@ -61,6 +61,9 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
             $robot_info = array_merge($robot_index_info, $robot_info);
             $allowed_edit_robots[] = $robot_token;
             $allowed_edit_data[$player_token]['player_robots'][$robot_token] = $robot_info;
+            if (empty($robot_info['robot_abilities'])){
+                $robot_info['robot_abilities'] = array('buster-shot' => array('ability_token' => 'buster-shot'));
+            }
 
             // Collect a temporary ability index
             $temp_ability_tokens = array_keys($robot_info['robot_abilities']);

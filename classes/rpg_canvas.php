@@ -466,6 +466,7 @@ class rpg_canvas {
 
                     // Calculate the zoom properties for the icon sprite
                     $icon_size = 80;
+                    $icon_type = !empty($this_data['robot_core']) ? $this_data['robot_core'] : 'none';
                     $icon_scale = $this_data['robot_scale'];
                     $icon_direction = $this_data['robot_direction'];
                     $icon_sprite_size = ceil($icon_scale * $icon_size);
@@ -505,7 +506,7 @@ class rpg_canvas {
                             'sprite_'.$icon_size.'x'.$icon_size.'_'.$frame_token.' '.
                             '" '.
                         'style="'.
-                            'background-image: url(images/assets/unlock-icon/sprite_left_'.$icon_size.'x'.$icon_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.
+                            'background-image: url(images/items/'.$icon_type.'-heart/sprite_left_'.$icon_size.'x'.$icon_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.
                             'background-size: '.$icon_file_width.'px '.$icon_file_height.'px; '.
                             'background-position: '.(!empty($frame_background_offset) ? $frame_background_offset.'px' : '0').' 0; '.
                             'width: '.$icon_sprite_size.'px; '.
