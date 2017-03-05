@@ -72,7 +72,7 @@ if (!empty($raw_ability_list)){
 
 // Define the index of hidden abilities to not appear in the database
 $hidden_database_abilities = array();
-$hidden_database_abilities = array_merge($hidden_database_abilities, array('ability', 'attachment-defeat', 'action-noweapons')); // system
+$hidden_database_abilities = array_merge($hidden_database_abilities, array('ability', 'attachment-defeat', 'action-noweapons', 'action-chargeweapons')); // system
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('sticky-bond', 'sticky-shot')); // unreleased
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('dive-blitzkrieg', 'pharaoh-wave', 'crash-avenger', 'sakugarne-bounce')); // conceptual
 $hidden_database_abilities = array_merge($hidden_database_abilities, array('energy-shuffle', 'attack-shuffle', 'defense-shuffle', 'speed-shuffle', 'repair-mode')); // deprecated

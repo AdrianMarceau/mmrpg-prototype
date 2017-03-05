@@ -1875,8 +1875,8 @@ class rpg_robot extends rpg_object {
             $robot_info['robot_item'] = $this->robot_item;
             $robot_info['robot_rewards'] = $this->robot_rewards;
 
-            // If this was the noweapons action, everything is zero
-            if ($this_ability->ability_token == 'action-noweapons'){
+            // If this was the noweapons/chargeweapons action, everything is zero
+            if (in_array($this_ability->ability_token, array('action-noweapons', 'action-chargeweapons'))){
                 $energy_new = 0;
                 $energy_base = 0;
                 $energy_mods = 0;
@@ -1899,7 +1899,7 @@ class rpg_robot extends rpg_object {
         $energy_mods = 0;
 
         // If this was the noweapons action, everything is zero
-        if ($this_ability['ability_token'] == 'action-noweapons'){
+        if (in_array($this_ability['ability_token'], array('action-noweapons', 'action-chargeweapons'))){
             $energy_new = 0;
             $energy_base = 0;
             $energy_mods = 0;

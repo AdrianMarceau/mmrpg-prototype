@@ -258,6 +258,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     font-size: 12px;
     line-height: 12px;
     color: #CFCFCF;
+    text-transform: none;
 }
 #prototype .banner .subpoints .amount {
     font-size: 10px;
