@@ -304,6 +304,13 @@ function windowResizePrototype(){
 
     var windowWidth = thisWindow.width();
     var windowHeight = thisWindow.height();
+    var bodyInnerHeight = thisBody.innerHeight();
+
+    //alert('windowWidth = '+windowWidth+' \nwindowHeight = '+windowHeight+' \nbodyInnerHeight = '+bodyInnerHeight);
+    //alert('ummmmm');
+
+    if (bodyInnerHeight < windowHeight){ windowHeight = bodyInnerHeight; }
+
     var bannerHeight = $('.banner', thisBody).outerHeight(true);
     var headerHeight = $('.menu .header', thisPrototype).height() + $('.menu .header', thisPrototype).outerHeight(true);
 
