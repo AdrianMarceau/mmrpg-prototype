@@ -40,6 +40,7 @@ $html_header_text = '';
 $html_form_fields = '';
 $html_form_buttons = '';
 $html_form_messages = '';
+$html_form_verified = true;
 
 // Define the serial ordering index
 $temp_serial_ordering = array(

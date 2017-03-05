@@ -18,6 +18,7 @@ $html_header_text = '';
 $html_form_fields = '';
 $html_form_buttons = '';
 $html_form_messages = '';
+$html_form_verified = true;
 
 // Create the has updated flag and default to false
 $file_has_updated = false;
