@@ -367,7 +367,7 @@ button {
     position: absolute;
     display: block;
     top: 4px;
-    right: 4px;
+    left: 4px;
     width: 19px;
     height: 19px;
     z-index: 100;
