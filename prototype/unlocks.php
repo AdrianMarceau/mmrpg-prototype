@@ -981,7 +981,7 @@ if (!mmrpg_prototype_item_unlocked('omega-seed')
     // Unlock the Omega Seed and generate the required event details
     mmrpg_game_unlock_item('omega-seed', array(
         'positive_word' => 'What\'s this?',
-        'event_text' => 'A new item has been unlocked...'
+        'event_text' => 'A new item appears to have been unlocked...'
         ));
 
 }
