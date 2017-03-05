@@ -25,6 +25,9 @@ $prototype_window_event_messages = array();
 // Check if a reset request has been placed
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
 
+    // Collect a reference to the user object
+    $this_user = $_SESSION[$session_token]['USER'];
+
     // Reset the game session and reload the page
     mmrpg_reset_game_session();
 

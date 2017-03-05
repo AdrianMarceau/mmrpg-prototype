@@ -33,7 +33,7 @@ while ($this_action == 'save'){
         $user_displayname = !empty($_POST['displayname']) ? preg_replace('/[^-_a-z0-9\.\s]+/i', '', trim($_POST['displayname'])) : '';
         $user_emailaddress = !empty($_POST['emailaddress']) ? preg_replace('/[^-_a-z0-9\.\+@]+/i', '', trim($_POST['emailaddress'])) : '';
 
-        $user_imagepath = !empty($_POST['imagepath']) && preg_match('/^[-_a-z0-9]+\/[-_a-z0-9]+$/i', $_POST['imagepath']) ? trim($_POST['imagepath']) : '';
+        $user_imagepath = !empty($_POST['imagepath']) && preg_match('/^[-_a-z0-9]+\/[-_a-z0-9]+\/[0-9]+$/i', $_POST['imagepath']) ? trim($_POST['imagepath']) : '';
         $user_colourtoken = !empty($_POST['colourtoken']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['colourtoken']) ? trim($_POST['colourtoken']) : '';
 
         $user_omegaseed = !empty($_POST['omegaseed']) ? trim($_POST['omegaseed']) : '';
