@@ -345,7 +345,8 @@ class rpg_game {
     // Define a function for checking if we're in user mode
     public static function is_user(){
         // If we're not in demo mode, we must be user mode
-        return !self::is_demo() ? true : false;
+        $session_token = self::session_token();
+        return !empty($_SESSION[$session_token]['USER']['userid']) && $_SESSION[$session_token]['USER']['userid'] != MMRPG_SETTINGS_GUEST_ID ? true : false;
     }
 
 

@@ -256,7 +256,7 @@ while ($this_action == 'profile'){
         sort($mmrpg_database_type);
         ?>
         <div class="field field_colourtoken">
-            <label class="label label_colourtoken">Player Colour :</label>
+            <label class="label label_colourtoken">Profile Colour :</label>
             <?
             $html_colour_options = array();
             $html_colour_options[] = '<option value="">- Select Type -</option>';
@@ -279,7 +279,7 @@ while ($this_action == 'profile'){
         </div>
 
         <div class="field field_imagepath">
-            <label class="label label_imagepath">Player Avatar :</label>
+            <label class="label label_imagepath">Robot Avatar :</label>
             <?
             $html_avatar_options = array();
             $html_avatar_options[] = '<option value="">- Select Robot -</option>';
@@ -376,7 +376,7 @@ while ($this_action == 'profile'){
         ksort($temp_omega_factor_options);
         ?>
         <div class="field field_backgroundpath">
-            <label class="label label_backgroundpath">Player Background :</label>
+            <label class="label label_backgroundpath">Field Background :</label>
             <?
             $temp_optgroup_token = 'MM00';
             $html_background_options = array();

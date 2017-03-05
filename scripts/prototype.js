@@ -353,7 +353,12 @@ function mmrpg_trigger_reset(){
         // Redirect the user to the prototype reset page
         var postURL = 'prototype.php?action=reset';
         $.post(postURL, function(){
-            window.location = 'prototype.php';
+            //alert('reset complete!');
+            if (window.self != window.parent){
+                window.location = 'prototype.php';
+                } else {
+                window.location = window.location.href;
+                }
             });
         return true;
         } else {
