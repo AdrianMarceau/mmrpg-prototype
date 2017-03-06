@@ -236,21 +236,64 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
 // If we're NOT viewing the session info
 if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 
-    // Select a random background image to display
-    $temp_field_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/intro-field';
-    $temp_field_type = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : '';
-    list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
+    // If this user is a member, collect background and type settings from the account
+    if (rpg_game::is_user()){
+
+        // Collect theme settings from the user's profile settings
+        $temp_field_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/intro-field';
+        $temp_field_type = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : '';
+
+    }
+    // Otherwise if guest we need to select a randomized field background for a time interval
+    else {
+
+        // Define the theme timeout for auto updating
+        $theme_timeout = 60 * 60 * 1; // 60s x 60m = 1 hr
+        if (!isset($_SESSION['INDEX']['theme_cache']) || (time() - $_SESSION['INDEX']['theme_cache']) > $theme_timeout){
+            // Hard code the type to none but collect a ranzomized field token
+            $temp_field_info = $db->get_array("SELECT
+                field_token,
+                CONCAT('fields/', field_token) AS field_path,
+                field_type
+                FROM mmrpg_index_fields
+                WHERE field_flag_complete = 1 AND field_flag_published = 1 AND field_flag_hidden = 0 AND field_game IN ('MM01', 'MM02', 'MM03', 'MM04')
+                ORDER BY RAND() LIMIT 1
+                ;");
+            $temp_field_type = 'none';
+            $temp_field_path = $temp_field_info['field_path'];
+            $temp_mecha_tokens = $db->get_array_list("SELECT
+                robot_token AS mecha_token
+                FROM mmrpg_index_robots
+                WHERE robot_flag_complete = 1 AND robot_flag_published = 1 AND robot_flag_hidden = 0 AND robot_class = 'mecha' AND robot_core = '{$temp_field_info['field_type']}' AND robot_game IN ('MM01', 'MM02', 'MM03', 'MM04')
+                ORDER BY RAND()
+                ;", 'mecha_token');
+            $temp_mecha_tokens = array_keys($temp_mecha_tokens);
+            // Update the session with these settings
+            $_SESSION['INDEX']['theme_cache'] = time();
+            $_SESSION['INDEX']['theme_field_path'] = $temp_field_path;
+            $_SESSION['INDEX']['theme_field_type'] = $temp_field_type;
+            $_SESSION['INDEX']['theme_mecha_tokens'] = $temp_mecha_tokens;
+        } else {
+            // Collect existing theme settings from the session
+            $temp_field_path = $_SESSION['INDEX']['theme_field_path'];
+            $temp_field_type = $_SESSION['INDEX']['theme_field_type'];
+            $temp_mecha_tokens = $_SESSION['INDEX']['theme_mecha_tokens'];
+        }
+    }
 
     // Collect the info for the chosen temp field
+    list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
     $temp_field_data = rpg_field::get_index_info($temp_field_token);
-    //die('<pre>'.print_r($temp_field_data, true).'</pre>');
-    //die('<pre>'.print_r($this_userinfo, true).'</pre>');
+    if (!empty($temp_mecha_tokens)){
+        $temp_field_data['field_mechas'] = array_merge($temp_field_data['field_mechas'], $temp_mecha_tokens);
+        $temp_field_data['field_mechas'] = array_unique($temp_field_data['field_mechas']);
+    }
+
     // Define the current field token for the index
     define('MMRPG_SETTINGS_CURRENT_FIELDTOKEN', $temp_field_data['field_token']);
     define('MMRPG_SETTINGS_CURRENT_FIELDTYPE', (!empty($temp_field_type) ? $temp_field_type : (!empty($temp_field_data['field_type']) ? $temp_field_data['field_type'] : 'none')));
     define('MMRPG_SETTINGS_CURRENT_FIELDFRAMES', count($temp_field_data['field_background_frame']));
     define('MMRPG_SETTINGS_CURRENT_FIELDMECHA', (!empty($temp_field_data['field_mechas']) ? $temp_field_data['field_mechas'][0] : 'met'));
-    //die('$temp_field_type = '.$temp_field_type.'; MMRPG_SETTINGS_CURRENT_FIELDTYPE = '.MMRPG_SETTINGS_CURRENT_FIELDTYPE);
 
 }
 

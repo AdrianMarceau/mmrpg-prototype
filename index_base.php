@@ -174,7 +174,7 @@ if ($this_current_page == 'file' // File sub-pages
             if (!defined('MMRPG_CRITICAL_ERROR') && $this_userid != MMRPG_SETTINGS_GUEST_ID){
                 // Define the avatar class and path variables
                 $temp_avatar_path = !empty($this_userinfo['user_image_path']) ? $this_userinfo['user_image_path'] : 'robots/mega-man/40';
-                $temp_background_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/intro-field';
+                $temp_background_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN;
                 //$temp_colour_token = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : '';
                 list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
@@ -186,7 +186,7 @@ if ($this_current_page == 'file' // File sub-pages
                 $temp_user_name = !empty($this_userinfo['user_name_public']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name'];
                 //echo '<div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>';
             } else {
-                $temp_background_path = 'fields/intro-field';
+                $temp_background_path = 'fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN;
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
                 $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_background_base.gif';
             }
