@@ -55,6 +55,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             'userid' => $this_playerinfo['user_id'],
             'username' => $this_playerinfo['user_name'],
             'username_clean' => $this_playerinfo['user_name_clean'],
+            'omega' => $this_playerinfo['user_omega'],
             'imagepath' => $this_playerinfo['user_image_path'],
             'backgroundpath' => $this_playerinfo['user_background_path'],
             'colourtoken' => $this_playerinfo['user_colour_token'],

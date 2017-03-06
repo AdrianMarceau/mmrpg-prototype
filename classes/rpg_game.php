@@ -1456,7 +1456,7 @@ class rpg_game {
         // Define the game session helper var
         $session_token = self::session_token();
 
-        // Attempt to collect the username
+        // Attempt to collect the user omega
         if (!empty($_SESSION[$session_token]['USER']['omega'])){
             return $_SESSION[$session_token]['USER']['omega'];
         } else {
