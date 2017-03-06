@@ -92,20 +92,22 @@ if (!empty($this_current_token)){
             $this_robot_image_size = (!empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40) * 2;
             $this_robot_image_size_text = $this_robot_image_size.'x'.$this_robot_image_size;
             if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
+
             // Check if this is a mecha and prepare extra text
             $robot_info['robot_name_append'] = '';
-            if (!empty($robot_info['robot_class']) && $robot_info['robot_class'] == 'mecha'){
-                $robot_info['robot_generation'] = '1st';
-                if (preg_match('/-2$/', $robot_info['robot_token'])){ $robot_info['robot_generation'] = '2nd'; $robot_info['robot_name_append'] = ' 2'; }
-                elseif (preg_match('/-3$/', $robot_info['robot_token'])){ $robot_info['robot_generation'] = '3rd'; $robot_info['robot_name_append'] = ' 3'; }
-            }
+
             // Define the SEO variables for this page
             $this_seo_title_backup = $this_seo_title;
             $this_seo_title = $robot_info['robot_name'].$robot_info['robot_name_append'].' | '.$this_seo_title;
-            $this_seo_description = $robot_info['robot_number'].' '.$robot_info['robot_name'].', a '.(!empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')).' core' : 'special').' robot master in the Mega Man RPG Prototype.  '.$this_seo_description;
+            $this_seo_description = $robot_info['robot_number'].' '.$robot_info['robot_name'].', the '.$robot_info['robot_description'].', ';
+            $this_seo_description .= 'is a '.rpg_robot::get_best_stat_desc($robot_info).' ';
+            $this_seo_description .= !empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core']).' ' : 'Neutral ';
+            if (!empty($robot_info['robot_core2'])){ $this_seo_description .= '/ '.ucfirst($robot_info['robot_core2']).' '; }
+            $this_seo_description .= 'Core robot master from the Mega Man RPG Prototype. ';
+
             // Define the Open Graph variables for this page
             $this_graph_data['title'] .= ' | '.$robot_info['robot_name'];
-            $this_graph_data['description'] = $robot_info['robot_number'].' '.$robot_info['robot_name'].', a '.(!empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')).' core' : 'special').' robot master in the Mega Man RPG Prototype. '.$this_graph_data['description'];
+            $this_graph_data['description'] = $this_seo_description;
             $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$robot_info['robot_token'].'/mug_right_'.$this_robot_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
 
         }
