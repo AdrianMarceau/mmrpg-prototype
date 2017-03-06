@@ -277,7 +277,7 @@
                 $form_messages[] = array('warning', 'Omega sequence input was invalid and will not be updated');
             }
             // Otherwise, we should generate a new omega sequence using the new string
-            else {
+            elseif (!empty($user_omega_seed)){
 
                 // Generate the new omega sequence from the seed value and update
                 $user_omega_sequence = md5(MMRPG_SETTINGS_OMEGA_SEED.$user_omega_seed);
