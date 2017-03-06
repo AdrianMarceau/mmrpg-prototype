@@ -93,23 +93,23 @@ if (!empty($this_current_token)){
             $this_boss_image_size = (!empty($boss_info['robot_image_size']) ? $boss_info['robot_image_size'] : 40) * 2;
             $this_boss_image_size_text = $this_boss_image_size.'x'.$this_boss_image_size;
             if ($this_boss_image == 'boss'){ $this_seo_bosses = 'noindex'; }
+
             // Check if this is a boss and prepare extra text
             $boss_info['robot_name_append'] = '';
-            /*
-            if (!empty($boss_info['robot_class']) && $boss_info['robot_class'] == 'boss'){
-                $boss_info['robot_generation'] = '1st';
-                if (preg_match('/-2$/', $boss_info['robot_token'])){ $boss_info['robot_generation'] = '2nd'; $boss_info['robot_name_append'] = ' 2'; }
-                elseif (preg_match('/-3$/', $boss_info['robot_token'])){ $boss_info['robot_generation'] = '3rd'; $boss_info['robot_name_append'] = ' 3'; }
-            }
-            */
+
             // Define the SEO variables for this page
             $this_seo_title_backup = $this_seo_title;
             $this_seo_title = $boss_info['robot_name'].$boss_info['robot_name_append'].' | '.$this_seo_title;
-            $this_seo_description = $boss_info['robot_number'].' '.$boss_info['robot_name'].', a '.(!empty($boss_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')).' core' : 'special').' fortress boss in the Mega Man RPG Prototype.  '.$this_seo_description;
+            $this_seo_description = $boss_info['robot_number'].' '.$boss_info['robot_name'].', the '.$boss_info['robot_description'].', ';
+            $this_seo_description .= 'is a '.rpg_robot::get_best_stat_desc($boss_info).' ';
+            $this_seo_description .= !empty($boss_info['robot_core']) ? ucwords($boss_info['robot_core']).' ' : 'Neutral ';
+            if (!empty($boss_info['robot_core2'])){ $this_seo_description .= '/ '.ucfirst($boss_info['robot_core2']).' '; }
+            $this_seo_description .= 'Core foretress boss from the Mega Man RPG Prototype. ';
+
             // Define the Open Graph variables for this page
             $this_graph_data['title'] .= ' | '.$boss_info['robot_name'];
-            $this_graph_data['description'] = $boss_info['robot_number'].' '.$boss_info['robot_name'].', a '.(!empty($boss_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')).' core' : 'special').' fortress boss in the Mega Man RPG Prototype. '.$this_graph_data['description'];
-            $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$boss_info['robot_token'].'/mug_right_'.$this_boss_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $this_graph_data['description'] = $this_seo_description;
+            $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$boss_info['robot_token'].'/mug_right_'.$this_robot_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
 
         }
 
