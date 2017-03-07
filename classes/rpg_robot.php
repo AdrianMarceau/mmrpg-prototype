@@ -704,7 +704,7 @@ class rpg_robot extends rpg_object {
         $this_robot_stats = self::calculate_stat_values($this->robot_level, $this_index_info, $this_rewards, true, $this->robot_core, $this->player->player_starforce);
 
         // Update the robot's stat values with calculated totals
-        $stat_tokens = array('energy', 'attack', 'defense', 'speed');
+        $stat_tokens = array('energy', 'weapons', 'attack', 'defense', 'speed');
         foreach ($stat_tokens AS $stat){
             // Collect and apply this robot's current stats and max
             $prop_stat = 'robot_'.$stat;
@@ -3459,7 +3459,7 @@ class rpg_robot extends rpg_object {
             // Collect the database for this robot
             $robot_database = !empty($player_robot_database[$robot_token]) ? $player_robot_database[$robot_token] : array(); //rpg_game::robot_database($robot_token);
             // Collect the robot ability core if it exists
-            $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : false;
+            $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
             // Collect the stat details for this robot
             $robot_stats = rpg_robot::calculate_stat_values($robot_info['robot_level'], $robot_info, $robot_rewards, true, $robot_ability_core, $player_starforce);
             // Check if this robot has the copy shot ability
