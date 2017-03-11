@@ -4,7 +4,7 @@
 function mmrpg_admin_update_save_file($key, $data, $patch_token){
     global $db;
     global $update_patch_tokens, $update_patch_names, $update_patch_details;
-    global $this_request_force;
+    global $this_request_force, $this_request_print;
 
     // Start the markup variable
     $this_page_markup = '';
@@ -69,6 +69,14 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             if (!function_exists($patch_function)){ exit('The patch function "'.$patch_function.'" doesn\'t exist...'); }
             $_GAME = call_user_func($patch_function, $_GAME);
             $patch_notes = trim(ob_get_clean());
+            // If print was requested, do not actually update file
+            if ($this_request_print){
+                // Print out debug info and exit now
+                header('Content-type: text/plain;');
+                echo($patch_notes.PHP_EOL);
+                echo($patch_function.'()');
+                exit();
+            }
         }
 
         // If the any key fields were empty, abort mission!

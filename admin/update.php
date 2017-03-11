@@ -15,6 +15,7 @@ $this_request_type = !empty($_REQUEST['type']) ? $_REQUEST['type'] : 'index';
 $this_request_id = !empty($_REQUEST['id']) && is_numeric($_REQUEST['id']) ? $_REQUEST['id'] : 0;
 $this_request_patch = !empty($_REQUEST['patch']) ? trim($_REQUEST['patch']) : '';
 $this_request_force = isset($_REQUEST['force']) && $_REQUEST['force'] == 'true' ? true : false;
+$this_request_print = isset($_REQUEST['print']) && $_REQUEST['print'] == 'true' ? true : false;
 $this_return_markup = '';
 
 // Prevent undefined patches from being applied

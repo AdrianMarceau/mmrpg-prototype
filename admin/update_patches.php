@@ -762,10 +762,6 @@ function mmrpg_patch_db_user_objects_2k17($_GAME){
     // Print the final message of success
     echo("...done! Thank you for your time. :) \n\n");
 
-    // Print out debug info and exit now
-    header('Content-type: text/plain;');
-    exit('mmrpg_patch_db_user_objects_2k17() $_SESSION['.$session_token.']');
-
     // Return the updated game array
     unset($_SESSION[$session_token]);
     return $_GAME;
