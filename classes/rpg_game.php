@@ -1675,5 +1675,26 @@ class rpg_game {
 
     }
 
+    // Define a function for collecting the current GAME session flags
+    public static function get_session_flags(){
+        $session_token = self::session_token();
+        if (!empty($_SESSION[$session_token]['flags'])){ return $_SESSION[$session_token]['flags']; }
+        else { return array(); }
+    }
+
+    // Define a function for collecting the current GAME session counters
+    public static function get_session_counters(){
+        $session_token = self::session_token();
+        if (!empty($_SESSION[$session_token]['counters'])){ return $_SESSION[$session_token]['counters']; }
+        else { return array(); }
+    }
+
+    // Define a function for collecting the current GAME session values
+    public static function get_session_values(){
+        $session_token = self::session_token();
+        if (!empty($_SESSION[$session_token]['values'])){ return $_SESSION[$session_token]['values']; }
+        else { return array(); }
+    }
+
 
 }
