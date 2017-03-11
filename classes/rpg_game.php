@@ -1708,6 +1708,12 @@ class rpg_game {
         // Create index arrays for all players and robots to save
         $mmrpg_users_players = array();
         $mmrpg_users_robots = array();
+        $mmrpg_users_abilities = array();
+        $mmrpg_users_abilities_players = array();
+        $mmrpg_users_abilities_robots = array();
+        $mmrpg_users_abilities_robots_current = array();
+        $mmrpg_users_items = array();
+        $mmrpg_users_stars = array();
 
         // Collect all the game session flags/counters/values
         $session_flags = self::get_session_flags();
@@ -1717,6 +1723,12 @@ class rpg_game {
         // Collect the global battle settings and rewards arrays
         $battle_settings = !empty($session_values['battle_settings']) ? $session_values['battle_settings'] : array();
         $battle_rewards = !empty($session_values['battle_rewards']) ? $session_values['battle_rewards'] : array();
+        $battle_abilities = !empty($session_values['battle_abilities']) ? $session_values['battle_abilities'] : array();
+        $battle_items = !empty($session_values['battle_items']) ? $session_values['battle_items'] : array();
+        $battle_stars = !empty($session_values['battle_stars']) ? $session_values['battle_stars'] : array();
+
+
+        // -- INDEX PLAYER OBJECTS -- //
 
         // Collect unique player tokens from the settings and/or rewards
         $player_tokens = array();
@@ -1808,6 +1820,9 @@ class rpg_game {
                 $mmrpg_player['player_abilities_unlocked'] = $ability_tokens;
                 $mmrpg_player['player_abilities_unlocked_count'] = count($ability_tokens);
 
+
+                // -- INDEX ROBOT OBJECTS -- //
+
                 // If robots not empty, loop through and save each to session
                 if (!empty($robot_tokens)){
                     foreach ($robot_tokens AS $robot_token){
@@ -1888,6 +1903,76 @@ class rpg_game {
             }
         }
 
+
+        // -- INDEX ABILITY OBJECTS -- //
+
+        // If not empty, loop through and index abilities
+        if (!empty($battle_abilities)){
+            foreach ($battle_abilities AS $key => $ability_token){
+                if (empty($ability_token)){ continue; }
+                // Create an entry for this ability in the global unlock index
+                $ability_info = array();
+                $ability_info['user_id'] = $this_userid;
+                $ability_info['ability_token'] = $ability_token;
+                $mmrpg_users_abilities[$ability_token] = $ability_info;
+            }
+        }
+
+        // If not empty, lop through players and index abilities
+        if (!empty($mmrpg_users_players)){
+            foreach ($mmrpg_users_players AS $player_token => $player_info){
+                // Create a sub-array to hold this player's unlocked abilities
+                $mmrpg_users_abilities_players[$player_token] = array();
+                if (!empty($player_info['player_abilities_unlocked'])){
+                    foreach ($player_info['player_abilities_unlocked'] AS $key => $ability_token){
+                        if (empty($ability_token)){ continue; }
+                        // Create an entry for this ability in the player unlock index
+                        $ability_info = array();
+                        $ability_info['user_id'] = $this_userid;
+                        $ability_info['player_token'] = $player_token;
+                        $ability_info['ability_token'] = $ability_token;
+                        $mmrpg_users_abilities_players[$player_token][$ability_token] = $ability_info;
+                    }
+                }
+            }
+        }
+
+        // If not empty, lop through robots and index abilities
+        if (!empty($mmrpg_users_robots)){
+            foreach ($mmrpg_users_robots AS $robot_token => $robot_info){
+                // Create a sub-array to hold this robot's unlocked abilities
+                $mmrpg_users_abilities_robots[$robot_token] = array();
+                if (!empty($robot_info['robot_abilities_unlocked'])){
+                    foreach ($robot_info['robot_abilities_unlocked'] AS $key => $ability_token){
+                        if (empty($ability_token)){ continue; }
+                        // Create an entry for this ability in the robot unlock index
+                        $ability_info = array();
+                        $ability_info['user_id'] = $this_userid;
+                        $ability_info['robot_token'] = $robot_token;
+                        $ability_info['ability_token'] = $ability_token;
+                        $mmrpg_users_abilities_robots[$robot_token][$ability_token] = $ability_info;
+                    }
+                }
+                // Create a sub-array to hold this robot's equipped abilities
+                $mmrpg_users_abilities_robots_current[$robot_token] = array();
+                if (!empty($robot_info['robot_abilities_current'])){
+                    foreach ($robot_info['robot_abilities_current'] AS $key => $ability_token){
+                        if (empty($ability_token)){ continue; }
+                        // Create an entry for this ability in the robot unlock index
+                        $ability_info = array();
+                        $ability_info['user_id'] = $this_userid;
+                        $ability_info['robot_token'] = $robot_token;
+                        $ability_info['ability_token'] = $ability_token;
+                        $ability_info['slot_key'] = $key;
+                        $mmrpg_users_abilities_robots_current[$robot_token][$ability_token] = $ability_info;
+                    }
+                }
+            }
+        }
+
+
+        // -- RUN POST-INDEX OBJECT MODS -- //
+
         // Loop through any collected robots and update original player
         if (!empty($mmrpg_users_robots)){
             foreach ($mmrpg_users_robots AS $robot_token => $robot_info){
@@ -1898,6 +1983,9 @@ class rpg_game {
                 }
             }
         }
+
+
+        // -- RUN PRE-DATABASE FIELD MODS -- //
 
         // Collapse any nested player arrays into csv strings
         foreach ($mmrpg_users_players AS $player_token => $player_info){
@@ -1917,12 +2005,19 @@ class rpg_game {
             }
         }
 
-        if ($echo){ echo('$mmrpg_users_players = '.print_r($mmrpg_users_players, true).PHP_EOL); }
-        if ($echo){ echo('$mmrpg_users_robots = '.print_r($mmrpg_users_robots, true).PHP_EOL); }
+
+        // -- SAVE OBJECTS TO DATABASE -- //
+
+        if ($echo){ echo('$mmrpg_users_players = '.print_r($mmrpg_users_players, true).'<hr />'.PHP_EOL); }
+        if ($echo){ echo('$mmrpg_users_robots = '.print_r($mmrpg_users_robots, true).'<hr />'.PHP_EOL); }
+        //if ($echo){ echo('$mmrpg_users_abilities = '.print_r($mmrpg_users_abilities, true).'<hr />'.PHP_EOL); }
+        //if ($echo){ echo('$mmrpg_users_abilities_players = '.print_r($mmrpg_users_abilities_players, true).'<hr />'.PHP_EOL); }
+        //if ($echo){ echo('$mmrpg_users_abilities_robots = '.print_r($mmrpg_users_abilities_robots, true).'<hr />'.PHP_EOL); }
+        //if ($echo){ echo('$mmrpg_users_abilities_robots_current = '.print_r($mmrpg_users_abilities_robots_current, true).'<hr />'.PHP_EOL); }
 
         // Loop through players and update/insert them in the database
-        $db_existing_players = $db->get_value("SELECT GROUP_CONCAT(player_token) AS player_tokens FROM mmrpg_users_players WHERE user_id = {$this_userid};", 'player_tokens');
-        $db_existing_players = !empty($db_existing_players) ? explode(',', $db_existing_players) : array();
+        $db_existing_players = $db->get_array_list("SELECT player_token FROM mmrpg_users_players WHERE user_id = {$this_userid};", 'player_token');
+        $db_existing_players = !empty($db_existing_players) ? array_column($db_existing_players, 'player_token') : array();
         foreach ($mmrpg_users_players AS $player_token => $player_info){
 
             // Insert or update the player info into the database
@@ -1935,8 +2030,8 @@ class rpg_game {
         }
 
         // Loop through robots and update/insert them in the database
-        $db_existing_robots = $db->get_value("SELECT GROUP_CONCAT(robot_token) AS robot_tokens FROM mmrpg_users_robots WHERE user_id = {$this_userid};", 'robot_tokens');
-        $db_existing_robots = !empty($db_existing_robots) ? explode(',', $db_existing_robots) : array();
+        $db_existing_robots = $db->get_array_list("SELECT robot_token FROM mmrpg_users_robots WHERE user_id = {$this_userid};", 'robot_token');
+        $db_existing_robots = !empty($db_existing_robots) ? array_column($db_existing_robots, 'robot_token') : array();
         foreach ($mmrpg_users_robots AS $robot_token => $robot_info){
 
             // Insert or update the robot info into the database
@@ -1946,6 +2041,54 @@ class rpg_game {
                 $db->insert('mmrpg_users_robots', $robot_info);
             }
 
+        }
+
+        // Loop through global abilities and update/insert them in the database
+        $db_existing_abilities = $db->get_array_list("SELECT ability_token FROM mmrpg_users_abilities WHERE user_id = {$this_userid};", 'ability_token');
+        $db_existing_abilities = !empty($db_existing_abilities) ? array_column($db_existing_abilities, 'ability_token') : array();
+        foreach ($mmrpg_users_abilities AS $ability_token => $ability_info){
+
+            // Insert the ability info into the database if not already there
+            if (!in_array($ability_token, $db_existing_abilities)){
+                $db->insert('mmrpg_users_abilities', $ability_info);
+            }
+
+        }
+
+        // Loop through player abilities and update/insert them in the database
+        foreach ($mmrpg_users_abilities_players AS $player_token => $player_abilities){
+            $db_existing_abilities_players = $db->get_array_list("SELECT ability_token FROM mmrpg_users_players_abilities WHERE user_id = {$this_userid} AND player_token = '{$player_token}';", 'ability_token');
+            $db_existing_abilities_players = !empty($db_existing_abilities_players) ? array_column($db_existing_abilities_players, 'ability_token') : array();
+            foreach ($player_abilities AS $ability_token => $ability_info){
+
+                // Insert the ability info into the database if not already there
+                if (!in_array($ability_token, $db_existing_abilities_players)){
+                    $db->insert('mmrpg_users_players_abilities', $ability_info);
+                }
+
+            }
+        }
+
+        // Loop through robot abilities and update/insert them in the database
+        foreach ($mmrpg_users_abilities_robots AS $robot_token => $robot_abilities){
+            $db_existing_abilities_robots = $db->get_array_list("SELECT ability_token FROM mmrpg_users_robots_abilities WHERE user_id = {$this_userid} AND robot_token = '{$robot_token}';", 'ability_token');
+            $db_existing_abilities_robots = !empty($db_existing_abilities_robots) ? array_column($db_existing_abilities_robots, 'ability_token') : array();
+            foreach ($robot_abilities AS $ability_token => $ability_info){
+
+                // Insert the ability info into the database if not already there
+                if (!in_array($ability_token, $db_existing_abilities_robots)){
+                    $db->insert('mmrpg_users_robots_abilities', $ability_info);
+                }
+
+            }
+        }
+
+        // Loop through equipped robot abilities and update/insert them in the database
+        foreach ($mmrpg_users_abilities_robots_current AS $robot_token => $robot_abilities){
+            $db->query("DELETE FROM mmrpg_users_robots_abilities_current WHERE user_id = {$this_userid} AND robot_token = '{$robot_token}';");
+            foreach ($robot_abilities AS $ability_token => $ability_info){
+                $db->insert('mmrpg_users_robots_abilities_current', $ability_info);
+            }
         }
 
         //exit();

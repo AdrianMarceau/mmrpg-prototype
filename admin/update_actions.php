@@ -69,6 +69,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             if (!function_exists($patch_function)){ exit('The patch function "'.$patch_function.'" doesn\'t exist...'); }
             $_GAME = call_user_func($patch_function, $_GAME);
             $patch_notes = trim(ob_get_clean());
+            $patch_notes = strip_tags(html_entity_decode($patch_notes, ENT_QUOTES, 'UTF-8'));
             // If print was requested, do not actually update file
             if ($this_request_print){
                 // Print out debug info and exit now
