@@ -2106,6 +2106,9 @@ class rpg_robot extends rpg_object {
     // Define a function for pulling a custom robot index
     public static function get_index_custom($robot_tokens = array()){
 
+        // If the robot tokens were empty, return nothing
+        if (empty($robot_tokens)){ return array(); }
+
         // Pull in global variables
         $db = cms_database::get_database();
 
