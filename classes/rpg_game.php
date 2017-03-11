@@ -1971,6 +1971,36 @@ class rpg_game {
         }
 
 
+        // -- INDEX ITEM OBJECTS -- //
+
+        // If not empty, loop through and index items
+        if (!empty($battle_items)){
+            foreach ($battle_items AS $item_token => $item_quantity){
+                if (empty($item_token)){ continue; }
+                // Create an entry for this item in the global unlock index
+                $item_info = array();
+                $item_info['user_id'] = $this_userid;
+                $item_info['item_token'] = $item_token;
+                $item_info['item_quantity'] = $item_quantity;
+                $mmrpg_users_items[$item_token] = $item_info;
+            }
+        }
+
+
+        // -- INDEX STAR OBJECTS -- //
+
+        // If not empty, loop through and index stars
+        if (!empty($battle_stars)){
+            foreach ($battle_stars AS $star_token => $star_info){
+                if (empty($star_token)){ continue; }
+                elseif (empty($star_info['star_kind'])){ continue; }
+                // Create an entry for this star in the global unlock index
+                $star_info['user_id'] = $this_userid;
+                $mmrpg_users_stars[$star_token] = $star_info;
+            }
+        }
+
+
         // -- RUN POST-INDEX OBJECT MODS -- //
 
         // Loop through any collected robots and update original player
@@ -2014,6 +2044,8 @@ class rpg_game {
         //if ($echo){ echo('$mmrpg_users_abilities_players = '.print_r($mmrpg_users_abilities_players, true).'<hr />'.PHP_EOL); }
         //if ($echo){ echo('$mmrpg_users_abilities_robots = '.print_r($mmrpg_users_abilities_robots, true).'<hr />'.PHP_EOL); }
         //if ($echo){ echo('$mmrpg_users_abilities_robots_current = '.print_r($mmrpg_users_abilities_robots_current, true).'<hr />'.PHP_EOL); }
+        if ($echo){ echo('$mmrpg_users_items = '.print_r($mmrpg_users_items, true).'<hr />'.PHP_EOL); }
+        if ($echo){ echo('$mmrpg_users_stars = '.print_r($mmrpg_users_stars, true).'<hr />'.PHP_EOL); }
 
         // Loop through players and update/insert them in the database
         $db_existing_players = $db->get_array_list("SELECT player_token FROM mmrpg_users_players WHERE user_id = {$this_userid};", 'player_token');
@@ -2089,6 +2121,34 @@ class rpg_game {
             foreach ($robot_abilities AS $ability_token => $ability_info){
                 $db->insert('mmrpg_users_robots_abilities_current', $ability_info);
             }
+        }
+
+        // Loop through items and update/insert them in the database
+        $db_existing_items = $db->get_array_list("SELECT item_token FROM mmrpg_users_items WHERE user_id = {$this_userid};", 'item_token');
+        $db_existing_items = !empty($db_existing_items) ? array_column($db_existing_items, 'item_token') : array();
+        foreach ($mmrpg_users_items AS $item_token => $item_info){
+
+            // Insert or update the item info into the database
+            if (in_array($item_token, $db_existing_items)){
+                $db->update('mmrpg_users_items', $item_info, array('user_id' => $this_userid, 'item_token' => $item_token));
+            } else {
+                $db->insert('mmrpg_users_items', $item_info);
+            }
+
+        }
+
+        // Loop through stars and update/insert them in the database
+        $db_existing_stars = $db->get_array_list("SELECT star_token FROM mmrpg_users_stars WHERE user_id = {$this_userid};", 'star_token');
+        $db_existing_stars = !empty($db_existing_stars) ? array_column($db_existing_stars, 'star_token') : array();
+        foreach ($mmrpg_users_stars AS $star_token => $star_info){
+
+            // Insert or update the star info into the database
+            if (in_array($star_token, $db_existing_stars)){
+                $db->update('mmrpg_users_stars', $star_info, array('user_id' => $this_userid, 'star_token' => $star_token));
+            } else {
+                $db->insert('mmrpg_users_stars', $star_info);
+            }
+
         }
 
         //exit();
