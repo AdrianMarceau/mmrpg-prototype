@@ -47,6 +47,35 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             $this_playerinfo['save_settings']
             );
 
+        // Fix issues with legacy player rewards array
+        if (!empty($this_playerinfo['values']['battle_rewards'])){
+            foreach ($this_playerinfo['values']['battle_rewards'] AS $player_token => $player_info){
+                // If new player robots array is empty but old is not, copy over
+                if (empty($player_info['player_robots']) && !empty($player_info['player_rewards']['robots'])){
+                    // Loop through and collect robot data from the legacy rewards array
+                    foreach ($player_info['player_rewards']['robots'] AS $key => $robot){
+                        if (empty($robot['token'])){ continue; }
+                        $robot_info = array();
+                        $robot_info['robot_token'] = $robot['token'];
+                        $robot_info['robot_level'] = !empty($robot['level']) ? $robot['level'] : 1;
+                        $robot_info['robot_experience'] = !empty($robot['points']) ? $robot['points'] : 0;
+                        $player_info['player_robots'][$robot['token']] = $robot_info;
+                    }
+                    // Kill the legacy rewards array to prevent confusion
+                    unset($player_info['player_rewards']);
+                }
+                // If player robots are NOT empty, update in the parent array
+                if (!empty($player_info['player_robots'])){
+                    $this_playerinfo['values']['battle_rewards'][$player_token] = $player_info;
+                }
+                // Otherwise if no robots found, kill this player's data in both arrays
+                else {
+                    unset($this_playerinfo['values']['battle_rewards'][$player_token]);
+                    unset($this_playerinfo['values']['battle_settings'][$player_token]);
+                }
+            }
+        }
+
         // Add this player's GAME data to the session for iframe scripts
         $temp_remote_session = array();
         $temp_remote_session['CACHE_DATE'] = !empty($_SESSION['GAME']['CACHE_DATE']) ? $_SESSION['GAME']['CACHE_DATE'] : MMRPG_CONFIG_CACHE_DATE;
