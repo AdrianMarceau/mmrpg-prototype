@@ -145,7 +145,7 @@ class cms_database {
             $caller['file'] = basename(dirname($caller['file'])).'/'.basename($caller['file']);
             $caller2['file'] = basename(dirname($caller2['file'])).'/'.basename($caller2['file']);
             $backtrace = "{$caller['file']}:{$caller['line']} <br /> {$caller2['file']}:{$caller2['line']}";
-            if (MMRPG_CONFIG_DEBUG_MODE || MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;. <br /> {$backtrace}"); }
+            if (!MMRPG_CONFIG_IS_LIVE || MMRPG_CONFIG_DEBUG_MODE){ $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;. <br /> {$backtrace}"); }
             else { $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". <br /> {$backtrace}"); }
             return false;
         }
