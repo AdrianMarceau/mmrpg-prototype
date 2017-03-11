@@ -14,6 +14,7 @@ $this_update_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']
 $this_request_type = !empty($_REQUEST['type']) ? $_REQUEST['type'] : 'index';
 $this_request_id = !empty($_REQUEST['id']) && is_numeric($_REQUEST['id']) ? $_REQUEST['id'] : 0;
 $this_request_patch = !empty($_REQUEST['patch']) ? trim($_REQUEST['patch']) : '';
+$this_request_force = isset($_REQUEST['force']) && $_REQUEST['force'] == 'true' ? true : false;
 $this_return_markup = '';
 
 // Prevent undefined patches from being applied
@@ -26,7 +27,7 @@ if (!in_array($this_request_patch, $update_patch_tokens)){
 // Define a WHERE clause for queries if user ID provided
 $this_where_query = '';
 if (!empty($this_request_id)){ $this_where_query .= "AND mmrpg_saves.user_id = {$this_request_id} "; }
-if (!empty($this_request_patch)){ $this_where_query .= "AND mmrpg_saves.save_patches_applied NOT LIKE '%\"{$this_request_patch}\"%' "; }
+if (!$this_request_force && !empty($this_request_patch)){ $this_where_query .= "AND mmrpg_saves.save_patches_applied NOT LIKE '%\"{$this_request_patch}\"%' "; }
 
 // Collect any save files that have a cache date less than the current one // AND mmrpg_saves.user_id = 110
 $this_update_query = "SELECT
@@ -89,7 +90,8 @@ if ($this_request_type != 'ajax'){
         <? } else { ?>
             <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$this_request_patch?>"><?= $update_patch_names[$this_request_patch] ?></a> &raquo;
             <br />
-            <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=10&amp;patch=<?=$this_request_patch?>" data-limit="10">x10</a>
+            <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=1&amp;patch=<?=$this_request_patch?>" data-limit="1">x1</a>
+            |  <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=10&amp;patch=<?=$this_request_patch?>" data-limit="10">x10</a>
             | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=50&amp;patch=<?=$this_request_patch?>" data-limit="50">x50</a>
             | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=100&amp;patch=<?=$this_request_patch?>" data-limit="100">x100</a>
             | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=200&amp;patch=<?=$this_request_patch?>" data-limit="200">x200</a>
@@ -123,7 +125,7 @@ elseif ($this_request_type == 'ajax'){
 if (!empty($this_update_list) && $this_request_type == 'ajax'){
     foreach ($this_update_list AS $key => $data){
         $applied_patches =  !empty($data['save_patches_applied']) ? json_decode($data['save_patches_applied'], true) : array();
-        if (!in_array($this_request_patch, $applied_patches)){
+        if ($this_request_force || !in_array($this_request_patch, $applied_patches)){
             $temp_markup = mmrpg_admin_update_save_file($key, $data, $this_request_patch);
             $this_return_markup .= preg_replace('/\s+/', ' ', $temp_markup)."\n";
         }

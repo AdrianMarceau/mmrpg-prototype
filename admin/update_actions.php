@@ -4,6 +4,7 @@
 function mmrpg_admin_update_save_file($key, $data, $patch_token){
     global $db;
     global $update_patch_tokens, $update_patch_names, $update_patch_details;
+    global $this_request_force;
 
     // Start the markup variable
     $this_page_markup = '';
@@ -52,7 +53,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     elseif (!isset($_GAME['values']['robot_database'])){ $_GAME['values']['robot_database'] = array(); }
 
     // Only apply the patch if it's not already applied
-    if (!in_array($patch_token, $_GAME['patches'])){
+    if ($this_request_force || !in_array($patch_token, $_GAME['patches'])){
 
         // Define variables to hold patch details
         $patch_name = '';
@@ -207,10 +208,6 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         'save_patches_applied' => mmrpg_admin_encode_save_data($_GAME['patches'])
         );
 
-    //die('$_SESSION[\'GAME\'][\'values\']('.$data['user_id'].':'.$data['user_name_clean'].') => <pre>'.print_r($_GAME['values'], true).'</pre>');
-    //die('$update_array('.$data['user_id'].':'.$data['user_name_clean'].') => <pre>'.print_r($update_array, true).'</pre>');
-    //die('$update_array[\'save_values\'] : '.$update_array['save_values']);
-
     // Update the database with the recent changes
     $temp_success = $db->update('mmrpg_saves', $update_array, "save_id = {$data['save_id']}");
 
@@ -235,15 +232,11 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         if ($update_array['save_values_battle_stars'] != $data['save_values_battle_stars']){ $this_page_markup .= 'Save values battle stars have been changed...<br />'; }
         if ($update_array['save_values_robot_database'] != $data['save_values_robot_database']){ $this_page_markup .= 'Save values robot database has been changed...<br />'; }
         if ($update_array['save_counters'] != $data['save_counters']){ $this_page_markup .= 'Save counters have been changed...<br />'; }
-        //$this_page_markup .= '<pre>$_SESSION[\'GAME\'][\'values\'] : '.print_r($_GAME['values'], true).'</pre><br /><hr /><br />';
         if ($temp_success === false){ $this_page_markup .= '...Failure!'; }
         else { $this_page_markup .= '...'.(!empty($temp_success) ? 'Success!' : 'Skipped!'); }
         unset($update_array);
 
     $this_page_markup .= '</p><hr />';
-
-    // Reset everything back to default
-    mmrpg_reset_game_session();
 
     // Return generated page markup
     return $this_page_markup;
