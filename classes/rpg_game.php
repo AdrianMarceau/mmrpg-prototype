@@ -1696,5 +1696,261 @@ class rpg_game {
         else { return array(); }
     }
 
+    // Define a function for saving the current user session to the database
+    public static function session_to_database($echo = false){
+        global $db;
+
+        // If there is not a logged in user, exit
+        if (!self::is_user() && !defined('MMRPG_REMOTE_GAME')){ return false; }
+        elseif (defined('MMRPG_REMOTE_GAME')){ $this_userid = MMRPG_REMOTE_GAME; }
+        else { global $this_userid; }
+
+        // Create index arrays for all players and robots to save
+        $mmrpg_users_players = array();
+        $mmrpg_users_robots = array();
+
+        // Collect all the game session flags/counters/values
+        $session_flags = self::get_session_flags();
+        $session_counters = self::get_session_counters();
+        $session_values = self::get_session_values();
+
+        // Collect the global battle settings and rewards arrays
+        $battle_settings = !empty($session_values['battle_settings']) ? $session_values['battle_settings'] : array();
+        $battle_rewards = !empty($session_values['battle_rewards']) ? $session_values['battle_rewards'] : array();
+
+        // Collect unique player tokens from the settings and/or rewards
+        $player_tokens = array();
+        if (!empty($battle_settings)){ $player_tokens = array_merge($player_tokens, array_keys($battle_settings)); }
+        if (!empty($battle_rewards)){ $player_tokens = array_merge($player_tokens, array_keys($battle_rewards)); }
+        $player_tokens = array_unique($player_tokens);
+
+        // Fix issues with legacy player rewards array
+        if (!empty($player_tokens)){
+            foreach ($player_tokens AS $player_key => $player_token){
+                if (empty($player_token)){ continue; }
+                if (!empty($battle_rewards)){
+                    foreach ($battle_rewards AS $player_token => $player_info){
+                        // If new player robots array is empty but old is not, copy over
+                        if (empty($player_info['player_robots']) && !empty($player_info['player_rewards']['robots'])){
+                            // Loop through and collect robot data from the legacy rewards array
+                            foreach ($player_info['player_rewards']['robots'] AS $key => $robot){
+                                if (empty($robot['token'])){ continue; }
+                                $robot_info = array();
+                                $robot_info['robot_token'] = $robot['token'];
+                                $robot_info['robot_level'] = !empty($robot['level']) ? $robot['level'] : 1;
+                                $robot_info['robot_experience'] = !empty($robot['points']) ? $robot['points'] : 0;
+                                $player_info['player_robots'][$robot['token']] = $robot_info;
+                            }
+                            // Kill the legacy rewards array to prevent confusion
+                            unset($player_info['player_rewards']);
+                        }
+                        // If player robots are NOT empty, update in the parent array
+                        if (!empty($player_info['player_robots'])){
+                            $battle_rewards[$player_token] = $player_info;
+                        }
+                        // Otherwise if no robots found, kill this player's data in both arrays
+                        else {
+                            unset($battle_rewards[$player_token]);
+                            unset($battle_settings[$player_token]);
+                            unset($player_tokens[$player_key]);
+                        }
+                    }
+                }
+            }
+        }
+
+        //echo('$player_tokens = '.print_r($player_tokens, true).PHP_EOL);
+
+        // If players not empty, loop through and save each to session
+        if (!empty($player_tokens)){
+            $player_tokens = array_values($player_tokens);
+            foreach ($player_tokens AS $player_token){
+                if (empty($player_token)){ continue; }
+
+                //echo('$player_token = '.print_r($player_token, true).PHP_EOL);
+
+                // Collect settings and rewards for this player
+                $player_settings = !empty($battle_settings[$player_token]) ? $battle_settings[$player_token] : array();
+                $player_rewards = !empty($battle_rewards[$player_token]) ? $battle_rewards[$player_token] : array();
+
+                // Create an entry in the save index for this player
+                if (!isset($mmrpg_users_players[$player_token])){ $mmrpg_users_players[$player_token] = array(); }
+                $mmrpg_player = $mmrpg_users_players[$player_token];
+
+                // Collect unique robot tokens from the settings and/or rewards
+                $robot_tokens = array();
+                if (!empty($player_settings['player_robots'])){ $robot_tokens = array_merge($robot_tokens, array_keys($player_settings['player_robots'])); }
+                if (!empty($player_rewards['player_robots'])){ $robot_tokens = array_merge($robot_tokens, array_keys($player_rewards['player_robots'])); }
+                $robot_tokens = array_unique($robot_tokens);
+
+                //echo('$robot_tokens = '.print_r($robot_tokens, true).PHP_EOL);
+
+                // Collect unique ability tokens from the settings and/or rewards
+                $ability_tokens = array();
+                if (!empty($player_settings['player_abilities'])){ $ability_tokens = array_merge($ability_tokens, array_keys($player_settings['player_abilities'])); }
+                if (!empty($player_rewards['player_abilities'])){ $ability_tokens = array_merge($ability_tokens, array_keys($player_rewards['player_abilities'])); }
+                $ability_tokens = array_unique($ability_tokens);
+
+                //echo('$ability_tokens = '.print_r($ability_tokens, true).PHP_EOL);
+
+                // Create or update player info using settings and rewards
+                $mmrpg_player['user_id'] = $this_userid;
+                $mmrpg_player['player_token'] = $player_token;
+
+                $mmrpg_player['player_points'] = !empty($player_rewards['player_points']) ? $player_rewards['player_points'] : 0;
+
+                $mmrpg_player['player_robots_unlocked'] = array();
+                $mmrpg_player['player_robots_unlocked_count'] = 0;
+
+                $mmrpg_player['player_robots_current'] = $robot_tokens;
+                $mmrpg_player['player_robots_current_count'] = count($robot_tokens);
+
+                $mmrpg_player['player_abilities_unlocked'] = $ability_tokens;
+                $mmrpg_player['player_abilities_unlocked_count'] = count($ability_tokens);
+
+                // If robots not empty, loop through and save each to session
+                if (!empty($robot_tokens)){
+                    foreach ($robot_tokens AS $robot_token){
+                        if (empty($robot_token)){ continue; }
+
+                        //echo('$robot_token = '.print_r($robot_token, true).PHP_EOL);
+
+                        // Collect settings and settings for this player
+                        $robot_settings = !empty($player_settings['player_robots'][$robot_token]) ? $player_settings['player_robots'][$robot_token] : array();
+                        $robot_rewards = !empty($player_rewards['player_robots'][$robot_token]) ? $player_rewards['player_robots'][$robot_token] : array();
+
+                        // Create an entry in the save index for this robot
+                        if (!isset($mmrpg_users_robots[$robot_token])){ $mmrpg_users_robots[$robot_token] = array(); }
+                        $mmrpg_robot = $mmrpg_users_robots[$robot_token];
+
+                        // Collect unique ability tokens from the settings and/or rewards
+                        $ability_tokens = array();
+                        if (!empty($robot_settings['robot_abilities'])){ $ability_tokens = array_merge($ability_tokens, array_keys($robot_settings['robot_abilities'])); }
+                        if (!empty($robot_rewards['robot_abilities'])){ $ability_tokens = array_merge($ability_tokens, array_keys($robot_rewards['robot_abilities'])); }
+                        $ability_tokens = array_unique($ability_tokens);
+
+                        //echo('$ability_tokens = '.print_r($ability_tokens, true).PHP_EOL);
+
+                        // Create or update player info using settings and rewards
+                        $mmrpg_robot['user_id'] = $this_userid;
+                        $mmrpg_robot['robot_token'] = $robot_token;
+
+                        $mmrpg_robot['robot_image'] = !empty($robot_settings['robot_image']) ? $robot_settings['robot_image'] : '';
+                        $mmrpg_robot['robot_item'] = !empty($robot_settings['robot_item']) ? $robot_settings['robot_item'] : '';
+
+                        $mmrpg_robot['robot_level'] = !empty($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
+                        $mmrpg_robot['robot_experience'] = !empty($robot_rewards['robot_experience']) ? $robot_rewards['robot_experience'] : 0;
+                        $mmrpg_robot['robot_experience_total'] = ($mmrpg_robot['robot_level'] * 1000) + $mmrpg_robot['robot_experience'];
+
+                        $mmrpg_robot['robot_energy_bonuses'] = !empty($robot_rewards['robot_energy']) ? $robot_rewards['robot_energy'] : 0;
+                        $mmrpg_robot['robot_energy_bonuses_pending'] = !empty($robot_rewards['robot_energy_pending']) ? $robot_rewards['robot_energy_pending'] : 0;
+                        $mmrpg_robot['robot_weapons_bonuses'] = !empty($robot_rewards['robot_weapons']) ? $robot_rewards['robot_weapons'] : 0;
+                        $mmrpg_robot['robot_weapons_bonuses_pending'] = !empty($robot_rewards['robot_weapons_pending']) ? $robot_rewards['robot_weapons_pending'] : 0;
+                        $mmrpg_robot['robot_attack_bonuses'] = !empty($robot_rewards['robot_attack']) ? $robot_rewards['robot_attack'] : 0;
+                        $mmrpg_robot['robot_attack_bonuses_pending'] = !empty($robot_rewards['robot_attack_pending']) ? $robot_rewards['robot_attack_pending'] : 0;
+                        $mmrpg_robot['robot_defense_bonuses'] = !empty($robot_rewards['robot_defense']) ? $robot_rewards['robot_defense'] : 0;
+                        $mmrpg_robot['robot_defense_bonuses_pending'] = !empty($robot_rewards['robot_defense_pending']) ? $robot_rewards['robot_defense_pending'] : 0;
+                        $mmrpg_robot['robot_speed_bonuses'] = !empty($robot_rewards['robot_speed']) ? $robot_rewards['robot_speed'] : 0;
+                        $mmrpg_robot['robot_speed_bonuses_pending'] = !empty($robot_rewards['robot_speed_pending']) ? $robot_rewards['robot_speed_pending'] : 0;
+
+                        $mmrpg_robot['robot_player'] = $player_token;
+                        $mmrpg_robot['robot_player_original'] = !empty($robot_settings['original_player']) ? $robot_settings['original_player'] : '';
+
+                        $mmrpg_robot['robot_abilities_unlocked'] = !empty($robot_rewards['robot_abilities']) ? array_keys($robot_rewards['robot_abilities']) : array();;
+                        $mmrpg_robot['robot_abilities_unlocked_count'] = count($mmrpg_robot['robot_abilities_unlocked']);
+                        $mmrpg_robot['robot_abilities_current'] = !empty($robot_settings['robot_abilities']) ? array_keys($robot_settings['robot_abilities']) : array();
+                        $mmrpg_robot['robot_abilities_current_count'] = count($mmrpg_robot['robot_abilities_current']);
+
+                        $robot_flags = array();
+                        if (!empty($robot_settings['flags'])){ $robot_flags = array_merge($robot_flags, $robot_settings['flags']); }
+                        if (!empty($robot_rewards['flags'])){ $robot_flags = array_merge($robot_flags, $robot_rewards['flags']); }
+                        $mmrpg_robot['robot_flags'] = !empty($robot_flags) ? json_encode($robot_flags) : '';
+
+                        $robot_counters = array();
+                        if (!empty($robot_settings['counters'])){ $robot_counters = array_merge($robot_counters, $robot_settings['counters']); }
+                        if (!empty($robot_rewards['counters'])){ $robot_counters = array_merge($robot_counters, $robot_rewards['counters']); }
+                        $mmrpg_robot['robot_counters'] = !empty($robot_counters) ? json_encode($robot_counters) : '';
+
+                        $robot_values = array();
+                        if (!empty($robot_settings['values'])){ $robot_values = array_merge($robot_values, $robot_settings['values']); }
+                        if (!empty($robot_rewards['values'])){ $robot_values = array_merge($robot_values, $robot_rewards['values']); }
+                        $mmrpg_robot['robot_values'] = !empty($robot_values) ? json_encode($robot_values) : '';
+
+                        // Update save index with new robot info
+                        $mmrpg_users_robots[$robot_token] = $mmrpg_robot;
+
+                    }
+                }
+
+                // Update save index with new player info
+                $mmrpg_users_players[$player_token] = $mmrpg_player;
+
+            }
+        }
+
+        // Loop through any collected robots and update original player
+        if (!empty($mmrpg_users_robots)){
+            foreach ($mmrpg_users_robots AS $robot_token => $robot_info){
+                if (!empty($robot_info['robot_player_original'])){
+                    $player_token = $robot_info['robot_player_original'];
+                    $mmrpg_users_players[$player_token]['player_robots_unlocked'][] = $robot_token;
+                    $mmrpg_users_players[$player_token]['player_robots_unlocked_count']++;
+                }
+            }
+        }
+
+        // Collapse any nested player arrays into csv strings
+        foreach ($mmrpg_users_players AS $player_token => $player_info){
+            foreach ($player_info AS $field_name => $field_value){
+                if (is_array($field_value)){
+                    $mmrpg_users_players[$player_token][$field_name] = implode(',', $field_value);
+                }
+            }
+        }
+
+        // Collapse any nested robot arrays into csv strings
+        foreach ($mmrpg_users_robots AS $robot_token => $robot_info){
+            foreach ($robot_info AS $field_name => $field_value){
+                if (is_array($field_value)){
+                    $mmrpg_users_robots[$robot_token][$field_name] = implode(',', $field_value);
+                }
+            }
+        }
+
+        if ($echo){ echo('$mmrpg_users_players = '.print_r($mmrpg_users_players, true).PHP_EOL); }
+        if ($echo){ echo('$mmrpg_users_robots = '.print_r($mmrpg_users_robots, true).PHP_EOL); }
+
+        // Loop through players and update/insert them in the database
+        $db_existing_players = $db->get_value("SELECT GROUP_CONCAT(player_token) AS player_tokens FROM mmrpg_users_players WHERE user_id = {$this_userid};", 'player_tokens');
+        $db_existing_players = !empty($db_existing_players) ? explode(',', $db_existing_players) : array();
+        foreach ($mmrpg_users_players AS $player_token => $player_info){
+
+            // Insert or update the player info into the database
+            if (in_array($player_token, $db_existing_players)){
+                $db->update('mmrpg_users_players', $player_info, array('user_id' => $this_userid, 'player_token' => $player_token));
+            } else {
+                $db->insert('mmrpg_users_players', $player_info);
+            }
+
+        }
+
+        // Loop through robots and update/insert them in the database
+        $db_existing_robots = $db->get_value("SELECT GROUP_CONCAT(robot_token) AS robot_tokens FROM mmrpg_users_robots WHERE user_id = {$this_userid};", 'robot_tokens');
+        $db_existing_robots = !empty($db_existing_robots) ? explode(',', $db_existing_robots) : array();
+        foreach ($mmrpg_users_robots AS $robot_token => $robot_info){
+
+            // Insert or update the robot info into the database
+            if (in_array($robot_token, $db_existing_robots)){
+                $db->update('mmrpg_users_robots', $robot_info, array('user_id' => $this_userid, 'robot_token' => $robot_token));
+            } else {
+                $db->insert('mmrpg_users_robots', $robot_info);
+            }
+
+        }
+
+        //exit();
+
+    }
+
 
 }

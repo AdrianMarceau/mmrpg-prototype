@@ -735,6 +735,44 @@ function mmrpg_patch_star_force_reboot_2k16($_GAME){
 }
 
 
+// -- DB USER OBJECTS 2k17 -- //
+
+// Define a patch function for applying the next update
+$token = 'db_user_objects_2k17';
+$update_patch_tokens[] = $token;
+$update_patch_names[$token] = 'Database User Objects 2k17';
+$update_patch_details[$token] = "The previous storage format for unlocked players, robots, and abilities \n";
+$update_patch_details[$token] .= "was ineffecient and needed to be optimized.  This patch should have no  \n";
+$update_patch_details[$token] .= "effect on user experience or gameplay and is only for internal purposes. ";
+function mmrpg_patch_db_user_objects_2k17($_GAME){
+
+    // Pull in global variables
+    global $db;
+
+    define('MMRPG_REMOTE_GAME', $_GAME['user_id']);
+    define('MMRPG_REMOTE_GAME_ID', $_GAME['user_id']);
+    $session_token = rpg_game::session_token();
+    $_SESSION[$session_token] = $_GAME;
+
+    echo("Converting session objects into database objects for user ID {$_GAME['user_id']}... \n\n");
+
+    // Trigger the session to database function to do all the work
+    rpg_game::session_to_database(true);
+
+    // Print the final message of success
+    echo("...done! Thank you for your time. :) \n\n");
+
+    // Print out debug info and exit now
+    header('Content-type: text/plain;');
+    exit('mmrpg_patch_db_user_objects_2k17() $_SESSION['.$session_token.']');
+
+    // Return the updated game array
+    unset($_SESSION[$session_token]);
+    return $_GAME;
+
+}
+
+
 /*
 
 // -- PATCH FUNCTION TEMPLATE -- //
