@@ -89,7 +89,8 @@ if ($this_request_type != 'ajax'){
         <? } else { ?>
             <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$this_request_patch?>"><?= $update_patch_names[$this_request_patch] ?></a> &raquo;
             <br />
-            <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=10&amp;patch=<?=$this_request_patch?>" data-limit="10">x10</a>
+            <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=1&amp;patch=<?=$this_request_patch?>" data-limit="1">x1</a>
+            |  <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=10&amp;patch=<?=$this_request_patch?>" data-limit="10">x10</a>
             | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=50&amp;patch=<?=$this_request_patch?>" data-limit="50">x50</a>
             | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=100&amp;patch=<?=$this_request_patch?>" data-limit="100">x100</a>
             | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=200&amp;patch=<?=$this_request_patch?>" data-limit="200">x200</a>
