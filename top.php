@@ -31,6 +31,7 @@ if (get_magic_quotes_gpc()){
 }
 
 // Include cms classs first and foremost
+require('classes/cms_core.php');
 require('classes/cms_database.php');
 require('classes/cms_website.php');
 require('classes/cms_index.php');
