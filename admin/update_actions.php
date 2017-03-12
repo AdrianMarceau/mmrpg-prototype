@@ -49,6 +49,9 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     if (!empty($data['save_values_battle_stars'])){ $_GAME['values']['battle_stars'] = json_decode($data['save_values_battle_stars'], true); }
     elseif (!isset($_GAME['values']['battle_stars'])){ $_GAME['values']['battle_stars'] = array(); }
 
+    if (!empty($data['save_values_robot_alts'])){ $_GAME['values']['robot_alts'] = json_decode($data['save_values_robot_alts'], true); }
+    elseif (!isset($_GAME['values']['robot_alts'])){ $_GAME['values']['robot_alts'] = array(); }
+
     if (!empty($data['save_values_robot_database'])){ $_GAME['values']['robot_database'] = json_decode($data['save_values_robot_database'], true); }
     elseif (!isset($_GAME['values']['robot_database'])){ $_GAME['values']['robot_database'] = array(); }
 
