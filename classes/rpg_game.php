@@ -2187,6 +2187,20 @@ class rpg_game {
             }
         }
 
+        // Loop through robots and update/insert them in the database
+        $db_existing_robots = $db->get_array_list("SELECT robot_token FROM mmrpg_users_robots_database WHERE user_id = {$this_userid};", 'robot_token');
+        $db_existing_robots = !empty($db_existing_robots) ? array_column($db_existing_robots, 'robot_token') : array();
+        foreach ($mmrpg_users_robots_database AS $robot_token => $robot_info){
+
+            // Insert or update the robot info into the database
+            if (in_array($robot_token, $db_existing_robots)){
+                $db->update('mmrpg_users_robots_database', $robot_info, array('user_id' => $this_userid, 'robot_token' => $robot_token));
+            } else {
+                $db->insert('mmrpg_users_robots_database', $robot_info);
+            }
+
+        }
+
         // Loop through items and update/insert them in the database
         $db_existing_items = $db->get_array_list("SELECT item_token FROM mmrpg_users_items WHERE user_id = {$this_userid};", 'item_token');
         $db_existing_items = !empty($db_existing_items) ? array_column($db_existing_items, 'item_token') : array();
@@ -2201,18 +2215,16 @@ class rpg_game {
 
         }
 
-        // Loop through robots and update/insert them in the database
-        $db_existing_robots = $db->get_array_list("SELECT robot_token FROM mmrpg_users_robots_database WHERE user_id = {$this_userid};", 'robot_token');
-        $db_existing_robots = !empty($db_existing_robots) ? array_column($db_existing_robots, 'robot_token') : array();
-        foreach ($mmrpg_users_robots_database AS $robot_token => $robot_info){
-
-            // Insert or update the robot info into the database
-            if (in_array($robot_token, $db_existing_robots)){
-                $db->update('mmrpg_users_robots_database', $robot_info, array('user_id' => $this_userid, 'robot_token' => $robot_token));
+        // Loop through stars and update/insert them in the database
+        $db_existing_stars = $db->get_array_list("SELECT star_token FROM mmrpg_users_stars WHERE user_id = {$this_userid};", 'star_token');
+        $db_existing_stars = !empty($db_existing_stars) ? array_column($db_existing_stars, 'star_token') : array();
+        foreach ($mmrpg_users_stars AS $star_token => $star_info){
+            // Insert or update the star info into the database
+            if (in_array($star_token, $db_existing_stars)){
+                $db->update('mmrpg_users_stars', $star_info, array('user_id' => $this_userid, 'star_token' => $star_token));
             } else {
-                $db->insert('mmrpg_users_robots_database', $robot_info);
+                $db->insert('mmrpg_users_stars', $star_info);
             }
-
         }
 
         //exit();
