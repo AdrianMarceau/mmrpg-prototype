@@ -473,6 +473,9 @@ function mmrpg_save_game_session(){
         //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
         $db->update('mmrpg_saves', $this_save_array, 'user_id = '.$this_user['userid']);
 
+        // Trigger session to database indexing
+        rpg_game::session_to_database();
+
     }
 
     // Unset the reset flag in the session
