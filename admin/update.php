@@ -2,6 +2,7 @@
 
 // Require the update actions file
 $update_patch_tokens = array();
+$update_patch_tokens_disabled = array();
 require_once('update_actions.php');
 require_once('update_patches.php');
 
@@ -85,7 +86,11 @@ if ($this_request_type != 'ajax'){
         <? if (empty($this_request_patch)){ ?>
             <br /><br /><strong>Select Patch</strong> :<br />
             <? foreach ($update_patch_tokens AS $key => $patch){ ?>
-                + <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$patch?>"><?= $update_patch_names[$patch] ?></a>
+                <? if (!in_array($patch, $update_patch_tokens_disabled)): ?>
+                    + <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$patch?>"><?= $update_patch_names[$patch] ?></a>
+                <? else: ?>
+                    + <a style="text-decoration: line-through;"><?= $update_patch_names[$patch] ?></a>
+            <? endif; ?>
                 <br />
             <? } ?>
         <? } else { ?>
