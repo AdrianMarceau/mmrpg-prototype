@@ -4,7 +4,7 @@
 function mmrpg_admin_update_save_file($key, $data, $patch_token){
     global $db;
     global $update_patch_tokens, $update_patch_names, $update_patch_details;
-    global $this_request_force, $this_request_print;
+    global $this_request_force, $this_request_print, $this_ajax_request_feedback;
 
     // Start the markup variable
     $this_page_markup = '';
@@ -23,7 +23,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     $_GAME['flags'] = !empty($data['save_flags']) ? json_decode($data['save_flags'], true) : array();
     $_GAME['values'] = !empty($data['save_values']) ? json_decode($data['save_values'], true) : array();
     $_GAME['counters'] = !empty($data['save_counters']) ? json_decode($data['save_counters'], true) : array();
-    $_GAME['patches'] = !empty($data['save_patches_applied']) ? json_decode($data['save_patches_applied'], true) : array();
+    $_GAME['patches'] = !empty($data['save_patches_applied']) ? explode(',', $data['save_patches_applied']) : array();
 
     if (!empty($data['save_values_battle_index'])){ $_GAME['values']['battle_index'] = array(); }
     elseif (!isset($_GAME['values']['battle_index'])){ $_GAME['values']['battle_index'] = array(); }
@@ -88,9 +88,6 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
 
         // If a patch was found and applied, update save file and generate notes
         if (!empty($patch_name) && !empty($patch_details) && !empty($patch_notes)){
-
-            // Add this patch token to the array list
-            $_GAME['patches'][] = $patch_token;
 
             // Generate the header for this update patch's notes including details
             ob_start();
@@ -217,17 +214,30 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         'save_values_battle_stars' => mmrpg_admin_encode_save_data($_GAME['values']['battle_stars']),
         'save_values_robot_database' => mmrpg_admin_encode_save_data($_GAME['values']['robot_database']),
         'save_counters' => mmrpg_admin_encode_save_data($_GAME['counters']),
-        'save_patches_applied' => mmrpg_admin_encode_save_data($_GAME['patches'])
+        'save_patches_applied' => mmrpg_admin_encode_save_data($_GAME['patches']),
+        'save_counters' => mmrpg_admin_encode_save_data($_GAME['counters']),
+        'save_date_modified' => time()
         );
 
     // Update the database with the recent changes
     $temp_success = $db->update('mmrpg_saves', $update_array, "save_id = {$data['save_id']}");
+    $temp_success2 = false;
+    if (!in_array($patch_token, $_GAME['patches'])){
+        // Add this patch token to the array list
+        $_GAME['patches'][] = $patch_token;
+        // Save the new patch info to the database
+        $temp_success2 = $db->insert('mmrpg_saves_patches_users', array(
+            'user_id' => $_GAME['user_id'],
+            'patch_token' => $patch_token
+            ));
+    }
 
     // DEBUG
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
 
         // Print the debug headers
         $this_page_markup .= '<strong>$this_update_list['.$key.']['.$data['user_name_clean'].']</strong><br />';
+        $this_page_markup .= 'User ID:'.$data['user_id'].'<br />';
         $this_page_markup .= 'Save ID:'.$data['save_id'].'<br />';
 
         // Check to see which fields have been updated
@@ -244,8 +254,19 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         if ($update_array['save_values_battle_stars'] != $data['save_values_battle_stars']){ $this_page_markup .= 'Save values battle stars have been changed...<br />'; }
         if ($update_array['save_values_robot_database'] != $data['save_values_robot_database']){ $this_page_markup .= 'Save values robot database has been changed...<br />'; }
         if ($update_array['save_counters'] != $data['save_counters']){ $this_page_markup .= 'Save counters have been changed...<br />'; }
-        if ($temp_success === false){ $this_page_markup .= '...Failure!'; }
-        else { $this_page_markup .= '...'.(!empty($temp_success) ? 'Success!' : 'Skipped!'); }
+        if (!empty($this_ajax_request_feedback)){
+            $this_page_markup .= nl2br(trim($this_ajax_request_feedback)).'<br />';
+        }
+        if (!empty($_GAME['patches'])){
+            $this_page_markup .= 'Save patches applied : '.implode(', ', $_GAME['patches']).'<br />';
+        }
+        if ($temp_success === false){
+            $this_page_markup .= '...Failure!';
+        } else {
+            $this_page_markup .= $temp_success ? '.' : '';
+            $this_page_markup .= $temp_success2 ? '.' : '';
+            $this_page_markup .= '...Success!';
+        }
         unset($update_array);
 
     $this_page_markup .= '</p><hr />';

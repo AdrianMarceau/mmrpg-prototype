@@ -2101,40 +2101,31 @@ class rpg_game {
         $db_existing_players = $db->get_array_list("SELECT player_token FROM mmrpg_users_players WHERE user_id = {$this_userid};", 'player_token');
         $db_existing_players = !empty($db_existing_players) ? array_column($db_existing_players, 'player_token') : array();
         foreach ($mmrpg_users_players AS $player_token => $player_info){
-
-            // Insert or update the player info into the database
             if (in_array($player_token, $db_existing_players)){
                 $db->update('mmrpg_users_players', $player_info, array('user_id' => $this_userid, 'player_token' => $player_token));
             } else {
                 $db->insert('mmrpg_users_players', $player_info);
             }
-
         }
 
         // Loop through robots and update/insert them in the database
         $db_existing_robots = $db->get_array_list("SELECT robot_token FROM mmrpg_users_robots WHERE user_id = {$this_userid};", 'robot_token');
         $db_existing_robots = !empty($db_existing_robots) ? array_column($db_existing_robots, 'robot_token') : array();
         foreach ($mmrpg_users_robots AS $robot_token => $robot_info){
-
-            // Insert or update the robot info into the database
             if (in_array($robot_token, $db_existing_robots)){
                 $db->update('mmrpg_users_robots', $robot_info, array('user_id' => $this_userid, 'robot_token' => $robot_token));
             } else {
                 $db->insert('mmrpg_users_robots', $robot_info);
             }
-
         }
 
         // Loop through global abilities and update/insert them in the database
         $db_existing_abilities = $db->get_array_list("SELECT ability_token FROM mmrpg_users_abilities WHERE user_id = {$this_userid};", 'ability_token');
         $db_existing_abilities = !empty($db_existing_abilities) ? array_column($db_existing_abilities, 'ability_token') : array();
         foreach ($mmrpg_users_abilities AS $ability_token => $ability_info){
-
-            // Insert the ability info into the database if not already there
             if (!in_array($ability_token, $db_existing_abilities)){
                 $db->insert('mmrpg_users_abilities', $ability_info);
             }
-
         }
 
         // Loop through player abilities and update/insert them in the database
@@ -2142,12 +2133,9 @@ class rpg_game {
             $db_existing_players_abilities = $db->get_array_list("SELECT ability_token FROM mmrpg_users_players_abilities WHERE user_id = {$this_userid} AND player_token = '{$player_token}';", 'ability_token');
             $db_existing_players_abilities = !empty($db_existing_players_abilities) ? array_column($db_existing_players_abilities, 'ability_token') : array();
             foreach ($player_abilities AS $ability_token => $ability_info){
-
-                // Insert the ability info into the database if not already there
                 if (!in_array($ability_token, $db_existing_players_abilities)){
                     $db->insert('mmrpg_users_players_abilities', $ability_info);
                 }
-
             }
         }
 
@@ -2156,12 +2144,9 @@ class rpg_game {
             $db_existing_robots_abilities = $db->get_array_list("SELECT ability_token FROM mmrpg_users_robots_abilities WHERE user_id = {$this_userid} AND robot_token = '{$robot_token}';", 'ability_token');
             $db_existing_robots_abilities = !empty($db_existing_robots_abilities) ? array_column($db_existing_robots_abilities, 'ability_token') : array();
             foreach ($robot_abilities AS $ability_token => $ability_info){
-
-                // Insert the ability info into the database if not already there
                 if (!in_array($ability_token, $db_existing_robots_abilities)){
                     $db->insert('mmrpg_users_robots_abilities', $ability_info);
                 }
-
             }
         }
 
@@ -2178,12 +2163,9 @@ class rpg_game {
             $db_existing_robots_alts = $db->get_array_list("SELECT alt_token FROM mmrpg_users_robots_alts WHERE user_id = {$this_userid} AND robot_token = '{$robot_token}';", 'alt_token');
             $db_existing_robots_alts = !empty($db_existing_robots_alts) ? array_column($db_existing_robots_alts, 'alt_token') : array();
             foreach ($robot_alts AS $alt_token => $alt_info){
-
-                // Insert the alt info into the database if not already there
                 if (!in_array($alt_token, $db_existing_robots_alts)){
                     $db->insert('mmrpg_users_robots_alts', $alt_info);
                 }
-
             }
         }
 
@@ -2191,40 +2173,43 @@ class rpg_game {
         $db_existing_robots = $db->get_array_list("SELECT robot_token FROM mmrpg_users_robots_database WHERE user_id = {$this_userid};", 'robot_token');
         $db_existing_robots = !empty($db_existing_robots) ? array_column($db_existing_robots, 'robot_token') : array();
         foreach ($mmrpg_users_robots_database AS $robot_token => $robot_info){
-
-            // Insert or update the robot info into the database
             if (in_array($robot_token, $db_existing_robots)){
                 $db->update('mmrpg_users_robots_database', $robot_info, array('user_id' => $this_userid, 'robot_token' => $robot_token));
             } else {
                 $db->insert('mmrpg_users_robots_database', $robot_info);
             }
-
         }
 
         // Loop through items and update/insert them in the database
         $db_existing_items = $db->get_array_list("SELECT item_token FROM mmrpg_users_items WHERE user_id = {$this_userid};", 'item_token');
         $db_existing_items = !empty($db_existing_items) ? array_column($db_existing_items, 'item_token') : array();
         foreach ($mmrpg_users_items AS $item_token => $item_info){
-
-            // Insert or update the item info into the database
             if (in_array($item_token, $db_existing_items)){
                 $db->update('mmrpg_users_items', $item_info, array('user_id' => $this_userid, 'item_token' => $item_token));
             } else {
                 $db->insert('mmrpg_users_items', $item_info);
             }
-
         }
 
-        // Loop through stars and update/insert them in the database
-        $db_existing_stars = $db->get_array_list("SELECT star_token FROM mmrpg_users_stars WHERE user_id = {$this_userid};", 'star_token');
-        $db_existing_stars = !empty($db_existing_stars) ? array_column($db_existing_stars, 'star_token') : array();
+        // Delete existing stars for this user from the database, then loop through and re-insert current ones
+        $db->query("DELETE FROM mmrpg_users_stars WHERE user_id = {$this_userid};");
         foreach ($mmrpg_users_stars AS $star_token => $star_info){
-            // Insert or update the star info into the database
-            if (in_array($star_token, $db_existing_stars)){
-                $db->update('mmrpg_users_stars', $star_info, array('user_id' => $this_userid, 'star_token' => $star_token));
-            } else {
-                $db->insert('mmrpg_users_stars', $star_info);
-            }
+            $db->insert('mmrpg_users_stars', $star_info);
+        }
+
+        // Create index arrays for all players and robots to save
+        if ($echo && defined('MMRPG_ADMIN_AJAX_REQUEST')){
+            global $this_ajax_request_feedback;
+            $this_ajax_request_feedback .= '$mmrpg_users_abilities('.count($mmrpg_users_abilities).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_players('.count($mmrpg_users_players).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_players_abilities('.count($mmrpg_users_players_abilities).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_robots('.count($mmrpg_users_robots).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_robots_abilities('.count($mmrpg_users_robots_abilities).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_robots_abilities_current('.count($mmrpg_users_robots_abilities_current).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_robots_alts('.count($mmrpg_users_robots_alts).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_robots_database('.count($mmrpg_users_robots_database).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_items('.count($mmrpg_users_items).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_stars('.count($mmrpg_users_stars).')'.PHP_EOL;
         }
 
         //exit();

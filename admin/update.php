@@ -19,6 +19,12 @@ $this_request_force = isset($_REQUEST['force']) && $_REQUEST['force'] == 'true' 
 $this_request_print = isset($_REQUEST['print']) && $_REQUEST['print'] == 'true' ? true : false;
 $this_return_markup = '';
 
+// If we're in an ajax request, set the ADMIN constant
+$this_ajax_request_feedback = '';
+if ($this_request_type == 'ajax'){
+    define('MMRPG_ADMIN_AJAX_REQUEST', true);
+}
+
 // Prevent undefined patches from being applied
 if (!in_array($this_request_patch, $update_patch_tokens)){
     $this_request_type = 'index';
@@ -27,11 +33,20 @@ if (!in_array($this_request_patch, $update_patch_tokens)){
 }
 
 // Define a WHERE clause for queries if user ID provided
+$this_select_query = '';
+$this_join_query = '';
 $this_where_query = '';
-if (!empty($this_request_id)){ $this_where_query .= "AND mmrpg_saves.user_id = {$this_request_id} "; }
-if (!$this_request_force && !empty($this_request_patch)){ $this_where_query .= "AND mmrpg_saves.save_patches_applied NOT LIKE '%\"{$this_request_patch}\"%' "; }
+if (!empty($this_request_id)){
+    $this_where_query .= "AND saves.user_id = {$this_request_id} ";
+}
+if (!$this_request_force && !empty($this_request_patch)){
+    $this_select_query .= "spusers.patch_token, ";
+    $this_join_query .= "LEFT JOIN mmrpg_saves_patches_users AS spusers ON spusers.user_id = saves.user_id AND spusers.patch_token = '{$this_request_patch}' ";
+    $this_where_query .= "AND spusers.patch_token IS NULL ";
+}
 
-// Collect any save files that have a cache date less than the current one // AND mmrpg_saves.user_id = 110
+// Collect any save files that have a cache date less than the current one
+/*
 $this_update_query = "SELECT
     mmrpg_saves.*,
     mmrpg_leaderboard.board_points,
@@ -48,6 +63,51 @@ $this_update_query = "SELECT
     LIMIT
         {$this_update_limit}
         ;";
+        */
+
+$this_update_query = "SELECT
+    {$this_select_query}
+    saves.save_id,
+    saves.user_id,
+    saves.save_counters,
+    saves.save_values,
+    saves.save_values_battle_index,
+    saves.save_values_battle_complete,
+    saves.save_values_battle_failure,
+    saves.save_values_battle_rewards,
+    saves.save_values_battle_settings,
+    saves.save_values_battle_items,
+    saves.save_values_battle_abilities,
+    saves.save_values_battle_stars,
+    saves.save_values_robot_database,
+    saves.save_values_robot_alts,
+    saves.save_flags,
+    saves.save_settings,
+    saves.save_cache_date,
+    saves.save_date_created,
+    saves.save_date_accessed,
+    saves.save_date_modified,
+    GROUP_CONCAT(patches.patch_token) AS save_patches_applied,
+    lboard.board_points,
+    users.user_name_clean
+    FROM mmrpg_saves AS saves
+    LEFT JOIN mmrpg_leaderboard AS lboard ON lboard.user_id = saves.user_id
+    LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
+    LEFT JOIN (SELECT user_id, patch_token FROM mmrpg_saves_patches_users) AS patches ON patches.user_id = saves.user_id
+    {$this_join_query}
+    WHERE
+    lboard.board_points > 0
+    {$this_where_query}
+    ORDER BY
+    lboard.board_points DESC
+    LIMIT {$this_update_limit}
+    ;";
+
+$this_update_list = $db->get_array_list($this_update_query);
+$this_update_count = $this_request_type == 'ajax' && !empty($this_update_list) ? count($this_update_list) : 0;
+$this_update_list = !empty($this_update_list) ? $this_update_list : array();
+
+/*
 $this_total_query = "SELECT
     mmrpg_saves.user_id,
     mmrpg_saves.save_cache_date,
@@ -63,15 +123,22 @@ $this_total_query = "SELECT
     ORDER BY
         board_points DESC
         ;";
-//die($this_update_query);
-//die($this_update_query);
-$this_update_list = $db->get_array_list($this_update_query);
-$this_total_list = $db->get_array_list($this_total_query);
-$this_update_count = $this_request_type == 'ajax' && !empty($this_update_list) ? count($this_update_list) : 0;
-$this_total_count = !empty($this_total_list) ? count($this_total_list) : 0;
-$this_update_list = !empty($this_update_list) ? $this_update_list : array();
-$this_total_list = array();
-//die($this_update_query);
+*/
+
+$this_total_query = "SELECT
+    COUNT(*) AS total_users
+    FROM mmrpg_saves AS saves
+    LEFT JOIN mmrpg_leaderboard AS lboard ON lboard.user_id = saves.user_id
+    LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
+    {$this_join_query}
+    WHERE
+    lboard.board_points > 0
+    {$this_where_query}
+    ORDER BY
+    lboard.board_points DESC
+    ;";
+
+$this_total_count = $db->get_value($this_total_query, 'total_users');
 
 // If the request type is ajax, clear the generated page markup
 if ($this_request_type == 'ajax'){ $this_page_markup = ''; }
@@ -130,7 +197,7 @@ elseif ($this_request_type == 'ajax'){
 // Loop through each of the player save files
 if (!empty($this_update_list) && $this_request_type == 'ajax'){
     foreach ($this_update_list AS $key => $data){
-        $applied_patches =  !empty($data['save_patches_applied']) ? json_decode($data['save_patches_applied'], true) : array();
+        $applied_patches =  !empty($data['save_patches_applied']) ? explode(',', $data['save_patches_applied']) : array();
         if ($this_request_force || !in_array($this_request_patch, $applied_patches)){
             $temp_markup = mmrpg_admin_update_save_file($key, $data, $this_request_patch);
             $this_return_markup .= preg_replace('/\s+/', ' ', $temp_markup)."\n";
