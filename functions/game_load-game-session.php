@@ -133,11 +133,20 @@ function mmrpg_load_game_session(){
         // Update the user table in the database if not done already
         if (empty($_SESSION[$session_token]['DEMO'])){
             $db->update('mmrpg_users', array(
+                'user_ip_addresses' => implode(',', $ip_list)
+                ), "user_id = {$this_database_user['user_id']}");
+        }
+
+        /*
+        // Update the user table in the database if not done already
+        if (empty($_SESSION[$session_token]['DEMO'])){
+            $db->update('mmrpg_users', array(
                 'user_last_login' => time(),
                 'user_backup_login' => $this_database_user['user_last_login'],
                 'user_ip_addresses' => implode(',', $ip_list)
                 ), "user_id = {$this_database_user['user_id']}");
         }
+        */
 
         // Clear the pending login ID
         unset($_SESSION[$session_token]['PENDING_LOGIN_ID']);
