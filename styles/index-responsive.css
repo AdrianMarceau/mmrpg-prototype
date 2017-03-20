@@ -267,7 +267,6 @@ body:before {
     #window .banner .userinfo .info .file_view {
         opacity: 0.3;
         text-decoration: line-through;
-        pointer-events: none;
     }
     #window .banner .userinfo .info .file_view + .pipe {
         opacity: 0.3;
@@ -302,7 +301,6 @@ body:before {
     #mmrpg #game_buttons .link_button.missions {
         opacity: 0.3;
         text-decoration: line-through;
-        pointer-events: none;
     }
 
     #window .page .body .bodytext .type {
