@@ -28,11 +28,11 @@ function mmrpg_reset_game_session(){
     // Unset known session variables used by the game
     unset(
         $_SESSION['GAME'],
-        $_SESSION['INDEX'],
+        //$_SESSION['INDEX'],
         $_SESSION['PROTOTYPE_TEMP'],
-        $_SESSION['LEADERBOARD'],
-        $_SESSION['COMMUNITY'],
-        $_SESSION['DATABASE'],
+        //$_SESSION['LEADERBOARD'],
+        //$_SESSION['COMMUNITY'],
+        //$_SESSION['DATABASE'],
         $_SESSION['BATTLES'],
         $_SESSION['FIELDS'],
         $_SESSION['PLAYERS'],
