@@ -25,8 +25,23 @@ function mmrpg_reset_game_session(){
     $this_battle_items = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items'] : array();
     $this_battle_abilities = !empty($_SESSION[$session_token]['values']['battle_abilities']) ? $_SESSION[$session_token]['values']['battle_abilities'] : array();
 
-    // Automatically unset the session variable entirely
-    session_unset();
+    // Unset known session variables used by the game
+    unset(
+        $_SESSION['GAME'],
+        $_SESSION['INDEX'],
+        $_SESSION['PROTOTYPE_TEMP'],
+        $_SESSION['LEADERBOARD'],
+        $_SESSION['COMMUNITY'],
+        $_SESSION['DATABASE'],
+        $_SESSION['BATTLES'],
+        $_SESSION['FIELDS'],
+        $_SESSION['PLAYERS'],
+        $_SESSION['ROBOTS'],
+        $_SESSION['ABILITIES'],
+        $_SESSION['ITEMS'],
+        $_SESSION['TEMP'],
+        $_SESSION['DEBUG']
+        );
 
     // Automatically create the cache date
     $_SESSION[$session_token] = array();
