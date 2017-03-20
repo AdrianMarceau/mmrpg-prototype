@@ -1768,7 +1768,7 @@ class rpg_game {
                         else {
                             unset($battle_rewards[$player_token]);
                             unset($battle_settings[$player_token]);
-                            unset($player_tokens[$player_key]);
+                            unset($player_tokens[array_search($player_token, $player_tokens)]);
                         }
                     }
                 }
