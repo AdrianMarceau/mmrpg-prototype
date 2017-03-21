@@ -3,7 +3,7 @@
 
 body:before {
     content: "Z";
-    display: none;
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
@@ -255,6 +255,12 @@ body:before {
         padding-right: 3px;
     }
 
+    #window .page .body .subheader .br {
+        display: block;
+        float: none;
+        clear: both;
+    }
+
     #window .page .body .community .thread_subbody_compact,
     #window .page .body .community .thread_subbody_compact:nth-child(odd),
     #window .page .body .community .thread_subbody_compact:nth-child(even) {
@@ -262,6 +268,17 @@ body:before {
         width: 100%;
         margin-right: 0;
         clear: both;
+    }
+
+
+    #window .page .body .community .subheader .br {
+        margin: 4px 0 0;
+    }
+    #window .page .body .community .subheader .float_link2 {
+        display: inline-block;
+        float: none;
+        clear: none;
+        margin: 0 4px 4px 0;
     }
 
     #window .banner .userinfo .info .file_view {
@@ -1241,6 +1258,15 @@ body:before {
     #window .page .event .section_tabs .link_inline:hover .wrap,
     #window .page .event .section_tabs .link_inline.active .wrap {
         text-decoration: none;
+    }
+
+
+    #window .page .body .community .subheader .br {
+        margin-top: 6px;
+    }
+    #window .page .body .community .subheader .float_link2 {
+        display: block;
+        margin: 0 auto 6px 0;
     }
 
     #window .page .body .community .thread_subbody_compact {
