@@ -3,7 +3,7 @@
 
 body:before {
     content: "Z";
-    display: block;
+    display: none;
     position: absolute;
     top: 0;
     left: 0;
@@ -281,14 +281,6 @@ body:before {
         margin: 0 4px 4px 0;
     }
 
-    #window .banner .userinfo .info .file_view {
-        opacity: 0.3;
-        text-decoration: line-through;
-    }
-    #window .banner .userinfo .info .file_view + .pipe {
-        opacity: 0.3;
-    }
-
     #mmrpg #game_frames.ps-container > .ps-scrollbar-x-rail {
         opacity: 0.6;
     }
@@ -331,6 +323,14 @@ body:before {
 
     body:before {
         content: "05B";
+    }
+
+    #window .banner .userinfo .info .file_view {
+        opacity: 0.3;
+        text-decoration: line-through;
+    }
+    #window .banner .userinfo .info .file_view + .pipe {
+        opacity: 0.3;
     }
 
     #window .menu .item[data-token="prototype"] .link span,
@@ -426,6 +426,33 @@ body:before {
     #window .banner .userinfo .expand.expanded span {
         transform: rotate(45deg);
     }
+
+    #window .banner .userinfo .xcounters {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 44px;
+        bottom: 0;
+        width: 19px;
+        background-color: transparent;
+    }
+    #window .banner .userinfo .xcounters .field_type {
+        display: block;
+        position: absolute;
+        width: 19px;
+        height: 16px;
+        line-height: 16px;
+        -moz-border-radius: 6px;
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+    }
+    #window .banner .userinfo .xcounters .field_type:nth-child(1) {
+        top: 4px;
+    }
+    #window .banner .userinfo .xcounters .field_type:nth-child(2) {
+        top: 22px;
+    }
+
     #window .banner .userinfo .avatar {
         margin-right: 0;
         margin-left: 0;
@@ -457,7 +484,7 @@ body:before {
         font-size: 11px;
         line-height: 13px;
     }
-    #window .banner .userinfo .field_type {
+    #window .banner .userinfo .field_type.xover {
         top: 0;
         right: 0;
         left: 0;
@@ -550,6 +577,7 @@ body:before {
         line-height: 30px;
         border-bottom: 1px solid rgba(255,255,255,0.03);
         border-top: 1px solid rgba(0,0,0,0.09);
+        cursor: pointer;
     }
     #window .menu .item:first-child {
         border-top: 0 none transparent;
