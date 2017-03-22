@@ -913,7 +913,7 @@ while ($this_action == 'load'){
         $db->update('mmrpg_users', array(
             'user_last_login' => time(),
             'user_backup_login' => $temp_database_user['user_last_login'],
-            ), "user_id = {$this_database_user['user_id']}");
+            ), "user_id = {$temp_database_user['user_id']}");
 
         // Redirect without wasting time to the home again
         header('Location: '.MMRPG_CONFIG_ROOTURL);
