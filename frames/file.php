@@ -494,6 +494,12 @@ while ($this_action == 'load'){
         exit();
         */
 
+        // Manually update this user's last login time for notifications
+        $db->update('mmrpg_users', array(
+            'user_last_login' => time(),
+            'user_backup_login' => $temp_database_user['user_last_login'],
+            ), "user_id = {$temp_database_user['user_id']}");
+
         // Redirect without wasting time to the home again
         header('Location: '.MMRPG_CONFIG_ROOTURL.'frames/file.php?action=load&reload=true');
         exit();

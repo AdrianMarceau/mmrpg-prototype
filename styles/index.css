@@ -260,8 +260,11 @@ button {
 #window .banner .userinfo .expand {
     display: none;
 }
+#window .banner .userinfo .xcounters {
+    display: none;
+}
 
-#window .banner .userinfo .field_type {
+#window .banner .userinfo .field_type.xover {
     display: block;
     position: absolute;
     top: 3px;
