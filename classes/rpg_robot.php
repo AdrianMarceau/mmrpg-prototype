@@ -2512,27 +2512,55 @@ class rpg_robot extends rpg_object {
         if ($print_options['show_records']){
 
             global $db;
-            $temp_robot_records = array('robot_encountered' => 0, 'robot_defeated' => 0, 'robot_unlocked' => 0, 'robot_summoned' => 0, 'robot_scanned' => 0);
-            //$temp_robot_records['player_count'] = $db->get_value("SELECT COUNT(board_id) AS player_count  FROM mmrpg_leaderboard WHERE board_robots LIKE '%[".$robot_info['robot_token'].":%' AND board_points > 0", 'player_count');
-            $temp_player_query = "SELECT
-                mmrpg_saves.user_id,
-                mmrpg_saves.save_values_robot_database,
-                mmrpg_leaderboard.board_points
-                FROM mmrpg_saves
-                LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_saves.user_id
-                WHERE mmrpg_saves.save_values_robot_database LIKE '%\"{$robot_info['robot_token']}\"%' AND mmrpg_leaderboard.board_points > 0;";
-            $temp_player_list = $db->get_array_list($temp_player_query);
-            if (!empty($temp_player_list)){
-                foreach ($temp_player_list AS $temp_data){
-                    $temp_values = !empty($temp_data['save_values_robot_database']) ? json_decode($temp_data['save_values_robot_database'], true) : array();
-                    $temp_entry = !empty($temp_values[$robot_info['robot_token']]) ? $temp_values[$robot_info['robot_token']] : array();
-                    foreach ($temp_robot_records AS $temp_record => $temp_count){
-                        if (!empty($temp_entry[$temp_record])){ $temp_robot_records[$temp_record] += $temp_entry[$temp_record]; }
-                    }
-                }
-            }
-            $temp_values = array();
-            //echo '<pre>'.print_r($temp_robot_records, true).'</pre>';
+            $temp_robot_records = $db->get_array("SELECT
+                robots.robot_token,
+                (CASE WHEN urobots1.robot_encountered IS NOT NULL THEN urobots1.robot_encountered ELSE 0 END) AS robot_encountered,
+                (CASE WHEN urobots2.robot_defeated IS NOT NULL THEN urobots2.robot_defeated ELSE 0 END) AS robot_defeated,
+                (CASE WHEN urobots3.robot_unlocked IS NOT NULL THEN urobots3.robot_unlocked ELSE 0 END) AS robot_unlocked,
+                (CASE WHEN urobots4.robot_summoned IS NOT NULL THEN urobots4.robot_summoned ELSE 0 END) AS robot_summoned,
+                (CASE WHEN urobots5.robot_scanned IS NOT NULL THEN urobots5.robot_scanned ELSE 0 END) AS robot_scanned
+                FROM mmrpg_index_robots AS robots
+                LEFT JOIN (SELECT
+                    urobots.robot_token,
+                    SUM(robot_encountered) AS robot_encountered
+                    FROM mmrpg_users_robots_database AS urobots
+                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
+                    GROUP BY urobots.robot_token
+                    ) AS urobots1 ON urobots1.robot_token = robots.robot_token
+                LEFT JOIN (SELECT
+                    urobots.robot_token,
+                    SUM(robot_defeated) AS robot_defeated
+                    FROM mmrpg_users_robots_database AS urobots
+                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
+                    GROUP BY urobots.robot_token
+                    ) AS urobots2 ON urobots2.robot_token = robots.robot_token
+                LEFT JOIN (SELECT
+                    urobots.robot_token,
+                    SUM(robot_unlocked) AS robot_unlocked
+                    FROM mmrpg_users_robots_database AS urobots
+                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
+                    GROUP BY urobots.robot_token
+                    ) AS urobots3 ON urobots3.robot_token = robots.robot_token
+                LEFT JOIN (SELECT
+                    urobots.robot_token,
+                    SUM(robot_summoned) AS robot_summoned
+                    FROM mmrpg_users_robots_database AS urobots
+                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
+                    GROUP BY urobots.robot_token
+                    ) AS urobots4 ON urobots4.robot_token = robots.robot_token
+                LEFT JOIN (SELECT
+                    urobots.robot_token,
+                    SUM(robot_scanned) AS robot_scanned
+                    FROM mmrpg_users_robots_database AS urobots
+                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
+                    GROUP BY urobots.robot_token
+                    ) AS urobots5 ON urobots5.robot_token = robots.robot_token
+                WHERE
+                robots.robot_token = '{$robot_info['robot_token']}'
+                ;");
+
+            //echo '<pre>$temp_robot_records = '.print_r($temp_robot_records, true).'</pre>';
+            //exit();
 
         }
 
