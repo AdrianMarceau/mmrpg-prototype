@@ -5,11 +5,11 @@ $ability = array(
     'ability_token' => 'speed-break',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Speed',
-    'ability_description' => 'The user breaks down the target&#39;s mobility, lowering its speed by {DAMAGE}%!',
+    'ability_description' => 'The user breaks down the target\'s mobility systems, lowering its speed by up to {DAMAGE}%!',
     'ability_energy' => 4,
-    'ability_damage' => 15,
+    'ability_damage' => 33,
     'ability_damage_percent' => true,
-    'ability_accuracy' => 95,
+    'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope

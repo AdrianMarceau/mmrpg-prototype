@@ -5,9 +5,9 @@ $ability = array(
     'ability_token' => 'speed-boost',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Speed',
-    'ability_description' => 'The user optimizes internal systems to improve mobility and raise speed by {RECOVERY}% of its base value!',
+    'ability_description' => 'The user optimizes internal systems to improve mobility and raise speed by up to {RECOVERY}%!',
     'ability_energy' => 4,
-    'ability_recovery' => 15,
+    'ability_recovery' => 33,
     'ability_recovery_percent' => true,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
@@ -33,7 +33,7 @@ $ability = array(
                 'success' => array(0, -2, 0, -10, $target_robot->print_name().'&#39;s mobility improved!'),
                 'failure' => array(9, -2, 0, -10, $target_robot->print_name().'&#39;s mobility was not affected&hellip;')
                 ));
-            $speed_recovery_amount = ceil($target_robot->robot_base_speed * ($this_ability->ability_recovery / 100));
+            $speed_recovery_amount = ceil($target_robot->robot_speed * ($this_ability->ability_recovery / 100));
             $target_robot->trigger_recovery($target_robot, $this_ability, $speed_recovery_amount);
 
         }
@@ -48,7 +48,7 @@ $ability = array(
                 'success' => array(0, -2, 0, -10, $this_robot->print_name().'&#39;s mobility improved!'),
                 'failure' => array(9, -2, 0, -10, $this_robot->print_name().'&#39;s mobility was not affected&hellip;')
                 ));
-            $speed_recovery_amount = ceil($this_robot->robot_base_speed * ($this_ability->ability_recovery / 100));
+            $speed_recovery_amount = ceil($this_robot->robot_speed * ($this_ability->ability_recovery / 100));
             $this_robot->trigger_recovery($this_robot, $this_ability, $speed_recovery_amount);
 
         }

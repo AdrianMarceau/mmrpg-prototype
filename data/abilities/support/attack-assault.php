@@ -5,12 +5,12 @@ $ability = array(
     'ability_token' => 'attack-assault',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Attack2',
-    'ability_description' => 'The user triggers weapon damage to all robots on the target\'s side of the field to lower attack by {DAMAGE}%!',
+    'ability_description' => 'The user triggers weapon damage to all robots on the target\'s side of the field to lower attack by up to {DAMAGE}%!',
     'ability_speed' => -1,
     'ability_energy' => 6,
-    'ability_damage' => 10,
+    'ability_damage' => 22,
     'ability_damage_percent' => true,
-    'ability_accuracy' => 100,
+    'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
