@@ -121,6 +121,11 @@ elseif ($this_page_action == 'import_fields'){
     // Require the import fields file
     require(MMRPG_CONFIG_ROOTDIR.'admin/import-fields.php');
 }
+// Else if this is an IMPORT MISSIONS request
+elseif ($this_page_action == 'import_missions'){
+    // Require the import fields file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/import-missions.php');
+}
 // Else if this is an DELETE CACHE request
 elseif ($this_page_action == 'delete_cache'){
     // Require the delete cache file

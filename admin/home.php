@@ -51,6 +51,10 @@
             <a href="admin.php?action=import_fields">Refresh Field Database</a>
             <em>rescan the fields directory and update the database</em>
         </li>
+        <li class="item">
+            <a href="admin.php?action=import_missions">Refresh Mission Database</a>
+            <em>regenerate missions and update the database</em>
+        </li>
     </ul>
 
     <ul class="adminhome">
