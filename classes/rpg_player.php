@@ -2077,8 +2077,53 @@ class rpg_player extends rpg_object {
         //$player_sprite_title = $player_info['player_number'].' '.$player_info['player_name'];
         //$player_sprite_title .= ' Sprite Sheet | Robot Database | Mega Man RPG Prototype';
 
+        // Collect the player's type for background display
+        $player_type_class = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
+        if ($player_type_class != 'none' && !empty($player_info['player_type2'])){ $player_type_class .= '_'.$player_info['player_type2']; }
+        elseif ($player_type_class == 'none' && !empty($player_info['player_type2'])){ $player_type_class = $player_info['player_type2'];  }
+        $player_header_types = 'player_type_'.$player_type_class.' ';
+
         // Define the sprite frame index for robot images
         $player_sprite_frames = array('base','taunt','victory','defeat','command','damage');
+        // Collect the database records for this player
+        if ($print_options['show_records']){
+
+            global $db;
+            $temp_player_records = $db->get_array("SELECT
+                players.player_token,
+                (CASE WHEN uplayers1.player_unlocked IS NOT NULL THEN uplayers1.player_unlocked ELSE 0 END) AS player_unlocked,
+                (CASE WHEN uplayers2.player_robots IS NOT NULL THEN uplayers2.player_robots ELSE 0 END) AS player_robots,
+                (CASE WHEN uplayers3.player_abilities IS NOT NULL THEN uplayers3.player_abilities ELSE 0 END) AS player_abilities
+                FROM mmrpg_index_players AS players
+                LEFT JOIN (SELECT
+                    uplayers.player_token,
+                    COUNT(*) AS player_unlocked
+                    FROM mmrpg_users_players AS uplayers
+                    WHERE uplayers.player_token = '{$player_info['player_token']}'
+                    GROUP BY uplayers.player_token
+                    ) AS uplayers1 ON uplayers1.player_token = players.player_token
+                LEFT JOIN (SELECT
+                    urobots.robot_player_original AS player_token,
+                    COUNT(*) AS player_robots
+                    FROM mmrpg_users_robots AS urobots
+                    WHERE urobots.robot_player_original = '{$player_info['player_token']}'
+                    GROUP BY urobots.robot_player_original
+                    ) AS uplayers2 ON uplayers2.player_token = players.player_token
+                LEFT JOIN (SELECT
+                    uabilities.player_token,
+                    COUNT(*) AS player_abilities
+                    FROM mmrpg_users_players_abilities AS uabilities
+                    WHERE uabilities.player_token = '{$player_info['player_token']}'
+                    GROUP BY uabilities.player_token
+                    ) AS uplayers3 ON uplayers3.player_token = players.player_token
+                WHERE
+                players.player_token = '{$player_info['player_token']}'
+                ;");
+
+            //echo '<pre>$temp_player_records = '.print_r($temp_player_records, true).'</pre>';
+            //exit();
+
+        }
 
         // Define the markup variable
         $this_markup = '';
@@ -2397,6 +2442,7 @@ class rpg_player extends rpg_object {
                 <? endif; ?>
 
                 <? if($print_options['show_abilities']): ?>
+
                     <h2 id="abilities" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left;">
                         Ability Rewards
                     </h2>
@@ -2521,6 +2567,47 @@ class rpg_player extends rpg_object {
                                         }
                                         ?>
                                         </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <? endif; ?>
+
+                <? endif; ?>
+
+                <? if($print_options['show_records']): ?>
+
+                    <h2 id="records" class="header header_full <?= $player_header_types ?>" style="margin: 10px 0 0; text-align: left;">
+                        Global Records
+                    </h2>
+                    <div class="body body_full" style="margin: 0 auto 5px; padding: 0 0 5px; min-height: 10px;">
+                        <table class="full records">
+                            <colgroup>
+                                <col width="100%" />
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td class="right">
+                                        <label>Unlocked By : </label>
+                                        <span class="player_record"><?= $temp_player_records['player_unlocked'] == 1 ? '1 User' : number_format($temp_player_records['player_unlocked'], 0, '.', ',').' Users' ?></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Robots Unlocked : </label>
+                                        <span class="player_record"><?= $temp_player_records['player_robots'] == 1 ? '1 Robot' : number_format($temp_player_records['player_robots'], 0, '.', ',').' Robots' ?></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Abilities Unlocked : </label>
+                                        <span class="player_record"><?= $temp_player_records['player_abilities'] == 1 ? '1 Robot' : number_format($temp_player_records['player_robots'], 0, '.', ',').' Robots' ?></span>
                                     </td>
                                 </tr>
                             </tbody>

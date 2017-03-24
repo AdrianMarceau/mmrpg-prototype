@@ -1768,7 +1768,7 @@ class rpg_item extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <label>Unlocked By : </label>
-                                        <span class="item_record"><?= $temp_item_records['item_unlocked'] == 1 ? '1 Player' : number_format($temp_item_records['item_unlocked'], 0, '.', ',').' Players' ?></span>
+                                        <span class="item_record"><?= $temp_item_records['item_unlocked'] == 1 ? '1 User' : number_format($temp_item_records['item_unlocked'], 0, '.', ',').' Users' ?></span>
                                     </td>
                                 </tr>
                                 <tr>

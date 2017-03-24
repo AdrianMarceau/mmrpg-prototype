@@ -3367,7 +3367,7 @@ class rpg_robot extends rpg_object {
                                     <tr>
                                         <td class="right">
                                             <label>Unlocked By : </label>
-                                            <span class="robot_record"><?= $temp_robot_records['robot_unlocked'] == 1 ? '1 Player' : number_format($temp_robot_records['robot_unlocked'], 0, '.', ',').' Players' ?></span>
+                                            <span class="robot_record"><?= $temp_robot_records['robot_unlocked'] == 1 ? '1 User' : number_format($temp_robot_records['robot_unlocked'], 0, '.', ',').' Users' ?></span>
                                         </td>
                                     </tr>
                                 <? endif; ?>
