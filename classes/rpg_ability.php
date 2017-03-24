@@ -1427,7 +1427,6 @@ class rpg_ability extends rpg_object {
         if (!empty($ability_info['ability_recovery_percent']) && $ability_info['ability_recovery'] > 100){ $ability_info['ability_recovery'] = 100; }
         if (!empty($ability_info['ability_recovery2_percent']) && $ability_info['ability_recovery2'] > 100){ $ability_info['ability_recovery2'] = 100; }
 
-
         // Collect the database records for this ability
         if ($print_options['show_records']){
 
@@ -1679,7 +1678,6 @@ class rpg_ability extends rpg_object {
                     </div>
 
                 <? endif; ?>
-
 
                 <? if($print_options['show_sprites'] && (!isset($ability_info['ability_image_sheets']) || $ability_info['ability_image_sheets'] !== 0) && $ability_image_token != 'ability' ): ?>
 
@@ -2030,7 +2028,7 @@ class rpg_ability extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <label>Equipped By : </label>
-                                        <span class="ability_record"><?= $temp_ability_records['ability_equipped'] == 1 ? '1 Time' : number_format($temp_ability_records['ability_equipped'], 0, '.', ',').' Robots' ?></span>
+                                        <span class="ability_record"><?= $temp_ability_records['ability_equipped'] == 1 ? '1 Robot' : number_format($temp_ability_records['ability_equipped'], 0, '.', ',').' Robots' ?></span>
                                     </td>
                                 </tr>
                             </tbody>

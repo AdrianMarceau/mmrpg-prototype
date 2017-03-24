@@ -1411,6 +1411,46 @@ class rpg_item extends rpg_object {
         if (!empty($item_info['item_recovery_percent']) && $item_info['item_recovery'] > 100){ $item_info['item_recovery'] = 100; }
         if (!empty($item_info['item_recovery2_percent']) && $item_info['item_recovery2'] > 100){ $item_info['item_recovery2'] = 100; }
 
+        // Collect the database records for this item
+        if ($print_options['show_records']){
+
+            global $db;
+            $temp_item_records = $db->get_array("SELECT
+                items.item_token,
+                (CASE WHEN uitems1.item_unlocked IS NOT NULL THEN uitems1.item_unlocked ELSE 0 END) AS item_unlocked,
+                (CASE WHEN uitems2.item_equipped IS NOT NULL THEN uitems2.item_equipped ELSE 0 END) AS item_equipped,
+                (CASE WHEN uitems3.item_total IS NOT NULL THEN uitems3.item_total ELSE 0 END) AS item_total
+                FROM mmrpg_index_items AS items
+                LEFT JOIN (SELECT
+                    uitems.item_token,
+                    COUNT(*) AS item_unlocked
+                    FROM mmrpg_users_items AS uitems
+                    WHERE uitems.item_token = '{$item_info['item_token']}'
+                    GROUP BY uitems.item_token
+                    ) AS uitems1 ON uitems1.item_token = items.item_token
+                LEFT JOIN (SELECT
+                    urobots.robot_item AS item_token,
+                    COUNT(*) AS item_equipped
+                    FROM mmrpg_users_robots AS urobots
+                    WHERE urobots.robot_item = '{$item_info['item_token']}'
+                    GROUP BY urobots.robot_item
+                    ) AS uitems2 ON uitems2.item_token = items.item_token
+                LEFT JOIN (SELECT
+                    uitems.item_token,
+                    SUM(item_quantity) AS item_total
+                    FROM mmrpg_users_items AS uitems
+                    WHERE uitems.item_token = '{$item_info['item_token']}'
+                    GROUP BY uitems.item_token
+                    ) AS uitems3 ON uitems3.item_token = items.item_token
+                WHERE
+                items.item_token = '{$item_info['item_token']}'
+                ;");
+
+            //echo '<pre>$temp_item_records = '.print_r($temp_item_records, true).'</pre>';
+            //exit();
+
+        }
+
         // Start the output buffer
         ob_start();
         ?>
@@ -1545,7 +1585,7 @@ class rpg_item extends rpg_object {
                     $section_tabs = array();
                     if ($print_options['show_sprites']){ $section_tabs[] = array('sprites', 'Sprites', false); }
                     //if ($print_options['show_description']){ $section_tabs[] = array('description', 'Description', false); }
-                    //if ($print_options['show_records']){ $section_tabs[] = array('records', 'Records', false); }
+                    if ($print_options['show_records']){ $section_tabs[] = array('records', 'Records', false); }
                     // Automatically mark the first element as true or active
                     $section_tabs[0][2] = true;
                     // Define the current URL for this item page
@@ -1704,6 +1744,47 @@ class rpg_item extends rpg_object {
                         }
                         ?>
                         <p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 10px; margin-top: 6px;">Sprite Editing by <strong><?= $temp_editor_title ?></strong> <span class="pipe"> | </span> Original Artwork by <strong>Capcom</strong></p>
+                    </div>
+
+                    <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <? endif; ?>
+
+                <? endif; ?>
+
+                <? if($print_options['show_records']): ?>
+
+                    <h2 id="records" class="header header_full <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left;">
+                        Global Records
+                    </h2>
+                    <div class="body body_full" style="margin: 0 auto 5px; padding: 0 0 5px; min-height: 10px;">
+                        <table class="full records">
+                            <colgroup>
+                                <col width="100%" />
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td class="right">
+                                        <label>Unlocked By : </label>
+                                        <span class="item_record"><?= $temp_item_records['item_unlocked'] == 1 ? '1 Player' : number_format($temp_item_records['item_unlocked'], 0, '.', ',').' Players' ?></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Equipped By : </label>
+                                        <span class="item_record"><?= $temp_item_records['item_equipped'] == 1 ? '1 Robot' : number_format($temp_item_records['item_equipped'], 0, '.', ',').' Robots' ?></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Current Total : </label>
+                                        <span class="item_record"><?= $temp_item_records['item_total'] == 1 ? '1 Unit' : number_format($temp_item_records['item_total'], 0, '.', ',').' Units' ?></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                 <? endif; ?>
