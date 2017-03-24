@@ -2507,7 +2507,6 @@ class rpg_robot extends rpg_object {
             }
         }
 
-
         // Collect the database records for this robot
         if ($print_options['show_records']){
 
@@ -3356,7 +3355,7 @@ class rpg_robot extends rpg_object {
                 <? if($print_options['show_records']): ?>
 
                     <h2 id="records" class="header header_full <?= $robot_header_types ?>" style="margin: 10px 0 0; text-align: left;">
-                        Community Records
+                        Global Records
                     </h2>
                     <div class="body body_full" style="margin: 0 auto 5px; padding: 0 0 5px; min-height: 10px;">
                         <table class="full records">
