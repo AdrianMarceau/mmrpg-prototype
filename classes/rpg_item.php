@@ -1817,13 +1817,6 @@ class rpg_item extends rpg_object {
         if (strstr($this_item->item_token, 'super')){ $stat_boost_tokens = array('attack', 'defense', 'speed'); }
         else { $stat_boost_tokens[] = $this_item->item_type; }
 
-        // Create the robot rewards variable if it doesn't already exist in the session
-        if (!isset($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token])){
-            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token] = array();
-        }
-        // Collect a reference to this robot session variable for updating
-        $robot_session_rewards = &$_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token];
-
         // Loop through each stat boost token and raise it
         foreach ($stat_boost_tokens AS $stat_token){
 

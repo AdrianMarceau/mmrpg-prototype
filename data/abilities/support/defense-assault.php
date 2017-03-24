@@ -5,12 +5,12 @@ $ability = array(
     'ability_token' => 'defense-assault',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Defense2',
-    'ability_description' => 'The user triggers shield damage to all robots on the target\'s side of the field to lower defense by {DAMAGE}%!',
+    'ability_description' => 'The user triggers shield damage to all robots on the target\'s side of the field to lower defense by up to {DAMAGE}%!',
     'ability_energy' => 6,
     'ability_speed' => -1,
-    'ability_damage' => 10,
+    'ability_damage' => 22,
     'ability_damage_percent' => true,
-    'ability_accuracy' => 100,
+    'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope

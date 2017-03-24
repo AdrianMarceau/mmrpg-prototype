@@ -395,10 +395,16 @@ class rpg_mission_double extends rpg_mission {
                 $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type2']] = 1;
             }
 
-            // Increase the power of the robot masters by 100 bonus points in each field
+            // Increase the power of the robot masters by 20% in each field
             foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
-                // Update the robot rewards array by adding 100 points to each of the three main stats
-                $temp_battle_omega['battle_target_player']['player_robots'][$key]['values']['robot_rewards'] = array('robot_attack' => 100, 'robot_defense' => 100, 'robot_speed' => 100);
+                if (!isset($this_robot_index[$robot['robot_token']])){ continue; }
+                $rindex = $this_robot_index[$robot['robot_token']];
+                // Update the robot rewards array by adding 20% to each of the three main stats
+                $temp_battle_omega['battle_target_player']['player_robots'][$key]['values']['robot_rewards'] = array(
+                    'robot_attack' => round($rindex['robot_attack'] * 0.20),
+                    'robot_defense' => round($rindex['robot_defense'] * 0.20),
+                    'robot_speed' => round($rindex['robot_speed'] * 0.20)
+                    );
             }
 
         }
