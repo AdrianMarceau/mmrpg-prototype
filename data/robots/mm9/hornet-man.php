@@ -9,7 +9,6 @@ $robot = array(
     'robot_image_size' => 80,
     'robot_core' => 'nature',
     'robot_description' => 'Flower Pollination Robot',
-    'robot_field' => 'preserved-forest',
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,
