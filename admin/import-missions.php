@@ -26,48 +26,56 @@ $this_page_markup .= ob_get_clean();
 $mmrpg_database_missions = array();
 
 // Define a quick insert function for new missions
-function mmrpg_insert_mission(
-    $phase = '',
-    $chapter = '',
-    $group = '',
-    $player = '',
-    $field = '',
-    $targets = array(),
-    $support = array(),
-    $level = 0,
-    $max_level = 0,
-    $order = 0,
-    $button = '1x1'
-    ){
+function mmrpg_insert_mission($this_mission){
     global $mmrpg_database_missions;
 
-    $targets = implode(',', $targets);
-    $support = implode(',', $support);
-    $level = !empty($level) ? $level : 1;
-    $max_level = !empty($max_level) ? $max_level : $level;
+    // Define defaults for required mission keys
+    if (!isset($this_mission['phase'])){ $this_mission['phase'] = 0; }
+    if (!isset($this_mission['chapter'])){ $this_mission['chapter'] = 0; }
+    if (!isset($this_mission['group'])){ $this_mission['group'] = ''; }
+    if (!isset($this_mission['field'])){ $this_mission['field'] = ''; }
+    if (!isset($this_mission['player'])){ $this_mission['player'] = ''; }
 
+    // Generate a unique token for this missing using keys
     $token = array();
-    //if (!empty($phase)){ $token[] = 'p'.$phase; }
-    if (!empty($chapter)){ $token[] = 'c'.$chapter; }
-    if (!empty($group)){ $token[] = $group; }
-    if (!empty($player)){ $token[] = $player; }
-    if (!empty($field) && $field != 'field'){ $token[] = $field; }
+    //if (!empty($this_mission['phase'])){ $token[] = 'p'.$this_mission['phase']; }
+    if (!empty($this_mission['chapter'])){ $token[] = 'c'.$this_mission['chapter']; }
+    if (!empty($this_mission['group'])){ $token[] = $this_mission['group']; }
+    if (!empty($this_mission['field']) && $this_mission['field'] != 'field'){ $token[] = $this_mission['field']; }
+    if (!empty($this_mission['player']) && $this_mission['player'] != 'player'){ $token[] = $this_mission['player']; }
     $token = implode('_', $token);
+    $this_mission['token'] = $token;
 
+    // Define defaults for all other mission fields
+    if (!isset($this_mission['field_types'])){ $this_mission['field_types'] = array(); }
+    if (!isset($this_mission['field_sources'])){ $this_mission['field_sources'] = array(); }
+    if (!isset($this_mission['target_player'])){ $this_mission['target_player'] = ''; }
+    if (!isset($this_mission['target_robots'])){ $this_mission['target_robots'] = array(); }
+    if (!isset($this_mission['target_mooks'])){ $this_mission['target_mooks'] = array(); }
+    if (!isset($this_mission['level_start'])){ $this_mission['level_start'] = 0; }
+    if (!isset($this_mission['level_limit'])){ $this_mission['level_limit'] = 0; }
+    if (!isset($this_mission['button_size'])){ $this_mission['button_size'] = '1x1'; }
+    if (!isset($this_mission['button_order'])){ $this_mission['button_order'] = 0; }
+
+    // Implode any array-based fields into strings
+    foreach ($this_mission AS $field => $value){
+        if (is_array($value)){
+            $value = implode(',', $value);
+            $this_mission[$field] = $value;
+        }
+    }
+
+    // Compensate for mission level limit variable
+    if (empty($this_mission['level_limit'])){
+        $this_mission['level_limit'] = $this_mission['level_start'];
+    }
+
+    // Append the "mission" prefix to all fields then insert
+    $this_backup = $this_mission;
     $this_mission = array();
-    $this_mission['mission_phase'] = $phase;
-    $this_mission['mission_chapter'] = $chapter;
-    $this_mission['mission_group'] = $group;
-    $this_mission['mission_player'] = $player;
-    $this_mission['mission_field'] = $field;
-    $this_mission['mission_targets'] = $targets;
-    $this_mission['mission_support'] = $support;
-    $this_mission['mission_level'] = $level;
-    $this_mission['mission_level_max'] = $max_level;
-    $this_mission['mission_button_size'] = $button;
-    $this_mission['mission_order'] = $order;
-    $this_mission['mission_token'] = $token;
+    foreach ($this_backup AS $f => $v){ $this_mission['mission_'.$f] = $v; }
     $mmrpg_database_missions[] = $this_mission;
+
 }
 
 
@@ -101,7 +109,7 @@ $mmrpg_player_tokens = array('dr-light', 'dr-wily', 'dr-cossack');
 $mmrpg_player_stat_tokens = array('defense', 'attack', 'speed');
 $mmrpg_player_field_tokens = array('light-laboratory', 'wily-castle', 'cossack-citadel');
 $mmrpg_player_robot_master_tokens = array('mega-man', 'bass', 'proto-man');
-$mmrpg_player_robot_support_tokens = array('roll', 'disco', 'rhythm');
+$mmrpg_player_target_mooks_tokens = array('roll', 'disco', 'rhythm');
 
 // Define the RIVAL-PLAYER+FIELD tokens we'll be generating missions for
 $mmrpg_rival_tokens = array('dr-wily', 'dr-cossack', 'dr-light');
@@ -173,93 +181,94 @@ $this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
 $this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
 $this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
 foreach ($mmrpg_player_tokens AS $player_key => $player_token){
-    $order = 0;
+    $button_order = 0;
 
     $rival_token = $mmrpg_rival_tokens[$player_key];
     $rival_key = array_search($rival_token, $mmrpg_player_tokens);
     $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
 
     // vs MET
-    $order++;
-    $group = 'intro-battle';
-    $field = 'intro-field';
-    $targets = array(
-        'met'
-        );
-    $support = array(
-        );
-    $level = $this_mission_levels[0];
-    $max_level = $level;
-    $button = '1x'.$this_mission_button_sizes[0];
-    mmrpg_insert_mission(
-        $this_mission_phase,
-        $this_mission_chapter,
-        $group,
-        $player_token,
-        $field,
-        $targets,
-        $support,
-        $level,
-        $max_level,
-        $order,
-        $button
-        );
+    $button_order++;
+    $group_token = 'intro-battle';
+    $field_token = 'intro-field';
+    $target_player = '';
+    $target_robots = array('met');
+    $target_mooks = array();
+    $field_types = array();
+    $field_sources = array($field_token);
+    $level_start = $this_mission_levels[0];
+    $button_size = '1x'.$this_mission_button_sizes[0];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'field_types' => $field_types,
+        'field_sources' => $field_sources,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
 
     // vs MECHA JOE
-    $order++;
-    $group = 'intro-battle';
-    $field = $mmrpg_player_field_tokens[$player_key];
-    $targets = array(
-        $mmrpg_mecha_joe_tokens[$player_key]
-        );
-    $support = array(
-        );
-    $level = $this_mission_levels[1];
-    $max_level = $level;
-    $button = '1x'.$this_mission_button_sizes[1];
-    mmrpg_insert_mission(
-        $this_mission_phase,
-        $this_mission_chapter,
-        $group,
-        $player_token,
-        $field,
-        $targets,
-        $support,
-        $level,
-        $max_level,
-        $order,
-        $button
-        );
+    $button_order++;
+    $group_token = 'intro-battle';
+    $field_token = $mmrpg_player_field_tokens[$player_key];
+    $target_player = '';
+    $target_robots = array($mmrpg_mecha_joe_tokens[$player_key]);
+    $target_mooks = array();
+    $field_types = array();
+    $field_sources = array($field_token);
+    $level_start = $this_mission_levels[1];
+    $button_size = '1x'.$this_mission_button_sizes[1];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'field_types' => $field_types,
+        'field_sources' => $field_sources,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
 
     // vs TRILL
-    $order++;
-    $group = 'intro-battle';
-    $field = 'prototype-subspace';
-    $targets = array(
-        'trill_'.$mmrpg_player_stat_tokens[$rival_key]
-        );
-    $support = array(
-        );
-    $level = $this_mission_levels[2];
-    $max_level = $level;
-    $button = '1x'.$this_mission_button_sizes[2];
-    mmrpg_insert_mission(
-        $this_mission_phase,
-        $this_mission_chapter,
-        $group,
-        $player_token,
-        $field,
-        $targets,
-        $support,
-        $level,
-        $max_level,
-        $order,
-        $button
-        );
+    $button_order++;
+    $group_token = 'intro-battle';
+    $field_token = 'prototype-subspace';
+    $target_player = '';
+    $target_robots = array('trill_'.$mmrpg_player_stat_tokens[$rival_key]);
+    $target_mooks = array();
+    $field_types = array();
+    $field_sources = array($field_token);
+    $level_start = $this_mission_levels[2];
+    $button_size = '1x'.$this_mission_button_sizes[2];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'field_types' => $field_types,
+        'field_sources' => $field_sources,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
 
 }
-
-
 
 // ------------------------------ //
 // MISSION GENERATION : PHASE TWO
@@ -274,71 +283,75 @@ $this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
 $this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
 $this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
 if (true){
-    $order = 0;
+    $button_order = 0;
 
     // vs MASTERS
-    $order++;
-    $level = $this_mission_levels[0];
-    $max_level = $level + (($this_mission_group_counters[0] - 1) * $this_mission_levels[1]);
-    $button = '1x'.$this_mission_button_sizes[0];
+    $button_order++;
+    $level_start = $this_mission_levels[0];
+    $level_limit = $level_start + (($this_mission_group_counters[0] - 1) * $this_mission_levels[1]);
+    $button_size = '1x'.$this_mission_button_sizes[0];
     foreach ($mmrpg_omega_factors AS $omega_key => $omega_factor){
 
-        $group = 'master-battle';
-        $player = 'player';
-        $field = $omega_factor['omega_field'];
-        $mechas = !empty($omega_factor['omega_mechas']) ? json_decode($omega_factor['omega_mechas'], true) : array();
-        $targets = array(
-            $omega_factor['omega_robot']
-            );
-        $support = array();
-        $support = array_merge($support, $mechas);
-        mmrpg_insert_mission(
-            $this_mission_phase,
-            $this_mission_chapter,
-            $group,
-            $player,
-            $field,
-            $targets,
-            $support,
-            $level,
-            $max_level,
-            $order,
-            $button
-            );
+        $group_token = 'master-battle';
+        $field_token = $omega_factor['omega_field'];
+        $player_token = '';
+        $omega_mechas = !empty($omega_factor['omega_mechas']) ? json_decode($omega_factor['omega_mechas'], true) : array();
+        $target_player = '';
+        $target_robots = array($omega_factor['omega_robot']);
+        $target_mooks = array_values($omega_mechas);
+        $field_types = array($omega_factor['omega_type']);
+        $field_sources = array($field_token);
+        mmrpg_insert_mission(array(
+            'phase' => $this_mission_phase,
+            'chapter' => $this_mission_chapter,
+            'group' => $group_token,
+            'field' => $field_token,
+            'player' => $player_token,
+            'target_player' => $target_player,
+            'target_robots' => $target_robots,
+            'target_mooks' => $target_mooks,
+            'field_types' => $field_types,
+            'field_sources' => $field_sources,
+            'level_start' => $level_start,
+            'level_limit' => $level_limit,
+            'button_size' => $button_size,
+            'button_order' => $button_order
+            ));
 
     }
 
     // vs DOC-ROBOT
-    $order++;
+    $button_order++;
     foreach ($mmrpg_player_tokens AS $player_key => $player_token){
 
         $rival_token = $mmrpg_rival_tokens[$player_key];
         $rival_key = array_search($rival_token, $mmrpg_player_tokens);
         $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
 
-        $group = 'fortress-battle';
-        $field = 'xxx-field';
-        $targets = array(
-            'doc-robot'
-            );
-        $support = array(
-            );
-        $level = $this_mission_levels[2];
-        $max_level = $level;
-        $button = '1x'.$this_mission_button_sizes[2];
-        mmrpg_insert_mission(
-            $this_mission_phase,
-            $this_mission_chapter,
-            $group,
-            $player_token,
-            $field,
-            $targets,
-            $support,
-            $level,
-            $max_level,
-            $order,
-            $button
-            );
+        $group_token = 'fortress-battle';
+        $field_token = 'xxx-field';
+        $target_player = '';
+        $target_robots = array('doc-robot');
+        $target_mooks = array();
+        $field_types = array();
+        $field_sources = array($field_token);
+        $level_start = $this_mission_levels[2];
+        $button_size = '1x'.$this_mission_button_sizes[2];
+        mmrpg_insert_mission(array(
+            'phase' => $this_mission_phase,
+            'chapter' => $this_mission_chapter,
+            'group' => $group_token,
+            'field' => $field_token,
+            'player' => $player_token,
+            'target_player' => $target_player,
+            'target_robots' => $target_robots,
+            'target_mooks' => $target_mooks,
+            'field_types' => $field_types,
+            'field_sources' => $field_sources,
+            'level_start' => $level_start,
+            'button_size' => $button_size,
+            'button_order' => $button_order
+            ));
 
     }
 
@@ -350,92 +363,92 @@ $this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
 $this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
 $this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
 foreach ($mmrpg_player_tokens AS $player_key => $player_token){
-    $order = 0;
+    $button_order = 0;
 
     $rival_token = $mmrpg_rival_tokens[$player_key];
     $rival_key = array_search($rival_token, $mmrpg_player_tokens);
     $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
 
     // vs RIVALS
-    $order++;
-    $group = 'rival-battle';
-    $field = $mmrpg_player_field_tokens[$rival_key];
-    $targets = array(
-        $mmrpg_player_robot_master_tokens[$rival_key],
-        $mmrpg_player_robot_support_tokens[$rival_key]
-        );
-    $support = array(
-        );
-    $level = $this_mission_levels[0];
-    $max_level = $level;
-    $button = '1x'.$this_mission_button_sizes[0];
-    mmrpg_insert_mission(
-        $this_mission_phase,
-        $this_mission_chapter,
-        $group,
-        $player_token,
-        $field,
-        $targets,
-        $support,
-        $level,
-        $max_level,
-        $order,
-        $button
-        );
+    $button_order++;
+    $group_token = 'rival-battle';
+    $field_token = $mmrpg_player_field_tokens[$rival_key];
+    $target_player = $rival_token;
+    $target_robots = array($mmrpg_player_robot_master_tokens[$rival_key], $mmrpg_player_target_mooks_tokens[$rival_key]);
+    $target_mooks = array();
+    $field_types = array();
+    $field_sources = array($field_token);
+    $level_start = $this_mission_levels[0];
+    $button_size = '1x'.$this_mission_button_sizes[0];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'field_types' => $field_types,
+        'field_sources' => $field_sources,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
 
     // vs KILLERS
-    $order++;
-    $group = 'killer-battle';
-    $field = 'xxx-field';
-    $targets = array(
-        $mmrpg_killer_robot_tokens[$player_key],
-        'quint'
-        );
-    $support = array(
-        );
-    $level = $this_mission_levels[1];
-    $max_level = $level;
-    $button = '1x'.$this_mission_button_sizes[1];
-    mmrpg_insert_mission(
-        $this_mission_phase,
-        $this_mission_chapter,
-        $group,
-        $player_token,
-        $field,
-        $targets,
-        $support,
-        $level,
-        $max_level,
-        $order,
-        $button
-        );
+    $button_order++;
+    $group_token = 'killer-battle';
+    $field_token = 'xxx-field';
+    $target_player = '';
+    $target_robots = array($mmrpg_killer_robot_tokens[$player_key], 'quint');
+    $target_mooks = array();
+    $field_types = array();
+    $field_sources = array($field_token);
+    $level_start = $this_mission_levels[1];
+    $button_size = '1x'.$this_mission_button_sizes[1];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'field_types' => $field_types,
+        'field_sources' => $field_sources,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
 
     // vs ALIENS
-    $order++;
-    $group = 'alien-battle';
-    $field = 'xxx-field';
-    $targets = array(
-        'sunstar',
-        'trill_'.$mmrpg_player_stat_tokens[$final_key]
-        );
-    $support = array(
-        );
-    $level = $this_mission_levels[2];
-    $max_level = $level;
-    $button = '1x'.$this_mission_button_sizes[2];
-    mmrpg_insert_mission(
-        $this_mission_phase,
-        $this_mission_chapter,
-        $group,
-        $player_token,
-        $field,
-        $targets,
-        $support,
-        $level,
-        $max_level,
-        $order,
-        $button
-        );
+    $button_order++;
+    $group_token = 'alien-battle';
+    $field_token = 'xxx-field';
+    $target_player = '';
+    $target_robots = array('sunstar','trill_'.$mmrpg_player_stat_tokens[$final_key]);
+    $target_mooks = array();
+    $field_types = array();
+    $field_sources = array($field_token);
+    $level_start = $this_mission_levels[2];
+    $button_size = '1x'.$this_mission_button_sizes[2];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'field_types' => $field_types,
+        'field_sources' => $field_sources,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
 
 }
 
@@ -454,91 +467,89 @@ $this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
 $this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
 $this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
 if (true){
-    $order = 0;
+    $button_order = 0;
 
     // vs MASTERS
-    $order++;
-    $level = $this_mission_levels[0];
-    $max_level = $level + (($this_mission_group_counters[0] - 1) * $this_mission_levels[1]);
-    $button = '1x'.$this_mission_button_sizes[0];
+    $button_order++;
+    $level_start = $this_mission_levels[0];
+    $level_limit = $level_start + (($this_mission_group_counters[0] - 1) * $this_mission_levels[1]);
+    $button_size = '1x'.$this_mission_button_sizes[0];
     foreach ($mmrpg_omega_factors AS $omega_key1 => $omega_factor1){
         foreach ($mmrpg_omega_factors AS $omega_key2 => $omega_factor2){
 
             if ($omega_key1 === $omega_key2){ continue; }
 
-            $group = 'fusion-battle';
-            $player = 'player';
+            $group_token = 'fusion-battle';
+            $player_token = '';
             $field1 = $omega_factor1['omega_field'];
             $field2 = $omega_factor2['omega_field'];
             $mechas1 = !empty($omega_factor1['omega_mechas']) ? json_decode($omega_factor1['omega_mechas'], true) : array();
             $mechas2 = !empty($omega_factor2['omega_mechas']) ? json_decode($omega_factor2['omega_mechas'], true) : array();
             $field_left = preg_replace('/^([a-z0-9]+)-([a-z0-9]+)$/i', '$1', $omega_factor1['omega_field']);
             $field_right = preg_replace('/^([a-z0-9]+)-([a-z0-9]+)$/i', '$2', $omega_factor2['omega_field']);
-            $field = $field_left.'-'.$field_right;
-            $targets = array(
-                $omega_factor1['omega_robot'],
-                $omega_factor2['omega_robot']
-                );
-            $support = array();
-            $support = array_merge($support, $mechas1);
-            $support = array_merge($support, $mechas2);
-            mmrpg_insert_mission(
-                $this_mission_phase,
-                $this_mission_chapter,
-                $group,
-                $player,
-                $field,
-                $targets,
-                $support,
-                $level,
-                $max_level,
-                $order,
-                $button
-                );
+            $field_token = $field_left.'-'.$field_right;
+            $target_player = '';
+            $target_robots = array($omega_factor1['omega_robot'], $omega_factor2['omega_robot']);
+            $target_mooks = array_filter(array_merge($mechas1, $mechas2));
+            $field_types = array_filter(array($omega_factor1['omega_type'], $omega_factor2['omega_type']));
+            $field_sources = array($omega_factor1['omega_field'], $omega_factor2['omega_field']);
+            mmrpg_insert_mission(array(
+                'phase' => $this_mission_phase,
+                'chapter' => $this_mission_chapter,
+                'group' => $group_token,
+                'field' => $field_token,
+                'player' => $player_token,
+                'target_player' => $target_player,
+                'target_robots' => $target_robots,
+                'target_mooks' => $target_mooks,
+                'field_types' => $field_types,
+                'field_sources' => $field_sources,
+                'level_start' => $level_start,
+                'level_limit' => $level_limit,
+                'button_size' => $button_size,
+                'button_order' => $button_order
+                ));
 
         }
         //break;
     }
 
     // vs KING + DOC-ROBOT
-    $order++;
+    $button_order++;
     foreach ($mmrpg_player_tokens AS $player_key => $player_token){
 
         $rival_token = $mmrpg_rival_tokens[$player_key];
         $rival_key = array_search($rival_token, $mmrpg_player_tokens);
         $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
 
-        $group = 'fortress-battle';
-        $field = 'xxx-field';
-        $targets = array(
-            'king',
-            'doc-robot'
-            );
-        $support = array(
-            );
-        $level = $this_mission_levels[2];
-        $max_level = $level;
-        $button = '1x'.$this_mission_button_sizes[2];
-        mmrpg_insert_mission(
-            $this_mission_phase,
-            $this_mission_chapter,
-            $group,
-            $player_token,
-            $field,
-            $targets,
-            $support,
-            $level,
-            $max_level,
-            $order,
-            $button
-            );
+        $group_token = 'fortress-battle';
+        $field_token = 'xxx-field';
+        $target_player = '';
+        $target_robots = array('king', 'doc-robot');
+        $target_mooks = array();
+        $field_types = array();
+        $field_sources = array($field_token);
+        $level_start = $this_mission_levels[2];
+        $button_size = '1x'.$this_mission_button_sizes[2];
+        mmrpg_insert_mission(array(
+            'phase' => $this_mission_phase,
+            'chapter' => $this_mission_chapter,
+            'group' => $group_token,
+            'field' => $field_token,
+            'player' => $player_token,
+            'target_player' => $target_player,
+            'target_robots' => $target_robots,
+            'target_mooks' => $target_mooks,
+            'field_types' => $field_types,
+            'field_sources' => $field_sources,
+            'level_start' => $level_start,
+            'button_size' => $button_size,
+            'button_order' => $button_order
+            ));
 
     }
 
 }
-
-
-
 
 
 
