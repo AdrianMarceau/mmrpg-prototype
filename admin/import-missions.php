@@ -19,9 +19,9 @@ $this_page_markup .= ob_get_clean();
 
 
 
-// ------------------------------ //
+// ---------------------------------------- //
 // MISSION VARIABLES / FUNCTIONS
-// ------------------------------ //
+// ---------------------------------------- //
 
 // Define a variable to hold all database missions
 $mmrpg_database_missions = array();
@@ -93,7 +93,27 @@ function mmrpg_insert_mission($this_mission){
 // MISSION SEEDS / TOKENS
 // ------------------------- //
 
-// Define the ROBOT tokens we'll be generating missions for
+// Define the OMEGA FACTORS we'll be generating missions with
+$mmrpg_omega_factors = $db->get_array_list("SELECT
+    irobots.robot_token AS omega_robot,
+    irobots.robot_core AS omega_type,
+    ifields.field_token AS omega_field,
+    ifields.field_mechas AS omega_mechas,
+    irobots.robot_game AS omega_group
+    FROM mmrpg_index_robots AS irobots
+    LEFT JOIN mmrpg_index_fields AS ifields ON ifields.field_token = irobots.robot_field
+    WHERE
+    irobots.robot_class = 'master'
+    AND irobots.robot_core <> ''
+    AND irobots.robot_core <> 'copy'
+    AND irobots.robot_core <> 'empty'
+    AND irobots.robot_flag_complete = 1
+    AND ifields.field_flag_complete = 1
+    ORDER BY
+    irobots.robot_order ASC
+    ;");
+
+// Define the CACHE FACTORS we'll be generating missions with
 $mmrpg_omega_factors = $db->get_array_list("SELECT
     irobots.robot_token AS omega_robot,
     irobots.robot_core AS omega_type,
@@ -135,6 +155,9 @@ $mmrpg_darkness_robot_tokens = array('dark-man', 'dark-man-2', 'dark-man-3');
 // Define the GENESIS-ROBOT tokens that we'll be using in our missions
 $mmrpg_genesis_robot_tokens = array('buster-rod-g', 'mega-water-s', 'hyper-storm-h');
 
+// Define the STARDROID-ROBOT tokens that we'll be using in our missions
+$mmrpg_stardroid_robot_tokens = array('terra', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'pluto', 'neptune');
+
 // Define the MISSION-LEVEL counters that the entire game will use for missions
 $mmrpg_mission_levels = array(
     1 => array(1, 2, 3),        // Chapter One   (Intro Battles)
@@ -173,9 +196,9 @@ $mmrpg_mission_button_sizes = array(
 
 
 
-// ------------------------------ //
+// ---------------------------------------- //
 // MISSION GENERATION : INIT
-// ------------------------------ //
+// ---------------------------------------- //
 
 // Define the global PHASE and CHAPTER variables at zero
 $this_mission_phase = 0;
@@ -183,9 +206,9 @@ $this_mission_chapter = 0;
 
 
 
-// ------------------------------ //
+// ---------------------------------------- //
 // MISSION GENERATION : PHASE ONE
-// ------------------------------ //
+// ---------------------------------------- //
 
 // PHASE 1 START
 $this_mission_phase++;
@@ -305,9 +328,9 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
 
 
 
-// ------------------------------ //
+// ---------------------------------------- //
 // MISSION GENERATION : PHASE TWO
-// ------------------------------ //
+// ---------------------------------------- //
 
 // PHASE 2 START
 $this_mission_phase++;
@@ -519,9 +542,9 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
 
 
 
-// ------------------------------ //
+// ---------------------------------------- //
 // MISSION GENERATION : PHASE THREE
-// ------------------------------ //
+// ---------------------------------------- //
 
 // PHASE 3 START
 $this_mission_phase++;
@@ -581,8 +604,12 @@ if (true){
                 'button_order' => $button_order
                 ));
 
+            //break;
+
         }
-        break;
+
+        //break;
+
     }
 
     // vs KING + DOC-ROBOT
@@ -740,6 +767,268 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         ));
 
 }
+
+
+
+// ---------------------------------------- //
+// MISSION GENERATION : PHASE FOUR
+// ---------------------------------------- //
+
+// PHASE 4 START
+$this_mission_phase++;
+
+// CHAPTER SIX / Stardroid Battles
+$this_mission_chapter++;
+$this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
+$this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
+$this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
+foreach ($mmrpg_player_tokens AS $player_key => $player_token){
+    $button_order = 0;
+
+    $rival_token = $mmrpg_rival_tokens[$player_key];
+    $rival_key = array_search($rival_token, $mmrpg_player_tokens);
+    $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
+
+    $stardroid_tokens = $mmrpg_stardroid_robot_tokens;
+    for ($i = 0; $i < $player_key; $i++){ array_push($stardroid_tokens, array_shift($stardroid_tokens)); }
+
+    // vs STARDROID
+    $button_order++;
+    $group_token = 'stardroid-battle';
+    $field_token = 'star-field';
+    $field_type = 'space';
+    $field_type2 = '';
+    $field_music = $field_token;
+    $field_background = $field_token;
+    $field_foreground = $field_token;
+    $target_player = '';
+    $target_robots = array($stardroid_tokens[0], $stardroid_tokens[1]);
+    $target_mooks = array();
+    $level_start = $this_mission_levels[0];
+    $button_size = '1x'.$this_mission_button_sizes[0];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'field_type' => $field_type,
+        'field_type2' => $field_type2,
+        'field_music' => $field_music,
+        'field_background' => $field_background,
+        'field_foreground' => $field_foreground,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
+
+    // vs STARDROID-2
+    $button_order++;
+    $group_token = 'stardroid-battle';
+    $field_token = 'star-field-ii';
+    $field_type = 'space';
+    $field_type2 = '';
+    $field_music = $field_token;
+    $field_background = $field_token;
+    $field_foreground = $field_token;
+    $target_player = '';
+    $target_robots = array($stardroid_tokens[2], $stardroid_tokens[3], $stardroid_tokens[4]);
+    $target_mooks = array();
+    $level_start = $this_mission_levels[1];
+    $button_size = '1x'.$this_mission_button_sizes[1];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'field_type' => $field_type,
+        'field_type2' => $field_type2,
+        'field_music' => $field_music,
+        'field_background' => $field_background,
+        'field_foreground' => $field_foreground,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
+
+    // vs STARDROID-3
+    $button_order++;
+    $group_token = 'stardroid-battle';
+    $field_token = 'star-field-iii';
+    $field_type = 'space';
+    $field_type2 = '';
+    $field_music = $field_token;
+    $field_background = $field_token;
+    $field_foreground = $field_token;
+    $target_player = '';
+    $target_robots = array($stardroid_tokens[5], $stardroid_tokens[6], $stardroid_tokens[7], $stardroid_tokens[8]);
+    $target_mooks = array();
+    $level_start = $this_mission_levels[2];
+    $button_size = '1x'.$this_mission_button_sizes[2];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'field_type' => $field_type,
+        'field_type2' => $field_type2,
+        'field_music' => $field_music,
+        'field_background' => $field_background,
+        'field_foreground' => $field_foreground,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
+
+}
+
+// CHAPTER SEVEN / Final Battles
+$this_mission_chapter++;
+$this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
+$this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
+$this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
+foreach ($mmrpg_player_tokens AS $player_key => $player_token){
+    $button_order = 0;
+
+    $rival_token = $mmrpg_rival_tokens[$player_key];
+    $rival_key = array_search($rival_token, $mmrpg_player_tokens);
+    $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
+
+    // vs DARK-KILLERS
+    $button_order++;
+    $group_token = 'final-battle';
+    $field_token = 'final-destination';
+    $field_type = '';
+    $field_type2 = '';
+    $field_music = $field_token;
+    $field_background = $field_token;
+    $field_foreground = $field_token;
+    $target_player = '';
+    $target_robots = array('dark-man-4', $mmrpg_killer_robot_tokens[$player_key].'-sp');
+    $target_mooks = array();
+    $level_start = $this_mission_levels[0];
+    $button_size = '1x'.$this_mission_button_sizes[0];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'field_type' => $field_type,
+        'field_type2' => $field_type2,
+        'field_music' => $field_music,
+        'field_background' => $field_background,
+        'field_foreground' => $field_foreground,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
+
+    // vs OMEGA-SLUR
+    $button_order++;
+    $group_token = 'final-battle';
+    $field_token = 'final-destination-ii';
+    $field_type = '';
+    $field_type2 = '';
+    $field_music = $field_token;
+    $field_background = $field_token;
+    $field_foreground = $field_token;
+    $target_player = '';
+    $target_robots = array('omega-slur');
+    $target_mooks = array('planet-man_water', 'planet-man_flame', 'planet-man_electric');
+    $level_start = $this_mission_levels[1];
+    $button_size = '1x'.$this_mission_button_sizes[1];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'field_type' => $field_type,
+        'field_type2' => $field_type2,
+        'field_music' => $field_music,
+        'field_background' => $field_background,
+        'field_foreground' => $field_foreground,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
+
+    // vs COSMO-WEAPON
+    $button_order++;
+    $group_token = 'final-battle';
+    $field_token = 'final-destination-iii';
+    $field_type = '';
+    $field_type2 = '';
+    $field_music = $field_token;
+    $field_background = $field_token;
+    $field_foreground = $field_token;
+    $target_player = '';
+    $target_robots = array('cosmo-man', 'omega-weapon');
+    $target_mooks = array('omega-battery_energy', 'omega-battery_attack', 'omega-battery_defense', 'omega-battery_speed');
+    $level_start = $this_mission_levels[2];
+    $button_size = '1x'.$this_mission_button_sizes[2];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'field_type' => $field_type,
+        'field_type2' => $field_type2,
+        'field_music' => $field_music,
+        'field_background' => $field_background,
+        'field_foreground' => $field_foreground,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
+
+}
+
+
+/*
+
+// ---------------------------------------- //
+// MISSION GENERATION : PHASE FIVE
+// ---------------------------------------- //
+
+// PHASE 5 START
+$this_mission_phase++;
+
+// CHAPTER EIGHT / Cache Battles
+$this_mission_chapter++;
+$this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
+$this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
+$this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
+
+// Cannot complete due to missing fields for Cache Numbers
+
+*/
+
+
+
+//$mmrpg_stardroid_robot_tokens
 
 /*
 */
