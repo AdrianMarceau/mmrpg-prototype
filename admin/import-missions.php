@@ -740,153 +740,29 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
 
 }
 
-
 /*
 */
 
-
 // DEBUG
-echo('<pre>$mmrpg_database_missions('.count($mmrpg_database_missions).') = '.print_r($mmrpg_database_missions, true).'</pre>');
-
-
-// Truncate any robots currently in the database
-$db->query('TRUNCATE TABLE mmrpg_index_missions');
-
-// Loop through and insert these missions into the database
-foreach ($mmrpg_database_missions AS $mission_key => $mission_info){
-
-    $db->insert('mmrpg_index_missions', $mission_info);
-
-}
-
-
-exit();
-
+//echo('<pre>$mmrpg_database_missions('.count($mmrpg_database_missions).') = '.print_r($mmrpg_database_missions, true).'</pre>');
 
 // Generate page headers
 $this_page_markup .= '<p style="margin-bottom: 10px;"><strong>$mmrpg_database_missions</strong><br />';
 $this_page_markup .= 'Count:'.(!empty($mmrpg_database_missions) ? count($mmrpg_database_missions) : 0).'<br />';
-//$this_page_markup .= '<pre>'.htmlentities(print_r($mmrpg_database_missions, true), ENT_QUOTES, 'UTF-8', true).'</pre><br />';
 $this_page_markup .= '</p>';
 
-$spreadsheet_mission_stats = array(); //mmrpg_spreadsheet_mission_stats();
-$spreadsheet_mission_descriptions = array(); //mmrpg_spreadsheet_mission_descriptions();
-
-
-// Sort the mission index based on mission number
-$temp_pattern_first = array();
-$temp_pattern_first[] = '/^dr-light$/i';
-$temp_pattern_first[] = '/^dr-wily$/i';
-$temp_pattern_first[] = '/^dr-cossack/i';
-//$temp_pattern_first = array_reverse($temp_pattern_first);
-$temp_pattern_last = array();
-//$temp_pattern_last = array_reverse($temp_pattern_last);
-// Sort the mission index based on mission number
-function mmrpg_index_sort_missions($mission_one, $mission_two){
-    // Pull in global variables
-    global $temp_pattern_first, $temp_pattern_last;
-    // Loop through all the temp patterns and compare them one at a time
-    foreach ($temp_pattern_first AS $key => $pattern){
-        // Check if either of these two missions matches the current pattern
-        if (preg_match($pattern, $mission_one['mission_token']) && !preg_match($pattern, $mission_two['mission_token'])){ return -1; }
-        elseif (!preg_match($pattern, $mission_one['mission_token']) && preg_match($pattern, $mission_two['mission_token'])){ return 1; }
-    }
-    foreach ($temp_pattern_last AS $key => $pattern){
-        // Check if either of these two missions matches the current pattern
-        if (preg_match($pattern, $mission_one['mission_token']) && !preg_match($pattern, $mission_two['mission_token'])){ return 1; }
-        elseif (!preg_match($pattern, $mission_one['mission_token']) && preg_match($pattern, $mission_two['mission_token'])){ return -1; }
-    }
-    if ($mission_one['mission_game'] > $mission_two['mission_game']){ return 1; }
-    elseif ($mission_one['mission_game'] < $mission_two['mission_game']){ return -1; }
-    elseif ($mission_one['mission_token'] > $mission_two['mission_token']){ return 1; }
-    elseif ($mission_one['mission_token'] < $mission_two['mission_token']){ return -1; }
-    elseif ($mission_one['mission_token'] > $mission_two['mission_token']){ return 1; }
-    elseif ($mission_one['mission_token'] < $mission_two['mission_token']){ return -1; }
-    else { return 0; }
-}
-uasort($mmrpg_database_missions, 'mmrpg_index_sort_missions');
+// Truncate any robots currently in the database
+$db->query('TRUNCATE TABLE mmrpg_index_missions');
 
 // Loop through each of the mission info arrays
-$mission_key = 0;
-$mission_order = 0;
-$temp_empty = $mmrpg_database_missions['mission'];
-unset($mmrpg_database_missions['mission']);
-array_unshift($mmrpg_database_missions, $temp_empty);
 if (!empty($mmrpg_database_missions)){
-    foreach ($mmrpg_database_missions AS $mission_token => $mission_data){
+    foreach ($mmrpg_database_missions AS $mission_key => $mission_data){
 
-        // If this mission's image exists, assign it
-        if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/missions/'.$mission_token.'/')){ $mission_data['mission_image'] = $mission_data['mission_token']; }
-        else { $mission_data['mission_image'] = 'mission'; }
+        // Generate the insert array based on this mission's data
+        $mission_token = $mission_data['mission_token'];
+        $temp_insert_array = $mission_data;
 
-        // Define the insert array and start populating it with basic details
-        $temp_insert_array = array();
-        //$temp_insert_array['mission_id'] = isset($mission_data['mission_id']) ? $mission_data['mission_id'] : $mission_key;
-        $temp_insert_array['mission_token'] = $mission_data['mission_token'];
-        $temp_insert_array['mission_number'] = !empty($mission_data['mission_number']) ? $mission_data['mission_number'] : '';
-        $temp_insert_array['mission_name'] = !empty($mission_data['mission_name']) ? $mission_data['mission_name'] : '';
-        $temp_insert_array['mission_game'] = !empty($mission_data['mission_game']) ? $mission_data['mission_game'] : '';
-        $temp_insert_array['mission_group'] = !empty($mission_data['mission_group']) ? $mission_data['mission_group'] : '';
-
-        $temp_insert_array['mission_class'] = !empty($mission_data['mission_class']) ? $mission_data['mission_class'] : 'mission';
-
-        $temp_insert_array['mission_image'] = !empty($mission_data['mission_image']) ? $mission_data['mission_image'] : '';
-        $temp_insert_array['mission_image_size'] = !empty($mission_data['mission_image_size']) ? $mission_data['mission_image_size'] : 40;
-        $temp_insert_array['mission_image_editor'] = !empty($mission_data['mission_image_editor']) ? $mission_data['mission_image_editor'] : 0;
-        $temp_insert_array['mission_image_alts'] = json_encode(!empty($mission_data['mission_image_alts']) ? $mission_data['mission_image_alts'] : array());
-
-        $temp_insert_array['mission_type'] = !empty($mission_data['mission_type']) ? $mission_data['mission_type'] : '';
-        $temp_insert_array['mission_type2'] = !empty($mission_data['mission_type2']) ? $mission_data['mission_type2'] : '';
-
-        $temp_insert_array['mission_description'] = !empty($mission_data['mission_description']) ? trim($mission_data['mission_description']) : '';
-        $temp_insert_array['mission_description2'] = !empty($mission_data['mission_description2']) ? trim($mission_data['mission_description2']) : '';
-
-        $temp_insert_array['mission_energy'] = !empty($mission_data['mission_energy']) ? $mission_data['mission_energy'] : 0;
-        $temp_insert_array['mission_weapons'] = !empty($mission_data['mission_weapons']) ? $mission_data['mission_weapons'] : 0;
-        $temp_insert_array['mission_attack'] = !empty($mission_data['mission_attack']) ? $mission_data['mission_attack'] : 0;
-        $temp_insert_array['mission_defense'] = !empty($mission_data['mission_defense']) ? $mission_data['mission_defense'] : 0;
-        $temp_insert_array['mission_speed'] = !empty($mission_data['mission_speed']) ? $mission_data['mission_speed'] : 0;
-
-        // Define the rewardss for this mission
-        $temp_insert_array['mission_robots_rewards'] = json_encode(!empty($mission_data['mission_rewards']['robots']) ? $mission_data['mission_rewards']['robots'] : array());
-        $temp_insert_array['mission_abilities_rewards'] = json_encode(!empty($mission_data['mission_rewards']['abilities']) ? $mission_data['mission_rewards']['abilities'] : array());
-
-        // Define compatibilities for this mission
-        $temp_insert_array['mission_robots_compatible'] = json_encode(!empty($mission_data['mission_robots_unlockable']) ? $mission_data['mission_robots_unlockable'] : array());
-        $temp_insert_array['mission_abilities_compatible'] = json_encode(!empty($mission_data['mission_abilities']) ? $mission_data['mission_abilities'] : array());
-
-        // Define the battle quotes for this mission
-        if (!empty($mission_data['mission_quotes'])){ foreach ($mission_data['mission_quotes'] AS $key => $quote){ $mission_data['mission_quotes'][$key] = html_entity_decode($quote, ENT_QUOTES, 'UTF-8'); } }
-        $temp_insert_array['mission_quotes_start'] = !empty($mission_data['mission_quotes']['battle_start']) && $mission_data['mission_quotes']['battle_start'] != '...' ? $mission_data['mission_quotes']['battle_start'] : '';
-        $temp_insert_array['mission_quotes_taunt'] = !empty($mission_data['mission_quotes']['battle_taunt']) && $mission_data['mission_quotes']['battle_taunt'] != '...' ? $mission_data['mission_quotes']['battle_taunt'] : '';
-        $temp_insert_array['mission_quotes_victory'] = !empty($mission_data['mission_quotes']['battle_victory']) && $mission_data['mission_quotes']['battle_victory'] != '...' ? $mission_data['mission_quotes']['battle_victory'] : '';
-        $temp_insert_array['mission_quotes_defeat'] = !empty($mission_data['mission_quotes']['battle_defeat']) && $mission_data['mission_quotes']['battle_defeat'] != '...' ? $mission_data['mission_quotes']['battle_defeat'] : '';
-
-
-        $temp_insert_array['mission_functions'] = !empty($mission_data['mission_functions']) ? $mission_data['mission_functions'] : 'missions/mission.php';
-
-        // Collect applicable spreadsheets for this mission
-        $spreadsheet_stats = !empty($spreadsheet_mission_stats[$mission_data['mission_token']]) ? $spreadsheet_mission_stats[$mission_data['mission_token']] : array();
-        $spreadsheet_descriptions = !empty($spreadsheet_mission_descriptions[$mission_data['mission_token']]) ? $spreadsheet_mission_descriptions[$mission_data['mission_token']] : array();
-
-        // Collect any user-contributed data for this mission
-        if (!empty($spreadsheet_descriptions['mission_description'])){ $temp_insert_array['mission_description2'] = trim($spreadsheet_descriptions['mission_description']); }
-
-        // Define the flags
-        $temp_insert_array['mission_flag_hidden'] = in_array($temp_insert_array['mission_token'], array('mission')) ? 1 : 0;
-        $temp_insert_array['mission_flag_complete'] = $mission_data['mission_image'] != 'mission' ? 1 : 0;
-        $temp_insert_array['mission_flag_published'] = 1;
-
-        // Define the order counter
-        if ($temp_insert_array['mission_class'] != 'system'){
-            $temp_insert_array['mission_order'] = $mission_order;
-            $mission_order++;
-        } else {
-            $temp_insert_array['mission_order'] = 0;
-        }
-
-
-        // Check if this mission already exists in the database
+        // Check if this mission already exists in the database and either insert or update
         $temp_success = true;
         $temp_exists = $db->get_array("SELECT mission_token FROM mmrpg_index_missions WHERE mission_token LIKE '{$temp_insert_array['mission_token']}' LIMIT 1") ? true : false;
         if (!$temp_exists){ $temp_success = $db->insert('mmrpg_index_missions', $temp_insert_array); }
@@ -895,20 +771,14 @@ if (!empty($mmrpg_database_missions)){
         // Print out the generated insert array
         $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
         $this_page_markup .= '<strong>$mmrpg_database_missions['.$mission_token.']</strong><br />';
-        //$this_page_markup .= '<pre>'.print_r($mission_data, true).'</pre><br /><hr /><br />';
         $this_page_markup .= '<pre>'.print_r($temp_insert_array, true).'</pre><br /><hr /><br />';
-        //$this_page_markup .= '<pre>'.print_r(rpg_mission::parse_index_info($temp_insert_array), true).'</pre><br /><hr /><br />';
         $this_page_markup .= '</p><hr />';
-
-        $mission_key++;
-
-        //die('end');
 
     }
 }
 // Otherwise, if empty, we're done!
 else {
-    $this_page_markup .= '<p style="padding: 6px; background-color: rgb(218, 255, 218);"><strong>ALL ROBOT HAVE BEEN IMPORTED UPDATED!</strong></p>';
+    $this_page_markup .= '<p style="padding: 6px; background-color: rgb(218, 255, 218);"><strong>ALL MISSIONS HAVE BEEN GENERATED!</strong></p>';
 }
 
 ?>
