@@ -33,6 +33,7 @@ function mmrpg_insert_mission(
     $player = '',
     $field = '',
     $targets = array(),
+    $support = array(),
     $level = 0,
     $max_level = 0,
     $order = 0,
@@ -41,6 +42,7 @@ function mmrpg_insert_mission(
     global $mmrpg_database_missions;
 
     $targets = implode(',', $targets);
+    $support = implode(',', $support);
     $level = !empty($level) ? $level : 1;
     $max_level = !empty($max_level) ? $max_level : $level;
 
@@ -50,7 +52,6 @@ function mmrpg_insert_mission(
     if (!empty($group)){ $token[] = $group; }
     if (!empty($player)){ $token[] = $player; }
     if (!empty($field) && $field != 'field'){ $token[] = $field; }
-    //if (!empty($targets)){ $token[] = $targets; }
     $token = implode('_', $token);
 
     $this_mission = array();
@@ -60,6 +61,7 @@ function mmrpg_insert_mission(
     $this_mission['mission_player'] = $player;
     $this_mission['mission_field'] = $field;
     $this_mission['mission_targets'] = $targets;
+    $this_mission['mission_support'] = $support;
     $this_mission['mission_level'] = $level;
     $this_mission['mission_level_max'] = $max_level;
     $this_mission['mission_button_size'] = $button;
@@ -184,6 +186,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     $targets = array(
         'met'
         );
+    $support = array(
+        );
     $level = $this_mission_levels[0];
     $max_level = $level;
     $button = '1x'.$this_mission_button_sizes[0];
@@ -194,6 +198,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $player_token,
         $field,
         $targets,
+        $support,
         $level,
         $max_level,
         $order,
@@ -207,6 +212,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     $targets = array(
         $mmrpg_mecha_joe_tokens[$player_key]
         );
+    $support = array(
+        );
     $level = $this_mission_levels[1];
     $max_level = $level;
     $button = '1x'.$this_mission_button_sizes[1];
@@ -217,6 +224,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $player_token,
         $field,
         $targets,
+        $support,
         $level,
         $max_level,
         $order,
@@ -230,6 +238,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     $targets = array(
         'trill_'.$mmrpg_player_stat_tokens[$rival_key]
         );
+    $support = array(
+        );
     $level = $this_mission_levels[2];
     $max_level = $level;
     $button = '1x'.$this_mission_button_sizes[2];
@@ -240,6 +250,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $player_token,
         $field,
         $targets,
+        $support,
         $level,
         $max_level,
         $order,
@@ -272,12 +283,15 @@ if (true){
     $button = '1x'.$this_mission_button_sizes[0];
     foreach ($mmrpg_omega_factors AS $omega_key => $omega_factor){
 
-        $group = 'single-battle';
+        $group = 'master-battle';
         $player = 'player';
         $field = $omega_factor['omega_field'];
+        $mechas = !empty($omega_factor['omega_mechas']) ? json_decode($omega_factor['omega_mechas'], true) : array();
         $targets = array(
             $omega_factor['omega_robot']
             );
+        $support = array();
+        $support = array_merge($support, $mechas);
         mmrpg_insert_mission(
             $this_mission_phase,
             $this_mission_chapter,
@@ -285,6 +299,7 @@ if (true){
             $player,
             $field,
             $targets,
+            $support,
             $level,
             $max_level,
             $order,
@@ -306,6 +321,8 @@ if (true){
         $targets = array(
             'doc-robot'
             );
+        $support = array(
+            );
         $level = $this_mission_levels[2];
         $max_level = $level;
         $button = '1x'.$this_mission_button_sizes[2];
@@ -316,6 +333,7 @@ if (true){
             $player_token,
             $field,
             $targets,
+            $support,
             $level,
             $max_level,
             $order,
@@ -346,6 +364,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $mmrpg_player_robot_master_tokens[$rival_key],
         $mmrpg_player_robot_support_tokens[$rival_key]
         );
+    $support = array(
+        );
     $level = $this_mission_levels[0];
     $max_level = $level;
     $button = '1x'.$this_mission_button_sizes[0];
@@ -356,6 +376,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $player_token,
         $field,
         $targets,
+        $support,
         $level,
         $max_level,
         $order,
@@ -370,6 +391,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $mmrpg_killer_robot_tokens[$player_key],
         'quint'
         );
+    $support = array(
+        );
     $level = $this_mission_levels[1];
     $max_level = $level;
     $button = '1x'.$this_mission_button_sizes[1];
@@ -380,6 +403,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $player_token,
         $field,
         $targets,
+        $support,
         $level,
         $max_level,
         $order,
@@ -394,6 +418,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'sunstar',
         'trill_'.$mmrpg_player_stat_tokens[$final_key]
         );
+    $support = array(
+        );
     $level = $this_mission_levels[2];
     $max_level = $level;
     $button = '1x'.$this_mission_button_sizes[2];
@@ -404,6 +430,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $player_token,
         $field,
         $targets,
+        $support,
         $level,
         $max_level,
         $order,
@@ -439,10 +466,12 @@ if (true){
 
             if ($omega_key1 === $omega_key2){ continue; }
 
-            $group = 'double-battle';
+            $group = 'fusion-battle';
             $player = 'player';
             $field1 = $omega_factor1['omega_field'];
             $field2 = $omega_factor2['omega_field'];
+            $mechas1 = !empty($omega_factor1['omega_mechas']) ? json_decode($omega_factor1['omega_mechas'], true) : array();
+            $mechas2 = !empty($omega_factor2['omega_mechas']) ? json_decode($omega_factor2['omega_mechas'], true) : array();
             $field_left = preg_replace('/^([a-z0-9]+)-([a-z0-9]+)$/i', '$1', $omega_factor1['omega_field']);
             $field_right = preg_replace('/^([a-z0-9]+)-([a-z0-9]+)$/i', '$2', $omega_factor2['omega_field']);
             $field = $field_left.'-'.$field_right;
@@ -450,6 +479,9 @@ if (true){
                 $omega_factor1['omega_robot'],
                 $omega_factor2['omega_robot']
                 );
+            $support = array();
+            $support = array_merge($support, $mechas1);
+            $support = array_merge($support, $mechas2);
             mmrpg_insert_mission(
                 $this_mission_phase,
                 $this_mission_chapter,
@@ -457,6 +489,7 @@ if (true){
                 $player,
                 $field,
                 $targets,
+                $support,
                 $level,
                 $max_level,
                 $order,
@@ -464,7 +497,7 @@ if (true){
                 );
 
         }
-        break;
+        //break;
     }
 
     // vs KING + DOC-ROBOT
@@ -481,6 +514,8 @@ if (true){
             'king',
             'doc-robot'
             );
+        $support = array(
+            );
         $level = $this_mission_levels[2];
         $max_level = $level;
         $button = '1x'.$this_mission_button_sizes[2];
@@ -491,6 +526,7 @@ if (true){
             $player_token,
             $field,
             $targets,
+            $support,
             $level,
             $max_level,
             $order,
