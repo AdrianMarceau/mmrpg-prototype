@@ -120,6 +120,12 @@ $mmrpg_mecha_joe_tokens = array('sniper-joe', 'skeleton-joe', 'crystal-joe');
 // Define the KILLER-ROBOT tokens that we'll be using in our missions
 $mmrpg_killer_robot_tokens = array('enker', 'punk', 'ballade');
 
+// Define the DARKNESS-ROBOT tokens that we'll be using in our missions
+$mmrpg_darkness_robot_tokens = array('dark-man', 'dark-man-2', 'dark-man-3');
+
+// Define the GENESIS-ROBOT tokens that we'll be using in our missions
+$mmrpg_genesis_robot_tokens = array('buster-rod-g', 'mega-water-s', 'hyper-storm-h');
+
 // Define the MISSION-LEVEL counters that the entire game will use for missions
 $mmrpg_mission_levels = array(
     1 => array(1, 2, 3),        // Chapter One   (Intro Battles)
@@ -548,6 +554,101 @@ if (true){
             ));
 
     }
+
+}
+
+// CHAPTER FIVE / Darkness Battles
+$this_mission_chapter++;
+$this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
+$this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
+$this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
+foreach ($mmrpg_player_tokens AS $player_key => $player_token){
+    $button_order = 0;
+
+    $rival_token = $mmrpg_rival_tokens[$player_key];
+    $rival_key = array_search($rival_token, $mmrpg_player_tokens);
+    $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
+
+    // vs DARKNESS
+    $button_order++;
+    $group_token = 'darkness-battle';
+    $field_token = 'xxx-field';
+    $target_player = $rival_token;
+    $target_robots = array($mmrpg_player_robot_master_tokens[$player_key].'-ds', $mmrpg_darkness_robot_tokens[$player_key]);
+    $target_mooks = array();
+    $field_types = array();
+    $field_sources = array($field_token);
+    $level_start = $this_mission_levels[0];
+    $button_size = '1x'.$this_mission_button_sizes[0];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'field_types' => $field_types,
+        'field_sources' => $field_sources,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
+
+    // vs GENESIS
+    $button_order++;
+    $group_token = 'genesis-battle';
+    $field_token = 'xxx-field';
+    $target_player = '';
+    $target_robots = array($mmrpg_genesis_robot_tokens[$player_key], $mmrpg_genesis_robot_tokens[$rival_key], $mmrpg_genesis_robot_tokens[$final_key]);
+    $target_mooks = array();
+    $field_types = array();
+    $field_sources = array($field_token);
+    $level_start = $this_mission_levels[1];
+    $button_size = '1x'.$this_mission_button_sizes[1];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'field_types' => $field_types,
+        'field_sources' => $field_sources,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
+
+    // vs ALIENS
+    $button_order++;
+    $group_token = 'alien-battle';
+    $field_token = 'xxx-field';
+    $target_player = '';
+    $target_robots = array('slur', 'sunstar', 'trill_'.$mmrpg_player_stat_tokens[$player_key], 'trill_'.$mmrpg_player_stat_tokens[$player_key]);
+    $target_mooks = array();
+    $field_types = array();
+    $field_sources = array($field_token);
+    $level_start = $this_mission_levels[2];
+    $button_size = '1x'.$this_mission_button_sizes[2];
+    mmrpg_insert_mission(array(
+        'phase' => $this_mission_phase,
+        'chapter' => $this_mission_chapter,
+        'group' => $group_token,
+        'field' => $field_token,
+        'player' => $player_token,
+        'target_player' => $target_player,
+        'target_robots' => $target_robots,
+        'target_mooks' => $target_mooks,
+        'field_types' => $field_types,
+        'field_sources' => $field_sources,
+        'level_start' => $level_start,
+        'button_size' => $button_size,
+        'button_order' => $button_order
+        ));
 
 }
 
