@@ -5,6 +5,7 @@ if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE 
 
 // Collect any extra request variables for the import
 $this_import_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : 10;
+$this_truncate_existing = isset($_REQUEST['truncate']) && $_REQUEST['truncate'] === 'false' ? false : true;
 
 // Print out the menu header so we know where we are
 ob_start();
@@ -752,7 +753,9 @@ $this_page_markup .= 'Count:'.(!empty($mmrpg_database_missions) ? count($mmrpg_d
 $this_page_markup .= '</p>';
 
 // Truncate any robots currently in the database
-$db->query('TRUNCATE TABLE mmrpg_index_missions');
+if ($this_truncate_existing){
+    $db->query('TRUNCATE TABLE mmrpg_index_missions');
+}
 
 // Loop through each of the mission info arrays
 if (!empty($mmrpg_database_missions)){
@@ -764,7 +767,8 @@ if (!empty($mmrpg_database_missions)){
 
         // Check if this mission already exists in the database and either insert or update
         $temp_success = true;
-        $temp_exists = $db->get_array("SELECT mission_token FROM mmrpg_index_missions WHERE mission_token LIKE '{$temp_insert_array['mission_token']}' LIMIT 1") ? true : false;
+        if (!$this_truncate_existing){ $temp_exists = $db->get_array("SELECT mission_token FROM mmrpg_index_missions WHERE mission_token LIKE '{$temp_insert_array['mission_token']}' LIMIT 1") ? true : false; }
+        else { $temp_exists = false; }
         if (!$temp_exists){ $temp_success = $db->insert('mmrpg_index_missions', $temp_insert_array); }
         else { $temp_success = $db->update('mmrpg_index_missions', $temp_insert_array, array('mission_token' => $temp_insert_array['mission_token'])); }
 
