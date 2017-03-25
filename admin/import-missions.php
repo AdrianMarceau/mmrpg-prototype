@@ -35,12 +35,24 @@ function mmrpg_insert_mission(
     $targets = array(),
     $level = 0,
     $max_level = 0,
-    $order = 0
+    $order = 0,
+    $button = '1x1'
     ){
     global $mmrpg_database_missions;
+
     $targets = implode(',', $targets);
     $level = !empty($level) ? $level : 1;
     $max_level = !empty($max_level) ? $max_level : $level;
+
+    $token = array();
+    //if (!empty($phase)){ $token[] = 'p'.$phase; }
+    if (!empty($chapter)){ $token[] = 'c'.$chapter; }
+    if (!empty($group)){ $token[] = $group; }
+    if (!empty($player)){ $token[] = $player; }
+    if (!empty($field) && $field != 'field'){ $token[] = $field; }
+    //if (!empty($targets)){ $token[] = $targets; }
+    $token = implode('_', $token);
+
     $this_mission = array();
     $this_mission['mission_phase'] = $phase;
     $this_mission['mission_chapter'] = $chapter;
@@ -50,7 +62,9 @@ function mmrpg_insert_mission(
     $this_mission['mission_targets'] = $targets;
     $this_mission['mission_level'] = $level;
     $this_mission['mission_level_max'] = $max_level;
+    $this_mission['mission_button_size'] = $button;
     $this_mission['mission_order'] = $order;
+    $this_mission['mission_token'] = $token;
     $mmrpg_database_missions[] = $this_mission;
 }
 
@@ -96,7 +110,7 @@ $mmrpg_mecha_joe_tokens = array('sniper-joe', 'skeleton-joe', 'crystal-joe');
 // Define the KILLER-ROBOT tokens that we'll be using in our missions
 $mmrpg_killer_robot_tokens = array('enker', 'punk', 'ballade');
 
-// Define the MISSION-LEVELS variables that the entire game will use for missions
+// Define the MISSION-LEVEL counters that the entire game will use for missions
 $mmrpg_mission_levels = array(
     1 => array(1, 2, 3),        // Chapter One   (Intro Battles)
     2 => array(4, 1, 12),       // Chapter Two   (Master Battles)
@@ -108,8 +122,20 @@ $mmrpg_mission_levels = array(
     8 => array(200, 100, 1000)  // Chapter Eight (Cache Battles)
     );
 
-// Define the CHAPTER-MISSION-SIZE counters that the entire game will use for missions
-$mmrpg_mission_sizes = array(
+// Define the MISSION-GROUP-COUNTERS that the entire game will use for missions
+$mmrpg_mission_group_counters = array(
+    1 => array(3),              // Chapter One   (Intro Battles)
+    2 => array(8, 1),           // Chapter Two   (Master Battles)
+    3 => array(3),              // Chapter Three (Rival Battles)
+    4 => array(4, 1),           // Chapter Four  (Fusion Battles)
+    5 => array(3),              // Chapter Five  (Darkness Battles)
+    6 => array(3),              // Chapter Six   (Stardroid Battles)
+    7 => array(3),              // Chapter Seven (Final Battles)
+    8 => array(8, 1)            // Chapter Eight (Cache Battles)
+    );
+
+// Define the MISSION-BUTTON-SIZE counters that the entire game will use for missions
+$mmrpg_mission_button_sizes = array(
     1 => array(1, 1, 1),       // Chapter One   (Intro Battles)
     2 => array(4, 4, 1),       // Chapter Two   (Master Battles)
     3 => array(1, 1, 1),       // Chapter Three (Rival Battles)
@@ -142,6 +168,8 @@ $this_mission_phase++;
 // CHAPTER ONE / Intro Battles
 $this_mission_chapter++;
 $this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
+$this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
+$this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
 foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     $order = 0;
 
@@ -158,6 +186,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         );
     $level = $this_mission_levels[0];
     $max_level = $level;
+    $button = '1x'.$this_mission_button_sizes[0];
     mmrpg_insert_mission(
         $this_mission_phase,
         $this_mission_chapter,
@@ -167,7 +196,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $targets,
         $level,
         $max_level,
-        $order
+        $order,
+        $button
         );
 
     // vs MECHA JOE
@@ -179,6 +209,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         );
     $level = $this_mission_levels[1];
     $max_level = $level;
+    $button = '1x'.$this_mission_button_sizes[1];
     mmrpg_insert_mission(
         $this_mission_phase,
         $this_mission_chapter,
@@ -188,7 +219,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $targets,
         $level,
         $max_level,
-        $order
+        $order,
+        $button
         );
 
     // vs TRILL
@@ -200,6 +232,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         );
     $level = $this_mission_levels[2];
     $max_level = $level;
+    $button = '1x'.$this_mission_button_sizes[2];
     mmrpg_insert_mission(
         $this_mission_phase,
         $this_mission_chapter,
@@ -209,7 +242,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $targets,
         $level,
         $max_level,
-        $order
+        $order,
+        $button
         );
 
 }
@@ -226,17 +260,20 @@ $this_mission_phase++;
 // CHAPTER TWO / Master Battles
 $this_mission_chapter++;
 $this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
+$this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
+$this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
 if (true){
     $order = 0;
 
     // vs MASTERS
     $order++;
     $level = $this_mission_levels[0];
-    $max_level = $this_mission_levels[2] - $this_mission_levels[1];
+    $max_level = $level + (($this_mission_group_counters[0] - 1) * $this_mission_levels[1]);
+    $button = '1x'.$this_mission_button_sizes[0];
     foreach ($mmrpg_omega_factors AS $omega_key => $omega_factor){
 
         $group = 'single-battle';
-        $player = 'global';
+        $player = 'player';
         $field = $omega_factor['omega_field'];
         $targets = array(
             $omega_factor['omega_robot']
@@ -250,7 +287,8 @@ if (true){
             $targets,
             $level,
             $max_level,
-            $order
+            $order,
+            $button
             );
 
     }
@@ -270,6 +308,7 @@ if (true){
             );
         $level = $this_mission_levels[2];
         $max_level = $level;
+        $button = '1x'.$this_mission_button_sizes[2];
         mmrpg_insert_mission(
             $this_mission_phase,
             $this_mission_chapter,
@@ -279,7 +318,8 @@ if (true){
             $targets,
             $level,
             $max_level,
-            $order
+            $order,
+            $button
             );
 
     }
@@ -289,6 +329,8 @@ if (true){
 // CHAPTER THREE / Rival Battles
 $this_mission_chapter++;
 $this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
+$this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
+$this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
 foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     $order = 0;
 
@@ -306,6 +348,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         );
     $level = $this_mission_levels[0];
     $max_level = $level;
+    $button = '1x'.$this_mission_button_sizes[0];
     mmrpg_insert_mission(
         $this_mission_phase,
         $this_mission_chapter,
@@ -315,7 +358,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $targets,
         $level,
         $max_level,
-        $order
+        $order,
+        $button
         );
 
     // vs KILLERS
@@ -328,6 +372,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         );
     $level = $this_mission_levels[1];
     $max_level = $level;
+    $button = '1x'.$this_mission_button_sizes[1];
     mmrpg_insert_mission(
         $this_mission_phase,
         $this_mission_chapter,
@@ -337,7 +382,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $targets,
         $level,
         $max_level,
-        $order
+        $order,
+        $button
         );
 
     // vs ALIENS
@@ -350,6 +396,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         );
     $level = $this_mission_levels[2];
     $max_level = $level;
+    $button = '1x'.$this_mission_button_sizes[2];
     mmrpg_insert_mission(
         $this_mission_phase,
         $this_mission_chapter,
@@ -359,10 +406,105 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         $targets,
         $level,
         $max_level,
-        $order
+        $order,
+        $button
         );
 
 }
+
+
+
+// ------------------------------ //
+// MISSION GENERATION : PHASE THREE
+// ------------------------------ //
+
+// PHASE 3 START
+$this_mission_phase++;
+
+// CHAPTER FOUR / Fusion Battles
+$this_mission_chapter++;
+$this_mission_levels = $mmrpg_mission_levels[$this_mission_chapter];
+$this_mission_group_counters = $mmrpg_mission_group_counters[$this_mission_chapter];
+$this_mission_button_sizes = $mmrpg_mission_button_sizes[$this_mission_chapter];
+if (true){
+    $order = 0;
+
+    // vs MASTERS
+    $order++;
+    $level = $this_mission_levels[0];
+    $max_level = $level + (($this_mission_group_counters[0] - 1) * $this_mission_levels[1]);
+    $button = '1x'.$this_mission_button_sizes[0];
+    foreach ($mmrpg_omega_factors AS $omega_key1 => $omega_factor1){
+        foreach ($mmrpg_omega_factors AS $omega_key2 => $omega_factor2){
+
+            if ($omega_key1 === $omega_key2){ continue; }
+
+            $group = 'double-battle';
+            $player = 'player';
+            $field1 = $omega_factor1['omega_field'];
+            $field2 = $omega_factor2['omega_field'];
+            $field_left = preg_replace('/^([a-z0-9]+)-([a-z0-9]+)$/i', '$1', $omega_factor1['omega_field']);
+            $field_right = preg_replace('/^([a-z0-9]+)-([a-z0-9]+)$/i', '$2', $omega_factor2['omega_field']);
+            $field = $field_left.'-'.$field_right;
+            $targets = array(
+                $omega_factor1['omega_robot'],
+                $omega_factor2['omega_robot']
+                );
+            mmrpg_insert_mission(
+                $this_mission_phase,
+                $this_mission_chapter,
+                $group,
+                $player,
+                $field,
+                $targets,
+                $level,
+                $max_level,
+                $order,
+                $button
+                );
+
+        }
+        break;
+    }
+
+    // vs KING + DOC-ROBOT
+    $order++;
+    foreach ($mmrpg_player_tokens AS $player_key => $player_token){
+
+        $rival_token = $mmrpg_rival_tokens[$player_key];
+        $rival_key = array_search($rival_token, $mmrpg_player_tokens);
+        $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
+
+        $group = 'fortress-battle';
+        $field = 'xxx-field';
+        $targets = array(
+            'king',
+            'doc-robot'
+            );
+        $level = $this_mission_levels[2];
+        $max_level = $level;
+        $button = '1x'.$this_mission_button_sizes[2];
+        mmrpg_insert_mission(
+            $this_mission_phase,
+            $this_mission_chapter,
+            $group,
+            $player_token,
+            $field,
+            $targets,
+            $level,
+            $max_level,
+            $order,
+            $button
+            );
+
+    }
+
+}
+
+
+
+
+
 
 
 
