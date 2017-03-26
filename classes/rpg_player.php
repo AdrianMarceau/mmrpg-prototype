@@ -2607,7 +2607,7 @@ class rpg_player extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <label>Abilities Unlocked : </label>
-                                        <span class="player_record"><?= $temp_player_records['player_abilities'] == 1 ? '1 Robot' : number_format($temp_player_records['player_robots'], 0, '.', ',').' Robots' ?></span>
+                                        <span class="player_record"><?= $temp_player_records['player_abilities'] == 1 ? '1 Ability' : number_format($temp_player_records['player_abilities'], 0, '.', ',').' Abilities' ?></span>
                                     </td>
                                 </tr>
                             </tbody>
