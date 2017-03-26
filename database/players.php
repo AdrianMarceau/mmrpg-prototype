@@ -24,9 +24,36 @@ if (isset($mmrpg_database_players_filter)){
 // Collect the database players and fields
 $player_fields = rpg_player::get_index_fields(true);
 $db->query("SET @player_row_number = 0;");
-$mmrpg_database_players = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_flag_published = 1 AND (player_flag_hidden = 0 OR player_token = '{$this_current_token}') {$temp_condition} ORDER BY player_flag_hidden ASC, player_order ASC;", 'player_token');
-$mmrpg_database_players_count = $db->get_value("SELECT COUNT(player_id) AS player_count FROM mmrpg_index_players WHERE player_flag_published = 1 AND player_flag_hidden = 0 {$temp_condition_unfiltered};", 'player_count');
-$mmrpg_database_players_numbers = $db->get_array_list("SELECT player_token, (@player_row_number:=@player_row_number + 1) AS player_key FROM mmrpg_index_players WHERE player_flag_published = 1 {$temp_condition_unfiltered} ORDER BY player_flag_hidden ASC, player_order ASC;", 'player_token');
+$mmrpg_database_players = $db->get_array_list("SELECT
+    {$player_fields}
+    FROM mmrpg_index_players
+    WHERE
+    player_flag_published = 1
+    AND (player_flag_hidden = 0 OR player_token = '{$this_current_token}')
+    {$temp_condition}
+    ORDER BY
+    player_flag_hidden ASC,
+    player_order ASC
+    ;", 'player_token');
+$mmrpg_database_players_count = $db->get_value("SELECT
+    COUNT(player_id) AS player_count
+    FROM mmrpg_index_players
+    WHERE
+    player_flag_published = 1
+    AND player_flag_hidden = 0
+    {$temp_condition_unfiltered}
+    ;", 'player_count');
+$mmrpg_database_players_numbers = $db->get_array_list("SELECT
+    player_token,
+    (@player_row_number:=@player_row_number + 1) AS player_key
+    FROM mmrpg_index_players
+    WHERE
+    player_flag_published = 1
+    {$temp_condition_unfiltered}
+    ORDER BY
+    player_flag_hidden ASC,
+    player_order ASC
+    ;", 'player_token');
 
 // Remove unallowed players from the database
 foreach ($mmrpg_database_players AS $temp_token => $temp_info){
