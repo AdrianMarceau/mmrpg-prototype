@@ -1625,9 +1625,10 @@ class rpg_player extends rpg_object {
     /**
      * Get a list of all player index fields as an array or, optionally, imploded into a string
      * @param bool $implode
+     * @param string $table (optional)
      * @return mixed
      */
-    public static function get_index_fields($implode = false){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various index fields for player objects
         $index_fields = array(
@@ -1665,6 +1666,14 @@ class rpg_player extends rpg_object {
             'player_flag_published',
             'player_order'
             );
+
+        // Add the table prefix if provided in the argument
+        if (!empty($table)){
+            $table = trim($table, ' .');
+            foreach ($index_fields AS $k => $f){
+                $index_fields[$k] = $table.'.'.$f;
+            }
+        }
 
         // Implode the index fields into a string if requested
         if ($implode){
@@ -2085,45 +2094,6 @@ class rpg_player extends rpg_object {
 
         // Define the sprite frame index for robot images
         $player_sprite_frames = array('base','taunt','victory','defeat','command','damage');
-        // Collect the database records for this player
-        if ($print_options['show_records']){
-
-            global $db;
-            $temp_player_records = $db->get_array("SELECT
-                players.player_token,
-                (CASE WHEN uplayers1.player_unlocked IS NOT NULL THEN uplayers1.player_unlocked ELSE 0 END) AS player_unlocked,
-                (CASE WHEN uplayers2.player_robots IS NOT NULL THEN uplayers2.player_robots ELSE 0 END) AS player_robots,
-                (CASE WHEN uplayers3.player_abilities IS NOT NULL THEN uplayers3.player_abilities ELSE 0 END) AS player_abilities
-                FROM mmrpg_index_players AS players
-                LEFT JOIN (SELECT
-                    uplayers.player_token,
-                    COUNT(*) AS player_unlocked
-                    FROM mmrpg_users_players AS uplayers
-                    WHERE uplayers.player_token = '{$player_info['player_token']}'
-                    GROUP BY uplayers.player_token
-                    ) AS uplayers1 ON uplayers1.player_token = players.player_token
-                LEFT JOIN (SELECT
-                    urobots.robot_player_original AS player_token,
-                    COUNT(*) AS player_robots
-                    FROM mmrpg_users_robots AS urobots
-                    WHERE urobots.robot_player_original = '{$player_info['player_token']}'
-                    GROUP BY urobots.robot_player_original
-                    ) AS uplayers2 ON uplayers2.player_token = players.player_token
-                LEFT JOIN (SELECT
-                    uabilities.player_token,
-                    COUNT(*) AS player_abilities
-                    FROM mmrpg_users_players_abilities AS uabilities
-                    WHERE uabilities.player_token = '{$player_info['player_token']}'
-                    GROUP BY uabilities.player_token
-                    ) AS uplayers3 ON uplayers3.player_token = players.player_token
-                WHERE
-                players.player_token = '{$player_info['player_token']}'
-                ;");
-
-            //echo '<pre>$temp_player_records = '.print_r($temp_player_records, true).'</pre>';
-            //exit();
-
-        }
 
         // Define the markup variable
         $this_markup = '';
@@ -2595,19 +2565,19 @@ class rpg_player extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <label>Unlocked By : </label>
-                                        <span class="player_record"><?= $temp_player_records['player_unlocked'] == 1 ? '1 User' : number_format($temp_player_records['player_unlocked'], 0, '.', ',').' Users' ?></span>
+                                        <span class="player_record"><?= $player_info['player_record_users_unlocked'] == 1 ? '1 User' : number_format($player_info['player_record_users_unlocked'], 0, '.', ',').' Users' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
                                         <label>Robots Unlocked : </label>
-                                        <span class="player_record"><?= $temp_player_records['player_robots'] == 1 ? '1 Robot' : number_format($temp_player_records['player_robots'], 0, '.', ',').' Robots' ?></span>
+                                        <span class="player_record"><?= $player_info['player_record_robots_unlocked'] == 1 ? '1 Robot' : number_format($player_info['player_record_robots_unlocked'], 0, '.', ',').' Robots' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
                                         <label>Abilities Unlocked : </label>
-                                        <span class="player_record"><?= $temp_player_records['player_abilities'] == 1 ? '1 Ability' : number_format($temp_player_records['player_abilities'], 0, '.', ',').' Abilities' ?></span>
+                                        <span class="player_record"><?= $player_info['player_record_abilities_unlocked'] == 1 ? '1 Ability' : number_format($player_info['player_record_abilities_unlocked'], 0, '.', ',').' Abilities' ?></span>
                                     </td>
                                 </tr>
                             </tbody>

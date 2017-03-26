@@ -1983,9 +1983,10 @@ class rpg_robot extends rpg_object {
     /**
      * Get a list of all robot index fields as an array or, optionally, imploded into a string
      * @param bool $implode
+     * @param string $table (optional)
      * @return mixed
      */
-    public static function get_index_fields($implode = false){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various index fields for robot objects
         $index_fields = array(
@@ -2028,6 +2029,14 @@ class rpg_robot extends rpg_object {
             'robot_flag_published',
             'robot_order'
             );
+
+        // Add the table prefix if provided in the argument
+        if (!empty($table)){
+            $table = trim($table, ' .');
+            foreach ($index_fields AS $k => $f){
+                $index_fields[$k] = $table.'.'.$f;
+            }
+        }
 
         // Implode the index fields into a string if requested
         if ($implode){

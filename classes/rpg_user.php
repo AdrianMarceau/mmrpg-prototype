@@ -59,10 +59,11 @@ class rpg_user {
             'user_flag_allowchat'
             );
 
-        // Add table name to each field string if requested
+        // Add the table prefix if provided in the argument
         if (!empty($table)){
-            foreach ($user_fields AS $key => $field){
-                $user_fields[$key] = $table.'.'.$field;
+            $table = trim($table, ' .');
+            foreach ($index_fields AS $k => $f){
+                $index_fields[$k] = $table.'.'.$f;
             }
         }
 

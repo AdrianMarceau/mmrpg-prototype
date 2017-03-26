@@ -143,9 +143,10 @@ class rpg_field extends rpg_object {
     /**
      * Get a list of all field index fields as an array or, optionally, imploded into a string
      * @param bool $implode
+     * @param string $table (optional)
      * @return mixed
      */
-    public static function get_index_fields($implode = false){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various index fields for field objects
         $index_fields = array(
@@ -181,6 +182,14 @@ class rpg_field extends rpg_object {
             'field_flag_published',
             'field_order'
             );
+
+        // Add the table prefix if provided in the argument
+        if (!empty($table)){
+            $table = trim($table, ' .');
+            foreach ($index_fields AS $k => $f){
+                $index_fields[$k] = $table.'.'.$f;
+            }
+        }
 
         // Implode the index fields into a string if requested
         if ($implode){
