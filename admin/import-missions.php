@@ -23,12 +23,16 @@ $this_page_markup .= ob_get_clean();
 // MISSION VARIABLES / FUNCTIONS
 // ---------------------------------------- //
 
+// Collect an index of all complete fields data for reference
+$mmrpg_index_fields = rpg_field::get_index();
+
 // Define a variable to hold all database missions
 $mmrpg_database_missions = array();
 
 // Define a quick insert function for new missions
 function mmrpg_insert_mission($this_mission){
     global $mmrpg_database_missions;
+    global $mmrpg_index_fields;
 
     // Define defaults for required mission keys
     if (!isset($this_mission['phase'])){ $this_mission['phase'] = 0; }
@@ -48,11 +52,15 @@ function mmrpg_insert_mission($this_mission){
     $this_mission['token'] = $token;
 
     // Define defaults for all other mission fields
+    if (!isset($this_mission['name'])){ $this_mission['name'] = ''; }
+    if (!isset($this_mission['description'])){ $this_mission['description'] = ''; }
     if (!isset($this_mission['field_type'])){ $this_mission['field_type'] = ''; }
     if (!isset($this_mission['field_type2'])){ $this_mission['field_type2'] = ''; }
     if (!isset($this_mission['field_music'])){ $this_mission['field_music'] = ''; }
     if (!isset($this_mission['field_background'])){ $this_mission['field_background'] = ''; }
+    if (!isset($this_mission['field_background_attachments'])){ $this_mission['field_background_attachments'] = array(); }
     if (!isset($this_mission['field_foreground'])){ $this_mission['field_foreground'] = ''; }
+    if (!isset($this_mission['field_foreground_attachments'])){ $this_mission['field_foreground_attachments'] = array(); }
     if (!isset($this_mission['target_player'])){ $this_mission['target_player'] = ''; }
     if (!isset($this_mission['target_robots'])){ $this_mission['target_robots'] = array(); }
     if (!isset($this_mission['target_mooks'])){ $this_mission['target_mooks'] = array(); }
@@ -61,11 +69,19 @@ function mmrpg_insert_mission($this_mission){
     if (!isset($this_mission['button_size'])){ $this_mission['button_size'] = '1x1'; }
     if (!isset($this_mission['button_order'])){ $this_mission['button_order'] = 0; }
 
-    // Implode any array-based fields into strings
-    foreach ($this_mission AS $field => $value){
-        if (is_array($value)){
-            $value = implode(',', $value);
-            $this_mission[$field] = $value;
+    // Compensate for missing background attachments based on the background image
+    if (empty($this_mission['field_background_attachments'])){
+        if (!empty($this_mission['field_background']) && !empty($mmrpg_index_fields[$this_mission['field_background']])){
+            $background_field = $mmrpg_index_fields[$this_mission['field_background']];
+            $this_mission['field_background_attachments'] = $background_field['field_background_attachments'];
+        }
+    }
+
+    // Compensate for missing foreground attachments based on the foreground image
+    if (empty($this_mission['field_foreground_attachments'])){
+        if (!empty($this_mission['field_foreground']) && !empty($mmrpg_index_fields[$this_mission['field_foreground']])){
+            $foreground_field = $mmrpg_index_fields[$this_mission['field_foreground']];
+            $this_mission['field_foreground_attachments'] = $foreground_field['field_foreground_attachments'];
         }
     }
 
@@ -74,9 +90,85 @@ function mmrpg_insert_mission($this_mission){
         $this_mission['field_type2'] = '';
     }
 
-    // Compensate for mission level limit variable
+    // Compensate for missing level limit variable
     if (empty($this_mission['level_limit'])){
         $this_mission['level_limit'] = $this_mission['level_start'];
+    }
+
+    // Auto-generate the mission name variable if not provided
+    if (empty($this_mission['name'])){
+        $nf = new NumberFormatter('en', NumberFormatter::SPELLOUT);
+        $chapter_name = 'Chapter '.ucfirst($nf->format($this_mission['chapter']));
+        $chapter_group = ucwords(str_replace('-', ' ', $this_mission['group']));
+        $this_mission['name'] = $chapter_name.' '.$chapter_group;
+    }
+
+    // Auto-generate the mission description variable if not provided
+    if (empty($this_mission['description'])){
+
+        if (isset($this_mission['description_prefix'])){
+            $description_prefix = trim($this_mission['description_prefix']);
+            unset($this_mission['description_prefix']);
+        } else {
+            $description_prefix = 'Defeat';
+        }
+
+        if (isset($this_mission['description_action'])){
+            $description_action = $this_mission['description_action'];
+            unset($this_mission['description_action']);
+        } else {
+            $description_action = 'in the ';
+        }
+
+        if (isset($this_mission['description_location'])){
+            $description_location = $this_mission['description_location'];
+            unset($this_mission['description_location']);
+        } else {
+            $this_mission['field'] = str_replace('-iii', '-III', $this_mission['field']);
+            $this_mission['field'] = str_replace('-ii', '-II', $this_mission['field']);
+            $description_location = ucwords(str_replace('-', ' ', $this_mission['field']));
+        }
+
+        $player_name = '';
+        if (!empty($this_mission['target_player']) && $this_mission['target_player'] != 'player'){
+            $player_name = ucwords(str_replace('-', '. ', $this_mission['target_player'])).'\'s ';
+        }
+
+        $robot_names = array();
+        if (!empty($this_mission['target_robots'])){
+            foreach ($this_mission['target_robots'] AS $robot_token){
+                $robot_name = $robot_token;
+                $robot_name = str_replace('-sp', '-SP', $robot_name);
+                $robot_name = str_replace('-ds', '-DS', $robot_name);
+                $robot_name = ucwords(str_replace('-', ' ', $robot_name));
+                if (strstr($robot_name, '_')){ list($robot_name) = explode('_', $robot_name); }
+                $robot_names[] = $robot_name;
+            }
+        }
+        $ncount = count($robot_names);
+        if ($ncount == 1){ $robot_names = implode('', $robot_names); }
+        elseif ($ncount == 2){ $robot_names = implode(' and ', $robot_names); }
+        else {
+            $fnames = $robot_names;
+            $lname = array_pop($fnames);
+            $robot_names = implode(', ', $fnames).', and '.$lname;
+        }
+
+
+        $this_mission['description'] =
+            $description_prefix.' '.
+            $player_name.$robot_names.' '.
+            $description_action.
+            $description_location.
+            '!';
+    }
+
+    // Implode any array-based fields into strings
+    foreach ($this_mission AS $field => $value){
+        if (is_array($value)){
+            $value = !empty($value) ? json_encode($value) : '';
+            $this_mission[$field] = $value;
+        }
     }
 
     // Append the "mission" prefix to all fields then insert
@@ -138,7 +230,7 @@ $mmrpg_player_tokens = array('dr-light', 'dr-wily', 'dr-cossack');
 $mmrpg_player_stat_tokens = array('defense', 'attack', 'speed');
 $mmrpg_player_field_tokens = array('light-laboratory', 'wily-castle', 'cossack-citadel');
 $mmrpg_player_robot_master_tokens = array('mega-man', 'bass', 'proto-man');
-$mmrpg_player_target_mooks_tokens = array('roll', 'disco', 'rhythm');
+$mmrpg_player_robot_support_tokens = array('roll', 'disco', 'rhythm');
 
 // Define the RIVAL-PLAYER+FIELD tokens we'll be generating missions for
 $mmrpg_rival_tokens = array('dr-wily', 'dr-cossack', 'dr-light');
@@ -234,22 +326,31 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     $field_music = $field_token;
     $field_background = $field_token;
     $field_foreground = $field_token;
+    $foreground_attachments = array(
+        'home-base' => array('class' => 'object', 'size' => 160, 'offset_x' => 12, 'offset_y' => 121, 'offset_z' => 1, 'object_token' => 'intro-field-'.str_replace('dr-', '', $player_token), 'object_frame' => array(0), 'object_direction' => 'right'),
+        'rescue-robot' => array('class' => 'robot', 'size' => 40, 'offset_x' => 91, 'offset_y' => 118, 'offset_z' => 2, 'robot_token' => $mmrpg_player_robot_support_tokens[$player_key], 'robot_frame' => array(8,0,8,0,0), 'robot_direction' => 'right')
+        );
     $target_player = '';
     $target_robots = array('met');
     $target_mooks = array();
     $level_start = $this_mission_levels[0];
     $button_size = '1x'.$this_mission_button_sizes[0];
+    $location_name = preg_replace('/^([a-z0-9]+)-([a-z0-9]+)$/i', '$2', $mmrpg_player_field_tokens[$player_key]);
     mmrpg_insert_mission(array(
         'phase' => $this_mission_phase,
         'chapter' => $this_mission_chapter,
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_prefix' => 'Defeat the',
+        'description_action' => 'guarding the ',
+        'description_location' => $location_name,
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
         'field_background' => $field_background,
         'field_foreground' => $field_foreground,
+        'field_foreground_attachments' => $foreground_attachments,
         'target_player' => $target_player,
         'target_robots' => $target_robots,
         'target_mooks' => $target_mooks,
@@ -278,6 +379,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_prefix' => 'Defeat the',
+        'description_action' => 'attacking ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -311,6 +414,8 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_prefix' => 'Defeat the',
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -393,7 +498,7 @@ if (true){
         $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
 
         $group_token = 'fortress-battle';
-        $field_token = 'xxx-field';
+        $field_token = '???-field'; // ?liberated-fortress?
         $field_type = '';
         $field_type2 = '';
         $field_music = $field_token;
@@ -410,6 +515,7 @@ if (true){
             'group' => $group_token,
             'field' => $field_token,
             'player' => $player_token,
+            'description_action' => 'at the ',
             'field_type' => $field_type,
             'field_type2' => $field_type2,
             'field_music' => $field_music,
@@ -449,7 +555,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     $field_background = $field_token;
     $field_foreground = $field_token;
     $target_player = $rival_token;
-    $target_robots = array($mmrpg_player_robot_master_tokens[$rival_key], $mmrpg_player_target_mooks_tokens[$rival_key]);
+    $target_robots = array($mmrpg_player_robot_master_tokens[$rival_key], $mmrpg_player_robot_support_tokens[$rival_key]);
     $target_mooks = array();
     $level_start = $this_mission_levels[0];
     $button_size = '1x'.$this_mission_button_sizes[0];
@@ -459,6 +565,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -475,7 +582,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     // vs KILLERS
     $button_order++;
     $group_token = 'killer-battle';
-    $field_token = 'xxx-field';
+    $field_token = '???-field'; // ?hunter-station?
     $field_type = '';
     $field_type2 = '';
     $field_music = $field_token;
@@ -492,6 +599,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -508,7 +616,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     // vs ALIENS
     $button_order++;
     $group_token = 'alien-battle';
-    $field_token = 'xxx-field';
+    $field_token = '???-field'; // ?captured-starbase?
     $field_type = '';
     $field_type2 = '';
     $field_music = $field_token;
@@ -525,6 +633,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -604,11 +713,11 @@ if (true){
                 'button_order' => $button_order
                 ));
 
-            //break;
+            break;
 
         }
 
-        //break;
+        break;
 
     }
 
@@ -621,7 +730,7 @@ if (true){
         $final_key = isset($mmrpg_player_tokens[$rival_key + 1]) ? $rival_key + 1 : 0;
 
         $group_token = 'fortress-battle';
-        $field_token = 'xxx-field';
+        $field_token = '???-field'; // ?elemental-deposit?
         $field_type = '';
         $field_type2 = '';
         $field_music = $field_token;
@@ -638,6 +747,7 @@ if (true){
             'group' => $group_token,
             'field' => $field_token,
             'player' => $player_token,
+            'description_action' => 'at the ',
             'field_type' => $field_type,
             'field_type2' => $field_type2,
             'field_music' => $field_music,
@@ -670,7 +780,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     // vs DARKNESS
     $button_order++;
     $group_token = 'darkness-battle';
-    $field_token = 'xxx-field';
+    $field_token = '???-field';
     $field_type = '';
     $field_type2 = '';
     $field_music = $field_token;
@@ -703,7 +813,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     // vs GENESIS
     $button_order++;
     $group_token = 'genesis-battle';
-    $field_token = 'xxx-field';
+    $field_token = '???-field';
     $field_type = '';
     $field_type2 = '';
     $field_music = $field_token;
@@ -736,7 +846,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
     // vs ALIENS
     $button_order++;
     $group_token = 'alien-battle';
-    $field_token = 'xxx-field';
+    $field_token = '???-field';
     $field_type = '';
     $field_type2 = '';
     $field_music = $field_token;
@@ -812,6 +922,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -845,6 +956,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -878,6 +990,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -925,6 +1038,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -958,6 +1072,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
@@ -991,6 +1106,7 @@ foreach ($mmrpg_player_tokens AS $player_key => $player_token){
         'group' => $group_token,
         'field' => $field_token,
         'player' => $player_token,
+        'description_action' => 'in ',
         'field_type' => $field_type,
         'field_type2' => $field_type2,
         'field_music' => $field_music,
