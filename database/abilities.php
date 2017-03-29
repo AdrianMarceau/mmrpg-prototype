@@ -36,8 +36,7 @@ if (isset($mmrpg_database_abilities_filter)){
 // If we're specifically on the abilities page, collect records
 $temp_joins = '';
 $temp_ability_fields = '';
-if (MMRPG_CONFIG_DATABASE_USER_RECORDS
-    && $this_current_sub == 'abilities'){
+if ($this_current_sub == 'abilities'){
     $temp_ability_fields .= ",
         (CASE WHEN uabilities1.ability_unlocked IS NOT NULL THEN uabilities1.ability_unlocked ELSE 0 END) AS ability_record_users_unlocked,
         (CASE WHEN uabilities2.ability_equipped IS NOT NULL THEN uabilities2.ability_equipped ELSE 0 END) AS ability_record_robots_equipped

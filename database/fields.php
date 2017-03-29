@@ -24,7 +24,7 @@ if (isset($mmrpg_database_fields_filter)){
 // If we're specifically on the fields page, collect records
 $temp_joins = '';
 $temp_field_fields = '';
-if (MMRPG_CONFIG_DATABASE_USER_RECORDS && $this_current_sub == 'fields'){
+if ($this_current_sub == 'fields'){
     //$temp_field_fields .= "";
     //$temp_joins .= "";
 }

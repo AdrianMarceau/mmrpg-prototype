@@ -24,8 +24,7 @@ if (isset($mmrpg_database_players_filter)){
 // If we're specifically on the players page, collect records
 $temp_joins = '';
 $temp_player_fields = '';
-if (MMRPG_CONFIG_DATABASE_USER_RECORDS
-    && $this_current_sub == 'players'){
+if ($this_current_sub == 'players'){
     $temp_player_fields .= ",
         (CASE WHEN uplayers1.player_unlocked IS NOT NULL THEN uplayers1.player_unlocked ELSE 0 END) AS player_record_users_unlocked,
         (CASE WHEN uplayers2.player_robots IS NOT NULL THEN uplayers2.player_robots ELSE 0 END) AS player_record_robots_unlocked,

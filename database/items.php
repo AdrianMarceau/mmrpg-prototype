@@ -24,7 +24,7 @@ if (isset($mmrpg_database_items_filter)){
 // If we're specifically on the items page, collect records
 $temp_joins = '';
 $temp_item_fields = '';
-if (MMRPG_CONFIG_DATABASE_USER_RECORDS && $this_current_sub == 'items'){
+if ($this_current_sub == 'items'){
     $temp_item_fields .= ",
         (CASE WHEN uitems1.item_unlocked IS NOT NULL THEN uitems1.item_unlocked ELSE 0 END) AS item_record_users_unlocked,
         (CASE WHEN uitems2.item_equipped IS NOT NULL THEN uitems2.item_equipped ELSE 0 END) AS item_record_robots_equipped,

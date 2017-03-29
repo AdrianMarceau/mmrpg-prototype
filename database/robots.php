@@ -34,8 +34,7 @@ if (isset($mmrpg_database_robots_filter)){
 // If we're specifically on the robots page, collect records
 $temp_joins = '';
 $temp_robot_fields = '';
-if (MMRPG_CONFIG_DATABASE_USER_RECORDS
-    && $this_current_sub == 'robots'){
+if ($this_current_sub == 'robots'){
     $temp_condition2 = str_replace('robots.', 'irobots.', $temp_condition);
     $temp_joins .= "
         LEFT JOIN (SELECT
