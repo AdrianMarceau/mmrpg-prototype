@@ -8,11 +8,11 @@ $hidden_database_fields_count = !empty($hidden_database_fields) ? count($hidden_
 
 // Define the hidden field query condition
 $temp_condition = '';
-$temp_condition .= "AND field_class <> 'system' ";
+$temp_condition .= "AND fields.field_class <> 'system' ";
 if (!empty($hidden_database_fields)){
     $temp_tokens = array();
     foreach ($hidden_database_fields AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND field_token NOT IN ('.implode(',', $temp_tokens).') ';
+    $temp_condition .= 'AND fields.field_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
 // If additional database filters were provided
 $temp_condition_unfiltered = $temp_condition;
@@ -21,39 +21,69 @@ if (isset($mmrpg_database_fields_filter)){
     $temp_condition .= $mmrpg_database_fields_filter;
 }
 
-// Collect the database fields
-$field_fields = rpg_field::get_index_fields(true);
-$db->query("SET @field_row_number = 0;");
-$mmrpg_database_fields = $db->get_array_list("SELECT
+// If we're specifically on the fields page, collect records
+$temp_joins = '';
+$temp_field_fields = '';
+if (MMRPG_CONFIG_DATABASE_USER_RECORDS && $this_current_sub == 'fields'){
+    //$temp_field_fields .= "";
+    //$temp_joins .= "";
+}
+
+// Collect the relevant index fields
+$field_fields = rpg_field::get_index_fields(true, 'fields');
+
+// Define the query for the global fields index
+$temp_fields_index_query = "SELECT
     {$field_fields}
-    FROM mmrpg_index_fields
+    {$temp_field_fields}
+    FROM mmrpg_index_fields AS fields
+    {$temp_joins}
     WHERE
-    field_flag_published = 1
-    AND (field_flag_hidden = 0 OR field_token = '{$this_current_token}')
+    fields.field_flag_published = 1
+    AND (fields.field_flag_hidden = 0 OR fields.field_token = '{$this_current_token}')
     {$temp_condition}
     ORDER BY
-    field_flag_hidden ASC,
-    field_order ASC
-    ;", 'field_token');
-$mmrpg_database_fields_count = $db->get_value("SELECT
-    COUNT(field_id) AS field_count
-    FROM mmrpg_index_fields
+    fields.field_flag_hidden ASC,
+    fields.field_order ASC
+    ;";
+
+// Define the query for the global fields count
+$temp_fields_count_query = "SELECT
+    COUNT(fields.field_id) AS field_count
+    FROM mmrpg_index_fields AS fields
     WHERE
-    field_flag_published = 1
-    AND field_flag_hidden = 0
+    fields.field_flag_published = 1
+    AND fields.field_flag_hidden = 0
     {$temp_condition_unfiltered}
-    ;", 'field_count');
-$mmrpg_database_fields_numbers = $db->get_array_list("SELECT
-    field_token,
+    ;";
+
+// Define the query for the global field numbers
+$temp_fields_numbers_query = "SELECT
+    fields.field_token,
     (@field_row_number:=@field_row_number + 1) AS field_key
-    FROM mmrpg_index_fields
+    FROM mmrpg_index_fields AS fields
     WHERE
-    field_flag_published = 1
+    fields.field_flag_published = 1
     {$temp_condition_unfiltered}
     ORDER BY
-    field_flag_hidden ASC,
-    field_order ASC
-    ;", 'field_token');
+    fields.field_flag_hidden ASC,
+    fields.field_order ASC
+    ;";
+
+// Execute generated queries and collect return value
+$db->query("SET @field_row_number = 0;");
+$mmrpg_database_fields = $db->get_array_list($temp_fields_index_query, 'field_token');
+$mmrpg_database_fields_count = $db->get_value($temp_fields_count_query, 'field_count');
+$mmrpg_database_fields_numbers = $db->get_array_list($temp_fields_numbers_query, 'field_token');
+
+// DEBUG
+//echo('<pre>$temp_fields_index_query = '.print_r($temp_fields_index_query, true).'</pre>');
+//echo('<pre>$temp_fields_count_query = '.print_r($temp_fields_count_query, true).'</pre>');
+//echo('<pre>$temp_fields_numbers_query = '.print_r($temp_fields_numbers_query, true).'</pre>');
+//echo('<pre>$mmrpg_database_fields = '.print_r($mmrpg_database_fields, true).'</pre>');
+//echo('<pre>$mmrpg_database_fields_count = '.print_r($mmrpg_database_fields_count, true).'</pre>');
+//echo('<pre>$mmrpg_database_fields_numbers = '.print_r($mmrpg_database_fields_numbers, true).'</pre>');
+//exit();
 
 // Remove unallowed fields from the database
 foreach ($mmrpg_database_fields AS $temp_token => $temp_info){

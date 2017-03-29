@@ -109,7 +109,7 @@ if (!empty($this_current_token)){
             // Define the Open Graph variables for this page
             $this_graph_data['title'] .= ' | '.$mecha_info['robot_name'];
             $this_graph_data['description'] = $this_seo_description;
-            $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$mecha_info['robot_token'].'/mug_right_'.$this_robot_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$mecha_info['robot_token'].'/mug_right_'.$this_mecha_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
 
         }
 
@@ -220,8 +220,8 @@ if (empty($this_current_token)){
         if (isset($this_current_filter) && $this_current_filter == 'none' && $mecha_info['robot_core'] != ''){ $key_counter++; continue; }
         elseif (isset($this_current_filter) && $this_current_filter != 'none' && $mecha_info['robot_core'] != $this_current_filter && $mecha_info['robot_core2'] != $this_current_filter){ $key_counter++; continue; }
         // Collect information about this mecha
-        $this_robot_image = !empty($mecha_info['robot_image']) ? $mecha_info['robot_image'] : $mecha_info['robot_token'];
-        if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
+        $this_mecha_image = !empty($mecha_info['robot_image']) ? $mecha_info['robot_image'] : $mecha_info['robot_token'];
+        if ($this_mecha_image == 'robot'){ $this_seo_robots = 'noindex'; }
         // Collect the markup for this robot and print it to the browser
         $temp_mecha_markup = rpg_robot::print_database_markup($mecha_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
         echo $temp_mecha_markup;

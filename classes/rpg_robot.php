@@ -2516,62 +2516,6 @@ class rpg_robot extends rpg_object {
             }
         }
 
-        // Collect the database records for this robot
-        if ($print_options['show_records']){
-
-            global $db;
-            $temp_robot_records = $db->get_array("SELECT
-                robots.robot_token,
-                (CASE WHEN urobots1.robot_encountered IS NOT NULL THEN urobots1.robot_encountered ELSE 0 END) AS robot_encountered,
-                (CASE WHEN urobots2.robot_defeated IS NOT NULL THEN urobots2.robot_defeated ELSE 0 END) AS robot_defeated,
-                (CASE WHEN urobots3.robot_unlocked IS NOT NULL THEN urobots3.robot_unlocked ELSE 0 END) AS robot_unlocked,
-                (CASE WHEN urobots4.robot_summoned IS NOT NULL THEN urobots4.robot_summoned ELSE 0 END) AS robot_summoned,
-                (CASE WHEN urobots5.robot_scanned IS NOT NULL THEN urobots5.robot_scanned ELSE 0 END) AS robot_scanned
-                FROM mmrpg_index_robots AS robots
-                LEFT JOIN (SELECT
-                    urobots.robot_token,
-                    SUM(robot_encountered) AS robot_encountered
-                    FROM mmrpg_users_robots_database AS urobots
-                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
-                    GROUP BY urobots.robot_token
-                    ) AS urobots1 ON urobots1.robot_token = robots.robot_token
-                LEFT JOIN (SELECT
-                    urobots.robot_token,
-                    SUM(robot_defeated) AS robot_defeated
-                    FROM mmrpg_users_robots_database AS urobots
-                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
-                    GROUP BY urobots.robot_token
-                    ) AS urobots2 ON urobots2.robot_token = robots.robot_token
-                LEFT JOIN (SELECT
-                    urobots.robot_token,
-                    SUM(robot_unlocked) AS robot_unlocked
-                    FROM mmrpg_users_robots_database AS urobots
-                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
-                    GROUP BY urobots.robot_token
-                    ) AS urobots3 ON urobots3.robot_token = robots.robot_token
-                LEFT JOIN (SELECT
-                    urobots.robot_token,
-                    SUM(robot_summoned) AS robot_summoned
-                    FROM mmrpg_users_robots_database AS urobots
-                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
-                    GROUP BY urobots.robot_token
-                    ) AS urobots4 ON urobots4.robot_token = robots.robot_token
-                LEFT JOIN (SELECT
-                    urobots.robot_token,
-                    SUM(robot_scanned) AS robot_scanned
-                    FROM mmrpg_users_robots_database AS urobots
-                    WHERE urobots.robot_token = '{$robot_info['robot_token']}'
-                    GROUP BY urobots.robot_token
-                    ) AS urobots5 ON urobots5.robot_token = robots.robot_token
-                WHERE
-                robots.robot_token = '{$robot_info['robot_token']}'
-                ;");
-
-            //echo '<pre>$temp_robot_records = '.print_r($temp_robot_records, true).'</pre>';
-            //exit();
-
-        }
-
         // Define the common stat container variables
         $stat_container_percent = 74;
         $stat_base_max_value = 2000;
@@ -3376,32 +3320,32 @@ class rpg_robot extends rpg_object {
                                     <tr>
                                         <td class="right">
                                             <label>Unlocked By : </label>
-                                            <span class="robot_record"><?= $temp_robot_records['robot_unlocked'] == 1 ? '1 User' : number_format($temp_robot_records['robot_unlocked'], 0, '.', ',').' Users' ?></span>
+                                            <span class="robot_record"><?= $robot_info['robot_record_user_unlocked'] == 1 ? '1 User' : number_format($robot_info['robot_record_user_unlocked'], 0, '.', ',').' Users' ?></span>
                                         </td>
                                     </tr>
                                 <? endif; ?>
                                 <tr>
                                     <td class="right">
                                         <label>Encountered : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_encountered'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_encountered'], 0, '.', ',').' Times' ?></span>
+                                        <span class="robot_record"><?= $robot_info['robot_record_user_encountered'] == 1 ? '1 Time' : number_format($robot_info['robot_record_user_encountered'], 0, '.', ',').' Times' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
                                         <label>Summoned : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_summoned'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_summoned'], 0, '.', ',').' Times' ?></span>
+                                        <span class="robot_record"><?= $robot_info['robot_record_user_summoned'] == 1 ? '1 Time' : number_format($robot_info['robot_record_user_summoned'], 0, '.', ',').' Times' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
                                         <label>Defeated : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_defeated'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_defeated'], 0, '.', ',').' Times' ?></span>
+                                        <span class="robot_record"><?= $robot_info['robot_record_user_defeated'] == 1 ? '1 Time' : number_format($robot_info['robot_record_user_defeated'], 0, '.', ',').' Times' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
                                         <label>Scanned : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_scanned'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_scanned'], 0, '.', ',').' Times' ?></span>
+                                        <span class="robot_record"><?= $robot_info['robot_record_user_scanned'] == 1 ? '1 Time' : number_format($robot_info['robot_record_user_scanned'], 0, '.', ',').' Times' ?></span>
                                     </td>
                                 </tr>
                             </tbody>

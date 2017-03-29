@@ -14,17 +14,17 @@ $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($h
 
 // Define the hidden ability query condition
 $temp_condition = '';
-$temp_condition .= "AND ability_class <> 'system' ";
+$temp_condition .= "AND abilities.ability_class <> 'system' ";
 if (!defined('DATA_DATABASE_SHOW_MECHAS')){
-    $temp_condition .= "AND ability_class <> 'mecha' ";
+    $temp_condition .= "AND abilities.ability_class <> 'mecha' ";
 }
 if (!defined('DATA_DATABASE_SHOW_BOSSES')){
-    $temp_condition .= "AND ability_class <> 'boss' ";
+    $temp_condition .= "AND abilities.ability_class <> 'boss' ";
 }
 if (!empty($hidden_database_abilities)){
     $temp_tokens = array();
     foreach ($hidden_database_abilities AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND ability_token NOT IN ('.implode(',', $temp_tokens).') ';
+    $temp_condition .= 'AND abilities.ability_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
 // If additional database filters were provided
 $temp_condition_unfiltered = $temp_condition;
@@ -33,39 +33,87 @@ if (isset($mmrpg_database_abilities_filter)){
     $temp_condition .= $mmrpg_database_abilities_filter;
 }
 
-// Collect the database abilities
-$ability_fields = rpg_ability::get_index_fields(true);
-$db->query("SET @ability_row_number = 0;");
-$mmrpg_database_abilities = $db->get_array_list("SELECT
+// If we're specifically on the abilities page, collect records
+$temp_joins = '';
+$temp_ability_fields = '';
+if (MMRPG_CONFIG_DATABASE_USER_RECORDS
+    && $this_current_sub == 'abilities'){
+    $temp_ability_fields .= ",
+        (CASE WHEN uabilities1.ability_unlocked IS NOT NULL THEN uabilities1.ability_unlocked ELSE 0 END) AS ability_record_users_unlocked,
+        (CASE WHEN uabilities2.ability_equipped IS NOT NULL THEN uabilities2.ability_equipped ELSE 0 END) AS ability_record_robots_equipped
+        ";
+    $temp_joins .= "
+        LEFT JOIN (SELECT
+            uabilities.ability_token,
+            COUNT(*) AS ability_unlocked
+            FROM mmrpg_users_abilities AS uabilities
+            GROUP BY uabilities.ability_token
+            ) AS uabilities1 ON uabilities1.ability_token = abilities.ability_token
+        LEFT JOIN (SELECT
+            uabilities.ability_token,
+            COUNT(*) AS ability_equipped
+            FROM mmrpg_users_robots_abilities_current AS uabilities
+            GROUP BY uabilities.ability_token
+            ) AS uabilities2 ON uabilities2.ability_token = abilities.ability_token
+            ";
+}
+
+// Collect the relevant index fields
+$ability_fields = rpg_ability::get_index_fields(true, 'abilities');
+
+// Define the query for the global abilities index
+$temp_abilities_index_query = "SELECT
     {$ability_fields}
-    FROM mmrpg_index_abilities
+    {$temp_ability_fields}
+    FROM mmrpg_index_abilities AS abilities
+    {$temp_joins}
     WHERE
-    ability_flag_published = 1
-    AND (ability_flag_hidden = 0 OR ability_token = '{$this_current_token}')
+    abilities.ability_flag_published = 1
+    AND (abilities.ability_flag_hidden = 0 OR abilities.ability_token = '{$this_current_token}')
     {$temp_condition}
     ORDER BY
-    ability_order ASC
-    ;", 'ability_token');
-$mmrpg_database_abilities_count = $db->get_value("SELECT
-    COUNT(ability_id) AS ability_count
+    abilities.ability_order ASC
+    ;";
+
+// Define the query for the global abilities count
+$temp_abilities_count_query = "SELECT
+    COUNT(abilities.ability_id) AS ability_count
     FROM
-    mmrpg_index_abilities
+    mmrpg_index_abilities AS abilities
     WHERE
-    ability_flag_published = 1
-    AND ability_flag_hidden = 0
+    abilities.ability_flag_published = 1
+    AND abilities.ability_flag_hidden = 0
     {$temp_condition_unfiltered}
-    ;", 'ability_count');
-$mmrpg_database_abilities_numbers = $db->get_array_list("SELECT
-    ability_token,
+    ;";
+
+// Define the query for the global ability numbers
+$temp_abilities_numbers_query = "SELECT
+    abilities.ability_token,
     (@ability_row_number:=@ability_row_number + 1) AS ability_key
-    FROM mmrpg_index_abilities
+    FROM mmrpg_index_abilities AS abilities
     WHERE
-    ability_flag_published = 1
+    abilities.ability_flag_published = 1
     {$temp_condition_unfiltered}
     ORDER BY
-    ability_flag_hidden ASC,
-    ability_order ASC
-    ;", 'ability_token');
+    abilities.ability_flag_hidden ASC,
+    abilities.ability_order ASC
+    ;";
+
+
+// Execute generated queries and collect return value
+$db->query("SET @ability_row_number = 0;");
+$mmrpg_database_abilities = $db->get_array_list($temp_abilities_index_query, 'ability_token');
+$mmrpg_database_abilities_count = $db->get_value($temp_abilities_count_query, 'ability_count');
+$mmrpg_database_abilities_numbers = $db->get_array_list($temp_abilities_numbers_query, 'ability_token');
+
+// DEBUG
+//echo('<pre>$temp_abilities_index_query = '.print_r($temp_abilities_index_query, true).'</pre>');
+//echo('<pre>$temp_abilities_count_query = '.print_r($temp_abilities_count_query, true).'</pre>');
+//echo('<pre>$temp_abilities_numbers_query = '.print_r($temp_abilities_numbers_query, true).'</pre>');
+//echo('<pre>$mmrpg_database_abilities = '.print_r($mmrpg_database_abilities, true).'</pre>');
+//echo('<pre>$mmrpg_database_abilities_count = '.print_r($mmrpg_database_abilities_count, true).'</pre>');
+//echo('<pre>$mmrpg_database_abilities_numbers = '.print_r($mmrpg_database_abilities_numbers, true).'</pre>');
+//exit();
 
 // Remove unallowed abilities from the database, and increment counters
 foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){

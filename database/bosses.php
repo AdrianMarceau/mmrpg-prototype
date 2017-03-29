@@ -16,14 +16,13 @@ foreach ($mmrpg_database_types AS $token => $info){
 $hidden_database_bosses = array();
 $hidden_database_bosses_count = !empty($hidden_database_bosses) ? count($hidden_database_bosses) : 0;
 
-
 // Define the hidden boss query condition
 $temp_condition = '';
-$temp_condition .= "AND robot_class = 'boss' ";
+$temp_condition .= "AND robots.robot_class = 'boss' ";
 if (!empty($hidden_database_bosses)){
     $temp_tokens = array();
     foreach ($hidden_database_bosses AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND robot_token NOT IN ('.implode(',', $temp_tokens).') ';
+    $temp_condition .= 'AND robots.robot_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
 // If additional database filters were provided
 $temp_condition_unfiltered = $temp_condition;
@@ -32,45 +31,102 @@ if (isset($mmrpg_database_bosses_filter)){
     $temp_condition .= $mmrpg_database_bosses_filter;
 }
 
+// If we're specifically on the bosses page, collect records
+$temp_joins = '';
+$temp_robot_fields = '';
+if (MMRPG_CONFIG_DATABASE_USER_RECORDS
+    && $this_current_sub == 'bosses'){
+    $temp_condition2 = str_replace('robots.', 'irobots.', $temp_condition);
+    $temp_joins .= "
+        LEFT JOIN (SELECT
+            urobots.robot_token,
+            SUM(robot_encountered) AS robot_encountered,
+            SUM(robot_defeated) AS robot_defeated,
+            SUM(robot_unlocked) AS robot_unlocked,
+            SUM(robot_summoned) AS robot_summoned,
+            SUM(robot_scanned) AS robot_scanned
+            FROM mmrpg_users_robots_database AS urobots
+            LEFT JOIN mmrpg_index_robots AS irobots ON irobots.robot_token = urobots.robot_token
+            WHERE 1 = 1 {$temp_condition2}
+            GROUP BY urobots.robot_token
+            ) AS urobots ON urobots.robot_token = robots.robot_token
+            ";
+    $temp_robot_fields .= ",
+        (CASE WHEN urobots.robot_encountered IS NOT NULL THEN urobots.robot_encountered ELSE 0 END) AS robot_record_user_encountered,
+        (CASE WHEN urobots.robot_defeated IS NOT NULL THEN urobots.robot_defeated ELSE 0 END) AS robot_record_user_defeated,
+        (CASE WHEN urobots.robot_unlocked IS NOT NULL THEN urobots.robot_unlocked ELSE 0 END) AS robot_record_user_unlocked,
+        (CASE WHEN urobots.robot_summoned IS NOT NULL THEN urobots.robot_summoned ELSE 0 END) AS robot_record_user_summoned,
+        (CASE WHEN urobots.robot_scanned IS NOT NULL THEN urobots.robot_scanned ELSE 0 END) AS robot_record_user_scanned
+        ";
+}
 
-// Collect the database bosses and fields
-$field_fields = rpg_field::get_index_fields(true);
-$robot_fields = rpg_robot::get_index_fields(true);
-$db->query("SET @robot_row_number = 0;");
-$mmrpg_database_fields = $db->get_array_list("SELECT
+// Collect the relevant index fields
+$field_fields = rpg_field::get_index_fields(true, 'fields');
+$robot_fields = rpg_robot::get_index_fields(true, 'robots');
+
+// Define the query for the dependant fields index
+$temp_fields_index_query = "SELECT
     {$field_fields}
-    FROM mmrpg_index_fields
+    FROM mmrpg_index_fields AS fields
     WHERE
-    field_flag_published = 1
-    ;", 'field_token');
-$mmrpg_database_bosses = $db->get_array_list("SELECT {$robot_fields}
-    FROM mmrpg_index_robots
+    fields.field_flag_published = 1
+    ;";
+
+// Define the query for the global bosses index
+$temp_bosses_index_query = "SELECT
+    {$robot_fields}
+    {$temp_robot_fields}
+    FROM mmrpg_index_robots AS robots
+    {$temp_joins}
     WHERE
-    robot_flag_published = 1
-    AND (robot_flag_hidden = 0 OR robot_token = '{$this_current_token}')
+    robots.robot_flag_published = 1
+    AND (robots.robot_flag_hidden = 0 OR robots.robot_token = '{$this_current_token}')
     {$temp_condition}
     ORDER BY
-    robot_order ASC
-    ;", 'robot_token');
-$mmrpg_database_bosses_count = $db->get_value("SELECT
-    COUNT(robot_id) AS robot_count
-    FROM mmrpg_index_robots
+    robots.robot_flag_hidden ASC,
+    robots.robot_order ASC
+    ;";
+
+// Define the query for the global bosses count
+$temp_bosses_count_query = "SELECT
+    COUNT(robots.robot_id) AS robot_count
+    FROM mmrpg_index_robots AS robots
     WHERE
-    robot_flag_published = 1
-    AND robot_flag_hidden = 0
+    robots.robot_flag_published = 1
+    AND robots.robot_flag_hidden = 0
     {$temp_condition_unfiltered}
-    ;", 'robot_count');
-$mmrpg_database_bosses_numbers = $db->get_array_list("SELECT
-    robot_token,
+    ;";
+
+// Define the query for the global boss numbers
+$temp_bosses_numbers_query = "SELECT
+    robots.robot_token,
     (@robot_row_number:=@robot_row_number + 1) AS robot_key
-    FROM mmrpg_index_robots
+    FROM mmrpg_index_robots AS robots
     WHERE
-    robot_flag_published = 1
+    robots.robot_flag_published = 1
     {$temp_condition_unfiltered}
     ORDER BY
-    robot_flag_hidden ASC,
-    robot_order ASC
-    ;", 'robot_token');
+    robots.robot_flag_hidden ASC,
+    robots.robot_order ASC
+    ;";
+
+// Execute generated queries and collect return value
+$db->query("SET @robot_row_number = 0;");
+$mmrpg_database_fields = $db->get_array_list($temp_fields_index_query, 'field_token');
+$mmrpg_database_bosses = $db->get_array_list($temp_bosses_index_query, 'robot_token');
+$mmrpg_database_bosses_count = $db->get_value($temp_bosses_count_query, 'robot_count');
+$mmrpg_database_bosses_numbers = $db->get_array_list($temp_bosses_numbers_query, 'robot_token');
+
+// DEBUG
+//echo('<pre>$temp_fields_index_query = '.print_r($temp_fields_index_query, true).'</pre>');
+//echo('<pre>$temp_bosses_index_query = '.print_r($temp_bosses_index_query, true).'</pre>');
+//echo('<pre>$temp_bosses_count_query = '.print_r($temp_bosses_count_query, true).'</pre>');
+//echo('<pre>$temp_bosses_numbers_query = '.print_r($temp_bosses_numbers_query, true).'</pre>');
+//echo('<pre>$mmrpg_database_fields = '.print_r($mmrpg_database_fields, true).'</pre>');
+//echo('<pre>$mmrpg_database_bosses = '.print_r($mmrpg_database_bosses, true).'</pre>');
+//echo('<pre>$mmrpg_database_bosses_count = '.print_r($mmrpg_database_bosses_count, true).'</pre>');
+//echo('<pre>$mmrpg_database_bosses_numbers = '.print_r($mmrpg_database_bosses_numbers, true).'</pre>');
+//exit();
 
 // Remove unallowed bosses from the database, and increment type counters
 foreach ($mmrpg_database_bosses AS $temp_token => $temp_info){

@@ -1768,20 +1768,20 @@ class rpg_item extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label>Unlocked By : </label>
-                                        <span class="item_record"><?= $temp_item_records['item_unlocked'] == 1 ? '1 User' : number_format($temp_item_records['item_unlocked'], 0, '.', ',').' Users' ?></span>
+                                        <label>Found By : </label>
+                                        <span class="item_record"><?= $item_info['item_record_users_unlocked'] == 1 ? '1 User' : number_format($item_info['item_record_users_unlocked'], 0, '.', ',').' Users' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Equipped By : </label>
-                                        <span class="item_record"><?= $temp_item_records['item_equipped'] == 1 ? '1 Robot' : number_format($temp_item_records['item_equipped'], 0, '.', ',').' Robots' ?></span>
+                                        <label>Equipped To : </label>
+                                        <span class="item_record"><?= $item_info['item_record_robots_equipped'] == 1 ? '1 Robot' : number_format($item_info['item_record_robots_equipped'], 0, '.', ',').' Robots' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Current Total : </label>
-                                        <span class="item_record"><?= $temp_item_records['item_total'] == 1 ? '1 Unit' : number_format($temp_item_records['item_total'], 0, '.', ',').' Units' ?></span>
+                                        <label>Community Total : </label>
+                                        <span class="item_record"><?= $item_info['item_record_current_total'] == 1 ? '1 Unit' : number_format($item_info['item_record_current_total'], 0, '.', ',').' Units' ?></span>
                                     </td>
                                 </tr>
                             </tbody>

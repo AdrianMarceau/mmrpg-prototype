@@ -1428,38 +1428,6 @@ class rpg_ability extends rpg_object {
         if (!empty($ability_info['ability_recovery_percent']) && $ability_info['ability_recovery'] > 100){ $ability_info['ability_recovery'] = 100; }
         if (!empty($ability_info['ability_recovery2_percent']) && $ability_info['ability_recovery2'] > 100){ $ability_info['ability_recovery2'] = 100; }
 
-        // Collect the database records for this ability
-        if ($print_options['show_records']){
-
-            global $db;
-            $temp_ability_records = $db->get_array("SELECT
-                abilities.ability_token,
-                (CASE WHEN uabilities1.ability_unlocked IS NOT NULL THEN uabilities1.ability_unlocked ELSE 0 END) AS ability_unlocked,
-                (CASE WHEN uabilities2.ability_equipped IS NOT NULL THEN uabilities2.ability_equipped ELSE 0 END) AS ability_equipped
-                FROM mmrpg_index_abilities AS abilities
-                LEFT JOIN (SELECT
-                    uabilities.ability_token,
-                    COUNT(*) AS ability_unlocked
-                    FROM mmrpg_users_abilities AS uabilities
-                    WHERE uabilities.ability_token = '{$ability_info['ability_token']}'
-                    GROUP BY uabilities.ability_token
-                    ) AS uabilities1 ON uabilities1.ability_token = abilities.ability_token
-                LEFT JOIN (SELECT
-                    uabilities.ability_token,
-                    COUNT(*) AS ability_equipped
-                    FROM mmrpg_users_robots_abilities_current AS uabilities
-                    WHERE uabilities.ability_token = '{$ability_info['ability_token']}'
-                    GROUP BY uabilities.ability_token
-                    ) AS uabilities2 ON uabilities2.ability_token = abilities.ability_token
-                WHERE
-                abilities.ability_token = '{$ability_info['ability_token']}'
-                ;");
-
-            //echo '<pre>$temp_ability_records = '.print_r($temp_ability_records, true).'</pre>';
-            //exit();
-
-        }
-
         // Start the output buffer
         ob_start();
         ?>
@@ -2023,13 +1991,13 @@ class rpg_ability extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <label>Unlocked By : </label>
-                                        <span class="ability_record"><?= $temp_ability_records['ability_unlocked'] == 1 ? '1 User' : number_format($temp_ability_records['ability_unlocked'], 0, '.', ',').' Users' ?></span>
+                                        <span class="ability_record"><?= $ability_info['ability_record_users_unlocked'] == 1 ? '1 User' : number_format($ability_info['ability_record_users_unlocked'], 0, '.', ',').' Users' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Equipped By : </label>
-                                        <span class="ability_record"><?= $temp_ability_records['ability_equipped'] == 1 ? '1 Robot' : number_format($temp_ability_records['ability_equipped'], 0, '.', ',').' Robots' ?></span>
+                                        <label>Equipped To : </label>
+                                        <span class="ability_record"><?= $ability_info['ability_record_robots_equipped'] == 1 ? '1 Robot' : number_format($ability_info['ability_record_robots_equipped'], 0, '.', ',').' Robots' ?></span>
                                     </td>
                                 </tr>
                             </tbody>

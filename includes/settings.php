@@ -29,6 +29,9 @@ define('MMRPG_CONFIG_ABILITIES_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.abili
 define('MMRPG_CONFIG_FIELDS_INDEX_PATH', MMRPG_CONFIG_ROOTDIR.'data/fields/');
 define('MMRPG_CONFIG_FIELDS_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.fields.'.MMRPG_CONFIG_CACHE_DATE.'.php');
 
+// Define the flags and values for the front-end database pages
+define('MMRPG_CONFIG_DATABASE_USER_RECORDS', true);
+
 // Define the global timeout variables for online and new status
 define('MMRPG_SETTINGS_ONLINE_TIMEOUT', (60 * 30)); // In seconds (60sec x 30min = 1/2 Hour)
 define('MMRPG_SETTINGS_ACTIVE_TIMEOUT', (60 * 60 * 24 * 90)); // In seconds (60sec x 60min x 24hr x 90days)

@@ -12,7 +12,7 @@ $temp_condition = '';
 if (!empty($hidden_database_robots)){
     $temp_tokens = array();
     foreach ($hidden_database_robots AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND player_token NOT IN ('.implode(',', $temp_tokens).') ';
+    $temp_condition .= 'AND players.player_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
 // If additional database filters were provided
 $temp_condition_unfiltered = $temp_condition;
@@ -21,39 +21,93 @@ if (isset($mmrpg_database_players_filter)){
     $temp_condition .= $mmrpg_database_players_filter;
 }
 
-// Collect the database players and fields
-$player_fields = rpg_player::get_index_fields(true);
-$db->query("SET @player_row_number = 0;");
-$mmrpg_database_players = $db->get_array_list("SELECT
+// If we're specifically on the players page, collect records
+$temp_joins = '';
+$temp_player_fields = '';
+if (MMRPG_CONFIG_DATABASE_USER_RECORDS
+    && $this_current_sub == 'players'){
+    $temp_player_fields .= ",
+        (CASE WHEN uplayers1.player_unlocked IS NOT NULL THEN uplayers1.player_unlocked ELSE 0 END) AS player_record_users_unlocked,
+        (CASE WHEN uplayers2.player_robots IS NOT NULL THEN uplayers2.player_robots ELSE 0 END) AS player_record_robots_unlocked,
+        (CASE WHEN uplayers3.player_abilities IS NOT NULL THEN uplayers3.player_abilities ELSE 0 END) AS player_record_abilities_unlocked
+        ";
+    $temp_joins .= "
+        LEFT JOIN (SELECT
+            uplayers.player_token,
+            COUNT(*) AS player_unlocked
+            FROM mmrpg_users_players AS uplayers
+            GROUP BY uplayers.player_token
+            ) AS uplayers1 ON uplayers1.player_token = players.player_token
+        LEFT JOIN (SELECT
+            urobots.robot_player_original AS player_token,
+            COUNT(*) AS player_robots
+            FROM mmrpg_users_robots AS urobots
+            GROUP BY urobots.robot_player_original
+            ) AS uplayers2 ON uplayers2.player_token = players.player_token
+        LEFT JOIN (SELECT
+            uabilities.player_token,
+            COUNT(*) AS player_abilities
+            FROM mmrpg_users_players_abilities AS uabilities
+            GROUP BY uabilities.player_token
+            ) AS uplayers3 ON uplayers3.player_token = players.player_token
+            ";
+}
+
+// Collect the relevant index fields
+$player_fields = rpg_player::get_index_fields(true, 'players');
+
+// Define the query for the global players index
+$temp_players_index_query = "SELECT
     {$player_fields}
-    FROM mmrpg_index_players
+    {$temp_player_fields}
+    FROM mmrpg_index_players AS players
+    {$temp_joins}
     WHERE
-    player_flag_published = 1
-    AND (player_flag_hidden = 0 OR player_token = '{$this_current_token}')
+    players.player_flag_published = 1
+    AND (players.player_flag_hidden = 0 OR players.player_token = '{$this_current_token}')
     {$temp_condition}
     ORDER BY
-    player_flag_hidden ASC,
-    player_order ASC
-    ;", 'player_token');
-$mmrpg_database_players_count = $db->get_value("SELECT
-    COUNT(player_id) AS player_count
-    FROM mmrpg_index_players
+    players.player_flag_hidden ASC,
+    players.player_order ASC
+    ;";
+
+// Define the query for the global players count
+$temp_players_count_query = "SELECT
+    COUNT(players.player_id) AS player_count
+    FROM mmrpg_index_players AS players
     WHERE
-    player_flag_published = 1
-    AND player_flag_hidden = 0
+    players.player_flag_published = 1
+    AND players.player_flag_hidden = 0
     {$temp_condition_unfiltered}
-    ;", 'player_count');
-$mmrpg_database_players_numbers = $db->get_array_list("SELECT
-    player_token,
+    ;";
+
+// Define the query for the global player numbers
+$temp_players_numbers_query = "SELECT
+    players.player_token,
     (@player_row_number:=@player_row_number + 1) AS player_key
-    FROM mmrpg_index_players
+    FROM mmrpg_index_players AS players
     WHERE
-    player_flag_published = 1
+    players.player_flag_published = 1
     {$temp_condition_unfiltered}
     ORDER BY
-    player_flag_hidden ASC,
-    player_order ASC
-    ;", 'player_token');
+    players.player_flag_hidden ASC,
+    players.player_order ASC
+    ;";
+
+// Execute generated queries and collect return value
+$db->query("SET @player_row_number = 0;");
+$mmrpg_database_players = $db->get_array_list($temp_players_index_query, 'player_token');
+$mmrpg_database_players_count = $db->get_value($temp_players_count_query, 'player_count');
+$mmrpg_database_players_numbers = $db->get_array_list($temp_players_numbers_query, 'player_token');
+
+// DEBUG
+//echo('<pre>$temp_players_index_query = '.print_r($temp_players_index_query, true).'</pre>');
+//echo('<pre>$temp_players_count_query = '.print_r($temp_players_count_query, true).'</pre>');
+//echo('<pre>$temp_players_numbers_query = '.print_r($temp_players_numbers_query, true).'</pre>');
+//echo('<pre>$mmrpg_database_players = '.print_r($mmrpg_database_players, true).'</pre>');
+//echo('<pre>$mmrpg_database_players_count = '.print_r($mmrpg_database_players_count, true).'</pre>');
+//echo('<pre>$mmrpg_database_players_numbers = '.print_r($mmrpg_database_players_numbers, true).'</pre>');
+//exit();
 
 // Remove unallowed players from the database
 foreach ($mmrpg_database_players AS $temp_token => $temp_info){
