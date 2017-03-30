@@ -94,6 +94,10 @@ $this_current_token = $_GET['token'] = !empty($_GET['token']) ? $_GET['token'] :
 $this_current_uri = !empty($this_current_page) && $this_current_page != 'home' ? $this_current_page.'/' : '';
 $this_current_uri .= !empty($this_current_sub) && $this_current_sub != 'home' ? $this_current_sub.'/' : '';
 
+// Append the current sort and/or order variables if set and on the leaderboard page
+if ($this_current_page == 'leaderboard' && !empty($_GET['sort'])){ $this_current_uri .= $_GET['sort'].'/'; }
+if ($this_current_page == 'leaderboard' && !empty($_GET['order'])){ $this_current_uri .= $_GET['order'].'/'; }
+
 // Append the current num to the URI as long as we're not on a community page (it's added later)
 if ($this_current_page != 'community'){
     $this_current_uri .= !empty($this_current_num) && $this_current_num > 1 ? $this_current_num.'/' : '';

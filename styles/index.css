@@ -1921,6 +1921,16 @@ button {
     height: auto;
     overflow: hidden;
 }
+
+#window .page .body .text.form.leaderboard_options .field {
+    text-align: right;
+}
+#window .page .body .text.form.leaderboard_options .field select[name="board_rank_kind"] {
+    width: 200px;
+    display: inline-block;
+    margin-left: 9px;
+}
+
 #window .page .leaderboard .wrapper {
     display: block;
     height: auto;
@@ -2163,6 +2173,7 @@ button {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: normal;
 }
 #window .page .leaderboard .file .userinfo .details {
     margin-top: 0;
@@ -2239,8 +2250,9 @@ button {
     right: 10px;
     font-size: 9px;
     line-height: 9px;
-    width: 400px;
-    text-transform: uppercase;
+    width: auto;
+    text-transform: none;
+    letter-spacing: 1px;
     color: #DEDEDE;
 }
 #window .page .leaderboard .file .points .padding {
@@ -4963,6 +4975,9 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
     font-size: 13px;
     line-height: 13px;
 }
+#window .page_leaderboard .form .field .text,
+#window .page_leaderboard .form .field .textarea,
+#window .page_leaderboard .form .field .select,
 #window .page_community .form .field .text,
 #window .page_community .form .field .textarea,
 #window .page_community .form .field .select,

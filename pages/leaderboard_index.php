@@ -24,6 +24,13 @@ $_GET['limit'] = $this_display_limit_default + ($this_num_offset * $this_display
 // Require the leaderboard data file
 require_once(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
 
+// If the sort by is not points, adjust document titles
+if ($leaderboard_sort_by != 'points'){
+    $title = $allowed_sort_types[$leaderboard_sort_by];
+    $this_seo_title = ucfirst($leaderboard_sort_by).' '.$this_seo_title;
+    $this_graph_data['title'] = $title.' Leaderboard';
+}
+
 //die('<pre>'.print_r($this_leaderboard_online_players, true).'</pre>');
 
 // Define the MARKUP variables for this page
@@ -36,7 +43,25 @@ ob_start();
 <h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Leaderboard Players Index</h2>
 <div class="subbody" style="margin-bottom: 6px;">
 
-        <p class="text">The <strong>Mega Man RPG Prototype</strong> currently has <?= !empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 player' : $this_leaderboard_count.' players') : 0 ?> and that number is growing all the time.  Throughout the course of the game, players collect Battle Points on completion of missions and those points build up to unlock new abilities and other new content.  Not all players are created equal, however, and some clearly stand above the rest in terms of their commitment to the game and their skill at exploiting the battle system's mechanics.  In the spirit of competition, all players have been ranked by their total Battle Point scores and listed from highest to lowest.  Use the numbered links at the top and bottom of the page to navigate and <a href="contact/">contact me</a> if you have any questions or concerns.</p>
+        <p class="text">
+            The <strong>Mega Man RPG Prototype</strong> currently has <?= !empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 player' : $this_leaderboard_count.' players') : 0 ?>
+            and that number is growing all the time.  Throughout the course of the game, players collect Battle Points on completion of missions and those points build up to unlock new abilities
+            and other new content.  Not all players are created equal, however, and some clearly stand above the rest in terms of their commitment to the game and their skill at exploiting the
+            battle system's mechanics.  In the spirit of competition, all players have been ranked by their total Battle Point scores and listed from highest to lowest.  Use the numbered links
+            at the top and bottom of the page to navigate and <a href="contact/">contact me</a> if you have any questions or concerns.
+        </p>
+
+        <div class="text form leaderboard_options">
+            <div class="field">
+                <strong class="label">Ranked by</strong>
+                <select class="select" name="board_rank_kind" onchange="location = this.value;">
+                    <? foreach ($allowed_sort_types AS $type => $title){ ?>
+                        <option value="leaderboard/<?= $type != 'points' ? $type.'/' : '' ?>" <?= $leaderboard_sort_by == $type ? 'selected="selected"' : '' ?>><?= $title ?></a>
+                    <? } ?>
+                </select>
+            </div>
+        </div>
+
         <? if(!empty($this_leaderboard_online_players)):?>
                 <p class="event text" style="min-height: 1px; text-align: right; font-size: 10px; line-height: 13px; margin-top: 30px; padding-bottom: 5px;">
                         <span><strong style="display: block; text-decoration: underline; margin-bottom: 6px;">Online Players</strong></span>
@@ -106,7 +131,10 @@ ob_start();
                         if ($new_display_limit < $this_display_limit_default){ $new_display_limit = 0; }
                         if ($new_start_key < 0){ $new_start_key = 0; }
                         $previous_page_num = $this_current_num - 1;
-                        echo '<a class="link prev" href="leaderboard/'.$previous_page_num.'/" >&laquo; Prev</a>';
+                        $previous_href = 'leaderboard/';
+                        if ($leaderboard_sort_by != 'points'){ $previous_href .= $leaderboard_sort_by.'/'; }
+                        $previous_href .= $previous_page_num.'/';
+                        echo '<a class="link prev" href="'.$previous_href.'" >&laquo; Prev</a>';
                     }
 
                     // If not displaying all players, create a link to show more
@@ -114,11 +142,16 @@ ob_start();
                         $new_display_limit = $this_display_limit + $this_display_limit_default;
                         if ($new_display_limit > $this_leaderboard_count){ $new_display_limit = $this_leaderboard_count; }
                         $next_page_num = $this_current_num + 1;
-                        echo '<a class="link next" href="leaderboard/'.$next_page_num.'/" >Next &raquo;</a>';
+                        $next_href = 'leaderboard/';
+                        if ($leaderboard_sort_by != 'points'){ $next_href .= $leaderboard_sort_by.'/'; }
+                        $next_href .= $next_page_num.'/';
+                        echo '<a class="link next" href="'.$next_href.'" >Next &raquo;</a>';
                     }
                     // If we're already on the last page, display a link to go to the first
                     elseif ($this_display_limit >= $this_leaderboard_count){
-                        echo '<a class="link next" href="leaderboard/">First &raquo;</a>';
+                        $first_href = 'leaderboard/';
+                        if ($leaderboard_sort_by != 'points'){ $first_href .= $leaderboard_sort_by.'/'; }
+                        echo '<a class="link next" href="'.$first_href.'">First &raquo;</a>';
                     }
 
                     // Create links for all the page numbers one by one
@@ -133,8 +166,14 @@ ob_start();
                             $show_num_text = $show_page_num ? $this_page_num : '.';
                             $show_num_type = $show_page_num ? 'number' : 'bullet';
                             $show_online = in_array($this_page_num, $this_leaderboard_online_pages) ? true : false;
-                            if ($this_current_num == $this_page_num){ echo '<a class="link '.$show_num_type.' active '.($show_online ? 'field_type field_type_nature' : '').'"><span>'.$this_page_num.'</span></a>'; }
-                            else { echo '<a class="link '.$show_num_type.' '.($show_online ? 'field_type field_type_nature' : '').'" href="leaderboard/'.($this_page_num > 1 ? $this_page_num.'/' : '').'" ><span>'.$this_page_num.'</span></a>'; }
+                            if ($this_current_num == $this_page_num){
+                                echo '<a class="link '.$show_num_type.' active '.($show_online ? 'field_type field_type_nature' : '').'"><span>'.$this_page_num.'</span></a>';
+                            } else {
+                                $num_href = 'leaderboard/';
+                                if ($leaderboard_sort_by != 'points'){ $num_href .= $leaderboard_sort_by.'/'; }
+                                $num_href .= $this_page_num > 1 ? $this_page_num.'/' : '';
+                                echo '<a class="link '.$show_num_type.' '.($show_online ? 'field_type field_type_nature' : '').'" href="'.$num_href.'" ><span>'.$this_page_num.'</span></a>';
+                            }
                         }
                     }
 
