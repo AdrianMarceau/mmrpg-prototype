@@ -1705,6 +1705,14 @@ class rpg_game {
         elseif (defined('MMRPG_REMOTE_GAME')){ $this_userid = MMRPG_REMOTE_GAME; }
         else { global $this_userid; }
 
+        // Collect in index of VALID player tokens to match against
+        $mmrpg_valid_player_tokens = $db->get_array_list("SELECT player_token FROM mmrpg_index_players WHERE player_flag_published = 1;");
+        $mmrpg_valid_player_tokens = !empty($mmrpg_valid_player_tokens) ? array_column($mmrpg_valid_player_tokens, 'player_token') : array();
+
+        // Collect in index of VALID robot tokens to match against
+        $mmrpg_valid_robot_tokens = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_flag_published = 1;");
+        $mmrpg_valid_robot_tokens = !empty($mmrpg_valid_robot_tokens) ? array_column($mmrpg_valid_robot_tokens, 'robot_token') : array();
+
         // Create index arrays for all players and robots to save
         $mmrpg_users_abilities = array();
         $mmrpg_users_players = array();
@@ -1781,7 +1789,8 @@ class rpg_game {
         if (!empty($player_tokens)){
             $player_tokens = array_values($player_tokens);
             foreach ($player_tokens AS $player_token){
-                if (empty($player_token)){ continue; }
+                if (empty($player_token) || $player_token == 'player'){ continue; }
+                elseif (!in_array($player_token, $mmrpg_valid_player_tokens)){ continue; }
 
                 //echo('$player_token = '.print_r($player_token, true).PHP_EOL);
 
@@ -2028,7 +2037,8 @@ class rpg_game {
         // If not empty, loop through and index robots
         if (!empty($robot_database)){
             foreach ($robot_database AS $robot_token => $robot_info){
-                if (empty($robot_token)){ continue; }
+                if (empty($robot_token) || $robot_token == 'robot'){ continue; }
+                elseif (!in_array($robot_token, $mmrpg_valid_robot_tokens)){ continue; }
                 // Create an entry for this robot in the global unlock index
                 $robot_info['user_id'] = $this_userid;
                 $robot_info['robot_token'] = $robot_token;
