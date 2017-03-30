@@ -138,6 +138,7 @@ $player = array(
         'battle_taunt' => 'Please do not waste my time - I\'ve important business elsewhere&hellip;',
         'battle_victory' => 'I had no doubt I would win. It was just a matter of timing.',
         'battle_defeat' => 'There must be some mistake&hellip; Did I miscalculate?'
-        )
+        ),
+    'player_flag_unlockable' => true
     );
 ?>

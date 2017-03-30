@@ -139,6 +139,7 @@ $player = array(
         'battle_taunt' => 'Your world is mine! Are you ready to be eliminated?',
         'battle_victory' => 'Feeling sorry for yourself? Mwhahaha!',
         'battle_defeat' => 'F-Forgive me! I only wanted to test your abilities!'
-        )
+        ),
+    'player_flag_unlockable' => true
     );
 ?>

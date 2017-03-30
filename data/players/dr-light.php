@@ -138,6 +138,7 @@ $player = array(
         'battle_taunt' => 'Please surrender before anyone else gets hurt!',
         'battle_victory' => 'I couldn&#39;t have won without my wonderful robots!',
         'battle_defeat' => 'I&#39;m so sorry everyone... I have failed you.'
-        )
+        ),
+    'player_flag_unlockable' => true
     );
 ?>
