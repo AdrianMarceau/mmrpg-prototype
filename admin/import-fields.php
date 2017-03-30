@@ -154,6 +154,7 @@ if (!empty($mmrpg_index['fields'])){
         // Define the flags
         $temp_insert_array['field_flag_hidden'] = in_array($temp_insert_array['field_token'], array('field')) ? 1 : 0;
         $temp_insert_array['field_flag_complete'] = $field_data['field_image'] != 'field' ? 1 : 0;
+        $temp_insert_array['field_flag_unlockable'] = $temp_insert_array['field_flag_complete'] && !empty($field_data['field_flag_unlockable']) ? 1 : 0;
         $temp_insert_array['field_flag_published'] = 1;
 
         // Define the order counter

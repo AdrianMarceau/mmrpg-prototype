@@ -250,6 +250,7 @@ if (!empty($mmrpg_index['items'])){
         // Define the flags
         $temp_insert_array['item_flag_hidden'] = in_array($temp_insert_array['item_token'], $hidden_database_items) ? 1 : 0;
         $temp_insert_array['item_flag_complete'] = $temp_insert_array['item_class'] == 'system' || $item_data['item_image'] != 'item' ? 1 : 0;
+        $temp_insert_array['item_flag_unlockable'] = $temp_insert_array['item_class'] != 'system' && $temp_insert_array['item_flag_complete'] ? 1 : 0;
         $temp_insert_array['item_flag_published'] = 1;
 
         // Define the order counter
