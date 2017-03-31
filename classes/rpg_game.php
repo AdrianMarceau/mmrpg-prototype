@@ -1705,13 +1705,21 @@ class rpg_game {
         elseif (defined('MMRPG_REMOTE_GAME')){ $this_userid = MMRPG_REMOTE_GAME; }
         else { global $this_userid; }
 
-        // Collect in index of VALID player tokens to match against
-        $mmrpg_valid_player_tokens = $db->get_array_list("SELECT player_token FROM mmrpg_index_players WHERE player_flag_published = 1;");
-        $mmrpg_valid_player_tokens = !empty($mmrpg_valid_player_tokens) ? array_column($mmrpg_valid_player_tokens, 'player_token') : array();
+        // Collect an index of VALID and UNLOCKABLE player tokens to match against
+        $mmrpg_index_players = $db->get_array_list("SELECT player_token, player_flag_unlockable FROM mmrpg_index_players WHERE player_flag_published = 1;");
+        $mmrpg_valid_player_tokens = !empty($mmrpg_index_players) ? array_column($mmrpg_index_players, 'player_token') : array();
+        $mmrpg_unlockable_player_tokens = !empty($mmrpg_index_players) ? array_column(array_filter($mmrpg_index_players, function($a){ return !empty($a['player_flag_unlockable']); }), 'player_token') : array();
 
-        // Collect in index of VALID robot tokens to match against
-        $mmrpg_valid_robot_tokens = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_flag_published = 1;");
-        $mmrpg_valid_robot_tokens = !empty($mmrpg_valid_robot_tokens) ? array_column($mmrpg_valid_robot_tokens, 'robot_token') : array();
+        //echo('<pre>$mmrpg_valid_player_tokens = '.print_r($mmrpg_valid_player_tokens, true).'</pre>');
+        //echo('<pre>$mmrpg_unlockable_player_tokens = '.print_r($mmrpg_unlockable_player_tokens, true).'</pre>');
+
+        // Collect an index of VALID robot tokens to match against
+        $mmrpg_index_robots = $db->get_array_list("SELECT robot_token, robot_flag_unlockable FROM mmrpg_index_robots WHERE robot_flag_published = 1;");
+        $mmrpg_valid_robot_tokens = !empty($mmrpg_index_robots) ? array_column($mmrpg_index_robots, 'robot_token') : array();
+        $mmrpg_unlockable_robot_tokens = !empty($mmrpg_index_robots) ? array_column(array_filter($mmrpg_index_robots, function($a){ return !empty($a['robot_flag_unlockable']); }), 'robot_token') : array();
+
+        //echo('<pre>$mmrpg_valid_robot_tokens = '.print_r($mmrpg_valid_robot_tokens, true).'</pre>');
+        //echo('<pre>$mmrpg_unlockable_robot_tokens = '.print_r($mmrpg_unlockable_robot_tokens, true).'</pre>');
 
         // Create index arrays for all players and robots to save
         $mmrpg_users_abilities = array();
@@ -1790,7 +1798,7 @@ class rpg_game {
             $player_tokens = array_values($player_tokens);
             foreach ($player_tokens AS $player_token){
                 if (empty($player_token) || $player_token == 'player'){ continue; }
-                elseif (!in_array($player_token, $mmrpg_valid_player_tokens)){ continue; }
+                elseif (!in_array($player_token, $mmrpg_unlockable_player_tokens)){ continue; }
 
                 //echo('$player_token = '.print_r($player_token, true).PHP_EOL);
 
@@ -1832,7 +1840,8 @@ class rpg_game {
                 // If robots not empty, loop through and save each to session
                 if (!empty($robot_tokens)){
                     foreach ($robot_tokens AS $robot_token){
-                        if (empty($robot_token)){ continue; }
+                        if (empty($robot_token) || $robot_token == 'robot'){ continue; }
+                        elseif (!in_array($robot_token, $mmrpg_unlockable_robot_tokens)){ continue; }
 
                         //echo('$robot_token = '.print_r($robot_token, true).PHP_EOL);
 
@@ -2099,9 +2108,9 @@ class rpg_game {
         if ($echo){ echo('$mmrpg_users_players('.count($mmrpg_users_players).') = '.print_r(array_keys($mmrpg_users_players), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_robots('.count($mmrpg_users_robots).') = '.print_r(array_keys($mmrpg_users_robots), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_abilities('.count($mmrpg_users_abilities).') = '.print_r(array_keys($mmrpg_users_abilities), true).'<hr />'.PHP_EOL); }
-        if ($echo){ echo('$mmrpg_users_players_abilities('.array_sum(array_map('count', $mmrpg_users_players_abilities)).') = '.print_r(array_keys($mmrpg_users_players_abilities), true).'<hr />'.PHP_EOL); }
-        if ($echo){ echo('$mmrpg_users_robots_abilities('.array_sum(array_map('count', $mmrpg_users_robots_abilities)).') = '.print_r(array_keys($mmrpg_users_robots_abilities), true).'<hr />'.PHP_EOL); }
-        if ($echo){ echo('$mmrpg_users_robots_abilities_current('.array_sum(array_map('count', $mmrpg_users_robots_abilities_current)).') = '.print_r(array_keys($mmrpg_users_robots_abilities_current), true).'<hr />'.PHP_EOL); }
+        //if ($echo){ echo('$mmrpg_users_players_abilities('.array_sum(array_map('count', $mmrpg_users_players_abilities)).') = '.print_r(array_keys($mmrpg_users_players_abilities), true).'<hr />'.PHP_EOL); }
+        //if ($echo){ echo('$mmrpg_users_robots_abilities('.array_sum(array_map('count', $mmrpg_users_robots_abilities)).') = '.print_r(array_keys($mmrpg_users_robots_abilities), true).'<hr />'.PHP_EOL); }
+        //if ($echo){ echo('$mmrpg_users_robots_abilities_current('.array_sum(array_map('count', $mmrpg_users_robots_abilities_current)).') = '.print_r(array_keys($mmrpg_users_robots_abilities_current), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_items('.count($mmrpg_users_items).') = '.print_r(array_keys($mmrpg_users_items), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_stars('.count($mmrpg_users_stars).') = '.print_r(array_keys($mmrpg_users_stars), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_robots_alts('.array_sum(array_map('count', $mmrpg_users_robots_alts)).') = '.print_r(array_keys($mmrpg_users_robots_alts), true).'<hr />'.PHP_EOL); }
