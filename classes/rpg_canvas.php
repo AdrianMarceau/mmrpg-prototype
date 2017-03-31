@@ -479,8 +479,8 @@ class rpg_canvas {
                     $icon_offset_z = $this_data['canvas_offset_z'] + 1;
                     $icon_offset_x = $this_data['canvas_offset_x'];
                     $icon_offset_y = $this_data['canvas_offset_y'];
-                    $icon_offset_x -= 25;
-                    $icon_offset_y += 20;
+                    //$icon_offset_x -= 25;
+                    $icon_offset_y += 30;
                     $base_multi = ceil($this_robot->robot_image_size / 40);
                     if ($base_multi > 1){
                         $icon_offset_x += ($base_multi - 1) * 25;
