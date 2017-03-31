@@ -590,7 +590,8 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
             <div class="sub_actions"><a data-order="3" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
         <div id="actions_settings_eventTimeout" class="actions_settings actions_settings_eventTimeout wrapper">
-            <div class="main_actions">
+            <div class="main_actions main_actions_hastitle">
+                <span class="main_actions_title">Select Speed</span>
                 <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_eventTimeout_1600"><label><span class="multi">Super&nbsp;Slow<br />(1f/1600ms)</span></label></a>
                 <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_eventTimeout_1250"><label><span class="multi">Medium&nbsp;Slow<br />(1f/1250ms)</span></label></a>
                 <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_eventTimeout_1000"><label><span class="multi">Normal&nbsp;Slow<br />(1f/1000ms)</span></label></a>
