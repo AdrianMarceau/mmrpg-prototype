@@ -40,6 +40,7 @@ $robot = array(
         'battle_taunt' => '',
         'battle_victory' => '',
         'battle_defeat' => ''
-        )
+        ),
+    'robot_flag_unlockable' => true
     );
 ?>
