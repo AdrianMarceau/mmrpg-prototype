@@ -1713,13 +1713,21 @@ class rpg_game {
         //echo('<pre>$mmrpg_valid_player_tokens = '.print_r($mmrpg_valid_player_tokens, true).'</pre>');
         //echo('<pre>$mmrpg_unlockable_player_tokens = '.print_r($mmrpg_unlockable_player_tokens, true).'</pre>');
 
-        // Collect an index of VALID robot tokens to match against
+        // Collect an index of VALID and UNLOCKABLE robot tokens to match against
         $mmrpg_index_robots = $db->get_array_list("SELECT robot_token, robot_flag_unlockable FROM mmrpg_index_robots WHERE robot_flag_published = 1;");
         $mmrpg_valid_robot_tokens = !empty($mmrpg_index_robots) ? array_column($mmrpg_index_robots, 'robot_token') : array();
         $mmrpg_unlockable_robot_tokens = !empty($mmrpg_index_robots) ? array_column(array_filter($mmrpg_index_robots, function($a){ return !empty($a['robot_flag_unlockable']); }), 'robot_token') : array();
 
         //echo('<pre>$mmrpg_valid_robot_tokens = '.print_r($mmrpg_valid_robot_tokens, true).'</pre>');
         //echo('<pre>$mmrpg_unlockable_robot_tokens = '.print_r($mmrpg_unlockable_robot_tokens, true).'</pre>');
+
+        // Collect an index of VALID and UNLOCKABLE ability tokens to match against
+        $mmrpg_index_abilities = $db->get_array_list("SELECT ability_token, ability_flag_unlockable FROM mmrpg_index_abilities WHERE ability_flag_published = 1;");
+        $mmrpg_valid_ability_tokens = !empty($mmrpg_index_abilities) ? array_column($mmrpg_index_abilities, 'ability_token') : array();
+        $mmrpg_unlockable_ability_tokens = !empty($mmrpg_index_abilities) ? array_column(array_filter($mmrpg_index_abilities, function($a){ return !empty($a['ability_flag_unlockable']); }), 'ability_token') : array();
+
+        //echo('<pre>$mmrpg_valid_ability_tokens = '.print_r($mmrpg_valid_ability_tokens, true).'</pre>');
+        //echo('<pre>$mmrpg_unlockable_ability_tokens = '.print_r($mmrpg_unlockable_ability_tokens, true).'</pre>');
 
         // Create index arrays for all players and robots to save
         $mmrpg_users_abilities = array();
@@ -1922,7 +1930,8 @@ class rpg_game {
         // If not empty, loop through and index abilities
         if (!empty($battle_abilities)){
             foreach ($battle_abilities AS $key => $ability_token){
-                if (empty($ability_token)){ continue; }
+                if (empty($ability_token) || $ability_token == 'ability'){ continue; }
+                elseif (!in_array($ability_token, $mmrpg_unlockable_ability_tokens)){ continue; }
                 // Create an entry for this ability in the global unlock index
                 $ability_info = array();
                 $ability_info['user_id'] = $this_userid;
@@ -1938,7 +1947,8 @@ class rpg_game {
                 $mmrpg_users_players_abilities[$player_token] = array();
                 if (!empty($player_info['player_abilities_unlocked'])){
                     foreach ($player_info['player_abilities_unlocked'] AS $key => $ability_token){
-                        if (empty($ability_token)){ continue; }
+                        if (empty($ability_token) || $ability_token == 'ability'){ continue; }
+                        elseif (!in_array($ability_token, $mmrpg_unlockable_ability_tokens)){ continue; }
                         // Create an entry for this ability in the player unlock index
                         $ability_info = array();
                         $ability_info['user_id'] = $this_userid;
@@ -1959,7 +1969,8 @@ class rpg_game {
                 $mmrpg_users_robots_abilities[$robot_token] = array();
                 if (!empty($robot_info['robot_abilities_unlocked'])){
                     foreach ($robot_info['robot_abilities_unlocked'] AS $key => $ability_token){
-                        if (empty($ability_token)){ continue; }
+                        if (empty($ability_token) || $ability_token == 'ability'){ continue; }
+                        elseif (!in_array($ability_token, $mmrpg_unlockable_ability_tokens)){ continue; }
                         // Create an entry for this ability in the robot unlock index
                         $ability_info = array();
                         $ability_info['user_id'] = $this_userid;
@@ -1972,7 +1983,8 @@ class rpg_game {
                 $mmrpg_users_robots_abilities_current[$robot_token] = array();
                 if (!empty($robot_info['robot_abilities_current'])){
                     foreach ($robot_info['robot_abilities_current'] AS $key => $ability_token){
-                        if (empty($ability_token)){ continue; }
+                        if (empty($ability_token) || $ability_token == 'ability'){ continue; }
+                        elseif (!in_array($ability_token, $mmrpg_unlockable_ability_tokens)){ continue; }
                         // Create an entry for this ability in the robot unlock index
                         $ability_info = array();
                         $ability_info['user_id'] = $this_userid;
