@@ -384,7 +384,7 @@ if (!empty($mmrpg_index['abilities'])){
         $temp_insert_array['ability_frame_classes'] = !empty($ability_data['ability_frame_classes']) ? $ability_data['ability_frame_classes'] : '';
 
         // Define the flags
-        $temp_insert_array['ability_flag_hidden'] = $temp_insert_array['ability_class'] != 'master' || in_array($temp_insert_array['ability_token'], $hidden_database_abilities) ? 1 : 0;
+        $temp_insert_array['ability_flag_hidden'] = $temp_insert_array['ability_class'] != 'master' || in_array($temp_insert_array['ability_token'], $hidden_database_abilities) || !empty($ability_data['ability_flag_hidden']) ? 1 : 0;
         $temp_insert_array['ability_flag_complete'] = $temp_insert_array['ability_class'] == 'system' || $ability_data['ability_image'] != 'ability' ? 1 : 0;
         $temp_insert_array['ability_flag_unlockable'] = $temp_insert_array['ability_class'] == 'master' && $temp_insert_array['ability_flag_complete'] ? 1 : 0;
         $temp_insert_array['ability_flag_published'] = 1;

@@ -157,7 +157,7 @@ if (!empty($mmrpg_index['players'])){
         if (!empty($spreadsheet_descriptions['player_description'])){ $temp_insert_array['player_description2'] = trim($spreadsheet_descriptions['player_description']); }
 
         // Define the flags
-        $temp_insert_array['player_flag_hidden'] = in_array($temp_insert_array['player_token'], array('player')) ? 1 : 0;
+        $temp_insert_array['player_flag_hidden'] = in_array($temp_insert_array['player_token'], array('player')) || !empty($player_data['player_flag_hidden']) ? 1 : 0;
         $temp_insert_array['player_flag_complete'] = $player_data['player_image'] != 'player' ? 1 : 0;
         $temp_insert_array['player_flag_unlockable'] = $temp_insert_array['player_flag_complete'] && !empty($player_data['player_flag_unlockable']) ? 1 : 0;
         $temp_insert_array['player_flag_published'] = 1;
