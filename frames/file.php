@@ -68,9 +68,11 @@ while ($this_action == 'save'){
             WHERE users.user_id = '{$this_userid}'
             LIMIT 1
             ;");
-        $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
-        $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
-        $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
+        if (!empty($this_userinfo)){
+            $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
+            $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
+            $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
+        }
 
         // Update the has updated flag variable
         $file_has_updated = true;
