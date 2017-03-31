@@ -22,6 +22,7 @@ $item = array(
     },
     'item_function_onload' => function($objects){
         return rpg_item::item_function_onload_core($objects);
-    }
+    },
+    'item_flag_unlockable' => true
     );
 ?>

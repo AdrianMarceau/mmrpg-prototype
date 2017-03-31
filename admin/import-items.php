@@ -115,8 +115,6 @@ foreach ($mmrpg_database_types AS $type_token => $type_info){
     $temp_pattern_last[] = '/^'.$type_token.'-core$/i';
 }
 
-$temp_pattern_last[] = '/^field-star$/i';
-$temp_pattern_last[] = '/^fusion-star$/i';
 
 $temp_pattern_last[] = '/^energy-upgrade$/i';
 $temp_pattern_last[] = '/^weapon-upgrade$/i';
@@ -145,6 +143,9 @@ $temp_pattern_last[] = '/^weapon-codes$/i';
 
 $temp_pattern_last[] = '/^equip-codes$/i';
 $temp_pattern_last[] = '/^field-codes$/i';
+
+$temp_pattern_last[] = '/^field-star$/i';
+$temp_pattern_last[] = '/^fusion-star$/i';
 
 $temp_pattern_last[] = '/^omega-seed$/i';
 
@@ -250,7 +251,7 @@ if (!empty($mmrpg_index['items'])){
         // Define the flags
         $temp_insert_array['item_flag_hidden'] = in_array($temp_insert_array['item_token'], $hidden_database_items) || !empty($item_data['item_flag_hidden']) ? 1 : 0;
         $temp_insert_array['item_flag_complete'] = $temp_insert_array['item_class'] == 'system' || $item_data['item_image'] != 'item' ? 1 : 0;
-        $temp_insert_array['item_flag_unlockable'] = $temp_insert_array['item_class'] != 'system' && $temp_insert_array['item_flag_complete'] ? 1 : 0;
+        $temp_insert_array['item_flag_unlockable'] = !empty($temp_insert_array['item_flag_complete']) && !empty($temp_insert_array['item_flag_unlockable']) ? 1 : 0;
         $temp_insert_array['item_flag_published'] = 1;
 
         // Define the order counter

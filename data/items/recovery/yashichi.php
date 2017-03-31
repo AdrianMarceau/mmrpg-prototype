@@ -58,6 +58,7 @@ $item = array(
         // Return true on success
         return true;
 
-    }
+    },
+    'item_flag_unlockable' => true
     );
 ?>

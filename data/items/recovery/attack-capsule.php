@@ -21,6 +21,7 @@ $item = array(
         // Call the global stat booster item function
         return rpg_item::item_function_stat_booster($objects);
 
-        }
+        },
+    'item_flag_unlockable' => true
     );
 ?>

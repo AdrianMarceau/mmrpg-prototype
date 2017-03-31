@@ -15,6 +15,7 @@ $item = array(
     'item_target' => 'auto',
     'item_function' => function($objects){
         return rpg_item::item_function_shard($objects);
-    }
+    },
+    'item_flag_unlockable' => true
     );
 ?>
