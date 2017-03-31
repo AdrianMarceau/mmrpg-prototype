@@ -29,7 +29,7 @@ class rpg_user {
     public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various table fields for user objects
-        $user_fields = array(
+        $index_fields = array(
             'user_id',
             'role_id',
             'user_name',
@@ -69,11 +69,11 @@ class rpg_user {
 
         // Implode the table fields into a string if requested
         if ($implode){
-            $user_fields = implode(', ', $user_fields);
+            $index_fields = implode(', ', $index_fields);
         }
 
         // Return the table fields, array or string
-        return $user_fields;
+        return $index_fields;
 
     }
 
