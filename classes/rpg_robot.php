@@ -1875,8 +1875,9 @@ class rpg_robot extends rpg_object {
             $robot_info['robot_item'] = $this->robot_item;
             $robot_info['robot_rewards'] = $this->robot_rewards;
 
-            // If this was the noweapons/chargeweapons action, everything is zero
-            if (in_array($this_ability->ability_token, array('action-noweapons', 'action-chargeweapons'))){
+            // If this was one of the system actions, everything is zero
+            $system_abilities = array('action-noweapons', 'action-skip-turn', 'action-charge-energy', 'action-charge-weapons');
+            if (in_array($this_ability->ability_token, $system_abilities)){
                 $energy_new = 0;
                 $energy_base = 0;
                 $energy_mods = 0;
@@ -1898,8 +1899,9 @@ class rpg_robot extends rpg_object {
         $energy_base = $energy_new;
         $energy_mods = 0;
 
-        // If this was the noweapons action, everything is zero
-        if (in_array($this_ability['ability_token'], array('action-noweapons', 'action-chargeweapons'))){
+        // If this was one of the system actions, everything is zero
+        $system_abilities = array('action-noweapons', 'action-skip-turn', 'action-charge-energy', 'action-charge-weapons');
+        if (in_array($this_ability['ability_token'], $system_abilities)){
             $energy_new = 0;
             $energy_base = 0;
             $energy_mods = 0;
@@ -4468,7 +4470,7 @@ class rpg_robot extends rpg_object {
                         // ATTACHMENT DESTROY
                         if ($attachment_info['attachment_destroy'] !== false){
 
-                            $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
+                            $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'special';
                             $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' duration ended and has '.$temp_trigger_type.' trigger!');
 
                             // DESTORY DAMAGE

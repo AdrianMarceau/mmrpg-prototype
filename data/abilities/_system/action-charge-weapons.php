@@ -1,7 +1,7 @@
 <?
 // ACTION : CHARGE WEAPONS
 $ability = array(
-    'ability_name' => 'Charging Weapons',
+    'ability_name' => 'Charge Weapons',
     'ability_token' => 'action-charge-weapons',
     'ability_class' => 'system',
     'ability_description' => 'The user enters a charging state that helps to recover a small amount of depleted life energy.',

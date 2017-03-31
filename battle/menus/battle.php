@@ -19,7 +19,7 @@ ob_start();
             if (!empty($temp_player_ability_actions) || $this_robot->robot_class == 'mecha'){
                 ?><a class="button action_ability" type="button" data-panel="ability" data-order="<?= $dataOrder ?>"><label>Ability</label></a><?
             } else {
-                ?><a class="button button_disabled action_ability" type="button" data-action="ability_8_action-noweapons" data-order="<?= $dataOrder ?>"><label style="text-decoration: line-through;">Ability</label></a><?
+                ?><a class="button button_disabled action_ability" type="button" data-action="ability_8_action-skip-turn" data-order="<?= $dataOrder ?>"><label style="text-decoration: line-through;">Ability</label></a><?
             } $dataOrder++;
         ?></div><?
 
