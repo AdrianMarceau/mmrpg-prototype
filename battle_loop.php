@@ -180,6 +180,13 @@ if ($this_action == 'start'){
         $this_field->update_session();
     }
 
+    // Collect a temporary robots index
+    $temp_tokens = array();
+    if (!empty($this_player_robots)){ $temp_tokens = array_merge($temp_tokens, explode(',', $this_player_robots)); }
+    if (!empty($target_player_robots)){ $temp_tokens = array_merge($temp_tokens, explode(',', $target_player_robots)); }
+    $temp_tokens = array_unique($temp_tokens);
+    $start_robots_index = rpg_robot::get_index($temp_tokens);
+
     // Ensure the player's robot string was provided
     if (!empty($this_player_robots)){
 
@@ -189,15 +196,11 @@ if ($this_action == 'start'){
         $this_player = rpg_game::get_player($this_battle, $backup_this_playerinfo);
         unset($backup_this_playerinfo);
         // Break apart the allowed robots string and unset undefined robots
-        $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-        //$this_playerinfo = $this_player->export_array();
-        //$this_playerinfo_robots = array();
-        //die('<pre>after:'.print_r($debug['player_robots'], true).'</pre>');
         $this_key_counter = 0;
         $temp_this_player_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
         foreach ($this_playerinfo['player_robots'] AS $this_key => $this_data){
             if (!mmrpg_prototype_robot_unlocked($this_player_token, $this_data['robot_token'])){ continue; }
-            $this_info = rpg_robot::parse_index_info($temp_robots_index[$this_data['robot_token']]);
+            $this_info = $start_robots_index[$this_data['robot_token']];
             $this_token = $this_data['robot_id'].'_'.$this_data['robot_token'];
             $this_position = array_search($this_token, $temp_this_player_robots);
             $this_data['robot_key'] = $this_key_counter;
@@ -219,11 +222,6 @@ if ($this_action == 'start'){
 
     // Ensure this player's items were provided
     $temp_session_token = $this_player->player_token.'_this-item-omega_prototype';
-    /*
-    if (!empty($_SESSION['GAME']['values'][$temp_session_token])){
-        $this_player_items = $_SESSION['GAME']['values'][$temp_session_token];
-    } else
-    */
     if (!empty($_SESSION['GAME']['values']['battle_items'])){
         $this_player_items = $_SESSION['GAME']['values']['battle_items'];
         unset($this_player_items['small-screw'], $this_player_items['large-screw']);
@@ -252,13 +250,10 @@ if ($this_action == 'start'){
         $target_player = rpg_game::get_player($this_battle, $backup_target_playerinfo);
         unset($backup_target_playerinfo);
         // Break apart the allowed robots string and unset undefined robots
-        $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-        //strstr($target_player_robots, ',') ? explode(',', $target_player_robots) : array($target_player_robots);
-        //$target_playerinfo = $target_player->export_array();
         $target_playerinfo_robots = array();
         $this_key_counter = 0;
         foreach ($target_playerinfo['player_robots'] AS $this_key => $this_data){
-            $this_info = rpg_robot::parse_index_info($temp_robots_index[$this_data['robot_token']]);
+            $this_info = $start_robots_index[$this_data['robot_token']];
             $this_token = $this_data['robot_id'].'_'.$this_data['robot_token'];
             $this_position = $this_key; //array_search($this_token, $target_player_robots);
             $this_data['robot_key'] = $this_key_counter;
