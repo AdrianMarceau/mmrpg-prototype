@@ -214,7 +214,13 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 <body id="mmrpg" class="battle">
 <div id="battle" class="hidden">
 
-    <form id="engine" action="battle_loop.php<?= $flag_wap ? '?wap=true' : '' ?>" target="connect" method="post">
+    <?
+    $engine_args = array();
+    //$engine_args['XDEBUG_PROFILE'] = 'true';
+    if ($flag_wap){ $engine_args['wap'] = 'true'; }
+    $engine_url = 'battle_loop.php?'.implode('&amp;', $engine_args);
+    ?>
+    <form id="engine" action="<?= $engine_url ?>" target="connect" method="post">
 
         <input type="hidden" name="this_action" value="" />
         <input type="hidden" name="next_action" value="loading" />
