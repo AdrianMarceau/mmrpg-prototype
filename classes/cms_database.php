@@ -24,7 +24,7 @@ class cms_database {
     // Define the constructor for the class
     public function __construct(){
         // Collect the initializer arguments
-        $this->HOST = MMRPG_CONFIG_DBHOST;
+        $this->HOST = MMRPG_CONFIG_IS_LIVE ? MMRPG_CONFIG_DBHOST : '127.0.0.1';
         $this->USERNAME = MMRPG_CONFIG_DBUSERNAME;
         $this->PASSWORD = MMRPG_CONFIG_DBPASSWORD;
         $this->CHARSET = MMRPG_CONFIG_DBCHARSET;
