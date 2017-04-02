@@ -147,7 +147,7 @@ if (!empty($mmrpg_index['players'])){
         $temp_insert_array['player_quotes_defeat'] = !empty($player_data['player_quotes']['battle_defeat']) && $player_data['player_quotes']['battle_defeat'] != '...' ? $player_data['player_quotes']['battle_defeat'] : '';
 
 
-        $temp_insert_array['player_functions'] = !empty($player_data['player_functions']) ? $player_data['player_functions'] : 'players/player.php';
+        $temp_insert_array['player_functions'] = !empty($player_data['player_functions']) && file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$player_data['player_functions']) ? $player_data['player_functions'] : 'players/player.php';
 
         // Collect applicable spreadsheets for this player
         $spreadsheet_stats = !empty($spreadsheet_player_stats[$player_data['player_token']]) ? $spreadsheet_player_stats[$player_data['player_token']] : array();

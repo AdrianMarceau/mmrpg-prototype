@@ -141,7 +141,7 @@ if (!empty($mmrpg_index['fields'])){
         $temp_insert_array['field_foreground_frame'] = json_encode(!empty($field_data['field_foreground_frame']) ? $field_data['field_foreground_frame']: array());
         $temp_insert_array['field_foreground_attachments'] = json_encode(!empty($field_data['field_foreground_attachments']) ? $field_data['field_foreground_attachments'] : array());
 
-        $temp_insert_array['field_functions'] = !empty($field_data['field_functions']) ? $field_data['field_functions'] : 'fields/field.php';
+        $temp_insert_array['field_functions'] = !empty($field_data['field_functions']) && file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$field_data['field_functions']) ? $field_data['field_functions'] : 'fields/field.php';
 
         // Collect applicable spreadsheets for this field
         $spreadsheet_stats = !empty($spreadsheet_field_stats[$field_data['field_token']]) ? $spreadsheet_field_stats[$field_data['field_token']] : array();

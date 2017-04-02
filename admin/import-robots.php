@@ -215,7 +215,7 @@ if (!empty($mmrpg_index['robots'])){
         $temp_insert_array['robot_attack'] = !empty($robot_data['robot_attack']) ? $robot_data['robot_attack'] : 100;
         $temp_insert_array['robot_defense'] = !empty($robot_data['robot_defense']) ? $robot_data['robot_defense'] : 100;
         $temp_insert_array['robot_speed'] = !empty($robot_data['robot_speed']) ? $robot_data['robot_speed'] : 100;
-        $temp_insert_array['robot_functions'] = !empty($robot_data['robot_functions']) ? $robot_data['robot_functions'] : 'robots/robot.php';
+        $temp_insert_array['robot_functions'] = !empty($robot_data['robot_functions']) && file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$robot_data['robot_functions']) ? $robot_data['robot_functions'] : 'robots/robot.php';
 
         // Define weaknesses for this robot
         $temp_insert_array['robot_weaknesses'] = json_encode(!empty($robot_data['robot_weaknesses']) ? $robot_data['robot_weaknesses'] : array());
@@ -437,7 +437,7 @@ if (!empty($mmrpg_index['mechas'])){
         $temp_insert_array['robot_attack'] = !empty($mecha_data['robot_attack']) ? $mecha_data['robot_attack'] : 100;
         $temp_insert_array['robot_defense'] = !empty($mecha_data['robot_defense']) ? $mecha_data['robot_defense'] : 100;
         $temp_insert_array['robot_speed'] = !empty($mecha_data['robot_speed']) ? $mecha_data['robot_speed'] : 100;
-        $temp_insert_array['robot_functions'] = !empty($mecha_data['robot_functions']) ? $mecha_data['robot_functions'] : 'robots/robot.php';
+        $temp_insert_array['robot_functions'] = !empty($mecha_data['robot_functions']) && file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$mecha_data['robot_functions']) ? $mecha_data['robot_functions'] : 'robots/robot.php';
 
         // Define weaknesses for this robot
         $temp_insert_array['robot_weaknesses'] = json_encode(!empty($mecha_data['robot_weaknesses']) ? $mecha_data['robot_weaknesses'] : array());
@@ -660,7 +660,7 @@ if (!empty($mmrpg_index['bosses'])){
         $temp_insert_array['robot_attack'] = !empty($boss_data['robot_attack']) ? $boss_data['robot_attack'] : 100;
         $temp_insert_array['robot_defense'] = !empty($boss_data['robot_defense']) ? $boss_data['robot_defense'] : 100;
         $temp_insert_array['robot_speed'] = !empty($boss_data['robot_speed']) ? $boss_data['robot_speed'] : 100;
-        $temp_insert_array['robot_functions'] = !empty($boss_data['robot_functions']) ? $boss_data['robot_functions'] : 'robots/robot.php';
+        $temp_insert_array['robot_functions'] = !empty($boss_data['robot_functions']) && file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$boss_data['robot_functions']) ? $boss_data['robot_functions'] : 'robots/robot.php';
 
         // Define weaknesses for this robot
         $temp_insert_array['robot_weaknesses'] = json_encode(!empty($boss_data['robot_weaknesses']) ? $boss_data['robot_weaknesses'] : array());

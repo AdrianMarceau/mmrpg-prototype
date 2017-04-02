@@ -37,9 +37,6 @@ class rpg_player extends rpg_object {
     // Define a public function for manually loading data
     public function player_load($this_playerinfo){
 
-        // Pull in the global index
-        global $mmrpg_index;
-
         // Pull in global variables
         $db = cms_database::get_database();
 
@@ -51,7 +48,7 @@ class rpg_player extends rpg_object {
         // Otherwise, collect player data from the index
         else {
             // Copy over the base contents from the players index
-            $this_playerinfo = $mmrpg_index['players'][$this_playerinfo['player_token']];
+            $this_playerinfo = self::get_index_info($this_playerinfo['player_token']);
         }
         $this_playerinfo = array_replace($this_playerinfo, $this_playerinfo_backup);
 
@@ -112,8 +109,7 @@ class rpg_player extends rpg_object {
 
         // Collect any functions associated with this player
         $this->player_functions = isset($this_playerinfo['player_functions']) ? $this_playerinfo['player_functions'] : 'players/player.php';
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->player_functions) ? $this->player_functions : 'players/player.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
+        require(MMRPG_CONFIG_ROOTDIR.'data/'.$this->player_functions);
         $this->player_function = isset($player['player_function']) ? $player['player_function'] : function(){};
         $this->player_function_onload = isset($player['player_function_onload']) ? $player['player_function_onload'] : function(){};
         unset($player);

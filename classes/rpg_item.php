@@ -163,8 +163,7 @@ class rpg_item extends rpg_object {
 
         // Collect any functions associated with this item
         $this->item_functions = isset($this_iteminfo['item_functions']) ? $this_iteminfo['item_functions'] : 'items/item.php';
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->item_functions) ? $this->item_functions : 'items/item.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
+        require(MMRPG_CONFIG_ROOTDIR.'data/'.$this->item_functions);
         $this->item_function = isset($item['item_function']) ? $item['item_function'] : function(){};
         $this->item_function_onload = isset($item['item_function_onload']) ? $item['item_function_onload'] : function(){};
         unset($item);

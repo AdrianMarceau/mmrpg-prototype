@@ -373,7 +373,7 @@ if (!empty($mmrpg_index['abilities'])){
         $temp_insert_array['ability_recovery2_percent'] = !empty($ability_data['ability_recovery2_percent']) ? 1 : 0;
         $temp_insert_array['ability_accuracy'] = !empty($ability_data['ability_accuracy']) ? $ability_data['ability_accuracy'] : 0;
         $temp_insert_array['ability_target'] = !empty($ability_data['ability_target']) ? $ability_data['ability_target'] : 'auto';
-        $temp_insert_array['ability_functions'] = !empty($ability_data['ability_functions']) ? $ability_data['ability_functions'] : 'abilities/ability.php';
+        $temp_insert_array['ability_functions'] = !empty($ability_data['ability_functions']) && file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$ability_data['ability_functions']) ? $ability_data['ability_functions'] : 'abilities/ability.php';
 
         // Define the ability frame properties
         $temp_insert_array['ability_frame'] = !empty($ability_data['ability_frame']) ? $ability_data['ability_frame'] : 'base';

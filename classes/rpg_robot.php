@@ -194,8 +194,7 @@ class rpg_robot extends rpg_object {
 
         // Collect any functions associated with this robot
         $this->robot_functions = isset($this_robotinfo['robot_functions']) ? $this_robotinfo['robot_functions'] : 'robots/robot.php';
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->robot_functions) ? $this->robot_functions : 'robots/robot.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
+        require(MMRPG_CONFIG_ROOTDIR.'data/'.$this->robot_functions);
         $this->robot_function = isset($robot['robot_function']) ? $robot['robot_function'] : function(){};
         $this->robot_function_onload = isset($robot['robot_function_onload']) ? $robot['robot_function_onload'] : function(){};
         $this->robot_function_ondamage = isset($robot['robot_function_ondamage']) ? $robot['robot_function_ondamage'] : function(){};
