@@ -3,18 +3,6 @@
  * INDEX PAGE : LEADERBOARD INDEX
  */
 
-// Define the SEO variables for this page
-$this_seo_title = 'Leaderboard | '.($this_current_num > 1 ? 'Page '.$this_current_num.' | ' : '').$this_seo_title;
-$this_seo_description = 'The Mega Man RPG Prototype currently has '.(!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').' players and that number is growing all the time. During the course of the game, players collect Battle Points on completion of a mission and those points build up over time to unlock new abilities and other new content. Not all players are created equal, however, and some clearly stand above the rest in terms of their commitment to the game and their skill at exploiting the battle system\'s mechanics. In the spirit of competition, all players have been ranked by their total Battle Point scores and listed from from highest to lowest. The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster.';
-
-// Define the Open Graph variables for this page
-$this_graph_data['title'] = 'Battle Points Leaderboard';
-$this_graph_data['description'] = 'The Mega Man RPG Prototype currently has '.(!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').' players and that number is growing all the time. During the course of the game, players collect Battle Points on completion of a mission and those points build up over time to unlock new abilities and other new content. Not all players are created equal, however, and some clearly stand above the rest in terms of their commitment to the game and their skill at exploiting the battle system\'s mechanics. In the spirit of competition, all players have been ranked by their total Battle Point scores and listed from from highest to lowest.';
-//$this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo.png';
-//$this_graph_data['type'] = 'website';
-
-//die('<pre>'.print_r($_GET, true).'</pre>');
-
 // Update the GET variables with the current page num
 $this_display_limit_default = 50;
 $this_num_offset = $this_current_num - 1;
@@ -24,31 +12,38 @@ $_GET['limit'] = $this_display_limit_default + ($this_num_offset * $this_display
 // Require the leaderboard data file
 require_once(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
 
-// If the sort by is not points, adjust document titles
-if ($leaderboard_sort_by != 'points'){
-    $title = $allowed_sort_types[$leaderboard_sort_by];
-    $this_seo_title = ucfirst($leaderboard_sort_by).' '.$this_seo_title;
-    $this_graph_data['title'] = $title.' Leaderboard';
-}
+// Define the rank title and description based on the sort parameter
+$ranked_by_title = 'Battle Points';
+if (!empty($leaderboard_sort_by)){ $ranked_by_title = $allowed_sort_types[$leaderboard_sort_by][1]; }
+$ranked_page_title = ($leaderboard_sort_by != 'points' ? $allowed_sort_types[$leaderboard_sort_by][0].' ' : '').'Leaderboard';
+$ranked_description_text1 = 'The <strong>Mega Man RPG Prototype</strong> currently has '.($this_leaderboard_count == 1 ? '1 user' : $this_leaderboard_count.' users').' and that number is growing all the time.';
+$ranked_description_text2 = 'In the spirit of competition, all users have been ranked by their total '.$ranked_by_title.' and listed from highest to lowest.';
+$ranked_description_text3 = 'Use the numbered links at the top and bottom of the page to navigate through users or use the dropdown below to rank them by other criteria.';
 
-//die('<pre>'.print_r($this_leaderboard_online_players, true).'</pre>');
+// Define the SEO variables for this page
+$this_seo_title = $ranked_page_title.' | '.($this_current_num > 1 ? 'Page '.$this_current_num.' | ' : '').$this_seo_title;
+$this_seo_description = $ranked_description_text1.' '.$ranked_description_text2;
+
+// Define the Open Graph variables for this page
+$this_graph_data['title'] = $ranked_page_title;
+$this_graph_data['description'] = $ranked_description_text1.' '.$ranked_description_text2;
 
 // Define the MARKUP variables for this page
 $this_markup_header = 'Mega Man RPG Prototype Leaderboard';
-$this_markup_counter = '<span class="count count_header">( '.(!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').($this_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$this_leaderboard_online_count.' Online</span>' : '').' )</span>';
+$this_markup_counter = '<span class="count count_header">( '.(!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 User' : $this_leaderboard_count.' Users') : '0 Users').($this_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$this_leaderboard_online_count.' Online</span>' : '').' )</span>';
 
 // Start generating the page markup
 ob_start();
 ?>
-<h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Leaderboard Players Index</h2>
+<h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+    <?= ($leaderboard_sort_by != 'points' ? $allowed_sort_types[$leaderboard_sort_by][0].' ' : '').'Leaderboard Index' ?>
+</h2>
 <div class="subbody" style="margin-bottom: 6px;">
 
         <p class="text">
-            The <strong>Mega Man RPG Prototype</strong> currently has <?= !empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 player' : $this_leaderboard_count.' players') : 0 ?>
-            and that number is growing all the time.  Throughout the course of the game, players collect Battle Points on completion of missions and those points build up to unlock new abilities
-            and other new content.  Not all players are created equal, however, and some clearly stand above the rest in terms of their commitment to the game and their skill at exploiting the
-            battle system's mechanics.  In the spirit of competition, all players have been ranked by their total Battle Point scores and listed from highest to lowest.  Use the numbered links
-            at the top and bottom of the page to navigate and <a href="contact/">contact me</a> if you have any questions or concerns.
+            <?= $ranked_description_text1 ?>
+            <?= $ranked_description_text2 ?>
+            <?= $ranked_description_text3 ?>
         </p>
 
         <div class="text form leaderboard_options">
@@ -56,7 +51,7 @@ ob_start();
                 <strong class="label">Ranked by</strong>
                 <select class="select" name="board_rank_kind" onchange="location = this.value;">
                     <? foreach ($allowed_sort_types AS $type => $title){ ?>
-                        <option value="leaderboard/<?= $type != 'points' ? $type.'/' : '' ?>" <?= $leaderboard_sort_by == $type ? 'selected="selected"' : '' ?>><?= $title ?></a>
+                        <option value="leaderboard/<?= $type != 'points' ? $type.'/' : '' ?>" <?= $leaderboard_sort_by == $type ? 'selected="selected"' : '' ?>><?= $title[1] ?></a>
                     <? } ?>
                 </select>
             </div>
@@ -64,7 +59,7 @@ ob_start();
 
         <? if(!empty($this_leaderboard_online_players)):?>
                 <p class="event text" style="min-height: 1px; text-align: right; font-size: 10px; line-height: 13px; margin-top: 30px; padding-bottom: 5px;">
-                        <span><strong style="display: block; text-decoration: underline; margin-bottom: 6px;">Online Players</strong></span>
+                        <span><strong style="display: block; text-decoration: underline; margin-bottom: 6px;">Online Users</strong></span>
                         <? foreach ($this_leaderboard_online_players AS $key => $info){
                                 if (empty($info['image'])){ $info['image'] = 'robots/mega-man/40'; }
                                 list($path, $token, $size) = explode('/', $info['image']);

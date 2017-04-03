@@ -207,13 +207,13 @@ function mmrpg_leaderboard_parse_index($board_key, $board_info, $quick_parse = f
 
 // Define a list of allowable sort paramaters for the leaderboard
 $allowed_sort_types = array();
-$allowed_sort_types['points'] = 'Battle Points';
-$allowed_sort_types['players'] = 'Players Unlocked';
-$allowed_sort_types['robots'] = 'Robots Unlocked';
-$allowed_sort_types['abilities'] = 'Abilities Unlocked';
-$allowed_sort_types['items'] = 'Items Collected';
-$allowed_sort_types['stars'] = 'Stars Collected';
-//$allowed_sort_types['database'] = 'Database Completion';
+$allowed_sort_types['points'] = array('Point', 'Battle Points');
+$allowed_sort_types['players'] = array('Player', 'Players Unlocked');
+$allowed_sort_types['robots'] = array('Robot', 'Robots Unlocked');
+$allowed_sort_types['abilities'] = array('Ability', 'Abilities Unlocked');
+$allowed_sort_types['items'] = array('Item', 'Items Collected');
+$allowed_sort_types['stars'] = array('Star', 'Stars Collected');
+//$allowed_sort_types['database'] = array('Dataase', 'Database Completion');
 
 // Collect any sorting arguments in the query URL
 $leaderboard_sort_by = !empty($_REQUEST['sort']) && isset($allowed_sort_types[$_REQUEST['sort']]) ? trim($_REQUEST['sort']) : 'points';
