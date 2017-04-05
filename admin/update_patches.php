@@ -754,6 +754,35 @@ function mmrpg_patch_db_user_objects_2k17($_GAME){
     // Pull in global variables
     global $db;
 
+
+    /* -- Retroactive Unlock Fixes -- */
+
+    // Manually append MM1, MM2, and MM4 fields to unlock list they should have been unlocked
+    if (!empty($_GAME['values']['battle_rewards'])){
+
+        // Collect unlocked player tokens and their index info
+        $unlocked_player_tokens = array_keys($_GAME['values']['battle_rewards']);
+        $unlocked_player_index = rpg_player::get_index_custom($unlocked_player_tokens);
+
+        // Create an array to hold the field backlog
+        $prev_battle_fields = array();
+
+        // Loop through unlocked players and collect fields to unlock for each
+        foreach ($unlocked_player_index AS $player_token => $player_info){
+            if (!empty($player_info['player_game'])){
+                $field_tokens = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_game = '{$player_info['player_game']}' AND field_flag_complete = 1 ORDER BY field_order ASC;", 'field_token');
+                $field_tokens = !empty($field_tokens) ? array_keys($field_tokens) : array();
+                $prev_battle_fields = array_merge($prev_battle_fields, $field_tokens);
+            }
+
+        }
+
+        // Merge the backlog and the current fields together into one
+        $_GAME['values']['battle_fields'] = array_merge($prev_battle_fields, $_GAME['values']['battle_fields']);
+
+    }
+
+
     define('MMRPG_REMOTE_GAME', $_GAME['user_id']);
     define('MMRPG_REMOTE_GAME_ID', $_GAME['user_id']);
     $session_token = rpg_game::session_token();
