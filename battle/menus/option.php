@@ -13,13 +13,13 @@ ob_start();
 
 	// Display the option for CHARGE ENERGY
 	$block_num++;
-	$title = 'The user spends their turn charging to recover depleted life energy. This leaves the user open to greater damage from attacks however.';
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_energy" type="button" data-action="ability_9_action-charge-energy"><label><span class="multi">Charge<br />Energy</span></label></a>';
+	$title = 'The user enters a charging state that helps to recover a small amount of depleted life energy.';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_energy" type="button" data-action="ability_9_action-charge-energy" data-tooltip="'.$title.'"><label><span class="multi">Charge<br />Energy</span></label></a>';
 
 	// Display the option for CHARGE WEAPONS
 	$block_num++;
-	$title = 'The user spends their turn charging to recover depleted weapon energy. This leaves the user open to greater damage from attacks however.';
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_weapons" type="button" data-action="ability_10_action-charge-weapons"><label><span class="multi">Charge<br />Weapons</span></label></a>';
+	$title = 'The user enters a charging state that helps to recover a small amount of depleted weapon energy.';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_weapons" type="button" data-action="ability_10_action-charge-weapons" data-tooltip="'.$title.'"><label><span class="multi">Charge<br />Weapons</span></label></a>';
 
 	// Display the option for RESTART BATTLE
 	$block_num++;
