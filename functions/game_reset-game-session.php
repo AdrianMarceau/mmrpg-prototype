@@ -79,7 +79,7 @@ function mmrpg_reset_game_session(){
 
         // Only unlock Dr. Light as a playable character
         $unlock_player_info = $mmrpg_index['players']['dr-light'];
-        mmrpg_game_unlock_player($unlock_player_info, false, true);
+        rpg_game::unlock_player($unlock_player_info, false, true, false);
         $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_points'] = 0;
         $_SESSION[$session_token]['values']['battle_items'] = array('energy-pellet' => 3, 'energy-capsule' => 2, 'weapon-pellet' => 3, 'weapon-capsule' => 2);
         $_SESSION[$session_token]['values']['battle_abilities'] = array('buster-shot');
@@ -159,7 +159,7 @@ function mmrpg_reset_game_session(){
 
         // Unlock Dr. Light as a playable character
         $unlock_player_info = $mmrpg_index['players']['dr-light'];
-        mmrpg_game_unlock_player($unlock_player_info, false, true);
+        rpg_game::unlock_player($unlock_player_info, false, true, true);
         $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_points'] = 0;
         mmrpg_game_unlock_ability($unlock_player_info, '', array('ability_token' => 'light-buster'), false);
 

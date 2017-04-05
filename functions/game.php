@@ -48,70 +48,8 @@ function mmrpg_game_players_unlocked(){
 
 
 // Define a function for unlocking a game player for use in battle
-function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_abilities = true){
-
-    // Reference the global variables
-    global $mmrpg_index, $db;
-
-    //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
-    $session_token = mmrpg_game_token();
-
-    // Define a reference to the game's session flag variable
-    if (empty($_SESSION[$session_token]['flags'])){ $_SESSION[$session_token]['flags'] = array(); }
-    $temp_game_flags = &$_SESSION[$session_token]['flags'];
-
-    // If the player token does not exist, return false
-    if (!isset($player_info['player_token'])){ return false; }
-    // If this player does not exist in the global index, return false
-    if (!isset($mmrpg_index['players'][$player_info['player_token']])){ return false; }
-    // Collect the player info from the index
-    $player_info = array_replace($mmrpg_index['players'][$player_info['player_token']], $player_info);
-    // Collect or define the player points and player rewards variables
-    $this_player_token = $player_info['player_token'];
-    $this_player_points = !empty($player_info['player_points']) ? $player_info['player_points'] : 0;
-    $this_player_rewards = !empty($player_info['player_rewards']) ? $player_info['player_rewards'] : array();
-    // Automatically unlock this player for use in battle then create the settings array
-    $this_reward = array('player_token' => $this_player_token, 'player_points' => $this_player_points);
-    $_SESSION[$session_token]['values']['battle_rewards'][$this_player_token] = $this_reward;
-    if (empty($_SESSION[$session_token]['values']['battle_settings'][$this_player_token])
-        || count($_SESSION[$session_token]['values']['battle_settings'][$this_player_token]) < 8){
-        $this_setting = array('player_token' => $this_player_token, 'player_robots' => array());
-        $_SESSION[$session_token]['values']['battle_settings'][$this_player_token] = $this_setting;
-    }
-    // Loop through the robot rewards for this player if set
-    if ($unlock_robots && !empty($this_player_rewards['robots'])){
-        $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-        foreach ($this_player_rewards['robots'] AS $robot_reward_key => $robot_reward_info){
-            // Check if the required amount of points have been met by this player
-            if ($this_player_points >= $robot_reward_info['points']){
-                // Unlock this robot and all abilities
-                $this_robot_info = rpg_robot::parse_index_info($temp_robots_index[$robot_reward_info['token']]);
-                $this_robot_info['robot_level'] = !empty($robot_reward_info['level']) ? $robot_reward_info['level'] : 1;
-                $this_robot_info['robot_experience'] = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 0;
-                mmrpg_game_unlock_robot($player_info, $this_robot_info, true, false);
-            }
-        }
-    }
-    // Loop through the ability rewards for this player if set
-    if ($unlock_abilities && !empty($this_player_rewards['abilities'])){
-        // Collect the ability index for calculation purposes
-        $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-        foreach ($this_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
-            // Check if the required amount of points have been met by this player
-            if ($this_player_points >= $ability_reward_info['points']){
-                // Unlock this ability
-                $this_ability_info = rpg_ability::parse_index_info($this_ability_index[$ability_reward_info['token']]);
-                $show_event = !mmrpg_game_ability_unlocked('', '', $ability_reward_info['token']) ? true : false;
-                mmrpg_game_unlock_ability($player_info, false, $this_ability_info);
-            }
-        }
-    }
-
-    // Create the event flag for unlocking this robot
-    $temp_game_flags['events']['unlocked-player_'.$this_player_token] = true;
-
-    // Return true on success
-    return true;
+function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_abilities = true, $unlock_fields = true){
+    return rpg_game::unlock_player($player_info, $unlock_robots, $unlock_abilities, $unlock_fields);
 }
 
 

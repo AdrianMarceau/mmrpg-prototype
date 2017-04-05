@@ -372,6 +372,7 @@ class rpg_game {
 
     // Define a function for unlocking a game player for use in battle
     public static function unlock_player($player_info, $unlock_robots = true, $unlock_abilities = true, $unlock_fields = true){
+
         // Reference the global variables
         global $mmrpg_index, $db;
 
@@ -387,7 +388,7 @@ class rpg_game {
 
         // Attempt to collect index info for this player, else return false
         $player_index_info = rpg_player::get_index_info($player_info['player_token']);
-        if (empty($player_index_info)){ return; }
+        if (empty($player_index_info)){ return false; }
 
         // Collect the player info from the index
         $player_info = array_replace($player_index_info, $player_info);
@@ -439,7 +440,13 @@ class rpg_game {
 
         // Loop through appropriate fields for this player in the database
         if ($unlock_fields){
-            // Define the appropriate game code for the given doctor
+
+            // Create the battle fields array if not set
+            if (!isset($_SESSION[$session_token]['values']['battle_fields'])){
+                $_SESSION[$session_token]['values']['battle_fields'] = array();
+            }
+
+            // Define the appropriate game code for the given doctor and collect fields
             $game_code = $player_index_info['player_game'];
             if (!empty($game_code)){
                 $field_tokens = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_game = '{$game_code}' AND field_flag_complete = 1 ORDER BY field_order ASC;", 'field_token');
@@ -453,6 +460,7 @@ class rpg_game {
                     }
                 }
             }
+
         }
 
         // Create the event flag for unlocking this robot
@@ -460,6 +468,7 @@ class rpg_game {
 
         // Return true on success
         return true;
+
     }
 
 
