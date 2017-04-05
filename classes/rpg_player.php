@@ -149,7 +149,7 @@ class rpg_player extends rpg_object {
             // If this is the currently logged-in user, collect their username token
             if ($this->player_id == $_SESSION['GAME']['USER']['userid']){
                 $this->user_token = $_SESSION['GAME']['USER']['username_clean'];
-                $this->user_omega = $_SESSION['GAME']['USER']['user_omega'];
+                $this->user_omega = $_SESSION['GAME']['USER']['omega'];
                 $this->player_controller = 'human';
             }
             // Otherwise if different human player, collect username token from db
