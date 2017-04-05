@@ -4,6 +4,7 @@ $player = array(
     'player_name' => 'Dr. Light',
     'player_token' => 'dr-light',
     'player_description' => '',
+    'player_game' => 'MM01',
     'player_number' => 1,
     'player_defense' => 25,
     'player_type' => 'defense',
