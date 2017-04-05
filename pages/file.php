@@ -95,7 +95,7 @@ while ($this_action == 'profile'){
                 // Update this user's accont password in the db
                 $html_form_messages .= '<span class="success">(!) Your account password has been changed.</span>';
                 $temp_password = $_POST['password_new'];
-                $temp_password_encoded = md5(MMRPG_SETTINGS_USER_SALT.$temp_password);
+                $temp_password_encoded = md5(MMRPG_SETTINGS_PASSWORD_SALT.$temp_password);
                 $db->update('mmrpg_users', array(
                     'user_password' => $temp_password,
                     'user_password_encoded' => $temp_password_encoded
