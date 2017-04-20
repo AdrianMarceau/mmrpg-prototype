@@ -83,7 +83,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
  */
 
 // Collect the current page from the header if set
-$this_allowed_pages = array('home', 'about', 'gallery', 'database', 'leaderboard', 'community', 'prototype', 'credits', 'contact', 'file', 'error', 'test');
+$this_allowed_pages = array('home', 'about', 'gallery', 'database', 'leaderboard', 'community', 'prototype', 'credits', 'contact', 'file', 'error', 'dev', 'test');
 $this_current_page = $_GET['page'] = !empty($_GET['page']) ? strtolower($_GET['page']) : false;
 $this_current_sub = $_GET['sub'] = !empty($_GET['sub']) && !is_numeric($_GET['sub']) ? strtolower($_GET['sub']) : false;
 $this_current_cat = $_GET['cat'] = !empty($_GET['cat']) && !is_numeric($_GET['cat']) ? strtolower($_GET['cat']) : false;

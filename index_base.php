@@ -488,12 +488,14 @@ if ($this_current_page == 'file' // File sub-pages
         </div>
 
         <div class="page page_<?= $this_current_page ?>">
-            <div class="header">
-                <div class="header_wrapper">
-                    <h1 class="title"><?= $this_current_page != 'home' ? preg_replace('/((?:the )?Mega Man RPG Prototype)/', '<span class="brand">$1</span>', $this_markup_header) : $this_markup_header ?></h1>
-                    <?= !empty($this_markup_counter) ? $this_markup_counter."\n" : '' ?>
+            <? if (!empty($this_markup_header)): ?>
+                <div class="header">
+                    <div class="header_wrapper">
+                        <h1 class="title"><?= $this_current_page != 'home' ? preg_replace('/((?:the )?Mega Man RPG Prototype)/', '<span class="brand">$1</span>', $this_markup_header) : $this_markup_header ?></h1>
+                        <?= !empty($this_markup_counter) ? $this_markup_counter."\n" : '' ?>
+                    </div>
                 </div>
-            </div>
+            <? endif; ?>
             <div class="body">
                 <div class="body_wrapper">
                     <?= $this_markup_body ?>
