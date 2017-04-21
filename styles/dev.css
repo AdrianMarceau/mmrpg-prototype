@@ -1,2 +1,339 @@
 
-/* -- DEV STYLESHEET -- */
+/* -- MAP GENERATOR STYLESHEET -- */
+
+.test_area {
+    width: 976px;
+    /* height: 244px; */
+    border: 0 none transparent;
+    margin: 0 auto 10px;
+}
+
+#window .field_map {
+    width: auto;
+    height: 0;
+    padding-bottom: calc((244 / 976) * 100%);
+    position: relative;
+    border: 1px solid #090909;
+    background-color: #696969;
+    border-radius: 6px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+#window .field_map > .wrapper,
+#window .field_map .field_background,
+#window .field_map .field_overlay,
+#window .field_map .event_grid {
+    display: block;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 13px;
+    line-height: 19px;
+    color: #FFFFFF;
+}
+
+#window .field_map > .wrapper {
+
+}
+
+#window .field_map .field_background {
+    background-image: none;
+    background-position: center center;
+    background-size: 100% auto;
+    background-size: cover;
+    background-repeat: repeat;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+
+    -webkit-filter: blur(2px);
+    -moz-filter: blur(2px);
+    -o-filter: blur(2px);
+    -ms-filter: blur(2px);
+    filter: blur(2px);
+
+    z-index: 1;
+}
+#window .field_map .field_overlay {
+    background-color: rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6);
+    z-index: 2;
+}
+
+#window .field_map .event_grid {
+    overflow: hidden;
+    background-position: -9999px -9999px;
+    background-repeat: no-repeat;
+    background-size: 1px 1px;
+    z-index: 10;
+    padding: 4px;
+}
+#window .field_map .event_grid .cell {
+    float: left;
+    box-sizing: border-box;
+    width: calc((100% / <?= $this_map_cols ?>) - 4px);
+    height: calc((100% / <?= $this_map_rows ?>) - 4px);
+    margin: 2px;
+    border: 1px solid transparent;
+    background-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.01);
+    font-size: 0;
+    line-height: 0;
+    color: transparent;
+    transition: background 0.3s;
+    cursor: pointer;
+    position: relative;
+}
+#window .field_map[data-rows="1"][data-cols="4"] .event_grid .cell {
+    width: calc((100% / 4) - 4px);
+    height: calc((100% / 1) - 4px);
+}
+#window .field_map[data-rows="2"][data-cols="8"] .event_grid .cell {
+    width: calc((100% / 8) - 4px);
+    height: calc((100% / 2) - 4px);
+}
+#window .field_map[data-rows="3"][data-cols="12"] .event_grid .cell {
+    width: calc((100% / 12) - 4px);
+    height: calc((100% / 3) - 4px);
+}
+#window .field_map[data-rows="4"][data-cols="16"] .event_grid .cell {
+    width: calc((100% / 16) - 4px);
+    height: calc((100% / 4) - 4px);
+}
+#window .field_map[data-rows="5"][data-cols="20"] .event_grid .cell {
+    width: calc((100% / 20) - 4px);
+    height: calc((100% / 5) - 4px);
+}
+#window .field_map[data-rows="6"][data-cols="24"] .event_grid .cell {
+    width: calc((100% / 24) - 4px);
+    height: calc((100% / 6) - 4px);
+}
+#window .field_map[data-rows="7"][data-cols="28"] .event_grid .cell {
+    width: calc((100% / 28) - 4px);
+    height: calc((100% / 7) - 4px);
+}
+#window .field_map[data-rows="8"][data-cols="32"] .event_grid .cell {
+    width: calc((100% / 32) - 4px);
+    height: calc((100% / 8) - 4px);
+}
+#window .field_map .event_grid .cell:hover,
+#window .field_map .event_grid .cell.complete {
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.9);
+}
+#window .field_map .event_grid .cell .event {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    min-height: 20px;
+    min-width: 20px;
+    max-height: 160px;
+    max-width: 160px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0 !important;
+    margin: 0 !important;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-radius: 100%;
+    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.3);
+    border: 1px solid #FFFFFF;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: border 1s ease-in-out;
+    animation: pulse 1s infinite;
+}
+@keyframes pulse {
+    0%   { border-color: rgba(255, 255, 255, 0.9); }
+    50%  { border-color: rgba(255, 255, 255, 0.1); }
+    100% { border-color: rgba(255, 255, 255, 0.9); }
+}
+
+#window .field_map .event_grid .cell .event.origin {
+    width: 60%;
+    height: 60%;
+    background-color: rgba(45, 111, 46, 0.9);
+    border-color: rgba(45, 111, 46, 0.9);
+    transition: border 4s ease-in-out;
+    animation: pulse 4s infinite;
+}
+#window .field_map .event_grid .cell .event.mecha {
+    width: 90%;
+    height: 90%;
+    background-color: rgba(130, 112, 27, 0.9);
+    border-color: rgba(130, 112, 27, 0.9);
+    transition: border 3s ease-in-out;
+    animation: pulse 3s infinite;
+}
+#window .field_map .event_grid .cell .event.robot {
+    width: 120%;
+    height: 120%;
+    background-color: rgba(177, 100, 5, 0.9);
+    border-color: rgba(177, 100, 5, 0.9);
+    transition: border 2s ease-in-out;
+    animation: pulse 2s infinite;
+}
+#window .field_map .event_grid .cell .event.boss {
+    width: 150%;
+    height: 150%;
+    background-color: rgba(146, 15, 15, 0.9);
+    border-color: rgba(146, 15, 15, 0.9);
+    transition: border 1s ease-in-out;
+    animation: pulse 1s infinite;
+}
+#window .field_map .event_grid .cell .event.destination {
+    width: 160%;
+    height: 160%;
+    background-color: rgba(146, 15, 15, 0.9);
+    border-color: rgba(146, 15, 15, 0.9);
+    transition: border 1s ease-in-out;
+    animation: pulse 1s infinite;
+}
+#window .field_map .event_grid .cell .sprite {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    pointer-events: none;
+    z-index: 100;
+}
+#window .field_map .event_grid .cell:hover .sprite_40x40 {
+    background-position: -40px 0;
+}
+#window .field_map .event_grid .cell:hover .sprite_80x80 {
+    background-position: -80px 0;
+}
+#window .field_map .event_grid .cell:hover .sprite_160x160 {
+    background-position: -160px 0;
+}
+
+#window .field_map[data-scale="1"] .event_grid .cell .event,
+#window .field_map[data-scale="2"] .event_grid .cell .event {
+    max-width: 100px;
+    max-height: 100px;
+}
+#window .field_map[data-scale="3"] .event_grid .cell .event,
+#window .field_map[data-scale="4"] .event_grid .cell .event {
+    max-width: 80px;
+    max-height: 80px;
+}
+#window .field_map[data-scale="5"] .event_grid .cell .event,
+#window .field_map[data-scale="6"] .event_grid .cell .event {
+    max-width: 60px;
+    max-height: 60px;
+}
+#window .field_map[data-scale="7"] .event_grid .cell .event,
+#window .field_map[data-scale="8"] .event_grid .cell .event {
+    max-width: 40px;
+    max-height: 40px;
+}
+
+
+#window .field_map[data-scale="1"] .event_grid .cell .sprite { bottom: 45%; }
+#window .field_map[data-scale="2"] .event_grid .cell .sprite { bottom: 40%; }
+#window .field_map[data-scale="3"] .event_grid .cell .sprite { bottom: 35%; }
+#window .field_map[data-scale="4"] .event_grid .cell .sprite { bottom: 30%; }
+#window .field_map[data-scale="5"] .event_grid .cell .sprite { bottom: 30%; }
+#window .field_map[data-scale="6"] .event_grid .cell .sprite { bottom: 25%; }
+#window .field_map[data-scale="7"] .event_grid .cell .sprite { bottom: 20%; }
+#window .field_map[data-scale="8"] .event_grid .cell .sprite { bottom: 15%; }
+
+#window .field_map .event_grid .cell .event.origin       { width: calc(5% + 20px); height: calc(5% + 20px); }
+#window .field_map .event_grid .cell .event.mecha        { width: calc(5% + 25px); height: calc(5% + 25px); }
+#window .field_map .event_grid .cell .event.robot        { width: calc(5% + 30px); height: calc(5% + 30px); }
+#window .field_map .event_grid .cell .event.boss         { width: calc(5% + 35px); height: calc(5% + 35px); }
+#window .field_map .event_grid .cell .event.destination  { width: calc(5% + 40px); height: calc(5% + 40px); }
+
+
+#window .field_options {
+    display: block;
+    margin: 10px auto 10px;
+    text-align: left;
+    overflow: hidden;
+}
+#window .field_options .options_form {
+    display: block;
+    margin: 0 auto;
+    text-align: left;
+    overflow: hidden;
+}
+#window .field_options .options_form .option,
+#window .field_options .options_form .button,
+#window .field_options .options_form label,
+#window .field_options .options_form select,
+#window .field_options .options_form input {
+    display: block;
+    box-sizing: border-box;
+}
+#window .field_options .options_form .option,
+#window .field_options .options_form .button {
+    float: left;
+    height: auto;
+    margin: 0 5px 5px 0;
+    padding: 0 5px 5px 0;
+    overflow: hidden;
+}
+#window .field_options .options_form .option {
+    width: calc(22% - 5px);
+}
+#window .field_options .options_form .button {
+    width: calc(12% - 5px);
+}
+#window .field_options .options_form label {
+    float: left;
+    height: auto;
+    width: auto;
+    margin: 0 5px 5px 0;
+    padding: 0;
+    clear: both;
+    font-weight: bold;
+    font-size: 11px;
+    line-height: 11px;
+}
+#window .field_options .options_form select {
+    float: left;
+    height: auto;
+    width: 100%;
+    border: 1px solid #262626;
+    background-color: #464646;
+    color: #FFFFFF;
+    font-size: 12px;
+    line-height: 12px;
+    margin: 0;
+    padding: 3px 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    clear: both;
+}
+#window .field_options .options_form input[type="button"] {
+    float: left;
+    height: auto;
+    width: 100%;
+    border: 1px solid #262626;
+    background-color: #363636;
+    color: #FFFFFF;
+    font-size: 12px;
+    line-height: 16px;
+    margin: 0;
+    padding: 3px 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    clear: both;
+    cursor: pointer;
+}
+#window .field_options .options_form input[type="button"]:hover {
+    background-color: #393939;
+}
