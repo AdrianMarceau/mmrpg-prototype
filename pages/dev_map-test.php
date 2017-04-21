@@ -28,6 +28,13 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
         if (true){
 
+            // Define array column function if not exists
+            if (!function_exists('array_column')){
+                function array_column($array, $column){
+                    return array_map(function($array){ return $array[$column]; }, $array);
+                }
+            }
+
             // Collect a list of battle fields from the database
             $index_field_tokens = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_flag_complete = 1 ORDER BY field_order ASC;");
             $index_field_tokens = !empty($index_field_tokens) ? array_column($index_field_tokens, 'field_token') : array('intro-field');
