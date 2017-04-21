@@ -31,7 +31,7 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
             // Define array column function if not exists
             if (!function_exists('array_column')){
                 function array_column($array, $column){
-                    return array_map(function($array){ return $array[$column]; }, $array);
+                    return array_map(function($array)use($column){ return $array[$column]; }, $array);
                 }
             }
 
