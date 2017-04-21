@@ -311,7 +311,7 @@ require_once('pages/'.$this_current_page.'.php');
 
 <style type="text/css"> html, body { background-color: #262626; } </style>
 
-<? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
+<? if ($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
     <link type="text/css" href="_ext/colorbox/jquery.colorbox.css" rel="stylesheet" />
 <? endif; ?>
 
@@ -319,6 +319,10 @@ require_once('pages/'.$this_current_page.'.php');
 <link type="text/css" href="styles/jquery.scrollbar.min.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/index.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/index-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+
+<? if ($this_current_page == 'dev'): ?>
+    <link type="text/css" href="styles/dev.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<? endif; ?>
 
 <meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
@@ -527,6 +531,9 @@ if ($this_current_page == 'file' // File sub-pages
     <? endif; ?>
     <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
     <script type="text/javascript" src="scripts/index.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? if ($this_current_page == 'dev'): ?>
+    <script type="text/javascript" src="scripts/dev.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? endif; ?>
     <script type="text/javascript">
     // Define the key client variables
     gameSettings.baseHref = '<?= MMRPG_CONFIG_ROOTURL ?>';
