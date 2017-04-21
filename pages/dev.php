@@ -3,6 +3,12 @@
  * DEV TESTS INDEX
  */
 
+// Force error reporting for this dev page
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+ini_set('xdebug.max_nesting_level', 32);
+error_reporting(-1);
+
 // Start generating the page markup
 ob_start();
 
