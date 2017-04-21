@@ -25,6 +25,7 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
         /* -- MAP GENERATION -- */
 
         ob_start();
+
         if (true){
 
             // Collect a list of battle fields from the database
@@ -338,6 +339,7 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
 
         }
+
         $debug_variable_text = ob_get_clean();
 
         ?>
