@@ -34,6 +34,7 @@ ob_start();
 
             <ul class="text" style="padding-bottom: 10px;">
                 <li>&raquo; <a class="link_inline" href="#">Experimental link</a></li>
+                <li>&raquo; <a class="link_inline" href="dev/map-test/">Procedurally generated map experiment</a></li>
             </ul>
 
         </div>
