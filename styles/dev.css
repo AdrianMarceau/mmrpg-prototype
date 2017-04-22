@@ -334,6 +334,12 @@
     margin: 10px auto 10px;
     text-align: left;
     overflow: hidden;
+    background-color: #1a1a1a;
+    padding: 6px 12px 0;
+    border: 1px solid #171717;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
 }
 #window .field_options .options_form {
     display: block;
@@ -342,7 +348,7 @@
     overflow: hidden;
 }
 #window .field_options .options_form .option,
-#window .field_options .options_form .button,
+#window .field_options .options_form .buttons,
 #window .field_options .options_form label,
 #window .field_options .options_form select,
 #window .field_options .options_form input {
@@ -350,18 +356,19 @@
     box-sizing: border-box;
 }
 #window .field_options .options_form .option,
-#window .field_options .options_form .button {
+#window .field_options .options_form .buttons {
     float: left;
     height: auto;
     margin: 0 5px 5px 0;
-    padding: 0 5px 5px 0;
+    padding: 5px 5px 5px 0;
     overflow: hidden;
 }
 #window .field_options .options_form .option {
     width: calc(22% - 5px);
 }
-#window .field_options .options_form .button {
+#window .field_options .options_form .buttons {
     width: calc(12% - 5px);
+    padding-top: 0;
 }
 #window .field_options .options_form label {
     float: left;
@@ -400,7 +407,7 @@
     font-size: 12px;
     line-height: 16px;
     margin: 0;
-    padding: 3px 6px;
+    padding: 6px;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
