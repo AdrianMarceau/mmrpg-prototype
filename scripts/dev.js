@@ -1,6 +1,19 @@
 
 /* -- MAP GENERATOR JAVASCRIPT -- */
 
+// Define global object variables
+var fieldOptions = null;
+var fieldCounters = null;
+var fieldMap = null;
+var fieldMapEventGrid = null;
+var fieldMovesRemaining = null;
+var fieldPointsCurrent = null;
+var fieldPointsTotal = null;
+var fieldCompletePercent = null;
+var firstCell = null;
+var firstCellRow = 0;
+var firstCellCol = 0;
+
 // Define move counter variables
 var allowedMoves = 0;
 var usedMoves = 0;
@@ -35,10 +48,55 @@ var completePercent = 0;
 
 $(document).ready(function(){
 
-    // Define a click event for the map generator filters
-    var fieldOptions = $('#window .field_options');
-    var fieldSubmit = $('input[type="button"]', fieldOptions);
-    fieldSubmit.bind('click', function(e){
+    // Collect referneces to key elements
+
+    fieldOptions = $('#window .field_options');
+
+    fieldCounters = $('#window .field_counters');
+    fieldMovesRemaining = $('.counter.moves .remaining', fieldCounters);
+    fieldPointsCurrent = $('.counter.points .current', fieldCounters);
+    fieldPointsTotal = $('.counter.points .total', fieldCounters);
+    fieldCompletePercent = $('.counter.complete .percent', fieldCounters);
+
+    fieldMap = $('#window .field_map');
+    fieldMapEventGrid = $('.event_grid', fieldMap);
+
+    firstCell = $('.cell.origin', fieldMapEventGrid);
+    firstCellRow = parseInt(firstCell.attr('data-row'));
+    firstCellCol = parseInt(firstCell.attr('data-col'));
+
+    // Define a click event for the map reset button
+    var resetButton = $('input[name="reset"][type="button"]', fieldOptions);
+    resetButton.bind('click', function(e){
+        e.preventDefault();
+
+        // Reset internal counters to zero
+        usedMoves = 0;
+        mechasDefeated = 0;
+        robotsDefeated = 0;
+        bossesDefeated = 0;
+        currentPoints = 0;
+
+        // Remove any complete classes from bodies
+        fieldCounters.removeClass('complete success failure');
+        fieldMap.removeClass('complete success failure');
+
+        // Reset the classes for each of the map cells
+        $('.cell', fieldMapEventGrid).removeClass('enabled complete');
+
+        // Update field counter calculations
+        updateFieldCounters();
+
+        // Re-enable the orgin cell and it's adjacent neighbours
+        firstCell.addClass('enabled complete');
+        enableAdjacentCells(firstCellRow, firstCellCol);
+
+        return true;
+        });
+
+    // Define a click event for the map generator button
+    var regenerateButton = $('input[name="regenerate"][type="button"]', fieldOptions);
+    regenerateButton.bind('click', function(e){
         e.preventDefault();
         var actionBase = fieldOptions.find('form').attr('action');
         var scaleValue = fieldOptions.find('select[name="scale"]').val();
@@ -62,70 +120,8 @@ $(document).ready(function(){
         return true;
         });
 
-    // Define a function for getting adjacent cells
-    function getAdjacentCells(thisCellRow, thisCellCol){
-        console.log('getAdjacentCells(' + thisCellRow + ', ' + thisCellCol + ')');
-
-        // Collect a reference to the requested cell
-        var thisCell = $('.cell[data-row="'+thisCellRow+'"][data-col="'+thisCellCol+'"]', eventGrid);
-
-        // Define the positions of adjacent cells to the current
-        var thisUpCellPos = [(thisCellRow - 1), thisCellCol];
-        var thisRightCellPos = [thisCellRow, (thisCellCol + 1)];
-        var thisBottomCellPos = [(thisCellRow + 1), thisCellCol];
-        var thisLeftCellPos = [thisCellRow, (thisCellCol - 1)];
-        var adjacentCellPositions = [thisUpCellPos, thisRightCellPos, thisBottomCellPos, thisLeftCellPos];
-
-        //console.log('thisUpCellPos', thisUpCellPos);
-        //console.log('thisRightCellPos', thisRightCellPos);
-        //console.log('thisBottomCellPos', thisBottomCellPos);
-        //console.log('thisLeftCellPos', thisLeftCellPos);
-        //console.log('adjacentCellPositions', adjacentCellPositions);
-
-        // Return the collected adjacent cells
-        return adjacentCellPositions;
-
-    }
-
-    // Define a function for enabling adjacent cells
-    function enableAdjacentCells(thisCellRow, thisCellCol){
-        //console.log('enableAdjacentCells(' + thisCellRow + ', ' + thisCellCol + ')');
-
-        // Collect a reference to the requested cell
-        var thisCell = $('.cell[data-row="'+thisCellRow+'"][data-col="'+thisCellCol+'"]', eventGrid);
-
-        // Collect adjacent cell positions
-        var adjacentCellPositions = getAdjacentCells(thisCellRow, thisCellCol);
-
-        // Loop through adjacent cells to see if any of them are complete
-        for (i = 0; i < adjacentCellPositions.length; i++){
-            var adjacentCellPos = adjacentCellPositions[i];
-            var adjacentCell = $('.cell[data-row="'+adjacentCellPos[0]+'"][data-col="'+adjacentCellPos[1]+'"]', eventGrid);
-            if (!adjacentCell.length){ continue; }
-            if (!adjacentCell.hasClass('complete')){
-                adjacentCell.removeClass('enabled');
-                void adjacentCell.get(0).offsetWidth;
-                }
-            adjacentCell.addClass('enabled');
-            //console.log('add enabled status to .cell[data-row="'+adjacentCellPos[0]+'"][data-col="'+adjacentCellPos[1]+'"]');
-            }
-
-        // Return return on complete
-        return true;
-
-    }
-
-    // Automatically enable cells around the starting point
-    var firstCell = $('.cell.complete', eventGrid).first();
-    var firstCellRow = parseInt(firstCell.attr('data-row'));
-    var firstCellCol = parseInt(firstCell.attr('data-col'));
-    firstCell.addClass('enabled');
-    enableAdjacentCells(firstCellRow, firstCellCol);
-
     // Define a click event for the cells of the field map
-    var fieldMap = $('#window .field_map');
-    var eventGrid = $('.event_grid', fieldMap);
-    $('.cell', eventGrid).bind('click', function(e){
+    $('.cell', fieldMapEventGrid).bind('click', function(e){
         e.preventDefault();
 
         // If the battle is already complete, do nothing
@@ -151,7 +147,7 @@ $(document).ready(function(){
             var adjacentToCompleted = false;
             for (i = 0; i < adjacentCellPositions.length; i++){
                 var adjacentCellPos = adjacentCellPositions[i];
-                var adjacentCell = $('.cell[data-row="'+adjacentCellPos[0]+'"][data-col="'+adjacentCellPos[1]+'"]', eventGrid);
+                var adjacentCell = $('.cell[data-row="'+adjacentCellPos[0]+'"][data-col="'+adjacentCellPos[1]+'"]', fieldMapEventGrid);
                 if (adjacentCell.hasClass('complete')){ adjacentToCompleted = true; }
                 }
 
@@ -204,83 +200,14 @@ $(document).ready(function(){
 
         });
 
-    // Define references to counter elements on the page
-    var fieldCounters = $('#window .field_counters');
-    var fieldMovesRemaining = $('.counter.moves .remaining', fieldCounters);
-    var fieldPointsCurrent = $('.counter.points .current', fieldCounters);
-    var fieldPointsTotal = $('.counter.points .total', fieldCounters);
-    var fieldCompletePercent = $('.counter.complete .percent', fieldCounters);
-
-    // Define a function for updating moves counters
-    function updateFieldCounters(){
-        console.log('updateFieldCounters()');
-
-        console.log('allowedMoves = ', allowedMoves);
-        console.log('usedMoves = ', usedMoves);
-
-        console.log('mechasTotal = ', mechasTotal);
-        console.log('robotsTotal = ', robotsTotal);
-        console.log('bossesTotal = ', bossesTotal);
-
-        console.log('mechasDefeated = ', mechasDefeated);
-        console.log('robotsDefeated = ', robotsDefeated);
-        console.log('bossesDefeated = ', bossesDefeated);
-
-        // Recalculate move counters
-        var mapScale = parseInt(fieldMap.attr('data-scale'));
-        allowedMoves = 0;
-        allowedMoves += mapScale + (mapScale - 1);
-        allowedMoves += mechasDefeated * mechaMovesValue;
-        allowedMoves += robotsDefeated * robotMovesValue;
-        allowedMoves += bossesDefeated * bossMovesValue;
-
-        // Update remaining moves counter and span
-        remainingMoves = allowedMoves - usedMoves;
-        fieldMovesRemaining.html(remainingMoves);
-        console.log('remainingMoves = ', remainingMoves);
-
-        // Recalculate point counters
-        currentPoints = 0;
-        currentPoints += mechasDefeated * mechaPointsValue;
-        currentPoints += robotsDefeated * robotPointsValue;
-        currentPoints += bossesDefeated * bossPointsValue;
-        fieldPointsCurrent.html(currentPoints);
-        console.log('currentPoints = ', currentPoints);
-
-        // Recalculate complete percentage
-        var targetsTotal = mechasTotal + robotsTotal + bossesTotal;
-        var targetsDefeated = mechasDefeated + robotsDefeated + bossesDefeated;
-        completePercent = Math.round(((targetsDefeated / targetsTotal) * 100), 2);
-        fieldCompletePercent.html(completePercent + '%');
-        console.log('currentPoints = ', completePercent);
-
-    }
-
-    // Define a function for updating game status
-    function updateGameStatus(){
-        console.log('updateGameStatus()');
-
-
-        // If the player has defeated all bosses, the game is complete
-        if (bossesDefeated >= bossesTotal){
-            console.log('bossesDefeated = ', bossesDefeated);
-            console.log('bossesTotal = ', bossesTotal);
-            fieldMap.addClass('complete success');
-            fieldCounters.addClass('complete success');
-        }
-        // Else if the user is out of moves, the game is complete
-        else if (remainingMoves == 0){
-            console.log('remainingMoves = ', remainingMoves);
-            fieldMap.addClass('complete failure');
-            fieldCounters.addClass('complete failure');
-        }
-
-    }
+    // Automatically enable cells around the starting point
+    firstCell.addClass('enabled');
+    enableAdjacentCells(firstCellRow, firstCellCol);
 
     // Update target mecha/robot/boss counters at start
-    mechasTotal = $('.event.mecha', eventGrid).length;
-    robotsTotal = $('.event.robot', eventGrid).length;
-    bossesTotal = $('.event.boss', eventGrid).length;
+    mechasTotal = $('.event.mecha', fieldMapEventGrid).length;
+    robotsTotal = $('.event.robot', fieldMapEventGrid).length;
+    bossesTotal = $('.event.boss', fieldMapEventGrid).length;
 
     // Calculate point totals for the field at start
     totalPoints = 0;
@@ -295,3 +222,123 @@ $(document).ready(function(){
 
 
 });
+
+
+// Define a function for getting adjacent cells
+function getAdjacentCells(thisCellRow, thisCellCol){
+    console.log('getAdjacentCells(' + thisCellRow + ', ' + thisCellCol + ')');
+
+    // Collect a reference to the requested cell
+    var thisCell = $('.cell[data-row="'+thisCellRow+'"][data-col="'+thisCellCol+'"]', fieldMapEventGrid);
+
+    // Define the positions of adjacent cells to the current
+    var thisUpCellPos = [(thisCellRow - 1), thisCellCol];
+    var thisRightCellPos = [thisCellRow, (thisCellCol + 1)];
+    var thisBottomCellPos = [(thisCellRow + 1), thisCellCol];
+    var thisLeftCellPos = [thisCellRow, (thisCellCol - 1)];
+    var adjacentCellPositions = [thisUpCellPos, thisRightCellPos, thisBottomCellPos, thisLeftCellPos];
+
+    //console.log('thisUpCellPos', thisUpCellPos);
+    //console.log('thisRightCellPos', thisRightCellPos);
+    //console.log('thisBottomCellPos', thisBottomCellPos);
+    //console.log('thisLeftCellPos', thisLeftCellPos);
+    //console.log('adjacentCellPositions', adjacentCellPositions);
+
+    // Return the collected adjacent cells
+    return adjacentCellPositions;
+
+}
+
+// Define a function for enabling adjacent cells
+function enableAdjacentCells(thisCellRow, thisCellCol){
+    //console.log('enableAdjacentCells(' + thisCellRow + ', ' + thisCellCol + ')');
+
+    // Collect a reference to the requested cell
+    var thisCell = $('.cell[data-row="'+thisCellRow+'"][data-col="'+thisCellCol+'"]', fieldMapEventGrid);
+
+    // Collect adjacent cell positions
+    var adjacentCellPositions = getAdjacentCells(thisCellRow, thisCellCol);
+
+    // Loop through adjacent cells to see if any of them are complete
+    for (i = 0; i < adjacentCellPositions.length; i++){
+        var adjacentCellPos = adjacentCellPositions[i];
+        var adjacentCell = $('.cell[data-row="'+adjacentCellPos[0]+'"][data-col="'+adjacentCellPos[1]+'"]', fieldMapEventGrid);
+        if (!adjacentCell.length){ continue; }
+        if (!adjacentCell.hasClass('complete')){
+            adjacentCell.removeClass('enabled');
+            void adjacentCell.get(0).offsetWidth;
+            }
+        adjacentCell.addClass('enabled');
+        //console.log('add enabled status to .cell[data-row="'+adjacentCellPos[0]+'"][data-col="'+adjacentCellPos[1]+'"]');
+        }
+
+    // Return return on complete
+    return true;
+
+}
+
+// Define a function for updating moves counters
+function updateFieldCounters(){
+    console.log('updateFieldCounters()');
+
+    console.log('allowedMoves = ', allowedMoves);
+    console.log('usedMoves = ', usedMoves);
+
+    console.log('mechasTotal = ', mechasTotal);
+    console.log('robotsTotal = ', robotsTotal);
+    console.log('bossesTotal = ', bossesTotal);
+
+    console.log('mechasDefeated = ', mechasDefeated);
+    console.log('robotsDefeated = ', robotsDefeated);
+    console.log('bossesDefeated = ', bossesDefeated);
+
+    // Recalculate move counters
+    var mapScale = parseInt(fieldMap.attr('data-scale'));
+    allowedMoves = 0;
+    allowedMoves += mapScale + (mapScale - 1);
+    allowedMoves += mechasDefeated * mechaMovesValue;
+    allowedMoves += robotsDefeated * robotMovesValue;
+    allowedMoves += bossesDefeated * bossMovesValue;
+
+    // Update remaining moves counter and span
+    remainingMoves = allowedMoves - usedMoves;
+    fieldMovesRemaining.html(remainingMoves);
+    console.log('remainingMoves = ', remainingMoves);
+
+    // Recalculate point counters
+    currentPoints = 0;
+    currentPoints += mechasDefeated * mechaPointsValue;
+    currentPoints += robotsDefeated * robotPointsValue;
+    currentPoints += bossesDefeated * bossPointsValue;
+    fieldPointsCurrent.html(currentPoints);
+    console.log('currentPoints = ', currentPoints);
+
+    // Recalculate complete percentage
+    var targetsTotal = mechasTotal + robotsTotal + bossesTotal;
+    var targetsDefeated = mechasDefeated + robotsDefeated + bossesDefeated;
+    completePercent = Math.round(((targetsDefeated / targetsTotal) * 100), 2);
+    fieldCompletePercent.html(completePercent + '%');
+    console.log('currentPoints = ', completePercent);
+
+}
+
+// Define a function for updating game status
+function updateGameStatus(){
+    console.log('updateGameStatus()');
+
+
+    // If the player has defeated all bosses, the game is complete
+    if (bossesDefeated >= bossesTotal){
+        console.log('bossesDefeated = ', bossesDefeated);
+        console.log('bossesTotal = ', bossesTotal);
+        fieldMap.addClass('complete success');
+        fieldCounters.addClass('complete success');
+    }
+    // Else if the user is out of moves, the game is complete
+    else if (remainingMoves == 0){
+        console.log('remainingMoves = ', remainingMoves);
+        fieldMap.addClass('complete failure');
+        fieldCounters.addClass('complete failure');
+    }
+
+}

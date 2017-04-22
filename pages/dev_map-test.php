@@ -570,9 +570,9 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
                     </select>
                 </div>
 
-                <div class="button">
-                    <label>&nbsp;</label>
-                    <input type="button" value="Regenerate" />
+                <div class="buttons">
+                    <input type="button" name="reset" value="Restart?" />
+                    <input type="button" name="regenerate" value="Regenerate" />
                 </div>
 
             </form>
