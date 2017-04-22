@@ -267,9 +267,7 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
                         // Create an event somewhere on the map with this robot
                         $remaining = temp_remaining_cell_positions();
-                        $temp_max = count($remaining) - 1;
-                        $temp_min = round(count($remaining) / 2);
-                        $temp_pos = $remaining[mt_rand($temp_min, $temp_max)];
+                        $temp_pos = $remaining[mt_rand(0, count($remaining) - 1)];
                         $this_map_events[$temp_pos] = array('kind' => 'robot', 'token' => $temp_robot_token, 'size' => $temp_robot_info['robot_image_size']);
 
                         //echo('<hr />');
@@ -350,6 +348,129 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
         $debug_variable_text = ob_get_clean();
 
         ?>
+
+        <div class="field_counters">
+
+            <div class="counter moves">
+                <span class="value remaining">0</span>
+                <strong class="label">Moves</strong>
+            </div>
+
+            <div class="counter points">
+                <span class="value current">0</span>
+                <span class="slash">/</span>
+                <span class="value total">0</span>
+                <strong class="label">Points</strong>
+            </div>
+
+            <div class="counter complete">
+                <span class="value percent">0%</span>
+                <strong class="label">Complete</strong>
+            </div>
+
+        </div>
+
+        <div class="field_map" data-scale="<?= $this_map_scale ?>" data-rows="<?= $this_map_rows ?>" data-cols="<?= $this_map_cols ?>">
+            <div class="wrapper">
+                <div class="field_background" style="background-image: url(images/fields/<?= $this_field_token ?>/battle-field_preview.png);"></div>
+                <div class="field_overlay"></div>
+                <div class="event_grid">
+                    <?
+
+                    /*
+                    $complete = array();
+                    $complete = array(
+                        $this_map_origin,
+                        ($this_orgin_row ).'-'.($this_origin_col + 1),
+                        ($this_orgin_row ).'-'.($this_origin_col + 2)
+                        );
+
+                    $current_position = $complete[count($complete) - 1];
+                    */
+
+                    $complete = array();
+                    $current_position = $this_map_origin;
+
+                    // Loop through rows, and then through columns
+                    for ($row = 1; $row <= $this_map_rows; $row++){
+                        for ($col = 1; $col <= $this_map_cols; $col++){
+                            $pos = $row.'-'.$col;
+
+                            $is_complete = false;
+
+                            $class = 'cell';
+                            $inside = '';
+
+                            // Add a special class if this is the origin or destination
+                            if ($pos == $this_map_origin){
+                                $class .= ' origin';
+                            } elseif ($pos == $this_map_destination){
+                                $class .= ' destination';
+                            }
+
+                            if (in_array($pos, $complete)){
+                                $is_complete = true;
+                            }
+
+                            // Add events markers and sprites based on event kind
+                            if (isset($this_map_events[$pos])){
+
+                                $event = $this_map_events[$pos];
+                                $direction = isset($event['direction']) ? $event['direction'] : 'left';
+                                $size = isset($event['size']) ? $event['size'] : 40;
+                                $xsize = $size.'x'.$size;
+
+                                // Add a special class if this is the origin or destination
+                                $eclass = $event['kind'];
+                                if ($pos == $this_map_origin){
+                                    $eclass .= ' player';
+                                } elseif ($pos == $this_map_destination){
+                                    $eclass .= ' boss';
+                                }
+
+                                $inside .= '<span class="event '.$eclass.'"></span>';
+
+                                if ($event['kind'] == 'origin'){
+
+                                    $is_complete = true;
+
+                                } elseif ($event['kind'] == 'destination'){
+
+                                    $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['boss'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
+
+                                } elseif (in_array($event['kind'], array('mecha', 'robot', 'boss'))){
+
+                                    $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['token'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
+
+                                }
+                            }
+
+                            // Add the player sprite to their current position on the map
+                            if ($pos == $current_position){
+
+                                $player = $this_map_events[$this_map_origin]['player'];
+                                $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/players/'.$player.'/sprite_right_'.$xsize.'.png);"></span>';
+                            }
+
+                            // If this cell has already been completed add the class
+                            if ($is_complete){
+                                $class .= ' complete';
+                            }
+
+                            // Print out the generated markup for this cell and its contents
+                            echo '<div '.
+                                'class="'.$class.'" '.
+                                'data-col="'.$col.'" '.
+                                'data-row="'.$row.'" '.
+                                //'title="'.$pos.'" '.
+                                '>'.$inside.
+                                '</div>';
+                        }
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
 
         <div class="field_options">
 
@@ -451,98 +572,11 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
                 <div class="button">
                     <label>&nbsp;</label>
-                    <input type="button" value="Generate" />
+                    <input type="button" value="Regenerate" />
                 </div>
 
             </form>
 
-        </div>
-
-        <div class="field_map" data-scale="<?= $this_map_scale ?>" data-rows="<?= $this_map_rows ?>" data-cols="<?= $this_map_cols ?>">
-            <div class="wrapper">
-                <div class="field_background" style="background-image: url(images/fields/<?= $this_field_token ?>/battle-field_preview.png);"></div>
-                <div class="field_overlay"></div>
-                <div class="event_grid">
-                    <?
-
-                    /*
-                    $complete = array();
-                    $complete = array(
-                        $this_map_origin,
-                        ($this_orgin_row ).'-'.($this_origin_col + 1),
-                        ($this_orgin_row ).'-'.($this_origin_col + 2)
-                        );
-
-                    $current_position = $complete[count($complete) - 1];
-                    */
-
-                    $complete = array();
-                    $current_position = $this_map_origin;
-
-                    // Loop through rows, and then through columns
-                    for ($row = 1; $row <= $this_map_rows; $row++){
-                        for ($col = 1; $col <= $this_map_cols; $col++){
-                            $pos = $row.'-'.$col;
-
-                            $is_complete = false;
-
-                            $class = 'cell';
-                            $inside = '';
-
-                            if (in_array($pos, $complete)){
-                                $is_complete = true;
-                            }
-
-                            // Add events markers and sprites based on event kind
-                            if (isset($this_map_events[$pos])){
-
-                                $event = $this_map_events[$pos];
-                                $direction = isset($event['direction']) ? $event['direction'] : 'left';
-                                $size = isset($event['size']) ? $event['size'] : 40;
-                                $xsize = $size.'x'.$size;
-
-                                $inside .= '<span class="event '.$event['kind'].'"></span>';
-
-                                if ($event['kind'] == 'origin'){
-
-                                    $is_complete = true;
-
-                                } elseif ($event['kind'] == 'destination'){
-
-                                    $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['boss'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
-
-                                } elseif (in_array($event['kind'], array('mecha', 'robot', 'boss'))){
-
-                                    $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['token'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
-
-                                }
-                            }
-
-                            // Add the player sprite to their current position on the map
-                            if ($pos == $current_position){
-
-                                $player = $this_map_events[$this_map_origin]['player'];
-                                $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/players/'.$player.'/sprite_right_'.$xsize.'.png);"></span>';
-                            }
-
-                            // If this cell has already been completed add the class
-                            if ($is_complete){
-                                $class .= ' complete';
-                            }
-
-                            // Print out the generated markup for this cell and its contents
-                            echo '<div '.
-                                'class="'.$class.'" '.
-                                'data-col="'.$col.'" '.
-                                'data-row="'.$row.'" '.
-                                //'title="'.$pos.'" '.
-                                '>'.$inside.
-                                '</div>';
-                        }
-                    }
-                    ?>
-                </div>
-            </div>
         </div>
 
         <div>
