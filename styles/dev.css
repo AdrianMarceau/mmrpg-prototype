@@ -17,7 +17,7 @@
     background-color: #696969;
     border-radius: 6px;
     margin: 0 auto;
-    overflow: hidden;
+    overflow: visible;
 }
 
 #window .field_map > .wrapper,
@@ -68,7 +68,7 @@
 }
 
 #window .field_map .event_grid {
-    overflow: hidden;
+    overflow: visible;
     background-position: -9999px -9999px;
     background-repeat: no-repeat;
     background-size: 1px 1px;
@@ -421,7 +421,7 @@
 
 #window .field_counters {
     display: block;
-    margin: 5px auto 10px;
+    margin: 5px auto 15px;
     padding: 0 10px;
     overflow: hidden;
     font-size: 16px;
