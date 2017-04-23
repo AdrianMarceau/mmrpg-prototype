@@ -267,7 +267,13 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
                         // Create an event somewhere on the map with this robot
                         $remaining = temp_remaining_cell_positions();
-                        $temp_pos = $remaining[mt_rand(0, count($remaining) - 1)];
+                        if ($this_map_scale == 1){
+                            $temp_max = count($remaining) - 1;
+                            $temp_min = round(count($remaining) / 2);
+                            $temp_pos = $remaining[mt_rand($temp_min, $temp_max)];
+                        } else {
+                            $temp_pos = $remaining[mt_rand(0, count($remaining) - 1)];
+                        }
                         $this_map_events[$temp_pos] = array('kind' => 'robot', 'token' => $temp_robot_token, 'size' => $temp_robot_info['robot_image_size']);
 
                         //echo('<hr />');
