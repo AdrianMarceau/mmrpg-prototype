@@ -98,6 +98,14 @@ button {
     -webkit-background-clip: padding;
 }
 
+#window .banner.compact {
+    height: 60px;
+}
+#window .banner.compact .credits {
+    background-position: center -130px;
+    top: 10px;
+}
+
 #window #header_social_facebook,
 #window #header_social_google,
 #window #header_social_github {
