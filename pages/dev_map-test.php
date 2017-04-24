@@ -94,9 +94,9 @@ if (!empty($_SESSION['mmrpg_conqest_playlist'])){
         $this_map_playlist[] = array('scale' => 6, 'field' => 'final-destination', 'boss' => $temp_robot_tokens[mt_rand(0, (count($temp_robot_tokens) - 1))]);
 
         $temp_robot_tokens = array('dark-man', 'dark-man-2', 'dark-man-3', 'dark-man-4');
-        $this_map_playlist[] = array('scale' => 7, 'field' => 'final-destination-ii', 'boss' => $temp_robot_tokens[mt_rand(0, (count($temp_robot_tokens) - 1))]);
+        $this_map_playlist[] = array('scale' => 7, 'field' => 'final-destination-2', 'boss' => $temp_robot_tokens[mt_rand(0, (count($temp_robot_tokens) - 1))]);
 
-        $this_map_playlist[] = array('scale' => 8, 'field' => 'final-destination-iii', 'boss' => 'slur');
+        $this_map_playlist[] = array('scale' => 8, 'field' => 'final-destination-3', 'boss' => 'slur');
 
         $this_map_playlist[] = array('scale' => 8, 'field' => 'prototype-complete', 'boss' => 'quint');
 
