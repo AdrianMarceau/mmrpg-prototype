@@ -238,6 +238,23 @@ $(document).ready(function(){
 
         });
 
+    // Define a click event for the map reset button
+    var resetButton = $('.button.reset', fieldOptions);
+    resetButton.bind('click', function(e){
+        //console.log('.button.continue.reset()');
+        e.preventDefault();
+        if ($(this).hasClass('disabled')){ return false; }
+        var confirmText = 'Are you sure you want to reset the game? ';
+        confirmText += '\n' + 'All progress will be lost! Continue anyway?';
+        if (confirm(confirmText)){
+            var redirectURL = $(this).attr('href');
+            window.location.href = redirectURL;
+            return true;
+            } else {
+            return false;
+            }
+        });
+
 
     /* -- Field Map Event Grid -- */
 

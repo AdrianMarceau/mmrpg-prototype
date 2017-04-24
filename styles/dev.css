@@ -246,6 +246,7 @@
     height: 90%;
     background-color: rgba(130, 112, 27, 0.9);
     border-color: rgba(130, 112, 27, 0.9);
+    border-width: 1px;
     transition: border 3s ease-in-out;
     animation: pulse 3s infinite;
 }
@@ -254,12 +255,14 @@
     height: 120%;
     background-color: rgba(177, 100, 5, 0.9);
     border-color: rgba(177, 100, 5, 0.9);
+    border-width: 2px;
     transition: border 2s ease-in-out;
     animation: pulse 2s infinite;
 }
 #window .field_map .event_grid .cell .event.boss {
     width: 150%;
     height: 150%;
+    border-width: 3px;
     background-color: rgba(146, 15, 15, 0.9);
     border-color: rgba(146, 15, 15, 0.9);
     transition: border 1s ease-in-out;
@@ -324,8 +327,8 @@
 #window .field_map[data-scale="7"] .event_grid .cell .sprite { bottom: 20%; }
 #window .field_map[data-scale="8"] .event_grid .cell .sprite { bottom: 15%; }
 
-#window .field_map .event_grid .cell .event.origin       { width: calc(5% + 20px); height: calc(5% + 20px); }
-#window .field_map .event_grid .cell .event.mecha        { width: calc(5% + 25px); height: calc(5% + 25px); }
+#window .field_map .event_grid .cell .event.origin       { width: calc(5% + 30px); height: calc(5% + 30px); }
+#window .field_map .event_grid .cell .event.mecha        { width: calc(5% + 15px); height: calc(5% + 15px); }
 #window .field_map .event_grid .cell .event.robot        { width: calc(5% + 30px); height: calc(5% + 30px); }
 #window .field_map .event_grid .cell .event.boss         { width: calc(5% + 35px); height: calc(5% + 35px); }
 #window .field_map .event_grid .cell .event.destination  { width: calc(5% + 40px); height: calc(5% + 40px); }
