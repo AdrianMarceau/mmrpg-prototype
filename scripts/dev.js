@@ -45,6 +45,7 @@ var totalPoints = 0;
 
 // Define the completion percent
 var completePercent = 0;
+var battleStatus = 'pending';
 
 $(document).ready(function(){
 
@@ -65,10 +66,15 @@ $(document).ready(function(){
     firstCellRow = parseInt(firstCell.attr('data-row'));
     firstCellCol = parseInt(firstCell.attr('data-col'));
 
-    // Define a click event for the map reset button
-    var resetButton = $('input[name="reset"][type="button"]', fieldOptions);
+
+    /* -- Field Option Buttons -- */
+
+    // Define a click event for the map retry button
+    var resetButton = $('.button.retry', fieldOptions);
     resetButton.bind('click', function(e){
+        //console.log('.button.retry.click()');
         e.preventDefault();
+        if ($(this).hasClass('disabled')){ return false; }
 
         // Reset internal counters to zero
         usedMoves = 0;
@@ -91,34 +97,149 @@ $(document).ready(function(){
         firstCell.addClass('enabled complete');
         enableAdjacentCells(firstCellRow, firstCellCol);
 
+        // Reset the battle status to pending
+        battleStatus = 'success';
+        $('.button.continue', fieldOptions).addClass('disabled');
+        $('.button.leaderboard', fieldOptions).addClass('disabled');
+
         return true;
         });
 
     // Define a click event for the map generator button
-    var regenerateButton = $('input[name="regenerate"][type="button"]', fieldOptions);
+    var regenerateButton = $('.button.regenerate', fieldOptions);
     regenerateButton.bind('click', function(e){
+        //console.log('.button.regenerate.click()');
         e.preventDefault();
+        if ($(this).hasClass('disabled')){ return false; }
+
+        var playlistActive = fieldOptions.hasClass('playlist_active') ? true : false;
+        //console.log('playlistActive', playlistActive);
+
         var actionBase = fieldOptions.find('form').attr('action');
-        var scaleValue = fieldOptions.find('select[name="scale"]').val();
-        var playerValue = fieldOptions.find('select[name="player"]').val();
-        var fieldValue = fieldOptions.find('select[name="field"]').val();
-        var bossValue = fieldOptions.find('select[name="boss"]').val();
         //console.log('actionBase', actionBase);
-        //console.log('scaleValue', scaleValue);
-        //console.log('playerValue', playerValue);
-        //console.log('fieldValue', fieldValue);
-        //console.log('bossValue', bossValue);
-        var redirectURL = [actionBase];
-        if (scaleValue.length){ redirectURL.push('scale='+scaleValue); }
-        if (playerValue.length){ redirectURL.push('player='+playerValue); }
-        if (fieldValue.length){ redirectURL.push('field='+fieldValue); }
-        if (bossValue.length){ redirectURL.push('boss='+bossValue); }
-        //console.log('redirectURL', redirectURL);
+
+        var keyValueInput = fieldOptions.find('[name="key"]');
+        var maxKeyValueInput = fieldOptions.find('[name="maxkey"]');
+        var scaleValueInput = fieldOptions.find('[name="scale"]');
+        var playerValueInput = fieldOptions.find('[name="player"]');
+        var fieldValueInput = fieldOptions.find('[name="field"]');
+        var bossValueInput = fieldOptions.find('[name="boss"]');
+
+        if (playlistActive){
+
+            var keyValue = keyValueInput.length ? keyValueInput.val() : false;
+            //console.log('keyValue', keyValue);
+
+            var fieldOptionsForm = $('<form style="display:none;"></form>');
+            fieldOptionsForm.attr('method', 'post');
+            fieldOptionsForm.attr('action', actionBase);
+            fieldOptionsForm.append('<input type="hidden" name="key" value="'+keyValue+'" />');
+            fieldOptionsForm.appendTo(fieldOptions);
+            fieldOptionsForm.submit();
+
+            } else {
+
+            var scaleValue = scaleValueInput.length ? scaleValueInput.val() : '';
+            var playerValue = playerValueInput.length ? playerValueInput.val() : '';
+            var fieldValue = fieldValueInput.length ? fieldValueInput.val() : '';
+            var bossValue = bossValueInput.length ? bossValueInput.val() : '';
+            //console.log('scaleValue', scaleValue);
+            //console.log('playerValue', playerValue);
+            //console.log('fieldValue', fieldValue);
+            //console.log('bossValue', bossValue);
+
+            var redirectURL = [actionBase];
+            redirectURL.push('debug=true');
+            if (scaleValue.length){ redirectURL.push('scale='+scaleValue); }
+            if (playerValue.length){ redirectURL.push('player='+playerValue); }
+            if (fieldValue.length){ redirectURL.push('field='+fieldValue); }
+            if (bossValue.length){ redirectURL.push('boss='+bossValue); }
+            //console.log('redirectURL', redirectURL);
+
+            redirectURL = redirectURL.join('&');
+            //console.log('redirectURL', redirectURL);
+
+            window.location.href = redirectURL;
+            return true;
+
+            }
+
+        });
+
+    // Define a click event for the map continue button
+    var continueButton = $('.button.continue', fieldOptions);
+    continueButton.bind('click', function(e){
+        //console.log('.button.continue.click()');
+        e.preventDefault();
+        if ($(this).hasClass('disabled')){ return false; }
+
+        var actionBase = fieldOptions.find('form').attr('action');
+        //console.log('actionBase', actionBase);
+
+        var keyValueInput = fieldOptions.find('[name="key"]');
+        var maxKeyValueInput = fieldOptions.find('[name="maxkey"]');
+        var scaleValueInput = fieldOptions.find('[name="scale"]');
+        var playerValueInput = fieldOptions.find('[name="player"]');
+        var fieldValueInput = fieldOptions.find('[name="field"]');
+        var bossValueInput = fieldOptions.find('[name="boss"]');
+
+        if (keyValueInput.length){
+
+            var keyValue = keyValueInput.length ? parseInt(keyValueInput.val()) : 0;
+            var maxKeyValue = maxKeyValueInput.length ? parseInt(maxKeyValueInput.val()) : keyValue;
+            //console.log('keyValue', keyValue);
+
+            var nextKeyValue = keyValue + 1;
+            if (nextKeyValue > maxKeyValue){ nextKeyValue = 0; }
+
+            updateFieldCounters();
+            var missionCompleteKey = keyValue;
+            var missionCompleteScore = currentPoints;
+            var missionCompletePossible = totalPoints;
+
+            var fieldOptionsForm = $('<form style="display:none;"></form>');
+            fieldOptionsForm.attr('method', 'post');
+            fieldOptionsForm.attr('action', actionBase);
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete_key" value="'+missionCompleteKey+'" />');
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete_score" value="'+missionCompleteScore+'" />');
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete_possible" value="'+missionCompletePossible+'" />');
+            fieldOptionsForm.append('<input type="hidden" name="key" value="'+nextKeyValue+'" />');
+            fieldOptionsForm.appendTo(fieldOptions);
+            fieldOptionsForm.submit();
+
+            } else {
+
+            var scaleValue = scaleValueInput.length ? parseInt(scaleValueInput.val()) : 1;
+            var playerValue = playerValueInput.length ? playerValueInput.val() : '';
+            var fieldValue = fieldValueInput.length ? fieldValueInput.val() : '';
+            var bossValue = bossValueInput.length ? bossValueInput.val() : '';
+            //console.log('scaleValue', scaleValue);
+            //console.log('playerValue', playerValue);
+            //console.log('fieldValue', fieldValue);
+            //console.log('bossValue', bossValue);
+
+            var nextScaleValue = scaleValue + 1;
+            if (nextScaleValue > 8){ nextScaleValue = 1; }
+
+            var redirectURL = [actionBase];
+            redirectURL.push('scale='+scaleValue);
+            if (playerValue.length){ redirectURL.push('player='+playerValue); }
+            if (fieldValue.length){ redirectURL.push('field='+fieldValue); }
+            if (bossValue.length){ redirectURL.push('boss='+bossValue); }
+            //console.log('redirectURL', redirectURL);
+
+            }
+
         redirectURL = redirectURL.join('&');
         //console.log('redirectURL', redirectURL);
+
         window.location.href = redirectURL;
         return true;
+
         });
+
+
+    /* -- Field Map Event Grid -- */
 
     // Define a click event for the cells of the field map
     $('.cell', fieldMapEventGrid).bind('click', function(e){
@@ -200,6 +321,9 @@ $(document).ready(function(){
 
         });
 
+
+    /* -- Game Inititialization -- */
+
     // Automatically enable cells around the starting point
     firstCell.addClass('enabled');
     enableAdjacentCells(firstCellRow, firstCellCol);
@@ -215,7 +339,7 @@ $(document).ready(function(){
     totalPoints += robotsTotal * robotPointsValue;
     totalPoints += bossesTotal * bossPointsValue;
     fieldPointsTotal.html(totalPoints);
-    console.log('totalPoints = ', totalPoints);
+    //console.log('totalPoints = ', totalPoints);
 
     // Trigger the field count update function at start
     updateFieldCounters();
@@ -224,9 +348,11 @@ $(document).ready(function(){
 });
 
 
+/* -- Game Functions -- */
+
 // Define a function for getting adjacent cells
 function getAdjacentCells(thisCellRow, thisCellCol){
-    console.log('getAdjacentCells(' + thisCellRow + ', ' + thisCellCol + ')');
+    //console.log('getAdjacentCells(' + thisCellRow + ', ' + thisCellCol + ')');
 
     // Collect a reference to the requested cell
     var thisCell = $('.cell[data-row="'+thisCellRow+'"][data-col="'+thisCellCol+'"]', fieldMapEventGrid);
@@ -279,18 +405,18 @@ function enableAdjacentCells(thisCellRow, thisCellCol){
 
 // Define a function for updating moves counters
 function updateFieldCounters(){
-    console.log('updateFieldCounters()');
+    //console.log('updateFieldCounters()');
 
-    console.log('allowedMoves = ', allowedMoves);
-    console.log('usedMoves = ', usedMoves);
+    //console.log('allowedMoves = ', allowedMoves);
+    //console.log('usedMoves = ', usedMoves);
 
-    console.log('mechasTotal = ', mechasTotal);
-    console.log('robotsTotal = ', robotsTotal);
-    console.log('bossesTotal = ', bossesTotal);
+    //console.log('mechasTotal = ', mechasTotal);
+    //console.log('robotsTotal = ', robotsTotal);
+    //console.log('bossesTotal = ', bossesTotal);
 
-    console.log('mechasDefeated = ', mechasDefeated);
-    console.log('robotsDefeated = ', robotsDefeated);
-    console.log('bossesDefeated = ', bossesDefeated);
+    //console.log('mechasDefeated = ', mechasDefeated);
+    //console.log('robotsDefeated = ', robotsDefeated);
+    //console.log('bossesDefeated = ', bossesDefeated);
 
     // Recalculate move counters
     var mapScale = parseInt(fieldMap.attr('data-scale'));
@@ -303,7 +429,7 @@ function updateFieldCounters(){
     // Update remaining moves counter and span
     remainingMoves = allowedMoves - usedMoves;
     fieldMovesRemaining.html(remainingMoves);
-    console.log('remainingMoves = ', remainingMoves);
+    //console.log('remainingMoves = ', remainingMoves);
 
     // Recalculate point counters
     currentPoints = 0;
@@ -311,34 +437,46 @@ function updateFieldCounters(){
     currentPoints += robotsDefeated * robotPointsValue;
     currentPoints += bossesDefeated * bossPointsValue;
     fieldPointsCurrent.html(currentPoints);
-    console.log('currentPoints = ', currentPoints);
+    //console.log('currentPoints = ', currentPoints);
 
     // Recalculate complete percentage
     var targetsTotal = mechasTotal + robotsTotal + bossesTotal;
     var targetsDefeated = mechasDefeated + robotsDefeated + bossesDefeated;
     completePercent = Math.round(((targetsDefeated / targetsTotal) * 100), 2);
     fieldCompletePercent.html(completePercent + '%');
-    console.log('currentPoints = ', completePercent);
+    //console.log('currentPoints = ', completePercent);
 
 }
 
 // Define a function for updating game status
 function updateGameStatus(){
-    console.log('updateGameStatus()');
+    //console.log('updateGameStatus()');
 
 
     // If the player has defeated all bosses, the game is complete
     if (bossesDefeated >= bossesTotal){
-        console.log('bossesDefeated = ', bossesDefeated);
-        console.log('bossesTotal = ', bossesTotal);
+        battleStatus = 'success';
+
+        //console.log('bossesDefeated = ', bossesDefeated);
+        //console.log('bossesTotal = ', bossesTotal);
         fieldMap.addClass('complete success');
         fieldCounters.addClass('complete success');
+
+        var continueButton = $('.button.continue', fieldOptions);
+        if (continueButton.length){ continueButton.removeClass('disabled'); }
+
+        var leaderboardButton = $('.button.leaderboard', fieldOptions);
+        if (leaderboardButton.length){ leaderboardButton.removeClass('disabled'); }
+
     }
     // Else if the user is out of moves, the game is complete
     else if (remainingMoves == 0){
-        console.log('remainingMoves = ', remainingMoves);
+        battleStatus = 'failure';
+
+        //console.log('remainingMoves = ', remainingMoves);
         fieldMap.addClass('complete failure');
         fieldCounters.addClass('complete failure');
+
     }
 
 }

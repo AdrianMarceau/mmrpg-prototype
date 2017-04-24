@@ -337,7 +337,7 @@
     text-align: left;
     overflow: hidden;
     background-color: #1a1a1a;
-    padding: 6px 12px 0;
+    padding: 6px 9px 0;
     border: 1px solid #171717;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
@@ -366,11 +366,14 @@
     overflow: hidden;
 }
 #window .field_options .options_form .option {
-    width: calc(22% - 5px);
+    width: calc(25% - 5px);
 }
 #window .field_options .options_form .buttons {
-    width: calc(12% - 5px);
-    padding-top: 0;
+    display: block;
+    width: auto;
+    float: none;
+    clear: both;
+    padding: 5px 0 0;
 }
 #window .field_options .options_form label {
     float: left;
@@ -399,27 +402,121 @@
     border-radius: 6px;
     clear: both;
 }
+#window .field_options .options_form .button,
 #window .field_options .options_form input[type="button"] {
     float: left;
     height: auto;
     width: 100%;
+    display: block;
+    box-sizing: border-box;
     border: 1px solid #262626;
     background-color: #363636;
     color: #FFFFFF;
     font-size: 12px;
     line-height: 16px;
+    text-align: center;
+    text-decoration: none;
     margin: 0;
     padding: 6px;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
-    clear: both;
     cursor: pointer;
 }
+#window .field_options .options_form .button:hover,
 #window .field_options .options_form input[type="button"]:hover {
     background-color: #393939;
+    text-decoration: none;
 }
 
+#window .field_options .options_form .button.retry,
+#window .field_options .options_form .button.regenerate,
+#window .field_options .options_form .button.continue,
+#window .field_options .options_form .button.leaderboard {
+    margin: 0 5px 5px 0;
+    float: left;
+    clear: none;
+    width: calc((100% / 3) - 5px);
+    font-size: 14px;
+    line-height: 21px;
+    padding: 6px;
+}
+#window .field_options .options_form .button.continue,
+#window .field_options .options_form .button.leaderboard {
+    margin-right: 0;
+    width: calc(100% / 3);
+}
+#window .field_options .options_form .button.leaderboard {
+    cursor: default;
+}
+#window .field_options .options_form .button.reset {
+    margin: 0 auto;
+    width: auto;
+    float: none;
+    clear: both;
+    font-size: 12px;
+    line-height: 16px;
+    padding: 2px 3px;
+    transition: opacity 0.3s;
+    opacity: 0.6;
+}
+#window .field_options .options_form .button.reset:hover {
+    opacity: 1.0;
+}
+
+#window .field_options .options_form .button.disabled,
+#window .field_options .options_form .button.disabled:hover,
+#window .field_options .options_form input[type="button"][disabled],
+#window .field_options .options_form input[type="button"][disabled]:hover {
+    opacity: 0.6;
+    cursor: default;
+    border-color: #262626 !important;
+    background-color: #363636 !important;
+    color: #969696;
+}
+#window .field_options .options_form .button.disabled > span,
+#window .field_options .options_form .button.disabled:hover > span  {
+    visibility: hidden;
+}
+
+#window .field_options .options_form .buttons.debug .button.retry,
+#window .field_options .options_form .buttons.bonus .button.retry {
+    margin: 0 5px 0 0;
+    width: calc((100% / 2) - 5px);
+}
+#window .field_options .options_form .buttons.debug .button.regenerate,
+#window .field_options .options_form .buttons.bonus .button.regenerate {
+    margin: 0 0 0 5px;
+    width: calc((100% / 2) - 5px);
+}
+
+
+#window .field_options .options_form .buttons.bonus .button.retry,
+#window .field_options .options_form .buttons.bonus .button.regenerate {
+    margin-bottom: 5px;
+}
+
+
+#window .field_counters .name {
+    display: block;
+    float: none;
+    clear: both;
+    text-align: center;
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: normal;
+    color: #FFFFFF;
+    margin: 0 -10px 4px;
+    background-color: transparent;
+    text-shadow: 0 0 0 transparent;
+    padding: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
 
 #window .field_counters {
     display: block;
@@ -436,13 +533,13 @@
     width: calc(100% / 3);
     text-align: center;
 }
-#window .field_counters .counter:nth-child(1) {
+#window .field_counters .counter.moves {
     text-align: left;
 }
-#window .field_counters .counter:nth-child(2) {
+#window .field_counters .counter.points {
     text-align: center;
 }
-#window .field_counters .counter:nth-child(3) {
+#window .field_counters .counter.complete {
     text-align: right;
 }
 
@@ -460,20 +557,31 @@
 #window .field_counters.complete.failure {
     color: #dd2222;
 }
-#window .field_counters:before {
-    content: " ";
+
+#window .field_counters .results {
     display: block;
-    text-align: center;
-    font-size: 18px;
-    line-height: 22px;
+    overflow: hidden;
     margin: 0 -10px 4px;
+    transition: max-height 1s;
     max-height: 0;
-    transition: max-height 0.5s;
+}
+#window .field_counters.complete .results {
+    max-height: 26px;
+}
+
+#window .field_counters .results .result {
+    display: none;
+    float: none;
+    clear: both;
+    text-align: center;
+    font-size: 16px;
+    line-height: 18px;
+    font-weight: normal;
+    color: #FFFFFF;
+    margin: 0 auto;
     background-color: transparent;
-    color: #1e1e1e;
     text-shadow: 0 0 0 transparent;
-    font-weight: bold;
-    padding: 2px 3px;
+    padding: 4px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -481,14 +589,32 @@
     -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
-#window .field_counters.complete:before {
-    max-height: 24px;
+#window .field_counters.complete .result {
+
 }
-#window .field_counters.complete.success:before {
-    content: "Mission Success!";
-    background-color: #40bf4a;
+#window .field_counters.complete.success .result.success,
+#window .field_counters.complete.failure .result.failure {
+    display: block;
 }
-#window .field_counters.complete.failure:before {
-    content: "Mission Failure!";
-    background-color: #dd2222;
+
+#window .field_progress {
+    display: block;
+    margin: 5px auto 0;
+    padding: 0 10px;
+    overflow: hidden;
+}
+#window .field_progress .score {
+    display: block;
+    margin: 5px auto 0;
+    padding: 0 0 10px;
+    overflow: hidden;
+    font-size: 16px;
+    line-height: 19px;
+    text-align: center;
+}
+#window .field_progress .score .label {
+
+}
+#window .field_progress .score .value {
+
 }

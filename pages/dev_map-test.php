@@ -4,6 +4,9 @@
  * DEV TESTS / MAP GENERATOR
  */
 
+// Define the constant that puts the front-end in compact mode
+define('MMRPG_INDEX_COMPACT_MODE', true);
+
 // Define the SEO variables for this page
 $this_seo_title = 'Map Generator | Dev Tests | '.$this_seo_title;
 $this_seo_description = 'An experimental map generator for the MMRPG.';
@@ -13,9 +16,162 @@ $this_seo_robots = 'noindex,nofollow';
 $this_graph_data['title'] = 'Map Generator';
 $this_graph_data['description'] = 'An experimental map generator for the MMRPG.';
 
+// Empty cached session playlist if reset requested
+if (!empty($_REQUEST['reset'])){
+    unset($_SESSION['mmrpg_conqest_playlist']);
+    header('Location: '.MMRPG_CONFIG_ROOTURL.'dev/map-test/');
+    exit();
+}
+
+// Define array column function if not exists
+if (!function_exists('array_column')){
+    function array_column($array, $column){
+        return array_map(function($array)use($column){ return $array[$column]; }, $array);
+    }
+}
+
+// If this is NOT a debug request, automatically set a key value
+if (!isset($_REQUEST['debug'])
+    && !isset($_REQUEST['key'])){
+    $_REQUEST['key'] = 0;
+    $_SESSION['mmrpg_conqest_playlist'] = array();
+    $_SESSION['mmrpg_conqest_playlist_progress'] = array();
+}
+
+// Define a playlist of map configurations to go through
+$this_map_playlist = array();
+if (!empty($_SESSION['mmrpg_conqest_playlist'])){
+
+    // Collect existing playlist from session
+    $this_map_playlist = $_SESSION['mmrpg_conqest_playlist'];
+
+} else {
+
+    // Generate the map playlist
+    function generate_conquest_playlist(){
+        global $db;
+
+        $this_map_playlist = array();
+
+        // Tutorial Mission
+
+        $this_map_playlist[] = array('scale' => 1, 'field' => 'intro-field', 'boss' => 'trill');
+
+        // Doctor Missions
+
+        $this_map_playlist[] = array('scale' => 2, 'field' => 'light-laboratory', 'boss' => 'enker');
+        $this_map_playlist[] = array('scale' => 2, 'field' => 'wily-castle', 'boss' => 'punk');
+        $this_map_playlist[] = array('scale' => 2, 'field' => 'cossack-citadel', 'boss' => 'ballade');
+
+        // Elemental Missions
+
+        $elemental_fields = $db->get_array_list("SELECT field_token, field_type FROM mmrpg_index_fields WHERE field_class = 'master' AND field_type <> '' AND field_flag_hidden = 0 AND field_flag_published = 1 AND field_flag_complete = 1 ORDER BY field_order ASC;");
+        $elemental_fields_bytype = array();
+        foreach ($elemental_fields AS $field_key => $field_info){
+            $field_token = $field_info['field_token'];
+            $field_type = $field_info['field_type'];
+            if (!isset($elemental_fields_bytype[$field_type])){ $elemental_fields_bytype[$field_type] = array(); }
+            $elemental_fields_bytype[$field_type][] = $field_token;
+        }
+
+        $elemental_types = $db->get_array_list("SELECT type_token, type_name FROM mmrpg_index_types WHERE type_class = 'normal' AND type_flag_hidden = 0 AND type_flag_published = 1 ORDER BY type_order ASC;");
+        $elemental_types_excluded = array('none', 'copy', 'laser', 'shield');
+
+        foreach ($elemental_types AS $type_key => $type_info){
+            $type_token = $type_info['type_token'];
+            if (in_array($type_token, $elemental_types_excluded)){ continue; }
+            elseif (empty($elemental_fields_bytype[$type_token])){ continue; }
+            $scale_value = 3;
+            if ($type_key >= 8){ $scale_value++; }
+            if ($type_key >= 16){ $scale_value++; }
+            $field_token = $elemental_fields_bytype[$type_token][mt_rand(0, (count($elemental_fields_bytype[$type_token]) - 1))];
+            $this_map_playlist[] = array('scale' => $scale_value, 'field' => $field_token, 'boss' => 'doc-robot');
+        }
+
+        // Final Missions
+
+        $temp_robot_tokens = array('mega-man-ds', 'bass-ds', 'proto-man-ds');
+        $this_map_playlist[] = array('scale' => 6, 'field' => 'final-destination', 'boss' => $temp_robot_tokens[mt_rand(0, (count($temp_robot_tokens) - 1))]);
+
+        $temp_robot_tokens = array('dark-man', 'dark-man-2', 'dark-man-3', 'dark-man-4');
+        $this_map_playlist[] = array('scale' => 7, 'field' => 'final-destination-ii', 'boss' => $temp_robot_tokens[mt_rand(0, (count($temp_robot_tokens) - 1))]);
+
+        $this_map_playlist[] = array('scale' => 8, 'field' => 'final-destination-iii', 'boss' => 'slur');
+
+        $this_map_playlist[] = array('scale' => 8, 'field' => 'prototype-complete', 'boss' => 'quint');
+
+        //echo('<pre>$elemental_fields = '.print_r($elemental_fields, true).'</pre>');
+        //echo('<pre>$elemental_fields_bytype = '.print_r($elemental_fields_bytype, true).'</pre>');
+
+        //echo('<pre>$elemental_types = '.print_r($elemental_types, true).'</pre>');
+        //echo('<pre>$elemental_types_excluded = '.print_r($elemental_types_excluded, true).'</pre>');
+
+        //echo('<pre>$this_map_playlist = '.print_r($this_map_playlist, true).'</pre>');
+        //exit();
+
+        // Return completed playlist
+        return $this_map_playlist;
+
+    }
+
+    // Generate a new playlist geing the conquest funtion
+    $this_map_playlist = generate_conquest_playlist();
+
+    // Update the session with the newly generated playlist
+    if (!empty($this_map_playlist)){ $_SESSION['mmrpg_conqest_playlist'] =  $this_map_playlist; }
+
+}
+
+// If a completion request was specifically posted, save it as progress
+if (isset($_POST['mission_complete_key'])
+    && is_numeric($_POST['mission_complete_key'])
+    && !empty($_POST['mission_complete_score'])
+    && is_numeric($_POST['mission_complete_score'])
+    && !empty($_POST['mission_complete_possible'])
+    && is_numeric($_POST['mission_complete_possible'])){
+    $_SESSION['mmrpg_conqest_playlist_progress'][] = array(
+        'key' => $_POST['mission_complete_key'],
+        'score' => $_POST['mission_complete_score'],
+        'possible' => $_POST['mission_complete_possible']
+        );
+}
+
+// Collect the progress array from the session
+$this_map_progress = $_SESSION['mmrpg_conqest_playlist_progress'];
+
+// If a specific playlist key was requested, load it now
+$current_playlist_key = false;
+if (isset($_REQUEST['key'])
+    && is_numeric($_REQUEST['key'])
+    && isset($this_map_playlist[$_REQUEST['key']])){
+    $current_playlist_key = $_REQUEST['key'];
+    foreach ($this_map_playlist[$current_playlist_key] AS $name => $value){
+        $_REQUEST[$name] = $value;
+    }
+}
+
 ?>
 
-<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Map Generator</h2>
+<div class="header">
+    <div class="header_wrapper">
+        <h1 class="title"><span class="brand">Mega Man RPG Conquest</span></h1>
+    </div>
+</div>
+
+<h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+    <? if ($current_playlist_key !== false){ ?>
+        Campaign Mode
+        <span style="float: right;">
+            <?= 'Mission '.($current_playlist_key + 1).' of '.(count($this_map_playlist) - 1) ?>
+        </span>
+    <? } else { ?>
+        Debug Mode
+        <span style="float: right;">
+            Custom Mission
+        </span>
+    <? } ?>
+</h2>
+
 <div class="subbody">
 
     <div class="test_area">
@@ -28,23 +184,16 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
         if (true){
 
-            // Define array column function if not exists
-            if (!function_exists('array_column')){
-                function array_column($array, $column){
-                    return array_map(function($array)use($column){ return $array[$column]; }, $array);
-                }
-            }
-
             // Collect a list of battle fields from the database
             $index_field_tokens = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_flag_complete = 1 ORDER BY field_order ASC;");
             $index_field_tokens = !empty($index_field_tokens) ? array_column($index_field_tokens, 'field_token') : array('intro-field');
 
             // Collect the field token from the request if set
             $request_field_token = false;
-            if (!empty($_GET['field'])
-                && is_string($_GET['field'])
-                && in_array($_GET['field'], $index_field_tokens)){
-                $request_field_token = $_GET['field'];
+            if (!empty($_REQUEST['field'])
+                && is_string($_REQUEST['field'])
+                && in_array($_REQUEST['field'], $index_field_tokens)){
+                $request_field_token = $_REQUEST['field'];
             }
 
             // Collect a random field for this test to use as a base
@@ -62,10 +211,10 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
             // Collect the player token from the request if set
             $request_player_token = false;
-            if (!empty($_GET['player'])
-                && is_string($_GET['player'])
-                && in_array($_GET['player'], $index_player_tokens)){
-                $request_player_token = $_GET['player'];
+            if (!empty($_REQUEST['player'])
+                && is_string($_REQUEST['player'])
+                && in_array($_REQUEST['player'], $index_player_tokens)){
+                $request_player_token = $_REQUEST['player'];
             }
 
             // Collect a random player for this test to use as a base
@@ -87,10 +236,10 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
             // Collect the boss token from the request if set
             $request_boss_token = false;
-            if (!empty($_GET['boss'])
-                && is_string($_GET['boss'])
-                && in_array($_GET['boss'], $index_boss_tokens)){
-                $request_boss_token = $_GET['boss'];
+            if (!empty($_REQUEST['boss'])
+                && is_string($_REQUEST['boss'])
+                && in_array($_REQUEST['boss'], $index_boss_tokens)){
+                $request_boss_token = $_REQUEST['boss'];
             }
 
             // Collect a random boss for this test to use as a base
@@ -103,7 +252,9 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
             //echo('<pre>$this_boss_info = '.print_r($this_boss_info, true).'</pre>');
 
             // Collect a list of robots targets based on field type
-            $index_robot_tokens = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_flag_complete = 1 AND robot_core = '{$this_field_info['field_type']}' AND robot_class = 'master' ORDER BY robot_order ASC;");
+            $index_robot_filter = '';
+            if ($request_field_token != 'prototype-complete'){ $index_robot_filter = "AND robot_core = '{$this_field_info['field_type']}' "; }
+            $index_robot_tokens = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_flag_complete = 1 {$index_robot_filter} AND robot_class = 'master' ORDER BY robot_order ASC;");
             $index_robot_tokens = !empty($index_robot_tokens) ? array_column($index_robot_tokens, 'robot_token') : array('mega-man');
             shuffle($index_robot_tokens);
             if (!empty($this_field_info['field_master'])){
@@ -118,7 +269,9 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
             //echo('<pre>$index_robot_info = '.print_r($index_robot_info, true).'</pre>');
 
             // Collect a list of mecha targets based on field type
-            $index_mecha_tokens = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_flag_complete = 1 AND robot_core = '{$this_field_info['field_type']}' AND robot_class = 'mecha' ORDER BY robot_order ASC;");
+            $index_mecha_filter = '';
+            if ($request_field_token != 'prototype-complete'){ $index_mecha_filter = "AND robot_core = '{$this_field_info['field_type']}' "; }
+            $index_mecha_tokens = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_flag_complete = 1 {$index_mecha_filter} AND robot_class = 'mecha' ORDER BY robot_order ASC;");
             $index_mecha_tokens = !empty($index_mecha_tokens) ? array_column($index_mecha_tokens, 'robot_token') : array('met');
             shuffle($index_mecha_tokens);
             if (!empty($this_field_info['field_mechas'])){
@@ -145,11 +298,11 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
             // Collect the map scale from the request if set
             $request_map_scale = false;
-            if (!empty($_GET['scale'])
-                && is_numeric($_GET['scale'])
-                && $_GET['scale'] >= $min_map_scale
-                && $_GET['scale'] <= $max_map_scale){
-                $request_map_scale = $_GET['scale'];
+            if (!empty($_REQUEST['scale'])
+                && is_numeric($_REQUEST['scale'])
+                && $_REQUEST['scale'] >= $min_map_scale
+                && $_REQUEST['scale'] <= $max_map_scale){
+                $request_map_scale = $_REQUEST['scale'];
             }
 
             // Generate the scale value and rows/cols for this map (1-8)
@@ -351,11 +504,20 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
         }
 
+        //echo('<pre>$this_map_progress = '.print_r($this_map_progress, true).'</pre>');
+
         $debug_variable_text = ob_get_clean();
 
         ?>
 
         <div class="field_counters">
+
+            <div class="name type type_<?= !empty($this_field_info['field_type']) ? $this_field_info['field_type'] : 'none' ?>"><?= $this_field_info['field_name'] ?></div>
+
+            <div class="results">
+                <div class="result success type type_nature">Mission Complete!</div>
+                <div class="result failure type type_flame">Mission Failure&hellip;</div>
+            </div>
 
             <div class="counter moves">
                 <span class="value remaining">0</span>
@@ -478,112 +640,160 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
             </div>
         </div>
 
-        <div class="field_options">
+        <div class="field_options <?= $current_playlist_key !== false ? 'playlist_active' : '' ?>">
 
             <form class="options_form" method="get" action="dev/map-test/">
 
-                <div class="option">
-                    <label>Map Size</label>
-                    <select name="scale">
-                        <?
-                        // Loop through and display scale options
-                        for ($scale = 0; $scale <= 8; $scale++){
+                <? if ($current_playlist_key !== false){ ?>
 
-                            $cols = $scale * 4;
-                            $rows = $scale * 1;
-                            $label = !empty($scale) ? $rows.' x '.$cols : 'Random';
-                            //$label = !empty($scale) ? 'Level '.$scale : 'Random';
+                    <?
+                    // Print hidden inputs for the playlist variables
+                    echo('<input class="hidden" type="hidden" name="key" value="'.$current_playlist_key.'" />'.PHP_EOL);
+                    echo('<input class="hidden" type="hidden" name="maxkey" value="'.count($this_map_playlist).'" />'.PHP_EOL);
+                    foreach ($this_map_playlist[$current_playlist_key] AS $name => $value){
+                        echo('<input class="hidden" type="hidden" name="'.$name.'" value="'.$value.'" />'.PHP_EOL);
+                    }
+                    ?>
 
-                            $value = !empty($scale) ? $scale : '';
+                    <div class="buttons <?= $current_playlist_key == (count($this_map_playlist) - 1) ? 'bonus' : '' ?>">
 
-                            if (empty($_GET['scale']) && empty($scale)){ $selected = 'selected="selected"'; }
-                            elseif (!empty($_GET['scale']) && $_GET['scale'] == $scale){ $selected = 'selected="selected"'; }
-                            else { $selected = ''; }
+                        <a class="button retry type type_water"><span>Retry Mission</span></a>
+                        <a class="button regenerate type type_time"><span>Regenerate Field</span></a>
+                        <? if (isset($this_map_playlist[$current_playlist_key + 2])){ ?>
+                            <a class="button continue type type_nature disabled"><span>Next Mission &raquo;</span></a>
+                        <? } elseif (isset($this_map_playlist[$current_playlist_key + 1])){ ?>
+                            <a class="button continue type type_electric disabled"><span>Campaign Complete!</span></a>
+                        <? } else { ?>
+                            <? /* <a class="button leaderboard type type_electric disabled"><span>Mission Complete!</span></a> */ ?>
+                        <? } ?>
+                        <a class="button reset type type_flame" href="dev/map-test/"><span>Reset Game</span></a>
 
-                            echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                    </div>
 
-                        }
-                        ?>
-                    </select>
-                </div>
+                <? } else { ?>
 
-                <div class="option">
-                    <label>Player Character</label>
-                    <select name="player">
-                        <?
-                        // Loop through and display player character options
-                        $player_tokens = array_merge(array(''), $index_player_tokens);
-                        foreach ($player_tokens AS $player){
+                    <div class="option">
+                        <label>Map Size</label>
+                        <select name="scale">
+                            <?
+                            // Loop through and display scale options
+                            for ($scale = 0; $scale <= 8; $scale++){
 
-                            $label = !empty($player) ? ucwords(str_replace('-', '. ', $player)) : 'Random';
+                                $cols = $scale * 4;
+                                $rows = $scale * 1;
+                                $label = !empty($scale) ? $rows.' x '.$cols : 'Random';
+                                //$label = !empty($scale) ? 'Level '.$scale : 'Random';
 
-                            $value = !empty($player) ? $player : '';
+                                $value = !empty($scale) ? $scale : '';
 
-                            if (empty($_GET['player']) && empty($player)){ $selected = 'selected="selected"'; }
-                            elseif (!empty($_GET['player']) && $_GET['player'] == $player){ $selected = 'selected="selected"'; }
-                            else { $selected = ''; }
+                                if (empty($_REQUEST['scale']) && empty($scale)){ $selected = 'selected="selected"'; }
+                                elseif (!empty($_REQUEST['scale']) && $_REQUEST['scale'] == $scale){ $selected = 'selected="selected"'; }
+                                else { $selected = ''; }
 
-                            echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
 
-                        }
-                        ?>
-                    </select>
-                </div>
+                            }
+                            ?>
+                        </select>
+                    </div>
 
-                <div class="option">
-                    <label>Battle Field</label>
-                    <select name="field">
-                        <?
-                        // Loop through and display battle field options
-                        $field_tokens = array_merge(array(''), $index_field_tokens);
-                        foreach ($field_tokens AS $field){
+                    <div class="option">
+                        <label>Player Character</label>
+                        <select name="player">
+                            <?
+                            // Loop through and display player character options
+                            $player_tokens = array_merge(array(''), $index_player_tokens);
+                            foreach ($player_tokens AS $player){
 
-                            $label = !empty($field) ? ucwords(str_replace('-', ' ', $field)) : 'Random';
+                                $label = !empty($player) ? ucwords(str_replace('-', '. ', $player)) : 'Random';
 
-                            $value = !empty($field) ? $field : '';
+                                $value = !empty($player) ? $player : '';
 
-                            if (empty($_GET['field']) && empty($field)){ $selected = 'selected="selected"'; }
-                            elseif (!empty($_GET['field']) && $_GET['field'] == $field){ $selected = 'selected="selected"'; }
-                            else { $selected = ''; }
+                                if (empty($_REQUEST['player']) && empty($player)){ $selected = 'selected="selected"'; }
+                                elseif (!empty($_REQUEST['player']) && $_REQUEST['player'] == $player){ $selected = 'selected="selected"'; }
+                                else { $selected = ''; }
 
-                            echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
 
-                        }
-                        ?>
-                    </select>
-                </div>
+                            }
+                            ?>
+                        </select>
+                    </div>
 
-                <div class="option">
-                    <label>Fortress Boss</label>
-                    <select name="boss">
-                        <?
-                        // Loop through and display boss character options
-                        $boss_tokens = array_merge(array(''), $index_boss_tokens);
-                        foreach ($boss_tokens AS $boss){
+                    <div class="option">
+                        <label>Battle Field</label>
+                        <select name="field">
+                            <?
+                            // Loop through and display battle field options
+                            $field_tokens = array_merge(array(''), $index_field_tokens);
+                            foreach ($field_tokens AS $field){
 
-                            $label = !empty($boss) ? ucwords(str_replace('-', ' ', str_replace('-ds', ' DS', $boss))) : 'Random';
+                                $label = !empty($field) ? ucwords(str_replace('-', ' ', $field)) : 'Random';
 
-                            $value = !empty($boss) ? $boss : '';
+                                $value = !empty($field) ? $field : '';
 
-                            if (empty($_GET['boss']) && empty($boss)){ $selected = 'selected="selected"'; }
-                            elseif (!empty($_GET['boss']) && $_GET['boss'] == $boss){ $selected = 'selected="selected"'; }
-                            else { $selected = ''; }
+                                if (empty($_REQUEST['field']) && empty($field)){ $selected = 'selected="selected"'; }
+                                elseif (!empty($_REQUEST['field']) && $_REQUEST['field'] == $field){ $selected = 'selected="selected"'; }
+                                else { $selected = ''; }
 
-                            echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
 
-                        }
-                        ?>
-                    </select>
-                </div>
+                            }
+                            ?>
+                        </select>
+                    </div>
 
-                <div class="buttons">
-                    <input type="button" name="reset" value="Restart?" />
-                    <input type="button" name="regenerate" value="Regenerate" />
-                </div>
+                    <div class="option">
+                        <label>Fortress Boss</label>
+                        <select name="boss">
+                            <?
+                            // Loop through and display boss character options
+                            $boss_tokens = array_merge(array(''), $index_boss_tokens);
+                            foreach ($boss_tokens AS $boss){
+
+                                $label = !empty($boss) ? ucwords(str_replace('-', ' ', str_replace('-ds', ' DS', $boss))) : 'Random';
+
+                                $value = !empty($boss) ? $boss : '';
+
+                                if (empty($_REQUEST['boss']) && empty($boss)){ $selected = 'selected="selected"'; }
+                                elseif (!empty($_REQUEST['boss']) && $_REQUEST['boss'] == $boss){ $selected = 'selected="selected"'; }
+                                else { $selected = ''; }
+
+                                echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="buttons debug">
+
+                        <a class="button retry type type_water"><span>Retry Mission</span></a>
+                        <a class="button regenerate type type_time"><span>Regenerate Field</span></a>
+
+                    </div>
+
+                <? } ?>
 
             </form>
 
         </div>
+
+        <? if ($current_playlist_key !== false){ ?>
+
+            <?
+            // Calculate the current score for this user
+            $current_score_total = 0;
+            foreach ($this_map_progress AS $key => $details){ $current_score_total += $details['score']; }
+            ?>
+            <div class="field_progress">
+                <div class="score" data-total="<?= $current_score_total ?>">
+                    <span class="label"><?= $current_playlist_key == (count($this_map_playlist) - 1) ? 'Final Score' : 'Current Score' ?>:</span>
+                    <span class="value"><?= number_format($current_score_total, 0, '.', ',') ?> Points</span>
+                </div>
+            </div>
+
+        <? } ?>
 
         <div>
             <?
