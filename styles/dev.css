@@ -163,9 +163,15 @@
     border-color: rgba(255, 255, 255, 0.9);
 }
 
-#window .field_map .event_grid .cell.complete .event {
+#window .field_map .event_grid .cell.complete .event.mecha,
+#window .field_map .event_grid .cell.complete .event.robot,
+#window .field_map .event_grid .cell.complete .event.boss {
     transition: opacity 1.0s;
     opacity: 0.4;
+}
+#window .field_map .event_grid .cell.complete .event.origin,
+#window .field_map .event_grid .cell.complete .event.destination {
+    opacity: 0.9;
 }
 #window .field_map .event_grid .cell.complete:not(.origin) .sprite {
     transition: opacity 1.0s, background 1.0s;
@@ -564,12 +570,13 @@
 #window .field_counters .results {
     display: block;
     overflow: hidden;
-    margin: 0 -10px 4px;
-    transition: max-height 1s;
+    margin: 0 -10px 0;
     max-height: 0;
+    transition: max-height 1s, margin 1s;
 }
 #window .field_counters.complete .results {
     max-height: 26px;
+    margin-bottom: 4px;
 }
 
 #window .field_counters .results .result {

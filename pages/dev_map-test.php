@@ -98,7 +98,7 @@ if (!empty($_SESSION['mmrpg_conqest_playlist'])){
 
         $this_map_playlist[] = array('scale' => 8, 'field' => 'final-destination-iii', 'boss' => 'slur');
 
-        $this_map_playlist[] = array('scale' => 8, 'field' => 'prototype-complete', 'boss' => 'quint');
+        $this_map_playlist[] = array('scale' => 8, 'field' => 'prototype-complete', 'boss' => 'quint', 'bonus' => true);
 
         //echo('<pre>$elemental_fields = '.print_r($elemental_fields, true).'</pre>');
         //echo('<pre>$elemental_fields_bytype = '.print_r($elemental_fields_bytype, true).'</pre>');
@@ -371,10 +371,10 @@ if (true){
     if ($this_map_cells_remaning_count > 0){
 
         // Define the limit for how many robots we can add events for
-        $this_map_robot_limit = $this_map_scale * 1;
+        $this_map_robot_limit = floor($this_map_scale * 1.50);
 
         //echo('<hr />');
-        //echo('<pre>$this_map_robot_limit = '.print_r($this_map_robot_limit, true).'</pre>');
+        //echo('<pre>$this_map_robot_limit = floor('.$this_map_scale.' * 1.5) = '.print_r($this_map_robot_limit, true).'</pre>');
 
         // Loop through and generate robots events for cells
         if (!empty($this_map_robot_limit)){
@@ -421,7 +421,7 @@ if (true){
         //echo('<pre>$this_map_cells_remaning_count = '.print_r($this_map_cells_remaning_count, true).'</pre>');
 
         // Define the limit for how many mechas we can add events for
-        $this_map_mecha_limit = $this_map_scale * $this_map_scale;
+        $this_map_mecha_limit = floor($this_map_scale * $this_map_scale * 1.10);
 
         //echo('<hr />');
         //echo('<pre>$this_map_mecha_limit = '.print_r($this_map_mecha_limit, true).'</pre>');
