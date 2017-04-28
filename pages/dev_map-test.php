@@ -123,6 +123,9 @@ if (!empty($_SESSION['mmrpg_conqest_playlist'])){
 }
 
 // If a completion request was specifically posted, save it as progress
+if (!isset($_SESSION['mmrpg_conqest_playlist_progress'])){
+    $_SESSION['mmrpg_conqest_playlist_progress'] = array();
+}
 if (isset($_POST['mission_complete_key'])
     && is_numeric($_POST['mission_complete_key'])
     && !empty($_POST['mission_complete_score'])
@@ -477,8 +480,6 @@ if (true){
 
 }
 
-//echo('<pre>$this_map_progress = '.print_r($this_map_progress, true).'</pre>');
-
 $debug_variable_text = ob_get_clean();
 
 ?>
@@ -535,7 +536,7 @@ $debug_variable_text = ob_get_clean();
 
         <div class="field_map" data-scale="<?= $this_map_scale ?>" data-rows="<?= $this_map_rows ?>" data-cols="<?= $this_map_cols ?>">
             <div class="wrapper">
-                <div class="field_background" style="background-image: url(images/fields/<?= $this_field_token ?>/battle-field_preview.png);"></div>
+                <div class="field_background" style="background-image: url(images/fields/<?= $this_field_token ?>/<?= !$flag_wap ? 'battle-field_background_base.gif' : 'battle-field_preview.png' ?>);"></div>
                 <div class="field_overlay"></div>
                 <div class="event_grid">
                     <?
@@ -607,11 +608,13 @@ $debug_variable_text = ob_get_clean();
 
                                 } elseif ($event['kind'] == 'destination'){
 
-                                    $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['boss'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
+                                    //$inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['boss'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
+                                    $inside .= '<span class="sprite sprite_left sprite_'.$xsize.' sprite_'.$event['boss'].' sprite_shadow"></span>';
 
                                 } elseif (in_array($event['kind'], array('mecha', 'robot', 'boss'))){
 
-                                    $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['token'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
+                                    //$inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['token'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
+                                    $inside .= '<span class="sprite sprite_left sprite_'.$xsize.' sprite_'.$event['token'].' sprite_shadow"></span>';
 
                                 }
                             }
@@ -621,6 +624,7 @@ $debug_variable_text = ob_get_clean();
 
                                 $player = $this_map_events[$this_map_origin]['player'];
                                 $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/players/'.$player.'/sprite_right_'.$xsize.'.png);"></span>';
+                                //$inside .= '<span class="sprite sprite_right sprite_'.$xsize.' sprite_'.$player.'"></span>';
                             }
 
                             // If this cell has already been completed add the class
