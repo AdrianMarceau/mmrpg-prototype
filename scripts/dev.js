@@ -90,11 +90,15 @@ $(document).ready(function(){
         // Reset the classes for each of the map cells
         $('.cell', fieldMapEventGrid).removeClass('enabled complete');
 
+        // Add the shadow class to all non-origin cell events
+        $('.sprite', fieldMapEventGrid).addClass('sprite_shadow');
+
         // Update field counter calculations
         updateFieldCounters();
 
         // Re-enable the orgin cell and it's adjacent neighbours
         firstCell.addClass('enabled complete');
+        firstCell.find('.sprite').removeClass('sprite_shadow');
         enableAdjacentCells(firstCellRow, firstCellCol);
 
         // Reset the battle status to pending
@@ -255,6 +259,15 @@ $(document).ready(function(){
             }
         });
 
+    // Loop through and preload non-shadow versions of sprites
+    var preloadImages = $('<div id="preload" style="visibility: hidden; width: 0; height: 0;"></div>');
+    $('.sprite.sprite_shadow', fieldMapEventGrid).each(function(){
+        var preloadSprite = $(this).clone();
+        preloadSprite.removeClass('sprite_shadow');
+        preloadImages.append(preloadSprite);
+        });
+    preloadImages.appendTo('body');
+
 
     /* -- Field Map Event Grid -- */
 
@@ -411,6 +424,7 @@ function enableAdjacentCells(thisCellRow, thisCellCol){
             adjacentCell.removeClass('enabled');
             void adjacentCell.get(0).offsetWidth;
             }
+        adjacentCell.find('.sprite_shadow').removeClass('sprite_shadow');
         adjacentCell.addClass('enabled');
         //console.log('add enabled status to .cell[data-row="'+adjacentCellPos[0]+'"][data-col="'+adjacentCellPos[1]+'"]');
         }

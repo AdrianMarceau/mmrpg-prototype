@@ -173,8 +173,11 @@
 #window .field_map .event_grid .cell.complete .event.destination {
     opacity: 0.9;
 }
+#window .field_map .event_grid .cell .sprite {
+    transition: opacity 0.5s, background-image 0.5s;
+}
 #window .field_map .event_grid .cell.complete:not(.origin) .sprite {
-    transition: opacity 1.0s, background 1.0s;
+    transition: opacity 0.5s, background 0.5s;
     opacity: 0.8;
 }
 #window .field_map .event_grid .cell.complete:not(.origin) .sprite_40x40 {
