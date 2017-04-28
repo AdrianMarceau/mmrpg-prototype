@@ -48,6 +48,7 @@ RewriteRule ^mmrpg-info\.xml$ mmrpg-info.php [L]
 RewriteRule ^mmrpg-ranking\.xml$ mmrpg-ranking.php [L]
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
 RewriteRule ^styles/style\.css$ styles/style.php [L]
+RewriteRule ^styles/robots\.css$ styles/robots.php [L]
 
 # Redirect the non-existant pages to better places
 RewriteRule ^home/?$ / [R,L]

@@ -322,6 +322,7 @@ require_once('pages/'.$this_current_page.'.php');
 
 <? if ($this_current_page == 'dev'): ?>
     <link type="text/css" href="styles/dev.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+    <link type="text/css" href="styles/robots.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <? endif; ?>
 
 <meta name="format-detection" content="telephone=no" />
