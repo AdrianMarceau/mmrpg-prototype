@@ -101,31 +101,6 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
             }
             <?
 
-            /*
-            ?>
-            #mmrpg .item_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .ability_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .battle_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .field_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .player_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .robot_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?> {
-                border-color: rgb(<?= implode(',', $type_info['type_colour_dark']) ?>) !important;
-                background-color: rgb(<?= implode(',', $type_info['type_colour_light']) ?>) !important;
-                background-image: linear-gradient(left top, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 20%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 80%) !important;
-                background-image: -o-linear-gradient(left top, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 20%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 80%) !important;
-                background-image: -moz-linear-gradient(left top, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 20%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 80%) !important;
-                background-image: -webkit-linear-gradient(left top, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 20%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 80%) !important;
-                background-image: -ms-linear-gradient(left top, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 20%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 80%) !important;
-                background-image: -webkit-gradient(
-                    linear,
-                    left top,
-                    right bottom,
-                    color-stop(0.2, rgb(<?= implode(',', $type_info['type_colour_light']) ?>)),
-                    color-stop(0.8, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>))
-                ) !important;
-            }
-            <?
-            */
         }
     }
     $temp_css_markup .= ob_get_clean();
