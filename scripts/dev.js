@@ -40,7 +40,7 @@ var robotPointsValue = 100;
 var bossPointsValue = 1000;
 
 // Define the point counters
-var currentPoints = 0;
+var earnedPoints = 0;
 var totalPoints = 0;
 
 // Define the completion percent
@@ -81,7 +81,7 @@ $(document).ready(function(){
         mechasDefeated = 0;
         robotsDefeated = 0;
         bossesDefeated = 0;
-        currentPoints = 0;
+        earnedPoints = 0;
 
         // Remove any complete classes from bodies
         fieldCounters.removeClass('complete success failure');
@@ -197,17 +197,29 @@ $(document).ready(function(){
             if (nextKeyValue > maxKeyValue){ nextKeyValue = 0; }
 
             updateFieldCounters();
-            var missionCompleteKey = keyValue;
-            var missionCompleteScore = currentPoints;
-            var missionCompletePossible = totalPoints;
 
             var fieldOptionsForm = $('<form style="display:none;"></form>');
             fieldOptionsForm.attr('method', 'post');
             fieldOptionsForm.attr('action', actionBase);
-            fieldOptionsForm.append('<input type="hidden" name="mission_complete_key" value="'+missionCompleteKey+'" />');
-            fieldOptionsForm.append('<input type="hidden" name="mission_complete_score" value="'+missionCompleteScore+'" />');
-            fieldOptionsForm.append('<input type="hidden" name="mission_complete_possible" value="'+missionCompletePossible+'" />');
+
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[mission_key]" value="'+keyValue+'" />');
+
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[mechas_defeated]" value="'+mechasDefeated+'" />');
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[mechas_total]" value="'+mechasTotal+'" />');
+
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[robots_defeated]" value="'+robotsDefeated+'" />');
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[robots_total]" value="'+robotsTotal+'" />');
+
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[bosses_defeated]" value="'+bossesDefeated+'" />');
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[bosses_total]" value="'+bossesTotal+'" />');
+
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[points_earned]" value="'+earnedPoints+'" />');
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[points_total]" value="'+totalPoints+'" />');
+
+            fieldOptionsForm.append('<input type="hidden" name="mission_complete[percent_complete]" value="'+completePercent+'" />');
+
             fieldOptionsForm.append('<input type="hidden" name="key" value="'+nextKeyValue+'" />');
+
             fieldOptionsForm.appendTo(fieldOptions);
             fieldOptionsForm.submit();
 
@@ -463,19 +475,19 @@ function updateFieldCounters(){
     //console.log('remainingMoves = ', remainingMoves);
 
     // Recalculate point counters
-    currentPoints = 0;
-    currentPoints += mechasDefeated * mechaPointsValue;
-    currentPoints += robotsDefeated * robotPointsValue;
-    currentPoints += bossesDefeated * bossPointsValue;
-    fieldPointsCurrent.html(currentPoints);
-    //console.log('currentPoints = ', currentPoints);
+    earnedPoints = 0;
+    earnedPoints += mechasDefeated * mechaPointsValue;
+    earnedPoints += robotsDefeated * robotPointsValue;
+    earnedPoints += bossesDefeated * bossPointsValue;
+    fieldPointsCurrent.html(earnedPoints);
+    //console.log('earnedPoints = ', earnedPoints);
 
     // Recalculate complete percentage
     var targetsTotal = mechasTotal + robotsTotal + bossesTotal;
     var targetsDefeated = mechasDefeated + robotsDefeated + bossesDefeated;
     completePercent = Math.round(((targetsDefeated / targetsTotal) * 100), 2);
     fieldCompletePercent.html(completePercent + '%');
-    //console.log('currentPoints = ', completePercent);
+    //console.log('earnedPoints = ', completePercent);
 
 }
 

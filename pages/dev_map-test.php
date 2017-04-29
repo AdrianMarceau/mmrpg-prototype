@@ -98,7 +98,9 @@ if (!empty($_SESSION['mmrpg_conqest_playlist'])){
 
         $this_map_playlist[] = array('scale' => 8, 'field' => 'final-destination-3', 'boss' => 'slur');
 
-        $this_map_playlist[] = array('scale' => 8, 'field' => 'prototype-complete', 'boss' => 'quint', 'bonus' => true);
+        //$this_map_playlist[] = array('scale' => 8, 'field' => 'prototype-complete', 'boss' => 'quint', 'bonus' => true, 'difficulty' => 1);
+
+        $this_map_playlist[] = array('results' => true);
 
         //echo('<pre>$elemental_fields = '.print_r($elemental_fields, true).'</pre>');
         //echo('<pre>$elemental_fields_bytype = '.print_r($elemental_fields_bytype, true).'</pre>');
@@ -122,10 +124,24 @@ if (!empty($_SESSION['mmrpg_conqest_playlist'])){
 
 }
 
+// Count the entries in the playlist they are NOT results
+$this_map_playlist_count = 0;
+foreach ($this_map_playlist AS $entry){
+    if (!isset($entry['results'])){ $this_map_playlist_count += 1; }
+}
+
 // If a completion request was specifically posted, save it as progress
 if (!isset($_SESSION['mmrpg_conqest_playlist_progress'])){
     $_SESSION['mmrpg_conqest_playlist_progress'] = array();
 }
+if (!empty($_POST['mission_complete'])
+    && is_array($_POST['mission_complete'])
+    && isset($_POST['mission_complete']['mission_key'])){
+    $mission_complete = $_POST['mission_complete'];
+    $mission_key = $mission_complete['mission_key'];
+    $_SESSION['mmrpg_conqest_playlist_progress'][$mission_key] = $mission_complete;
+}
+/*
 if (isset($_POST['mission_complete_key'])
     && is_numeric($_POST['mission_complete_key'])
     && !empty($_POST['mission_complete_score'])
@@ -138,18 +154,32 @@ if (isset($_POST['mission_complete_key'])
         'possible' => $_POST['mission_complete_possible']
         );
 }
+*/
 
 // Collect the progress array from the session
 $this_map_progress = $_SESSION['mmrpg_conqest_playlist_progress'];
 
 // If a specific playlist key was requested, load it now
 $current_playlist_key = false;
+$current_playlist_info = false;
+$current_playlist_key_semifinal = false;
+$current_playlist_key_final = false;
+$current_playlist_key_results = false;
 if (isset($_REQUEST['key'])
     && is_numeric($_REQUEST['key'])
     && isset($this_map_playlist[$_REQUEST['key']])){
     $current_playlist_key = $_REQUEST['key'];
     foreach ($this_map_playlist[$current_playlist_key] AS $name => $value){
         $_REQUEST[$name] = $value;
+    }
+    $current_playlist_info = $this_map_playlist[$current_playlist_key];
+    if (!empty($current_playlist_info['results'])){
+        $current_playlist_key_results = true;
+    }
+    if ($current_playlist_key == ($this_map_playlist_count - 1)){
+        $current_playlist_key_final = true;
+    } elseif ($current_playlist_key == ($this_map_playlist_count - 2)){
+        $current_playlist_key_semifinal = true;
     }
 }
 
@@ -158,7 +188,7 @@ if (isset($_REQUEST['key'])
 
 ob_start();
 
-if (true){
+if (!$current_playlist_key_results){
 
     // Collect a list of battle fields from the database
     $index_field_tokens = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_flag_complete = 1 ORDER BY field_order ASC;");
@@ -491,7 +521,12 @@ $debug_variable_text = ob_get_clean();
 </div>
 
 <h2 class="subheader field_type_<?= !empty($this_field_info['field_type']) ? $this_field_info['field_type'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-    <? if ($current_playlist_key !== false){ ?>
+    <? if ($current_playlist_key_results){ ?>
+        Conquest Complete!
+        <span style="float: right;">
+            Final Score
+        </span>
+    <? } elseif ($current_playlist_key !== false){ ?>
         <?= $this_field_info['field_name'] ?>
         <span style="float: right;">
             <?= 'Mission '.($current_playlist_key + 1).' of '.(count($this_map_playlist) - 1) ?>
@@ -508,299 +543,453 @@ $debug_variable_text = ob_get_clean();
 
     <div class="test_area">
 
-        <div class="field_counters">
+        <? if (!$current_playlist_key_results){ ?>
 
-            <div class="results">
-                <div class="result success type type_nature">Mission Complete!</div>
-                <div class="result failure type type_flame">Mission Failure&hellip;</div>
-            </div>
-
-            <div class="counter moves">
-                <span class="value remaining">0</span>
-                <strong class="label">Moves</strong>
-            </div>
-
-            <div class="counter points">
-                <span class="value current">0</span>
-                <span class="slash">/</span>
-                <span class="value total">0</span>
-                <strong class="label">Points</strong>
-            </div>
-
-            <div class="counter complete">
-                <span class="value percent">0%</span>
-                <strong class="label">Complete</strong>
-            </div>
-
-        </div>
-
-        <div class="field_map" data-scale="<?= $this_map_scale ?>" data-rows="<?= $this_map_rows ?>" data-cols="<?= $this_map_cols ?>">
-            <div class="wrapper">
-                <div class="field_background" style="background-image: url(images/fields/<?= $this_field_token ?>/<?= !$flag_wap ? 'battle-field_background_base.gif' : 'battle-field_preview.png' ?>);"></div>
-                <div class="field_overlay"></div>
-                <div class="event_grid">
-                    <?
-
-                    /*
-                    $complete = array();
-                    $complete = array(
-                        $this_map_origin,
-                        ($this_orgin_row ).'-'.($this_origin_col + 1),
-                        ($this_orgin_row ).'-'.($this_origin_col + 2)
-                        );
-
-                    $current_position = $complete[count($complete) - 1];
-                    */
-
-                    $complete = array();
-                    $current_position = $this_map_origin;
-
-                    // Loop through rows, and then through columns
-                    for ($row = 1; $row <= $this_map_rows; $row++){
-                        for ($col = 1; $col <= $this_map_cols; $col++){
-                            $pos = $row.'-'.$col;
-
-                            $is_complete = false;
-
-                            $class = 'cell';
-                            $inside = '';
-
-                            // Add a special class if this is the origin or destination
-                            if ($pos == $this_map_origin){
-                                $class .= ' origin';
-                            } elseif ($pos == $this_map_destination){
-                                $class .= ' destination';
-                            }
-
-                            if (in_array($pos, $complete)){
-                                $is_complete = true;
-                            }
-
-                            // Add events markers and sprites based on event kind
-                            if (isset($this_map_events[$pos])){
-
-                                $event = $this_map_events[$pos];
-                                $direction = isset($event['direction']) ? $event['direction'] : 'left';
-                                $size = isset($event['size']) ? $event['size'] : 40;
-                                $xsize = $size.'x'.$size;
-
-                                // Add a special class if this is the origin or destination
-                                $eclass = '';
-                                if ($pos == $this_map_origin){
-                                    $eclass .= ' origin player';
-                                    $eclass .= ' type type_nature';
-                                } elseif ($pos == $this_map_destination){
-                                    $eclass .= ' destination boss';
-                                    $eclass .= ' type type_flame';
-                                } elseif ($event['kind'] == 'robot'){
-                                    $eclass .= ' robot';
-                                    $eclass .= ' type type_explode';
-                                } elseif ($event['kind'] == 'mecha'){
-                                    $eclass .= ' mecha';
-                                    $eclass .= ' type type_electric';
-                                }
-
-                                $inside .= '<span class="event '.$eclass.'"></span>';
-
-                                if ($event['kind'] == 'origin'){
-
-                                    $is_complete = true;
-
-                                } elseif ($event['kind'] == 'destination'){
-
-                                    //$inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['boss'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
-                                    $inside .= '<span class="sprite sprite_left sprite_'.$xsize.' sprite_'.$event['boss'].' sprite_shadow"></span>';
-
-                                } elseif (in_array($event['kind'], array('mecha', 'robot', 'boss'))){
-
-                                    //$inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['token'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
-                                    $inside .= '<span class="sprite sprite_left sprite_'.$xsize.' sprite_'.$event['token'].' sprite_shadow"></span>';
-
-                                }
-                            }
-
-                            // Add the player sprite to their current position on the map
-                            if ($pos == $current_position){
-
-                                $player = $this_map_events[$this_map_origin]['player'];
-                                $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/players/'.$player.'/sprite_right_'.$xsize.'.png);"></span>';
-                                //$inside .= '<span class="sprite sprite_right sprite_'.$xsize.' sprite_'.$player.'"></span>';
-                            }
-
-                            // If this cell has already been completed add the class
-                            if ($is_complete){
-                                $class .= ' complete';
-                            }
-
-                            // Print out the generated markup for this cell and its contents
-                            echo '<div '.
-                                'class="'.$class.'" '.
-                                'data-col="'.$col.'" '.
-                                'data-row="'.$row.'" '.
-                                //'title="'.$pos.'" '.
-                                '>'.$inside.
-                                '</div>';
-                        }
-                    }
-                    ?>
+            <div class="field_counters">
+                <div class="results">
+                    <div class="result success type type_nature">Mission Complete!</div>
+                    <div class="result failure type type_flame">Mission Failure&hellip;</div>
+                </div>
+                <div class="counter moves">
+                    <span class="value remaining">0</span>
+                    <strong class="label">Moves</strong>
+                </div>
+                <div class="counter points">
+                    <span class="value current">0</span>
+                    <span class="slash">/</span>
+                    <span class="value total">0</span>
+                    <strong class="label">Points</strong>
+                </div>
+                <div class="counter complete">
+                    <span class="value percent">0%</span>
+                    <strong class="label">Complete</strong>
                 </div>
             </div>
-        </div>
 
-        <div class="field_options <?= $current_playlist_key !== false ? 'playlist_active' : '' ?>">
+            <div class="field_map" data-scale="<?= $this_map_scale ?>" data-rows="<?= $this_map_rows ?>" data-cols="<?= $this_map_cols ?>">
+                <div class="wrapper">
+                    <div class="field_background" style="background-image: url(images/fields/<?= $this_field_token ?>/<?= !$flag_wap ? 'battle-field_background_base.gif' : 'battle-field_preview.png' ?>);"></div>
+                    <div class="field_overlay"></div>
+                    <div class="event_grid">
+                        <?
 
-            <form class="options_form" method="get" action="dev/map-test/">
+                        /*
+                        $complete = array();
+                        $complete = array(
+                            $this_map_origin,
+                            ($this_orgin_row ).'-'.($this_origin_col + 1),
+                            ($this_orgin_row ).'-'.($this_origin_col + 2)
+                            );
 
-                <? if ($current_playlist_key !== false){ ?>
+                        $current_position = $complete[count($complete) - 1];
+                        */
 
-                    <?
-                    // Print hidden inputs for the playlist variables
-                    echo('<input class="hidden" type="hidden" name="key" value="'.$current_playlist_key.'" />'.PHP_EOL);
-                    echo('<input class="hidden" type="hidden" name="maxkey" value="'.count($this_map_playlist).'" />'.PHP_EOL);
-                    foreach ($this_map_playlist[$current_playlist_key] AS $name => $value){
-                        echo('<input class="hidden" type="hidden" name="'.$name.'" value="'.$value.'" />'.PHP_EOL);
-                    }
-                    ?>
+                        $complete = array();
+                        $current_position = $this_map_origin;
 
-                    <div class="buttons <?= $current_playlist_key == (count($this_map_playlist) - 1) ? 'bonus' : '' ?>">
+                        // Loop through rows, and then through columns
+                        for ($row = 1; $row <= $this_map_rows; $row++){
+                            for ($col = 1; $col <= $this_map_cols; $col++){
+                                $pos = $row.'-'.$col;
 
-                        <a class="button retry type type_water"><span>Retry Mission</span></a>
-                        <a class="button regenerate type type_time"><span>Regenerate Field</span></a>
-                        <? if (isset($this_map_playlist[$current_playlist_key + 2])){ ?>
-                            <a class="button continue type type_nature disabled"><span>Next Mission &raquo;</span></a>
-                        <? } elseif (isset($this_map_playlist[$current_playlist_key + 1])){ ?>
-                            <a class="button continue type type_electric disabled"><span>Campaign Complete!</span></a>
-                        <? } else { ?>
-                            <? /* <a class="button leaderboard type type_electric disabled"><span>Mission Complete!</span></a> */ ?>
-                        <? } ?>
-                        <a class="button reset type type_flame" href="dev/map-test/"><span>Reset Game</span></a>
+                                $is_complete = false;
 
-                    </div>
+                                $class = 'cell';
+                                $inside = '';
 
-                <? } else { ?>
+                                // Add a special class if this is the origin or destination
+                                if ($pos == $this_map_origin){
+                                    $class .= ' origin';
+                                } elseif ($pos == $this_map_destination){
+                                    $class .= ' destination';
+                                }
 
-                    <div class="option">
-                        <label>Map Size</label>
-                        <select name="scale">
-                            <?
-                            // Loop through and display scale options
-                            for ($scale = 0; $scale <= 8; $scale++){
+                                if (in_array($pos, $complete)){
+                                    $is_complete = true;
+                                }
 
-                                $cols = $scale * 4;
-                                $rows = $scale * 1;
-                                $label = !empty($scale) ? $rows.' x '.$cols : 'Random';
-                                //$label = !empty($scale) ? 'Level '.$scale : 'Random';
+                                // Add events markers and sprites based on event kind
+                                if (isset($this_map_events[$pos])){
 
-                                $value = !empty($scale) ? $scale : '';
+                                    $event = $this_map_events[$pos];
+                                    $direction = isset($event['direction']) ? $event['direction'] : 'left';
+                                    $size = isset($event['size']) ? $event['size'] : 40;
+                                    $xsize = $size.'x'.$size;
 
-                                if (empty($_REQUEST['scale']) && empty($scale)){ $selected = 'selected="selected"'; }
-                                elseif (!empty($_REQUEST['scale']) && $_REQUEST['scale'] == $scale){ $selected = 'selected="selected"'; }
-                                else { $selected = ''; }
+                                    // Add a special class if this is the origin or destination
+                                    $eclass = '';
+                                    if ($pos == $this_map_origin){
+                                        $eclass .= ' origin player';
+                                        $eclass .= ' type type_nature';
+                                    } elseif ($pos == $this_map_destination){
+                                        $eclass .= ' destination boss';
+                                        $eclass .= ' type type_flame';
+                                    } elseif ($event['kind'] == 'robot'){
+                                        $eclass .= ' robot';
+                                        $eclass .= ' type type_explode';
+                                    } elseif ($event['kind'] == 'mecha'){
+                                        $eclass .= ' mecha';
+                                        $eclass .= ' type type_electric';
+                                    }
 
-                                echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    $inside .= '<span class="event '.$eclass.'"></span>';
 
+                                    if ($event['kind'] == 'origin'){
+
+                                        $is_complete = true;
+
+                                    } elseif ($event['kind'] == 'destination'){
+
+                                        //$inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['boss'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
+                                        $inside .= '<span class="sprite sprite_left sprite_'.$xsize.' sprite_'.$event['boss'].' sprite_shadow"></span>';
+
+                                    } elseif (in_array($event['kind'], array('mecha', 'robot', 'boss'))){
+
+                                        //$inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/robots/'.$event['token'].'/sprite_'.$direction.'_'.$xsize.'.png);"></span>';
+                                        $inside .= '<span class="sprite sprite_left sprite_'.$xsize.' sprite_'.$event['token'].' sprite_shadow"></span>';
+
+                                    }
+                                }
+
+                                // Add the player sprite to their current position on the map
+                                if ($pos == $current_position){
+
+                                    $player = $this_map_events[$this_map_origin]['player'];
+                                    $inside .= '<span class="sprite sprite_'.$xsize.'" style="background-image: url(images/players/'.$player.'/sprite_right_'.$xsize.'.png);"></span>';
+                                    //$inside .= '<span class="sprite sprite_right sprite_'.$xsize.' sprite_'.$player.'"></span>';
+                                }
+
+                                // If this cell has already been completed add the class
+                                if ($is_complete){
+                                    $class .= ' complete';
+                                }
+
+                                // Print out the generated markup for this cell and its contents
+                                echo '<div '.
+                                    'class="'.$class.'" '.
+                                    'data-col="'.$col.'" '.
+                                    'data-row="'.$row.'" '.
+                                    //'title="'.$pos.'" '.
+                                    '>'.$inside.
+                                    '</div>';
                             }
-                            ?>
-                        </select>
+                        }
+                        ?>
                     </div>
+                </div>
+            </div>
 
-                    <div class="option">
-                        <label>Player Character</label>
-                        <select name="player">
+            <div class="field_options <?= $current_playlist_key !== false ? 'playlist_active' : '' ?>">
+                <form class="options_form" method="get" action="dev/map-test/">
+
+                    <? if ($current_playlist_key !== false && $current_playlist_key_results != true){ ?>
+
+                        <?
+                        // Print hidden inputs for the playlist variables
+                        echo('<input class="hidden" type="hidden" name="key" value="'.$current_playlist_key.'" />'.PHP_EOL);
+                        echo('<input class="hidden" type="hidden" name="maxkey" value="'.count($this_map_playlist).'" />'.PHP_EOL);
+                        foreach ($this_map_playlist[$current_playlist_key] AS $name => $value){
+                            echo('<input class="hidden" type="hidden" name="'.$name.'" value="'.$value.'" />'.PHP_EOL);
+                        }
+                        ?>
+
+                        <div class="buttons">
+
+                            <a class="button retry type type_water"><span>Retry Mission</span></a>
+                            <a class="button regenerate type type_time"><span>Regenerate Field</span></a>
                             <?
-                            // Loop through and display player character options
-                            $player_tokens = array_merge(array(''), $index_player_tokens);
-                            foreach ($player_tokens AS $player){
-
-                                $label = !empty($player) ? ucwords(str_replace('-', '. ', $player)) : 'Random';
-
-                                $value = !empty($player) ? $player : '';
-
-                                if (empty($_REQUEST['player']) && empty($player)){ $selected = 'selected="selected"'; }
-                                elseif (!empty($_REQUEST['player']) && $_REQUEST['player'] == $player){ $selected = 'selected="selected"'; }
-                                else { $selected = ''; }
-
-                                echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-
-                            }
+                            if ($current_playlist_key_final){ $next_button_text = 'Continue to Results'; }
+                            elseif ($current_playlist_key_semifinal){ $next_button_text = 'Final Mission'; }
+                            else { $next_button_text = 'Next Mission'; }
                             ?>
-                        </select>
-                    </div>
+                            <a class="button continue type type_nature disabled"><span><?= $next_button_text ?> &raquo;</span></a>
+                            <a class="button reset type type_flame" href="dev/map-test/"><span>Reset Game</span></a>
 
-                    <div class="option">
-                        <label>Battle Field</label>
-                        <select name="field">
-                            <?
-                            // Loop through and display battle field options
-                            $field_tokens = array_merge(array(''), $index_field_tokens);
-                            foreach ($field_tokens AS $field){
+                        </div>
 
-                                $label = !empty($field) ? ucwords(str_replace('-', ' ', $field)) : 'Random';
+                    <? } else { ?>
 
-                                $value = !empty($field) ? $field : '';
+                        <div class="option">
+                            <label>Map Size</label>
+                            <select name="scale">
+                                <?
+                                // Loop through and display scale options
+                                for ($scale = 0; $scale <= 8; $scale++){
 
-                                if (empty($_REQUEST['field']) && empty($field)){ $selected = 'selected="selected"'; }
-                                elseif (!empty($_REQUEST['field']) && $_REQUEST['field'] == $field){ $selected = 'selected="selected"'; }
-                                else { $selected = ''; }
+                                    $cols = $scale * 4;
+                                    $rows = $scale * 1;
+                                    $label = !empty($scale) ? $rows.' x '.$cols : 'Random';
+                                    //$label = !empty($scale) ? 'Level '.$scale : 'Random';
 
-                                echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    $value = !empty($scale) ? $scale : '';
 
-                            }
-                            ?>
-                        </select>
-                    </div>
+                                    if (empty($_REQUEST['scale']) && empty($scale)){ $selected = 'selected="selected"'; }
+                                    elseif (!empty($_REQUEST['scale']) && $_REQUEST['scale'] == $scale){ $selected = 'selected="selected"'; }
+                                    else { $selected = ''; }
 
-                    <div class="option">
-                        <label>Fortress Boss</label>
-                        <select name="boss">
-                            <?
-                            // Loop through and display boss character options
-                            $boss_tokens = array_merge(array(''), $index_boss_tokens);
-                            foreach ($boss_tokens AS $boss){
+                                    echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
 
-                                $label = !empty($boss) ? ucwords(str_replace('-', ' ', str_replace('-ds', ' DS', $boss))) : 'Random';
+                                }
+                                ?>
+                            </select>
+                        </div>
 
-                                $value = !empty($boss) ? $boss : '';
+                        <div class="option">
+                            <label>Player Character</label>
+                            <select name="player">
+                                <?
+                                // Loop through and display player character options
+                                $player_tokens = array_merge(array(''), $index_player_tokens);
+                                foreach ($player_tokens AS $player){
 
-                                if (empty($_REQUEST['boss']) && empty($boss)){ $selected = 'selected="selected"'; }
-                                elseif (!empty($_REQUEST['boss']) && $_REQUEST['boss'] == $boss){ $selected = 'selected="selected"'; }
-                                else { $selected = ''; }
+                                    $label = !empty($player) ? ucwords(str_replace('-', '. ', $player)) : 'Random';
 
-                                echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    $value = !empty($player) ? $player : '';
 
-                            }
-                            ?>
-                        </select>
-                    </div>
+                                    if (empty($_REQUEST['player']) && empty($player)){ $selected = 'selected="selected"'; }
+                                    elseif (!empty($_REQUEST['player']) && $_REQUEST['player'] == $player){ $selected = 'selected="selected"'; }
+                                    else { $selected = ''; }
 
-                    <div class="buttons debug">
+                                    echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
 
-                        <a class="button retry type type_water"><span>Retry Mission</span></a>
-                        <a class="button regenerate type type_time"><span>Regenerate Field</span></a>
+                                }
+                                ?>
+                            </select>
+                        </div>
 
-                    </div>
+                        <div class="option">
+                            <label>Battle Field</label>
+                            <select name="field">
+                                <?
+                                // Loop through and display battle field options
+                                $field_tokens = array_merge(array(''), $index_field_tokens);
+                                foreach ($field_tokens AS $field){
 
-                <? } ?>
+                                    $label = !empty($field) ? ucwords(str_replace('-', ' ', $field)) : 'Random';
 
-            </form>
+                                    $value = !empty($field) ? $field : '';
 
-        </div>
+                                    if (empty($_REQUEST['field']) && empty($field)){ $selected = 'selected="selected"'; }
+                                    elseif (!empty($_REQUEST['field']) && $_REQUEST['field'] == $field){ $selected = 'selected="selected"'; }
+                                    else { $selected = ''; }
+
+                                    echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="option">
+                            <label>Fortress Boss</label>
+                            <select name="boss">
+                                <?
+                                // Loop through and display boss character options
+                                $boss_tokens = array_merge(array(''), $index_boss_tokens);
+                                foreach ($boss_tokens AS $boss){
+
+                                    $label = !empty($boss) ? ucwords(str_replace('-', ' ', str_replace('-ds', ' DS', $boss))) : 'Random';
+
+                                    $value = !empty($boss) ? $boss : '';
+
+                                    if (empty($_REQUEST['boss']) && empty($boss)){ $selected = 'selected="selected"'; }
+                                    elseif (!empty($_REQUEST['boss']) && $_REQUEST['boss'] == $boss){ $selected = 'selected="selected"'; }
+                                    else { $selected = ''; }
+
+                                    echo('<option value="'.$value.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="buttons debug">
+
+                            <a class="button retry type type_water"><span>Retry Mission</span></a>
+                            <a class="button regenerate type type_time"><span>Regenerate Field</span></a>
+
+                        </div>
+
+                    <? } ?>
+
+                </form>
+            </div>
+
+        <? } ?>
 
         <? if ($current_playlist_key !== false){ ?>
 
             <?
             // Calculate the current score for this user
             $current_score_total = 0;
-            foreach ($this_map_progress AS $key => $details){ $current_score_total += $details['score']; }
+            $current_mechas_defeated = 0;
+            $current_mechas_total = 0;
+            $current_masters_defeated = 0;
+            $current_masters_total = 0;
+            $current_bosses_defeated = 0;
+            $current_bosses_total = 0;
+            foreach ($this_map_progress AS $key => $complete_info){
+                $current_score_total += $complete_info['points_earned'];
+                if (isset($complete_info['mechas_defeated'])){ $current_mechas_defeated += $complete_info['mechas_defeated']; }
+                if (isset($complete_info['mechas_total'])){ $current_mechas_total += $complete_info['mechas_total']; }
+                if (isset($complete_info['robots_defeated'])){ $current_masters_defeated += $complete_info['robots_defeated']; }
+                if (isset($complete_info['robots_total'])){ $current_masters_total += $complete_info['robots_total']; }
+                if (isset($complete_info['bosses_defeated'])){ $current_bosses_defeated += $complete_info['bosses_defeated']; }
+                if (isset($complete_info['bosses_total'])){ $current_bosses_total += $complete_info['bosses_total']; }
+            }
+            $defeated_sum = ($current_mechas_defeated + $current_masters_defeated + $current_bosses_defeated);
+            $total_sum = ($current_mechas_total + $current_masters_total + $current_bosses_total);
+            $current_percent_total = !empty($total_sum) ? (($defeated_sum / $total_sum) * 100) : 0;
             ?>
             <div class="field_progress">
-                <div class="score" data-total="<?= $current_score_total ?>">
-                    <span class="label"><?= $current_playlist_key == (count($this_map_playlist) - 1) ? 'Final Score' : 'Current Score' ?>:</span>
+                <div class="score <?= $current_playlist_key_results ? 'final type type_electric' : '' ?>" data-total="<?= $current_score_total ?>">
+                    <span class="label"><?= $current_playlist_key_results ? 'Final Score' : 'Current Score' ?>:</span>
                     <span class="value"><?= number_format($current_score_total, 0, '.', ',') ?> Points</span>
                 </div>
             </div>
 
+            <div class="field_playlist">
+                <?
+
+                // Collect a custom field index for display purposes
+                $print_field_tokens = array_column($this_map_playlist, 'field');
+                $print_field_index = rpg_field::get_index_custom($print_field_tokens);
+
+                // Collect a custom boss index for display purposes
+                $print_boss_tokens = array_column($this_map_playlist, 'boss');
+                $print_boss_index = rpg_robot::get_index_custom($print_boss_tokens);
+
+                // Loop through the playlist and print all entries
+                echo('<table style="width: 100%">'.PHP_EOL);
+
+                    echo('<thead>'.PHP_EOL);
+                        echo('<tr>');
+                            echo('<th class="number">#</th>');
+                            echo('<th class="name">Field Name</th>');
+                            echo('<th class="size">Size</th>');
+                            echo('<th class="difficulty">Difficulty</th>');
+                            echo('<th class="mechas">Mechas</th>');
+                            echo('<th class="masters">Masters</th>');
+                            echo('<th class="bosses">Bosses</th>');
+                            echo('<th class="score">Points</th>');
+                            echo('<th class="percent">%</th>');
+                        echo('</tr>'.PHP_EOL);
+                    echo('</thead>'.PHP_EOL);
+
+                    echo('<tfoot>'.PHP_EOL);
+                        echo('<tr>');
+
+                            echo('<td class="number"></td>');
+                            echo('<td class="name">Overall Totals</td>');
+                            echo('<td class="size"></td>');
+                            echo('<td class="difficulty"></td>');
+
+                            echo('<td class="mechas">'.$current_mechas_defeated.' / <sub>'.$current_mechas_total.'</sub></td>');
+                            echo('<td class="masters">'.$current_masters_defeated.' / <sub>'.$current_masters_total.'</sub></sub></td>');
+                            echo('<td class="bosses">'.$current_bosses_defeated.' / <sub>'.$current_bosses_total.'</sub></sub></td>');
+
+                            echo('<td class="score">'.number_format($current_score_total, 0, '.', ',').'</td>');
+
+                            $percent_text = number_format($current_percent_total, 2, '.', ',');
+                            $percent_class = '';
+                            if ($current_percent_total == 100){ $percent_class = 'perfect'; }
+                            elseif ($current_percent_total >= 75){ $percent_class = 'high'; }
+                            elseif ($current_percent_total >= 50){ $percent_class = 'medium'; }
+                            elseif ($current_percent_total >= 25){ $percent_class = 'low'; }
+                            elseif ($current_percent_total > 0){ $percent_class = 'bad'; }
+                            echo('<td class="percent '.$percent_class.'">'.$percent_text.'%</td>');
+
+                        echo('</tr>'.PHP_EOL);
+                    echo('</tfoot>'.PHP_EOL);
+
+                    echo('<tbody>'.PHP_EOL);
+                        foreach ($this_map_playlist AS $key => $entry){
+                            if (!empty($entry['results'])){ continue; }
+
+                            $complete_info = isset($this_map_progress[$key]) ? $this_map_progress[$key] : false;
+
+                            echo('<tr>');
+
+                                $number_text = $key + 1;
+                                echo('<td class="number">'.$number_text.'</td>');
+
+                                $field_info = !empty($entry['field']) ? $print_field_index[$entry['field']] : false;
+                                $field_text = isset($field_info['field_name']) ? $field_info['field_name'] : '-';
+                                if (empty($complete_info) && $key != $current_playlist_key){ $field_text = '-'; }
+                                echo('<td class="name">'.$field_text.'</td>');
+
+                                $scale_text = !empty($entry['scale']) ? $entry['scale'].' x '.($entry['scale'] * 4) : '-';
+                                if (empty($complete_info) && $key != $current_playlist_key){ $scale_text = '-'; }
+                                echo('<td class="size">'.$scale_text.'</td>');
+
+                                $difficulty_value = !empty($entry['difficulty']) ? $entry['difficulty'] : $entry['scale'];
+                                $difficulty_text = str_repeat('&#9733;', $difficulty_value);
+                                if (empty($complete_info) && $key != $current_playlist_key){ $difficulty_text = '-'; }
+                                echo('<td class="difficulty">'.$difficulty_text.'</td>');
+
+                                if (!empty($complete_info)){
+
+                                    $mechas_defeated = $complete_info['mechas_defeated'];
+                                    $mechas_total = $complete_info['mechas_total'];
+                                    $mechas_text = $mechas_defeated.'<sub> / '.$mechas_total.'</sub>';
+                                    echo('<td class="mechas">'.$mechas_text.'</td>');
+
+                                    $masters_defeated = $complete_info['robots_defeated'];
+                                    $masters_total = $complete_info['robots_total'];
+                                    $masters_text = $masters_defeated.'<sub> / '.$masters_total.'</sub>';
+                                    echo('<td class="masters">'.$masters_text.'</td>');
+
+                                    $bosses_defeated = $complete_info['bosses_defeated'];
+                                    $bosses_total = $complete_info['bosses_total'];
+                                    $bosses_text = $bosses_defeated.'<sub> / '.$bosses_total.'</sub>';
+                                    echo('<td class="bosses">'.$bosses_text.'</td>');
+
+                                    $score_text = isset($complete_info['points_earned']) ? number_format($complete_info['points_earned'], 0, '.', ',') : '-';
+                                    echo('<td class="score">'.$score_text.'</td>');
+
+                                    $percent_text = isset($complete_info['percent_complete']) ? $complete_info['percent_complete'].'%' : '-';
+                                    $percent_class = '';
+                                    if ($complete_info['percent_complete'] == 100){ $percent_class = 'perfect'; }
+                                    elseif ($complete_info['percent_complete'] >= 75){ $percent_class = 'high'; }
+                                    elseif ($complete_info['percent_complete'] >= 50){ $percent_class = 'medium'; }
+                                    elseif ($complete_info['percent_complete'] >= 25){ $percent_class = 'low'; }
+                                    elseif ($complete_info['percent_complete'] > 0){ $percent_class = 'bad'; }
+                                    echo('<td class="percent '.$percent_class.'">'.$percent_text.'</td>');
+
+
+                                } else {
+
+                                    echo('<td class="mechas">-</td>');
+                                    echo('<td class="masters">-</td>');
+                                    echo('<td class="bosses">-</td>');
+                                    echo('<td class="score">-</td>');
+                                    echo('<td class="percent">-</td>');
+
+                                }
+
+                            echo('</tr>'.PHP_EOL);
+                        }
+                    echo('</tbody>'.PHP_EOL);
+
+                echo('</table>'.PHP_EOL);
+
+                //echo('<pre>$_POST = '.print_r($_POST, true).'</pre>'.PHP_EOL);
+                //echo('<pre>$this_map_playlist = '.print_r($this_map_playlist, true).'</pre>'.PHP_EOL);
+                //echo('<pre>$this_map_progress = '.print_r($this_map_progress, true).'</pre>'.PHP_EOL);
+
+                ?>
+            </div>
+
         <? } ?>
+
+        <? if ($current_playlist_key_results){  ?>
+            <div class="game_complete">
+                <div class="thank_you type type_nature">
+                    Thank you for playing!
+                </div>
+                <a class="link link_inline play_again" href="dev/map-test/">Play again?</a>
+            </div>
+        <?} ?>
 
         <div>
             <?

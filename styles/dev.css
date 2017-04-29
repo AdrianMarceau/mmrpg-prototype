@@ -345,7 +345,7 @@
 
 #window .field_options {
     display: block;
-    margin: 10px auto 10px;
+    margin: 10px auto 5px;
     text-align: left;
     overflow: hidden;
     background-color: #1a1a1a;
@@ -612,22 +612,144 @@
 
 #window .field_progress {
     display: block;
-    margin: 5px auto 0;
+    margin: 0 -10px 5px;
     padding: 0 10px;
     overflow: hidden;
 }
 #window .field_progress .score {
     display: block;
-    margin: 5px auto 0;
-    padding: 0 0 10px;
     overflow: hidden;
+    margin: 0 auto;
+    padding: 9px 9px;
     font-size: 16px;
     line-height: 19px;
     text-align: center;
+    background-color: #1a1a1a;
+    border: 1px solid #171717;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+#window .field_progress .score.final {
+    margin-bottom: 5px;
+    padding: 12px 9px;
+    font-size: 19px;
+    line-height: 21px;
 }
 #window .field_progress .score .label {
 
 }
 #window .field_progress .score .value {
 
+}
+
+#window .field_playlist {
+
+}
+#window .field_playlist table {
+    width: 100%;
+    margin: 0 auto 10px;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+#window .field_playlist table thead {
+
+}
+#window .field_playlist thead th {
+    font-weight: bold;
+    background-color: #1a1a1a;
+    text-align: left;
+    padding: 3px 6px;
+    font-size: 80%;
+}
+#window .field_playlist table tbody {
+
+}
+#window .field_playlist tbody td {
+    font-weight: normal;
+    text-align: left;
+    padding: 3px 6px;
+    font-size: 100%;
+}
+#window .field_playlist tbody tr:nth-child(odd) td {
+    background-color: #292929;
+}
+#window .field_playlist tbody tr:nth-child(even) td {
+    background-color: #242424;
+}
+
+#window .field_playlist tfoot td {
+    font-weight: bold;
+    background-color: #1a1a1a;
+    text-align: left;
+    padding: 6px;
+    font-size: 110%;
+}
+
+#window .field_playlist table .size,
+#window .field_playlist table .difficulty {
+    text-align: center;
+}
+#window .field_playlist table .mechas,
+#window .field_playlist table .masters,
+#window .field_playlist table .bosses {
+    text-align: center;
+}
+#window .field_playlist table .score {
+    text-align: right;
+    font-weight: bold;
+}
+#window .field_playlist table .percent {
+    text-align: right;
+}
+
+#window .field_playlist table .perfect {
+    color: #25d625;
+}
+#window .field_playlist table .high {
+    color: #80d625;
+}
+#window .field_playlist table .medium {
+    color: #d6ca25;
+}
+#window .field_playlist table .low {
+    color: #d6a125;
+}
+#window .field_playlist table .bad {
+    color: #d66025;
+}
+
+#window .field_playlist table .mechas sub,
+#window .field_playlist table .masters sub,
+#window .field_playlist table .bosses sub {
+    font-size: 10px;
+    padding-left: 2px;
+    color: #969696;
+}
+
+
+#window .game_complete {
+    display: block;
+    overflow: hidden;
+    margin: 0 auto 10px;
+    text-align: center;
+}
+#window .game_complete .thank_you {
+    display: block;
+    overflow: hidden;
+    margin: 0 auto 5px;
+    padding: 9px 9px;
+    font-size: 16px;
+    line-height: 19px;
+    text-align: center;
+    background-color: #1a1a1a;
+    border: 1px solid #171717;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+#window .game_complete .play_again {
+    display: inline-block;
+    font-size: 13px;
+    line-height: 16px;
 }
