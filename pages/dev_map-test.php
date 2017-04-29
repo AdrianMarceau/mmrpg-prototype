@@ -26,7 +26,9 @@ if (!empty($_REQUEST['reset'])){
 // Define array column function if not exists
 if (!function_exists('array_column')){
     function array_column($array, $column){
-        return array_map(function($array)use($column){ return $array[$column]; }, $array);
+        return array_map(function($array)use($column){
+            return isset($array[$column]) ? $array[$column] : false;
+            }, $array);
     }
 }
 
@@ -852,11 +854,11 @@ $debug_variable_text = ob_get_clean();
                 <?
 
                 // Collect a custom field index for display purposes
-                $print_field_tokens = array_column($this_map_playlist, 'field');
+                $print_field_tokens = array_filter(array_column($this_map_playlist, 'field'));
                 $print_field_index = rpg_field::get_index_custom($print_field_tokens);
 
                 // Collect a custom boss index for display purposes
-                $print_boss_tokens = array_column($this_map_playlist, 'boss');
+                $print_boss_tokens = array_filter(array_column($this_map_playlist, 'boss'));
                 $print_boss_index = rpg_robot::get_index_custom($print_boss_tokens);
 
                 // Loop through the playlist and print all entries
