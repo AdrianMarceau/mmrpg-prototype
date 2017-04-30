@@ -133,6 +133,7 @@ if (MMRPG_CONFIG_BANNED_LIST){
 // Include mandatory class files
 require('classes/rpg_user.php');
 require('classes/rpg_user_role.php');
+require('classes/rpg_user_save.php');
 require('classes/rpg_functions.php');
 require('classes/rpg_game.php');
 require('classes/rpg_prototype.php');
