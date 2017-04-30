@@ -195,6 +195,9 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
 
     }
 
+    // Make sure only unique patch values make it through
+    $_GAME['patches'] = array_unique($_GAME['patches']);
+
     // Recompress and prepare the save data for the database
     $temp_values = $_GAME['values'];
     unset($temp_values['battle_index'], $temp_values['battle_complete'], $temp_values['battle_failure'],
