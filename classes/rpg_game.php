@@ -2139,7 +2139,7 @@ class rpg_game {
                 if (empty($robot_token) || $robot_token == 'robot'){ continue; }
                 elseif (!in_array($robot_token, $mmrpg_valid_robot_tokens)){ continue; }
                 // Create an entry for this robot in the global unlock index
-                $robot_info = array_merge(array('user_id' => $this_userid), $robot_info);
+                $robot_info = array_merge(array('user_id' => $this_userid, 'robot_token' => $robot_token), $robot_info);
                 $mmrpg_users_robots_database[$robot_token] = $robot_info;
             }
         }
