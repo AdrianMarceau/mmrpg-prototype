@@ -48,6 +48,7 @@ RewriteRule ^mmrpg-info\.xml$ mmrpg-info.php [L]
 RewriteRule ^mmrpg-ranking\.xml$ mmrpg-ranking.php [L]
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
 RewriteRule ^styles/style\.css$ styles/style.php [L]
+RewriteRule ^styles/robots\.css$ styles/robots.php [L]
 
 # Redirect the non-existant pages to better places
 RewriteRule ^home/?$ / [R,L]
@@ -95,7 +96,7 @@ RewriteRule ^leaderboard/([-_a-z0-9]+)/\??(.*)$ index.php?page=leaderboard&sub=$
 RewriteRule ^database/(players|abilities|robots|mechas|bosses|types|fields|items)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=database&sub=$1&token=$2 [L]
 RewriteRule ^database/(players|abilities|robots|mechas|bosses|types|fields|items)/\??(.*)$ index.php?page=database&sub=$1&$2 [L]
 
-RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file)/([0-9]+)/?\??(.*)$ index.php?page=$1&num=$2&$3 [L]
-RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file)/([-_a-z0-9]+)/([0-9]+)/?\??(.*)$ index.php?page=$1&sub=$2&num=$3&$4 [L]
-RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file)/([-_a-z0-9]+)/?(.*)?$ index.php?page=$1&sub=$2&$3 [L]
-RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|error)/?\??(.*)$ index.php?page=$1&$2 [L]
+RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|dev|test)/([0-9]+)/?\??(.*)$ index.php?page=$1&num=$2&$3 [L]
+RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|dev|test)/([-_a-z0-9]+)/([0-9]+)/?\??(.*)$ index.php?page=$1&sub=$2&num=$3&$4 [L]
+RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|dev|test)/([-_a-z0-9]+)/?(.*)?$ index.php?page=$1&sub=$2&$3 [L]
+RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|error|dev|test)/?\??(.*)$ index.php?page=$1&$2 [L]

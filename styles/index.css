@@ -98,6 +98,16 @@ button {
     -webkit-background-clip: padding;
 }
 
+/*
+#window .banner.compact {
+    height: 60px;
+}
+#window .banner.compact .credits {
+    background-position: center -130px;
+    top: 10px;
+}
+*/
+
 #window #header_social_facebook,
 #window #header_social_google,
 #window #header_social_github {
@@ -505,12 +515,13 @@ button {
     position: relative;
     font-size: 0;
     height: 30px;
+    z-index: 30;
 }
 #window .menu .subs {
     display: none;
     position: absolute;
-    z-index: 10;
     top: 30px;
+    z-index: 30;
     margin: 0 auto 0 -25px;
     padding: 5px 10px;
     width: auto;

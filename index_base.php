@@ -311,7 +311,7 @@ require_once('pages/'.$this_current_page.'.php');
 
 <style type="text/css"> html, body { background-color: #262626; } </style>
 
-<? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
+<? if ($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
     <link type="text/css" href="_ext/colorbox/jquery.colorbox.css" rel="stylesheet" />
 <? endif; ?>
 
@@ -319,6 +319,11 @@ require_once('pages/'.$this_current_page.'.php');
 <link type="text/css" href="styles/jquery.scrollbar.min.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/index.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/index-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+
+<? if ($this_current_page == 'dev'): ?>
+    <link type="text/css" href="styles/dev.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+    <link type="text/css" href="styles/robots.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<? endif; ?>
 
 <meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
@@ -347,7 +352,7 @@ if ($this_current_page == 'file' // File sub-pages
 <div id="fb-root"></div>
     <div id="window" style="position: relative; height: auto !important;">
 
-        <div class="banner">
+        <div class="banner <?= defined('MMRPG_INDEX_COMPACT_MODE') ? 'compact' : '' ?>">
 
             <?
             // Collect the current user's info from the database
@@ -364,6 +369,7 @@ if ($this_current_page == 'file' // File sub-pages
                 $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_00';
                 $temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_left_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
                 $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE;
+                if (defined('MMRPG_INDEX_COMPACT_MODE')){ $temp_background_path = str_replace('.gif', '.png', $temp_background_path); }
                 // Define the user name variables
                 $temp_user_name = !empty($this_userinfo['user_name_public']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name'];
                 //echo '<div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>';
@@ -371,11 +377,12 @@ if ($this_current_page == 'file' // File sub-pages
                 $temp_background_path = 'fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN;
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
                 $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_background_base.gif';
+                if (defined('MMRPG_INDEX_COMPACT_MODE')){ $temp_background_path = str_replace('.gif', '.png', $temp_background_path); }
             }
             //die($temp_background_path);
             ?>
             <a class="anchor" id="top">&nbsp;</a>
-            <div class="sprite background banner_background" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_background_base.gif' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>);"><?= ucwords(str_replace('-', ' ', MMRPG_SETTINGS_CURRENT_FIELDTOKEN)) ?></div>
+            <div class="sprite background banner_background" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_background_base.gif' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>);"></div>
             <?
             // Only continue if we're NOT in critical error mode
             if (!defined('MMRPG_CRITICAL_ERROR')){
@@ -409,7 +416,7 @@ if ($this_current_page == 'file' // File sub-pages
                         $this_animate = implode(',', $this_frames);
                         $this_direction = $this_info[$this_class.'_direction'];
                         $this_float = $this_direction == 'left' ? 'right' : 'left';
-                        echo '<div data-id="background_attachment_'.$this_key.'" class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" data-type="attachment" data-position="background" data-size="'.$this_size.'" data-direction="'.$this_direction.'" data-frame="'.$this_frame.'" data-animate="'.$this_animate.'" style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_token.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.ucwords(str_replace('-', ' ', $this_token)).'</div>';
+                        echo '<div data-id="background_attachment_'.$this_key.'" class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" data-type="attachment" data-position="background" data-size="'.$this_size.'" data-direction="'.$this_direction.'" data-frame="'.$this_frame.'" data-animate="'.$this_animate.'" style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_token.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
                     }
                     echo '</div>';
                 }
@@ -488,12 +495,14 @@ if ($this_current_page == 'file' // File sub-pages
         </div>
 
         <div class="page page_<?= $this_current_page ?>">
-            <div class="header">
-                <div class="header_wrapper">
-                    <h1 class="title"><?= $this_current_page != 'home' ? preg_replace('/((?:the )?Mega Man RPG Prototype)/', '<span class="brand">$1</span>', $this_markup_header) : $this_markup_header ?></h1>
-                    <?= !empty($this_markup_counter) ? $this_markup_counter."\n" : '' ?>
+            <? if (!empty($this_markup_header)): ?>
+                <div class="header">
+                    <div class="header_wrapper">
+                        <h1 class="title"><?= $this_current_page != 'home' ? preg_replace('/((?:the )?Mega Man RPG Prototype)/', '<span class="brand">$1</span>', $this_markup_header) : $this_markup_header ?></h1>
+                        <?= !empty($this_markup_counter) ? $this_markup_counter."\n" : '' ?>
+                    </div>
                 </div>
-            </div>
+            <? endif; ?>
             <div class="body">
                 <div class="body_wrapper">
                     <?= $this_markup_body ?>
@@ -525,6 +534,9 @@ if ($this_current_page == 'file' // File sub-pages
     <? endif; ?>
     <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
     <script type="text/javascript" src="scripts/index.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? if ($this_current_page == 'dev'): ?>
+    <script type="text/javascript" src="scripts/dev.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? endif; ?>
     <script type="text/javascript">
     // Define the key client variables
     gameSettings.baseHref = '<?= MMRPG_CONFIG_ROOTURL ?>';

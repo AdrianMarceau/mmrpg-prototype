@@ -110,7 +110,7 @@ $this_omega_factors_eight[] = array('robot' => 'grenade-man', 'field' => 'field'
 //$this_omega_factors_eight_two[] = array('robot' => 'cold-man', 'field' => 'field', 'type' => 'freeze');
 //$this_omega_factors_eight_two[] = array('robot' => 'ground-man', 'field' => 'field', 'type' => 'earth');
 //$this_omega_factors_eight_two[] = array('robot' => 'pirate-man', 'field' => 'field', 'type' => 'explode');
-//$this_omega_factors_eight_two[] = array('robot' => 'burner-man', 'field' => 'field', 'type' => 'flame');
+$this_omega_factors_eight_two[] = array('robot' => 'burner-man', 'field' => 'field', 'type' => 'flame');
 $this_omega_factors_eight_two[] = array('robot' => 'magic-man', 'field' => 'field', 'type' => 'shadow');
 
 // Define the expansion omega factors for DR. COSSACK (MEGA MAN 9)
@@ -127,7 +127,7 @@ $this_omega_factors_nine[] = array('robot' => 'galaxy-man', 'field' => 'field', 
 // Define the expansion omega factors for DR. LIGHT (MEGA MAN 10)
 $this_omega_factors_ten = array();
 $this_omega_factors_ten[] = array('robot' => 'blade-man', 'field' => 'field', 'type' => 'cutter');
-//$this_omega_factors_ten[] = array('robot' => 'pump-man', 'field' => 'field', 'type' => 'water');
+$this_omega_factors_ten[] = array('robot' => 'pump-man', 'field' => 'field', 'type' => 'water');
 $this_omega_factors_ten[] = array('robot' => 'commando-man', 'field' => 'field', 'type' => 'missile');
 //$this_omega_factors_ten[] = array('robot' => 'chill-man', 'field' => 'field', 'type' => 'freeze');
 $this_omega_factors_ten[] = array('robot' => 'sheep-man', 'field' => 'field', 'type' => 'electric');
