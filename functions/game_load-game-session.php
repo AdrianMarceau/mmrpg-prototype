@@ -93,14 +93,12 @@ function mmrpg_load_game_session(){
 
         // Predefine an array to hold this player's battle items then collect from database
         $new_game_data['values']['battle_items'] = array();
-        $raw_battle_items = $db->get_array_list("SELECT item_token, item_quantity FROM mmrpg_users_items WHERE user_id = {$login_user_id};");
+        $raw_battle_items = $db->get_array_list("SELECT item_token, item_quantity FROM mmrpg_users_items WHERE user_id = {$login_user_id};", 'item_token');
         if (!empty($raw_battle_items)){
             // Loop through database items and format into game-compatible array
             $new_battle_items = array();
-            foreach ($raw_battle_items AS $key => $item_info){
-                $item_token = $item_info['item_token'];
-                $item_quantity = $item_info['item_quantity'];
-                $new_battle_items[$item_token] = $item_quantity;
+            foreach ($raw_battle_items AS $item_token => $item_info){
+                $new_battle_items[$item_token] = $item_info['item_quantity'];
             }
             // Update parent array with formatted battle items
             $new_game_data['values']['battle_items'] = $new_battle_items;
@@ -121,9 +119,11 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['robot_alts_hash'] = md5($this_database_user_save['save_values_robot_alts']);
         }
 
-        if (!empty($this_database_user_save['save_values_robot_database'])){
-            $new_game_data['values']['robot_database'] = json_decode($this_database_user_save['save_values_robot_database'], true);
-            $new_game_data['values']['robot_database_hash'] = md5($this_database_user_save['save_values_robot_database']);
+        // Predefine an array to hold this player's robot database then collect from database
+        $new_game_data['values']['robot_database'] = array();
+        $raw_robot_database = $db->get_array_list("SELECT robot_token, robot_encountered, robot_summoned, robot_scanned, robot_defeated, robot_unlocked FROM mmrpg_users_robots_database WHERE user_id = {$login_user_id};", 'robot_token');
+        if (!empty($raw_robot_database)){
+            $new_game_data['values']['robot_database'] = $raw_robot_database;
         }
 
         $new_game_data['flags'] = !empty($this_database_user_save['save_flags']) ? json_decode($this_database_user_save['save_flags'], true) : array();

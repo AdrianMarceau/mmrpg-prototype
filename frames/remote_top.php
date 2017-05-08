@@ -29,10 +29,8 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
         $this_playerinfo['values']['battle_failure'] = !defined('MMRPG_REMOTE_SKIP_FAILURE') && !empty($this_playerinfo['save_values_battle_failure']) ? json_decode($this_playerinfo['save_values_battle_failure'], true) : array();
         $this_playerinfo['values']['battle_rewards'] = !defined('MMRPG_REMOTE_SKIP_REWARDS') && !empty($this_playerinfo['save_values_battle_rewards']) ? json_decode($this_playerinfo['save_values_battle_rewards'], true) : array();
         $this_playerinfo['values']['battle_settings'] = !defined('MMRPG_REMOTE_SKIP_SETTINGS') && !empty($this_playerinfo['save_values_battle_settings']) ? json_decode($this_playerinfo['save_values_battle_settings'], true) : array();
-        //$this_playerinfo['values']['battle_items'] = !defined('MMRPG_REMOTE_SKIP_ITEMS') && !empty($this_playerinfo['save_values_battle_items']) ? json_decode($this_playerinfo['save_values_battle_items'], true) : array();
         $this_playerinfo['values']['battle_abilities'] = !defined('MMRPG_REMOTE_SKIP_ABILITIES') && !empty($this_playerinfo['save_values_battle_abilities']) ? json_decode($this_playerinfo['save_values_battle_abilities'], true) : array();
         $this_playerinfo['values']['battle_stars'] = !defined('MMRPG_REMOTE_SKIP_STARS') && !empty($this_playerinfo['save_values_battle_stars']) ? json_decode($this_playerinfo['save_values_battle_stars'], true) : array();
-        $this_playerinfo['values']['robot_database'] = !defined('MMRPG_REMOTE_SKIP_DATABASE') && !empty($this_playerinfo['save_values_robot_database']) ? json_decode($this_playerinfo['save_values_robot_database'], true) : array();
         $this_playerinfo['flags'] = !empty($this_playerinfo['save_flags']) ? json_decode($this_playerinfo['save_flags'], true) : array();
         $this_playerinfo['settings'] = !empty($this_playerinfo['save_settings']) ? json_decode($this_playerinfo['save_settings'], true) : array();
         unset($this_playerinfo['save_values'],
@@ -41,9 +39,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             $this_playerinfo['save_values_battle_failure'],
             $this_playerinfo['save_values_battle_rewards'],
             $this_playerinfo['save_values_battle_settings'],
-            //$this_playerinfo['save_values_battle_items'],
             $this_playerinfo['save_values_battle_abilities'],
-            $this_playerinfo['save_values_battle_database'],
             $this_playerinfo['save_flags'],
             $this_playerinfo['save_settings']
             );
@@ -64,6 +60,15 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
                 $this_playerinfo['values']['battle_items'] = $new_battle_items;
             }
 
+        }
+
+        // Manually load robot database records from another table if requested and they exist
+        $this_playerinfo['values']['robot_database'] = array();
+        if (!defined('MMRPG_REMOTE_SKIP_DATABASE')){
+            $raw_robot_database = $db->get_array_list("SELECT robot_token, robot_encountered, robot_summoned, robot_scanned, robot_defeated, robot_unlocked FROM mmrpg_users_robots_database WHERE user_id = {$this_playerid};", 'robot_token');
+            if (!empty($raw_robot_database)){
+                $this_playerinfo['values']['robot_database'] = $raw_robot_database;
+            }
         }
 
         // Fix issues with legacy player rewards array
