@@ -4,12 +4,13 @@ if (!defined('MMRPG_REMOTE_GAME_ID')){ define('MMRPG_REMOTE_GAME_ID', (!empty($_
 if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER']['userid']){
 
     // Attempt to collect data for this player from the database
+    $this_playerid = MMRPG_REMOTE_GAME_ID;
     $this_playerinfo = $db->get_array("SELECT
         mmrpg_users.*,
         mmrpg_saves.*
         FROM mmrpg_users
         LEFT JOIN mmrpg_saves ON mmrpg_saves.user_id = mmrpg_users.user_id
-        WHERE mmrpg_users.user_id = '".MMRPG_REMOTE_GAME_ID."';");
+        WHERE mmrpg_users.user_id = {$this_playerid};");
 
     // If the userinfo exists in the database, display it
     if (!empty($this_playerinfo)){
@@ -28,7 +29,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
         $this_playerinfo['values']['battle_failure'] = !defined('MMRPG_REMOTE_SKIP_FAILURE') && !empty($this_playerinfo['save_values_battle_failure']) ? json_decode($this_playerinfo['save_values_battle_failure'], true) : array();
         $this_playerinfo['values']['battle_rewards'] = !defined('MMRPG_REMOTE_SKIP_REWARDS') && !empty($this_playerinfo['save_values_battle_rewards']) ? json_decode($this_playerinfo['save_values_battle_rewards'], true) : array();
         $this_playerinfo['values']['battle_settings'] = !defined('MMRPG_REMOTE_SKIP_SETTINGS') && !empty($this_playerinfo['save_values_battle_settings']) ? json_decode($this_playerinfo['save_values_battle_settings'], true) : array();
-        $this_playerinfo['values']['battle_items'] = !defined('MMRPG_REMOTE_SKIP_ITEMS') && !empty($this_playerinfo['save_values_battle_items']) ? json_decode($this_playerinfo['save_values_battle_items'], true) : array();
+        //$this_playerinfo['values']['battle_items'] = !defined('MMRPG_REMOTE_SKIP_ITEMS') && !empty($this_playerinfo['save_values_battle_items']) ? json_decode($this_playerinfo['save_values_battle_items'], true) : array();
         $this_playerinfo['values']['battle_abilities'] = !defined('MMRPG_REMOTE_SKIP_ABILITIES') && !empty($this_playerinfo['save_values_battle_abilities']) ? json_decode($this_playerinfo['save_values_battle_abilities'], true) : array();
         $this_playerinfo['values']['battle_stars'] = !defined('MMRPG_REMOTE_SKIP_STARS') && !empty($this_playerinfo['save_values_battle_stars']) ? json_decode($this_playerinfo['save_values_battle_stars'], true) : array();
         $this_playerinfo['values']['robot_database'] = !defined('MMRPG_REMOTE_SKIP_DATABASE') && !empty($this_playerinfo['save_values_robot_database']) ? json_decode($this_playerinfo['save_values_robot_database'], true) : array();
@@ -40,12 +41,30 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             $this_playerinfo['save_values_battle_failure'],
             $this_playerinfo['save_values_battle_rewards'],
             $this_playerinfo['save_values_battle_settings'],
-            $this_playerinfo['save_values_battle_items'],
+            //$this_playerinfo['save_values_battle_items'],
             $this_playerinfo['save_values_battle_abilities'],
             $this_playerinfo['save_values_battle_database'],
             $this_playerinfo['save_flags'],
             $this_playerinfo['save_settings']
             );
+
+        // Manually load items from another table if requested and they exist
+        $this_playerinfo['values']['battle_items'] = array();
+        if (!defined('MMRPG_REMOTE_SKIP_ITEMS')){
+            $raw_battle_items = $db->get_array_list("SELECT item_token, item_quantity FROM mmrpg_users_items WHERE user_id = {$this_playerid};");
+            if (!empty($raw_battle_items)){
+                // Loop through database items and format into game-compatible array
+                $new_battle_items = array();
+                foreach ($raw_battle_items AS $key => $item_info){
+                    $item_token = $item_info['item_token'];
+                    $item_quantity = $item_info['item_quantity'];
+                    $new_battle_items[$item_token] = $item_quantity;
+                }
+                // Update parent array with formatted battle items
+                $this_playerinfo['values']['battle_items'] = $new_battle_items;
+            }
+
+        }
 
         // Fix issues with legacy player rewards array
         if (!empty($this_playerinfo['values']['battle_rewards'])){

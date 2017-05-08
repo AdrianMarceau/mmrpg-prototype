@@ -27,15 +27,22 @@ function mmrpg_load_game_session(){
         // LOAD DATABASE INFO
 
         // Collect the user and save info from the database
-        $this_database_save = $db->get_array("SELECT * FROM mmrpg_saves WHERE user_id = {$login_user_id} LIMIT 1");
-        $this_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$login_user_id} LIMIT 1");
-        if (empty($this_database_save)){ die('could not load save for file '.$temp_matches[2].' and path '.$temp_matches[1].' on line '.__LINE__); }
-        if (empty($this_database_user)){ die('could not load user for '.$this_database_save['user_id'].' on line '.__LINE__); }
+        $user_index_fields = rpg_user::get_index_fields(true);
+        $user_save_index_fields = rpg_user_save::get_index_fields(true);
+        $this_database_user = $db->get_array("SELECT {$user_index_fields} FROM mmrpg_users WHERE user_id = {$login_user_id} LIMIT 1");
+        $this_database_user_save = $db->get_array("SELECT {$user_save_index_fields} FROM mmrpg_saves WHERE user_id = {$login_user_id} LIMIT 1");
+        if (empty($this_database_user)){ die('could not load user for '.$this_database_user_save['user_id'].' on line '.__LINE__); }
+        if (empty($this_database_user_save)){ die('could not load save for file '.$temp_matches[2].' and path '.$temp_matches[1].' on line '.__LINE__); }
+
+        //echo('<pre><strong>Loading game file '.$login_user_id.' &hellip;</strong></pre><hr />'.PHP_EOL);
+
+        //echo('<pre>$this_database_user_save = '.print_r($this_database_user_save, true).'</pre><hr />'.PHP_EOL);
+        //echo('<pre>$this_database_user = '.print_r($this_database_user, true).'</pre><hr />'.PHP_EOL);
 
         // Update the game session with database extracted variables
         $new_game_data = array();
 
-        $new_game_data['CACHE_DATE'] = $this_database_save['save_cache_date'];
+        $new_game_data['CACHE_DATE'] = $this_database_user_save['save_cache_date'];
 
         $new_game_data['USER']['userid'] = $this_database_user['user_id'];
         $new_game_data['USER']['roleid'] = $this_database_user['role_id'];
@@ -57,61 +64,77 @@ function mmrpg_load_game_session(){
         $new_game_data['USER']['dateofbirth'] = $this_database_user['user_date_birth'];
         $new_game_data['USER']['approved'] = $this_database_user['user_flag_approved'];
 
-        $new_game_data['counters'] = !empty($this_database_save['save_counters']) ? json_decode($this_database_save['save_counters'], true) : array();
-        $new_game_data['values'] = !empty($this_database_save['save_values']) ? json_decode($this_database_save['save_values'], true) : array();
+        $new_game_data['counters'] = !empty($this_database_user_save['save_counters']) ? json_decode($this_database_user_save['save_counters'], true) : array();
+        $new_game_data['values'] = !empty($this_database_user_save['save_values']) ? json_decode($this_database_user_save['save_values'], true) : array();
 
-        if (!isset($this_database_save['save_values_battle_index'])){
+        if (!isset($this_database_user_save['save_values_battle_index'])){
             $new_game_data['values']['battle_index'] = array();
         }
 
-        if (!empty($this_database_save['save_values_battle_complete'])){
-            $new_game_data['values']['battle_complete'] = json_decode($this_database_save['save_values_battle_complete'], true);
-            $new_game_data['values']['battle_complete_hash'] = md5($this_database_save['save_values_battle_complete']);
+        if (!empty($this_database_user_save['save_values_battle_complete'])){
+            $new_game_data['values']['battle_complete'] = json_decode($this_database_user_save['save_values_battle_complete'], true);
+            $new_game_data['values']['battle_complete_hash'] = md5($this_database_user_save['save_values_battle_complete']);
         }
 
-        if (!empty($this_database_save['save_values_battle_failure'])){
-            $new_game_data['values']['battle_failure'] = json_decode($this_database_save['save_values_battle_failure'], true);
-            $new_game_data['values']['battle_failure_hash'] = md5($this_database_save['save_values_battle_failure']);
+        if (!empty($this_database_user_save['save_values_battle_failure'])){
+            $new_game_data['values']['battle_failure'] = json_decode($this_database_user_save['save_values_battle_failure'], true);
+            $new_game_data['values']['battle_failure_hash'] = md5($this_database_user_save['save_values_battle_failure']);
         }
 
-        if (!empty($this_database_save['save_values_battle_rewards'])){
-            $new_game_data['values']['battle_rewards'] = json_decode($this_database_save['save_values_battle_rewards'], true);
-            $new_game_data['values']['battle_rewards_hash'] = md5($this_database_save['save_values_battle_rewards']);
+        if (!empty($this_database_user_save['save_values_battle_rewards'])){
+            $new_game_data['values']['battle_rewards'] = json_decode($this_database_user_save['save_values_battle_rewards'], true);
+            $new_game_data['values']['battle_rewards_hash'] = md5($this_database_user_save['save_values_battle_rewards']);
         }
 
-        if (!empty($this_database_save['save_values_battle_settings'])){
-            $new_game_data['values']['battle_settings'] = json_decode($this_database_save['save_values_battle_settings'], true);
-            $new_game_data['values']['battle_settings_hash'] = md5($this_database_save['save_values_battle_settings']);
+        if (!empty($this_database_user_save['save_values_battle_settings'])){
+            $new_game_data['values']['battle_settings'] = json_decode($this_database_user_save['save_values_battle_settings'], true);
+            $new_game_data['values']['battle_settings_hash'] = md5($this_database_user_save['save_values_battle_settings']);
         }
 
-        if (!empty($this_database_save['save_values_battle_items'])){
-            $new_game_data['values']['battle_items'] = json_decode($this_database_save['save_values_battle_items'], true);
-            $new_game_data['values']['battle_items_hash'] = md5($this_database_save['save_values_battle_items']);
+        // Predefine an array to hold this player's battle items then collect from database
+        $new_game_data['values']['battle_items'] = array();
+        $raw_battle_items = $db->get_array_list("SELECT item_token, item_quantity FROM mmrpg_users_items WHERE user_id = {$login_user_id};");
+        if (!empty($raw_battle_items)){
+            // Loop through database items and format into game-compatible array
+            $new_battle_items = array();
+            foreach ($raw_battle_items AS $key => $item_info){
+                $item_token = $item_info['item_token'];
+                $item_quantity = $item_info['item_quantity'];
+                $new_battle_items[$item_token] = $item_quantity;
+            }
+            // Update parent array with formatted battle items
+            $new_game_data['values']['battle_items'] = $new_battle_items;
         }
 
-        if (!empty($this_database_save['save_values_battle_abilities'])){
-            $new_game_data['values']['battle_abilities'] = json_decode($this_database_save['save_values_battle_abilities'], true);
-            $new_game_data['values']['battle_abilities_hash'] = md5($this_database_save['save_values_battle_abilities']);
+        if (!empty($this_database_user_save['save_values_battle_abilities'])){
+            $new_game_data['values']['battle_abilities'] = json_decode($this_database_user_save['save_values_battle_abilities'], true);
+            $new_game_data['values']['battle_abilities_hash'] = md5($this_database_user_save['save_values_battle_abilities']);
         }
 
-        if (!empty($this_database_save['save_values_battle_stars'])){
-            $new_game_data['values']['battle_stars'] = json_decode($this_database_save['save_values_battle_stars'], true);
-            $new_game_data['values']['battle_stars_hash'] = md5($this_database_save['save_values_battle_stars']);
+        if (!empty($this_database_user_save['save_values_battle_stars'])){
+            $new_game_data['values']['battle_stars'] = json_decode($this_database_user_save['save_values_battle_stars'], true);
+            $new_game_data['values']['battle_stars_hash'] = md5($this_database_user_save['save_values_battle_stars']);
         }
 
-        if (!empty($this_database_save['save_values_robot_alts'])){
-            $new_game_data['values']['robot_alts'] = json_decode($this_database_save['save_values_robot_alts'], true);
-            $new_game_data['values']['robot_alts_hash'] = md5($this_database_save['save_values_robot_alts']);
+        if (!empty($this_database_user_save['save_values_robot_alts'])){
+            $new_game_data['values']['robot_alts'] = json_decode($this_database_user_save['save_values_robot_alts'], true);
+            $new_game_data['values']['robot_alts_hash'] = md5($this_database_user_save['save_values_robot_alts']);
         }
 
-        if (!empty($this_database_save['save_values_robot_database'])){
-            $new_game_data['values']['robot_database'] = json_decode($this_database_save['save_values_robot_database'], true);
-            $new_game_data['values']['robot_database_hash'] = md5($this_database_save['save_values_robot_database']);
+        if (!empty($this_database_user_save['save_values_robot_database'])){
+            $new_game_data['values']['robot_database'] = json_decode($this_database_user_save['save_values_robot_database'], true);
+            $new_game_data['values']['robot_database_hash'] = md5($this_database_user_save['save_values_robot_database']);
         }
 
-        $new_game_data['flags'] = !empty($this_database_save['save_flags']) ? json_decode($this_database_save['save_flags'], true) : array();
+        $new_game_data['flags'] = !empty($this_database_user_save['save_flags']) ? json_decode($this_database_user_save['save_flags'], true) : array();
 
-        $new_game_data['battle_settings'] = !empty($this_database_save['save_settings']) ? json_decode($this_database_save['save_settings'], true) : array();
+        $new_game_data['battle_settings'] = !empty($this_database_user_save['save_settings']) ? json_decode($this_database_user_save['save_settings'], true) : array();
+
+
+        //echo('<pre>$new_game_data = '.print_r($new_game_data, true).'</pre><hr />'.PHP_EOL);
+
+        //exit();
+
 
         // Update the session with the new save info
         $_SESSION[$session_token] = array_merge($_SESSION[$session_token], $new_game_data);

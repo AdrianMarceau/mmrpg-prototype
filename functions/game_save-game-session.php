@@ -211,12 +211,6 @@ function mmrpg_save_game_session(){
                     if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
                     unset($this_values['battle_settings'], $this_values['battle_settings_hash']);
                 }
-                if (!empty($this_values['battle_items']) || $reset_in_progress){
-                    $this_save_array['save_values_battle_items'] = json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
-                    $temp_hash = md5($this_save_array['save_values_battle_items']);
-                    if (isset($this_values['battle_items_hash']) && $this_values['battle_items_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_items']); }
-                    unset($this_values['battle_items'], $this_values['battle_items_hash']);
-                }
                 if (!empty($this_values['battle_abilities'])){
                     $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
                     $temp_hash = md5($this_save_array['save_values_battle_abilities']);
@@ -429,12 +423,6 @@ function mmrpg_save_game_session(){
             $temp_hash = md5($this_save_array['save_values_battle_settings']);
             if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
             unset($this_values['battle_settings'], $this_values['battle_settings_hash']);
-        }
-        if (!empty($this_values['battle_items']) || $reset_in_progress){
-            $this_save_array['save_values_battle_items'] = json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
-            $temp_hash = md5($this_save_array['save_values_battle_items']);
-            if (isset($this_values['battle_items_hash']) && $this_values['battle_items_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_items']); }
-            unset($this_values['battle_items'], $this_values['battle_items_hash']);
         }
         if (!empty($this_values['battle_abilities']) || $reset_in_progress){
             $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
