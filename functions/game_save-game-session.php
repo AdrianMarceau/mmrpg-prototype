@@ -220,11 +220,8 @@ function mmrpg_save_game_session(){
                     if (isset($this_values['battle_abilities_hash']) && $this_values['battle_abilities_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_abilities']); }
                     unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
                 }
-                if (!empty($this_values['battle_stars']) || $reset_in_progress){
-                    $this_save_array['save_values_battle_stars'] = json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
-                    $temp_hash = md5($this_save_array['save_values_battle_stars']);
-                    if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
-                    unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
+                if (empty($this_values['battle_stars']) || $reset_in_progress){
+                    $this_save_array['save_values_battle_stars'] = '';
                 }
                 if (!empty($this_values['robot_alts']) || $reset_in_progress){
                     $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
@@ -433,11 +430,8 @@ function mmrpg_save_game_session(){
             if (isset($this_values['battle_abilities_hash']) && $this_values['battle_abilities_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_abilities']); }
             unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
         }
-        if (!empty($this_values['battle_stars']) || $reset_in_progress){
-            $this_save_array['save_values_battle_stars'] = json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
-            $temp_hash = md5($this_save_array['save_values_battle_stars']);
-            if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
-            unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
+        if (empty($this_values['battle_stars']) || $reset_in_progress){
+            $this_save_array['save_values_battle_stars'] = '';
         }
         if (!empty($this_values['robot_alts']) || $reset_in_progress){
             $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());

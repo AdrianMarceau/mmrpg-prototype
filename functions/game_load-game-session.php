@@ -109,9 +109,11 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['battle_abilities_hash'] = md5($this_database_user_save['save_values_battle_abilities']);
         }
 
-        if (!empty($this_database_user_save['save_values_battle_stars'])){
-            $new_game_data['values']['battle_stars'] = json_decode($this_database_user_save['save_values_battle_stars'], true);
-            $new_game_data['values']['battle_stars_hash'] = md5($this_database_user_save['save_values_battle_stars']);
+        // Predefine an array to hold this player's battle stars then collect from database
+        $new_game_data['values']['battle_stars'] = array();
+        $raw_battle_stars = $db->get_array_list("SELECT star_token, star_name, star_kind, star_type, star_type2, star_field, star_field2, star_player, star_date FROM mmrpg_users_stars WHERE user_id = {$login_user_id};", 'star_token');
+        if (!empty($raw_battle_stars)){
+            $new_game_data['values']['battle_stars'] = $raw_battle_stars;
         }
 
         if (!empty($this_database_user_save['save_values_robot_alts'])){
