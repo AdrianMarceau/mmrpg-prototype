@@ -52,9 +52,12 @@ require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/mechas.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/bosses.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
 //require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+
+// Collect the complete ability index for display purposes
+$mmrpg_database_abilities = rpg_ability::get_index(true);
 
 // Merge the robots and mechas
 $mmrpg_database_robots = array_merge($mmrpg_database_robots, $mmrpg_database_mechas, $mmrpg_database_bosses);
@@ -563,8 +566,9 @@ if (true){
                                                         //$temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
                                                         foreach ($robot_ability_rewards AS $this_info){
+                                                            $this_token = $this_info['token'];
                                                             $this_level = $this_info['level'];
-                                                            $this_ability = rpg_ability::parse_index_info($mmrpg_database_abilities[$this_info['token']]);
+                                                            $this_ability = $mmrpg_database_abilities[$this_token];
                                                             $this_ability_token = $this_ability['ability_token'];
                                                             $this_ability_name = $this_ability['ability_name'];
                                                             $this_ability_type = !empty($this_ability['ability_type']) ? $this_ability['ability_type'] : false;
