@@ -44,35 +44,17 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             $this_playerinfo['save_settings']
             );
 
-        // Manually load items from another table if requested and they exist
+        // Manually load unlocked items from another table if requested and they exist
         $this_playerinfo['values']['battle_items'] = array();
-        if (!defined('MMRPG_REMOTE_SKIP_ITEMS')){
-            $raw_battle_items = $db->get_array_list("SELECT item_token, item_quantity FROM mmrpg_users_items WHERE user_id = {$this_playerid};");
-            if (!empty($raw_battle_items)){
-                $raw_battle_tokens = array_map(function($arr){ return $arr['item_token']; }, $raw_battle_items);
-                $raw_battle_quantities = array_map(function($arr){ return $arr['item_quantity']; }, $raw_battle_items);
-                $this_playerinfo['values']['battle_items'] = array_combine($raw_battle_tokens, $raw_battle_quantities);
-            }
+        if (!defined('MMRPG_REMOTE_SKIP_ITEMS')){ $this_playerinfo['values']['battle_items'] = rpg_user::get_battle_items($this_playerid); }
 
-        }
-
-        // Manually load battle stars from another table if requested and they exist
+        // Manually load unlocked stars from another table if requested and they exist
         $this_playerinfo['values']['battle_stars'] = array();
-        if (!defined('MMRPG_REMOTE_SKIP_STARS')){
-            $raw_battle_stars = $db->get_array_list("SELECT star_token, star_name, star_kind, star_type, star_type2, star_field, star_field2, star_player, star_date FROM mmrpg_users_stars WHERE user_id = {$this_playerid};", 'star_token');
-            if (!empty($raw_battle_stars)){
-                $this_playerinfo['values']['battle_stars'] = $raw_battle_stars;
-            }
-        }
+        if (!defined('MMRPG_REMOTE_SKIP_STARS')){ $this_playerinfo['values']['battle_stars'] = rpg_user::get_battle_stars($this_playerid); }
 
-        // Manually load robot database records from another table if requested and they exist
+        // Manually load encounter records from another table if requested and they exist
         $this_playerinfo['values']['robot_database'] = array();
-        if (!defined('MMRPG_REMOTE_SKIP_DATABASE')){
-            $raw_robot_database = $db->get_array_list("SELECT robot_token, robot_encountered, robot_summoned, robot_scanned, robot_defeated, robot_unlocked FROM mmrpg_users_robots_database WHERE user_id = {$this_playerid};", 'robot_token');
-            if (!empty($raw_robot_database)){
-                $this_playerinfo['values']['robot_database'] = $raw_robot_database;
-            }
-        }
+        if (!defined('MMRPG_REMOTE_SKIP_DATABASE')){ $this_playerinfo['values']['robot_database'] = rpg_user::get_robot_database($this_playerid); }
 
         // Fix issues with legacy player rewards array
         if (!empty($this_playerinfo['values']['battle_rewards'])){

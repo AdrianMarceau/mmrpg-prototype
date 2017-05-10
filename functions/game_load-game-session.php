@@ -91,41 +91,29 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['battle_settings_hash'] = md5($this_database_user_save['save_values_battle_settings']);
         }
 
-        // Predefine an array to hold this player's battle items then collect from database
-        $new_game_data['values']['battle_items'] = array();
-        $raw_battle_items = $db->get_array_list("SELECT item_token, item_quantity FROM mmrpg_users_items WHERE user_id = {$login_user_id};", 'item_token');
-        if (!empty($raw_battle_items)){
-            $raw_battle_tokens = array_map(function($arr){ return $arr['item_token']; }, $raw_battle_items);
-            $raw_battle_quantities = array_map(function($arr){ return $arr['item_quantity']; }, $raw_battle_items);
-            $new_game_data['values']['battle_items'] = array_combine($raw_battle_tokens, $raw_battle_quantities);
-        }
+        // Collect any unlocked items for this user from the database
+        $new_game_data['values']['battle_items'] = rpg_user::get_battle_items($login_user_id);
 
         if (!empty($this_database_user_save['save_values_battle_abilities'])){
             $new_game_data['values']['battle_abilities'] = json_decode($this_database_user_save['save_values_battle_abilities'], true);
             $new_game_data['values']['battle_abilities_hash'] = md5($this_database_user_save['save_values_battle_abilities']);
         }
 
-        // Predefine an array to hold this player's battle stars then collect from database
-        $new_game_data['values']['battle_stars'] = array();
-        $raw_battle_stars = $db->get_array_list("SELECT star_token, star_name, star_kind, star_type, star_type2, star_field, star_field2, star_player, star_date FROM mmrpg_users_stars WHERE user_id = {$login_user_id};", 'star_token');
-        if (!empty($raw_battle_stars)){
-            $new_game_data['values']['battle_stars'] = $raw_battle_stars;
-        }
+        // Collect any unlocked stars for this user from the database
+        $new_game_data['values']['battle_stars'] = rpg_user::get_battle_stars($login_user_id);
 
         if (!empty($this_database_user_save['save_values_robot_alts'])){
             $new_game_data['values']['robot_alts'] = json_decode($this_database_user_save['save_values_robot_alts'], true);
             $new_game_data['values']['robot_alts_hash'] = md5($this_database_user_save['save_values_robot_alts']);
         }
 
-        // Predefine an array to hold this player's robot database then collect from database
-        $new_game_data['values']['robot_database'] = array();
-        $raw_robot_database = $db->get_array_list("SELECT robot_token, robot_encountered, robot_summoned, robot_scanned, robot_defeated, robot_unlocked FROM mmrpg_users_robots_database WHERE user_id = {$login_user_id};", 'robot_token');
-        if (!empty($raw_robot_database)){
-            $new_game_data['values']['robot_database'] = $raw_robot_database;
-        }
+        // Collect any encounter records for this user from the database
+        $new_game_data['values']['robot_database'] = rpg_user::get_robot_database($login_user_id);
 
+        // Decode this user's save flag if any have been set
         $new_game_data['flags'] = !empty($this_database_user_save['save_flags']) ? json_decode($this_database_user_save['save_flags'], true) : array();
 
+        // Decode this user's battle settings if any have been created
         $new_game_data['battle_settings'] = !empty($this_database_user_save['save_settings']) ? json_decode($this_database_user_save['save_settings'], true) : array();
 
 
