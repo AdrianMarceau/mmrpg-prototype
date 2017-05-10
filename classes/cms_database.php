@@ -58,8 +58,8 @@ class cms_database {
      * @return cms_database
      */
     public static function get_database(){
-        if (isset($GLOBALS['DB'])){ $db = $GLOBALS['DB'];  }
-        elseif (isset($GLOBALS['db'])){ $db = $GLOBALS['db'];  }
+        if (isset($GLOBALS['db'])){ $db = $GLOBALS['db'];  }
+        elseif (isset($GLOBALS['DB'])){ $db = $GLOBALS['DB'];  }
         else { $db = false; }
         if (empty($db)){ $db = new cms_database(); }
         return $db;
