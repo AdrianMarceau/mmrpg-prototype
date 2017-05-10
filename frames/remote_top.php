@@ -49,15 +49,9 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
         if (!defined('MMRPG_REMOTE_SKIP_ITEMS')){
             $raw_battle_items = $db->get_array_list("SELECT item_token, item_quantity FROM mmrpg_users_items WHERE user_id = {$this_playerid};");
             if (!empty($raw_battle_items)){
-                // Loop through database items and format into game-compatible array
-                $new_battle_items = array();
-                foreach ($raw_battle_items AS $key => $item_info){
-                    $item_token = $item_info['item_token'];
-                    $item_quantity = $item_info['item_quantity'];
-                    $new_battle_items[$item_token] = $item_quantity;
-                }
-                // Update parent array with formatted battle items
-                $this_playerinfo['values']['battle_items'] = $new_battle_items;
+                $raw_battle_tokens = array_map(function($arr){ return $arr['item_token']; }, $raw_battle_items);
+                $raw_battle_quantities = array_map(function($arr){ return $arr['item_quantity']; }, $raw_battle_items);
+                $this_playerinfo['values']['battle_items'] = array_combine($raw_battle_tokens, $raw_battle_quantities);
             }
 
         }

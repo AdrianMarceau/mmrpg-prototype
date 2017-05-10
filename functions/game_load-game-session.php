@@ -95,13 +95,9 @@ function mmrpg_load_game_session(){
         $new_game_data['values']['battle_items'] = array();
         $raw_battle_items = $db->get_array_list("SELECT item_token, item_quantity FROM mmrpg_users_items WHERE user_id = {$login_user_id};", 'item_token');
         if (!empty($raw_battle_items)){
-            // Loop through database items and format into game-compatible array
-            $new_battle_items = array();
-            foreach ($raw_battle_items AS $item_token => $item_info){
-                $new_battle_items[$item_token] = $item_info['item_quantity'];
-            }
-            // Update parent array with formatted battle items
-            $new_game_data['values']['battle_items'] = $new_battle_items;
+            $raw_battle_tokens = array_map(function($arr){ return $arr['item_token']; }, $raw_battle_items);
+            $raw_battle_quantities = array_map(function($arr){ return $arr['item_quantity']; }, $raw_battle_items);
+            $new_game_data['values']['battle_items'] = array_combine($raw_battle_tokens, $raw_battle_quantities);
         }
 
         if (!empty($this_database_user_save['save_values_battle_abilities'])){
