@@ -390,8 +390,8 @@ class rpg_functions {
      */
     public static function items_sort_for_editor($item_one, $item_two){
         global $mmrpg_index;
-        $item_token_one = preg_match('/^([a-z0-9]+)-(a-z0-9+)$/i', $item_one['item_token']) ? $item_one['item_token'] : $item_one['item_token'].'-size';
-        $item_token_two = preg_match('/^([a-z0-9]+)-(a-z0-9+)$/i', $item_two['item_token']) ? $item_two['item_token'] : $item_two['item_token'].'-size';
+        $item_token_one = preg_match('/^([a-z0-9]+)-(a-z0-9+)$/i', $item_one) ? $item_one : $item_one.'-size';
+        $item_token_two = preg_match('/^([a-z0-9]+)-(a-z0-9+)$/i', $item_two) ? $item_two : $item_two.'-size';
         list($kind_one, $size_one) = explode('-', $item_token_one);
         list($kind_two, $size_two) = explode('-', $item_token_two);
         if ($kind_one == 'energy' && $kind_two != 'energy'){ return -1; }
@@ -406,8 +406,8 @@ class rpg_functions {
         elseif ($size_one != 'capsule' && $size_two == 'capsule'){ return 1; }
         elseif ($size_one == 'tank' && $size_two != 'tank'){ return -1; }
         elseif ($size_one != 'tank' && $size_two == 'tank'){ return 1; }
-        elseif ($item_one['item_token'] > $item_two['item_token']){ return 1; }
-        elseif ($item_one['item_token'] < $item_two['item_token']){ return -1; }
+        elseif ($item_token_one > $item_token_two){ return 1; }
+        elseif ($item_token_one < $item_token_two){ return -1; }
         else { return 0; }
     }
 
