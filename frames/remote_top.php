@@ -23,14 +23,11 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
         // Collect this player's info from the database... all of it
         $this_playerinfo['counters'] = !empty($this_playerinfo['save_counters']) ? json_decode($this_playerinfo['save_counters'], true) : array();
         $this_playerinfo['values'] = !empty($this_playerinfo['save_values']) ? json_decode($this_playerinfo['save_values'], true) : array();
-        //$this_playerinfo['values']['battle_index'] = !defined('MMRPG_REMOTE_SKIP_INDEX') && !empty($this_playerinfo['save_values_battle_index']) ? json_decode($this_playerinfo['save_values_battle_index'], true) : array();
         $this_playerinfo['values']['battle_index'] = !defined('MMRPG_REMOTE_SKIP_INDEX') && !empty($this_playerinfo['save_values_battle_index']) ? $this_playerinfo['save_values_battle_index'] : array();
         $this_playerinfo['values']['battle_complete'] = !defined('MMRPG_REMOTE_SKIP_COMPLETE') && !empty($this_playerinfo['save_values_battle_complete']) ? json_decode($this_playerinfo['save_values_battle_complete'], true) : array();
         $this_playerinfo['values']['battle_failure'] = !defined('MMRPG_REMOTE_SKIP_FAILURE') && !empty($this_playerinfo['save_values_battle_failure']) ? json_decode($this_playerinfo['save_values_battle_failure'], true) : array();
         $this_playerinfo['values']['battle_rewards'] = !defined('MMRPG_REMOTE_SKIP_REWARDS') && !empty($this_playerinfo['save_values_battle_rewards']) ? json_decode($this_playerinfo['save_values_battle_rewards'], true) : array();
         $this_playerinfo['values']['battle_settings'] = !defined('MMRPG_REMOTE_SKIP_SETTINGS') && !empty($this_playerinfo['save_values_battle_settings']) ? json_decode($this_playerinfo['save_values_battle_settings'], true) : array();
-        $this_playerinfo['values']['battle_abilities'] = !defined('MMRPG_REMOTE_SKIP_ABILITIES') && !empty($this_playerinfo['save_values_battle_abilities']) ? json_decode($this_playerinfo['save_values_battle_abilities'], true) : array();
-        //$this_playerinfo['values']['battle_stars'] = !defined('MMRPG_REMOTE_SKIP_STARS') && !empty($this_playerinfo['save_values_battle_stars']) ? json_decode($this_playerinfo['save_values_battle_stars'], true) : array();
         $this_playerinfo['flags'] = !empty($this_playerinfo['save_flags']) ? json_decode($this_playerinfo['save_flags'], true) : array();
         $this_playerinfo['settings'] = !empty($this_playerinfo['save_settings']) ? json_decode($this_playerinfo['save_settings'], true) : array();
         unset($this_playerinfo['save_values'],
@@ -39,10 +36,13 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             $this_playerinfo['save_values_battle_failure'],
             $this_playerinfo['save_values_battle_rewards'],
             $this_playerinfo['save_values_battle_settings'],
-            $this_playerinfo['save_values_battle_abilities'],
             $this_playerinfo['save_flags'],
             $this_playerinfo['save_settings']
             );
+
+        // Manually load unlocked abilities from another table if requested and they exist
+        $this_playerinfo['values']['battle_abilities'] = array();
+        if (!defined('MMRPG_REMOTE_SKIP_ABILITIES')){ $this_playerinfo['values']['battle_abilities'] = rpg_user::get_battle_abilities($this_playerid); }
 
         // Manually load unlocked items from another table if requested and they exist
         $this_playerinfo['values']['battle_items'] = array();
@@ -56,6 +56,11 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
         $this_playerinfo['values']['robot_database'] = array();
         if (!defined('MMRPG_REMOTE_SKIP_DATABASE')){ $this_playerinfo['values']['robot_database'] = rpg_user::get_robot_database($this_playerid); }
 
+        //echo('<pre>$this_playerinfo[\'values\'][\'battle_abilities\'] = '.print_r($this_playerinfo['values']['battle_abilities'], true).'</pre>');
+        //exit();
+
+        /*
+        // vv MIGHT NOT BE NECESSARY NOW, RETESTING REQUIRED vv //
         // Fix issues with legacy player rewards array
         if (!empty($this_playerinfo['values']['battle_rewards'])){
             foreach ($this_playerinfo['values']['battle_rewards'] AS $player_token => $player_info){
@@ -84,6 +89,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
                 }
             }
         }
+        */
 
         // Add this player's GAME data to the session for iframe scripts
         $temp_remote_session = array();

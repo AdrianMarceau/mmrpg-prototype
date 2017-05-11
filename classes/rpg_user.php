@@ -301,6 +301,32 @@ class rpg_user {
 
 
     /**
+     * Pull an array of unlocked abilities for a given user ID from the database
+     * @param int $user_id
+     * @return array
+     */
+    public static function get_battle_abilities($user_id){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Pull a list of unlocked abilities for this user from the database
+        $raw_battle_abilities = $db->get_array_list("SELECT ability_token FROM mmrpg_users_abilities WHERE user_id = {$user_id};");
+        if (empty($raw_battle_abilities)){ return array(); }
+
+        // Reformat to game-compatible array
+        $user_battle_abilities = array_map(function($arr){ return $arr['ability_token']; }, $raw_battle_abilities);
+
+        // Return the final array
+        return $user_battle_abilities;
+
+    }
+
+
+    /**
      * Pull an array of unlocked items for a given user ID from the database
      * @param int $user_id
      * @return array
@@ -317,7 +343,7 @@ class rpg_user {
         $raw_battle_items = $db->get_array_list("SELECT item_token, item_quantity FROM mmrpg_users_items WHERE user_id = {$user_id};");
         if (empty($raw_battle_items)){ return array(); }
 
-        // Reformat to game-compatible array syntax
+        // Reformat to game-compatible array
         $raw_battle_tokens = array_map(function($arr){ return $arr['item_token']; }, $raw_battle_items);
         $raw_battle_quantities = array_map(function($arr){ return $arr['item_quantity']; }, $raw_battle_items);
         $user_battle_items = array_combine($raw_battle_tokens, $raw_battle_quantities);
@@ -345,7 +371,7 @@ class rpg_user {
         $raw_battle_stars = $db->get_array_list("SELECT star_token, star_name, star_kind, star_type, star_type2, star_field, star_field2, star_player, star_date FROM mmrpg_users_stars WHERE user_id = {$user_id};", 'star_token');
         if (empty($raw_battle_stars)){ return array(); }
 
-        // Collect into game-compatible array syntax
+        // Collect into game-compatible array
         $user_battle_stars = $raw_battle_stars;
 
         // Return the final array
@@ -371,11 +397,43 @@ class rpg_user {
         $raw_robot_database = $db->get_array_list("SELECT robot_token, robot_encountered, robot_summoned, robot_scanned, robot_defeated, robot_unlocked FROM mmrpg_users_robots_database WHERE user_id = {$user_id};", 'robot_token');
         if (empty($raw_robot_database)){ return array(); }
 
-        // Collect into game-compatible array syntax
+        // Collect into game-compatible array
         $user_robot_database = $raw_robot_database;
 
         // Return the final array
         return $user_robot_database;
+
+    }
+
+
+    /**
+     * Pull an array of unlocked robot alts for a given user ID from the database
+     * @param int $user_id
+     * @return array
+     */
+    public static function get_robot_alts($user_id){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Pull a list of unlocked robot alts for this user from the database
+        $raw_robot_alts = $db->get_array_list("SELECT robot_token, alt_token FROM mmrpg_users_robots_alts WHERE user_id = {$user_id};");
+        if (empty($raw_robot_alts)){ return array(); }
+
+        // Reformat to game-compatible array
+        $user_robot_alts = array();
+        foreach ($raw_robot_alts AS $key => $alt_info){
+            $robot_token = $alt_info['robot_token'];
+            $alt_token = $alt_info['alt_token'];
+            if (!isset($user_robot_alts[$robot_token])){ $user_robot_alts[$robot_token] = array(); }
+            $user_robot_alts[$robot_token][] = $alt_token;
+        }
+
+        // Return the final array
+        return $user_robot_alts;
 
     }
 

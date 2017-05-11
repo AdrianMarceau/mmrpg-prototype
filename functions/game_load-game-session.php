@@ -91,24 +91,20 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['battle_settings_hash'] = md5($this_database_user_save['save_values_battle_settings']);
         }
 
+        // Collect any unlocked abilities for this user from the database
+        $new_game_data['values']['battle_abilities'] = rpg_user::get_battle_abilities($login_user_id);
+
         // Collect any unlocked items for this user from the database
         $new_game_data['values']['battle_items'] = rpg_user::get_battle_items($login_user_id);
-
-        if (!empty($this_database_user_save['save_values_battle_abilities'])){
-            $new_game_data['values']['battle_abilities'] = json_decode($this_database_user_save['save_values_battle_abilities'], true);
-            $new_game_data['values']['battle_abilities_hash'] = md5($this_database_user_save['save_values_battle_abilities']);
-        }
 
         // Collect any unlocked stars for this user from the database
         $new_game_data['values']['battle_stars'] = rpg_user::get_battle_stars($login_user_id);
 
-        if (!empty($this_database_user_save['save_values_robot_alts'])){
-            $new_game_data['values']['robot_alts'] = json_decode($this_database_user_save['save_values_robot_alts'], true);
-            $new_game_data['values']['robot_alts_hash'] = md5($this_database_user_save['save_values_robot_alts']);
-        }
-
         // Collect any encounter records for this user from the database
         $new_game_data['values']['robot_database'] = rpg_user::get_robot_database($login_user_id);
+
+        // Collect any unlocked alts for this user from the database
+        $new_game_data['values']['robot_alts'] = rpg_user::get_robot_alts($login_user_id);
 
         // Decode this user's save flag if any have been set
         $new_game_data['flags'] = !empty($this_database_user_save['save_flags']) ? json_decode($this_database_user_save['save_flags'], true) : array();
