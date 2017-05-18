@@ -537,7 +537,7 @@ class rpg_user {
             `robot_scanned`,
             `robot_defeated`,
             `robot_unlocked`
-            FROM mmrpg_users_robots_database
+            FROM mmrpg_users_robots_records
             WHERE `user_id` = {$user_id}
             ;", 'robot_token');
         if (empty($raw_robot_database)){ return array(); }

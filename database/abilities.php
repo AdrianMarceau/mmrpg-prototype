@@ -51,7 +51,7 @@ if ($this_current_sub == 'abilities'){
         LEFT JOIN (SELECT
             uabilities.ability_token,
             COUNT(*) AS ability_equipped
-            FROM mmrpg_users_robots_abilities_current AS uabilities
+            FROM mmrpg_users_robots_movesets AS uabilities
             GROUP BY uabilities.ability_token
             ) AS uabilities2 ON uabilities2.ability_token = abilities.ability_token
             ";

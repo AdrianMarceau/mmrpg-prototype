@@ -305,7 +305,7 @@ $temp_leaderboard_query = "SELECT
     LEFT JOIN (SELECT
         urobots.user_id,
         COUNT(*) AS user_robots
-        FROM mmrpg_users_robots_database AS urobots
+        FROM mmrpg_users_robots_records AS urobots
         GROUP BY user_id
         ) AS udatabase ON udatabase.user_id = users.user_id
     LEFT JOIN (SELECT

@@ -44,7 +44,7 @@ if ($this_current_sub == 'bosses'){
             SUM(robot_unlocked) AS robot_unlocked,
             SUM(robot_summoned) AS robot_summoned,
             SUM(robot_scanned) AS robot_scanned
-            FROM mmrpg_users_robots_database AS urobots
+            FROM mmrpg_users_robots_records AS urobots
             LEFT JOIN mmrpg_index_robots AS irobots ON irobots.robot_token = urobots.robot_token
             WHERE 1 = 1 {$temp_condition2}
             GROUP BY urobots.robot_token
