@@ -121,13 +121,15 @@ function mmrpg_load_game_session(){
         // Decode this user's battle settings if any have been created
         $new_game_data['battle_settings'] = !empty($this_database_user_save['save_settings']) ? json_decode($this_database_user_save['save_settings'], true) : array();
 
-        //echo('<pre>$new_game_data = '.print_r($new_game_data, true).'</pre><hr />'.PHP_EOL);
-
-        //exit();
 
         // Update the session with the new save info
         $_SESSION[$session_token] = array_merge($_SESSION[$session_token], $new_game_data);
         unset($new_game_data);
+
+        //echo('<pre>$_SESSION[\''.$session_token.'\'] = '.print_r($_SESSION[$session_token], true).'</pre><hr />'.PHP_EOL);
+        //echo('<pre>$new_game_data = '.print_r($new_game_data, true).'</pre><hr />'.PHP_EOL);
+
+        //exit();
 
         // Unset the player selection to restart at the player select screen
         if (mmrpg_prototype_players_unlocked() > 1){ $_SESSION[$session_token]['battle_settings']['this_player_token'] = false; }

@@ -847,10 +847,8 @@ class rpg_user {
 
         }
 
-
-
         // Collect into game-compatible array
-        $user_battle_settings = array();
+        $user_battle_settings = $raw_battle_settings;
 
         // Return the final array
         return $user_battle_settings;

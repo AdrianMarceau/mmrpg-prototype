@@ -50,7 +50,6 @@ foreach ($battle_settings AS $player_token => $player_info){
 */
 
 
-
 // -- COLLECT SETTINGS DATA -- //
 
 // Define the index of allowable players to appear in the edit
@@ -275,6 +274,11 @@ foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token
 $allowed_edit_data_count = !empty($allowed_edit_players) ? count($allowed_edit_players) : 0;
 $allowed_edit_player_count = !empty($allowed_edit_players) ? count($allowed_edit_players) : 0;
 //$allowed_edit_data = array_reverse($allowed_edit_data, true);
+
+//echo('<pre>$_SESSION[\''.$session_token.'\'] = '.print_r($_SESSION[$session_token], true).'</pre>');
+//echo('<pre>$_SESSION[\''.$session_token.'\'][\'values\'][\'battle_settings\'] = '.print_r($_SESSION[$session_token]['values']['battle_settings'], true).'</pre>');
+//echo('<pre>$allowed_edit_data = '.print_r($allowed_edit_data, true).'</pre>');
+//exit();
 
 
 // -- GENERATE EDITOR MARKUP
