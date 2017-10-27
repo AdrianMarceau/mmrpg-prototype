@@ -81,15 +81,24 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['battle_failure_hash'] = md5($this_database_user_save['save_values_battle_failure']);
         }
 
+        /*
         if (!empty($this_database_user_save['save_values_battle_rewards'])){
             $new_game_data['values']['battle_rewards'] = json_decode($this_database_user_save['save_values_battle_rewards'], true);
             $new_game_data['values']['battle_rewards_hash'] = md5($this_database_user_save['save_values_battle_rewards']);
         }
+        */
 
+        /*
         if (!empty($this_database_user_save['save_values_battle_settings'])){
             $new_game_data['values']['battle_settings'] = json_decode($this_database_user_save['save_values_battle_settings'], true);
             $new_game_data['values']['battle_settings_hash'] = md5($this_database_user_save['save_values_battle_settings']);
         }
+        */
+
+        // Collect battle rewards and settings for this user from the database
+        $raw_battle_vars = rpg_user::get_battle_vars($login_user_id);
+        $new_game_data['values']['battle_rewards'] = $raw_battle_vars['battle_rewards'];
+        $new_game_data['values']['battle_settings'] = $raw_battle_vars['battle_settings'];
 
         // Collect any unlocked abilities for this user from the database
         $new_game_data['values']['battle_abilities'] = rpg_user::get_battle_abilities($login_user_id);
@@ -112,11 +121,9 @@ function mmrpg_load_game_session(){
         // Decode this user's battle settings if any have been created
         $new_game_data['battle_settings'] = !empty($this_database_user_save['save_settings']) ? json_decode($this_database_user_save['save_settings'], true) : array();
 
-
         //echo('<pre>$new_game_data = '.print_r($new_game_data, true).'</pre><hr />'.PHP_EOL);
 
         //exit();
-
 
         // Update the session with the new save info
         $_SESSION[$session_token] = array_merge($_SESSION[$session_token], $new_game_data);
