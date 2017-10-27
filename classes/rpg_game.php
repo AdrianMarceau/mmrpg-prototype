@@ -1919,6 +1919,7 @@ class rpg_game {
 
                         $mmrpg_robot['robot_image'] = !empty($robot_settings['robot_image']) ? $robot_settings['robot_image'] : '';
                         $mmrpg_robot['robot_item'] = !empty($robot_settings['robot_item']) ? $robot_settings['robot_item'] : '';
+                        $mmrpg_robot['robot_core'] = !empty($robot_settings['robot_core']) ? $robot_settings['robot_core'] : '';
 
                         $mmrpg_robot['robot_level'] = !empty($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
                         $mmrpg_robot['robot_experience'] = !empty($robot_rewards['robot_experience']) ? $robot_rewards['robot_experience'] : 0;
