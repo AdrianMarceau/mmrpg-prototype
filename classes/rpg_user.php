@@ -586,6 +586,54 @@ class rpg_user {
 
 
     /**
+     * Pull a complete array of battle rewards for a given user ID from the database
+     * @param int $user_id
+     * @return array
+     */
+    public static function get_battle_rewards($user_id){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // ...
+
+        // Collect into game-compatible array
+        $user_battle_rewards = array();
+
+        // Return the final array
+        return $user_battle_rewards;
+
+    }
+
+
+    /**
+     * Pull a complete array of battle settings for a given user ID from the database
+     * @param int $user_id
+     * @return array
+     */
+    public static function get_battle_settings($user_id){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // ...
+
+        // Collect into game-compatible array
+        $user_battle_settings = array();
+
+        // Return the final array
+        return $user_battle_settings;
+
+    }
+
+
+    /**
      * Pull an array of encounter records for a given user ID from the database
      * @param int $user_id
      * @return array
