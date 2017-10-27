@@ -586,11 +586,11 @@ class rpg_user {
 
 
     /**
-     * Pull a complete array of battle rewards for a given user ID from the database
+     * Pull a complete array of battle vars (rewards + settings) for a given user ID from the database
      * @param int $user_id
      * @return array
      */
-    public static function get_battle_rewards($user_id){
+    public static function get_battle_vars($user_id, &$index_arrays = array()){
 
         // Return false on missing or invalid user ID
         if (empty($user_id) || !is_numeric($user_id)){ return false; }
@@ -598,10 +598,152 @@ class rpg_user {
         // Get the global database object for querying
         $db = cms_database::get_database();
 
-        // ...
+        // Collect the players and robots for this user for all requests
+        if (!isset($index_arrays['battle_players'])){ $index_arrays['battle_players'] = rpg_user::get_players($user_id); }
+        if (!isset($index_arrays['battle_players_abilities'])){ $index_arrays['battle_players_abilities'] = rpg_user::get_players_abilities($user_id); }
+        if (!isset($index_arrays['battle_robots'])){ $index_arrays['battle_robots'] = rpg_user::get_robots($user_id); }
+        if (!isset($index_arrays['battle_robots_abilities'])){ $index_arrays['battle_robots_abilities'] = rpg_user::get_robots_abilities($user_id); }
+        if (!isset($index_arrays['battle_robots_movesets'])){ $index_arrays['battle_robots_movesets'] = rpg_user::get_robots_movesets($user_id); }
+        if (!isset($index_arrays['temp_robot_player_index'])){ $index_arrays['temp_robot_player_index'] = array(); }
+
+        // Create arrays to hold the battle rewards and settings
+        $raw_battle_rewards = rpg_user::get_battle_rewards($user_id, $index_arrays);
+        $raw_battle_settings = rpg_user::get_battle_settings($user_id, $index_arrays);
 
         // Collect into game-compatible array
-        $user_battle_rewards = array();
+        $user_battle_vars = array();
+        $user_battle_vars['battle_rewards'] = $raw_battle_rewards;
+        $user_battle_vars['battle_settings'] = $raw_battle_settings;
+
+        // Return the final array
+        return $user_battle_vars;
+
+    }
+
+
+    /**
+     * Pull a complete array of battle rewards for a given user ID from the database
+     * @param int $user_id
+     * @return array
+     */
+    public static function get_battle_rewards($user_id, &$index_arrays = array()){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Collect the players and robots for this user for all requests
+        if (!isset($index_arrays['battle_players'])){ $index_arrays['battle_players'] = rpg_user::get_players($user_id); }
+        if (!isset($index_arrays['battle_players_abilities'])){ $index_arrays['battle_players_abilities'] = rpg_user::get_players_abilities($user_id); }
+        if (!isset($index_arrays['battle_robots'])){ $index_arrays['battle_robots'] = rpg_user::get_robots($user_id); }
+        if (!isset($index_arrays['battle_robots_abilities'])){ $index_arrays['battle_robots_abilities'] = rpg_user::get_robots_abilities($user_id); }
+        if (!isset($index_arrays['temp_robot_player_index'])){ $index_arrays['temp_robot_player_index'] = array(); }
+
+        //echo('<pre>$index_arrays['battle_players'] = '.print_r($index_arrays['battle_players'], true).'</pre>');
+        //echo('<pre>$index_arrays['battle_players_abilities'] = '.print_r($index_arrays['battle_players_abilities'], true).'</pre>');
+        //echo('<pre>$index_arrays['battle_robots'] = '.print_r($index_arrays['battle_robots'], true).'</pre>');
+        //echo('<pre>$index_arrays['battle_robots_abilities'] = '.print_r($index_arrays['battle_robots_abilities'], true).'</pre>');
+        //echo('<pre>$index_arrays['battle_robots_movesets'] = '.print_r($index_arrays['battle_robots_movesets'], true).'</pre>');
+
+        // Create arrays to hold the battle rewards
+        $raw_battle_rewards = array();
+
+        // Loop through players and add them to the rewards array
+        if (!empty($index_arrays['battle_players'])){
+            foreach ($index_arrays['battle_players'] AS $player_key => $player_info){
+
+                // Collect the player token for reference
+                $player_token = $player_info['player_token'];
+
+                // Construct the player rewards array with required info
+                $player_rewards = array();
+                $player_rewards['player_token'] = $player_info['player_token'];
+                $player_rewards['player_points'] = $player_info['player_points'];
+
+                // Define player rewards list arrays to be populated later
+                $player_rewards['player_abilities'] = array();
+                $player_rewards['player_robots'] = array();
+
+                // Add this player's data to the parent rewards array
+                $raw_battle_rewards[$player_token] = $player_rewards;
+            }
+
+            // Loop through player-unlocked abilities and add them to the rewards array
+            if (!empty($index_arrays['battle_players_abilities'])){
+                foreach ($index_arrays['battle_players_abilities'] AS $ability_key => $ability_info){
+
+                    // Collect the ability and player token for reference
+                    $ability_token = $ability_info['ability_token'];
+                    $player_token = $ability_info['player_token'];
+
+                    // Construct the ability rewards array with required info
+                    $ability_rewards = array();
+                    $ability_rewards['ability_token'] = $ability_token;
+
+                    // Add this ability's data to the parent player rewards array
+                    $raw_battle_rewards[$player_token]['player_abilities'][$ability_token] = $ability_rewards;
+
+                }
+            }
+
+            // Loop through robots and add them to the rewards array
+            if (!empty($index_arrays['battle_robots'])){
+                foreach ($index_arrays['battle_robots'] AS $robot_key => $robot_info){
+
+                    // Collect the robot and player token for reference
+                    $robot_token = $robot_info['robot_token'];
+                    $player_token = $robot_info['robot_player'];
+                    $index_arrays['temp_robot_player_index'][$robot_token] = $player_token;
+
+                    // Construct the robot rewards array with required info
+                    $robot_rewards = array();
+                    $robot_rewards['flags'] = !empty($robot_info['robot_flags']) ? json_decode($robot_info['robot_flags'], true) : array();
+                    $robot_rewards['values'] = !empty($robot_info['robot_values']) ? json_decode($robot_info['robot_values'], true) : array();
+                    $robot_rewards['counters'] = !empty($robot_info['robot_counters']) ? json_decode($robot_info['robot_counters'], true) : array();
+                    $robot_rewards['robot_token'] = $robot_info['robot_token'];
+                    $robot_rewards['robot_level'] = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : 1;
+                    $robot_rewards['robot_experience'] = !empty($robot_info['robot_experience']) ? $robot_info['robot_experience'] : 0;
+                    $robot_rewards['robot_energy'] = !empty($robot_info['robot_energy_bonuses']) ? $robot_info['robot_energy_bonuses'] : 0;
+                    $robot_rewards['robot_energy_pending'] = !empty($robot_info['robot_energy_bonuses_pending']) ? $robot_info['robot_energy_bonuses_pending'] : 0;
+                    $robot_rewards['robot_attack'] = !empty($robot_info['robot_attack_bonuses']) ? $robot_info['robot_attack_bonuses'] : 0;
+                    $robot_rewards['robot_attack_pending'] = !empty($robot_info['robot_attack_bonuses_pending']) ? $robot_info['robot_attack_bonuses_pending'] : 0;
+                    $robot_rewards['robot_defense'] = !empty($robot_info['robot_defense_bonuses']) ? $robot_info['robot_defense_bonuses'] : 0;
+                    $robot_rewards['robot_defense_pending'] = !empty($robot_info['robot_defense_bonuses_pending']) ? $robot_info['robot_defense_bonuses_pending'] : 0;
+                    $robot_rewards['robot_speed'] = !empty($robot_info['robot_speed_bonuses']) ? $robot_info['robot_speed_bonuses'] : 0;
+                    $robot_rewards['robot_speed_pending'] = !empty($robot_info['robot_speed_bonuses_pending']) ? $robot_info['robot_speed_bonuses_pending'] : 0;
+                    $robot_rewards['robot_abilities'] = array();
+
+                    // Add this robot's data to the parent player rewards array
+                    $raw_battle_rewards[$player_token]['player_robots'][$robot_token] = $robot_rewards;
+
+                }
+            }
+
+            // Loop through robot-unlocked abilities and add them to the rewards array
+            if (!empty($index_arrays['battle_robots_abilities'])){
+                foreach ($index_arrays['battle_robots_abilities'] AS $ability_key => $ability_info){
+
+                    // Collect the ability and player token for reference
+                    $ability_token = $ability_info['ability_token'];
+                    $robot_token = $ability_info['robot_token'];
+                    $player_token = $index_arrays['temp_robot_player_index'][$robot_token];
+
+                    // Construct the ability rewards array with required info
+                    $ability_rewards = array();
+                    $ability_rewards['ability_token'] = $ability_token;
+
+                    // Add this ability's data to the parent player rewards array
+                    $raw_battle_rewards[$player_token]['player_robots'][$robot_token]['robot_abilities'][$ability_token] = $ability_rewards;
+
+                }
+            }
+
+        }
+
+        // Collect into game-compatible array
+        $user_battle_rewards = $raw_battle_rewards;
 
         // Return the final array
         return $user_battle_rewards;
@@ -614,7 +756,7 @@ class rpg_user {
      * @param int $user_id
      * @return array
      */
-    public static function get_battle_settings($user_id){
+    public static function get_battle_settings($user_id, &$index_arrays = array()){
 
         // Return false on missing or invalid user ID
         if (empty($user_id) || !is_numeric($user_id)){ return false; }
@@ -622,7 +764,90 @@ class rpg_user {
         // Get the global database object for querying
         $db = cms_database::get_database();
 
-        // ...
+        // Collect the players and robots for this user for all requests
+        if (!isset($index_arrays['battle_players'])){ $index_arrays['battle_players'] = rpg_user::get_players($user_id); }
+        if (!isset($index_arrays['battle_players_abilities'])){ $index_arrays['battle_players_abilities'] = rpg_user::get_players_abilities($user_id); }
+        if (!isset($index_arrays['battle_robots'])){ $index_arrays['battle_robots'] = rpg_user::get_robots($user_id); }
+        if (!isset($index_arrays['battle_robots_abilities'])){ $index_arrays['battle_robots_abilities'] = rpg_user::get_robots_abilities($user_id); }
+        if (!isset($index_arrays['battle_robots_movesets'])){ $index_arrays['battle_robots_movesets'] = rpg_user::get_robots_movesets($user_id); }
+        if (!isset($index_arrays['temp_robot_player_index'])){ $index_arrays['temp_robot_player_index'] = array(); }
+
+        //echo('<pre>$index_arrays['battle_players'] = '.print_r($index_arrays['battle_players'], true).'</pre>');
+        //echo('<pre>$index_arrays['battle_players_abilities'] = '.print_r($index_arrays['battle_players_abilities'], true).'</pre>');
+        //echo('<pre>$index_arrays['battle_robots'] = '.print_r($index_arrays['battle_robots'], true).'</pre>');
+        //echo('<pre>$index_arrays['battle_robots_abilities'] = '.print_r($index_arrays['battle_robots_abilities'], true).'</pre>');
+        //echo('<pre>$index_arrays['battle_robots_movesets'] = '.print_r($index_arrays['battle_robots_movesets'], true).'</pre>');
+
+        // Create arrays to hold the battle settings
+        $raw_battle_settings = array();
+
+        // Loop through players and add them to the settings array
+        if (!empty($index_arrays['battle_players'])){
+            foreach ($index_arrays['battle_players'] AS $player_key => $player_info){
+
+                // Collect the player token for reference
+                $player_token = $player_info['player_token'];
+
+                // Construct the player settings with define basic info
+                $player_settings = array();
+                $player_settings['player_token'] = $player_info['player_token'];
+
+                // Define player settings list arrays to be populated later
+                $player_settings['player_robots'] = array();
+                $player_settings['player_fields'] = array();
+
+                // Add this player's data to the parent settings array
+                $raw_battle_settings[$player_token] = $player_settings;
+            }
+
+            // Loop through robots and add them to the settings array
+            if (!empty($index_arrays['battle_robots'])){
+                foreach ($index_arrays['battle_robots'] AS $robot_key => $robot_info){
+
+                    // Collect the robot and player token for reference
+                    $robot_token = $robot_info['robot_token'];
+                    $player_token = $robot_info['robot_player'];
+
+                    // Construct the robot settings array with required info
+                    $robot_settings = array();
+                    $robot_settings['flags'] = !empty($robot_info['robot_flags']) ? json_decode($robot_info['robot_flags'], true) : array();
+                    $robot_settings['values'] = !empty($robot_info['robot_values']) ? json_decode($robot_info['robot_values'], true) : array();
+                    $robot_settings['counters'] = !empty($robot_info['robot_counters']) ? json_decode($robot_info['robot_counters'], true) : array();
+                    $robot_settings['robot_token'] = $robot_info['robot_token'];
+                    $robot_settings['robot_core'] = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+                    $robot_settings['robot_image'] = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : '';
+                    $robot_settings['original_player'] = !empty($robot_info['original_player']) ? $robot_info['original_player'] : '';
+                    $robot_settings['robot_abilities'] = array();
+
+                    // Add this robot's data to the parent player settings array
+                    $raw_battle_settings[$player_token]['player_robots'][$robot_token] = $robot_settings;
+
+                }
+            }
+
+            // Loop through robot-equipped abilities and add them to the rewards array
+            if (!empty($index_arrays['battle_robots_movesets'])){
+                foreach ($index_arrays['battle_robots_movesets'] AS $ability_key => $ability_info){
+
+                    // Collect the ability and player token for reference
+                    $ability_token = $ability_info['ability_token'];
+                    $robot_token = $ability_info['robot_token'];
+                    $slot_key = $ability_info['slot_key'];
+                    $player_token = $index_arrays['temp_robot_player_index'][$robot_token];
+
+                    // Construct the ability settings array with required info
+                    $ability_settings = array();
+                    $ability_settings['ability_token'] = $ability_token;
+
+                    // Add this ability's data to the parent player rewards array
+                    $raw_battle_settings[$player_token]['player_robots'][$robot_token]['robot_abilities'][$ability_token] = $ability_settings;
+
+                }
+            }
+
+        }
+
+
 
         // Collect into game-compatible array
         $user_battle_settings = array();

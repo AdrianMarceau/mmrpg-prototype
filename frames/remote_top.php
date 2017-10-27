@@ -47,15 +47,28 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             $raw_battle_rewards = array();
             $raw_battle_settings = array();
 
+            // Collect battle settings and/or rewards from the functions
+            if (!defined('MMRPG_REMOTE_SKIP_REWARDS') && !defined('MMRPG_REMOTE_SKIP_SETTINGS')){
+                $raw_battle_vars = rpg_user::get_battle_vars($this_playerid);
+                $raw_battle_rewards = $raw_battle_vars['battle_rewards'];
+                $raw_battle_settings = $raw_battle_vars['battle_settings'];
+            } elseif (!defined('MMRPG_REMOTE_SKIP_REWARDS')){
+                $raw_battle_rewards = rpg_user::get_battle_rewards($this_playerid);
+            } elseif (!defined('MMRPG_REMOTE_SKIP_SETTINGS')){
+                $raw_battle_settings = rpg_user::get_battle_settings($this_playerid);
+            }
+
+            /*
             // Collect the players and robots for this user for all requests
             $raw_battle_players = rpg_user::get_players($this_playerid);
             $raw_battle_players_abilities = rpg_user::get_players_abilities($this_playerid);
             $raw_battle_robots = rpg_user::get_robots($this_playerid);
             $raw_battle_robots_abilities = rpg_user::get_robots_abilities($this_playerid);
             $raw_battle_robots_movesets = rpg_user::get_robots_movesets($this_playerid);
+            */
 
             // Define a temporary index to say which robot is with which player
-            $temp_robot_player_index = array();
+            //$temp_robot_player_index = array();
 
             //echo('<pre>$raw_battle_players = '.print_r($raw_battle_players, true).'</pre>');
             //echo('<pre>$raw_battle_players_abilities = '.print_r($raw_battle_players_abilities, true).'</pre>');
@@ -63,6 +76,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             //echo('<pre>$raw_battle_robots_abilities = '.print_r($raw_battle_robots_abilities, true).'</pre>');
             //echo('<pre>$raw_battle_robots_movesets = '.print_r($raw_battle_robots_movesets, true).'</pre>');
 
+            /*
             // If requested, generate and save a battle rewards array
             if (!defined('MMRPG_REMOTE_SKIP_REWARDS')){
 
@@ -159,9 +173,11 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
                 }
 
             }
+            */
 
             //echo('<pre>$raw_battle_rewards = '.print_r($raw_battle_rewards, true).'</pre>');
 
+            /*
             // If requested, generate and save a battle settings array
             if (!defined('MMRPG_REMOTE_SKIP_SETTINGS')){
 
@@ -232,6 +248,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
                 }
 
             }
+            */
 
             //echo('<pre>$raw_battle_settings = '.print_r($raw_battle_settings, true).'</pre>');
 
