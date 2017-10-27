@@ -997,7 +997,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_speed = $this_robot_stats['speed']['current'];
 
         // Update the robot's image if in the settings
-        if (isset($this_robot_settings['robot_image'])){
+        if (!empty($this_robot_settings['robot_image'])){
             $this_option_image = $this_robot_settings['robot_image'];
         }
         // Update the robot's item if in the settings
