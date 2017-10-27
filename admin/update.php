@@ -1,6 +1,7 @@
 <?
 
 // Require the update actions file
+set_time_limit(30);
 $update_patch_tokens = array();
 $update_patch_tokens_disabled = array();
 require_once('update_actions.php');
