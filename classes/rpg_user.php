@@ -365,6 +365,74 @@ class rpg_user {
 
 
     /**
+     * Pull an array of unlocked robot abilities for a given user ID from the database
+     * @param int $user_id
+     * @return array
+     */
+    public static function get_robots_abilities($user_id){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Pull a list of unlocked robot abilities for this user from the database
+        $raw_robots_abilities = $db->get_array_list("SELECT
+            `user_id`,
+            `robot_token`,
+            `ability_token`
+            FROM mmrpg_users_robots_abilities
+            WHERE `user_id` = {$user_id}
+            ;");
+        if (empty($raw_robots_abilities)){ return array(); }
+
+        // Reformat to game-compatible array
+        $user_robots_abilities = $raw_robots_abilities;
+
+        // Return the final array
+        return $user_robots_abilities;
+
+    }
+
+
+    /**
+     * Pull an array of unlocked robot movesets for a given user ID from the database
+     * @param int $user_id
+     * @return array
+     */
+    public static function get_robots_movesets($user_id){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Pull a list of equipped robot abilities for this user from the database
+        $raw_robots_movesets = $db->get_array_list("SELECT
+            `user_id`,
+            `robot_token`,
+            `ability_token`,
+            `slot_key`
+            FROM mmrpg_users_robots_movesets
+            WHERE `user_id` = {$user_id}
+            ORDER BY
+            `robot_token` ASC,
+            `slot_key` ASC
+            ;");
+        if (empty($raw_robots_movesets)){ return array(); }
+
+        // Reformat to game-compatible array
+        $user_robots_movesets = $raw_robots_movesets;
+
+        // Return the final array
+        return $user_robots_movesets;
+
+    }
+
+
+    /**
      * Pull an array of unlocked robots for a given user ID from the database
      * @param int $user_id
      * @return array
@@ -384,6 +452,7 @@ class rpg_user {
             `robot_player`,
             `robot_player_original`,
             `robot_image`,
+            `robot_core`,
             `robot_item`,
             `robot_level`,
             `robot_experience`,
