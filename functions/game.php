@@ -4,7 +4,8 @@
 
 // Define a function for collecting the current GAME token
 function mmrpg_game_token(){
-    if (defined('MMRPG_REMOTE_GAME')){ return 'REMOTE_GAME_'.MMRPG_REMOTE_GAME; }
+    if (defined('MMRPG_UPDATE_GAME')){ return 'UPDATE_GAME_'.MMRPG_UPDATE_GAME; }
+    elseif (defined('MMRPG_REMOTE_GAME')){ return 'REMOTE_GAME_'.MMRPG_REMOTE_GAME; }
     else { return 'GAME'; }
 }
 
@@ -627,16 +628,8 @@ function mmrpg_game_ability_tokens_unlocked($player_token = ''){
     }
     // Otherwise, loop through all abilities and make sure no player has unlocked this ability
     else {
-        // Loop through and collect the ability settings and rewards for all players
-        foreach ($_SESSION[$session_token]['values']['battle_abilities'] AS $player_token => $player_info){
-            if (!empty($_SESSION[$session_token]['values']['battle_abilities'])){
-                foreach ($_SESSION[$session_token]['values']['battle_abilities'] AS $ability_token => $ability_info){
-                    if (!empty($ability_token) && !empty($ability_info) && !in_array($ability_token, $unlocked_abilities_tokens)){
-                        $unlocked_abilities_tokens[] = $ability_token;
-                    }
-                }
-            }
-        }
+        // Collect unlocked abilities directly from the global array
+        $unlocked_abilities_tokens = array_unique($_SESSION[$session_token]['values']['battle_abilities']);
     }
     // Return the collected ability tokens
     return $unlocked_abilities_tokens;

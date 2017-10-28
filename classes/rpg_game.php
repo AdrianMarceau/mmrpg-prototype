@@ -1158,7 +1158,7 @@ class rpg_game {
 
         // No matter what, always unlock new abilities in the main array
         if (!isset($_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'] = array(); }
-        $_SESSION[$session_token]['values']['battle_abilities'][$this_ability_token] = $this_reward;
+        if (!in_array($this_ability_token, $_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'][] = $this_ability_token; }
 
         // Only show the event if allowed by the function args
         if ($events_create != false){
@@ -1624,7 +1624,8 @@ class rpg_game {
 
     // Define a function for collecting the current GAME token
     public static function session_token(){
-        if (defined('MMRPG_REMOTE_GAME')){ return 'REMOTE_GAME_'.MMRPG_REMOTE_GAME; }
+        if (defined('MMRPG_UPDATE_GAME')){ return 'UPDATE_GAME_'.MMRPG_UPDATE_GAME; }
+        elseif (defined('MMRPG_REMOTE_GAME')){ return 'REMOTE_GAME_'.MMRPG_REMOTE_GAME; }
         else { return 'GAME'; }
     }
 
