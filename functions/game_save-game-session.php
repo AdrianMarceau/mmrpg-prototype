@@ -4,7 +4,7 @@ function mmrpg_save_game_session(){
 
     // Reference global variables
     global $db;
-    $session_token = mmrpg_game_token();
+    $session_token = rpg_game::session_token();
     $mmrpg_index_players = &$GLOBALS['mmrpg_index']['players'];
 
     // Do NOT load, save, or otherwise alter the game file while viewing remote

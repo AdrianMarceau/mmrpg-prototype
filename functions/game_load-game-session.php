@@ -4,7 +4,7 @@ function mmrpg_load_game_session(){
 
     // Reference global variables
     global $db;
-    $session_token = mmrpg_game_token();
+    $session_token = rpg_game::session_token();
 
     // Do NOT load, save, or otherwise alter the game file while viewing remote
     if (defined('MMRPG_REMOTE_GAME')){ return true; }
@@ -20,8 +20,11 @@ function mmrpg_load_game_session(){
         $login_user_id = $_SESSION[$session_token]['USER']['userid'];
     }
 
+    //echo('<pre>$login_user_id = '.print_r($login_user_id, true).'</pre>'.PHP_EOL);
+
     // If this is NOT demo mode, load from database
     $is_demo_mode = rpg_game::is_demo();
+    //echo('<pre>$is_demo_mode = '.print_r($is_demo_mode, true).'</pre>'.PHP_EOL);
     if (!$is_demo_mode && !empty($login_user_id)){
 
         // LOAD DATABASE INFO
@@ -64,6 +67,9 @@ function mmrpg_load_game_session(){
         $new_game_data['USER']['dateofbirth'] = $this_database_user['user_date_birth'];
         $new_game_data['USER']['approved'] = $this_database_user['user_flag_approved'];
 
+
+        // Decode this user's save flag if any have been set
+        $new_game_data['flags'] = !empty($this_database_user_save['save_flags']) ? json_decode($this_database_user_save['save_flags'], true) : array();
         $new_game_data['counters'] = !empty($this_database_user_save['save_counters']) ? json_decode($this_database_user_save['save_counters'], true) : array();
         $new_game_data['values'] = !empty($this_database_user_save['save_values']) ? json_decode($this_database_user_save['save_values'], true) : array();
 
@@ -80,20 +86,6 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['battle_failure'] = json_decode($this_database_user_save['save_values_battle_failure'], true);
             $new_game_data['values']['battle_failure_hash'] = md5($this_database_user_save['save_values_battle_failure']);
         }
-
-        /*
-        if (!empty($this_database_user_save['save_values_battle_rewards'])){
-            $new_game_data['values']['battle_rewards'] = json_decode($this_database_user_save['save_values_battle_rewards'], true);
-            $new_game_data['values']['battle_rewards_hash'] = md5($this_database_user_save['save_values_battle_rewards']);
-        }
-        */
-
-        /*
-        if (!empty($this_database_user_save['save_values_battle_settings'])){
-            $new_game_data['values']['battle_settings'] = json_decode($this_database_user_save['save_values_battle_settings'], true);
-            $new_game_data['values']['battle_settings_hash'] = md5($this_database_user_save['save_values_battle_settings']);
-        }
-        */
 
         // Collect battle rewards and settings for this user from the database
         $raw_battle_vars = rpg_user::get_battle_vars($login_user_id);
@@ -114,9 +106,6 @@ function mmrpg_load_game_session(){
 
         // Collect any unlocked alts for this user from the database
         $new_game_data['values']['robot_alts'] = rpg_user::get_robot_alts($login_user_id);
-
-        // Decode this user's save flag if any have been set
-        $new_game_data['flags'] = !empty($this_database_user_save['save_flags']) ? json_decode($this_database_user_save['save_flags'], true) : array();
 
         // Decode this user's battle settings if any have been created
         $new_game_data['battle_settings'] = !empty($this_database_user_save['save_settings']) ? json_decode($this_database_user_save['save_settings'], true) : array();

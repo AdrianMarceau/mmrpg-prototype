@@ -4,7 +4,7 @@ function mmrpg_reset_game_session(){
 
     // Reference global variables
     global $mmrpg_index, $db;
-    $session_token = mmrpg_game_token();
+    $session_token = rpg_game::session_token();
 
     //exit('mmrpg_reset_game_session()');
 
@@ -175,7 +175,7 @@ function mmrpg_reset_game_session(){
 
     }
 
-    //echo('<pre>$_SESSION[$session_token] = '.htmlentities(print_r($_SESSION[$session_token], true), ENT_QUOTES, 'UTF-8', true).'</pre><hr /> ');
+    //echo('<pre>$_SESSION['.$session_token.'] = '.htmlentities(print_r($_SESSION[$session_token], true), ENT_QUOTES, 'UTF-8', true).'</pre><hr /> ');
     //exit();
 
     // Return true on success
