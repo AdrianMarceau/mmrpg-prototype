@@ -183,7 +183,14 @@ if ($this_request_type != 'ajax'){
 if ($this_request_type == 'index' && !empty($this_request_patch)){
     $this_page_markup .= '<p style="margin-bottom: 10px;"><strong>$this_update_list</strong><br />';
     $this_page_markup .= 'Query: <span>'.$this_update_query.'</span><br />';
-    $this_page_markup .= '<strong>Count: <span id="count_pending" style="color: #9C9C9C;">0</span> / <span id="count_completed">'.$this_update_count.'</span> / <span id="count_total">'.$this_total_count.'</span> / <span id="count_percent">0%</span></strong><br />';
+    $this_page_markup .= '<strong>';
+        $this_page_markup .= 'Count: ';
+        $this_page_markup .= '<span id="count_pending" style="color: #9C9C9C;">0</span>';
+        $this_page_markup .= ' / <span id="count_completed">'.$this_update_count.'</span>';
+        $this_page_markup .= ' / <span id="count_total">'.$this_total_count.'</span>';
+        $this_page_markup .= ' / <span id="count_percent">0%</span>';
+        $this_page_markup .= ' / <span id="count_loading"><span class="img"><img src="images/ajax-loader_admin.gif" width="16" height="16" /></span><span class="dash">-</span></span>';
+    $this_page_markup .= '</strong><br />';
     $this_page_markup .= '</p>';
     $this_page_markup .= '<div id="results"></div>';
 }
@@ -243,15 +250,30 @@ $(document).ready(function(){
     thisPendingCounter = $('#count_pending', thisContent);
     thisCompletedCounter = $('#count_completed', thisContent);
     thisPercentCounter = $('#count_percent', thisContent);
+    thisLoadingIcon = $('#count_loading', thisContent);
+
+    thisLoadingIcon.find('.img').css({display:'none'});
+    thisLoadingIcon.find('.dash').css({display:''});
 
     $('a[data-limit]', thisMenu).click(function(e){
         e.preventDefault();
+
         if (pendingUpdates > 0){ return false; }
         var thisLink = $(this);
         var thisHref = thisLink.attr('href') + '&type=ajax';
         var thisLimit = parseInt(thisLink.attr('data-limit'));
+
         if (completedUpdates + thisLimit <= totalUpdates){ pendingUpdates = thisLimit;  }
         else { pendingUpdates = totalUpdates - completedUpdates; }
+
+        updatePercent = ((completedUpdates / totalUpdates) * 100).toFixed(2);
+        var updatePercentColour = 'red';
+        if (updatePercent > 33.33){ updatePercentColour = 'orange'; }
+        if (updatePercent > 66.66){ updatePercentColour = 'green'; }
+        thisPendingCounter.html(pendingUpdates);
+        thisCompletedCounter.html(completedUpdates);
+        thisPercentCounter.html(updatePercent+'%').css({color:updatePercentColour});
+
         if (pendingUpdates != 0){ admin_trigger_update(thisHref); }
         });
 
@@ -264,11 +286,13 @@ function admin_trigger_update(thisHref){
             var postData = {date:thisCacheDate,limit:1};
 
             // Post this change back to the server
+            trigger_now_loading();
             $.ajax({
                 type: 'POST',
                 url: thisHref, //'admin.php?action=update&type=ajax',
                 data: postData,
                 success: function(data, status){
+                    trigger_done_loading();
 
                     // Break apart the response into parts
                     var data = data.split('\n');
@@ -311,6 +335,17 @@ function admin_trigger_update(thisHref){
                     }
                 });
     }
+}
+
+function trigger_now_loading(){
+    $('#menu').css({pointerEvents:'none',opacity:0.5});
+    thisLoadingIcon.find('.img').css({display:''});
+    thisLoadingIcon.find('.dash').css({display:'none'});
+}
+function trigger_done_loading(){
+    $('#menu').css({pointerEvents:'',opacity:1.0});
+    thisLoadingIcon.find('.img').css({display:'none'});
+    thisLoadingIcon.find('.dash').css({display:''});
 }
 
 </script>
