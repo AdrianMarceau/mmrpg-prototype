@@ -22,14 +22,17 @@ $this_purge_query = "SELECT
   mmrpg_users.*,
   mmrpg_saves.save_file_path,
   mmrpg_saves.save_file_name,
-  mmrpg_leaderboard.board_points
+  mmrpg_leaderboard.board_points,
+  mmrpg_saves.save_values,
+  mmrpg_saves.save_flags,
+  mmrpg_saves.save_counters
   FROM mmrpg_users
   LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id
   INNER JOIN mmrpg_leaderboard ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
   WHERE
   mmrpg_users.user_date_created = mmrpg_users.user_last_login
   AND mmrpg_users.user_name_clean <> 'guest'
-  AND mmrpg_leaderboard.board_points = 0
+  AND (mmrpg_leaderboard.board_points = 0 OR mmrpg_leaderboard.board_points IS NULL)
   LIMIT {$this_purge_limit}
   ;";
 $this_purge_list = $db->get_array_list($this_purge_query);
@@ -54,8 +57,8 @@ if (!empty($this_purge_list)){
     }
 
     // Delete any files for this user
-    if (file_exists($this_save_dir.$data['save_file_path'].$data['save_file_name'])){ @unlink($this_save_dir.$data['save_file_path'].$data['save_file_name']); }
-    if (file_exists($this_save_dir.$data['save_file_path'])){ @deleteDir($this_save_dir.$data['save_file_path']); }
+    //if (file_exists($this_save_dir.$data['save_file_path'].$data['save_file_name'])){ @unlink($this_save_dir.$data['save_file_path'].$data['save_file_name']); }
+    //if (file_exists($this_save_dir.$data['save_file_path'])){ @deleteDir($this_save_dir.$data['save_file_path']); }
 
     // DEBUG
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
