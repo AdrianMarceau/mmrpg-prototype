@@ -1778,6 +1778,7 @@ class rpg_game {
         $mmrpg_users_items = array();
         $mmrpg_users_stars = array();
 
+        /*
         // Collect all the game session flags/counters/values
         $session_flags = self::get_session_flags();
         $session_counters = self::get_session_counters();
@@ -1798,7 +1799,62 @@ class rpg_game {
         $player_omega['dr-light'] = !empty($session_values['dr-light_target-robot-omega_prototype']) ? $session_values['dr-light_target-robot-omega_prototype'] : array();
         $player_omega['dr-wily'] = !empty($session_values['dr-wily_target-robot-omega_prototype']) ? $session_values['dr-wily_target-robot-omega_prototype'] : array();
         $player_omega['dr-cossack'] = !empty($session_values['dr-cossack_target-robot-omega_prototype']) ? $session_values['dr-cossack_target-robot-omega_prototype'] : array();
+        */
 
+        // Collect game session variables from legacy db fields
+        $session_vars = $db->get_array("SELECT
+            save_flags,
+            save_values,
+            save_counters,
+            save_values_battle_index,
+            save_values_battle_complete,
+            save_values_battle_failure,
+            save_values_battle_rewards,
+            save_values_battle_settings,
+            save_values_battle_items,
+            save_values_battle_abilities,
+            save_values_battle_stars,
+            save_values_robot_database,
+            save_values_robot_alts
+            FROM mmrpg_saves
+            WHERE
+            user_id = {$this_userid}
+            ;");
+
+        //echo('$session_vars = '.print_r($session_vars, true).PHP_EOL);
+
+        // Extract all the game flags/counters/values from the session
+        $session_flags = !empty($session_vars['save_flags']) ? json_decode($session_vars['save_flags'], true) : array();
+        $session_counters = !empty($session_vars['save_counters']) ? json_decode($session_vars['save_counters'], true) : array();
+        $session_values = !empty($session_vars['save_values']) ? json_decode($session_vars['save_values'], true) : array();
+
+        // Collect the global battle settings, rewards, and other key arrays
+        $battle_settings = !empty($session_vars['save_values_battle_settings']) ? json_decode($session_vars['save_values_battle_settings'], true) : array();
+        $battle_rewards = !empty($session_vars['save_values_battle_rewards']) ? json_decode($session_vars['save_values_battle_rewards'], true) : array();
+        $battle_abilities = !empty($session_vars['save_values_battle_abilities']) ? json_decode($session_vars['save_values_battle_abilities'], true) : array();
+        $battle_items = !empty($session_vars['save_values_battle_items']) ? json_decode($session_vars['save_values_battle_items'], true) : array();
+        $battle_stars = !empty($session_vars['save_values_battle_stars']) ? json_decode($session_vars['save_values_battle_stars'], true) : array();
+        $robot_alts = !empty($session_vars['save_values_robot_alts']) ? json_decode($session_vars['save_values_robot_alts'], true) : array();
+        $robot_database = !empty($session_vars['save_values_robot_database']) ? json_decode($session_vars['save_values_robot_database'], true) : array();
+        // Collect the only battle array that didn't have its own dedicated field
+        $battle_fields = !empty($session_values['battle_fields']) ? $session_values['battle_fields'] : array();
+
+        //echo('$battle_settings = '.print_r($battle_settings, true).PHP_EOL);
+        //echo('$battle_rewards = '.print_r($battle_rewards, true).PHP_EOL);
+        //echo('$battle_abilities = '.print_r($battle_abilities, true).PHP_EOL);
+        //echo('$battle_items = '.print_r($battle_items, true).PHP_EOL);
+        //echo('$battle_stars = '.print_r($battle_stars, true).PHP_EOL);
+        //echo('$robot_alts = '.print_r($robot_alts, true).PHP_EOL);
+        //echo('$robot_database = '.print_r($robot_database, true).PHP_EOL);
+        //echo('$battle_fields = '.print_r($battle_fields, true).PHP_EOL);
+
+        // Collect any player omega arrays from the session
+        $player_omega = array();
+        $player_omega['dr-light'] = !empty($session_values['dr-light_target-robot-omega_prototype']) ? $session_values['dr-light_target-robot-omega_prototype'] : array();
+        $player_omega['dr-wily'] = !empty($session_values['dr-wily_target-robot-omega_prototype']) ? $session_values['dr-wily_target-robot-omega_prototype'] : array();
+        $player_omega['dr-cossack'] = !empty($session_values['dr-cossack_target-robot-omega_prototype']) ? $session_values['dr-cossack_target-robot-omega_prototype'] : array();
+
+        //echo('$player_omega = '.print_r($player_omega, true).PHP_EOL);
 
         // -- INDEX PLAYER OBJECTS -- //
 
@@ -1849,10 +1905,9 @@ class rpg_game {
         if (!empty($player_tokens)){
             $player_tokens = array_values($player_tokens);
             foreach ($player_tokens AS $player_token){
+                //echo('$player_token = '.print_r($player_token, true).PHP_EOL);
                 if (empty($player_token) || $player_token == 'player'){ continue; }
                 elseif (!in_array($player_token, $mmrpg_unlockable_player_tokens)){ continue; }
-
-                //echo('$player_token = '.print_r($player_token, true).PHP_EOL);
 
                 // Collect settings and rewards for this player
                 $player_settings = !empty($battle_settings[$player_token]) ? $battle_settings[$player_token] : array();
