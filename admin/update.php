@@ -97,12 +97,15 @@ $this_update_query = "SELECT
     LEFT JOIN (SELECT user_id, patch_token FROM mmrpg_saves_patches_users) AS patches ON patches.user_id = saves.user_id
     {$this_join_query}
     WHERE
-    lboard.board_points > 0
+    1 = 1
+    -- AND lboard.board_points > 0
     {$this_where_query}
     ORDER BY
     lboard.board_points DESC
     LIMIT {$this_update_limit}
     ;";
+
+//echo('<pre>$this_update_query = '.print_r($this_update_query, true).'</pre>'.PHP_EOL);
 
 $this_update_list = $db->get_array_list($this_update_query);
 $this_update_count = $this_request_type == 'ajax' && !empty($this_update_list) ? count($this_update_list) : 0;
@@ -204,6 +207,7 @@ elseif ($this_request_type == 'ajax'){
 
 // Loop through each of the player save files
 if (!empty($this_update_list) && $this_request_type == 'ajax'){
+    //echo('<pre>$this_update_list = '.print_r($this_update_list, true).'</pre>'.PHP_EOL);
     foreach ($this_update_list AS $key => $data){
         $applied_patches =  !empty($data['save_patches_applied']) ? explode(',', $data['save_patches_applied']) : array();
         if ($this_request_force || !in_array($this_request_patch, $applied_patches)){
