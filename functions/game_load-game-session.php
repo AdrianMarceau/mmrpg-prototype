@@ -6,6 +6,9 @@ function mmrpg_load_game_session(){
     global $db;
     $session_token = rpg_game::session_token();
 
+    //echo('<pre>mmrpg_load_game_session()</pre>'.PHP_EOL);
+    //echo('<pre>$session_token = '.print_r($session_token, true).'</pre>'.PHP_EOL);
+
     // Do NOT load, save, or otherwise alter the game file while viewing remote
     if (defined('MMRPG_REMOTE_GAME')){ return true; }
 
