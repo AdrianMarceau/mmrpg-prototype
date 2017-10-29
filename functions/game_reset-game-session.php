@@ -6,7 +6,11 @@ function mmrpg_reset_game_session(){
     global $mmrpg_index, $db;
     $session_token = rpg_game::session_token();
 
-    //exit('mmrpg_reset_game_session()');
+    //echo('<pre>mmrpg_reset_game_session()</pre>'.PHP_EOL);
+    //echo('<pre>$session_token = '.print_r($session_token, true).'</pre>'.PHP_EOL);
+
+    // Do NOT load, save, or otherwise alter the game file while viewing remote
+    if (defined('MMRPG_REMOTE_GAME')){ return false; }
 
     // Create variables that don't exist yet
     if (!isset($_SESSION[$session_token]['DEMO'])){ $_SESSION[$session_token]['DEMO'] = 1; }
