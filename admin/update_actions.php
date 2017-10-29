@@ -6,54 +6,52 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     global $update_patch_tokens, $update_patch_names, $update_patch_details;
     global $this_request_force, $this_request_print, $this_ajax_request_feedback;
 
+    // Change content type of print was requested
+    if ($this_request_print){ header('Content-type: text/plain;'); }
+
+    //echo('<pre>---------------------------------------------</pre>'.PHP_EOL);
+    //echo('<pre>mmrpg_admin_update_save_file($key, $data, $patch_token)</pre>'.PHP_EOL);
+    //echo('<pre>$key = '.print_r($key, true).'</pre>'.PHP_EOL);
+    //echo('<pre>$data = '.print_r($data, true).'</pre>'.PHP_EOL);
+    //echo('<pre>$patch_token = '.print_r($patch_token, true).'</pre>'.PHP_EOL);
+
     // Start the markup variable
     $this_page_markup = '';
 
-    // Define a parent GAME variable to hold all save data in
-    $_GAME = array();
+    //echo('<pre>---------------------------------------------</pre>'.PHP_EOL);
+    //echo('<pre>Loading game data into the update session...</pre>'.PHP_EOL);
+
+    // Load the game session into a special var
+    define('MMRPG_UPDATE_GAME', $data['user_id']);
+    $session_token = 'UPDATE_GAME_'.$data['user_id'];
+    $_SESSION[$session_token]['PENDING_LOGIN_ID'] = $data['user_id'];
+    $_SESSION[$session_token]['DEMO'] = 0;
+    mmrpg_load_game_session();
+    //echo('<pre>mmrpg_load_game_session();</pre>'.PHP_EOL);
+    //echo('<pre>$_SESSION[\''.$session_token.'\'] = '.print_r($_SESSION[$session_token], true).'</pre>'.PHP_EOL);
+
+    // If session was empty or board points were zero, reset now
+    //echo('<pre>Validating session and board points not empty, else reset</pre>'.PHP_EOL);
+    if (empty($_SESSION[$session_token]) || empty($data['board_points'])){
+        mmrpg_reset_game_session();
+        //echo('<pre>mmrpg_reset_game_session();</pre>'.PHP_EOL);
+        //echo('<pre>$_SESSION[\''.$session_token.'\'] = '.print_r($_SESSION[$session_token], true).'</pre>'.PHP_EOL);
+    }
+
+    // Collect the GAME variable from the session then remove it
+    $_GAME = !empty($_SESSION[$session_token]) ? $_SESSION[$session_token] : array();
+
+    // Hard-code the current user and save ID into the game object
+    $_GAME['user_id'] = $data['user_id'];
+    $_GAME['save_id'] = $data['save_id'];
 
     // Expand this save files data into full arrays and update the session
     $_GAME['CACHE_DATE'] = $data['save_cache_date'];
     $cache_date_backup = $data['save_cache_date'];
 
-    // Expand the flags and values to their appropriate battle values
-    $_GAME['user_id'] = $data['user_id'];
-    $_GAME['save_id'] = $data['save_id'];
-
-    $_GAME['flags'] = !empty($data['save_flags']) ? json_decode($data['save_flags'], true) : array();
-    $_GAME['values'] = !empty($data['save_values']) ? json_decode($data['save_values'], true) : array();
-    $_GAME['counters'] = !empty($data['save_counters']) ? json_decode($data['save_counters'], true) : array();
-    $_GAME['patches'] = !empty($data['save_patches_applied']) ? explode(',', $data['save_patches_applied']) : array();
-
-    if (!empty($data['save_values_battle_index'])){ $_GAME['values']['battle_index'] = array(); }
-    elseif (!isset($_GAME['values']['battle_index'])){ $_GAME['values']['battle_index'] = array(); }
-
-    if (!empty($data['save_values_battle_complete'])){ $_GAME['values']['battle_complete'] = json_decode($data['save_values_battle_complete'], true); }
-    elseif (!isset($_GAME['values']['battle_complete'])){ $_GAME['values']['battle_complete'] = array(); }
-
-    if (!empty($data['save_values_battle_failure'])){ $_GAME['values']['battle_failure'] = json_decode($data['save_values_battle_failure'], true); }
-    elseif (!isset($_GAME['values']['battle_failure'])){ $_GAME['values']['battle_failure'] = array(); }
-
-    if (!empty($data['save_values_battle_settings'])){ $_GAME['values']['battle_settings'] = json_decode($data['save_values_battle_settings'], true); }
-    elseif (!isset($_GAME['values']['battle_settings'])){ $_GAME['values']['battle_settings'] = array(); }
-
-    if (!empty($data['save_values_battle_rewards'])){ $_GAME['values']['battle_rewards'] = json_decode($data['save_values_battle_rewards'], true); }
-    elseif (!isset($_GAME['values']['battle_rewards'])){ $_GAME['values']['battle_rewards'] = array(); }
-
-    if (!empty($data['save_values_battle_items'])){ $_GAME['values']['battle_items'] = json_decode($data['save_values_battle_items'], true); }
-    elseif (!isset($_GAME['values']['battle_items'])){ $_GAME['values']['battle_items'] = array(); }
-
-    if (!empty($data['save_values_battle_abilities'])){ $_GAME['values']['battle_abilities'] = json_decode($data['save_values_battle_abilities'], true); }
-    elseif (!isset($_GAME['values']['battle_abilities'])){ $_GAME['values']['battle_abilities'] = array(); }
-
-    if (!empty($data['save_values_battle_stars'])){ $_GAME['values']['battle_stars'] = json_decode($data['save_values_battle_stars'], true); }
-    elseif (!isset($_GAME['values']['battle_stars'])){ $_GAME['values']['battle_stars'] = array(); }
-
-    if (!empty($data['save_values_robot_alts'])){ $_GAME['values']['robot_alts'] = json_decode($data['save_values_robot_alts'], true); }
-    elseif (!isset($_GAME['values']['robot_alts'])){ $_GAME['values']['robot_alts'] = array(); }
-
-    if (!empty($data['save_values_robot_database'])){ $_GAME['values']['robot_database'] = json_decode($data['save_values_robot_database'], true); }
-    elseif (!isset($_GAME['values']['robot_database'])){ $_GAME['values']['robot_database'] = array(); }
+    //echo('<pre>---------------------------------------------</pre>'.PHP_EOL);
+    //echo('<pre>Game is prepared and ready to start updating...</pre>'.PHP_EOL);
+    //echo('<pre>$_GAME = '.print_r($_GAME, true).'</pre>'.PHP_EOL);
 
     // Only apply the patch if it's not already applied
     if ($this_request_force || !in_array($patch_token, $_GAME['patches'])){
@@ -62,6 +60,9 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         $patch_name = '';
         $patch_details = '';
         $patch_notes = '';
+
+        //echo('<pre>---------------------------------------------</pre>'.PHP_EOL);
+        //echo('<pre>Time to patch the game!</pre>'.PHP_EOL);
 
         // Use the patch token to deterine which function to run on save data
         if (in_array($patch_token, $update_patch_tokens)){
@@ -76,12 +77,17 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             // If print was requested, do not actually update file
             if ($this_request_print){
                 // Print out debug info and exit now
-                header('Content-type: text/plain;');
+                //header('Content-type: text/plain;');
                 echo($patch_notes.PHP_EOL);
                 echo($patch_function.'()');
                 exit();
             }
         }
+
+        //echo('<pre>---------------------------------------------</pre>'.PHP_EOL);
+        //echo('<pre>Update is done for now...</pre>'.PHP_EOL);
+        //echo('<pre>---------------------------------------------</pre>'.PHP_EOL);
+        //exit();
 
         // If the any key fields were empty, abort mission!
         if (empty($_GAME['user_id'])){ die('Something happened to the user ID...'); }
@@ -198,32 +204,21 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     // Make sure only unique patch values make it through
     $_GAME['patches'] = array_unique($_GAME['patches']);
 
-    // Recompress and prepare the save data for the database
-    $temp_values = $_GAME['values'];
-    unset($temp_values['battle_index'], $temp_values['battle_complete'], $temp_values['battle_failure'],
-    $temp_values['battle_rewards'], $temp_values['battle_settings'], $temp_values['battle_items'],
-    $temp_values['battle_stars'], $temp_values['robot_database']);
-    $update_array = array(
-        'save_cache_date' => MMRPG_CONFIG_CACHE_DATE,
-        'save_flags' => mmrpg_admin_encode_save_data($_GAME['flags']),
-        'save_values' => mmrpg_admin_encode_save_data($temp_values),
-        'save_values_battle_index' => mmrpg_admin_encode_save_data($_GAME['values']['battle_index']),
-        'save_values_battle_complete' => mmrpg_admin_encode_save_data($_GAME['values']['battle_complete']),
-        'save_values_battle_failure' => mmrpg_admin_encode_save_data($_GAME['values']['battle_failure']),
-        'save_values_battle_rewards' => mmrpg_admin_encode_save_data($_GAME['values']['battle_rewards']),
-        'save_values_battle_settings' => mmrpg_admin_encode_save_data($_GAME['values']['battle_settings']),
-        'save_values_battle_items' => mmrpg_admin_encode_save_data($_GAME['values']['battle_items']),
-        'save_values_battle_abilities' => mmrpg_admin_encode_save_data($_GAME['values']['battle_abilities']),
-        'save_values_battle_stars' => mmrpg_admin_encode_save_data($_GAME['values']['battle_stars']),
-        'save_values_robot_database' => mmrpg_admin_encode_save_data($_GAME['values']['robot_database']),
-        'save_counters' => mmrpg_admin_encode_save_data($_GAME['counters']),
-        'save_patches_applied' => mmrpg_admin_encode_save_data($_GAME['patches']),
-        'save_counters' => mmrpg_admin_encode_save_data($_GAME['counters']),
-        'save_date_modified' => time()
-        );
+    // Update session with modified game values and save
+    $_SESSION[$session_token] = $_GAME;
+    mmrpg_save_game_session();
+
+    // Unset the temporary session array
+    unset($_SESSION[$session_token]);
 
     // Update the database with the recent changes
-    $temp_success = $db->update('mmrpg_saves', $update_array, "save_id = {$data['save_id']}");
+    $temp_success = $db->update('mmrpg_saves', array(
+        'save_cache_date' => MMRPG_CONFIG_CACHE_DATE,
+        'save_patches_applied' => mmrpg_admin_encode_save_data($_GAME['patches']),
+        'save_date_modified' => time()
+        ), "save_id = {$data['save_id']}");
+
+    // Add this patch token to the database list
     $temp_success2 = false;
     if (!in_array($patch_token, $_GAME['patches'])){
         // Add this patch token to the array list
