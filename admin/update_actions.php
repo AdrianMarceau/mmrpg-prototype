@@ -55,6 +55,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     //echo('<pre>$_GAME = '.print_r($_GAME, true).'</pre>'.PHP_EOL);
 
     // Only apply the patch if it's not already applied
+    $_GAME['patches'] = !empty($_GAME['patches']) ? $_GAME['patches'] : array();
     if ($this_request_force || !in_array($patch_token, $_GAME['patches'])){
 
         // Define variables to hold patch details
@@ -240,25 +241,18 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         $this_page_markup .= 'Save ID:'.$data['save_id'].'<br />';
 
         // Check to see which fields have been updated
-        if ($update_array['save_cache_date'] != $data['save_cache_date']){ $this_page_markup .= 'Save cache date has been changed...<br />'; }
-        if ($update_array['save_flags'] != $data['save_flags']){ $this_page_markup .= 'Save flags have been changed...<br />'; }
-        if ($update_array['save_values'] != $data['save_values']){ $this_page_markup .= 'Save values have been changed...<br />'; }
-        if ($update_array['save_values_battle_index'] != $data['save_values_battle_index']){ $this_page_markup .= 'Save values battle index has been changed...<br />'; }
-        if ($update_array['save_values_battle_complete'] != $data['save_values_battle_complete']){ $this_page_markup .= 'Save values battle completes have been changed...<br />'; }
-        if ($update_array['save_values_battle_failure'] != $data['save_values_battle_failure']){ $this_page_markup .= 'Save values battle failures have been changed...<br />'; }
-        if ($update_array['save_values_battle_rewards'] != $data['save_values_battle_rewards']){ $this_page_markup .= 'Save values battle rewards have been changed...<br />'; }
-        if ($update_array['save_values_battle_settings'] != $data['save_values_battle_settings']){ $this_page_markup .= 'Save values battle settings have been changed...<br />'; }
-        if ($update_array['save_values_battle_items'] != $data['save_values_battle_items']){ $this_page_markup .= 'Save values battle items have been changed...<br />'; }
-        if ($update_array['save_values_battle_abilities'] != $data['save_values_battle_abilities']){ $this_page_markup .= 'Save values battle abilities have been changed...<br />'; }
-        if ($update_array['save_values_battle_stars'] != $data['save_values_battle_stars']){ $this_page_markup .= 'Save values battle stars have been changed...<br />'; }
-        if ($update_array['save_values_robot_database'] != $data['save_values_robot_database']){ $this_page_markup .= 'Save values robot database has been changed...<br />'; }
-        if ($update_array['save_counters'] != $data['save_counters']){ $this_page_markup .= 'Save counters have been changed...<br />'; }
+        if ($update_array['save_cache_date'] != $data['save_cache_date']){
+            $this_page_markup .= 'Save cache date has been changed...<br />';
+        }
+
         if (!empty($this_ajax_request_feedback)){
             $this_page_markup .= nl2br(trim($this_ajax_request_feedback)).'<br />';
         }
+
         if (!empty($_GAME['patches'])){
             $this_page_markup .= 'Save patches applied : '.implode(', ', $_GAME['patches']).'<br />';
         }
+
         if ($temp_success === false){
             $this_page_markup .= '...Failure!';
         } else {
@@ -266,6 +260,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             $this_page_markup .= $temp_success2 ? '.' : '';
             $this_page_markup .= '...Success!';
         }
+
         unset($update_array);
 
     $this_page_markup .= '</p><hr />';

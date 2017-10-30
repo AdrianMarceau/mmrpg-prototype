@@ -98,7 +98,6 @@ $this_update_query = "SELECT
     {$this_join_query}
     WHERE
     1 = 1
-    -- AND lboard.board_points > 0
     {$this_where_query}
     ORDER BY
     lboard.board_points DESC

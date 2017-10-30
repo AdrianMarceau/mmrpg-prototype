@@ -768,8 +768,11 @@ function mmrpg_patch_db_user_objects_2k17($_GAME){
     // Manually append MM1, MM2, and MM4 fields to unlock list they should have been unlocked
     legacy_rpg_game::fix_battle_fields_array($_GAME);
 
-    // Manually fix the player rewards array by making sure arrays are in the current format
+    // Manually fix the player rewards array by making sure its in the current format
     legacy_rpg_game::fix_player_rewards_array($_GAME);
+
+    // Manually fix the player omega array by making sure it's in the current format
+    legacy_rpg_game::fix_player_omega_array($_GAME);
 
     echo("Converting session objects into database objects for user ID {$_GAME['user_id']}... \n\n");
 
@@ -939,6 +942,70 @@ class legacy_rpg_game {
                     }
                 }
             }
+        }
+
+    }
+
+    // Define a function for "fixing" the player omega array formatting
+    public static function fix_player_omega_array(&$_GAME){
+        global $db;
+
+        // Collect a backup index for missing omega field, robot, or type details
+        $omega_index = $db->get_array_list("SELECT
+            `fields`.field_token AS `field`,
+            `fields`.field_master AS `robot`,
+            `fields`.field_type AS `type`
+            FROM mmrpg_index_fields AS `fields`
+            WHERE
+            `fields`.field_master <> ''
+            AND `fields`.field_type <> ''
+            ;", 'field');
+
+        $omega_field_names = array();
+        if (!empty($_GAME['values']['dr-light_target-robot-omega_prototype'])){ $omega_field_names[] = 'dr-light_target-robot-omega_prototype'; }
+        if (!empty($_GAME['values']['dr-wily_target-robot-omega_prototype'])){ $omega_field_names[] = 'dr-wily_target-robot-omega_prototype'; }
+        if (!empty($_GAME['values']['dr-cossack_target-robot-omega_prototype'])){ $omega_field_names[] = 'dr-cossack_target-robot-omega_prototype'; }
+        foreach ($omega_field_names AS $omega_field_name){
+            $this_omega_list = $_GAME['values'][$omega_field_name];
+
+            // Ensure the list is in the right format, extracting if nested too deep
+            if (!empty($this_omega_list)
+                && count($this_omega_list) === 8
+                && isset($this_omega_list[0]['field'])){
+                // we're good!
+            } elseif (!empty($this_omega_list)){
+                $this_omega_list = array_pop($this_omega_list);
+                if (!empty($this_omega_list)
+                    && count($this_omega_list) === 8
+                    && isset($this_omega_list[0]['field'])){
+                    // we're good!
+                } else {
+                    unset($_GAME['values'][$omega_field_name]);
+                    continue;
+                }
+            } else {
+                unset($_GAME['values'][$omega_field_name]);
+                continue;
+            }
+
+            // Loop through each omega factor and ensure all fields are set
+            if (!empty($this_omega_list)){
+                foreach ($this_omega_list AS $key => $factor){
+                    if (!isset($factor['field'])){
+                        unset($_GAME['values'][$factor_field_name]);
+                        continue 2;
+                    } else {
+                        $index = $omega_index[$factor['field']];
+                        if (!isset($factor['robot'])){ $factor['robot'] = $index['robot']; }
+                        if (!isset($factor['type'])){ $factor['type'] = $index['type']; }
+                        $this_omega_list[$key] = $factor;
+                    }
+                }
+            }
+
+            // Update the parent game values with the omega list changes
+            $_GAME['values'][$omega_field_name] = $this_omega_list;
+
         }
 
     }
