@@ -1967,7 +1967,7 @@ class rpg_game {
                         $mmrpg_robot['robot_speed_bonuses_pending'] = !empty($robot_rewards['robot_speed_pending']) ? $robot_rewards['robot_speed_pending'] : 0;
 
                         $mmrpg_robot['robot_player'] = $player_token;
-                        $mmrpg_robot['robot_player_original'] = !empty($robot_settings['original_player']) ? $robot_settings['original_player'] : '';
+                        $mmrpg_robot['robot_player_original'] = !empty($robot_settings['original_player']) ? $robot_settings['original_player'] : $player_token;
 
                         $mmrpg_robot['robot_abilities_unlocked'] = !empty($robot_rewards['robot_abilities']) ? array_keys($robot_rewards['robot_abilities']) : array();;
                         $mmrpg_robot['robot_abilities_current'] = !empty($robot_settings['robot_abilities']) ? array_keys($robot_settings['robot_abilities']) : array();
