@@ -33,6 +33,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
     // If session was empty or board points were zero, reset now
     //echo('<pre>Validating session and board points not empty, else reset</pre>'.PHP_EOL);
     if (empty($_SESSION[$session_token]) || empty($data['board_points'])){
+        define('MMRPG_UPDATE_GAME_RESET', true);
         mmrpg_reset_game_session();
         //echo('<pre>mmrpg_reset_game_session();</pre>'.PHP_EOL);
         //echo('<pre>$_SESSION[\''.$session_token.'\'] = '.print_r($_SESSION[$session_token], true).'</pre>'.PHP_EOL);

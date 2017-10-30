@@ -39,7 +39,7 @@ function mmrpg_save_game_session(){
         $this_counters = !empty($save['counters']) ? $save['counters'] : array();
         $this_values = !empty($save['values']) ? $save['values'] : array();
         $this_flags = !empty($save['flags']) ? $save['flags'] : array();
-        $this_settings = !empty($save['battle_settings']) ? $save['battle_settings'] : array();
+        $this_settings = !empty($save['settings']) ? $save['settings'] : array();
         unset($save);
 
         // Define the flag for whether this is a new user

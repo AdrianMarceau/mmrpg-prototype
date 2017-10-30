@@ -1718,9 +1718,11 @@ class rpg_game {
         $session_vars['flags'] = array();
         $session_vars['counters'] = array();
         $session_vars['values'] = array();
+        $session_vars['settings'] = array();
         if (!empty($_SESSION[$session_token]['flags'])){ $session_vars['flags'] = $_SESSION[$session_token]['flags']; }
         if (!empty($_SESSION[$session_token]['counters'])){ $session_vars['counters'] = $_SESSION[$session_token]['counters']; }
         if (!empty($_SESSION[$session_token]['values'])){ $session_vars['values'] = $_SESSION[$session_token]['values']; }
+        if (!empty($_SESSION[$session_token]['settings'])){ $session_vars['settings'] = $_SESSION[$session_token]['settings']; }
         return $session_vars;
     }
 
@@ -1742,6 +1744,13 @@ class rpg_game {
     public static function get_session_values(){
         $session_token = self::session_token();
         if (!empty($_SESSION[$session_token]['values'])){ return $_SESSION[$session_token]['values']; }
+        else { return array(); }
+    }
+
+    // Define a function for collecting the current GAME session settings
+    public static function get_session_settings(){
+        $session_token = self::session_token();
+        if (!empty($_SESSION[$session_token]['settings'])){ return $_SESSION[$session_token]['settings']; }
         else { return array(); }
     }
 

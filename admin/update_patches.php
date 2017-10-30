@@ -755,7 +755,9 @@ function mmrpg_patch_db_user_objects_2k17($_GAME){
     global $db;
 
     // Save the current game session to legacy database fields
-    legacy_rpg_game::session_to_fields($_GAME, $_GAME['user_id']);
+    if (defined('MMRPG_UPDATE_GAME_RESET')){
+        legacy_rpg_game::session_to_fields($_GAME, $_GAME['user_id']);
+    }
 
     // Collect legacy session vars into current game array
     $legacy_session_vars = legacy_rpg_game::get_session_vars($_GAME['user_id']);
@@ -833,7 +835,8 @@ class legacy_rpg_game {
             save_values_battle_abilities,
             save_values_battle_stars,
             save_values_robot_database,
-            save_values_robot_alts
+            save_values_robot_alts,
+            save_settings
             FROM mmrpg_saves
             WHERE
             user_id = {$this_userid}
@@ -853,12 +856,14 @@ class legacy_rpg_game {
         $session_values['robot_alts'] = !empty($session_vars['save_values_robot_alts']) ? json_decode($session_vars['save_values_robot_alts'], true) : array();
         $session_values['robot_database'] = !empty($session_vars['save_values_robot_database']) ? json_decode($session_vars['save_values_robot_database'], true) : array();
         $session_values['battle_fields'] = !empty($session_values['battle_fields']) ? $session_values['battle_fields'] : array();
+        $session_settings = !empty($session_vars['save_settings']) ? json_decode($session_vars['save_settings'], true) : array();
 
         // Return parsed values in a single array
         return array(
             'flags' => $session_flags,
             'counters' => $session_counters,
             'values' => $session_values,
+            'settings' => $session_settings
             );
 
     }
@@ -871,7 +876,7 @@ class legacy_rpg_game {
         if (!empty($_GAME['values']['battle_rewards'])){
 
             // Collect unlocked player tokens and their index info
-            $unlocked_player_tokens = array_keys($_GAME['values']['battle_rewards']);
+            $unlocked_player_tokens = rpg_game::parse_player_tokens($_GAME['values']['battle_settings'], $_GAME['values']['battle_rewards']);
             $unlocked_player_index = rpg_player::get_index_custom($unlocked_player_tokens);
 
             // Create an array to hold the field backlog
@@ -959,7 +964,7 @@ class legacy_rpg_game {
         $this_counters = !empty($_GAME['counters']) ? $_GAME['counters'] : array();
         $this_values = !empty($_GAME['values']) ? $_GAME['values'] : array();
         $this_flags = !empty($_GAME['flags']) ? $_GAME['flags'] : array();
-        $this_settings = !empty($_GAME['battle_settings']) ? $_GAME['battle_settings'] : array();
+        $this_settings = !empty($_GAME['settings']) ? $_GAME['settings'] : array();
 
         // Index the main user array
         if (true){
