@@ -155,7 +155,6 @@ class legacy_rpg_game {
             save_flags,
             save_values,
             save_counters,
-            save_values_battle_index,
             save_values_battle_complete,
             save_values_battle_failure,
             save_values_battle_rewards,
@@ -496,7 +495,6 @@ class legacy_rpg_game {
 
             // Define the save database update array and populate
             $this_save_array = array();
-            $this_save_array['save_values_battle_index'] = '';
             $this_save_array['save_values_battle_complete'] = json_encode(!empty($this_values['battle_complete']) ? $this_values['battle_complete'] : array());
             $this_save_array['save_values_battle_failure'] = json_encode(!empty($this_values['battle_failure']) ? $this_values['battle_failure'] : array());
             $this_save_array['save_values_battle_rewards'] = json_encode(!empty($this_values['battle_rewards']) ? $this_values['battle_rewards'] : array());

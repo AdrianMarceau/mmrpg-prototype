@@ -76,10 +76,6 @@ function mmrpg_load_game_session(){
         $new_game_data['counters'] = !empty($this_database_user_save['save_counters']) ? json_decode($this_database_user_save['save_counters'], true) : array();
         $new_game_data['values'] = !empty($this_database_user_save['save_values']) ? json_decode($this_database_user_save['save_values'], true) : array();
 
-        if (!isset($this_database_user_save['save_values_battle_index'])){
-            $new_game_data['values']['battle_index'] = array();
-        }
-
         if (!empty($this_database_user_save['save_values_battle_complete'])){
             $new_game_data['values']['battle_complete'] = json_decode($this_database_user_save['save_values_battle_complete'], true);
             $new_game_data['values']['battle_complete_hash'] = md5($this_database_user_save['save_values_battle_complete']);

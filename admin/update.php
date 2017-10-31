@@ -72,7 +72,6 @@ $this_update_query = "SELECT
     saves.user_id,
     saves.save_counters,
     saves.save_values,
-    saves.save_values_battle_index,
     saves.save_values_battle_complete,
     saves.save_values_battle_failure,
     saves.save_values_battle_rewards,

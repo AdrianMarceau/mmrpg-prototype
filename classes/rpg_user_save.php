@@ -35,7 +35,6 @@ class rpg_user_save {
             'save_flags',
             'save_counters',
             'save_values',
-            'save_values_battle_index',
             'save_values_battle_complete',
             'save_values_battle_failure',
             'save_settings',
