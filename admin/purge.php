@@ -17,6 +17,29 @@ ob_start();
 <?
 $this_page_markup .= ob_get_clean();
 
+/*
+  -- VIEW ALL INCOMPLETE SAVE OR USER FILES
+  SELECT saves.save_id, users.user_id FROM mmrpg_saves AS saves
+  LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
+  WHERE users.user_id IS NULL
+  UNION
+  SELECT saves.save_id, users.user_id FROM mmrpg_saves AS saves
+  RIGHT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
+  WHERE saves.save_id IS NULL
+ */
+
+// Delete save files that do not have a user attached
+$db->query("DELETE mmrpg_saves FROM mmrpg_saves
+  LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_saves.user_id
+  WHERE mmrpg_users.user_id IS NULL
+  ;");
+
+// Delete users that do not have save files attached
+$db->query("DELETE mmrpg_users FROM mmrpg_users
+  LEFT JOIN mmrpg_saves ON mmrpg_saves.user_id = mmrpg_users.user_id
+  WHERE mmrpg_saves.user_id IS NULL
+  ;");
+
 // Collect any save files that have a cache date less than the current one
 $this_purge_query = "SELECT
   mmrpg_users.*,
