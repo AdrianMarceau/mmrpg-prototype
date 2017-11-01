@@ -72,15 +72,15 @@ $this_update_query = "SELECT
     saves.user_id,
     saves.save_counters,
     saves.save_values,
-    saves.save_values_battle_complete,
-    saves.save_values_battle_failure,
-    saves.save_values_battle_rewards,
-    saves.save_values_battle_settings,
-    saves.save_values_battle_items,
-    saves.save_values_battle_abilities,
-    saves.save_values_battle_stars,
-    saves.save_values_robot_database,
-    saves.save_values_robot_alts,
+    saves2.save_values_battle_complete,
+    saves2.save_values_battle_failure,
+    saves2.save_values_battle_rewards,
+    saves2.save_values_battle_settings,
+    saves2.save_values_battle_items,
+    saves2.save_values_battle_abilities,
+    saves2.save_values_battle_stars,
+    saves2.save_values_robot_database,
+    saves2.save_values_robot_alts,
     saves.save_flags,
     saves.save_settings,
     saves.save_cache_date,
@@ -91,6 +91,7 @@ $this_update_query = "SELECT
     lboard.board_points,
     users.user_name_clean
     FROM mmrpg_saves AS saves
+    LEFT JOIN mmrpg_saves_legacy AS saves2 ON saves2.user_id = saves.user_id
     LEFT JOIN mmrpg_leaderboard AS lboard ON lboard.user_id = saves.user_id
     LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
     LEFT JOIN (SELECT user_id, patch_token FROM mmrpg_saves_patches_users) AS patches ON patches.user_id = saves.user_id

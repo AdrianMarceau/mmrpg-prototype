@@ -32,13 +32,28 @@ function mmrpg_load_game_session(){
 
         // LOAD DATABASE INFO
 
-        // Collect the user and save info from the database
-        $user_index_fields = rpg_user::get_index_fields(true);
-        $user_save_index_fields = rpg_user_save::get_index_fields(true);
-        $this_database_user = $db->get_array("SELECT {$user_index_fields} FROM mmrpg_users WHERE user_id = {$login_user_id} LIMIT 1");
-        $this_database_user_save = $db->get_array("SELECT {$user_save_index_fields} FROM mmrpg_saves WHERE user_id = {$login_user_id} LIMIT 1");
-        if (empty($this_database_user)){ die('could not load user for '.$this_database_user_save['user_id'].' on line '.__LINE__); }
-        if (empty($this_database_user_save)){ die('could not load save for file '.$temp_matches[2].' and path '.$temp_matches[1].' on line '.__LINE__); }
+        // Collect the user info from the database
+        $user_index_fields = rpg_user::get_index_fields(true, 'users');
+        $this_database_user = $db->get_array("SELECT
+            {$user_index_fields}
+            FROM mmrpg_users AS users
+            WHERE user_id = {$login_user_id}
+            LIMIT 1
+            ;");
+        if (empty($this_database_user)){ die('could not load user for uid:'.$login_user_id.' on line '.__LINE__); }
+
+        // Collect the save file info from the database
+        $user_save_index_fields = rpg_user_save::get_index_fields(true, 'saves');
+        $user_save2_index_fields = rpg_user_save::get_legacy_index_fields(true, 'saves2');
+        $this_database_user_save = $db->get_array("SELECT
+            {$user_save_index_fields},
+            {$user_save2_index_fields}
+            FROM mmrpg_saves AS saves
+            LEFT JOIN mmrpg_saves_legacy AS saves2 ON saves2.user_id = saves.user_id
+            WHERE saves.user_id = {$login_user_id}
+            LIMIT 1
+            ;");
+        if (empty($this_database_user_save)){ die('could not load save for uid:'.$login_user_id.' on line '.__LINE__); }
 
         //echo('<pre><strong>Loading game file '.$login_user_id.' &hellip;</strong></pre><hr />'.PHP_EOL);
 

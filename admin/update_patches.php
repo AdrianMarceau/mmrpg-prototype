@@ -152,22 +152,23 @@ class legacy_rpg_game {
 
         // Collect game session variables from legacy db fields
         $session_vars = $db->get_array("SELECT
-            save_flags,
-            save_values,
-            save_counters,
-            save_values_battle_complete,
-            save_values_battle_failure,
-            save_values_battle_rewards,
-            save_values_battle_settings,
-            save_values_battle_items,
-            save_values_battle_abilities,
-            save_values_battle_stars,
-            save_values_robot_database,
-            save_values_robot_alts,
-            save_settings
-            FROM mmrpg_saves
+            saves.save_flags,
+            saves.save_values,
+            saves.save_counters,
+            saves2.save_values_battle_complete,
+            saves2.save_values_battle_failure,
+            saves2.save_values_battle_rewards,
+            saves2.save_values_battle_settings,
+            saves2.save_values_battle_items,
+            saves2.save_values_battle_abilities,
+            saves2.save_values_battle_stars,
+            saves2.save_values_robot_database,
+            saves2.save_values_robot_alts,
+            saves.save_settings
+            FROM mmrpg_saves AS saves
+            LEFT JOIN mmrpg_saves_legacy AS saves2 ON saves2.user_id = saves.user_id
             WHERE
-            user_id = {$this_userid}
+            saves.user_id = {$this_userid}
             ;");
 
         //echo('$session_vars = '.print_r($session_vars, true).PHP_EOL);

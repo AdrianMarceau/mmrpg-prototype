@@ -1275,38 +1275,45 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         } else {
             $temp_exclude_usernames_string = '';
         }
+
         // Generate the points index and then break it down to unique for ranks
         $this_points_index = array();
         foreach ($this_leaderboard_index AS $info){ $this_points_index[] = $info['board_points']; }
         $this_points_index = array_unique($this_points_index);
+
         // Define the vars for finding the online players
         $this_player_points = mmrpg_prototype_battle_points();
         $this_player_points_min = ceil($this_player_points * 0.10);
         $this_player_points_max = ceil($this_player_points * 2.10);
+
         // Define the array for pulling all the leaderboard data
         $temp_leaderboard_query = 'SELECT
-                mmrpg_leaderboard.user_id,
-                mmrpg_leaderboard.board_points,
-                mmrpg_users.user_name,
-                mmrpg_users.user_name_clean,
-                mmrpg_users.user_name_public,
-                mmrpg_users.user_gender,
-                mmrpg_saves.save_values_battle_rewards AS player_rewards,
-                mmrpg_saves.save_values_battle_settings AS player_settings,
-                mmrpg_saves.save_values AS player_values,
-                mmrpg_saves.save_counters AS player_counters
-                FROM mmrpg_leaderboard
-                LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
-                LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id
-                WHERE (board_points_dr_light > 0 OR board_points_dr_wily > 0 OR board_points_dr_cossack > 0)
-                AND board_points >= '.$this_player_points_min.' AND board_points <= '.$this_player_points_max.'
-                AND mmrpg_leaderboard.user_id != '.$this_userid.'
-                '.(!empty($temp_exclude_usernames_string) ? ' AND mmrpg_users.user_name_clean NOT IN ('.$temp_exclude_usernames_string.')' : '').'
-                ORDER BY '.(!empty($temp_include_usernames_string) ? ' FIELD(user_name_clean, '.$temp_include_usernames_string.') DESC, ' : '').'board_points DESC
-                LIMIT 12
-            ';
+            lboard.user_id,
+            lboard.board_points,
+            users.user_name,
+            users.user_name_clean,
+            users.user_name_public,
+            users.user_gender,
+            saves2.save_values_battle_rewards AS player_rewards,
+            saves2.save_values_battle_settings AS player_settings,
+            saves.save_flags AS player_flags,
+            saves.save_values AS player_values,
+            saves.save_counters AS player_counters
+            FROM mmrpg_leaderboard AS lboard
+            LEFT JOIN mmrpg_users AS users ON users.user_id = lboard.user_id
+            LEFT JOIN mmrpg_saves AS saves ON saves.user_id = lboard.user_id
+            LEFT JOIN mmrpg_saves_legacy AS saves2 ON saves2.user_id = lboard.user_id
+            WHERE (lboard.board_points_dr_light > 0 OR lboard.board_points_dr_wily > 0 OR lboard.board_points_dr_cossack > 0)
+            AND lboard.board_points >= '.$this_player_points_min.' AND lboard.board_points <= '.$this_player_points_max.'
+            AND lboard.user_id != '.$this_userid.'
+            '.(!empty($temp_exclude_usernames_string) ? ' AND users.user_name_clean NOT IN ('.$temp_exclude_usernames_string.')' : '').'
+            ORDER BY '.(!empty($temp_include_usernames_string) ? ' FIELD(users.user_name_clean, '.$temp_include_usernames_string.') DESC, ' : '').' lboard.board_points DESC
+            LIMIT 12
+            ;';
+
         // Query the database and collect the array list of all online players
         $this_leaderboard_target_players = $db->get_array_list($temp_leaderboard_query);
+
         // Loop through and decode any fields that require it
         if (!empty($this_leaderboard_target_players)){
             foreach ($this_leaderboard_target_players AS $key => $player){
@@ -1323,10 +1330,12 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 $this_leaderboard_target_players[$key] = $player;
             }
         }
+
         // Update the database index cache
         //if (!empty($player_robot_sort)){ uasort($this_leaderboard_target_players, 'mmrpg_prototype_leaderboard_targets_sort'); }
         $db->INDEX['LEADERBOARD']['targets'] = json_encode($this_leaderboard_target_players);
         //die($temp_leaderboard_query);
+        //
     }
     // Return the collected online players if any
     //die('<pre>$this_leaderboard_target_players : '.print_r($this_leaderboard_target_players, true).'</pre>');

@@ -215,21 +215,22 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
 
     // Update the database with the recent changes
     $temp_success = $db->update('mmrpg_saves', array(
-        'save_cache_date' => MMRPG_CONFIG_CACHE_DATE,
-        'save_patches_applied' => mmrpg_admin_encode_save_data($_GAME['patches']),
-        'save_date_modified' => time()
+        'save_cache_date' => MMRPG_CONFIG_CACHE_DATE
         ), "save_id = {$data['save_id']}");
 
     // Add this patch token to the database list
     $temp_success2 = false;
     if (!in_array($patch_token, $_GAME['patches'])){
+
         // Add this patch token to the array list
         $_GAME['patches'][] = $patch_token;
+
         // Save the new patch info to the database
         $temp_success2 = $db->insert('mmrpg_saves_patches_users', array(
             'user_id' => $_GAME['user_id'],
             'patch_token' => $patch_token
             ));
+
     }
 
     // DEBUG

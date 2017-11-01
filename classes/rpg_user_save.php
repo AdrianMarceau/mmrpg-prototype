@@ -35,15 +35,47 @@ class rpg_user_save {
             'save_flags',
             'save_counters',
             'save_values',
-            'save_values_battle_complete',
-            'save_values_battle_failure',
             'save_settings',
             'save_cache_date',
-            'save_file_name',
-            'save_file_path',
             'save_date_created',
             'save_date_accessed',
-            'save_date_modified',
+            'save_date_modified'
+            );
+
+        // Add the table prefix if provided in the argument
+        if (!empty($table)){
+            $table = trim($table, ' .');
+            foreach ($index_fields AS $k => $f){
+                $index_fields[$k] = $table.'.'.$f;
+            }
+        }
+
+        // Implode the table fields into a string if requested
+        if ($implode){
+            $index_fields = implode(', ', $index_fields);
+        }
+
+        // Return the table fields, array or string
+        return $index_fields;
+
+    }
+
+    /**
+     * Get a list of all save fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @param string $table (optional)
+     * @return mixed
+     */
+    public static function get_legacy_index_fields($implode = false, $table = ''){
+
+        // Define the various table fields for save objects
+        $index_fields = array(
+            'save_id',
+            'user_id',
+            'save_values_battle_complete',
+            'save_values_battle_failure',
+            'save_file_name',
+            'save_file_path',
             'save_patches_applied'
             );
 
@@ -68,6 +100,11 @@ class rpg_user_save {
     // Define an alias function name for the above
     public static function get_fields($implode = false, $table = ''){
         return self::get_index_fields($implode, $table);
+    }
+
+    // Define an alias function name for the above
+    public static function get_legacy_fields($implode = false, $table = ''){
+        return self::get_legacy_index_fields($implode, $table);
     }
 
 

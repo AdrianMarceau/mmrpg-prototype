@@ -4,19 +4,20 @@ if (!defined('MMRPG_REMOTE_GAME_ID')){ define('MMRPG_REMOTE_GAME_ID', (!empty($_
 if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER']['userid']){
 
     // Attempt to collect data for this player from the database
-    $db_user_fields = rpg_user::get_index_fields(true, 'mmrpg_users');
+    $db_user_fields = rpg_user::get_index_fields(true, 'users');
+    $db_save_fields = rpg_user_save::get_index_fields(true, 'saves');
+    $db_save2_fields = rpg_user_save::get_legacy_index_fields(true, 'saves2');
     $this_playerid = MMRPG_REMOTE_GAME_ID;
     $raw_playerinfo = $db->get_array("SELECT
         {$db_user_fields},
-        mmrpg_saves.save_flags,
-        mmrpg_saves.save_counters,
-        mmrpg_saves.save_values,
-        mmrpg_saves.save_values_battle_complete,
-        mmrpg_saves.save_values_battle_failure,
-        mmrpg_saves.save_settings
-        FROM mmrpg_users
-        LEFT JOIN mmrpg_saves ON mmrpg_saves.user_id = mmrpg_users.user_id
-        WHERE mmrpg_users.user_id = {$this_playerid};");
+        {$db_save_fields},
+        {$db_save2_fields}
+        FROM mmrpg_users AS users
+        LEFT JOIN mmrpg_saves AS saves ON saves.user_id = users.user_id
+        LEFT JOIN mmrpg_saves_legacy AS saves2 ON saves2.user_id = users.user_id
+        WHERE
+        users.user_id = {$this_playerid}
+        ;");
 
     // If the userinfo exists in the database, display it
     if (!empty($this_playerid) && !empty($raw_playerinfo)){
