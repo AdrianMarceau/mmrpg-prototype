@@ -28,34 +28,35 @@ $this_page_markup .= ob_get_clean();
   WHERE saves.save_id IS NULL
  */
 
+// Collect the GUEST ID into a normal variable
+$guest_userid = MMRPG_SETTINGS_GUEST_ID;
+
 // Delete save files that do not have a user attached
 $db->query("DELETE mmrpg_saves FROM mmrpg_saves
   LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_saves.user_id
-  WHERE mmrpg_users.user_id IS NULL
+  WHERE mmrpg_users.user_id IS NULL AND mmrpg_saves.user_id <> {$guest_userid}
   ;");
 
 // Delete users that do not have save files attached
 $db->query("DELETE mmrpg_users FROM mmrpg_users
   LEFT JOIN mmrpg_saves ON mmrpg_saves.user_id = mmrpg_users.user_id
-  WHERE mmrpg_saves.user_id IS NULL
+  WHERE mmrpg_saves.user_id IS NULL AND mmrpg_users.user_id <> {$guest_userid}
   ;");
 
 // Collect any save files that have a cache date less than the current one
 $this_purge_query = "SELECT
-  mmrpg_users.*,
-  mmrpg_saves.save_file_path,
-  mmrpg_saves.save_file_name,
-  mmrpg_leaderboard.board_points,
-  mmrpg_saves.save_values,
-  mmrpg_saves.save_flags,
-  mmrpg_saves.save_counters
-  FROM mmrpg_users
-  LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id
-  INNER JOIN mmrpg_leaderboard ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
+  users.*,
+  lboard.board_points,
+  saves.save_values,
+  saves.save_flags,
+  saves.save_counters
+  FROM mmrpg_users AS users
+  LEFT JOIN mmrpg_saves AS saves ON users.user_id = saves.user_id
+  INNER JOIN mmrpg_leaderboard AS lboard ON users.user_id = lboard.user_id
   WHERE
-  mmrpg_users.user_date_created = mmrpg_users.user_last_login
-  AND mmrpg_users.user_name_clean <> 'guest'
-  AND (mmrpg_leaderboard.board_points = 0 OR mmrpg_leaderboard.board_points IS NULL)
+  users.user_date_created = users.user_last_login
+  AND users.user_id <> {$guest_userid}
+  AND (lboard.board_points = 0 OR lboard.board_points IS NULL)
   LIMIT {$this_purge_limit}
   ;";
 $this_purge_list = $db->get_array_list($this_purge_query);
