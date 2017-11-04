@@ -296,6 +296,39 @@ class rpg_user {
 
     }
 
+    /**
+     * Define a function for generating a temporary GUEST user info array
+     * @return bool
+     */
+    public static function guest_userinfo(){
+
+        // Collect required fields for a userinfo array
+        $user_fields = self::get_index_fields();
+
+        // Generate a userinfo array with all index fields
+        $guest_userinfo = array();
+        foreach ($user_fields AS $field){ $guest_userinfo[$field] = substr($field, -3) === '_id' ? 0 : ''; }
+
+        // Populate key fields with guest-specific values
+        $now_time = time();
+        $guest_userinfo['user_id'] = MMRPG_SETTINGS_GUEST_ID;
+        $guest_userinfo['user_name'] = 'Guest';
+        $guest_userinfo['user_name_clean'] = 'guest';
+        $guest_userinfo['user_omega'] = '20618f17e896961296207783cc960180';
+        $guest_userinfo['user_email_address'] = 'info@megamanpoweredup.net';
+        $guest_userinfo['user_date_created'] = $now_time;
+        $guest_userinfo['user_date_accessed'] = $now_time;
+        $guest_userinfo['user_date_modified'] = $now_time;
+        $guest_userinfo['user_last_login'] = $now_time;
+        $guest_userinfo['user_backup_login'] = $now_time;
+
+        // Return the generated guest userinfo
+        return $guest_userinfo;
+
+    }
+
+
+
 
     // -- GAME SETTINGS AND REWARDS -- //
 

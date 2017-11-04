@@ -214,7 +214,7 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
         // Collect the guest userinfo from the database
         $this_userid = MMRPG_SETTINGS_GUEST_ID;
         if (empty($_SESSION['GAME']['USER']['userinfo'])){
-            $this_userinfo = $db->get_array("SELECT users.* FROM mmrpg_users AS users WHERE users.user_id = '{$this_userid}' LIMIT 1");
+            $this_userinfo = rpg_user::guest_userinfo();
             $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
         } else {
             $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];
