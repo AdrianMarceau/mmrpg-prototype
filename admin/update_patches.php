@@ -111,6 +111,68 @@ function mmrpg_patch_db_user_objects_2k17($_GAME){
     // Return the updated game array
     return $_GAME;
 
+    /*
+
+    // QUERIES TO RUN AFTER THE UPDATE!!!!
+
+    -- FIND ALL USER ROBOTS WITH INCORRECT OR MISSING ORIGINAL PLAYERS
+    SELECT
+        urobots.user_id,
+        irobots.robot_token,
+        irobots.robot_game,
+        urobots.robot_player,
+        urobots.robot_player_original,
+        iplayers.player_token AS correct_player_original
+        FROM mmrpg_users_robots AS urobots
+        LEFT JOIN mmrpg_index_robots AS irobots ON irobots.robot_token = urobots.robot_token
+        LEFT JOIN mmrpg_index_players AS iplayers ON (
+            iplayers.player_game = irobots.robot_game
+            OR (iplayers.player_token = 'dr-light' AND irobots.robot_token = 'mega-man')
+            OR (iplayers.player_token = 'dr-wily' AND irobots.robot_token = 'bass')
+            OR (iplayers.player_token = 'dr-cossack' AND irobots.robot_token = 'proto-man')
+            )
+        WHERE
+        irobots.robot_class = 'master'
+        AND irobots.robot_game IN ('MM00', 'MM01', 'MM02', 'MM04')
+        AND (
+            urobots.robot_player_original = ''
+            OR (
+                urobots.robot_player_original <> iplayers.player_token
+                AND irobots.robot_token IN ('mega-man', 'bass', 'proto-man', 'roll', 'disco', 'rhythm')
+                )
+            )
+        ORDER BY
+        urobots.user_id ASC,
+        iplayers.player_order ASC,
+        irobots.robot_order ASC
+        ;
+
+
+    -- FIX ALL USER ROBOTS WITH INCORRECT OR MISSING ORIGINAL PLAYERS
+    UPDATE
+        mmrpg_users_robots AS urobots
+        LEFT JOIN mmrpg_index_robots AS irobots ON irobots.robot_token = urobots.robot_token
+        LEFT JOIN mmrpg_index_players AS iplayers ON (
+            iplayers.player_game = irobots.robot_game
+            OR (iplayers.player_token = 'dr-light' AND irobots.robot_token = 'mega-man')
+            OR (iplayers.player_token = 'dr-wily' AND irobots.robot_token = 'bass')
+            OR (iplayers.player_token = 'dr-cossack' AND irobots.robot_token = 'proto-man')
+            )
+        SET urobots.robot_player_original = iplayers.player_token
+        WHERE
+        iplayers.player_token IS NOT NULL
+        AND (
+            urobots.robot_player_original = ''
+            OR urobots.robot_player_original IS NULL
+            OR (
+                urobots.robot_player_original <> iplayers.player_token
+                AND irobots.robot_token IN ('mega-man', 'bass', 'proto-man', 'roll', 'disco', 'rhythm')
+                )
+            )
+        ;
+
+     */
+
 }
 
 
