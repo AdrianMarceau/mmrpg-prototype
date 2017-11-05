@@ -213,6 +213,74 @@ class rpg_functions {
 
     }
 
+    /**
+     * Generate a gendered pronoun index for word mapping based on identity
+     * @return string
+     */
+    public static function get_pronoun_index(){
+        $pronoun_index = array();
+        $pronoun_index['subject'] = array('he', 'she', 'they', 'it');
+        $pronoun_index['object'] = array('him', 'her', 'them', 'it');
+        $pronoun_index['possesive'] = array('his', 'her', 'their', 'its');
+        $pronoun_index['possessive_pronoun'] = array('his', 'hers', 'theirs', 'its');
+        $pronoun_index['reflexive'] = array('himself', 'herself', 'themself', 'itself');
+        return $pronoun_index;
+    }
+
+    /**
+     * Return a pronoun given a kind, a character's gender identity, and toaster status
+     * @return string
+     */
+    public static function get_pronoun($kind, $gender = '', $toaster = false){
+        $pronoun_index = self::get_pronoun_index();
+        if (empty($pronoun_index[$kind])){ return ''; }
+        else { $pronouns = $pronoun_index[$kind]; }
+        if ($gender == 'male'){ $pronoun = $pronouns[0]; }
+        elseif ($gender == 'female'){ $pronoun = $pronouns[1]; }
+        else { $pronoun = $toaster ? $pronouns[3] : $pronouns[2]; }
+        return $pronoun;
+    }
+
+    /**
+     * Return a subject pronoun given a character's gender identity and toaster status ('he', 'she', 'they', 'it')
+     * @return string
+     */
+    public static function get_subject_pronoun($gender = '', $toaster = false){
+        return self::get_pronoun('subject', $gender, $toaster);
+    }
+
+    /**
+     * Return a object pronoun given a character's gender identity and toaster status ('him', 'her', 'them', 'it')
+     * @return string
+     */
+    public static function get_object_pronoun($gender = '', $toaster = false){
+        return self::get_pronoun('object', $gender, $toaster);
+    }
+
+    /**
+     * Return a possesive pronoun given a character's gender identity and toaster status ('his', 'her', 'their', 'its')
+     * @return string
+     */
+    public static function get_possesive_pronoun($gender = '', $toaster = false){
+        return self::get_pronoun('possesive', $gender, $toaster);
+    }
+
+    /**
+     * Return a possessive_pronoun pronoun given a character's gender identity and toaster status ('his', 'hers', 'theirs', 'its')
+     * @return string
+     */
+    public static function get_possessive_pronoun_pronoun($gender = '', $toaster = false){
+        return self::get_pronoun('possessive_pronoun', $gender, $toaster);
+    }
+
+    /**
+     * Return a reflexive pronoun given a character's gender identity and toaster status ('himself', 'herself', 'themself', 'itself')
+     * @return string
+     */
+    public static function get_reflexive_pronoun($gender = '', $toaster = false){
+        return self::get_pronoun('reflexive', $gender, $toaster);
+    }
+
     // -- STATIC MATH FUNCTIONS -- //
 
     /**
