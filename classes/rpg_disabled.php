@@ -300,7 +300,9 @@ class rpg_disabled {
          * Reward the player and robots with items and experience if not in demo mode
          */
 
-        if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID && empty($_SESSION['GAME']['DEMO'])){
+        if ($target_player->player_side == 'left'
+            && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID
+            ){
 
             // -- EXPERIENCE POINTS / LEVEL UP -- //
 
@@ -779,8 +781,13 @@ class rpg_disabled {
                 //$this_battle->events_create(false, false, 'DEBUG', $event_body);
 
                 // Loop through the ability rewards for this robot if set
-                if ($temp_robot->robot_class != 'mecha' && ($temp_start_level == 100 || ($temp_start_level != $temp_new_level && !empty($index_robot_rewards['abilities'])))){
-                    $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                if ($temp_robot->robot_class == 'master'
+                    && !rpg_game::is_demo()
+                    && !empty($index_robot_rewards['abilities'])
+                    && ($temp_start_level == 100 || ($temp_start_level != $temp_new_level))
+                    ){
+                    $temp_ability_tokens = array_map(function($reward){ return $reward['token']; }, $index_robot_rewards['abilities']);
+                    $temp_abilities_index = rpg_ability::get_index_custom($temp_ability_tokens);
                     foreach ($index_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
 
                         // If this ability is already unlocked, continue
