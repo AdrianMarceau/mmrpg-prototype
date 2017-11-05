@@ -2,7 +2,10 @@
 
 // Require the application top file
 define('MMRPG_ADMIN_PANEL', true);
-require_once('top.php');
+require('top.php');
+
+// Require legacy classes for patching
+require('classes/rpg_game.legacy.php');
 
 // Define the page title and markup variables
 $this_page_title = 'MMRPG Admin Panel';
