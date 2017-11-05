@@ -8,8 +8,9 @@ ob_start();
 
 	// Display the option for SKIP TURN
 	$block_num++;
-	$title = 'The user skips their turn and allows the opponent to go instead, either strategically or out of desperation.';
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_speed" type="button" data-action="ability_8_action-skip-turn" data-tooltip="'.$title.'"><label><span class="multi">Skip<br />Turn</span></label></a>';
+	//$title = 'The user skips their turn and allows the opponent to go instead, either strategically or out of desperation.';
+	//$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_speed" type="button" data-action="ability_8_action-skip-turn" data-tooltip="'.$title.'"><label><span class="multi">Skip<br />Turn</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_speed" type="button" data-action="ability_8_action-skip-turn"><label><span class="multi">Skip<br />Turn</span></label></a>';
 
 	// Display an EMPTY SPACE for an option
 	$block_num++;
