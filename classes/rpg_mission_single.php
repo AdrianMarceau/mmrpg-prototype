@@ -374,17 +374,18 @@ class rpg_mission_single extends rpg_mission {
         }
 
         // Update the battle description based on what we've calculated
+        $temp_field_name = $temp_option_field['field_name'];
         if (!empty($temp_battle_omega['values']['field_star'])){
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].' and collect its Field Star! ';
-            $temp_battle_omega['battle_description2'] = 'The star\'s energy appears to have attracted another robot master to the field...';
-        } else if (!empty($this_unlock_abilities_count)){
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].' and download its special weapon!';
-            $temp_battle_omega['battle_description2'] = 'Once we\'ve acquired it, we may be able to equip the ability to other robots...';
+            if (!$temp_option_completed){ $temp_battle_omega['battle_description'] = 'Liberate the '.$temp_field_name.' and collect the field star! '; }
+            else { $temp_battle_omega['battle_description'] = 'Return to the '.$temp_field_name.' and collect the field star! '; }
+            $temp_battle_omega['battle_description2'] = 'The star\'s energy appears to have drawn another robot to the field... ';
         } elseif (!empty($this_unlock_robots_count)){
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].' and download its robot data!';
-            $temp_battle_omega['battle_description2'] = 'If we use only Neutral type abilities on the target we may be able to save it...';
+            if (!$temp_option_completed){ $temp_battle_omega['battle_description'] = 'Liberate the '.$temp_field_name.' and save the robot master! '; }
+            else { $temp_battle_omega['battle_description'] = 'Return to the '.$temp_field_name.' and save the robot master! '; }
+            $temp_battle_omega['battle_description2'] = 'We may be able to repair the target\'s data if we only use neutral abilities... ';
         } else {
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].'!';
+            if (!$temp_option_completed){ $temp_battle_omega['battle_description'] = 'Liberate the '.$temp_field_name.'! '; }
+            else { $temp_battle_omega['battle_description'] = 'Return to the '.$temp_field_name.'! '; }
         }
 
         // Return the generated battle data

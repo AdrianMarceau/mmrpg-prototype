@@ -23,8 +23,9 @@ class rpg_mission_starter extends rpg_mission {
         global $this_omega_factors_ten;
 
         // Collect data on this robot and the rescue robot
-        $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-        $this_robot_data = rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
+        //$this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        //$this_robot_data = rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
+        $this_robot_data = rpg_robot::get_index_info($this_robot_token);
         $this_robot_name = $this_robot_data['robot_name'];
         // Populate the battle options with the starter battle option
         $temp_target_count = 1;
@@ -32,6 +33,7 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_omega = array();
         $temp_battle_omega['battle_field_base']['field_id'] = 100;
         $temp_battle_omega['battle_field_base']['field_token'] = 'intro-field';
+        $temp_battle_omega['battle_field_base']['field_name'] = 'Intro Field';
         $temp_battle_omega['flags']['starter_battle'] = true;
         $temp_battle_omega['battle_token'] = $temp_battle_token;
         $temp_battle_omega['battle_size'] = '1x4';
@@ -84,30 +86,31 @@ class rpg_mission_starter extends rpg_mission {
             // Add the rescue to the background with animation
             $temp_battle_omega['battle_field_base']['field_foreground_attachments']['robot_'.$this_rescue_token.'-01'] = array('class' => 'robot', 'size' => 40, 'offset_x' => 91, 'offset_y' => 118, 'offset_z' => 2, 'robot_token' => $this_rescue_token, 'robot_frame' => array(8,0,8,0,0), 'robot_direction' => 'right');
         }
+
         // Allow unlocking of the mecha support ability if the player has reached max targets
         if ($temp_target_count >= 8){
-            // Add the Mecha Support ability as an unlockable move if not already unlocked
+
+            // Add the Mecha Support or Field Support abilities as unlockable moves if not already earned
             $temp_battle_omega['battle_rewards']['abilities'] = array();
             if (!mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'mecha-support')){
-                // Add the Met as a reward for the battle
                 $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'mecha-support');
-                // Update the description text for the battle
-                $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' data! &#10023; ';
             } elseif (!mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'field-support')){
-                // Add the Met as a reward for the battle
                 $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'field-support');
-                // Update the description text for the battle
-                $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' data! &#10022; ';
-            } else {
-                // Update the description text for the battle
-                $temp_battle_omega['battle_description'] = 'Defeat the enemy robot'.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' data!';
             }
+
         }
-        // Otherwise, if the player has already unlocked Roll
-        else {
-            // Update the description text for the battle
-            $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's that are' : ' that\'s').' attacking the lab!';
+
+        // Update the battle description based on what we've calculated
+        $temp_field_name = $temp_battle_omega['battle_field_base']['field_name'];
+        if (!empty($temp_battle_omega['battle_rewards']['abilities'])){
+            if (!$temp_battle_omega_complete){ $temp_battle_omega['battle_description'] = 'Liberate the '.$temp_field_name.' and download the hidden ability data! '; }
+            else { $temp_battle_omega['battle_description'] = 'Return to the '.$temp_field_name.' and download the hidden ability data! '; }
+        } else {
+            $temp_robot_or_robots = 'robot'.($temp_target_count > 1 ? 's' : '');
+            if (!$temp_battle_omega_complete){ $temp_battle_omega['battle_description'] = 'Defeat the enemy '.$temp_robot_or_robots.' and liberate the '.$temp_field_name.'! '; }
+            else { $temp_battle_omega['battle_description'] = 'Return to the '.$temp_field_name.' and defeat the enemy '.$temp_robot_or_robots.'! '; }
         }
+
         // Add some random item drops to the starter battle
         if ($temp_target_count > 1){
             $temp_battle_omega['battle_rewards']['items'] = array(

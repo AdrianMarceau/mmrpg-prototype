@@ -410,19 +410,18 @@ class rpg_mission_double extends rpg_mission {
         }
 
         // Update the battle description based on what we've calculated
-        //$temp_description_target_robots = ($temp_option_field['field_type'] != $temp_option_field2['field_type'] ? ucfirst($temp_option_field['field_type']).' and '.ucfirst($temp_option_field2['field_type']) : ucfirst($temp_option_field['field_type'])).' core';
-        $temp_description_target_robots = $temp_option_robot['robot_name'].' and '.$temp_option_robot2['robot_name'];
+        $temp_field_name = $temp_option_battle['battle_field_base']['field_name'];
         if (!empty($temp_battle_omega['values']['field_star'])){
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and collect their Fusion Star!';
-            $temp_battle_omega['battle_description2'] = 'The star\'s energy appears to have attracted more robots to the field...';
-        } elseif (!empty($this_unlock_abilities_count)){
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and download their special weapons!';
-            $temp_battle_omega['battle_description2'] = 'Once we\'ve acquired them, we may be able to equip the abilities to other robots...';
+            if (!$temp_option_completed){ $temp_battle_omega['battle_description'] = 'Liberate the '.$temp_field_name.' and collect the fusion star! '; }
+            else { $temp_battle_omega['battle_description'] = 'Return to the '.$temp_field_name.' and collect the fusion star! '; }
+            $temp_battle_omega['battle_description2'] = 'The star\'s energy appears to have drawn more robots to the field... ';
         } elseif (!empty($this_unlock_robots_count)){
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and download their robot data!';
-            $temp_battle_omega['battle_description2'] = 'If we use only Neutral type abilities on the targets we may be able to save them...';
+            if (!$temp_option_completed){ $temp_battle_omega['battle_description'] = 'Liberate the '.$temp_field_name.' and save the robot master! '; }
+            else { $temp_battle_omega['battle_description'] = 'Return to the '.$temp_field_name.' and save the robot master! '; }
+            $temp_battle_omega['battle_description2'] = 'We may be able to repair the target\'s data if we only use neutral abilities... ';
         } else {
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.'!';
+            if (!$temp_option_completed){ $temp_battle_omega['battle_description'] = 'Liberate the '.$temp_field_name.'! '; }
+            else { $temp_battle_omega['battle_description'] = 'Return to the '.$temp_field_name.'! '; }
         }
 
         // Add some random item drops to the starter battle
