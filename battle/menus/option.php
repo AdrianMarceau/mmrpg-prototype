@@ -11,19 +11,17 @@ ob_start();
 	$title = 'The user skips their turn and allows the opponent to go instead, either strategically or out of desperation.';
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_speed" type="button" data-action="ability_8_action-skip-turn" data-tooltip="'.$title.'"><label><span class="multi">Skip<br />Turn</span></label></a>';
 
-	// Display the option for CHARGE ENERGY
+	// Display an EMPTY SPACE for an option
 	$block_num++;
-	$title = 'The user enters a charging state that helps to recover a small amount of depleted life energy.';
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_energy" type="button" data-action="ability_9_action-charge-energy" data-tooltip="'.$title.'"><label><span class="multi">Charge<br />Energy</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' button_disabled ability_type_energy" type="button"><label>???</label></a>';
 
-	// Display the option for CHARGE WEAPONS
+	// Display the option for RESTART MISSION
 	$block_num++;
-	$title = 'The user enters a charging state that helps to recover a small amount of depleted weapon energy.';
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_weapons" type="button" data-action="ability_10_action-charge-weapons" data-tooltip="'.$title.'"><label><span class="multi">Charge<br />Weapons</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_defense" type="button" data-action="restart"><label><span class="multi">Restart<br />Mission</span></label></a>';
 
-	// Display the option for RESTART BATTLE
+	// Display the option for RETURN TO MAIN MENU
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="restart"><label><span class="multi">Restart<br />Mission</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
 
 	// Display the option for RESTART MUSIC
 	$block_num++;
@@ -38,9 +36,38 @@ ob_start();
 	$current_debug_value = !empty($_SESSION['GAME']['debug_mode']) ? 1 : 0;
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shadow" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Debug Mode</span><br /><span class="value type type_'.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
 
-	// Display the option for RETURN TO MAIN MENU
+	// Display an EMPTY SPACE for an option
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shadow" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' button_disabled ability_type_shadow" type="button"><label>&nbsp;</label></a>';
+
+	/*
+	// Display the option for REPAIR BREAKS
+	$block_num++;
+	$title = 'The user converts weapon energy into stat points to repair broken weapon, shield, and/or mobility systems.';
+	$enabled = false;
+	if ($enabled){ $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_energy" type="button" data-action="ability_9_action-repair-stats" data-tooltip="'.$title.'"><label><span class="multi">Repair<br />Breaks</span></label></a>'; }
+	else { $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_energy button_disabled" type="button" data-tooltip="'.$title.'"><label><span class="multi">Repair<br />Breaks</span></label></a>'; }
+	*/
+
+	/*
+	// Display an EMPTY SPACE for an option
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' button_disabled" type="button"><label>&nbsp;</label></a>';
+	 */
+
+	/*
+	// Display the option for CHARGE ENERGY
+	$block_num++;
+	$title = 'The user enters a charging state that helps to recover a small amount of depleted life energy.';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_energy" type="button" data-action="ability_9_action-charge-energy" data-tooltip="'.$title.'"><label><span class="multi">Charge<br />Energy</span></label></a>';
+	*/
+
+	/*
+	// Display the option for CHARGE WEAPONS
+	$block_num++;
+	$title = 'The user enters a charging state that helps to recover a small amount of depleted weapon energy.';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_weapons" type="button" data-action="ability_10_action-charge-weapons" data-tooltip="'.$title.'"><label><span class="multi">Charge<br />Weapons</span></label></a>';
+	*/
 
 	/*
 	// Display the toggle options for perspective mode and stuff
