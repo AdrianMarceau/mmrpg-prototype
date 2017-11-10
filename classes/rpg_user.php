@@ -969,5 +969,129 @@ class rpg_user {
     }
 
 
+    /**
+     * Pull an array of encounter records for a given user ID from the database
+     * @param int $user_id
+     * @param string $mission_result (optional)
+     * @return array
+     */
+    public static function get_mission_records($user_id, $return_result = ''){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Compensate for empty or missing record kind
+        $allowed_results = array('victory', 'defeat');
+        if (!empty($return_result) && !in_array($return_result, $allowed_results)){ $return_result = ''; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Define an array to hold collected mission records
+        $raw_mission_records = array();
+
+        // Define the base query for pulling high score records
+        $raw_mission_query = "SELECT
+            m.row_id,
+            m.user_id,
+            m.player_token,
+            m.mission_token,
+            m.mission_result,
+            m.mission_level,
+            m.mission_points_earned,
+            m.mission_turns_target,
+            m.mission_turns_used,
+            m.mission_robots_target,
+            m.mission_robots_used,
+            m.mission_points_base,
+            m.mission_date,
+            c.mission_count
+            FROM mmrpg_users_missions_records m                             -- m from max
+                LEFT JOIN mmrpg_users_missions_records b                    -- b from bigger
+                    ON b.mission_token = m.mission_token                    -- match max row with bigger row by home
+                    AND b.user_id = m.user_id                               -- must be the same user
+                    AND b.mission_points_earned >= m.mission_points_earned  -- want bigger than max
+                    AND b.row_id > m.row_id                                 -- want bigger than max
+                LEFT JOIN (SELECT
+                    c.user_id,
+                    c.mission_token,
+                    c.mission_result,
+                    COUNT(*) AS mission_count
+                    FROM mmrpg_users_missions_records AS c
+                    GROUP BY
+                    c.mission_token) AS c
+                    ON c.user_id = m.user_id
+                    AND c.mission_token = m.mission_token
+                    AND c.mission_result = m.mission_result
+            WHERE
+                1 = 1
+                AND b.mission_points_earned IS NULL          -- keep only if there is no bigger than max
+                AND c.mission_count IS NOT NULL              -- keep only if mission count for given result
+                AND m.user_id = {$user_id}
+                AND m.mission_result = '{mission_result}'
+            ORDER BY
+                m.mission_token ASC
+            ;";
+
+        // Loop through result types and collect records for allowed
+        foreach ($allowed_results AS $result_key => $result_token){
+
+            // Add an entry to the parent array for this result token
+            $raw_mission_records[$result_token] = array();
+
+            // Collect all mission records with a matching result if allowed
+            if (empty($return_result) || $result_token == $return_result){
+
+                // Pull a list of high scores for all misions with a victory result
+                $temp_mission_query = str_replace('{mission_result}', $result_token, $raw_mission_query);
+                $temp_mission_results = $db->get_array_list($temp_mission_query, 'mission_token');
+                if (empty($temp_mission_results)){ $temp_mission_results = array(); }
+
+                // Loop through mission results and add to nested player arrays
+                if (!empty($temp_mission_results)){
+                    foreach ($temp_mission_results AS $mission_token => $mission_record){
+
+                        // Collect the player token for indexing purposes
+                        $mission_player = $mission_record['player_token'];
+
+                        // Use the db record to generate a battle-compatible array
+                        $battle_record = array(
+                            'battle_token' => $mission_record['mission_token'],
+                            'battle_count' => $mission_record['mission_count'],
+                            'battle_level' => $mission_record['mission_level'],
+                            'battle_turns_target' => $mission_record['mission_turns_target'],
+                            'battle_turns_used' => $mission_record['mission_turns_used'],
+                            'battle_robots_target' => $mission_record['mission_robots_target'],
+                            'battle_robots_used' => $mission_record['mission_robots_used'],
+                            'battle_points_base' => $mission_record['mission_points_base'],
+                            'battle_points_earned' => $mission_record['mission_points_earned'],
+                            'battle_date' => $mission_record['mission_date']
+                            );
+
+                        // Add these mission records to the parent record array
+                        $raw_mission_records[$result_token][$mission_player][$mission_token] = $battle_record;
+
+                    }
+                }
+
+            }
+
+        }
+
+        // Collect either whole or part of records into game-compatible array based on request
+        if (empty($return_result)){
+            $user_mission_records = $raw_mission_records;
+        } elseif (!empty($return_result) && !empty($raw_mission_records[$return_result])){
+            $user_mission_records = $raw_mission_records[$return_result];
+        } elseif (!empty($return_result) && empty($raw_mission_records[$return_result])){
+            $user_mission_records = array();
+        }
+
+        // Return the final array
+        return $user_mission_records;
+
+    }
+
+
 }
 ?>
