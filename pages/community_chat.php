@@ -39,10 +39,10 @@ $user_chat_name = preg_replace('/([^-_a-z0-9]+)/i', '', $user_chat_name);
   <p class="text"><?= $this_category_info['category_description'] ?></p>
   <p class="text" style="margin-bottom: 6px;">(!) You will need a Discord account to use the chat, <a href="https://discordapp.com/register?redirect_to=%2Fchannels%342807345782325249%342807977906143237" target="_blank">please create one</a> if you do not have one already</p>
   <p class="text" style="margin-bottom: 6px;">(!) Please see <a href="community/general/1107/official-chat-help-and-guidelines/">this thread</a> for a more thorough overview of the rules for the chat room<br />
-  <p class="text type_block type_water" style="width: auto; padding: 6px;">
+  <p class="text type_block type_water" style="width: auto; padding: 6px; clear: both;">
     <strong>MMRPG Discord Invite</strong> : <a href="https://discord.gg/hv5Ht2d" target="_blank">https://discord.gg/hv5Ht2d</a>
   </p>
-  <p class="text type_block type_water" style="width: auto; padding: 6px;">
+  <p class="text type_block type_water" style="width: auto; padding: 6px; clear: both;">
     <strong>MMRPG Discord Chat</strong> : <a href="https://discordapp.com/channels/342807345782325249/342807977906143237" target="_blank">https://discordapp.com/channels/342807345782325249/342807977906143237</a>
   </p>
   </p>
