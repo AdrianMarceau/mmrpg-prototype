@@ -39,6 +39,8 @@ class legacy_rpg_game {
         $session_flags = !empty($session_vars['save_flags']) ? json_decode($session_vars['save_flags'], true) : array();
         $session_counters = !empty($session_vars['save_counters']) ? json_decode($session_vars['save_counters'], true) : array();
         $session_values = !empty($session_vars['save_values']) ? json_decode($session_vars['save_values'], true) : array();
+        $session_values['battle_complete'] = !empty($session_vars['save_values_battle_complete']) ? json_decode($session_vars['save_values_battle_complete'], true) : array();
+        $session_values['battle_failure'] = !empty($session_vars['save_values_battle_failure']) ? json_decode($session_vars['save_values_battle_failure'], true) : array();
         $session_values['battle_settings'] = !empty($session_vars['save_values_battle_settings']) ? json_decode($session_vars['save_values_battle_settings'], true) : array();
         $session_values['battle_rewards'] = !empty($session_vars['save_values_battle_rewards']) ? json_decode($session_vars['save_values_battle_rewards'], true) : array();
         $session_values['battle_abilities'] = !empty($session_vars['save_values_battle_abilities']) ? json_decode($session_vars['save_values_battle_abilities'], true) : array();
@@ -194,6 +196,76 @@ class legacy_rpg_game {
             // Update the parent game values with the omega list changes
             $_GAME['values'][$omega_field_name] = $this_omega_list;
 
+        }
+
+    }
+
+    // Define a function for generating a database-compatible list of user missions
+    public static function parse_user_mission_records($this_userid,
+        $battle_complete, $battle_failure,
+        $allowed_players, $mmrpg_users_players,
+        &$mmrpg_users_missions_records
+        ){
+
+        // If not empty, loop through completed missions and index
+        $mission_results = array();
+        $mission_results['victory'] = $battle_complete;
+        $mission_results['defeat'] = $battle_failure;
+        foreach ($mission_results AS $mission_result => $mission_players){
+            if (!empty($mission_players)){
+                foreach ($mission_players AS $player_token => $player_missions){
+                    if (!empty($player_missions)){
+                        foreach ($player_missions AS $mission_token => $mission_records){
+                            // Define base values for this mission using legacy fields
+                            $base_count = !empty($mission_records['battle_count']) ? $mission_records['battle_count'] : 1;
+                            $base_level = !empty($mission_records['battle_level']) ? $mission_records['battle_level'] : 1;
+                            $base_min_level = !empty($mission_records['battle_min_level']) ? $mission_records['battle_min_level'] : $base_level;
+                            $base_max_level = !empty($mission_records['battle_max_level']) ? $mission_records['battle_max_level'] : $base_level;
+                            $base_min_turns = !empty($mission_records['battle_min_turns']) ? $mission_records['battle_min_turns'] : 1;
+                            $base_max_turns = !empty($mission_records['battle_max_turns']) ? $mission_records['battle_max_turns'] : 1;
+                            $base_min_robots = !empty($mission_records['battle_min_robots']) ? $mission_records['battle_min_robots'] : 1;
+                            $base_max_robots = !empty($mission_records['battle_max_robots']) ? $mission_records['battle_max_robots'] : 1;
+                            $base_min_points = !empty($mission_records['battle_min_points']) ? $mission_records['battle_min_points'] : 1;
+                            $base_max_points = !empty($mission_records['battle_max_points']) ? $mission_records['battle_max_points'] : 1;
+                            $base_avg_points = ceil(($base_min_points + $base_max_points) / 2);
+                            $base_date = time();
+                            // Generate the base mission info to use as a template
+                            $base_mission_info = array();
+                            $base_mission_info['user_id'] = $this_userid;
+                            $base_mission_info['player_token'] = $player_token;
+                            $base_mission_info['mission_token'] = $mission_token;
+                            $base_mission_info['mission_result'] = $mission_result;
+                            // Loop as many times as this mission has been completed to generate a fake history
+                            for ($i = 0; $i < $base_count; $i++){
+                                $mission_info = $base_mission_info;
+                                // If first in loop give it the best values, else give worst values
+                                if ($i == 0){
+                                    // Assume the best outcome in this case
+                                    $mission_info['mission_level'] = $base_max_level;
+                                    $mission_info['mission_turns_target'] = $base_max_turns;
+                                    $mission_info['mission_turns_used'] = $base_min_turns;
+                                    $mission_info['mission_robots_target'] = $base_max_robots;
+                                    $mission_info['mission_robots_used'] = $base_min_robots;
+                                    $mission_info['mission_points_base'] = $base_avg_points;
+                                    $mission_info['mission_points_earned'] = $base_max_points;
+                                } else {
+                                    // Assume the worst outcome in this case
+                                    $mission_info['mission_level'] = $base_min_level;
+                                    $mission_info['mission_turns_target'] = $base_max_turns;
+                                    $mission_info['mission_turns_used'] = $base_max_turns;
+                                    $mission_info['mission_robots_target'] = $base_max_robots;
+                                    $mission_info['mission_robots_used'] = $base_max_robots;
+                                    $mission_info['mission_points_base'] = $base_avg_points;
+                                    $mission_info['mission_points_earned'] = $base_min_points;
+                                }
+                                $mission_info['mission_date'] = $base_date - ($i * 60 * 60); // assume one per hour
+                                $mmrpg_users_missions_records[] = $mission_info;
+                            }
+                        }
+                    }
+
+                }
+            }
         }
 
     }
@@ -358,24 +430,12 @@ class legacy_rpg_game {
 
             // Define the save database update array and populate
             $this_save_array = array();
-            $this_save_array['save_values_battle_complete'] = json_encode(!empty($this_values['battle_complete']) ? $this_values['battle_complete'] : array());
-            $this_save_array['save_values_battle_failure'] = json_encode(!empty($this_values['battle_failure']) ? $this_values['battle_failure'] : array());
-            $this_save_array['save_values_battle_rewards'] = json_encode(!empty($this_values['battle_rewards']) ? $this_values['battle_rewards'] : array());
-            $this_save_array['save_values_battle_settings'] = json_encode(!empty($this_values['battle_settings']) ? $this_values['battle_settings'] : array());
-            $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
-            $this_save_array['save_values_battle_items'] = json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
-            $this_save_array['save_values_battle_stars'] = json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
-            $this_save_array['save_values_robot_database'] = json_encode(!empty($this_values['robot_database']) ? $this_values['robot_database'] : array());
-            $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
-
             $this_save_array['save_counters'] = !empty($this_counters) ? $this_counters : array();
             $this_save_array['save_values'] = !empty($this_values) ? $this_values : array();
             $this_save_array['save_flags'] = !empty($this_flags) ? $this_flags : array();
             $this_save_array['save_settings'] = !empty($this_settings) ? $this_settings : array();
-
             $this_save_array['save_cache_date'] = $this_cache_date;
             $this_save_array['save_date_modified'] = time();
-
             unset(
                 $this_save_array['save_values']['battle_index'],
                 $this_save_array['save_values']['battle_complete'],
@@ -388,7 +448,6 @@ class legacy_rpg_game {
                 $this_save_array['save_values']['robot_database'],
                 $this_save_array['save_values']['robot_alts']
                 );
-
             $this_save_array['save_counters'] = json_encode($this_save_array['save_counters']);
             $this_save_array['save_values'] = json_encode($this_save_array['save_values']);
             $this_save_array['save_flags'] = json_encode($this_save_array['save_flags']);
@@ -398,6 +457,28 @@ class legacy_rpg_game {
             //echo('<hr /><pre>FINAL DB SAVES UPDATE (user_id = '.$_USER['userid'].')</pre>');
             //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
             $db->update('mmrpg_saves', $this_save_array, 'user_id = '.$_USER['userid']);
+
+        }
+
+        // Index the main legacy save arrays
+        if (true){
+
+            // Define the legacy save database update array and populate
+            $this_save_array = array();
+            $this_save_array['save_values_battle_complete'] = json_encode(!empty($this_values['battle_complete']) ? $this_values['battle_complete'] : array());
+            $this_save_array['save_values_battle_failure'] = json_encode(!empty($this_values['battle_failure']) ? $this_values['battle_failure'] : array());
+            $this_save_array['save_values_battle_rewards'] = json_encode(!empty($this_values['battle_rewards']) ? $this_values['battle_rewards'] : array());
+            $this_save_array['save_values_battle_settings'] = json_encode(!empty($this_values['battle_settings']) ? $this_values['battle_settings'] : array());
+            $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
+            $this_save_array['save_values_battle_items'] = json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
+            $this_save_array['save_values_battle_stars'] = json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
+            $this_save_array['save_values_robot_database'] = json_encode(!empty($this_values['robot_database']) ? $this_values['robot_database'] : array());
+            $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
+
+            // Update this legacy save's info in the database
+            //echo('<hr /><pre>FINAL DB SAVES UPDATE (user_id = '.$_USER['userid'].')</pre>');
+            //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
+            $db->update('mmrpg_saves_legacy', $this_save_array, 'user_id = '.$_USER['userid']);
 
         }
 
@@ -432,6 +513,7 @@ class legacy_rpg_game {
         $mmrpg_users_robots_records = array();
         $mmrpg_users_items = array();
         $mmrpg_users_stars = array();
+        $mmrpg_users_missions_records = array();
 
         // Collect an index of VALID and UNLOCKABLE player, robot, and ability tokens to match against
         $allowed_players = rpg_game::get_allowed_players();
@@ -458,6 +540,8 @@ class legacy_rpg_game {
         $battle_stars = !empty($session_values['battle_stars']) ? $session_values['battle_stars'] : array();
         $robot_alts = !empty($session_values['robot_alts']) ? $session_values['robot_alts'] : array();
         $robot_database = !empty($session_values['robot_database']) ? $session_values['robot_database'] : array();
+        $battle_complete = !empty($session_values['battle_complete']) ? $session_values['battle_complete'] : array();
+        $battle_failure = !empty($session_values['battle_failure']) ? $session_values['battle_failure'] : array();
         //echo('$battle_settings = '.print_r($battle_settings, true).PHP_EOL);
         //echo('$battle_rewards = '.print_r($battle_rewards, true).PHP_EOL);
         //echo('$battle_abilities = '.print_r($battle_abilities, true).PHP_EOL);
@@ -466,6 +550,8 @@ class legacy_rpg_game {
         //echo('$robot_alts = '.print_r($robot_alts, true).PHP_EOL);
         //echo('$robot_database = '.print_r($robot_database, true).PHP_EOL);
         //echo('$battle_fields = '.print_r($battle_fields, true).PHP_EOL);
+        //echo('$battle_complete = '.print_r($battle_complete, true).PHP_EOL);
+        //echo('$battle_failure = '.print_r($battle_failure, true).PHP_EOL);
 
         // Collect any player omega arrays from the session
         $player_omega = rpg_game::parse_player_omega($session_values);
@@ -548,6 +634,14 @@ class legacy_rpg_game {
             );
         //echo('$mmrpg_users_robots_records = '.print_r($mmrpg_users_robots_records, true).PHP_EOL);
 
+        // Generate database rows for the user's mission records
+        legacy_rpg_game::parse_user_mission_records($this_userid,
+            $battle_complete, $battle_failure,
+            $allowed_players, $mmrpg_users_players,
+            $mmrpg_users_missions_records
+            );
+        //echo('$mmrpg_users_missions_records = '.print_r($mmrpg_users_missions_records, true).PHP_EOL);
+
         // Clean and collapse user players and robots for database insertion
         rpg_game::prepare_user_database_players($mmrpg_users_players);
         rpg_game::prepare_user_database_robots($mmrpg_users_robots);
@@ -595,7 +689,7 @@ class legacy_rpg_game {
         if ($echo){ echo('$mmrpg_users_stars('.count($mmrpg_users_stars).') = '.print_r(array_keys($mmrpg_users_stars), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_robots_alts('.array_sum(array_map('count', $mmrpg_users_robots_alts)).') = '.print_r(array_map(function($a){ return implode('/', array_keys($a)); }, $mmrpg_users_robots_alts), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_robots_records('.count($mmrpg_users_robots_records).') = '.print_r(array_map(function($a){ return implode('/', array_values($a)); }, $mmrpg_users_robots_records), true).'<hr />'.PHP_EOL); }
-
+        if ($echo){ echo('$mmrpg_users_missions_records('.count($mmrpg_users_missions_records).') = '.print_r(array_map(function($a){ return implode('/', array_values($a)); }, $mmrpg_users_missions_records), true).'<hr />'.PHP_EOL); }
 
         // Loop through players and update/insert them in the database
         $db_existing_players = $db->get_array_list("SELECT player_token FROM mmrpg_users_players WHERE user_id = {$this_userid};", 'player_token');
@@ -688,7 +782,7 @@ class legacy_rpg_game {
             }
         }
 
-        // Loop through robots and update/insert them in the database
+        // Loop through robot records and update/insert them in the database
         $db_existing_robots = $db->get_array_list("SELECT robot_token FROM mmrpg_users_robots_records WHERE user_id = {$this_userid};", 'robot_token');
         $db_existing_robots = !empty($db_existing_robots) ? array_column($db_existing_robots, 'robot_token') : array();
         foreach ($mmrpg_users_robots_records AS $robot_token => $robot_info){
@@ -716,6 +810,12 @@ class legacy_rpg_game {
             $db->insert('mmrpg_users_stars', $star_info);
         }
 
+        // Delete existing missions for this user from the database, then loop through and re-insert current ones
+        $db->query("DELETE FROM mmrpg_users_missions_records WHERE user_id = {$this_userid};");
+        foreach ($mmrpg_users_missions_records AS $record_key => $record_info){
+            $db->insert('mmrpg_users_missions_records', $record_info);
+        }
+
         // Create index arrays for all players and robots to save
         if ($echo && defined('MMRPG_ADMIN_AJAX_REQUEST')){
             global $this_ajax_request_feedback;
@@ -729,6 +829,7 @@ class legacy_rpg_game {
             $this_ajax_request_feedback .= '$mmrpg_users_robots_records('.count($mmrpg_users_robots_records).')'.PHP_EOL;
             $this_ajax_request_feedback .= '$mmrpg_users_items('.count($mmrpg_users_items).')'.PHP_EOL;
             $this_ajax_request_feedback .= '$mmrpg_users_stars('.count($mmrpg_users_stars).')'.PHP_EOL;
+            $this_ajax_request_feedback .= '$mmrpg_users_missions_records('.count($mmrpg_users_missions_records).')'.PHP_EOL;
         }
 
         //exit();
