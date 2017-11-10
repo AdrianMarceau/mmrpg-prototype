@@ -554,16 +554,41 @@ class rpg_battle extends rpg_object {
 
             // Update the GAME session variable with the failed battle token
             if ($this->battle_counts){
+
                 // DEBUG
                 //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
                 $bak_session_array = isset($_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token] : array();
+
+                // Generate a new session array for this battle
                 $new_session_array = array('battle_token' => $this->battle_token, 'battle_count' => 0, 'battle_level' => 0);
                 if (!empty($bak_session_array['battle_count'])){ $new_session_array['battle_count'] = $bak_session_array['battle_count']; }
                 if (!empty($bak_session_array['battle_level'])){ $new_session_array['battle_level'] = $bak_session_array['battle_level']; }
                 $new_session_array['battle_level'] = $this->battle_level;
                 $new_session_array['battle_count']++;
+
+                // Create a new entry in the database for this battle (assuming it's not demo)
+                if (!rpg_game::is_demo()){
+                    $temp_userid = rpg_game::session_userid();
+                    $new_mission_result = array();
+                    $new_mission_result['user_id'] = $temp_userid;
+                    $new_mission_result['player_token'] = $target_player->player_token;
+                    $new_mission_result['mission_token'] = $this->battle_token;
+                    $new_mission_result['mission_result'] = 'failure';
+                    $new_mission_result['mission_level'] = $this->battle_level;
+                    $new_mission_result['mission_turns_target'] = $this->battle_turns;
+                    $new_mission_result['mission_turns_used'] = $this->counters['battle_turn'];
+                    $new_mission_result['mission_robots_target'] = $this_player->counters['robots_total'];
+                    $new_mission_result['mission_robots_used'] = $target_player->counters['robots_total'];
+                    $new_mission_result['mission_points_base'] = $this->battle_points;
+                    $new_mission_result['mission_points_earned'] = $temp_human_rewards['battle_points'];
+                    $new_mission_result['mission_date'] = time();
+                    $db->insert('mmrpg_users_missions_records', $new_mission_result);
+                }
+
+                // And also add this battle to the session's failure array
                 $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token] = $new_session_array;
                 $temp_human_rewards['battle_failure'] = $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token]['battle_count'];
+
             }
 
             // Recalculate the overall battle points total with new values
@@ -1053,6 +1078,25 @@ class rpg_battle extends rpg_object {
                 if ($new_session_array['battle_max_robots'] == 0 || $this_player->counters['robots_total'] > $new_session_array['battle_max_robots']){ $new_session_array['battle_max_robots'] = $this_player->counters['robots_total']; }
                 if ($new_session_array['battle_min_robots'] == 0 || $this_player->counters['robots_total'] < $new_session_array['battle_min_robots']){ $new_session_array['battle_min_robots'] = $this_player->counters['robots_total']; }
                 $new_session_array['battle_count']++;
+
+                // Create a new entry in the database for this battle (assuming it's not demo)
+                if (!rpg_game::is_demo()){
+                    $temp_userid = rpg_game::session_userid();
+                    $new_mission_result = array();
+                    $new_mission_result['user_id'] = $temp_userid;
+                    $new_mission_result['player_token'] = $this_player->player_token;
+                    $new_mission_result['mission_token'] = $this->battle_token;
+                    $new_mission_result['mission_result'] = 'victory';
+                    $new_mission_result['mission_level'] = $this->battle_level;
+                    $new_mission_result['mission_turns_target'] = $this->battle_turns;
+                    $new_mission_result['mission_turns_used'] = $this->counters['battle_turn'];
+                    $new_mission_result['mission_robots_target'] = $target_player->counters['robots_total'];
+                    $new_mission_result['mission_robots_used'] = $this_player->counters['robots_total'];
+                    $new_mission_result['mission_points_base'] = $this->battle_points;
+                    $new_mission_result['mission_points_earned'] = $temp_human_rewards['battle_points'];
+                    $new_mission_result['mission_date'] = time();
+                    $db->insert('mmrpg_users_missions_records', $new_mission_result);
+                }
 
                 // Update the session variable for this player with the updated battle values
                 $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] = $new_session_array;
