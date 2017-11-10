@@ -1629,6 +1629,14 @@ class rpg_game {
         else { return 'GAME'; }
     }
 
+
+    // Define a function for collecting the current USERID token
+    public static function session_userid(){
+        $session_token = self::session_token();
+        if (!empty($_SESSION[$session_token]['USER']['userid'])){ return $_SESSION[$session_token]['USER']['userid']; }
+        else { return 0; }
+    }
+
     // Define a function for starting the game session
     public static function start_session(){
 
