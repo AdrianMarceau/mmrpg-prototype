@@ -92,13 +92,13 @@ function mmrpg_load_game_session(){
         $new_game_data['values'] = !empty($this_database_user_save['save_values']) ? json_decode($this_database_user_save['save_values'], true) : array();
 
         if (!empty($this_database_user_save['save_values_battle_complete'])){
-            $new_game_data['values']['battle_complete'] = json_decode($this_database_user_save['save_values_battle_complete'], true);
-            $new_game_data['values']['battle_complete_hash'] = md5($this_database_user_save['save_values_battle_complete']);
+            //$new_game_data['values']['battle_complete'] = json_decode($this_database_user_save['save_values_battle_complete'], true);
+            //$new_game_data['values']['battle_complete_hash'] = md5($this_database_user_save['save_values_battle_complete']);
         }
 
         if (!empty($this_database_user_save['save_values_battle_failure'])){
-            $new_game_data['values']['battle_failure'] = json_decode($this_database_user_save['save_values_battle_failure'], true);
-            $new_game_data['values']['battle_failure_hash'] = md5($this_database_user_save['save_values_battle_failure']);
+            //$new_game_data['values']['battle_failure'] = json_decode($this_database_user_save['save_values_battle_failure'], true);
+            //$new_game_data['values']['battle_failure_hash'] = md5($this_database_user_save['save_values_battle_failure']);
         }
 
         // Collect battle rewards and settings for this user from the database
@@ -121,16 +121,23 @@ function mmrpg_load_game_session(){
         // Collect any unlocked alts for this user from the database
         $new_game_data['values']['robot_alts'] = rpg_user::get_robot_alts($login_user_id);
 
+        // Collect any encounter records for this user from the database
+        $new_game_data['values']['robot_database'] = rpg_user::get_robot_database($login_user_id);
+
+        // Collect any mission records for this user from the database
+        $new_game_data['values']['battle_complete'] = rpg_user::get_mission_records($login_user_id, 'victory');
+        $new_game_data['values']['battle_failure'] = rpg_user::get_mission_records($login_user_id, 'defeat');
+
         // Decode this user's battle settings if any have been created
         $new_game_data['battle_settings'] = !empty($this_database_user_save['save_settings']) ? json_decode($this_database_user_save['save_settings'], true) : array();
 
+        //echo('<pre>$new_game_data = '.print_r($new_game_data, true).'</pre><hr />'.PHP_EOL);
 
         // Update the session with the new save info
         $_SESSION[$session_token] = array_merge($_SESSION[$session_token], $new_game_data);
         unset($new_game_data);
 
         //echo('<pre>$_SESSION[\''.$session_token.'\'] = '.print_r($_SESSION[$session_token], true).'</pre><hr />'.PHP_EOL);
-        //echo('<pre>$new_game_data = '.print_r($new_game_data, true).'</pre><hr />'.PHP_EOL);
 
         //exit();
 
