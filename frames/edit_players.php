@@ -55,12 +55,12 @@ foreach ($battle_settings AS $player_token => $player_info){
 // Define the index of allowable players to appear in the edit
 $allowed_edit_players = array();
 $allowed_edit_data = array();
-foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){
-    if (empty($player_token) || !isset($mmrpg_index['players'][$player_token])){ continue; }
-    $player_info = array_merge($mmrpg_index['players'][$player_token], $player_info);
-    $player_info['player_image'] = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
-    $allowed_edit_players[] = $player_info;
-    $allowed_edit_data[$player_token] = $player_info;
+foreach ($mmrpg_database_players AS $player_token => $player_index_info){
+    if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token])){
+        $player_info = array_merge($player_index_info, $_SESSION[$session_token]['values']['battle_settings'][$player_token]);
+        $allowed_edit_players[] = $player_info;
+        $allowed_edit_data[$player_token] = $player_info;
+    }
 }
 $allowed_edit_data_count = !empty($allowed_edit_players) ? count($allowed_edit_players) : 0;
 $allowed_edit_player_count = !empty($allowed_edit_players) ? count($allowed_edit_players) : 0;
@@ -262,14 +262,16 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
 
 // -- RECOLLECT SETTINGS DATA -- //
 
+
 // Define the index of allowable players to appear in the edit
 $allowed_edit_players = array();
 $allowed_edit_data = array();
-foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){
-    if (empty($player_token) || !isset($mmrpg_index['players'][$player_token])){ continue; }
-    $player_info = array_merge($mmrpg_index['players'][$player_token], $player_info);
-    $allowed_edit_players[] = $player_info;
-    $allowed_edit_data[$player_token] = $player_info;
+foreach ($mmrpg_database_players AS $player_token => $player_index_info){
+    if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token])){
+        $player_info = array_merge($player_index_info, $_SESSION[$session_token]['values']['battle_settings'][$player_token]);
+        $allowed_edit_players[] = $player_info;
+        $allowed_edit_data[$player_token] = $player_info;
+    }
 }
 $allowed_edit_data_count = !empty($allowed_edit_players) ? count($allowed_edit_players) : 0;
 $allowed_edit_player_count = !empty($allowed_edit_players) ? count($allowed_edit_players) : 0;
@@ -277,6 +279,7 @@ $allowed_edit_player_count = !empty($allowed_edit_players) ? count($allowed_edit
 
 //echo('<pre>$_SESSION[\''.$session_token.'\'] = '.print_r($_SESSION[$session_token], true).'</pre>');
 //echo('<pre>$_SESSION[\''.$session_token.'\'][\'values\'][\'battle_settings\'] = '.print_r($_SESSION[$session_token]['values']['battle_settings'], true).'</pre>');
+//echo('<pre>$mmrpg_database_players = '.print_r($mmrpg_database_players, true).'</pre>');
 //echo('<pre>$allowed_edit_data = '.print_r($allowed_edit_data, true).'</pre>');
 //exit();
 
