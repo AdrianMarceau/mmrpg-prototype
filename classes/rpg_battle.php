@@ -555,16 +555,38 @@ class rpg_battle extends rpg_object {
             // Update the GAME session variable with the failed battle token
             if ($this->battle_counts){
 
-                // DEBUG
-                //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
-                $bak_session_array = isset($_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token] : array();
+                // Back up the current session array for this battle complete counter
+                $curr_session_array = isset($_SESSION['GAME']['values']['battle_failure'][$this_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_failure'][$this_player->player_token][$this->battle_token] : array();
+                if (!isset($curr_session_array['battle_token'])){ $curr_session_array = array(); }
+                elseif (!isset($curr_session_array['battle_points_earned'])){ $curr_session_array = array(); }
 
-                // Generate a new session array for this battle
-                $new_session_array = array('battle_token' => $this->battle_token, 'battle_count' => 0, 'battle_level' => 0);
-                if (!empty($bak_session_array['battle_count'])){ $new_session_array['battle_count'] = $bak_session_array['battle_count']; }
-                if (!empty($bak_session_array['battle_level'])){ $new_session_array['battle_level'] = $bak_session_array['battle_level']; }
-                $new_session_array['battle_level'] = $this->battle_level;
-                $new_session_array['battle_count']++;
+                // Create the new session array from scratch to ensure all values exist
+                $new_session_array = array(
+                    'battle_token' => $this->battle_token,
+                    'battle_count' => !empty($curr_session_array['battle_count']) ? $curr_session_array['battle_count'] : 0,
+                    'battle_level' => $this->battle_level,
+                    'battle_turns_target' => $this->battle_turns,
+                    'battle_turns_used' => $this->counters['battle_turn'],
+                    'battle_robots_target' => $target_player->counters['robots_total'],
+                    'battle_robots_used' => $this_player->counters['robots_total'],
+                    'battle_points_base' => $this->battle_points,
+                    'battle_points_earned' => $temp_human_rewards['battle_points'],
+                    'battle_date' => time()
+                    );
+
+                // Collect whichever session array is "best" given battle points and use that for saving
+                if (empty($curr_session_array)
+                    || $new_session_array['battle_points_earned'] > $curr_session_array['battle_points_earned']){
+                    $best_session_array = $new_session_array;
+                } else {
+                    $best_session_array = $curr_session_array;
+                }
+
+                // Update the final session array's counter and then add to the actual game session
+                $best_session_array['battle_count']++;
+                $_SESSION['GAME']['values']['battle_failure'][$this_player->player_token][$this->battle_token] = $best_session_array;
+                $temp_human_rewards['battle_failure'] = $best_session_array['battle_count'];
+
 
                 // Create a new entry in the database for this battle (assuming it's not demo)
                 if (!rpg_game::is_demo()){
@@ -584,10 +606,6 @@ class rpg_battle extends rpg_object {
                     $new_mission_result['mission_date'] = time();
                     $db->insert('mmrpg_users_missions_records', $new_mission_result);
                 }
-
-                // And also add this battle to the session's failure array
-                $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token] = $new_session_array;
-                $temp_human_rewards['battle_failure'] = $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token]['battle_count'];
 
             }
 
@@ -1040,44 +1058,36 @@ class rpg_battle extends rpg_object {
                 //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
 
                 // Back up the current session array for this battle complete counter
-                $bak_session_array = isset($_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] : array();
+                $curr_session_array = isset($_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] : array();
+                if (!isset($curr_session_array['battle_token'])){ $curr_session_array = array(); }
+                elseif (!isset($curr_session_array['battle_points_earned'])){ $curr_session_array = array(); }
 
                 // Create the new session array from scratch to ensure all values exist
                 $new_session_array = array(
                     'battle_token' => $this->battle_token,
-                    'battle_count' => 0,
-                    'battle_min_level' => 0,
-                    'battle_max_level' => 0,
-                    'battle_min_turns' => 0,
-                    'battle_max_turns' => 0,
-                    'battle_min_points' => 0,
-                    'battle_max_points' => 0,
-                    'battle_min_robots' => 0,
-                    'battle_max_robots' => 0
+                    'battle_count' => !empty($curr_session_array['battle_count']) ? $curr_session_array['battle_count'] : 0,
+                    'battle_level' => $this->battle_level,
+                    'battle_turns_target' => $this->battle_turns,
+                    'battle_turns_used' => $this->counters['battle_turn'],
+                    'battle_robots_target' => $target_player->counters['robots_total'],
+                    'battle_robots_used' => $this_player->counters['robots_total'],
+                    'battle_points_base' => $this->battle_points,
+                    'battle_points_earned' => $temp_human_rewards['battle_points'],
+                    'battle_date' => time()
                     );
 
-                // Recollect applicable battle values from the backup session array
-                if (!empty($bak_session_array['battle_count'])){ $new_session_array['battle_count'] = $bak_session_array['battle_count']; }
-                if (!empty($bak_session_array['battle_level'])){ $new_session_array['battle_min_level'] = $bak_session_array['battle_level']; } // LEGACY
-                if (!empty($bak_session_array['battle_min_level'])){ $new_session_array['battle_min_level'] = $bak_session_array['battle_min_level']; }
-                if (!empty($bak_session_array['battle_max_level'])){ $new_session_array['battle_max_level'] = $bak_session_array['battle_max_level']; }
-                if (!empty($bak_session_array['battle_min_turns'])){ $new_session_array['battle_min_turns'] = $bak_session_array['battle_min_turns']; }
-                if (!empty($bak_session_array['battle_max_turns'])){ $new_session_array['battle_max_turns'] = $bak_session_array['battle_max_turns']; }
-                if (!empty($bak_session_array['battle_min_points'])){ $new_session_array['battle_min_points'] = $bak_session_array['battle_min_points']; }
-                if (!empty($bak_session_array['battle_max_points'])){ $new_session_array['battle_max_points'] = $bak_session_array['battle_max_points']; }
-                if (!empty($bak_session_array['battle_min_robots'])){ $new_session_array['battle_min_robots'] = $bak_session_array['battle_min_robots']; }
-                if (!empty($bak_session_array['battle_max_robots'])){ $new_session_array['battle_max_robots'] = $bak_session_array['battle_max_robots']; }
+                // Collect whichever session array is "best" given battle points and use that for saving
+                if (empty($curr_session_array)
+                    || $new_session_array['battle_points_earned'] > $curr_session_array['battle_points_earned']){
+                    $best_session_array = $new_session_array;
+                } else {
+                    $best_session_array = $curr_session_array;
+                }
 
-                // Update and/or increment the appropriate battle variables in the new array
-                if ($new_session_array['battle_max_level'] == 0 || $this->battle_level > $new_session_array['battle_max_level']){ $new_session_array['battle_max_level'] = $this->battle_level; }
-                if ($new_session_array['battle_min_level'] == 0 || $this->battle_level < $new_session_array['battle_min_level']){ $new_session_array['battle_min_level'] = $this->battle_level; }
-                if ($new_session_array['battle_max_turns'] == 0 || $this->counters['battle_turn'] > $new_session_array['battle_max_turns']){ $new_session_array['battle_max_turns'] = $this->counters['battle_turn']; }
-                if ($new_session_array['battle_min_turns'] == 0 || $this->counters['battle_turn'] < $new_session_array['battle_min_turns']){ $new_session_array['battle_min_turns'] = $this->counters['battle_turn']; }
-                if ($new_session_array['battle_max_points'] == 0 || $temp_human_rewards['battle_points'] > $new_session_array['battle_max_points']){ $new_session_array['battle_max_points'] = $temp_human_rewards['battle_points']; }
-                if ($new_session_array['battle_min_points'] == 0 || $temp_human_rewards['battle_points'] < $new_session_array['battle_min_points']){ $new_session_array['battle_min_points'] = $temp_human_rewards['battle_points']; }
-                if ($new_session_array['battle_max_robots'] == 0 || $this_player->counters['robots_total'] > $new_session_array['battle_max_robots']){ $new_session_array['battle_max_robots'] = $this_player->counters['robots_total']; }
-                if ($new_session_array['battle_min_robots'] == 0 || $this_player->counters['robots_total'] < $new_session_array['battle_min_robots']){ $new_session_array['battle_min_robots'] = $this_player->counters['robots_total']; }
-                $new_session_array['battle_count']++;
+                // Update the final session array's counter and then add to the actual game session
+                $best_session_array['battle_count']++;
+                $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] = $best_session_array;
+                $temp_human_rewards['battle_complete'] = $best_session_array['battle_count'];
 
                 // Create a new entry in the database for this battle (assuming it's not demo)
                 if (!rpg_game::is_demo()){
@@ -1097,10 +1107,6 @@ class rpg_battle extends rpg_object {
                     $new_mission_result['mission_date'] = time();
                     $db->insert('mmrpg_users_missions_records', $new_mission_result);
                 }
-
-                // Update the session variable for this player with the updated battle values
-                $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] = $new_session_array;
-                $temp_human_rewards['battle_complete'] = $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token]['battle_count'];
 
                 // Recalculate the overall battle points total with new values
                 mmrpg_prototype_calculate_battle_points(true);
