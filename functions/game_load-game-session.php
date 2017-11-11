@@ -91,16 +91,6 @@ function mmrpg_load_game_session(){
         $new_game_data['counters'] = !empty($this_database_user_save['save_counters']) ? json_decode($this_database_user_save['save_counters'], true) : array();
         $new_game_data['values'] = !empty($this_database_user_save['save_values']) ? json_decode($this_database_user_save['save_values'], true) : array();
 
-        if (!empty($this_database_user_save['save_values_battle_complete'])){
-            //$new_game_data['values']['battle_complete'] = json_decode($this_database_user_save['save_values_battle_complete'], true);
-            //$new_game_data['values']['battle_complete_hash'] = md5($this_database_user_save['save_values_battle_complete']);
-        }
-
-        if (!empty($this_database_user_save['save_values_battle_failure'])){
-            //$new_game_data['values']['battle_failure'] = json_decode($this_database_user_save['save_values_battle_failure'], true);
-            //$new_game_data['values']['battle_failure_hash'] = md5($this_database_user_save['save_values_battle_failure']);
-        }
-
         // Collect battle rewards and settings for this user from the database
         $raw_battle_vars = rpg_user::get_battle_vars($login_user_id);
         $new_game_data['values']['battle_rewards'] = $raw_battle_vars['battle_rewards'];

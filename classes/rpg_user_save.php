@@ -72,8 +72,6 @@ class rpg_user_save {
         $index_fields = array(
             'save_id',
             'user_id',
-            'save_values_battle_complete',
-            'save_values_battle_failure',
             'save_file_name',
             'save_file_path',
             'save_patches_applied'
