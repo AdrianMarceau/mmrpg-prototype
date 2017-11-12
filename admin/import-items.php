@@ -46,7 +46,9 @@ foreach ($mmrpg_database_types AS $type_token => $type_info){
         $hidden_database_items[] = $type_token.'-shard';
     }
 }
-$hidden_database_items = array_merge($hidden_database_items, array('heart', 'star'));
+$hidden_item_tokens = array();
+$hidden_item_tokens[] = 'star';
+$hidden_database_items = array_merge($hidden_database_items, $hidden_item_tokens);
 $hidden_database_items_count = !empty($hidden_database_items) ? count($hidden_database_items) : 0;
 
 // Truncate any robots currently in the database
@@ -152,9 +154,8 @@ $temp_pattern_last[] = '/^fusion-star$/i';
 $types = implode('|', array_keys($mmrpg_database_types));
 $temp_pattern_last[] = '/^('.$types.')-star$/i';
 
-//$temp_pattern_last[] = '/^heart$/i';
-//
 $temp_pattern_last = array_reverse($temp_pattern_last);
+
 //die('$temp_pattern_last = <pre>'.print_r($temp_pattern_last, true).'</pre>');
 function mmrpg_index_sort_items($item_one, $item_two){
     // Pull in global variables

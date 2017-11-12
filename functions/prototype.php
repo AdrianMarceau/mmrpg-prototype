@@ -481,19 +481,6 @@ function mmrpg_prototype_robots_unlocked($player_token = ''){
     }
 
 }
-// Define a function for checking how many hearts have been unlocked by a player
-function mmrpg_prototype_hearts_unlocked($player_token = ''){
-    // Define the game session helper var
-    $session_token = mmrpg_game_token();
-    if (empty($_SESSION[$session_token]['counters']['battle_hearts'])){ $_SESSION[$session_token]['counters']['battle_hearts'] = array(); }
-    if (!empty($player_token) && empty($_SESSION[$session_token]['counters']['battle_hearts'][$player_token])){ $_SESSION[$session_token]['counters']['battle_hearts'][$player_token] = 0; }
-    if (!empty($player_token)){ return $_SESSION[$session_token]['counters']['battle_hearts'][$player_token]; }
-    else {
-     $temp_counter = 0;
-     foreach ($_SESSION[$session_token]['counters']['battle_hearts'] AS $player_token => $heart_counter){ $temp_counter += $heart_counter; }
-     return $temp_counter;
-    }
-}
 // Define a function for checking is a prototype star has been unlocked
 function mmrpg_prototype_star_unlocked($star_token){
     $session_token = mmrpg_game_token();

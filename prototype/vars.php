@@ -14,7 +14,6 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
     $robot_counter_light = $unlock_flag_light ? mmrpg_prototype_robots_unlocked('dr-light') : 0;
     //$ability_counter_light = $unlock_flag_light ? mmrpg_prototype_abilities_unlocked('dr-light') : 0;
     //$star_counter_light = $unlock_flag_light ? mmrpg_prototype_stars_unlocked('dr-light') : 0;
-    //$heart_counter_light = $unlock_flag_light ? mmrpg_prototype_hearts_unlocked('dr-light') : 0;
     $battle_complete_counter_light = $unlock_flag_light ? mmrpg_prototype_battles_complete('dr-light') : 0;
     $battle_failure_counter_light = $unlock_flag_light ? mmrpg_prototype_battles_failure('dr-light') : 0;
     //$battle_complete_counter_light_total = $unlock_flag_light ? mmrpg_prototype_battles_complete('dr-light', false) : 0;
@@ -37,7 +36,6 @@ else {
     if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-light', $this_data_condition)){
         $ability_counter_light = $unlock_flag_light ? mmrpg_prototype_abilities_unlocked('dr-light') : 0;
         $star_counter_light = $unlock_flag_light ? mmrpg_prototype_stars_unlocked('dr-light') : 0;
-        //$heart_counter_light = $unlock_flag_light ? mmrpg_prototype_hearts_unlocked('dr-light') : 0;
     }
     $battle_complete_counter_light = $unlock_flag_light ? mmrpg_prototype_battles_complete('dr-light') : 0;
     $battle_failure_counter_light = $unlock_flag_light ? mmrpg_prototype_battles_failure('dr-light') : 0;
@@ -55,7 +53,6 @@ else {
     if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-wily', $this_data_condition)){
         $ability_counter_wily = $unlock_flag_wily ? mmrpg_prototype_abilities_unlocked('dr-wily') : 0;
         $star_counter_wily = $unlock_flag_wily ? mmrpg_prototype_stars_unlocked('dr-wily') : 0;
-        //$heart_counter_wily = $unlock_flag_wily ? mmrpg_prototype_hearts_unlocked('dr-wily') : 0;
     }
     $battle_complete_counter_wily = $unlock_flag_wily ? mmrpg_prototype_battles_complete('dr-wily') : 0;
     $battle_failure_counter_wily = $unlock_flag_wily ? mmrpg_prototype_battles_failure('dr-wily') : 0;
@@ -73,7 +70,6 @@ else {
     if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-cossack', $this_data_condition)){
         $ability_counter_cossack = $unlock_flag_cossack ? mmrpg_prototype_abilities_unlocked('dr-cossack') : 0;
         $star_counter_cossack = $unlock_flag_cossack ? mmrpg_prototype_stars_unlocked('dr-cossack') : 0;
-        //$heart_counter_cossack = $unlock_flag_cossack ? mmrpg_prototype_hearts_unlocked('dr-cossack') : 0;
     }
     $battle_complete_counter_cossack = $unlock_flag_cossack ? mmrpg_prototype_battles_complete('dr-cossack') : 0;
     $battle_failure_counter_cossack = $unlock_flag_cossack ? mmrpg_prototype_battles_failure('dr-cossack') : 0;

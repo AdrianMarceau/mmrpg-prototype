@@ -1529,7 +1529,7 @@ class rpg_player extends rpg_object {
         $_SESSION['GAME']['values']['battle_items'][$temp_item_token] += $item_quantity_dropped;
 
         // If this item is not on the list of key items (un-equippable), don't add it
-        $temp_key_items = array('large-screw', 'small-screw', 'heart', 'star');
+        $temp_key_items = array('large-screw', 'small-screw', 'star');
         if (!in_array($temp_item_token, $temp_key_items)){
             // If there is room in this player's current item omega, add the new item
             $temp_session_token = $target_player->player_token.'_this-item-omega_prototype';
@@ -2641,9 +2641,10 @@ class rpg_player extends rpg_object {
         $player_info['player_field_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'field');
         $player_info['player_fusion_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'fusion');
         $player_info['player_screw_counter'] = 0;
-        $player_info['player_heart_counter'] = 0;
+
         // Define the player's experience points total
         $player_info['player_experience'] = 0;
+
         // Collect this player's current defined omega item list
         if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
             //$debug_experience_sum = $player_token.' : ';

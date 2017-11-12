@@ -29,7 +29,6 @@ $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'protot
 // -- GENERATE EDITOR MARKUP
 
 // Manually remove items that should not show here
-unset($mmrpg_database_items['heart']);
 unset($mmrpg_database_items['star']);
 
 // Define which items we're allowed to see

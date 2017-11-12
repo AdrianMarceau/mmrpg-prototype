@@ -81,7 +81,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
         $player_info['player_field_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'field');
         $player_info['player_fusion_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'fusion');
         $player_info['player_screw_counter'] = 0;
-        $player_info['player_heart_counter'] = 0;
+
         // Define the player's experience points total
         $player_info['player_experience'] = 0;
         if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
@@ -347,7 +347,7 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
         $player_info['player_field_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'field');
         $player_info['player_fusion_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'fusion');
         $player_info['player_screw_counter'] = 0;
-        $player_info['player_heart_counter'] = 0;
+
         // Define the player's experience points total
         $player_info['player_experience'] = 0;
         if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
@@ -626,7 +626,7 @@ if ($battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
         $player_info['player_field_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'field');
         $player_info['player_fusion_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'fusion');
         $player_info['player_screw_counter'] = 0;
-        $player_info['player_heart_counter'] = 0;
+
         // Define the player's experience points total
         $player_info['player_experience'] = 0;
         if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
