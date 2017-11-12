@@ -348,11 +348,15 @@ class rpg_user {
 
         // Pull a list of unlocked players for this user from the database
         $raw_players = $db->get_array_list("SELECT
-            `user_id`,
-            `player_token`,
-            `player_points`
-            FROM mmrpg_users_players
-            WHERE `user_id` = {$user_id}
+            uplayers.`user_id`,
+            uplayers.`player_token`,
+            uplayers.`player_points`,
+            iplayers.`player_order`
+            FROM mmrpg_users_players AS uplayers
+            LEFT JOIN mmrpg_index_players AS iplayers ON iplayers.player_token = uplayers.player_token
+            WHERE uplayers.`user_id` = {$user_id}
+            ORDER BY
+            iplayers.`player_order` ASC
             ;");
         if (empty($raw_players)){ return array(); }
 
@@ -505,6 +509,7 @@ class rpg_user {
             `robot_values`
             FROM mmrpg_users_robots
             WHERE `user_id` = {$user_id}
+            ORDER BY `robot_order` ASC
             ;");
         if (empty($raw_robots)){ return array(); }
 
@@ -725,8 +730,9 @@ class rpg_user {
                     $robot_settings['values'] = !empty($robot_info['robot_values']) ? json_decode($robot_info['robot_values'], true) : array();
                     $robot_settings['counters'] = !empty($robot_info['robot_counters']) ? json_decode($robot_info['robot_counters'], true) : array();
                     $robot_settings['robot_token'] = $robot_info['robot_token'];
-                    $robot_settings['robot_core'] = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
                     $robot_settings['robot_image'] = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : '';
+                    $robot_settings['robot_core'] = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+                    $robot_settings['robot_item'] = !empty($robot_info['robot_item']) ? $robot_info['robot_item'] : '';
                     $robot_settings['original_player'] = !empty($robot_info['original_player']) ? $robot_info['original_player'] : '';
                     $robot_settings['robot_abilities'] = array();
 
