@@ -220,7 +220,7 @@
                     $temp_info_tooltip = $star_info_name.'<br /> ';
                     $temp_info_tooltip .= '<span style="font-size:80%;">';
                     $temp_info_tooltip .= ucfirst($star_info['star_kind']).' Star | '.$star_info_type_title.' Type';
-                    if (!empty($star_info_date)){ $temp_info_tooltip .= ' <br />Found '.date('Y/m/d', $star_info_date); }
+                    if (!empty($star_info_date)){ $temp_info_tooltip .= ' <br />Found '.date('Y-m-d', $star_info_date); }
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                     $temp_info_tooltip .= '</span>';
 

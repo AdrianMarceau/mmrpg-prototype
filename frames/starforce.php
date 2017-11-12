@@ -577,7 +577,7 @@ gameSettings.autoScrollTop = false;
                                                         */
 
                                                         if (!empty($temp_star_date)){
-                                                            $temp_star_title .= ' <br />Found '.date('Y/m/d', $temp_star_date);
+                                                            $temp_star_title .= ' <br />Found '.date('Y-m-d', $temp_star_date);
                                                         }
 
                                                     $temp_star_title .= '</span>';
