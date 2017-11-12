@@ -103,8 +103,8 @@ function mmrpg_prototype_calculate_player_points($player_token, $update_session 
     // If the player has completed battles, loop through them and add up points
     if (!empty($_GAME['values']['battle_complete'][$player_token])){
         foreach ($_GAME['values']['battle_complete'][$player_token] AS $battle_token => $battle_records){
-            if (!empty($battle_records['battle_max_points'])){
-                $player_battle_points += $battle_records['battle_max_points'];
+            if (!empty($battle_records['battle_points_earned'])){
+                $player_battle_points += $battle_records['battle_points_earned'];
             }
         }
     }
