@@ -1918,7 +1918,7 @@ class rpg_game {
         // If players not empty, loop through and save each to session
         if (!empty($player_tokens)){
             $player_tokens = array_values($player_tokens);
-            foreach ($player_tokens AS $player_token){
+            foreach ($player_tokens AS $player_key => $player_token){
                 if (empty($player_token) || $player_token == 'player'){ continue; }
                 elseif (!in_array($player_token, $allowed_players['unlockable'])){ continue; }
                 //echo('$player_token = '.print_r($player_token, true).PHP_EOL);
@@ -1930,7 +1930,7 @@ class rpg_game {
 
                 // If robots not empty, loop through and save each to session
                 if (!empty($mmrpg_player['player_robots_unlocked'])){
-                    foreach ($mmrpg_player['player_robots_unlocked'] AS $robot_token){
+                    foreach ($mmrpg_player['player_robots_unlocked'] AS $robot_key => $robot_token){
                         if (empty($robot_token) || $robot_token == 'robot'){ continue; }
                         elseif (!in_array($robot_token, $allowed_robots['unlockable'])){ continue; }
 
@@ -1994,6 +1994,8 @@ class rpg_game {
                         if (!empty($robot_settings['values'])){ $robot_values = array_merge($robot_values, $robot_settings['values']); }
                         if (!empty($robot_rewards['values'])){ $robot_values = array_merge($robot_values, $robot_rewards['values']); }
                         $mmrpg_robot['robot_values'] = !empty($robot_values) ? json_encode($robot_values) : '';
+
+                        $mmrpg_robot['robot_order'] = $robot_key;
 
                         // Update save index with new robot info
                         $mmrpg_users_robots[$robot_token] = $mmrpg_robot;
