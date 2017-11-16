@@ -2002,6 +2002,7 @@ class rpg_robot extends rpg_object {
             'robot_class',
             'robot_gender',
             'robot_image',
+            'robot_image_sheets',
             'robot_image_size',
             'robot_image_editor',
             'robot_image_alts',
@@ -2892,22 +2893,25 @@ class rpg_robot extends rpg_object {
                     // Define the alts we'll be looping through for this robot
                     $temp_alts_array = array();
                     $temp_alts_array[] = array('token' => '', 'name' => $robot_info['robot_name'], 'summons' => 0);
-                    // Append predefined alts automatically, based on the robot image alt array
-                    if (!empty($robot_info['robot_image_alts'])){
-                        $temp_alts_array = array_merge($temp_alts_array, $robot_info['robot_image_alts']);
+
+                    // If this robot has multiple sheets, add them as alt options
+                    if (!empty($robot_info['robot_image_sheets'])){
+                        for ($i = 2; $i <= $robot_info['robot_image_sheets']; $i++){
+                            $temp_alts_array[] = array('sheet' => $i, 'name' => $robot_info['robot_name'].' (Sheet #'.$i.')', 'summons' => 0);
+                        }
                     }
-                    // Otherwise, if this is a copy robot, append based on all the types in the index
-                    elseif ($robot_info['robot_core'] == 'copy' && preg_match('/^(mega-man|proto-man|bass|doc-robot)$/i', $robot_info['robot_token'])){
+
+                    // Ff this is a copy robot, append based on all the types in the index
+                    if ($robot_info['robot_core'] == 'copy' && preg_match('/^(mega-man|proto-man|bass|doc-robot)$/i', $robot_info['robot_token'])){
                         foreach ($mmrpg_database_types AS $type_token => $type_info){
                             if (empty($type_token) || $type_token == 'none' || $type_token == 'copy'){ continue; }
                             $temp_alts_array[] = array('token' => $type_token, 'name' => $robot_info['robot_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0);
                         }
                     }
-                    // Otherwise, if this robot has multiple sheets, add them as alt options
-                    elseif (!empty($robot_info['robot_image_sheets'])){
-                        for ($i = 2; $i <= $robot_info['robot_image_sheets']; $i++){
-                            $temp_alts_array[] = array('sheet' => $i, 'name' => $robot_info['robot_name'].' (Sheet #'.$i.')', 'summons' => 0);
-                        }
+
+                    // Append predefined alts automatically, based on the robot image alt array
+                    if (!empty($robot_info['robot_image_alts'])){
+                        $temp_alts_array = array_merge($temp_alts_array, $robot_info['robot_image_alts']);
                     }
 
                     // Loop through the alts and display images for them (yay!)
@@ -2918,6 +2922,7 @@ class rpg_robot extends rpg_object {
                         $temp_robot_image_token .= !empty($alt_info['token']) ? '_'.$alt_info['token'] : '';
                         $temp_robot_image_token .= !empty($alt_info['sheet']) ? '-'.$alt_info['sheet'] : '';
                         $temp_robot_image_name = $alt_info['name'];
+
                         // Update the alt array with this info
                         $temp_alts_array[$alt_key]['image'] = $temp_robot_image_token;
 
@@ -2988,12 +2993,15 @@ class rpg_robot extends rpg_object {
                                         $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; ';
                                     }
                                     else {
-                                        $alt_name = $alt_key == 0 ? $robot_info['robot_name'] : 'Alt'.($alt_key > 1 ? ' '.$alt_key : '');
+                                        if ($alt_key == 0){ $alt_name = $robot_info['robot_name']; }
+                                        elseif (isset($alt_info['sheet'])){ $alt_name = 'Sheet '.$alt_info['sheet']; }
+                                        elseif (isset($alt_info['token'])){ $alt_name = ucfirst(preg_replace('/^([a-z]+)([0-9]+)$/', '$1 $2', $alt_info['token'])); }
+
+                                        //$alt_name = $alt_key == 0 ? $robot_info['robot_name'] : 'Alt'.($alt_key > 1 ? ' '.$alt_key : '');
                                         $alt_type = 'robot_type type_empty ';
                                         $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ';
                                         //if ($robot_info['robot_core'] == 'copy' && $alt_key == 0){ $alt_type = 'robot_type type_empty '; }
                                     }
-
                                     echo '<a href="#" data-tooltip="'.$alt_title.'" data-tooltip-type="'.$alt_title_type.'" class="link link_image '.($alt_key == 0 ? 'link_active ' : '').'" data-image="'.$alt_info['image'].'">';
                                     echo '<span class="'.$alt_type.'" style="'.$alt_style.'">'.$alt_name.'</span>';
                                     echo '</a>';
