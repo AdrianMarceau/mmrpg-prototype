@@ -6,6 +6,9 @@ $robot = array(
     'robot_name' => 'Proto Man',
     'robot_token' => 'proto-man',
     'robot_image_editor' => 412,
+    'robot_image_alts' => array(
+        array('token' => 'alt9', 'name' => 'Proto Man (Darkness Alt)', 'summons' => 1800, 'colour' => 'empty')
+        ),
     'robot_core' => 'copy',
     'robot_description' => 'Renegade Prototype Robot',
     'robot_description2' => 'Originally the prototype of all robots, he became a renegade and stopped villainy in the shadows. Reproductions of this unit have been made over all the battling lately and have proved to be powerful fighters. They have the Proto Buster, Proto Shield, a copy chip, and the Proto Strike, a powerful technique capable of changing the tide of battle. They are usually resilient and like to make their own choices, but usually never show acts of evil. Despite being a prototype of robots, this unit has great power and speed with good whistling skill, too!',

@@ -6,6 +6,9 @@ $robot = array(
     'robot_name' => 'Mega Man',
     'robot_token' => 'mega-man',
     'robot_image_editor' => 412,
+    'robot_image_alts' => array(
+        array('token' => 'alt9', 'name' => 'Mega Man (Darkness Alt)', 'summons' => 1800, 'colour' => 'empty')
+        ),
     'robot_core' => 'copy',
     'robot_description' => 'Super Fighting Robot',
     'robot_field' => 'light-laboratory',

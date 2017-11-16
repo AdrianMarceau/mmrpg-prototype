@@ -12,7 +12,8 @@ $robot = array(
         array('token' => 'alt2', 'name' => 'Cute Dress Rhythm', 'summons' => 100, 'colour' => 'nature'),
         array('token' => 'alt3', 'name' => 'Cute Dress Rhythm (Proto Alt)', 'summons' => 150, 'colour' => 'flame'),
         array('token' => 'alt4', 'name' => 'Mobile Suit Rhythm', 'summons' => 200, 'colour' => 'nature'),
-        array('token' => 'alt5', 'name' => 'Mobile Suit Rhythm (Proto Alt)', 'summons' => 250, 'colour' => 'flame')
+        array('token' => 'alt5', 'name' => 'Mobile Suit Rhythm (Proto Alt)', 'summons' => 250, 'colour' => 'flame'),
+        array('token' => 'alt9', 'name' => 'Rhythm (Darkness Alt)', 'summons' => 450, 'colour' => 'empty')
         ),
     'robot_description' => 'Genius Hacker Robot',
     'robot_description2' => 'Rhythm is a digital support robot coded by Dr. Cossack and integrated directly into the data of the prototype.  Rhythm\'s initial function was to act as kind of debug tool for the two doctors during the prototype\'s development, tweaking values and swapping parameters as needed, but recent events have forced Cossack to clone her data for battle purposes instead.  As a genius hacker, the Rhythm series excels in abilities that modify the system from the inside to alter the conditions of battle in strange and unusual ways. With abilities that allow her to swap and shuffle robot stats at will, the Rhythm series is both a great ally and a formidable, unpredictable foe.',

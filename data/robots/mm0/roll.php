@@ -12,7 +12,8 @@ $robot = array(
         array('token' => 'alt2', 'name' => 'Button Dress Roll', 'summons' => 100, 'colour' => 'flame'),
         array('token' => 'alt3', 'name' => 'Button Dress Roll (Mega Alt)', 'summons' => 150, 'colour' => 'water'),
         array('token' => 'alt4', 'name' => 'Heart Suit Roll', 'summons' => 200, 'colour' => 'flame'),
-        array('token' => 'alt5', 'name' => 'Heart Suit Roll (Mega Alt)', 'summons' => 250, 'colour' => 'water')
+        array('token' => 'alt5', 'name' => 'Heart Suit Roll (Mega Alt)', 'summons' => 250, 'colour' => 'water'),
+        array('token' => 'alt9', 'name' => 'Roll (Darkness Alt)', 'summons' => 450, 'colour' => 'empty')
         ),
     'robot_description' => 'Lab Assistant Robot',
     'robot_description2' => 'Originally created to clean houses and other things, this model has lately shown signs of battle and can match with their brother unit, Mega Man. They show great gymnastic skill and can even fight with simple household materials such as brooms and vacuums. They typically show traits of stereotypical school girls, but sometimes shows signs of great aggression. One famous Roll unit is known as the "Queen of Busters" and holds many types of different busters. Although typically support units in battle, they can match in battle with the strongest of robots.',

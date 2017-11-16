@@ -6,6 +6,9 @@ $robot = array(
     'robot_name' => 'Bass',
     'robot_token' => 'bass',
     'robot_image_editor' => 4117,
+    'robot_image_alts' => array(
+        array('token' => 'alt9', 'name' => 'Bass (Darkness Alt)', 'summons' => 1800, 'colour' => 'empty')
+        ),
     'robot_core' => 'copy',
     'robot_description' => 'Strongest Challenger Robot',
     'robot_description2' => 'The original Bass was created to scrap the original Mega Man. They are now used as a weapon of war. The Bass series are usually narcissists and are not often loyal. They are equipped with the Bass Buster and variable weapon system(copy chip). Some Bass units have an adaptor that allows them to fuse with their support unit. The Bass series may be cocky but have great power and ablities to back up that confidence.',
