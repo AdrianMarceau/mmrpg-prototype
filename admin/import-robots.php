@@ -203,6 +203,7 @@ if (!empty($mmrpg_index['robots'])){
         $temp_insert_array['robot_class'] = !empty($robot_data['robot_class']) ? $robot_data['robot_class'] : 'master';
         $temp_insert_array['robot_gender'] = !empty($robot_data['robot_gender']) ? $robot_data['robot_gender'] : ($temp_insert_array['robot_class'] == 'master' ? 'male' : 'none');
         $temp_insert_array['robot_image'] = !empty($robot_data['robot_image']) ? $robot_data['robot_image'] : '';
+        $temp_insert_array['robot_image_sheets'] = !empty($robot_data['robot_image_sheets']) ? $robot_data['robot_image_sheets'] : 1;
         $temp_insert_array['robot_image_size'] = !empty($robot_data['robot_image_size']) ? $robot_data['robot_image_size'] : 40;
         $temp_insert_array['robot_image_editor'] = !empty($robot_data['robot_image_editor']) ? $robot_data['robot_image_editor'] : 0;
         $temp_insert_array['robot_image_alts'] = json_encode(!empty($robot_data['robot_image_alts']) ? $robot_data['robot_image_alts'] : array());
@@ -425,6 +426,7 @@ if (!empty($mmrpg_index['mechas'])){
         $temp_insert_array['robot_class'] = !empty($mecha_data['robot_class']) ? $mecha_data['robot_class'] : 'master';
         $temp_insert_array['robot_gender'] = !empty($mecha_data['robot_gender']) ? $mecha_data['robot_gender'] : ($temp_insert_array['robot_class'] == 'master' ? 'male' : 'none');
         $temp_insert_array['robot_image'] = !empty($mecha_data['robot_image']) ? $mecha_data['robot_image'] : '';
+        $temp_insert_array['robot_image_sheets'] = !empty($mecha_data['robot_image_sheets']) ? $mecha_data['robot_image_sheets'] : 1;
         $temp_insert_array['robot_image_size'] = !empty($mecha_data['robot_image_size']) ? $mecha_data['robot_image_size'] : 40;
         $temp_insert_array['robot_image_editor'] = !empty($mecha_data['robot_image_editor']) ? $mecha_data['robot_image_editor'] : 0;
         $temp_insert_array['robot_image_alts'] = json_encode(!empty($mecha_data['robot_image_alts']) ? $mecha_data['robot_image_alts'] : array());
@@ -648,6 +650,7 @@ if (!empty($mmrpg_index['bosses'])){
         $temp_insert_array['robot_class'] = !empty($boss_data['robot_class']) ? $boss_data['robot_class'] : 'master';
         $temp_insert_array['robot_gender'] = !empty($boss_data['robot_gender']) ? $boss_data['robot_gender'] : ($temp_insert_array['robot_class'] == 'master' ? 'male' : 'none');
         $temp_insert_array['robot_image'] = !empty($boss_data['robot_image']) ? $boss_data['robot_image'] : '';
+        $temp_insert_array['robot_image_sheets'] = !empty($boss_data['robot_image_sheets']) ? $boss_data['robot_image_sheets'] : 1;
         $temp_insert_array['robot_image_size'] = !empty($boss_data['robot_image_size']) ? $boss_data['robot_image_size'] : 40;
         $temp_insert_array['robot_image_editor'] = !empty($boss_data['robot_image_editor']) ? $boss_data['robot_image_editor'] : 0;
         $temp_insert_array['robot_image_alts'] = json_encode(!empty($boss_data['robot_image_alts']) ? $boss_data['robot_image_alts'] : array());
