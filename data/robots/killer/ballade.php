@@ -7,9 +7,11 @@ $robot = array(
     'robot_group' => 'MMRPG2',
     'robot_name' => 'Ballade',
     'robot_token' => 'ballade',
-    'robot_image_sheets' => 2,
     'robot_image_editor' => 18,
     'robot_image_size' => 80,
+    'robot_image_alts' => array(
+        array('token' => 'alt', 'name' => 'Ballade (Super Alt)', 'summons' => 900, 'colour' => 'time')
+        ),
     'robot_core' => 'explode',
     'robot_description' => 'Elite Megaman Hunter',
     'robot_description2' => 'Ballade was made to be the last in the Mega Man Killer unit and are very powerful, having great speed and power. They are equipped with the Ballade Cracker, a very explosive bomb capable of taking out multiple robots. They also have a second form, boosting their abilities even more. They only fight strong robots and believe themselves to be the strongest. They follow orders better than the Punk unit but are still very reckless. Although they believe themselves to be the strongest, they have great reason to see it that way.',
