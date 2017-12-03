@@ -162,6 +162,7 @@ require('classes/rpg_ability_recovery.php');
 require('classes/rpg_item.php');
 require('classes/rpg_item_damage.php');
 require('classes/rpg_item_recovery.php');
+require('classes/rpg_shop.php');
 
 // Include mandatory function files
 require('functions/website.php');
