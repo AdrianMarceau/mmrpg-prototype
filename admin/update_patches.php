@@ -84,7 +84,36 @@ function mmrpg_patch_db_user_objects_2k17($_GAME){
         -  Make sure all nested arrays in global values are saved in dedicated tables instead
 
             -  Make sure the shop writes directly to the database on buy/sell actions
+
             -  Make sure the player editor writes directly to the database on omega factor changes
+
+            -  Automatically generate star-force and star-force-strict arrays on game load, do not save in values
+
+                -  Update player battles to compensate by also auto-generating these values on player load
+
+            -  Update the user robots table to include a flag for favourites, make sure it's set on robot import
+
+                -  Automatically generate the favourites array on game load, do not save in values
+
+                    -  Make sure the leadboard profile's favourites description works with the new structure
+
+            -  Create a new table for user prototype awards, make sure they're indexed during the patch
+
+                -  Automatically pull these awards into the values array on game load
+
+                -  Make sure all instances of creating/adding new ones adds to the database as well
+
+        -  Compile a list of all the new table fields and add them to the pre-launch queries below
+
+        -  Compile a list of all the new database tables and add them to the pre-launch queries below
+
+            -  Include data for any tables that need to be manually populated
+
+        -  Re-download live data into local database and run the patch again to test (repeat many times)
+
+            -  Make a backup of the local database with all changes (by cloning the local table with a new name)
+
+            -  Re-download the live data for all mmrpg_save and mmrpg_user tables
 
         -  ???
 
