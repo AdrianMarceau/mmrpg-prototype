@@ -2445,6 +2445,8 @@ class rpg_game {
         if ($echo){ echo('$mmrpg_users_robots_records = '.print_r($mmrpg_users_robots_records, true).'<hr />'.PHP_EOL); }
         */
 
+        if ($echo){ echo('rpg_game::session_to_database()<hr />'.PHP_EOL.PHP_EOL); }
+
         if ($echo){ echo('$mmrpg_users_players('.count($mmrpg_users_players).') = '.print_r(array_keys($mmrpg_users_players), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_robots('.count($mmrpg_users_robots).') = '.print_r(array_keys($mmrpg_users_robots), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_abilities('.count($mmrpg_users_abilities).') = '.print_r(array_keys($mmrpg_users_abilities), true).'<hr />'.PHP_EOL); }
@@ -2581,6 +2583,7 @@ class rpg_game {
         // Create index arrays for all players and robots to save
         if ($echo && defined('MMRPG_ADMIN_AJAX_REQUEST')){
             global $this_ajax_request_feedback;
+            $this_ajax_request_feedback .= 'rpg_game::session_to_database()'.PHP_EOL;
             $this_ajax_request_feedback .= '$mmrpg_users_abilities('.count($mmrpg_users_abilities).')'.PHP_EOL;
             $this_ajax_request_feedback .= '$mmrpg_users_players('.count($mmrpg_users_players).')'.PHP_EOL;
             $this_ajax_request_feedback .= '$mmrpg_users_players_abilities('.count($mmrpg_users_players_abilities).')'.PHP_EOL;
