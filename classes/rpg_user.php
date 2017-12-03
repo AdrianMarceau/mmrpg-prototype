@@ -1099,5 +1099,305 @@ class rpg_user {
     }
 
 
+    /**
+     * Pull an array of shops for a given user ID from the database
+     * @param int $user_id
+     * @param string $return_shop (optional)
+     * @return array
+     */
+    public static function get_shops($user_id, $return_shop = ''){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Compensate for empty or missing record kind
+        $allowed_shops = rpg_shop::get_index_tokens(true, false);
+        if (!empty($return_shop) && !in_array($return_shop, $allowed_shops)){ $return_shop = ''; }
+
+        // Define the action key map for later looping
+        $action_key_map = array('selling' => 'sold', 'buying' => 'bought');
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Define the query filter for this request
+        $raw_where = '';
+        if (!empty($return_shop)){ $raw_where .= "AND ushops.shop_token = '{$return_shop}' "; }
+        else { $raw_where .= "AND ushops.shop_token IN ('".implode("','", $allowed_shops)."') "; }
+
+        // Define the base query for pulling shop records
+        $raw_shop_query = "SELECT
+            ushops.row_id,
+            ushops.user_id,
+            ushops.shop_token,
+            ushops.shop_level,
+            ushops.shop_experience,
+            ushops.shop_zenny_earned,
+            ushops.shop_zenny_spent
+            FROM mmrpg_users_shops AS ushops
+                LEFT JOIN mmrpg_index_shops AS ishops ON ishops.shop_token = ushops.shop_token
+            WHERE
+                ushops.user_id = {$user_id}
+                {$raw_where}
+            ORDER BY
+                ishops.shop_order
+            ;";
+
+        // Attempt to collect shops from the database with the above query
+        $raw_shops = $db->get_array_list($raw_shop_query, 'shop_token');
+
+        // If the results were not empty, loop through and collect into nested array
+        $user_shops = array();
+        if (!empty($raw_shops)){
+            foreach ($raw_shops AS $shop_token => $raw_shop_info){
+
+                // Define an array to hold parsed shop info
+                $shop_info = array();
+
+                // Collect basic fields for this shop from the raw records
+                $shop_info['shop_token'] = $shop_token;
+                $shop_info['shop_level'] = !empty($raw_shop_info['shop_level']) ? $raw_shop_info['shop_level'] : 1;
+                $shop_info['shop_experience'] = !empty($raw_shop_info['shop_experience']) ? $raw_shop_info['shop_experience'] : 0;
+                $shop_info['zenny_earned'] = !empty($raw_shop_info['shop_zenny_earned']) ? $raw_shop_info['shop_zenny_earned'] : 0;
+                $shop_info['zenny_spent'] = !empty($raw_shop_info['shop_zenny_spent']) ? $raw_shop_info['shop_zenny_spent'] : 0;
+
+                // Loop through the action map and predefine selling/buying arrays for records
+                foreach ($action_key_map AS $action_key1 => $action_key2){
+                    if (!empty($raw_shop_info['shop_products_'.$action_key1])){
+                        foreach ($raw_shop_info['shop_products_'.$action_key1] AS $product_key){
+                            $shop_info[$product.'_'.$action_key2] = array();
+                        }
+                    }
+                }
+
+                // Add this shop info to the global shop index
+                $user_shops[$shop_token] = $shop_info;
+
+            }
+        }
+
+        // Return either the whole shop array or a part of it based on the request
+        if (!empty($return_shop) && !empty($user_shops[$return_shop])){ return $user_shops[$return_shop]; }
+        elseif (!empty($return_shop) && empty($user_shops[$return_shop])){ return array(); }
+        else { return $user_shops; }
+
+    }
+
+
+    /**
+     * Pull an array of encounter records for a given user ID from the database
+     * @param int $user_id
+     * @param string $return_shop (optional)
+     * @return array
+     */
+    public static function get_shop_records($user_id, $return_shop = ''){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Compensate for empty or missing record kind
+        $allowed_shops = rpg_shop::get_index_tokens(true, false);
+        if (!empty($return_shop) && !in_array($return_shop, $allowed_shops)){ $return_shop = ''; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Define the query filter for this request
+        $raw_where = '';
+        if (!empty($return_shop)){ $raw_where .= "AND urecords.shop_token = '{$return_shop}' "; }
+        else { $raw_where .= "AND urecords.shop_token IN ('".implode("','", $allowed_shops)."') "; }
+
+        // Define the base query for pulling shop records
+        $raw_shop_query = "SELECT
+            urecords.row_id,
+            urecords.user_id,
+            urecords.shop_token,
+            urecords.shop_category,
+            urecords.shop_action,
+            urecords.shop_product,
+            urecords.shop_quantity
+            FROM mmrpg_users_shops_records AS urecords
+                LEFT JOIN mmrpg_index_shops AS ishops ON ishops.shop_token = urecords.shop_token
+            WHERE
+                urecords.user_id = {$user_id}
+                {$raw_where}
+            ORDER BY
+                ishops.shop_order ASC,
+                urecords.shop_action ASC,
+                urecords.shop_category ASC
+            ;";
+
+        // Attempt to collect shop records from the database with the above query
+        $raw_shops_records = $db->get_array_list($raw_shop_query);
+
+        // If the results were not empty, loop through and collect into nested array
+        $user_shops_records = array();
+        if (!empty($raw_shops_records)){
+            foreach ($raw_shops_records AS $record_key => $raw_record_info){
+
+                // Collect the shop token for this record
+                $shop_token = $raw_record_info['shop_token'];
+
+                // Define the record index key for appending the product
+                $shop_category_action_key = $raw_record_info['shop_category'].'_'.$raw_record_info['shop_action'];
+
+                // Collect the actual product token and record quantity
+                $shop_product = $raw_record_info['shop_token'];
+                $shop_quantity = $raw_record_info['shop_quantity'];
+
+                // Create nested arrays that do not exist yet before adding
+                if (!isset($user_shops_records[$shop_token])){ $user_shops_records[$shop_token] = array(); }
+                if (!isset($user_shops_records[$shop_token][$shop_category_action_key])){ $user_shops_records[$shop_token][$shop_category_action_key] = array(); }
+
+                // Add this shop info to the global shop index
+                $user_shops_records[$shop_token][$shop_category_action_key][$shop_product] = $shop_quantity;
+
+            }
+        }
+
+        // Return either the whole shop array or a part of it based on the request
+        if (!empty($return_shop) && !empty($user_shops_records[$return_shop])){ return $user_shops_records[$return_shop]; }
+        elseif (!empty($return_shop) && empty($user_shops_records[$return_shop])){ return array(); }
+        else { return $user_shops_records; }
+
+    }
+
+
+    /**
+     * Pull an array of shops stats with records for a given user ID from the database
+     * @param int $user_id
+     * @param string $return_shop (optional)
+     * @return array
+     */
+    public static function get_battle_shops($user_id){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Collect the basic shop details for this user ID
+        $user_shops = self::get_shops($user_id);
+        if (empty($user_shops)){ return array(); }
+
+        // Collect any shop sold/bought records for this user ID
+        $users_shops_records = self::get_shop_records($user_id);
+        if (empty($users_shops_records)){ return $user_shops; }
+
+        // Loop through shops and records then merge into single array
+        $user_battle_shops = array();
+        foreach ($user_shops AS $shop_token => $shop_info){
+            $user_battle_shops[$shop_token] = $shop_info;
+        }
+        foreach ($users_shops_records AS $shop_token => $shop_records){
+            foreach ($shop_records AS $list_key => $list_records){
+                $user_battle_shops[$shop_token][$list_key] = $list_records;
+            }
+        }
+
+        // Return the consolodated battle shop array
+        return $user_battle_shops;
+
+    }
+
+
+    /**
+     * Pull an array of player omega factors for a given user ID from the database
+     * @param int $user_id
+     * @param string $return_player (optional)
+     * @return array
+     */
+    public static function get_player_omega($user_id, $return_player = ''){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Compensate for empty or missing player token
+        $allowed_players = rpg_player::get_index_tokens(true, false);
+        if (!empty($return_player) && !in_array($return_player, $allowed_players)){ $return_player = ''; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Define the query filter for this request
+        $raw_where = '';
+        if (!empty($return_player)){ $raw_where .= "AND omega.player_token = '{$return_player}' "; }
+        else { $raw_where .= "AND omega.player_token IN ('".implode("','", $allowed_players)."') "; }
+
+        // Define the base query for pulling omega factors
+        $raw_omega_query = "SELECT
+            omega.row_id,
+            omega.user_id,
+            omega.player_token,
+            omega.field_token,
+            omega.robot_token,
+            omega.type_token,
+            omega.slot_key
+            FROM mmrpg_users_players_omega AS omega
+                LEFT JOIN mmrpg_index_players AS iplayers ON iplayers.player_token = omega.player_token
+            WHERE
+                omega.user_id = {$user_id}
+                {$raw_where}
+            ORDER BY
+                iplayers.player_order ASC,
+                omega.slot_key ASC
+            ;";
+
+        // Attempt to collect omega factors from the database with the above query
+        $raw_player_omega = $db->get_array_list($raw_omega_query);
+
+        // If the results were not empty, loop through and collect into nested array
+        $user_player_omega = array();
+        if (!empty($raw_player_omega)){
+            foreach ($raw_player_omega AS $omega_key => $raw_omega_info){
+
+                // Collect the player token for this omega factor
+                $player_token = $raw_omega_info['player_token'];
+
+                // Create an entry for this player if one does not exist yet
+                if (!isset($user_player_omega[$player_token])){ $user_player_omega[$player_token] = array(); }
+
+                // Generate the game-compatible array for this player's omega factor
+                $omega_factor = array();
+                $omega_factor['robot'] = $raw_omega_info['robot_token'];
+                $omega_factor['field'] = $raw_omega_info['field_token'];
+                $omega_factor['type'] = $raw_omega_info['type_token'];
+
+                // Append this omega factor to the current player's global list array
+                $user_player_omega[$player_token][] = $omega_factor;
+
+            }
+        }
+
+        // Return either the whole omega array or a part of it based on the request
+        if (!empty($return_player) && !empty($user_player_omega[$return_player])){ return $user_player_omega[$return_player]; }
+        elseif (!empty($return_player) && empty($user_player_omega[$return_player])){ return array(); }
+        else { return $user_player_omega; }
+
+    }
+
+
+    /**
+     * Pull an array of target robot omega factors for a given user ID from the database
+     * @param int $user_id
+     * @return array
+     */
+    public static function get_target_robot_omega($user_id){
+
+        // Collect player omega factors normally before reformatting
+        $user_player_omega = self::get_player_omega($user_id);
+        if (empty($user_player_omega)){ return array(); }
+
+        // Loop through and create game-compatible target-robot versions for each list
+        $user_target_robot_omega = array();
+        foreach ($user_player_omega AS $player_token => $omega_factors){
+            $target_robot__omega_key = $player_token.'_target-robot-omega_prototype';
+            $user_target_robot_omega[$target_robot__omega_key] = $omega_factors;
+        }
+
+        // Return the reformatted target robot omega array
+        return $user_target_robot_omega;
+
+    }
+
+
 }
 ?>
