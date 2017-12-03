@@ -118,6 +118,12 @@ function mmrpg_load_game_session(){
         $new_game_data['values']['battle_complete'] = rpg_user::get_mission_records($login_user_id, 'victory');
         $new_game_data['values']['battle_failure'] = rpg_user::get_mission_records($login_user_id, 'defeat');
 
+        // Collect any shop records for this user from the database
+        $new_game_data['values']['battle_shops'] = rpg_user::get_battle_shops($login_user_id);
+
+        // Collect any omega factors for this user from the database
+        $new_game_data['values'] += rpg_user::get_target_robot_omega($login_user_id);
+
         // Decode this user's battle settings if any have been created
         $new_game_data['battle_settings'] = !empty($this_database_user_save['save_settings']) ? json_decode($this_database_user_save['save_settings'], true) : array();
 

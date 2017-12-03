@@ -99,6 +99,13 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
         $this_playerinfo['values']['robot_database'] = array();
         if (!defined('MMRPG_REMOTE_SKIP_DATABASE')){ $this_playerinfo['values']['robot_database'] = rpg_user::get_robot_database($this_playerid); }
 
+        // Manually load unlocked shops from another table if requested and they exist
+        $this_playerinfo['values']['battle_shops'] = array();
+        if (!defined('MMRPG_REMOTE_SKIP_SHOPS')){ $this_playerinfo['values']['battle_shops'] = rpg_user::get_battle_shops($this_playerid); }
+
+        // Manually load target omega robots from another table if requested and they exist
+        if (!defined('MMRPG_REMOTE_SKIP_OMEGA')){ $this_playerinfo['values'] += rpg_user::get_target_robot_omega($this_playerid); }
+
         // Add this player's GAME data to the session for iframe scripts
         $temp_remote_session = array();
         $temp_remote_session['CACHE_DATE'] = !empty($_SESSION['GAME']['CACHE_DATE']) ? $_SESSION['GAME']['CACHE_DATE'] : MMRPG_CONFIG_CACHE_DATE;
