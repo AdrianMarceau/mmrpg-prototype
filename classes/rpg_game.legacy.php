@@ -23,6 +23,8 @@ class legacy_rpg_game {
             saves2.save_values_battle_settings,
             saves2.save_values_battle_items,
             saves2.save_values_battle_abilities,
+            saves2.save_values_battle_shops,
+            saves2.save_values_battle_fields,
             saves2.save_values_battle_stars,
             saves2.save_values_robot_database,
             saves2.save_values_robot_alts,
@@ -45,6 +47,7 @@ class legacy_rpg_game {
         $session_values['battle_rewards'] = !empty($session_vars['save_values_battle_rewards']) ? json_decode($session_vars['save_values_battle_rewards'], true) : array();
         $session_values['battle_abilities'] = !empty($session_vars['save_values_battle_abilities']) ? json_decode($session_vars['save_values_battle_abilities'], true) : array();
         $session_values['battle_items'] = !empty($session_vars['save_values_battle_items']) ? json_decode($session_vars['save_values_battle_items'], true) : array();
+        $session_values['battle_shops'] = !empty($session_vars['save_values_battle_shops']) ? json_decode($session_vars['save_values_battle_shops'], true) : array();
         $session_values['battle_stars'] = !empty($session_vars['save_values_battle_stars']) ? json_decode($session_vars['save_values_battle_stars'], true) : array();
         $session_values['robot_alts'] = !empty($session_vars['save_values_robot_alts']) ? json_decode($session_vars['save_values_robot_alts'], true) : array();
         $session_values['robot_database'] = !empty($session_vars['save_values_robot_database']) ? json_decode($session_vars['save_values_robot_database'], true) : array();
@@ -270,6 +273,94 @@ class legacy_rpg_game {
 
     }
 
+    // Define a function for generating a database-compatible list of user shops
+    public static function parse_user_shops($this_userid,
+        $battle_shops,
+        &$mmrpg_users_shops,
+        &$mmrpg_users_shops_records
+        ){
+
+        // Define allowed shop tokens we can work with
+        $allowed_shops = rpg_shop::get_index_tokens(true, false);
+
+        // Define allowed shop categories we can loop through
+        $allowed_categories = array('items', 'cores', 'abilities', 'alts', 'stars');
+
+        // Define allowed shop actions we can loop through
+        $allowed_actions = array('sold', 'bought');
+
+        // Loop through shops and collect their saved data
+        if (!empty($battle_shops)){
+            foreach ($battle_shops AS $shop_token => $shop_records){
+                if (in_array($shop_token, $allowed_shops)){
+
+                    // Generate basic records for this shop
+                    $shop_info = array();
+                    $shop_info['user_id'] = $this_userid;
+                    $shop_info['shop_token'] = $shop_token;
+                    $shop_info['shop_level'] = !empty($shop_records['shop_level']) ? $shop_records['shop_level'] : 1;
+                    $shop_info['shop_experience'] = !empty($shop_records['shop_experience']) ? $shop_records['shop_experience'] : 0;
+                    $shop_info['shop_zenny_earned'] = !empty($shop_records['zenny_earned']) ? $shop_records['zenny_earned'] : 0;
+                    $shop_info['shop_zenny_spent'] = !empty($shop_records['zenny_spent']) ? $shop_records['zenny_spent'] : 0;
+                    $mmrpg_users_shops[] = $shop_info;
+
+                    // Define a temp array to hold this shop's product records
+                    $temp_user_shop_records = array();
+
+                    // Loop through allowed actions for shop owners
+                    foreach ($allowed_actions AS $shop_action){
+
+                        // Loop through allowed categories for shop products
+                        foreach ($allowed_categories AS $shop_category){
+
+                            // Generate a deep key of category + action strings
+                            $category_action_key = $shop_category.'_'.$shop_action;
+
+                            // Loop through the actual records for this shop and parse
+                            if (!empty($shop_records[$category_action_key])){
+                                foreach ($shop_records[$category_action_key] AS $shop_product => $shop_quantity){
+
+                                    // Fix the product token to fix legacy formats
+                                    $shop_product = preg_replace('/(core|screw)-([a-z]+)$/i', '$2-$1', $shop_product);
+                                    $shop_product = preg_replace('/^(item|core|alt|star)-/i', '', $shop_product);
+
+                                    // Generate a deeper key of category + action + product strings
+                                    $category_action_product_key = $category_action_key.'_'.$shop_product;
+
+                                    // Collect the existing quantity product duplicate has already been indexed
+                                    $existing_quantity = 0;
+                                    if (!empty($temp_user_shop_records[$category_action_product_key])){
+                                        $existing_quantity = $temp_user_shop_records[$category_action_product_key]['shop_quantity'];
+                                    }
+
+                                    // Generate record info using the info we have so far
+                                    $record_info = array();
+                                    $record_info['user_id'] = $this_userid;
+                                    $record_info['shop_token'] = $shop_token;
+                                    $record_info['shop_action'] = $shop_action;
+                                    $record_info['shop_category'] = $shop_category;
+                                    $record_info['shop_product'] = $shop_product;
+                                    $record_info['shop_quantity'] = $existing_quantity + $shop_quantity;
+                                    $temp_user_shop_records[$category_action_product_key] = $record_info;
+
+                                }
+                            }
+
+                        }
+
+                    }
+
+                    // Loop through parsed user shop records and add them to the main array
+                    foreach ($temp_user_shop_records AS $key => $temp_record){
+                        $mmrpg_users_shops_records[] = $temp_record;
+                    }
+
+                }
+            }
+        }
+
+    }
+
     // Define a function for saving current game session to legacy database fields
     public static function session_to_fields($_GAME, $this_userid){
         global $db;
@@ -444,6 +535,7 @@ class legacy_rpg_game {
                 $this_save_array['save_values']['battle_settings'],
                 $this_save_array['save_values']['battle_abilities'],
                 $this_save_array['save_values']['battle_items'],
+                $this_save_array['save_values']['battle_shops'],
                 $this_save_array['save_values']['battle_stars'],
                 $this_save_array['save_values']['robot_database'],
                 $this_save_array['save_values']['robot_alts']
@@ -465,20 +557,23 @@ class legacy_rpg_game {
 
             // Define the legacy save database update array and populate
             $this_save_array = array();
-            $this_save_array['save_values_battle_complete'] = json_encode(!empty($this_values['battle_complete']) ? $this_values['battle_complete'] : array());
-            $this_save_array['save_values_battle_failure'] = json_encode(!empty($this_values['battle_failure']) ? $this_values['battle_failure'] : array());
-            $this_save_array['save_values_battle_rewards'] = json_encode(!empty($this_values['battle_rewards']) ? $this_values['battle_rewards'] : array());
-            $this_save_array['save_values_battle_settings'] = json_encode(!empty($this_values['battle_settings']) ? $this_values['battle_settings'] : array());
-            $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
-            $this_save_array['save_values_battle_items'] = json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
-            $this_save_array['save_values_battle_stars'] = json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
-            $this_save_array['save_values_robot_database'] = json_encode(!empty($this_values['robot_database']) ? $this_values['robot_database'] : array());
-            $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
+            if (!empty($this_values['battle_complete'])){ $this_save_array['save_values_battle_complete'] = json_encode($this_values['battle_complete']); }
+            if (!empty($this_values['battle_failure'])){ $this_save_array['save_values_battle_failure'] = json_encode($this_values['battle_failure']); }
+            if (!empty($this_values['battle_rewards'])){ $this_save_array['save_values_battle_rewards'] = json_encode($this_values['battle_rewards']); }
+            if (!empty($this_values['battle_settings'])){ $this_save_array['save_values_battle_settings'] = json_encode($this_values['battle_settings']); }
+            if (!empty($this_values['battle_abilities'])){ $this_save_array['save_values_battle_abilities'] = json_encode($this_values['battle_abilities']); }
+            if (!empty($this_values['battle_items'])){ $this_save_array['save_values_battle_items'] = json_encode($this_values['battle_items']); }
+            if (!empty($this_values['battle_shops'])){ $this_save_array['save_values_battle_shops'] = json_encode($this_values['battle_shops']); }
+            if (!empty($this_values['battle_stars'])){ $this_save_array['save_values_battle_stars'] = json_encode($this_values['battle_stars']); }
+            if (!empty($this_values['robot_database'])){ $this_save_array['save_values_robot_database'] = json_encode($this_values['robot_database']); }
+            if (!empty($this_values['robot_alts'])){ $this_save_array['save_values_robot_alts'] = json_encode($this_values['robot_alts']); }
 
             // Update this legacy save's info in the database
-            //echo('<hr /><pre>FINAL DB SAVES UPDATE (user_id = '.$_USER['userid'].')</pre>');
-            //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
-            $db->update('mmrpg_saves_legacy', $this_save_array, 'user_id = '.$_USER['userid']);
+            if (!empty($this_save_array)){
+                //echo('<hr /><pre>FINAL DB SAVES UPDATE (user_id = '.$_USER['userid'].')</pre>');
+                //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
+                $db->update('mmrpg_saves_legacy', $this_save_array, 'user_id = '.$_USER['userid']);
+            }
 
         }
 
@@ -514,6 +609,8 @@ class legacy_rpg_game {
         $mmrpg_users_items = array();
         $mmrpg_users_stars = array();
         $mmrpg_users_missions_records = array();
+        $mmrpg_users_shops = array();
+        $mmrpg_users_shops_records = array();
 
         // Collect an index of VALID and UNLOCKABLE player, robot, and ability tokens to match against
         $allowed_players = rpg_game::get_allowed_players();
@@ -537,6 +634,7 @@ class legacy_rpg_game {
         $battle_abilities = !empty($session_values['battle_abilities']) ? $session_values['battle_abilities'] : array();
         $battle_fields = !empty($session_values['battle_fields']) ? $session_values['battle_fields'] : array();
         $battle_items = !empty($session_values['battle_items']) ? $session_values['battle_items'] : array();
+        $battle_shops = !empty($session_values['battle_shops']) ? $session_values['battle_shops'] : array();
         $battle_stars = !empty($session_values['battle_stars']) ? $session_values['battle_stars'] : array();
         $robot_alts = !empty($session_values['robot_alts']) ? $session_values['robot_alts'] : array();
         $robot_database = !empty($session_values['robot_database']) ? $session_values['robot_database'] : array();
@@ -546,12 +644,14 @@ class legacy_rpg_game {
         //echo('$battle_rewards = '.print_r($battle_rewards, true).PHP_EOL);
         //echo('$battle_abilities = '.print_r($battle_abilities, true).PHP_EOL);
         //echo('$battle_items = '.print_r($battle_items, true).PHP_EOL);
+        //echo('$battle_shops = '.print_r($battle_shops, true).PHP_EOL);
         //echo('$battle_stars = '.print_r($battle_stars, true).PHP_EOL);
         //echo('$robot_alts = '.print_r($robot_alts, true).PHP_EOL);
         //echo('$robot_database = '.print_r($robot_database, true).PHP_EOL);
         //echo('$battle_fields = '.print_r($battle_fields, true).PHP_EOL);
         //echo('$battle_complete = '.print_r($battle_complete, true).PHP_EOL);
         //echo('$battle_failure = '.print_r($battle_failure, true).PHP_EOL);
+        //echo('$battle_shops = '.print_r($battle_shops, true).PHP_EOL);
 
         // Collect any player omega arrays from the session
         $player_omega = rpg_game::parse_player_omega($session_values);
@@ -642,6 +742,15 @@ class legacy_rpg_game {
             );
         //echo('$mmrpg_users_missions_records = '.print_r($mmrpg_users_missions_records, true).PHP_EOL);
 
+        // Generate database rows for the user's unlocked shops
+        legacy_rpg_game::parse_user_shops($this_userid,
+            $battle_shops,
+            $mmrpg_users_shops,
+            $mmrpg_users_shops_records
+            );
+        //echo('$mmrpg_users_shops = '.print_r($mmrpg_users_shops, true).PHP_EOL);
+        //echo('$mmrpg_users_shops_records = '.print_r($mmrpg_users_shops_records, true).PHP_EOL);
+
         // Clean and collapse user players and robots for database insertion
         rpg_game::prepare_user_database_players($mmrpg_users_players);
         rpg_game::prepare_user_database_robots($mmrpg_users_robots);
@@ -677,12 +786,16 @@ class legacy_rpg_game {
         if ($echo){ echo('$mmrpg_users_robots_records = '.print_r($mmrpg_users_robots_records, true).'<hr />'.PHP_EOL); }
         */
 
+        if ($echo){ echo('legacy_rpg_game::session_to_database()<hr />'.PHP_EOL.PHP_EOL); }
+
         if ($echo){ echo('$mmrpg_users_players('.count($mmrpg_users_players).') = '.print_r(array_keys($mmrpg_users_players), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_robots('.count($mmrpg_users_robots).') = '.print_r(array_keys($mmrpg_users_robots), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_abilities('.count($mmrpg_users_abilities).') = '.print_r(array_keys($mmrpg_users_abilities), true).'<hr />'.PHP_EOL); }
+
         //if ($echo){ echo('$mmrpg_users_players_abilities('.array_sum(array_map('count', $mmrpg_users_players_abilities)).') = '.print_r(array_keys($mmrpg_users_players_abilities), true).'<hr />'.PHP_EOL); }
         //if ($echo){ echo('$mmrpg_users_robots_abilities('.array_sum(array_map('count', $mmrpg_users_robots_abilities)).') = '.print_r(array_keys($mmrpg_users_robots_abilities), true).'<hr />'.PHP_EOL); }
         //if ($echo){ echo('$mmrpg_users_robots_movesets('.array_sum(array_map('count', $mmrpg_users_robots_movesets)).') = '.print_r(array_keys($mmrpg_users_robots_movesets), true).'<hr />'.PHP_EOL); }
+
         if ($echo){ echo('$mmrpg_users_items('.count($mmrpg_users_items).') = '.print_r(array_values(array_map(function($a){ return implode('/', array_values($a)); }, $mmrpg_users_items)), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_fields('.count($mmrpg_users_fields).') = '.print_r(array_keys($mmrpg_users_fields), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_players_omega('.count($mmrpg_users_players_omega).') = '.print_r(array_map(function($a){ return implode('/', array_column($a, 'field_token')); }, $mmrpg_users_players_omega), true).'<hr />'.PHP_EOL); }
@@ -690,6 +803,9 @@ class legacy_rpg_game {
         if ($echo){ echo('$mmrpg_users_robots_alts('.array_sum(array_map('count', $mmrpg_users_robots_alts)).') = '.print_r(array_map(function($a){ return implode('/', array_keys($a)); }, $mmrpg_users_robots_alts), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_robots_records('.count($mmrpg_users_robots_records).') = '.print_r(array_map(function($a){ return implode('/', array_values($a)); }, $mmrpg_users_robots_records), true).'<hr />'.PHP_EOL); }
         if ($echo){ echo('$mmrpg_users_missions_records('.count($mmrpg_users_missions_records).') = '.print_r(array_map(function($a){ return implode('/', array_values($a)); }, $mmrpg_users_missions_records), true).'<hr />'.PHP_EOL); }
+
+        if ($echo){ echo('$mmrpg_users_shops('.count($mmrpg_users_shops).') = '.print_r(array_values(array_map(function($a){ return implode('/', array_values($a)); }, $mmrpg_users_shops)), true).'<hr />'.PHP_EOL); }
+        if ($echo){ echo('$mmrpg_users_shops_records('.count($mmrpg_users_shops_records).') = '.print_r(array_map(function($a){ return implode('/', array_values($a)); }, $mmrpg_users_shops_records), true).'<hr />'.PHP_EOL); }
 
         // Loop through players and update/insert them in the database
         $db_existing_players = $db->get_array_list("SELECT player_token FROM mmrpg_users_players WHERE user_id = {$this_userid};", 'player_token');
@@ -816,9 +932,22 @@ class legacy_rpg_game {
             $db->insert('mmrpg_users_missions_records', $record_info);
         }
 
+        // Delete existing shops for this user from the database, then loop through and re-insert current ones
+        $db->query("DELETE FROM mmrpg_users_shops WHERE user_id = {$this_userid};");
+        foreach ($mmrpg_users_shops AS $record_key => $record_info){
+            $db->insert('mmrpg_users_shops', $record_info);
+        }
+
+        // Delete existing shop records for this user from the database, then loop through and re-insert current ones
+        $db->query("DELETE FROM mmrpg_users_shops_records WHERE user_id = {$this_userid};");
+        foreach ($mmrpg_users_shops_records AS $record_key => $record_info){
+            $db->insert('mmrpg_users_shops_records', $record_info);
+        }
+
         // Create index arrays for all players and robots to save
         if ($echo && defined('MMRPG_ADMIN_AJAX_REQUEST')){
             global $this_ajax_request_feedback;
+            $this_ajax_request_feedback .= 'legacy_rpg_game::session_to_database()'.PHP_EOL;
             $this_ajax_request_feedback .= '$mmrpg_users_abilities('.count($mmrpg_users_abilities).')'.PHP_EOL;
             $this_ajax_request_feedback .= '$mmrpg_users_players('.count($mmrpg_users_players).')'.PHP_EOL;
             $this_ajax_request_feedback .= '$mmrpg_users_players_abilities('.count($mmrpg_users_players_abilities).')'.PHP_EOL;
@@ -832,6 +961,8 @@ class legacy_rpg_game {
             $this_ajax_request_feedback .= '$mmrpg_users_missions_records('.count($mmrpg_users_missions_records).')'.PHP_EOL;
         }
 
+        // Return true on success
+        return true;
         //exit();
 
     }
