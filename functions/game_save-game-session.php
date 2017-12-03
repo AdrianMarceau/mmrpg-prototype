@@ -229,6 +229,7 @@ function mmrpg_save_game_session(){
                         $this_save_array['save_values']['battle_abilities'],
                         $this_save_array['save_values']['battle_items'],
                         $this_save_array['save_values']['battle_stars'],
+                        $this_save_array['save_values']['battle_shops'],
                         $this_save_array['save_values']['robot_database'],
                         $this_save_array['save_values']['robot_alts']
                         );
@@ -406,6 +407,7 @@ function mmrpg_save_game_session(){
                 $this_save_array['save_values']['battle_abilities'],
                 $this_save_array['save_values']['battle_items'],
                 $this_save_array['save_values']['battle_stars'],
+                $this_save_array['save_values']['battle_shops'],
                 $this_save_array['save_values']['robot_database'],
                 $this_save_array['save_values']['robot_alts']
                 );
