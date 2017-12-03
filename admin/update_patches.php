@@ -103,6 +103,10 @@ function mmrpg_patch_db_user_objects_2k17($_GAME){
 
                 -  Make sure all instances of creating/adding new ones adds to the database as well
 
+        -  Make sure all nested arrays in global counters are saved in dedicated tables instead
+
+        -  Make sure all nested arrays in global flags are saved in dedicated tables instead
+
         -  Compile a list of all the new table fields and add them to the pre-launch queries below
 
         -  Compile a list of all the new database tables and add them to the pre-launch queries below
@@ -366,7 +370,7 @@ function mmrpg_patch_db_user_objects_2k17($_GAME){
 
     // QUERIES TO RUN AFTER THE UPDATE!!!!
 
-    -- FIND ALL USER ROBOTS WITH INCORRECT OR MISSING ORIGINAL PLAYERS
+    -- (STEP 01) FIND ALL USER ROBOTS WITH INCORRECT OR MISSING ORIGINAL PLAYERS
     SELECT
         urobots.user_id,
         irobots.robot_token,
@@ -399,7 +403,7 @@ function mmrpg_patch_db_user_objects_2k17($_GAME){
         ;
 
 
-    -- FIX ALL USER ROBOTS WITH INCORRECT OR MISSING ORIGINAL PLAYERS
+    -- (STEP 02) FIX ALL USER ROBOTS WITH INCORRECT OR MISSING ORIGINAL PLAYERS
     UPDATE
         mmrpg_users_robots AS urobots
         LEFT JOIN mmrpg_index_robots AS irobots ON irobots.robot_token = urobots.robot_token
