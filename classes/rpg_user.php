@@ -1399,5 +1399,74 @@ class rpg_user {
     }
 
 
+    /**
+     * Update target robot omega factors for a given user ID and player in the database
+     * @param int $user_id
+     * @param string $player_token
+     * @param array $new_target_robot_omega
+     * @return boolean
+     */
+    public static function set_target_robot_omega($user_id, $player_token, $new_target_robot_omega){
+
+        // Return false on missing or invalid user ID, player token, or factors
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+        else if (empty($player_token) || !is_string($player_token)){ return false; }
+        else if (empty($new_target_robot_omega) || !is_array($new_target_robot_omega)){ return false; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Delete existing omega factors for this player before inserting
+        $db->delete('mmrpg_users_players_omega', array('user_id' => $user_id, 'player_token' => $player_token));
+
+        // Generate a query inserting all these field factors into the database at once and execute
+        $raw_insert_values = array();
+        foreach ($new_target_robot_omega AS $slot_key => $omega_info){
+            $insert = array();
+            $insert[] = $user_id;
+            $insert[] = "'".$player_token."'";
+            $insert[] = "'".$omega_info['field']."'";
+            $insert[] = "'".$omega_info['robot']."'";
+            $insert[] = "'".$omega_info['type']."'";
+            $insert[] = $slot_key;
+            $raw_insert_values[] = '('.implode(', ', $insert).')';
+        }
+        $raw_insert_values = implode(",\n", $raw_insert_values);
+        $success = $db->query("INSERT INTO mmrpg_users_players_omega
+            (user_id, player_token, field_token, robot_token, type_token, slot_key)
+            VALUES
+            {$raw_insert_values}
+            ;");
+
+        // Return true on success
+        return $success;
+
+    }
+
+
+    /**
+     * Update a given user's save time in the database
+     * @param int $user_id
+     * @return boolean
+     */
+    public static function update_user_save_times($user_id){
+
+        // Return false on missing or invalid user ID
+        if (empty($user_id) || !is_numeric($user_id)){ return false; }
+
+        // Get the global database object for querying
+        $db = cms_database::get_database();
+
+        // Update the access and modified times for this user and their save data
+        $now_time = time();
+        $db->update('mmrpg_saves', array('save_date_accessed' => $now_time, 'save_date_modified' => $now_time), array('user_id' => $user_id));
+        $db->update('mmrpg_users', array('user_date_accessed' => $now_time, 'user_date_modified' => $now_time), array('user_id' => $user_id));
+
+        // Return true on success
+        return true;
+
+    }
+
+
 }
 ?>

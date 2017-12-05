@@ -90,33 +90,19 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
     // Crop the field settings if they've somehow exceeded the eight limit
     if (count($temp_fields) > 8){ $temp_fields = array_slice($temp_fields, 0, 8, true); }
 
-    // If requested new field was an empty string, remove the previous value
-    if (empty($temp_field)){
-        // If this was the last field, do nothing with this request
-        if (count($temp_fields) <= 1){ die('success|remove-last|'.implode(',', $temp_fields)); }
-        // Unset the requested key in the array
-        unset($temp_fields[$temp_key]);
-        // Create a new array to hold the full field settings and populate
-        $temp_fields_new = array();
-        foreach ($temp_fields AS $temp_token){ $temp_fields_new[$temp_token] = array('field_token' => $temp_token); }
-        // Update the new field settings in the session variable
-        $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_fields'] = $temp_fields_new;
-        // Collect the available star counts for this player
-        $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
-        // Save, produce the success message with the new field order
-        mmrpg_save_game_session();
-        exit('success|field-removed|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
-
-    }
     // Otherwise if this was a shuffle request
-    elseif ($temp_field == 'shuffle'){
+    if ($temp_field == 'shuffle'){
+
         // Shuffle fields, simple as that
         shuffle($temp_fields);
+
         // Create a new array to hold the full field settings and populate
         $temp_fields_new = array();
         foreach ($temp_fields AS $temp_token){ $temp_fields_new[$temp_token] = array('field_token' => $temp_token); }
+
         // Update the new field settings in the session variable
         $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_fields'] = $temp_fields_new;
+
         // Manually update the target robot omega with the new field values
         $temp_session_key = $temp_player.'_target-robot-omega_prototype';
         $new_target_robot_omega = array();
@@ -130,21 +116,29 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
                 );
         }
         //die(print_r($new_target_robot_omega, true));
+
+        // Manually save these changes to the player fields in the session
         //$new_target_robot_omega = array_reverse($new_target_robot_omega);
         $_SESSION[$session_token]['values'][$temp_session_key] = $new_target_robot_omega;
+
+        // Manually save these changes to player fields in the database
+        rpg_user::set_target_robot_omega($this_userid, $temp_player, $new_target_robot_omega);
+
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
-        // Save, produce the success message with the new field order
-        mmrpg_save_game_session();
-        exit('success|field-shuffled|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
+        // Update save time and produce the success message with the new field order
+        rpg_user::update_user_save_times($this_userid);
+        exit('success|field-shuffled|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
     }
     // Otherwise if this was a randomize request
     elseif ($temp_field == 'randomize'){
+
         // Collect a copy of the available fields and then shuffle them
         $temp_available_fields = $temp_omega_factor_options;
         shuffle($temp_available_fields);
+
         // Pick eight fields randomly from the entire available list
         $temp_fields = array();
         foreach ($temp_available_fields AS $key => $info){
@@ -156,8 +150,10 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
         // Create a new array to hold the full field settings and populate
         $temp_fields_new = array();
         foreach ($temp_fields AS $temp_token){ $temp_fields_new[$temp_token] = array('field_token' => $temp_token); }
+
         // Update the new field settings in the session variable
         $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_fields'] = $temp_fields_new;
+
         // Manually update the target robot omega with the new field values
         $temp_session_key = $temp_player.'_target-robot-omega_prototype';
         $new_target_robot_omega = array();
@@ -171,25 +167,35 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
                 );
         }
         //die(print_r($new_target_robot_omega, true));
+
+        // Manually save these changes to the player fields in the session
         //$new_target_robot_omega = array_reverse($new_target_robot_omega);
         $_SESSION[$session_token]['values'][$temp_session_key] = $new_target_robot_omega;
+
+        // Manually save these changes to player fields in the database
+        rpg_user::set_target_robot_omega($this_userid, $temp_player, $new_target_robot_omega);
+
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
-        // Save, produce the success message with the new field order
-        mmrpg_save_game_session();
-        exit('success|field-randomize|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
+        // Update save time and produce the success message with the new field order
+        rpg_user::update_user_save_times($this_userid);
+        exit('success|field-randomize|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
     }
     // Otherwise, if there was a new field provided, update it in the array
     elseif (!in_array($temp_field, $temp_fields)){
+
         // Update this position in the array with the new field
         $temp_fields[$temp_key] = $temp_field;
+
         // Create a new array to hold the full field settings and populate
         $temp_fields_new = array();
         foreach ($temp_fields AS $temp_token){ $temp_fields_new[$temp_token] = array('field_token' => $temp_token); }
+
         // Update the new field settings in the session variable
         $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_fields'] = $temp_fields_new;
+
         // Manually update the target robot omega with the new field values
         $temp_session_key = $temp_player.'_target-robot-omega_prototype';
         $new_target_robot_omega = array();
@@ -203,31 +209,44 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
                 );
         }
         //die(print_r($new_target_robot_omega, true));
+
+        // Manually save these changes to the player fields in the session
         //$new_target_robot_omega = array_reverse($new_target_robot_omega);
         $_SESSION[$session_token]['values'][$temp_session_key] = $new_target_robot_omega;
+
+        // Manually save these changes to player fields in the database
+        rpg_user::set_target_robot_omega($this_userid, $temp_player, $new_target_robot_omega);
+
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
-        // Save, produce the success message with the new field order
-        mmrpg_save_game_session();
+
+        // Update save time and produce the success message with the new field order
+        rpg_user::update_user_save_times($this_userid);
         exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
     }
     // Otherwise, if this field already exists, swap position in array
     elseif (in_array($temp_field, $temp_fields)){
+
         // Update this position in the array with the new field
         $this_slot_key = $temp_key;
         $this_slot_value = $temp_fields[$temp_key];
         $copy_slot_value = $temp_field;
         $copy_slot_key = array_search($temp_field, $temp_fields);
+
         // Update this slot with new value
         $temp_fields[$this_slot_key] = $copy_slot_value;
+
         // Update copy slot with new value
         $temp_fields[$copy_slot_key] = $this_slot_value;
+
         // Create a new array to hold the full field settings and populate
         $temp_fields_new = array();
         foreach ($temp_fields AS $temp_token){ $temp_fields_new[$temp_token] = array('field_token' => $temp_token); }
+
         // Update the new field settings in the session variable
         $_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_fields'] = $temp_fields_new;
+
         // Manually update the target robot omega with the new field values
         $temp_session_key = $temp_player.'_target-robot-omega_prototype';
         $new_target_robot_omega = array();
@@ -241,17 +260,26 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
                 );
         }
         //die(print_r($new_target_robot_omega, true));
+
+        // Manually save these changes to the player fields in the session
         //$new_target_robot_omega = array_reverse($new_target_robot_omega);
         $_SESSION[$session_token]['values'][$temp_session_key] = $new_target_robot_omega;
+
+        // Manually save these changes to player fields in the database
+        rpg_user::set_target_robot_omega($this_userid, $temp_player, $new_target_robot_omega);
+
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
-        // Save, produce the success message with the new field order
-        mmrpg_save_game_session();
+
+        // Update save time and produce the success message with the new field order
+        rpg_user::update_user_save_times($this_userid);
         exit('success|field-updated|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
     } else {
+
         // Collect the available star counts for this player
         $temp_star_counts = mmrpg_prototype_player_stars_available($temp_player);
+
         // Produce an error show this field has already been selected
         exit('error|field-exists|'.implode(',', $temp_fields).'|'.implode(',', $temp_star_counts));
 
