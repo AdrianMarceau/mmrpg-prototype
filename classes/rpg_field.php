@@ -197,7 +197,7 @@ class rpg_field extends rpg_object {
      * @param bool $parse_data
      * @return array
      */
-    public static function get_index($include_hidden = false, $include_unpublished = false){
+    public static function get_index($include_hidden = false, $include_unpublished = false, $include_incomplete = false){
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -206,6 +206,7 @@ class rpg_field extends rpg_object {
         $temp_where = '';
         if (!$include_hidden){ $temp_where .= 'AND field_flag_hidden = 0 '; }
         if (!$include_unpublished){ $temp_where .= 'AND field_flag_published = 1 '; }
+        if (!$include_incomplete){ $temp_where .= 'AND field_flag_complete = 1 '; }
 
         // Collect every type's info from the database index
         $field_fields = self::get_index_fields(true);
@@ -225,7 +226,7 @@ class rpg_field extends rpg_object {
      * Get the tokens for all fields in the global index
      * @return array
      */
-    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $include_incomplete = false){
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -234,6 +235,7 @@ class rpg_field extends rpg_object {
         $temp_where = '';
         if (!$include_hidden){ $temp_where .= 'AND field_flag_hidden = 0 '; }
         if (!$include_unpublished){ $temp_where .= 'AND field_flag_published = 1 '; }
+        if (!$include_incomplete){ $temp_where .= 'AND field_flag_complete = 1 '; }
 
         // Collect an array of field tokens from the database
         $field_index = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
