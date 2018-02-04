@@ -17,6 +17,9 @@ define('MMRPG_CONFIG_DBPASSWORD', 'password');
 define('MMRPG_CONFIG_DBCHARSET', 'utf8');
 define('MMRPG_CONFIG_DBNAME', 'mmrpg2k11');
 
+// Define the analytics account ID
+define('LEGACY_MMRPG_GA_ACCOUNTID', 'UA-00000000-0');
+
 // Define the list of administrator-approved remote addresses
 define('MMRPG_CONFIG_ADMIN_LIST', '127.0.0.1,999.999.999.999');
 
