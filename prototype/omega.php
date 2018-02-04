@@ -73,7 +73,7 @@ $this_omega_factors_five[] = array('robot' => 'crystal-man', 'field' => 'crystal
 // Define the expansion omega factors for DR. COSSACK (MEGA MAN 6)
 $this_omega_factors_six = array();
 $this_omega_factors_six[] = array('robot' => 'blizzard-man', 'field' => 'field', 'type' => 'freeze');
-//$this_omega_factors_six[] = array('robot' => 'centaur-man', 'field' => 'field', 'type' => 'time');
+$this_omega_factors_six[] = array('robot' => 'centaur-man', 'field' => 'field', 'type' => 'time');
 $this_omega_factors_six[] = array('robot' => 'flame-man', 'field' => 'field', 'type' => 'flame');
 $this_omega_factors_six[] = array('robot' => 'knight-man', 'field' => 'field', 'type' => 'impact');
 //$this_omega_factors_six[] = array('robot' => 'plant-man', 'field' => 'field', 'type' => 'nature');
