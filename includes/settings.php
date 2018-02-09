@@ -120,7 +120,7 @@ define('MMRPG_SETTINGS_POSTS_PERPAGE', 20); // How many discussion threads shoul
 define('MMRPG_SETTINGS_THREADS_PERPAGE', 50); // How many comment posts should be displayed per page
 
 // Define the global counters for missions in each campaign
-define('MMRPG_SETTINGS_CHAPTER1_MISSIONS', 1);  // Intro
+define('MMRPG_SETTINGS_CHAPTER1_MISSIONS', 3);  // Intro
 define('MMRPG_SETTINGS_CHAPTER2_MISSIONS', 8);  // Masters
 define('MMRPG_SETTINGS_CHAPTER3_MISSIONS', 1);  // Rivals
 define('MMRPG_SETTINGS_CHAPTER4_MISSIONS', 4);  // Fusions
