@@ -16,19 +16,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '0';
 
     // If the player has completed at least zero battles, display the starter battle
-    if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0'])){
-
-        // Generate the battle option with the starter data
-        $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'];
-        if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
-            $temp_battle_omega = rpg_mission_starter::generate($this_prototype_data, 'met', $this_prototype_data['this_chapter_levels'][0], $this_prototype_data['this_support_robot']);
-            $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-            $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
-        } else {
-            $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-            $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
-        }
+    if ($this_prototype_data['prototype_complete']
+        || !empty($this_prototype_data['this_chapter_unlocked']['0a'])
+        || !empty($this_prototype_data['this_chapter_unlocked']['0b'])
+        || !empty($this_prototype_data['this_chapter_unlocked']['0c'])){
 
         // EVENT MESSAGE : CHAPTER ONE
         $this_prototype_data['battle_options'][] = array(
@@ -37,12 +28,51 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Chapter One : An Unexpected Attack'
             );
 
-        // Add the omega battle to the options, index, and session
-        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        // Intro Battle vs Met
+        // Always add this battle first, no matter what
+        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0a'])){
+
+            // Generate the battle option with the starter data
+            $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'];
+            if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
+                $temp_battle_omega = rpg_mission_starter::generate($this_prototype_data, 'met', $this_prototype_data['this_chapter_levels'][0], $this_prototype_data['this_support_robot']);
+                $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
+            } else {
+                $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
+                $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
+            }
+
+            // Add the omega battle to the options, index, and session
+            $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+        }
+
+        // Intro Battle vs Sniper Joe
+        // Only add this battle if the player has defeated the first one
+        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0b'])){
+
+            // Unlock the first of the final destination battles
+            $temp_final_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-intro-ii', 'battle_level' => $this_prototype_data['this_chapter_levels'][0] + 1);
+            $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $this_prototype_data['battle_options'][] = $temp_final_option;
+
+        }
+
+        // Intro Battle vs Sniper Joe
+        // Only add this battle if the player has defeated the first and second one
+        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0c'])){
+
+            // Unlock the first of the final destination battles
+            $temp_final_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-intro-iii', 'battle_level' => $this_prototype_data['this_chapter_levels'][0] + 2);
+            $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $this_prototype_data['battle_options'][] = $temp_final_option;
+
+        }
+
 
     }
-
-
 
 
 
