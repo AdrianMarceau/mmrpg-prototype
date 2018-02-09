@@ -8,6 +8,9 @@ $robot = array(
     'robot_token' => 'sniper-joe',
     'robot_description' => 'Shield Sniper Mecha',
     'robot_image_editor' => 412,
+    'robot_image_alts' => array(
+        array('token' => 'alt', 'name' => 'Sniper Joe (No Shield)', 'summons' => 0),
+        ),
     'robot_class' => 'mecha',
     'robot_core' => 'shield',
     'robot_field' => 'intro-field',
@@ -26,7 +29,8 @@ $robot = array(
         ),
     'robot_rewards' => array(
         'abilities' => array(
-                array('level' => 0, 'token' => 'buster-shot'),
+                array('level' => 0, 'token' => 'joe-shot'),
+                array('level' => 0, 'token' => 'joe-shield'),
             )
         ),
     'robot_quotes' => array(
