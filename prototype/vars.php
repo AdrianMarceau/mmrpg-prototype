@@ -92,7 +92,9 @@ else {
         global $battle_star_counter;
 
         // Intro
-        $chapters_unlocked['0'] = true;
+        $chapters_unlocked['0a'] = true;
+        $chapters_unlocked['0b'] = $battle_complete_counter >= 1 ? true : false;
+        $chapters_unlocked['0c'] = $battle_complete_counter >= 2 ? true : false;
 
         // Masters
         $chapters_unlocked['1'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;

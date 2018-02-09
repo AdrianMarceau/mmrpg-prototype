@@ -2,7 +2,7 @@
 /*
  * DEMO MISSION SELECT
  */
-if (!empty($_SESSION[$session_token]['DEMO'])){
+if (rpg_game::is_demo()){
 
     // DEBUG
     //echo 'checkpoint_'.__LINE__.'<br />';
@@ -86,7 +86,7 @@ else {
                 $_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_1'] = true;
             }
 
-            if ($chapters_unlocked['0']
+            if ($chapters_unlocked['0a']
                 && empty($_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_0'])){
                 unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
                 $_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_0'] = true;
@@ -105,13 +105,13 @@ else {
                 elseif ($chapters_unlocked['3']){ $temp_last_chapter = '3'; }
                 elseif ($chapters_unlocked['2']){ $temp_last_chapter = '2'; }
                 elseif ($chapters_unlocked['1']){ $temp_last_chapter = '1'; }
-                elseif ($chapters_unlocked['0']){ $temp_last_chapter = '0'; }
+                elseif ($chapters_unlocked['0a']){ $temp_last_chapter = '0'; }
             }
 
             /* -- Generate Chapter Links -- */
 
             // CHAPTER ONE(0) Intro
-            if ($chapters_unlocked['0']){
+            if ($chapters_unlocked['0a']){
                 $chapters_display_count++;
                 echo '<a class="chapter_link '.($temp_last_chapter === '0' ? 'chapter_link_active ' : '').'" href="#" data-chapter="0">Chapter One</a>';
             } else {
