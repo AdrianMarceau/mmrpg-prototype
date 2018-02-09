@@ -20,7 +20,8 @@ $this_prototype_data['points_unlocked'] = mmrpg_prototype_player_points($this_pr
 $this_prototype_data['prototype_complete'] = $prototype_complete_flag_light;
 
 // Define the stage select music based on progression
-$this_music_token = $this_prototype_data['battles_complete'] >= 10 ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];
+$phase_two_start = MMRPG_SETTINGS_CHAPTER1_MISSIONS + MMRPG_SETTINGS_CHAPTER2_MISSIONS + MMRPG_SETTINGS_CHAPTER3_MISSIONS;
+$this_music_token = $this_prototype_data['battles_complete'] >= $phase_two_start ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];
 $this_prototype_data['missions_music'] = 'misc/stage-select-'.$this_music_token;
 
 // DEBUG DEBUG DEBUG

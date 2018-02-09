@@ -13,7 +13,6 @@ $this_prototype_data['battle_phase'] = 0;
 $this_prototype_data['battle_options'] = array();
 $this_prototype_data['missions_markup'] = '';
 $this_prototype_data['battles_complete'] = mmrpg_prototype_battles_complete($this_prototype_data['this_player_token']);
-$this_prototype_data['battles_complete_debug'] = $battle_complete_counter_wily;
 $this_prototype_data['phase_token'] = 'phase'.$this_prototype_data['battle_phase'];
 $this_prototype_data['phase_battle_token'] = $this_prototype_data['this_player_token'].'-'.$this_prototype_data['phase_token'];
 $this_prototype_data['robots_unlocked'] = mmrpg_prototype_robots_unlocked($this_prototype_data['this_player_token']);
@@ -21,7 +20,8 @@ $this_prototype_data['points_unlocked'] = mmrpg_prototype_player_points($this_pr
 $this_prototype_data['prototype_complete'] = $prototype_complete_flag_wily;
 
 // Define the stage select music based on progression
-$this_music_token = $this_prototype_data['battles_complete'] >= 10 ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];
+$phase_two_start = MMRPG_SETTINGS_CHAPTER1_MISSIONS + MMRPG_SETTINGS_CHAPTER2_MISSIONS + MMRPG_SETTINGS_CHAPTER3_MISSIONS;
+$this_music_token = $this_prototype_data['battles_complete'] >= $phase_two_start ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];
 $this_prototype_data['missions_music'] = 'misc/stage-select-'.$this_music_token;
 
 // DEBUG DEBUG DEBUG
