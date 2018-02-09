@@ -109,7 +109,7 @@ if (!empty($this_current_token)){
             // Define the Open Graph variables for this page
             $this_graph_data['title'] .= ' | '.$mecha_info['robot_name'];
             $this_graph_data['description'] = $this_seo_description;
-            $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$mecha_info['robot_token'].'/mug_right_'.$this_robot_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/robots/'.$mecha_info['robot_token'].'/mug_right_'.$this_mecha_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
 
         }
 
