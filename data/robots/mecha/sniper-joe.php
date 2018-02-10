@@ -38,6 +38,33 @@ $robot = array(
         'battle_taunt' => '',
         'battle_victory' => '',
         'battle_defeat' => ''
-        )
+        ),
+    'robot_function_onload' => function($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Check if this robot has the shield attachment active
+        $joe_shield_active = false;
+        if (!empty($this_robot->robot_attachments)){
+            foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
+                if (strstr($attachment_token, 'ability_joe-shield_')){
+                    $joe_shield_active = true;
+                    break;
+                }
+            }
+        }
+
+        // If this robot does not have the shield attachment, change alts
+        $base_image_token = $this_robot->robot_token;
+        $alt_image_token = $this_robot->robot_token.'_alt';
+        if (!$joe_shield_active && $this_robot->robot_image != $alt_image_token){
+            $this_robot->set_image($alt_image_token);
+        } elseif ($joe_shield_active && $this_robot->robot_image != $base_image_token){
+            $this_robot->set_image($base_image_token);
+        }
+
+
+        }
     );
 ?>
