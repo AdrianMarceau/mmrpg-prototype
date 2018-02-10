@@ -9,7 +9,10 @@ $request_data = !empty($_POST['requestData']) ? $_POST['requestData'] : false;
 if ($request_type == 'session' && $request_data !== false){
 
     // Start the session object
-    session_start();
+    if (session_id() == ''){
+        session_name('RPG2k17');
+        session_start();
+    }
 
     // Trim the request data for extra semicolons
     $request_data = trim($request_data, ';');
