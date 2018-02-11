@@ -24,6 +24,17 @@ $ability = array(
             ));
         $this_robot->trigger_target($this_robot, $this_ability);
 
+        // Increase this robot's speed stat
+        $this_ability->recovery_options_update(array(
+            'kind' => 'speed',
+            'frame' => 'taunt',
+            'percent' => true,
+            'success' => array(0, -6, 0, -10,  $this_robot->print_name().'&#39;s mobility improved&hellip;'),
+            'failure' => array(9, -6, 0, -10, $this_robot->print_name().'&#39;s mobility was not affected&hellip;')
+            ));
+        $speed_recovery_amount = ceil($this_robot->robot_attack * ($this_ability->ability_recovery / 100));
+        $this_robot->trigger_recovery($this_robot, $this_ability, $speed_recovery_amount);
+
         // Decrease this robot's defense stat
         $this_ability->damage_options_update(array(
             'kind' => 'defense',
@@ -45,17 +56,6 @@ $ability = array(
             ));
         $attack_damage_amount = ceil($this_robot->robot_attack * ($this_ability->ability_damage / 100));
         $this_robot->trigger_damage($this_robot, $this_ability, $attack_damage_amount);
-
-        // Increase this robot's speed stat
-        $this_ability->recovery_options_update(array(
-            'kind' => 'speed',
-            'frame' => 'taunt',
-            'percent' => true,
-            'success' => array(0, -6, 0, -10,  $this_robot->print_name().'&#39;s mobility improved&hellip;'),
-            'failure' => array(9, -6, 0, -10, $this_robot->print_name().'&#39;s mobility was not affected&hellip;')
-            ));
-        $speed_recovery_amount = ceil($this_robot->robot_attack * ($this_ability->ability_recovery / 100));
-        $this_robot->trigger_recovery($this_robot, $this_ability, $speed_recovery_amount);
 
         // Return true on success
         return true;
