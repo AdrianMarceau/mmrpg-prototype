@@ -13,7 +13,24 @@ $battle = array(
         'player_token' => 'player',
         'player_switch' => 1,
         'player_robots' => array(
-            array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'trill', 'robot_image' => 'trill_alt3', 'robot_level' => 3, 'robot_abilities' => array('space-shot', 'space-buster', 'space-overdrive'))
+            array(
+                'robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1),
+                'robot_token' => 'trill',
+                'robot_level' => 3,
+                'robot_abilities' => array(
+                    0 => 'space-shot',
+                    1 => 'space-buster',
+                    2 => 'space-overdrive',
+                    3 => 'speed-mode'
+                    ),
+                'robot_abilities_choices' =>
+                    'start:(3)'.
+                    '|once:(1)'.
+                    '|high-energy:(0)'.
+                    '|medium-energy:(1)'.
+                    '|once:(2)'.
+                    '|low-energy:(0,1)'
+                )
             )
         ),
     'battle_rewards' => array(

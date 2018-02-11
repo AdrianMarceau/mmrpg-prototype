@@ -13,7 +13,13 @@ $battle = array(
         'player_token' => 'player',
         'player_switch' => 1,
         'player_robots' => array(
-            array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'sniper-joe', 'robot_level' => 2, 'robot_abilities' => array('joe-shot', 'joe-shield'))
+            array(
+                'robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1),
+                'robot_token' => 'sniper-joe',
+                'robot_level' => 2,
+                'robot_abilities' => array('joe-shot', 'joe-shield'),
+                'robot_abilities_choices' => 'always:loop(1,0)'
+                )
             )
         ),
     'battle_rewards' => array(
