@@ -271,6 +271,19 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                     //echo '<div class="animate_fadein background_canvas background background_'.$background_animate[0].'" data-frame="'.$background_animate[0].'" '.(!empty($background_data_animate) ? 'data-animate="'.$background_data_animate.'"' : '').' style="background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
                     echo '<div class="animate_fadein background_canvas background background_00" data-frame="00" style="background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
 
+                    // Create the background attachments array if it doesn't exist
+                    if (!isset($this_field_data['field_background_attachments'])){
+                        $this_field_data['field_background_attachments'] = array();
+                    }
+
+                    // Manually merge any background attachments appended from a separate array
+                    if (!empty($this_field_data['field_background_attachments_append'])){
+                        $this_field_data['field_background_attachments'] = array_merge(
+                            $this_field_data['field_background_attachments'],
+                            $this_field_data['field_background_attachments_append']
+                            );
+                    }
+
                     // Loop through and display the markup of any background attachments
                     if (!empty($this_field_data['field_background_attachments'])){
                         echo '<div class="animate_fadein background_event event clearback sticky" style="z-index: 30; border-color: transparent;">';
@@ -374,6 +387,19 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             'item_text' => $temp_star_text
                             );
 
+                    }
+
+                    // Create the foreground attachments array if it doesn't exist
+                    if (!isset($this_field_data['field_foreground_attachments'])){
+                        $this_field_data['field_foreground_attachments'] = array();
+                    }
+
+                    // Manually merge any foreground attachments appended from a separate array
+                    if (!empty($this_field_data['field_foreground_attachments_append'])){
+                        $this_field_data['field_foreground_attachments'] = array_merge(
+                            $this_field_data['field_foreground_attachments'],
+                            $this_field_data['field_foreground_attachments_append']
+                            );
                     }
 
                     // Loop through and display the markup of any foreground attachments
