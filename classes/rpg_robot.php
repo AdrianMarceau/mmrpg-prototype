@@ -1096,11 +1096,11 @@ class rpg_robot extends rpg_object {
 
         // Collect a list of this robot's abilities
         $temp_ability_tokens = $this_robot->robot_abilities;
-        $temp_ability_tokens_count = !empty($temp_ability_tokens) ? $temp_ability_tokens : count();
+        $temp_ability_tokens_count = !empty($temp_ability_tokens) ? count($temp_ability_tokens) : 0;
         if (empty($temp_ability_tokens)){ return 'action-noweapons'; }
 
         // Check to see how many moves this robot has used already
-        $temp_abilities_used = !empty($this->history['triggered_abilities']) ? count($this->history['triggered_abilities']) : 0;
+        $temp_abilities_used = !empty($this_robot->history['triggered_abilities']) ? count($this_robot->history['triggered_abilities']) : 0;
         $temp_next_ability_key = $temp_abilities_used >= $temp_ability_tokens_count ? $temp_abilities_used % $temp_ability_tokens_count : $temp_abilities_used;
         $temp_next_ability_token = $temp_ability_tokens[$temp_next_ability_key];
 
