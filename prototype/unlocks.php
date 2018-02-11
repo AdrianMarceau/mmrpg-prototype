@@ -6,7 +6,7 @@
 // UNLOCK EVENT : PHASE ONE ROBOTS (LIGHT)
 
 // If Dr. Light has completed all of his second phase, open Dr. Wily's second
-if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
+if ($battle_complete_counter_light == 1){
 
     // Create the event flag and unset the player select variable to force main menu
     $temp_event_flag = 'dr-light-event-00_phase-zero-complete';
@@ -24,8 +24,6 @@ if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
             'console_markup' => $temp_console_markup
             ));
 
-        //$temp_game_flags['events'][$temp_event_flag] = true;
-        //$_SESSION[$session_token]['battle_settings']['this_player_token'] = false;
     }
 
 }
@@ -38,8 +36,8 @@ if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false,
     // Unlock Roll as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-light'];
     $unlock_robot_info = rpg_robot::get_index_info('roll');
-    $unlock_robot_info['robot_level'] = 1;
-    $unlock_robot_info['robot_experience'] = 999;
+    $unlock_robot_info['robot_level'] = 2;
+    $unlock_robot_info['robot_experience'] = 0;
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
@@ -304,8 +302,8 @@ if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 
     // Unlock Disco as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-wily'];
     $unlock_robot_info = rpg_robot::get_index_info('disco');
-    $unlock_robot_info['robot_level'] = 11;
-    $unlock_robot_info['robot_experience'] = 999;
+    $unlock_robot_info['robot_level'] = 12;
+    $unlock_robot_info['robot_experience'] = 0;
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
@@ -569,8 +567,8 @@ if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(fals
     // Unlock Rhythm as a playable character
     $unlock_player_info = $mmrpg_index['players']['dr-cossack'];
     $unlock_robot_info = rpg_robot::get_index_info('rhythm');
-    $unlock_robot_info['robot_level'] = 21;
-    $unlock_robot_info['robot_experience'] = 999;
+    $unlock_robot_info['robot_level'] = 22;
+    $unlock_robot_info['robot_experience'] = 0;
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
