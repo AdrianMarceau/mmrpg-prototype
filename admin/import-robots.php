@@ -96,7 +96,11 @@ if (!empty($mmrpg_index['robots'])){
             $temp_field_token = $robot['robot_field'];
             $temp_field_info = $mmrpg_index['fields'][$temp_field_token];
             $temp_master_token = !empty($temp_field_info['field_master']) ? $temp_field_info['field_master'] : 'met';
-            $temp_master_number = isset($mmrpg_index['robots'][$temp_master_token]) ? $mmrpg_index['robots'][$temp_master_token]['robot_number'] : $mmrpg_index['mechas'][$temp_master_token]['robot_number'];
+            if (isset($mmrpg_index['bosses'][$temp_master_token])){ $temp_master_number = $mmrpg_index['bosses'][$temp_master_token]['robot_number']; }
+            elseif (isset($mmrpg_index['robots'][$temp_master_token])){ $temp_master_number = $mmrpg_index['robots'][$temp_master_token]['robot_number']; }
+            elseif (isset($mmrpg_index['mechas'][$temp_master_token])){ $temp_master_number = $mmrpg_index['mechas'][$temp_master_token]['robot_number']; }
+            else { $temp_master_number = ''; }
+            //$temp_master_number = isset($mmrpg_index['robots'][$temp_master_token]) ? $mmrpg_index['robots'][$temp_master_token]['robot_number'] : $mmrpg_index['mechas'][$temp_master_token]['robot_number'];
             $robot['robot_master_number'] = $temp_master_number;
         } elseif ($robot['robot_class'] == 'master'){
             $robot['robot_master_number'] = $robot['robot_number'];
