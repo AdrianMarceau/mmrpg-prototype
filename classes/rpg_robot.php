@@ -2553,13 +2553,6 @@ class rpg_robot extends rpg_object {
 
         // If this is a mecha, define it's generation for display
         $robot_info['robot_name_append'] = '';
-        if (!empty($robot_info['robot_class']) && $robot_info['robot_class'] == 'mecha'){
-            $robot_info['robot_generation'] = '1st';
-            if (preg_match('/-2$/', $robot_info['robot_token'])){ $robot_info['robot_generation'] = '2nd'; $robot_info['robot_name_append'] = ' 2'; }
-            elseif (preg_match('/-3$/', $robot_info['robot_token'])){ $robot_info['robot_generation'] = '3rd'; $robot_info['robot_name_append'] = ' 3'; }
-        } elseif (preg_match('/^duo/i', $robot_info['robot_token'])){
-
-        }
 
         // Define the sprite frame index for robot images
         $robot_sprite_frames = array('base','taunt','victory','defeat','shoot','throw','summon','slide','defend','damage','base2');
@@ -2716,7 +2709,6 @@ class rpg_robot extends rpg_object {
                                         <td  class="right">
                                             <label>Name :</label>
                                             <span class="robot_type" style="width: auto;"><?= $robot_info['robot_name']?></span>
-                                            <? if (!empty($robot_info['robot_generation'])){ ?><span class="robot_type" style="width: auto;"><?= $robot_info['robot_generation']?> Gen</span><? } ?>
                                         </td>
                                     </tr>
                                 <? endif; ?>
