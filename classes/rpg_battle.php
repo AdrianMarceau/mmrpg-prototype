@@ -1820,6 +1820,7 @@ class rpg_battle extends rpg_object {
                 $temp_target_robot_affinities = $temp_target_robot->print_affinities();
                 $temp_target_robot_immunities = $temp_target_robot->print_immunities();
                 $temp_target_robot_abilities = $temp_target_robot->print_abilities();
+                $temp_target_robot_abilities_choices = $temp_target_robot->robot_abilities_choices;
 
                 // Change the target robot's frame to defend base and save
                 $temp_target_robot->robot_frame = 'taunt';
@@ -1909,6 +1910,12 @@ class rpg_battle extends rpg_object {
                                         <td class="right" colspan="5">
                                             <span style="float: left;">Abilities :</span>
                                             <?= !empty($temp_target_robot_abilities) ? $temp_target_robot_abilities : '<span class="robot_ability">None</span>' ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="right" colspan="5">
+                                            <span style="float: left;">Logic :</span>
+                                            <?= !empty($temp_target_robot_abilities_choices) ? $temp_target_robot_abilities_choices : '-' ?>
                                         </td>
                                     </tr>
                                 <? } ?>
