@@ -14,7 +14,6 @@ $robot = array(
     'robot_attack' => 50,
     'robot_defense' => 50,
     'robot_speed' => 50,
-    'robot_weaknesses' => array('empty'),
     'robot_immunities' => array('*'),
     'robot_abilities' => array('energy-boost', 'energy-break'),
     'robot_rewards' => array(
