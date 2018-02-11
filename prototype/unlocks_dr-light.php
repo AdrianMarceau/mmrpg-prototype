@@ -211,18 +211,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
 /* -- UNLOCKABLE ROBOTS -- */
 
-// NEW ROBOT : ROLL (SUPPORT)
-// If the player has failed at least one battle, unlock Roll as a playable character
-if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false, 'roll')){
-
-    // Unlock Roll as a playable character
-    $unlock_player_info = $mmrpg_index['players']['dr-light'];
-    $unlock_robot_info = rpg_robot::get_index_info('roll');
-    $unlock_robot_info['robot_level'] = 2;
-    $unlock_robot_info['robot_experience'] = 0;
-    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
-
-}
+// ...not yet!
 
 
 /* -- UNLOCKABLE PLAYERS -- */
