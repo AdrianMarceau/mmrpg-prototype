@@ -81,33 +81,23 @@ foreach ($mmrpg_database_mechas AS $temp_token => $temp_info){
     if (!empty($temp_info['robot_core2'])){ $mmrpg_database_mechas_types['cores'][$temp_info['robot_core2']]++; }
     //else { $mmrpg_database_mechas_types['cores']['none']++; }
 
-    // Loop through the mecha weaknesses if there are any to loop through
-    if (!empty($temp_info['robot_weaknesses'])){
-        foreach ($temp_info['robot_weaknesses'] AS $weakness){ $mmrpg_database_mechas_types['weaknesses'][$weakness]++; }
-    } else {
-        $mmrpg_database_mechas_types['weaknesses']['none']++;
-    }
-    // Loop through the mecha resistances if there are any to loop through
-    if (!empty($temp_info['robot_resistances'])){
-        foreach ($temp_info['robot_resistances'] AS $weakness){ $mmrpg_database_mechas_types['resistances'][$weakness]++; }
-    } else {
-        $mmrpg_database_mechas_types['resistances']['none']++;
-    }
-    // Loop through the mecha affinities if there are any to loop through
-    if (!empty($temp_info['robot_affinities'])){
-        foreach ($temp_info['robot_affinities'] AS $weakness){ $mmrpg_database_mechas_types['affinities'][$weakness]++; }
-    } else {
-        $mmrpg_database_mechas_types['affinities']['none']++;
-    }
-    // Loop through the mecha immunities if there are any to loop through
-    if (!empty($temp_info['robot_immunities'])){
-        foreach ($temp_info['robot_immunities'] AS $weakness){ $mmrpg_database_mechas_types['immunities'][$weakness]++; }
-    } else {
-        $mmrpg_database_mechas_types['immunities']['none']++;
+    // Define the stat attributes to loop through and then do so to count instances
+    $stat_attributes = array('weaknesses', 'resistances', 'affinities', 'immunities');
+    foreach ($stat_attributes AS $attribute){
+        if (!empty($temp_info['robot_'.$attribute])){
+            foreach ($temp_info['robot_'.$attribute] AS $type){
+                if ($type === '*'){ foreach ($mmrpg_database_mechas_types[$attribute] AS $k => $v){ $mmrpg_database_mechas_types[$attribute][$k]++; } }
+                if (!isset($mmrpg_database_mechas_types[$attribute][$type])){ continue; }
+                $mmrpg_database_mechas_types[$attribute][$type]++;
+            }
+        } else {
+            $mmrpg_database_mechas_types[$attribute]['none']++;
+        }
     }
 
     // Update the main database array with the changes
     $mmrpg_database_mechas[$temp_token] = $temp_info;
+
 }
 
 // Define the max stat value before we filter and update
@@ -152,7 +142,6 @@ foreach ($mmrpg_database_mechas AS $mecha_key => $mecha_info){
     $mecha_is_active = !empty($this_current_token) && $this_current_token == $mecha_info['robot_token'] ? true : false;
     $mecha_title_text = $mecha_info['robot_name'].$mecha_info['robot_name_append'].' | '.$mecha_info['robot_number'].' | '.(!empty($mecha_info['robot_core']) ? ucwords($mecha_info['robot_core'].(!empty($mecha_info['robot_core2']) ? ' / '.$mecha_info['robot_core2'] : '')) : 'Neutral').' Type';
     $mecha_title_text .= '|| [[E:'.$mecha_info['robot_energy'].' | W:'.$mecha_info['robot_weapons'].' | A:'.$mecha_info['robot_attack'].' | D:'.$mecha_info['robot_defense'].' | S:'.$mecha_info['robot_speed'].']]';
-    $mecha_title_text .= '|| ' . $game_code;
     $mecha_image_path = 'images/robots/'.$mecha_image_token.'/mug_right_'.$mecha_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
     $mecha_stat_max = $mecha_info['robot_energy'] + $mecha_info['robot_attack'] + $mecha_info['robot_defense'] + $mecha_info['robot_speed'];
     if ($mecha_stat_max > $mmrpg_stat_base_max_value['mecha']){ $mmrpg_stat_base_max_value['mecha'] = $mecha_stat_max; }

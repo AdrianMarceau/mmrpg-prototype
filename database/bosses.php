@@ -76,29 +76,18 @@ foreach ($mmrpg_database_bosses AS $temp_token => $temp_info){
     else { $mmrpg_database_bosses_types['cores']['none']++; }
     if (!empty($temp_info['robot_core2'])){ $mmrpg_database_bosses_types['cores'][$temp_info['robot_core2']]++; }
 
-    // Loop through the boss weaknesses if there are any to loop through
-    if (!empty($temp_info['robot_weaknesses'])){
-        foreach ($temp_info['robot_weaknesses'] AS $weakness){ $mmrpg_database_bosses_types['weaknesses'][$weakness]++; }
-    } else {
-        $mmrpg_database_bosses_types['weaknesses']['none']++;
-    }
-    // Loop through the boss resistances if there are any to loop through
-    if (!empty($temp_info['robot_resistances'])){
-        foreach ($temp_info['robot_resistances'] AS $weakness){ $mmrpg_database_bosses_types['resistances'][$weakness]++; }
-    } else {
-        $mmrpg_database_bosses_types['resistances']['none']++;
-    }
-    // Loop through the boss affinities if there are any to loop through
-    if (!empty($temp_info['robot_affinities'])){
-        foreach ($temp_info['robot_affinities'] AS $weakness){ $mmrpg_database_bosses_types['affinities'][$weakness]++; }
-    } else {
-        $mmrpg_database_bosses_types['affinities']['none']++;
-    }
-    // Loop through the boss immunities if there are any to loop through
-    if (!empty($temp_info['robot_immunities'])){
-        foreach ($temp_info['robot_immunities'] AS $weakness){ $mmrpg_database_bosses_types['immunities'][$weakness]++; }
-    } else {
-        $mmrpg_database_bosses_types['immunities']['none']++;
+    // Define the stat attributes to loop through and then do so to count instances
+    $stat_attributes = array('weaknesses', 'resistances', 'affinities', 'immunities');
+    foreach ($stat_attributes AS $attribute){
+        if (!empty($temp_info['robot_'.$attribute])){
+            foreach ($temp_info['robot_'.$attribute] AS $type){
+                if ($type === '*'){ foreach ($mmrpg_database_bosses_types[$attribute] AS $k => $v){ $mmrpg_database_bosses_types[$attribute][$k]++; } }
+                if (!isset($mmrpg_database_bosses_types[$attribute][$type])){ continue; }
+                $mmrpg_database_bosses_types[$attribute][$type]++;
+            }
+        } else {
+            $mmrpg_database_bosses_types[$attribute]['none']++;
+        }
     }
 
     // Update the main database array with the changes
