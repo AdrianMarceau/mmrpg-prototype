@@ -32,8 +32,8 @@ $ability = array(
                 'percent' => true,
                 'frame' => $this_robot->robot_token == 'sniper-joe' ? 'defend' : 'taunt',
                 'rates' => array(100, 0, 0),
-                'success' => array(0, 34, -10, 18, $temp_text.$this_ability->print_name().' attached itself to '.$this_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s defenses were bolstered!'),
-                'failure' => array(0, 34, -10, 18, $temp_text.$this_ability->print_name().' attached itself to '.$this_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s defenses were bolstered!')
+                'success' => array(0, 34, -10, 18, $temp_text.$this_ability->print_name().' attached itself to '.$this_robot->print_name().'!<br /> '.$this_robot->print_name().'&#39;s defenses were bolstered!'),
+                'failure' => array(0, 34, -10, 18, $temp_text.$this_ability->print_name().' attached itself to '.$this_robot->print_name().'!<br /> '.$this_robot->print_name().'&#39;s defenses were bolstered!')
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
