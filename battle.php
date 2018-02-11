@@ -292,13 +292,14 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             if ($flag_wap && preg_match('/^(mecha|object)/i', $this_id)){ continue; }
                             $this_key++;
                             $this_class = $this_info['class'];
+                            $this_token = $this_info[$this_class.'_token'];
+                            if (!empty($this_info['hide_if_unlocked']) && $this_class == 'robot' && mmrpg_prototype_robot_unlocked('', $this_token)){ continue; }
                             $this_size = $this_info['size'];
                             $this_boxsize = $this_size.'x'.$this_size;
                             $this_path = $class_paths[$this_class];
                             $this_offset_x = $this_info['offset_x'];
                             $this_offset_y = $this_info['offset_y'];
                             $this_offset_z = $this_key + 1;
-                            $this_token = $this_info[$this_class.'_token'];
                             $this_image = !empty($this_info[$this_class.'_image']) ? $this_info[$this_class.'_image'] : $this_token;
                             $this_frames = $this_info[$this_class.'_frame'];
                             if ($this_class == 'robot' && !empty($this_field_data['field_mechas']) && preg_match('/^mecha/i', $this_id)){
@@ -410,13 +411,14 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             if ($flag_wap && preg_match('/^(mecha|object)/i', $this_id)){ continue; }
                             $this_key++;
                             $this_class = $this_info['class'];
+                            $this_token = $this_info[$this_class.'_token'];
+                            if (!empty($this_info['hide_if_unlocked']) && $this_class == 'robot' && mmrpg_prototype_robot_unlocked('', $this_token)){ continue; }
                             $this_size = $this_info['size'];
                             $this_boxsize = $this_size.'x'.$this_size;
                             $this_path = $class_paths[$this_class];
                             $this_offset_x = $this_info['offset_x'];
                             $this_offset_y = $this_info['offset_y'];
                             $this_offset_z = isset($this_info['offset_z']) ? $this_info['offset_z'] : $this_key + 1;
-                            $this_token = $this_info[$this_class.'_token'];
                             $this_text = !empty($this_info[$this_class.'_text']) ? $this_info[$this_class.'_text'] : '&nbsp;';
                             $this_image = !empty($this_info[$this_class.'_image']) ? $this_info[$this_class.'_image'] : $this_token;
                             $this_frames = $this_info[$this_class.'_frame'];
