@@ -2488,7 +2488,7 @@ class rpg_robot extends rpg_object {
 
         // Define the global variables
         global $mmrpg_index, $this_current_uri, $this_current_url, $db;
-        global $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_types;
+        global $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_types, $mmrpg_database_types_hidden;
         global $mmrpg_stat_base_max_value;
 
         // Define any local static variables
@@ -2498,7 +2498,8 @@ class rpg_robot extends rpg_object {
         if (empty($mmrpg_database_players)){ $mmrpg_database_players = rpg_player::get_index(true); }
         if (empty($mmrpg_database_items)){ $mmrpg_database_items = rpg_item::get_index(true); }
         if (empty($mmrpg_database_fields)){ $mmrpg_database_fields = rpg_field::get_index(true); }
-        if (empty($mmrpg_database_types)){ $mmrpg_database_types = rpg_type::get_index(); }
+        if (empty($mmrpg_database_types)){ $mmrpg_database_types = rpg_type::get_index(true); }
+        if (empty($mmrpg_database_types_hidden)){ $mmrpg_database_types_hidden = array(); }
 
         // Define the print style defaults
         if (!isset($print_options['layout_style'])){ $print_options['layout_style'] = 'website'; }
@@ -2829,6 +2830,50 @@ class rpg_robot extends rpg_object {
 
                         <table class="full types">
                             <tbody>
+                                <?
+                                // Define the stat attributes to loop through and display, then do so
+                                $stat_attributes = array('weakness' => 'weaknesses', 'resistance' => 'resistances', 'affinity' => 'affinities', 'immunity' => 'immunities');
+                                foreach ($stat_attributes AS $attribute_single => $attribute_plural){
+                                    ?>
+                                    <tr>
+                                        <td class="right <?= $attribute_plural ?>" data-count="<?= count($robot_info['robot_'.$attribute_plural]) ?>">
+                                            <label><?= ucfirst($attribute_plural) ?> :</label>
+                                            <?
+
+                                            // Loop through all elements in this stat attribute list and generate markup
+                                            $temp_string = array();
+                                            if (!empty($robot_info['robot_'.$attribute_plural])){
+                                                foreach ($robot_info['robot_'.$attribute_plural] AS $type_token){
+                                                    if ($type_token == '*'){
+                                                        $name = 'All Elements';
+                                                        $name1 = '<span>'.substr($name, 0, 3).'</span>';
+                                                        $name2 = '<span>'.substr($name, 3).'</span>';
+                                                        if ($print_options['layout_style'] != 'event'){ $temp_string[] = '<span class="robot_'.$attribute_single.' robot_type type_empty">'.$name1.$name2.'</a>'; }
+                                                        else { $temp_string[] = '<span class="robot_'.$attribute_single.' robot_type type_empty">'.$name.'</span>'; }
+                                                    } elseif (isset($mmrpg_database_types[$type_token])
+                                                        || isset($mmrpg_database_types_hidden[$type_token])){
+                                                        $name = isset($mmrpg_database_types[$type_token]) ? $mmrpg_database_types[$type_token]['type_name'] : $mmrpg_database_types_hidden[$type_token]['type_name'];
+                                                        $name1 = '<span>'.substr($name, 0, 2).'</span>';
+                                                        $name2 = '<span>'.substr($name, 2).'</span>';
+                                                        if ($print_options['layout_style'] != 'event'){ $temp_string[] = '<a href="'.$database_url.'abilities/'.$type_token.'/" class="robot_'.$attribute_single.' robot_type type_'.$type_token.'">'.$name1.$name2.'</a>'; }
+                                                        else { $temp_string[] = '<span class="robot_'.$attribute_single.' robot_type type_'.$type_token.'">'.$name.'</span>'; }
+                                                    }
+                                                }
+
+                                            }
+
+                                            // Print the collect type spans/links if they exist, else print a none span
+                                            if (!empty($temp_string)){ echo implode(' ', $temp_string); }
+                                            else { echo '<span class="robot_'.$attribute_single.' robot_type type_none">None</span>'; }
+
+                                            ?>
+                                        </td>
+                                    </tr>
+                                    <?
+                                }
+                                ?>
+
+                                <? /*
                                 <tr>
                                     <td class="right weaknesses" data-count="<?= count($robot_info['robot_weaknesses']) ?>">
                                         <label>Weaknesses :</label>
@@ -2909,6 +2954,9 @@ class rpg_robot extends rpg_object {
                                         ?>
                                     </td>
                                 </tr>
+                                */ ?>
+
+
                             </tbody>
                         </table>
 
