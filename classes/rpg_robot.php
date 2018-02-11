@@ -128,6 +128,7 @@ class rpg_robot extends rpg_object {
         $this->robot_immunities = isset($this_robotinfo['robot_immunities']) ? $this_robotinfo['robot_immunities'] : array();
         $this->robot_item = isset($this_robotinfo['robot_item']) ? $this_robotinfo['robot_item'] : '';
         $this->robot_abilities = isset($this_robotinfo['robot_abilities']) ? $this_robotinfo['robot_abilities'] : array();
+        $this->robot_abilities_choices = isset($this_robotinfo['robot_abilities_choices']) ? $this_robotinfo['robot_abilities_choices'] : 'auto';
         $this->robot_attachments = isset($this_robotinfo['robot_attachments']) ? $this_robotinfo['robot_attachments'] : array();
         $this->robot_quotes = isset($this_robotinfo['robot_quotes']) ? $this_robotinfo['robot_quotes'] : array();
         $this->robot_status = isset($this_robotinfo['robot_status']) ? $this_robotinfo['robot_status'] : 'active';
@@ -1074,43 +1075,122 @@ class rpg_robot extends rpg_object {
         else { return false; }
     }
 
-    // Define a function for deciding which ability a robot should in battle
-    public static function robot_choices_abilities($objects, $choice_method = 'auto'){
-
-        // If the method for selection was set to sequence, use that function to decide
-        if ($choice_method == 'order'){
-            return self::robot_choices_abilities_byorder($objects);
+    // Define a function for checking this robot's current stat levels
+    public function get_energy_level($return = 'percent'){ return $this->get_stat_level('energy', $return);  }
+    public function get_weapons_level($return = 'percent'){ return $this->get_stat_level('weapons', $return);  }
+    public function get_attack_level($return = 'percent'){ return $this->get_stat_level('attack', $return);  }
+    public function get_defense_level($return = 'percent'){ return $this->get_stat_level('defense', $return);  }
+    public function get_speed_level($return = 'percent'){ return $this->get_stat_level('speed', $return);  }
+    public function get_stat_level($stat, $return = 'percent'){
+        if (!in_array($return, array('percent', 'string'))){ $return = 'percent'; }
+        if ($stat == 'energy'){ $current_stat = $this->robot_energy; $base_stat = $this->robot_base_energy; }
+        elseif ($stat == 'weapons'){ $current_stat = $this->robot_weapons; $base_stat = $this->robot_base_weapons; }
+        elseif ($stat == 'attack'){ $current_stat = $this->robot_attack; $base_stat = $this->robot_base_attack; }
+        elseif ($stat == 'defense'){ $current_stat = $this->robot_defense; $base_stat = $this->robot_base_defense; }
+        elseif ($stat == 'speed'){ $current_stat = $this->robot_speed; $base_stat = $this->robot_base_speed; }
+        $current_percent = ($current_stat / $base_stat) * 100;
+        if ($return == 'percent'){
+            return $current_percent;
+        } elseif ($return == 'string'){
+            if ($current_percent >= 50){ $current_string = 'high'; }
+            elseif ($current_percent >= 25){ $current_string = 'medium'; }
+            else { $current_string = 'low'; }
+            return $current_string;
         }
-        // Else if method was automatic or undefined, select the next ability using weighted randoms
-        else {
-            return self::robot_choices_abilities_byauto($objects);
-        }
-
     }
 
-    // Define a function for deciding which ability a robot should in battle used order
-    public static function robot_choices_abilities_byorder($objects){
+    // Define a function for deciding which ability a robot should in battle
+    public static function robot_choices_abilities($objects, $choice_data = ''){
 
-        // Extract all objects into the current scope
-        extract($objects);
+        // Predefine the choice method as auto
+        $choice_method = 'auto';
 
-        // Collect a list of this robot's abilities
-        $temp_ability_tokens = $this_robot->robot_abilities;
-        $temp_ability_tokens_count = !empty($temp_ability_tokens) ? count($temp_ability_tokens) : 0;
-        if (empty($temp_ability_tokens)){ return 'action-noweapons'; }
+        // If empty, attempt to pull the choice method from the robot
+        if (empty($choice_data)){
+            extract($objects);
+            if (!empty($this_robot->robot_abilities_choices)){
+                $choice_data = $this_robot->robot_abilities_choices;
+            }
+        }
 
-        // Check to see how many moves this robot has used already
-        $temp_abilities_used = !empty($this_robot->history['triggered_abilities']) ? count($this_robot->history['triggered_abilities']) : 0;
-        $temp_next_ability_key = $temp_abilities_used >= $temp_ability_tokens_count ? $temp_abilities_used % $temp_ability_tokens_count : $temp_abilities_used;
-        $temp_next_ability_token = $temp_ability_tokens[$temp_next_ability_key];
+        // If choice data was found we need to parse it
+        if (!empty($choice_data) && $choice_data != 'auto'){
 
-        // Return the next ability token in sequence of equipped
-        return $temp_next_ability_token;
+            // Define the pattern for allowed choice data
+            $regex_pattern = '/^(start|once|always|(?:high|medium|low)-(?:energy|weapons|attack|defense|speed)):([a-z]+)?\(([,0-9]+)\)$/i';
+
+            // Collect data about this robot's current stats (high/medium/low)
+            $robot_ability_list = !empty($this_robot->robot_abilities) ? $this_robot->robot_abilities : array();
+            $robot_abilities_triggered = !empty($this_robot->history['triggered_abilities']) ? $this_robot->history['triggered_abilities'] : array();
+            $robot_abilities_triggered_count = !empty($robot_abilities_triggered) ? count($robot_abilities_triggered) : 0;
+            $robot_energy_level = $this_robot->get_energy_level('string');
+            $robot_weapons_level = $this_robot->get_weapons_level('string');
+            $robot_attack_level = $this_robot->get_attack_level('string');
+            $robot_defense_level = $this_robot->get_defense_level('string');
+            $robot_speed_level = $this_robot->get_speed_level('string');
+
+            // Collect choice data and break apart if several options
+            if (strstr($choice_data, '|')){ $choice_data = explode('|', $choice_data); }
+            else { $choice_data = array($choice_data); }
+
+            // Loop through and parse all the choice data, breaking on matched conditions
+            foreach ($choice_data AS $key => $string){
+
+                // Continue to next if not in the correct format
+                if (!preg_match($regex_pattern, $string, $matches)){ continue; }
+
+                // Extract the conditional variables from the string matches
+                list($match, $when, $order, $ability_keys) = $matches;
+                $ability_keys = strstr($ability_keys, ',') ? explode(',', $ability_keys) : array($ability_keys);
+
+                // Remove keys that do not have matching abilities
+                foreach ($ability_keys AS $kk => $kv){ if (!isset($robot_ability_list[$kv])){ unset($ability_keys[$kk]); } }
+                $ability_keys = array_values($ability_keys);
+
+                // If there are no valid keys in this choice, continue to next
+                if (empty($ability_keys)){ continue; }
+                $ability_keys_count = count($ability_keys);
+
+                // Check to see if this choice should be allowed and continue if not
+                $allow_choice = false;
+                if ($when == 'start' && empty($robot_abilities_triggered_count)){ $allow_choice = true; }
+                elseif ($when == 'once' && !in_array($robot_ability_list[$ability_keys[0]], $robot_abilities_triggered)){ $allow_choice = true; }
+                elseif (strstr($when, 'energy') && strstr($when, $robot_energy_level)){ $allow_choice = true; }
+                elseif (strstr($when, 'weapons') && strstr($when, $robot_weapons_level)){ $allow_choice = true; }
+                elseif (strstr($when, 'attack') && strstr($when, $robot_attack_level)){ $allow_choice = true; }
+                elseif (strstr($when, 'defense') && strstr($when, $robot_defense_level)){ $allow_choice = true; }
+                elseif (strstr($when, 'speed') && strstr($when, $robot_speed_level)){ $allow_choice = true; }
+                elseif ($when == 'always'){ $allow_choice = true; }
+                if (!$allow_choice){ continue; }
+
+                // If there's only one choice key, just return it now
+                if ($ability_keys_count == 1){
+                    $choice_key = $ability_keys[0];
+                    return $robot_ability_list[$choice_key];
+                }
+
+                // Otherwise pull a choice key based on the order argument
+                if ($order == 'loop'){
+                    $key_key = $robot_abilities_triggered_count >= $ability_keys_count ? $robot_abilities_triggered_count % $ability_keys_count : $robot_abilities_triggered_count;
+                    $choice_key = $ability_keys[$key_key];
+                    return $robot_ability_list[$choice_key];
+                } else {
+                    $key_key = mt_rand(0, ($ability_keys_count - 1));
+                    $choice_key = $ability_keys[$key_key];
+                    return $robot_ability_list[$choice_key];
+                }
+
+            }
+
+        }
+
+        // If we made if this far, we need to decide the next ability automatically
+        return self::robot_choices_abilities_auto($objects);
 
     }
 
     // Define a function for deciding which ability a robot should in battle using weighted randoms
-    public static function robot_choices_abilities_byauto($objects){
+    public static function robot_choices_abilities_auto($objects){
 
         // Extract all objects into the current scope
         extract($objects);
@@ -2348,6 +2428,7 @@ class rpg_robot extends rpg_object {
             'robot_affinities' => $this->robot_affinities,
             'robot_immunities' => $this->robot_immunities,
             'robot_abilities' => $this->robot_abilities,
+            'robot_abilities_choices' => $this->robot_abilities_choices,
             'robot_attachments' => $this->robot_attachments,
             'robot_quotes' => $this->robot_quotes,
             'robot_rewards' => $this->robot_rewards,
