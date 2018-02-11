@@ -1074,8 +1074,43 @@ class rpg_robot extends rpg_object {
         else { return false; }
     }
 
-    // Define a function for checking if this robot is in speed break status
-    public static function robot_choices_abilities($objects){
+    // Define a function for deciding which ability a robot should in battle
+    public static function robot_choices_abilities($objects, $choice_method = 'auto'){
+
+        // If the method for selection was set to sequence, use that function to decide
+        if ($choice_method == 'order'){
+            return self::robot_choices_abilities_byorder($objects);
+        }
+        // Else if method was automatic or undefined, select the next ability using weighted randoms
+        else {
+            return self::robot_choices_abilities_byauto($objects);
+        }
+
+    }
+
+    // Define a function for deciding which ability a robot should in battle used order
+    public static function robot_choices_abilities_byorder($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Collect a list of this robot's abilities
+        $temp_ability_tokens = $this_robot->robot_abilities;
+        $temp_ability_tokens_count = !empty($temp_ability_tokens) ? $temp_ability_tokens : count();
+        if (empty($temp_ability_tokens)){ return 'action-noweapons'; }
+
+        // Check to see how many moves this robot has used already
+        $temp_abilities_used = !empty($this->history['triggered_abilities']) ? count($this->history['triggered_abilities']) : 0;
+        $temp_next_ability_key = $temp_abilities_used >= $temp_ability_tokens_count ? $temp_abilities_used % $temp_ability_tokens_count : $temp_abilities_used;
+        $temp_next_ability_token = $temp_ability_tokens[$temp_next_ability_key];
+
+        // Return the next ability token in sequence of equipped
+        return $temp_next_ability_token;
+
+    }
+
+    // Define a function for deciding which ability a robot should in battle using weighted randoms
+    public static function robot_choices_abilities_byauto($objects){
 
         // Extract all objects into the current scope
         extract($objects);
