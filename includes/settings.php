@@ -75,6 +75,7 @@ define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX', 8); // The maximum number of r
 // Define the global multiplier for battle points per level
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL', 1000); // The point rate per robot master level for normal battles
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2', 100); // The point rate per support mecha level for normal battles
+define('MMRPG_SETTINGS_BATTLETURNS_PERBOSS', 12); // The point rate per target fortress boss for normal battles
 define('MMRPG_SETTINGS_BATTLETURNS_PERROBOT', 8); // The point rate per target robot master for normal battles
 define('MMRPG_SETTINGS_BATTLETURNS_PERMECHA', 2); // The point rate per target support mecha for normal battles
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER', 0.01); // The conversion rate for battle points into zenny rewards
