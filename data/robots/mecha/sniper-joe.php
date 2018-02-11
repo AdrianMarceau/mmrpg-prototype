@@ -34,10 +34,10 @@ $robot = array(
             )
         ),
     'robot_quotes' => array(
-        'battle_start' => '',
-        'battle_taunt' => '',
-        'battle_victory' => '',
-        'battle_defeat' => ''
+        'battle_start' => '...',
+        'battle_taunt' => '...!',
+        'battle_victory' => '...!!',
+        'battle_defeat' => '...?'
         ),
     'robot_function_onload' => function($objects){
 
