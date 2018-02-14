@@ -64,4 +64,14 @@ if (!empty($temp_flags['drlight_password_abilitygetnowivegotyourpower'])){
     }
 }
 
+// If the UNLOCK MEGA SLIDE password was created
+if (!empty($temp_flags['drlight_password_abilitygetslideintofirst'])){
+    if (!mmrpg_prototype_ability_unlocked('dr-light', false, 'mega-slide')){
+        // Unlock Copy Shot as an equippable ability
+        mmrpg_game_unlock_ability($mmrpg_index['players']['dr-light'], false, array('ability_token' => 'mega-slide'), true);
+        header('Location: prototype.php');
+        exit();
+    }
+}
+
 ?>
