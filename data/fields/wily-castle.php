@@ -22,8 +22,7 @@ $field = array(
   'field_background_attachments' => array(
     'mecha-01' => array('class' => 'robot', 'size' => 40, 'offset_x' => 52, 'offset_y' => 161, 'robot_token' => 'met', 'robot_frame' => array(0), 'robot_direction' => 'left'),
     'mecha-02' => array('class' => 'robot', 'size' => 40, 'offset_x' => 184, 'offset_y' => 185, 'robot_token' => 'met', 'robot_frame' => array(0), 'robot_direction' => 'right'),
-    'mecha-03' => array('class' => 'robot', 'size' => 40, 'offset_x' => 242, 'offset_y' => 169, 'robot_token' => 'met', 'robot_frame' => array(0), 'robot_direction' => 'left'),
-    'mecha-04' => array('class' => 'robot', 'size' => 40, 'offset_x' => -33, 'offset_y' => 137, 'robot_token' => 'met', 'robot_frame' => array(0), 'robot_direction' => 'right')
+    'mecha-03' => array('class' => 'robot', 'size' => 40, 'offset_x' => -33, 'offset_y' => 137, 'robot_token' => 'met', 'robot_frame' => array(0), 'robot_direction' => 'right')
     ),
   'field_foreground_attachments' => array(
     'mecha-05' => array('class' => 'robot', 'size' => 80, 'offset_x' => -100, 'offset_y' => 0, 'robot_token' => 'met', 'robot_frame' => array(0), 'robot_direction' => 'right'),
