@@ -211,7 +211,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
 /* -- UNLOCKABLE ROBOTS -- */
 
-// ...not yet!
+// ...not anymore!
 
 
 /* -- UNLOCKABLE PLAYERS -- */

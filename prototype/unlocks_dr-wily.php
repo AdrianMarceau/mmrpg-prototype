@@ -187,18 +187,7 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
 /* -- UNLOCKABLE ROBOTS -- */
 
-// NEW ROBOT : DISCO (SUPPORT)
-// If the player has failed at least two battles, unlock Disco as a playable character
-if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked('', 'disco')){
-
-    // Unlock Disco as a playable character
-    $unlock_player_info = $mmrpg_index['players']['dr-wily'];
-    $unlock_robot_info = rpg_robot::get_index_info('disco');
-    $unlock_robot_info['robot_level'] = 12;
-    $unlock_robot_info['robot_experience'] = 0;
-    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
-
-}
+// ...not anymore!
 
 
 /* -- UNLOCKABLE PLAYERS -- */
@@ -259,8 +248,8 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT){
         $temp_event_flag = 'dr-cossack-event-00_player-unlocked';
         if (empty($temp_game_flags['events'][$temp_event_flag])){
             $temp_game_flags['events'][$temp_event_flag] = true;
-            $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
+            $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/cossack-citadel/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/cossack-citadel/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">Cossack Citadel</div>';
             $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-cossack/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 160px;">Dr. Cossack</div>';
             $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/proto-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 160px;">Proto Man</div>';
             $temp_console_markup = '<p>Congratulations!  <strong>Dr. Cossack</strong> has been unlocked as a playable character!</p>';
