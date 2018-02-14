@@ -5,7 +5,7 @@ $battle = array(
     'battle_size' => '1x4',
     'battle_encore' => true,
     'battle_description' => 'Defeat the Mets that are attacking Wily Castle!',
-    'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERMECHA * 1),
+    'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERMECHA * 2),
     'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 10 * 1),
     'battle_field_base' => array(
         'field_id' => 100,
@@ -45,20 +45,22 @@ $battle = array(
                 'robot_token' => 'met',
                 'robot_level' => 10,
                 'robot_abilities' => array(
-                    0 => 'met-shot'
+                    0 => 'met-shot',
+                    1 => 'attack-boost'
                     ),
                 'robot_abilities_choices' =>
-                    'always:(0)'
+                    'always:loop(1,0,0)'
                 ),
             array(
                 'robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2),
                 'robot_token' => 'met',
                 'robot_level' => 10,
                 'robot_abilities' => array(
-                    0 => 'met-shot'
+                    0 => 'met-shot',
+                    1 => 'defense-boost'
                     ),
                 'robot_abilities_choices' =>
-                    'always:(0)'
+                    'always:loop(1,1,0)'
                 )
             )
         ),
