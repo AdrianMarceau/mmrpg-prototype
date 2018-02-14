@@ -9,7 +9,7 @@ $field = array(
   'field_master' => 'proto-man',
   'field_master2' => array('rhythm'),
   'field_mechas' => array('met'),
-  'field_multipliers' => array('experience' => 2.0, 'recovery' => 0.5, 'damage' => 0.5),
+  'field_multipliers' => array('experience' => 2.0, 'recovery' => 1.1, 'damage' => 1.1),
   'field_description' => 'Cossack\'s Citadel',
   'field_background' => 'cossack-citadel',
   'field_foreground' => 'cossack-citadel',

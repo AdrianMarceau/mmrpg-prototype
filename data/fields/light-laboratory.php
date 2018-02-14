@@ -9,7 +9,7 @@ $field = array(
     'field_master' => 'mega-man',
     'field_master2' => array('roll'),
     'field_mechas' => array('met'),
-    'field_multipliers' => array('experience' => 2.0, 'recovery' => 1.5),
+    'field_multipliers' => array('experience' => 2.0, 'recovery' => 1.1),
     'field_description' => 'Light\'s Laboratory',
     'field_background' => 'light-laboratory',
     'field_foreground' => 'light-laboratory',

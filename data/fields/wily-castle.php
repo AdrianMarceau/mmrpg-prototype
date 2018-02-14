@@ -10,7 +10,7 @@ $field = array(
   'field_master' => 'bass',
   'field_master2' => array('disco'),
   'field_mechas' => array('met'),
-  'field_multipliers' => array('experience' => 2.0, 'damage' => 1.5),
+  'field_multipliers' => array('experience' => 2.0, 'damage' => 1.1),
   'field_description' => 'Wily\'s Castle',
   'field_background' => 'wily-castle',
   'field_foreground' => 'wily-castle',
