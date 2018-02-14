@@ -1,5 +1,5 @@
 <?
-// CHAPTER ONE INTRO BATTLE II : VS JOE (SNIPER)
+// CHAPTER ONE INTRO BATTLE II : VS JOE (SNIPER / SHOULD BE SKELETON)
 $battle = array(
     'battle_name' => 'Chapter One Intro Battle II',
     'battle_size' => '1x4',
