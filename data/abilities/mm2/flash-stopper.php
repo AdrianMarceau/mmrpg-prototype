@@ -7,8 +7,9 @@ $ability = array(
     'ability_group' => 'MM02/Weapons/014',
     'ability_description' => 'The user triggers a flash in space-time that damages all robots on the target\'s side of the field! This ability\'s effects appear to be more powerful when there are fewer robots on the opponent\'s side of the field&hellip;',
     'ability_type' => 'time',
-    'ability_energy' => 4,
-    'ability_damage' => 32,
+    'ability_type2' => 'crystal',
+    'ability_energy' => 8,
+    'ability_damage' => 64,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
