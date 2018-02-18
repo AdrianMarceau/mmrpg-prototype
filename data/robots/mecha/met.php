@@ -1,7 +1,7 @@
 <?
 // MET
 $robot = array(
-    'robot_number' => 'METT-001', // ROBOT : MET (1st Gen)
+    'robot_number' => 'DLM-MET01',
     'robot_class' => 'mecha',
     'robot_game' => 'MM00',
     'robot_name' => 'Met',

@@ -1,7 +1,7 @@
 <?
 // SKELETON JOE
 $robot = array(
-    'robot_number' => 'SJOE-002', // ROBOT : SKELETON JOE (1st Gen)
+    'robot_number' => 'DWM-JOE05',
     'robot_game' => 'MM04',
     'robot_group' => 'MMRPG',
     'robot_name' => 'Skeleton Joe',
