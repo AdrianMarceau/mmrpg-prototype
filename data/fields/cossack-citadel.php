@@ -3,8 +3,8 @@
 $field = array(
   'field_name' => 'Cossack Citadel',
   'field_token' => 'cossack-citadel',
-  'field_game' => 'MM00',
-  'field_number' => 'DCN-000',
+  'field_game' => 'MMRPGC',
+  'field_number' => 'DCN-001',
   'field_class' => 'player',
   'field_master' => 'proto-man',
   'field_master2' => array('rhythm'),
