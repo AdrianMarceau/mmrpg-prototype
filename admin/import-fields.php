@@ -59,14 +59,26 @@ die($this_page_markup."\n\n".
 
 // Sort the field index based on field number
 $temp_pattern_first = array();
+
 $temp_pattern_first[] = '/^(intro-field)$/i';
+
+$temp_pattern_first[] = '/^gentle-countryside$/i';
 $temp_pattern_first[] = '/^light-laboratory$/i';
+
+$temp_pattern_first[] = '/^maniacal-hideaway$/i';
 $temp_pattern_first[] = '/^wily-castle$/i';
+
+$temp_pattern_first[] = '/^wintry-forefront$/i';
 $temp_pattern_first[] = '/^cossack-citadel$/i';
+
 //$temp_pattern_first = array_reverse($temp_pattern_first);
 $temp_pattern_last = array();
+
 $temp_pattern_last[] = '/^final-destination(-2|-3)?$/i';
+
+$temp_pattern_last[] = '/^prototype-subspace/i';
 $temp_pattern_last[] = '/^prototype-complete$/i';
+
 $temp_pattern_last = array_reverse($temp_pattern_last);
 // Sort the field index based on field number
 function mmrpg_index_sort_fields($field_one, $field_two){
