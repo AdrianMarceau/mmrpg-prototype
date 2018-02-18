@@ -4,7 +4,7 @@ $battle = array(
     'battle_name' => 'Chapter One Intro Battle II',
     'battle_size' => '1x4',
     'battle_encore' => true,
-    'battle_description' => 'Defeat the Sniper Joe that\'s taken over Wily Castle!',
+    'battle_description' => 'Clear out the Skeleton Joe that have taken over Wily Castle!',
     'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 1),
     'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 11 * 1),
     'battle_field_base' => array(
@@ -12,6 +12,7 @@ $battle = array(
         'field_token' => 'wily-castle',
         'field_name' => 'Wily Castle',
         'field_music' => 'wily-castle',
+        'field_mechas' => array('skeleton-joe'),
         'field_background_attachments_append' => array(
             'robot_disco-support' => array(
                 'class' => 'robot',
@@ -32,11 +33,11 @@ $battle = array(
         'player_robots' => array(
             array(
                 'robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1),
-                'robot_token' => 'sniper-joe',
+                'robot_token' => 'skeleton-joe',
                 'robot_level' => 11,
                 'robot_abilities' => array(
                     0 => 'joe-shot',
-                    1 => 'joe-shield'
+                    1 => 'buster-shot'
                     ),
                 'robot_abilities_choices' =>
                     'always:loop(1,0)'

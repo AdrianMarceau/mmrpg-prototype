@@ -4,7 +4,7 @@ $battle = array(
     'battle_name' => 'Chapter One Intro Battle II',
     'battle_size' => '1x4',
     'battle_encore' => true,
-    'battle_description' => 'Defeat the Sniper Joe that\'s taken over Cossack Citadel!',
+    'battle_description' => 'Clear out the Crystal Joe that have taken over Cossack Citadel!',
     'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 1),
     'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 21 * 1),
     'battle_field_base' => array(
@@ -12,6 +12,7 @@ $battle = array(
         'field_token' => 'cossack-citadel',
         'field_name' => 'Cossack Citadel',
         'field_music' => 'cossack-citadel',
+        'field_mechas' => array('crystal-joe'),
         'field_background_attachments_append' => array(
             'robot_rhythm-support' => array(
                 'class' => 'robot',
@@ -32,11 +33,11 @@ $battle = array(
         'player_robots' => array(
             array(
                 'robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1),
-                'robot_token' => 'sniper-joe',
+                'robot_token' => 'crystal-joe',
                 'robot_level' => 21,
                 'robot_abilities' => array(
                     0 => 'joe-shot',
-                    1 => 'joe-shield'
+                    1 => 'buster-shot'
                     ),
                 'robot_abilities_choices' =>
                     'always:loop(1,0)'
