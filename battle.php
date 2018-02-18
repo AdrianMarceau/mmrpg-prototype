@@ -331,7 +331,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             $this_direction = $this_info[$this_class.'_direction'];
                             $this_float = $this_direction == 'left' ? 'right' : 'left';
                             echo '<div '.
-                                'data-id="background_attachment_'.$this_key.'" '.
+                                'data-id="background_attachment_'.$this_id.'" '.
                                 'class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" '.
                                 'data-type="attachment" '.
                                 'data-position="background" '.

@@ -1397,6 +1397,7 @@ function mmrpg_events(){
     //console.log('mmrpg_events()');
     //clearTimeout(canvasAnimationTimeout);
     clearInterval(canvasAnimationTimeout);
+
     var thisEvent = false;
     if (mmrpgEvents.length){
         // Switch to the events panel
@@ -1405,6 +1406,7 @@ function mmrpg_events(){
         thisEvent = mmrpgEvents.shift();
         thisEvent.event_functions();
         }
+
     if (mmrpgEvents.length < 1){
         // Switch to the specified "next" action
         var nextAction = $('input[name=next_action]', gameEngine).val();
@@ -1427,31 +1429,61 @@ function mmrpg_events(){
                 clearTimeout(autoClickTimer);
                 });
         }
+
     // Collect the current battle status and result
     var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
     var battleResult = $('input[name=this_battle_result]', gameEngine).val();
+
     // Check for specific value triggers and execute events
     if (battleStatus == 'complete'){
+
         //console.log('checkpoint | battleStatus='+battleStatus+' battleResult='+battleResult);
+
         // Collect object referenences for the two sound objects
         //var musicController = document.getElementById('volumeControl_musicLevels');
         var musicController = $('#volumeControl_musicLevels');
         //var soundController = document.getElementById('volumeControl_soundLevels');
         var soundController = $('#volumeControl_soundLevels');
+
         // Collect the current volume of the background music
         var musicVolume = musicController.volume;
+
         // Based on the battle result, play the victory or defeat music
-        if (battleResult == 'victory' && thisEvent.event_flags.victory != undefined && thisEvent.event_flags.victory != false){
+        if (battleResult == 'victory'
+            && thisEvent.event_flags.victory != undefined
+            && thisEvent.event_flags.victory != false){
+
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
             parent.mmrpg_music_load('misc/battle-victory', false, true);
             //var victoryTimeout = setTimeout(function(){ parent.mmrpg_music_load('last-track'); }, 5000);
-            } else if (battleResult == 'defeat' && thisEvent.event_flags.defeat != undefined && thisEvent.event_flags.defeat != false){
+
+            // Loop through and fade-out / remove any mecha or robot background/foreground attachments
+            $('.event.sticky .sprite[data-type="attachment"]', gameCanvas).each(function(i){
+                var $attachment = $(this);
+                var attachmentID = $attachment.attr('data-id');
+                if (attachmentID.match(/_mecha-([0-9]+)$/i)){
+                    $attachment.animate({opacity:0},600,'swing',function(){
+                        $attachment.remove();
+                        });
+                    }
+                });
+
+            } else if (battleResult == 'defeat'
+            && thisEvent.event_flags.defeat != undefined
+            && thisEvent.event_flags.defeat != false
+            ){
+
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
             parent.mmrpg_music_load('misc/battle-defeat', false, true);
             //var defeatTimeout = setTimeout(function(){ parent.mmrpg_music_load('last-track'); }, 5000);
+
             }
+
+
+
+
         }
 }
 
