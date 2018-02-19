@@ -536,11 +536,32 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
         return !empty($ability_tokens) ? count($ability_tokens) : 0;
     }
 }
+
+// Define a function for calculating the currently allowed robot limit
+function mmrpg_prototype_allowed_robot_limit($floor_to_unlocked = false){
+
+    // Define the default robot limit based on in-game unlocks
+    $allowed_robot_limit = 0;
+    $total_robots_unlocked = mmrpg_prototype_robots_unlocked();
+    if (mmrpg_prototype_player_unlocked('dr-light')){ $allowed_robot_limit += 2; }
+    if (mmrpg_prototype_player_unlocked('dr-wily')){ $allowed_robot_limit += 2; }
+    if (mmrpg_prototype_player_unlocked('dr-cossack')){ $allowed_robot_limit += 2; }
+    if (mmrpg_prototype_complete()){ $allowed_robot_limit += 2; }
+    if (empty($allowed_robot_limit)){ $allowed_robot_limit = 1; }
+    elseif ($allowed_robot_limit > 8){ $allowed_robot_limit = 8; }
+    if ($floor_to_unlocked && $allowed_robot_limit > $total_robots_unlocked){ $allowed_robot_limit = $total_robots_unlocked; }
+    return $allowed_robot_limit;
+
+}
+
 // Define a function for displaying prototype battle option markup
 function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     // Refence the global config and index objects for easy access
     global $mmrpg_index, $db;
     $mmrpg_index_fields = rpg_field::get_index();
+
+    // Define the default robot limit based on in-game unlocks
+    $default_robot_limit = mmrpg_prototype_allowed_robot_limit(true);
 
     // Define the variable to collect option markup
     $this_markup = '';
@@ -587,7 +608,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             // Generate the markup fields for display
             $this_option_token = $this_battleinfo['battle_token'];
-            $this_option_limit = !empty($this_battleinfo['battle_robot_limit']) ? $this_battleinfo['battle_robot_limit'] : 8;
+            $this_option_limit = !empty($this_battleinfo['battle_robot_limit']) ? $this_battleinfo['battle_robot_limit'] : $default_robot_limit;
             $this_option_frame = !empty($this_battleinfo['battle_sprite_frame']) ? $this_battleinfo['battle_sprite_frame'] : 'base';
             $this_option_status = !empty($this_battleinfo['battle_status']) ? $this_battleinfo['battle_status'] : 'enabled';
             $this_option_points = !empty($this_battleinfo['battle_points']) ? $this_battleinfo['battle_points'] : 0;
