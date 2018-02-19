@@ -773,13 +773,17 @@ function prototype_menu_click_option(thisContext, thisOption){
             // Update the start button's counter text
             $('.option[data-parent]', tempMenu).find('.count').html('0/'+gameSettings.nextRobotLimit+' Select');
 
-            // Reposition the robot select center if less than max 8
-            if (gameSettings.nextRobotLimit < 8){
-                $('.option[data-parent] label', tempMenu).css({
+            // Reposition the robot select center based on max limit
+            var tempOptionLabel = $('.option[data-parent] label', tempMenu);
+            if (tempOptionLabel.length){
+                tempOptionLabel.css({
                     position:'absolute',
-                    right:'calc(50% - '+(gameSettings.nextRobotLimit * 35)+'px)',
-                    transform:'translate(50%,0)'
+                    right:'50%',
+                    transform:'translate(50%,0)',
+                    paddingRight:'0'
                     });
+                tempOptionLabel[0].style.setProperty('padding-left', (gameSettings.nextRobotLimit * 40)+'px', 'important');
+                tempOptionLabel[0].style.setProperty('margin-left', 'auto', 'important');
                 }
 
             var tempMenuHeader = $('.header', tempMenu);
