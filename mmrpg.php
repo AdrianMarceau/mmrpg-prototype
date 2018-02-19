@@ -267,7 +267,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
                 WHERE robot_flag_complete = 1 AND robot_flag_published = 1 AND robot_flag_hidden = 0 AND robot_class = 'mecha' AND robot_core = '{$temp_field_info['field_type']}' AND robot_game IN ('MM01', 'MM02', 'MM03', 'MM04')
                 ORDER BY RAND()
                 ;", 'mecha_token');
-            $temp_mecha_tokens = array_keys($temp_mecha_tokens);
+            $temp_mecha_tokens = !empty($temp_mecha_tokens) ? array_keys($temp_mecha_tokens) : array();
             // Update the session with these settings
             $_SESSION['INDEX']['theme_cache'] = time();
             $_SESSION['INDEX']['theme_field_path'] = $temp_field_path;
