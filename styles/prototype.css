@@ -1200,17 +1200,33 @@ body[data-source="website"] #prototype .menu {
     background-size: 150% auto;
     background-size: cover;
 }
+
+#mmrpg #prototype .option[data-token] {
+    -moz-transition: border-color 0.1s linear;
+    -ms-transition: border-color 0.1s linear;
+    -o-transition: border-color 0.1s linear;
+    -webkit-transition: border-color 0.1s linear;
+    transition: border-color 0.1s linear;
+}
+#mmrpg #prototype .option[data-token]:hover {
+    border-color: #C0C0C0 !important;
+}
+
+/*
 @keyframes border-pulsate {
     0%   { border-color: #1A1A1A; }
     50% { border-color: #C0C0C0; }
     100%   { border-color: #1A1A1A; }
 }
 #mmrpg #prototype .option[data-token] {
-    -moz-transition: border 0.1s linear;
-    -ms-transition: border 0.1s linear;
-    -o-transition: border 0.1s linear;
-    -webkit-transition: border 0.1s linear;
-    transition: border 0.1s linear;
+    -moz-transition: border-color 0.1s linear;
+    -ms-transition: border-color 0.1s linear;
+    -o-transition: border-color 0.1s linear;
+    -webkit-transition: border-color 0.1s linear;
+    transition: border-color 0.1s linear;
+    transform: rotateZ(360deg);
+    backface-visibility: hidden;
+    perspective: 1000;
 }
 #mmrpg #prototype .option[data-token]:hover {
     -moz-animation: border-pulsate 2s infinite;
@@ -1226,6 +1242,7 @@ body[data-source="website"] #prototype .menu {
     -webkit-animation: none;
     animation: none;
 }
+*/
 
 #prototype .option_1x1 .platform,
 #prototype .option_1x2 .platform,
