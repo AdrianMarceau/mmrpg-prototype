@@ -26,7 +26,7 @@ $battle = array(
                     0 => 'space-shot',
                     1 => 'space-buster',
                     2 => 'space-overdrive',
-                    3 => 'defense-boost'
+                    3 => 'defense-mode'
                     ),
                 'robot_abilities_choices' =>
                     'start:(3)'.
