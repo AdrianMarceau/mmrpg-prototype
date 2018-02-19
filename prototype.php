@@ -425,34 +425,17 @@ if (rpg_game::is_user()){
     </div>
 
     <?
-        /*
-         * DEMO ROBOT SELECT
-         */
-        if (!empty($_SESSION[$session_token]['DEMO'])){
 
-            // Only show robot select if the player has more than two robots
-            if (mmrpg_prototype_robots_unlocked('dr-light') > 3){
+    // Collect the number of allowed in-battle robots right now
+    $current_allowed_robots = mmrpg_prototype_allowed_robot_limit();
 
-                // Print out the opening tags for the robot select container
-                echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
-                echo '<span class="header block_1 header_types type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"><span class="count">Robot Select</span></span>'."\n";
+    /*
+     * DEMO ROBOT SELECT
+     */
+    if (!empty($_SESSION[$session_token]['DEMO'])){
 
-                // Require the prototype robots display file
-                require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
-
-                // Print out the back button for going back to player select
-                echo '<a class="option option_back block_1" data-back="2">&#9668; Back</a>'."\n";
-
-                // Print out the closing tags for the robot select container
-                echo '</div>'."\n";
-
-            }
-
-        }
-        /*
-         * NORMAL ROBOT SELECT
-         */
-        else {
+        // Only show robot select if the player has more than three robots
+        if (mmrpg_prototype_robots_unlocked('dr-light') > 3){
 
             // Print out the opening tags for the robot select container
             echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
@@ -468,6 +451,33 @@ if (rpg_game::is_user()){
             echo '</div>'."\n";
 
         }
+
+    }
+    /*
+     * NORMAL ROBOT SELECT
+     */
+    else {
+
+        // Only show robot select if the player has more than allowed robots
+        if (mmrpg_prototype_robots_unlocked('dr-light') > $current_allowed_robots){
+
+            // Print out the opening tags for the robot select container
+            echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
+            echo '<span class="header block_1 header_types type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"><span class="count">Robot Select</span></span>'."\n";
+
+            // Require the prototype robots display file
+            require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
+
+            // Print out the back button for going back to player select
+            echo '<a class="option option_back block_1" data-back="2">&#9668; Back</a>'."\n";
+
+            // Print out the closing tags for the robot select container
+            echo '</div>'."\n";
+
+        }
+
+    }
+
     ?>
 
     <div class="menu menu_hide menu_file_new" data-step="file_new" data-source="frames/file.php?action=new"></div>
@@ -524,19 +534,72 @@ gameSettings.totalPlayerOptions = <?= $unlock_count_players ?>;
 gameSettings.prototypeBannerKey = 0;
 gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
 // Define any preset menu selections
-battleOptions['this_player_id'] = <?= $this_userid ?>;
-<? if(!empty($_SESSION[$session_token]['DEMO'])): ?>
-    battleOptions['this_player_token'] = 'dr-light';
-    <? if(mmrpg_prototype_robots_unlocked('dr-light') == 3): ?>
-        battleOptions['this_player_robots'] = '103_mega-man,104_bass,105_proto-man';
-    <?endif;?>
-<? else: ?>
-    <? if(!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])): ?>
-        battleOptions['this_player_token'] = '<?=$_SESSION[$session_token]['battle_settings']['this_player_token']?>';
-    <? elseif($unlock_count_players < 2): ?>
-        battleOptions['this_player_token'] = 'dr-light';
-    <? endif; ?>
-<? endif; ?>
+<?
+
+/* -- DEMO BATTLE VARS -- */
+if (!empty($_SESSION[$session_token]['DEMO'])){
+
+    // Always include the user/player ID in the battle data
+    echo("battleOptions['this_player_id'] = {$this_userid};".PHP_EOL);
+
+    // Demo mode should always use Dr. Light as the current player
+    echo("battleOptions['this_player_token'] = 'dr-light';".PHP_EOL);
+
+    // If exactly three robots are unlocked (and they should be) preselect them
+    if (mmrpg_prototype_robots_unlocked('dr-light') == 3){
+        echo("battleOptions['this_player_robots'] = '103_mega-man,104_bass,105_proto-man';".PHP_EOL);
+    }
+
+}
+/* -- NORMAL BATTLE VARS -- */
+else {
+
+    // Always include the player ID in the battle data
+    echo("battleOptions['this_player_id'] = {$this_userid};".PHP_EOL);
+
+    // If a player token has been pre-selected elsewhere, apply it here
+    if (!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){
+        echo("battleOptions['this_player_token'] = '{$_SESSION[$session_token]['battle_settings']['this_player_token']}';".PHP_EOL);
+    }
+    // Else if there's only one player unlocked (Dr. Light), pre-select them
+    elseif ($unlock_count_players == 1){
+        echo("battleOptions['this_player_token'] = 'dr-light';".PHP_EOL);
+    }
+
+    //echo('<pre>$current_allowed_robots = '.print_r($current_allowed_robots, true).'</pre>'.PHP_EOL);
+    //echo('<pre>mmrpg_prototype_robots_unlocked(\'dr-light\') = '.print_r(mmrpg_prototype_robots_unlocked('dr-light'), true).'</pre>'.PHP_EOL);
+
+    // If there's only one player, and that player has equal or fewer robots than allowed, pre-select them too
+    if ($unlock_count_players == 1
+        && mmrpg_prototype_robots_unlocked('dr-light') <= $current_allowed_robots
+        && !empty($_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_robots'])){
+        $temp_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_robots'];
+        $temp_robot_tokens = array_keys($temp_robot_rewards);
+        //echo('<pre>$temp_robot_rewards = '.print_r($temp_robot_rewards, true).'</pre>'.PHP_EOL);
+        //echo('<pre>$temp_robot_tokens = '.print_r($temp_robot_tokens, true).'</pre>'.PHP_EOL);
+        //echo('<pre>$mmrpg_index[\'players\'] = '.print_r($mmrpg_index['players'], true).'</pre>'.PHP_EOL)
+        $temp_select_string = array();
+        foreach ($temp_robot_tokens AS $robot_token){
+            foreach ($mmrpg_index['players']['dr-light']['player_robots'] AS $robot){
+                if ($robot['robot_token'] == $robot_token){
+                    $temp_select_string[] = $robot['robot_id'].'_'.$robot_token;
+                    break;
+                }
+            }
+        }
+        $temp_select_string = implode(',', $temp_select_string);
+        echo("battleOptions['this_player_robots'] = '{$temp_select_string}';".PHP_EOL);
+        /*
+        $temp_robot_ids = $db->get_array_list("SELECT robot_token, robot_id FROM mmrpg_index_robots WHERE robot_token IN ('".implode("','", $temp_robot_tokens)."');", 'robot_token');
+        $temp_select_string = array();
+        foreach ($temp_robot_tokens AS $token){ $temp_select_string[] = (100 + $temp_robot_ids[$token]['robot_id']).'_'.$token; }
+        $temp_select_string = implode(',', $temp_select_string);
+        echo("battleOptions['this_player_robots'] = '{$temp_select_string}';".PHP_EOL);
+        */
+    }
+}
+
+?>
 // Create the document ready events
 $(document).ready(function(){
 
