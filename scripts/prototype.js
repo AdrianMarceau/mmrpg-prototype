@@ -773,6 +773,15 @@ function prototype_menu_click_option(thisContext, thisOption){
             // Update the start button's counter text
             $('.option[data-parent]', tempMenu).find('.count').html('0/'+gameSettings.nextRobotLimit+' Select');
 
+            // Reposition the robot select center if less than max 8
+            if (gameSettings.nextRobotLimit < 8){
+                $('.option[data-parent] label', tempMenu).css({
+                    position:'absolute',
+                    right:'calc(50% - '+(gameSettings.nextRobotLimit * 35)+'px)',
+                    transform:'translate(50%,0)'
+                    });
+                }
+
             var tempMenuHeader = $('.header', tempMenu);
             tempMenuHeader.find('.count').html('Robot Select ('+(availableRobots.length == 1 ? '1 Robot' : availableRobots.length+' Robots')+')');
             if (!$('.reselect', tempMenuHeader).length){
