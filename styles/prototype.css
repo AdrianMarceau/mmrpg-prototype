@@ -929,10 +929,28 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     bottom: 54px;
     left: 8px;
 }
-#prototype .option_this-team-select .chrome label {
+#prototype .option_this-team-select .chrome label:not(.centered) {
     width: 100px !important;
     margin-left: 460px !important;
     padding-left: 0 !important;
+}
+#prototype .option_this-team-select .chrome label.centered {
+    width: 115px;
+    position: absolute;
+    right: 50%;
+    /*transform: translate(50%,0);*/
+    padding-right: 0;
+    padding-left: 0;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+#prototype .option_this-team-select .chrome label.centered .single {
+    display: inline-block;
+    position: relative;
+    top: 5px;
+    right: 11px;
+    padding-right: 20px;
 }
 body.windowFlag_landscapeMode #prototype .option_this-team-select .chrome label,
 body.mobileFlag_landscapeMode #prototype .option_this-team-select .chrome label {
@@ -1555,6 +1573,18 @@ body[data-source="website"] #prototype .menu {
     position: absolute;
     top: 0;
     right: 3px;
+}
+
+#mmrpg #prototype .banner .option[data-token],
+#mmrpg #prototype .banner .option[data-token]:hover {
+    cursor: default;
+    border-color: #1A1A1A !important;
+}
+#mmrpg #prototype .banner .option[data-token] div label {
+    cursor: default;
+}
+#mmrpg #prototype .banner .option[data-token] div label .arrow {
+    display: none;
 }
 
 #prototype .option_this-team-select .count {

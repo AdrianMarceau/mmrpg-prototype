@@ -776,14 +776,10 @@ function prototype_menu_click_option(thisContext, thisOption){
             // Reposition the robot select center based on max limit
             var tempOptionLabel = $('.option[data-parent] label', tempMenu);
             if (tempOptionLabel.length){
-                tempOptionLabel.css({
-                    position:'absolute',
-                    right:'50%',
-                    transform:'translate(50%,0)',
-                    paddingRight:'0'
+                tempOptionLabel.addClass('centered').css({
+                    paddingLeft:(gameSettings.nextRobotLimit * 40)+'px',
+                    right:'calc(50% - '+(((gameSettings.nextRobotLimit * 40) + 115) / 2)+'px)'
                     });
-                tempOptionLabel[0].style.setProperty('padding-left', (gameSettings.nextRobotLimit * 40)+'px', 'important');
-                tempOptionLabel[0].style.setProperty('margin-left', 'auto', 'important');
                 }
 
             var tempMenuHeader = $('.header', tempMenu);
