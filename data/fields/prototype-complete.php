@@ -32,6 +32,7 @@ $field = array(
         'bulb-blaster', 'robo-fishtot', 'lady-blader', 'manta-missile', 'drill-mole', 'pyre-fly', 'ring-ring', 'skullmet'
         ),
     'field_background_frame' => array(0), //array(0,1),
-    'field_foreground_frame' => array(0)
+    'field_foreground_frame' => array(0),
+    'field_flag_hidden' => true
     );
 ?>

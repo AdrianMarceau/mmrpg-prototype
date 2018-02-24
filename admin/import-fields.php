@@ -167,7 +167,7 @@ if (!empty($mmrpg_index['fields'])){
         if (!empty($spreadsheet_descriptions['field_description'])){ $temp_insert_array['field_description2'] = trim($spreadsheet_descriptions['field_description']); }
 
         // Define the flags
-        $temp_insert_array['field_flag_hidden'] = in_array($temp_insert_array['field_token'], array('field')) ? 1 : 0;
+        $temp_insert_array['field_flag_hidden'] = in_array($temp_insert_array['field_token'], array('field')) || !empty($field_data['field_flag_hidden']) ? 1 : 0;
         $temp_insert_array['field_flag_complete'] = $field_data['field_image'] != 'field' ? 1 : 0;
         $temp_insert_array['field_flag_published'] = 1;
 

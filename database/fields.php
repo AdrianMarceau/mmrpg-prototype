@@ -64,6 +64,9 @@ $mmrpg_database_fields_count_complete = 0;
 // Loop through the results and generate the links for these fields
 foreach ($mmrpg_database_fields AS $field_key => $field_info){
 
+    // Do not show hidden fields in the link list
+    if (!empty($field_info['field_flag_hidden'])){ continue; }
+
     // If a type filter has been applied to the field page
     $temp_field_types = array();
     if (!empty($field_info['field_type'])){ $temp_field_types[] = $field_info['field_type']; }
