@@ -3,7 +3,7 @@
 $field = array(
     'field_name' => 'Final Destination III',
     'field_token' => 'final-destination-3',
-    'field_type' => '',
+    'field_type' => 'space',
     'field_group' => 'MMRPG3',
     'field_game' => 'MMRPG',
     'field_number' => 'RPG3-00B',
