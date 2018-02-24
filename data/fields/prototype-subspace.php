@@ -27,7 +27,6 @@ $field = array(
         'mecha-06' => array('class' => 'robot', 'size' => 80, 'offset_x' => 100, 'offset_y' => 0, 'robot_token' => 'dark-frag', 'robot_frame' => array(0), 'robot_direction' => 'right'),
         'mecha-07' => array('class' => 'robot', 'size' => 80, 'offset_x' => 100, 'offset_y' => 0, 'robot_token' => 'dark-frag', 'robot_frame' => array(0), 'robot_direction' => 'left'),
         'mecha-08' => array('class' => 'robot', 'size' => 80, 'offset_x' => -100, 'offset_y' => 0, 'robot_token' => 'dark-frag', 'robot_frame' => array(0), 'robot_direction' => 'left')
-        ),
-    'field_flag_hidden' => true
+        )
     );
 ?>
