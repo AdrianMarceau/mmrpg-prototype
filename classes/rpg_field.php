@@ -1051,7 +1051,7 @@ class rpg_field extends rpg_object {
                             <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.($print_options['show_key'] + 1) ?></div>
                         <? endif; ?>
                         <? if ($field_image_token != 'field'){ ?>
-                            <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><div style="background-image: url(images/fields/<?= $field_image_token ?>/battle-field_avatar.png?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 50px 50px; background-position: -5px -5px;" class="sprite sprite_field sprite_40x40 sprite_40x40_mug sprite_size_<?= $field_image_size_text ?> sprite_size_<?= $field_image_size_text ?>_mug field_status_active field_position_active"><?=$field_info['field_name']?>'s Avatar</div></div>
+                            <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><div style="background-image: url(images/fields/<?= $field_image_token ?>/battle-field_avatar.png?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 50px 50px; background-position: -10px -2px;" class="sprite sprite_field sprite_40x40 sprite_40x40_mug sprite_size_<?= $field_image_size_text ?> sprite_size_<?= $field_image_size_text ?>_mug field_status_active field_position_active"><?=$field_info['field_name']?>'s Avatar</div></div>
                         <? } else { ?>
                             <div class="mugshot field_type field_type_<?= !empty($field_info['field_type']) ? $field_info['field_type'] : 'none' ?>"><div style="background-image: none; background-color: #000000; background-color: rgba(0, 0, 0, 0.6); " class="sprite sprite_field sprite_40x40 sprite_40x40_mug sprite_size_<?= $field_image_size_text ?> sprite_size_<?= $field_image_size_text ?>_mug field_status_active field_position_active">No Image</div></div>
                         <? }?>
@@ -1094,6 +1094,7 @@ class rpg_field extends rpg_object {
                                         <?
                                         // Define the source game string
                                         if ($field_info['field_token'] == 'intro-field'){ $temp_source_string = 'Mega Man RPG Prototype'; }
+                                        elseif ($field_info['field_token'] == 'prototype-complete'){ $temp_source_string = '???'; }
                                         elseif ($field_info['field_token'] == 'oil-wells' || $field_info['field_token'] == 'clock-citadel'){ $temp_source_string = 'Mega Man Powered Up'; }
                                         elseif ($field_info['field_game'] == 'MM01'){ $temp_source_string = 'Mega Man'; }
                                         elseif ($field_info['field_game'] == 'MM00' || $field_info['field_game'] == 'MMRPG'){ $temp_source_string = 'Mega Man RPG Prototype'; }

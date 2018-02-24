@@ -3222,6 +3222,15 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
     margin-top: -4px;
     margin-left: -10px;
 }
+#window .page .subbody .iconwrap .float_link .sprite_size_40x40.field span,
+#window .page .subbody .iconwrap .float_link .sprite_size_40x40.field img,
+#window .page .subbody .iconwrap .float.link .sprite_size_40x40.field span,
+#window .page .subbody .iconwrap .float.link .sprite_size_40x40.field img,
+#window .page .subbody .iconwrap .float.link .sprite.size40.field span,
+#window .page .subbody .iconwrap .float.link .sprite.size40.field img {
+    margin-top: -4px;
+    margin-left: -16px;
+}
 #window .page .subbody .float_link .sprite_size_80x80,
 #window .page .subbody .float.link .sprite_size_80x80,
 #window .page .subbody .float.link .sprite.size80 {

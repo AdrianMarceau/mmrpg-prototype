@@ -67,6 +67,15 @@ body:before {
         margin-top: -4px;
         margin-left: -6px;
     }
+    #window .page .subbody .iconwrap .float_link .sprite_size_40x40.field span,
+    #window .page .subbody .iconwrap .float_link .sprite_size_40x40.field img,
+    #window .page .subbody .iconwrap .float.link .sprite_size_40x40.field span,
+    #window .page .subbody .iconwrap .float.link .sprite_size_40x40.field img,
+    #window .page .subbody .iconwrap .float.link .sprite.size40.field span,
+    #window .page .subbody .iconwrap .float.link .sprite.size40.field img {
+        margin-top: -4px;
+        margin-left: -12px;
+    }
     #window .page .body .subbody .float_link_group,
     #window .page .body .subbody .float.link.group {
         margin: 0 8px 8px 0 !important;
