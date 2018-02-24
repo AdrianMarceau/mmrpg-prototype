@@ -582,6 +582,18 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $this_markup .= '<a data-chapter="'.$this_info['option_chapter'].'" class="option option_message option_1x4 option_this-'.$player_token.'-message" style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'"><div class="chrome"><div class="inset"><label class="'.(!empty($temp_optionimages) ? 'has_image' : '').'">'.$temp_optionimages.$temp_optiontext.'</label></div></div></a>'."\n";
 
         }
+        // Else If this is an placeholder
+        elseif (!empty($this_info['option_type']) && $this_info['option_type'] == 'placeholder'){
+
+            // Generate the option markup for the event message
+            $temp_size = !empty($this_info['option_size']) ? $this_info['option_size'] : (!empty($this_info['battle_size']) ? $this_info['battle_size'] : '1x1');
+            $temp_maintext = !empty($this_info['option_maintext']) ? '<span class="maintext">'.$this_info['option_maintext'].'</span>' : '';
+            $temp_subtext = !empty($this_info['option_subtext']) ? '<span class="subtext">'.$this_info['option_subtext'].'</span>' : '';
+            $temp_subtext2 = !empty($this_info['option_subtext2']) ? '<span class="subtext2">'.$this_info['option_subtext2'].'</span>' : '';
+            $temp_optiontext = '<span class="multi">'.$temp_maintext.$temp_subtext.$temp_subtext2.'</span>';
+            $this_markup .= '<div data-chapter="'.$this_info['option_chapter'].'" class="option option_placeholder option_'.$temp_size.' option_this-'.$player_token.'-placeholder field_type field_type_empty" style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'"><div class="platform"><div class="chrome"><div class="inset"><label>'.$temp_optiontext.'</label></div></div></div></div>'."\n";
+
+        }
         // Otherwise, if this is a normal battle option
         else {
 
@@ -855,6 +867,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 }
             }
             $temp_field_multipliers = !empty($temp_field_multipliers) ? implode('|', $temp_field_multipliers) : '';
+
             // Print out the option button markup with sprite and name
             $this_markup .= '<a '.
                 'class="'.$this_option_class.'" '.

@@ -30,26 +30,35 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Intro Battle vs Met
         // Always add this battle first, no matter what
+        $temp_battle_token = $this_prototype_data['this_player_token'].'-intro-i';
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0a'])){
-            $temp_battle_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-intro-i', 'battle_level' => $this_prototype_data['this_chapter_levels'][0] + 0);
+            $temp_battle_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $temp_battle_token, 'battle_level' => $this_prototype_data['this_chapter_levels'][0] + 0);
             $temp_battle_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
             $this_prototype_data['battle_options'][] = $temp_battle_option;
+        } else {
+            $this_prototype_data['battle_options'][] = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $temp_battle_token, 'option_type' => 'placeholder', 'option_size' => '1x4', 'option_maintext' => '???');
         }
 
         // Intro Battle vs Joe
         // Only add this battle if the player has defeated the first one
+        $temp_battle_token = $this_prototype_data['this_player_token'].'-intro-ii';
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0b'])){
-            $temp_battle_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-intro-ii', 'battle_level' => $this_prototype_data['this_chapter_levels'][0] + 1);
+            $temp_battle_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $temp_battle_token, 'battle_level' => $this_prototype_data['this_chapter_levels'][0] + 1);
             $temp_battle_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
             $this_prototype_data['battle_options'][] = $temp_battle_option;
+        } else {
+            $this_prototype_data['battle_options'][] = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $temp_battle_token, 'option_type' => 'placeholder', 'option_size' => '1x4', 'option_maintext' => '???');
         }
 
         // Intro Battle vs Trill
         // Only add this battle if the player has defeated the first and second one
+        $temp_battle_token = $this_prototype_data['this_player_token'].'-intro-iii';
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0c'])){
-            $temp_battle_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-intro-iii', 'battle_level' => $this_prototype_data['this_chapter_levels'][0] + 2);
+            $temp_battle_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $temp_battle_token, 'battle_level' => $this_prototype_data['this_chapter_levels'][0] + 2);
             $temp_battle_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
             $this_prototype_data['battle_options'][] = $temp_battle_option;
+        } else {
+            $this_prototype_data['battle_options'][] = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $temp_battle_token, 'option_type' => 'placeholder', 'option_size' => '1x4', 'option_maintext' => '???');
         }
 
 

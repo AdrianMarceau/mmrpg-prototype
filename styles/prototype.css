@@ -974,6 +974,42 @@ body.mobileFlag_landscapeMode #prototype .option_this-team-select .chrome label 
 #prototype .option label:hover {
     background-color: #2D2D2D;
 }
+
+#prototype .option.option_placeholder {
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+    border-color: #292929 !important;
+}
+#prototype .option.option_placeholder,
+#prototype .option.option_placeholder * {
+    cursor: default !important;
+}
+#prototype .option.option_placeholder .platform,
+#prototype .option.option_placeholder .chrome,
+#prototype .option.option_placeholder .inset,
+#prototype .option.option_placeholder label {
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+#prototype .option.option_placeholder div label .maintext,
+#prototype .option.option_placeholder div label .subtext,
+#prototype .option.option_placeholder div label .subtext2 {
+    text-align: center;
+    width: auto;
+    position: static;
+    margin: 0 auto;
+    vertical-align: middle;
+    color: #404040;
+    text-shadow: none;
+    font-size: 10px;
+}
+#prototype .option.option_placeholder div label .maintext {
+    margin-top: 19px;
+}
+
 #prototype .menu {
     overflow: hidden;
     padding: 0 10px 0 5px;
