@@ -31,7 +31,7 @@ if (!empty($mmrpg_index['fields'])){
     foreach ($mmrpg_index['fields'] AS $token => $field){
         $field['field_class'] = isset($field['field_class']) ? $field['field_class'] : 'master';
         $field['field_game'] = isset($field['field_game']) ? $field['field_game'] : 'MMRPG';
-        $field['field_group'] = isset($field['field_group']) ? $field['field_group'] : 'MMRPG';
+        $field['field_group'] = isset($field['field_group']) ? $field['field_group'] : $field['field_game'];
         $field['field_type'] = isset($field['field_type']) ? $field['field_type'] : '';
         $field['field_type2'] = isset($field['field_type2']) ? $field['field_type2'] : '';
         $mmrpg_index['fields'][$token] = $field;
@@ -63,12 +63,11 @@ $temp_pattern_first = array();
 $temp_pattern_first[] = '/^(intro-field)$/i';
 
 $temp_pattern_first[] = '/^gentle-countryside$/i';
-$temp_pattern_first[] = '/^light-laboratory$/i';
-
 $temp_pattern_first[] = '/^maniacal-hideaway$/i';
-$temp_pattern_first[] = '/^wily-castle$/i';
-
 $temp_pattern_first[] = '/^wintry-forefront$/i';
+
+$temp_pattern_first[] = '/^light-laboratory$/i';
+$temp_pattern_first[] = '/^wily-castle$/i';
 $temp_pattern_first[] = '/^cossack-citadel$/i';
 
 //$temp_pattern_first = array_reverse($temp_pattern_first);
@@ -95,7 +94,9 @@ function mmrpg_index_sort_fields($field_one, $field_two){
         if (preg_match($pattern, $field_one['field_token']) && !preg_match($pattern, $field_two['field_token'])){ return 1; }
         elseif (!preg_match($pattern, $field_one['field_token']) && preg_match($pattern, $field_two['field_token'])){ return -1; }
     }
-    if ($field_one['field_game'] > $field_two['field_game']){ return 1; }
+    if ($field_one['field_group'] > $field_two['field_group']){ return 1; }
+    elseif ($field_one['field_group'] < $field_two['field_group']){ return -1; }
+    elseif ($field_one['field_game'] > $field_two['field_game']){ return 1; }
     elseif ($field_one['field_game'] < $field_two['field_game']){ return -1; }
     elseif ($field_one['field_number'] > $field_two['field_number']){ return 1; }
     elseif ($field_one['field_number'] < $field_two['field_number']){ return -1; }
@@ -124,6 +125,8 @@ if (!empty($mmrpg_index['fields'])){
         $temp_insert_array['field_token'] = $field_data['field_token'];
         $temp_insert_array['field_number'] = !empty($field_data['field_number']) ? $field_data['field_number'] : '';
         $temp_insert_array['field_name'] = !empty($field_data['field_name']) ? $field_data['field_name'] : '';
+
+        $temp_insert_array['field_group'] = !empty($field_data['field_group']) ? $field_data['field_group'] : '';
         $temp_insert_array['field_game'] = !empty($field_data['field_game']) ? $field_data['field_game'] : '';
 
         $temp_insert_array['field_class'] = !empty($field_data['field_class']) ? $field_data['field_class'] : 'master';

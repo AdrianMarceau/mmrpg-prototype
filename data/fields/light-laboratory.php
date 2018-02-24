@@ -3,8 +3,9 @@
 $field = array(
     'field_name' => 'Light Laboratory',
     'field_token' => 'light-laboratory',
-    'field_game' => 'MMRPGL',
-    'field_number' => 'DLN-001',
+    'field_group' => 'MMRPG2',
+    'field_game' => 'MM09',
+    'field_number' => 'RPG2-00A',
     'field_class' => 'player',
     'field_master' => 'mega-man',
     'field_master2' => array('roll'),
