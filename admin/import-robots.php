@@ -304,7 +304,7 @@ if (!empty($mmrpg_index['robots'])){
         }*/
 
         // Define the flags
-        $temp_insert_array['robot_flag_hidden'] = in_array($temp_insert_array['robot_token'], array('bond-man', 'fake-man', 'rock')) ? 1 : 0;
+        $temp_insert_array['robot_flag_hidden'] = in_array($temp_insert_array['robot_token'], array('bond-man', 'fake-man', 'rock')) || !empty($robot_data['robot_flag_hidden'])  ? 1 : 0;
         $temp_insert_array['robot_flag_complete'] = $robot_data['robot_image'] != 'robot' && $robot_data['robot_image'] != $robot_data['robot_class'] ? 1 : 0;
         $temp_insert_array['robot_flag_published'] = 1;
 
@@ -525,7 +525,7 @@ if (!empty($mmrpg_index['mechas'])){
         }*/
 
         // Define the flags
-        $temp_insert_array['robot_flag_hidden'] = in_array($temp_insert_array['robot_token'], array('mecha')) ? 1 : 0;
+        $temp_insert_array['robot_flag_hidden'] = in_array($temp_insert_array['robot_token'], array('mecha')) || !empty($mecha_data['robot_flag_hidden'])  ? 1 : 0;
         $temp_insert_array['robot_flag_complete'] = $mecha_data['robot_image'] != 'robot' && $mecha_data['robot_image'] != $mecha_data['robot_class'] ? 1 : 0;
         $temp_insert_array['robot_flag_published'] = 1;
 
@@ -747,7 +747,7 @@ if (!empty($mmrpg_index['bosses'])){
         }*/
 
         // Define the flags
-        $temp_insert_array['robot_flag_hidden'] = in_array($temp_insert_array['robot_token'], array('cache', 'planet-man', 'cosmo-man', 'solo', 'duo', 'duo-2', 'trio', 'trio-2', 'trio-3')) ? 1 : 0;
+        $temp_insert_array['robot_flag_hidden'] = in_array($temp_insert_array['robot_token'], array('cache', 'planet-man', 'cosmo-man', 'solo', 'duo', 'duo-2', 'trio', 'trio-2', 'trio-3')) || !empty($boss_data['robot_flag_hidden'])  ? 1 : 0;
         $temp_insert_array['robot_flag_complete'] = $boss_data['robot_image'] != 'robot' && $boss_data['robot_image'] != $boss_data['robot_class'] ? 1 : 0;
         $temp_insert_array['robot_flag_published'] = 1;
 
