@@ -1094,8 +1094,6 @@ class rpg_field extends rpg_object {
                                         <?
                                         // Define the source game string
                                         if ($field_info['field_token'] == 'intro-field'){ $temp_source_string = 'Mega Man RPG Prototype'; }
-                                        elseif ($field_info['field_token'] == 'light-laboratory' || $field_info['field_token'] == 'wily-castle'){ $temp_source_string = 'Mega Man'; }
-                                        elseif ($field_info['field_token'] == 'cossack-citadel'){ $temp_source_string = 'Mega Man 4'; }
                                         elseif ($field_info['field_token'] == 'oil-wells' || $field_info['field_token'] == 'clock-citadel'){ $temp_source_string = 'Mega Man Powered Up'; }
                                         elseif ($field_info['field_game'] == 'MM01'){ $temp_source_string = 'Mega Man'; }
                                         elseif ($field_info['field_game'] == 'MM00' || $field_info['field_game'] == 'MMRPG'){ $temp_source_string = 'Mega Man RPG Prototype'; }

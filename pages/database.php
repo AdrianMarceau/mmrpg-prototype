@@ -41,7 +41,7 @@ if ($this_current_sub != 'items'){
 // Define FIELD preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'fields'){
     // If we're not on the full field index, only show preview fields
-    $mmrpg_database_fields_filter = "AND (field_token IN ('intro-field') OR field_game IN ('MM00', 'MM01')) ";
+    $mmrpg_database_fields_filter = "AND (field_group IN ('MMRPG1', 'MMRPG2') OR (field_game IN ('MM01') && field_group NOT LIKE 'MMRPG%')) ";
 }
 
 
