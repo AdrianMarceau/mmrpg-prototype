@@ -1,0 +1,397 @@
+
+/* -- RESPONSIVE STYLESHEET (PROTOTYPE) -- */
+
+body:before {
+    content: "Z";
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    background-color: magenta;
+    border: 1px solid magenta;
+    border-top: 0 none transparent;
+    border-left: 0 none transparent;
+    color: #FFFFFF;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    font-family: "Courier New";
+    font-size: 26px;
+    line-height: 50px;
+    z-index: 99999;
+}
+
+
+/* -- Right-before Landscape Mode -- */
+@media (max-width: 1048px){
+
+    body:before {
+        content: "12";
+    }
+
+    body,
+    #mmrpg,
+    #prototype {
+        width: auto !important;
+        min-width: 768px;
+        min-height: 924px;
+        height: auto;
+        background-color: #262626;
+        background-image: none;
+    }
+
+}
+
+/* -- Landscape Mode -- */
+@media (min-width: 1024px){
+
+    body:before {
+        content: "11";
+    }
+
+
+}
+
+/* -- Portrait Mode -- */
+@media (max-width: 1060px){
+
+    body:before {
+        content: "10";
+    }
+
+
+    /* Responsive Player Buttons */
+
+    body.prototype #prototype .select_this_player .option[data-token],
+    body.prototype #prototype .select_this_player .option[data-token] .platform,
+    body.prototype #prototype .select_this_player .option[data-token] .chrome {
+        display: block;
+        box-sizing: border-box;
+        width: auto;
+        height: auto;
+        margin: 0 auto;
+    }
+    body.prototype #prototype .select_this_player .option[data-token] {
+        position: relative;
+        height: calc((100vh - 290px) / 3);
+    }
+    body.prototype #prototype .select_this_player .option_1x4[data-token] {
+        width: calc((100vw - 16px) / 1);
+    }
+    body.prototype #prototype .select_this_player .option_1x2[data-token] {
+        width: calc((100vw - 16px) / 2);
+    }
+    body.prototype #prototype .select_this_player .option_1x1[data-token] {
+        width: calc((100vw - 16px) / 4);
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .platform,
+    body.prototype #prototype .select_this_player .option[data-token] .chrome,
+    body.prototype #prototype .select_this_player .option[data-token] .inset {
+        position: absolute;
+        display: block;
+        box-sizing: border-box;
+        width: auto;
+        height: auto;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .platform {
+
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .chrome {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .inset label {
+        position: absolute;
+        /*
+        top: 50%;
+        transform: translate(0, -50%);
+        */
+        top: calc(50% - (40px / 2));
+        left: 10px;
+        right: 10px;
+        height: auto;
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .inset label:after {
+        content: "";
+        display: block;
+        float: none;
+        clear: both;
+        height: 0;
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .inset label .multi .maintext,
+    body.prototype #prototype .select_this_player .option[data-token] .inset label .multi .subtext,
+    body.prototype #prototype .select_this_player .option[data-token] .inset label .multi .subtext2 {
+        position: static;
+        height: auto;
+        text-align: left;
+        width: auto;
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .inset label .multi .maintext {
+        font-size: 1.6vh;
+        line-height: 1.2;
+        white-space: normal;
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .inset label .multi .subtext,
+    body.prototype #prototype .select_this_player .option[data-token] .inset label .multi .subtext2 {
+        font-size: 1.4vh;
+        line-height: 1.4;
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .inset label .sprite {
+
+    }
+    body.prototype #prototype .select_this_player .option[data-token] .inset label .arrow {
+
+    }
+
+
+
+
+    /* Responsive Mission Buttons */
+
+    body.prototype #prototype .select_this_battle .option[data-token],
+    body.prototype #prototype .select_this_battle .option[data-token] .platform,
+    body.prototype #prototype .select_this_battle .option[data-token] .chrome {
+        display: block;
+        box-sizing: border-box;
+        width: auto;
+        height: auto;
+        margin: 0 auto;
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] {
+        position: relative;
+        height: calc((100vh - 370px) / 3);
+    }
+    body.prototype #prototype .select_this_battle .option_1x4[data-token] {
+        width: calc((100vw - 16px) / 1);
+    }
+    body.prototype #prototype .select_this_battle .option_1x2[data-token] {
+        width: calc((100vw - 16px) / 2);
+    }
+    body.prototype #prototype .select_this_battle .option_1x1[data-token] {
+        width: calc((100vw - 16px) / 4);
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .platform,
+    body.prototype #prototype .select_this_battle .option[data-token] .chrome,
+    body.prototype #prototype .select_this_battle .option[data-token] .inset {
+        position: absolute;
+        display: block;
+        box-sizing: border-box;
+        width: auto;
+        height: auto;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .platform {
+
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .chrome {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label {
+        position: absolute;
+        top: 50%;
+        transform: translate(0, -50%);
+        left: 10px;
+        right: 10px;
+        height: auto;
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label:after {
+        content: "";
+        display: block;
+        float: none;
+        clear: both;
+        height: 0;
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label .multi .maintext,
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label .multi .subtext,
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label .multi .subtext2 {
+        position: static;
+        height: auto;
+        text-align: center;
+        width: auto;
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label .multi .maintext {
+        font-size: 1.6vh;
+        line-height: 1.2;
+        white-space: normal;
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label .multi .subtext,
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label .multi .subtext2 {
+        font-size: 1.4vh;
+        line-height: 1.4;
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label .sprite {
+        top: auto !important;
+        bottom: calc(100% + 10px) !important;
+        right: 50% !important;
+        transform: translate(50%,0) !important;
+        display: none;
+    }
+    body.prototype #prototype .select_this_battle .option[data-token] .inset label .arrow {
+        font-size: 2vh;
+        line-height: 1;
+        top: calc(100% + 10px);
+        left: 50%;
+        transform: translate(-50%,0);
+        right: auto;
+        bottom: auto;
+        display: none;
+    }
+
+
+    body.prototype #prototype .select_this_battle .option[data-token][data-chapter="0"],
+    body.prototype #prototype .select_this_battle .option[data-token][data-chapter="4"],
+    body.prototype #prototype .select_this_battle .option[data-token][data-chapter="6"] {
+        height: calc((100vh - 370px) / 3);
+    }
+    body.prototype #prototype .select_this_battle .option[data-token][data-chapter="1"],
+    body.prototype #prototype .select_this_battle .option[data-token][data-chapter="3"],
+    body.prototype #prototype .select_this_battle .option[data-token][data-chapter="5"] {
+        height: calc((100vh - 370px) / 2);
+    }
+    body.prototype #prototype .select_this_battle .option[data-token][data-chapter="2"] {
+        height: calc((100vh - 370px) / 1);
+    }
+
+
+
+
+}
+
+/* -- Slightly Less than Portrait Mode -- */
+@media (max-width: 1000px){
+
+    body:before {
+        content: "09";
+    }
+
+}
+
+/* -- Less than Portrait Mode -- */
+@media (max-width: 970px){
+
+    body:before {
+        content: "08";
+    }
+
+}
+
+@media (max-width: 800px){
+
+    body:before {
+        content: "07";
+    }
+
+    #window {
+        border-width: 0;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        border-radius: 0;
+        -webkit-box-shadow: 0 0 0 transparent;
+        -moz-box-shadow: 0 0 0 transparent;
+        box-shadow: 0 0 0 transparent;
+        padding: 2px 0;
+    }
+
+    #music.onload {
+        bottom: -200px;
+    }
+
+}
+
+/* -- Even Less than Portrait Mode -- */
+@media (max-width: 780px){
+
+    body:before {
+        content: "06";
+    }
+
+    #mmrpg.index #window,
+    #mmrpg.index #window iframe {
+        border-left: 0 none transparent !important;
+        border-right: 0 none transparent !important;
+        -moz-border-radius: 0 !important;
+        -webkit-border-radius: 0 !important;
+        border-radius: 0 !important;
+    }
+
+
+}
+
+@media (max-width: 768px){
+
+    body:before {
+        content: "05";
+    }
+
+    #prototype .option_1x1 div label .maintext .icons.stats {
+        display: none;
+    }
+
+}
+
+/* -- Even More Less than Portrait Mode -- */
+@media (max-width: 700px){
+
+    body:before {
+        content: "04";
+    }
+
+
+}
+
+/* -- Almost iPhone Portrait Mode -- */
+@media (max-width: 560px){
+
+    body:before {
+        content: "03";
+    }
+
+
+}
+
+/* -- So Close to iPhone Portrait Mode -- */
+@media (max-width: 460px){
+
+    body:before {
+        content: "02";
+    }
+
+    body.index {
+        min-height: 100vh;
+    }
+
+}
+
+/* -- Even Closer to iPhone Portrait Mode -- */
+@media (max-width: 400px){
+
+    body:before {
+        content: "01";
+    }
+
+
+}
+
+
+/* -- iPhone Portrait Mode -- */
+@media (max-width: 350px){
+
+    body:before {
+        content: "00";
+    }
+
+
+}

@@ -1735,7 +1735,7 @@ button {
 #window .page .event .ability_record,
 #window .page .event .item_record {
     background-color: rgba(65,65,65,0.5);
-    border-color: rgba(70,70,700.1);
+    border-color: rgba(70,70,70,0.6);
 }
 #window .page .event .player_name {
 
