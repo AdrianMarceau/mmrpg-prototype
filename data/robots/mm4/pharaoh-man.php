@@ -5,7 +5,7 @@ $robot = array(
     'robot_game' => 'MM04',
     'robot_name' => 'Pharaoh Man',
     'robot_token' => 'pharaoh-man',
-    'robot_image_editor' => 18,
+    'robot_image_editor' => 3842,
     'robot_image_alts' => array(
         array('token' => 'alt', 'name' => 'Pharaoh Man (Cursed Alt)', 'summons' => 100, 'colour' => 'flame'),
         array('token' => 'alt2', 'name' => 'Pharaoh Man (Blessed Alt)', 'summons' => 200, 'colour' => 'electric'),

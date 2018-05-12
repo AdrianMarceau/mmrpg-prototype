@@ -5,7 +5,7 @@ $robot = array(
     'robot_game' => 'MM01',
     'robot_name' => 'Fire Man',
     'robot_token' => 'fire-man',
-    'robot_image_editor' => 412,
+    'robot_image_editor' => 3842,
     'robot_image_alts' => array(
         array('token' => 'alt', 'name' => 'Fire Man (Blue Alt)', 'summons' => 100, 'colour' => 'water'),
         array('token' => 'alt2', 'name' => 'Fire Man (Yellow Alt)', 'summons' => 200, 'colour' => 'electric'),
