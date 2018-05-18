@@ -5,10 +5,11 @@ $ability = array(
     'ability_token' => 'flash-stopper',
     'ability_game' => 'MM02',
     'ability_group' => 'MM02/Weapons/014',
-    'ability_description' => 'The user triggers a flash in space-time that damages all robots on the target\'s side of the field! This ability\'s effects appear to be more powerful when there are fewer robots on the opponent\'s side of the field&hellip;',
+    'ability_description' => 'The user releases a flash of temporal energy towards the opposing team, dealing damage to all enemy robots! This ability\'s total power is divided among all targets and thus becomes much more lethal when focused on a single enemy.',
     'ability_type' => 'time',
-    'ability_energy' => 4,
-    'ability_damage' => 32,
+    'ability_type2' => 'crystal',
+    'ability_energy' => 8,
+    'ability_damage' => 42,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
