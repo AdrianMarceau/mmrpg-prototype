@@ -1,5 +1,8 @@
 <?php
 
+// Require the global config file
+require('../includes/config.php');
+
 // Collect the POST header type
 $request_type = !empty($_POST['requestType']) ? $_POST['requestType'] : false;
 // Collect the POST header data
