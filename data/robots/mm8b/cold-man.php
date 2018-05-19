@@ -5,6 +5,7 @@ $robot = array(
     'robot_game' => 'MM085',
     'robot_name' => 'Cold Man',
     'robot_token' => 'cold-man',
+    'robot_image_editor' => 3842,
     'robot_core' => 'freeze',
     'robot_description' => 'Deep Freeze Robot',
     'robot_energy' => 100,
