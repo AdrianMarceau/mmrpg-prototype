@@ -186,6 +186,14 @@ body.index #header {
     image-rendering: crisp-edges;
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
 }
+#mmrpg #canvas .sprite {
+    image-rendering: auto;
+    /* image-rendering: -moz-crisp-edges;   NOT Firefox */
+    image-rendering:   -o-crisp-edges;         /* Opera */
+    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+}
 #mmrpg .sprite_fullscreen {
     width: auto !important;
     height: auto !important;
