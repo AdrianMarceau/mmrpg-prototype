@@ -107,7 +107,7 @@ $this_omega_factors_eight[] = array('robot' => 'grenade-man', 'field' => 'field'
 
 //// Define the expansion omega factors for KING (MEGA MAN 8.5 / MEGA MAN & BASS)
 //$this_omega_factors_eight_two[] = array('robot' => 'dynamo-man', 'field' => 'field', 'type' => 'electric');
-//$this_omega_factors_eight_two[] = array('robot' => 'cold-man', 'field' => 'field', 'type' => 'freeze');
+$this_omega_factors_eight_two[] = array('robot' => 'cold-man', 'field' => 'field', 'type' => 'freeze');
 //$this_omega_factors_eight_two[] = array('robot' => 'ground-man', 'field' => 'field', 'type' => 'earth');
 //$this_omega_factors_eight_two[] = array('robot' => 'pirate-man', 'field' => 'field', 'type' => 'explode');
 $this_omega_factors_eight_two[] = array('robot' => 'burner-man', 'field' => 'field', 'type' => 'flame');
