@@ -3045,6 +3045,7 @@ class rpg_robot extends rpg_object {
                             elseif ($robot_info['robot_image_editor'] == 4117){ $temp_editor_title = 'Jonathan Backstrom / Rhythm_BCA'; }
                             elseif ($robot_info['robot_image_editor'] == 3842){ $temp_editor_title = 'Miki Bossman / MegaBossMan'; }
                             elseif ($robot_info['robot_image_editor'] == 5161){ $temp_editor_title = 'The Zion / maistir1234'; }
+                            elseif ($robot_info['robot_image_editor'] == 7469){ $temp_editor_title = 'Brash Buster'; }
                         }
                         $temp_is_capcom = true;
                         $temp_is_original = array('disco', 'rhythm', 'flutter-fly', 'flutter-fly-2', 'flutter-fly-3');

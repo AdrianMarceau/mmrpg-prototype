@@ -26,6 +26,8 @@ $contributor_ids = array(
     18,  // MetalMan (Contributor)
     435,  // Spinstrike (Contributor)
     4117,  // Rhythm_BCA (Contributor)
+    5161,  // The Zion (Contributor)
+    7469,  // Brash Buster (Contributor)
     4091,  // CHAOSFANTAZY (Moderator)
     //4831,  // ThatGuyNamedMikey (Moderator)
     4307,  // Reisrat (Moderator)
