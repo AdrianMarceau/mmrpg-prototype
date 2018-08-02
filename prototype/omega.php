@@ -76,7 +76,7 @@ $this_omega_factors_six[] = array('robot' => 'blizzard-man', 'field' => 'field',
 $this_omega_factors_six[] = array('robot' => 'centaur-man', 'field' => 'field', 'type' => 'time');
 $this_omega_factors_six[] = array('robot' => 'flame-man', 'field' => 'field', 'type' => 'flame');
 $this_omega_factors_six[] = array('robot' => 'knight-man', 'field' => 'field', 'type' => 'impact');
-//$this_omega_factors_six[] = array('robot' => 'plant-man', 'field' => 'field', 'type' => 'nature');
+$this_omega_factors_six[] = array('robot' => 'plant-man', 'field' => 'field', 'type' => 'nature');
 $this_omega_factors_six[] = array('robot' => 'tomahawk-man', 'field' => 'field', 'type' => 'earth');
 $this_omega_factors_six[] = array('robot' => 'wind-man', 'field' => 'field', 'type' => 'wind');
 $this_omega_factors_six[] = array('robot' => 'yamato-man', 'field' => 'field', 'type' => 'cutter');
@@ -98,10 +98,10 @@ $this_omega_factors_seven[] = array('robot' => 'turbo-man', 'field' => 'field', 
 $this_omega_factors_eight = array();
 $this_omega_factors_eight[] = array('robot' => 'tengu-man', 'field' => 'field', 'type' => 'wind');
 //$this_omega_factors_eight[] = array('robot' => 'astro-man', 'field' => 'field', 'type' => 'space');
-//$this_omega_factors_eight[] = array('robot' => 'sword-man', 'field' => 'field', 'type' => 'flame');
+$this_omega_factors_eight[] = array('robot' => 'sword-man', 'field' => 'field', 'type' => 'flame');
 $this_omega_factors_eight[] = array('robot' => 'clown-man', 'field' => 'field', 'type' => 'electric');
 $this_omega_factors_eight[] = array('robot' => 'search-man', 'field' => 'field', 'type' => 'missile');
-//$this_omega_factors_eight[] = array('robot' => 'frost-man', 'field' => 'field', 'type' => 'freeze');
+$this_omega_factors_eight[] = array('robot' => 'frost-man', 'field' => 'field', 'type' => 'freeze');
 $this_omega_factors_eight[] = array('robot' => 'grenade-man', 'field' => 'field', 'type' => 'explode');
 //$this_omega_factors_eight[] = array('robot' => 'aqua-man', 'field' => 'field', 'type' => 'water');
 
