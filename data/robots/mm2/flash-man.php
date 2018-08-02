@@ -5,7 +5,7 @@ $robot = array(
     'robot_game' => 'MM02',
     'robot_name' => 'Flash Man',
     'robot_token' => 'flash-man',
-    'robot_image_editor' => 412,
+    'robot_image_editor' => 7469,
     'robot_image_alts' => array(
         array('token' => 'alt', 'name' => 'Flash Man (Red Alt)', 'summons' => 100, 'colour' => 'flame'),
         array('token' => 'alt2', 'name' => 'Flash Man (Green Alt)', 'summons' => 200, 'colour' => 'nature'),
