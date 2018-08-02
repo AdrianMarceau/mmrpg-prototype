@@ -5,7 +5,7 @@ $robot = array(
     'robot_game' => 'MM02',
     'robot_name' => 'Crash Man',
     'robot_token' => 'crash-man',
-    'robot_image_editor' => 412,
+    'robot_image_editor' => 7469,
     'robot_image_alts' => array(
         array('token' => 'alt', 'name' => 'Crash Man (Green Alt)', 'summons' => 100, 'colour' => 'nature'),
         array('token' => 'alt2', 'name' => 'Crash Man (Purple Alt)', 'summons' => 200, 'colour' => 'time'),
