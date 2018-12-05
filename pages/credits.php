@@ -19,19 +19,20 @@ $this_markup_header = 'Mega Man RPG Prototype Credits & Contributors';
 // Collect user data for all contributors in the database
 $contributor_ids = array(
     412,  // AdrianMarceau (Developer)
-    // 92,  // ChillPenguin (Administrator)
     3842,  // MegaBossMan (Administrator)
-    2,  // Brorman (Contributor)
-    110,  // EliteP1 / MMX100 (Contributor)
-    18,  // MetalMan (Contributor)
-    435,  // Spinstrike (Contributor)
     4117,  // Rhythm_BCA (Contributor)
-    5161,  // The Zion (Contributor)
-    7469,  // Brash Buster (Contributor)
-    4091,  // CHAOSFANTAZY (Moderator)
-    //4831,  // ThatGuyNamedMikey (Moderator)
-    4307,  // Reisrat (Moderator)
     1330, // TheDoc (Moderator)
+    6455, // Shiver (Moderator)
+    110,  // EliteP1 / MMX100 (Contributor)
+    2,  // Brorman (Contributor)
+    435,  // Spinstrike (Contributor)
+    18,  // MetalMan (Contributor)
+    7469,  // Brash Buster (Contributor)
+    5161,  // The Zion (Contributor)
+    //4307,  // Reisrat (Moderator)
+    //4091,  // CHAOSFANTAZY (Moderator)
+    //4831,  // ThatGuyNamedMikey (Moderator)
+    // 92,  // ChillPenguin (Administrator)
     );
     // 484 Ephnee
 $contributor_index = $db->get_array_list("SELECT * FROM mmrpg_users LEFT JOIN mmrpg_roles ON mmrpg_users.role_id = mmrpg_roles.role_id WHERE user_id IN (".implode(', ', $contributor_ids).")", 'user_id');
@@ -186,6 +187,30 @@ foreach ($contributor_ids AS $id){
 
 
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Honorable Mentions</h2>
+<div class="subbody creditblock compact">
+    <div class="text">
+        <div class="detail">
+            <strong class="name">CHAOS_FANTAZY</strong>
+            <span class="pipe">|</span>
+            <em class="reason">Legacy Story Planning, Forum Moderation</em>
+        </div>
+        <div class="description">
+            <p>CHAOS_FANTAZY joined the community in January 2014 and was originally going to help write the general story and narrative for the game.  Unfortunately, as the goals of our project changed and the narrative became less of a focus, CHAOS_FANTAZY decided to step back and go his own way.  Either way, his contributions to our discussions were still appreciated and it was great having him around.</p>
+        </div>
+    </div>
+</div>
+<div class="subbody creditblock compact">
+    <div class="text">
+        <div class="detail">
+            <strong class="name">ThatGuyNamedMikey</strong>
+            <span class="pipe">|</span>
+            <em class="reason">Outspoken Game Critic / Persistently Pedantic Patron</em>
+        </div>
+        <div class="description">
+            <p>ThatGuyNamedMikey joined us in September 2014 and has been a frequent sight on the leaderboards, in the community, and around the various chat rooms since.  Many know Mike as our most vocal advocate for game-balance and he is often the first to point out potential issues with features or ideas before they go too far.  Mike was also responsible for creating our first chat room (Xat) and played a key role in our upgrading to a better platform (Ajax) when the time came.  Mike has hosted countless tournaments, contests, and other events since joining the community and even served as a moderator for a time.  His contributions are appreciated by many.</p>
+        </div>
+    </div>
+</div>
 <div class="subbody creditblock compact">
     <div class="text">
         <div class="detail">
