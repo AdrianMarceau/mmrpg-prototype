@@ -33,9 +33,15 @@ $contributor_ids = array(
     //4091,  // CHAOSFANTAZY (Moderator)
     //4831,  // ThatGuyNamedMikey (Moderator)
     // 92,  // ChillPenguin (Administrator)
+    // 484, // Ephnee (Early Tester)
     );
-    // 484 Ephnee
-$contributor_index = $db->get_array_list("SELECT * FROM mmrpg_users LEFT JOIN mmrpg_roles ON mmrpg_users.role_id = mmrpg_roles.role_id WHERE user_id IN (".implode(', ', $contributor_ids).")", 'user_id');
+$user_fields = rpg_user::get_index_fields(true, 'users');
+$contributor_index = $db->get_array_list("SELECT
+    {$user_fields}
+    FROM mmrpg_users AS users
+    LEFT JOIN mmrpg_roles AS uroles ON users.role_id = uroles.role_id
+    WHERE users.user_id IN (".implode(', ', $contributor_ids).")
+    ;", 'user_id');
 //die(print_r($contributor_index, true));
 function temp_sort_by_date($u1, $u2){
     global $contributor_ids;
