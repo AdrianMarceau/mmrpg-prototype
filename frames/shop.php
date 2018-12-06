@@ -169,9 +169,11 @@ if (true){
 
                         // Loop through the buying tokens and display tabs for them
                         foreach ($shop_buying_tokens AS $buying_token){
+                            if ($buying_token === 'stars'){ $buying_label = 'Show '.ucfirst($buying_token); }
+                            else { $buying_label = 'Sell '.ucfirst($buying_token); }
                             ?>
                                 <span class="tab_spacer"><span class="inset">&nbsp;</span></span>
-                                <a class="tab_link tab_link_buying" href="#" data-tab="buying" data-tab-type="<?= $buying_token ?>"><span class="inset">Sell</span></a>
+                                <a class="tab_link tab_link_buying" href="#" data-tab="buying" data-tab-type="<?= $buying_token ?>"><span class="inset"><?= $buying_label ?></span></a>
                             <?
                             $tab_counter++;
                         }
