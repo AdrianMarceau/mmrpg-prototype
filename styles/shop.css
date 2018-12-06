@@ -482,6 +482,9 @@
     opacity: 1.0;
     filter: alpha(opacity=100);
 }
+#shop #console .tab_container[data-tab="buying"][data-tab-type="stars"] .sell_button {
+    width: 40px;
+}
 #shop #console .event .confirm_button,
 #shop #console .event .cancel_button,
 #shop #console .event .player_button {
