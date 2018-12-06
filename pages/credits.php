@@ -36,13 +36,15 @@ $contributor_ids = array(
     // 484, // Ephnee (Early Tester)
     );
 $user_fields = rpg_user::get_index_fields(true, 'users');
+$user_roles_fields = rpg_user_role::get_index_fields(true, 'uroles');
 $contributor_index = $db->get_array_list("SELECT
-    {$user_fields}
+    {$user_fields},
+    {$user_roles_fields}
     FROM mmrpg_users AS users
     LEFT JOIN mmrpg_roles AS uroles ON users.role_id = uroles.role_id
     WHERE users.user_id IN (".implode(', ', $contributor_ids).")
     ;", 'user_id');
-//die(print_r($contributor_index, true));
+//die('<pre>'.print_r($contributor_index, true).'</pre>');
 function temp_sort_by_date($u1, $u2){
     global $contributor_ids;
     if ($u1['user_id'] == 412){ return -1; }
