@@ -276,7 +276,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         // Ensure this field exists before continuing
         if (isset($mmrpg_database_fields[$temp_actual_token])){
 
-            // Remove this field's entry from the global arrayand define the new quantity
+            // Remove this field's entry from the global array and define the new quantity
             $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
             $temp_unlocked_fields[] = $temp_actual_token;
             $temp_unlocked_fields = array_unique($temp_unlocked_fields);
@@ -303,6 +303,68 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
 
             // Print an error message and kill the script
             exit('error|invalid-field|'.$temp_actual_token);
+
+        }
+
+    }
+    // Check if this is an ROBOT based action
+    elseif ($temp_kind == 'robot'){
+
+        // Collect the actual robot token from the provided one
+        $temp_actual_token = preg_replace('/^robot-/i', '', $temp_token);
+
+        // Ensure this robot exists before continuing
+        if (isset($mmrpg_database_robots[$temp_actual_token])){
+
+            // Collect detailed info on this robot from the database
+            $unlock_robot_info = $mmrpg_database_robots[$temp_actual_token];
+
+            // Decide which play this robot will be unlocked for
+            $this_best_stat_value = 0;
+            $this_best_stat_kind = '';
+            $stat_kinds = array('attack', 'defense', 'speed', 'energy');
+            foreach ($stat_kinds AS $kind){
+                if ($unlock_robot_info['robot_'.$kind] > $this_best_stat_value){
+                    $this_best_stat_value = $unlock_robot_info['robot_'.$kind];
+                    $this_best_stat_kind = $kind;
+                }
+            }
+            if ($this_best_stat_kind === 'attack'){ $unlock_player_token = 'dr-wily'; }
+            elseif ($this_best_stat_kind === 'defense'){ $unlock_player_token = 'dr-light'; }
+            elseif ($this_best_stat_kind === 'speed'){ $unlock_player_token = 'dr-cossack'; }
+            elseif ($this_best_stat_kind === 'energy'){ $unlock_player_token = 'dr-light'; } // dr-lalinde?
+
+            // Manually unlock this robot using the predefined global function
+            $temp_current_quantity = 1;
+            if (!mmrpg_prototype_robot_unlocked(false, $temp_actual_token)){
+                // Unlock Roll as a playable character
+                $unlock_player_info = $mmrpg_index['players'][$unlock_player_token];
+                $unlock_robot_info = rpg_robot::get_index_info($temp_actual_token);
+                $unlock_robot_info['robot_level'] = 99;
+                $unlock_robot_info['robot_experience'] = 999;
+                mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true);
+            }
+
+            // Decrement the player's zenny count based on the provided price
+            $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
+            $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
+
+            // Update the shop history with this sold item under the given character
+            if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['robots_sold'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['robots_sold'][$temp_token] = 0; }
+            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['robots_sold'][$temp_token] += 1;
+            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
+            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
+
+            // Save, produce the success message with the new robot order
+            mmrpg_save_game_session();
+            exit('success|robot-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
+
+        }
+        // Otherwise if this robot does not exist
+        else {
+
+            // Print an error message and kill the script
+            exit('error|invalid-robot|'.$temp_actual_token);
 
         }
 

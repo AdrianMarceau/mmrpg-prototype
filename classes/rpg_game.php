@@ -627,7 +627,7 @@ class rpg_game {
         // If this robot does not exist in the global index, return false
         //if (!isset($player_info['player_token'])){ echo 'player_info<pre>'.print_r($player_info, true).'</pre>'; }
         $player_index_info = $mmrpg_index['players'][$player_info['player_token']];
-        $robot_index_info = $robot_info;
+        $robot_index_info = !empty($robot_info['_parsed']) ? $robot_info : rpg_robot::get_index_info($robot_info['robot_token']);
         if (!isset($player_index_info)){ return false; }
         if (!isset($robot_index_info)){ return false; }
 
