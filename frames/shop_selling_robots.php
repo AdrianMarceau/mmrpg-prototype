@@ -88,7 +88,7 @@
 
                     ?>
                         <td class="<?= $robot_cell_float ?> item_cell" data-kind="robot" data-action="buy" data-token="<?= 'robot-'.$robot_info_token ?>">
-                            <span class="item_name robot_type robot_type_<?= $robot_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $robot_info_name ?></span>
+                            <span class="item_name robot_name robot_type robot_type_<?= $robot_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $robot_info_name ?></span>
                             <a class="buy_button robot_type robot_type_none" href="#">Buy</a>
                             <label class="item_quantity" data-quantity="0"><?= !empty($robot_info_quantity) ? '&#10004;' : '-' ?></label>
                             <label class="item_price" data-price="<?= $robot_info_price ?>">&hellip; <?= $robot_info_price ?>z</label>

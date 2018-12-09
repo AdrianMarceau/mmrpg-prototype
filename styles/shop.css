@@ -426,6 +426,7 @@
 }
 #shop #console .event .item_name,
 #shop #console .event .ability_name,
+#shop #console .event .robot_name,
 #shop #console .event .field_name,
 #shop #console .event .buy_button,
 #shop #console .event .sell_button,
@@ -460,6 +461,12 @@
 #shop #console .event .item_cell_confirm .item_name {
     float: right;
     margin-right: 30px;
+}
+@media (max-width: 800px){
+    #shop #console .event .field_name {
+        max-width: 120px;
+        max-width: calc(100% - 176px);
+    }
 }
 #shop #console .event .buy_button,
 #shop #console .event .sell_button,
