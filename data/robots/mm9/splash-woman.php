@@ -1,5 +1,5 @@
 <?
-// SPLASH MAN
+// SPLASH WOMAN
 $robot = array(
     'robot_number' => 'DLN-067',
     'robot_game' => 'MM09',
@@ -10,6 +10,7 @@ $robot = array(
     'robot_image_size' => 80,
     'robot_core' => 'water',
     'robot_description' => 'Aquatic Rescue Robot',
+    'robot_field' => 'waterfall-institute', // echo-field
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,

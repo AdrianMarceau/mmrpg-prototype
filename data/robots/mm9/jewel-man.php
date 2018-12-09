@@ -9,6 +9,7 @@ $robot = array(
     'robot_core' => 'crystal',
     'robot_field' => 'gemstone-cavern',
     'robot_description' => 'Shining Diamond Robot',
+    'robot_field' => 'reflection-chamber', // echo-field
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,

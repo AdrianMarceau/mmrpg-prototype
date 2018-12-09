@@ -2651,7 +2651,7 @@ class rpg_player extends rpg_object {
         elseif (!empty($player_info['player_speed'])){ $player_info['player_stat_type'] = 'speed'; }
 
         // Define whether or not field switching is enabled
-        $temp_allow_field_switch = mmrpg_prototype_item_unlocked('field-codes');
+        $temp_allow_field_switch = mmrpg_prototype_item_unlocked('legacy-codes');
 
         // Collect a temp robot object for printing items
         if ($player_info['player_token'] == 'dr-light'){
@@ -2804,7 +2804,7 @@ class rpg_player extends rpg_object {
                         </tbody>
                     </table>
 
-                    <? if(mmrpg_prototype_item_unlocked('field-codes')){ ?>
+                    <? if(mmrpg_prototype_item_unlocked('legacy-codes')){ ?>
 
                         <table class="full">
                             <colgroup>

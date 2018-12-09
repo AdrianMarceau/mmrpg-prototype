@@ -9,6 +9,7 @@ $robot = array(
     'robot_image_size' => 80,
     'robot_core' => 'nature',
     'robot_description' => 'Razor Claws Robot',
+    'robot_field' => 'preserved-forest', // echo-field
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,
