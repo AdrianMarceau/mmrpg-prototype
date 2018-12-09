@@ -4,12 +4,13 @@ if (!defined('MMRPG_REMOTE_GAME_ID')){ define('MMRPG_REMOTE_GAME_ID', (!empty($_
 if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER']['userid']){
 
     // Attempt to collect data for this player from the database
+    $user_fields = rpg_user::get_index_fields(true, 'users');
     $this_playerinfo = $db->get_array("SELECT
-        mmrpg_users.*,
-        mmrpg_saves.*
-        FROM mmrpg_users
-        LEFT JOIN mmrpg_saves ON mmrpg_saves.user_id = mmrpg_users.user_id
-        WHERE mmrpg_users.user_id = '".MMRPG_REMOTE_GAME_ID."';");
+        {$user_fields},
+        usaves.*
+        FROM mmrpg_users AS users
+        LEFT JOIN mmrpg_saves AS usaves ON usaves.user_id = users.user_id
+        WHERE users.user_id = '".MMRPG_REMOTE_GAME_ID."';");
 
     // If the userinfo exists in the database, display it
     if (!empty($this_playerinfo)){
