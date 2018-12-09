@@ -761,14 +761,31 @@ if (!empty($this_shop_index['kalinka'])){
     unset($this_shop_index['kalinka']['shop_items']['items_selling2']);
 
     // If the player has completed the prototype, Kalinka's Shop also sells fields
-    if (mmrpg_prototype_item_unlocked('field-codes')){
+    if (mmrpg_prototype_item_unlocked('legacy-codes')
+        || mmrpg_prototype_item_unlocked('field-codes')){
         $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
-        $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I think I\'ve discoved a way to generate new starforce, but it\'ll require additional research. Interested?';
+        $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I\'ve discovered that we can generate new stars using the data of legacy battle fields. Interested?';
         $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
             'construction-site' => 48000, 'magnetic-generator' => 48000,
             'reflection-chamber' => 48000, 'rocky-plateau' => 48000,
             'spinning-greenhouse' => 48000, 'serpent-column' => 48000,
             'power-plant' => 48000, 'septic-system' => 48000
+            );
+    }
+
+    // If the player has completed the prototype, Kalinka's Shop also sells robots
+    if (mmrpg_prototype_item_unlocked('legacy-codes')
+        || mmrpg_prototype_item_unlocked('robot-codes')){
+        $this_shop_index['kalinka']['shop_kind_selling'][] = 'robots';
+        $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Would you like me to build you a new robot or two? I created a few blueprints using your scan data.';
+        $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array(
+            'needle-man' => 48000, 'magnet-man' => 48000,
+            'gemini-man' => 48000, 'hard-man' => 48000,
+            'top-man' => 48000, 'snake-man' => 48000,
+            'spark-man' => 48000, 'shadow-man' => 48000,
+            'star-man' => 48000, 'gyro-man' => 48000,
+            'slash-man' => 48000, 'splash-woman' => 48000,
+            'jewel-man' => 48000, 'magic-man' => 48000
             );
     }
 
@@ -789,6 +806,14 @@ if (!empty($this_shop_index['kalinka'])){
             foreach ($this_shop_index['kalinka']['shop_fields']['fields_selling'] AS $field_kind => $field_price){
                 $field_price -= round(($field_price / 2) * $level_discount);
                 $this_shop_index['kalinka']['shop_fields']['fields_selling'][$field_kind] = $field_price;
+            }
+        }
+
+        // If her shop is selling robots, discount their prices
+        if (!empty($this_shop_index['kalinka']['shop_robotss']['robotss_selling'])){
+            foreach ($this_shop_index['kalinka']['shop_robotss']['robotss_selling'] AS $robots_kind => $robots_price){
+                $robot_price -= round(($robot_price / 2) * $level_discount);
+                $this_shop_index['kalinka']['shop_robots']['robots_selling'][$robot_kind] = $robot_price;
             }
         }
 

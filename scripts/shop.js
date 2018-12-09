@@ -390,11 +390,30 @@ $(document).ready(function(){
 
                     updateItemCells();
 
+                    // Animate the cell to show that an action has been completed
                     thisConfirmCell.stop().animate({opacity:1.0},300,'swing',function(){
                         thisConfirmCell.animate({opacity:0.3},600,'swing',function(){
                             $(this).css({opacity:1.0}).empty().append('<div class="placeholder">&hellip;</div>');
                             $('#zenny_counter', thisBody).css({color:''});
-                            thisShopData.allowEdit = true;
+
+                            // If the completed action was buying a new robot, refresh page
+                            //console.log('we just completed an action... postData = ', postData);
+                            if (postData.kind === 'robot'
+                                && postData.action === 'buy'
+                                && postData.quantity >= 1){
+                                if (window.self !== window.top){
+                                    window.parent.location = window.parent.location.href;
+                                    thisShopData.allowEdit = false;
+                                    } else {
+                                    thisShopData.allowEdit = true;
+                                    }
+                                }
+                            // Otherwise turn editing back on for the user
+                            else {
+                                thisShopData.allowEdit = true;
+                                }
+
+
                             });
                         });
 
@@ -502,7 +521,7 @@ function updateItemQuantity(itemToken, itemQuantity){
             if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
             else if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); }
 
-            } else if (thisKind == 'field'){
+            } else if (thisKind == 'field' || thisKind == 'robot'){
 
             if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }
 
