@@ -809,6 +809,14 @@ if (!empty($this_shop_index['kalinka'])){
             }
         }
 
+        // If her shop is selling robots, discount their prices
+        if (!empty($this_shop_index['kalinka']['shop_robotss']['robotss_selling'])){
+            foreach ($this_shop_index['kalinka']['shop_robotss']['robotss_selling'] AS $robots_kind => $robots_price){
+                $robot_price -= round(($robot_price / 2) * $level_discount);
+                $this_shop_index['kalinka']['shop_robots']['robots_selling'][$robot_kind] = $robot_price;
+            }
+        }
+
     }
 
 }

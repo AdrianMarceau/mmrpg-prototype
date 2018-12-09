@@ -68,7 +68,7 @@
 
                     ?>
                         <td class="<?= $field_cell_float ?> item_cell" data-kind="field" data-action="buy" data-token="<?= 'field-'.$field_info_token ?>">
-                            <span class="item_name field_type field_type_<?= $field_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $field_info_name ?></span>
+                            <span class="item_name field_name field_type field_type_<?= $field_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $field_info_name ?></span>
                             <a class="buy_button field_type field_type_none" href="#">Buy</a>
                             <label class="item_quantity" data-quantity="0"><?= !empty($field_info_quantity) ? '&#10004;' : '-' ?></label>
                             <label class="item_price" data-price="<?= $field_info_price ?>">&hellip; <?= $field_info_price ?>z</label>
