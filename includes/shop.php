@@ -782,7 +782,10 @@ if (!empty($this_shop_index['kalinka'])){
             'needle-man' => 48000, 'magnet-man' => 48000,
             'gemini-man' => 48000, 'hard-man' => 48000,
             'top-man' => 48000, 'snake-man' => 48000,
-            'spark-man' => 48000, 'shadow-man' => 48000
+            'spark-man' => 48000, 'shadow-man' => 48000,
+            'star-man' => 48000, 'gyro-man' => 48000,
+            'slash-man' => 48000, 'splash-woman' => 48000,
+            'jewel-man' => 48000, 'magic-man' => 48000
             );
     }
 

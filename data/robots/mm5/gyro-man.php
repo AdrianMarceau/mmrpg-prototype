@@ -9,6 +9,7 @@ $robot = array(
     'robot_image_size' => 80,
     'robot_core' => 'wind',
     'robot_description' => 'Aerial Strike Robot',
+    'robot_field' => 'sky-ridge', // echo-field
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,

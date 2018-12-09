@@ -8,6 +8,7 @@ $robot = array(
     'robot_image_editor' => 18,
     'robot_core' => 'space',
     'robot_description' => 'Interstellar Research Robot',
+    'robot_field' => 'space-simulator', // echo-field
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,
