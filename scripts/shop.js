@@ -502,7 +502,7 @@ function updateItemQuantity(itemToken, itemQuantity){
             if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
             else if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); }
 
-            } else if (thisKind == 'field'){
+            } else if (thisKind == 'field' || thisKind == 'robot'){
 
             if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }
 

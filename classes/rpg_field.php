@@ -1367,12 +1367,14 @@ class rpg_field extends rpg_object {
             if (!empty($temp_mecha)){ $temp_field_mechas[$key] = $temp_mecha['robot_name'];  }
             else { unset($temp_field_mechas[$key]); }
         }
+        $temp_field_mechas = array_unique($temp_field_mechas);
         $temp_field_title = $field_info['field_name'];
         if (!empty($temp_field_type)){ $temp_field_title .= ' ('.$temp_field_type['type_name'].' Type)'; }
         if (!empty($temp_field_type2)){ $temp_field_title = str_replace('Type', '/ '.$temp_field_type2['type_name'].' Type', $temp_field_title); }
-        $temp_field_title .= '  // ';
-        if (!empty($temp_field_master)){ $temp_field_title .= 'Robot : '.$temp_field_master['robot_name'].' // '; }
-        if (!empty($temp_field_mechas)){ $temp_field_title .= 'Mecha : '.implode(', ', array_unique($temp_field_mechas)).' // '; }
+        $temp_field_title .= '  // [[ ';
+            if (!empty($temp_field_master)){ $temp_field_title .= 'Master : '.$temp_field_master['robot_name'].' // '; }
+            if (!empty($temp_field_mechas)){ $temp_field_title .= 'Mecha'.(count($temp_field_mechas) > 1 ? 's' : '').' : '.implode(', ', $temp_field_mechas).' // '; }
+        $temp_field_title .= '  ]] ';
         /*
         if (!empty($field_info['field_description'])){
             //$temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');

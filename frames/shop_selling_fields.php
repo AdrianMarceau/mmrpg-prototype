@@ -74,8 +74,6 @@
                     }
 
                     if ($field_info_unlocked){ $field_info_price = 0; }
-                    //if ($field_info_unlocked){ continue; }
-                    if ($field_counter >= 24){ break; }
 
                     $field_counter++;
                     $field_cell_float = $field_counter % 2 == 0 ? 'right' : 'left';
