@@ -315,7 +315,7 @@ $this_shop_index['kalinka'] = array(
         'shop_kind_selling' => array('items'),
         'shop_kind_buying' => array('stars'),
         'shop_quote_selling' => array('items' => 'Greetings and welcome to Kalinka\'s Shop! I think you\'ll enjoy the new hold items I\'m developing.'),
-        'shop_quote_buying' => array('stars' => 'Do you have any field or fusion stars? I\'m studying the effects of starforce and need some samples.'),
+        'shop_quote_buying' => array('stars' => 'Do you have any field or fusion stars? I\'m studying the effects of starforce and need to scan a few.'),
         'shop_items' => array(
             'items_selling' => array(
                 'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,

@@ -86,7 +86,8 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
         if (isset($_SESSION[$session_token]['values']['battle_stars'][$temp_actual_token])){
 
             // Add this star's token to the daily list of shown stars
-            // ...
+            $temp_session_key = 'star_list_array_raw';
+            $_SESSION[$session_token]['SHOP'][$temp_session_key]['shown']['star-'.$temp_actual_token] = true;
             $temp_current_quantity = 0;
 
             /*
@@ -108,7 +109,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
 
             // Save, produce the success message with the new field order
             mmrpg_save_game_session();
-            exit('success|star-sold|'.$temp_current_quantity.'|'.$global_zenny_counter);
+            exit('success|star-shown|'.$temp_current_quantity.'|'.$global_zenny_counter);
 
         }
         // Otherwise if this star does not exist
