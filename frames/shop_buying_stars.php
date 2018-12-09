@@ -54,8 +54,8 @@
                     foreach ($mmrpg_index['players'] AS $temp_player_token => $temp_player_info){
 
                         // Collect this player's omega factors from the session
-                        $temp_session_key = $temp_player_token.'_target-robot-omega_prototype';
-                        $temp_target_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
+                        $temp_omega_session_key = $temp_player_token.'_target-robot-omega_prototype';
+                        $temp_target_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_omega_session_key]) ? $_SESSION[$session_token]['values'][$temp_omega_session_key] : array();
 
                         // Loop through omega factors and collect base fields
                         foreach ($temp_target_robot_omega AS $key => $factor){
@@ -93,11 +93,15 @@
                     shuffle($temp_fusion_tokens);
 
                     // Define the first eight field and fusion star tokens
-                    $temp_limit = ceil(($shop_info['shop_level'] / 100) * 64);
+                    $shop_level = $shop_info['shop_level'] >= 100 ? 100 : $shop_info['shop_level'];
+                    $temp_limit = ceil(($shop_level / 100) * 20);
                     if ($temp_limit % 2 != 0){ $temp_limit += 1; }
-                    $temp_fusion_star_tokens = array_slice($temp_fusion_tokens, 0, 10);
-                    $temp_required = $temp_limit - count($temp_fusion_star_tokens);
-                    $temp_field_star_tokens = array_slice($temp_base_tokens, 0, $temp_required);
+                    $temp_limit_half = ceil($temp_limit / 2);
+                    $temp_field_star_tokens = array_slice($temp_base_tokens, 0, $temp_limit_half);
+                    $temp_fusion_star_tokens = array_slice($temp_fusion_tokens, 0, $temp_limit_half);
+                    //$temp_fusion_star_tokens = array_slice($temp_fusion_tokens, 0, floor($temp_limit / 2));
+                    //$temp_required = $temp_limit - count($temp_fusion_star_tokens);
+                    //$temp_field_star_tokens = array_slice($temp_base_tokens, 0, $temp_required);
 
                     /*
                     echo('<hr />');
@@ -163,6 +167,21 @@
                     exit();
                     */
 
+                    // Re-sort the star tokens based on field vs fusion stars
+                    $today_star_tokens = array_keys($star_list_array_raw['today']);
+                    usort($today_star_tokens, function($a, $b) use($temp_fusion_tokens){
+                        $at = in_array($a, $temp_fusion_tokens) ? 'fusion' : 'field';
+                        $bt = in_array($b, $temp_fusion_tokens) ? 'fusion' : 'field';
+                        if ($at === 'field' && $bt !== 'field'){ return -1; }
+                        elseif ($bt === 'field' && $at !== 'field'){ return 1; }
+                        elseif ($a > $b){ return -1; }
+                        elseif ($b > $a){ return 1; }
+                        else { return 0; }
+                        });
+                    $new_today_star_list = array();
+                    foreach ($today_star_tokens AS $key => $token){ $new_today_star_list[$token] = $star_list_array_raw['today'][$token]; }
+                    $star_list_array_raw['today'] = $new_today_star_list;
+
                     // Update the session with the new array in raw format
                     $_SESSION[$session_token]['SHOP'][$temp_session_key] = $star_list_array_raw;
 
@@ -170,7 +189,7 @@
 
                 // Reformat the list arrays to what we need them for
                 $star_list_array = array_keys($star_list_array_raw['today']);
-                shuffle($star_list_array);
+                //shuffle($star_list_array);
 
                 //echo('<pre>$star_list_array = '.print_r($star_list_array, true).'</pre>');
                 //echo('<pre>$star_list_array_raw[today] = '.print_r($star_list_array_raw['today'], true).'</pre>');
@@ -208,10 +227,10 @@
 
                     // If Robots or Abilities have been unlocked, increase the core selling prices
                     if (!empty($shop_info['shop_hidden_power'])){
-                        $omega_boost = false;
-                        if (!empty($star_info_type) && $star_info_type == $shop_info['shop_hidden_power']){ $omega_boost = true; }
-                        elseif (!empty($star_info_type2) && $star_info_type2 != $star_info_type && $star_info_type2 == $shop_info['shop_hidden_power']){ $omega_boost = 2; }
-                        if (!empty($omega_boost)){ $star_info_price = ceil($star_info_price * 1.5); }
+                        $omega_boost = 0;
+                        if (!empty($star_info_type) && $star_info_type == $shop_info['shop_hidden_power']){ $omega_boost = 0.50; }
+                        elseif (!empty($star_info_type2) && $star_info_type2 != $star_info_type && $star_info_type2 == $shop_info['shop_hidden_power']){ $omega_boost = 1.0; }
+                        if (!empty($omega_boost)){ $star_info_price += floor($star_info_price * $omega_boost); }
                     }
 
                     $global_item_quantities['star-'.$star_info_token] = !empty($_SESSION[$session_token]['values']['battle_stars'][$star_info_token]) ? 1 : 0;
