@@ -234,6 +234,7 @@
                     }
 
                     $global_item_quantities['star-'.$star_info_token] = !empty($_SESSION[$session_token]['values']['battle_stars'][$star_info_token]) ? 1 : 0;
+                    if (!empty($_SESSION[$session_token]['SHOP'][$temp_session_key]['shown']['star-'.$star_info_token])){ $global_item_quantities['star-'.$star_info_token] = 0; }
                     $global_item_prices['sell']['star-'.$star_info_token] = $star_info_price;
 
                     $temp_info_tooltip = $star_info_name.'<br /> ';
