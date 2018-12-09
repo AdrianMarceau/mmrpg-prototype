@@ -9,6 +9,7 @@ $robot = array(
     'robot_image_size' => 80,
     'robot_core' => 'shadow',
     'robot_description' => 'Showy Illusionist Robot',
+    'robot_field' => 'septic-system', // echo-field
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,
