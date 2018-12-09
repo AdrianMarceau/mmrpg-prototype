@@ -332,8 +332,8 @@ $this_shop_index['kalinka'] = array(
             ),
         'shop_stars' => array(
             'stars_buying' => array(
-                'field' => 6000,
-                'fusion' => 9000
+                'field' => 2000,
+                'fusion' => 4000
                 )
             )
         );
