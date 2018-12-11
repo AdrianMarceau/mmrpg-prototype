@@ -16,6 +16,7 @@ $ability = array(
         extract($objects);
 
         // Define this ability's attachment token
+        $this_gender = preg_match('/^(roll|disco|rhythm|[-a-z]+woman)$/i', $target_robot->robot_token) ? 'female' : 'male';
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
         $this_attachment_info = array(
             'class' => 'ability',
@@ -30,8 +31,8 @@ $ability = array(
                 'percent' => true,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
-                'success' => array(9, -10, -5, -10, $target_robot->print_name().' found itself frozen in ice!<br /> '.$target_robot->print_name().' is prevented from switching!'),
-                'failure' => array(9, -10, -5, -10, $target_robot->print_name().' found itself frozen in ice!<br /> '.$target_robot->print_name().' is prevented from switching!')
+                'success' => array(9, -10, -5, -10, $target_robot->print_name().' found '.($this_gender == 'female' ? 'herself' : 'himself').' frozen in ice!<br /> '.$target_robot->print_name().' is prevented from switching!'),
+                'failure' => array(9, -10, -5, -10, $target_robot->print_name().' found '.($this_gender == 'female' ? 'herself' : 'himself').' frozen in ice!<br /> '.$target_robot->print_name().' is prevented from switching!')
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -105,7 +106,7 @@ $ability = array(
                 // Target the opposing robot
                 $this_ability->target_options_update(array(
                     'frame' => 'defend',
-                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' refreshed the ice surrounding '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s inability to switch has been extended!')
+                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' refreshed the ice surrounding '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s inability to switch has been prolonged!')
                     ));
                 $target_robot->trigger_target($target_robot, $this_ability);
 

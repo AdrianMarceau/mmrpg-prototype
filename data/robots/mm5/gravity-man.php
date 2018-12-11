@@ -9,6 +9,7 @@ $robot = array(
     'robot_image_size' => 80,
     'robot_core' => 'electric',
     'robot_description' => 'Gravity Manipulation Robot',
+    'robot_field' => 'space-simulator', // echo-field
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,
