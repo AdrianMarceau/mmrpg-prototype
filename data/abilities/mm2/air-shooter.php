@@ -8,8 +8,8 @@ $ability = array(
     'ability_description' => 'The user fires three whirlwinds that spread out and rise upward, hitting the target up to three times!',
     'ability_type' => 'wind',
     'ability_energy' => 4,
-    'ability_damage' => 8,
-    'ability_accuracy' => 92,
+    'ability_damage' => 12,
+    'ability_accuracy' => 96,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
