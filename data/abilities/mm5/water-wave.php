@@ -15,7 +15,7 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Count the number of active robots on the target's side of the field
+        // Count the number of active robots on the target's side of the  field
         $target_robots_active_count = $target_player->counters['robots_active'];
         $target_robot_ids = array($target_robot->robot_id);
         $get_next_target_robot = function() use($this_battle, $target_player, &$target_robot_ids){
