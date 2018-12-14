@@ -142,10 +142,12 @@ class cms_database {
             $bt = debug_backtrace();
             $caller = array_shift($bt);
             $caller2 = array_shift($bt);
+            $caller3 = array_shift($bt);
             $caller['file'] = basename(dirname($caller['file'])).'/'.basename($caller['file']);
             $caller2['file'] = basename(dirname($caller2['file'])).'/'.basename($caller2['file']);
-            $backtrace = "{$caller['file']}:{$caller['line']} <br /> {$caller2['file']}:{$caller2['line']}";
-            if (!MMRPG_CONFIG_IS_LIVE || MMRPG_CONFIG_DEBUG_MODE){ $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;. <br /> {$backtrace}"); }
+            $caller3['file'] = basename(dirname($caller3['file'])).'/'.basename($caller3['file']);
+            $backtrace = "{$caller['file']}:{$caller['line']} <br /> {$caller2['file']}:{$caller2['line']} <br /> {$caller3['file']}:{$caller3['line']}";
+            if (!MMRPG_CONFIG_IS_LIVE || MMRPG_CONFIG_DEBUG_MODE){ $this->critical_error("[[cms_database::query]] : Unable to run the requested query. <br /> [Error ".mysqli_errno($this->LINK)." | ".mysqli_error($this->LINK)."]. <br /> The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;. <br /> {$backtrace}"); }
             else { $this->critical_error("[[cms_database::query]] : Unable to run the requested query. ".mysqli_errno($this->LINK).". <br /> {$backtrace}"); }
             return false;
         }
