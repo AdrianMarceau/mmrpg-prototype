@@ -5,11 +5,11 @@ $ability = array(
     'ability_token' => 'energy-break',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Energy',
-    'ability_description' => 'The user bypasses the target\'s shields to deal direct life enery damage of up to {DAMAGE}% its max value!',
-    'ability_energy' => 6,
-    'ability_damage' => 22,
+    'ability_description' => 'The user bypasses the target\'s shields to deal direct life enery damage of up to {DAMAGE}%!',
+    'ability_energy' => 4,
+    'ability_damage' => 20,
     'ability_damage_percent' => true,
-    'ability_accuracy' => 98,
+    'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
