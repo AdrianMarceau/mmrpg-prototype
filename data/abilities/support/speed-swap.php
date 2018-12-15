@@ -27,86 +27,65 @@ $ability = array(
         $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
         $target_robot->update_session();
 
-        // Target this robot's self
-        $this_ability->target_options_update(array(
-            'frame' => 'summon',
-            'success' => array(0, 0, 10, -10, $this_robot->print_name().' triggered a '.$this_ability->print_name().' with '.$target_robot->print_name().'!')
-            ));
+        // Check if this robot is targetting itself
+        $has_target_self = $this_robot->robot_id == $target_robot->robot_id ? true : false;
+
+        // Target this robot's self to initiate ability
+        $target_name_text = $has_target_self ? 'itself' : $target_robot->print_name();
+        $this_ability->target_options_update(array('frame' => 'summon', 'success' => array(0, 0, 10, -10, $this_robot->print_name().' triggered an '.$this_ability->print_name().' with '.$target_name_text.'!')));
         $this_robot->trigger_target($this_robot, $this_ability);
 
         // Remove this ability from the target
         unset($target_robot->robot_attachments[$this_attachment_token]);
         $target_robot->update_session();
 
-        // If this robot happens to be targeting itself, nothing happens
-        if ($this_robot->robot_id == $target_robot->robot_id){
+        // Collect this robot's stat mods and the target's so we can swap them
+        $stat_token = 'speed';
+        $this_stat_mods = $this_robot->counters[$stat_token.'_mods'];
+        $target_stat_mods = $target_robot->counters[$stat_token.'_mods'];
+
+        // If this robot happens to be targeting itself or the stats are otherwise the same, do nothing and return now
+        if ($has_target_self || $this_stat_mods === $target_stat_mods){
 
                 // Update the ability's target options and trigger
-                $this_ability->target_options_update(array(
-                    'frame' => 'defend',
-                    'success' => array(0, 0, 0, 10, '&hellip;but nothing happened.')
-                    ));
+                $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, 0, 0, 10, '&hellip;but nothing happened.')));
                 $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
                 return;
 
         }
 
-        // Create a function that increases or decreases a robot's speed to target
-        $temp_speed_function = function($this_robot, $this_ability, $temp_this_speed, $temp_target_speed){
-            global $this_battle;
+        // Swap the two robot's stat values now and then save the changes
+        $this_robot->counters[$stat_token.'_mods'] = $target_stat_mods;
+        $target_robot->counters[$stat_token.'_mods'] = $this_stat_mods;
+        $this_robot->update_session();
+        $target_robot->update_session();
 
-            // Collect the target's current speed amount
-            //$temp_this_speed = $this_robot->robot_speed.'/'.$this_robot->robot_base_speed;
+        // Check to see if the target's stats got better or worse
+        $effect_text = 'changed';
+        if ($target_robot->counters[$stat_token.'_mods'] === 0){
+            $diff = 0;
+            $effect = 'reset';
+            $effect_text = 'returned to normal';
+            $effect_frame = $this_stat_mods > $target_stat_mods ? 'taunt' : 'defend';
+        } elseif ($this_stat_mods > $target_stat_mods){
+            $diff = $this_stat_mods - $target_stat_mods;
+            $effect = 'rose';
+            if ($diff >= 3){ $effect_text = 'rose drastically'; }
+            elseif ($diff >= 2){ $effect_text = 'sharply rose'; }
+            else { $effect_text = 'rose'; }
+            $effect_frame = 'taunt';
+        } elseif ($this_stat_mods < $target_stat_mods){
+            $diff = $target_stat_mods - $this_stat_mods;
+            $effect = 'fell';
+            if ($diff >= 3){ $effect_text = 'severely fell'; }
+            elseif ($diff >= 2){ $effect_text = 'harshly fell'; }
+            else { $effect_text = 'fell'; }
+            $effect_frame = 'defend';
+        }
 
-            //$this_battle->events_create(false, false, 'DEBUG '.__LINE__, '$temp_this_speed = '.$temp_this_speed.', $temp_target_speed = '.$temp_target_speed);
-
-            // Only continue if this robot and the target's speed are not equal
-            if ($temp_this_speed != $temp_target_speed){
-
-                // Break apart the speed into its current and base amounts
-                list($temp_speed, $temp_base_speed) = explode('/', $temp_target_speed);
-
-                // Update this robot's values with the random data
-                $this_robot->robot_speed = $temp_speed;
-                $this_robot->robot_base_speed = $temp_base_speed;
-                $this_robot->update_session();
-
-                // Target this robot's self
-                $is_her = in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm', 'splash-woman')) ? true : false;
-                $is_mecha = $this_robot->robot_class == 'mecha' ? true : false;
-                $this_ability->target_options_update(array(
-                    'frame' => 'defend',
-                    'success' => array(9, 0, 10, -10, $this_robot->print_name().'&#39;s speed stats were modified&hellip;<br /> '.($is_her ? 'Her' : ($is_mecha ? 'Its' : 'His')).' new speed stats are '.$this_robot->print_speed().' / '.$this_robot->print_robot_base_speed().'!')
-                    ));
-                $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
-
-            }
-            // Otherwise, if the two already have equal speed amounts
-            else {
-
-                // Target this robot's self and show the ability failing
-                $this_ability->target_options_update(array(
-                    'frame' => 'defend',
-                    'success' => array(9, 0, 0, -10, $this_robot->print_name().'&#39;s speed stats were was not affected&hellip;')
-                    ));
-                $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
-
-                // Return true on success (well, failure, but whatever)
-                return true;
-
-            }
-
-        };
-
-        // Collect the target's current speed amount
-        $temp_this_speed = $this_robot->robot_speed.'/'.$this_robot->robot_base_speed;
-        // Collect this robot's current speed amount
-        $temp_target_speed = $target_robot->robot_speed.'/'.$target_robot->robot_base_speed;
-
-        // Update this robot's speed to that of the target's
-        $temp_speed_function($this_robot, $this_ability, $temp_this_speed, $temp_target_speed);
-        // Update the target's speed to that of this robot
-        $temp_speed_function($target_robot, $this_ability, $temp_target_speed, $temp_this_speed);
+        // Generate an event showing the stat swap was successful
+        $this_ability->target_options_update(array('frame' => $effect_frame, 'success' => array(9, 0, 10, -10, $target_name_text.'&#39;s '.$stat_token.' stat '.$effect_text.'!')));
+        $target_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
 
         // Return true on success
         return true;
