@@ -17,8 +17,8 @@ $ability = array(
         $this_ability->target_options_update(array('frame' => 'summon', 'success' => array(0, -2, 0, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')));
         $this_robot->trigger_target($target_robot, $this_ability);
 
-        // Call the global stat boost function with customized options
-        return rpg_ability::ability_function_stat_break($target_robot, 'attack', 2, $this_ability);
+        // Call the global stat break function with customized options
+        rpg_ability::ability_function_stat_break($target_robot, 'attack', 2, $this_ability);
 
         // Return true on success
         return true;
