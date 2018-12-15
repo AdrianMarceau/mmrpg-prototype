@@ -8,7 +8,7 @@ $ability = array(
     'ability_description' => 'The user triggers an exploit in the prototype to swap their own speed stat changes with the target! However the weapon energy cost for this ability increases after each use.',
     'ability_energy' => 8,
     'ability_accuracy' => 100,
-    'ability_target' => 'select_this',
+    'ability_target' => 'auto',
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -47,10 +47,10 @@ $ability = array(
         // If this robot happens to be targeting itself or the stats are otherwise the same, do nothing and return now
         if ($has_target_self || $this_stat_mods === $target_stat_mods){
 
-                // Update the ability's target options and trigger
-                $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, 0, 0, 10, '&hellip;but nothing happened.')));
-                $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
-                return;
+            // Update the ability's target options and trigger
+            $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, 0, 0, 10, '&hellip;but nothing happened.')));
+            $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
+            return;
 
         }
 
@@ -99,8 +99,8 @@ $ability = array(
         // If used by support robot OR the has a Target Module, allow opponent targetting
         $temp_support_robots = array('roll', 'disco', 'rhythm');
         if (in_array($this_robot->robot_token, $temp_support_robots)
-            || $this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
-        else { $this_ability->set_target('select_this'); }
+            || $this_robot->has_item('target-module')){ $this_ability->set_target('select_this'); }
+        else { $this_ability->set_target('auto'); }
 
         // Check to see if this ability has been used already, and if so increase the cost
         if (!empty($this_robot->history['triggered_abilities'])){
