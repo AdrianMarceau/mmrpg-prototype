@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Speed',
     'ability_description' => 'The user breaks down the target\'s mobility systems, sharply lowering its speed stat!',
-    'ability_energy' => 4,
+    'ability_energy' => 6,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
