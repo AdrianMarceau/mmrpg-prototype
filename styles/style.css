@@ -520,14 +520,14 @@ body.index #header {
 */
 
 #mmrpg .robot_details_left {
-    background-image: url(../images/assets/battle-scene_robot-details.png?20130908-01);
+    background-image: url(../images/assets/battle-scene_robot-details-4.png?20181214-01);
     background-position: 0 0;
     text-align: left;
     top: 4px;
     left: 4px;
 }
 #mmrpg .robot_details_right {
-    background-image: url(../images/assets/battle-scene_robot-details.png?20130908-01);
+    background-image: url(../images/assets/battle-scene_robot-details-4.png?20181214-01);
     background-position: -271px 0;
     text-align: right;
     top: 4px;
@@ -694,7 +694,8 @@ body.index #header {
 #mmrpg .robot_details .robot_attack,
 #mmrpg .robot_details .robot_defense,
 #mmrpg .robot_details .robot_speed,
-#mmrpg .robot_details .robot_item {
+#mmrpg .robot_details .robot_item,
+#mmrpg .robot_details .stat_mod {
     display: block;
     margin: 0;
     padding: 0;
@@ -874,6 +875,33 @@ body.index #header {
 #mmrpg .robot_details_right .robot_item {
     right: 2px;
 }
+
+#mmrpg .robot_details .stat_mod {
+    display: block;
+    width: 6px;
+    height: 5px;
+    background-color: transparent;
+    background-image: url(../images/assets/battle-scene_robot-details-4_arrows.png?20181214-01);
+    background-repeat: repeat-x;
+    background-size: auto;
+}
+
+#mmrpg .robot_details_left .stat_mod { left: 20px; }
+#mmrpg .robot_details_right .stat_mod { right: 20px; }
+
+#mmrpg .robot_details .stat_mod.plus { background-position: 0 0; }
+#mmrpg .robot_details .stat_mod.minus { background-position: 0 -5px; }
+
+#mmrpg .robot_details .stat_mod.s1 { width: 6px; }
+#mmrpg .robot_details .stat_mod.s2 { width: 12px; }
+#mmrpg .robot_details .stat_mod.s3 { width: 18px; }
+#mmrpg .robot_details .stat_mod.s4 { width: 24px; }
+#mmrpg .robot_details .stat_mod.s5 { width: 30px; }
+
+#mmrpg .robot_details .stat_mod.attack { top: 56px; }
+#mmrpg .robot_details .stat_mod.defense { top: 80px; }
+#mmrpg .robot_details .stat_mod.speed { top: 104px; }
+
 
 #mmrpg .robot_details .energy {
     display: block;

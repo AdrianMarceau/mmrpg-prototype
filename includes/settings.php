@@ -53,6 +53,8 @@ define('MMRPG_SETTINGS_MULTIPLIER_MAX', 9.9); // Ensure the multiplier stays und
 define('MMRPG_SETTINGS_STATS_MIN', 0); // Prevent the multiplier from reaching absolute zero
 define('MMRPG_SETTINGS_STATS_MAX', 9999); // Ensure the multiplier stays under the limit of ten
 define('MMRPG_SETTINGS_STATS_BONUS_MAX', 1); // Ensure bonuses do not go exceed X times the base value
+define('MMRPG_SETTINGS_STATS_MOD_MIN', -5); // Prevent the multiplier from reaching too low
+define('MMRPG_SETTINGS_STATS_MOD_MAX', 5); // Prevent the multiplier from reaching too high
 
 // Define the global values for robot recharge stat values
 define('MMRPG_SETTINGS_RECHARGE_WEAPONS', 1); // Recharge one unit of weapon energy each turn
