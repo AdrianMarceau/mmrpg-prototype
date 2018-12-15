@@ -720,7 +720,10 @@ class rpg_robot extends rpg_object {
                 $this->$prop_stat += $temp_boost;
                 $this->$prop_stat_base += $temp_boost;
             }
-
+            // Also create a variable for mods if applicable
+            if ($stat !== 'energy' && $stat !== 'weapons'){
+                $this->counters[$stat.'_mods'] = 0;
+            }
         }
 
         // If this robot is holder a relavant item, apply stat upgrades
