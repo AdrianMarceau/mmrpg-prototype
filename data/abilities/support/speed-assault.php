@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Speed2',
     'ability_description' => 'The user triggers mobility damage to all robots on the target\'s side of the field to lower their speed stats!',
-    'ability_energy' => 6,
+    'ability_energy' => 12,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
