@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Defense',
     'ability_description' => 'The user breaks down the target\'s shield systems, sharply lowering its defense stat!',
-    'ability_energy' => 4,
+    'ability_energy' => 6,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
