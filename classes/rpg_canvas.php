@@ -546,13 +546,7 @@ class rpg_canvas {
                 $details_data['robot_details'] .= '<div class="'.$details_data['weapons_class'].'" style="'.$details_data['weapons_style'].'" title="'.$details_data['weapons_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_weapons">'.$details_data['weapons_title'].'</div>';
                 if ($this_data['robot_float'] == 'left'){ $details_data['robot_details'] .= '<div class="'.$details_data['experience_class'].'" style="'.$details_data['experience_style'].'" title="'.$details_data['experience_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_experience">'.$details_data['experience_title'].'</div>'; }
 
-                /*
-                $robot_attack_markup = '<div class="robot_attack'.($this_robot->robot_attack < 1 ? ' robot_attack_break' : ($this_robot->robot_attack < ($this_robot->robot_base_attack / 2) ? ' robot_attack_break_chance' : '')).'">'.str_pad($this_robot->robot_attack, 3, '0', STR_PAD_LEFT).'</div>';
-                $robot_defense_markup = '<div class="robot_defense'.($this_robot->robot_defense < 1 ? ' robot_defense_break' : ($this_robot->robot_defense < ($this_robot->robot_base_defense / 2) ? ' robot_defense_break_chance' : '')).'">'.str_pad($this_robot->robot_defense, 3, '0', STR_PAD_LEFT).'</div>';
-                $robot_speed_markup = '<div class="robot_speed'.($this_robot->robot_speed < 1 ? ' robot_speed_break' : ($this_robot->robot_speed < ($this_robot->robot_base_speed / 2) ? ' robot_speed_break_chance' : '')).'">'.str_pad($this_robot->robot_speed, 3, '0', STR_PAD_LEFT).'</div>';
-                */
-
-                // Loop through and define the other stat variables and markup
+                // Loop through and define the other stat variables and markup ($robot_attack_markup, $robot_defense_markup, $robot_speed_markup)
                 $stat_tokens = array('attack' => 'AT', 'defense' => 'DF', 'speed' => 'SP');
                 foreach ($stat_tokens AS $stat => $letters){
                     $prop_stat = 'robot_'.$stat;
@@ -566,7 +560,11 @@ class rpg_canvas {
                     if ($this_data['robot_float'] == 'left'){ $temp_stat_title = $this_robot->$prop_stat.' / '.$this_robot->$prop_stat_base.' '.$letters.' | '.$temp_stat_percent.'%'.($temp_stat_break ? ' | BREAK!' : '').($temp_stat_maxed ? ' | &#9733;' : ''); }
                     elseif ($this_data['robot_float'] == 'right'){ $temp_stat_title = ($temp_stat_maxed ? '&#9733; |' : '').($temp_stat_break ? 'BREAK! | ' : '').$temp_stat_percent.'% | '.$this_robot->$prop_stat.' / '.$this_robot->$prop_stat_base.' '.$letters; }
                     $$prop_markup = '<div class="robot_'.$stat.''.($temp_stat_break ? ' robot_'.$stat.'_break' : ($temp_stat_break_chance ? ' robot_'.$stat.'_break_chance' : '')).'" title="'.$temp_stat_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_'.$stat.'">'.$this_robot->$prop_stat.'</div>';
-
+                    if (!empty($this_robot->counters[$stat.'_mods'])){
+                        $temp_stat_mods = $this_robot->counters[$stat.'_mods'];
+                        if ($temp_stat_mods > 0){ $$prop_markup .= '<div class="stat_mod '.$stat.' plus s'.$temp_stat_mods.'"></div>'; }
+                        elseif ($temp_stat_mods < 0){ $$prop_markup .= '<div class="stat_mod '.$stat.' minus s'.($temp_stat_mods * -1).'"></div>'; }
+                    }
                 }
 
                 // Add these markup variables to the details string
