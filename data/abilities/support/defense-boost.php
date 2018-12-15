@@ -5,10 +5,8 @@ $ability = array(
     'ability_token' => 'defense-boost',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Defense',
-    'ability_description' => 'The user optimizes internal systems to improve shields and raise defense by up to {RECOVERY}%!',
+    'ability_description' => 'The user optimizes internal systems to improve shields and sharpy raise its defense stat!',
     'ability_energy' => 4,
-    'ability_recovery' => 33,
-    'ability_recovery_percent' => true,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -16,42 +14,15 @@ $ability = array(
         extract($objects);
 
         // Target this robot's self
-        $this_ability->target_options_update(array(
-            'frame' => 'summon',
-            'success' => array(0, 0, 10, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')
-            ));
+        $this_ability->target_options_update(array('frame' => 'summon', 'success' => array(0, 0, 10, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')));
         $this_robot->trigger_target($this_robot, $this_ability);
 
-        // If this ability is being used by a special support robot that allows targetting
-        if ($this_robot->player_id == $target_robot->player_id){
+        // Create a reference to the target robot, whichever one it is
+        if ($this_robot->player_id == $target_robot->player_id){ $temp_target_robot = $target_robot; }
+        else { $temp_target_robot = $this_robot; }
 
-            // Increase this robot's defense stat
-            $this_ability->recovery_options_update(array(
-                'kind' => 'defense',
-                'percent' => true,
-                'frame' => 'taunt',
-                'success' => array(0, -2, 0, -10, $target_robot->print_name().'&#39;s shields powered up!'),
-                'failure' => array(9, -2, 0, -10, $target_robot->print_name().'&#39;s shields were not affected&hellip;')
-                ));
-            $defense_recovery_amount = ceil($target_robot->robot_defense * ($this_ability->ability_recovery / 100));
-            $target_robot->trigger_recovery($target_robot, $this_ability, $defense_recovery_amount);
-
-        }
-        // Otherwise if targetting a team mate
-        else {
-
-            // Increase the target robot's defense stat
-            $this_ability->recovery_options_update(array(
-                'kind' => 'defense',
-                'percent' => true,
-                'frame' => 'taunt',
-                'success' => array(0, -2, 0, -10, $this_robot->print_name().'&#39;s shields powered up!'),
-                'failure' => array(9, -2, 0, -10, $this_robot->print_name().'&#39;s shields were not affected&hellip;')
-                ));
-            $defense_recovery_amount = ceil($this_robot->robot_defense * ($this_ability->ability_recovery / 100));
-            $this_robot->trigger_recovery($this_robot, $this_ability, $defense_recovery_amount);
-
-        }
+        // Call the global stat boost function with customized options
+        return rpg_ability::ability_function_stat_boost($temp_target_robot, 'defense', 2, $this_ability);
 
         // Return true on success
         return true;
