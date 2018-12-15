@@ -2211,6 +2211,29 @@ class rpg_robot extends rpg_object {
         // Calculate this robot's count variables
         $this->counters['abilities_total'] = count($this->robot_abilities);
 
+        // Recalculate this robot's effective stats based on modifiers
+        $stat_tokens = array('attack', 'defense', 'speed');
+        $mod_numerator = 2;
+        $mod_denominator = 2;
+        foreach ($stat_tokens AS $key => $stat){
+            $prop_stat = 'robot_'.$stat;
+            $prop_stat_base = 'robot_base_'.$stat;
+            $base_value = $this->$prop_stat_base;
+            // Reset the stat to its base value to start
+            $new_value = $base_value;
+            // Apply any positive or negative stat mods to the value
+            if (!empty($this->counters[$stat.'_mods'])){
+                $stage = $this->counters[$stat.'_mods'];
+                $numerator = $mod_numerator;
+                $denominator = $mod_denominator;
+                if ($stage > 0){ $numerator += $stage; }
+                elseif ($stage < 0){ $denominator += ($stage * -1); }
+                $new_value = ceil($base_value * ($numerator / $denominator));
+            }
+            // Update the robot with the recalculated value
+            $this->$prop_stat = $new_value;
+        }
+
         // Now collect an export array for this object
         $this_data = $this->export_array();
 
