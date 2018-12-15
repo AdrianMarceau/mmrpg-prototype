@@ -1992,6 +1992,80 @@ class rpg_ability extends rpg_object {
 
     }
 
+    // Define a static function to use as a common action for all stat boosting
+    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability){
+
+        // Define the counter name we'll be working with here
+        $mods_token = $stat_type.'_mods';
+
+        // Increase the target's stat modifier only if it's not already at max
+        if ($target_robot->counters[$mods_token] < MMRPG_SETTINGS_STATS_MOD_MAX){
+
+            // Increase the stat by X stages and then floor if too high
+            $rel_boost_amount = $boost_amount;
+            $target_robot->counters[$mods_token] += $rel_boost_amount;
+            if ($target_robot->counters[$mods_token] > MMRPG_SETTINGS_STATS_MOD_MAX){
+                $rel_boost_amount -= ($target_robot->counters[$mods_token] - MMRPG_SETTINGS_STATS_MOD_MAX);
+                $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MAX;
+            }
+            $target_robot->update_session();
+
+            // Define the boost text based on how much was applied
+            if ($rel_boost_amount >= 3){ $boost_text = 'rose drastically'; }
+            elseif ($rel_boost_amount >= 2){ $boost_text = 'sharply rose'; }
+            else { $boost_text = 'rose'; }
+
+            // Target this robot's self to show the success message
+            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array(0, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' '.$boost_text.'!')));
+            $target_robot->trigger_target($target_robot, $trigger_ability);
+
+        } else {
+
+            // Target this robot's self to show the failure message
+            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array(9, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' wont go any higher&hellip;')));
+            $target_robot->trigger_target($target_robot, $trigger_ability);
+
+        }
+
+    }
+
+    // Define a static function to use as a common action for all stat breaking
+    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability){
+
+        // Define the counter name we'll be working with here
+        $mods_token = $stat_type.'_mods';
+
+        // Increase the target's stat modifier only if it's not already at min
+        if ($target_robot->counters[$mods_token] > MMRPG_SETTINGS_STATS_MOD_MIN){
+
+            // Decrease the stat by X stages and then ceil if too low
+            $rel_break_amount = $break_amount;
+            $target_robot->counters[$mods_token] -= $rel_break_amount;
+            if ($target_robot->counters[$mods_token] < MMRPG_SETTINGS_STATS_MOD_MIN){
+                $rel_break_amount += ($target_robot->counters[$mods_token] + MMRPG_SETTINGS_STATS_MOD_MIN);
+                $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MIN;
+            }
+            $target_robot->update_session();
+
+            // Define the break text based on how much was applied
+            if ($rel_break_amount >= 3){ $break_text = 'severely fell'; }
+            elseif ($rel_break_amount >= 2){ $break_text = 'harshly fell'; }
+            else { $break_text = 'fell'; }
+
+            // Target this robot's self to show the success message
+            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array(0, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' '.$break_text.'!')));
+            $target_robot->trigger_target($target_robot, $trigger_ability);
+
+        } else {
+
+            // Target this robot's self to show the failure message
+            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array(9, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' wont go any lower&hellip;')));
+            $target_robot->trigger_target($target_robot, $trigger_ability);
+
+        }
+
+    }
+
 
     // Define a static function to use as the common action for all forward attack type abilities
     public static function ability_function_forward_attack($objects, $target_options, $damage_options, $recovery_options, $effect_options = array()){
