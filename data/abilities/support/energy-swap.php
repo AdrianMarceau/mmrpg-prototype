@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'energy-swap',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Energy',
-    'ability_description' => 'The user triggers a glitch in the prototype that swaps the user\'s own life energy with the target\'s!',
+    'ability_description' => 'The user triggers an exploit in the prototype to swap their own life energy with the target\'s!  However the weapon energy cost for this ability increases after each use.',
     'ability_energy' => 8,
     'ability_accuracy' => 100,
     'ability_target' => 'select_this',
@@ -122,6 +122,16 @@ $ability = array(
         if (in_array($this_robot->robot_token, $temp_support_robots)
             || $this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
         else { $this_ability->set_target('select_this'); }
+
+        // Check to see if this ability has been used already, and if so increase the cost
+        if (!empty($this_robot->history['triggered_abilities'])){
+            $trigger_counts = array_count_values($this_robot->history['triggered_abilities']);
+            if (!empty($trigger_counts[$this_ability->ability_token])){
+                $trigger_count = $trigger_counts[$this_ability->ability_token];
+                $new_energy_cost = $this_ability->ability_base_energy * ($trigger_count + 1);
+                $this_ability->set_energy($new_energy_cost);
+            }
+        }
 
         // Return true on success
         return true;
