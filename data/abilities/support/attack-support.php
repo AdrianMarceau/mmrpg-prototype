@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Attack2',
     'ability_description' => 'The user triggers weapon optimizations for all robots on their side of the field to raise their attack stats!',
-    'ability_energy' => 6,
+    'ability_energy' => 10,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
