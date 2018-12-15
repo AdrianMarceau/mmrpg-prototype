@@ -617,7 +617,6 @@ class rpg_battle extends rpg_object {
                 $event_header = $this_robot->robot_name.' Undefeated';
                 $event_body = '';
                 $event_body .= $this_robot->print_name().' could not be defeated! ';
-                //$event_body .= $this_robot->print_name().' downloads the '.($target_robot->counters['robots_disabled'] > 1 ? 'targets#39;' : 'target#39;s').' battle data!';
                 $event_body .= '<br />';
                 $event_options = array();
                 $event_options['console_show_this_robot'] = true;
@@ -683,7 +682,6 @@ class rpg_battle extends rpg_object {
                 $event_header = $this_player->player_name.' Victorious';
                 $event_body = $this_player->print_name().' was victorious! ';
                 $event_body .= $this_player->print_name().' collects <span class="recovery_amount">'.number_format($other_battle_points_modded, 0, '.', ',').'</span> battle points!';
-                //$event_body .= $this_player->print_name().' downloads the '.($target_player->counters['robots_disabled'] > 1 ? 'targets#39;' : 'target#39;s').' battle data!';
                 $event_body .= '<br />';
                 $event_options = array();
                 $event_options['console_show_this_player'] = true;
