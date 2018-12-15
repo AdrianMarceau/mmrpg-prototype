@@ -2030,7 +2030,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat breaking
-    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability){
+    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability, $success_frame = 0, $failure_frame = 9){
 
         // Define the counter name we'll be working with here
         $mods_token = $stat_type.'_mods';
@@ -2053,13 +2053,13 @@ class rpg_ability extends rpg_object {
             else { $break_text = 'fell'; }
 
             // Target this robot's self to show the success message
-            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' '.$break_text.'!')));
+            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($success_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' '.$break_text.'!')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         } else {
 
             // Target this robot's self to show the failure message
-            $trigger_ability->target_options_update(array('frame' => 'defend', 'base' => array(9, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' wont go any lower&hellip;')));
+            $trigger_ability->target_options_update(array('frame' => 'base', 'success' => array($failure_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' wont go any lower&hellip;')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         }
