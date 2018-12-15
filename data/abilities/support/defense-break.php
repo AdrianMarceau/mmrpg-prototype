@@ -5,38 +5,25 @@ $ability = array(
     'ability_token' => 'defense-break',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Defense',
-    'ability_description' => 'The user breaks down the target\'s shield systems, lowering its defense by up to {DAMAGE}%!',
+    'ability_description' => 'The user breaks down the target\'s shield systems, sharply lowering its defense stat!',
     'ability_energy' => 4,
-    'ability_damage' => 33,
-    'ability_damage_percent' => true,
-    'ability_accuracy' => 98,
+    'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
         extract($objects);
 
         // Target the opposing robot
-        $this_ability->target_options_update(array(
-            'frame' => 'summon',
-            'success' => array(0, -2, 0, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')
-            ));
+        $this_ability->target_options_update(array('frame' => 'summon', 'success' => array(0, -2, 0, -10, $this_robot->print_name().' uses '.$this_ability->print_name().'!')));
         $this_robot->trigger_target($target_robot, $this_ability);
 
-        // Decrease the target robot's defense stat
-        $this_ability->damage_options_update(array(
-            'kind' => 'defense',
-            'percent' => true,
-            'kickback' => array(10, 0, 0),
-            'success' => array(0, -2, 0, -10, $target_robot->print_name().'&#39;s shields were damaged!'),
-            'failure' => array(9, -2, 0, -10, 'It had no effect on '.$target_robot->print_name().'&hellip;')
-            ));
-        $defense_damage_amount = ceil($target_robot->robot_defense * ($this_ability->ability_damage / 100));
-        $target_robot->trigger_damage($this_robot, $this_ability, $defense_damage_amount);
+        // Call the global stat boost function with customized options
+        return rpg_ability::ability_function_stat_break($target_robot, 'defense', 2, $this_ability);
 
         // Return true on success
         return true;
 
-        },
+    },
     'ability_function_onload' => function($objects){
 
         // Extract all objects into the current scope
