@@ -225,14 +225,11 @@ class rpg_disabled {
                     elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->$prop_stat_base < MMRPG_SETTINGS_STATS_MAX){
 
                         // Define the base stat boost based on robot base stats
-                        $temp_stat_boost = ceil($this_stat_boost);
-                        $temp_stat_base_boost = $temp_stat_boost;
-                        if ($temp_stat_boost + $target_robot->$prop_stat > MMRPG_SETTINGS_STATS_MAX){ $temp_stat_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->$prop_stat; }
-                        if ($temp_stat_base_boost + $target_robot->$prop_stat_base > MMRPG_SETTINGS_STATS_MAX){ $temp_stat_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->$prop_stat_base; }
+                        $temp_stat_base_boost = ceil($this_stat_boost);
+                        if ($target_robot->$prop_stat_base + $temp_stat_base_boost > MMRPG_SETTINGS_STATS_MAX){ $temp_stat_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->$prop_stat_base; }
 
                         // Increment this robot's stat by the calculated amount
-                        $target_robot->$prop_stat = ceil($target_robot->$prop_stat + $temp_stat_boost);
-                        $target_robot->$prop_stat_base = ceil($target_robot->$prop_stat_base + $temp_stat_base_boost);
+                        $target_robot->$prop_stat_base += $temp_stat_base_boost;
                         $target_robot->update_session();
                         $target_player->update_session();
 
@@ -243,14 +240,14 @@ class rpg_disabled {
                         $event_options['this_ability_results']['recovery_type'] = '';
                         $event_options['this_ability_results']['flag_affinity'] = true;
                         $event_options['this_ability_results']['flag_critical'] = true;
-                        $event_options['this_ability_results']['this_amount'] = $temp_stat_boost;
+                        $event_options['this_ability_results']['this_amount'] = $temp_stat_base_boost;
                         $event_options['this_ability_results']['this_result'] = 'success';
                         $event_options['this_ability_results']['total_actions'] = $temp_boost_actions++;
                         $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
                         $event_options['console_show_target'] = false;
                         $event_body = $target_robot->print_name().' downloads '.$stat_system[$stat].' data from the target robot! ';
                         $event_body .= '<br />';
-                        $event_body .= $target_robot->print_name().'&#39;s '.$stat.' grew by <span class="recovery_amount">'.$temp_stat_boost.'</span>! ';
+                        $event_body .= $target_robot->print_name().'&#39;s base '.$stat.' grew by <span class="recovery_amount">'.$temp_stat_base_boost.'</span>! ';
                         $frame = 'taunt';
                         if ($stat == 'energy'){ $frame = 'summon'; }
                         elseif ($stat == 'attack'){ $frame = 'shoot'; }
