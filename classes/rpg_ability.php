@@ -1993,10 +1993,19 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat boosting
-    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9){
+    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
+
+        // Compensate for malformed arguments
+        if (empty($trigger_ability)){ $trigger_ability = false; }
+        if (!is_numeric($success_frame)){ $success_frame = 0; }
+        if (!is_numeric($failure_frame)){ $failure_frame = 9; }
+        if (!is_string($extra_text)){ $extra_text = ''; }
+
+        // Add a break to the extra text if not empty
+        if (!empty($extra_text) && !strstr($extra_text, '<br />')){ $extra_text .= ' <br /> '; }
 
         // Define the counter name we'll be working with here
         $mods_token = $stat_type.'_mods';
@@ -2027,14 +2036,14 @@ class rpg_ability extends rpg_object {
 
             // Target this robot's self to show the success message
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($success_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' '.$boost_text.'!')));
+            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($success_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' '.$boost_text.'!')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         } else {
 
             // Target this robot's self to show the failure message
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($failure_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' wont go any higher&hellip;')));
+            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' wont go any higher&hellip;')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         }
@@ -2042,10 +2051,19 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat breaking
-    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9){
+    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
+
+        // Compensate for malformed arguments
+        if (empty($trigger_ability)){ $trigger_ability = false; }
+        if (!is_numeric($success_frame)){ $success_frame = 0; }
+        if (!is_numeric($failure_frame)){ $failure_frame = 9; }
+        if (!is_string($extra_text)){ $extra_text = ''; }
+
+        // Add a break to the extra text if not empty
+        if (!empty($extra_text) && !strstr($extra_text, '<br />')){ $extra_text .= ' <br /> '; }
 
         // Define the counter name we'll be working with here
         $mods_token = $stat_type.'_mods';
@@ -2076,14 +2094,14 @@ class rpg_ability extends rpg_object {
 
             // Target this robot's self to show the success message
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($success_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' '.$break_text.'!')));
+            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($success_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' '.$break_text.'!')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         } else {
 
             // Target this robot's self to show the failure message
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'base', 'success' => array($failure_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' wont go any lower&hellip;')));
+            $trigger_ability->target_options_update(array('frame' => 'base', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' wont go any lower&hellip;')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         }
