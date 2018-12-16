@@ -5,13 +5,11 @@ $ability = array(
     'ability_token' => 'spark-shock',
     'ability_game' => 'MM03',
     'ability_group' => 'MM03/Weapons/023',
-    'ability_description' => 'The user looses a large ball of electricity at the target that disrupts internal systems to inflict damage and lower defense by {DAMAGE2}%!',
+    'ability_description' => 'The user lets loose a large ball of electricity at the target to inflict damage and lower their attack stat!',
     'ability_type' => 'electric',
     'ability_energy' => 4,
-    'ability_damage' => 16,
-    'ability_damage2' => 10,
-    'ability_damage2_percent' => true,
-    'ability_accuracy' => 90,
+    'ability_damage' => 14,
+    'ability_accuracy' => 92,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -43,29 +41,11 @@ $ability = array(
 
         // Randomly trigger a defense break if the ability was successful
         if ($target_robot->robot_status != 'disabled'
-            && $this_ability->ability_results['this_result'] != 'failure'
-            && $this_ability->ability_results['this_amount'] > 0){
-            // Decrease the target robot's speed stat
-            $this_ability->damage_options_update(array(
-                'kind' => 'defense',
-                'frame' => 'defend',
-                'percent' => true,
-                'modifiers' => false,
-                'kickback' => array(10, 0, 0),
-                'success' => array(2, 0, -6, 10, $target_robot->print_name().'&#39;s shields were damaged!'),
-                'failure' => array(2, 0, -6, -10, '')
-                ));
-            $this_ability->recovery_options_update(array(
-                'kind' => 'defense',
-                'frame' => 'taunt',
-                'percent' => true,
-                'modifiers' => false,
-                'kickback' => array(0, 0, 0),
-                'success' => array(2, 0, -6, 10, $target_robot->print_name().'&#39;s shields improved!'),
-                'failure' => array(2, 0, -6, -9999, '')
-                ));
-            $defense_damage_amount = ceil($target_robot->robot_defense * ($this_ability->ability_damage2 / 100));
-            $target_robot->trigger_damage($this_robot, $this_ability, $defense_damage_amount, true, array('apply_modifiers' => false));
+            && $this_ability->ability_results['this_result'] != 'failure'){
+
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_stat_break($target_robot, 'attack', 1);
+
         }
 
         // Return true on success
