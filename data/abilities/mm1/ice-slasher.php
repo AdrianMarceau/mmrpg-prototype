@@ -5,14 +5,12 @@ $ability = array(
     'ability_token' => 'ice-slasher',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/005',
-    'ability_description' => 'The user fires a blast of razor-sharp ice at the target, inflicting damage and occasionally lowering their speed by {DAMAGE2}%!',
+    'ability_description' => 'The user fires a blast of razor-sharp ice at the target to inflict damage and lower their speed stat!',
     'ability_type' => 'freeze',
     'ability_type2' => 'cutter',
     'ability_energy' => 8,
     'ability_damage' => 26,
-    'ability_damage2' => 10,
-    'ability_damage2_percent' => true,
-    'ability_accuracy' => 96,
+    'ability_accuracy' => 94,
     'ability_function' => function($objects){
 
         // Call a global ability function with customized options
@@ -48,9 +46,8 @@ $ability = array(
             // Effect options
             array(
                 'stat_kind' => 'speed',
-                'damage_text' => '{this_robot_name}\'s mobility was damaged!',
-                'recovery_text' => '{this_robot_name}\'s mobility improved!',
-                'effect_chance' => 50
+                'effect_chance' => 100,
+                'effect_value' => -1
                 )
             );
 
