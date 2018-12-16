@@ -1308,7 +1308,8 @@ class rpg_canvas {
                         $this_ability_data = $this_options['this_ability']->canvas_markup($this_options, $this_player_data, $this_robot_data);
 
                         // Display the object's mugshot sprite
-                        if (empty($this_options['this_ability_results']['total_actions'])){
+                        if (empty($this_options['this_ability_results']['total_actions'])
+                            && empty($this_options['this_ability']->flags['skip_canvas_header'])){
                             $this_mugshot_image = !empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token;
                             $this_mugshot_image2 = !empty($this_options['this_ability']->ability_image2) ? $this_options['this_ability']->ability_image2 : '';
                             $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left" style="background-image: url(images/abilities/'.$this_mugshot_image.'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_ability']->ability_name.'</div>';
