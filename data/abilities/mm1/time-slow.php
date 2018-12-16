@@ -5,25 +5,34 @@ $ability = array(
     'ability_token' => 'time-slow',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/00A',
-    'ability_description' => 'The user charges on the first turn and builds power then releases a wave of temporal energy on the second to deal massive speed damage to the opposing team!',
+    'ability_description' => 'The user charges itself with temporal energy to boost the power of Time type attacks. If used again after charging this ability can slow a single target and severely lower their speed stat!',
     'ability_type' => 'time',
     'ability_energy' => 8,
-    'ability_damage' => 20,
-    'ability_damage_percent' => true,
+    'ability_recovery2' => 33,
+    'ability_recovery2_percent' => true,
+    'ability_damage2' => 33,
+    'ability_damage2_percent' => true,
     'ability_accuracy' => 100,
+    'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
         extract($objects);
 
         // Define this ability's attachment token
+        $this_attachment_boost_modifier = 1 + ($this_ability->ability_recovery2 / 100);
+        $this_attachment_break_modifier = 1 - ($this_ability->ability_damage2 / 100);
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         $this_attachment_info = array(
             'class' => 'ability',
             'ability_token' => $this_ability->ability_token,
             'ability_frame' => 0,
             'ability_frame_animate' => array(1, 0),
-            'ability_frame_offset' => array('x' => -10, 'y' => 0, 'z' => -10)
+            'ability_frame_offset' => array('x' => -10, 'y' => 0, 'z' => -10),
+            'attachment_damage_output_booster_'.$this_ability->ability_type => $this_attachment_boost_modifier,
+            'attachment_damage_input_breaker_'.$this_ability->ability_type => $this_attachment_break_modifier,
+            'attachment_recovery_output_booster_'.$this_ability->ability_type => $this_attachment_boost_modifier,
+            'attachment_recovery_input_breaker_'.$this_ability->ability_type => $this_attachment_break_modifier
             );
 
         // Check if this ability is already charged
@@ -62,57 +71,16 @@ $ability = array(
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
-            // Inflict damage on the opposing robot
-            $this_ability->damage_options_update(array(
-                'kind' => 'speed',
-                        'percent' => 'true',
-                'kickback' => array(10, 0, 0),
-                'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_name().' damaged the target&#39;s mobility!'),
-                'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_name().' had no effect on '.$target_robot->print_name().'&hellip;')
+            // Update this ability's target options and trigger
+            $this_ability->target_options_update(array(
+                'frame' => 'damage',
+                'kickback' => array(-10, 0, 0),
+                'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_name().' looms behind '.$target_robot->print_name().'&hellip;'),
                 ));
-            $this_ability->recovery_options_update(array(
-                'kind' => 'speed',
-                        'percent' => 'true',
-                'kickback' => array(10, 0, 0),
-                'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_name().' improved the target&#39;s mobility!'),
-                'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_name().' had no effect on '.$target_robot->print_name().'&hellip;')
-                ));
-            $energy_damage_amount = ceil(($this_ability->ability_damage / 100) * $target_robot->robot_speed);
-            $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+            $target_robot->trigger_target($this_robot, $this_ability);
 
-            // Randomly trigger a bench damage if the ability was successful
-            $backup_robots_active = $target_player->values['robots_active'];
-            $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
-            if (true){
-
-                // Loop through the target's benched robots, inflicting les and less damage to each
-                $target_key = 0;
-                foreach ($backup_robots_active AS $key => $info){
-                    if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-                    $this_ability->ability_results_reset();
-                    $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
-                    // Inflict damage on the target robot
-                    $this_ability->damage_options_update(array(
-                        'kind' => 'speed',
-                        'percent' => 'true',
-                        'kickback' => array(10, 0, 0),
-                        'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_name().' damaged the target&#39;s mobility!'),
-                        'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_name().' had no effect on '.$temp_target_robot->print_name().'&hellip;')
-                        ));
-                    $this_ability->recovery_options_update(array(
-                        'kind' => 'speed',
-                        'percent' => 'true',
-                        'kickback' => array(10, 0, 0),
-                        'success' => array(3, 5, 70, -10, 'The '.$this_ability->print_name().' improved the target&#39;s mobility!'),
-                        'failure' => array(9, 5, 70, -10, 'The '.$this_ability->print_name().' had no effect on '.$temp_target_robot->print_name().'&hellip;')
-                        ));
-                    $energy_damage_amount = ceil(($this_ability->ability_damage / 100) * $temp_target_robot->robot_speed);
-                    $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-                    // Increment the target key
-                    $target_key++;
-                }
-
-            }
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_stat_break($target_robot, 'speed', 3);
 
         }
 
@@ -135,6 +103,10 @@ $ability = array(
         if ($is_charged){ $this_ability->set_energy(0); }
         // Otherwise, return the weapon energy back to default
         else { $this_ability->reset_energy(); }
+
+        // If the ability is already charged, allow bench targeting
+        if ($is_charged){ $this_ability->set_target('select_target'); }
+        else { $this_ability->set_target('auto'); }
 
         // Return true on success
         return true;
