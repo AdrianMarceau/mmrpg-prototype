@@ -1995,6 +1995,9 @@ class rpg_ability extends rpg_object {
     // Define a static function to use as a common action for all stat boosting
     public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9){
 
+        // Do not boost stats if the battle is over
+        if ($target_robot->battle->battle_status === 'complete'){ return false; }
+
         // Define the counter name we'll be working with here
         $mods_token = $stat_type.'_mods';
 
@@ -2040,6 +2043,9 @@ class rpg_ability extends rpg_object {
 
     // Define a static function to use as a common action for all stat breaking
     public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9){
+
+        // Do not boost stats if the battle is over
+        if ($target_robot->battle->battle_status === 'complete'){ return false; }
 
         // Define the counter name we'll be working with here
         $mods_token = $stat_type.'_mods';
@@ -2123,6 +2129,7 @@ class rpg_ability extends rpg_object {
             if (!isset($effect_options['recovery_text'])){ $effect_options['recovery_text'] = '{this_robot_name}\'s stats improved!'; }
             if (!isset($effect_options['effect_chance'])){ $effect_options['effect_chance'] = 50; }
             if (!isset($effect_options['effect_target'])){ $effect_options['effect_target'] = 'target'; }
+            if (!isset($effect_options['effect_value'])){ $effect_options['effect_value'] = 0; }
         }
 
         // Extract all objects into the current scope
@@ -2217,38 +2224,19 @@ class rpg_ability extends rpg_object {
             if ($effect_options['effect_target'] == 'target'){
 
                 // Trigger effect if target isn't disabled and ability was successful and chance
-                if (
+                if (!empty($effect_options['effect_value']) &&
                     $target_robot->robot_status != 'disabled' &&
                     $this_ability->ability_results['this_result'] != 'failure' &&
-                    $this_ability->ability_results['this_amount'] > 0 &&
-                    $target_robot->$robot_stat_prop > 0 &&
                     ($effect_options['effect_chance'] == 100 || $this_battle->critical_chance($effect_options['effect_chance']))
                     ){
 
-                    // Define the default damage options for the stat effect
-                    $this_ability->damage_options_update(array(
-                        'kind' => $effect_options['stat_kind'],
-                        'frame' => 'defend',
-                        'percent' => true,
-                        'kickback' => array(10, 0, 0),
-                        'success' => array(9, 0, 0, -10, $effect_options['damage_text']),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
+                    // Call the global stat boost or break function with customized options
+                    if ($effect_options['effect_value'] > 0){
+                        rpg_ability::ability_function_stat_boost($target_robot, $effect_options['stat_kind'], $effect_options['effect_value']);
+                    } elseif ($effect_options['effect_value'] < 0){
+                        rpg_ability::ability_function_stat_break($target_robot, $effect_options['stat_kind'], ($effect_options['effect_value'] * -1));
+                    }
 
-                    // Define the default recovery options for the stat effect
-                    $this_ability->recovery_options_update(array(
-                        'kind' => $effect_options['stat_kind'],
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'kickback' => array(0, 0, 0),
-                        'success' => array(9, 0, 0, -10, $effect_options['recovery_text']),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
-
-                    // Calculate the exact damage amount and trigger it on the target
-                    $trigger_options = array('apply_modifiers' => false);
-                    $stat_damage_amount = ceil($target_robot->$robot_stat_prop * ($this_ability->ability_damage2 / 100));
-                    $target_robot->trigger_damage($this_robot, $this_ability, $stat_damage_amount, true, $trigger_options);
                 }
 
             }
@@ -2256,38 +2244,18 @@ class rpg_ability extends rpg_object {
             elseif ($effect_options['effect_target'] == 'user'){
 
                 // Trigger effect if target isn't disabled and ability was successful and chance
-                if (
+                if (!empty($effect_options['effect_value']) &&
                     $this_robot->robot_status != 'disabled' &&
-                    $this_ability->ability_results['this_result'] != 'failure' &&
-                    $this_ability->ability_results['this_amount'] > 0 &&
-                    $this_robot->$robot_stat_prop < MMRPG_SETTINGS_STATS_MAX &&
                     ($effect_options['effect_chance'] == 100 || $this_battle->critical_chance($effect_options['effect_chance']))
                     ){
 
-                    // Define the default recovery options for the stat effect
-                    $this_ability->recovery_options_update(array(
-                        'kind' => $effect_options['stat_kind'],
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'kickback' => array(0, 0, 0),
-                        'success' => array(9, 0, 0, -10, $effect_options['recovery_text']),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
+                    // Call the global stat boost or break function with customized options
+                    if ($effect_options['effect_value'] > 0){
+                        rpg_ability::ability_function_stat_boost($this_robot, $effect_options['stat_kind'], $effect_options['effect_value']);
+                    } elseif ($effect_options['effect_value'] < 0){
+                        rpg_ability::ability_function_stat_break($this_robot, $effect_options['stat_kind'], ($effect_options['effect_value'] * -1));
+                    }
 
-                    // Define the default damage options for the stat effect
-                    $this_ability->damage_options_update(array(
-                        'kind' => $effect_options['stat_kind'],
-                        'frame' => 'defend',
-                        'percent' => true,
-                        'kickback' => array(10, 0, 0),
-                        'success' => array(9, 0, 0, -10, $effect_options['damage_text']),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
-
-                    // Calculate the exact damage amount and trigger it on the target
-                    $trigger_options = array('apply_modifiers' => false);
-                    $stat_recovery_amount = ceil($this_robot->$robot_stat_prop * ($this_ability->ability_recovery2 / 100));
-                    $this_robot->trigger_recovery($this_robot, $this_ability, $stat_recovery_amount, true, $trigger_options);
                 }
 
             }
