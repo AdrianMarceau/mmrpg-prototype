@@ -5,10 +5,8 @@ $ability = array(
     'ability_token' => 'disco-buster',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MM00/Weapons/Disco',
-    'ability_description' => 'The user charges on the first turn to build power and recover life energy by {RECOVERY2}%, then releases a powerful shot on the second to inflict {DAMAGE}% damage to weapon sytems!',
+    'ability_description' => 'The user charges to build power and restore a bit of life energy. If used again after charging this ability can release an energy shot to severely lower the target\'s attack stat!',
     'ability_energy' => 2,
-    'ability_damage' => 36,
-    'ability_damage_percent' => true,
     'ability_recovery2' => 10,
     'ability_recovery2_percent' => true,
     'ability_accuracy' => 100,
@@ -77,17 +75,8 @@ $ability = array(
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
-            // Inflict damage on the opposing robot
-            $this_ability->damage_options_update(array(
-                'kind' => 'attack',
-                'percent' => true,
-                'modifiers' => false,
-                'kickback' => array(20, 0, 0),
-                'success' => array(3, -110, -15, 10, 'A massive energy shot hit the target!'),
-                'failure' => array(3, -110, -15, -10, 'The '.$this_ability->print_name().' shot missed&hellip;')
-                ));
-            $attack_damage_amount = ceil($target_robot->robot_base_attack * ($this_ability->ability_damage / 100));
-            $target_robot->trigger_damage($this_robot, $this_ability, $attack_damage_amount, false, array('apply_modifiers' => false));
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_stat_break($target_robot, 'attack', 3);
 
         }
 
