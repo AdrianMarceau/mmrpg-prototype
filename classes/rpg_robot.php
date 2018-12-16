@@ -4872,36 +4872,6 @@ class rpg_robot extends rpg_object {
                 }
 
             }
-            // Else the robot is holding an Attack Booster item, apply boosts
-            elseif ($item_token == 'attack-booster'){
-
-                // Ensure this robot's stat isn't already at max value
-                if ($this_robot->counters['attack_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-                    // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'attack', 1);
-                }
-
-            }
-            // Else if the robot is holding an Defense Booster item, apply boosts
-            elseif ($item_token == 'defense-booster'){
-
-                // Ensure this robot's stat isn't already at max value
-                if ($this_robot->counters['defense_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-                    // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'defense', 1);
-                }
-
-            }
-            // Else if the robot is holding an Defense Booster item, apply boosts
-            elseif ($item_token == 'speed-booster'){
-
-                // Ensure this robot's stat isn't already at max value
-                if ($this_robot->counters['speed_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-                    // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'speed', 1);
-                }
-
-            }
             // Else the robot is holding an Energy Capsule or Energy Pellet item, apply recovery
             elseif ($item_token == 'energy-pellet' || $item_token == 'energy-capsule' || $item_token == 'energy-tank'){
 
@@ -4982,274 +4952,6 @@ class rpg_robot extends rpg_object {
 
                     // Trigger stat recovery for the holding robot
                     $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores weapons by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
-                    if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
-
-                    // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
-                        $ptoken = $this_player->player_token;
-                        $rtoken = $this_robot->robot_token;
-                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
-                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
-                        }
-                    }
-
-                }
-
-            }
-            // Else the robot is holding an Attack Capsule or Attack Pellet item, apply recovery
-            elseif ($item_token == 'attack-pellet' || $item_token == 'attack-capsule'){
-
-                // Collect the base stat for this robot and the item
-                $temp_attack = $this_robot->get_attack();
-                $temp_base_attack = $this_robot->get_base_attack();
-                $temp_item_recovery = $this_item->get_recovery();
-
-                // Calculate this robot's current damage percent
-                $temp_damage_required = ceil($temp_item_recovery - 10);
-                $temp_damage_taken = round((($temp_base_attack - $temp_attack) / $temp_base_attack) * 100);
-                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' triggers when attack lowered by '.$temp_damage_required.'% (currently at '.$temp_damage_taken.'%)');
-
-                // If the user has token enough damage, we can trigger the ability
-                if ($temp_damage_taken >= $temp_damage_required){
-
-                    // Remove the robot's current item now that it's used up in battle
-                    $this_robot->set_item('');
-
-                    // Define the item object and trigger info
-                    $temp_recovery_amount = round($temp_base_attack * ($temp_item_recovery / 100));
-                    $this_item->recovery_options_update(array(
-                        'kind' => 'attack',
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'modifiers' => false,
-                        'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, 'The held '.$this_item->print_name().' powered up '.$this_robot->print_name().'&#39;s weapons!'),
-                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s weapons were not affected by the '.$this_item->print_name().'&hellip;')
-                        ));
-
-                    // Trigger stat recovery for the holding robot
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
-                    if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
-
-                    // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
-                        $ptoken = $this_player->player_token;
-                        $rtoken = $this_robot->robot_token;
-                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
-                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
-                        }
-                    }
-
-                }
-
-            }
-            // Else the robot is holding an Defense Capsule or Defense Pellet item, apply recovery
-            elseif ($item_token == 'defense-pellet' || $item_token == 'defense-capsule'){
-
-                // Collect the base stat for this robot and the item
-                $temp_defense = $this_robot->get_defense();
-                $temp_base_defense = $this_robot->get_base_defense();
-                $temp_item_recovery = $this_item->get_recovery();
-
-                // Calculate this robot's current damage percent
-                $temp_damage_required = ceil($temp_item_recovery - 10);
-                $temp_damage_taken = round((($temp_base_defense - $temp_defense) / $temp_base_defense) * 100);
-                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' triggers when defense lowered by '.$temp_damage_required.'% (currently at '.$temp_damage_taken.'%)');
-
-                // If the user has token enough damage, we can trigger the ability
-                if ($temp_damage_taken >= $temp_damage_required){
-
-                    // Remove the robot's current item now that it's used up in battle
-                    $this_robot->set_item('');
-
-                    // Define the item object and trigger info
-                    $temp_recovery_amount = round($temp_base_defense * ($temp_item_recovery / 100));
-                    $this_item->recovery_options_update(array(
-                        'kind' => 'defense',
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'modifiers' => false,
-                        'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, 'The held '.$this_item->print_name().' powered up '.$this_robot->print_name().'&#39;s shields!'),
-                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s shields were not affected by the '.$this_item->print_name().'&hellip;')
-                        ));
-
-                    // Trigger stat recovery for the holding robot
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores defense by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
-                    if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
-
-                    // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
-                        $ptoken = $this_player->player_token;
-                        $rtoken = $this_robot->robot_token;
-                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
-                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
-                        }
-                    }
-
-                }
-
-            }
-            // Else the robot is holding an Speed Capsule or Speed Pellet item, apply recovery
-            elseif ($item_token == 'speed-pellet' || $item_token == 'speed-capsule'){
-
-                // Collect the base stat for this robot and the item
-                $temp_speed = $this_robot->get_speed();
-                $temp_base_speed = $this_robot->get_base_speed();
-                $temp_item_recovery = $this_item->get_recovery();
-
-                // Calculate this robot's current damage percent
-                $temp_damage_required = ceil($temp_item_recovery - 10);
-                $temp_damage_taken = round((($temp_base_speed - $temp_speed) / $temp_base_speed) * 100);
-                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' triggers when speed lowered by '.$temp_damage_required.'% (currently at '.$temp_damage_taken.'%)');
-
-                // If the user has token enough damage, we can trigger the ability
-                if ($temp_damage_taken >= $temp_damage_required){
-
-                    // Remove the robot's current item now that it's used up in battle
-                    $this_robot->set_item('');
-
-                    // Define the item object and trigger info
-                    $temp_recovery_amount = round($temp_base_speed * ($temp_item_recovery / 100));
-                    $this_item->recovery_options_update(array(
-                        'kind' => 'speed',
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'modifiers' => false,
-                        'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, 'The held '.$this_item->print_name().' improved '.$this_robot->print_name().'&#39;s mobility!'),
-                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().'&#39;s mobility was not affected by the '.$this_item->print_name().'&hellip;')
-                        ));
-
-                    // Trigger stat recovery for the holding robot
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores speed by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
-                    if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
-
-                    // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
-                        $ptoken = $this_player->player_token;
-                        $rtoken = $this_robot->robot_token;
-                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
-                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
-                        }
-                    }
-
-                }
-
-            }
-            // Else the robot is holding an Super Capsule or Super Pellet item, apply recovery
-            elseif ($item_token == 'super-pellet' || $item_token == 'super-capsule'){
-
-                // Define the trigger flag as false for now
-                $trigger_recovery = false;
-                $temp_item_recovery = $this_item->get_recovery();
-
-                // First check if attack recovery is necessary
-                if (!$trigger_recovery){
-
-                    // Collect the base stat for this robot and the item
-                    $temp_attack = $this_robot->get_attack();
-                    $temp_base_attack = $this_robot->get_base_attack();
-
-                    // Calculate this robot's current damage percent
-                    $temp_damage_required = ceil($temp_item_recovery - 10);
-                    $temp_damage_taken = round((($temp_base_attack - $temp_attack) / $temp_base_attack) * 100);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' triggers when attack lowered by '.$temp_damage_required.'% (currently at '.$temp_damage_taken.'%)');
-
-                    // If the user has token enough damage, we can trigger the ability
-                    if ($temp_damage_taken >= $temp_damage_required){ $trigger_recovery = true; }
-
-                }
-
-                // Next check if defense recovery is necessary
-                if (!$trigger_recovery){
-
-                    // Collect the base stat for this robot and the item
-                    $temp_defense = $this_robot->get_defense();
-                    $temp_base_defense = $this_robot->get_base_defense();
-
-                    // Calculate this robot's current damage percent
-                    $temp_damage_required = ceil($temp_item_recovery - 10);
-                    $temp_damage_taken = round((($temp_base_defense - $temp_defense) / $temp_base_defense) * 100);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' triggers when defense lowered by '.$temp_damage_required.'% (currently at '.$temp_damage_taken.'%)');
-
-                    // If the user has token enough damage, we can trigger the ability
-                    if ($temp_damage_taken >= $temp_damage_required){ $trigger_recovery = true; }
-
-                }
-
-                // Last check if speed recovery is necessary
-                if (!$trigger_recovery){
-
-                    // Collect the base stat for this robot and the item
-                    $temp_speed = $this_robot->get_speed();
-                    $temp_base_speed = $this_robot->get_base_speed();
-
-                    // Calculate this robot's current damage percent
-                    $temp_damage_required = ceil($temp_item_recovery - 10);
-                    $temp_damage_taken = round((($temp_base_speed - $temp_speed) / $temp_base_speed) * 100);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' triggers when speed lowered by '.$temp_damage_required.'% (currently at '.$temp_damage_taken.'%)');
-
-                    // If the user has token enough damage, we can trigger the ability
-                    if ($temp_damage_taken >= $temp_damage_required){ $trigger_recovery = true; }
-
-                }
-
-                // If the user has token enough damage or any kind, we can trigger the ability
-                if ($trigger_recovery){
-
-                    // Remove the robot's current item now that it's used up in battle
-                    $this_robot->set_item('');
-
-                    // Define the item object and trigger info
-                    $temp_base_attack = $this_robot->get_base_attack();
-                    $temp_recovery_amount = round($temp_base_attack * ($temp_item_recovery / 100));
-                    $this_item->recovery_options_update(array(
-                        'kind' => 'attack',
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'modifiers' => false,
-                        'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, 'The held '.$this_item->print_name().' powered up '.$this_robot->print_name().'&#39;s weapons!'),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
-
-                    // Trigger stat recovery for the holding robot
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
-                    if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
-
-                    // Define the item object and trigger info
-                    $temp_base_defense = $this_robot->get_base_defense();
-                    $temp_recovery_amount = round($temp_base_defense * ($temp_item_recovery / 100));
-                    $this_item->recovery_options_update(array(
-                        'kind' => 'defense',
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'modifiers' => false,
-                        'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, 'The held '.$this_item->print_name().' powered up '.$this_robot->print_name().'&#39;s shields!'),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
-
-                    // Trigger stat recovery for the holding robot
-                    $temp_base_speed = $this_robot->get_base_speed();
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores defense by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
-                    if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
-
-                    // Define the item object and trigger info
-                    $temp_recovery_amount = round($temp_base_speed * ($temp_item_recovery / 100));
-                    $this_item->recovery_options_update(array(
-                        'kind' => 'speed',
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'modifiers' => false,
-                        'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, 'The held '.$this_item->print_name().' improved '.$this_robot->print_name().'&#39;s mobility!'),
-                        'failure' => array(9, 0, 0, -9999, '')
-                        ));
-
-                    // Trigger stat recovery for the holding robot
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores speed by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
@@ -5354,7 +5056,162 @@ class rpg_robot extends rpg_object {
                         }
                     }
 
+                }
 
+            }
+            // Else the robot is holding an Attack Booster item, apply boosts
+            elseif ($item_token == 'attack-booster'){
+
+                // Ensure this robot's stat isn't already at max value
+                if ($this_robot->counters['attack_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts attack by one stage');
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, 'attack', 1, false, null, null, 'Oh! An '.$this_item->print_name().'!');
+                }
+
+            }
+            // Else if the robot is holding an Defense Booster item, apply boosts
+            elseif ($item_token == 'defense-booster'){
+
+                // Ensure this robot's stat isn't already at max value
+                if ($this_robot->counters['defense_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts defense by one stage');
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, 'defense', 1, false, null, null, 'Oh! A '.$this_item->print_name().'!');
+                }
+
+            }
+            // Else if the robot is holding an Defense Booster item, apply boosts
+            elseif ($item_token == 'speed-booster'){
+
+                // Ensure this robot's stat isn't already at max value
+                if ($this_robot->counters['speed_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts speed by one stage');
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, 'speed', 1, false, null, null, 'Oh! A '.$this_item->print_name().'!');
+                }
+
+            }
+            // Else the robot is holding an Attack Capsule or Attack Pellet item, apply recovery
+            elseif ($item_token === 'attack-pellet' || $item_token === 'attack-capsule'){
+
+                // Ensure this robot's stat has actually taken damage
+                $item_restore_value = $item_token === 'attack-capsule' ? 5 : 2;
+                $item_trigger_value = $item_restore_value * -1;
+                if ($this_robot->counters['attack_mods'] <= $item_trigger_value){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack by '.$item_restore_value.' stages');
+
+                    // Remove the robot's current item now that it's used up in battle
+                    $this_robot->set_item('');
+
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, 'attack', $item_restore_value, false, null, null, 'Oh! An '.$this_item->print_name().'!');
+
+                    // Also remove this robot's item from the session, we're done with it
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                        $ptoken = $this_player->player_token;
+                        $rtoken = $this_robot->robot_token;
+                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                        }
+                    }
+
+                }
+
+            }
+            // Else the robot is holding an Defense Capsule or Defense Pellet item, apply recovery
+            elseif ($item_token == 'defense-pellet' || $item_token == 'defense-capsule'){
+
+                // Ensure this robot's stat has actually taken damage
+                $item_restore_value = $item_token === 'defense-capsule' ? 5 : 2;
+                $item_trigger_value = $item_restore_value * -1;
+                if ($this_robot->counters['defense_mods'] <= $item_trigger_value){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores defense by '.$item_restore_value.' stages');
+
+                    // Remove the robot's current item now that it's used up in battle
+                    $this_robot->set_item('');
+
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, 'defense', $item_restore_value, false, null, null, 'Oh! A '.$this_item->print_name().'!');
+
+                    // Also remove this robot's item from the session, we're done with it
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                        $ptoken = $this_player->player_token;
+                        $rtoken = $this_robot->robot_token;
+                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                        }
+                    }
+
+                }
+
+            }
+            // Else the robot is holding an Speed Capsule or Speed Pellet item, apply recovery
+            elseif ($item_token == 'speed-pellet' || $item_token == 'speed-capsule'){
+
+                // Ensure this robot's stat has actually taken damage
+                $item_restore_value = $item_token === 'speed-capsule' ? 5 : 2;
+                $item_trigger_value = $item_restore_value * -1;
+                if ($this_robot->counters['speed_mods'] <= $item_trigger_value){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores speed by '.$item_restore_value.' stages');
+
+                    // Remove the robot's current item now that it's used up in battle
+                    $this_robot->set_item('');
+
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, 'speed', $item_restore_value, false, null, null, 'Oh! A '.$this_item->print_name().'!');
+
+                    // Also remove this robot's item from the session, we're done with it
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                        $ptoken = $this_player->player_token;
+                        $rtoken = $this_robot->robot_token;
+                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                        }
+                    }
+
+                }
+
+            }
+            // Else the robot is holding an Super Capsule or Super Pellet item, apply recovery
+            elseif ($item_token == 'super-pellet' || $item_token == 'super-capsule'){
+
+                // Loop through the three stat types that can be restored
+                $trigger_stat = false;
+                $trigger_item = false;
+                $temp_stat_tokens = array('attack', 'defense', 'speed');
+                $item_restore_value = $item_token === 'super-capsule' ? 5 : 2;
+                $item_trigger_value = $item_restore_value * -1;
+                foreach ($temp_stat_tokens AS $temp_stat){
+                    // Ensure this robot's stat has actually taken damage
+                    if ($this_robot->counters[$temp_stat.'_mods'] <= $item_trigger_value){
+                        $trigger_stat = $temp_stat;
+                        $trigger_item = true;
+                    }
+                }
+
+                // Ensure this robot's stat has actually taken damage
+                if ($trigger_item){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack/defense/speed by '.$item_restore_value.' stages');
+
+                    // Remove the robot's current item now that it's used up in battle
+                    $this_robot->set_item('');
+
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, $trigger_stat, $item_restore_value, false, null, null, 'Oh! An '.$this_item->print_name().'!');
+                    foreach ($temp_stat_tokens AS $temp_stat){
+                        if ($temp_stat === $trigger_stat){ continue; }
+                        rpg_ability::ability_function_stat_boost($this_robot, $temp_stat, $item_restore_value);
+                    }
+
+                    // Also remove this robot's item from the session, we're done with it
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                        $ptoken = $this_player->player_token;
+                        $rtoken = $this_robot->robot_token;
+                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                        }
+                    }
 
                 }
 
