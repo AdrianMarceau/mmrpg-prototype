@@ -4875,62 +4875,31 @@ class rpg_robot extends rpg_object {
             // Else the robot is holding an Attack Booster item, apply boosts
             elseif ($item_token == 'attack-booster'){
 
-                // Define the item object and trigger info
-                $temp_recovery_amount = round($this_robot->get_base_attack() * ($this_item->get_recovery2() / 100));
-                $this_item->recovery_options_update(array(
-                    'kind' => 'attack',
-                    'frame' => 'taunt',
-                    'percent' => true,
-                    'modifiers' => false,
-                    'kickback' => array(0, 0, 0),
-                    'success' => array(9, -10, -10, -10, 'The '.$this_item->print_name().' improved '.$this_robot->print_name().'&#39;s weapon systems!'),
-                    'failure' => array(9, -10, -10, -10, '')
-                    ));
-
-
-                // Trigger stat recovery for the holding robot
-                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts attack by '.$temp_recovery_amount.' ('.$this_item->get_recovery2().'%)');
-                if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
+                // Ensure this robot's stat isn't already at max value
+                if ($this_robot->counters['attack_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, 'attack', 1);
+                }
 
             }
             // Else if the robot is holding an Defense Booster item, apply boosts
             elseif ($item_token == 'defense-booster'){
 
-                // Define the item object and trigger info
-                $temp_recovery_amount = round($this_robot->get_base_defense() * ($this_item->get_recovery2() / 100));
-                $this_item->recovery_options_update(array(
-                    'kind' => 'defense',
-                    'frame' => 'taunt',
-                    'percent' => true,
-                    'modifiers' => false,
-                    'kickback' => array(0, 0, 0),
-                    'success' => array(9, -10, -10, -10, 'The '.$this_item->print_name().' improved '.$this_robot->print_name().'&#39;s shield systems!'),
-                    'failure' => array(9, -10, -10, -10, '')
-                    ));
-
-                // Trigger stat recovery for the holding robot
-                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts defense by '.$temp_recovery_amount.' ('.$this_item->get_recovery2().'%)');
-                if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
+                // Ensure this robot's stat isn't already at max value
+                if ($this_robot->counters['defense_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, 'defense', 1);
+                }
 
             }
             // Else if the robot is holding an Defense Booster item, apply boosts
             elseif ($item_token == 'speed-booster'){
 
-                // Define the item object and trigger info
-                $temp_recovery_amount = round($this_robot->get_base_speed() * ($this_item->get_recovery2() / 100));
-                $this_item->recovery_options_update(array(
-                    'kind' => 'speed',
-                    'frame' => 'taunt',
-                    'percent' => true,
-                    'modifiers' => false,
-                    'kickback' => array(0, 0, 0),
-                    'success' => array(9, -10, -10, -10, 'The '.$this_item->print_name().' improved '.$this_robot->print_name().'&#39;s mobility systems!'),
-                    'failure' => array(9, -10, -10, -10, '')
-                    ));
-
-                // Trigger stat recovery for the holding robot
-                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts speed by '.$temp_recovery_amount.' ('.$this_item->get_recovery2().'%)');
-                if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
+                // Ensure this robot's stat isn't already at max value
+                if ($this_robot->counters['speed_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
+                    // Call the global stat boost function with customized options
+                    rpg_ability::ability_function_stat_boost($this_robot, 'speed', 1);
+                }
 
             }
             // Else the robot is holding an Energy Capsule or Energy Pellet item, apply recovery
