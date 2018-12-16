@@ -5,11 +5,9 @@ $ability = array(
     'ability_token' => 'mega-buster',
     'ability_game' => 'MM00',
     'ability_group' => 'MM00/Weapons/Mega',
-    'ability_description' => 'The user charges on the first turn to build power and raise defense by {RECOVERY2}%, then releases a powerful energy shot on the second to inflict massive damage!',
+    'ability_description' => 'The user charges to build power and raise its defense stat. If used again after charging this ability can release a powerful energy shot to inflict massive damage!',
     'ability_energy' => 2,
     'ability_damage' => 36,
-    'ability_recovery2' => 10,
-    'ability_recovery2_percent' => true,
     'ability_accuracy' => 100,
     'ability_target' => 'auto',
     'ability_function' => function($objects){
@@ -45,16 +43,8 @@ $ability = array(
                 ));
             $this_robot->trigger_target($this_robot, $this_ability);
 
-            // Increase this robot's defense stat slightly
-            $this_ability->recovery_options_update(array(
-                'kind' => 'defense',
-                'percent' => true,
-                'rates' => array(100, 0, 0),
-                'success' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s shields powered up!'),
-                'failure' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s shields were not affected&hellip;')
-                ));
-            $defense_recovery_amount = ceil($this_robot->robot_defense * ($this_ability->ability_recovery2 / 100));
-            $this_robot->trigger_recovery($this_robot, $this_ability, $defense_recovery_amount);
+            // Call the global stat boost function with customized options
+            rpg_ability::ability_function_stat_boost($this_robot, 'defense', 1);
 
             // Attach this ability attachment to the robot using it
             $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
