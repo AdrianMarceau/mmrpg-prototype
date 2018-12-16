@@ -5,14 +5,12 @@ $ability = array(
     'ability_token' => 'oil-slider',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/00B',
-    'ability_description' => 'The user quickly slides toward the target on a wave of crude oil, inflicting damage and occasionally raising the user\'s speed by {RECOVERY2}%!',
+    'ability_description' => 'The user quickly slides toward the target on a wave of crude oil to inflict damage and raise the user\'s speed stat!',
     'ability_type' => 'earth',
     'ability_type2' => 'impact',
     'ability_energy' => 8,
     'ability_speed' => 2,
-    'ability_damage' => 24,
-    'ability_recovery2' => 10,
-    'ability_recovery2_percent' => true,
+    'ability_damage' => 22,
     'ability_accuracy' => 92,
     'ability_function' => function($objects){
 
@@ -44,31 +42,8 @@ $ability = array(
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
-        // Randomly trigger a speed boost if the ability was successful
-        if ($this_robot->robot_speed < MMRPG_SETTINGS_STATS_MAX
-            && $this_ability->ability_results['this_result'] != 'failure' && $this_ability->ability_results['this_amount'] > 0
-            && $this_battle->critical_chance(50)){
-            $this_ability->recovery_options_update(array(
-                'kind' => 'speed',
-                'frame' => 'taunt',
-                'percent' => true,
-                'modifiers' => false,
-                'kickback' => array(0, 0, 0),
-                'success' => array(2, -15, 10, -10, $this_robot->print_name().'&#39;s mobility improved!'),
-                'failure' => array(2, 0, 0, -9999, '')
-                ));
-            $this_ability->damage_options_update(array(
-                'kind' => 'speed',
-                'frame' => 'damage',
-                'percent' => true,
-                'modifiers' => false,
-                'kickback' => array(0, 0, 0),
-                'success' => array(2, -15, 10, -10, $this_robot->print_name().'&#39;s mobility worsened!'),
-                'failure' => array(2, 0, 0, -9999, '')
-                ));
-            $speed_damage_amount = ceil($this_robot->robot_speed * ($this_ability->ability_recovery2 / 100));
-            $this_robot->trigger_recovery($this_robot, $this_ability, $speed_damage_amount, true, array('apply_modifiers' => false));
-        }
+        // Call the global stat boost function with customized options
+        rpg_ability::ability_function_stat_boost($this_robot, 'speed', 1);
 
         // Return true on success
         return true;
