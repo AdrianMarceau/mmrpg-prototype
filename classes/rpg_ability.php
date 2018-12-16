@@ -1999,7 +1999,11 @@ class rpg_ability extends rpg_object {
         $mods_token = $stat_type.'_mods';
 
         // If ability not provided then generate a new one
-        if (!$trigger_ability){ $trigger_ability = rpg_game::get_ability($target_robot->battle, $target_robot->player, $target_robot, array('ability_token' => $stat_type.'-boost')); }
+        $hide_ability_header = false;
+        if (!$trigger_ability){
+            $hide_ability_header = true;
+            $trigger_ability = rpg_game::get_ability($target_robot->battle, $target_robot->player, $target_robot, array('ability_token' => $stat_type.'-boost'));
+        }
 
         // Increase the target's stat modifier only if it's not already at max
         if ($target_robot->counters[$mods_token] < MMRPG_SETTINGS_STATS_MOD_MAX){
@@ -2019,12 +2023,14 @@ class rpg_ability extends rpg_object {
             else { $boost_text = 'rose'; }
 
             // Target this robot's self to show the success message
+            $trigger_ability->set_flag('skip_canvas_header', true);
             $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($success_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' '.$boost_text.'!')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         } else {
 
             // Target this robot's self to show the failure message
+            $trigger_ability->set_flag('skip_canvas_header', true);
             $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($failure_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' wont go any higher&hellip;')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
@@ -2039,7 +2045,11 @@ class rpg_ability extends rpg_object {
         $mods_token = $stat_type.'_mods';
 
         // If ability not provided then generate a new one
-        if (!$trigger_ability){ $trigger_ability = rpg_game::get_ability($target_robot->battle, $target_robot->player, $target_robot, array('ability_token' => $stat_type.'-break')); }
+        $hide_ability_header = false;
+        if (!$trigger_ability){
+            $hide_ability_header = true;
+            $trigger_ability = rpg_game::get_ability($target_robot->battle, $target_robot->player, $target_robot, array('ability_token' => $stat_type.'-break'));
+        }
 
         // Increase the target's stat modifier only if it's not already at min
         if ($target_robot->counters[$mods_token] > MMRPG_SETTINGS_STATS_MOD_MIN){
@@ -2059,12 +2069,14 @@ class rpg_ability extends rpg_object {
             else { $break_text = 'fell'; }
 
             // Target this robot's self to show the success message
+            $trigger_ability->set_flag('skip_canvas_header', true);
             $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($success_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' '.$break_text.'!')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         } else {
 
             // Target this robot's self to show the failure message
+            $trigger_ability->set_flag('skip_canvas_header', true);
             $trigger_ability->target_options_update(array('frame' => 'base', 'success' => array($failure_frame, -2, 0, -10, $target_robot->print_name().'&#39;s '.$stat_type.' wont go any lower&hellip;')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
