@@ -75,6 +75,14 @@ $ability = array(
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
+            // Update this ability's target options and trigger
+            $this_ability->target_options_update(array(
+                'frame' => 'damage',
+                'kickback' => array(-10, 0, 0),
+                'success' => array(3, -110, -15, 10, 'A massive energy shot hit the target!'),
+                ));
+            $target_robot->trigger_target($this_robot, $this_ability);
+
             // Call the global stat break function with customized options
             rpg_ability::ability_function_stat_break($target_robot, 'attack', 3);
 
