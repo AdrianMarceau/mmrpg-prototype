@@ -5,12 +5,10 @@ $ability = array(
     'ability_token' => 'rising-cutter',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/003',
-    'ability_description' => 'The user summons a giant cutter below the target to inflict massive damage and occasionally lower defense by {DAMAGE2}%!',
+    'ability_description' => 'The user summons a giant cutter below the target to inflict massive damage and sharply lower defense!',
     'ability_type' => 'cutter',
     'ability_energy' => 8,
     'ability_damage' => 20,
-    'ability_damage2' => 20,
-    'ability_damage2_percent' => true,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -20,7 +18,7 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'defend',
-            'success' => array(0, 430, 0, 10, $this_robot->print_name().' summons the '.$this_ability->print_name().'!')
+            'success' => array(0, 300, 0, 10, $this_robot->print_name().' summons the '.$this_ability->print_name().'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -44,6 +42,9 @@ $ability = array(
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
         $this_robot->robot_frame = 'base';
         $this_robot->update_session();
+
+        // Call the global stat break function with customized options
+        rpg_ability::ability_function_stat_break($target_robot, 'defense', 2);
 
         // Return true on success
         return true;
