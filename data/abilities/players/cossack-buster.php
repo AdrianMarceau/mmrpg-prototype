@@ -5,12 +5,10 @@ $ability = array(
     'ability_token' => 'cossack-buster',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MM00/Weapons/00/Doctors',
-    'ability_description' => 'An adaptation of the Proto Buster created for use on other robot masters.  The user charges on the first turn to build power and raise speed by {RECOVERY2}%, then releases a powerful energy shot on the second to inflict massive damage! This ability\'s power increases when used by a robot belonging to Dr. Cossack.',
+    'ability_description' => 'The user charges to build power and raise its speed stat. If used again after charging this ability can release a powerful energy shot to inflict massive damage! This ability\'s power increases when used by a robot belonging to Dr. Cossack.',
     'ability_player' => 'dr-cossack',
     'ability_energy' => 4,
     'ability_damage' => 36,
-    'ability_recovery2' => 10,
-    'ability_recovery2_percent' => true,
     'ability_accuracy' => 98,
     'ability_target' => 'auto',
     'ability_function' => function($objects){
@@ -55,16 +53,8 @@ $ability = array(
                 ));
             $this_robot->trigger_target($this_robot, $this_ability);
 
-            // Increase this robot's defense stat slightly
-            $this_ability->recovery_options_update(array(
-                'kind' => 'speed',
-                'percent' => true,
-                'rates' => array(100, 0, 0),
-                'success' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s mobility improved!'),
-                'failure' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s mobility was not affected&hellip;')
-                ));
-            $speed_recovery_amount = ceil($this_robot->robot_speed * 0.10);
-            $this_robot->trigger_recovery($this_robot, $this_ability, $speed_recovery_amount);
+            // Call the global stat boost function with customized options
+            rpg_ability::ability_function_stat_boost($this_robot, 'speed', 1);
 
             // Attach this ability attachment to the robot using it
             $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
