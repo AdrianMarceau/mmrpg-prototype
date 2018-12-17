@@ -1997,6 +1997,7 @@ class rpg_ability extends rpg_object {
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
+        elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
 
         // Compensate for malformed arguments
         if (empty($trigger_ability)){ $trigger_ability = false; }
@@ -2055,6 +2056,7 @@ class rpg_ability extends rpg_object {
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
+        elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
 
         // Compensate for malformed arguments
         if (empty($trigger_ability)){ $trigger_ability = false; }
