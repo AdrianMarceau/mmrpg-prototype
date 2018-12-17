@@ -41,9 +41,7 @@ $ability = array(
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
         // Call the global stat boost function with customized options
-        if ($this_robot->counters['attack_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-            rpg_ability::ability_function_stat_boost($this_robot, 'attack', 1);
-        }
+        rpg_ability::ability_function_stat_boost($this_robot, 'attack', 1);
 
         // Return true on success
         return true;
