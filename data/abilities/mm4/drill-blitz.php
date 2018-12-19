@@ -5,11 +5,12 @@ $ability = array(
     'ability_token' => 'drill-blitz',
     'ability_game' => 'MM04',
     'ability_group' => 'MM04/Weapons/027',
-    'ability_description' => 'The user fires a series of sharp drills at any target to pierce their immunities and defenses and deal damage!',
+    'ability_description' => 'The user fires off a pair of sharp drills toward the target that deal damage on contact and remove any boosts to their defense stat!',
     'ability_type' => 'earth',
-    'ability_energy' => 4,
-    'ability_damage' => 8,
-    'ability_accuracy' => 90,
+    'ability_type2' => 'missile',
+    'ability_energy' => 8,
+    'ability_damage' => 12,
+    'ability_accuracy' => 92,
     'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
@@ -25,29 +26,18 @@ $ability = array(
             'ability_frame_animate' => array(0),
             'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => 0)
             );
-        $this_robot->robot_attachments[$this_attachment_token.'_1'] = $this_attachment_info;
         $this_robot->robot_attachments[$this_attachment_token.'_2'] = $this_attachment_info;
-        $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame_offset'] = array('x' => 75, 'y' => -25, 'z' => 10);
         $this_robot->robot_attachments[$this_attachment_token.'_2']['ability_frame_offset'] = array('x' => 95, 'y' => 25, 'z' => 10);
         $this_robot->update_session();
-
-        // Backup the target robot's earth weakness, if it has one
-        $temp_target_weaknesses_backup = array();
-        if ($target_robot->has_immunity($this_ability->ability_type)){
-            $temp_target_weaknesses_backup = $target_robot->robot_weaknesses;
-            unset($target_robot->robot_weaknesses[array_search($this_ability->ability_type, $target_robot->robot_weaknesses)]);
-            $target_robot->update_session();
-        }
 
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'shoot',
-            'success' => array(0, 115, -25, 10, 'The '.$this_ability->print_name().' summoned a triad of drills!')
+            'success' => array(0, 95, -25, 10, 'The '.$this_ability->print_name().' summoned a triad of drills!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
         // Update the two whirlwind's animation frames
-        $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame'] = 0;
         $this_robot->robot_attachments[$this_attachment_token.'_2']['ability_frame'] = 0;
         $this_robot->update_session();
 
@@ -68,6 +58,16 @@ $ability = array(
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
+        // Ensure the target is not disabled before apply a stat change
+        if ($target_robot->robot_status != 'disabled'
+            && $this_ability->ability_results['this_result'] != 'failure'
+            && $target_robot->counters['defense_mods'] > 0){
+
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_stat_break($target_robot, 'defense', $target_robot->counters['defense_mods']);
+
+        }
+
         // Ensure the target has not been disabled
         if ($target_robot->robot_status != 'disabled'){
 
@@ -85,10 +85,6 @@ $ability = array(
                 $this_robot->update_session();
             }
 
-            // Update the remaining whirlwind's animation frame
-            $this_robot->robot_attachments[$this_attachment_token.'_1']['ability_frame'] = 0;
-            $this_robot->update_session();
-
             // Attempt to trigger damage to the target robot again
             $this_ability->damage_options_update(array(
                 'kind' => 'energy',
@@ -103,38 +99,15 @@ $ability = array(
                 'success' => array(1, -40, 25, 10, $success_text),
                 'failure' => array(1, -60, 25, -10, $failure_text)
                 ));
-            $target_robot->trigger_damage($this_robot, $this_ability,  $energy_damage_amount);
+            $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
-            // Ensure the target has not been disabled
-            if ($target_robot->robot_status != 'disabled'){
+            // Ensure the target is not disabled before apply a stat change
+            if ($target_robot->robot_status != 'disabled'
+                && $this_ability->ability_results['this_result'] != 'failure'
+                && $target_robot->counters['defense_mods'] > 0){
 
-                // Adjust damage/recovery text based on results again
-                if ($this_ability->ability_results['total_strikes'] == 1){ $success_text = 'Another drill hit!'; }
-                elseif ($this_ability->ability_results['total_strikes'] == 2){ $success_text = 'A third drill hit!'; }
-                if ($this_ability->ability_results['total_misses'] == 1){ $failure_text = 'Another drill missed!'; }
-                elseif ($this_ability->ability_results['total_misses'] == 2){ $failure_text = 'A third drill missed!'; }
-
-                // Remove the first extra whirlwind
-                if (isset($this_robot->robot_attachments[$this_attachment_token.'_1'])){
-                    unset($this_robot->robot_attachments[$this_attachment_token.'_1']);
-                    $this_robot->update_session();
-                }
-
-                // Attempt to trigger damage to the target robot a third time
-                $this_ability->damage_options_update(array(
-                    'kind' => 'energy',
-                    'kickback' => array(15, 0, 0),
-                    'success' => array(1, -70, -25, 10, $success_text),
-                    'failure' => array(1, -90, -25, -10, $failure_text)
-                    ));
-                $this_ability->recovery_options_update(array(
-                    'kind' => 'energy',
-                    'frame' => 'taunt',
-                    'kickback' => array(0, 0, 0),
-                    'success' => array(1, -70, -25, 10, $success_text),
-                    'failure' => array(1, -90, -25, -10, $failure_text)
-                    ));
-                $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+                // Call the global stat break function with customized options
+                rpg_ability::ability_function_stat_break($target_robot, 'defense', $target_robot->counters['defense_mods']);
 
             }
 
@@ -144,18 +117,6 @@ $ability = array(
         if (isset($this_robot->robot_attachments[$this_attachment_token.'_2'])){
             unset($this_robot->robot_attachments[$this_attachment_token.'_2']);
             $this_robot->update_session();
-        }
-
-        // Remove the third whirlwind
-        if (isset($this_robot->robot_attachments[$this_attachment_token.'_1'])){
-            unset($this_robot->robot_attachments[$this_attachment_token.'_1']);
-            $this_robot->update_session();
-        }
-
-        // If this robot has an immunity removed, re-add it and update session
-        if (!empty($temp_target_weaknesses_backup)){
-            $target_robot->robot_weaknesses = $temp_target_weaknesses_backup;
-            $target_robot->update_session();
         }
 
         // Return true on success

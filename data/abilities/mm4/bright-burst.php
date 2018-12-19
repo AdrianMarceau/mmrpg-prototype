@@ -5,13 +5,11 @@ $ability = array(
     'ability_token' => 'bright-burst',
     'ability_game' => 'MM04',
     'ability_group' => 'MM04/Weapons/025',
-    'ability_description' => 'The user warps time to create an intense flash of light that damages the target and lowers its defense by {DAMAGE2}%!',
-    'ability_type' => 'time',
-    'ability_type2' => 'electric',
-    'ability_energy' => 4,
-    'ability_damage' => 16,
-    'ability_damage2' => 8,
-    'ability_damage2_percent' => true,
+    'ability_description' => 'The user generates an intense burst of light that damages the target with ten million watts of power and sharply lowers their attack stat!',
+    'ability_type' => 'electric',
+    'ability_type2' => 'time',
+    'ability_energy' => 8,
+    'ability_damage' => 18,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -99,32 +97,13 @@ $ability = array(
             $target_robot->trigger_disabled($this_robot);
         }
 
-        // Randomly trigger a defense break if the ability was successful
+        // Ensure the target is not disabled before apply a stat change
         if ($target_robot->robot_status != 'disabled'
-            && $target_robot->robot_defense > 0
-            && $this_ability->ability_results['this_result'] != 'failure'
-            && $this_ability->ability_results['this_amount'] > 0){
-                // Decrease the target robot's defense stat
-                $this_ability->damage_options_update(array(
-                    'kind' => 'defense',
-                    'percent' => true,
-                    'modifiers' => false,
-                    'frame' => 'defend',
-                    'kickback' => array(10, 0, 0),
-                    'success' => array(9, -5, 20, -10, $target_robot->print_name().'&#39;s shields were damaged!'),
-                    'failure' => array(9, -5, 20, -10, '')
-                    ));
-                $this_ability->recovery_options_update(array(
-                    'kind' => 'defense',
-                    'percent' => true,
-                    'modifiers' => false,
-                    'frame' => 'taunt',
-                    'kickback' => array(5, 0, 0),
-                    'success' => array(9, -5, 20, -10, $target_robot->print_name().'&#39;s shields were bolstered!'),
-                    'failure' => array(9, -5, 20, -10, '')
-                    ));
-                $defense_damage_amount = ceil($target_robot->robot_defense * ($this_ability->ability_damage2 / 100));
-                $target_robot->trigger_damage($this_robot, $this_ability, $defense_damage_amount, true, array('apply_modifiers' => false));
+            && $this_ability->ability_results['this_result'] != 'failure'){
+
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_stat_break($target_robot, 'attack', 2);
+
         }
 
         // Change the image to the full-screen rain effect

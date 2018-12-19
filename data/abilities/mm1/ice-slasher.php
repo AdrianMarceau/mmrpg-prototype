@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'ice-slasher',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/005',
-    'ability_description' => 'The user fires a blast of razor-sharp ice at the target to inflict damage and lower their speed stat!',
+    'ability_description' => 'The user fires a blast of razor-sharp ice at the target to inflict damage and remove any boosts to their speed stat!',
     'ability_type' => 'freeze',
     'ability_type2' => 'cutter',
     'ability_energy' => 8,
@@ -13,44 +13,42 @@ $ability = array(
     'ability_accuracy' => 94,
     'ability_function' => function($objects){
 
-        // Call a global ability function with customized options
-        return rpg_ability::ability_function_forward_attack($objects,
-            // Target options
-            array(
-                'robot_frame' => 'shoot',
-                'robot_kickback' => array(-10, 0, 0),
-                'ability_frame' => 0,
-                'ability_offset' => array(110, 0, 10),
-                'ability_text' => '{this_robot_name} fires an {this_ability_name}!'
-                ),
-            // Damage options
-            array(
-                'robot_kickback' => array(15, 0, 0),
-                'ability_success_frame' => 0,
-                'ability_success_offset' => array(-90, 0, 10),
-                'ability_success_text' => 'The {this_ability_name} cut into the target!',
-                'ability_failure_frame' => 0,
-                'ability_failure_offset' => array(-100, 0, -10),
-                'ability_failure_text' => 'The {this_ability_name} missed...'
-                ),
-            // Recovery options
-            array(
-                'robot_kickback' => array(10, 0, 0),
-                'ability_success_frame' => 0,
-                'ability_success_offset' => array(-90, 0, 10),
-                'ability_success_text' => 'The {this_ability_name} was absorbed by the target!',
-                'ability_failure_frame' => 0,
-                'ability_failure_offset' => array(-100, 0, -10),
-                'ability_failure_text' => 'The {this_ability_name} had no effect...'
-                ),
-            // Effect options
-            array(
-                'stat_kind' => 'speed',
-                'effect_chance' => 100,
-                'effect_value' => -1
-                )
-            );
+        // Extract all objects into the current scope
+        extract($objects);
 
+        // Target the opposing robot
+        $this_ability->target_options_update(array(
+            'frame' => 'shoot',
+            'success' => array(0, -10, 0, 0, $this_robot->print_name().' fires the '.$this_ability->print_name().'!')
+            ));
+        $this_robot->trigger_target($target_robot, $this_ability);
+
+        // Inflict damage on the opposing robot
+        $this_ability->damage_options_update(array(
+            'kind' => 'energy',
+            'kickback' => array(15, 0, 0),
+            'success' => array(4, -65, 0, 10, 'The '.$this_ability->print_name().' cut into the target!'),
+            'failure' => array(0, -95, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
+            ));
+        $this_ability->recovery_options_update(array(
+            'kind' => 'energy',
+            'frame' => 'taunt',
+            'kickback' => array(10, 0, 0),
+            'success' => array(4, -65, 0, 10, 'The '.$this_ability->print_name().' was absorbed by the target!'),
+            'failure' => array(0, -95, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
+            ));
+        $energy_damage_amount = $this_ability->ability_damage;
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+        // Ensure the target is not disabled before apply a stat change
+        if ($target_robot->robot_status != 'disabled'
+            && $this_ability->ability_results['this_result'] != 'failure'
+            && $target_robot->counters['speed_mods'] > 0){
+
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_stat_break($target_robot, 'speed', $target_robot->counters['speed_mods']);
+
+        }
 
         },
     'ability_function_onload' => function($objects){
