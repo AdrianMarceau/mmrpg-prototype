@@ -5,13 +5,11 @@ $ability = array(
     'ability_token' => 'atomic-fire',
     'ability_game' => 'MM02',
     'ability_group' => 'MM02/Weapons/015',
-    'ability_description' => 'The user unleashes a barrage of fire at the target, dealing damage and raising the user\'s attack by {RECOVERY2}%! This ability has three levels of power, with damage multiplying on each successive barrage until the limit is reached or another technique is used.',
+    'ability_description' => 'The user engulfs itself in flames then unleashes a volley of fireballs at the target to deal damage. This ability grows stronger with consecutive use, culminating in a large drastic to the user\'s attack if uninterrupted.',
     'ability_type' => 'flame',
     'ability_energy' => 4,
     'ability_damage' => 10,
-    'ability_recovery2' => 8,
-    'ability_recovery2_percent' => true,
-    'ability_accuracy' => 95,
+    'ability_accuracy' => 96,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -116,11 +114,14 @@ $ability = array(
         $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
         $this_ability->recovery_options_update($this_attachment_info['attachment_create'], true);
 
-        // Trigger an attack boost if the ability was successful
-        if ($this_robot->robot_status != 'disabled' && $this_ability->ability_results['this_result'] == 'success'){
-            $attack_recovery_amount = ceil($this_robot->robot_base_attack * ($this_ability->ability_recovery2 / 100));
-            $trigger_options = array('apply_modifiers' => false);
-            $this_robot->trigger_recovery($this_robot, $this_ability, $attack_recovery_amount, true, $trigger_options);
+        // If this was the final shot and the attack was successful, we can boost their stats
+        if ($shot_power >= 3
+            && $this_robot->robot_status != 'disabled'
+            && $this_ability->ability_results['this_result'] == 'success'){
+
+            // Call the global stat boost function with customized options
+            rpg_ability::ability_function_stat_boost($this_robot, 'attack', 3);
+
         }
 
         // If the shot power was at maximum, remove the attachment from the robot
@@ -155,15 +156,12 @@ $ability = array(
             $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
             $shot_power = !empty($this_attachment_info['attachment_power']) ? $this_attachment_info['attachment_power'] + 1 : 1;
             $shot_numeral = $shot_power == 3 ? 'III' : 'II';
-            $ability_damage = ceil($this_ability->ability_base_damage * $shot_power);
-            $ability_recovery2 = ceil($this_ability->ability_base_recovery2 * $shot_power);
+            $ability_damage = ceil($this_ability->ability_base_damage + (($shot_power - 1) * 4));
             $this_ability->set_damage($ability_damage);
-            $this_ability->set_recovery2($ability_recovery2);
             if ($shot_power > 1){ $this_ability->set_name($this_ability->ability_base_name.' '.$shot_numeral); }
             else { $this_ability->set_name($this_ability->ability_base_name); }
         } else {
             $this_ability->set_damage($this_ability->ability_base_damage);
-            $this_ability->set_recovery2($this_ability->ability_base_recovery2);
             $this_ability->set_name($this_ability->ability_base_name);
         }
 
