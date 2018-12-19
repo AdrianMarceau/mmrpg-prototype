@@ -5,11 +5,11 @@ $ability = array(
     'ability_token' => 'rising-cutter',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/003',
-    'ability_description' => 'The user summons a giant cutter below the target to inflict massive damage and sharply lower defense!',
+    'ability_description' => 'The user summons a giant cutter below the target that rises up to inflict massive damage and sharply lower their defense stat!',
     'ability_type' => 'cutter',
     'ability_energy' => 8,
     'ability_damage' => 20,
-    'ability_accuracy' => 100,
+    'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
