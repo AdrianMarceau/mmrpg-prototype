@@ -5314,7 +5314,9 @@ class rpg_robot extends rpg_object {
     // Define a function for calculating this robot's best stat and returning it
     public static function get_best_stat($robot_info){
         // Decide which one of this robot's stats is best
-        $stats = array('energy' => $robot_info['robot_energy'], 'attack' => $robot_info['robot_attack'], 'defense' => $robot_info['robot_defense'], 'speed' => $robot_info['robot_speed'] );
+        if (is_object($robot_info)){ $stats = array('energy' => $robot_info->robot_energy, 'attack' => $robot_info->robot_attack, 'defense' => $robot_info->robot_defense, 'speed' => $robot_info->robot_speed); }
+        elseif (is_array($robot_info)){ $stats = array('energy' => $robot_info['robot_energy'], 'attack' => $robot_info['robot_attack'], 'defense' => $robot_info['robot_defense'], 'speed' => $robot_info['robot_speed']); }
+        else { return false; }
         asort($stats); $stats = array_reverse($stats);
         if (count(array_unique($stats)) === 1){ $best = 'all'; }
         else { $best = key($stats); }
