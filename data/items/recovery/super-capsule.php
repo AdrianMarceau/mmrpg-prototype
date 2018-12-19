@@ -9,20 +9,17 @@ $item = array(
     'item_subclass' => 'consumable',
     'item_type' => '',
     'item_type2' => 'shield',
-    'item_description' => 'A large weapon capsule that that boosts the attack, defense, and speed stat of one robot on the user\'s side of the field by {RECOVERY2}% each. This item\'s effects appear to be permanent, though only up until the target has reached its max stat limits.',
+    'item_description' => 'A large multi-color capsule that drastically raises the attack, defense, and speed stats of one robot on the user\'s side of the field.',
     'item_energy' => 0,
     'item_speed' => 10,
-    'item_recovery' => 120,
-    'item_recovery_percent' => true,
-    'item_recovery2' => 40,
-    'item_recovery_percent' => true,
+    'item_recovery' => 9,
     'item_accuracy' => 100,
     'item_price' => 10800,
     'item_target' => 'select_this',
     'item_function' => function($objects){
 
-            // Call the global stat booster item function
-            return rpg_item::item_function_stat_booster($objects);
+        // Call the global stat booster item function
+        return rpg_item::item_function_stat_booster($objects);
 
         }
     );

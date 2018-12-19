@@ -1804,40 +1804,21 @@ class rpg_item extends rpg_object {
             ));
         $target_robot->trigger_target($target_robot, $this_item);
 
-        // Define the various object words used for each boost type
-        $stat_boost_subjects = array('attack' => 'weapons', 'defense' => 'shields', 'speed' => 'mobility');
-        $stat_boost_verbs = array('weapons' => 'were', 'shields' => 'were', 'mobility' => 'was');
-
-        // Define the various effect words used for each item size
-        if (strstr($this_item->item_token, 'pellet')){ $boost_effect_word = 'a bit'; }
-        elseif (strstr($this_item->item_token, 'capsule')){ $boost_effect_word = 'a lot'; }
-
-        // Define the stat(s) this item will boost (super items boost all)
+        // Define the stat(s) this item will boost and how much
         $stat_boost_tokens = array();
-        if (strstr($this_item->item_token, 'super')){ $stat_boost_tokens = array('attack', 'defense', 'speed'); }
-        else { $stat_boost_tokens[] = $this_item->item_type; }
+        if (strstr($this_item->item_token, 'super')){
+            $stat_boost_tokens = array('attack', 'defense', 'speed');
+            $stat_boost_amount = ceil($this_item->item_recovery / count($stat_boost_tokens));
+        } else {
+            $stat_boost_tokens[] = $this_item->item_type;
+            $stat_boost_amount = $this_item->item_recovery;
+        }
 
-        // Loop through each stat boost token and raise it
+        // Loop through each stat boost token and raise it with calculated amount
         foreach ($stat_boost_tokens AS $stat_token){
 
-            // Collect the object word for this stat type
-            $stat_name = ucfirst($stat_token);
-            $stat_subject = $stat_boost_subjects[$stat_token];
-            $stat_verb = $stat_boost_verbs[$stat_subject];
-            $stat_base_prop = 'robot_base_'.$stat_token;
-            $stat_max_prop = 'robot_max_'.$stat_token;
-
-            // Increase this robot's in-battle stat
-            $this_item->recovery_options_update(array(
-                'kind' => $stat_token,
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'taunt',
-                'success' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s '.$stat_subject.' powered up '.$boost_effect_word.'! '.rpg_battle::random_positive_word()),
-                'failure' => array(9, 0, 0, -9999, $target_robot->print_name().'&#39;s '.$stat_subject.''.$stat_verb.' not affected&hellip; '.rpg_battle::random_negative_word())
-                ));
-            $stat_recovery_amount = ceil($target_robot->$stat_base_prop * ($this_item->item_recovery / 100));
-            $target_robot->trigger_recovery($target_robot, $this_item, $stat_recovery_amount);
+            // Call the global stat boost function with customized options
+            rpg_ability::ability_function_stat_boost($target_robot, $stat_token, $stat_boost_amount);
 
         }
 
