@@ -5,13 +5,11 @@ $ability = array(
     'ability_token' => 'danger-bomb',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/006',
-    'ability_description' => 'The user throws a dangerous and powerful bomb that explodes mid-air to inflict massive damage on the target! The user of this devasting attack receives {DAMAGE2}% recoil damage, so use with extreme caution.',
+    'ability_description' => 'The user throws a powerful bomb toward the target that explodes mid-air to inflict massive damage! This ability sharply lowers the defense stats of both the target and user so detonate with extreme caution.',
     'ability_type' => 'explode',
     'ability_energy' => 8,
     'ability_damage' => 50,
-    'ability_damage2' => 20,
-    'ability_damage2_percent' => true,
-    'ability_accuracy' => 70,
+    'ability_accuracy' => 86,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -66,100 +64,22 @@ $ability = array(
             'failure' => array(2, -65, 0, -10, $target_robot->print_name().' avoided the blast&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
         unset($target_robot->robot_attachments[$this_attachment_token_one]);
         unset($target_robot->robot_attachments[$this_attachment_token_two]);
         $target_robot->update_session();
 
-        // If the ability was successful against the target, this robot gets exactly half damage
-        if ($this_ability->ability_results['this_result'] != 'failure'
-            && $this_ability->ability_results['this_amount'] > 0){
+        // Ensure the target is not disabled before apply a stat change
+        if ($target_robot->robot_status != 'disabled'
+            && $this_ability->ability_results['this_result'] != 'failure'){
 
-            // Inflict damage on the opposing robot
-            $this_ability->damage_options_update(array(
-                'kind' => 'energy',
-                'frame' => 'damage',
-                'type' => $this_ability->ability_type,
-                'percent' => true,
-                'modifiers' => false,
-                'kickback' => array(15, 0, 0),
-                'success' => array(3, -30, 0, 10, $this_robot->print_name().' was damaged by the blast!'),
-                'failure' => array(3, -65, 0, -10, $this_robot->print_name().' avoided the blast&hellip;')
-                ));
-            $this_ability->recovery_options_update(array(
-                'kind' => 'energy',
-                'frame' => 'taunt',
-                'type' => '$this_ability->ability_type',
-                'percent' => true,
-                'modifiers' => false,
-                'kickback' => array(0, 0, 0),
-                'success' => array(3, -30, 0, 10, $this_robot->print_name().' was invigorated by the blast!'),
-                'failure' => array(3, -65, 0, -10, $this_robot->print_name().' avoided the blast&hellip;')
-                ));
-            $energy_damage_amount = $this_ability->ability_results['this_amount'];
-            $energy_damage_amount += !empty($this_ability->ability_results['this_overkill']) ? $this_ability->ability_results['this_overkill'] : 0;
-            $energy_damage_amount = round($energy_damage_amount * ($this_ability->ability_damage2 / 100));
-            //$energy_damage_amount = round($energy_damage_amount * (2 / 3));
-            $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, false);
-
-        }
-        // Otherwise, if the ability missed or was absored somehow, treat as attack from target
-        else {
-
-            // Inflict damage on the opposing robot
-            $this_ability->damage_options_update(array(
-                'kind' => 'energy',
-                'frame' => 'damage',
-                'type' => '',
-                'kickback' => array(15, 0, 0),
-                //'success' => array(3, -30, 0, 10, $this_robot->print_name().' was damaged by the blast!'),
-                'success' => array(3, -65, 0, -10, $this_robot->print_name().' avoided the blast&hellip;'),
-                'failure' => array(3, -65, 0, -10, $this_robot->print_name().' avoided the blast&hellip;')
-                ));
-            $this_ability->recovery_options_update(array(
-                'kind' => 'energy',
-                'frame' => 'taunt',
-                'type' => '',
-                'kickback' => array(0, 0, 0),
-                //'success' => array(3, -30, 0, 10, $this_robot->print_name().' was invigorated by the blast!'),
-                'success' => array(3, -65, 0, -10, $this_robot->print_name().' avoided the blast&hellip;'),
-                'failure' => array(3, -65, 0, -10, $this_robot->print_name().' avoided the blast&hellip;')
-                ));
-            $energy_damage_amount = 0; //ceil($this_ability->ability_damage * ($this_robot->robot_attack / $this_robot->robot_defense));
-            $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, false);
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_stat_break($target_robot, 'defense', 3);
 
         }
 
-        // Update the player session quickly
-
-        // If this robot is no longer active, find a new active robot for this player
-        $this_active_robot = $this_robot;
-        if ($this_robot->robot_energy < 1 || $this_robot->robot_status == 'disabled'){
-            foreach ($this_player->values['robots_active'] AS $key => $info){
-                if ($info['robot_position'] != 'bench'){
-                        $this_active_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']));
-                    }
-            }
-        }
-
-        // Trigger the disabled event on the target robot now if necessary
-        if ($target_robot->robot_energy < 1 || $target_robot->robot_status == 'disabled'){
-            $target_robot->trigger_disabled($this_active_robot);
-
-        }
-
-        // Trigger the disabled event on this robot now if necessary
-        if ($this_robot->robot_energy < 1 || $this_robot->robot_status == 'disabled'){
-            //$this_robot->robot_energy = 1;
-            //$this_robot->robot_status = 'active';
-            //$this_robot->robot_frame = 'defeat';
-            //$this_robot->update_session();
-            $this_robot->trigger_disabled($target_robot);
-            //$this_battle->actions_empty();
-            //$this_robot->robot_energy = 0;
-            //$this_robot->robot_status = 'disabled';
-            //$this_robot->update_session();
-        }
+        // Call the global stat break function with customized options
+        rpg_ability::ability_function_stat_break($this_robot, 'defense', 3);
 
         // Return true on success
         return true;
