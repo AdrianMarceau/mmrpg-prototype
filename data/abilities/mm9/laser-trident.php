@@ -5,53 +5,57 @@ $ability = array(
     'ability_token' => 'laser-trident',
     'ability_game' => 'MM09',
     'ability_group' => 'MM09/Weapons/067',
-    'ability_description' => 'The user fires a powerful three-pronged energy beam at the target to deal damage and reduce their attack power by {DAMAGE2}%.',
+    'ability_description' => 'The user fires a three-pronged energy beam at the target to inflict damage and remove any positive stat changes applied to them!',
     'ability_type' => 'water',
     'ability_type2' => 'laser',
     'ability_energy' => 8,
     'ability_damage' => 20,
-    'ability_damage2' => 20,
     'ability_accuracy' => 94,
     'ability_function' => function($objects){
 
-        // Call a global ability function with customized options
-        return rpg_ability::ability_function_forward_attack($objects,
-            // Target options
-            array(
-                'robot_frame' => 'shoot',
-                'robot_kickback' => array(-10, 0, 0),
-                'ability_frame' => 0,
-                'ability_offset' => array(120, 0, 10),
-                'ability_text' => '{this_robot_name} fires the {this_ability_name}!'
-                ),
-            // Damage options
-            array(
-                'robot_kickback' => array(-15, 0, 0),
-                'ability_success_frame' => 0,
-                'ability_success_offset' => array(-95, 0, 10),
-                'ability_success_text' => 'The {this_ability_name} burns through the target!',
-                'ability_failure_frame' => 0,
-                'ability_failure_offset' => array(-105, 0, -10),
-                'ability_failure_text' => 'The {this_ability_name} was evaded by target...'
-                ),
-            // Recovery options
-            array(
-                'robot_kickback' => array(-15, 0, 0),
-                'ability_success_frame' => 0,
-                'ability_success_offset' => array(-95, 0, 10),
-                'ability_success_text' => 'The {this_ability_name}\'s power invigorated the target!',
-                'ability_failure_frame' => 0,
-                'ability_failure_offset' => array(-105, 0, -10),
-                'ability_failure_text' => 'The {this_ability_name} had no effect on the target...'
-                ),
-            // Effect options
-            array(
-                'stat_kind' => 'attack',
-                'damage_text' => '{this_robot_name}\'s weapons were damaged!',
-                'recovery_text' => '{this_robot_name}\'s weapons improved!',
-                'effect_chance' => 100
-                )
-            );
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Target the opposing robot
+        $this_ability->target_options_update(array(
+            'frame' => 'shoot',
+            'kickback' => array(-10, ($this_robot->robot_token === 'splash-woman' ? 20 : 0), 0),
+            'success' => array(0, 120, ($this_robot->robot_token === 'splash-woman' ? -20 : 0), 10, $this_robot->print_name().' fires the '.$this_ability->print_name().'!')
+            ));
+        $this_robot->trigger_target($target_robot, $this_ability);
+
+        // Inflict damage on the opposing robot
+        $this_ability->damage_options_update(array(
+            'kind' => 'energy',
+            'kickback' => array(15, 0, 0),
+            'success' => array(0, -95, 0, 10, 'The '.$this_ability->print_name().' burned through the target!'),
+            'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
+            ));
+        $this_ability->recovery_options_update(array(
+            'kind' => 'energy',
+            'frame' => 'taunt',
+            'kickback' => array(10, 0, 0),
+            'success' => array(0, -95, 0, 10, 'The '.$this_ability->print_name().' was absorbed by the target!'),
+            'failure' => array(1, -105, 0, -10, 'The '.$this_ability->print_name().' missed the target&hellip;')
+            ));
+        $energy_damage_amount = $this_ability->ability_damage;
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+        // Ensure the target is not disabled before apply a stat change
+        if ($target_robot->robot_status != 'disabled'
+            && $this_ability->ability_results['this_result'] != 'failure'){
+
+            // Check all three stats to see if they should be reversed
+            $check_stats = array('attack', 'defense', 'speed');
+            foreach ($check_stats AS $stat){
+                if ($target_robot->counters[$stat.'_mods'] <= 0){ continue; }
+
+                // Call the global stat break function with customized options
+                rpg_ability::ability_function_stat_break($target_robot, $stat, $target_robot->counters[$stat.'_mods']);
+
+            }
+
+        }
 
         },
     'ability_function_onload' => function($objects){
