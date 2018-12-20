@@ -4415,7 +4415,7 @@ class rpg_robot extends rpg_object {
             if ($stat == 'energy'){
 
                 // If this is the ENERGY stat
-                $robot_stats[$stat]['base_max'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level_max']);
+                $robot_stats[$stat]['base_max'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level_max'], 1);
 
                 $robot_stats[$stat]['bonus'] = isset($bonus_stats['robot_'.$stat]) ? $bonus_stats['robot_'.$stat] : 0;
                 if ($stat != 'energy'){ $robot_stats[$stat]['bonus_max'] = round($robot_stats[$stat]['base_max'] * MMRPG_SETTINGS_STATS_BONUS_MAX); }
@@ -4425,8 +4425,8 @@ class rpg_robot extends rpg_object {
                 if ($is_neutral_core){ $robot_stats[$stat]['starforce'] = $starforce_boost; }
                 else { $robot_stats[$stat]['starforce'] = 0; }
 
-                $robot_stats[$stat]['current'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level']) + $robot_stats[$stat]['bonus'] + $robot_stats[$stat]['starforce'];
-                $robot_stats[$stat]['current_noboost'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $level);
+                $robot_stats[$stat]['current'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $robot_stats['level'], 1) + $robot_stats[$stat]['bonus'] + $robot_stats[$stat]['starforce'];
+                $robot_stats[$stat]['current_noboost'] = self::calculate_level_boosted_stat($robot_stats[$stat]['base'], $level, 1);
 
                 $robot_stats[$stat]['max'] = $robot_stats[$stat]['base_max'] + $robot_stats[$stat]['bonus_max'] + $robot_stats[$stat]['starforce'];
 
@@ -4482,8 +4482,9 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a function for calculating a robot stat level boost
-    public static function calculate_level_boosted_stat($base, $level){
-        $stat_boost = round( $base + ($base * 0.05 * ($level - 1)) );
+    public static function calculate_level_boosted_stat($base, $level, $percent = 5){
+        $rel_level = $level < 100 ? ($level - 1) : $level;
+        $stat_boost = round( $base + ($base * ($percent / 100) * $rel_level) );
         return $stat_boost;
     }
 
