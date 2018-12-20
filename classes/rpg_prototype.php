@@ -1449,8 +1449,8 @@ class rpg_prototype {
             $this_robot_speed = $info['robot_speed'];
             $this_robot_core = !empty($info['robot_core']) ? $info['robot_core'] : '';
             $this_robot_core2 = !empty($info['robot_core2']) ? $info['robot_core2'] : '';
-            $temp_level = $this_robot_level - 1;
-            $this_robot_energy += ceil($temp_level * (0.05 * $this_robot_energy));
+            $temp_level = $this_robot_level < 100 ? ($this_robot_level - 1) : $this_robot_level;
+            $this_robot_energy += ceil($temp_level * (0.01 * $this_robot_energy));
             $this_robot_attack += ceil($temp_level * (0.05 * $this_robot_attack));
             $this_robot_defense += ceil($temp_level * (0.05 * $this_robot_defense));
             $this_robot_speed += ceil($temp_level * (0.05 * $this_robot_speed));

@@ -635,7 +635,7 @@ class rpg_disabled {
                     //$this_battle->events_create(false, false, 'DEBUG', '<pre>'.preg_replace('/\s+/', ' ', print_r($temp_robot_rewards, true)).'</pre>', $event_options);
 
                     // Define the base energy boost based on robot base stats
-                    $temp_energy_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_energy']));
+                    $temp_energy_boost = ceil($level_boost * (0.01 * $temp_index_robot['robot_energy']));
 
                     // If this robot has reached level 100, the max level, create the flag in their session
                     if ($temp_new_level >= 100){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['flags']['reached_max_level'] = true; }
@@ -651,7 +651,7 @@ class rpg_disabled {
 
                     // Increment this robot's energy by the calculated amount and display an event
                     $temp_robot->robot_energy += $temp_energy_boost;
-                    $temp_base_energy_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_energy']));
+                    $temp_base_energy_boost = ceil($level_boost * (0.01 * $temp_index_robot['robot_energy']));
                     $temp_robot->robot_base_energy += $temp_base_energy_boost;
                     $temp_robot->update_session();
                     $target_player->update_session();
