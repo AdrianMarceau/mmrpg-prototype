@@ -81,7 +81,7 @@ $ability = array(
                 'kickback' => array(-10, 0, 0),
                 'success' => array(3, -110, -15, 10, 'A massive energy shot hit the target!'),
                 ));
-            $target_robot->trigger_target($this_robot, $this_ability);
+            $target_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
             // Call the global stat break function with customized options
             rpg_ability::ability_function_stat_break($target_robot, 'defense', 3);
