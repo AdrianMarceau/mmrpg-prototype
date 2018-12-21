@@ -11,7 +11,7 @@ $robot = array(
     'robot_weaknesses' => array('explode'),
     'robot_resistances' => array(),
     'robot_abilities' => array(
-        'block-drop',
+        'block-dropper',
         'buster-shot',
         'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
         'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
@@ -22,7 +22,7 @@ $robot = array(
         ),
     'robot_rewards' => array(
         'abilities' => array(
-                array('level' => 0, 'token' => 'block-drop')
+                array('level' => 0, 'token' => 'block-dropper')
             )
         )
     );
