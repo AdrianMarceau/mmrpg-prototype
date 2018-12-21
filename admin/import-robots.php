@@ -300,7 +300,8 @@ if (!empty($mmrpg_index['robots'])){
         }*/
 
         // Define the flags
-        $temp_insert_array['robot_flag_hidden'] = in_array($temp_insert_array['robot_token'], array('bond-man', 'fake-man', 'rock')) ? 1 : 0;
+        if (!isset($robot_data['robot_flag_hidden'])){ $temp_insert_array['robot_flag_hidden'] = in_array($temp_insert_array['robot_token'], array('bond-man', 'fake-man', 'rock')) ? 1 : 0; }
+        else { $temp_insert_array['robot_flag_hidden'] = $robot_data['robot_flag_hidden']; }
         $temp_insert_array['robot_flag_complete'] = $robot_data['robot_image'] != 'robot' && $robot_data['robot_image'] != $robot_data['robot_class'] ? 1 : 0;
         $temp_insert_array['robot_flag_published'] = 1;
 
