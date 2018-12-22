@@ -53,6 +53,7 @@
                     $robot_info_price = $price;
                     $robot_info_name = $robot_info['robot_name'];
                     $robot_info_type = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none';
+                    $robot_info_type_name = !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral';
                     if (!empty($robot_info['robot_core2'])){ $robot_info_type .= '_'.$robot_info['robot_core2']; }
                     $robot_info_unlocked = mmrpg_prototype_robot_unlocked('', $robot_info_token);
                     $robot_info_hidden = empty($_SESSION['GAME']['values']['robot_database'][$robot_info_token]['robot_scanned']) ? true : false;
@@ -60,7 +61,8 @@
                         $global_item_quantities['robot-'.$robot_info_token] = 1;
                         $global_item_prices['buy']['robot-'.$robot_info_token] = 0;
                         $temp_master_prefix = preg_match('/^(a|e|i|o|u)/i', $robot_info_name) ? 'an ' : 'a ';
-                        $temp_info_tooltip = 'My apologies, but I haven\'t finished this one yet. If you encounter '.$temp_master_prefix.$robot_info_name.' in battle, would you mind scanning its data for me?';
+                        //$temp_info_tooltip = 'My apologies, but I haven\'t finished this one yet. If you encounter '.$temp_master_prefix.$robot_info_name.' in battle, would you mind scanning its data for me?';
+                        $temp_info_tooltip = 'My apologies, but I haven\'t finished this one yet. If you encounter any new '.$robot_info_type_name.' Core robots in battle, would you mind scanning their data for me?';
                         $robot_info_name = preg_replace('/[a-z]{1}/i', '?', $robot_info_name);
                     } else {
                         $global_item_quantities['robot-'.$robot_info_token] = $robot_info_unlocked ? 1 : 0;
