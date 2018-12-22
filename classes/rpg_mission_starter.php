@@ -21,6 +21,7 @@ class rpg_mission_starter extends rpg_mission {
         global $this_omega_factors_eight_two;
         global $this_omega_factors_nine;
         global $this_omega_factors_ten;
+        global $this_omega_factors_eleven;
 
         // Collect data on this robot and the rescue robot
         $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');

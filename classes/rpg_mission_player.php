@@ -21,6 +21,7 @@ class rpg_mission_player extends rpg_mission {
         global $this_omega_factors_eight_two;
         global $this_omega_factors_nine;
         global $this_omega_factors_ten;
+        global $this_omega_factors_eleven;
 
         $this_field_index = rpg_field::get_index();
 
