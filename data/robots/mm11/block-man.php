@@ -8,8 +8,8 @@ $robot = array(
     'robot_image_editor' => 4117,
     'robot_core' => 'earth',
     'robot_field' => 'mineral-quarry', // echo-field
-    'robot_weaknesses' => array('explode'),
-    'robot_resistances' => array(),
+    'robot_weaknesses' => array('explode', 'impact'),
+    'robot_resistances' => array('flame', 'cutter'),
     'robot_abilities' => array(
         'block-dropper',
         'buster-shot',
