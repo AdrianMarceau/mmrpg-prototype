@@ -780,21 +780,21 @@ if (!empty($this_shop_index['kalinka'])){
         $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Would you like me to build you a new robot or two? I created a few blueprints using your scan data.';
         $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array(
             // MM3 Robot Masters
-            'needle-man' => 48000, 'magnet-man' => 48000,
-            'gemini-man' => 48000, 'hard-man' => 48000,
-            'top-man' => 48000, 'snake-man' => 48000,
-            'spark-man' => 48000, 'shadow-man' => 48000,
+            'needle-man' => 32000, 'magnet-man' => 32000,
+            'gemini-man' => 32000, 'hard-man' => 32000,
+            'top-man' => 32000, 'snake-man' => 32000,
+            'spark-man' => 32000, 'shadow-man' => 32000,
             // MM5 Robot Masters
-            'gravity-man' => 48000, 'wave-man' => 48000,
-            'gyro-man' => 48000, 'star-man' => 48000,
+            'gravity-man' => 32000, 'wave-man' => 32000,
+            'gyro-man' => 32000, 'star-man' => 32000,
             // MM7 Robot Masters
-            'slash-man' => 48000,
+            'slash-man' => 32000,
             // MM8.5 Robot Masters
-            'magic-man' => 48000,
+            'magic-man' => 32000,
             // MM9 Robot Masters
-            'splash-woman' => 48000, 'jewel-man' => 48000,
+            'splash-woman' => 32000, 'jewel-man' => 32000,
             // MM11 Robot Masters
-            'block-man' => 48000
+            'block-man' => 32000
             );
     }
 
