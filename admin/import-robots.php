@@ -125,7 +125,7 @@ if (!empty($mmrpg_index['robots'])){
 
 // Sort the robot index based on robot number
 $temp_first_robots = array('mega-man', 'bass', 'proto-man', 'roll', 'disco', 'rhythm');
-$temp_last_robots = array('laser-man', 'shield-man', 'portal-man', 'prism-man', 'hallow-man', 'target-man', 'zephyr-woman', 'desert-man', 'blossom-woman', 'shark-man', 'magic-man', 'burner-man', 'pirate-man', 'ground-man', 'cold-man', 'dynamo-man');
+$temp_last_robots = array('laser-man', 'shield-man', 'portal-man', 'prism-man', 'hallow-man', 'target-man', 'zephyr-woman', 'desert-man', 'blossom-woman', 'shark-man'); //'magic-man', 'burner-man', 'pirate-man', 'ground-man', 'cold-man', 'dynamo-man'
 $temp_serial_ordering = array(
     'DLN', // Dr. Light Number
     'DWN', // Dr. Wily Number
