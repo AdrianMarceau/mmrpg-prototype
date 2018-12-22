@@ -42,7 +42,7 @@ $ability = array(
         // The first attachment always exists (though it's part of the attack itself)
         $this_attachment_info1 = $this_attachment_info;
 
-        // Only add an additional waves if there are enough targets
+        // Only add an additional attachments if there are enough targets
         if ($target_robots_active_count >= 2){
             $this_attachment_info2 = $this_attachment_info;
             $this_attachment_info2['ability_id'] .= '02';
@@ -52,7 +52,7 @@ $ability = array(
             $target_robot_2 = $get_next_target_robot();
         }
 
-        // Only add an additional waves if there are enough targets
+        // Only add an additional attachments if there are enough targets
         if ($target_robots_active_count >= 3){
             $this_attachment_info3 = $this_attachment_info;
             $this_attachment_info3['ability_id'] .= '03';
@@ -69,13 +69,13 @@ $ability = array(
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
-        // Update the wave object's object's animation frames
+        // Update the second attachment object's animation frames
         if ($this_robot->has_attachment($this_attachment_token.'_2')){
             $this_attachment_info2['ability_frame'] = 0;
             $this_robot->set_attachment($this_attachment_token.'_2', $this_attachment_info2);
         }
 
-        // Update the wave object's object's animation frames
+        // Update the third attachment object's animation frames
         if ($this_robot->has_attachment($this_attachment_token.'_3')){
             $this_attachment_info3['ability_frame'] = 0;
             $this_robot->set_attachment($this_attachment_token.'_3', $this_attachment_info3);
