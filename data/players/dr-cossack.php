@@ -113,12 +113,21 @@ $player = array(
         array('robot_id' => 389, 'robot_token' => 'strike-man'),
         array('robot_id' => 390, 'robot_token' => 'nitro-man'),
         array('robot_id' => 391, 'robot_token' => 'solar-man'),
-        // MEGA MAN GB
-        array('robot_id' => 392, 'robot_token' => 'enker'),
-        array('robot_id' => 393, 'robot_token' => 'punk'),
-        array('robot_id' => 394, 'robot_token' => 'ballade'),
+        // MEGA MAN 11
+        array('robot_id' => 392, 'robot_token' => 'block-man'),
+        array('robot_id' => 393, 'robot_token' => 'fuse-man'),
+        array('robot_id' => 394, 'robot_token' => 'blast-man'),
+        array('robot_id' => 395, 'robot_token' => 'acid-man'),
+        array('robot_id' => 396, 'robot_token' => 'tundra-man'),
+        array('robot_id' => 397, 'robot_token' => 'torch-man'),
+        array('robot_id' => 398, 'robot_token' => 'impact-man'),
+        array('robot_id' => 399, 'robot_token' => 'bounce-man'),
         // PROTOTYPE BONUS
-        array('robot_id' => 3000, 'robot_token' => 'met')
+        array('robot_id' => 3000, 'robot_token' => 'met'),
+        // MEGA MAN GB
+        array('robot_id' => 3001, 'robot_token' => 'enker'),
+        array('robot_id' => 3002, 'robot_token' => 'punk'),
+        array('robot_id' => 3003, 'robot_token' => 'ballade')
         ),
     'player_robots_unlockable' => array(
         'rhythm', 'proto-man',
