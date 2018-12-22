@@ -7,13 +7,13 @@
 // Define the base omega factors for ITEMS
 $this_omega_factors_items = array('energy-pellet','energy-capsule','weapon-pellet','weapon-capsule', 'energy-tank', 'weapon-tank', 'yashichi', 'extra-life');
 
-// Define the base omega factors for SYSTEM (MEGA MAN 0)
+// Define the base omega factors for MEGA MAN 0 (BASE)
 $this_omega_factors_system = array();
 $this_omega_factors_system[] = array('robot' => 'mega-man', 'field' => 'light-laboratory', 'type' => '');
 $this_omega_factors_system[] = array('robot' => 'bass', 'field' => 'wily-castle', 'type' => '');
 $this_omega_factors_system[] = array('robot' => 'proto-man', 'field' => 'cossack-citadel', 'type' => '');
 
-// Define the base omega factors for DR. LIGHT (MEGA MAN 1)
+// Define the base omega factors for MEGA MAN 1 (DR. LIGHT)
 $this_omega_factors_one = array();
 $this_omega_factors_one[] = array('robot' => 'cut-man', 'field' => 'abandoned-warehouse', 'type' => 'cutter');
 $this_omega_factors_one[] = array('robot' => 'guts-man', 'field' => 'mountain-mines', 'type' => 'impact');
@@ -24,7 +24,7 @@ $this_omega_factors_one[] = array('robot' => 'elec-man', 'field' => 'electrical-
 $this_omega_factors_one[] = array('robot' => 'time-man', 'field' => 'clock-citadel', 'type' => 'time');
 $this_omega_factors_one[] = array('robot' => 'oil-man', 'field' => 'oil-wells', 'type' => 'earth');
 
-// Define the base omega factors for DR. WILY (MEGA MAN 2)
+// Define the base omega factors for MEGA MAN 2 (DR. WILY)
 $this_omega_factors_two = array();
 $this_omega_factors_two[] = array('robot' => 'air-man', 'field' => 'sky-ridge', 'type' => 'wind');
 $this_omega_factors_two[] = array('robot' => 'bubble-man', 'field' => 'waterfall-institute', 'type' => 'water');
@@ -35,7 +35,7 @@ $this_omega_factors_two[] = array('robot' => 'metal-man', 'field' => 'industrial
 $this_omega_factors_two[] = array('robot' => 'quick-man', 'field' => 'underground-laboratory', 'type' => 'swift');
 $this_omega_factors_two[] = array('robot' => 'wood-man', 'field' => 'preserved-forest', 'type' => 'nature');
 
-// Define the base omega factors for DR. COSSACK (MEGA MAN 4)
+// Define the base omega factors for MEGA MAN 4 (DR. COSSACK)
 $this_omega_factors_three = array();
 $this_omega_factors_three[] = array('robot' => 'bright-man', 'field' => 'lighting-control', 'type' => 'electric');
 $this_omega_factors_three[] = array('robot' => 'toad-man', 'field' => 'rainy-sewers', 'type' => 'water');
@@ -48,7 +48,7 @@ $this_omega_factors_three[] = array('robot' => 'skull-man', 'field' => 'robosaur
 
 // --- //
 
-// Define the expansion omega factors for DR. LIGHT (MEGA MAN 3)
+// Define the expansion omega factors for MEGA MAN 3
 $this_omega_factors_four = array();
 $this_omega_factors_four[] = array('robot' => 'needle-man', 'field' => 'construction-site', 'type' => 'cutter');
 $this_omega_factors_four[] = array('robot' => 'magnet-man', 'field' => 'magnetic-generator', 'type' => 'missile');
@@ -59,7 +59,7 @@ $this_omega_factors_four[] = array('robot' => 'snake-man', 'field' => 'serpent-c
 $this_omega_factors_four[] = array('robot' => 'spark-man', 'field' => 'power-plant', 'type' => 'electric');
 $this_omega_factors_four[] = array('robot' => 'shadow-man', 'field' => 'septic-system', 'type' => 'shadow');
 
-// Define the expansion omega factors for DR. WILY (MEGA MAN 5)
+// Define the expansion omega factors for MEGA MAN 5
 $this_omega_factors_five = array();
 $this_omega_factors_five[] = array('robot' => 'stone-man', 'field' => 'field', 'type' => 'earth');
 $this_omega_factors_five[] = array('robot' => 'gravity-man', 'field' => 'field', 'type' => 'electric');
@@ -70,7 +70,7 @@ $this_omega_factors_five[] = array('robot' => 'charge-man', 'field' => 'field', 
 $this_omega_factors_five[] = array('robot' => 'napalm-man', 'field' => 'field', 'type' => 'explode');
 $this_omega_factors_five[] = array('robot' => 'crystal-man', 'field' => 'crystal-catacombs', 'type' => 'crystal'); //'crystal'
 
-// Define the expansion omega factors for DR. COSSACK (MEGA MAN 6)
+// Define the expansion omega factors for MEGA MAN 6
 $this_omega_factors_six = array();
 $this_omega_factors_six[] = array('robot' => 'blizzard-man', 'field' => 'field', 'type' => 'freeze');
 $this_omega_factors_six[] = array('robot' => 'centaur-man', 'field' => 'field', 'type' => 'time');
@@ -81,9 +81,7 @@ $this_omega_factors_six[] = array('robot' => 'tomahawk-man', 'field' => 'field',
 $this_omega_factors_six[] = array('robot' => 'wind-man', 'field' => 'field', 'type' => 'wind');
 $this_omega_factors_six[] = array('robot' => 'yamato-man', 'field' => 'field', 'type' => 'cutter');
 
-// --- //
-
-// Define the expansion omega factors for DR. LIGHT (MEGA MAN 7)
+// Define the expansion omega factors for MEGA MAN 7
 $this_omega_factors_seven = array();
 $this_omega_factors_seven[] = array('robot' => 'freeze-man', 'field' => 'field', 'type' => 'freeze');
 $this_omega_factors_seven[] = array('robot' => 'junk-man', 'field' => 'field', 'type' => 'earth');
@@ -94,7 +92,7 @@ $this_omega_factors_seven[] = array('robot' => 'slash-man', 'field' => 'field', 
 $this_omega_factors_seven[] = array('robot' => 'shade-man', 'field' => 'field', 'type' => 'shadow');
 $this_omega_factors_seven[] = array('robot' => 'turbo-man', 'field' => 'field', 'type' => 'swift');
 
-// Define the expansion omega factors for DR. WILY (MEGA MAN 8)
+// Define the expansion omega factors for MEGA MAN 8
 $this_omega_factors_eight = array();
 $this_omega_factors_eight[] = array('robot' => 'tengu-man', 'field' => 'field', 'type' => 'wind');
 //$this_omega_factors_eight[] = array('robot' => 'astro-man', 'field' => 'field', 'type' => 'space');
@@ -105,7 +103,7 @@ $this_omega_factors_eight[] = array('robot' => 'frost-man', 'field' => 'field', 
 $this_omega_factors_eight[] = array('robot' => 'grenade-man', 'field' => 'field', 'type' => 'explode');
 //$this_omega_factors_eight[] = array('robot' => 'aqua-man', 'field' => 'field', 'type' => 'water');
 
-//// Define the expansion omega factors for KING (MEGA MAN 8.5 / MEGA MAN & BASS)
+//// Define the expansion omega factors for MEGA MAN 8.5 / MEGA MAN & BASS
 //$this_omega_factors_eight_two[] = array('robot' => 'dynamo-man', 'field' => 'field', 'type' => 'electric');
 $this_omega_factors_eight_two[] = array('robot' => 'cold-man', 'field' => 'field', 'type' => 'freeze');
 //$this_omega_factors_eight_two[] = array('robot' => 'ground-man', 'field' => 'field', 'type' => 'earth');
@@ -113,7 +111,7 @@ $this_omega_factors_eight_two[] = array('robot' => 'cold-man', 'field' => 'field
 $this_omega_factors_eight_two[] = array('robot' => 'burner-man', 'field' => 'field', 'type' => 'flame');
 $this_omega_factors_eight_two[] = array('robot' => 'magic-man', 'field' => 'field', 'type' => 'shadow');
 
-// Define the expansion omega factors for DR. COSSACK (MEGA MAN 9)
+// Define the expansion omega factors for MEGA MAN 9
 $this_omega_factors_nine = array();
 $this_omega_factors_nine[] = array('robot' => 'concrete-man', 'field' => 'field', 'type' => 'earth');
 $this_omega_factors_nine[] = array('robot' => 'tornado-man', 'field' => 'field', 'type' => 'wind');
@@ -124,7 +122,7 @@ $this_omega_factors_nine[] = array('robot' => 'hornet-man', 'field' => 'field', 
 $this_omega_factors_nine[] = array('robot' => 'magma-man', 'field' => 'field', 'type' => 'flame');
 $this_omega_factors_nine[] = array('robot' => 'galaxy-man', 'field' => 'field', 'type' => 'space');
 
-// Define the expansion omega factors for DR. LIGHT (MEGA MAN 10)
+// Define the expansion omega factors for MEGA MAN 10
 $this_omega_factors_ten = array();
 $this_omega_factors_ten[] = array('robot' => 'blade-man', 'field' => 'field', 'type' => 'cutter');
 $this_omega_factors_ten[] = array('robot' => 'pump-man', 'field' => 'field', 'type' => 'water');
@@ -134,5 +132,16 @@ $this_omega_factors_ten[] = array('robot' => 'sheep-man', 'field' => 'field', 't
 $this_omega_factors_ten[] = array('robot' => 'strike-man', 'field' => 'field', 'type' => 'impact');
 $this_omega_factors_ten[] = array('robot' => 'nitro-man', 'field' => 'field', 'type' => 'swift');
 $this_omega_factors_ten[] = array('robot' => 'solar-man', 'field' => 'field', 'type' => 'flame');
+
+// Define the expansion omega factors for MEGA MAN 11
+$this_omega_factors_eleven = array();
+$this_omega_factors_eleven[] = array('robot' => 'block-man', 'field' => 'field', 'type' => 'earth');
+//$this_omega_factors_eleven[] = array('robot' => 'fuse-man', 'field' => 'field', 'type' => 'electric');
+//$this_omega_factors_eleven[] = array('robot' => 'blast-man', 'field' => 'field', 'type' => 'explode');
+//$this_omega_factors_eleven[] = array('robot' => 'acid-man', 'field' => 'field', 'type' => 'water');
+//$this_omega_factors_eleven[] = array('robot' => 'tundra-man', 'field' => 'field', 'type' => 'freeze');
+//$this_omega_factors_eleven[] = array('robot' => 'torch-man', 'field' => 'field', 'type' => 'flame');
+//$this_omega_factors_eleven[] = array('robot' => 'impact-man', 'field' => 'field', 'type' => 'impact');
+//$this_omega_factors_eleven[] = array('robot' => 'bounce-man', 'field' => 'field', 'type' => 'swift');
 
 ?>

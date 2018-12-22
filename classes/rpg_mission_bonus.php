@@ -21,6 +21,7 @@ class rpg_mission_bonus extends rpg_mission {
         global $this_omega_factors_eight_two;
         global $this_omega_factors_nine;
         global $this_omega_factors_ten;
+        global $this_omega_factors_eleven;
 
         // Collect the robot index for calculation purposes
         $robot_index_query = "SELECT *,

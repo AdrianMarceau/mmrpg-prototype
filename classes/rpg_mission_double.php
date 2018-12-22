@@ -21,6 +21,7 @@ class rpg_mission_double extends rpg_mission {
         global $this_omega_factors_eight_two;
         global $this_omega_factors_nine;
         global $this_omega_factors_ten;
+        global $this_omega_factors_eleven;
 
         // Collect the robot index for calculation purposes
         $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
@@ -112,7 +113,8 @@ class rpg_mission_double extends rpg_mission {
                     $this_omega_factors_eight,
                     $this_omega_factors_eight_two,
                     $this_omega_factors_nine,
-                    $this_omega_factors_ten
+                    $this_omega_factors_ten,
+                    $this_omega_factors_eleven
                     ));
             } elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){
                 $temp_factors_list = array($this_omega_factors_two, array_merge(
@@ -125,6 +127,7 @@ class rpg_mission_double extends rpg_mission {
                     $this_omega_factors_eight_two,
                     $this_omega_factors_nine,
                     $this_omega_factors_ten,
+                    $this_omega_factors_eleven,
                     $this_omega_factors_one
                     ));
             } elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){
@@ -137,6 +140,7 @@ class rpg_mission_double extends rpg_mission {
                     $this_omega_factors_eight_two,
                     $this_omega_factors_nine,
                     $this_omega_factors_ten,
+                    $this_omega_factors_eleven,
                     $this_omega_factors_one,
                     $this_omega_factors_two
                     ));
