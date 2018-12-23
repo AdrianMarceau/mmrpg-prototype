@@ -1464,8 +1464,16 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
     $temp_offset_opacity = 0.75;
     $text_sprites_markup = '';
     $temp_player_robots = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'];
-    $temp_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $temp_db_tokens = "'".implode("','", array_keys($temp_player_robots))."'";
+    $temp_db_fields = rpg_robot::get_index_fields(true, 'robots');
+    $temp_robot_index = $db->get_array_list("SELECT
+        {$temp_db_fields}
+        FROM mmrpg_index_robots AS robots
+        WHERE robots.robot_flag_complete = 1
+        AND robot_token IN ({$temp_db_tokens})
+        ;", 'robot_token');
     foreach ($temp_player_robots AS $token => $info){
+        if (!isset($temp_robot_index[$token])){ continue; }
         $index = rpg_robot::parse_index_info($temp_robot_index[$token]);
         $info = array_merge($index, $info);
         if (mmrpg_prototype_robot_unlocked($player_token, $token)){
