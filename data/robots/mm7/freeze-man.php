@@ -7,6 +7,7 @@ $robot = array(
     'robot_token' => 'freeze-man',
     'robot_core' => 'freeze',
     'robot_description' => 'Icy Blasts Robot',
+    'robot_field' => 'arctic-jungle', // echo-field
     'robot_image_editor' => 3842,
     'robot_image_size' => 80,
     'robot_energy' => 100,
