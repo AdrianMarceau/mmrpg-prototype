@@ -39,7 +39,7 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'summon',
-            'success' => array(1, 0, 100, 10, $this_robot->print_name().' summons a '.$this_ability->print_name().'!')
+            'success' => array(0, 0, 100, 10, $this_robot->print_name().' summons a '.$this_ability->print_name().'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true, 'prevent_stats_text' => true));
 
@@ -48,14 +48,12 @@ $ability = array(
         $this_ability->ability_frame_classes = 'sprite_fullscreen ';
         $this_ability->update_session();
 
-        // Ensure this robot stays in the summon position for the duration of the attack
-        $this_robot->robot_frame = 'summon';
-        $this_robot->update_session();
-
 
         // -- DAMAGE TARGETS -- //
 
         // Inflict damage on the opposing robot
+        $num_hits_counter = 0;
+        $this_robot->set_frame('throw');
         $target_robot->set_attachment($this_attachment_token.'_fx', $this_attachment_info);
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
@@ -75,11 +73,13 @@ $ability = array(
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
         $target_robot->unset_attachment($this_attachment_token.'_fx');
+        $num_hits_counter++;
 
         // Loop through the target's benched robots, inflicting damage to each
         $backup_target_robots_active = $target_player->values['robots_active'];
         foreach ($backup_target_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
+            $this_robot->set_frame($num_hits_counter % 2 === 0 ? 'defend' : 'taunt');
             $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
             $temp_target_robot->set_attachment($this_attachment_token.'_fx', $this_attachment_info);
             $this_ability->ability_results_reset();
@@ -103,7 +103,11 @@ $ability = array(
             $energy_damage_amount = $this_ability->ability_damage;
             $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
             $temp_target_robot->unset_attachment($this_attachment_token.'_fx');
+            $num_hits_counter++;
         }
+
+        // Return the user to their base frame
+        $this_robot->set_frame('base');
 
         // REMOVE ATTACHMENTS
         if (true){
