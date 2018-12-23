@@ -16,19 +16,6 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Count the number of active robots on the target's side of the  field
-        $target_robots_active_count = $target_player->counters['robots_active'];
-        $target_robot_ids = array($target_robot->robot_id);
-        $get_next_target_robot = function() use($this_battle, $target_player, &$target_robot_ids){
-            foreach ($target_player->values['robots_active'] AS $key => $info){
-                if (!in_array($info['robot_id'], $target_robot_ids)){
-                    $target_robot_ids[] = $info['robot_id'];
-                    $next_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
-                    return $next_target_robot;
-                    }
-                }
-            };
-
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         $this_attachment_info = array(
@@ -143,18 +130,14 @@ $ability = array(
         // -- DISABLE FALLEN -- //
 
         // Trigger the disabled event on the targets now if necessary
-        if ($target_robot->robot_status == 'disabled'){
-            $target_robot->trigger_disabled($this_robot);
-        }
+        if ($target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot); }
         else { $target_robot->robot_frame = 'base'; }
         $target_robot->update_session();
         foreach ($backup_target_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ continue; }
             $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
             $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info2);
-            if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
-                $temp_target_robot->trigger_disabled($this_robot);
-            }
+            if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){ $temp_target_robot->trigger_disabled($this_robot); }
             else { $temp_target_robot->robot_frame = 'base'; }
             $temp_target_robot->update_session();
         }
