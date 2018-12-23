@@ -59,7 +59,7 @@ $ability = array(
             'kind' => 'energy',
             'modifiers' => true,
             'kickback' => array(5, 0, 0),
-            'success' => array(0, -5, 0, 99, 'The '.$this_ability->print_name().' battered a target with ice!'),
+            'success' => array(0, -5, 0, 99, 'The hailstorm battered the target with ice!'),
             'failure' => array(0, -5, 0, -10,'The '. $this_ability->print_name().' missed the first target&hellip;')
             ));
         $this_ability->recovery_options_update(array(
@@ -67,7 +67,7 @@ $ability = array(
             'modifiers' => true,
             'frame' => 'taunt',
             'kickback' => array(5, 0, 0),
-            'success' => array(0, -5, 0, 9, 'The '.$this_ability->print_name().' was absorbed by the target!'),
+            'success' => array(0, -5, 0, 9, 'The hailstorm was absorbed by the target!'),
             'failure' => array(0, -5, 0, 9, 'The '.$this_ability->print_name().' had no effect on the first target&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
