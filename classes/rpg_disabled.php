@@ -230,21 +230,36 @@ class rpg_disabled {
                     // If the robot is at level 100 or a mecha, stat boosts are immediately rewarded
                     elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->$prop_stat_base < MMRPG_SETTINGS_STATS_MAX){
 
+                        // Create/validate the session variables if not mecha
+                        $current_bonus_amount = 0;
+                        if ($target_robot->robot_class == 'master'){
+                            if (!isset($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] = 0; }
+                            $current_bonus_amount = $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] >= $temp_robot_stats[$stat]['bonus_max'] ? true : false;
+                        }
+
                         // If the stat is already maxed, just continue
-                        if ($target_robot->$prop_stat_base >= $temp_robot_stats[$stat]['max']){ continue; }
+                        if ($current_bonus_amount >= $temp_robot_stats[$stat]['bonus_max']){ continue; }
 
                         // Define the base stat boost based on robot base stats
                         $temp_stat_base_boost = ceil($this_stat_boost);
                         if (($target_robot->$prop_stat_base + $temp_stat_base_boost) > MMRPG_SETTINGS_STATS_MAX){ $temp_stat_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->$prop_stat_base; }
-                        if (($target_robot->$prop_stat_base + $temp_stat_base_boost) > $temp_robot_stats[$stat]['max']){ $temp_stat_base_boost = $temp_robot_stats[$stat]['max'] - $target_robot->$prop_stat_base; }
+                        if (($current_bonus_amount + $temp_stat_base_boost) > $temp_robot_stats[$stat]['bonus_max']){ $temp_stat_base_boost = $temp_robot_stats[$stat]['bonus_max'] - $current_bonus_amount; }
 
                         // Increment this robot's stat by the calculated amount
                         $target_robot->$prop_stat_base += $temp_stat_base_boost;
                         $target_robot->update_session();
                         $target_player->update_session();
 
-                        // Check to see if this stat can now be considered "maxed"
-                        $stat_is_maxed = $target_robot->$prop_stat_base >= $temp_robot_stats[$stat]['max'] ? true : false;
+                        // Update the session variables with the rewarded stat boost if not mecha
+                        $stat_is_maxed = false;
+                        if ($target_robot->robot_class == 'master'){
+                            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] = ceil($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat]);
+                            $temp_stat_session_boost = round($this_stat_boost);
+                            if ($temp_stat_session_boost < 1){ $temp_stat_session_boost = 1; }
+                            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] += $temp_stat_session_boost;
+                            $new_bonus_amount = $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] >= $temp_robot_stats[$stat]['bonus_max'] ? true : false;
+                            $stat_is_maxed = $target_robot->robot_level >= 100 && $new_bonus_amount >= $temp_robot_stats[$stat]['bonus_max'] ? true : false;
+                        }
 
                         // Display an event showing the recovery increase
                         $event_options = array();
@@ -258,10 +273,10 @@ class rpg_disabled {
                         $event_options['this_ability_results']['total_actions'] = $temp_boost_actions++;
                         $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
                         $event_options['console_show_target'] = false;
-                        $event_body = $target_robot->print_name().' downloads '.$stat_system[$stat].' data from the target robot! ';
+                        $event_body = $target_robot->print_name().' downloads '.$stat_system[$stat].' data from the target! ';
                         $event_body .= '<br />';
-                        if ($stat_is_maxed){ $event_body .= $target_robot->print_name().'&#39;s base '.$stat.' maxed-out at <span class="recovery_amount type type_'.$stat.'">'.$temp_robot_stats[$stat]['max'].'</span>! Congratulations!'; }
-                        else { $event_body .= $target_robot->print_name().'&#39;s base '.$stat.' grew by <span class="recovery_amount">'.$temp_stat_base_boost.'</span>! '; }
+                        $event_body .= $target_robot->print_name().'&#39;s base '.$stat.' grew by <span class="recovery_amount">'.$temp_stat_base_boost.'</span>! ';
+                        if ($stat_is_maxed){ $event_body .= '<span class="recovery_amount type type_'.$stat.'">Max '.ucfirst($stat).'! &#9733;</span>'; }
                         $frame = 'taunt';
                         if ($stat == 'energy'){ $frame = 'summon'; }
                         elseif ($stat == 'attack'){ $frame = 'shoot'; }
@@ -269,15 +284,6 @@ class rpg_disabled {
                         elseif ($stat == 'speed'){ $frame = 'slide'; }
                         $target_robot->set_frame($frame);
                         $this_battle->events_create($target_robot, $this_robot, $event_header, $event_body, $event_options);
-
-                        // Update the session variables with the rewarded stat boost if not mecha
-                        if ($target_robot->robot_class == 'master'){
-                            if (!isset($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] = 0; }
-                            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] = ceil($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat]);
-                            $temp_stat_session_boost = round($this_stat_boost);
-                            if ($temp_stat_session_boost < 1){ $temp_stat_session_boost = 1; }
-                            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] += $temp_stat_session_boost;
-                        }
 
 
                     }
