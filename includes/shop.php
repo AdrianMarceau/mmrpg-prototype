@@ -791,6 +791,8 @@ if (!empty($this_shop_index['kalinka'])){
             'blizzard-man' => 48000,
             // MM7 Robot Masters
             'freeze-man' => 48000, 'slash-man' => 48000,
+            // MM8 Robot Masters
+            'frost-man' => 48000,
             // MM8.5 Robot Masters
             'magic-man' => 48000,
             // MM9 Robot Masters
