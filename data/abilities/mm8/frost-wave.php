@@ -1,11 +1,11 @@
 <?
-// ICE WAVE
+// FROST WAVE
 $ability = array(
-    'ability_name' => 'Ice Wave',
-    'ability_token' => 'ice-wave',
+    'ability_name' => 'Frost Wave',
+    'ability_token' => 'frost-wave',
     'ability_game' => 'MM08',
     'ability_group' => 'MM08/Weapons/062',
-    'ability_description' => 'The user creates an ice wave that races toward the target then collides to inflict damage and lower their attack stat!',
+    'ability_description' => 'The user summons a wave of frozen spikes that race toward the target and collide to inflict damage and lower the target\'s attack stat!',
     'ability_type' => 'freeze',
     'ability_energy' => 4,
     'ability_speed' => 3,

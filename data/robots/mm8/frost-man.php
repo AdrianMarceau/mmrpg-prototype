@@ -17,7 +17,7 @@ $robot = array(
     'robot_weaknesses' => array('explode', 'flame'),
     'robot_resistances' => array('freeze', 'water'),
     'robot_abilities' => array(
-        'ice-wave',
+        'frost-wave',
         'buster-shot',
         'attack-boost', 'attack-break', 'attack-swap', 'attack-mode',
         'defense-boost', 'defense-break', 'defense-swap', 'defense-mode',
@@ -28,7 +28,7 @@ $robot = array(
         ),
     'robot_rewards' => array(
         'abilities' => array(
-                array('level' => 0, 'token' => 'ice-wave')
+                array('level' => 0, 'token' => 'frost-wave')
             )
         ),
     'robot_quotes' => array(
