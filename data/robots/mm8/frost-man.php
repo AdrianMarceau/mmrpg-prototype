@@ -9,6 +9,7 @@ $robot = array(
     'robot_image_size' => 80,
     'robot_core' => 'freeze',
     'robot_description' => 'Frozen Brute Robot',
+    'robot_field' => 'arctic-jungle', // echo-field
     'robot_energy' => 100,
     'robot_attack' => 100,
     'robot_defense' => 100,
