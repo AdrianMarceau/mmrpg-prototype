@@ -5,10 +5,12 @@ $ability = array(
     'ability_token' => 'ice-wave',
     'ability_game' => 'MM08',
     'ability_group' => 'MM08/Weapons/062',
-    'ability_description' => '...',
+    'ability_description' => 'The user creates an ice wave that races toward the target then collides to inflict damage and lower their attack stat!',
     'ability_type' => 'freeze',
-    'ability_damage' => 10,
-    'ability_accuracy' => 90,
+    'ability_energy' => 4,
+    'ability_speed' => 3,
+    'ability_damage' => 12,
+    'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -17,7 +19,7 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'shoot',
-            'success' => array(0, 75, 0, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
+            'success' => array(0, 75, 0, 10, $this_robot->print_name().' fires the '.$this_ability->print_name().'!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -38,9 +40,31 @@ $ability = array(
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
+        // Randomly trigger a defense break if the ability was successful
+        if ($target_robot->robot_status != 'disabled'
+            && $this_ability->ability_results['this_result'] != 'failure'){
+
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_stat_break($target_robot, 'attack', 1);
+
+        }
+
         // Return true on success
         return true;
 
-    }
+        },
+    'ability_function_onload' => function($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // If the user is holding a Target Module, allow bench targeting
+        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
+
+        // Return true on success
+        return true;
+
+        }
     );
 ?>
