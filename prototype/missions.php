@@ -110,10 +110,13 @@ else {
 
             /* -- Generate Chapter Links -- */
 
+            // Collect the current star count for everyone
+            $battle_star_counter = mmrpg_prototype_stars_unlocked();
+
             // CHAPTER ONE(0) Intro
             if ($chapters_unlocked['0']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '0' ? 'chapter_link_active ' : '').'" href="#" data-chapter="0">Chapter One</a>';
+                echo '<a class="chapter_link '.($temp_last_chapter === '0' ? 'chapter_link_active ' : '').'" href="#" data-chapter="0">Chapter 1</a>';
             } else {
                 $chapters_display_count++;
                 echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -122,7 +125,7 @@ else {
             // CHAPTER TWO(1) Masters
             if ($chapters_unlocked['1']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '1' ? 'chapter_link_active ' : '').'" href="#" data-chapter="1">Chapter Two</a>';
+                echo '<a class="chapter_link '.($temp_last_chapter === '1' ? 'chapter_link_active ' : '').'" href="#" data-chapter="1">Chapter 2</a>';
             } else {
                 $chapters_display_count++;
                 echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -131,7 +134,7 @@ else {
             // CHAPTER THREE(2) Rivals
             if ($chapters_unlocked['2']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '2' ? 'chapter_link_active ' : '').'" href="#" data-chapter="2">Chapter Three</a>';
+                echo '<a class="chapter_link '.($temp_last_chapter === '2' ? 'chapter_link_active ' : '').'" href="#" data-chapter="2">Chapter 3</a>';
             } else {
                 $chapters_display_count++;
                 echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -140,10 +143,10 @@ else {
             // CHAPTER FOUR(3) Fusions
             if ($chapters_unlocked['3']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '3' ? 'chapter_link_active ' : '').'" href="#" data-chapter="3">Chapter Four</a>';
+                echo '<a class="chapter_link '.($temp_last_chapter === '3' ? 'chapter_link_active ' : '').'" href="#" data-chapter="3">Chapter 4</a>';
             } else {
                 $chapters_display_count++;
-                if ($chapters_unlocked['2'] && $battle_complete_counter > MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT){
+                if ($battle_star_counter > 0 && $chapters_unlocked['2'] && $battle_complete_counter > MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT){
                     $text = '<span>'.
                     '&#9733; &times; '.MMRPG_SETTINGS_CHAPTER4_STARLOCK.
                     '</span>';
@@ -156,10 +159,10 @@ else {
             // CHAPTER FIVE(4a-c) Finals
             if ($chapters_unlocked['4a']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '4' ? 'chapter_link_active ' : '').'" href="#" data-chapter="4">Chapter Five</a>';
+                echo '<a class="chapter_link '.($temp_last_chapter === '4' ? 'chapter_link_active ' : '').'" href="#" data-chapter="4">Chapter 5</a>';
             } else {
                 $chapters_display_count++;
-                if ($chapters_unlocked['3']){
+                if ($battle_star_counter > 0 && $chapters_unlocked['3']){
                     $text = '<span>'.
                     '&#9733; &times; '.MMRPG_SETTINGS_CHAPTER5_STARLOCK.
                     '</span>';
@@ -172,13 +175,13 @@ else {
             // CHAPTER BONUS(5)
             if ($chapters_unlocked['5']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus Chapter</a>';
+                echo '<a class="chapter_link bonus '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus</a>';
                 }
 
             // CHAPTER PLAYER(6)
             if ($chapters_unlocked['6']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6">Player Battles</a>';
+                echo '<a class="chapter_link players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6">Players</a>';
                 }
 
         // Collect generated chapter markup
