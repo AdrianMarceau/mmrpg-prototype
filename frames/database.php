@@ -112,7 +112,7 @@ $database_page_groups[7] = array('MM07');
 $database_page_groups[8] = array('MM08', 'MM085');
 $database_page_groups[9] = array('MM09');
 $database_page_groups[10] = array('MM10');
-$database_page_groups[11] = array('MM19');
+$database_page_groups[11] = array('MM11');
 $database_page_groups[12] = array('MM30');
 $database_page_groups[13] = array('MMEXE', 'MM21', 'MMRPG2');
 
