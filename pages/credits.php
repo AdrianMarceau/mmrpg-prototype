@@ -176,7 +176,13 @@ foreach ($contributor_ids AS $id){
 <div class="subbody" style="margin-bottom: 2px; ">
     <p class="text">
         <a href="http://www.sprites-inc.co.uk/files/Classic/" target="_blank"><strong>Sprites Inc.</strong></a> <span class="pipe">|</span> <span>Resource</span> <span class="pipe">|</span> <em>Official Sprites</em><br />
-        Many (and maybe all) sprites that appear in this game were found on the number one Mega Man sprite resource - Sprites Inc. - and without the the website I'm sure many Mega Man fan-games would not have been possible.  Even the custom sprites are based on those found on this website, and I cannot thank the creators and contributors enough for their efforts and the fantastic service they provide.  I highly recommend the website for all your Mega Man sprite needs.  :)
+        The majority of the sprites that appear in this game were found on the number one Mega Man sprite resource - Sprites Inc. - and without the the website I'm sure many Mega Man fan-games would not have been possible.  Even the custom sprites are based on those found on this website, and I cannot thank the creators and contributors enough for their efforts and the fantastic service they provide.  I highly recommend the website for all your Mega Man sprite needs.  :)
+    </p>
+</div>
+<div class="subbody" style="margin-bottom: 2px; ">
+    <p class="text">
+        <a href="https://www.spriters-resource.com/nes/" target="_blank"><strong>The Spriters Resource</strong></a> <span class="pipe">|</span> <span>Resource</span> <span class="pipe">|</span> <em>Official Sprites</em><br />
+        Miscellaneous other sprites that appear in this game have bits and pieces of sheets found on The Spriters Resource.  While Sprites Inc. is the #1 shop for Mega Man series sprites, The Spriters Resource has virtually everything other game series covered.  Another highly recommended site if what you're looking for can't be found at the above.  Thank you to all the contributors of that site who inadvertently helped with the development of this game. :)
     </p>
 </div>
 <div class="subbody" style="margin-bottom: 2px; ">

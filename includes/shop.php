@@ -787,8 +787,12 @@ if (!empty($this_shop_index['kalinka'])){
             // MM5 Robot Masters
             'gravity-man' => 32000, 'wave-man' => 32000,
             'gyro-man' => 32000, 'star-man' => 32000,
+            // MM6 Robot Masters
+            'blizzard-man' => 48000,
             // MM7 Robot Masters
-            'slash-man' => 32000,
+            'freeze-man' => 48000, 'slash-man' => 48000,
+            // MM8 Robot Masters
+            'frost-man' => 48000,
             // MM8.5 Robot Masters
             'magic-man' => 32000,
             // MM9 Robot Masters
