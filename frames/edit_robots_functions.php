@@ -47,7 +47,10 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
         $temp_robot_index = rpg_robot::get_index_custom($temp_robot_tokens);
 
         foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
-            if (empty($robot_token) || !isset($temp_robot_index[$robot_token])){ continue; }
+            if (empty($robot_token) || !isset($temp_robot_index[$robot_token])){
+                unset($allowed_edit_data[$player_token]['player_robots'][$robot_token]);
+                continue;
+            }
             $robot_index_info = $temp_robot_index[$robot_token];
 
             // Merge the robot and index info then append the token and info
@@ -72,6 +75,7 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
 
             }
         }
+
     }
 
     //$allowed_edit_data = array_reverse($allowed_edit_data, true);

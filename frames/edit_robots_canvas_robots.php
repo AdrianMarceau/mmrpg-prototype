@@ -25,6 +25,7 @@ foreach($allowed_edit_data AS $player_token => $player_info){
             echo '<div class="wrapper_overflow">';
                 foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
                     $robot_key = $key_counter;
+                    if (!isset($mmrpg_database_robots[$robot_token])){ continue; }
                     $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
                     $temp_robot_rewards = array();
 
