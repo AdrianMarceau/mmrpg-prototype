@@ -172,16 +172,37 @@ else {
                 echo '<a class="chapter_link chapter_link_disabled">'.$text.'</a>';
             }
 
-            // CHAPTER PLAYER(6)
-            if ($chapters_unlocked['6']){
+            // Pre-check to see how many extra tabs to add
+            $num_extra = 0;
+            $num_extra += $allow_player_battles = $chapters_unlocked['6'] ? 1 : 0;
+            $num_extra += $allow_bonus_fields = $chapters_unlocked['5'] ? 1 : 0;
+            $num_extra += $allow_star_fields = 0;
+
+            // CHAPTER STARS(7)
+            if ($allow_star_fields){
                 $chapters_display_count++;
-                echo '<a class="chapter_link players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6">Players</a>';
+                echo '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7">Stars</a>';
+                } elseif ($num_extra > 0){
+                $chapters_display_count++;
+                echo '<a class="chapter_link extra chapter_link_disabled">???</a>';
+                }
+
+            // CHAPTER PLAYER(6)
+            if ($allow_player_battles){
+                $chapters_display_count++;
+                echo '<a class="chapter_link extra players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6">Players</a>';
+                } elseif ($num_extra > 0){
+                $chapters_display_count++;
+                echo '<a class="chapter_link extra chapter_link_disabled">???</a>';
                 }
 
             // CHAPTER BONUS(5)
-            if ($chapters_unlocked['5']){
+            if ($allow_bonus_fields){
                 $chapters_display_count++;
-                echo '<a class="chapter_link bonus '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus</a>';
+                echo '<a class="chapter_link extra bonus '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus</a>';
+                } elseif ($num_extra > 0){
+                $chapters_display_count++;
+                echo '<a class="chapter_link extra chapter_link_disabled">???</a>';
                 }
 
         // Collect generated chapter markup

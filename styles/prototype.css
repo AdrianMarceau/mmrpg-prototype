@@ -695,7 +695,7 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 #prototype .option_wrapper_missions .chapter_select .chapter_link {
     display: block;
     float: left;
-    width: 12.36%;
+    width: 12%;
     margin: 0 2px 0 0;
     border: 2px solid #2C2B2B;
     font-size: 9px;
@@ -755,6 +755,11 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     color: #494343;
     cursor: default;
 }
+
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra {
+    width: 8%;
+}
+
 #prototype .option_wrapper_missions .hidden_chapter_option {
     display: none !important;
 }
