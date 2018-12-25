@@ -172,16 +172,16 @@ else {
                 echo '<a class="chapter_link chapter_link_disabled">'.$text.'</a>';
             }
 
-            // CHAPTER BONUS(5)
-            if ($chapters_unlocked['5']){
-                $chapters_display_count++;
-                echo '<a class="chapter_link bonus '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus</a>';
-                }
-
             // CHAPTER PLAYER(6)
             if ($chapters_unlocked['6']){
                 $chapters_display_count++;
                 echo '<a class="chapter_link players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6">Players</a>';
+                }
+
+            // CHAPTER BONUS(5)
+            if ($chapters_unlocked['5']){
+                $chapters_display_count++;
+                echo '<a class="chapter_link bonus '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus</a>';
                 }
 
         // Collect generated chapter markup
