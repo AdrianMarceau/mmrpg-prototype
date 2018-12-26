@@ -139,7 +139,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
         // Collect the ability index for calculation purposes
         static $this_ability_index;
-        if (empty($this_ability_index)){ $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token'); }
+        if (empty($this_ability_index)){
+            $db_ability_fields = rpg_ability::get_index_fields(true);
+            $this_ability_index = $db->get_array_list("SELECT $db_ability_fields FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        }
 
         // Check if this robot is holding a core
         $robot_item_core = !empty($robot_item) && preg_match('/-core$/i', $robot_item) ? preg_replace('/-core$/i', '', $robot_item) : '';
