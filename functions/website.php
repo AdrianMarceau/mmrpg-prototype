@@ -341,7 +341,18 @@ function mmrpg_website_session_update($session_href){
     // Collect the session ID from the system
     $session_key = session_id();
     // Attempt to collect the current database row if it exists
-    $temp_session = $db->get_array("SELECT * FROM mmrpg_sessions WHERE user_id = '{$this_userid}' AND session_key = '{$session_key}' AND session_href = '{$session_href}' LIMIT 1");
+    $temp_session = $db->get_array("SELECT
+        session_id, user_id,
+        session_key, session_href,
+        session_start, session_access,
+        session_ip
+        FROM mmrpg_sessions
+        WHERE
+        user_id = '{$this_userid}'
+        AND session_key = '{$session_key}'
+        AND session_href = '{$session_href}'
+        LIMIT 1
+        ;");
     // If an existing session for this page was found, update it
     if (!empty($temp_session['session_id'])){
         $update_array = array();
