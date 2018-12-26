@@ -725,6 +725,11 @@ body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link {
     width: 12.8%;
 }
+body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra,
+body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra {
+    width: 8%;
+}
+
 
 #prototype .option_wrapper_missions .chapter_select_5 .chapter_link {
     width: 18.1%;
