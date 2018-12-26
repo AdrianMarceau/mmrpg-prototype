@@ -69,6 +69,9 @@ define('MMRPG_SETTINGS_CORES_MAXQUANTITY', 999); // Define the max quantity allo
 
 // Define the global values for starforce related values
 define('MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT', 10);  // Base starforce boost percentage for each field star or half of fusion star
+define('MMRPG_SETTINGS_STARFORCE_FIELDCOUNT', 32);
+define('MMRPG_SETTINGS_STARFORCE_FUSIONCOUNT', 992);
+define('MMRPG_SETTINGS_STARFORCE_CURRENTMAX', 1024);
 
 // Define the global variables for the total number of robots allower per player
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MIN', 1); // The minimum number of robots required for battle per side
