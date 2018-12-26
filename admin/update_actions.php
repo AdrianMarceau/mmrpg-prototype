@@ -116,7 +116,13 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
             $patch_thread_target = $_GAME['user_id'];
 
             // Define the thread select query
-            $thread_select_query = "SELECT *
+            $thread_select_query = "SELECT
+                thread_id, category_id, user_id, user_ip,
+                thread_name, thread_token, thread_body, thread_frame, thread_colour,
+                thread_date, thread_mod_date, thread_mod_user,
+                thread_published, thread_locked, thread_sticky,
+                thread_views, thread_votes,
+                thread_target
                 FROM mmrpg_threads
                 WHERE
                 category_id = {$patch_thread_category} AND
