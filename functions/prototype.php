@@ -1486,7 +1486,8 @@ function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'
 
     $temp_session_key = $player_token.'_target-robot-omega_prototype';
     $temp_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
-    $temp_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $db_robot_fields = rpg_robot::get_index_fields(true);
+    $temp_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
     // Count the games representaed and order by count
     $temp_game_counters = array();
