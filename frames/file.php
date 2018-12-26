@@ -47,7 +47,8 @@ while ($this_action == 'save'){
     if (true){
 
         // Sort the robot index based on robot number
-        $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $mmrpg_database_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
         uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
         //die('<pre>$mmrpg_database_robots = '.print_r($mmrpg_database_robots, true).'</pre>');
 
@@ -382,7 +383,13 @@ while ($this_action == 'load'){
         $this_user['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$this_user['password']);
 
         // The file exists, so let's collect this user's info from teh database
-        $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
+        $db_user_fields = rpg_user::get_index_fields(true);
+        $temp_database_user = $db->get_array("SELECT
+            {$db_user_fields},
+            user_password_encoded
+            FROM mmrpg_users WHERE
+            user_name_clean LIKE '{$this_user['username_clean']}'
+            ;");
 
         // Check if the requested save file path exists
         if (!empty($temp_database_user)){
