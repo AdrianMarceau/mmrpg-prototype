@@ -312,6 +312,52 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Bonus Chapter : Star Fields'
             );
 
+        // Count the number of stars collected to determine level
+        $star_count = mmrpg_prototype_stars_unlocked();
+        $star_level = 50 + ceil(50 * ($star_count / MMRPG_SETTINGS_STARFORCE_STARTOTAL));
+
+        // Collect a list of all stars that have not been claimed yet
+        $remaining_stars = mmrpg_prototype_remaining_stars(true);
+
+        // Shuffle the list of remaining stars before displaying some
+        $remaining_stars_tokens = array_keys($remaining_stars);
+        shuffle($remaining_stars_tokens);
+
+        // Loop through remaining stars and display the first twelve
+        $added_star_fields = 0;
+        foreach ($remaining_stars_tokens AS $key => $star_token){
+            $star_info = $remaining_stars[$star_token];
+
+            $info = $star_info['info1'];
+            $info2 = $star_info['info2'];
+
+            // Generate the battle option with the starter data
+            $temp_session_token = $this_prototype_data['this_player_token'].'_star-field_'.$added_star_fields;
+            if (true || empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
+                if (!empty($info) && !empty($info2)){
+                // Double battle for this star field
+                $temp_battle_omega = rpg_mission_double::generate($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $star_level, false, false, true);
+                } elseif (!empty($info)){
+                // Single battle for this star field
+                $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, $info['robot'], $info['field'], $star_level, false, false, true);
+                }
+                $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
+            } else {
+                $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
+                $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
+            }
+
+            // Add the omega battle to the options, index, and session
+            $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+            // If we're over the limit, break now
+            $added_star_fields++;
+            if ($added_star_fields >= 12){ break; }
+
+        }
+
     }
 
 
