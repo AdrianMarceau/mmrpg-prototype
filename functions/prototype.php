@@ -648,6 +648,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     // Define the variable to collect option markup
     $this_markup = '';
 
+    // Collect the robot index for calculation purposes
+    $db_robot_fields = rpg_robot::get_index_fields(true);
+    $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+
     // Count the number of completed battle options for this group and update the variable
     $battle_options_reversed = $battle_options; //array_reverse($battle_options);
     foreach ($battle_options_reversed AS $this_key => $this_info){
@@ -680,9 +684,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
             $is_battle_counts = isset($this_battleinfo['battle_counts']) && $this_battleinfo['battle_counts'] == false ? false : true;
-
-            // Collect the robot index for calculation purposes
-            $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
             // Check the GAME session to see if this battle has been completed, increment the counter if it was
             $this_battleinfo['battle_option_complete'] = mmrpg_prototype_battle_complete($player_token, $this_info['battle_token']);
