@@ -652,6 +652,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 $temp_robot_tokens_count = count($temp_robot_tokens);
                 $temp_robot_target_count = count($this_targetinfo['player_robots']);
 
+                // Check to see if we're allowed to show robots on-screen
+                $show_robot_targets = true;
+                if (!empty($this_battleinfo['flags']['hide_robots_from_mission_select'])){ $show_robot_targets = false; }
+
                 // Create a list of the different robot tokens in this battle
                 // Now loop through robots again and display 'em
                 foreach ($this_targetinfo['player_robots'] AS $this_robotinfo){
@@ -661,8 +665,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         && !empty($this_robotinfo['robot_class']) && $this_robotinfo['robot_class'] == 'mecha'
                         && $temp_robot_tokens_count > 1 && $this_master_count > 0){ continue; }
 
+                    // Update min/max level indicators
+                    $this_robot_level = !empty($this_robotinfo['robot_level']) ? $this_robotinfo['robot_level'] : 1;
+                    if ($this_option_min_level === false || $this_option_min_level > $this_robot_level){ $this_option_min_level = $this_robot_level; }
+                    if ($this_option_max_level === false || $this_option_max_level < $this_robot_level){ $this_option_max_level = $this_robot_level; }
+
                     // HIDE HIDDEN
-                    if (!empty($this_robotinfo['flags']['hide_from_mission_select'])){ continue; }
+                    if (!$show_robot_targets || !empty($this_robotinfo['flags']['hide_from_mission_select'])){ continue; }
 
                     $this_robotinfo['robot_image'] = !empty($this_robotinfo['robot_image']) ? $this_robotinfo['robot_image'] : $this_robotinfo['robot_token'];
                     //if (!empty($this_robotinfo['flags']['hide_from_mission_select'])){ $temp_path = 'robots/robot'; }
@@ -670,12 +679,11 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $temp_path = 'robots/'.$this_robotinfo['robot_image'];
                     $this_battleinfo['battle_sprite'][] = array('path' => $temp_path, 'size' => !empty($this_robotinfo['robot_image_size']) ? $this_robotinfo['robot_image_size'] : 40);
 
-                    $this_robot_level = !empty($this_robotinfo['robot_level']) ? $this_robotinfo['robot_level'] : 1;
-                    if ($this_option_min_level === false || $this_option_min_level > $this_robot_level){ $this_option_min_level = $this_robot_level; }
-                    if ($this_option_max_level === false || $this_option_max_level < $this_robot_level){ $this_option_max_level = $this_robot_level; }
 
                 }
+
             }
+
             // Add the fusion star sprite if one has been added
             $this_has_field_star = false;
             if (!empty($this_battleinfo['values']['field_star'])){
