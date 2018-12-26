@@ -41,7 +41,8 @@ elseif ($temp_display_points > 0 && $temp_last_login_diff < MMRPG_SETTINGS_ACTIV
 // Collect the robot index for later use
 $hidden_database_robots = array('robot', 'mega-man-ds', 'proto-man-ds', 'bass-ds', 'rock', 'cache', 'bond-man', 'fake-man');
 foreach ($hidden_database_robots AS $key => $token){ $hidden_database_robots[$key] = "'".$token."'"; }
-$temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1 AND robot_token NOT IN (".implode(',', $hidden_database_robots).");", 'robot_token');
+$db_robot_fields = rpg_robot::get_index_fields(true);
+$temp_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1 AND robot_token NOT IN (".implode(',', $hidden_database_robots).");", 'robot_token');
 
 // Generate this player's record numbers
 $temp_counter_players = array('total' => 0);
