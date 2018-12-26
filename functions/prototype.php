@@ -514,6 +514,111 @@ function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
         return count($temp_stars_index);
     }
 }
+
+// Define a function that returns a list of all allowed fields
+function mmrpg_prototype_unlocked_field_tokens(){
+
+    // Collect the current session token
+    $session_token = mmrpg_game_token();
+
+    // Define an array to hold possible field tokens
+    $unlocked_field_tokens = array();
+
+    // Add the base fields given throughout the campaign
+    global $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three;
+    if (empty($this_omega_factors_one)){ require(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php'); }
+    $base_omega_fields = array_merge($this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three);
+    foreach ($base_omega_fields AS $key => $omega){ $unlocked_field_tokens[] = $omega['field']; }
+
+    // Add any fields that have been manually unlocked to the list
+    if (!empty($_SESSION[$session_token]['values']['battle_fields'])){ $unlocked_field_tokens += $_SESSION[$session_token]['values']['battle_fields']; }
+
+    // Remove any duplicates that made their way through
+    $unlocked_field_tokens = array_unique($unlocked_field_tokens);
+
+    // Return the unlocked field tokens
+    return $unlocked_field_tokens;
+
+}
+
+// Define a function for calculating all possible stars
+function mmrpg_prototype_possible_stars($return_arrays = false){
+
+    // Collect the current session token
+    $session_token = mmrpg_game_token();
+
+    // Collect an index of all fields for reference
+    $mmrpg_index_fields = rpg_field::get_index();
+
+    // Collect a list of all unlocked field tokens
+    $unlocked_field_tokens = mmrpg_prototype_unlocked_field_tokens();
+
+    // Loop through the field tokens to construct a list of field stars
+    $possible_star_list = array();
+    foreach ($unlocked_field_tokens AS $key1 => $field1_token){
+
+        // Collect details about the first field
+        $field1_token_parts = explode('-', $field1_token);
+        $field1_info = $mmrpg_index_fields[$field1_token];
+
+        // Define data for the field star of this particular field
+        $possible_star_list[$field1_token] = array(
+            'token' => $field1_token,
+            'name' => $field1_info['field_name'],
+            'kind' => 'field',
+            'info1' => array('field' => $field1_token, 'robot' => $field1_info['field_master']),
+            'info2' => false
+            );
+
+        // Loop through field tokens again to construct a list of fusion stars too
+        foreach ($unlocked_field_tokens AS $key2 => $field2_token){
+
+            // Collect details about the second field
+            $field2_token_parts = explode('-', $field2_token);
+            $field2_info = $mmrpg_index_fields[$field2_token];
+
+            // Define data for the fusion star of this particular fusion field
+            $fusion_token = $field1_token_parts[0].'-'.$field2_token_parts[1];
+            $possible_star_list[$fusion_token] = array(
+                'token' => $fusion_token,
+                'name' => ucwords(str_replace('-', ' ', $fusion_token)),
+                'kind' => 'fusion',
+                'info1' => array('field' => $field1_token, 'robot' => $field1_info['field_master']),
+                'info2' => array('field' => $field2_token, 'robot' => $field2_info['field_master'])
+                );
+
+        }
+    }
+
+    // Return the list of possible field and fusion stars
+    return $return_arrays ? $possible_star_list : array_keys($possible_star_list);
+
+}
+
+
+// Define a function for calculating which stars are remaining for a player
+function mmrpg_prototype_remaining_stars($return_arrays = false){
+
+    // Collect the current session token
+    $session_token = mmrpg_game_token();
+
+    // Collect the list of possible stars first for reference
+    $remaining_star_list = mmrpg_prototype_possible_stars($return_arrays);
+
+    // Remove from the above list any stars that have already been collected
+    if (!empty($_SESSION[$session_token]['values']['battle_stars'])){
+        $unlocked_star_list = array_keys($_SESSION[$session_token]['values']['battle_stars']);
+        foreach ($unlocked_star_list AS $star_token){
+            if ($return_arrays){ unset($remaining_star_list[$star_token]); }
+            else { unset($remaining_star_list[array_search($star_token, $remaining_star_list)]); }
+        }
+    }
+
+    // Return the list of remaining stars to collect
+    return $remaining_star_list;
+
+}
+
 // Define a function for checking if a prototype ability has been unlocked
 function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = ''){
     // Pull in global variables
