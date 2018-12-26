@@ -33,8 +33,10 @@ ob_start();
         }
 
         // Collect the temp ability and item indexes
-        $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-        $temp_items_index = $db->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
+        $db_ability_fields = rpg_ability::get_index_fields(true);
+        $db_item_fields = rpg_item::get_index_fields(true);
+        $temp_abilities_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $temp_items_index = $db->get_array_list("SELECT {$db_item_fields} FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
 
         // Collect the target robot options and sort them
         $switch_player_robots = $this_player->player_robots;
