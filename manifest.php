@@ -36,7 +36,8 @@ echo "{$asset_base_url}images/tiles/vertical-gradient_energy-bar.gif\r\n";
 // Define the robot sprite variables
 $robot_sprite_sizes = array(40, 80);
 // Loop through the entire robot index
-$mmrpg_index_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 ORDER BY robot_token ASC", 'robot_token');
+$db_robot_fields = rpg_robot::get_index_fields(true);
+$mmrpg_index_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 ORDER BY robot_token ASC", 'robot_token');
 if (!empty($mmrpg_index_robots)){
   foreach ($mmrpg_index_robots AS $robot_token => $this_robot){
     if ($robot_token == 'robot'){ continue; }
