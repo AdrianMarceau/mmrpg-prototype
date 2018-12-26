@@ -385,7 +385,16 @@ function mmrpg_website_community_index(){
     } else {
         // Collect the community catetories from the database
         // Collect all the categories from the index
-        $this_categories_query = "SELECT * FROM mmrpg_categories AS categories WHERE categories.category_published = 1 ORDER BY categories.category_order ASC";
+        $this_categories_query = "SELECT
+            category_id, category_level,
+            category_name, category_token, category_description,
+            category_published, category_order
+            FROM mmrpg_categories AS categories
+            WHERE
+            categories.category_published = 1
+            ORDER BY
+            categories.category_order ASC
+            ;";
         $this_categories_index = $db->get_array_list($this_categories_query, 'category_token');
         // Update the database index cache
         $_SESSION['COMMUNITY']['categories'] = json_encode($this_categories_index);
