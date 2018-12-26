@@ -1262,8 +1262,9 @@ class rpg_robot extends rpg_object {
         }
 
         // Loop through any leftover abilities and add them to the weighted ability options
+        $db_ability_fields = rpg_ability::get_index_fields(true);
         $temp_ability_tokens = "'".implode("','", array_values($this_robot->robot_abilities))."'";
-        $temp_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
+        $temp_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
         foreach ($this_robot->robot_abilities AS $key => $token){
             if (!in_array($token, $options)){
                 $info = rpg_ability::parse_index_info($temp_ability_index[$token]);
@@ -1407,7 +1408,8 @@ class rpg_robot extends rpg_object {
         // If this robot has any attachments, loop through them
         if (!empty($this->robot_attachments)){
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
-            $temp_attachments_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+            $db_ability_fields = rpg_ability::get_index_fields(true);
+            $temp_attachments_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
             foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
 
                 // Ensure this ability has a type before checking weaknesses, resistances, etc.
@@ -1580,7 +1582,8 @@ class rpg_robot extends rpg_object {
         // If this robot has any attachments, loop through them
         if (!empty($this->robot_attachments)){
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
-            $temp_attachments_index = $db->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
+            $db_ability_fields = rpg_ability::get_index_fields(true);
+            $temp_attachments_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
             foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
 
                 // Ensure this item has a type before checking weaknesses, resistances, etc.
