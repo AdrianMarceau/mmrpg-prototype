@@ -560,8 +560,6 @@ if (true){
                                                         $temp_string = array();
                                                         $ability_key = 0;
 
-                                                        //$temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-
                                                         foreach ($robot_ability_rewards AS $this_info){
                                                             $this_level = $this_info['level'];
                                                             $this_ability = rpg_ability::parse_index_info($mmrpg_database_abilities[$this_info['token']]);
