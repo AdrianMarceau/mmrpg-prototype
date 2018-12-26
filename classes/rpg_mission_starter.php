@@ -24,7 +24,8 @@ class rpg_mission_starter extends rpg_mission {
         global $this_omega_factors_eleven;
 
         // Collect data on this robot and the rescue robot
-        $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         $this_robot_data = rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
         $this_robot_name = $this_robot_data['robot_name'];
         // Populate the battle options with the starter battle option

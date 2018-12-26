@@ -24,7 +24,8 @@ class rpg_mission_single extends rpg_mission {
         global $this_omega_factors_eleven;
 
         // Collect the robot index for calculation purposes
-        $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         $this_field_index = rpg_field::get_index();
 
         // Define the array to hold this omega battle and populate with base varaibles
