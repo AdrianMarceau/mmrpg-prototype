@@ -353,37 +353,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 'option_maintext' => 'Player Battles : Leaderboard Challengers'
                 );
 
-            /*
-
-            // Include the leaderboard data for pruning
-            $this_leaderboard_online_players = mmrpg_prototype_leaderboard_online();
-
-            $temp_include_usernames = array();
-            $temp_include_usernames_string = array();
-            if (!empty($this_leaderboard_online_players)){
-                foreach ($this_leaderboard_online_players AS $info){ $temp_include_usernames[] = $info['token']; }
-                foreach ($temp_include_usernames AS $token){ $temp_include_usernames_string[] = "'{$token}'"; }
-                $temp_include_usernames_string = implode(',', $temp_include_usernames_string);
-            } else {
-                $temp_include_usernames_string = '';
-            }
-
-            // Pull a random player from the database with a similar point level
-            $this_player_points = $this_prototype_data['points_unlocked'];
-            $this_player_points_max = ceil($this_player_points * 1.10);
-            $temp_query_token = str_replace('-', '_', $this_prototype_data['target_player_token']);
-            $temp_player_query = "SELECT mmrpg_leaderboard.user_id, mmrpg_users.user_name, mmrpg_users.user_name_clean, mmrpg_users.user_name_public, mmrpg_saves.save_values
-                FROM mmrpg_leaderboard
-                LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
-                LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id
-                WHERE (board_points_{$temp_query_token} <= {$this_player_points_max}".(!empty($this_leaderboard_online_players) ? " OR user_name_clean IN ({$temp_include_usernames_string})" : '').")
-                AND mmrpg_leaderboard.user_id != {$this_userid}
-                ORDER BY board_points_{$temp_query_token} DESC
-                LIMIT 12";
-            //die($temp_player_query);
-            $temp_player_list = $db->get_array_list($temp_player_query);
-            */
-
             // Include the leaderboard data for pruning
             $this_leaderboard_online_players = mmrpg_prototype_leaderboard_online();
             $temp_include_usernames = array();
