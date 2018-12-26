@@ -174,8 +174,9 @@ else {
 $temp_active_target_robot_abilities = $active_target_robot->robot_abilities;
 
 // Loop through the target robot's current abilities and check weapon energy
+$db_ability_fields = rpg_ability::get_index_fields(true);
 $temp_ability_tokens = "'".implode("', '", array_values($active_target_robot->robot_abilities))."'";
-$temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
+$temp_abilities_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
 foreach ($active_target_robot->robot_abilities AS $key => $token){
 
     // Collect the data for this ability from the index
