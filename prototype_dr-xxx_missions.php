@@ -43,10 +43,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     }
 
 
-
-
-
-
     // -- ROBOT MASTER BATTLES : CHAPTER TWO -- //
 
     // Update the prototype data's global current chapter variable
@@ -301,24 +297,39 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     }
 
 
-    // -- EXTRA CHAPTER : PLAYER BATTLES (6) -- //
+    // -- BONUS CHAPTER : STAR FIELDS (7) -- //
+
+    // Update the prototype data's global current chapter variable
+    $this_prototype_data['this_current_chapter'] = '7';
+
+    // Only continue if the player has unlocked this extra chapter
+    if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['7']){
+
+        // EVENT MESSAGE : BONUS CHAPTER
+        $this_prototype_data['battle_options'][] = array(
+            'option_type' => 'message',
+            'option_chapter' => $this_prototype_data['this_current_chapter'],
+            'option_maintext' => 'Bonus Chapter : Star Fields'
+            );
+
+    }
+
+
+    // -- BONUS CHAPTER : PLAYER BATTLES (6) -- //
 
     // Update the prototype data's global current chapter variable
     $this_prototype_data['this_current_chapter'] = '6';
 
-    // Unlock a battle with a randomized player from the leaderboards if the game is done
-    //$temp_flags = !empty($_SESSION['GAME']['flags']) ? $_SESSION['GAME']['flags'] : array();
+    // Only continue if the player has unlocked this extra chapter
     $temp_ptoken = str_replace('-', '', $this_prototype_data['this_player_token']);
     if ($this_prototype_data['this_chapter_unlocked']['6']){
-        //die('checkpoint1');
         if (true){
-            //die('checkpoint2');
 
             // EVENT MESSAGE : BONUS CHAPTER
             $this_prototype_data['battle_options'][] = array(
                 'option_type' => 'message',
                 'option_chapter' => $this_prototype_data['this_current_chapter'],
-                'option_maintext' => 'Player Battles : Leaderboard Challengers'
+                'option_maintext' => 'Bonus Chapter : Player Battles'
                 );
 
             // Include the leaderboard data for pruning
@@ -422,7 +433,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             }
 
             // Unset the temp player array
-            //die('<pre>checkpoint 6 i guess? : ---</pre>');
             unset($temp_player_list);
 
         }
@@ -430,19 +440,19 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     }
 
 
-    // -- EXTRA CHAPTER : BONUS MISSIONS (5) -- //
+    // -- BONUS CHAPTER : BONUS MISSIONS (5) -- //
 
     // Update the prototype data's global current chapter variable
     $this_prototype_data['this_current_chapter'] = '5';
 
-    // Only continue if the player has defeated all other battles
+    // Only continue if the player has unlocked this extra chapter
     if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['5']){
 
-        // EVENT MESSAGE : CHAPTER SIX
+        // EVENT MESSAGE : BONUS CHAPTER
         $this_prototype_data['battle_options'][] = array(
             'option_type' => 'message',
             'option_chapter' => $this_prototype_data['this_current_chapter'],
-            'option_maintext' => 'Bonus Chapter : Prototype Complete!'
+            'option_maintext' => 'Bonus Chapter : Mission Randomizer'
             );
 
         // Generate the bonus battle and using the prototype data

@@ -118,14 +118,14 @@ else {
             $chapters_unlocked['4c'] = false;
         }
 
-        // Bonus
-        $chapters_unlocked['5'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
+        // Stars
+        $chapters_unlocked['7'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;;
 
         // Player
-        $chapters_unlocked['6'] = $prototype_complete_flag ? true : false;
+        $chapters_unlocked['6'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
 
-        // Stars
-        $chapters_unlocked['7'] = $battle_star_counter >= MMRPG_SETTINGS_STARFORCE_FIELDCOUNT ? true : false;
+        // Bonus
+        $chapters_unlocked['5'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
 
     }
 

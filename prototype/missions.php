@@ -207,7 +207,7 @@ else {
             // CHAPTER BONUS(5)
             if ($allow_bonus_fields){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra bonus '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Bonus</a>';
+                echo '<a class="chapter_link extra bonus '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Random</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
                 echo '<a class="chapter_link extra chapter_link_disabled">???</a>';
