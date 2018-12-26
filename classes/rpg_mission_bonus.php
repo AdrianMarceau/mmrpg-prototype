@@ -48,11 +48,11 @@ class rpg_mission_bonus extends rpg_mission {
         $temp_battle_token = $this_prototype_data['phase_battle_token'].'-prototype-bonus-'.$this_robot_class;
         if ($this_robot_class == 'mecha'){
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete');
-            $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field';
+            $temp_battle_omega['battle_field_base']['field_name'] = 'Mecha Field';
         }
         elseif ($this_robot_class == 'master'){
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-2');
-            $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field II';
+            $temp_battle_omega['battle_field_base']['field_name'] = 'Master Field';
         }
         // Populate the player's target robots with compatible class matches
         $temp_battle_omega['battle_target_player']['player_robots'] = array();
