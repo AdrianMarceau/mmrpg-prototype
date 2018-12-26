@@ -183,7 +183,7 @@ else {
             $num_extra = 0;
             $num_extra += $allow_player_battles = $chapters_unlocked['6'] ? 1 : 0;
             $num_extra += $allow_bonus_fields = $chapters_unlocked['5'] ? 1 : 0;
-            $num_extra += $allow_star_fields = 0;
+            $num_extra += $allow_star_fields = $chapters_unlocked['7'] ? 1 : 0;
 
             // CHAPTER STARS(7)
             if ($allow_star_fields){
