@@ -188,7 +188,7 @@ else {
             // CHAPTER STARS(7)
             if ($allow_star_fields){
                 $chapters_display_count++;
-                if ($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL){ echo '<a class="chapter_link extra chapter_link_disabled"><del>Stars</del></a>'; }
+                if ($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL){ echo '<a class="chapter_link extra chapter_link_disabled">Stars &check;</a>'; }
                 else { echo '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7">Stars</a>'; }
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
