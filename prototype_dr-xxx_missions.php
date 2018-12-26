@@ -328,26 +328,20 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         foreach ($remaining_stars_tokens AS $key => $star_token){
             $star_info = $remaining_stars[$star_token];
 
+            // Collect references to the two stages' info
             $info = $star_info['info1'];
             $info2 = $star_info['info2'];
 
-            // Generate the battle option with the starter data
-            $temp_session_token = $this_prototype_data['this_player_token'].'_star-field_'.$added_star_fields;
-            if (true || empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
-                if (!empty($info) && !empty($info2)){
-                // Double battle for this star field
+            // Generate either a double or single battle based on field factors
+            if (!empty($info) && !empty($info2)){
                 $temp_battle_omega = rpg_mission_double::generate($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $star_level, false, false, true);
-                } elseif (!empty($info)){
-                // Single battle for this star field
+            } elseif (!empty($info)){
                 $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, $info['robot'], $info['field'], $star_level, false, false, true);
-                }
-                $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
-            } else {
-                $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-                $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
             }
+
+            // Update the chapter number and then save this data to the temp index
+            $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
             // Add the omega battle to the options, index, and session
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
