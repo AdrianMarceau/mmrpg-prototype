@@ -344,6 +344,7 @@ class rpg_mission_double extends rpg_mission {
 
         // If this battle doesn't count, so let's modify the point value
         if (!$temp_battle_omega['battle_counts']){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER); }
+        if ($starfield_mission){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER); }
 
         // Update the option robots
         $temp_option_robot = $this_robot_index[$temp_option_robot['robot_token']];

@@ -335,6 +335,7 @@ class rpg_mission_single extends rpg_mission {
 
         // If this battle doesn't count, so let's modify the point value
         if (!$temp_battle_omega['battle_counts']){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER); }
+        if ($starfield_mission){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER); }
 
         // Reverse the order of the robots in battle
         $temp_battle_omega['battle_target_player']['player_robots'] = array_reverse($temp_battle_omega['battle_target_player']['player_robots']);
