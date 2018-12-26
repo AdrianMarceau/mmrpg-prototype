@@ -1349,7 +1349,8 @@ class rpg_field extends rpg_object {
         // Pull in global variables
         global $mmrpg_index, $db;
         // Collect the approriate database indexes
-        $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $mmrpg_database_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         // Generate the field option markup
         $temp_player_token = $player_info['player_token'];
         if (!isset($mmrpg_index['players'][$temp_player_token])){ return false; }
