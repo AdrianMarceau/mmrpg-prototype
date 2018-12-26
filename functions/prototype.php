@@ -861,9 +861,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $temp_last_size = $temp_size;
                 }
             }
-            //if ($this_battleinfo['battle_token'] == 'base-spark-man') die('<pre>'.print_r(htmlentities($this_option_label), true).'</pre>');
-            //$this_option_button_text = !empty($this_battleinfo['battle_button']) ? $this_battleinfo['battle_button'] : '';
-            //$this_option_button_text = !empty($this_fieldinfo['field_name']) ? $this_fieldinfo['field_name'] : '';
 
             if (!empty($this_battleinfo['battle_button'])){ $this_option_button_text = $this_battleinfo['battle_button']; }
             elseif (!empty($this_fieldinfo['field_name'])){ $this_option_button_text = $this_fieldinfo['field_name']; }
@@ -948,6 +945,12 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 }
             }
             $temp_field_multipliers = !empty($temp_field_multipliers) ? implode('|', $temp_field_multipliers) : '';
+
+
+            // Check if this is a starfield mission or not
+            $is_starfield_mission = !empty($this_battleinfo['flags']['starfield_mission']) ? true : false;
+            if ($is_starfield_mission){ $this_option_class .= ' starfield'; }
+
             // Print out the option button markup with sprite and name
             $this_markup .= '<a '.
                 'class="'.$this_option_class.'" '.
