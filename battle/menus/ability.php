@@ -51,8 +51,10 @@ ob_start();
         $unlocked_abilities_count = 0;
 
         // Collect the temp ability and robot indexes
-        $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-        $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $db_ability_fields = rpg_ability::get_index_fields(true);
+        $temp_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $temp_abilities_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         $temp_robotinfo = $temp_robots_index[$this_robot->robot_token];
         $temp_robotinfo = rpg_robot::parse_index_info($temp_robotinfo);
         if ($temp_robotinfo['robot_core'] != $this_robot->robot_core){ $temp_robotinfo['robot_core'] = $this_robot->robot_core; }
