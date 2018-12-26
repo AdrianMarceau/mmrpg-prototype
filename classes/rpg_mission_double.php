@@ -6,7 +6,7 @@
 class rpg_mission_double extends rpg_mission {
 
     // Define a function for generating the DOUBLES missions
-    public static function generate($this_prototype_data, $this_robot_tokens, $this_field_tokens, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true){
+    public static function generate($this_prototype_data, $this_robot_tokens, $this_field_tokens, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true, $starfield_mission = false){
 
         // Pull in global variables for this function
         global $mmrpg_index, $db;
@@ -52,15 +52,26 @@ class rpg_mission_double extends rpg_mission {
         $temp_option_battle['battle_size'] = '1x2';
         $temp_option_battle['battle_name'] = 'Chapter Four Fusion Battle';
         $temp_option_battle['battle_complete'] = false;
+        $temp_option_battle['battle_counts'] = true;
         $temp_option_completed = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_option_battle['battle_token']);
         if ($temp_option_completed){ $temp_option_battle['battle_complete'] = $temp_option_completed; }
+
+        // If this is a starfield mission, adjust for the new conditions
+        if ($starfield_mission){
+            $temp_option_battle['battle_counts'] = false;
+            $temp_option_battle['flags']['hide_robots_from_mission_select'] = true;
+            $temp_option_battle['battle_size'] = '1x1';
+        }
 
         // Determine the amount of targets and their ability counts
         $temp_target_count = 1;
         $temp_ability_count = 2;
         $temp_limit_count = 8;
         $temp_battle_count = 0;
-        if (!empty($temp_battle_omega['battle_complete']['battle_count'])){
+        if ($starfield_mission){
+            $temp_target_count = 6;
+            $temp_ability_count = 6;
+        } elseif (!empty($temp_battle_omega['battle_complete']['battle_count'])){
             $temp_battle_count = $temp_battle_omega['battle_complete']['battle_count'];
             if ($temp_battle_count <= $temp_limit_count){
                 $temp_target_count += $temp_battle_count;
@@ -177,16 +188,23 @@ class rpg_mission_double extends rpg_mission {
         }
 
         // Define the omega variables for level, points, turns, and random encounter rate
-        $omega_robot_level_max = $this_start_level + 3;
-        $omega_robot_level = $this_start_level + (!empty($this_prototype_data['battles_complete']) ? ($this_prototype_data['battles_complete'] - 10) * 1 : 0);
-        if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
-        $omega_random_encounter = false;
+        if ($starfield_mission){
+            $omega_robot_level_max = $this_start_level;
+            $omega_robot_level = $this_start_level;
+        } else {
+            $omega_robot_level_max = $this_start_level + 3;
+            if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
+            $omega_robot_level = $this_start_level + (!empty($this_prototype_data['battles_complete']) ? ($this_prototype_data['battles_complete'] - 10) * 1 : 0);
+            if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
+            if ($omega_robot_level >= 100){ $omega_robot_level = 100; }
+        }
 
         // Also, fill the empty spots with minor enemy robots
         if (true){
             $temp_option_battle['battle_target_player']['player_switch'] = 1.5;
             $bonus_robot_count = $temp_target_count;
-            if ($this_prototype_data['this_player_token'] == 'dr-light'){ $bonus_robot_count += 0; }
+            if ($starfield_mission){ $bonus_robot_count += 0; }
+            elseif ($this_prototype_data['this_player_token'] == 'dr-light'){ $bonus_robot_count += 0; }
             elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){ $bonus_robot_count += 1; }
             elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $bonus_robot_count += 2; }
             $temp_mook_options = array();
@@ -320,6 +338,10 @@ class rpg_mission_double extends rpg_mission {
             }
 
         }
+
+        // If this battle doesn't count, so let's modify the point value
+        if (!$temp_battle_omega['battle_counts']){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER); }
+
         // Update the option robots
         $temp_option_robot = $this_robot_index[$temp_option_robot['robot_token']];
         $temp_option_robot2 = $this_robot_index[$temp_option_robot2['robot_token']];
@@ -416,7 +438,10 @@ class rpg_mission_double extends rpg_mission {
         // Update the battle description based on what we've calculated
         //$temp_description_target_robots = ($temp_option_field['field_type'] != $temp_option_field2['field_type'] ? ucfirst($temp_option_field['field_type']).' and '.ucfirst($temp_option_field2['field_type']) : ucfirst($temp_option_field['field_type'])).' core';
         $temp_description_target_robots = $temp_option_robot['robot_name'].' and '.$temp_option_robot2['robot_name'];
-        if (!empty($temp_battle_omega['values']['field_star'])){
+        if ($starfield_mission){
+            $temp_battle_omega['battle_description'] = 'Defeat the robot masters guarding this Fusion Star to liberate it! ';
+            $temp_battle_omega['battle_description2'] = 'Collecting stars increases our Starforce and makes us stronger in battle! ';
+        } elseif (!empty($temp_battle_omega['values']['field_star'])){
             $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and collect their Fusion Star!';
             $temp_battle_omega['battle_description2'] = 'The star\'s energy appears to have attracted more robots to the field...';
         } elseif (!empty($this_unlock_abilities_count)){
