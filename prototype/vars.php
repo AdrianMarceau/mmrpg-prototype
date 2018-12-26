@@ -124,6 +124,9 @@ else {
         // Player
         $chapters_unlocked['6'] = $prototype_complete_flag ? true : false;
 
+        // Stars
+        $chapters_unlocked['7'] = $battle_star_counter >= MMRPG_SETTINGS_STARFORCE_FIELDCOUNT ? true : false;
+
     }
 
     // Define which chapters should be unlocked for Dr. Light based on missions complete
