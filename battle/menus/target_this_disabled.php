@@ -12,8 +12,8 @@ ob_start();
 	if (!empty($this_player->player_robots)){
 
 		// Collect the temp ability index
-		//$temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-		$temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $db_ability_fields = rpg_ability::get_index_fields(true);
+		$temp_abilities_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
 		// Count the total number of robots
 		$num_robots = count($this_player->player_robots);
