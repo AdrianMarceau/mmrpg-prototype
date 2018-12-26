@@ -50,6 +50,12 @@ else {
 
             /* -- Calculate Chapter Unlocks -- */
 
+            if ($chapters_unlocked['7']
+                && empty($_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_7'])){
+                unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
+                $_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_7'] = true;
+            }
+
             if ($chapters_unlocked['6']
                 && empty($_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_6'])){
                 unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
@@ -99,7 +105,8 @@ else {
             }
 
             if ($temp_last_chapter === false){
-                if ($chapters_unlocked['6']){ $temp_last_chapter = '6'; }
+                if ($chapters_unlocked['7']){ $temp_last_chapter = '7'; }
+                elseif ($chapters_unlocked['6']){ $temp_last_chapter = '6'; }
                 elseif ($chapters_unlocked['5']){ $temp_last_chapter = '5'; }
                 elseif ($chapters_unlocked['4a']){ $temp_last_chapter = '4'; }
                 elseif ($chapters_unlocked['3']){ $temp_last_chapter = '3'; }
