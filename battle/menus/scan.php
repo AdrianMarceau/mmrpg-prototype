@@ -30,7 +30,8 @@ ob_start();
         usort($target_player_robots, 'mmrpg_action_sort_scan');
 
         // Collect the temp item index
-        $temp_items_index = $db->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
+        $db_item_fields = rpg_item::get_index_fields(true);
+        $temp_items_index = $db->get_array_list("SELECT {$db_item_fields} FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
 
         // Loop through each robot and display its target button
         foreach ($target_player_robots AS $robot_key => $scan_robotinfo){
