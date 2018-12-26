@@ -197,7 +197,22 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
         }
 
         if (!defined('MMRPG_SCRIPT_REQUEST')){
-            $this_boardinfo = $db->get_array("SELECT * FROM mmrpg_leaderboard WHERE user_id = {$this_userid}");
+            $this_boardinfo = $db->get_array("SELECT
+                board_id, user_id, save_id,
+                board_points, board_points_dr_light, board_points_dr_wily, board_points_dr_cossack,
+                board_points_pending, -- board_points_pending_dr_light, board_points_pending_dr_wily, board_points_pending_dr_cossack,
+                board_points_legacy, -- board_points_dr_light_legacy, board_points_dr_wily_legacy, board_points_dr_cossack_legacy,
+                board_robots, board_robots_dr_light, board_robots_dr_wily, board_robots_dr_cossack,
+                board_battles, board_battles_dr_light, board_battles_dr_wily, board_battles_dr_cossack,
+                board_awards, board_awards_dr_light, board_awards_dr_wily, board_awards_dr_cossack,
+                board_stars, board_stars_dr_light, board_stars_dr_wily, board_stars_dr_cossack,
+                board_abilities, board_abilities_dr_light, board_abilities_dr_wily, board_abilities_dr_cossack,
+                board_missions, board_missions_dr_light, board_missions_dr_wily, board_missions_dr_cossack,
+                board_date_created, board_date_modified
+                FROM mmrpg_leaderboard
+                WHERE
+                user_id = {$this_userid}
+                ;");
             $this_boardid = $this_boardinfo['board_id'];
             $this_boardinfo['board_rank'] = !empty($_SESSION['GAME']['BOARD']['boardrank']) ? $_SESSION['GAME']['BOARD']['boardrank'] : 0;
             if (empty($this_boardinfo['board_rank'])){ $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'] = mmrpg_prototype_leaderboard_rank($this_userid); }
