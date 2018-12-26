@@ -301,39 +301,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     }
 
 
-    // -- PROTOTYPE COMPLETE BATTLE : CHAPTER SIX -- //
-
-    // Update the prototype data's global current chapter variable
-    $this_prototype_data['this_current_chapter'] = '5';
-
-    // Only continue if the player has defeated all other battles
-    if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['5']){
-
-        // EVENT MESSAGE : CHAPTER SIX
-        $this_prototype_data['battle_options'][] = array(
-            'option_type' => 'message',
-            'option_chapter' => $this_prototype_data['this_current_chapter'],
-            'option_maintext' => 'Bonus Chapter : Prototype Complete!'
-            );
-
-        // Generate the bonus battle and using the prototype data
-        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 6, 'mecha');
-        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-        // Add the omega battle to the options, index, and session
-        $this_prototype_data['battle_options'][] = $temp_battle_omega;
-        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-
-        // Generate the bonus battle and using the prototype data
-        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 4, 'master');
-        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-        // Add the omega battle to the options, index, and session
-        $this_prototype_data['battle_options'][] = $temp_battle_omega;
-        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-
-    }
-
-
-    // -- SPECIAL PLAYER BATTLE : BONUS CHAPTER -- //
+    // -- EXTRA CHAPTER : PLAYER BATTLES (6) -- //
 
     // Update the prototype data's global current chapter variable
     $this_prototype_data['this_current_chapter'] = '6';
@@ -458,6 +426,38 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             unset($temp_player_list);
 
         }
+
+    }
+
+
+    // -- EXTRA CHAPTER : BONUS MISSIONS (5) -- //
+
+    // Update the prototype data's global current chapter variable
+    $this_prototype_data['this_current_chapter'] = '5';
+
+    // Only continue if the player has defeated all other battles
+    if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['5']){
+
+        // EVENT MESSAGE : CHAPTER SIX
+        $this_prototype_data['battle_options'][] = array(
+            'option_type' => 'message',
+            'option_chapter' => $this_prototype_data['this_current_chapter'],
+            'option_maintext' => 'Bonus Chapter : Prototype Complete!'
+            );
+
+        // Generate the bonus battle and using the prototype data
+        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 8, 'mecha');
+        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+        // Add the omega battle to the options, index, and session
+        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+
+        // Generate the bonus battle and using the prototype data
+        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 8, 'master');
+        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+        // Add the omega battle to the options, index, and session
+        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
     }
 
