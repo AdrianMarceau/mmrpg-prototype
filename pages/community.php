@@ -50,10 +50,6 @@ $this_current_view = 'index';
 if (!empty($this_current_cat)){ $this_current_view = 'category'; }
 if ($this_current_id !== false && !empty($this_current_token)){ $this_current_view = 'thread'; }
 
-// Collect all the users from the index (MAYBE DELETE)
-//$this_users_query = "SELECT * FROM mmrpg_users ORDER BY user_id ASC";
-//$this_users_index = $db->get_array_list($this_users_query, 'user_id');
-
 // If a specific category has been requested, collect its info
 $this_category_info = array();
 if (!empty($this_current_cat) && !empty($this_categories_index[$this_current_cat])){
