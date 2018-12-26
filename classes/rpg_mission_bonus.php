@@ -24,7 +24,8 @@ class rpg_mission_bonus extends rpg_mission {
         global $this_omega_factors_eleven;
 
         // Collect the robot index for calculation purposes
-        $robot_index_query = "SELECT *,
+        $temp_fields = rpg_robot::get_index_fields(true);
+        $robot_index_query = "SELECT {$temp_fields},
             (robot_energy + robot_attack + robot_defense + robot_speed) AS base_total
             FROM mmrpg_index_robots
             HAVING robot_flag_complete = 1 ";
