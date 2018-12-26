@@ -216,7 +216,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4c'])){
 
             // Collect the robot index for quick use
-            $temp_robots_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+            $db_robot_fields = rpg_robot::get_index_fields(true);
+            $temp_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
             $temp_fields_index = rpg_field::get_index();
 
             // Unlock the first of the final destination battles
