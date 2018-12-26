@@ -52,6 +52,7 @@ class rpg_mission_single extends rpg_mission {
             $temp_battle_omega['battle_name'] = 'Bonus Chapter Starforce Battle';
             $temp_battle_omega['battle_counts'] = false;
             $temp_battle_omega['flags']['hide_robots_from_mission_select'] = true;
+            $temp_battle_omega['flags']['starfield_mission'] = true;
             $temp_battle_omega['battle_size'] = '1x1';
         }
 
