@@ -148,20 +148,29 @@ class rpg_prototype {
         // Define the variable to collect option markup
         $this_markup = '';
 
+        // Collect the robot index for calculation purposes
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+
         // Count the number of completed battle options for this group and update the variable
         foreach ($battle_options AS $this_key => $this_info){
+
             // Define the chapter if not set
             if (!isset($this_info['option_chapter'])){ $this_info['option_chapter'] = '0'; }
+
             // If this is an event message type option, simply display the text/images
             if (!empty($this_info['option_type']) && $this_info['option_type'] == 'message'){
+
                 // Generate the option markup for the event message
                 $temp_optiontitle = $this_info['option_maintext'];
                 $temp_optionimages = !empty($this_info['option_images']) ? $this_info['option_images'] : '';
                 $temp_optiontext = '<span class="multi"><span class="maintext">'.$this_info['option_maintext'].'</span></span>';
                 $this_markup .= '<a data-chapter="'.$this_info['option_chapter'].'" class="option option_message option_1x4 option_this-'.$player_token.'-message" style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'"><div class="chrome"><div class="inset"><label class="'.(!empty($temp_optionimages) ? 'has_image' : '').'">'.$temp_optionimages.$temp_optiontext.'</label></div></div></a>'."\n";
+
             }
             // Otherwise, if this is a normal battle option
             else {
+
                 // If the skip flag is set, continue to the next index
                 //if (isset($this_info['flag_skip']) && $this_info['flag_skip'] == true){ continue; }
                 // Collect the current battle and field info from the index
@@ -186,9 +195,6 @@ class rpg_prototype {
                     ? array_replace(rpg_field::parse_index_info($mmrpg_index_fields[$this_fieldtoken]), $this_battleinfo['battle_field_info'])
                     : $this_battleinfo['battle_field_info'];
                 $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
-
-                // Collect the robot index for calculation purposes
-                $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
                 // Check the GAME session to see if this battle has been completed, increment the counter if it was
                 $this_battleinfo['battle_option_complete'] = rpg_prototype::battle_complete($player_token, $this_info['battle_token']);
@@ -632,7 +638,10 @@ class rpg_prototype {
 
             // Collect the ability index for calculation purposes
             static $this_ability_index;
-            if (empty($this_ability_index)){ $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token'); }
+            if (empty($this_ability_index)){
+                $db_ability_fields = rpg_ability::get_index_fields(true);
+                $this_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                }
 
             // Check if this robot is holding a core
             $robot_item_core = !empty($robot_item) && preg_match('/^item-core-/i', $robot_item) ? preg_replace('/^item-core-/i', '', $robot_item) : '';
@@ -1221,7 +1230,8 @@ class rpg_prototype {
 
         $temp_session_key = $player_token.'_target-robot-omega_prototype';
         $temp_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
-        $temp_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $temp_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
         // Count the games representaed and order by count
         $temp_game_counters = array();
@@ -1337,7 +1347,8 @@ class rpg_prototype {
         $temp_token_string = array();
         foreach ($temp_player_robots AS $token){ $temp_token_string[] = "'{$token}'"; }
         $temp_token_string = implode(', ', $temp_token_string);
-        $temp_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_token IN ({$temp_token_string}) AND robot_flag_complete = 1;", 'robot_token');
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $temp_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_token IN ({$temp_token_string}) AND robot_flag_complete = 1;", 'robot_token');
 
         foreach ($temp_player_robots AS $key => $robot_token){
             $index = rpg_robot::parse_index_info($temp_robot_index[$robot_token]);
@@ -1408,10 +1419,12 @@ class rpg_prototype {
         $this_robots_markup = '';
 
         // Collect the robot index for calculation purposes
-        $this_robot_index = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
         // Collect the ability index for calculation purposes
-        $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $db_ability_fields = rpg_ability::get_index_fields(true);
+        $this_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
         // Loop through and display the available robot options for this player
         $temp_robot_option_count = count($this_prototype_data['robot_options']);
