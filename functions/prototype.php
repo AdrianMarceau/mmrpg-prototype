@@ -800,22 +800,25 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             $this_option_title .= ' | '.($this_battleinfo['battle_turns'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns'].' Turns');
             $this_option_title .= ' <br />'.$this_battleinfo['battle_description'].(!empty($this_battleinfo['battle_description2']) ? ' '.$this_battleinfo['battle_description2'] : '');
-            if (!empty($this_option_complete) || !empty($this_option_failure) || !empty($this_has_field_star)){
-                $this_option_title .= ' <hr />&laquo; Battle Records &raquo;';
-                $this_option_title .= ' <br />Cleared : '.(!empty($this_option_complete['battle_count']) ? ($this_option_complete['battle_count'] == 1 ? '1 Time' : $this_option_complete['battle_count'].' Times') : '0 Times');
-                $this_option_title .= ' | Failed : '.(!empty($this_option_failure['battle_count']) ? ($this_option_failure['battle_count'] == 1 ? '1 Time' : $this_option_failure['battle_count'].' Times') : '0 Times');
-                if (!empty($this_option_complete)){
-                    if (!empty($this_option_complete['battle_max_points'])){
-                        $this_option_title .= ' <br />Max Points : '.(!empty($this_option_complete['battle_max_points']) ? number_format($this_option_complete['battle_max_points']) : 0).'';
-                        $this_option_title .= ' | Min Points : '.(!empty($this_option_complete['battle_min_points']) ? number_format($this_option_complete['battle_min_points']) : 0).'';
-                    }
-                    if (!empty($this_option_complete['battle_max_turns'])){
-                        $this_option_title .= ' <br />Max Turns : '.(!empty($this_option_complete['battle_max_turns']) ? number_format($this_option_complete['battle_max_turns']) : 0).'';
-                        $this_option_title .= ' | Min Turns : '.(!empty($this_option_complete['battle_min_turns']) ? number_format($this_option_complete['battle_min_turns']) : 0).'';
-                    }
-                    if (!empty($this_option_complete['battle_max_robots'])){
-                        $this_option_title .= ' <br />Max Robots : '.(!empty($this_option_complete['battle_max_robots']) ? number_format($this_option_complete['battle_max_robots']) : 0).'';
-                        $this_option_title .= ' | Min Robots : '.(!empty($this_option_complete['battle_min_robots']) ? number_format($this_option_complete['battle_min_robots']) : 0).'';
+            if (!isset($this_battleinfo['battle_counts'])
+                || $this_battleinfo['battle_counts'] !== false){
+                if (!empty($this_option_complete) || !empty($this_option_failure) || !empty($this_has_field_star)){
+                    $this_option_title .= ' <hr />&laquo; Battle Records &raquo;';
+                    $this_option_title .= ' <br />Cleared : '.(!empty($this_option_complete['battle_count']) ? ($this_option_complete['battle_count'] == 1 ? '1 Time' : $this_option_complete['battle_count'].' Times') : '0 Times');
+                    $this_option_title .= ' | Failed : '.(!empty($this_option_failure['battle_count']) ? ($this_option_failure['battle_count'] == 1 ? '1 Time' : $this_option_failure['battle_count'].' Times') : '0 Times');
+                    if (!empty($this_option_complete)){
+                        if (!empty($this_option_complete['battle_max_points'])){
+                            $this_option_title .= ' <br />Max Points : '.(!empty($this_option_complete['battle_max_points']) ? number_format($this_option_complete['battle_max_points']) : 0).'';
+                            $this_option_title .= ' | Min Points : '.(!empty($this_option_complete['battle_min_points']) ? number_format($this_option_complete['battle_min_points']) : 0).'';
+                        }
+                        if (!empty($this_option_complete['battle_max_turns'])){
+                            $this_option_title .= ' <br />Max Turns : '.(!empty($this_option_complete['battle_max_turns']) ? number_format($this_option_complete['battle_max_turns']) : 0).'';
+                            $this_option_title .= ' | Min Turns : '.(!empty($this_option_complete['battle_min_turns']) ? number_format($this_option_complete['battle_min_turns']) : 0).'';
+                        }
+                        if (!empty($this_option_complete['battle_max_robots'])){
+                            $this_option_title .= ' <br />Max Robots : '.(!empty($this_option_complete['battle_max_robots']) ? number_format($this_option_complete['battle_max_robots']) : 0).'';
+                            $this_option_title .= ' | Min Robots : '.(!empty($this_option_complete['battle_min_robots']) ? number_format($this_option_complete['battle_min_robots']) : 0).'';
+                        }
                     }
                 }
             }
