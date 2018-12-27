@@ -74,9 +74,12 @@ $temp_critical_chance = (int)($temp_critical_chance);
 
 // Check if the switch should be disabled
 $temp_switch_disabled = false;
-if ($active_target_robot->robot_status != 'disabled' && !empty($active_target_robot->robot_attachments)){
-    foreach ($active_target_robot->robot_attachments AS $attachment_token => $attachment_info){
-        if (!empty($attachment_info['attachment_switch_disabled'])){ $temp_switch_disabled = true; }
+if ($active_target_robot->robot_status != 'disabled'){
+    $active_target_attachments = $active_target_robot->get_current_attachments();
+    if (!empty($active_target_attachments)){
+        foreach ($active_target_attachments AS $attachment_token => $attachment_info){
+            if (!empty($attachment_info['attachment_switch_disabled'])){ $temp_switch_disabled = true; }
+        }
     }
 }
 
