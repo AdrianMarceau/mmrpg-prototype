@@ -4,9 +4,12 @@ ob_start();
 
     // Check if the switch should be disabled
     $this_switch_disabled = false;
-    if ($this_robot->robot_status != 'disabled' && $this_robot->robot_position == 'active' && !empty($this_robot->robot_attachments)){
-        foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
-            if (isset($attachment_info['attachment_switch_disabled']) && $attachment_info['attachment_switch_disabled'] == 1){ $this_switch_disabled = true; }
+    if ($this_robot->robot_status != 'disabled' && $this_robot->robot_position == 'active'){
+        $this_robot_attachments = $this_robot->get_current_attachments();
+        if (!empty($this_robot_attachments)){
+            foreach ($this_robot_attachments AS $attachment_token => $attachment_info){
+                if (isset($attachment_info['attachment_switch_disabled']) && $attachment_info['attachment_switch_disabled'] == 1){ $this_switch_disabled = true; }
+            }
         }
     }
 
@@ -53,9 +56,12 @@ ob_start();
 
                 // Check if the switch should be disabled based on attachments on this robot
                 $temp_switch_disabled = false;
-                if ($temp_robot->robot_status != 'disabled' && !empty($temp_robot->robot_attachments)){
-                    foreach ($temp_robot->robot_attachments AS $attachment_token => $attachment_info){
-                        if (!empty($attachment_info['attachment_switch_disabled'])){ $temp_switch_disabled = true; }
+                if ($temp_robot->robot_status != 'disabled'){
+                    $temp_robot_attachments = $active_target_robot->get_current_attachments();
+                    if (!empty($temp_robot_attachments)){
+                        foreach ($temp_robot_attachments AS $attachment_token => $attachment_info){
+                            if (!empty($attachment_info['attachment_switch_disabled'])){ $temp_switch_disabled = true; }
+                        }
                     }
                 }
 
