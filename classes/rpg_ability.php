@@ -2350,7 +2350,8 @@ class rpg_ability extends rpg_object {
 
         // Loop through any attachments and boost power for each buster charge
         $temp_new_damage = $this_ability->ability_base_damage;
-        foreach ($this_robot->robot_attachments AS $this_attachment_token => $this_attachment_info){
+        $this_robot_attachments = $this_robot->get_current_attachments();
+        foreach ($this_robot_attachments AS $this_attachment_token => $this_attachment_info){
             if ($this_attachment_token == 'ability_'.$this_ability->ability_type.'-buster'){
                 $temp_new_damage += 2;
             }
@@ -2392,7 +2393,8 @@ class rpg_ability extends rpg_object {
             );
 
         // Loop through each existing attachment and alter the start frame by one
-        foreach ($this_robot->robot_attachments AS $key => $info){
+        $this_robot_attachments = $this_robot->get_current_attachments();
+        foreach ($this_robot_attachments AS $key => $info){
             // Move the start frame to the end of the queue so it doesn't overlay with others
             $temp_first = array_shift($this_attachment_info['ability_frame_animate']);
             array_push($this_attachment_info['ability_frame_animate'], $temp_first);
@@ -2404,7 +2406,7 @@ class rpg_ability extends rpg_object {
         }
 
         // Define the charge required flag based on existing attachments of this ability
-        $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+        $this_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
         // If this robot is holding a charge module, bypass changing and set to false
         if ($this_robot->has_item('charge-module')){ $this_charge_required = false; }
 
@@ -2475,7 +2477,8 @@ class rpg_ability extends rpg_object {
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
         // Define the charge required flag based on existing attachments of this ability
-        $this_charge_required = !isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+        $this_robot_attachments = $this_robot->get_current_attachments();
+        $this_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
         // If this robot is holding a Charge Module, bypass changing and set to false
         if ($this_robot->has_item('charge-module')){ $this_charge_required = false; }
 
