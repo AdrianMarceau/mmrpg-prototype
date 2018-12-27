@@ -574,8 +574,9 @@ class rpg_item_recovery extends rpg_recovery {
             if ($trigger_options['apply_modifiers'] != false && $trigger_options['referred_recovery'] == false){
 
                 // If this robot has an attachment with a recovery multiplier
-                if (!empty($this_robot->robot_attachments)){
-                    foreach ($this_robot->robot_attachments AS $temp_token => $temp_info){
+                $this_robot_attachments = $this_robot->get_current_attachments();
+                if (!empty($this_robot_attachments)){
+                    foreach ($this_robot_attachments AS $temp_token => $temp_info){
                         $temp_token_debug = str_replace('item_', 'attachment_', $temp_token);
 
                         // First check to see if any basic boosters or breakers have been created for this robot
@@ -676,8 +677,9 @@ class rpg_item_recovery extends rpg_recovery {
                 }
 
                 // If this robot has an attachment with a recovery multiplier
-                if (!empty($target_robot->robot_attachments)){
-                    foreach ($target_robot->robot_attachments AS $temp_token => $temp_info){
+                $target_robot_attachments = $target_robot->get_current_attachments();
+                if (!empty($target_robot_attachments)){
+                    foreach ($target_robot_attachments AS $temp_token => $temp_info){
                         $temp_token_debug = str_replace('item_', 'attachment_', $temp_token);
 
                         // First check to see if any basic boosters or breakers have been created for this robot
@@ -1059,9 +1061,11 @@ class rpg_item_recovery extends rpg_recovery {
             // Ensure the item was a success before checking attachments
             if ($this_item->item_results['this_result'] == 'success'){
                 // If this robot has any attachments, loop through them
-                if (!empty($this_robot->robot_attachments)){
+                $static_attachment_key = $this_robot->get_static_attachment_key();
+                $this_robot_attachments = $this_robot->get_current_attachments();
+                if (!empty($this_robot_attachments)){
                     $this_battle->events_debug(__FILE__, __LINE__, 'checkpoint has attachments');
-                    foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
+                    foreach ($this_robot_attachments AS $attachment_token => $attachment_info){
 
                         // Ensure this item has a type before checking weaknesses, resistances, etc.
                         if (!empty($this_item->item_type)
@@ -1076,7 +1080,9 @@ class rpg_item_recovery extends rpg_recovery {
                                 $this_battle->events_debug(__FILE__, __LINE__, 'checkpoint weaknesses');
                                 // Remove this attachment and inflict damage on the robot
                                 unset($this_robot->robot_attachments[$attachment_token]);
+                                unset($this_robot->battle->battle_attachments[$static_attachment_key][$attachment_token]);
                                 $this_robot->update_session();
+                                $this_robot->battle->update_session();
                                 if ($attachment_info['attachment_destroy'] !== false){
                                     $temp_attachment = rpg_game::get_item($this_robot->battle, $this_robot->player, $this_robot, array('item_token' => $attachment_info['item_token']));
                                     $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
