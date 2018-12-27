@@ -57,7 +57,7 @@ ob_start();
                 // Check if the switch should be disabled based on attachments on this robot
                 $temp_switch_disabled = false;
                 if ($temp_robot->robot_status != 'disabled'){
-                    $temp_robot_attachments = $active_target_robot->get_current_attachments();
+                    $temp_robot_attachments = $temp_robot->get_current_attachments();
                     if (!empty($temp_robot_attachments)){
                         foreach ($temp_robot_attachments AS $attachment_token => $attachment_info){
                             if (!empty($attachment_info['attachment_switch_disabled'])){ $temp_switch_disabled = true; }
