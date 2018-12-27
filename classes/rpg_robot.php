@@ -662,7 +662,7 @@ class rpg_robot extends rpg_object {
         $current_attachments = array();
         if (!empty($this->robot_attachments)){ $current_attachments += $this->robot_attachments; }
         $static_attachment_key = $this->get_static_attachment_key();
-        if (!empty($this_battle->battle_attachments[$static_attachment_key])){ $current_attachments += $this_battle->battle_attachments[$static_attachment_key]; }
+        if (!empty($this->battle->battle_attachments[$static_attachment_key])){ $current_attachments += $this->battle->battle_attachments[$static_attachment_key]; }
         return $current_attachments;
     }
 
@@ -4540,11 +4540,11 @@ class rpg_robot extends rpg_object {
         }
 
         // If this robot has any attachments, loop through them
-        if ($this_robot->has_attachments()){
+        $this_robot_attachments = $this_robot->get_current_attachments();
+        if (!empty($this_robot_attachments)){
             $attachment_action_flag = false;
             $attachment_key = 0;
-            $robot_attachments = $this_robot->get_attachments();
-            foreach ($robot_attachments AS $attachment_token => $attachment_info){
+            foreach ($this_robot_attachments AS $attachment_token => $attachment_info){
 
                 $attachment_debug_token = str_replace('ability_', '', $attachment_token);
                 $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has attachment '.$attachment_debug_token);
