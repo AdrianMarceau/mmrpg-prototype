@@ -648,6 +648,14 @@ class rpg_robot extends rpg_object {
         return $lookup;
     }
 
+    public function get_static_attachment_key(){
+        $position = $this->get_info('robot_position');
+        $static_attachment_key = $this->player->get_info('player_side');
+        $static_attachment_key .= '/'.$position;
+        if ($position !== 'active'){ $static_attachment_key .= '/'.$this->get_info('robot_key'); }
+        return $static_attachment_key;
+    }
+
     // Define a public function for applying robot stat bonuses
     public function apply_stat_bonuses(){
 
