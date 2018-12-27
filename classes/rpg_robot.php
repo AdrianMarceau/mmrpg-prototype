@@ -1424,11 +1424,13 @@ class rpg_robot extends rpg_object {
         // -- CHECK ATTACHMENTS -- //
 
         // If this robot has any attachments, loop through them
-        if (!empty($this->robot_attachments)){
+        $this_attachments = $this->get_current_attachments();
+        $static_attachment_key = $this->get_static_attachment_key();
+        if (!empty($this_attachments)){
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
             $db_ability_fields = rpg_ability::get_index_fields(true);
             $temp_attachments_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-            foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
+            foreach ($this_attachments AS $attachment_token => $attachment_info){
 
                 // Ensure this ability has a type before checking weaknesses, resistances, etc.
                 if (!empty($this_ability->ability_type)){
@@ -1441,7 +1443,9 @@ class rpg_robot extends rpg_object {
                         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint weaknesses');
                         // Remove this attachment and inflict damage on the robot
                         unset($this->robot_attachments[$attachment_token]);
+                        unset($this->battle->battle_attachments[$static_attachment_key][$attachment_token]);
                         $this->update_session();
+                        $this->battle->update_session();
                         if ($attachment_info['attachment_destroy'] !== false){
                             $temp_ability = rpg_ability::parse_index_info($temp_attachments_index[$attachment_info['ability_token']]);
                             $attachment_info = array_merge($temp_ability, $attachment_info);
@@ -1598,11 +1602,13 @@ class rpg_robot extends rpg_object {
         // -- CHECK ATTACHMENTS -- //
 
         // If this robot has any attachments, loop through them
-        if (!empty($this->robot_attachments)){
+        $this_attachments = $this->get_current_attachments();
+        $static_attachment_key = $this->get_static_attachment_key();
+        if (!empty($this_attachments)){
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
             $db_ability_fields = rpg_ability::get_index_fields(true);
             $temp_attachments_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
-            foreach ($this->robot_attachments AS $attachment_token => $attachment_info){
+            foreach ($this_attachments AS $attachment_token => $attachment_info){
 
                 // Ensure this item has a type before checking weaknesses, resistances, etc.
                 if (!empty($this_item->item_type)){
@@ -1615,7 +1621,9 @@ class rpg_robot extends rpg_object {
                         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint weaknesses');
                         // Remove this attachment and inflict damage on the robot
                         unset($this->robot_attachments[$attachment_token]);
+                        unset($this->battle->battle_attachments[$static_attachment_key][$attachment_token]);
                         $this->update_session();
+                        $this->battle->update_session();
                         if ($attachment_info['attachment_destroy'] !== false){
                             $temp_item = rpg_item::parse_index_info($temp_attachments_index[$attachment_info['item_token']]);
                             $attachment_info = array_merge($temp_item, $attachment_info);
