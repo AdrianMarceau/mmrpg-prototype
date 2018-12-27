@@ -207,6 +207,7 @@ class rpg_battle extends rpg_object {
         $this->battle_rewards = isset($this_battleinfo['battle_rewards']) ? $this_battleinfo['battle_rewards'] : array();
         $this->battle_points = isset($this_battleinfo['battle_points']) ? $this_battleinfo['battle_points'] : 0;
         $this->battle_level = isset($this_battleinfo['battle_level']) ? $this_battleinfo['battle_level'] : 0;
+        $this->battle_attachments = isset($this_battleinfo['battle_attachments']) ? $this_battleinfo['battle_attachments'] : array();
 
         // Define the internal robot base values using the robots index array
         $this->battle_base_name = isset($this_battleinfo['battle_base_name']) ? $this_battleinfo['battle_base_name'] : $this->battle_name;
@@ -216,6 +217,7 @@ class rpg_battle extends rpg_object {
         $this->battle_base_rewards = isset($this_battleinfo['battle_base_rewards']) ? $this_battleinfo['battle_base_rewards'] : $this->battle_rewards;
         $this->battle_base_points = isset($this_battleinfo['battle_base_points']) ? $this_battleinfo['battle_base_points'] : $this->battle_points;
         $this->battle_base_level = isset($this_battleinfo['battle_base_level']) ? $this_battleinfo['battle_base_level'] : $this->battle_level;
+        $this->battle_base_attachments = isset($this_battleinfo['battle_base_attachments']) ? $this_battleinfo['battle_base_attachments'] : $this->battle_attachments;
 
         // Collect any functions associated with this battle
         $this->battle_functions = isset($this_battleinfo['battle_functions']) ? $this_battleinfo['battle_functions'] : 'battles/battle.php';
@@ -2579,6 +2581,7 @@ class rpg_battle extends rpg_object {
             'battle_rewards' => $this->battle_rewards,
             'battle_points' => $this->battle_points,
             'battle_level' => $this->battle_level,
+            'battle_attachments' => $this->battle_attachments,
             'battle_base_name' => $this->battle_base_name,
             'battle_base_token' => $this->battle_base_token,
             'battle_base_description' => $this->battle_base_description,
@@ -2586,6 +2589,7 @@ class rpg_battle extends rpg_object {
             'battle_base_rewards' => $this->battle_base_rewards,
             'battle_base_points' => $this->battle_base_points,
             'battle_base_level' => $this->battle_base_level,
+            'battle_base_attachments' => $this->battle_base_attachments,
             'battle_counts' => $this->battle_counts,
             'battle_status' => $this->battle_status,
             'battle_result' => $this->battle_result,
