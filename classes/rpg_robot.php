@@ -648,12 +648,22 @@ class rpg_robot extends rpg_object {
         return $lookup;
     }
 
+    // Define a function for generating a static attachment key for this position
     public function get_static_attachment_key(){
         $position = $this->get_info('robot_position');
         $static_attachment_key = $this->player->get_info('player_side');
         $static_attachment_key .= '/'.$position;
         if ($position !== 'active'){ $static_attachment_key .= '/'.$this->get_info('robot_key'); }
         return $static_attachment_key;
+    }
+
+    // Define a function for collecting all attachments on this robot or affecting their position
+    public function get_current_attachments(){
+        $current_attachments = array();
+        if (!empty($this->robot_attachments)){ $current_attachments += $this->robot_attachments; }
+        $static_attachment_key = $this->get_static_attachment_key();
+        if (!empty($this_battle->battle_attachments[$static_attachment_key])){ $current_attachments += $this_battle->battle_attachments[$static_attachment_key]; }
+        return $current_attachments;
     }
 
     // Define a public function for applying robot stat bonuses
