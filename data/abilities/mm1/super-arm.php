@@ -6,12 +6,12 @@ $ability = array(
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/004',
     'ability_image_sheets' => 8,
-    'ability_description' => 'The user creates a blockade using the surrounding environment to bolster shields and reduce damage by {RECOVERY2}%!  The blockade can also be thrown at the target for massive damage!',
+    'ability_description' => 'The user creates a blockade using the surrounding environment to bolster shields and reduce damage by half!  The blockade can also be thrown at the target for massive damage!',
     'ability_type' => 'impact',
     'ability_type2' => 'shield',
     'ability_energy' => 8,
     'ability_damage' => 30,
-    'ability_recovery2' => 60,
+    'ability_recovery2' => 50,
     'ability_recovery_percent2' => true,
     'ability_accuracy' => 98,
     'ability_function' => function($objects){
@@ -40,12 +40,15 @@ $ability = array(
         }
 
         // Define this ability's attachment token
+        $static_attachment_key = $this_robot->get_static_attachment_key();
         $this_gender = preg_match('/^(roll|disco|rhythm|[-a-z]+woman)$/i', $this_robot->robot_token) ? 'female' : 'male';
         $this_effect_multiplier = 1 - ($this_ability->ability_recovery2 / 100);
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
+            'robot_id' => $this_robot->robot_id,
+            'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
             'ability_image' => 'super-arm'.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : ''),
             'attachment_token' => $this_attachment_token,
@@ -88,15 +91,15 @@ $ability = array(
                 ),
             'ability_frame' => $this_target_frame,
             'ability_frame_animate' => array($this_target_frame),
-            'ability_frame_offset' => array('x' => 105, 'y' => 0, 'z' => -10)
+            'ability_frame_offset' => array('x' => 105, 'y' => 0, 'z' => 2)
             );
 
         // Create the attachment object for this ability
         $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $this_attachment_info);
         $this_attachment->set_image($this_attachment_info['ability_image']);
 
-        // Check if this ability is already summoned
-        $is_summoned = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+        // Check if this ability is already summoned to the field
+        $is_summoned = isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token]) ? true : false;
 
         // If the user is holding a Charge Module, auto-summon the ability
         if ($this_robot->has_item('charge-module')){ $is_summoned = true; }
@@ -111,17 +114,17 @@ $ability = array(
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
-            // Attach this ability attachment to the robot using it
-            $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-            $this_robot->update_session();
+            // Attach this ability attachment to the battle field itself
+            $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+            $this_battle->update_session();
 
         }
         // Else if the ability flag was set, leaf shield is thrown and defense is lowered by 30%
         else {
 
-            // Remove this ability attachment to the robot using it
-            unset($this_robot->robot_attachments[$this_attachment_token]);
-            $this_robot->update_session();
+            // Remove this ability attachment from the battle field itself
+            unset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token]);
+            $this_battle->update_session();
 
             // Target the opposing robot
             $this_ability->target_options_update(array(
@@ -164,10 +167,11 @@ $ability = array(
         extract($objects);
 
         // Define this ability's attachment token
+        $static_attachment_key = $this_robot->get_static_attachment_key();
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
-        // Check if this ability is already summoned
-        $is_summoned = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+        // Check if this ability is already summoned to the field
+        $is_summoned = isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token]) ? true : false;
 
         // Check if this ability has a true core-match
         $is_corematch = $this_robot->robot_core == $this_ability->ability_type ? true : false;
