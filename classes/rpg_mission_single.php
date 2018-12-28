@@ -38,7 +38,7 @@ class rpg_mission_single extends rpg_mission {
         $temp_battle_omega['battle_counts'] = true;
         $temp_battle_omega['battle_size'] = '1x1';
         $temp_battle_omega['battle_name'] = 'Chapter Two Master Battle';
-        $temp_battle_omega['battle_token'] = $this_prototype_data['phase_battle_token'].'-'.$this_robot_token;
+        $temp_battle_omega['battle_token'] = ($starfield_mission ? 'starfield' : $this_prototype_data['phase_battle_token']).'-'.$this_robot_token;
         $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
         $temp_battle_omega['battle_field_base']['field_id'] = 100;
         $temp_battle_omega['battle_field_base']['field_token'] = $temp_option_field['field_token'];

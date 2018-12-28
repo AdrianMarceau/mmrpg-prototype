@@ -48,7 +48,7 @@ class rpg_mission_double extends rpg_mission {
                 }
             }
         }
-        $temp_option_battle['battle_token'] = $this_prototype_data['phase_battle_token'].'-'.str_replace('-man', '', $this_robot_tokens[0]).'-'.str_replace('-man', '', $this_robot_tokens[1]);
+        $temp_option_battle['battle_token'] = ($starfield_mission ? 'starfield' : $this_prototype_data['phase_battle_token']).'-'.str_replace('-man', '', $this_robot_tokens[0]).'-'.str_replace('-man', '', $this_robot_tokens[1]);
         $temp_option_battle['battle_phase'] = $this_prototype_data['battle_phase'];
         $temp_option_battle['battle_size'] = '1x2';
         $temp_option_battle['battle_name'] = 'Chapter Four Fusion Battle';
