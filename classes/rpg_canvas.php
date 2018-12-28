@@ -763,24 +763,7 @@ class rpg_canvas {
     }
 
     // Define a function for generating ability canvas variables
-    public static function static_ability_markup($this_ability, $options, $player_data, $robot_data = array()){
-
-        /*
-        // Define the position data
-        $robot_data = array();
-        $robot_data['robot_id'] = 0;
-        $robot_data['robot_key'] = 0;
-        $robot_data['robot_status'] = 'active'
-        $robot_data['robot_position'] = 'active';
-        $robot_data['robot_direction'] = 'right';
-        $robot_data['robot_float'] = 'left';
-        $robot_data['robot_size'] = 40;
-        $robot_data['robot_sprite_size']  = 40;
-        $robot_data['canvas_base_offset_x'] = 0;
-        $robot_data['canvas_base_offset_y'] = 0;
-        $robot_data['canvas_base_offset_z'] = 0;
-        $robot_data['robot_scale'] = 1;
-        */
+    public static function static_ability_markup($this_ability, $options, $player_data, $robot_data){
 
         // Define the variable to hold the console robot data
         $this_data = array();
@@ -1058,6 +1041,106 @@ class rpg_canvas {
                 echo '<div data-item-id="'.$this_data['item_id_token'].'" data-item-quantity="'.$this_data['item_quantity'].'" data-robot-id="'.$robot_data['robot_id_token'].'" class="'.($this_data['item_markup_class'].$this_data['item_frame_classes']).'" style="'.($this_data['item_markup_style'].$this_data['item_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['item_sprite_size'].'" data-direction="'.$this_data['item_direction'].'" data-frame="'.$this_data['item_frame'].'" data-animate="'.$this_data['item_frame_animate'].'" data-position="'.$this_data['item_position'].'" data-status="'.$this_data['item_status'].'" data-scale="'.$this_data['item_scale'].'">'.$this_data['item_token'].'</div>';
 
             }
+
+        // Collect the generated item markup
+        $this_data['item_markup'] .= trim(ob_get_clean());
+
+        // Return the robot canvas data
+        return $this_data;
+
+    }
+
+    // Define a function for generating item canvas variables
+    public static function static_item_markup($this_item, $options, $player_data, $robot_data){
+
+        // Define the variable to hold the console robot data
+        $this_data = array();
+
+        // Define the item data array and populate basic data
+        $this_data['item_markup'] = '';
+        $this_data['data_sticky'] = !empty($options['data_sticky']) ? true : false;
+        $this_data['data_type'] = !empty($options['data_type']) ? $options['data_type'] : 'item';
+        $this_data['data_debug'] = !empty($options['data_debug']) ? $options['data_debug'] : '';
+        $this_data['item_name'] = isset($options['item_name']) ? $options['item_name'] : $this_item->item_name;
+        $this_data['item_id'] = $this_item->item_id;
+        $this_data['item_title'] = $this_item->item_name;
+        $this_data['item_token'] = $this_item->item_token;
+        $this_data['item_id_token'] = $this_item->item_id.'_'.$this_item->item_token;
+        $this_data['item_image'] = isset($options['item_image']) ? $options['item_image'] : $this_item->item_image;
+        $this_data['item_image2'] = isset($options['item_image2']) ? $options['item_image2'] : $this_item->item_image2;
+        $this_data['item_status'] = $robot_data['robot_status'];
+        $this_data['item_position'] = $robot_data['robot_position'];
+        $this_data['item_direction'] = $this_item->robot_id == $robot_data['robot_id'] ? $robot_data['robot_direction'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
+        $this_data['item_float'] = $robot_data['robot_float'];
+        $this_data['item_size'] = $this_data['item_position'] == 'active' ? ($this_item->item_image_size * 2) : $this_item->item_image_size;
+        $this_data['item_frame'] = isset($options['item_frame']) ? $options['item_frame'] : $this_item->item_frame;
+        $this_data['item_frame_span'] = isset($options['item_frame_span']) ? $options['item_frame_span'] : $this_item->item_frame_span;
+        $this_data['item_frame_index'] = isset($options['item_frame_index']) ? $options['item_frame_index'] : $this_item->item_frame_index;
+        if (is_numeric($this_data['item_frame']) && $this_data['item_frame'] >= 0){ $this_data['item_frame'] = str_pad($this_data['item_frame'], 2, '0', STR_PAD_LEFT); }
+        elseif (is_numeric($this_data['item_frame']) && $this_data['item_frame'] < 0){ $this_data['item_frame'] = ''; }
+        $this_data['item_frame_offset'] = isset($options['item_frame_offset']) && is_array($options['item_frame_offset']) ? $options['item_frame_offset'] : $this_item->item_frame_offset;
+        $animate_frames_array = isset($options['item_frame_animate']) ? $options['item_frame_animate'] : array($this_data['item_frame']);
+        $animate_frames_string = array();
+        if (!empty($animate_frames_array)){
+            foreach ($animate_frames_array AS $key => $frame){
+                $animate_frames_string[] = is_numeric($frame) ? str_pad($frame, 2, '0', STR_PAD_LEFT) : $frame;
+            }
+        }
+        $this_data['item_frame_animate'] = implode(',', $animate_frames_string);
+        $this_data['item_frame_styles'] = isset($options['item_frame_styles']) ? $options['item_frame_styles'] : $this_item->item_frame_styles;
+        $this_data['item_frame_classes'] = isset($options['item_frame_classes']) ? $options['item_frame_classes'] : $this_item->item_frame_classes;
+
+        $this_data['item_scale'] = isset($robot_data['robot_scale']) ? $robot_data['robot_scale'] : ($robot_data['robot_position'] == 'active' ? 1 : 0.5 + (((8 - $robot_data['robot_key']) / 8) * 0.5));
+
+        // Calculate the rest of the sprite size variables
+        $zoom_size = ($this_item->item_image_size * 2);
+        $this_data['item_sprite_size'] = ceil($this_data['item_scale'] * $zoom_size);
+        $this_data['item_sprite_width'] = ceil($this_data['item_scale'] * $zoom_size);
+        $this_data['item_sprite_height'] = ceil($this_data['item_scale'] * $zoom_size);
+        $this_data['item_image_width'] = ceil($this_data['item_scale'] * $zoom_size * 10);
+        $this_data['item_image_height'] = ceil($this_data['item_scale'] * $zoom_size);
+
+        // Calculate the canvas offset variables for this robot
+        $canvas_offset_data = $this_item->battle->canvas_markup_offset($robot_data['robot_key'], $robot_data['robot_position'], $robot_data['robot_size']);
+
+        // Define the item's canvas offset variables
+        $temp_size_diff = 0;
+        if ($robot_data['robot_sprite_size'] != $this_data['item_sprite_size']){ $temp_size_diff = ceil(($robot_data['robot_sprite_size'] - $this_data['item_sprite_size']) / 2) ; }
+
+        // Calculate the canvas X offsets using the robot's offset as base
+        if ($this_data['item_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] + ($this_data['item_sprite_size'] * ($this_data['item_frame_offset']['x']/100))) + $temp_size_diff; }
+        elseif ($this_data['item_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] - ($this_data['item_sprite_size'] * (($this_data['item_frame_offset']['x'] * -1)/100))) + $temp_size_diff; }
+        else { $this_data['canvas_offset_x'] = $robot_data['canvas_base_offset_x'] + $temp_size_diff; }
+        // Calculate the canvas Y offsets using the robot's offset as base
+        if ($this_data['item_frame_offset']['y'] > 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_base_offset_y'] + ($this_data['item_sprite_size'] * ($this_data['item_frame_offset']['y']/100))); }
+        elseif ($this_data['item_frame_offset']['y'] < 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_base_offset_y'] - ($this_data['item_sprite_size'] * (($this_data['item_frame_offset']['y'] * -1)/100))); }
+        else { $this_data['canvas_offset_y'] = $robot_data['canvas_base_offset_y'];  }
+        // Calculate the canvas Z offsets using the robot's offset as base
+        if ($this_data['item_frame_offset']['z'] > 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_base_offset_z'] + $this_data['item_frame_offset']['z']); }
+        elseif ($this_data['item_frame_offset']['z'] < 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_base_offset_z'] - ($this_data['item_frame_offset']['z'] * -1)); }
+        else { $this_data['canvas_offset_z'] = $robot_data['canvas_base_offset_z'];  }
+
+
+        // Define the rest of the display variables
+        if (!preg_match('/^images/i', $this_data['item_image'])){ $this_data['item_image_path'] = 'images/items/'.$this_data['item_image'].'/sprite_'.$this_data['item_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
+        else { $this_data['item_image_path'] = $this_data['item_image']; }
+        $this_data['item_markup_class'] = 'sprite sprite_item ';
+        $this_data['item_markup_class'] .= 'sprite_'.$this_data['item_sprite_size'].'x'.$this_data['item_sprite_size'].' sprite_'.$this_data['item_sprite_size'].'x'.$this_data['item_sprite_size'].'_'.$this_data['item_frame'].' ';
+        $this_data['item_markup_class'] .= 'item_status_'.$this_data['item_status'].' item_position_'.$this_data['item_position'].' ';
+        $frame_position = is_numeric($this_data['item_frame']) ? (int)($this_data['item_frame']) : array_search($this_data['item_frame'], $this_data['item_frame_index']);
+        if ($frame_position === false){ $frame_position = 0; }
+        $frame_background_offset = -1 * ceil(($this_data['item_sprite_size'] * $frame_position));
+        $this_data['item_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
+        $this_data['item_markup_style'] .= 'pointer-events: none; z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['item_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
+        $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image_path'].'); width: '.($this_data['item_sprite_size'] * $this_data['item_frame_span']).'px; height: '.$this_data['item_sprite_size'].'px; background-size: '.$this_data['item_image_width'].'px '.$this_data['item_image_height'].'px; ';
+
+        // Generate the final markup for the canvas item
+        ob_start();
+
+            // Display the item's battle sprite
+            $temp_markup = '<div data-item-id="'.$this_data['item_id_token'].'" class="'.($this_data['item_markup_class'].$this_data['item_frame_classes']).'" style="'.($this_data['item_markup_style'].$this_data['item_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['item_sprite_size'].'" data-direction="'.$this_data['item_direction'].'" data-frame="'.$this_data['item_frame'].'" data-animate="'.$this_data['item_frame_animate'].'" data-position="'.$this_data['item_position'].'" data-status="'.$this_data['item_status'].'" data-scale="'.$this_data['item_scale'].'"></div>';
+            if (!empty($this_data['item_image2'])){ $temp_markup .= str_replace('/'.$this_data['item_image'].'/', '/'.$this_data['item_image2'].'/', $temp_markup); }
+            echo $temp_markup;
 
         // Collect the generated item markup
         $this_data['item_markup'] .= trim(ob_get_clean());
@@ -1599,6 +1682,7 @@ class rpg_canvas {
                 $right_side_player = $eventinfo['target_player'];
                 $left_side_player_data = $this_player_data;
                 $right_side_player_data = $target_player_data;
+
             } elseif ($eventinfo['target_player']->player_side === 'left'){
                 $left_side_player = $eventinfo['target_player'];
                 $right_side_player = $eventinfo['this_player'];
@@ -1619,19 +1703,20 @@ class rpg_canvas {
                 if ($static_side !== 'left' && $static_side !== 'right'){ continue; }
                 if ($static_position === 'bench' && !is_numeric($static_key)){ continue; }
 
-                // Collect a reference to the appropriate player side
-                if ($static_side === 'left'){ $static_bench_size = $left_side_player->counters['robots_total']; }
-                elseif ($static_side === 'right'){ $static_bench_size = $right_side_player->counters['robots_total']; }
+                // Collect references to static player & robot variables based on side
+                if ($static_side === 'left'){
+                    $static_bench_size = $left_side_player->counters['robots_total'];
+                    $static_robot_object = rpg_game::get_robot($this_battle, $left_side_player, array('robot_id' => -1, 'robot_token' => 'robot'));
+                } elseif ($static_side === 'right'){
+                    $static_bench_size = $right_side_player->counters['robots_total'];
+                    $static_robot_object = rpg_game::get_robot($this_battle, $right_side_player, array('robot_id' => -2, 'robot_token' => 'robot'));
+                }
 
                 // Loop through all attachments on this side and position
                 foreach ($static_attachments AS $attachment_token => $attachment_info){
 
                     // If a source robot was not provided, we can't do anything (yet?)
                     if (empty($attachment_info['robot_id'])){ continue; }
-
-                    // Collect a temporary reference to the creator robot
-                    $temp_robot = rpg_game::find_robot(array('robot_id' => $attachment_info['robot_id']));
-                    if (empty($temp_robot)){ continue; }
 
                     // Define the pseudo robot data for positioning
                     $static_robot_data = array();
@@ -1641,8 +1726,8 @@ class rpg_canvas {
                     $static_robot_data['robot_position'] = $static_position;
                     $static_robot_data['robot_direction'] = $static_side === 'left' ? 'right' : 'left';
                     $static_robot_data['robot_float'] = $static_side;
-                    $static_robot_data['robot_size'] = $temp_robot->robot_image_size;
-                    $static_robot_data['robot_sprite_size']  = $temp_robot->robot_image_size * 2;
+                    $static_robot_data['robot_size'] = $static_robot_object->robot_image_size;
+                    $static_robot_data['robot_sprite_size']  = $static_robot_object->robot_image_size * 2;
 
                     // Define the rest of the position variables based on above data
                     $static_position = $this_battle->canvas_markup_offset_perspective(
@@ -1662,7 +1747,7 @@ class rpg_canvas {
                         // Create the temporary ability object using the provided data and generate its markup data
                         $attachment_info['flags']['is_attachment'] = true;
                         if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
-                        $this_ability = rpg_game::get_ability($this_battle, $left_side_player, $temp_robot, $attachment_info);
+                        $this_ability = rpg_game::get_ability($this_battle, $left_side_player, $static_robot_object, $attachment_info);
 
                         // Define this ability data array and generate the markup data
                         $this_attachment_options = $options;
@@ -1682,7 +1767,6 @@ class rpg_canvas {
                         $this_attachment_options['ability_frame_offset'] = isset($attachment_info['ability_frame_offset']) ? $attachment_info['ability_frame_offset'] : $this_ability->ability_frame_offset;
                         $this_attachment_options['ability_frame_styles'] = isset($attachment_info['ability_frame_styles']) ? $attachment_info['ability_frame_styles'] : $this_ability->ability_frame_styles;
                         $this_attachment_options['ability_frame_classes'] = isset($attachment_info['ability_frame_classes']) ? $attachment_info['ability_frame_classes'] : $this_ability->ability_frame_classes;
-                        //$this_ability_data = $this_ability->canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
 
                         // Collect and appent static abilty markup to the parent string
                         $this_attachment_data = rpg_canvas::static_ability_markup($this_ability, $this_attachment_options, $left_side_player_data, $static_robot_data);
@@ -1695,7 +1779,7 @@ class rpg_canvas {
                         // Create the temporary item object using the provided data and generate its markup data
                         $attachment_info['flags']['is_attachment'] = true;
                         if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
-                        $this_item = rpg_game::get_item($this_battle, $left_side_player, $temp_robot, $attachment_info);
+                        $this_item = rpg_game::get_item($this_battle, $left_side_player, $static_robot_object, $attachment_info);
 
                         // Define this item data array and generate the markup data
                         $this_attachment_options = $options;
@@ -1715,7 +1799,6 @@ class rpg_canvas {
                         $this_attachment_options['item_frame_offset'] = isset($attachment_info['item_frame_offset']) ? $attachment_info['item_frame_offset'] : $this_item->item_frame_offset;
                         $this_attachment_options['item_frame_styles'] = isset($attachment_info['item_frame_styles']) ? $attachment_info['item_frame_styles'] : $this_item->item_frame_styles;
                         $this_attachment_options['item_frame_classes'] = isset($attachment_info['item_frame_classes']) ? $attachment_info['item_frame_classes'] : $this_item->item_frame_classes;
-                        //$this_item_data = $this_item->canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
 
                         // Collect and appent static abilty markup to the parent string
                         $this_attachment_data = rpg_canvas::static_item_markup($this_item, $this_attachment_options, $left_side_player_data, $static_robot_data);
