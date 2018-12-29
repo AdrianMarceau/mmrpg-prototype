@@ -16,7 +16,24 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Define this ability's attachment token
+        // Predefine attachment create and destroy text for later
+        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' in a puddle of crude oil!<br /> '.
+            'That position on the field is vulnerable to '.
+            rpg_type::print_span('flame').' and '.rpg_type::print_span('explode').' '.
+            'types now!'
+            );
+        $this_destroy_text = ('The '.$this_ability->print_name().'\'s crude oil faded away...<br /> '.
+            'That position on the field isn\'t vulnerable to '.
+            rpg_type::print_span('flame').' or '.rpg_type::print_span('explode').' '.
+            'types anymore!'
+            );
+        $this_refresh_text = ($this_robot->print_name().' refreshed the '.$this_ability->print_name().'\'s puddle of crude oil!<br /> '.
+            'That position on the field is still vulnerable to '.
+            rpg_type::print_span('flame').' and '.rpg_type::print_span('explode').' '.
+            'types!'
+            );
+
+        // Define this ability's attachment token and info
         $static_attachment_key = $target_robot->get_static_attachment_key();
         $static_attachment_duration = 6;
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
@@ -30,15 +47,14 @@ $ability = array(
             'attachment_sticky' => true,
             'attachment_damage_input_booster_flame' => 2.0,
             'attachment_damage_input_booster_explode' => 2.0,
-            'attachment_weaknesses' => array('flame', 'explode'),
             'attachment_create' => array(
                 'trigger' => 'special',
                 'kind' => '',
                 'percent' => true,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
-                'success' => array(9, 0, -10, -8, $target_robot->print_name().' found '.$target_robot->get_pronoun('possessive').' in a puddle of crude oil!<br /> '.$target_robot->print_name().'\'s position on the field is now vulnerable to Flame and Explode!'),
-                'failure' => array(9, 0, -10, -8, $target_robot->print_name().' found '.$target_robot->get_pronoun('possessive').' in a puddle of crude oil!<br /> '.$target_robot->print_name().'\'s position on the field is now vulnerable to Flame and Explode!')
+                'success' => array(9, 0, -10, -8, $this_create_text),
+                'failure' => array(9, 0, -10, -8, $this_create_text)
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -48,14 +64,8 @@ $ability = array(
                 'modifiers' => false,
                 'frame' => 'taunt',
                 'rates' => array(100, 0, 0),
-                'success' => array(9, 0, -9999, 0,
-                    'The '.$this_ability->print_name().'\'s puddle of oil faded away...<br /> '.
-                    'This position on the field isn\'t vulnerable to Flame and Explode anymore!'
-                    ),
-                'failure' => array(9, 0, -9999, 0,
-                    'The '.$this_ability->print_name().'\'s puddle of oil faded away!<br /> '.
-                    'This position on the field isn\'t vulnerable to Flame and Explode anymore!'
-                    )
+                'success' => array(9, 0, -9999, 0, $this_destroy_text),
+                'failure' => array(9, 0, -9999, 0, $this_destroy_text)
                 ),
             'ability_frame' => 1,
             'ability_frame_animate' => array(1, 2),
@@ -87,8 +97,7 @@ $ability = array(
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
         // Attach the ability to the target if not disabled
-        if ($target_robot->robot_status != 'disabled'
-            && $this_ability->ability_results['this_result'] != 'failure'){
+        if ($this_ability->ability_results['this_result'] != 'failure'){
 
             // If the ability flag was not set, attach the hazard to the target position
             if (!isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token])){
@@ -98,10 +107,12 @@ $ability = array(
                 $this_battle->update_session();
 
                 // Target this robot's self
-                $this_robot->robot_frame = 'base';
-                $this_robot->update_session();
-                $this_ability->target_options_update($this_attachment_info['attachment_create']);
-                $target_robot->trigger_target($target_robot, $this_ability);
+                if ($target_robot->robot_status != 'disabled'){
+                    $this_robot->robot_frame = 'base';
+                    $this_robot->update_session();
+                    $this_ability->target_options_update($this_attachment_info['attachment_create']);
+                    $target_robot->trigger_target($target_robot, $this_ability);
+                }
 
             }
             // Else if the ability flag was set, reinforce the hazard by one more duration point
@@ -114,14 +125,13 @@ $ability = array(
                 $this_battle->update_session();
 
                 // Target the opposing robot
-                $this_ability->target_options_update(array(
-                    'frame' => 'defend',
-                    'success' => array(9, 85, -10, -10,
-                        $this_robot->print_name().' refreshed the '.$this_ability->print_name().'\'s puddle!<br /> '.
-                        $target_robot->print_name().'\'s position on the field is still vulnerable to Flame and Explode!'
-                        )
-                    ));
-                $target_robot->trigger_target($target_robot, $this_ability);
+                if ($target_robot->robot_status != 'disabled'){
+                    $this_ability->target_options_update(array(
+                        'frame' => 'defend',
+                        'success' => array(9, 85, -10, -10, $this_refresh_text)
+                        ));
+                    $target_robot->trigger_target($target_robot, $this_ability);
+                }
 
             }
 
