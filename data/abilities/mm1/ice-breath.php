@@ -29,7 +29,7 @@ $ability = array(
         // Define this ability's attachment token
         $static_attachment_key = $target_robot->get_static_attachment_key();
         $static_attachment_duration = 3;
-        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
+        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
@@ -38,7 +38,6 @@ $ability = array(
             'attachment_duration' => $static_attachment_duration,
             'attachment_token' => $this_attachment_token,
             'attachment_sticky' => true,
-            'attachment_bias' => 'negative',
             'attachment_switch_disabled' => true,
             'attachment_weaknesses' => array('flame', 'laser'),
             'attachment_weaknesses_trigger' => 'either',
