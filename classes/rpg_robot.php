@@ -652,17 +652,17 @@ class rpg_robot extends rpg_object {
     public function get_static_attachment_key(){
         $position = $this->get_info('robot_position');
         $static_attachment_key = $this->player->get_info('player_side');
-        $static_attachment_key .= '/'.$position;
-        if ($position !== 'active'){ $static_attachment_key .= '/'.$this->get_info('robot_key'); }
+        $static_attachment_key .= '-'.$position;
+        if ($position !== 'active'){ $static_attachment_key .= '-'.$this->get_info('robot_key'); }
         return $static_attachment_key;
     }
 
     // Define a function for collecting all attachments on this robot or affecting their position
     public function get_current_attachments(){
         $current_attachments = array();
-        if (!empty($this->robot_attachments)){ $current_attachments += $this->robot_attachments; }
+        if (!empty($this->robot_attachments)){ foreach ($this->robot_attachments AS $token => $info){ $current_attachments[$token] = $info; }  }
         $static_attachment_key = $this->get_static_attachment_key();
-        if (!empty($this->battle->battle_attachments[$static_attachment_key])){ $current_attachments += $this->battle->battle_attachments[$static_attachment_key]; }
+        if (!empty($this->battle->battle_attachments[$static_attachment_key])){ foreach ($this->battle->battle_attachments[$static_attachment_key] AS $token => $info){ $current_attachments[$token] = $info; } }
         return $current_attachments;
     }
 
@@ -4540,6 +4540,7 @@ class rpg_robot extends rpg_object {
         }
 
         // If this robot has any attachments, loop through them
+        $static_attachment_key = $this_robot->get_static_attachment_key();
         $this_robot_attachments = $this_robot->get_current_attachments();
         if (!empty($this_robot_attachments)){
             $attachment_action_flag = false;
@@ -4548,6 +4549,9 @@ class rpg_robot extends rpg_object {
 
                 $attachment_debug_token = str_replace('ability_', '', $attachment_token);
                 $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has attachment '.$attachment_debug_token);
+
+                // Check to see if this is a static or dynamic attachment
+                $is_static_attachment = !isset($this_robot->robot_attachments[$attachment_token]) ? true : false;
 
                 // Collect or load the attachment into memory
                 $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $attachment_info);
@@ -4562,7 +4566,8 @@ class rpg_robot extends rpg_object {
                     if ($attachment_info['attachment_duration'] > 0){
 
                         $attachment_info['attachment_duration'] = $attachment_info['attachment_duration'] - 1;
-                        $this_robot->set_attachment($attachment_token, $attachment_info);
+                        if ($is_static_attachment){ $this_battle->battle_attachments[$static_attachment_key][$attachment_token] = $attachment_info; }
+                        else { $this_robot->set_attachment($attachment_token, $attachment_info); }
                         $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' duration decreased to '.$attachment_info['attachment_duration']);
 
                     }
@@ -4571,7 +4576,8 @@ class rpg_robot extends rpg_object {
                     else {
 
                         // Remove this attachment and inflict damage on the robot
-                        $this_robot->unset_attachment($attachment_token);
+                        if ($is_static_attachment){ unset($this_battle->battle_attachments[$static_attachment_key][$attachment_token]); }
+                        else { $this_robot->unset_attachment($attachment_token); }
 
                         // ATTACHMENT DESTROY
                         if ($attachment_info['attachment_destroy'] !== false){
