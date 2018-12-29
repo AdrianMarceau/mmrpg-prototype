@@ -5,34 +5,51 @@ $ability = array(
     'ability_token' => 'ice-breath',
     'ability_game' => 'MM01',
     'ability_group' => 'MM01/Weapons/005',
-    'ability_description' => 'The user blows a blast of super-chilled air at the target, freezing them in place to inflict damage and preventing switching!',
+    'ability_description' => 'The user blasts super-chilled air at the target\'s feet to deal damage and freeze them in place! The target is prevented from switching while frozen in the ice.',
     'ability_type' => 'freeze',
-    'ability_damage' => 16,
     'ability_energy' => 4,
+    'ability_damage' => 16,
     'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
         extract($objects);
 
+        // Predefine attachment create and destroy text for later
+        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' frozen in ice!<br /> '.
+            $target_robot->print_name().' is prevented from switching!'
+            );
+        $this_destroy_text = ('The ice surrounding '.$target_robot->print_name().' melted away...<br /> '.
+            $target_robot->print_name().' isn\'t prevented from switching anymore!'
+            );
+        $this_refresh_text = ($this_robot->print_name().' refreshed the ice surrounding '.$target_robot->print_name().'!<br /> '.
+            $target_robot->print_name().' is still prevented from switching!'
+            );
+
         // Define this ability's attachment token
-        $this_gender = preg_match('/^(roll|disco|rhythm|[-a-z]+woman)$/i', $target_robot->robot_token) ? 'female' : 'male';
+        $static_attachment_key = $target_robot->get_static_attachment_key();
+        $static_attachment_duration = 3;
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
+            'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
-            'attachment_duration' => 9,
+            'attachment_duration' => $static_attachment_duration,
+            'attachment_token' => $this_attachment_token,
+            'attachment_sticky' => true,
+            'attachment_bias' => 'negative',
             'attachment_switch_disabled' => true,
-            'attachment_weaknesses' => array('flame', 'explode'),
+            'attachment_weaknesses' => array('flame', 'laser'),
+            'attachment_weaknesses_trigger' => 'either',
             'attachment_create' => array(
                 'trigger' => 'special',
                 'kind' => '',
                 'percent' => true,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
-                'success' => array(9, -10, -5, -10, $target_robot->print_name().' found '.($this_gender == 'female' ? 'herself' : 'himself').' frozen in ice!<br /> '.$target_robot->print_name().' is prevented from switching!'),
-                'failure' => array(9, -10, -5, -10, $target_robot->print_name().' found '.($this_gender == 'female' ? 'herself' : 'himself').' frozen in ice!<br /> '.$target_robot->print_name().' is prevented from switching!')
+                'success' => array(9, -10, -5, -10, $this_create_text),
+                'failure' => array(9, -10, -5, -10, $this_create_text)
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -43,10 +60,10 @@ $ability = array(
                 'modifiers' => false,
                 'frame' => 'taunt',
                 'rates' => array(100, 0, 0),
-                'success' => array(9, 0, -9999, 0,  'The ice surrounding '.$target_robot->print_name().' melted away&hellip;<br /> '.$target_robot->print_name().' is no longer prevented from switching!'),
-                'failure' => array(9, 0, -9999, 0, 'The ice surrounding '.$target_robot->print_name().' melted away&hellip;<br /> '.$target_robot->print_name().' is no longer prevented from switching!')
+                'success' => array(9, 0, -9999, 0,  $this_destroy_text),
+                'failure' => array(9, 0, -9999, 0, $this_destroy_text)
                 ),
-            'ability_frame' => 0,
+            'ability_frame' => 2,
             'ability_frame_animate' => array(2, 3),
             'ability_frame_offset' => array('x' => 0, 'y' => -5, 'z' => 8)
             );
@@ -76,39 +93,41 @@ $ability = array(
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
         // Attach the ability to the target if not disabled
-        if ($target_robot->robot_status != 'disabled'
-            && $this_ability->ability_results['this_result'] != 'failure'
-            && $this_ability->ability_results['this_amount'] > 0){
+        if ($this_ability->ability_results['this_result'] != 'failure'){
 
-            // If the ability flag was not set, attach the Proto Shield to the target
-            if (!isset($target_robot->robot_attachments[$this_attachment_token])){
+            // If the ability flag was not set, attach the hazard to the target position
+            if (!isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token])){
 
                 // Attach this ability attachment to the robot using it
-                $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-                $target_robot->update_session();
+                $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+                $this_battle->update_session();
 
                 // Target this robot's self
-                $this_robot->robot_frame = 'base';
-                $this_robot->update_session();
-                $this_ability->target_options_update($this_attachment_info['attachment_create']);
-                $target_robot->trigger_target($target_robot, $this_ability);
+                if ($target_robot->robot_status != 'disabled'){
+                    $this_robot->robot_frame = 'base';
+                    $this_robot->update_session();
+                    $this_ability->target_options_update($this_attachment_info['attachment_create']);
+                    $target_robot->trigger_target($target_robot, $this_ability);
+                }
 
             }
-            // Else if the ability flag was set, reinforce the shield by one more duration point
+            // Else if the ability flag was set, reinforce the hazard by one more duration point
             else {
 
                 // Collect the attachment from the robot to back up its info
-                $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
-                $this_attachment_info['attachment_duration'] = 9;
-                $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-                $target_robot->update_session();
+                $this_attachment_info = $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token];
+                $this_attachment_info['attachment_duration'] = $static_attachment_duration;
+                $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+                $this_battle->update_session();
 
                 // Target the opposing robot
-                $this_ability->target_options_update(array(
-                    'frame' => 'defend',
-                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' refreshed the ice surrounding '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s inability to switch has been prolonged!')
-                    ));
-                $target_robot->trigger_target($target_robot, $this_ability);
+                if ($target_robot->robot_status != 'disabled'){
+                    $this_ability->target_options_update(array(
+                        'frame' => 'defend',
+                        'success' => array(9, 85, -10, -10, $this_refresh_text)
+                        ));
+                    $target_robot->trigger_target($target_robot, $this_ability);
+                }
 
             }
 
