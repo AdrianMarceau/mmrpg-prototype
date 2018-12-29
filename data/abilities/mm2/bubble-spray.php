@@ -8,8 +8,9 @@ $ability = array(
     'ability_description' => 'The user sprays a thick layer of foamy bubbles at the target\'s feet to deal damage and make their position on the field vulnerable to Electric and Freeze type attacks!',
     'ability_type' => 'water',
     'ability_energy' => 4,
-    'ability_damage' => 16,
+    'ability_damage' => 15,
     'ability_accuracy' => 98,
+    'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -39,7 +40,7 @@ $ability = array(
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
-            'ability_id' => $this_ability->ability_id,
+            'ability_id' => $this_ability->ability_id.'_'.$static_attachment_key,
             'ability_token' => $this_ability->ability_token,
             'attachment_duration' => $static_attachment_duration,
             'attachment_token' => $this_attachment_token,
@@ -78,6 +79,11 @@ $ability = array(
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 
+        // Apply or re-apply this attachment to the battle field, regardless of the ability's damage/recovery
+        $attachment_already_exists = isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token]) ? true : false;
+        $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+        $this_battle->update_session();
+
         // Inflict damage on the opposing robot
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
@@ -95,68 +101,20 @@ $ability = array(
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
-        // Inflect a break on speed if the robot wasn't disabled
-        if ($this_ability->ability_results['this_result'] != 'failure'){
-
-            // If the ability flag was not set, attach the hazard to the target position
-            if (!isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token])){
-
-                // Attach this ability attachment to the robot using it
-                $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
-                $this_battle->update_session();
-
-                // Target this robot's self
-                if ($target_robot->robot_status != 'disabled'){
-                    $this_robot->robot_frame = 'base';
-                    $this_robot->update_session();
-                    $this_ability->target_options_update($this_attachment_info['attachment_create']);
-                    $target_robot->trigger_target($target_robot, $this_ability);
-                }
-
+        // If the target was not disabled, show the message for the attachment
+        if ($target_robot->robot_status != 'disabled'){
+            if (!$attachment_already_exists){
+                $this_ability->target_options_update($this_attachment_info['attachment_create']);
+                $target_robot->trigger_target($target_robot, $this_ability);
+            } else {
+                $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(9, 85, -10, -10, $this_refresh_text)));
+                $target_robot->trigger_target($target_robot, $this_ability);
             }
-            // Else if the ability flag was set, reinforce the hazard by one more duration point
-            else {
-
-                // Collect the attachment from the robot to back up its info
-                $this_attachment_info = $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token];
-                $this_attachment_info['attachment_duration'] = $static_attachment_duration;
-                $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
-                $this_battle->update_session();
-
-                // Target the opposing robot
-                if ($target_robot->robot_status != 'disabled'){
-                    $this_ability->target_options_update(array(
-                        'frame' => 'defend',
-                        'success' => array(9, 85, -10, -10, $this_refresh_text)
-                        ));
-                    $target_robot->trigger_target($target_robot, $this_ability);
-                }
-
-            }
-
         }
 
-        // Either way, update this ability's settings to prevent recovery
-        $this_ability->damage_options_update($this_attachment_info['attachment_destroy'], true);
-        $this_ability->recovery_options_update($this_attachment_info['attachment_destroy'], true);
-        $this_ability->update_session();
-
         // Return true on success
         return true;
 
-
-        },
-    'ability_function_onload' => function($objects){
-
-        // Extract all objects into the current scope
-        extract($objects);
-
-        // If the user is holding a Target Module, allow bench targeting
-        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
-        else { $this_ability->reset_target(); }
-
-        // Return true on success
-        return true;
 
         }
     );
