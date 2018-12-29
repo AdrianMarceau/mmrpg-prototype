@@ -5,19 +5,15 @@ $ability = array(
     'ability_token' => 'disco-fever',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MM00/Weapons/Disco',
-    'ability_description' => 'The user summons a spinning disco ball that hovers above a target and diverts its attention. This causes the target deal half damage from attacks for the next six turns.',
+    'ability_image_sheets' => 2,
+    'ability_description' => 'The user summons a spinning disco ball that hovers above the target to divert its attention. The target deals half damage from attacks while distracted by the ball.',
     'ability_type' => 'laser',
     'ability_energy' => 4,
     'ability_accuracy' => 100,
-    'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
         extract($objects);
-
-        // Define the base attachment duration
-        $base_attachment_duration = 6;
-        $base_attachment_multiplier = 0.5;
 
         // Define this ability's overlay effect token
         $this_overlay_token = 'effect_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
@@ -36,30 +32,45 @@ $ability = array(
         // Create the attachment object for this ability
         $this_overlay = rpg_game::get_ability($this_battle, $target_player, $target_robot, $this_overlay_info);
 
-        // Update the ability image if the user is in their alt image
-        $alt_image_triggers = array('disco_alt', 'disco_alt3', 'disco_alt5');
-        if (in_array($this_robot->robot_image, $alt_image_triggers)){
-            $this_ability->set_image($this_ability->ability_token.'-b');
-        }
+        // Add the black background overlay attachment
+        $target_robot->robot_attachments[$this_overlay_token] = $this_overlay_info;
+        $target_robot->update_session();
+
+        // Predefine attachment create and destroy text for later
+        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' lost in the disco lights!<br /> '.
+            $target_robot->print_name().'\'s damage output has been compromised!'
+            );
+        $this_destroy_text = ('The disco lights distracting '.$target_robot->print_name().' faded away...<br /> '.
+            $target_robot->print_name().'\'s damage output isn\'t compromised anymore!'
+            );
+        $this_refresh_text = ($this_robot->print_name().' spun the disco ball in front of '.$target_robot->print_name().'!<br /> '.
+            $target_robot->print_name().'\'s damage output is still compromised!'
+            );
 
         // Define this ability's attachment token
-        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
+        $static_attachment_key = $target_robot->get_static_attachment_key();
+        $static_attachment_duration = 3;
+        $static_attachment_multiplier = 0.5;
+        $static_attachment_image = in_array($this_robot->robot_image, array('disco_alt', 'disco_alt3', 'disco_alt5')) ? $this_ability->ability_token.'-2' : $this_ability->ability_image;
+        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
         $this_attachment_info = array(
             'class' => 'ability',
+            'sticky' => true,
             'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
-            'ability_image' => $this_ability->ability_image,
+            'ability_image' => $static_attachment_image,
+            'attachment_duration' => $static_attachment_duration,
             'attachment_token' => $this_attachment_token,
-            'attachment_duration' => $base_attachment_duration,
-            'attachment_damage_output_breaker' => $base_attachment_multiplier,
+            'attachment_sticky' => true,
+            'attachment_damage_output_breaker' => $static_attachment_multiplier,
             'attachment_create' => array(
                 'trigger' => 'special',
                 'kind' => '',
                 'percent' => true,
                 'frame' => 'taunt',
                 'rates' => array(100, 0, 0),
-                'success' => array(0, 30, 0, 30, 'The '.$this_ability->print_name().' hypnotized '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s weapons were compromised!'),
-                'failure' => array(0, 30, 0, 30, 'The '.$this_ability->print_name().' hypnotized '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s weapons were compromised!')
+                'success' => array(0, 30, 0, 30, $this_create_text),
+                'failure' => array(0, 30, 0, 30, $this_create_text)
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -69,8 +80,8 @@ $ability = array(
                 'modifiers' => false,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
-                'success' => array(2, 30, 0, 30,  'The '.$this_ability->print_name().' faded away!<br /> '.$target_robot->print_name().'&#39;s weapons returned to normal!'),
-                'failure' => array(2, 30, 0, 30, 'The '.$this_ability->print_name().' faded away!<br /> '.$target_robot->print_name().'&#39;s weapons returned to normal!')
+                'success' => array(2, 30, 0, 30,  $this_destroy_text),
+                'failure' => array(2, 30, 0, 30, $this_destroy_text)
                 ),
             'ability_frame' => 0,
             'ability_frame_animate' => array(0, 1, 2, 1),
@@ -80,12 +91,8 @@ $ability = array(
         // Create the attachment object for this ability
         $this_attachment = rpg_game::get_ability($this_battle, $target_player, $target_robot, $this_attachment_info);
 
-        // Add the black background overlay attachment
-        $target_robot->robot_attachments[$this_overlay_token] = $this_overlay_info;
-        $target_robot->update_session();
-
-        // If the ability flag was not set, attach the ability to the target
-        if (!isset($target_robot->robot_attachments[$this_attachment_token])){
+        // If the ability flag was not set, attach the hazard to the target position
+        if (!isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token])){
 
             // Target this robot's self
             $this_ability->target_options_update(array(
@@ -102,24 +109,23 @@ $ability = array(
 
             // Attach this ability attachment to the robot using it
             $this_attachment_info['ability_frame_animate'] = array(0, 1, 2, 1);
-            $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-            $target_robot->update_session();
+            $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+            $this_battle->update_session();
 
         }
         // Else if the ability flag was set, reinforce the fever by one more duration point
         else {
 
             // Collect the attachment from the robot to back up its info
-            $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
-            $this_attachment_info['attachment_duration'] = $base_attachment_duration;
-            $this_attachment_info['attachment_damage_output_breaker'] = $this_attachment_info['attachment_damage_output_breaker'] * $base_attachment_multiplier;
-            $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-            $target_robot->update_session();
+            $this_attachment_info = $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token];
+            $this_attachment_info['attachment_duration'] = $static_attachment_duration;
+            $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+            $this_battle->update_session();
 
             // Target the opposing robot
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array(9, -10, 0, -10, $this_robot->print_name().' intensified the effects of the '.$this_ability->print_name().'!<br /> The duration of '.$target_robot->print_name().'&#39;s trance was extended!')
+                'success' => array(9, -10, 0, -10, $this_refresh_text)
                 ));
             $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -143,11 +149,13 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // If the user is holding a Target Module, allow bench targeting
+        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
+
         // Update the ability image if the user is in their alt image
         $alt_image_triggers = array('disco_alt', 'disco_alt3', 'disco_alt5');
-        if (in_array($this_robot->robot_image, $alt_image_triggers)){
-            $this_ability->set_image($this_ability->ability_token.'-b');
-        }
+        if (in_array($this_robot->robot_image, $alt_image_triggers)){ $this_ability->set_image($this_ability->ability_token.'-2'); }
 
         // Return true on success
         return true;
