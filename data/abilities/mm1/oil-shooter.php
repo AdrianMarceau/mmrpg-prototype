@@ -37,8 +37,8 @@ $ability = array(
                 'percent' => true,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
-                'success' => array(9, -10, -5, -10, $target_robot->print_name().' found '.$target_robot->get_pronoun('possessive').' in a puddle of crude oil!<br /> '.$target_robot->print_name().'\'s position on the field is now vulnerable to Flame and Explode!'),
-                'failure' => array(9, -10, -5, -10, $target_robot->print_name().' found '.$target_robot->get_pronoun('possessive').' in a puddle of crude oil!<br /> '.$target_robot->print_name().'\'s position on the field is now vulnerable to Flame and Explode!')
+                'success' => array(9, 0, -10, -8, $target_robot->print_name().' found '.$target_robot->get_pronoun('possessive').' in a puddle of crude oil!<br /> '.$target_robot->print_name().'\'s position on the field is now vulnerable to Flame and Explode!'),
+                'failure' => array(9, 0, -10, -8, $target_robot->print_name().' found '.$target_robot->get_pronoun('possessive').' in a puddle of crude oil!<br /> '.$target_robot->print_name().'\'s position on the field is now vulnerable to Flame and Explode!')
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -73,15 +73,15 @@ $ability = array(
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
             'kickback' => array(5, 0, 0),
-            'success' => array(1, -5, -10, 10, 'The '.$this_ability->print_name().' splashed into the target!'),
-            'failure' => array(1, -105, -10, -10, 'The '.$this_ability->print_name().' missed&hellip;')
+            'success' => array(1, 0, -10, 10, 'The '.$this_ability->print_name().' splashed into the target!'),
+            'failure' => array(1, -30, -10, -10, 'The '.$this_ability->print_name().' missed&hellip;')
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
             'frame' => 'taunt',
             'kickback' => array(5, 0, 0),
-            'success' => array(1, -5, -10, 10, 'The '.$this_ability->print_name().' was absorbed by the target!'),
-            'failure' => array(1, -105, -10, -10, 'The '.$this_ability->print_name().' had no effect&hellip;')
+            'success' => array(1, 0, -10, 10, 'The '.$this_ability->print_name().' was absorbed by the target!'),
+            'failure' => array(1, -30, -10, -10, 'The '.$this_ability->print_name().' had no effect&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
