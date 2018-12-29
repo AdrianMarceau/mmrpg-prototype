@@ -43,12 +43,11 @@ $ability = array(
         $static_attachment_key = $this_robot->get_static_attachment_key();
         $this_gender = preg_match('/^(roll|disco|rhythm|[-a-z]+woman)$/i', $this_robot->robot_token) ? 'female' : 'male';
         $this_effect_multiplier = 1 - ($this_ability->ability_recovery2 / 100);
-        $this_attachment_token = 'ability_'.$this_ability->ability_token;
+        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
-            'robot_id' => $this_robot->robot_id,
-            'ability_id' => $this_ability->ability_id,
+            'ability_id' => $this_ability->ability_id, //.'_'.$static_attachment_key,
             'ability_token' => $this_ability->ability_token,
             'ability_image' => 'super-arm'.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : ''),
             'attachment_token' => $this_attachment_token,
@@ -81,12 +80,12 @@ $ability = array(
                 'rates' => array(100, 0, 0),
                 'kickback' => array(0, 0, 0),
                 'success' => array(-1, -10, 0, -10,
-                    'The '.$this_ability->print_name().'\'s '.$this_object_name.' was destroyed!<br /> '.
-                    $this_robot->print_name().' is no longer protected...'
+                    'The '.$this_ability->print_name().'\'s '.$this_object_name.' faded away...<br /> '.
+                    'The '.$this_object_name.'\'s protection was lost!'
                     ),
                 'failure' => array(-1, -10, 0, -10,
-                    'The '.$this_ability->print_name().'\'s '.$this_object_name.' was destroyed!<br /> '.
-                    $this_robot->print_name().' is no longer protected...'
+                    'The '.$this_ability->print_name().'\'s '.$this_object_name.' faded away...<br /> '.
+                    'The '.$this_object_name.'\'s protection was lost!'
                     )
                 ),
             'ability_frame' => $this_target_frame,
