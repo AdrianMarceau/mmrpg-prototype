@@ -782,7 +782,7 @@ class rpg_canvas {
         $this_data['ability_image2'] = isset($options['ability_image2']) ? $options['ability_image2'] : $this_ability->ability_image2;
         $this_data['ability_status'] = $robot_data['robot_status'];
         $this_data['ability_position'] = $robot_data['robot_position'];
-        $this_data['ability_direction'] = $this_ability->robot_id == $robot_data['robot_id'] ? $robot_data['robot_direction'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
+        $this_data['ability_direction'] = $robot_data['robot_direction'];
         $this_data['ability_float'] = $robot_data['robot_float'];
         $this_data['ability_size'] = $this_data['ability_position'] == 'active' ? ($this_ability->ability_image_size * 2) : $this_ability->ability_image_size;
         $this_data['ability_frame'] = isset($options['ability_frame']) ? $options['ability_frame'] : $this_ability->ability_frame;
@@ -790,7 +790,7 @@ class rpg_canvas {
         $this_data['ability_frame_index'] = isset($options['ability_frame_index']) ? $options['ability_frame_index'] : $this_ability->ability_frame_index;
         if (is_numeric($this_data['ability_frame']) && $this_data['ability_frame'] >= 0){ $this_data['ability_frame'] = str_pad($this_data['ability_frame'], 2, '0', STR_PAD_LEFT); }
         elseif (is_numeric($this_data['ability_frame']) && $this_data['ability_frame'] < 0){ $this_data['ability_frame'] = ''; }
-        $this_data['ability_frame_offset'] = isset($options['ability_frame_offset']) && is_array($options['ability_frame_offset']) ? $options['ability_frame_offset'] : array('canvas_offset_x' => 0, 'canvas_offset_y' => 0, 'canvas_offset_z' => 0);
+        $this_data['ability_frame_offset'] = isset($options['ability_frame_offset']) && is_array($options['ability_frame_offset']) ? $options['ability_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
         $animate_frames_array = isset($options['ability_frame_animate']) ? $options['ability_frame_animate'] : array($this_data['ability_frame']);
         $animate_frames_string = array();
         if (!empty($animate_frames_array)){
@@ -809,27 +809,20 @@ class rpg_canvas {
         $this_data['ability_sprite_size'] = ceil($this_data['ability_scale'] * $zoom_size);
         $this_data['ability_sprite_width'] = ceil($this_data['ability_scale'] * $zoom_size);
         $this_data['ability_sprite_height'] = ceil($this_data['ability_scale'] * $zoom_size);
-        $this_data['ability_image_width'] = ceil($this_data['ability_scale'] * $zoom_size * 10);
+        $this_data['ability_image_width'] = ceil($this_data['ability_scale'] * $zoom_size * 10); // 'cause there are ten frames in the sheet
         $this_data['ability_image_height'] = ceil($this_data['ability_scale'] * $zoom_size);
-
-        // Calculate the canvas offset variables for this robot
-        $canvas_offset_data = $this_ability->battle->canvas_markup_offset($robot_data['robot_key'], $robot_data['robot_position'], $robot_data['robot_size']);
-
-        // Define the ability's canvas offset variables
-        $temp_size_diff = 0;
-        if ($robot_data['robot_sprite_size'] != $this_data['ability_sprite_size']){ $temp_size_diff = ceil(($robot_data['robot_sprite_size'] - $this_data['ability_sprite_size']) / 2) ; }
 
         /*
         // Update the canvas offsets using the base data
-        $this_data['canvas_offset_x'] = $robot_data['canvas_base_offset_x'] + $temp_size_diff;
+        $this_data['canvas_offset_x'] = $robot_data['canvas_base_offset_x'];
         $this_data['canvas_offset_y'] = $robot_data['canvas_base_offset_y'];
         $this_data['canvas_offset_z'] = $robot_data['canvas_base_offset_z'];
         */
 
         // Calculate the canvas X offsets using the robot's offset as base
-        if ($this_data['ability_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['x']/100))) + $temp_size_diff; }
-        elseif ($this_data['ability_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] - ($this_data['ability_sprite_size'] * (($this_data['ability_frame_offset']['x'] * -1)/100))) + $temp_size_diff; }
-        else { $this_data['canvas_offset_x'] = $robot_data['canvas_base_offset_x'] + $temp_size_diff; }
+        if ($this_data['ability_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['x']/100))); }
+        elseif ($this_data['ability_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] - ($this_data['ability_sprite_size'] * (($this_data['ability_frame_offset']['x'] * -1)/100))); }
+        else { $this_data['canvas_offset_x'] = $robot_data['canvas_base_offset_x']; }
         // Calculate the canvas Y offsets using the robot's offset as base
         if ($this_data['ability_frame_offset']['y'] > 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_base_offset_y'] + ($this_data['ability_sprite_size'] * ($this_data['ability_frame_offset']['y']/100))); }
         elseif ($this_data['ability_frame_offset']['y'] < 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_base_offset_y'] - ($this_data['ability_sprite_size'] * (($this_data['ability_frame_offset']['y'] * -1)/100))); }
@@ -1084,7 +1077,7 @@ class rpg_canvas {
         $this_data['item_frame_index'] = isset($options['item_frame_index']) ? $options['item_frame_index'] : $this_item->item_frame_index;
         if (is_numeric($this_data['item_frame']) && $this_data['item_frame'] >= 0){ $this_data['item_frame'] = str_pad($this_data['item_frame'], 2, '0', STR_PAD_LEFT); }
         elseif (is_numeric($this_data['item_frame']) && $this_data['item_frame'] < 0){ $this_data['item_frame'] = ''; }
-        $this_data['item_frame_offset'] = isset($options['item_frame_offset']) && is_array($options['item_frame_offset']) ? $options['item_frame_offset'] : array('canvas_offset_x' => 0, 'canvas_offset_y' => 0, 'canvas_offset_z' => 0);
+        $this_data['item_frame_offset'] = isset($options['item_frame_offset']) && is_array($options['item_frame_offset']) ? $options['item_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
         $animate_frames_array = isset($options['item_frame_animate']) ? $options['item_frame_animate'] : array($this_data['item_frame']);
         $animate_frames_string = array();
         if (!empty($animate_frames_array)){
@@ -1683,7 +1676,6 @@ class rpg_canvas {
         }
 
         // -- FIELD ATTACHMENT SPRITES -- //
-        // XXXXXXX
 
         // Check for battle field attachments exist before looping
         if (!empty($this_battle->battle_attachments)){
@@ -1738,8 +1730,7 @@ class rpg_canvas {
                     $static_robot_data['robot_position'] = $static_position;
                     $static_robot_data['robot_direction'] = $static_side === 'left' ? 'right' : 'left';
                     $static_robot_data['robot_float'] = $static_side;
-                    $static_robot_data['robot_size'] = $static_robot_object->robot_image_size;
-                    $static_robot_data['robot_sprite_size']  = $static_robot_object->robot_image_size * 2;
+                    $static_robot_data['robot_size'] = $static_position === 'active' ? ($static_robot_object->robot_image_size * 2) : $static_robot_object->robot_image_size;
 
                     // Define the rest of the position variables based on above data
                     $static_position = $this_battle->canvas_markup_offset_perspective(
@@ -1752,6 +1743,7 @@ class rpg_canvas {
                     $static_robot_data['canvas_base_offset_y'] = $static_position['canvas_offset_y'];
                     $static_robot_data['canvas_base_offset_z'] = $static_position['canvas_offset_z'];
                     $static_robot_data['robot_scale'] = $static_position['canvas_scale'];
+                    $static_robot_data['robot_sprite_size']  = ceil($this_data['robot_scale'] * ($static_robot_object->robot_image_size * 2));
 
                     // If this is an ability attachment
                     if ($attachment_info['class'] == 'ability'){
@@ -1776,7 +1768,7 @@ class rpg_canvas {
                         elseif ($temp_event_frame < $attachment_frame_count){ $attachment_frame_key = $temp_event_frame; }
                         elseif ($temp_event_frame >= $attachment_frame_count){ $attachment_frame_key = $temp_event_frame % $attachment_frame_count; }
                         if (isset($this_attachment_options['ability_frame_animate'][$attachment_frame_key])){ $this_attachment_options['ability_frame'] = $this_attachment_options['ability_frame_animate'][$attachment_frame_key]; }
-                        $this_attachment_options['ability_frame_offset'] = isset($attachment_info['ability_frame_offset']) ? $attachment_info['ability_frame_offset'] : array('canvas_offset_x' => 0, 'canvas_offset_y' => 0, 'canvas_offset_z' => 0);
+                        $this_attachment_options['ability_frame_offset'] = isset($attachment_info['ability_frame_offset']) ? $attachment_info['ability_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
                         $this_attachment_options['ability_frame_styles'] = isset($attachment_info['ability_frame_styles']) ? $attachment_info['ability_frame_styles'] : $this_ability->ability_frame_styles;
                         $this_attachment_options['ability_frame_classes'] = isset($attachment_info['ability_frame_classes']) ? $attachment_info['ability_frame_classes'] : $this_ability->ability_frame_classes;
 
@@ -1808,7 +1800,7 @@ class rpg_canvas {
                         elseif ($temp_event_frame < $attachment_frame_count){ $attachment_frame_key = $temp_event_frame; }
                         elseif ($temp_event_frame >= $attachment_frame_count){ $attachment_frame_key = $temp_event_frame % $attachment_frame_count; }
                         if (isset($this_attachment_options['item_frame_animate'][$attachment_frame_key])){ $this_attachment_options['item_frame'] = $this_attachment_options['item_frame_animate'][$attachment_frame_key]; }
-                        $this_attachment_options['item_frame_offset'] = isset($attachment_info['item_frame_offset']) ? $attachment_info['item_frame_offset'] : array('canvas_offset_x' => 0, 'canvas_offset_y' => 0, 'canvas_offset_z' => 0);
+                        $this_attachment_options['item_frame_offset'] = isset($attachment_info['item_frame_offset']) ? $attachment_info['item_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
                         $this_attachment_options['item_frame_styles'] = isset($attachment_info['item_frame_styles']) ? $attachment_info['item_frame_styles'] : $this_item->item_frame_styles;
                         $this_attachment_options['item_frame_classes'] = isset($attachment_info['item_frame_classes']) ? $attachment_info['item_frame_classes'] : $this_item->item_frame_classes;
 
