@@ -33,7 +33,7 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'shoot',
-            'success' => array(0, 95, -25, 10, 'The '.$this_ability->print_name().' summoned a triad of drills!')
+            'success' => array(0, 95, -25, 10, 'The '.$this_ability->print_name().' fired a pair of drill-tipped missiles!')
             ));
         $this_robot->trigger_target($target_robot, $this_ability);
 

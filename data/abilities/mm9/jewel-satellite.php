@@ -30,6 +30,7 @@ $ability = array(
             'attachment_damage_input_breaker_electric' => $this_effect_multiplier,
             'attachment_damage_input_breaker_water' => $this_effect_multiplier,
             'attachment_weaknesses' => array('impact', 'explode'),
+            'attachment_weaknesses_trigger' => 'target',
             'attachment_create' => array(
                 'kind' => 'defense',
                 'percent' => true,

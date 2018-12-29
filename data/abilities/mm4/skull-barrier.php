@@ -25,7 +25,6 @@ $ability = array(
             'class' => 'ability',
             'ability_token' => $this_ability->ability_token,
             'attachment_damage_input_breaker' => $this_effect_multiplier,
-            'attachment_weaknesses' => array('crystal'),
             'attachment_duration' => 1,
             'attachment_create' => array(
                 'trigger' => 'special',

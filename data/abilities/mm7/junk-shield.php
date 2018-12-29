@@ -5,14 +5,13 @@ $ability = array(
     'ability_token' => 'junk-shield',
     'ability_game' => 'MM07',
     'ability_group' => 'MM07/Weapons/050',
-    'ability_description' => 'The user surrounds itself with large pieces of scrap metal to bolster shields and prevent all damage from one attack! If the shield survives it can also be thrown at the target for damage!',
+    'ability_description' => 'The user surrounds itself with large pieces of scrap metal that bolster shields and prevent damage all from one attack!',
     'ability_type' => 'earth',
     'ability_type2' => 'shield',
     'ability_energy' => 4,
-    'ability_damage' => 32,
     'ability_recovery2' => 100,
     'ability_recovery_percent2' => true,
-    'ability_accuracy' => 96,
+    'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -26,6 +25,7 @@ $ability = array(
             'ability_token' => $this_ability->ability_token,
             'attachment_damage_input_breaker' => $this_effect_multiplier,
             'attachment_weaknesses' => array('*'),
+            'attachment_weaknesses_trigger' => 'target',
             'attachment_create' => array(
                 'trigger' => 'special',
                 'kind' => '',

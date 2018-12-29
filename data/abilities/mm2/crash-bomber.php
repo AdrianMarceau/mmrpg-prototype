@@ -91,7 +91,7 @@ $ability = array(
             'ability_frame_offset' => array('x' => 0, 'y' => $temp_y_offset, 'z' => 10),
             'attachment_token' => $this_attachment_token,
             'attachment_duration' => $attachment_duration,
-            'attachment_weaknesses' => array('electric'),
+            'attachment_weaknesses' => array('electric', 'flame'),
             'attachment_energy' => 0,
             'attachment_create' => array(
                 'kind' => 'energy',
