@@ -849,7 +849,21 @@ class rpg_canvas {
         ob_start();
 
             // Display the ability's battle sprite
-            $temp_markup = '<div data-ability-id="'.$this_data['ability_id_token'].'" class="'.($this_data['ability_markup_class'].$this_data['ability_frame_classes']).'" style="'.($this_data['ability_markup_style'].$this_data['ability_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['ability_sprite_size'].'" data-direction="'.$this_data['ability_direction'].'" data-frame="'.$this_data['ability_frame'].'" data-animate="'.$this_data['ability_frame_animate'].'" data-position="'.$this_data['ability_position'].'" data-status="'.$this_data['ability_status'].'" data-scale="'.$this_data['ability_scale'].'"></div>';
+            $temp_markup = '<div '.
+                'data-ability-id="'.$this_data['ability_id_token'].'" '.
+                'class="'.($this_data['ability_markup_class'].$this_data['ability_frame_classes']).'" '.
+                'style="'.($this_data['ability_markup_style'].$this_data['ability_frame_styles']).'" '.
+                (!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').
+                'data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" '.
+                'data-type="'.$this_data['data_type'].'" '.
+                'data-size="'.$this_data['ability_sprite_size'].'" '.
+                'data-direction="'.$this_data['ability_direction'].'" '.
+                'data-frame="'.$this_data['ability_frame'].'" '.
+                'data-animate="'.$this_data['ability_frame_animate'].'" '.
+                'data-position="'.$this_data['ability_position'].'" '.
+                'data-status="'.$this_data['ability_status'].'" '.
+                'data-scale="'.$this_data['ability_scale'].'"'.
+                '></div>';
             if (!empty($this_data['ability_image2'])){ $temp_markup .= str_replace('/'.$this_data['ability_image'].'/', '/'.$this_data['ability_image2'].'/', $temp_markup); }
             echo $temp_markup;
 
@@ -1143,7 +1157,21 @@ class rpg_canvas {
         ob_start();
 
             // Display the item's battle sprite
-            $temp_markup = '<div data-item-id="'.$this_data['item_id_token'].'" class="'.($this_data['item_markup_class'].$this_data['item_frame_classes']).'" style="'.($this_data['item_markup_style'].$this_data['item_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['item_sprite_size'].'" data-direction="'.$this_data['item_direction'].'" data-frame="'.$this_data['item_frame'].'" data-animate="'.$this_data['item_frame_animate'].'" data-position="'.$this_data['item_position'].'" data-status="'.$this_data['item_status'].'" data-scale="'.$this_data['item_scale'].'"></div>';
+            $temp_markup = '<div '.
+                'data-item-id="'.$this_data['item_id_token'].'" '.
+                'class="'.($this_data['item_markup_class'].$this_data['item_frame_classes']).'" '.
+                'style="'.($this_data['item_markup_style'].$this_data['item_frame_styles']).'" '.
+                (!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').
+                'data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" '.
+                'data-type="'.$this_data['data_type'].'" '.
+                'data-size="'.$this_data['item_sprite_size'].'" '.
+                'data-direction="'.$this_data['item_direction'].'" '.
+                'data-frame="'.$this_data['item_frame'].'" '.
+                'data-animate="'.$this_data['item_frame_animate'].'" '.
+                'data-position="'.$this_data['item_position'].'" '.
+                'data-status="'.$this_data['item_status'].'" '.
+                'data-scale="'.$this_data['item_scale'].'"'.
+                '></div>';
             if (!empty($this_data['item_image2'])){ $temp_markup .= str_replace('/'.$this_data['item_image'].'/', '/'.$this_data['item_image2'].'/', $temp_markup); }
             echo $temp_markup;
 
@@ -1733,16 +1761,16 @@ class rpg_canvas {
                     $static_robot_data['robot_size'] = $static_position === 'active' ? ($static_robot_object->robot_image_size * 2) : $static_robot_object->robot_image_size;
 
                     // Define the rest of the position variables based on above data
-                    $static_position = $this_battle->canvas_markup_offset_perspective(
+                    $static_position_offset = $this_battle->canvas_markup_offset_perspective(
                         $static_robot_data['robot_key'],
                         $static_robot_data['robot_position'],
                         $static_robot_data['robot_sprite_size'],
                         $static_bench_size
                         );
-                    $static_robot_data['canvas_base_offset_x'] = $static_position['canvas_offset_x'];
-                    $static_robot_data['canvas_base_offset_y'] = $static_position['canvas_offset_y'];
-                    $static_robot_data['canvas_base_offset_z'] = $static_position['canvas_offset_z'];
-                    $static_robot_data['robot_scale'] = $static_position['canvas_scale'];
+                    $static_robot_data['canvas_base_offset_x'] = $static_position_offset['canvas_offset_x'];
+                    $static_robot_data['canvas_base_offset_y'] = $static_position_offset['canvas_offset_y'];
+                    $static_robot_data['canvas_base_offset_z'] = $static_position_offset['canvas_offset_z'];
+                    $static_robot_data['robot_scale'] = $static_position_offset['canvas_scale'];
                     $static_robot_data['robot_sprite_size']  = ceil($this_data['robot_scale'] * ($static_robot_object->robot_image_size * 2));
 
                     // If this is an ability attachment
