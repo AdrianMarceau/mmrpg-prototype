@@ -25,6 +25,7 @@ $ability = array(
                 'attachment_duration' => 1,
                 'attachment_power' => 0,
                 'attachment_weaknesses' => array('water', 'freeze', 'wind'),
+                'attachment_weaknesses_trigger' => 'target',
                 'attachment_create' => array(
                     'kind' => 'defense',
                     'percent' => true,
