@@ -44,7 +44,6 @@ $ability = array(
             'attachment_duration' => $static_attachment_duration,
             'attachment_token' => $this_attachment_token,
             'attachment_sticky' => true,
-            'attachment_bias' => 'negative',
             'attachment_damage_input_booster_electric' => 2.0,
             'attachment_damage_input_booster_freeze' => 2.0,
             'attachment_create' => array(
