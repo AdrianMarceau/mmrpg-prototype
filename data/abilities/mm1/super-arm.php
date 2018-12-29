@@ -25,7 +25,6 @@ $ability = array(
         $this_target_frame = 0;
         $this_impact_frame = 1;
         $this_object_name = 'boulder';
-        $this_object_weaknesses = array('explode');
 
         // Define the sprite sheets and the stages they contain
         $this_sprite_index = !empty($this_ability->values['this_sprite_index']) ? $this_ability->values['this_sprite_index'] : array();
@@ -36,12 +35,11 @@ $ability = array(
             $this_target_frame = $this_sprite_index[$this_field_token][1];
             $this_impact_frame = $this_sprite_index[$this_field_token][2];
             $this_object_name = $this_sprite_index[$this_field_token][3];
-            //$this_object_weaknesses[] = '';
         }
 
         // Define this ability's attachment token
         $static_attachment_key = $this_robot->get_static_attachment_key();
-        $this_gender = preg_match('/^(roll|disco|rhythm|[-a-z]+woman)$/i', $this_robot->robot_token) ? 'female' : 'male';
+        $static_attachment_duration = 9;
         $this_effect_multiplier = 1 - ($this_ability->ability_recovery2 / 100);
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
         $this_attachment_info = array(
@@ -49,11 +47,13 @@ $ability = array(
             'sticky' => true,
             'ability_id' => $this_ability->ability_id, //.'_'.$static_attachment_key,
             'ability_token' => $this_ability->ability_token,
+            'attachment_duration' => $static_attachment_duration,
             'ability_image' => 'super-arm'.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : ''),
             'attachment_token' => $this_attachment_token,
             'attachment_sticky' => true,
             'attachment_damage_input_breaker' => $this_effect_multiplier,
-            'attachment_weaknesses' => $this_object_weaknesses,
+            'attachment_weaknesses' => array('explode', 'impact'),
+            'attachment_weaknesses_trigger' => 'target',
             'attachment_create' => array(
                 'trigger' => 'special',
                 'kind' => '',
@@ -62,11 +62,11 @@ $ability = array(
                 'rates' => array(100, 0, 0),
                 'kickback' => array(0, 0, 0),
                 'success' => array($this_target_frame, 105, 0, 10,
-                    $this_robot->print_name().' shielded '.($this_gender == 'female' ? 'herself' : 'himself').' with the '.$this_object_name.'!<br /> '.
+                    $this_robot->print_name().' shielded '.$this_robot->get_pronoun('reflexive').' with the '.$this_object_name.'!<br /> '.
                     $this_robot->print_name().'\'s defenses were bolstered!'
                     ),
                 'failure' => array($this_target_frame, 105, 0, 10,
-                    $this_robot->print_name().' shielded '.($this_gender == 'female' ? 'herself' : 'himself').' with the '.$this_object_name.'!<br /> '.
+                    $this_robot->print_name().' shielded '.$this_robot->get_pronoun('reflexive').' with the '.$this_object_name.'!<br /> '.
                     $this_robot->print_name().'\'s defenses were bolstered!'
                     )
                 ),
