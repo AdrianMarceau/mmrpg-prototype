@@ -145,7 +145,9 @@ class rpg_canvas {
         $this_data['robot_scale'] = $temp_data['canvas_scale'];
 
         // If this robot has an oversized sprite, adjust their position accordingly
-        if ($this_robot->robot_image_size > 40){ $this_data['canvas_offset_x'] += ceil((($this_robot->robot_image_size - 40) / 2) * $temp_data['canvas_scale']); }
+        if ($this_robot->robot_image_size > 40 && $this_data['robot_position'] === 'active'){
+            $this_data['canvas_offset_x'] += ceil((($this_robot->robot_image_size - 40) / 2) * $temp_data['canvas_scale']);
+        }
 
         // Calculate the zoom properties for the robot sprite
         $zoom_size = $this_robot->robot_image_size * 2;
