@@ -1124,6 +1124,9 @@ class rpg_ability_damage extends rpg_damage {
                                 && (in_array('*', $attachment_info['attachment_weaknesses'])
                                     || in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses'])
                                     || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))
+                                && (!isset($attachment_info['attachment_weaknesses_trigger'])
+                                    || $attachment_info['attachment_weaknesses_trigger'] === 'either'
+                                    || $attachment_info['attachment_weaknesses_trigger'] === 'target')
                                     ){
                                 $this_battle->events_debug(__FILE__, __LINE__, 'checkpoint weaknesses');
                                 // Remove this attachment and inflict damage on the robot

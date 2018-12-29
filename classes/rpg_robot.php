@@ -1443,6 +1443,9 @@ class rpg_robot extends rpg_object {
                     if (!empty($attachment_info['attachment_weaknesses'])
                         && (in_array($this_ability->ability_type, $attachment_info['attachment_weaknesses'])
                             || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))
+                        && (!isset($attachment_info['attachment_weaknesses_trigger'])
+                            || $attachment_info['attachment_weaknesses_trigger'] === 'either'
+                            || $attachment_info['attachment_weaknesses_trigger'] === 'self')
                             ){
                         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint weaknesses');
                         // Remove this attachment and inflict damage on the robot
@@ -1621,6 +1624,9 @@ class rpg_robot extends rpg_object {
                     if (!empty($attachment_info['attachment_weaknesses'])
                         && (in_array($this_item->item_type, $attachment_info['attachment_weaknesses'])
                             || in_array($this_item->item_type2, $attachment_info['attachment_weaknesses']))
+                        && (!isset($attachment_info['attachment_weaknesses_trigger'])
+                            || $attachment_info['attachment_weaknesses_trigger'] === 'either'
+                            || $attachment_info['attachment_weaknesses_trigger'] === 'self')
                             ){
                         //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint weaknesses');
                         // Remove this attachment and inflict damage on the robot
