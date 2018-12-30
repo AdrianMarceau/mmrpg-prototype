@@ -74,6 +74,9 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
 
     //if (!preg_match('/^star-/i', $item_info['item_token'])){ continue; }
 
+    // Do not show incomplete items in the link list
+    if (!$item_info['item_flag_complete'] && $item_info['item_token'] !== $this_current_token){ $key_counter++; continue; }
+
     // If a type filter has been applied to the item page
     $temp_item_types = array();
     if (!empty($item_info['item_type'])){ $temp_item_types[] = $item_info['item_type']; }
