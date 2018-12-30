@@ -169,7 +169,10 @@ class rpg_disabled {
         $event_options['this_ability_results']['total_actions'] = 0;
 
         // Calculate the bonus boosts from defeating the target robot (if NOT player battle)
-        if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
+        if ($target_player->player_side === 'left'
+            && $target_robot->robot_class === 'master'
+            && $this_player->player_id === MMRPG_SETTINGS_TARGET_PLAYERID
+            ){
 
             // Collect this robot's stat details for reference
             $temp_index_info = rpg_robot::get_index_info($target_robot->robot_token);
@@ -220,7 +223,10 @@ class rpg_disabled {
                 if ($this_stat_boost > 0){
 
                     // If the robot is under level 100, stat boosts are pending
-                    if ($target_player->player_side == 'left' && $target_robot->robot_level < 100 && $target_robot->robot_class == 'master'){
+                    if ($target_player->player_side === 'left'
+                        && $target_robot->robot_class === 'master'
+                        && $target_robot->robot_level < 100
+                        ){
 
                         // Update the session variables with the pending stat boost
                         if (empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending] = 0; }
@@ -228,7 +234,11 @@ class rpg_disabled {
 
                     }
                     // If the robot is at level 100 or a mecha, stat boosts are immediately rewarded
-                    elseif ($target_player->player_side == 'left' && (($target_robot->robot_level == 100 && $target_robot->robot_class == 'master') || $target_robot->robot_class == 'mecha') && $target_robot->$prop_stat_base < MMRPG_SETTINGS_STATS_MAX){
+                    elseif ($target_player->player_side === 'left'
+                        && $target_robot->robot_class === 'master'
+                        && $target_robot->robot_level === 100
+                        && $target_robot->$prop_stat_base < MMRPG_SETTINGS_STATS_MAX
+                        ){
 
                         // Create/validate the session variables if not mecha
                         $current_bonus_amount = 0;
