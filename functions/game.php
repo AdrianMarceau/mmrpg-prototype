@@ -434,6 +434,8 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 
     // Loop through the ability rewards for this robot if set
     if ($unlock_abilities && !empty($this_robot_rewards['abilities'])){
+        // Automatically unlock the Buster Shot for all robot masters
+        array_unshift($this_robot_rewards['abilities'], array('level' => 0, 'token' => 'buster-shot'));
         // Collect the ability index for calculation purposes
         $db_ability_fields = rpg_ability::get_index_fields(true);
         $this_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
