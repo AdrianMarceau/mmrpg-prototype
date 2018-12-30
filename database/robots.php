@@ -128,6 +128,9 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
     // Do not show hidden robots in the link list
     if (!empty($robot_info['robot_flag_hidden'])){ continue; }
 
+    // Do not show incomplete robots in the link list
+    if (!$robot_info['robot_flag_complete'] && $robot_info['robot_token'] !== $this_current_token){ $key_counter++; continue; }
+
     // If a type filter has been applied to the robot page
     if (isset($this_current_filter) && $this_current_filter == 'none' && $robot_info['robot_core'] != ''){ $key_counter++; continue; }
     elseif (isset($this_current_filter) && $this_current_filter != 'none' && $robot_info['robot_core'] != $this_current_filter && $robot_info['robot_core2'] != $this_current_filter){ $key_counter++; continue; }

@@ -90,6 +90,9 @@ $mmrpg_database_abilities_count_complete = 0;
 // Loop through the results and generate the links for these abilities
 foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
 
+    // Do not show incomplete abilities in the link list
+    if (!$ability_info['ability_flag_complete'] && $ability_info['ability_token'] !== $this_current_token){ $key_counter++; continue; }
+
     // If a type filter has been applied to the ability page
     $temp_ability_types = array();
     if (!empty($ability_info['ability_type'])){ $temp_ability_types[] = $ability_info['ability_type']; }
