@@ -1003,6 +1003,9 @@ $temp_userinfo = $this_userinfo; //$db->get_array("SELECT users.*, roles.* FROM 
 // If the player has pending battle rewards, loop through and display window events
 if (!empty($temp_battles_list)){
 
+    // Collect a temporary robot index with data
+    $temp_robot_index = rpg_robot::get_index();
+
     // Loop through each of the battles and display it to the user
     foreach ($temp_battles_list AS $temp_key => $temp_battleinfo){
 
@@ -1026,8 +1029,24 @@ if (!empty($temp_battles_list)){
         $temp_console_markup = '';
         $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$temp_battleinfo['battle_field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$temp_battleinfo['battle_field_name'].'</div>';
         $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$temp_battleinfo['battle_field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$temp_battleinfo['battle_field_name'].'</div>';
-        foreach ($temp_target_playerrobots AS $key => $info){ $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$temp_battleinfo['target_player_result'].'" style="background-image: url(images/robots/'.$info['token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: '.(25 + $key * 3).'px; left: '.(-10 + $key * 20).'px; z-index: '.(10 - $key).';">'.$info['token'].' (Lv.'.$info['level'].')</div>'; }
-        foreach ($temp_this_playerrobots AS $key => $info){ $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$temp_battleinfo['this_player_result'].'" style="background-image: url(images/robots/'.$info['token'].'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: '.(25 + $key * 3).'px; right: '.(-10 + $key * 20).'px; z-index: '.(10 - $key).';">'.$info['token'].' (Lv.'.$info['level'].')</div>'; }
+        foreach ($temp_target_playerrobots AS $key => $info){
+            if (!isset($temp_robot_index[$info['token']])){ continue; }
+            $temp_robot_info = $temp_robot_index[$info['token']];
+            if ($temp_robot_info['robot_image_size'] == 40){
+                $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$temp_battleinfo['target_player_result'].'" style="background-image: url(images/robots/'.$info['token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: '.(25 + $key * 3).'px; left: '.(-10 + $key * 20).'px; z-index: '.(10 - $key).';">'.$info['token'].' (Lv.'.$info['level'].')</div>';
+            } elseif ($temp_robot_info['robot_image_size'] == 80){
+                $temp_canvas_markup .= '<div class="sprite sprite_160x160 sprite_160x160_'.$temp_battleinfo['target_player_result'].'" style="background-image: url(images/robots/'.$info['token'].'/sprite_right_160x160.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: '.(25 + $key * 3).'px; left: '.(-20 + $key * 10).'px; z-index: '.(10 - $key).';">'.$info['token'].' (Lv.'.$info['level'].')</div>';
+            }
+        }
+        foreach ($temp_this_playerrobots AS $key => $info){
+            if (!isset($temp_robot_index[$info['token']])){ continue; }
+            $temp_robot_info = $temp_robot_index[$info['token']];
+            if ($temp_robot_info['robot_image_size'] == 40){
+                $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$temp_battleinfo['this_player_result'].'" style="background-image: url(images/robots/'.$info['token'].'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: '.(25 + $key * 3).'px; right: '.(-10 + $key * 20).'px; z-index: '.(10 - $key).';">'.$info['token'].' (Lv.'.$info['level'].')</div>';
+            } elseif ($temp_robot_info['robot_image_size'] == 80){
+                $temp_canvas_markup .= '<div class="sprite sprite_160x160 sprite_160x160_'.$temp_battleinfo['this_player_result'].'" style="background-image: url(images/robots/'.$info['token'].'/sprite_left_160x160.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: '.(25 + $key * 3).'px; right: '.(-20 + $key * 10).'px; z-index: '.(10 - $key).';">'.$info['token'].' (Lv.'.$info['level'].')</div>';
+            }
+        }
         $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$temp_battleinfo['target_player_result'].'" style="background-image: url(images/players/'.$temp_target_playerinfo['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 25px; left: 110px; z-index: 20;">'.$temp_target_playerinfo['player_name'].'</div>';
         $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$temp_battleinfo['this_player_result'].'" style="background-image: url(images/players/'.$temp_this_playerinfo['player_token'].'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 25px; right: 110px; z-index: 20;">'.$temp_target_playerinfo['player_name'].'</div>';
 
@@ -1047,8 +1066,7 @@ if (!empty($temp_battles_list)){
             }
 
         // Display the rest of the reward message
-        if ($battle_complete_counter_light >= 29){ $temp_console_markup .= '<p>Now that you\'ve unlocked the Player Battle bonus mode, you too can challenge other players and earn even more experience and battle points!</p>'; }
-        else { $temp_console_markup .= '<p>Complete all of '.$temp_target_playerinfo['player_name'].'\'s missions to beat the game and you too can challenge other players to battle for tons of experience and more battle points!</p><p>The phrase &quot;Chapter&nbsp;Get&nbsp;:&nbsp;Player&nbsp;Battles&quot; might also be of some use&hellip;</p>'; }
+        if (!mmrpg_prototype_complete($temp_target_playerinfo['player_token'])){ $temp_console_markup .= '<p>Complete all of '.$temp_target_playerinfo['player_name'].'\'s missions to unlock the Player Battles chapter and you too can challenge the ghost data of other players!</p><p>The phrase &quot;Chapter&nbsp;Get&nbsp;:&nbsp;Player&nbsp;Battles&quot; might also be of some use&hellip;</p>'; }
 
         // Add this mesage to the event session IF VICTORY (Only good news now!)
         if ($temp_battleinfo['target_player_result'] == 'victory'){
