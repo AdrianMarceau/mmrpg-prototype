@@ -97,6 +97,9 @@ $ability = array(
         $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $this_attachment_info);
         $this_attachment->set_image($this_attachment_info['ability_image']);
 
+        // Update the image of the actual ability so it matches
+        $this_ability->set_image($this_attachment_info['ability_image']);
+
         // Check if this ability is already summoned to the field
         $is_summoned = isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token]) ? true : false;
 
