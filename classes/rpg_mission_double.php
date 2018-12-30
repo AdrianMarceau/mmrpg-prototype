@@ -393,7 +393,7 @@ class rpg_mission_double extends rpg_mission {
                 if (mmrpg_prototype_robot_unlocked(false, $robot['token'])){
                     $this_unlock_robots_count -= 1;
                     // If this isn't a starforce/starfield mission, we don't show already-unlocked robots
-                    if (!$starfield_mission && !$temp_field_star_present){
+                    if (!$starfield_mission && !$temp_fusion_star_present){
                         foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
                             if ($rm_robot['robot_token'] === $robot['token']){
                                 //$rm_robot['flags']['hide_from_mission_select'] = true;
