@@ -949,7 +949,7 @@ if (!mmrpg_prototype_item_unlocked('cossack-program')
 
 }
 
-// Unlock the FIELD CODES after Dr. Cossack has completed at least half of Chapter Four
+// Unlock the LEGACY CODES after Dr. Cossack has completed at least half of Chapter Four
 $required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
 $required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
 $required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
@@ -958,7 +958,7 @@ if (!mmrpg_prototype_item_unlocked('legacy-codes')
     && mmrpg_prototype_battles_complete('dr-cossack') >= $required_missions
     ){
 
-    // Unlock the Field Codes and generate the required event details
+    // Unlock the Legacy Codes and generate the required event details
     mmrpg_game_unlock_item('legacy-codes', array(
         'event_text' => '{shop} made another discovery! The {item} have been unlocked!',
         'player_token' => 'dr-cossack',
