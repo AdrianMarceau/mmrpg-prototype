@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'mecha-support',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Special',
-    'ability_description' => 'The user summons a familiar support mecha from their own home field to their side of the battle, allowing it to temporarily fight as part of the user\'s own team! This ability seems to work differently for Neutral and Copy Core robots...',
+    'ability_description' => 'The user summons a familiar support mecha to their side of the field, allowing it to fight as part of the user\'s own team for the rest of the battle! However, the weapon energy cost for this ability increases after each use and it works differently for Neutral and Copy Core robots.',
     'ability_energy' => 5,
     'ability_speed' => 10,
     'ability_accuracy' => 100,
@@ -13,7 +13,6 @@ $ability = array(
 
         // Extract all objects into the current scope
         extract($objects);
-        //$mmrpg_index_fields = rpg_field::get_index();
 
         // Update the ability's target options and trigger
         $this_ability->target_options_update(array(
@@ -40,16 +39,12 @@ $ability = array(
             $this_field_level = !empty($this_battle->battle_level) ? $this_battle->battle_level : 1;
 
             // Check if this robot is a Copy Core or Elemental Core (skip if Neutral)
-            global $mmrpg_index;
             $this_field_mechas = array();
             if (!empty($this_robot->robot_core)){
                 if ($this_robot->robot_core == 'copy'){
                     // Collect the current robots available for this current field
                     $this_field_mechas = !empty($this_battle->battle_field->field_mechas) ? $this_battle->battle_field->field_mechas : array();
                 } elseif (!empty($this_robot->robot_field)){
-                    // Collect the current mechas available for this robot's home field
-                    //$temp_field = !empty($mmrpg_index_fields[$this_robot->robot_field]) ? $mmrpg_index_fields[$this_robot->robot_field] : array();
-                    //$this_field_info = rpg_field::parse_index_info($temp_field);
                     $this_field_info = rpg_field::get_index_info($this_robot->robot_field);
                     $this_field_mechas = !empty($this_field_info['field_mechas']) ? $this_field_info['field_mechas'] : array();
                 }
@@ -86,7 +81,6 @@ $ability = array(
             $this_robot->update_session();
 
             // Collect database info for this mecha
-            global $db;
             $this_mecha_info = rpg_robot::get_index_info($this_mecha_token);
             $this_mecha_info = rpg_robot::parse_index_info($this_mecha_info);
 
@@ -105,35 +99,51 @@ $ability = array(
             $this_letter_options = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H');
             $this_mecha_letter = $this_letter_options[$this_player->counters['player_mechas'][$this_mecha_name_token]];
 
-            // DEBUG
-
             // Generate the new robot and add it to this player's team
             $this_key = $this_player->counters['robots_active'] + $this_player->counters['robots_disabled'];
             $this_id = $this_player->player_id + 2 + $this_key;
             $this_id_token = $this_id.'_'.$this_mecha_info['robot_token'];
-            $this_summon_statboost = $this_robot_level >= 100 ? 100 : $this_robot_level;
-            $this_summon_bonusmoves = $this_robot_level >= 100 ? 3 : round(($this_robot_level / 100) * 3);
-            $this_stat_basetotal = $this_mecha_info['robot_energy'] + $this_mecha_info['robot_attack'] + $this_mecha_info['robot_defense'] + $this_mecha_info['robot_speed'];
             $this_boost_abilities = array('attack-boost', 'defense-boost', 'speed-boost', 'energy-boost');
             $this_break_abilities = array('attack-break', 'defense-break', 'speed-break', 'energy-break');
-            $this_extra_abilities = array_merge($this_boost_abilities, $this_break_abilities);
+            $this_mode_abilities = array('attack-mode', 'defense-mode', 'speed-mode', 'energy-mode');
+            $this_swap_abilities = array('attack-swap', 'defense-swap', 'speed-swap', 'energy-swap');
+            $this_extra_abilities = array_merge($this_boost_abilities, $this_break_abilities, $this_mode_abilities, $this_swap_abilities);
             shuffle($this_extra_abilities);
+
+            // Define the base mecha info with position, level, and base rewards
             $this_mecha_info['robot_id'] = $this_id;
             $this_mecha_info['robot_key'] = $this_key;
             $this_mecha_info['robot_position'] = 'active';
             $this_mecha_info['robot_name'] .= ' '.$this_mecha_letter;
             $this_mecha_info['robot_experience'] = 0;
-            $this_mecha_info['robot_level'] = ceil($this_robot_level / 2);
+            $this_mecha_info['robot_level'] = $this_robot_level;
+            $this_mecha_info['robot_weapons'] = $this_robot->robot_base_weapons;
+            $this_mecha_info['robot_base_weapons'] = $this_robot->robot_base_weapons;
             $this_mecha_info['values']['robot_rewards'] = array();
-            $this_mecha_info['values']['robot_rewards']['robot_energy'] = ceil(($this_mecha_info['robot_energy'] / $this_stat_basetotal) * $this_summon_statboost);
-            $this_mecha_info['values']['robot_rewards']['robot_attack'] = ceil(($this_mecha_info['robot_attack'] / $this_stat_basetotal) * $this_summon_statboost);
-            $this_mecha_info['values']['robot_rewards']['robot_defense'] = ceil(($this_mecha_info['robot_defense'] / $this_stat_basetotal) * $this_summon_statboost);
-            $this_mecha_info['values']['robot_rewards']['robot_speed'] = ceil(($this_mecha_info['robot_speed'] / $this_stat_basetotal) * $this_summon_statboost);
+            $this_mecha_info['values']['robot_rewards']['robot_energy'] = !empty($this_robot->values['robot_rewards']['robot_energy']) ? $this_robot->values['robot_rewards']['robot_energy'] : 0;
+            $this_mecha_info['values']['robot_rewards']['robot_attack'] = !empty($this_robot->values['robot_rewards']['robot_attack']) ? $this_robot->values['robot_rewards']['robot_attack'] : 0;
+            $this_mecha_info['values']['robot_rewards']['robot_defense'] = !empty($this_robot->values['robot_rewards']['robot_defense']) ? $this_robot->values['robot_rewards']['robot_defense'] : 0;
+            $this_mecha_info['values']['robot_rewards']['robot_speed'] = !empty($this_robot->values['robot_rewards']['robot_speed']) ? $this_robot->values['robot_rewards']['robot_speed'] : 0;
             $this_mecha_info['values']['robot_rewards'] = array();
-            for ($i = 0; $i < $this_summon_bonusmoves; $i++){
-                $extra_ability = array_shift($this_extra_abilities);
-                $this_mecha_info['robot_abilities'][] = $extra_ability;
+
+            // Give this mecha any extra support abilities the caller knows
+            foreach ($this_robot->robot_abilities AS $key => $extra_ability){
+                if (in_array($extra_ability, $this_extra_abilities)){
+                    $this_mecha_info['robot_abilities'][] = $extra_ability;
+                    $remove_key = array_search($extra_ability, $this_extra_abilities);
+                    unset($this_extra_abilities[$remove_key]);
+                }
             }
+
+            /*
+            // Always give the mecha at least one random support ability as an extra
+            $extra_ability = array_shift($this_extra_abilities);
+            $this_mecha_info['robot_abilities'][] = $extra_ability;
+            $remove_key = array_search($extra_ability, $this_extra_abilities);
+            unset($this_extra_abilities[$remove_key]);
+            */
+
+            // Now that we're set everything up, we can create the new mecha object and apply flags
             $temp_mecha = rpg_game::get_robot($this_battle, $this_player, $this_mecha_info);
             $temp_mecha->apply_stat_bonuses();
             foreach ($temp_mecha->robot_abilities AS $this_key2 => $this_token){
