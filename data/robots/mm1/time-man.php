@@ -33,7 +33,7 @@ $robot = array(
     'robot_rewards' => array(
         'abilities' => array(
                 array('level' => 0, 'token' => 'time-arrow'),
-                array('level' => 10, 'token' => 'time-slow')
+                array('level' => 0, 'token' => 'time-slow')
             )
         ),
     'robot_quotes' => array(

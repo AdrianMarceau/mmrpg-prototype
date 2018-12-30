@@ -35,7 +35,7 @@ $robot = array(
     'robot_rewards' => array(
         'abilities' => array(
                 array('level' => 0, 'token' => 'thunder-strike'),
-                array('level' => 10, 'token' => 'thunder-beam')
+                array('level' => 0, 'token' => 'thunder-beam')
             )
         ),
     'robot_quotes' => array(
