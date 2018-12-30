@@ -368,12 +368,14 @@ class rpg_mission_double extends rpg_mission {
                 foreach ($temp_option_robot['robot_rewards']['abilities'] AS $key => $info){
                     if ($info['token'] == 'buster-shot' || $info['level'] > $omega_robot_level){ continue; }
                     $temp_battle_omega['battle_rewards']['abilities'][] = $info;
+                    break; // only unlock first ability (T1) if simply clearing the stage
                 }
             }
             if (!empty($temp_option_robot2['robot_rewards']['abilities'])){
                 foreach ($temp_option_robot2['robot_rewards']['abilities'] AS $key => $info){
                     if ($info['token'] == 'buster-shot' || $info['level'] > $omega_robot_level){ continue; }
                     $temp_battle_omega['battle_rewards']['abilities'][] = $info;
+                    break; // only unlock first ability (T1) if simply clearing the stage
                 }
             }
         }
