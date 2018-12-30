@@ -106,16 +106,16 @@ $ability = array(
         // If the ability flag was not set, this ability begins charging
         if (!$is_summoned){
 
-            // Target this robot's self
-            $this_ability->target_options_update(array(
-                'frame' => 'summon',
-                'success' => array($this_target_frame, 105, 0, 10, 'The '.$this_ability->print_name().' created '.(preg_match('/^(a|e|i|o|u)/i', $this_object_name) ? 'an '.$this_object_name : 'a '.$this_object_name).'!')
-                ));
-            $this_robot->trigger_target($target_robot, $this_ability);
-
             // Attach this ability attachment to the battle field itself
             $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
             $this_battle->update_session();
+
+            // Target this robot's self
+            $this_ability->target_options_update(array(
+                'frame' => 'summon',
+                'success' => array($this_target_frame, -9999, -9999, 0, 'The '.$this_ability->print_name().' created '.(preg_match('/^(a|e|i|o|u)/i', $this_object_name) ? 'an '.$this_object_name : 'a '.$this_object_name).'!')
+                ));
+            $this_robot->trigger_target($target_robot, $this_ability);
 
         }
         // Else if the ability flag was set, leaf shield is thrown and defense is lowered by 30%
