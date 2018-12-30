@@ -59,30 +59,13 @@ $ability = array(
     $this_ability->ability_frame_styles = 'display: none; ';
     $this_ability->update_session();
 
-      // Randomly trigger a speed break if the ability was successful
+    // Randomly trigger a defense break if the ability was successful
     if ($target_robot->robot_status != 'disabled'
-      && $target_robot->robot_attack > 0
-      && $this_ability->ability_results['this_result'] != 'failure'
-      && $this_ability->ability_results['this_amount'] > 0){
-      // Decrease the target robot's attack stat
-      $this_ability->damage_options_update(array(
-        'kind' => 'attack',
-        'percent' => true,
-        'frame' => 'defend',
-        'kickback' => array(10, 0, 0),
-        'success' => array(9, 0, -6, 10, $target_robot->print_name().'&#39;s weapons were damaged!'),
-        'failure' => array(9, 0, -6, -10, '')
-        ));
-      $this_ability->recovery_options_update(array(
-        'kind' => 'attack',
-        'percent' => true,
-        'frame' => 'taunt',
-        'kickback' => array(5, 0, 0),
-        'success' => array(9, 0, -6, 10, $target_robot->print_name().'&#39;s weapons improved!'),
-        'failure' => array(9, 0, -6, -9999, '')
-        ));
-      $attack_damage_amount = ceil($target_robot->robot_attack * ($this_ability->ability_damage2 / 100));
-      $target_robot->trigger_damage($this_robot, $this_ability, $attack_damage_amount);
+      && $this_ability->ability_results['this_result'] != 'failure'){
+
+      // Call the global stat break function with customized options
+      rpg_ability::ability_function_stat_break($target_robot, 'attack', 1);
+
     }
 
     // Change the image to the full-screen rain effect
