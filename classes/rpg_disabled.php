@@ -327,7 +327,9 @@ class rpg_disabled {
          * Reward the player and robots with items and experience if not in demo mode
          */
 
-        if ($target_player->player_side == 'left' && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID && empty($_SESSION['GAME']['DEMO'])){
+        if ($target_player->player_side == 'left'
+            && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID
+            && empty($_SESSION['GAME']['DEMO'])){
 
             // -- EXPERIENCE POINTS / LEVEL UP -- //
 
@@ -423,7 +425,7 @@ class rpg_disabled {
 
                 // Collect or define the robot points and robot rewards variables
                 $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : rpg_game::get_robot($this_robot, $target_player, $temp_info);
-                //if ($temp_robot->robot_class == 'mecha'){ continue; }
+                if ($temp_robot->robot_class !== 'master'){ continue; }
                 $temp_robot_token = $temp_info['robot_token'];
                 if ($temp_robot_token == 'robot'){ continue; }
                 $temp_robot_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);
@@ -437,7 +439,7 @@ class rpg_disabled {
                 $target_robot_experience = 0;
 
                 // Continue with experience mods only if under level 100
-                if ($temp_robot->robot_level < 100 && $temp_robot->robot_class == 'master'){
+                if ($temp_robot->robot_level < 100){
 
                     // Give a proportionate amount of experience based on this and the target robot's levels
                     if ($temp_robot->robot_level == $temp_target_experience['level']){
@@ -861,7 +863,6 @@ class rpg_disabled {
                 }
 
             }
-
 
             // -- ITEM REWARDS -- //
 

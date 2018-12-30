@@ -59,8 +59,12 @@ $ability = array(
             $this_mecha_count = count($this_field_mechas);
             $this_mecha_token = $this_field_mechas[0]; //$this_field_mechas[array_rand($this_field_mechas)];
             $this_mecha_name_token = preg_replace('/-([1-3]+)$/i', '', $this_mecha_token);
-            if (empty($_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'])){ $_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'] = 0; }
-            $this_mecha_summoned_counter = $_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'];
+            if ($this_player->player_side === 'left'){
+                if (empty($_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'])){ $_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'] = 0; }
+                $this_mecha_summoned_counter = $_SESSION['GAME']['values']['robot_database'][$this_mecha_token]['robot_summoned'];
+            } else {
+                $this_mecha_summoned_counter = 0;
+            }
 
             // Check to see if this robot has summoned a mecha during this battle already
             if (!isset($this_robot->counters['ability_mecha_support'])){ $this_robot->counters['ability_mecha_support'] = 0; }
