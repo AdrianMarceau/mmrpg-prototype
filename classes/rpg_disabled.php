@@ -1126,8 +1126,20 @@ class rpg_disabled {
                     }
                 }
 
+                // Calculate whether or not this robot is currently corrupted
+                $temp_is_corrupted = false;
+                if (!empty($this_robot->history['triggered_damage_types'])){
+                    foreach ($this_robot->history['triggered_damage_types'] AS $types){
+                        if (!empty($types)){
+                            $temp_is_corrupted = true;
+                            $this_robot->set_flag('robot_is_unlockable_corrupted', $temp_is_corrupted);
+                            break;
+                        }
+                    }
+                }
+
                 // If this robot's data has NOT been corrupted, unlock is successful
-                if (empty($this_robot->flags['robot_is_unlockable_corrupted'])){
+                if (!$temp_is_corrupted){
 
                     // Collect this reward's information
                     $robot_reward_info = $this_robot->battle->battle_rewards['robots'][$temp_reward_key];
