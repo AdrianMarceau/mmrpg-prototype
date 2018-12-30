@@ -118,6 +118,17 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_battle_omega['battle_description'] = preg_replace('/^Defeat (Dr. (Wily|Light|Cossack)\'s)/i', 'Defeat', $temp_battle_omega['battle_description']);
         }
 
+        // Remove robots that have already been unlocked from view
+        if ($temp_battle_complete){
+            foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
+                if (mmrpg_prototype_robot_unlocked(false, $rm_robot['robot_token'])){
+                    //$rm_robot['flags']['hide_from_mission_select'] = true;
+                    $rm_robot['flags']['shadow_on_mission_select'] = true;
+                    $temp_battle_omega['battle_target_player']['player_robots'][$rm_key] = $rm_robot;
+                }
+            }
+        }
+
         // Add the omega battle to the battle options
         $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
