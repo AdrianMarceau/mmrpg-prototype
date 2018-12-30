@@ -170,7 +170,7 @@ $ability = array(
 
         // Define this ability's attachment token
         $static_attachment_key = $this_robot->get_static_attachment_key();
-        $this_attachment_token = 'ability_'.$this_ability->ability_token;
+        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
 
         // Check if this ability is already summoned to the field
         $is_summoned = isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token]) ? true : false;
