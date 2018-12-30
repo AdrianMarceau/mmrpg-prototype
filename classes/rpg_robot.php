@@ -1943,6 +1943,7 @@ class rpg_robot extends rpg_object {
             // Define basic robot info for caluclations
             $robot_info = array();
             $robot_info['robot_token'] = $this->robot_token;
+            $robot_info['robot_class'] = $this->robot_class;
             $robot_info['robot_core'] = $this->robot_core;
             $robot_info['robot_core2'] = $this->robot_core2;
             $robot_info['robot_item'] = $this->robot_item;
@@ -2017,6 +2018,13 @@ class rpg_robot extends rpg_object {
             // Apply held robot core multipliers if they exist
             if ($ability_type_token2 == $core_type_token3){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER); $energy_mods++; }
 
+        }
+
+        // Check if the user is a MECHA class robot for lower WE requirements
+        if (isset($this_robot['robot_class'])
+            && $this_robot['robot_class'] === 'mecha'){
+            $energy_new = ceil($energy_new * MMRPG_SETTINGS_MECHABONUS_MULTIPLIER);
+            $energy_mods++;
         }
 
         // If this ability is in the list of robot rewards, apply LEVEL UP bonuses
