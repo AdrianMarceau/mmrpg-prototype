@@ -34,7 +34,7 @@ $robot = array(
     'robot_rewards' => array(
         'abilities' => array(
                 array('level' => 0, 'token' => 'bubble-spray'),
-                array('level' => 10, 'token' => 'bubble-lead')
+                array('level' => 0, 'token' => 'bubble-lead')
             )
         ),
     'robot_quotes' => array(

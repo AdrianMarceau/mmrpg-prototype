@@ -34,7 +34,7 @@ $robot = array(
     'robot_rewards' => array(
         'abilities' => array(
                 array('level' => 0, 'token' => 'super-throw'),
-                array('level' => 10, 'token' => 'super-arm')
+                array('level' => 0, 'token' => 'super-arm')
             )
         ),
     'robot_quotes' => array(
