@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Special',
     'ability_image_sheets' => 4,
-    'ability_description' => 'Using its own home field as a base, the user alters the conditions of the current battle by raising or lowering familiar type multipliers. This ability seems to work differently for Neutral and Copy Core robots...',
+    'ability_description' => 'The user increases the field mupltier matching their core and lowers the field multipliers matching their weaknesses, tilting the odds in their favour! However, the weapon energy cost for this ability increases after each use and it seems to work differently for Neutral and Copy Core robots...',
     'ability_energy' => 5,
     'ability_speed' => 10,
     'ability_accuracy' => 100,
@@ -16,54 +16,35 @@ $ability = array(
         extract($objects);
         $mmrpg_index_fields = rpg_field::get_index();
 
-        // Check if this robot is a Copy Core or Elemental Core (skip if Neutral)
+        // Define field multipliers differently for Copy Core, Elemental Core, and Neutral Core
         $this_field_multipliers = array();
-        if (!empty($this_robot->robot_core)){
+        if ($this_robot->robot_core === 'copy'){
 
-            // Check if this robot is a Copy Core or Elemental Core
-            if ($this_robot->robot_core == 'copy'){
+            // Define the field multipliers for when a Copy Core robot uses the ability (multiply existing)
+            $this_field_multipliers = !empty($this_field->field_multipliers) ? $this_field->field_multipliers : array();
 
-                // Collect the field multipliers defined by this particular field
-                $this_field_multipliers = !empty($this_field->field_base_multipliers) ? $this_field->field_base_multipliers : array();
+        } elseif (empty($this_robot->robot_core)){
 
-            } elseif (!empty($this_robot->robot_field)){
-
-                // Collect the current robots available for this robot's home field
-                $temp_field = !empty($mmrpg_index_fields[$this_robot->robot_field]) ? $mmrpg_index_fields[$this_robot->robot_field] : array();
-                $this_field_info = rpg_field::parse_index_info($temp_field);
-                $this_field_multipliers = !empty($this_field_info['field_multipliers']) ? $this_field_info['field_multipliers'] : array();
-
-            } elseif (empty($this_robot->robot_field)){
-
-                // Loop through this robot's weaknesses and resistances to determine boosts
-                if (!empty($this_robot->robot_weaknesses)){
-                    foreach ($this_robot->robot_weaknesses AS $temp_type){
-                        $this_field_multipliers[$temp_type] = 2.0;
-                    }
-                }
-
-                // Loop through this robot's weaknesses and resistances to determine breaks
-                if (!empty($this_robot->robot_resistances)){
-                    foreach ($this_robot->robot_resistances AS $temp_type){
-                        $this_field_multipliers[$temp_type] = 0.5;
-                    }
-                }
-
-            }
-        }
-        // Used by a NEUTRAL type so we're resetting all the field multipliers
-        else {
-
-            // Loop through existing field multipliers and invert them
+            // Define the field multipliers for when a Neutral Core robot uses the ability (remove existing)
             foreach ($this_field->field_multipliers AS $temp_type => $temp_multiplier){
                 if ($temp_multiplier == 1){ continue; }
                 $temp_new_multiplier = $temp_multiplier / ($temp_multiplier * $temp_multiplier);
                 $this_field_multipliers[$temp_type] = $temp_new_multiplier;
             }
 
+        } else {
+
+            // Define the field multipliers for when an Elemental Core robot uses the ability (boost core, break weaknesses)
+            $this_field_multipliers[$this_robot->robot_core] = 1.5;
+            if (!empty($this_robot->robot_weaknesses)){
+                foreach ($this_robot->robot_weaknesses AS $temp_type){
+                    $this_field_multipliers[$temp_type] = 0.5;
+                }
+            }
+
         }
 
-        // Only continue with the ability if player has less than 8 robots
+        // Only continue with the ability if there are multipliers to apply
         if (!empty($this_field_multipliers)){
 
             // Target this robot's self
@@ -84,9 +65,9 @@ $ability = array(
 
                 // Define the modify and boost parameters for this multiplier
                 $type_name = ucfirst($type_token);
-                if ($type_multiplier > 1){ $temp_modify_amount = 0.1; $temp_boost_percent = '+10'; }
-                elseif ($type_multiplier < 1){ $temp_modify_amount = -0.1; $temp_boost_percent = '-10'; }
-                else { $temp_modify_amount = 0; $temp_boost_percent = ''; }
+                if ($type_multiplier > 1){ $temp_modify_amount = 0.1; }
+                elseif ($type_multiplier < 1){ $temp_modify_amount = -0.1; }
+                else { $temp_modify_amount = 0; }
 
                 // Only continue if there was a difference to boost
                 if (!empty($temp_modify_amount)){
@@ -107,16 +88,19 @@ $ability = array(
 
                     // Define the boost or lower percent
                     $temp_change_text = '';
+                    $temp_change_text2 = '';
                     if ($temp_new_amount > $temp_first_amount){
                         $temp_change = $temp_new_amount - $temp_first_amount;
                         $temp_change_percent = round(($temp_change / $temp_first_amount) * 100);
                         $temp_change_text = 'boosted';
+                        $temp_change_text2 = 'intensified';
                         //$temp_change_alert = rpg_battle::random_positive_word();
                         $temp_change_alert = $this_player->player_side == 'left' ? rpg_battle::random_positive_word() : rpg_battle::random_negative_word();
                     } elseif ($temp_new_amount < $temp_first_amount){
                         $temp_change = $temp_first_amount - $temp_new_amount;
                         $temp_change_percent = round(($temp_change / $temp_first_amount) * 100);
                         $temp_change_text = 'reduced';
+                        $temp_change_text2 = 'worsened';
                         //$temp_change_alert = rpg_battle::random_positive_word();
                         $temp_change_alert = $this_player->player_side == 'left' ? rpg_battle::random_positive_word() : rpg_battle::random_negative_word();
                     } else {
@@ -184,8 +168,12 @@ $ability = array(
                     }
 
                     // Create the event to show this multiplier boost or lowering
+                    $first_text = '';
+                    if ($this_robot->robot_core === 'copy'){ $effect_text = '<span class="ability_name ability_type ability_type_'.$type_token.'">'.$type_name.' Effects</span> were '.$temp_change_text2.'!<br />'; }
+                    elseif (!empty($this_robot->robot_core)){ $effect_text = '<span class="ability_name ability_type ability_type_'.$type_token.'">'.$type_name.' Effects</span> were '.$temp_change_text.' by '.$temp_change_percent.'%!<br />'; }
+                    else { $effect_text = '<span class="ability_name ability_type ability_type_'.$type_token.'">'.$type_name.' Effects</span> returned to normal!<br />'; }
                     $this_battle->events_create($this_robot, false, $this_field->field_name.' Multipliers',
-                        $temp_change_alert.' <span class="ability_name ability_type ability_type_'.$type_token.'">'.$type_name.' Effects</span> were '.$temp_change_text.' by '.$temp_change_percent.'%!<br />'.
+                        $temp_change_alert.' '.$effect_text.
                         'The multiplier is now at <span class="ability_name ability_type ability_type_'.$type_name.'">'.$type_name.' x '.number_format($temp_new_amount, 1).'</span>!',
                         array('canvas_show_this_ability_overlay' => true)
                         );
@@ -279,6 +267,25 @@ $ability = array(
                 ));
             $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
+        }
+
+        // Return true on success
+        return true;
+
+        },
+    'ability_function_onload' => function($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Check to see if this ability has been used already, and if so increase the cost
+        if (!empty($this_robot->history['triggered_abilities'])){
+            $trigger_counts = array_count_values($this_robot->history['triggered_abilities']);
+            if (!empty($trigger_counts[$this_ability->ability_token])){
+                $trigger_count = $trigger_counts[$this_ability->ability_token];
+                $new_energy_cost = $this_ability->ability_base_energy * ($trigger_count + 1);
+                $this_ability->set_energy($new_energy_cost);
+            }
         }
 
         // Return true on success
