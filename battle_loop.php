@@ -129,6 +129,7 @@ if ($this_action != 'start'){
 }
 // Otherwise, prepopulate their robot arrays
 elseif ($this_action == 'start'){
+
     // Break apart and filter this player's robots
     $this_playerinfo['player_robots'] = array();
     $temp_this_player_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
@@ -146,6 +147,12 @@ elseif ($this_action == 'start'){
     }
     if (!empty($this_battle->battle_target_player['player_controller'])){
         $target_playerinfo['player_controller'] = $this_battle->battle_target_player['player_controller'];
+    }
+    if (!empty($this_battle->battle_target_player['player_switch'])){
+        $target_playerinfo['player_switch'] = $this_battle->battle_target_player['player_switch'];
+    }
+    if (!empty($this_battle->battle_target_player['player_quotes'])){
+        $target_playerinfo['player_quotes'] = $this_battle->battle_target_player['player_quotes'];
     }
 
     // Break apart and filter the target player's robots
