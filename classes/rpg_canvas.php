@@ -1785,6 +1785,7 @@ class rpg_canvas {
                         $attachment_info['flags']['is_attachment'] = true;
                         if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                         $this_ability = rpg_game::get_ability($this_battle, $left_side_player, $static_robot_object, $attachment_info);
+                        $this_ability->update_session();
 
                         // Define this ability data array and generate the markup data
                         $this_attachment_options = $options;
@@ -1817,6 +1818,7 @@ class rpg_canvas {
                         $attachment_info['flags']['is_attachment'] = true;
                         if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                         $this_item = rpg_game::get_item($this_battle, $left_side_player, $static_robot_object, $attachment_info);
+                        $this_item->update_session();
 
                         // Define this item data array and generate the markup data
                         $this_attachment_options = $options;
