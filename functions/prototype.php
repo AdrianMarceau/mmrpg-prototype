@@ -782,8 +782,20 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $this_robotinfo['robot_image'] = !empty($this_robotinfo['robot_image']) ? $this_robotinfo['robot_image'] : $this_robotinfo['robot_token'];
                     //if (!empty($this_robotinfo['flags']['hide_from_mission_select'])){ $temp_path = 'robots/robot'; }
                     //else { $temp_path = 'robots/'.$this_robotinfo['robot_image']; }
+
+                    // Define the basic path for the robot image
                     $temp_path = 'robots/'.$this_robotinfo['robot_image'];
-                    $this_battleinfo['battle_sprite'][] = array('path' => $temp_path, 'size' => !empty($this_robotinfo['robot_image_size']) ? $this_robotinfo['robot_image_size'] : 40);
+
+                    // Some robots should only show as shadows
+                    $use_shadow = false;
+                    if (!empty($this_robotinfo['flags']['shadow_on_mission_select'])){ $use_shadow = true; }
+
+                    // Generate the final path variables for the mission button sprite
+                    $this_battleinfo['battle_sprite'][] = array(
+                        'path' => $temp_path,
+                        'size' => (!empty($this_robotinfo['robot_image_size']) ? $this_robotinfo['robot_image_size'] : 40),
+                        'shadow' => $use_shadow
+                        );
 
 
                 }
@@ -823,7 +835,18 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $temp_opacity = $temp_layer == 10 ? 1 : 1 - ($temp_key * 0.09);
                     $temp_path = $this_battle_sprite['path'];
                     $temp_size = $this_battle_sprite['size'];
-                    if (preg_match('/^robots/i', $temp_path) && $this_targetinfo['player_id'] != MMRPG_SETTINGS_TARGET_PLAYERID){ $temp_path = 'robots/robot'; $temp_size = 40; }
+                    $temp_shadow = isset($this_battle_sprite['shadow']) ? $this_battle_sprite['shadow'] : false;
+                    $temp_other_styles = '';
+                    if ($temp_shadow){
+                        //$temp_other_styles .= 'filter: contrast(0%) brightness(0%); ';
+                        $temp_other_styles .= '-webkit-filter: grayscale(100%); filter: grayscale(100%); ';
+                        $temp_opacity *= 0.5;
+                        }
+                    if (preg_match('/^robots/i', $temp_path)
+                        && $this_targetinfo['player_id'] != MMRPG_SETTINGS_TARGET_PLAYERID){
+                        $temp_path = 'robots/robot';
+                        $temp_size = 40;
+                        }
                     $temp_frame = !empty($this_battle_sprite['frame']) ? $this_battle_sprite['frame'] : '';
                     $temp_size_text = $temp_size.'x'.$temp_size;
                     $temp_top = -2 + (40 - $temp_size);
@@ -854,9 +877,9 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         $temp_right = 5;
                     }
                     if (preg_match('/^(abilities|items)/i', $temp_path)){
-                        $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: 1px; right: -3px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.';">&nbsp;</span>';
+                        $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: 1px; right: -3px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
                     } else {
-                        $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' '.($this_option_complete && !$this_has_field_star && $this_option_frame == 'base' ? 'sprite_'.$temp_size_text.'_defeat ' : 'sprite_'.$temp_size_text.'_'.$this_option_frame.' ').'" style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_top.'px; right: '.$temp_right.'px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.';">&nbsp;</span>';
+                        $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' '.($this_option_complete && !$this_has_field_star && $this_option_frame == 'base' ? 'sprite_'.$temp_size_text.'_defeat ' : 'sprite_'.$temp_size_text.'_'.$this_option_frame.' ').'" style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_top.'px; right: '.$temp_right.'px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
                     }
                     $temp_layer -= 1;
                     $temp_last_size = $temp_size;
