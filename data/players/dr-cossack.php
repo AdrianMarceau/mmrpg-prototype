@@ -138,8 +138,8 @@ $player = array(
             array('points' => 0, 'token' => 'proto-man', 'level' => 1)
             ),
         'abilities' => array(
-            array('points' =>        0, 'token' => 'buster-shot'),
-            array('points' =>        0, 'token' => 'cossack-buster')
+            array('points' => 0, 'token' => 'buster-shot'),
+            array('points' => 0, 'token' => 'cossack-buster')
             )
         ),
     'player_quotes' => array(
