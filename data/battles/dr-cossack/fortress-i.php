@@ -39,7 +39,7 @@ $battle = array(
                 'robot_quotes' => array(
                     'battle_start' => 'My role here is support. Do not try to distract me.',
                     'battle_taunt' => 'I am not the robot you think I am. I will not hold back.',
-                    'battle_victory' => 'Your efforts were in vein. You will not win.',
+                    'battle_victory' => 'Your efforts were in vain. You will not win.',
                     'battle_defeat' => 'I have failed my mission. I should be recycled.'
                     )
                 )
