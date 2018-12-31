@@ -35,10 +35,13 @@ $ability = array(
         } else {
 
             // Define the field multipliers for when an Elemental Core robot uses the ability (boost core, break weaknesses)
-            $this_field_multipliers[$this_robot->robot_core] = 1.5;
+            $field_boost = 1.5;
+            $field_break = 0.5;
+            $this_field_multipliers[$this_robot->robot_core] = $field_boost;
             if (!empty($this_robot->robot_weaknesses)){
                 foreach ($this_robot->robot_weaknesses AS $temp_type){
-                    $this_field_multipliers[$temp_type] = 0.5;
+                    if ($temp_type === $this_robot->robot_core){ $field_break *= $field_break; continue; }
+                    $this_field_multipliers[$temp_type] = $field_break;
                 }
             }
 
