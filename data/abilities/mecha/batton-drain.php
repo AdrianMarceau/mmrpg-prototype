@@ -8,7 +8,7 @@ $ability = array(
   'ability_description' => 'The user drains the life energy from the target to restore its own, inflicting damage in the process.',
   'ability_energy' => 0,
   'ability_type' => 'nature',
-  'ability_damage' => 10,
+  'ability_damage' => 20,
   'ability_accuracy' => 100,
   'ability_function' => function($objects){
 
@@ -58,7 +58,7 @@ $ability = array(
         'success' => array($this_frames['target'], -9999, 5, -10, $this_robot->print_name().'&#39;s energy was restored!'),
         'failure' => array($this_frames['target'], -9999, 5, -10, $this_robot->print_name().'&#39;s energy was not affected&hellip;')
         ));
-      $energy_recovery_amount = ceil($this_ability->ability_results['this_amount'] / 2);
+      $energy_recovery_amount = $this_ability->ability_results['this_amount'];
       $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
 
     }
