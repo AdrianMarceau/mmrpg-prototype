@@ -50,21 +50,21 @@ else {
 
             /* -- Calculate Chapter Unlocks -- */
 
-            if ($chapters_unlocked['7']
+            if ($chapters_unlocked['7']  // Stars
                 && empty($_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_7'])){
-                unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
+                //unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
                 $_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_7'] = true;
             }
 
-            if ($chapters_unlocked['6']
+            if ($chapters_unlocked['6']  // Players
                 && empty($_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_6'])){
-                unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
+                //unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
                 $_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_6'] = true;
             }
 
-            if ($chapters_unlocked['5']
+            if ($chapters_unlocked['5']  // Random
                 && empty($_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_5'])){
-                unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
+                //unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
                 $_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_5'] = true;
             }
 
@@ -120,10 +120,15 @@ else {
             // Collect the current star count for everyone
             $battle_star_counter = mmrpg_prototype_stars_unlocked();
 
+            // Define markup for the player's current chapter marker
+            $chapter_sprite_markup = '<img class="marker" src="images/players/'.$player_token.'/chapter-sprite.gif" />';
+
             // CHAPTER ONE(0) Intro
             if ($chapters_unlocked['0']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '0' ? 'chapter_link_active ' : '').'" href="#" data-chapter="0">Chapter 1</a>';
+                $chapter_title_markup = '<span>Chapter 1</span>';
+                if (!$chapters_unlocked['1']){ $chapter_title_markup .= $chapter_sprite_markup; }
+                echo '<a class="chapter_link '.($temp_last_chapter === '0' ? 'chapter_link_active ' : '').'" href="#" data-chapter="0">'.$chapter_title_markup.'</a>';
             } else {
                 $chapters_display_count++;
                 echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -132,7 +137,9 @@ else {
             // CHAPTER TWO(1) Masters
             if ($chapters_unlocked['1']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '1' ? 'chapter_link_active ' : '').'" href="#" data-chapter="1">Chapter 2</a>';
+                $chapter_title_markup = '<span>Chapter 2</span>';
+                if (!$chapters_unlocked['2']){ $chapter_title_markup .= $chapter_sprite_markup; }
+                echo '<a class="chapter_link '.($temp_last_chapter === '1' ? 'chapter_link_active ' : '').'" href="#" data-chapter="1">'.$chapter_title_markup.'</a>';
             } else {
                 $chapters_display_count++;
                 echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -141,7 +148,9 @@ else {
             // CHAPTER THREE(2) Rivals
             if ($chapters_unlocked['2']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '2' ? 'chapter_link_active ' : '').'" href="#" data-chapter="2">Chapter 3</a>';
+                $chapter_title_markup = '<span>Chapter 3</span>';
+                if (!$chapters_unlocked['3']){ $chapter_title_markup .= $chapter_sprite_markup; }
+                echo '<a class="chapter_link '.($temp_last_chapter === '2' ? 'chapter_link_active ' : '').'" href="#" data-chapter="2">'.$chapter_title_markup.'</a>';
             } else {
                 $chapters_display_count++;
                 echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -150,7 +159,9 @@ else {
             // CHAPTER FOUR(3) Fusions
             if ($chapters_unlocked['3']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '3' ? 'chapter_link_active ' : '').'" href="#" data-chapter="3">Chapter 4</a>';
+                $chapter_title_markup = '<span>Chapter 4</span>';
+                if (!$chapters_unlocked['4a']){ $chapter_title_markup .= $chapter_sprite_markup; }
+                echo '<a class="chapter_link '.($temp_last_chapter === '3' ? 'chapter_link_active ' : '').'" href="#" data-chapter="3">'.$chapter_title_markup.'</a>';
             } else {
                 $chapters_display_count++;
                 echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -159,7 +170,9 @@ else {
             // CHAPTER FIVE(4a-c) Finals
             if ($chapters_unlocked['4a']){
                 $chapters_display_count++;
-                echo '<a class="chapter_link '.($temp_last_chapter === '4' ? 'chapter_link_active ' : '').'" href="#" data-chapter="4">Chapter 5</a>';
+                $chapter_title_markup = '<span>Chapter 5</span>';
+                if (true){ $chapter_title_markup .= $chapter_sprite_markup; }
+                echo '<a class="chapter_link '.($temp_last_chapter === '4' ? 'chapter_link_active ' : '').'" href="#" data-chapter="4">'.$chapter_title_markup.'</a>';
             } else {
                 $chapters_display_count++;
                 echo '<a class="chapter_link chapter_link_disabled">???</a>';
