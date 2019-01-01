@@ -313,9 +313,9 @@ $this_shop_index['kalinka'] = array(
         'shop_player' => 'dr-cossack',
         'shop_number' => 'SHOP-003',
         'shop_kind_selling' => array('items'),
-        'shop_kind_buying' => array('stars'),
+        'shop_kind_buying' => array(),
         'shop_quote_selling' => array('items' => 'Greetings and welcome to Kalinka\'s Shop! I think you\'ll enjoy the new hold items I\'m developing.'),
-        'shop_quote_buying' => array('stars' => 'Do you have any field or fusion stars? I\'m studying the effects of starforce and need to scan a few.'),
+        'shop_quote_buying' => array(),
         'shop_items' => array(
             'items_selling' => array(
                 'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,
@@ -328,12 +328,6 @@ $this_shop_index['kalinka'] = array(
                 'speed-booster' => 32000, 'field-booster' => 32000,
                 'growth-module' => 32000, 'fortune-module' => 32000,
                 'target-module' => 32000, 'charge-module' => 32000
-                )
-            ),
-        'shop_stars' => array(
-            'stars_buying' => array(
-                'field' => 2000,
-                'fusion' => 4000
                 )
             )
         );
@@ -760,22 +754,12 @@ if (!empty($this_shop_index['kalinka'])){
     if ($this_shop_index['kalinka']['shop_level'] >= 30){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
     unset($this_shop_index['kalinka']['shop_items']['items_selling2']);
 
-    // If the player has completed the prototype, Kalinka's Shop also sells fields
+    // If the player has unlocked the Legacy Codes, Kalinka's Shop also sells legacy fields & robots
     if (mmrpg_prototype_item_unlocked('legacy-codes')
+        || mmrpg_prototype_item_unlocked('robot-codes')
         || mmrpg_prototype_item_unlocked('field-codes')){
-        $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
-        $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I\'ve discovered that we can generate new stars using the data of legacy battle fields. Interested?';
-        $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
-            'construction-site' => 48000, 'magnetic-generator' => 48000,
-            'reflection-chamber' => 48000, 'rocky-plateau' => 48000,
-            'spinning-greenhouse' => 48000, 'serpent-column' => 48000,
-            'power-plant' => 48000, 'septic-system' => 48000
-            );
-    }
 
-    // If the player has completed the prototype, Kalinka's Shop also sells robots
-    if (mmrpg_prototype_item_unlocked('legacy-codes')
-        || mmrpg_prototype_item_unlocked('robot-codes')){
+        // Add robot data to Kalinka's Shop
         $this_shop_index['kalinka']['shop_kind_selling'][] = 'robots';
         $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Would you like me to build you a new robot or two? I created a few blueprints using your scan data.';
         $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array(
@@ -799,6 +783,28 @@ if (!empty($this_shop_index['kalinka'])){
             'splash-woman' => 32000, 'jewel-man' => 32000,
             // MM11 Robot Masters
             'block-man' => 32000
+            );
+
+        // Add field data to Kalinka's Shop
+        $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
+        $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I\'ve discovered that we can generate new stars using the data of legacy battle fields. Interested?';
+        $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
+            'construction-site' => 48000, 'magnetic-generator' => 48000,
+            'reflection-chamber' => 48000, 'rocky-plateau' => 48000,
+            'spinning-greenhouse' => 48000, 'serpent-column' => 48000,
+            'power-plant' => 48000, 'septic-system' => 48000
+            );
+
+    }
+
+    // If the player has unlocked the Cossack Program, Kalinka's Shop also sells fields
+    if (mmrpg_prototype_item_unlocked('cossack-program')){
+
+        // Add starshow data to Kalinka's Shop
+        $this_shop_index['kalinka']['shop_kind_buying'][] = 'stars';
+        $this_shop_index['kalinka']['shop_quote_buying']['stars'] = 'Do you have any field or fusion stars? I\'m studying the effects of starforce and need to scan a few.';
+        $this_shop_index['kalinka']['shop_stars']['stars_buying'] = array(
+            'field' => 2000, 'fusion' => 4000
             );
     }
 
