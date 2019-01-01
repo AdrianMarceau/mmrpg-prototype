@@ -35,6 +35,12 @@ ob_start();
 	$current_debug_value = !empty($_SESSION['GAME']['debug_mode']) ? 1 : 0;
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Debug Mode</span><br /><span class="value type type_'.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
 
+	// Display the DEVPOWER option for CLEAR MISSION
+	if (MMRPG_CONFIG_IS_LIVE === false){
+		$block_num++;
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_nature_shield" type="button" data-action="ability_10_action-devpower-clearmission"><label><span class="multi">Clear<br />Mission</span></label></a>';
+	}
+
 	/*
 	// Display the toggle options for perspective mode and stuff
 	$current_perspective_value = isset($_SESSION['GAME']['perspective_mode']) && empty($_SESSION['GAME']['perspective_mode']) ? 0 : 1;
