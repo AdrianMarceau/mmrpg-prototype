@@ -20,7 +20,7 @@ $ability = array(
         $this_robot->update_session();
 
        	// Print out the DEVPOWER header so we know it's serious
-		$this_battle->events_create(false, false, 'DEVPOWER', '<strong class="ability_type type_nature_shield">DevPower : Clear Mission!</strong>');
+		$this_battle->events_create(false, false, 'DEVPOWER', '<strong class="ability_name ability_type ability_type_nature_shield">DevPower : Clear Mission!</strong>');
 
         // Count the number of active robots on the target's side of the field
         $target_robots_active = $target_player->counters['robots_active'];
@@ -30,13 +30,13 @@ $ability = array(
             'kind' => 'energy',
             'frame' => 'damage',
             'modifiers' => false,
-            'success' => array(0, 0, 0, 0, 'The <strong class="type type_nature_shield">DevPower</strong> cleared out '.$target_robot->print_name().'!')
+            'success' => array(0, 0, 0, 0, 'The <strong class="ability_name ability_type type_nature_shield">DevPower</strong> cleared out '.$target_robot->print_name().'!')
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
             'frame' => 'damage',
             'modifiers' => false,
-            'success' => array(0, 0, 0, 0, 'The <strong class="type type_nature_shield">DevPower</strong> cleared out '.$target_robot->print_name().'!')
+            'success' => array(0, 0, 0, 0, 'The <strong class="ability_name ability_type type_nature_shield">DevPower</strong> cleared out '.$target_robot->print_name().'!')
             ));
         $energy_damage_amount = $target_robot->robot_base_energy;
         $trigger_options = array('apply_modifiers' => false, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
@@ -52,13 +52,13 @@ $ability = array(
 	            'kind' => 'energy',
 	            'frame' => 'damage',
 	            'modifiers' => false,
-	            'success' => array(0, 0, 0, 0, 'The <strong class="type type_nature_shield">DevPower</strong> cleared out '.$temp_target_robot->print_name().'!')
+	            'success' => array(0, 0, 0, 0, 'The <strong class="ability_name ability_type type_nature_shield">DevPower</strong> cleared out '.$temp_target_robot->print_name().'!')
                 ));
             $this_ability->recovery_options_update(array(
 	            'kind' => 'energy',
 	            'frame' => 'damage',
 	            'modifiers' => false,
-	            'success' => array(0, 0, 0, 0, 'The <strong class="type type_nature_shield">DevPower</strong> cleared out '.$temp_target_robot->print_name().'!')
+	            'success' => array(0, 0, 0, 0, 'The <strong class="ability_name ability_type type_nature_shield">DevPower</strong> cleared out '.$temp_target_robot->print_name().'!')
                 ));
             $energy_damage_amount = $temp_target_robot->robot_base_energy;
             $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
