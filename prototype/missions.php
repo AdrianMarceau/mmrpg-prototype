@@ -153,14 +153,7 @@ else {
                 echo '<a class="chapter_link '.($temp_last_chapter === '3' ? 'chapter_link_active ' : '').'" href="#" data-chapter="3">Chapter 4</a>';
             } else {
                 $chapters_display_count++;
-                if ($battle_star_counter > 0 && $chapters_unlocked['2'] && $battle_complete_counter > MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT){
-                    $text = '<span>'.
-                    '&#9733; &times; '.MMRPG_SETTINGS_CHAPTER4_STARLOCK.
-                    '</span>';
-                } else {
-                    $text = '???';
-                }
-                echo '<a class="chapter_link chapter_link_disabled">'.$text.'</a>';
+                echo '<a class="chapter_link chapter_link_disabled">???</a>';
             }
 
             // CHAPTER FIVE(4a-c) Finals
@@ -169,14 +162,7 @@ else {
                 echo '<a class="chapter_link '.($temp_last_chapter === '4' ? 'chapter_link_active ' : '').'" href="#" data-chapter="4">Chapter 5</a>';
             } else {
                 $chapters_display_count++;
-                if ($battle_star_counter > 0 && $chapters_unlocked['3']){
-                    $text = '<span>'.
-                    '&#9733; &times; '.MMRPG_SETTINGS_CHAPTER5_STARLOCK.
-                    '</span>';
-                } else {
-                    $text = '???';
-                }
-                echo '<a class="chapter_link chapter_link_disabled">'.$text.'</a>';
+                echo '<a class="chapter_link chapter_link_disabled">???</a>';
             }
 
             // Pre-check to see how many extra tabs to add

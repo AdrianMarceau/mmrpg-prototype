@@ -91,6 +91,8 @@ else {
     function temp_calculate_player_progress(&$chapters_unlocked, &$battle_complete_counter, &$prototype_complete_flag){
         global $battle_star_counter;
 
+        // -- PHASE ONE -- //
+
         // Intro
         $chapters_unlocked['0'] = true;
 
@@ -100,32 +102,58 @@ else {
         // Rivals
         $chapters_unlocked['2'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
 
-        // Fusions
-        if ($battle_star_counter >= MMRPG_SETTINGS_CHAPTER4_STARLOCK || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT){
-            $chapters_unlocked['3'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
-        } else {
-            $chapters_unlocked['3'] = false;
-        }
+        // -- PHASE TWO -- //
 
-        // Finals
-        if ($battle_star_counter >= MMRPG_SETTINGS_CHAPTER5_STARLOCK || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
+        if ($prototype_complete_flag
+            || mmrpg_prototype_item_unlocked('cossack-program')
+            || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
+
+            // Fusions
+            $chapters_unlocked['3'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
+
+            // Finals
             $chapters_unlocked['4a'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
             $chapters_unlocked['4b'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
             $chapters_unlocked['4c'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
+
         } else {
+
+            // Fusions
+            $chapters_unlocked['3'] = false;
+
+            // Finals
             $chapters_unlocked['4a'] = false;
             $chapters_unlocked['4b'] = false;
             $chapters_unlocked['4c'] = false;
+
         }
 
-        // Stars
-        $chapters_unlocked['7'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;;
+        // -- BONUS PHASE -- //
 
-        // Player
-        $chapters_unlocked['6'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
+        if ($prototype_complete_flag
+            || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
-        // Bonus
-        $chapters_unlocked['5'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
+            // Stars
+            $chapters_unlocked['7'] = true;
+
+            // Player
+            $chapters_unlocked['6'] = true;
+
+            // Bonus
+            $chapters_unlocked['5'] = true;
+
+        } else {
+
+            // Stars
+            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
+
+            // Player
+            $chapters_unlocked['6'] = false;
+
+            // Bonus
+            $chapters_unlocked['5'] = false;
+
+        }
 
     }
 
