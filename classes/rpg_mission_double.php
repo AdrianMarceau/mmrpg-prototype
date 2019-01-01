@@ -472,7 +472,7 @@ class rpg_mission_double extends rpg_mission {
             if ($this_unlock_robots_count > 1){ $temp_battle_omega['battle_description2'] = 'If we use only Neutral type abilities on the targets we may be able to save them...'; }
             else { $temp_battle_omega['battle_description2'] = 'If we use only Neutral type abilities on the target we may be able to save it...'; }
         } else {
-            $temp_battle_omega['battle_description'] = 'Defeat the powered up copies of '.$temp_description_target_robots.'!';
+            $temp_battle_omega['battle_description'] = 'Defeat the powered up copies of '.$temp_description_target_robots.' on their fusion field!';
         }
 
         // Add some random item drops to the starter battle
