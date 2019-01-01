@@ -4,7 +4,7 @@ $battle = array(
   'battle_name' => 'Chapter Five Final Battle 2/3',
   'battle_size' => '1x4',
   'battle_encore' => true,
-  'battle_description' => 'Defeat the dark soul copies of Proto Man, Mega Man, and Bass!',
+  'battle_description' => 'Defeat the dark soul variants of Proto Man, Mega Man, and Bass!',
   'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 3),
   'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 50 * 3),
   'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination-2', 'field_name' => 'Final Destination II', 'field_music' => 'final-destination-2', 'field_mechas' => array('bulb-blaster-2', 'robo-fishtot-2', 'lady-blader-2', 'manta-missile-2', 'drill-mole-2', 'pyre-fly-2', 'ring-ring-2', 'skullmet-2')),
