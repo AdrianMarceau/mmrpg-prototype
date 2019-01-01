@@ -78,7 +78,7 @@ class rpg_mission_single extends rpg_mission {
 
         // Define the fusion star token in case we need to test for it
         $temp_field_star_token = $temp_option_field['field_token'];
-        $temp_field_star_present = mmrpg_prototype_item_unlocked('cossack-program') && empty($_SESSION['GAME']['values']['battle_stars'][$temp_field_star_token]) ? true : false;
+        $temp_field_star_present = $starfield_mission && empty($_SESSION['GAME']['values']['battle_stars'][$temp_field_star_token]) ? true : false;
 
         // If a field star is present on the field, fill the empty spots with like-typed robots
         if ($temp_field_star_present){
@@ -362,7 +362,9 @@ class rpg_mission_single extends rpg_mission {
                 if (mmrpg_prototype_robot_unlocked(false, $robot['token'])){
                     $this_unlock_robots_count -= 1;
                     // If this isn't a starforce/starfield mission, we don't show already-unlocked robots
-                    if (!$starfield_mission && !$temp_field_star_present){
+                    if ($temp_battle_omega['battle_complete']
+                        && !$starfield_mission
+                        && !$temp_field_star_present){
                         foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
                             if ($rm_robot['robot_token'] === $robot['token']){
                                 //$rm_robot['flags']['hide_from_mission_select'] = true;
