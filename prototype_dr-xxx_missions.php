@@ -234,7 +234,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             // Unlock the first of the final destination battles
             $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iv';
             $temp_final_option = rpg_battle::get_index_info($temp_final_option_token);
-            if (empty($temp_final_option)){ die('$temp_final_option empty on line '.__LINE__.'<pre>'.print_r($this_prototype_data['this_player_token'].'-fortress-iv', true).'</pre>'); }
+            //if (empty($temp_final_option)){ die('$temp_final_option empty on line '.__LINE__.'<pre>'.print_r($this_prototype_data['this_player_token'].'-fortress-iv', true).'</pre>'); }
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
             //$temp_final_option['battle_token'] = $this_prototype_data['this_player_token'].'-'.$this_prototype_data['battle_phase'].'-'.$temp_final_option['battle_token'];
             $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
