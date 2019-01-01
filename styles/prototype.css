@@ -734,10 +734,6 @@ body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link {
     width: 12.8%;
 }
-body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra,
-body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra {
-    width: 8%;
-}
 body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link img.marker,
 body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link img.marker {
     left: 12px;
@@ -775,7 +771,27 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 }
 
 #prototype .option_wrapper_missions .chapter_select .chapter_link.extra {
-    width: 8%;
+    width: 7%;
+    padding-bottom: 3px;
+    padding-top: 1px;
+    font-size: 7px;
+    text-transform: uppercase;
+    border-width: 1px;
+}
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra:hover,
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.chapter_link_active {
+    text-decoration: none;
+}
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars {
+    margin-left: 3%;
+}
+body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra,
+body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra {
+    width: 7%;
+}
+body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars,
+body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars {
+    margin-left: 3%;
 }
 
 #prototype .option_wrapper_missions .hidden_chapter_option {
@@ -1561,6 +1577,10 @@ body[data-source="website"] #prototype .menu {
     position: absolute;
     top: 0;
     right: 3px;
+}
+
+#prototype .banner .option div label .arrow {
+    display: none;
 }
 
 #prototype .option_this-team-select .count {
