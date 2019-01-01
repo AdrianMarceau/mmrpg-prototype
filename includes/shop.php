@@ -798,7 +798,8 @@ if (!empty($this_shop_index['kalinka'])){
     }
 
     // If the player has unlocked the Cossack Program, Kalinka's Shop also sells fields
-    if (mmrpg_prototype_item_unlocked('cossack-program')){
+    if ($this_battle_stars_count > 0
+        && mmrpg_prototype_item_unlocked('cossack-program')){
 
         // Add starshow data to Kalinka's Shop
         $this_shop_index['kalinka']['shop_kind_buying'][] = 'stars';
