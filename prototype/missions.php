@@ -105,10 +105,11 @@ else {
             }
 
             if ($temp_last_chapter === false){
-                if ($chapters_unlocked['7']){ $temp_last_chapter = '7'; }
-                elseif ($chapters_unlocked['6']){ $temp_last_chapter = '6'; }
-                elseif ($chapters_unlocked['5']){ $temp_last_chapter = '5'; }
-                elseif ($chapters_unlocked['4a']){ $temp_last_chapter = '4'; }
+                //if ($chapters_unlocked['7']){ $temp_last_chapter = '7'; }
+                //elseif ($chapters_unlocked['6']){ $temp_last_chapter = '6'; }
+                //elseif ($chapters_unlocked['5']){ $temp_last_chapter = '5'; }
+                //elseif ($chapters_unlocked['4a']){ $temp_last_chapter = '4'; }
+                if ($chapters_unlocked['4a']){ $temp_last_chapter = '4'; }
                 elseif ($chapters_unlocked['3']){ $temp_last_chapter = '3'; }
                 elseif ($chapters_unlocked['2']){ $temp_last_chapter = '2'; }
                 elseif ($chapters_unlocked['1']){ $temp_last_chapter = '1'; }
