@@ -87,9 +87,7 @@ class rpg_mission_starter extends rpg_mission {
             // When the appropriate number of targets are defeated, add the rescure robot as a battle reward
             $rescue_is_unlockable = false;
             $rescue_robot_frame = array(8,0,8,0,0);
-            if (($this_rescue_token === 'roll' && $temp_target_count >= 2)
-                || ($this_rescue_token === 'disco' && $temp_target_count >= 4)
-                || ($this_rescue_token === 'rhythm' && $temp_target_count >= 6)){
+            if ($temp_target_count >= 2){
                 $level = $temp_target_count;
                 if ($this_rescue_token === 'roll'){ $level += 0; $rescue_robot_frame = array(0,6,8,6,8,10); }
                 elseif ($this_rescue_token === 'disco'){ $level += 10; $rescue_robot_frame = array(0,1,2,1,2,10); }
