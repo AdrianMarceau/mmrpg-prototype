@@ -1604,6 +1604,10 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -webkit-border-radius: 0.5em;
     overflow: auto;
 }
+#events #canvas:empty,
+#events #messages:empty {
+    display: none;
+}
 #events #messages.ps-container {
     position: relative;
     overflow: hidden;

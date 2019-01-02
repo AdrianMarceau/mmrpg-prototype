@@ -738,6 +738,8 @@ function prototype_menu_click_option(thisContext, thisOption){
             // Count the number of available missions right now
             var availableMissions = $('.option[data-token]', tempShowOptionWrapper);
             $('.header', tempMenu).find('.count').html('Mission Select ('+(availableMissions.length == 1 ? '1 Mission' : availableMissions.length+' Missions')+')');
+            $('.menu[data-select="this_battle_token"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
+            $('.menu[data-select="this_player_robots"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
 
             break;
             }
@@ -1419,6 +1421,8 @@ function prototype_menu_switch(switchOptions){
                     var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
                     var availableMissions = $('.option[data-token]', tempShowOptionWrapper);
                     $('.header', tempMenu).find('.count').html('Mission Select ('+(availableMissions.length == 1 ? '1 Mission' : availableMissions.length+' Missions')+')');
+                    $('.menu[data-select="this_battle_token"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
+                    $('.menu[data-select="this_player_robots"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
                     break;
 
                     }
