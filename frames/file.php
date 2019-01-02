@@ -180,7 +180,7 @@ while ($this_action == 'save'){
         $user_omegaseed = !empty($_POST['omegaseed']) ? trim($_POST['omegaseed']) : '';
 
         if (!in_array($user_imagepath, $allowed_avatar_options)){ $user_imagepath = $allowed_avatar_options[0]; }
-        if (!in_array($user_colourtoken, $allowed_colour_options)){ $user_colourtoken = $allowed_colour_options[0]; }
+        if (!empty($user_colourtoken) && !in_array($user_colourtoken, $allowed_colour_options)){ $user_colourtoken = $allowed_colour_options[0]; }
 
         // Check if the password has changed at all
         if (true){
