@@ -598,10 +598,21 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .header_dr-cossack {
     background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
 }
+
 #prototype .header_types {
     background-image: url(../images/menus/menu-options_header-gradient.png?4);
     border-color: #1A1A1A !important;
 }
+#prototype .header_types[data-player="dr-light"] {
+    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
+}
+#prototype .header_types[data-player="dr-wily"] {
+    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif);
+}
+#prototype .header_types[data-player="dr-cossack"] {
+    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
+}
+
 #prototype .header_types .count,
 #prototype .header_dr-light .count,
 #prototype .header_dr-wily .count,
