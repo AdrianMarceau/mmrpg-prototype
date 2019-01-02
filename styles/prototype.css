@@ -722,6 +722,12 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     -webkit-border-radius: 0 0 0.75em 0.75em;
     position: relative;
 }
+body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link,
+body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link {
+    width: 12.8%;
+}
+
+
 #prototype .option_wrapper_missions .chapter_select .chapter_link img.marker {
     display: block;
     position: absolute;
@@ -729,14 +735,16 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     top: -2px;
     left: 1%;
 }
-
-body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link,
-body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link {
-    width: 12.8%;
+#prototype .option_wrapper_missions .chapter_select_5 .chapter_link img.marker {
+    left: 10%;
 }
 body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link img.marker,
 body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link img.marker {
     left: 12px;
+}
+body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select_5 .chapter_link img.marker,
+body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select_5 .chapter_link img.marker {
+    left: 14%;
 }
 
 
