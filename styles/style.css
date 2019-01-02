@@ -1670,6 +1670,32 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -o-box-decoration-break: clone;
     box-decoration-break: clone;
 }
+#events #messages div.headline,
+#events #messages p.headline {
+    text-align: center;
+    font-size: 160%;
+    line-height: 1.6;
+    margin: 5px auto 10px;
+}
+#events #messages div.inset_panel,
+#events #messages p.inset_panel {
+    font-size: 100%;
+    line-height: 1.6;
+    padding: 20px 10px;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    background-image: none;
+}
+#events #messages p.bigtext {
+    font-size: 140%;
+    line-height: 1.6;
+}
+#events #messages p.hugetext {
+    font-size: 160%;
+    line-height: 1.6;
+}
+#events #messages p.centertext {
+    text-align: center;
+}
 
 
 #events #messages .event {

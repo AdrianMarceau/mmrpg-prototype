@@ -828,6 +828,44 @@ if (!mmrpg_prototype_item_unlocked('legacy-codes')
  * MULTI DR. EVENT ITEMS
  */
 
+// Loop through and display chapter unlock messages where relevant
+$chapter_unlock_players = array('dr-light', 'dr-wily', 'dr-cossack');
+$chapter_unlock_popup_index = array();
+//$chapter_unlock_popup_index[] = array('chapter_key' => '0', 'chapter_token' => 'chapter-1', 'chapter_name' => 'Chapter 1', 'chapter_subname' => 'Chapter One : An Unexpected Attack');
+//$chapter_unlock_popup_index[] = array('chapter_key' => '1', 'chapter_token' => 'chapter-2', 'chapter_name' => 'Chapter 2', 'chapter_subname' => 'Chapter Two : Robot Master Revival');
+//$chapter_unlock_popup_index[] = array('chapter_key' => '2', 'chapter_token' => 'chapter-3', 'chapter_name' => 'Chapter 3', 'chapter_subname' => 'Chapter Three : The Rival Challengers');
+$chapter_unlock_popup_index[] = array('chapter_key' => '3', 'chapter_token' => 'chapter-4', 'chapter_name' => 'Chapter 4', 'chapter_subname' => 'Chapter Four : Battle Field Fusions');
+//$chapter_unlock_popup_index[] = array('chapter_key' => '5', 'chapter_token' => 'chapter-5', 'chapter_name' => 'Chapter 5', 'chapter_subname' => 'Chapter Five : The Final Battles');
+foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
+    $chapter_key = $chapter_info['chapter_key'];
+    $chapter_token = $chapter_info['chapter_token'];
+    $chapter_name = $chapter_info['chapter_name'];
+    $chapter_subname = $chapter_info['chapter_subname'];
+    foreach ($chapter_unlock_players AS $player_token){
+        if (!$chapters_unlocked_index[$player_token][$chapter_key]){ continue; }
+        $temp_event_flag = $player_token.'_'.$chapter_token.'-unlocked';
+        if (empty($temp_game_flags['events'][$temp_event_flag])){
+            $temp_game_flags['events'][$temp_event_flag] = true;
+            $player_info = $mmrpg_players_index[$player_token];
+            $player_name = $player_info['player_name'];
+            $player_type = $player_info['player_type'];
+            $temp_canvas_markup = '';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/events/event-banner_'.$chapter_token.'-unlocked_'.$player_token.'.jpg?'.MMRPG_CONFIG_CACHE_DATE.'); background-size: cover; background-position: center top; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+            $temp_console_markup = '';
+            $temp_console_markup .= '<p class="ability_type ability_type_'.$player_type.' headline"><strong>Congratulations!</strong></p>';
+            $temp_console_markup .= '<div class="ability_type inset_panel">';
+                $temp_console_markup .= '<p class="bigtext centertext"><strong class="ability_type ability_type_'.$player_type.'">'.$player_name.'</strong> unlocked a new chapter!</p>';
+                $temp_console_markup .= '<p class="bigtext centertext">&quot;<strong>'.$chapter_subname.'</strong>&quot;<br /> is now available!</p>';
+            $temp_console_markup .= '</div>';
+            array_push($_SESSION[$session_token]['EVENTS'], array(
+                'canvas_markup' => $temp_canvas_markup,
+                'console_markup' => $temp_console_markup
+                ));
+        }
+    }
+
+}
+
 // Unlock the OMEGA SEED after all three Drs. have completed the prototype
 if (!mmrpg_prototype_item_unlocked('omega-seed')
     && mmrpg_prototype_complete() >= 3
