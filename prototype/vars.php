@@ -169,6 +169,12 @@ else {
     $chapters_unlocked_cossack = array();
     temp_calculate_player_progress($chapters_unlocked_cossack, $battle_complete_counter_cossack, $prototype_complete_flag_cossack);
 
+    // Define an index to hold all the chapter unlocks for later reference
+    $chapters_unlocked_index = array();
+    $chapters_unlocked_index['dr-light'] = $chapters_unlocked_light;
+    $chapters_unlocked_index['dr-wily'] = $chapters_unlocked_wily;
+    $chapters_unlocked_index['dr-cossack'] = $chapters_unlocked_cossack;
+
     // If the player has manually unlocked any Dr. Light chapters via password, update their flags
     if (!$chapters_unlocked_light['6']){
         if ($battle_complete_counter_light > 0
