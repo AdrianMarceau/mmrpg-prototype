@@ -835,7 +835,7 @@ $chapter_unlock_popup_index = array();
 //$chapter_unlock_popup_index[] = array('chapter_key' => '1', 'chapter_token' => 'chapter-2', 'chapter_name' => 'Chapter 2', 'chapter_subname' => 'Chapter Two : Robot Master Revival');
 //$chapter_unlock_popup_index[] = array('chapter_key' => '2', 'chapter_token' => 'chapter-3', 'chapter_name' => 'Chapter 3', 'chapter_subname' => 'Chapter Three : The Rival Challengers');
 $chapter_unlock_popup_index[] = array('chapter_key' => '3', 'chapter_token' => 'chapter-4', 'chapter_name' => 'Chapter 4', 'chapter_subname' => 'Chapter Four : Battle Field Fusions');
-//$chapter_unlock_popup_index[] = array('chapter_key' => '5', 'chapter_token' => 'chapter-5', 'chapter_name' => 'Chapter 5', 'chapter_subname' => 'Chapter Five : The Final Battles');
+$chapter_unlock_popup_index[] = array('chapter_key' => '4a', 'chapter_token' => 'chapter-5', 'chapter_name' => 'Chapter 5', 'chapter_subname' => 'Chapter Five : The Final Battles');
 foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
     $chapter_key = $chapter_info['chapter_key'];
     $chapter_token = $chapter_info['chapter_token'];
