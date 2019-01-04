@@ -178,7 +178,6 @@
             $form_data['user_flag_approved'] = isset($_POST['user_flag_approved']) && is_numeric($_POST['user_flag_approved']) ? trim($_POST['user_flag_approved']) : 0;
             $form_data['user_flag_postpublic'] = isset($_POST['user_flag_postpublic']) && is_numeric($_POST['user_flag_postpublic']) ? trim($_POST['user_flag_postpublic']) : 0;
             $form_data['user_flag_postprivate'] = isset($_POST['user_flag_postprivate']) && is_numeric($_POST['user_flag_postprivate']) ? trim($_POST['user_flag_postprivate']) : 0;
-            $form_data['user_flag_allowchat'] = isset($_POST['user_flag_allowchat']) && is_numeric($_POST['user_flag_allowchat']) ? trim($_POST['user_flag_allowchat']) : 0;
 
             $user_omega_seed = !empty($_POST['user_omega_seed']) ? trim(preg_replace('/[^-_0-9a-z\.\s\,\?\!]+/i', '', $_POST['user_omega_seed'])) : '';
             $user_omega_seed = preg_replace('/\s+/', ' ', $user_omega_seed);
@@ -757,15 +756,6 @@
                                 <input class="checkbox" type="checkbox" name="user_flag_postprivate" value="1" <?= !empty($user_data['user_flag_postprivate']) ? 'checked="checked"' : '' ?> />
                             </label>
                             <p class="subtext">Allow user to send private messages</p>
-                        </div>
-
-                        <div class="field checkwrap">
-                            <label class="label">
-                                <strong>Allow Chat</strong>
-                                <input type="hidden" name="user_flag_allowchat" value="0" checked="checked" />
-                                <input class="checkbox" type="checkbox" name="user_flag_allowchat" value="1" <?= !empty($user_data['user_flag_allowchat']) ? 'checked="checked"' : '' ?> />
-                            </label>
-                            <p class="subtext">Allow user to access the chat</p>
                         </div>
 
                     </div>
