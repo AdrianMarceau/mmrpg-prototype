@@ -375,7 +375,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$
         $temp_console_markup = '';
         $temp_console_markup .= '<p class="ability_type ability_type_attack" style="margin: 5px auto 10px;">Congratulations! <strong>Dr. Wily</strong> has been unlocked as a playable character!</p>';
         $temp_console_markup .= '<p>Play through the game as <strong>Dr. Wily</strong> and <strong>Bass</strong> to continue the story from their perspective.  Unlock even more new robots, abilities, and items as you continue your fight against the prototype\'s army of powered up opponents!</p>';
-        $temp_console_markup .= '<p style="margin: 5px auto 0; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_attack">Dr. Wily</strong> from the main menu to play through his story.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> missions at any time.</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 0; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_attack">Dr. Wily</strong> from the player select menu to continue the campaign.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> missions at any time.</p>';
         array_unshift($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
             'console_markup' => $temp_console_markup
@@ -520,7 +520,7 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$u
         $temp_console_markup = '';
         $temp_console_markup .= '<p class="ability_type ability_type_speed" style="margin: 5px auto 10px;">Congratulations! <strong>Dr. Cossack</strong> has been unlocked as a playable character!</p>';
         $temp_console_markup .= '<p>Play through the game as <strong>Dr. Cossack</strong> and <strong>Proto Man</strong> to continue the story from their perspective.  Unlock even more new robots, abilities, and items as you continue your fight against the prototype\'s army of powered up opponents!</p>';
-        $temp_console_markup .= '<p style="margin: 5px auto 0; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_speed">Dr. Cossack</strong> from the main menu to play through his story.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> or <strong class="ability_type ability_type_attack">Dr. Wily</strong> missions at any time.</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 0; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_speed">Dr. Cossack</strong> from the player select menu to continue the campaign.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> or <strong class="ability_type ability_type_attack">Dr. Wily</strong> missions at any time.</p>';
         array_unshift($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
             'console_markup' => $temp_console_markup
@@ -832,8 +832,8 @@ if (!mmrpg_prototype_item_unlocked('legacy-codes')
 $chapter_unlock_players = array('dr-light', 'dr-wily', 'dr-cossack');
 $chapter_unlock_popup_index = array();
 //$chapter_unlock_popup_index[] = array('chapter_key' => '0', 'chapter_token' => 'chapter-1', 'chapter_name' => 'Chapter 1', 'chapter_subname' => 'Chapter One : An Unexpected Attack');
-//$chapter_unlock_popup_index[] = array('chapter_key' => '1', 'chapter_token' => 'chapter-2', 'chapter_name' => 'Chapter 2', 'chapter_subname' => 'Chapter Two : Robot Master Revival');
-//$chapter_unlock_popup_index[] = array('chapter_key' => '2', 'chapter_token' => 'chapter-3', 'chapter_name' => 'Chapter 3', 'chapter_subname' => 'Chapter Three : The Rival Challengers');
+$chapter_unlock_popup_index[] = array('chapter_key' => '1', 'chapter_token' => 'chapter-2', 'chapter_name' => 'Chapter 2', 'chapter_subname' => 'Chapter Two : Robot Master Revival');
+$chapter_unlock_popup_index[] = array('chapter_key' => '2', 'chapter_token' => 'chapter-3', 'chapter_name' => 'Chapter 3', 'chapter_subname' => 'Chapter Three : The Rival Challengers');
 $chapter_unlock_popup_index[] = array('chapter_key' => '3', 'chapter_token' => 'chapter-4', 'chapter_name' => 'Chapter 4', 'chapter_subname' => 'Chapter Four : Battle Field Fusions');
 $chapter_unlock_popup_index[] = array('chapter_key' => '4a', 'chapter_token' => 'chapter-5', 'chapter_name' => 'Chapter 5', 'chapter_subname' => 'Chapter Five : The Final Battles');
 foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
@@ -841,8 +841,12 @@ foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
     $chapter_token = $chapter_info['chapter_token'];
     $chapter_name = $chapter_info['chapter_name'];
     $chapter_subname = $chapter_info['chapter_subname'];
+    $next_chapter_info = isset($chapter_unlock_popup_index[$key + 1]) ? $chapter_unlock_popup_index[$key + 1] : false;
+    $next_chapter_key = isset($next_chapter_info['chapter_key']) ? $next_chapter_info['chapter_key'] : false;
     foreach ($chapter_unlock_players AS $player_token){
-        if (!$chapters_unlocked_index[$player_token][$chapter_key]){ continue; }
+        if (!$chapters_unlocked_index[$player_token][$chapter_key]){ continue; } // continue if not unlocked yet
+        elseif ($next_chapter_key !== false && $chapters_unlocked_index[$player_token][$next_chapter_key]){ continue; } // continue if already unlocked next
+        elseif ($next_chapter_key === false && mmrpg_prototype_complete($player_token)){ continue; } // continue if last mission but player has already completed prototype
         $temp_event_flag = $player_token.'_'.$chapter_token.'-unlocked';
         if (empty($temp_game_flags['events'][$temp_event_flag])){
             $temp_game_flags['events'][$temp_event_flag] = true;
