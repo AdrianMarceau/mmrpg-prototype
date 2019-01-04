@@ -121,6 +121,9 @@ body.windowFlag_landscapeMode #prototype {
 #edit #console .field_tools .tool {
     cursor: pointer;
 }
+#edit #console .field_stars {
+    display: none;
+}
 #edit #console .field_stars .star_field {
     color: rgba(252, 237, 132, 0.60);
 }
