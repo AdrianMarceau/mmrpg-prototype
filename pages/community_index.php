@@ -31,7 +31,7 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
     // Define the extra links array for the header
     $temp_header_links = array();
     // If there are more threads in this category to display, show the more link
-    if($this_threads_count_more > 0){
+    if ($this_threads_count_more > 0){
         $temp_header_links[] = array(
             'href' => 'community/'.$this_category_info['category_token'].'/',
             'title' => 'View '.($this_threads_count_more == '1' ? '1 More '.($this_category_info['category_id'] != 0 ? 'Discussion' : 'Message') : $this_threads_count_more.' More '.($this_category_info['category_id'] != 0 ? 'Discussions' : 'Messages')),
@@ -39,7 +39,10 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
             );
     }
     // If this user has the necessary permissions, show the new thread link
-    if($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_userinfo['role_level'] >= $this_category_info['category_level'] && $community_battle_points >= 10000){
+    if ($this_userid != MMRPG_SETTINGS_GUEST_ID
+        && $community_battle_points >= 10000
+        && $this_userinfo['role_level'] >= $this_category_info['category_level']
+        && !empty($this_userinfo['user_flag_postpublic'])){
         $temp_header_links[] = array(
             'href' => 'community/'.$this_category_info['category_token'].'/0/new/',
             'title' => 'Create New '.($this_category_info['category_id'] != 0 ? 'Discussion' : 'Message'),
