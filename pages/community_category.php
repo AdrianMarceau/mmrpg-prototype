@@ -47,7 +47,11 @@ if ($this_category_info['category_id'] != 0){
         <?
     }
     // Add a new thread option to the end of the list if allowed
-    if($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_userinfo['role_level'] >= $this_category_info['category_level'] && $community_battle_points >= 10000){
+    if($this_userid != MMRPG_SETTINGS_GUEST_ID
+        && $this_userinfo['role_level'] >= $this_category_info['category_level']
+        && $community_battle_points >= 10000
+        && !empty($this_userinfo['user_flag_postpublic'])
+        ){
         ?>
         <div class="subheader thread_name" style="float: right; margin: 0 0 0 10px; overflow: hidden; text-align: center; border: 1px solid rgba(0, 0, 0, 0.30); ">
             <a class="link" href="community/<?= $this_category_info['category_token'] ?>/0/new/" style="margin-top: 0;">Create New Discussion &raquo;</a>
