@@ -572,7 +572,7 @@ else { $this_thread_info['post_count'] = false; }
 
         <h2 class="subheader thread_posts_count" style="opacity: 0.5; filter: alpha(opacity = 50);">- you cannot reply to system threads -</h2>
 
-    <? } elseif (!empty($this_thread_info['thread_locked'])){ ?>
+    <? } elseif (!empty($this_thread_info['thread_locked']) || empty($this_userinfo['user_flag_postpublic'])){ ?>
 
         <h2 id="comment-form" class="subheader thread_posts_count" style="opacity: 0.5; filter: alpha(opacity = 50);">- comments disabled -</h2>
 
