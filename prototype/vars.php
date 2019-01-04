@@ -91,42 +91,29 @@ else {
     function temp_calculate_player_progress(&$chapters_unlocked, &$battle_complete_counter, &$prototype_complete_flag){
         global $battle_star_counter;
 
+
         // -- PHASE ONE -- //
 
         // Intro
         $chapters_unlocked['0'] = true;
 
         // Masters
-        $chapters_unlocked['1'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;
+        $chapters_unlocked['1'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;
 
         // Rivals
-        $chapters_unlocked['2'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
+        $chapters_unlocked['2'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
+
 
         // -- PHASE TWO -- //
 
-        if ($prototype_complete_flag
-            || mmrpg_prototype_item_unlocked('cossack-program')
-            || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
+        // Fusions
+        $chapters_unlocked['3'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
 
-            // Fusions
-            $chapters_unlocked['3'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
+        // Finals
+        $chapters_unlocked['4a'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
+        $chapters_unlocked['4b'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
+        $chapters_unlocked['4c'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
 
-            // Finals
-            $chapters_unlocked['4a'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
-            $chapters_unlocked['4b'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
-            $chapters_unlocked['4c'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
-
-        } else {
-
-            // Fusions
-            $chapters_unlocked['3'] = false;
-
-            // Finals
-            $chapters_unlocked['4a'] = false;
-            $chapters_unlocked['4b'] = false;
-            $chapters_unlocked['4c'] = false;
-
-        }
 
         // -- BONUS PHASE -- //
 
