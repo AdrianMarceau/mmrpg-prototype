@@ -759,6 +759,7 @@
                             <p class="subtext">Allow user to send private messages</p>
                         </div>
 
+                        <? /*
                         <div class="field checkwrap">
                             <label class="label">
                                 <strong>Allow Chat</strong>
@@ -767,6 +768,7 @@
                             </label>
                             <p class="subtext">Allow user to access the chat</p>
                         </div>
+                        */ ?>
 
                     </div>
 
