@@ -579,6 +579,7 @@ function mmrpg_prototype_possible_stars($return_arrays = false){
 
             // Define data for the fusion star of this particular fusion field
             $fusion_token = $field1_token_parts[0].'-'.$field2_token_parts[1];
+            if (isset($mmrpg_index_fields[$fusion_token])){ continue; }
             $possible_star_list[$fusion_token] = array(
                 'token' => $fusion_token,
                 'name' => ucwords(str_replace('-', ' ', $fusion_token)),
