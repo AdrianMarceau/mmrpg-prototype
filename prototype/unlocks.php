@@ -828,28 +828,39 @@ if (!mmrpg_prototype_item_unlocked('legacy-codes')
  * MULTI DR. EVENT ITEMS
  */
 
-// Loop through and display chapter unlock messages where relevant
+// Define the index of chapter-relavant players and their chapter details
 $chapter_unlock_players = array('dr-light', 'dr-wily', 'dr-cossack');
 $chapter_unlock_popup_index = array();
+
+// Main-Game Chapters
 //$chapter_unlock_popup_index[] = array('chapter_key' => '0', 'chapter_token' => 'chapter-1', 'chapter_name' => 'Chapter 1', 'chapter_subname' => 'Chapter One : An Unexpected Attack');
 $chapter_unlock_popup_index[] = array('chapter_key' => '1', 'chapter_token' => 'chapter-2', 'chapter_name' => 'Chapter 2', 'chapter_subname' => 'Chapter Two : Robot Master Revival');
 $chapter_unlock_popup_index[] = array('chapter_key' => '2', 'chapter_token' => 'chapter-3', 'chapter_name' => 'Chapter 3', 'chapter_subname' => 'Chapter Three : The Rival Challengers');
 $chapter_unlock_popup_index[] = array('chapter_key' => '3', 'chapter_token' => 'chapter-4', 'chapter_name' => 'Chapter 4', 'chapter_subname' => 'Chapter Four : Battle Field Fusions');
-$chapter_unlock_popup_index[] = array('chapter_key' => '4a', 'chapter_token' => 'chapter-5', 'chapter_name' => 'Chapter 5', 'chapter_subname' => 'Chapter Five : The Final Battles');
+$chapter_unlock_popup_index[] = array('chapter_key' => '4a', 'chapter_token' => 'chapter-5', 'chapter_name' => 'Chapter 5', 'chapter_subname' => 'Chapter Five : The Final Battles', 'chapter_is_endgame' => true);
+
+// Post-Game Chapters
+$chapter_unlock_popup_index[] = array('chapter_key' => '7', 'chapter_token' => 'chapter-stars', 'chapter_name' => 'Stars', 'chapter_subname' => 'Bonus Chapter : Star Fields', 'chapter_is_bonus' => true);
+$chapter_unlock_popup_index[] = array('chapter_key' => '5', 'chapter_token' => 'chapter-players', 'chapter_name' => 'Players', 'chapter_subname' => 'Bonus Chapter : Player Battles', 'chapter_is_bonus' => true);
+$chapter_unlock_popup_index[] = array('chapter_key' => '6', 'chapter_token' => 'chapter-random', 'chapter_name' => 'Random', 'chapter_subname' => 'Bonus Chapter : Mission Randomizer', 'chapter_is_bonus' => true);
+
+// Loop through and display chapter unlock messages where relevant
 foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
     $chapter_key = $chapter_info['chapter_key'];
     $chapter_token = $chapter_info['chapter_token'];
     $chapter_name = $chapter_info['chapter_name'];
     $chapter_subname = $chapter_info['chapter_subname'];
+    $chapter_is_endgame = !empty($chapter_info['chapter_is_endgame']) ? true : false;
+    $chapter_is_bonus = !empty($chapter_info['chapter_is_bonus']) ? true : false;
     $next_chapter_info = isset($chapter_unlock_popup_index[$key + 1]) ? $chapter_unlock_popup_index[$key + 1] : false;
     $next_chapter_key = isset($next_chapter_info['chapter_key']) ? $next_chapter_info['chapter_key'] : false;
     foreach ($chapter_unlock_players AS $player_token){
         if (!$chapters_unlocked_index[$player_token][$chapter_key]){ continue; } // continue if not unlocked yet
-        elseif ($next_chapter_key !== false && $chapters_unlocked_index[$player_token][$next_chapter_key]){ continue; } // continue if already unlocked next
-        elseif ($next_chapter_key === false && mmrpg_prototype_complete($player_token)){ continue; } // continue if last mission but player has already completed prototype
         $temp_event_flag = $player_token.'_'.$chapter_token.'-unlocked';
         if (empty($temp_game_flags['events'][$temp_event_flag])){
             $temp_game_flags['events'][$temp_event_flag] = true;
+            if (!$chapter_is_bonus && $next_chapter_key !== false && $chapters_unlocked_index[$player_token][$next_chapter_key]){ continue; } // continue if already unlocked next and not bonus
+            elseif ($chapter_is_endgame && mmrpg_prototype_complete($player_token)){ continue; } // continue if final chapter but player has already completed prototype
             $player_info = $mmrpg_players_index[$player_token];
             $player_name = $player_info['player_name'];
             $player_type = $player_info['player_type'];
