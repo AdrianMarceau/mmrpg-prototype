@@ -9,9 +9,19 @@ if (!empty($_SESSION[mmrpg_game_token()]['DEMO'])){
     header('Location: '.MMRPG_CONFIG_ROOTURL.'file/load/return='.$_GET['this_current_uri']);
     exit();
 }
-// Return to index if not enough points
+
+// Return to community index if not enough points
 if ($community_battle_points < MMRPG_SETTINGS_THREAD_MINPOINTS){
-    header('Location: '.MMRPG_CONFIG_ROOTURL);
+    header('Location: '.MMRPG_CONFIG_ROOTURL.'community/');
+    exit();
+}
+
+// Return to community/leaderboard index if posting permissions insufficient
+if ($this_current_cat !== 'personal' && !$this_userinfo['user_flag_postpublic']){
+    header('Location: '.MMRPG_CONFIG_ROOTURL.'community/'.$this_current_cat.'/');
+    exit();
+} elseif ($this_current_cat === 'personal' && !$this_userinfo['user_flag_postprivate']){
+    header('Location: '.MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_current_target.'/');
     exit();
 }
 
