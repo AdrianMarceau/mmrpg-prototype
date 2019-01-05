@@ -77,6 +77,7 @@ while ($this_action == 'save'){
             if ($info['robot_game'] != $temp_optgroup_token){
                 $temp_optgroup_token = $info['robot_game'];
                 if ($temp_optgroup_token == 'MM20'){ $temp_optgroup_name = 'Mega Man Killers'; }
+                elseif ($temp_optgroup_token == 'MM085'){ $temp_optgroup_name = 'Mega Man & Bass Robots'; }
                 elseif (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '0').' Robots'; }
                 else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $temp_optgroup_token).' Robots'; }
                 $html_avatar_options[] = '</optgroup>';
