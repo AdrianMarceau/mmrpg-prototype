@@ -46,7 +46,7 @@ class rpg_canvas {
             $this_data['player_sprite_size'] = ceil($this_data['player_scale'] * 80);
             $this_data['player_sprite_width'] = ceil($this_data['player_scale'] * 80);
             $this_data['player_sprite_height'] = ceil($this_data['player_scale'] * 80);
-            $this_data['player_image_width'] = ceil($this_data['player_scale'] * 800);
+            $this_data['player_image_width'] = ceil($this_data['player_scale'] * 880);
             $this_data['player_image_height'] = ceil($this_data['player_scale'] * 80);
             //$this_data['canvas_offset_z'] = 4900;
             //$this_data['canvas_offset_x'] = 200;
