@@ -89,7 +89,7 @@ class rpg_player extends rpg_object {
         $this->player_rewards = isset($this_playerinfo['player_rewards']) ? $this_playerinfo['player_rewards'] : array();
         $this->player_starforce = isset($this_playerinfo['player_starforce']) ? $this_playerinfo['player_starforce'] : array();
         $this->player_frame = isset($this_playerinfo['player_frame']) ? $this_playerinfo['player_frame'] : 'base';
-        $this->player_frame_index = isset($this_playerinfo['player_frame_index']) ? $this_playerinfo['player_frame_index'] : array('base','taunt','victory','defeat','command','damage');
+        $this->player_frame_index = isset($this_playerinfo['player_frame_index']) ? $this_playerinfo['player_frame_index'] : array('base','taunt','victory','defeat','command','damage','base2');
         $this->player_frame_offset = isset($this_playerinfo['player_frame_offset']) ? $this_playerinfo['player_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
         $this->player_points = isset($this_playerinfo['player_points']) ? $this_playerinfo['player_points'] : 0;
         $this->player_switch = isset($this_playerinfo['player_switch']) ? $this_playerinfo['player_switch'] : 1;
@@ -2078,7 +2078,7 @@ class rpg_player extends rpg_object {
         //$player_sprite_title .= ' Sprite Sheet | Robot Database | Mega Man RPG Prototype';
 
         // Define the sprite frame index for robot images
-        $player_sprite_frames = array('base','taunt','victory','defeat','command','damage');
+        $player_sprite_frames = array('base','taunt','victory','defeat','command','damage','base2');
 
         // Define the markup variable
         $this_markup = '';
@@ -2398,7 +2398,7 @@ class rpg_player extends rpg_object {
 
                 <? if($print_options['show_abilities']): ?>
                     <h2 id="abilities" class="header header_full player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left;">
-                        Ability Rewards
+                        Player Abilities
                     </h2>
                     <div class="body body_full solid" style="margin: 0; padding: 2px 3px; min-height: 10px;">
                         <table class="full abilities" style="margin: 5px auto 10px;">
@@ -2487,7 +2487,7 @@ class rpg_player extends rpg_object {
                                                 $this_ability_title_plain = rpg_ability::print_editor_title_markup($temp_robot_info, $this_ability);
 
                                                 $this_ability_method = 'points';
-                                                $this_ability_method_text = 'Battle Points';
+                                                $this_ability_method_text = 'Start';
                                                 $this_ability_title_html = '<strong class="name">'.$this_ability_name.'</strong>';
                                                 if ($this_points > 1){ $this_ability_title_html .= '<span class="points">'.str_pad($this_points, 2, '0', STR_PAD_LEFT).' BP</span>'; }
                                                 else { $this_ability_title_html .= '<span class="points">Start</span>'; }
@@ -2501,7 +2501,7 @@ class rpg_player extends rpg_object {
                                                 $this_ability_title_html = '<span class="label">'.$this_ability_title_html.'</span>';
                                                 //$this_ability_title_html = (is_numeric($this_points) && $this_points > 1 ? 'Lv '.str_pad($this_points, 2, '0', STR_PAD_LEFT).' : ' : $this_points.' : ').$this_ability_title_html;
                                                 if ($ability_method != $this_ability_method){
-                                                    $temp_separator = '<div class="ability_separator">'.$this_ability_method_text.'</div>';
+                                                    $temp_separator = ''; //'<div class="ability_separator">'.$this_ability_method_text.'</div>';
                                                     $temp_string[] = $temp_separator;
                                                     $ability_method = $this_ability_method;
                                                     $ability_method_key++;
