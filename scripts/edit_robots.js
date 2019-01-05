@@ -1029,7 +1029,7 @@ $(document).ready(function(){
                         var tempLink = $('a.item_name[data-item='+oldItemToken+']', thisItemCanvas);
                         var oldCount = parseInt(tempLink.attr('data-count'));
                         var newCount = oldCount + 1;
-                        tempLink.attr('data-count', newCount).find('.count').html(newCount);
+                        tempLink.attr('data-count', newCount).find('.count').html('x '+newCount);
                         }
 
                     // Decrement the old item's count if not empty (we're taking it out)
@@ -1038,7 +1038,7 @@ $(document).ready(function(){
                         var tempLink = $('a.item_name[data-item='+thisItemToken+']', thisItemCanvas);
                         var oldCount = parseInt(tempLink.attr('data-count'));
                         var newCount = oldCount - 1;
-                        tempLink.attr('data-count', newCount).find('.count').html(newCount);
+                        tempLink.attr('data-count', newCount).find('.count').html('x '+newCount);
                         }
 
                     // If a non-empty item token was provided, normal equip
