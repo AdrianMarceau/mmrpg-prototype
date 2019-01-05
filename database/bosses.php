@@ -124,7 +124,8 @@ foreach ($mmrpg_database_bosses AS $boss_key => $boss_info){
     if (!empty($boss_info['robot_flag_hidden'])){ continue; }
 
     // Do not show incomplete bosses in the link list
-    if (!$boss_info['robot_flag_complete'] && $boss_info['robot_token'] !== $this_current_token){ $key_counter++; continue; }
+    $show_in_link_list = true;
+    if (!$boss_info['robot_flag_complete'] && $boss_info['robot_token'] !== $this_current_token){ $show_in_link_list = false; }
 
     // If a type filter has been applied to the robot page
     if (isset($this_current_filter) && $this_current_filter == 'none' && $boss_info['robot_core'] != ''){ $key_counter++; continue; }
@@ -132,7 +133,7 @@ foreach ($mmrpg_database_bosses AS $boss_key => $boss_info){
 
     // If this is the first in a new group
     $game_code = !empty($boss_info['robot_group']) ? $boss_info['robot_group'] : (!empty($boss_info['robot_game']) ? $boss_info['robot_game'] : 'MMRPG');
-    if ($game_code != $last_game_code){
+    if ($show_in_link_list && $game_code != $last_game_code){
         if ($key_counter != 0){ $mmrpg_database_bosses_links .= '</div>'; }
         $mmrpg_database_bosses_links .= '<div class="float link group" data-game="'.$game_code.'">';
         $last_game_code = $game_code;
@@ -170,7 +171,7 @@ foreach ($mmrpg_database_bosses AS $boss_key => $boss_info){
     if ($boss_flag_complete){ $mmrpg_database_bosses_count_complete++; }
     $temp_markup = ob_get_clean();
     $mmrpg_database_bosses_links_index[$boss_key] = $temp_markup;
-    $mmrpg_database_bosses_links .= $temp_markup;
+    if ($show_in_link_list){ $mmrpg_database_bosses_links .= $temp_markup; }
     $mmrpg_database_bosses_links_counter++;
     $key_counter++;
 
