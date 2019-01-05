@@ -2367,8 +2367,14 @@ button {
 #window .page .leaderboard .playerlinks {
     display: block;
     margin: 0 auto;
-    overflow: hidden;
+    overflow: visible;
     text-align: center;
+}
+#window .page .leaderboard .playerlinks:after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    clear: both;
 }
 
 
