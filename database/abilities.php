@@ -91,7 +91,8 @@ $mmrpg_database_abilities_count_complete = 0;
 foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
 
     // Do not show incomplete abilities in the link list
-    if (!$ability_info['ability_flag_complete'] && $ability_info['ability_token'] !== $this_current_token){ $key_counter++; continue; }
+    $show_in_link_list = true;
+    if (!$ability_info['ability_flag_complete'] && $ability_info['ability_token'] !== $this_current_token){ $show_in_link_list = false;; }
 
     // If a type filter has been applied to the ability page
     $temp_ability_types = array();
@@ -106,7 +107,7 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
         $game_code = str_replace('MM00/Weapons/T0', 'MMRPG/Weapons/T0', $game_code);
         $game_code = preg_replace('/^([a-z0-9]+)\/Weapons\/([a-z0-9]+)$/i', '$1/Weapons', $game_code);
     }
-    if ($game_code != $last_game_code){
+    if ($show_in_link_list && $game_code != $last_game_code){
         if ($key_counter != 0){ $mmrpg_database_abilities_links .= '</div>'; }
         //if (!empty($this_current_sub) && $game_code == 'MM01/Weapons/003'){ $mmrpg_database_abilities_links .= '<span class="break"></span>'; }
         $mmrpg_database_abilities_links .= '<div class="float_link float_link_group" data-game="'.$game_code.'">';
@@ -155,7 +156,7 @@ foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
     if ($ability_flag_complete){ $mmrpg_database_abilities_count_complete++; }
     $temp_markup = ob_get_clean();
     $mmrpg_database_abilities_links_index[$ability_key] = $temp_markup;
-    $mmrpg_database_abilities_links .= $temp_markup;
+    if ($show_in_link_list){ $mmrpg_database_abilities_links .= $temp_markup; }
     $mmrpg_database_abilities_links_counter++;
     $key_counter++;
 

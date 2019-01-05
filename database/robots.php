@@ -129,7 +129,8 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
     if (!empty($robot_info['robot_flag_hidden'])){ continue; }
 
     // Do not show incomplete robots in the link list
-    if (!$robot_info['robot_flag_complete'] && $robot_info['robot_token'] !== $this_current_token){ $key_counter++; continue; }
+    $show_in_link_list = true;
+    if (!$robot_info['robot_flag_complete'] && $robot_info['robot_token'] !== $this_current_token){ $show_in_link_list = false; }
 
     // If a type filter has been applied to the robot page
     if (isset($this_current_filter) && $this_current_filter == 'none' && $robot_info['robot_core'] != ''){ $key_counter++; continue; }
@@ -137,7 +138,7 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
 
     // If this is the first in a new group
     $game_code = !empty($robot_info['robot_group']) ? $robot_info['robot_group'] : (!empty($robot_info['robot_game']) ? $robot_info['robot_game'] : 'MMRPG');
-    if ($game_code != $last_game_code){
+    if ($show_in_link_list && $game_code != $last_game_code){
         if ($key_counter != 0){ $mmrpg_database_robots_links .= '</div>'; }
         $mmrpg_database_robots_links .= '<div class="float link group" data-game="'.$game_code.'">';
         $last_game_code = $game_code;
@@ -176,7 +177,7 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
     if ($robot_flag_complete){ $mmrpg_database_robots_count_complete++; }
     $temp_markup = ob_get_clean();
     $mmrpg_database_robots_links_index[$robot_key] = $temp_markup;
-    $mmrpg_database_robots_links .= $temp_markup;
+    if ($show_in_link_list){ $mmrpg_database_robots_links .= $temp_markup; }
     $mmrpg_database_robots_links_counter++;
     $key_counter++;
 

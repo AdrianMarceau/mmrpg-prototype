@@ -75,7 +75,8 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
     //if (!preg_match('/^star-/i', $item_info['item_token'])){ continue; }
 
     // Do not show incomplete items in the link list
-    if (!$item_info['item_flag_complete'] && $item_info['item_token'] !== $this_current_token){ $key_counter++; continue; }
+    $show_in_link_list = true;
+    if (!$item_info['item_flag_complete'] && $item_info['item_token'] !== $this_current_token){ $show_in_link_list = false; }
 
     // If a type filter has been applied to the item page
     $temp_item_types = array();
@@ -88,7 +89,7 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
 
     // If this is the first in a new group
     $game_code = !empty($item_info['item_group']) ? $item_info['item_group'] : (!empty($item_info['item_game']) ? $item_info['item_game'] : 'MMRPG');
-    if ($game_code != $last_game_code){
+    if ($show_in_link_list && $game_code != $last_game_code){
         if ($key_counter != 0){ $mmrpg_database_items_links .= '</div>'; }
         $mmrpg_database_items_links .= '<div class="float link group" data-game="'.$game_code.'">';
         $last_game_code = $game_code;
@@ -133,7 +134,7 @@ foreach ($mmrpg_database_items AS $item_key => $item_info){
     if ($item_flag_complete){ $mmrpg_database_items_count_complete++; }
     $temp_markup = ob_get_clean();
     $mmrpg_database_items_links_index[$item_key] = $temp_markup;
-    $mmrpg_database_items_links .= $temp_markup;
+    if ($show_in_link_list){ $mmrpg_database_items_links .= $temp_markup; }
     $mmrpg_database_items_links_counter++;
     $key_counter++;
 
