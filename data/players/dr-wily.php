@@ -3,6 +3,7 @@
 $player = array(
     'player_name' => 'Dr. Wily',
     'player_token' => 'dr-wily',
+    'player_image_editor' => 4117,
     'player_description' => '',
     'player_number' => 2,
     'player_attack' => 25,

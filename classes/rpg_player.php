@@ -2301,6 +2301,10 @@ class rpg_player extends rpg_object {
                             if ($player_info['player_image_editor'] == 412){ $temp_editor_title = 'Adrian Marceau / Ageman20XX'; }
                             elseif ($player_info['player_image_editor'] == 110){ $temp_editor_title = 'MetalMarioX100 / EliteP1'; }
                             elseif ($player_info['player_image_editor'] == 18){ $temp_editor_title = 'Sean Adamson / MetalMan'; }
+                            elseif ($player_info['player_image_editor'] == 4117){ $temp_editor_title = 'Jonathan Backstrom / Rhythm_BCA'; }
+                            elseif ($player_info['player_image_editor'] == 3842){ $temp_editor_title = 'Miki Bossman / MegaBossMan'; }
+                            elseif ($player_info['player_image_editor'] == 5161){ $temp_editor_title = 'The Zion / maistir1234'; }
+                            elseif ($player_info['player_image_editor'] == 7469){ $temp_editor_title = 'Brash Buster'; }
                         } else {
                             $temp_editor_title = 'Adrian Marceau / Ageman20XX';
                         }
