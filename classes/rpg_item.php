@@ -1500,7 +1500,7 @@ class rpg_item extends rpg_object {
                                         <? if(!empty($item_info['item_price'])): ?>
                                             <span class="item_stat"><?= number_format($item_info['item_price'], 0, '.', ',').' z' ?></span>
                                             <? if(!strstr($item_info['item_token'], '-screw')): ?>
-                                                <span class="item_stat"><?= number_format($item_info['item_price'], 0, '.', ',').' BP' ?></span>
+                                                / <span class="item_stat"><?= number_format($item_info['item_price'], 0, '.', ',').' BP' ?></span>
                                             <? endif; ?>
                                         <? elseif(!empty($item_info['item_value'])): ?>
                                             <span class="item_stat"><?= number_format($item_info['item_value'], 0, '.', ',').' BP' ?></span>
