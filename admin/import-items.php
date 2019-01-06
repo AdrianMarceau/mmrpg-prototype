@@ -236,6 +236,7 @@ if (!empty($mmrpg_index['items'])){
         $temp_insert_array['item_recovery2_percent'] = !empty($item_data['item_recovery2_percent']) ? 1 : 0;
         $temp_insert_array['item_accuracy'] = !empty($item_data['item_accuracy']) ? $item_data['item_accuracy'] : 0;
         $temp_insert_array['item_price'] = !empty($item_data['item_price']) ? $item_data['item_price'] : 0;
+        $temp_insert_array['item_price2'] = !empty($item_data['item_price2']) ? $item_data['item_price2'] : 0;
         $temp_insert_array['item_target'] = !empty($item_data['item_target']) ? $item_data['item_target'] : 'auto';
         $temp_insert_array['item_functions'] = !empty($item_data['item_functions']) ? $item_data['item_functions'] : 'items/item.php';
 
