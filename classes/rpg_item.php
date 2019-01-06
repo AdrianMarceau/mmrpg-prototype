@@ -785,6 +785,7 @@ class rpg_item extends rpg_object {
             'item_recovery2_percent',
             'item_accuracy',
             'item_price',
+            'item_value',
             'item_target',
             'item_frame',
             'item_frame_animate',
@@ -1497,7 +1498,12 @@ class rpg_item extends rpg_object {
                                     <td class="right">
                                         <label style="display: block; float: left;">Value :</label>
                                         <? if(!empty($item_info['item_price'])): ?>
-                                            <span class="item_stat"><?= number_format($item_info['item_price'], 0, '.', ',').'z' ?></span>
+                                            <span class="item_stat"><?= number_format($item_info['item_price'], 0, '.', ',').' z' ?></span>
+                                            <? if(!strstr($item_info['item_token'], '-screw')): ?>
+                                                <span class="item_stat"><?= number_format($item_info['item_price'], 0, '.', ',').' BP' ?></span>
+                                            <? endif; ?>
+                                        <? elseif(!empty($item_info['item_value'])): ?>
+                                            <span class="item_stat"><?= number_format($item_info['item_value'], 0, '.', ',').' BP' ?></span>
                                         <? else: ?>
                                             <span class="item_stat">-</span>
                                         <? endif; ?>
