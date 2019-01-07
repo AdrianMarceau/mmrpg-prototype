@@ -12,7 +12,7 @@ $item = array(
     'item_description' => 'A mysterious chip that improves the charging capabilities of the holder.  When held by a robot master, this item allows the user to skip the charging phase of abilities that typically require two turns to execute.',
     'item_energy' => 0,
     'item_speed' => 10,
-    'item_price' => 32000,
+    'item_price' => 8000,
     'item_accuracy' => 100,
     'item_function' => function($objects){
 
