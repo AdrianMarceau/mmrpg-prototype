@@ -281,7 +281,7 @@ class rpg_mission_single extends rpg_mission {
         $temp_battle_omega['battle_level'] = $temp_omega_robot_level;
 
         // Update the battle points and turns with the omega values
-        $temp_battle_omega['battle_points'] = 0;
+        $temp_battle_omega['battle_zenny'] = 0;
         $temp_battle_omega['battle_turns'] = 0;
 
         // Loop through the target robots again update with omega values
@@ -294,8 +294,13 @@ class rpg_mission_single extends rpg_mission {
             // Update the robot level and battle points plus turns
             $temp_robot_level = $robot['robot_class'] != 'mecha' ? $temp_omega_robot_level : mt_rand(1, ceil($temp_omega_robot_level / 3));
             $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_level'] = $temp_robot_level;
-            $temp_battle_omega['battle_points'] += $robot['robot_class'] == 'master' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * $temp_robot_level  : 0;
-            $temp_battle_omega['battle_turns'] += $robot['robot_class'] == 'master' ? MMRPG_SETTINGS_BATTLETURNS_PERROBOT : 0;
+            if ($robot['robot_class'] == 'master'){
+                $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $temp_robot_level);
+                $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
+            } elseif ($robot['robot_class'] == 'mecha'){
+                $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $temp_robot_level);
+                $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERMECHA;
+            }
 
             // If this is a mecha, only allow limited extra abilities
             $ability_count = $temp_ability_count;
@@ -334,9 +339,11 @@ class rpg_mission_single extends rpg_mission {
 
         }
 
-        // If this battle doesn't count, so let's modify the point value
-        if (!$temp_battle_omega['battle_counts']){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER); }
-        if ($starfield_mission){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER); }
+        // If the battle is complete already, it only gives half the usual zenny
+        if ($temp_complete_count > 0){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * (2 / (2 + $temp_complete_count))); }
+
+        // If this is a starfield mission, it will give slightly more zenny than usual
+        if ($starfield_mission){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 1.10); }
 
         // Reverse the order of the robots in battle
         $temp_battle_omega['battle_target_player']['player_robots'] = array_reverse($temp_battle_omega['battle_target_player']['player_robots']);
