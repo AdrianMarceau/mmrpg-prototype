@@ -120,8 +120,8 @@ function get_abilities_with_prices(){
         if (!isset($mmrpg_abilities[$ability_token])){ continue; }
         $ability_info = $mmrpg_abilities[$ability_token];
         $ability_price = 0;
-        if (!empty($ability_info['ability_energy'])){ $ability_price = ceil($ability_info['ability_energy'] * 1500); }
-        else { $ability_price = 1500; }
+        if (!empty($ability_info['ability_energy'])){ $ability_price = ceil($ability_info['ability_energy'] * MMRPG_SETTINGS_SHOP_ABILITY_PRICE); }
+        else { $ability_price = MMRPG_SETTINGS_SHOP_ABILITY_PRICE; }
         if (empty($ability_price)){ continue; }
         $ability_prices[$ability_token] = $ability_price;
     }
@@ -314,6 +314,7 @@ $this_shop_index['reggae'] = array(
         )
     );
 
+
 // KALINKA'S SHOP
 $this_shop_index['kalinka'] = array(
         'shop_token' => 'kalinka',
@@ -331,17 +332,17 @@ $this_shop_index['kalinka'] = array(
         'shop_quote_selling' => array('items' => 'Greetings and welcome to Kalinka\'s Shop! I think you\'ll enjoy the new hold items I\'m developing.'),
         'shop_quote_buying' => array(),
         'shop_items' => array(
-            'items_selling' => array(
-                'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,
-                'attack-booster' => 32000, 'defense-booster' => 32000,
-                'growth-module' => 32000, 'fortune-module' => 32000
+            'items_selling' => get_items_with_prices(
+                'energy-upgrade', 'weapon-upgrade',
+                'attack-booster', 'defense-booster',
+                'growth-module', 'fortune-module'
                 ),
-            'items_selling2' => array(
-                'energy-upgrade' => 32000, 'weapon-upgrade' => 32000,
-                'attack-booster' => 32000, 'defense-booster' => 32000,
-                'speed-booster' => 32000, 'field-booster' => 32000,
-                'growth-module' => 32000, 'fortune-module' => 32000,
-                'target-module' => 32000, 'charge-module' => 32000
+            'items_selling2' => get_items_with_prices(
+                'energy-upgrade', 'weapon-upgrade',
+                'attack-booster', 'defense-booster',
+                'speed-booster', 'field-booster',
+                'growth-module', 'fortune-module',
+                'target-module', 'charge-module'
                 )
             )
         );
@@ -591,29 +592,20 @@ if (!empty($this_shop_index['reggae'])){
 
             // Add the Copy Abilities to the shop if they've been unlocked
             if (rpg_game::copy_abilities_unlocked()){
-
-                // Manually append some starter abilities as the first items in the list
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-shot'] = 24000;
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['copy-soul'] = 48000;
-
+                $prices = get_items_with_prices('copy-shot', 'copy-soul');
+                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
             }
 
             // Add the Core Abilities to the shop if they've been unlocked
             if (rpg_game::core_abilities_unlocked()){
-
-                // Manually append some starter abilities as the first items in the list
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['core-shield'] = 24000;
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['core-laser'] = 48000;
-
+                $prices = get_items_with_prices('core-shield', 'core-laser');
+                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
             }
 
             // Add the Omega Abilities to the shop if they've been unlocked
             if (rpg_game::omega_abilities_unlocked()){
-
-                // Manually append some starter abilities as the first items in the list
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-pulse'] = 24000;
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-wave'] = 48000;
-
+                $prices = get_items_with_prices('omega-pulse', 'omega-wave');
+                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
             }
 
             /*
@@ -656,19 +648,12 @@ if (!empty($this_shop_index['reggae'])){
                 if ($ability_info['ability_energy'] > 4){ $ability_tier += 1; }
                 if ($ability_info['ability_energy'] > 8){ $ability_tier += 1; }
 
-                // Define the core required and price based on it's tier
-                $ability_price = 0;
-                $cores_required = 0;
-                if ($ability_tier == 1){
-                    $ability_price = 6000;
-                    $cores_required = 1;
-                } elseif ($ability_tier == 2){
-                    $ability_price = 9000;
-                    $cores_required = 3;
-                } elseif ($ability_tier == 3){
-                    $ability_price = 12000;
-                    $cores_required = 9;
-                }
+                // Define the price based on its weapon energy
+                $ability_price = $ability_info['ability_energy'] * MMRPG_SETTINGS_SHOP_ABILITY_PRICE;
+                if (empty($ability_price)){ $ability_price = MMRPG_SETTINGS_SHOP_ABILITY_PRICE; }
+
+                // Define the cores required based on its tier
+                $cores_required = $ability_tier * 3;
 
                 // If the user has not sold enough cores, skip this ability
                 $cores_sold = !empty($core_level_index[$ability_info['ability_type']]) ? $core_level_index[$ability_info['ability_type']] : 0;
@@ -701,15 +686,9 @@ if (!empty($this_shop_index['reggae'])){
                 if ($ability_info['ability_energy'] > 4){ $ability_tier += 1; }
                 if ($ability_info['ability_energy'] > 8){ $ability_tier += 1; }
 
-                // Define the core required and price based on it's tier
-                $ability_price = 0;
-                if ($ability_tier == 1){
-                    $ability_price = 6000;
-                } elseif ($ability_tier == 2){
-                    $ability_price = 9000;
-                } elseif ($ability_tier == 3){
-                    $ability_price = 12000;
-                }
+                // Define the price based on its weapon energy
+                $ability_price = $ability_info['ability_energy'] * MMRPG_SETTINGS_SHOP_ABILITY_PRICE;
+                if (empty($ability_price)){ $ability_price = MMRPG_SETTINGS_SHOP_ABILITY_PRICE; }
 
                 // Apply a discount to the price if the shop is a high enough level
                 if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
@@ -778,35 +757,35 @@ if (!empty($this_shop_index['kalinka'])){
         $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Would you like me to build you a new robot or two? I created a few blueprints using your scan data.';
         $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array(
             // MM3 Robot Masters
-            'needle-man' => 32000, 'magnet-man' => 32000,
-            'gemini-man' => 32000, 'hard-man' => 32000,
-            'top-man' => 32000, 'snake-man' => 32000,
-            'spark-man' => 32000, 'shadow-man' => 32000,
+            'needle-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'magnet-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
+            'gemini-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'hard-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
+            'top-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'snake-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
+            'spark-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'shadow-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
             // MM5 Robot Masters
-            'gravity-man' => 32000, 'wave-man' => 32000,
-            'gyro-man' => 32000, 'star-man' => 32000,
+            'gravity-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'wave-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
+            'gyro-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'star-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
             // MM6 Robot Masters
-            'blizzard-man' => 32000,
+            'blizzard-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
             // MM7 Robot Masters
-            'freeze-man' => 32000, 'slash-man' => 32000,
+            'freeze-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'slash-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
             // MM8 Robot Masters
-            'frost-man' => 32000,
+            'frost-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
             // MM8.5 Robot Masters
-            'magic-man' => 32000,
+            'magic-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
             // MM9 Robot Masters
-            'splash-woman' => 32000, 'jewel-man' => 32000,
+            'splash-woman' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'jewel-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
             // MM11 Robot Masters
-            'block-man' => 32000
+            'block-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE
             );
 
         // Add field data to Kalinka's Shop
         $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
         $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I\'ve discovered that we can generate new stars using the data of legacy battle fields. Interested?';
         $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
-            'construction-site' => 48000, 'magnetic-generator' => 48000,
-            'reflection-chamber' => 48000, 'rocky-plateau' => 48000,
-            'spinning-greenhouse' => 48000, 'serpent-column' => 48000,
-            'power-plant' => 48000, 'septic-system' => 48000
+            'construction-site' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'magnetic-generator' => MMRPG_SETTINGS_SHOP_FIELD_PRICE,
+            'reflection-chamber' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'rocky-plateau' => MMRPG_SETTINGS_SHOP_FIELD_PRICE,
+            'spinning-greenhouse' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'serpent-column' => MMRPG_SETTINGS_SHOP_FIELD_PRICE,
+            'power-plant' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'septic-system' => MMRPG_SETTINGS_SHOP_FIELD_PRICE
             );
 
     }
@@ -819,7 +798,8 @@ if (!empty($this_shop_index['kalinka'])){
         $this_shop_index['kalinka']['shop_kind_buying'][] = 'stars';
         $this_shop_index['kalinka']['shop_quote_buying']['stars'] = 'Do you have any field or fusion stars? I\'m studying the effects of starforce and need to scan a few.';
         $this_shop_index['kalinka']['shop_stars']['stars_buying'] = array(
-            'field' => 2000, 'fusion' => 4000
+            'field' => ceil($mmrpg_items['field-star']['item_value'] / 2),
+            'fusion' => ceil($mmrpg_items['fusion-star']['item_value'] / 2)
             );
     }
 

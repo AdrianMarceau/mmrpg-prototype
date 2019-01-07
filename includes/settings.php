@@ -100,6 +100,11 @@ define('MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER', 0.75); // Sub-Core matched abil
 define('MMRPG_SETTINGS_NATIVEBONUS_MULTIPLIER', 0.5); // Level-up abilites should recive a 50% weapon enery reduction
 define('MMRPG_SETTINGS_MECHABONUS_MULTIPLIER', 0.5); // support mechas should receive a 50% weapon enery reduction
 
+// Define the global values for shop prices and multipliers
+define('MMRPG_SETTINGS_SHOP_ABILITY_PRICE', 1500);  // use as (PRICE * ENERGY)
+define('MMRPG_SETTINGS_SHOP_ROBOT_PRICE', 32000);
+define('MMRPG_SETTINGS_SHOP_FIELD_PRICE', 48000);
+
 // Define the global comment size limit for characters
 define('MMRPG_SETTINGS_COMMENT_MINLENGTH', 10); // Prevent spam comments
 define('MMRPG_SETTINGS_COMMENT_MAXLENGTH', 5000); // Prevent wordy comments
