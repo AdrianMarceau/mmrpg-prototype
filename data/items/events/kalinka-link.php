@@ -13,7 +13,7 @@ $item = array(
     'item_energy' => 0,
     'item_speed' => 10,
     'item_accuracy' => 100,
-    'item_value' => 5000,
+    'item_value' => 50000,
     'item_function' => function($objects){
 
         // Return true on success
