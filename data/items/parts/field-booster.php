@@ -13,7 +13,7 @@ $item = array(
     'item_recovery2' => 10,
     'item_recovery2_percent' => true,
     'item_speed' => 10,
-    'item_price' => 32000,
+    'item_price' => 7500,
     'item_accuracy' => 100,
     'item_function' => function($objects){
 
