@@ -72,8 +72,6 @@ class rpg_mission_bonus extends rpg_mission {
         $temp_battle_omega['battle_token'] = $temp_battle_token;
         $temp_battle_omega['battle_size'] = '1x4';
         $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
-        if ($this_robot_class == 'mecha'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERROBOT * $this_robot_count; }
-        elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_turns'] = MMRPG_SETTINGS_BATTLETURNS_PERMECHA * $this_robot_count; }
         //$temp_battle_omega['battle_points'] = ceil(($this_prototype_data['battles_complete'] > 1 ? 100 : 1000) * $temp_rand_num);
         shuffle($temp_battle_omega['battle_target_player']['player_robots']);
         $temp_battle_omega['battle_target_player']['player_robots'] = array_slice($temp_battle_omega['battle_target_player']['player_robots'], 0, $this_robot_count);
@@ -96,7 +94,8 @@ class rpg_mission_bonus extends rpg_mission {
         }
 
         // Loop through each of the bonus robots and update their levels
-        $temp_battle_omega['battle_points'] = 0;
+        $temp_battle_omega['battle_zenny'] = 0;
+        $temp_battle_omega['battle_turns'] = 0;
         foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $info){
             $info['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
             $index = rpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
@@ -115,14 +114,18 @@ class rpg_mission_bonus extends rpg_mission {
                 shuffle($images);
                 $info['robot_image'] = array_shift($images);
             }
-            $temp_battle_omega['battle_points'] += $info['robot_level'] * ($this_robot_class == 'master' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2);
+            if ($index['robot_class'] == 'master' || $index['robot_class'] == 'boss'){
+                $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $info['robot_level']);
+                $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
+            } elseif ($index['robot_class'] == 'mecha'){
+                $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $info['robot_level']);
+                $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERMECHA;
+            }
             $temp_battle_omega['battle_target_player']['player_robots'][$key] = $info;
         }
-        // Multiply battle points by ten for bonus amount
-        $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10);
-        //if ($this_robot_class == 'mecha'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 100); }
-        //elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10); }
-        //elseif ($this_robot_class == 'master'){ $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] / 10); }
+
+        // Multiply battle zenny by ten for bonus amount, this is NOT a zenny-grinding area
+        $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] / 100);
 
         // Create the randomized field multupliers
         $temp_types = $mmrpg_index['types'];
