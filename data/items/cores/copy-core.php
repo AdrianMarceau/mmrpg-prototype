@@ -9,7 +9,6 @@ $item = array(
     'item_subclass' => 'treasure',
     'item_type' => 'copy',
     'item_description' => 'A mysterious elemental core that radiates with the Copy type energy of a defeated robot master.',
-    'item_description_shop' => 'This item appears to be coveted by a certain character and can be traded in for a variable amount of Zenny.',
     'item_energy' => 0,
     'item_speed' => 10,
     'item_damage' => 0,

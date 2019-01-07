@@ -8,7 +8,7 @@ $item = array(
     'item_class' => 'item',
     'item_subclass' => 'collectible',
     'item_value' => 4000,
-    'item_description' => 'A mysterious elemental star that radiates with the energy of a distant planet. These stars appear to come in a variety of different types and collecting lots of them may be essential to progressing through the story.  A certain character is also said to be researching these items and would likely trade a respectable amount of Zenny to study one up close.',
+    'item_description' => 'A mysterious elemental star that radiates with the energy of a distant planet. These stars appear to form on elemental battle fields and come in a variety of different types. Collecting stars increases one\'s Starforce and makes their robots grow stronger!',
     'item_function' => function($objects){
 
         // Extract all objects into the current scope
