@@ -351,7 +351,7 @@ class rpg_mission_double extends rpg_mission {
         if ($temp_complete_count > 0){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * (2 / (2 + $temp_complete_count))); }
 
         // If this is a starfield mission, it will give slightly more zenny than usual
-        if ($starfield_mission){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.5); }
+        if ($starfield_mission){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.1); }
 
         // Update the option robots
         $temp_option_robot = $this_robot_index[$temp_option_robot['robot_token']];
