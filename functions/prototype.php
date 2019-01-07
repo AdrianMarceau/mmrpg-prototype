@@ -369,26 +369,9 @@ function mmrpg_prototype_calculate_battle_points($update_session = false, $_GAME
     $session_token = mmrpg_game_token();
     if (empty($_GAME)){ $_GAME = &$_SESSION[$session_token]; }
 
-    // Start the battle points value at zero and increment
-    $total_battle_points = 0;
-
-    // If the player has completed battles, loop through them and add up points
-    if (!empty($_GAME['values']['battle_complete'])){
-        foreach ($_GAME['values']['battle_complete'] AS $player_token => $player_battles){
-            $player_points = mmrpg_prototype_calculate_player_points($player_token);
-            if ($update_session){ $_GAME['values']['battle_rewards'][$player_token]['player_points'] = $player_points; }
-            $total_battle_points += $player_points;
-        }
-    }
-
-    // If the player has unlocked any stars, loop through them and add up points
-    if (!empty($_GAME['values']['battle_stars'])){
-        foreach ($_GAME['values']['battle_stars'] AS $star_key => $star_data){
-            if ($star_data['star_kind'] == 'field'){ $star_points = 6000; }
-            elseif ($star_data['star_kind'] == 'fusion'){ $star_points = 9000; }
-            $total_battle_points += $star_points;
-        }
-    }
+    // Collect the user ID from the session
+    $user_id = $_GAME['USER']['userid'];
+    $total_battle_points = mmrpg_prototype_calculate_battle_points_2k19($user_id);
 
     // If requested, update the session variable with the new total
     if ($update_session){ $_GAME['counters']['battle_points'] = $total_battle_points; }
@@ -406,15 +389,6 @@ function mmrpg_prototype_calculate_player_points($player_token, $update_session 
 
     // Start the battle points value at zero and increment
     $player_battle_points = 0;
-
-    // If the player has completed battles, loop through them and add up points
-    if (!empty($_GAME['values']['battle_complete'][$player_token])){
-        foreach ($_GAME['values']['battle_complete'][$player_token] AS $battle_token => $battle_records){
-            if (!empty($battle_records['battle_max_points'])){
-                $player_battle_points += $battle_records['battle_max_points'];
-            }
-        }
-    }
 
     // If requested, update the session variable with new player rewards
     if ($update_session){ $_GAME['values']['battle_rewards'][$player_token]['player_points'] = $player_battle_points; }
