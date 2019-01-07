@@ -72,6 +72,41 @@ die('<hr />'.
 
 // -- DEFINE SHOP INDEXES -- //
 
+// Define a function for collecting an array or items with prices given tokens
+$mmrpg_items = rpg_item::get_index();
+function get_items_with_prices(){
+    $item_tokens = func_get_args();
+    if (empty($item_tokens)){ return array(); }
+    global $mmrpg_items;
+    $item_prices = array();
+    foreach ($item_tokens AS $item_token){
+        if (!isset($mmrpg_items[$item_token])){ continue; }
+        $item_info = $mmrpg_items[$item_token];
+        $item_price = 0;
+        if (!empty($item_info['item_price'])){ $item_price = $item_info['item_price']; }
+        if (empty($item_price)){ continue; }
+        $item_prices[$item_token] = $item_price;
+    }
+    return $item_prices;
+}
+// Define a function for collecting an array or items with values given tokens
+function get_items_with_values(){
+    $item_tokens = func_get_args();
+    if (empty($item_tokens)){ return array(); }
+    global $mmrpg_items;
+    $item_values = array();
+    foreach ($item_tokens AS $item_token){
+        if (!isset($mmrpg_items[$item_token])){ continue; }
+        $item_info = $mmrpg_items[$item_token];
+        $item_value = 0;
+        if (!empty($item_info['item_value'])){ $item_value = $item_info['item_value']; }
+        elseif (!empty($item_info['item_price'])){ $item_value = $item_info['item_price'] / 2; }
+        if (empty($item_value)){ continue; }
+        $item_values[$item_token] = $item_value;
+    }
+    return $item_values;
+}
+
 // Define the array to hold all the shop data
 $this_shop_index = array();
 
@@ -97,79 +132,73 @@ $this_shop_index['auto'] = array(
             'items' => 'So you wanna sell something, eh? Let\'s see what you\'ve collected so far! Hopefully lots of screws!'
             ),
         'shop_items' => array(
-            'items_selling' => array(
+            'items_selling' => get_items_with_prices(
 
-                'energy-pellet' => 200, 'weapon-pellet' => 200,
-                'energy-capsule' => 400, 'weapon-capsule' => 400,
-                'energy-tank' => 800, 'weapon-tank' => 800
-
-                ),
-            'items_selling2' => array(
-
-                'energy-pellet' => 200, 'weapon-pellet' => 200,
-                'energy-capsule' => 400, 'weapon-capsule' => 400,
-                'energy-tank' => 800, 'weapon-tank' => 800,
-
-                'attack-pellet' => 900, 'defense-pellet' => 900,
-                'attack-capsule' => 1800, 'defense-capsule' => 1800,
-                'speed-pellet' => 900, 'super-pellet' => 2700,
-                'speed-capsule' => 1800, 'super-capsule' => 5400
+                'energy-pellet', 'weapon-pellet',
+                'energy-capsule', 'weapon-capsule',
+                'energy-tank', 'weapon-tank'
 
                 ),
-            'items_selling3' => array(
+            'items_selling2' => get_items_with_prices(
 
-                'energy-pellet' => 200, 'weapon-pellet' => 200,
-                'energy-capsule' => 400, 'weapon-capsule' => 400,
-                'energy-tank' => 800, 'weapon-tank' => 800,
+                'energy-pellet', 'weapon-pellet',
+                'energy-capsule', 'weapon-capsule',
+                'energy-tank', 'weapon-tank',
 
-                'attack-pellet' => 900, 'defense-pellet' => 900,
-                'attack-capsule' => 1800, 'defense-capsule' => 1800,
-                'speed-pellet' => 900, 'super-pellet' => 2700,
-                'speed-capsule' => 1800, 'super-capsule' => 5400,
-
-                'extra-life' => 1600, 'yashichi' => 1600
+                'attack-pellet', 'defense-pellet',
+                'attack-capsule', 'defense-capsule',
+                'speed-pellet', 'super-pellet',
+                'speed-capsule', 'super-capsule'
 
                 ),
-            'items_selling4' => array(
+            'items_selling3' => get_items_with_prices(
 
-                'energy-pellet' => 200, 'weapon-pellet' => 200,
-                'energy-capsule' => 400, 'weapon-capsule' => 400,
-                'energy-tank' => 800, 'weapon-tank' => 800,
+                'energy-pellet', 'weapon-pellet',
+                'energy-capsule', 'weapon-capsule',
+                'energy-tank', 'weapon-tank',
 
-                'attack-pellet' => 900, 'defense-pellet' => 900,
-                'attack-capsule' => 1800, 'defense-capsule' => 1800,
-                'speed-pellet' => 900, 'super-pellet' => 2700,
-                'speed-capsule' => 1800, 'super-capsule' => 5400,
+                'attack-pellet', 'defense-pellet',
+                'attack-capsule', 'defense-capsule',
+                'speed-pellet', 'super-pellet',
+                'speed-capsule', 'super-capsule',
 
-                'extra-life' => 1600, 'yashichi' => 1600,
+                'extra-life', 'yashichi'
 
                 ),
-            'items_buying' => array(
+            'items_selling4' => get_items_with_prices(
 
-                'small-screw' => 100, 'large-screw' => 1000,
+                'energy-pellet', 'weapon-pellet',
+                'energy-capsule', 'weapon-capsule',
+                'energy-tank', 'weapon-tank',
 
-                'energy-pellet' => 100, 'weapon-pellet' => 100,
-                'energy-capsule' => 200, 'weapon-capsule' => 200,
-                'energy-tank' => 400, 'weapon-tank' => 400,
+                'attack-pellet', 'defense-pellet',
+                'attack-capsule', 'defense-capsule',
+                'speed-pellet', 'super-pellet',
+                'speed-capsule', 'super-capsule',
 
-                'attack-pellet' => 450, 'defense-pellet' => 450,
-                'attack-capsule' => 900, 'defense-capsule' => 900,
-                'speed-pellet' => 450, 'super-pellet' => 1350,
-                'speed-capsule' => 900, 'super-capsule' => 2800,
+                'extra-life', 'yashichi'
 
-                'extra-life' => 800, 'yashichi' => 800,
+                ),
+            'items_buying' => get_items_with_values(
 
-                /*
-                'energy-upgrade' => 4000, 'weapon-upgrade' => 4000,
-                'attack-booster' => 4000, 'defense-booster' => 4000,
-                'speed-booster' => 4000, 'field-booster' => 4000,
-                'target-module' => 4000, 'charge-module' => 4000,
-                'growth-module' => 4000, 'fortune-module' => 4000
-                */
+                'small-screw', 'large-screw',
+
+                'energy-pellet', 'weapon-pellet',
+                'energy-capsule', 'weapon-capsule',
+                'energy-tank', 'weapon-tank',
+
+                'attack-pellet', 'defense-pellet',
+                'attack-capsule', 'defense-capsule',
+                'speed-pellet', 'super-pellet',
+                'speed-capsule', 'super-capsule',
+
+                'extra-life', 'yashichi'
 
                 )
             )
         );
+
+exit('<pre>$this_shop_index[\'auto\'] = '.print_r($this_shop_index['auto'], true).'</pre>');
 
 // REGGAE'S SHOP
 $this_shop_index['reggae'] = array(
