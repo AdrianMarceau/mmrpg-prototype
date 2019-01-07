@@ -1644,23 +1644,45 @@ function mmrpg_prototype_leaderboard_online(){
 }
 
 // Define a function for pulling the leaderboard targets
-function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = ''){
+function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = '', &$this_leaderboard_defeated_players = array()){
     global $db;
     // Check to see if the leaderboard targets have already been pulled or not
     if (!empty($db->INDEX['LEADERBOARD']['targets'])){
         $this_leaderboard_target_players = json_decode($db->INDEX['LEADERBOARD']['targets'], true);
     } else {
+
         // Collect the leaderboard index and online players for ranking
         $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
         $this_leaderboard_online_players = mmrpg_prototype_leaderboard_online();
-        $this_leaderboard_defeated_players = !empty($_SESSION['LEADERBOARD']['player_targets_defeated']) ? $_SESSION['LEADERBOARD']['player_targets_defeated'] : array();
-        if (count($this_leaderboard_defeated_players) >= 2){ $_SESSION['LEADERBOARD']['player_targets_defeated'] = $this_leaderboard_defeated_players = array_slice($this_leaderboard_defeated_players, -2); }
+
+        // Collect a list of user IDs that have already been defeated if not already provided
+        if (empty($this_leaderboard_defeated_players)){
+            $defeated_leaderboard_players_index =  $db->get_array_list("SELECT
+                DISTINCT(battles.target_user_id) AS target_user_id,
+                users.user_name_clean AS target_user_name,
+                users.user_colour_token As target_user_colour
+                FROM mmrpg_battles AS battles
+                LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+                WHERE
+                battles.this_user_id = {$this_userid}
+                AND battles.this_player_result = 'victory'
+                ;", 'target_user_name');
+        }
+
+        // Collapse the defeated players into a string of just their usernames
+        if (!empty($defeated_leaderboard_players_index)){ $this_leaderboard_defeated_players = array_keys($defeated_leaderboard_players_index); }
+        else { $this_leaderboard_defeated_players = array(); }
+
         // Generate the online username tokens for adding to the condition list
         $temp_include_usernames = array();
         $temp_include_usernames_count = 0;
         $temp_include_usernames_string = array();
+        $this_leaderboard_online_usernames = array();
         if (!empty($this_leaderboard_online_players)){
-            foreach ($this_leaderboard_online_players AS $info){ if ($info['id'] != $this_userid){ $temp_include_usernames[] = $info['token']; } }
+            foreach ($this_leaderboard_online_players AS $info){ if ($info['id'] != $this_userid){
+                $temp_include_usernames[] = $info['token'];
+                $this_leaderboard_online_usernames[] = $info['token'];
+                } }
             $temp_include_usernames_count = count($temp_include_usernames);
             if (!empty($temp_include_usernames)){
                 foreach ($temp_include_usernames AS $token){ $temp_include_usernames_string[] = "'{$token}'"; }
@@ -1677,7 +1699,6 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         $temp_exclude_usernames_string = array();
         if (!empty($this_leaderboard_defeated_players)){
             $temp_exclude_usernames = $this_leaderboard_defeated_players;
-            if (count($temp_exclude_usernames) > 6){ $temp_exclude_usernames = array_slice($temp_exclude_usernames, -6, 6); }
             $temp_exclude_usernames_count = count($temp_exclude_usernames);
             if (!empty($temp_exclude_usernames)){
                 foreach ($temp_exclude_usernames AS $token){ $temp_exclude_usernames_string[] = "'{$token}'"; }
@@ -1703,6 +1724,7 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 mmrpg_users.user_name,
                 mmrpg_users.user_name_clean,
                 mmrpg_users.user_name_public,
+                mmrpg_users.user_colour_token,
                 mmrpg_users.user_gender,
                 mmrpg_saves.save_values_battle_rewards AS player_rewards,
                 mmrpg_saves.save_values_battle_settings AS player_settings,
@@ -1714,8 +1736,10 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 WHERE
                 board_points >= '.$this_player_points_min.' AND board_points <= '.$this_player_points_max.'
                 AND mmrpg_leaderboard.user_id != '.$this_userid.'
-                '.(!empty($temp_exclude_usernames_string) ? ' AND mmrpg_users.user_name_clean NOT IN ('.$temp_exclude_usernames_string.')' : '').'
-                ORDER BY '.(!empty($temp_include_usernames_string) ? ' FIELD(user_name_clean, '.$temp_include_usernames_string.') DESC, ' : '').'board_points DESC
+                ORDER BY
+                '.(!empty($temp_include_usernames_string) ? ' FIELD(user_name_clean, '.$temp_include_usernames_string.') DESC, ' : '').'
+                '.(!empty($temp_exclude_usernames_string) ? ' FIELD(user_name_clean, '.$temp_exclude_usernames_string.') ASC, ' : '').'
+                board_points DESC
                 LIMIT 12
             ';
         // Query the database and collect the array list of all online players
@@ -1732,7 +1756,9 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 $player['player_favourites'] = !empty($player['values']['robot_favourites']) ? $player['values']['robot_favourites'] : array();
                 $player['player_starforce'] = !empty($player['values']['star_force']) ? $player['values']['star_force'] : array();
                 if (!empty($player_robot_sort)){ $player['counters']['player_robots_count'] = !empty($player['player_rewards'][$player_robot_sort]['player_robots']) ? count($player['player_rewards'][$player_robot_sort]['player_robots']) : 0; }
-                $player['values']['flag_online'] = in_array($player['user_name_clean'], $temp_include_usernames) ? 1 : 0;
+                $player['values']['flag_online'] = in_array($player['user_name_clean'], $this_leaderboard_online_usernames) ? 1 : 0;
+                $player['values']['flag_defeated'] = in_array($player['user_name_clean'], $this_leaderboard_defeated_players) ? 1 : 0;
+                $player['values']['colour_token'] = !empty($player['user_colour_token']) ? $player['user_colour_token'] : '';
                 $this_leaderboard_target_players[$key] = $player;
             }
         }
@@ -1750,15 +1776,19 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
 function mmrpg_prototype_leaderboard_targets_sort($player1, $player2){
 
     if (!isset($player1['values']['flag_online'])){ $player1['values']['flag_online'] = 0; }
+    if (!isset($player1['values']['flag_defeated'])){ $player1['values']['flag_defeated'] = 0; }
     if (!isset($player1['counters']['battle_points'])){ $player1['counters']['battle_points'] = 0; }
     if (!isset($player1['counters']['player_robots_count'])){ $player1['counters']['player_robots_count'] = 1; }
 
     if (!isset($player2['values']['flag_online'])){ $player2['values']['flag_online'] = 0; }
+    if (!isset($player2['values']['flag_defeated'])){ $player2['values']['flag_defeated'] = 0; }
     if (!isset($player2['counters']['battle_points'])){ $player2['counters']['battle_points'] = 0; }
     if (!isset($player2['counters']['player_robots_count'])){ $player2['counters']['player_robots_count'] = 1; }
 
     if ($player1['values']['flag_online'] < $player2['values']['flag_online']){ return 1; }
     elseif ($player1['values']['flag_online'] > $player2['values']['flag_online']){ return -1; }
+    if ($player1['values']['flag_defeated'] < $player2['values']['flag_defeated']){ return -1; }
+    elseif ($player1['values']['flag_defeated'] > $player2['values']['flag_defeated']){ return 1; }
     elseif ($player1['counters']['battle_points'] < $player2['counters']['battle_points']){ return -1; }
     elseif ($player1['counters']['battle_points'] > $player2['counters']['battle_points']){ return 1; }
     elseif ($player1['counters']['player_robots_count'] < $player2['counters']['player_robots_count']){ return -1; }
@@ -1770,6 +1800,8 @@ function mmrpg_prototype_leaderboard_targets_sort($player1, $player2){
 function mmrpg_prototype_leaderboard_targets_sort_online($player1, $player2){
     if ($player1['values']['flag_online'] < $player2['values']['flag_online']){ return 1; }
     elseif ($player1['values']['flag_online'] > $player2['values']['flag_online']){ return -1; }
+    if ($player1['values']['flag_defeated'] < $player2['values']['flag_defeated']){ return -1; }
+    elseif ($player1['values']['flag_defeated'] > $player2['values']['flag_defeated']){ return 1; }
     else { return 0; }
 }
 

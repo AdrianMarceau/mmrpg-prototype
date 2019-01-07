@@ -470,12 +470,20 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     // Update the option chapter to the current
                     $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
 
-                    // If this user is only, update the battle button with details
-                    if (in_array($temp_player_array['user_name_clean'], $temp_include_usernames)){
+                    // If this user is online, update the battle button with details
+                    if (!empty($temp_player_array['values']['flags_online'])){
                         $temp_battle_omega['option_style'] = 'border-color: green !important; ';
                         $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="online_type player_type player_type_nature">Online</sup>';
                     }
-                    //die('<pre>$temp_battle_omega4 : '.print_r($temp_battle_omega, true).'</pre>');
+
+                    // If this user is defeated, update the battle button with details
+                    if (!empty($temp_player_array['values']['flag_defeated'])){
+                        $victory_token_colour = !empty($temp_player_array['values']['colour_token']) ? $temp_player_array['values']['colour_token'] : 'none';
+                        $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="online_type player_type player_type_'.$victory_token_colour.'">&#9733;</sup>';
+                        $temp_battle_omega['battle_description2'] .= 'This player\'s victory token has already been collected...';
+                    } else {
+                        $temp_battle_omega['battle_description2'] .= 'Collect this player\'s victory token for additional battle points!';
+                    }
 
                     // Add the omega battle to the options, index, and session
                     $this_prototype_data['battle_options'][] = $temp_battle_omega;
