@@ -976,7 +976,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $this_option_limit = !empty($this_battleinfo['battle_robot_limit']) ? $this_battleinfo['battle_robot_limit'] : 8;
             $this_option_frame = !empty($this_battleinfo['battle_sprite_frame']) ? $this_battleinfo['battle_sprite_frame'] : 'base';
             $this_option_status = !empty($this_battleinfo['battle_status']) ? $this_battleinfo['battle_status'] : 'enabled';
-            $this_option_points = !empty($this_battleinfo['battle_points']) ? $this_battleinfo['battle_points'] : 0;
+            $this_option_zenny = !empty($this_battleinfo['battle_zenny']) ? $this_battleinfo['battle_zenny'] : 0;
             $this_option_complete = $this_battleinfo['battle_option_complete'];
             $this_option_failure = $this_battleinfo['battle_option_failure'];
             $this_option_targets = !empty($this_targetinfo['player_robots']) ? count($this_targetinfo['player_robots']) : 0;
@@ -1176,15 +1176,11 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             if ($this_option_max_level > 100){ $this_option_max_level = 100; }
             $this_option_level_range = $this_option_min_level == $this_option_max_level ? 'Level '.$this_option_min_level : 'Levels '.$this_option_min_level.'-'.$this_option_max_level;
 
-            if ($is_battle_counts){
-                $this_option_point_amount = number_format($this_option_points, 0, '.', ',').' Point'.($this_option_points != 1 ? 's' : '');
-            } else {
-                $this_option_point_amount = number_format($this_option_points, 0, '.', ',').' Zenny';
-            }
+            $this_option_zenny_amount = number_format($this_option_zenny, 0, '.', ',').' Zenny';
 
             $this_option_label .= (
                 !empty($this_option_button_text)
-                    ? '<span class="multi"><span class="maintext">'.$this_option_button_text.'</span><span class="subtext">'.$this_option_level_range.'</span><span class="subtext2">'.$this_option_point_amount.'</span></span>'.(!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore)) ? '<span class="arrow"> &#9658;</span>' : '')
+                    ? '<span class="multi"><span class="maintext">'.$this_option_button_text.'</span><span class="subtext">'.$this_option_level_range.'</span><span class="subtext2">'.$this_option_zenny_amount.'</span></span>'.(!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore)) ? '<span class="arrow"> &#9658;</span>' : '')
                     : '<span class="single">???</span>'
                     );
 
@@ -1200,10 +1196,8 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             }
             $this_option_title .= ' <br />'.$this_option_level_range;
 
-            if ($is_battle_counts){
-                $this_option_title .= ' | '.($this_battleinfo['battle_points'] == 1 ? '1 Point' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Points');
-            } else {
-                $this_option_title .= ' | '.($this_battleinfo['battle_points'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_points'], 0, '.', ',').' Zenny');
+            if (!empty($this_battleinfo['battle_zenny'])){
+                $this_option_title .= ' | '.($this_battleinfo['battle_zenny'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_zenny'], 0, '.', ',').' Zenny');
             }
 
             $this_option_title .= ' | '.($this_battleinfo['battle_turns'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns'].' Turns');
@@ -1215,10 +1209,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $this_option_title .= ' <br />Cleared : '.(!empty($this_option_complete['battle_count']) ? ($this_option_complete['battle_count'] == 1 ? '1 Time' : $this_option_complete['battle_count'].' Times') : '0 Times');
                     $this_option_title .= ' | Failed : '.(!empty($this_option_failure['battle_count']) ? ($this_option_failure['battle_count'] == 1 ? '1 Time' : $this_option_failure['battle_count'].' Times') : '0 Times');
                     if (!empty($this_option_complete)){
-                        if (!empty($this_option_complete['battle_max_points'])){
-                            $this_option_title .= ' <br />Max Points : '.(!empty($this_option_complete['battle_max_points']) ? number_format($this_option_complete['battle_max_points']) : 0).'';
-                            $this_option_title .= ' | Min Points : '.(!empty($this_option_complete['battle_min_points']) ? number_format($this_option_complete['battle_min_points']) : 0).'';
-                        }
                         if (!empty($this_option_complete['battle_max_turns'])){
                             $this_option_title .= ' <br />Max Turns : '.(!empty($this_option_complete['battle_max_turns']) ? number_format($this_option_complete['battle_max_turns']) : 0).'';
                             $this_option_title .= ' | Min Turns : '.(!empty($this_option_complete['battle_min_turns']) ? number_format($this_option_complete['battle_min_turns']) : 0).'';
@@ -1721,8 +1711,8 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 FROM mmrpg_leaderboard
                 LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
                 LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id
-                WHERE (board_points_dr_light > 0 OR board_points_dr_wily > 0 OR board_points_dr_cossack > 0)
-                AND board_points >= '.$this_player_points_min.' AND board_points <= '.$this_player_points_max.'
+                WHERE
+                board_points >= '.$this_player_points_min.' AND board_points <= '.$this_player_points_max.'
                 AND mmrpg_leaderboard.user_id != '.$this_userid.'
                 '.(!empty($temp_exclude_usernames_string) ? ' AND mmrpg_users.user_name_clean NOT IN ('.$temp_exclude_usernames_string.')' : '').'
                 ORDER BY '.(!empty($temp_include_usernames_string) ? ' FIELD(user_name_clean, '.$temp_include_usernames_string.') DESC, ' : '').'board_points DESC
