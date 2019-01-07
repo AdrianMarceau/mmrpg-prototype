@@ -72,8 +72,11 @@ die('<hr />'.
 
 // -- DEFINE SHOP INDEXES -- //
 
-// Define a function for collecting an array or items with prices given tokens
+// Collect an item and ability index for reference
 $mmrpg_items = rpg_item::get_index();
+$mmrpg_abilities = rpg_ability::get_index();
+
+// Define a function for collecting an array or items with prices given tokens
 function get_items_with_prices(){
     $item_tokens = func_get_args();
     if (empty($item_tokens)){ return array(); }
@@ -99,12 +102,30 @@ function get_items_with_values(){
         if (!isset($mmrpg_items[$item_token])){ continue; }
         $item_info = $mmrpg_items[$item_token];
         $item_value = 0;
-        if (!empty($item_info['item_value'])){ $item_value = $item_info['item_value']; }
-        elseif (!empty($item_info['item_price'])){ $item_value = $item_info['item_price'] / 2; }
+        if (!empty($item_info['item_value'])){ $item_value = ceil($item_info['item_value'] / 2); }
+        elseif (!empty($item_info['item_price'])){ $item_value = ceil($item_info['item_price'] / 2); }
         if (empty($item_value)){ continue; }
         $item_values[$item_token] = $item_value;
     }
     return $item_values;
+}
+
+// Define a function for collecting an array of abilities with prices given tokens
+function get_abilities_with_prices(){
+    $ability_tokens = func_get_args();
+    if (empty($ability_tokens)){ return array(); }
+    global $mmrpg_abilities;
+    $ability_prices = array();
+    foreach ($ability_tokens AS $ability_token){
+        if (!isset($mmrpg_abilities[$ability_token])){ continue; }
+        $ability_info = $mmrpg_abilities[$ability_token];
+        $ability_price = 0;
+        if (!empty($ability_info['ability_energy'])){ $ability_price = ceil($ability_info['ability_energy'] * 1500); }
+        else { $ability_price = 1500; }
+        if (empty($ability_price)){ continue; }
+        $ability_prices[$ability_token] = $ability_price;
+    }
+    return $ability_prices;
 }
 
 // Define the array to hold all the shop data
@@ -133,72 +154,52 @@ $this_shop_index['auto'] = array(
             ),
         'shop_items' => array(
             'items_selling' => get_items_with_prices(
-
                 'energy-pellet', 'weapon-pellet',
                 'energy-capsule', 'weapon-capsule',
                 'energy-tank', 'weapon-tank'
-
                 ),
             'items_selling2' => get_items_with_prices(
-
                 'energy-pellet', 'weapon-pellet',
                 'energy-capsule', 'weapon-capsule',
                 'energy-tank', 'weapon-tank',
-
                 'attack-pellet', 'defense-pellet',
                 'attack-capsule', 'defense-capsule',
                 'speed-pellet', 'super-pellet',
                 'speed-capsule', 'super-capsule'
-
                 ),
             'items_selling3' => get_items_with_prices(
-
                 'energy-pellet', 'weapon-pellet',
                 'energy-capsule', 'weapon-capsule',
                 'energy-tank', 'weapon-tank',
-
                 'attack-pellet', 'defense-pellet',
                 'attack-capsule', 'defense-capsule',
                 'speed-pellet', 'super-pellet',
                 'speed-capsule', 'super-capsule',
-
                 'extra-life', 'yashichi'
-
                 ),
             'items_selling4' => get_items_with_prices(
-
                 'energy-pellet', 'weapon-pellet',
                 'energy-capsule', 'weapon-capsule',
                 'energy-tank', 'weapon-tank',
-
                 'attack-pellet', 'defense-pellet',
                 'attack-capsule', 'defense-capsule',
                 'speed-pellet', 'super-pellet',
                 'speed-capsule', 'super-capsule',
-
                 'extra-life', 'yashichi'
-
                 ),
             'items_buying' => get_items_with_values(
-
                 'small-screw', 'large-screw',
-
                 'energy-pellet', 'weapon-pellet',
                 'energy-capsule', 'weapon-capsule',
                 'energy-tank', 'weapon-tank',
-
                 'attack-pellet', 'defense-pellet',
                 'attack-capsule', 'defense-capsule',
                 'speed-pellet', 'super-pellet',
                 'speed-capsule', 'super-capsule',
-
                 'extra-life', 'yashichi'
-
                 )
             )
         );
-
-exit('<pre>$this_shop_index[\'auto\'] = '.print_r($this_shop_index['auto'], true).'</pre>');
 
 // REGGAE'S SHOP
 $this_shop_index['reggae'] = array(
@@ -221,113 +222,97 @@ $this_shop_index['reggae'] = array(
         'cores' => 'Reggae wants robot cores, robot cores! Squawk! No other items will do, will do! Squaaaaawk!'
         ),
     'shop_abilities' => array(
-        'abilities_selling' => array(
-            'buster-charge' => 3000, 'buster-relay' => 3000,
-            'energy-boost' => 6000, 'attack-boost' => 6000,
-            'defense-boost' => 6000, 'speed-boost' => 6000,
-            'energy-break' => 9000, 'attack-break' => 9000,
-            'defense-break' => 9000, 'speed-break' => 9000,
+        'abilities_selling' => get_abilities_with_prices(
+            'buster-charge', 'buster-relay',
+            'energy-boost', 'attack-boost',
+            'defense-boost', 'speed-boost',
+            'energy-break', 'attack-break',
+            'defense-break', 'speed-break'
             ),
-        'abilities_selling2' => array(
-            'buster-charge' => 3000, 'buster-relay' => 3000,
-            'energy-boost' => 6000, 'attack-boost' => 6000,
-            'defense-boost' => 6000, 'speed-boost' => 6000,
-            'energy-break' => 9000, 'attack-break' => 9000,
-            'defense-break' => 9000, 'speed-break' => 9000,
-            'energy-swap' => 12000, 'attack-swap' => 12000,
-            'defense-swap' => 12000, 'speed-swap' => 12000,
+        'abilities_selling2' => get_abilities_with_prices(
+            'buster-charge', 'buster-relay',
+            'energy-boost', 'attack-boost',
+            'defense-boost', 'speed-boost',
+            'energy-break', 'attack-break',
+            'defense-break', 'speed-break',
+            'energy-swap', 'attack-swap',
+            'defense-swap', 'speed-swap'
             ),
-        'abilities_selling3' => array(
-            'buster-charge' => 3000, 'buster-relay' => 3000,
-            'energy-boost' => 6000, 'attack-boost' => 6000,
-            'defense-boost' => 6000, 'speed-boost' => 6000,
-            'energy-break' => 9000, 'attack-break' => 9000,
-            'defense-break' => 9000, 'speed-break' => 9000,
-            'energy-swap' => 12000, 'attack-swap' => 12000,
-            'defense-swap' => 12000, 'speed-swap' => 12000,
-            'attack-support' => 15000, 'defense-support' => 15000,
-            'speed-support' => 15000, 'energy-support' => 15000,
-            'attack-assault' => 15000, 'defense-assault' => 15000,
-            'speed-assault' => 15000, 'energy-assault' => 15000,
+        'abilities_selling3' => get_abilities_with_prices(
+            'buster-charge', 'buster-relay',
+            'energy-boost', 'attack-boost',
+            'defense-boost', 'speed-boost',
+            'energy-break', 'attack-break',
+            'defense-break', 'speed-break',
+            'energy-swap', 'attack-swap',
+            'defense-swap', 'speed-swap',
+            'attack-support', 'defense-support',
+            'speed-support', 'energy-support',
+            'attack-assault', 'defense-assault',
+            'speed-assault', 'energy-assault'
             ),
-        'abilities_selling4' => array(
-            'buster-charge' => 3000, 'buster-relay' => 3000,
-            'energy-boost' => 6000, 'attack-boost' => 6000,
-            'defense-boost' => 6000, 'speed-boost' => 6000,
-            'energy-break' => 9000, 'attack-break' => 9000,
-            'defense-break' => 9000, 'speed-break' => 9000,
-            'energy-swap' => 12000, 'attack-swap' => 12000,
-            'defense-swap' => 12000, 'speed-swap' => 12000,
-            'attack-support' => 15000, 'defense-support' => 15000,
-            'speed-support' => 15000, 'energy-support' => 15000,
-            'attack-assault' => 15000, 'defense-assault' => 15000,
-            'speed-assault' => 15000, 'energy-assault' => 15000,
-            'attack-mode' => 15000, 'defense-mode' => 15000,
-            'speed-mode' => 15000, 'energy-mode' => 15000,
+        'abilities_selling4' => get_abilities_with_prices(
+            'buster-charge', 'buster-relay',
+            'energy-boost', 'attack-boost',
+            'defense-boost', 'speed-boost',
+            'energy-break', 'attack-break',
+            'defense-break', 'speed-break',
+            'energy-swap', 'attack-swap',
+            'defense-swap', 'speed-swap',
+            'attack-support', 'defense-support',
+            'speed-support', 'energy-support',
+            'attack-assault', 'defense-assault',
+            'speed-assault', 'energy-assault',
+            'attack-mode', 'defense-mode',
+            'speed-mode', 'energy-mode'
             ),
-        'abilities_selling5' => array(
-            'buster-charge' => 3000, 'buster-relay' => 3000,
-            'energy-boost' => 6000, 'attack-boost' => 6000,
-            'defense-boost' => 6000, 'speed-boost' => 6000,
-            'energy-break' => 9000, 'attack-break' => 9000,
-            'defense-break' => 9000, 'speed-break' => 9000,
-            'energy-swap' => 12000, 'attack-swap' => 12000,
-            'defense-swap' => 12000, 'speed-swap' => 12000,
-            'attack-support' => 15000, 'defense-support' => 15000,
-            'speed-support' => 15000, 'energy-support' => 15000,
-            'attack-assault' => 15000, 'defense-assault' => 15000,
-            'speed-assault' => 15000, 'energy-assault' => 15000,
-            'attack-mode' => 15000, 'defense-mode' => 15000,
-            'speed-mode' => 15000, 'energy-mode' => 15000,
-            'field-support' => 16000, 'mecha-support' => 16000
+        'abilities_selling5' => get_abilities_with_prices(
+            'buster-charge', 'buster-relay',
+            'energy-boost', 'attack-boost',
+            'defense-boost', 'speed-boost',
+            'energy-break', 'attack-break',
+            'defense-break', 'speed-break',
+            'energy-swap', 'attack-swap',
+            'defense-swap', 'speed-swap',
+            'attack-support', 'defense-support',
+            'speed-support', 'energy-support',
+            'attack-assault', 'defense-assault',
+            'speed-assault', 'energy-assault',
+            'attack-mode', 'defense-mode',
+            'speed-mode', 'energy-mode',
+            'field-support', 'mecha-support'
             ),
-        'abilities_selling6' => array(
-            'buster-charge' => 3000, 'buster-relay' => 3000,
-            'energy-boost' => 6000, 'attack-boost' => 6000,
-            'defense-boost' => 6000, 'speed-boost' => 6000,
-            'energy-break' => 9000, 'attack-break' => 9000,
-            'defense-break' => 9000, 'speed-break' => 9000,
-            'energy-swap' => 12000, 'attack-swap' => 12000,
-            'defense-swap' => 12000, 'speed-swap' => 12000,
-            'attack-support' => 15000, 'defense-support' => 15000,
-            'speed-support' => 15000, 'energy-support' => 15000,
-            'attack-assault' => 15000, 'defense-assault' => 15000,
-            'speed-assault' => 15000, 'energy-assault' => 15000,
-            'attack-mode' => 15000, 'defense-mode' => 15000,
-            'speed-mode' => 15000, 'energy-mode' => 15000,
-            'field-support' => 16000, 'mecha-support' => 16000,
-            'experience-booster' => 18000, 'experience-breaker' => 18000,
-            'recovery-booster' => 18000, 'recovery-breaker' => 18000,
-            'damage-booster' => 18000, 'damage-breaker' => 18000
+        'abilities_selling6' => get_abilities_with_prices(
+            'buster-charge', 'buster-relay',
+            'energy-boost', 'attack-boost',
+            'defense-boost', 'speed-boost',
+            'energy-break', 'attack-break',
+            'defense-break', 'speed-break',
+            'energy-swap', 'attack-swap',
+            'defense-swap', 'speed-swap',
+            'attack-support', 'defense-support',
+            'speed-support', 'energy-support',
+            'attack-assault', 'defense-assault',
+            'speed-assault', 'energy-assault',
+            'attack-mode', 'defense-mode',
+            'speed-mode', 'energy-mode',
+            'field-support', 'mecha-support',
+            'experience-booster', 'experience-breaker',
+            'recovery-booster', 'recovery-breaker',
+            'damage-booster', 'damage-breaker'
             )
         ),
     'shop_items' => array(
-        'items_buying' => array(
-            'cutter-core' => 3000,
-            'impact-core' => 3000,
-            'freeze-core' => 3000,
-            'explode-core' => 3000,
-            'flame-core' => 3000,
-            'electric-core' => 3000,
-            'time-core' => 3000,
-            'earth-core' => 3000,
-            'wind-core' => 3000,
-            'water-core' => 3000,
-            'swift-core' => 3000,
-            'nature-core' => 3000,
-            'missile-core' => 3000,
-            'crystal-core' => 3000,
-            'shadow-core' => 3000,
-            'space-core' => 3000,
-            'shield-core' => 3000,
-            'laser-core' => 3000,
-            'copy-core' => 6000,
-            'none-core' => 6000,
+        'items_buying' => get_items_with_values(
+            'cutter-core', 'impact-core', 'freeze-core', 'explode-core',
+            'flame-core', 'electric-core', 'time-core', 'earth-core',
+            'wind-core', 'water-core', 'swift-core', 'nature-core',
+            'missile-core', 'crystal-core', 'shadow-core', 'space-core',
+            'shield-core', 'laser-core',
+            'copy-core', 'none-core'
             )
         )
     );
-
-
 
 // KALINKA'S SHOP
 $this_shop_index['kalinka'] = array(
