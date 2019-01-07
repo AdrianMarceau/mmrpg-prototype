@@ -1507,6 +1507,9 @@ class rpg_item extends rpg_object {
                                         } elseif (strstr($item_info['item_token'], '-core')){
                                             $value_rows[] = '<span class="item_stat">'.number_format(ceil($item_info['item_value'] / 2), 0, '.', ',').' z</span>';
                                             $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_value'], 0, '.', ',').' BP</span>';
+                                        } elseif (strstr($item_info['item_token'], '-star')){
+                                            $value_rows[] = '<span class="item_stat">'.number_format(ceil($item_info['item_value'] / 2), 0, '.', ',').' z</span>';
+                                            $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_value'], 0, '.', ',').' BP</span>';
                                         } else {
                                             if (!empty($item_info['item_price'])){
                                                 $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_price'], 0, '.', ',').' z</span>';
