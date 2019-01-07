@@ -1497,16 +1497,28 @@ class rpg_item extends rpg_object {
                                 <tr>
                                     <td class="right">
                                         <label style="display: block; float: left;">Value :</label>
-                                        <? if(!empty($item_info['item_price'])): ?>
-                                            <span class="item_stat"><?= number_format($item_info['item_price'], 0, '.', ',').' z' ?></span>
-                                            <? if(!strstr($item_info['item_token'], '-screw')): ?>
-                                                / <span class="item_stat"><?= number_format($item_info['item_price'], 0, '.', ',').' BP' ?></span>
-                                            <? endif; ?>
-                                        <? elseif(!empty($item_info['item_value'])): ?>
-                                            <span class="item_stat"><?= number_format($item_info['item_value'], 0, '.', ',').' BP' ?></span>
-                                        <? else: ?>
-                                            <span class="item_stat">-</span>
-                                        <? endif; ?>
+                                        <?
+                                        // Collect this item's price and/or BP value where applicable
+                                        $value_rows = array();
+                                        if (strstr($item_info['item_token'], '-screw')){
+                                            $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_value'], 0, '.', ',').' z</span>';
+                                        } elseif (strstr($item_info['item_token'], '-shard')){
+                                            $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_value'], 0, '.', ',').' BP</span>';
+                                        } elseif (strstr($item_info['item_token'], '-core')){
+                                            $value_rows[] = '<span class="item_stat">'.number_format(ceil($item_info['item_value'] / 2), 0, '.', ',').' z</span>';
+                                            $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_value'], 0, '.', ',').' BP</span>';
+                                        } else {
+                                            if (!empty($item_info['item_price'])){
+                                                $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_price'], 0, '.', ',').' z</span>';
+                                                $value_rows[] = '<span class="item_stat">'.number_format(ceil($item_info['item_price'] / 2), 0, '.', ',').' BP</span>';
+                                            } elseif (!empty($item_info['item_value'])){
+                                                $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_value'], 0, '.', ',').' BP</span>';
+                                            }
+                                        }
+                                        if (empty($value_rows)){ $value_rows = '<span class="item_stat">-</span>'; }
+                                        else { $value_rows = implode(' / ', $value_rows); }
+                                        echo $value_rows.PHP_EOL;
+                                        ?>
                                     </td>
                                 </tr>
                             </tbody>
