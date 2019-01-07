@@ -154,9 +154,9 @@ class rpg_mission_player extends rpg_mission {
             $temp_battle_omega['battle_name'] = 'Player Battle vs '.$temp_battle_username;
             $temp_battle_omega['battle_description'] = 'Defeat '.ucfirst($temp_battle_username).'&#39;'.(!preg_match('/s$/i', $temp_battle_username) ? 's' : '').' player data in a '.$temp_challenge_type.' battle!';
             $temp_battle_omega['battle_description2'] = '';
-            $temp_battle_omega['battle_turns'] = ceil(MMRPG_SETTINGS_BATTLETURNS_PERROBOT * $temp_robots_num * MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER);
             $temp_battle_omega['battle_robot_limit'] = $this_max_robots;
-            $temp_battle_omega['battle_points'] = 0;
+            $temp_battle_omega['battle_zenny'] = 0;
+            $temp_battle_omega['battle_turns'] = 0;
             foreach ($temp_battle_omega_robots AS $info){
                 $temp_stat_counter = 0;
                 $temp_robot_rewards = !empty($info['values']['robot_rewards']) ? $info['values']['robot_rewards'] : array();
@@ -164,7 +164,8 @@ class rpg_mission_player extends rpg_mission {
                 if (!empty($temp_robot_rewards['robot_attack'])){ $temp_stat_counter += $temp_robot_rewards['robot_attack']; }
                 if (!empty($temp_robot_rewards['robot_defense'])){ $temp_stat_counter += $temp_robot_rewards['robot_defense']; }
                 if (!empty($temp_robot_rewards['robot_speed'])){ $temp_stat_counter += $temp_robot_rewards['robot_speed']; }
-                $temp_battle_omega['battle_points'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * $info['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER) + $temp_stat_counter;
+                $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER * $info['robot_level']) + $temp_stat_counter;
+                $temp_battle_omega['battle_turns'] += ceil(MMRPG_SETTINGS_BATTLETURNS_PERROBOT * MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER);
             }
 
             // Define the fusion field properties
@@ -211,9 +212,6 @@ class rpg_mission_player extends rpg_mission {
             $temp_battle_omega['battle_target_player']['player_robots'] = $temp_battle_omega_robots;
             $temp_battle_omega['battle_target_player']['player_starforce'] = $temp_player_starforce;
             $temp_battle_omega['battle_robot_limit'] = count($temp_battle_omega_robots);
-
-            // This battle doesn't count, so let's modify the point value
-            $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
 
         } else {
 
