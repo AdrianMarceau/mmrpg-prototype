@@ -10,6 +10,11 @@
 if (!defined('MMRPG_SCRIPT_REQUEST') ||
     ($this_data_select == 'this_battle_token' && in_array('this_player_token='.$this_prototype_data['this_player_token'], $this_data_condition))){
 
+    // Collect the robot index for quick use
+    $db_robot_fields = rpg_robot::get_index_fields(true);
+    $mmrpg_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $mmrpg_fields_index = rpg_field::get_index();
+
     // -- STARTER BATTLE : CHAPTER ONE -- //
 
     // Update the prototype data's global current chapter variable
@@ -116,10 +121,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_battle_omega['battle_target_player']['player_token'] = 'player';
             $temp_battle_omega['battle_description'] = $temp_index_battle['battle_description'];
             $temp_battle_omega['battle_description'] = preg_replace('/^Defeat (Dr. (Wily|Light|Cossack)\'s)/i', 'Defeat', $temp_battle_omega['battle_description']);
-        }
-
-        // Remove robots that have already been unlocked from view
-        if ($temp_battle_complete){
+            // Also make sure any unlocked robots appear in greyscale on the button
             foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
                 if (mmrpg_prototype_robot_unlocked(false, $rm_robot['robot_token'])){
                     //$rm_robot['flags']['hide_from_mission_select'] = true;
@@ -128,6 +130,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 }
             }
         }
+
+        // Recalculate zenny and turns for this fortress mission
+        rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
 
         // Add the omega battle to the battle options
         $this_prototype_data['battle_options'][] = $temp_battle_omega;
@@ -207,6 +212,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             // Unlock the first of the final destination battles
             $temp_final_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-fortress-ii', 'battle_level' => $this_prototype_data['this_chapter_levels'][4]);
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
 
         }
@@ -218,6 +224,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             // Unlock the first of the final destination battles
             $temp_final_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-fortress-iii', 'battle_level' => $this_prototype_data['this_chapter_levels'][4]);
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
 
         }
@@ -225,11 +232,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Final Destination III
         // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4c'])){
-
-            // Collect the robot index for quick use
-            $db_robot_fields = rpg_robot::get_index_fields(true);
-            $temp_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-            $temp_fields_index = rpg_field::get_index();
 
             // Unlock the first of the final destination battles
             $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iv';
@@ -246,7 +248,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_support_mechas = array();
             if (isset($this_prototype_data['target_robot_omega'][1][0])){ $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1]; }
             foreach ($this_prototype_data['target_robot_omega'] AS $key => $info){
-                $temp_field_info = rpg_field::parse_index_info($temp_fields_index[$info['field']]);
+                $temp_field_info = rpg_field::parse_index_info($mmrpg_fields_index[$info['field']]);
                 if (!empty($temp_field_info['field_master'])){ $temp_robot_masters[] = $temp_field_info['field_master']; }
                 if (!empty($temp_field_info['field_mechas'])){ $temp_support_mechas[] = array_pop($temp_field_info['field_mechas']); }
             }
@@ -279,7 +281,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_final_option['battle_target_player']['player_robots'] = array();
             foreach ($temp_robot_masters AS $key => $token){
                 //if ($info['robot_level'] > $temp_final_option['battle_level']){ $temp_final_option['battle_level'] = $info['robot_level']; }
-                $index = rpg_robot::parse_index_info($temp_robots_index[$token]);
+                $index = rpg_robot::parse_index_info($mmrpg_robots_index[$token]);
                 $info = array();
                 $info['robot_id'] = (MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1);
                 $info['robot_token'] = $token;
@@ -301,6 +303,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_battle_omega['battle_field_base']['field_mechas'] = $temp_support_mechas;
             shuffle($temp_final_option['battle_target_player']['player_robots']);
             //die('<pre>'.print_r($temp_final_option, true).'</pre>');
+            rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
             rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
 
