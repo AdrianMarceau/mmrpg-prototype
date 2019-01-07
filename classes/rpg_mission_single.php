@@ -162,7 +162,7 @@ class rpg_mission_single extends rpg_mission {
         }
 
 
-        // Define the omega variables for level, points, turns, and random encounter rate
+        // Define the omega variables for level, zenny, turns, and random encounter rate
         if ($starfield_mission){
             $omega_robot_level_max = $this_start_level;
             $omega_robot_level = $this_start_level;
@@ -254,7 +254,7 @@ class rpg_mission_single extends rpg_mission {
         if (empty($temp_battle_omega['battle_token']) || $temp_battle_omega['battle_token'] == 'battle' || $temp_battle_omega['battle_phase'] != $this_prototype_data['battle_phase']){ return false; }
         // Collect the battle token and create an omega clone from the index base
         $temp_battle_token = $temp_battle_omega['battle_token'];
-        // Make copied of the robot level, points, and turns
+        // Make copied of the robot level var and adjust
         $temp_omega_robot_level = $omega_robot_level;
         // If the battle was already complete, collect its details and modify the mission
         $temp_complete_level = 0;
@@ -280,7 +280,7 @@ class rpg_mission_single extends rpg_mission {
         // Update the robot level for this battle
         $temp_battle_omega['battle_level'] = $temp_omega_robot_level;
 
-        // Update the battle points and turns with the omega values
+        // Update the battle zenny and turns with the omega values
         $temp_battle_omega['battle_zenny'] = 0;
         $temp_battle_omega['battle_turns'] = 0;
 
@@ -291,7 +291,7 @@ class rpg_mission_single extends rpg_mission {
             if (isset($this_robot_index[$robot['robot_token']])){ $robot = rpg_robot::parse_index_info($this_robot_index[$robot['robot_token']]); }
             else { continue; }
 
-            // Update the robot level and battle points plus turns
+            // Update the robot level and battle zenny plus turns
             $temp_robot_level = $robot['robot_class'] != 'mecha' ? $temp_omega_robot_level : mt_rand(1, ceil($temp_omega_robot_level / 3));
             $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_level'] = $temp_robot_level;
             if ($robot['robot_class'] == 'master'){
@@ -339,11 +339,11 @@ class rpg_mission_single extends rpg_mission {
 
         }
 
-        // If the battle is complete already, it only gives half the usual zenny
+        // Reduce the zenny earned from this mission each time it is completed
         if ($temp_complete_count > 0){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * (2 / (2 + $temp_complete_count))); }
 
-        // If this is a starfield mission, it will give slightly more zenny than usual
-        if ($starfield_mission){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 1.10); }
+        // If this is a starfield mission, it will give slightly less zenny than usual
+        if ($starfield_mission){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.5); }
 
         // Reverse the order of the robots in battle
         $temp_battle_omega['battle_target_player']['player_robots'] = array_reverse($temp_battle_omega['battle_target_player']['player_robots']);
@@ -363,7 +363,7 @@ class rpg_mission_single extends rpg_mission {
         // Loop through the omega battle robot rewards and update the robot levels there too
         if (!empty($temp_battle_omega['battle_rewards']['robots'])){
             foreach ($temp_battle_omega['battle_rewards']['robots'] AS $key2 => $robot){
-                // Update the robot level and battle points plus turns
+                // Update the robot level and battle or button details
                 $temp_battle_omega['battle_rewards']['robots'][$key2]['level'] = $temp_omega_robot_level;  //1;
                 // Remove if this robot is already unlocked
                 if (mmrpg_prototype_robot_unlocked(false, $robot['token'])){
