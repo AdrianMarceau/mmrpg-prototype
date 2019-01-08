@@ -1786,14 +1786,6 @@ function mmrpg_prototype_leaderboard_targets_sort($player1, $player2){
     else { return 0; }
 
 }
-// Define a function for sorting the target leaderboard players
-function mmrpg_prototype_leaderboard_targets_sort_online($player1, $player2){
-    if ($player1['values']['flag_online'] < $player2['values']['flag_online']){ return 1; }
-    elseif ($player1['values']['flag_online'] > $player2['values']['flag_online']){ return -1; }
-    if ($player1['values']['flag_defeated'] < $player2['values']['flag_defeated']){ return -1; }
-    elseif ($player1['values']['flag_defeated'] > $player2['values']['flag_defeated']){ return 1; }
-    else { return 0; }
-}
 
 
 
