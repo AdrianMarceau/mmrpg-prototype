@@ -335,10 +335,6 @@ ob_start();
                 <a class="link_button stars field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'stars' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/stars/' ?>">Stars</a>
             <? endif; ?>
 
-            <? if ($this_playerinfo['board_missions'] > 1): ?>
-                <a class="link_button missions field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'missions' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/missions/' ?>">Missions</a>
-            <? endif; ?>
-
             <? if (!empty($this_playerinfo['user_website_address']) && preg_match('/^([^@]+)@([^@]+)$/i', $this_playerinfo['user_website_address'])): ?>
                 <a class="link_button website field_type field_type_<?= $temp_colour_token ?>" href="mailto:<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Email</a>
             <? elseif (!empty($this_playerinfo['user_website_address'])): ?>
@@ -356,7 +352,7 @@ ob_start();
         // -- LEADERBOARD PAGES -- //
 
         // Define the allowable pages
-        $temp_allowed_pages = array('robots', 'players', 'database', 'stars','items',  'missions');
+        $temp_allowed_pages = array('robots', 'players', 'database', 'stars','items');
 
         // If this is the View Profile page, show the appropriate content
         if (empty($this_current_token) || !in_array($this_current_token, $temp_allowed_pages)){
@@ -471,155 +467,6 @@ ob_start();
 
             <?
         }
-        // Else if this is the View Missions page, show the appropriate content
-        elseif ($this_current_token == 'missions'){
-            ?>
-
-            <div id="game_frames" class="field view_missions" style="height: auto; min-height: 600px; max-height: none;">
-
-                <div class="bodytext player_links">
-                    <?
-
-                    // Define or collect the current player token
-                    if (empty($this_current_player)){ $this_current_player = 'dr-light'; }
-
-                    // Display links for the other players
-                    $player_tokens = array('dr-light', 'dr-wily', 'dr-cossack');
-                    foreach ($player_tokens AS $player_token){
-                        if (!isset($this_playerinfo['save_values_battle_complete'][$player_token])){ continue; }
-                        $player_class = str_replace('dr-', '', $player_token);
-                        $player_name = $mmrpg_index['players'][$player_token]['player_name'];
-                        $player_link = preg_replace('/\/dr-[a-z0-9]+\/$/i', '/', $this_current_uri).$player_token.'/';
-                        $player_battle_count = count($this_playerinfo['save_values_battle_complete'][$player_token]);
-                        echo '<a href="'.$player_link.'" class="player_float player_type_'.$player_class.($player_token == $this_current_player ? ' active' : '').'">';
-                            echo '<strong class="label">'.$player_name.'</strong> ';
-                            echo '<span class="count">'.($player_battle_count == 1 ? '1 Mission' : $player_battle_count.' Missions').'</span>';
-                        echo '</a>'."\n";
-                    }
-
-                    ?>
-                </div>
-
-                <div class="bodytext player_missions">
-
-                    <?
-
-                    // Define search and replace variables for later display
-                    $numerals_find = array('Iv', 'Iii', 'Ii');
-                    $numerals_replace = array('IV', 'III', 'II');
-                    $man_find = array(' / Man', ' / Woman');
-                    $man_replace = array(' Man', ' Woman');
-
-                    // Define a function for generation a mission name from token
-                    function mission_name_from_token($battle_token){
-
-                        // Pull in global variables we need
-                        global $numerals_find, $numerals_replace;
-                        global $man_find, $man_replace;
-
-                        // Generate the mission name based on token
-                        $battle_name = array_slice(explode('-', $battle_token), 1);
-                        $player_token = 'dr-'.array_shift($battle_name);
-                        $player_name = ucwords(str_replace('dr-', 'dr. ', $player_token));
-                        $phase_name = ucwords(array_shift($battle_name));
-                        $battle_name = implode(' / ', $battle_name);
-                        $battle_name = ucwords($battle_name);
-                        $battle_name = str_replace($numerals_find, $numerals_replace, $battle_name);
-                        $battle_name = str_replace($man_find, $man_replace, $battle_name);
-
-                        // Generate the final mission header
-                        if ($phase_name != 'Fortress'){ $final_name = $player_name.' vs. '.$battle_name; }
-                        else { $final_name = $player_name.' vs. '.$phase_name.' '.$battle_name; }
-
-                        // Return the mission name generated
-                        return $final_name;
-
-                    }
-
-                    // Loop through this player's rewards and
-                    $battle_key = 0;
-                    $battle_points = 0;
-                    $battles_complete = !empty($this_playerinfo['save_values_battle_complete']) ? $this_playerinfo['save_values_battle_complete'] : array();
-                    $battles_failure = !empty($this_playerinfo['save_values_battle_failure']) ? $this_playerinfo['save_values_battle_failure'] : array();
-                    if (!empty($battles_complete)){
-                        foreach ($battles_complete AS $player_token => $player_battles){
-                            if ($player_token != $this_current_player){ continue; }
-                            $player_token_short = str_replace('dr-', '', $player_token);
-                            if (!empty($player_battles)){
-                                foreach ($player_battles AS $battle_token => $victory_records){
-                                    $defeat_records = isset($battles_failure[$player_token][$battle_token]) ? $battles_failure[$player_token][$battle_token] : array();
-                                    $battle_num = $battle_key + 1;
-                                    $battle_name = mission_name_from_token($battle_token);
-                                    $victory_count = isset($victory_records['battle_count']) ? $victory_records['battle_count'] : 0;
-                                    $defeat_count = isset($defeat_records['battle_count']) ? $defeat_records['battle_count'] : 0;
-                                    $max_points = isset($victory_records['battle_max_points']) ? $victory_records['battle_max_points'] : 0;;
-                                    $battle_points += $max_points;
-                                    ?>
-                                    <div class="text player_stats mission">
-                                        <strong class="label player_type player_type_<?= $player_token_short ?>">#<?= $battle_num ?> : <?= $battle_name ?></strong>
-                                        <table class="records">
-                                            <colgroup>
-                                                <col width="96" />
-                                                <col width="" />
-                                                <col width="96" />
-                                                <col width="" />
-                                            </colgroup>
-                                            <tbody>
-                                                <tr>
-                                                    <?
-                                                    // Define the mission stat limits/tokens in order
-                                                    $record_limits = array('min', 'max');
-                                                    $record_stats = array('level', 'turns', 'robots', 'points');
-                                                    // Loop through the stats and print mission records
-                                                    $key = 0;
-                                                    foreach ($record_stats AS $stat){
-                                                        foreach ($record_limits AS $limit){
-                                                            $record_token = 'battle_'.$limit.'_'.$stat;
-                                                            $record_name = ucwords(str_replace('_', ' ', str_replace('battle_', '', $record_token)));
-                                                            $record_value = isset($victory_records[$record_token]) ? $victory_records[$record_token] : 0;
-                                                            if ($key % 2 == 0){ echo "\n</tr>\n<tr>\n"; }
-                                                            echo '<td class="stat"><span class="label '.$limit.'_'.$stat.'">'.$record_name.' : </span></td>'."\n";
-                                                            echo '<td class="stat"><span class="counter '.$limit.'_'.$stat.'">'.number_format($record_value, 0, '.', ',').'</span></td>'."\n";
-                                                            $key++;
-                                                        }
-                                                    }
-                                                    ?>
-                                                </tr>
-                                                <tr>
-                                                    <td class="stat"><span class="label defeat_count">Total Defeats :</span></td>
-                                                    <td class="stat"><span class="counter defeat_count"><?= number_format($defeat_count, 0, '.', ',') ?></span></td>
-                                                    <td class="stat"><span class="label victory_count">Total Victories :</span></td>
-                                                    <td class="stat"><span class="counter victory_count"><?= number_format($victory_count, 0, '.', ',') ?></span></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <?
-                                    $battle_key++;
-                                }
-                            }
-                        }
-                    }
-
-                    ?>
-
-                </div>
-
-                <?
-                // Print out the total battle points for this player
-                echo '<div class="mission_points">';
-                    echo '<strong class="player">'.number_format($battle_points, 0, '.', ',').'</strong>';
-                    echo ' / ';
-                    echo '<span class="overall">'.number_format($temp_display_points, 0, '.', ',').'</span>';
-                    echo ' Points';
-                echo '</div>'."\n";
-                ?>
-
-            </div>
-
-            <?
-        }
-
         ?>
 
     </div>
