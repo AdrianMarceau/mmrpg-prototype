@@ -2708,7 +2708,7 @@ class rpg_player extends rpg_object {
                     ?>
                     <span class="core player_type">
                         <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'].'-capsule' : 'item' ?>/icon_left_40x40.png);"></span></span>
-                        <span class="text"><?= !empty($player_info['player_stat_type']) ? ucfirst($player_info['player_stat_type']) : 'Neutral' ?> Type</span>
+                        <span class="text"><?= ucfirst($player_info['player_stat_type']).' +'.$player_info['player_'.$player_info['player_stat_type']].'%' ?></span>
                     </span>
                 </div>
 
@@ -2723,35 +2723,25 @@ class rpg_player extends rpg_object {
 
                             <tr>
                                 <td  class="right">
-                                    <label style="display: block; float: left;">Name :</label>
-                                    <span class="player_name player_type player_type_none"><?=$player_info['player_name']?></span>
+                                    <label style="display: block; float: left;">Full Name :</label>
+                                    <span class="player_name player_type player_type_none"><?
+                                        if ($player_info['player_token'] === 'dr-light'){ echo 'Dr. Thomas X. Light'; } // Xavier? [fanon or confirmed?]
+                                        elseif ($player_info['player_token'] === 'dr-wily'){ echo 'Dr. Albert W. Wily'; } // William? [fanon]
+                                        elseif ($player_info['player_token'] === 'dr-cossack'){ echo 'Dr. Mikhail S. Cossack'; } // Sergeyevich [confirmed]
+                                        else { echo $player_info['player_name']; }
+                                    ?></span>
                                 </td>
                                 <td class="center">&nbsp;</td>
                                 <td class="right">
-                                    <label style="display: block; float: left;">Bonus :</label>
-                                    <?
-                                        // Display any special boosts this player has
-                                        if (!empty($player_info['player_stat_type'])){ echo '<span class="player_name player_type player_type_'.$player_info['player_stat_type'].'">Robot '.ucfirst($player_info['player_stat_type']).' +'.$player_info['player_'.$player_info['player_stat_type']].'%</span>'; }
-                                        else { echo '<span class="player_name player_type player_type_none">None</span>'; }
-                                    ?>
+                                    <label style="display: block; float: left;">Exp Points :</label>
+                                    <span class="player_stat player_type player_type_none"><?= number_format($player_info['player_experience'], 0, '.', ',') ?> EXP</span>
                                 </td>
                             </tr>
 
                             <tr>
                                 <td  class="right">
-                                    <label style="display: block; float: left;">Exp Points :</label>
-                                    <span class="player_stat player_type player_type_<?= !empty($player_info['player_experience']) ? 'cutter' : 'none' ?>"><?= number_format($player_info['player_experience'], 0, '.', ',') ?> EXP</span>
-                                </td>
-                                <td class="center">&nbsp;</td>
-                                <td  class="right">
                                     <label style="display: block; float: left;">Unlocked Robots :</label>
                                     <span class="player_stat player_type player_type_<?= !empty($player_info['player_robots_count']) ? 'cutter' : 'none' ?>"><?= $player_info['player_robots_count'].' '.($player_info['player_robots_count'] == 1 ? 'Robot' : 'Robots') ?></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td  class="right">
-                                    <label style="display: block; float: left;">Battle Points :</label>
-                                    <span class="player_stat player_type player_type_<?= !empty($player_info['player_points']) ? 'cutter' : 'none' ?>"><?= number_format($player_info['player_points'], 0, '.', ',') ?> BP</span>
                                 </td>
                                 <td class="center">&nbsp;</td>
                                 <td  class="right">
