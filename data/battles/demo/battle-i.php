@@ -6,7 +6,7 @@ $battle = array(
   'battle_encore' => true,
   'battle_description' => 'Defeat the rogue Met attacking the lab!',
   'battle_turns' => 3,
-  'battle_points' => 100,
+  'battle_zenny' => 100,
   'battle_field_base' => array('field_id' => 100, 'field_token' => 'intro-field', 'field_music' => 'intro-field-dr-light', 'field_multipliers' => array()),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
