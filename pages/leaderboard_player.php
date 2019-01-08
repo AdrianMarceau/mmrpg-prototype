@@ -320,6 +320,10 @@ ob_start();
 
             <a class="link_button profile field_type field_type_<?= $temp_colour_token ?> <?= empty($this_current_token) ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/' ?>">Profile</a>
 
+            <? if(!empty($temp_display_points)): ?>
+                <a class="link_button points field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'points' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/points/' ?>">Points</a>
+            <? endif; ?>
+
             <a class="link_button robots field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'robots' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/robots/' ?>">Robots</a>
 
             <? if(!empty($temp_show_players)): ?>
@@ -352,7 +356,7 @@ ob_start();
         // -- LEADERBOARD PAGES -- //
 
         // Define the allowable pages
-        $temp_allowed_pages = array('robots', 'players', 'database', 'stars','items');
+        $temp_allowed_pages = array('robots', 'players', 'database', 'stars', 'items', 'points');
 
         // If this is the View Profile page, show the appropriate content
         if (empty($this_current_token) || !in_array($this_current_token, $temp_allowed_pages)){
@@ -463,6 +467,18 @@ ob_start();
 
             <div id="game_frames" class="field view_database">
                 <iframe name="view_database" src="frames/database.php?source=website&amp;wap=<?= $flag_wap ? 'true' : 'false' ?>&amp;fadein=false&amp;edit=false<?= !empty($temp_remote_session) ? '&amp;user_id='.$this_playerinfo['user_id'] : '' ?>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+            </div>
+
+            <?
+        }
+        // Else if this is the View Points page, show the appropriate content
+        elseif ($this_current_token == 'points'){
+            ?>
+
+            <div id="game_frames" class="field view_points">
+
+                <p>....view points...</p>
+
             </div>
 
             <?
