@@ -231,20 +231,20 @@ if (rpg_game::is_user()){
         <div class="sprite overlay overlay_hidden banner_overlay">&nbsp;</div>
         <div class="title">Mega Man RPG Prototype</div>
 
-        <div class="points field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-            <div class="wrapper">
-                <label class="label">Battle Points</label>
-                <span class="amount">
-                    <span class="value"><?= !empty($_SESSION[$session_token]['counters']['battle_points']) ? number_format($_SESSION[$session_token]['counters']['battle_points'], 0, '.', ',') : 0 ?></span>
-                    <? if(empty($_SESSION[$session_token]['DEMO']) && !empty($this_boardinfo['board_rank'])): ?>
-                        <span class="pipe">|</span>
-                        <span class="place"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?></span>
-                    <? endif; ?>
-                </span>
-            </div>
-        </div>
         <? if (empty($_SESSION[$session_token]['DEMO'])){
             ?>
+            <div class="points field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <div class="wrapper">
+                    <label class="label">Battle Points</label>
+                    <span class="amount">
+                        <span class="value"><?= !empty($_SESSION[$session_token]['counters']['battle_points']) ? number_format($_SESSION[$session_token]['counters']['battle_points'], 0, '.', ',') : 0 ?></span>
+                        <? if(empty($_SESSION[$session_token]['DEMO']) && !empty($this_boardinfo['board_rank'])): ?>
+                            <span class="pipe">|</span>
+                            <span class="place"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?></span>
+                        <? endif; ?>
+                    </span>
+                </div>
+            </div>
             <div class="subpoints field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                 <div class="wrapper">
                     <span class="amount zenny">
