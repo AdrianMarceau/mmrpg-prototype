@@ -5,8 +5,6 @@ $battle = array(
     'battle_size' => '1x4',
     'battle_encore' => true,
     'battle_description' => 'Defeat Dr. Wily\'s Bass and Disco!',
-    'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 2),
-    'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 10 * 2),
     'battle_field_base' => array('field_id' => 100, 'field_token' => 'wily-castle', 'field_name' => 'Wily Castle', 'field_music' => 'wily-castle'),
     'battle_target_player' => array(
         'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,

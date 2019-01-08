@@ -6,9 +6,6 @@ $battle = array(
   'battle_encore' => true,
   'battle_counts' => false,
   'battle_description' => 'You\'ve completed the MMRPG Prototype! Thanks for playing to the end! :D',
-  'battle_level' => 30,
-  'battle_turns' => 24,
-  'battle_points' => 60000,
   'battle_field_base' => array('field_id' => 1000, 'field_token' => 'prototype-complete'),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,

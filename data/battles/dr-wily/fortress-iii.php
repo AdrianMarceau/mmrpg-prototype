@@ -5,8 +5,6 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat the dark soul variants of Bass, Proto Man, and Mega Man!',
-  'battle_turns' => (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 3),
-  'battle_points' => (MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * 45 * 3),
   'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination-2', 'field_name' => 'Final Destination II', 'field_music' => 'final-destination-2', 'field_mechas' => array('batton-2', 'crazy-cannon-2', 'fan-fiend-2', 'killer-bullet-2', 'pierrobot-2', 'snapper-2', 'spring-head-2', 'telly-2')),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,

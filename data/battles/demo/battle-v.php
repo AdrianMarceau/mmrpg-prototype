@@ -6,7 +6,7 @@ $battle = array(
   'battle_encore' => true,
   'battle_description' => 'Defeat Dr. Wily\'s team of reprogrammed Robot Masters!',
   'battle_turns' => 24,
-  'battle_points' => 800,
+  'battle_zenny' => 800,
   'battle_field_base' => array('field_id' => 100, 'field_token' => 'wily-castle', 'field_multipliers' => array('damage' => 2.0, 'recovery' => 0.5)),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
