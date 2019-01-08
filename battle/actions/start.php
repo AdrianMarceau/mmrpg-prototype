@@ -9,7 +9,7 @@ $this_battle->update_session();
 // Check if this is a player battle
 $flag_player_battle = $target_player_id != MMRPG_SETTINGS_TARGET_PLAYERID ? true : false;
 
-// Check if this battle's points count
+// Check if this battles records should be saved
 $flag_battle_counts = $this_battle->battle_counts ? true : false;
 
 // Define the first event body markup, regardless of player type
@@ -21,12 +21,7 @@ $first_event_body .= 'Goal : '.$this_battle->battle_turns.($this_battle->battle_
 $first_event_body .= '<span style="opacity:0.25;">|</span> ';
 
 // Print out the rewards for this mission
-if ($flag_battle_counts){
-    $first_event_body .= 'Reward : '.($this_battle->battle_points == 1 ? '1 Battle Points' :  number_format($this_battle->battle_points, 0, '.', ',').' Points').' ';
-} else {
-    $first_event_body .= 'Reward : '.number_format($this_battle->battle_points, 0, '.', ',').' Zenny ';
-}
-
+$first_event_body .= 'Reward : '.number_format($this_battle->battle_zenny, 0, '.', ',').' Zenny ';
 $first_event_body .= '<br />';
 
 //$first_event_body .= '$this_battle->flags = '.preg_replace('/\s+/', ' ', print_r($this_battle->flags, true)).'<br />';
@@ -76,7 +71,7 @@ foreach ($target_player->values['robots_active'] AS $key => $info){
 // If there is a target player, have this player's robots display first
 if ($target_player->player_token != 'player'){
 
-    // Create the battle start event, showing the points and amount of turns
+    // Create the battle start event, showing the zenny and amount of turns
     $event_header = $first_event_header;
     $event_body = $first_event_body;
     $event_options = array();
@@ -164,7 +159,7 @@ if ($target_player->player_token != 'player'){
 // Otherwise, if there is no target player, have the target's robots display first
 elseif ($target_player->player_token == 'player'){
 
-    // Create the battle start event, showing the points and amount of turns
+    // Create the battle start event, showing the zenny and amount of turns
     $event_header = $first_event_header;
     $event_body = $first_event_body;
     $event_options = array();
