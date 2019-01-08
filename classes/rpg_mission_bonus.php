@@ -72,7 +72,6 @@ class rpg_mission_bonus extends rpg_mission {
         $temp_battle_omega['battle_token'] = $temp_battle_token;
         $temp_battle_omega['battle_size'] = '1x4';
         $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
-        //$temp_battle_omega['battle_points'] = ceil(($this_prototype_data['battles_complete'] > 1 ? 100 : 1000) * $temp_rand_num);
         shuffle($temp_battle_omega['battle_target_player']['player_robots']);
         $temp_battle_omega['battle_target_player']['player_robots'] = array_slice($temp_battle_omega['battle_target_player']['player_robots'], 0, $this_robot_count);
 
@@ -161,10 +160,6 @@ class rpg_mission_bonus extends rpg_mission {
         $temp_battle_omega['battle_rewards']['items'] = array(
 
             );
-
-        // This battle doesn't count, so let's modify the point value
-        $temp_battle_omega['battle_points'] = ceil($temp_battle_omega['battle_points'] * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
-
 
         // Return the generated battle data
         return $temp_battle_omega;
