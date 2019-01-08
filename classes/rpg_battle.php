@@ -205,7 +205,7 @@ class rpg_battle extends rpg_object {
         $this->battle_field_base = isset($this_battleinfo['battle_field_base']) ? $this_battleinfo['battle_field_base'] : array();
         $this->battle_target_player = isset($this_battleinfo['battle_target_player']) ? $this_battleinfo['battle_target_player'] : array();
         $this->battle_rewards = isset($this_battleinfo['battle_rewards']) ? $this_battleinfo['battle_rewards'] : array();
-        $this->battle_points = isset($this_battleinfo['battle_points']) ? $this_battleinfo['battle_points'] : 0;
+        $this->battle_zenny = isset($this_battleinfo['battle_zenny']) ? $this_battleinfo['battle_zenny'] : 0;
         $this->battle_level = isset($this_battleinfo['battle_level']) ? $this_battleinfo['battle_level'] : 0;
         $this->battle_attachments = isset($this_battleinfo['battle_attachments']) ? $this_battleinfo['battle_attachments'] : array();
 
@@ -215,7 +215,7 @@ class rpg_battle extends rpg_object {
         $this->battle_base_description = isset($this_battleinfo['battle_base_description']) ? $this_battleinfo['battle_base_description'] : $this->battle_description;
         $this->battle_base_turns = isset($this_battleinfo['battle_base_turns']) ? $this_battleinfo['battle_base_turns'] : $this->battle_turns;
         $this->battle_base_rewards = isset($this_battleinfo['battle_base_rewards']) ? $this_battleinfo['battle_base_rewards'] : $this->battle_rewards;
-        $this->battle_base_points = isset($this_battleinfo['battle_base_points']) ? $this_battleinfo['battle_base_points'] : $this->battle_points;
+        $this->battle_base_zenny = isset($this_battleinfo['battle_base_zenny']) ? $this_battleinfo['battle_base_zenny'] : $this->battle_zenny;
         $this->battle_base_level = isset($this_battleinfo['battle_base_level']) ? $this_battleinfo['battle_base_level'] : $this->battle_level;
         $this->battle_base_attachments = isset($this_battleinfo['battle_base_attachments']) ? $this_battleinfo['battle_base_attachments'] : $this->battle_attachments;
 
@@ -254,7 +254,7 @@ class rpg_battle extends rpg_object {
     public function print_name(){ return '<span class="battle_name battle_type">'.$this->battle_name.'</span>'; }
     public function print_token(){ return '<span class="battle_token">'.$this->battle_token.'</span>'; }
     public function print_description(){ return '<span class="battle_description">'.$this->battle_description.'</span>'; }
-    public function print_points(){ return '<span class="battle_points">'.$this->battle_points.'</span>'; }
+    public function print_zenny(){ return '<span class="battle_zenny">'.$this->battle_zenny.'</span>'; }
 
     // Define a static public function for encouraging battle words
     public static function random_positive_word(){
@@ -514,7 +514,7 @@ class rpg_battle extends rpg_object {
         // Define variables for the human's rewards in this scenario
         $temp_human_token = $target_player->player_side == 'left' ? $target_player->player_token : $this_player->player_token;
         $temp_human_rewards = array();
-        $temp_human_rewards['battle_points'] = 0;
+        $temp_human_rewards['battle_zenny'] = 0;
         $temp_human_rewards['battle_complete'] = isset($_SESSION['GAME']['values']['battle_complete'][$temp_human_token][$this->battle_token]['battle_count']) ? $_SESSION['GAME']['values']['battle_complete'][$temp_human_token][$this->battle_token]['battle_count'] : 0;
         $temp_human_rewards['battle_failure'] = isset($_SESSION['GAME']['values']['battle_failure'][$temp_human_token][$this->battle_token]['battle_count']) ? $_SESSION['GAME']['values']['battle_failure'][$temp_human_token][$this->battle_token]['battle_count'] : 0;
         $temp_human_rewards['checkpoint'] = 'start: ';
@@ -527,13 +527,8 @@ class rpg_battle extends rpg_object {
             $this_is_player_battle = true;
         }
 
-        // Check if this battle's points count
+        // Check if this battle's records count
         $this_mission_counts = $this->battle_counts ? true : false;
-
-        // Ensure the system knows to reward zenny instead of points for player battles
-        if (!$this_mission_counts){
-            $force_zenny_rewards = true;
-        }
 
         // (HUMAN) TARGET DEFEATED
         // Check if the target was the human character
@@ -542,17 +537,17 @@ class rpg_battle extends rpg_object {
             // DEBUG
             //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
 
-            // Calculate the number of battle points for the target player
-            $this_base_points = 0; //$this->battle_points;
-            $this_turn_points = 100 * $this->counters['battle_turn'];
-            $this_stat_points = 0;
-            $target_battle_points = $this_base_points + $this_turn_points + $this_stat_points;
-            // Prevent players from loosing points
-            if ($target_battle_points == 0){ $target_battle_points = 1; }
-            elseif ($target_battle_points < 0){ $target_battle_points = -1 * $target_battle_points; }
+            // Calculate the number of battle zenny for the target player
+            $this_base_zenny = 0; //$this->battle_zenny;
+            $this_turn_zenny = 100 * $this->counters['battle_turn'];
+            $this_stat_zenny = 0;
+            $target_battle_zenny = $this_base_zenny + $this_turn_zenny + $this_stat_zenny;
+            // Prevent players from loosing zenny
+            if ($target_battle_zenny == 0){ $target_battle_zenny = 1; }
+            elseif ($target_battle_zenny < 0){ $target_battle_zenny = -1 * $target_battle_zenny; }
 
-            // Update the global variable with the points reward
-            $temp_human_rewards['battle_points'] = $target_battle_points;
+            // Update the global variable with the zenny reward
+            $temp_human_rewards['battle_zenny'] = $target_battle_zenny;
 
             // Update the GAME session variable with the failed battle token
             if ($this->battle_counts){
@@ -576,17 +571,17 @@ class rpg_battle extends rpg_object {
         // Otherwise if the target was a computer-controlled human character
         elseif ($target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
 
-            // Calculate the battle points based on how many turns they lasted
-            $target_battle_points = ceil($this->counters['battle_turn'] * 100 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
+            // Calculate the battle zenny based on how many turns they lasted
+            $target_battle_zenny = ceil($this->counters['battle_turn'] * 100 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
 
         }
         // (COMPUTER) TARGET DEFEATED
-        // Otherwise, zero target battle points
+        // Otherwise, zero target battle zenny
         else {
             // DEBUG
             //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
-            // Target is computer, no battle points for them
-            $target_battle_points = 0;
+            // Target is computer, no battle zenny for them
+            $target_battle_zenny = 0;
         }
 
 
@@ -601,17 +596,17 @@ class rpg_battle extends rpg_object {
             // If this was a player battle and the human user lost against the ghost target (this/computer/victory | target/human/defeat)
             if ($this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID && $target_player->player_side == 'left' && $this_robot->robot_class != 'mecha'){
 
-                // Calculate how many points the other player is rewarded for winning
+                // Calculate how many zenny the other player is rewarded for winning
                 $target_player_robots = $target_player->values['robots_disabled'];
                 $target_player_robots_count = count($target_player_robots);
-                $other_player_points = 0;
+                $other_player_zenny = 0;
                 $other_player_turns = $target_player_robots_count * MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
                 foreach ($target_player_robots AS $disabled_robotinfo){
-                    $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER;
+                    $other_player_zenny += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER;
                 }
 
-                // Collect the battle points from the function
-                $other_battle_points_modded = $this->calculate_battle_points($target_player, $other_player_points, $other_player_turns);
+                // Collect the battle zenny from the function
+                $other_battle_zenny_modded = $this->calculate_battle_zenny($target_player, $other_player_zenny, $other_player_turns);
 
                 // Create the victory event for the target player
                 $this_robot->robot_frame = 'victory';
@@ -643,7 +638,6 @@ class rpg_battle extends rpg_object {
             $target_player->update_session();
             $event_header = $target_player->player_name.' Defeated';
             $event_body = $target_player->print_name().' was defeated'.($target_player->player_side == 'left' ? '&hellip;' : '!').' ';
-            //if (!empty($target_battle_points)){ $event_body .= $target_player->print_name().' collects <span class="recovery_amount">'.number_format($target_battle_points, 0, '.', ',').'</span> battle points&hellip;'; }
             $event_body .= '<br />';
             $event_options = array();
             $event_options['console_show_this_player'] = true;
@@ -665,17 +659,17 @@ class rpg_battle extends rpg_object {
             // If this was a player battle and the human user lost against the ghost target (this/computer/victory | target/human/defeat)
             if ($this_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID && $target_player->player_side == 'left'){
 
-                // Calculate how many points the other player is rewarded for winning
+                // Calculate how many zenny the other player is rewarded for winning
                 $target_player_robots = $target_player->values['robots_disabled'];
                 $target_player_robots_count = count($target_player_robots);
-                $other_player_points = 0;
+                $other_player_zenny = 0;
                 $other_player_turns = $target_player_robots_count * MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
                 foreach ($target_player_robots AS $disabled_robotinfo){
-                    $other_player_points += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER;
+                    $other_player_zenny += $disabled_robotinfo['robot_level'] * MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER;
                 }
 
-                // Collect the battle points from the function
-                $other_battle_points_modded = $this->calculate_battle_points($target_player, $other_player_points, $other_player_turns);
+                // Collect the battle zenny from the function
+                $other_battle_zenny_modded = $this->calculate_battle_zenny($target_player, $other_player_zenny, $other_player_turns);
 
                 // Create the victory event for the target player
                 $this_player->player_frame = 'victory';
@@ -683,7 +677,7 @@ class rpg_battle extends rpg_object {
                 $this_player->update_session();
                 $event_header = $this_player->player_name.' Victorious';
                 $event_body = $this_player->print_name().' was victorious! ';
-                $event_body .= $this_player->print_name().' collects <span class="recovery_amount">'.number_format($other_battle_points_modded, 0, '.', ',').'</span> battle points!';
+                $event_body .= $this_player->print_name().' collects <span class="recovery_amount">'.number_format($other_battle_zenny_modded, 0, '.', ',').'</span> zenny!';
                 $event_body .= '<br />';
                 $event_options = array();
                 $event_options['console_show_this_player'] = true;
@@ -722,13 +716,13 @@ class rpg_battle extends rpg_object {
                     'this_user_id' => $target_player->player_id,
                     'this_player_token' => $target_player->player_token,
                     'this_player_robots' => $temp_this_player_robots,
-                    'this_player_points' => $target_battle_points,
+                    'this_player_zenny' => $target_battle_zenny,
                     'this_player_result' => 'defeat',
                     'this_reward_pending' => 0,
                     'target_user_id' => $this_player->player_id,
                     'target_player_token' => $this_player->player_token,
                     'target_player_robots' => $temp_target_player_robots,
-                    'target_player_points' => $other_battle_points_modded,
+                    'target_player_zenny' => $other_battle_zenny_modded,
                     'target_player_result' => 'victory',
                     'target_reward_pending' => 1
                     ));
@@ -742,70 +736,7 @@ class rpg_battle extends rpg_object {
         // Check if the target was the human character (and they LOST)
         if ($target_player->player_side == 'left'){
 
-                // DEBUG
-                //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
-
-                // Collect the robot info array
-                $temp_player_info = $target_player->export_array();
-
-                // Collect or define the player points and player rewards variables
-                $temp_player_token = $temp_player_info['player_token'];
-                $temp_player_points = mmrpg_prototype_player_points($temp_player_info['player_token']);
-                $temp_player_rewards = mmrpg_prototype_player_rewards($temp_player_info['player_token']); //!empty($temp_player_info['player_rewards']) ? $temp_player_info['player_rewards'] : array();
-
-                // -- ABILITY REWARDS for HUMAN PLAYER -- //
-
-                // Loop through the ability rewards for this robot if set
-                if (!empty($temp_player_rewards['abilities']) && empty($_SESSION['GAME']['DEMO'])){
-                    $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-                    foreach ($temp_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
-
-                        // If this ability is already unlocked, continue
-                        if (mmrpg_prototype_ability_unlocked($target_player->player_token, false, $ability_reward_info['token'])){ continue; }
-                        // If we're in DEMO mode, continue
-                        //if (!empty($_SESSION['GAME']['DEMO'])){ continue; }
-
-                        // Check if the required level has been met by this robot
-                        if ($temp_player_points >= $ability_reward_info['points'] && empty($_SESSION['GAME']['DEMO'])){
-
-                            // Collect the ability info from the index
-                            $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
-                            // Create the temporary ability object for event creation
-                            $temp_ability = rpg_game::get_ability($this, $target_player, $target_robot, $ability_info);
-
-                            // Collect or define the ability variables
-                            $temp_ability_token = $ability_info['ability_token'];
-
-                            // Display the robot reward message markup
-                            $event_header = $ability_info['ability_name'].' Unlocked';
-                            $event_body = rpg_battle::random_positive_word().' <span class="player_name">'.$temp_player_info['player_name'].'</span> unlocked new ability data!<br />';
-                            $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
-                            $event_options = array();
-                            $event_options['console_show_target'] = false;
-                            $event_options['this_header_float'] = $target_player->player_side;
-                            $event_options['this_body_float'] = $target_player->player_side;
-                            $event_options['this_ability'] = $temp_ability;
-                            $event_options['this_ability_image'] = 'icon';
-                            $event_options['event_flag_victory'] = true;
-                            $event_options['console_show_this_player'] = false;
-                            $event_options['console_show_this_robot'] = false;
-                            $event_options['console_show_this_ability'] = true;
-                            $event_options['canvas_show_this_ability'] = false;
-                            $target_player->player_frame = $ability_reward_key % 2 == 0 ? 'victory' : 'taunt';
-                            $target_player->update_session();
-                            $temp_ability->ability_frame = 'base';
-                            $temp_ability->update_session();
-                            $this->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
-
-                            // Automatically unlock this ability for use in battle
-                            $this_reward = array('ability_token' => $temp_ability_token);
-                            mmrpg_game_unlock_ability($temp_player_info, false, $this_reward, true);
-
-                        }
-
-                    }
-                }
-
+            // Nothing specific happened...
 
         }
 
@@ -816,30 +747,29 @@ class rpg_battle extends rpg_object {
             // DEBUG
             //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
 
-            // Collect the battle points from the function
-            $this_battle_points = $this->calculate_battle_points($this_player, $this->battle_points, $this->battle_turns);
+            // Collect the battle zenny from the function
+            $this_battle_zenny = $this->calculate_battle_zenny($this_player, $this->battle_zenny, $this->battle_turns);
 
             // Recalculate the overall battle points total with new values
             mmrpg_prototype_calculate_battle_points(true);
 
-            // Reference the number of points this player gets
-            $this_player_points = $this_battle_points;
+            // Reference the number of zenny this player gets
+            $this_player_zenny = $this_battle_zenny;
 
             // Collect the player token and export array as reference
             $player_token = $this_player->player_token;
             $player_info = $this_player->export_array();
 
-            // Update the global variable with the points reward
-            $temp_human_rewards['battle_points'] = $this_player_points;
+            // Update the global variable with the zenny reward
+            $temp_human_rewards['battle_zenny'] = $this_player_zenny;
 
-            // Display the win message for this player with battle points
+            // Display the win message for this player with battle zenny
             $this_robot->robot_frame = 'victory';
             $this_player->player_frame = 'victory';
             $this_robot->update_session();
             $this_player->update_session();
             $event_header = $this_player->player_name.' Victorious';
             $event_body = $this_player->print_name().' was victorious! ';
-            //$event_body .= $this_player->print_name().' collects <span class="recovery_amount">'.number_format($this_player_points, 0, '.', ',').'</span> battle points!';
             $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
             $event_body .= '<br />';
             $event_options = array();
@@ -863,7 +793,7 @@ class rpg_battle extends rpg_object {
                 // DEBUG
                 //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
 
-                // Ensure the system knows to reward zenny instead of points
+                // Ensure the system knows to reward zenny instead of zenny
                 $force_zenny_rewards = true;
 
                 // Create the temp robot sprites for the database
@@ -887,13 +817,13 @@ class rpg_battle extends rpg_object {
                     'this_user_id' => $this_player->player_id,
                     'this_player_token' => $this_player->player_token,
                     'this_player_robots' => $temp_this_player_robots,
-                    'this_player_points' => $this_player_points,
+                    'this_player_zenny' => $this_player_zenny,
                     'this_player_result' => 'victory',
                     'this_reward_pending' => 0,
                     'target_user_id' => $target_player->player_id,
                     'target_player_token' => $target_player->player_token,
                     'target_player_robots' => $temp_target_player_robots,
-                    'target_player_points' => $target_battle_points,
+                    'target_player_zenny' => $target_battle_zenny,
                     'target_player_result' => 'defeat',
                     'target_reward_pending' => 1
                     ));
@@ -908,72 +838,7 @@ class rpg_battle extends rpg_object {
             // Check if the the player was a human character
             if ($this_player->player_side == 'left'){
 
-                // DEBUG
-                //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
-
-
-                // Collect the robot info array
-                $temp_player_info = $this_player->export_array();
-
-                // Collect or define the player points and player rewards variables
-                $temp_player_token = $temp_player_info['player_token'];
-                $temp_player_points = mmrpg_prototype_player_points($temp_player_info['player_token']);
-                $temp_player_rewards = !empty($temp_player_info['player_rewards']) ? $temp_player_info['player_rewards'] : array();
-
-                // -- ABILITY REWARDS for HUMAN PLAYER -- //
-
-                // Loop through the ability rewards for this player if set
-                if (!empty($temp_player_rewards['abilities']) && empty($_SESSION['GAME']['DEMO'])){
-                    $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-                    foreach ($temp_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
-
-                        // If this ability is already unlocked, continue
-                        if (mmrpg_prototype_ability_unlocked($this_player->player_token, false, $ability_reward_info['token'])){ continue; }
-                        // If this is the copy shot ability and we're in DEMO mode, continue
-                        //if (!empty($_SESSION['GAME']['DEMO'])){ continue; }
-
-                        // Check if the required level has been met by this robot
-                        if ($temp_player_points >= $ability_reward_info['points']){
-
-                            // Collect the ability info from the index
-                            $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
-                            // Create the temporary ability object for event creation
-                            $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $ability_info);
-
-                            // Collect or define the ability variables
-                            $temp_ability_token = $ability_info['ability_token'];
-
-                            // Display the robot reward message markup
-                            $event_header = $ability_info['ability_name'].' Unlocked';
-                            $event_body = rpg_battle::random_positive_word().' <span class="player_name">'.$temp_player_info['player_name'].'</span> unlocked new ability data!<br />';
-                            $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
-                            $event_options = array();
-                            $event_options['console_show_target'] = false;
-                            $event_options['this_header_float'] = $this_player->player_side;
-                            $event_options['this_body_float'] = $this_player->player_side;
-                            $event_options['this_ability'] = $temp_ability;
-                            $event_options['this_ability_image'] = 'icon';
-                            $event_options['event_flag_victory'] = true;
-                            $event_options['console_show_this_player'] = false;
-                            $event_options['console_show_this_robot'] = false;
-                            $event_options['console_show_this_ability'] = true;
-                            $event_options['canvas_show_this_ability'] = false;
-                            $this_player->player_frame = $ability_reward_key % 2 == 0 ? 'victory' : 'taunt';
-                            $this_player->update_session();
-                            $this_robot->robot_frame = $ability_reward_key % 2 == 0 ? 'taunt' : 'base';
-                            $this_robot->update_session();
-                            $temp_ability->ability_frame = 'base';
-                            $temp_ability->update_session();
-                            $this->events_create($this_robot, $this_robot, $event_header, $event_body, $event_options);
-
-                            // Automatically unlock this ability for use in battle
-                            $this_reward = array('ability_token' => $temp_ability_token);
-                            mmrpg_game_unlock_ability($temp_player_info, false, $this_reward, true);
-
-                        }
-
-                    }
-                }
+                // Nothing specific happens
 
             }
 
@@ -1020,38 +885,13 @@ class rpg_battle extends rpg_object {
                 // Create the new session array from scratch to ensure all values exist
                 $new_session_array = array(
                     'battle_token' => $this->battle_token,
-                    'battle_count' => 0,
-                    'battle_min_level' => 0,
-                    'battle_max_level' => 0,
-                    'battle_min_turns' => 0,
-                    'battle_max_turns' => 0,
-                    'battle_min_points' => 0,
-                    'battle_max_points' => 0,
-                    'battle_min_robots' => 0,
-                    'battle_max_robots' => 0
+                    'battle_count' => 0
                     );
 
                 // Recollect applicable battle values from the backup session array
                 if (!empty($bak_session_array['battle_count'])){ $new_session_array['battle_count'] = $bak_session_array['battle_count']; }
-                if (!empty($bak_session_array['battle_level'])){ $new_session_array['battle_min_level'] = $bak_session_array['battle_level']; } // LEGACY
-                if (!empty($bak_session_array['battle_min_level'])){ $new_session_array['battle_min_level'] = $bak_session_array['battle_min_level']; }
-                if (!empty($bak_session_array['battle_max_level'])){ $new_session_array['battle_max_level'] = $bak_session_array['battle_max_level']; }
-                if (!empty($bak_session_array['battle_min_turns'])){ $new_session_array['battle_min_turns'] = $bak_session_array['battle_min_turns']; }
-                if (!empty($bak_session_array['battle_max_turns'])){ $new_session_array['battle_max_turns'] = $bak_session_array['battle_max_turns']; }
-                if (!empty($bak_session_array['battle_min_points'])){ $new_session_array['battle_min_points'] = $bak_session_array['battle_min_points']; }
-                if (!empty($bak_session_array['battle_max_points'])){ $new_session_array['battle_max_points'] = $bak_session_array['battle_max_points']; }
-                if (!empty($bak_session_array['battle_min_robots'])){ $new_session_array['battle_min_robots'] = $bak_session_array['battle_min_robots']; }
-                if (!empty($bak_session_array['battle_max_robots'])){ $new_session_array['battle_max_robots'] = $bak_session_array['battle_max_robots']; }
 
                 // Update and/or increment the appropriate battle variables in the new array
-                if ($new_session_array['battle_max_level'] == 0 || $this->battle_level > $new_session_array['battle_max_level']){ $new_session_array['battle_max_level'] = $this->battle_level; }
-                if ($new_session_array['battle_min_level'] == 0 || $this->battle_level < $new_session_array['battle_min_level']){ $new_session_array['battle_min_level'] = $this->battle_level; }
-                if ($new_session_array['battle_max_turns'] == 0 || $this->counters['battle_turn'] > $new_session_array['battle_max_turns']){ $new_session_array['battle_max_turns'] = $this->counters['battle_turn']; }
-                if ($new_session_array['battle_min_turns'] == 0 || $this->counters['battle_turn'] < $new_session_array['battle_min_turns']){ $new_session_array['battle_min_turns'] = $this->counters['battle_turn']; }
-                if ($new_session_array['battle_max_points'] == 0 || $temp_human_rewards['battle_points'] > $new_session_array['battle_max_points']){ $new_session_array['battle_max_points'] = $temp_human_rewards['battle_points']; }
-                if ($new_session_array['battle_min_points'] == 0 || $temp_human_rewards['battle_points'] < $new_session_array['battle_min_points']){ $new_session_array['battle_min_points'] = $temp_human_rewards['battle_points']; }
-                if ($new_session_array['battle_max_robots'] == 0 || $this_player->counters['robots_total'] > $new_session_array['battle_max_robots']){ $new_session_array['battle_max_robots'] = $this_player->counters['robots_total']; }
-                if ($new_session_array['battle_min_robots'] == 0 || $this_player->counters['robots_total'] < $new_session_array['battle_min_robots']){ $new_session_array['battle_min_robots'] = $this_player->counters['robots_total']; }
                 $new_session_array['battle_count']++;
 
                 // Update the session variable for this player with the updated battle values
@@ -1096,7 +936,7 @@ class rpg_battle extends rpg_object {
                     // Create the temporary robot object for event creation
                     $temp_robot = rpg_game::get_robot($this, $this_player, $robot_info);
 
-                    // Collect or define the robot points and robot rewards variables
+                    // Collect or define the robot zenny and robot rewards variables
                     $this_robot_token = $robot_reward_info['token'];
                     $this_robot_level = !empty($robot_reward_info['level']) ? $robot_reward_info['level'] : 1;
                     $this_robot_experience = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 0;
@@ -1124,7 +964,7 @@ class rpg_battle extends rpg_object {
                     // Create the temporary robot object for event creation
                     $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $ability_info);
 
-                    // Collect or define the robot points and robot rewards variables
+                    // Collect or define the robot zenny and robot rewards variables
                     $this_ability_token = $ability_info['ability_token'];
 
                     // Now loop through all active robots on this side of the field
@@ -1216,10 +1056,10 @@ class rpg_battle extends rpg_object {
         $first_event_body .= '<br />';
 
         // Print out the current vs allowed turns for this mission
-        $first_event_body .= 'Turns : '.$this->counters['battle_turn'].' / '.$this->battle_turns.' <span style="opacity:0.25;">|</span> ';
+        $first_event_body .= 'Goal Turns : '.$this->counters['battle_turn'].' / '.$this->battle_turns.' <span style="opacity:0.25;">|</span> ';
 
         // Print out the base reward amount
-        $first_event_body .= 'Reward : '.number_format($this->battle_points, 0, '.', ',').' <span style="opacity:0.25;">|</span> ';
+        $first_event_body .= 'Base Zenny : '.number_format($this->battle_zenny, 0, '.', ',').' <span style="opacity:0.25;">|</span> ';
 
         // Print out the bonus and rewards based on the above stats
         if ($this->battle_result == 'victory'){
@@ -1241,14 +1081,7 @@ class rpg_battle extends rpg_object {
             }
 
             // Define the zenny reward amount if not empty
-            $total_zenny_rewards = 0;
-            $total_points_rewards = $temp_human_rewards['battle_points'];
-
-            // If zenny rewards are forced for this mission, use the battle point amount
-            if ($force_zenny_rewards){
-                $total_zenny_rewards += $total_points_rewards;
-                $total_points_rewards = 0;
-            }
+            $total_zenny_rewards = $temp_human_rewards['battle_zenny'];
 
             // If the winning player had any overkill bonuses, award zenny as well
             if (!empty($this_player->counters['overkill_bonus'])){
@@ -1264,15 +1097,9 @@ class rpg_battle extends rpg_object {
                 }
             }
 
-            // Print out the final point reward amounts after mods (if it applies)
-            if (!empty($total_points_rewards)){
-                $first_event_body .= 'Points : '.number_format($total_points_rewards, 0, '.', ',').' ';
-            }
-
             // Print out the final zenny reward amounts after mods (if not empty)
             if (!empty($total_zenny_rewards)){
-                if (!empty($total_points_rewards)){ $first_event_body .= '<span style="opacity:0.25;">|</span> '; }
-                $first_event_body .= 'Zenny : '.number_format($total_zenny_rewards, 0, '.', ',').'z ';
+                $first_event_body .= 'Earned Zenny : '.number_format($total_zenny_rewards, 0, '.', ',').'z ';
                 if (!isset($_SESSION['GAME']['counters']['battle_zenny'])){ $_SESSION['GAME']['counters']['battle_zenny'] = 0; }
                 $_SESSION['GAME']['counters']['battle_zenny'] += $total_zenny_rewards;
             }
@@ -1419,10 +1246,10 @@ class rpg_battle extends rpg_object {
                 // Ensure this robot has abilities to loop through
                 if (!isset($this_robot->flags['ability_startup']) && !empty($this_robot->robot_abilities)){
                     // Loop through each of this robot's abilities and trigger the start event
-                    $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                    $temp_abilities_index = rpg_ability::get_index(true);
                     foreach ($this_robot->robot_abilities AS $this_key => $this_token){
                         // Define the current ability object using the loaded ability data
-                        $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilities_index[$this_token]);
+                        $temp_abilityinfo = $temp_abilities_index[$this_token];
                         $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $temp_abilityinfo);
                     }
                     // And now update the robot with the flag
@@ -1442,7 +1269,7 @@ class rpg_battle extends rpg_object {
             elseif ($this_action == 'ability'){
 
                 // Combine into the actions index
-                $temp_actions_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                $temp_actions_index = rpg_ability::get_index(true);
 
                 // DEFINE ABILITY TOKEN
 
@@ -1460,7 +1287,7 @@ class rpg_battle extends rpg_object {
                     $temp_id = $this->index['abilities'][$temp_token]['ability_id'];//array_search($temp_token, $this_robot->robot_abilities);
                     $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
                     //$this_token = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
-                    $this_token = rpg_ability::parse_index_info($temp_actions_index[$temp_token]);
+                    $this_token = $temp_actions_index[$temp_token];
                     $this_token['ability_id'] = $temp_id;
                 }
                 // Otherwise, parse the token for data
@@ -1468,7 +1295,7 @@ class rpg_battle extends rpg_object {
                     // Define the ability choice data for this robot
                     list($temp_id, $temp_token) = explode('_', $this_token);
                     //$this_token = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
-                    $this_token = rpg_ability::parse_index_info($temp_actions_index[$temp_token]);
+                    $this_token = $temp_actions_index[$temp_token];
                     $this_token['ability_id'] = $temp_id;
                 }
 
@@ -1525,7 +1352,7 @@ class rpg_battle extends rpg_object {
             elseif ($this_action == 'item'){
 
                 // Combine into the actions index
-                $temp_actions_index = $db->get_array_list("SELECT * FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
+                $temp_actions_index = rpg_item::get_index(true);
 
                 // DEFINE ABILITY TOKEN
 
@@ -1543,7 +1370,7 @@ class rpg_battle extends rpg_object {
                     $temp_id = $this->index['items'][$temp_token]['item_id'];//array_search($temp_token, $this_robot->robot_items);
                     $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
                     //$this_token = array('item_id' => $temp_id, 'item_token' => $temp_token);
-                    $this_token = rpg_item::parse_index_info($temp_actions_index[$temp_token]);
+                    $this_token = $temp_actions_index[$temp_token];
                     $this_token['item_id'] = $temp_id;
                 }
                 // Otherwise, parse the token for data
@@ -1759,11 +1586,11 @@ class rpg_battle extends rpg_object {
                 // Ensure this robot has abilities to loop through
                 if (!isset($this_robot->flags['ability_startup']) && !empty($this_robot->robot_abilities)){
                     // Loop through each of this robot's abilities and trigger the start event
-                    $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                    $temp_abilities_index = rpg_ability::get_index(true);
                     foreach ($this_robot->robot_abilities AS $this_key => $this_token){
                         if (!isset($temp_abilities_index[$this_token])){ continue; }
                         // Define the current ability object using the loaded ability data
-                        $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilities_index[$this_token]);
+                        $temp_abilityinfo = $temp_abilities_index[$this_token];
                         $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $temp_abilityinfo);
                     }
                     // And now update the robot with the flag
@@ -2312,27 +2139,27 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a function for calculating the amount of BATTLE POINTS a player gets in battle
-    public function calculate_battle_points($this_player, $base_points = 0, $base_turns = 0){
+    public function calculate_battle_zenny($this_player, $base_zenny = 0, $base_turns = 0){
 
-        // Calculate the number of turn points for this player using the base amounts
-        $this_base_points = $base_points;
+        // Calculate the number of turn zenny for this player using the base amounts
+        $this_base_zenny = $base_zenny;
         if ($this->counters['battle_turn'] < $base_turns
             || $this->counters['battle_turn'] > $base_turns){
-            //$this_half_points = $base_points * 0.10;
-            //$this_turn_points = ceil($this_half_points * ($base_turns / $this->counters['battle_turn']));
-            $this_base_points = ceil($this_base_points * ($base_turns / $this->counters['battle_turn']));
+            //$this_half_zenny = $base_zenny * 0.10;
+            //$this_turn_zenny = ceil($this_half_zenny * ($base_turns / $this->counters['battle_turn']));
+            $this_base_zenny = ceil($this_base_zenny * ($base_turns / $this->counters['battle_turn']));
         }
 
-        //$this_battle_points = $this_base_points + $this_turn_points + $this_stat_points;
-        $this_battle_points = $this_base_points;
+        //$this_battle_zenny = $this_base_zenny + $this_turn_zenny + $this_stat_zenny;
+        $this_battle_zenny = $this_base_zenny;
 
-        // Prevent players from loosing points
-        if ($this_battle_points == 0){ $this_battle_points = 1; }
-        elseif ($this_battle_points < 0){ $this_battle_points = -1 * $this_battle_points; }
+        // Prevent players from loosing zenny
+        if ($this_battle_zenny == 0){ $this_battle_zenny = 1; }
+        elseif ($this_battle_zenny < 0){ $this_battle_zenny = -1 * $this_battle_zenny; }
 
 
-        // Return the calculated battle points
-        return $this_battle_points;
+        // Return the calculated battle zenny
+        return $this_battle_zenny;
 
     }
 
@@ -2579,7 +2406,7 @@ class rpg_battle extends rpg_object {
             'battle_description' => $this->battle_description,
             'battle_turns' => $this->battle_turns,
             'battle_rewards' => $this->battle_rewards,
-            'battle_points' => $this->battle_points,
+            'battle_zenny' => $this->battle_zenny,
             'battle_level' => $this->battle_level,
             'battle_attachments' => $this->battle_attachments,
             'battle_base_name' => $this->battle_base_name,
@@ -2587,7 +2414,7 @@ class rpg_battle extends rpg_object {
             'battle_base_description' => $this->battle_base_description,
             'battle_base_turns' => $this->battle_base_turns,
             'battle_base_rewards' => $this->battle_base_rewards,
-            'battle_base_points' => $this->battle_base_points,
+            'battle_base_zenny' => $this->battle_base_zenny,
             'battle_base_level' => $this->battle_base_level,
             'battle_base_attachments' => $this->battle_base_attachments,
             'battle_counts' => $this->battle_counts,
