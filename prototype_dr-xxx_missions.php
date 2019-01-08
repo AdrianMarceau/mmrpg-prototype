@@ -481,6 +481,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         $victory_token_colour = !empty($temp_player_array['values']['colour_token']) ? $temp_player_array['values']['colour_token'] : 'none';
                         $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="online_type player_type player_type_'.$victory_token_colour.'">&#9733;</sup>';
                         $temp_battle_omega['battle_description2'] .= 'This player\'s victory token has already been collected...';
+                        $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.10);
                     } else {
                         $temp_battle_omega['battle_description2'] .= 'Collect this player\'s victory token for additional battle points!';
                     }
