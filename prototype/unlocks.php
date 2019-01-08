@@ -94,7 +94,7 @@ function generate_prototype_complete_message($player_token){
                         <tr>
                             <td  class="right">
                                 <label style="display: block; float: left;">Battle Points :</label>
-                                <span class="player_stat player_type player_type_<?= !empty($player_info['player_points']) ? 'cutter' : 'none' ?>"><?= number_format($player_info['player_points'], 0, '.', ',') ?> BP</span>
+                                <span class="player_stat player_type player_type_<?= !empty($player_info['player_points']) ? 'cutter' : 'none' ?>"><?= !empty($_SESSION[$session_token]['counters']['battle_points']) ? number_format($_SESSION[$session_token]['counters']['battle_points'], 0, '.', ',') : 0 ?> BP</span>
                             </td>
                             <td class="center">&nbsp;</td>
                             <td  class="right">
