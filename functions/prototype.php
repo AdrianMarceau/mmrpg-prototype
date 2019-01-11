@@ -107,6 +107,27 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     $mmrpg_items = rpg_item::get_index();
     $mmrpg_fields = rpg_field::get_index();
 
+    // -- CHAPTER POINTS -- //
+
+    // Grant the player bonuses for completing any of the doctor's chapters (chapter complete)
+    if (true){
+        $chapter_events_unlocked = array();
+        if (!empty($user_save_array['save_flags']['events'])){
+            $event_flags = $user_save_array['save_flags']['events'];
+            $doctors_unlocked = array_keys($user_battle_rewards);
+            foreach ($doctors_unlocked AS $doctor_token){
+                if ($doctor_token === 'player'){ continue; }
+                for ($ch = 1; $ch <= 5; $ch++){
+                    if (empty($event_flags[$doctor_token.'_chapter-'.$ch.'-unlocked'])){ continue; }
+                    $chapter_events_unlocked[] = $doctor_token.'_chapter-'.$ch;
+                }
+            }
+        }
+        $points_index['chapters_unlocked'] = $chapter_events_unlocked;
+        $points_index['chapters_unlocked_points'] = count($chapter_events_unlocked) * 25000;
+        $total_battle_points += $points_index['chapters_unlocked_points'];
+    }
+
     // -- DOCTOR POINTS -- //
 
     // Loop through and grant the user battle points for each doctor unlocked
@@ -119,58 +140,6 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['doctors_unlocked'] = $doctors_unlocked;
         $points_index['doctors_unlocked_points'] = count($doctors_unlocked) * 50000;
         $total_battle_points += $points_index['doctors_unlocked_points'];
-    }
-
-
-    // -- ROBOT POINTS -- //
-
-    // Loop through and grant the user battle points for each robot unlocked
-    if (true){
-        $robots_unlocked = array();
-        $robots_unlocked_max_level = array();
-        $robots_unlocked_max_attack = array();
-        $robots_unlocked_max_defense = array();
-        $robots_unlocked_max_speed = array();
-        $robots_unlocked_alt_outfits = array();
-        foreach ($user_battle_rewards AS $doctor_token => $doctor_info){
-            if (empty($doctor_info) || empty($doctor_info['player_robots'])){ continue; }
-            foreach ($doctor_info['player_robots'] AS $robot_token => $robot_info){
-                if (!isset($mmrpg_robots[$robot_token])){ continue; }
-                elseif (in_array($robot_token, $robots_unlocked)){ continue; }
-                elseif (!$mmrpg_robots[$robot_token]['robot_flag_complete']){ continue; }
-                elseif ($mmrpg_robots[$robot_token]['robot_flag_hidden']){ continue; }
-                $robots_unlocked[] = $robot_token;
-                $robot_level = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : 1;
-                $robot_stats = rpg_robot::calculate_stat_values($robot_level, $mmrpg_robots[$robot_token], $robot_info, true);
-                if ($robot_stats['level'] >= 100 && !in_array($robot_token, $robots_unlocked_max_level)){ $robots_unlocked_max_level[] = $robot_token; }
-                if ($robot_stats['attack']['bonus'] >= $robot_stats['attack']['bonus_max'] && !in_array($robot_token, $robots_unlocked_max_attack)){ $robots_unlocked_max_attack[] = $robot_token; }
-                if ($robot_stats['defense']['bonus'] >= $robot_stats['defense']['bonus_max'] && !in_array($robot_token, $robots_unlocked_max_defense)){ $robots_unlocked_max_defense[] = $robot_token; }
-                if ($robot_stats['speed']['bonus'] >= $robot_stats['speed']['bonus_max'] && !in_array($robot_token, $robots_unlocked_max_speed)){ $robots_unlocked_max_speed[] = $robot_token; }
-                if (!empty($user_robot_alts[$robot_token])){
-                    foreach ($user_robot_alts[$robot_token] AS $alt_token){
-                        $robots_unlocked_alt_outfits[] = $robot_token.'_'.$alt_token;
-                    }
-                }
-            }
-        }
-        $points_index['robots_unlocked'] = $robots_unlocked;
-        $points_index['robots_unlocked_points'] = count($robots_unlocked) * 10000;
-        $total_battle_points += $points_index['robots_unlocked_points'];
-        $points_index['robots_unlocked_max_level'] = $robots_unlocked;
-        $points_index['robots_unlocked_max_level_points'] = count($robots_unlocked_max_level) * 4000;
-        $total_battle_points += $points_index['robots_unlocked_max_level_points'];
-        $points_index['robots_unlocked_max_attack'] = $robots_unlocked;
-        $points_index['robots_unlocked_max_attack_points'] = count($robots_unlocked_max_attack) * 2000;
-        $total_battle_points += $points_index['robots_unlocked_max_attack_points'];
-        $points_index['robots_unlocked_max_defense'] = $robots_unlocked;
-        $points_index['robots_unlocked_max_defense_points'] = count($robots_unlocked_max_defense) * 2000;
-        $total_battle_points += $points_index['robots_unlocked_max_defense_points'];
-        $points_index['robots_unlocked_max_speed'] = $robots_unlocked;
-        $points_index['robots_unlocked_max_speed_points'] = count($robots_unlocked_max_speed) * 2000;
-        $total_battle_points += $points_index['robots_unlocked_max_speed_points'];
-        $points_index['robots_unlocked_alt_outfits'] = $robots_unlocked;
-        $points_index['robots_unlocked_alt_outfits_points'] = count($robots_unlocked_alt_outfits) * 500;
-        $total_battle_points += $points_index['robots_unlocked_alt_outfits_points'];
     }
 
 
@@ -242,37 +211,57 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $total_battle_points += $points_index['fields_unlocked_points'];
     }
 
-    // -- EVENT POINTS -- //
 
-    // Grant the player bonuses for completing any of the doctor's chapters (chapter complete)
+    // -- ROBOT POINTS -- //
+
+    // Loop through and grant the user battle points for each robot unlocked
     if (true){
-        $chapter_events_unlocked = array();
-        if (!empty($user_save_array['save_flags']['events'])){
-            $event_flags = $user_save_array['save_flags']['events'];
-            foreach ($doctors_unlocked AS $doctor_token){
-                for ($ch = 1; $ch <= 5; $ch++){
-                    if (empty($event_flags[$doctor_token.'_chapter-'.$ch.'-unlocked'])){ continue; }
-                    $chapter_events_unlocked[] = $doctor_token.'_chapter-'.$ch;
+        $robots_unlocked = array();
+        $robots_unlocked_max_level = array();
+        $robots_unlocked_max_attack = array();
+        $robots_unlocked_max_defense = array();
+        $robots_unlocked_max_speed = array();
+        $robots_unlocked_alt_outfits = array();
+        $robots_unlocked_alt_outfits_count = 0;
+        foreach ($user_battle_rewards AS $doctor_token => $doctor_info){
+            if (empty($doctor_info) || empty($doctor_info['player_robots'])){ continue; }
+            foreach ($doctor_info['player_robots'] AS $robot_token => $robot_info){
+                if (!isset($mmrpg_robots[$robot_token])){ continue; }
+                elseif (in_array($robot_token, $robots_unlocked)){ continue; }
+                elseif (!$mmrpg_robots[$robot_token]['robot_flag_complete']){ continue; }
+                elseif ($mmrpg_robots[$robot_token]['robot_flag_hidden']){ continue; }
+                $robots_unlocked[] = $robot_token;
+                $robot_level = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : 1;
+                $robot_stats = rpg_robot::calculate_stat_values($robot_level, $mmrpg_robots[$robot_token], $robot_info, true);
+                if ($robot_stats['level'] >= 100 && !in_array($robot_token, $robots_unlocked_max_level)){ $robots_unlocked_max_level[] = $robot_token; }
+                if ($robot_stats['attack']['bonus'] >= $robot_stats['attack']['bonus_max'] && !in_array($robot_token, $robots_unlocked_max_attack)){ $robots_unlocked_max_attack[] = $robot_token; }
+                if ($robot_stats['defense']['bonus'] >= $robot_stats['defense']['bonus_max'] && !in_array($robot_token, $robots_unlocked_max_defense)){ $robots_unlocked_max_defense[] = $robot_token; }
+                if ($robot_stats['speed']['bonus'] >= $robot_stats['speed']['bonus_max'] && !in_array($robot_token, $robots_unlocked_max_speed)){ $robots_unlocked_max_speed[] = $robot_token; }
+                if (!empty($user_robot_alts[$robot_token])){
+                    $num_alts = count($user_robot_alts[$robot_token]);
+                    $robots_unlocked_alt_outfits[] = $robot_token.' x'.$num_alts;
+                    $robots_unlocked_alt_outfits_count += $num_alts;
                 }
             }
         }
-        $points_index['story_chapters_unlocked'] = $chapter_events_unlocked;
-        $points_index['story_chapters_unlocked_points'] = count($chapter_events_unlocked) * 10000;
-        $total_battle_points += $points_index['story_chapters_unlocked_points'];
-    }
-
-    // Grant the player huge bonuses for completing any of the doctor's campaigns (prototype complete)
-    if (true){
-        $complete_events_unlocked = array();
-        if (!empty($user_save_array['save_values']['prototype_awards'])){
-            $prototype_awards = $user_save_array['save_values']['prototype_awards'];
-            if (!empty($prototype_awards['prototype_complete_light'])){ $complete_events_unlocked[] = 'dr-light'; }
-            if (!empty($prototype_awards['prototype_complete_wily'])){ $complete_events_unlocked[] = 'dr-wily'; }
-            if (!empty($prototype_awards['prototype_complete_cossack'])){ $complete_events_unlocked[] = 'dr-cossack'; }
-        }
-        $points_index['story_modes_completed'] = $complete_events_unlocked;
-        $points_index['story_modes_completed_points'] = count($complete_events_unlocked) * 500000;
-        $total_battle_points += $points_index['story_modes_completed_points'];
+        $points_index['robots_unlocked'] = $robots_unlocked;
+        $points_index['robots_unlocked_points'] = count($robots_unlocked) * 10000;
+        $total_battle_points += $points_index['robots_unlocked_points'];
+        $points_index['robots_unlocked_max_level'] = $robots_unlocked_max_level;
+        $points_index['robots_unlocked_max_level_points'] = count($robots_unlocked_max_level) * 4000;
+        $total_battle_points += $points_index['robots_unlocked_max_level_points'];
+        $points_index['robots_unlocked_max_attack'] = $robots_unlocked_max_attack;
+        $points_index['robots_unlocked_max_attack_points'] = count($robots_unlocked_max_attack) * 2000;
+        $total_battle_points += $points_index['robots_unlocked_max_attack_points'];
+        $points_index['robots_unlocked_max_defense'] = $robots_unlocked_max_defense;
+        $points_index['robots_unlocked_max_defense_points'] = count($robots_unlocked_max_defense) * 2000;
+        $total_battle_points += $points_index['robots_unlocked_max_defense_points'];
+        $points_index['robots_unlocked_max_speed'] = $robots_unlocked_max_speed;
+        $points_index['robots_unlocked_max_speed_points'] = count($robots_unlocked_max_speed) * 2000;
+        $total_battle_points += $points_index['robots_unlocked_max_speed_points'];
+        $points_index['robots_unlocked_alt_outfits'] = $robots_unlocked_alt_outfits;
+        $points_index['robots_unlocked_alt_outfits_points'] = $robots_unlocked_alt_outfits_count * 500;
+        $total_battle_points += $points_index['robots_unlocked_alt_outfits_points'];
     }
 
     // -- DATABASE POINTS -- //
@@ -284,7 +273,8 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $database_robots_summoned = array();
         $database_robots_scanned = array();
         foreach ($mmrpg_robots AS $robot_token => $robot_info){
-            if (!$robot_info['robot_flag_complete']){ continue; }
+            if ($robot_token === 'robot'){ continue; }
+            elseif (!$robot_info['robot_flag_complete']){ continue; }
             elseif ($robot_info['robot_flag_hidden']){ continue; }
             if (!empty($user_robot_database[$robot_token]['robot_encountered'])){ $database_robots_encountered[] = $robot_token; }
             if (!empty($user_robot_database[$robot_token]['robot_defeated'])){ $database_robots_defeated[] = $robot_token; }
@@ -318,12 +308,12 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             if (empty($star_info['star_field2']) || $star_info['star_field2'] === $star_info['star_field']){ $field_stars_unlocked[] = $star_token; }
             else { $fusion_stars_unlocked[] = $star_token; }
         }
-        $points_index['field_stars_unlocked'] = $field_stars_unlocked;
-        $points_index['field_stars_unlocked_points'] = count($field_stars_unlocked) * $mmrpg_items['field-star']['item_value'];
-        $total_battle_points += $points_index['field_stars_unlocked_points'];
-        $points_index['fusion_stars_unlocked'] = $fusion_stars_unlocked;
-        $points_index['fusion_stars_unlocked_points'] = count($fusion_stars_unlocked) * $mmrpg_items['fusion-star']['item_value'];
-        $total_battle_points += $points_index['fusion_stars_unlocked_points'];
+        $points_index['field_stars_collected'] = $field_stars_unlocked;
+        $points_index['field_stars_collected_points'] = count($field_stars_unlocked) * $mmrpg_items['field-star']['item_value'];
+        $total_battle_points += $points_index['field_stars_collected_points'];
+        $points_index['fusion_stars_collected'] = $fusion_stars_unlocked;
+        $points_index['fusion_stars_collected_points'] = count($fusion_stars_unlocked) * $mmrpg_items['fusion-star']['item_value'];
+        $total_battle_points += $points_index['fusion_stars_collected_points'];
     }
 
     // -- PLAYER POINTS -- //
@@ -333,16 +323,20 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $players_defeated = array();
         $defeated_players = $db->get_array_list("SELECT
             DISTINCT(battles.target_user_id) AS target_user_id,
-            users.user_name_clean AS target_user_name
+            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS target_user_name,
+            users.user_name_clean AS target_user_token,
+            users.user_colour_token AS target_user_colour
             FROM mmrpg_battles AS battles
             LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
             WHERE
             battles.this_user_id = {$user_id}
             AND battles.this_player_result = 'victory'
+            AND users.user_flag_approved = 1
+            AND users.user_date_created <> users.user_date_accessed
             ;", 'target_user_name');
-        $points_index['player_battles_completed'] = $defeated_players;
-        $points_index['player_battles_completed_points'] = count($defeated_players) * 1000;
-        $total_battle_points += $points_index['player_battles_completed_points'];
+        $points_index['players_defeated'] = $defeated_players;
+        $points_index['players_defeated_points'] = count($defeated_players) * 1000;
+        $total_battle_points += $points_index['players_defeated_points'];
     }
 
     // -- BONUS POINTS -- //
@@ -351,9 +345,25 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     if (true){
         $guest_id = MMRPG_SETTINGS_GUEST_ID;
         $max_user_id = (int)($db->get_value("SELECT MAX(user_id) AS max_id FROM mmrpg_users WHERE user_id < {$guest_id};", 'max_id'));
-        $points_index['user_veteran_bonus'] = 'MaxID('.$max_user_id.') - YourID('.$user_id.')';
-        $points_index['user_veteran_bonus_points'] = $max_user_id - $user_id;
-        $total_battle_points += $points_index['user_veteran_bonus_points'];
+        $points_index['veteran_bonus'] = 'Max User ID ('.$max_user_id.') - This User ID ('.$user_id.') = Bonus ('.($max_user_id - $user_id).')';
+        $points_index['veteran_bonus_points'] = $max_user_id - $user_id;
+        $total_battle_points += $points_index['veteran_bonus_points'];
+    }
+
+    // -- CAMPAIGN POINTS -- //
+
+    // Grant the player huge bonuses for completing any of the doctor's campaigns (prototype complete)
+    if (true){
+        $complete_events_unlocked = array();
+        if (!empty($user_save_array['save_values']['prototype_awards'])){
+            $prototype_awards = $user_save_array['save_values']['prototype_awards'];
+            if (!empty($prototype_awards['prototype_complete_light'])){ $complete_events_unlocked[] = 'dr-light'; }
+            if (!empty($prototype_awards['prototype_complete_wily'])){ $complete_events_unlocked[] = 'dr-wily'; }
+            if (!empty($prototype_awards['prototype_complete_cossack'])){ $complete_events_unlocked[] = 'dr-cossack'; }
+        }
+        $points_index['campaigns_completed'] = $complete_events_unlocked;
+        $points_index['campaigns_completed_points'] = count($complete_events_unlocked) * 500000;
+        $total_battle_points += $points_index['campaigns_completed_points'];
     }
 
     // Return calculated battle points
