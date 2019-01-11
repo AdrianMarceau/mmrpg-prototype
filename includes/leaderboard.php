@@ -43,9 +43,10 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     }
     // Collect this player's robots
     $this_robots = $temp_robots;
-    $this_stars = !empty($board['board_stars']) ? $board['board_stars'] : 0;
+    $this_robots_count = !empty($this_robots) ? count($this_robots) : 0;
+    $this_items = !empty($board['board_items']) ? $board['board_items'] : 0;
     $this_abilities = !empty($board['board_abilities']) ? $board['board_abilities'] : 0;
-    $this_missions = !empty($board['board_missions']) ? $board['board_missions'] : 0;
+    $this_stars = !empty($board['board_stars']) ? $board['board_stars'] : 0;
     $this_awards = !empty($board['board_awards']) ? explode(',', $board['board_awards']) : array();
     $this_first_save = !empty($board['board_date_created']) ? $board['board_date_created'] : 0;
     $this_last_save = !empty($board['board_date_modified']) ? $board['board_date_modified'] : 0;
@@ -67,21 +68,20 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
         // Only generate markup if we're withing the viewing range
         if ($board_key >= $this_start_key && $board_key < $this_display_limit || defined('MMRPG_SHOW_MARKUP_'.$this_user_id)){
 
-            $this_robots_count = (!empty($this_robots) ? count($this_robots) : 0);
-            $this_robots_count = $this_robots_count == 1 ? '1 Robot' : $this_robots_count.' Robots';
-            $this_stars_count = $this_stars;
-            $this_abilities_count = $this_abilities;
-            $this_missions_count = $this_missions;
 
-            $this_stars_count = $this_stars_count == 1 ? '1 Star' : $this_stars_count.' Stars';
-            $this_abilities_count = $this_abilities_count == 1 ? '1 Ability' : $this_abilities_count.' Abilities';
-            $this_missions_count = $this_missions_count == 1 ? '1 Mission' : $this_missions_count.' Missions';
 
-            //$this_points_html = preg_replace('#^([0]+)([0-9]+)$#', '<span class="padding">$1</span><span class="value">$2</span>', str_pad((!empty($this_points) ? $this_points : 0), 13, '0', STR_PAD_LEFT)).' BP';
-            $this_records_html = '<span class="count missions">'.$this_missions_count.'</span>';
-            $this_records_html .= ' <span class="pipe">|</span> <span class="count robots">'.$this_robots_count.'</span>';
-            $this_records_html .= ' <span class="pipe">|</span> <span class="count abilities">'.$this_abilities_count.'</span>';
-            $this_records_html .= ' <span class="pipe">|</span> <span class="count stars">'.$this_stars_count.'</span>';
+            $this_robots_count = $this_robots_count === 1 ? '1 Robot' : $this_robots_count.' Robots';
+            $this_items_count = $this_items === 1 ? '1 Item' : $this_items.' Items';
+            $this_stars_count = $this_stars === 1 ? '1 Star' : $this_stars.' Stars';
+            $this_abilities_count = $this_abilities === 1 ? '1 Ability' : $this_abilities.' Abilities';
+
+            $this_records_html = array();
+            if (!empty($this_items_count)){ $this_records_html[] = '<span class="count items">'.$this_items_count.'</span>'; }
+            if (!empty($this_robots_count)){ $this_records_html[] = '<span class="count robots">'.$this_robots_count.'</span>'; }
+            if (!empty($this_abilities_count)){ $this_records_html[] = '<span class="count abilities">'.$this_abilities_count.'</span>'; }
+            if (!empty($this_stars_count)){ $this_records_html[] = '<span class="count stars">'.$this_stars_count.'</span>'; }
+            $this_records_html = implode(' <span class="pipe">|</span> ', $this_records_html);
+
             $this_points_html = '<span class="value">'.(!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0).'</span>'.' BP';
             $this_points_plain = (!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0).' BP';
 
@@ -164,6 +164,7 @@ $temp_leaderboard_query = "SELECT
     board.board_points_dr_light,
     board.board_points_dr_wily,
     board.board_points_dr_cossack,
+    board.board_items,
     board.board_robots,
     board.board_robots_dr_light,
     board.board_robots_dr_wily,
