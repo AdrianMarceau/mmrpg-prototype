@@ -84,7 +84,11 @@ if ($this_request_type != 'ajax'){
         <? if (empty($this_request_patch)){ ?>
             <br /><br /><strong>Select Patch</strong> :<br />
             <? foreach ($update_patch_tokens AS $key => $patch){ ?>
-                + <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$patch?>"><?= $update_patch_names[$patch] ?></a>
+                <? if ($key === (count($update_patch_tokens) - 1)){ ?>
+                    + <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$patch?>"><?= $update_patch_names[$patch] ?></a>
+                <? } else { ?>
+                    + <a><del><?= $update_patch_names[$patch] ?></del></a>
+                <? } ?>
                 <br />
             <? } ?>
         <? } else { ?>

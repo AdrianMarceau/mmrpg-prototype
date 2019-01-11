@@ -22,7 +22,7 @@
             <em>purge user accounts with zero progress</em>
         </li>
         <li class="item">
-            <a href="admin.php?action=update&amp;date=<?=MMRPG_CONFIG_CACHE_DATE?>&limit=1">Patch Save Files</a>
+            <a href="admin.php?action=update">Patch Save Files</a>
             <em>apply specific patches to existing save files</em>
         </li>
     </ul>
