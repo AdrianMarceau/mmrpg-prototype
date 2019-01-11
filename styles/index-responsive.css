@@ -1575,8 +1575,14 @@ body:before {
     #window .page .leaderboard .subbody .view_points .points_table tbody tr {
 
     }
-    #window .page .leaderboard .subbody .view_points .points_table tbody tr.main td.category,
-    #window .page .leaderboard .subbody .view_points .points_table tbody tr.main td.counter,
+    #window .page .leaderboard .subbody .view_points .points_table tbody tr.main td.category {
+        float: left;
+        width: calc(100% - 150px);
+    }
+    #window .page .leaderboard .subbody .view_points .points_table tbody tr.main td.counter {
+        float: left;
+        width: 150px;
+    }
     #window .page .leaderboard .subbody .view_points .points_table tbody tr.main td.points {
         clear: both;
     }
