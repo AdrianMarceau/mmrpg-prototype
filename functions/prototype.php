@@ -1577,23 +1577,28 @@ function mmrpg_prototype_leaderboard_rank($user_id){
 
 }
 
-// Define a function for collecting the requested player's legacy oard ranking
-function mmrpg_prototype_leaderboard_rank_legacy($user_id){
+// Define a function for collecting the requested player's legacy board ranking (2k16 or 2k19)
+function mmrpg_prototype_leaderboard_rank_legacy($user_id, $year_token = 2016){
     global $db;
+
+    // Define the legacy field name based on year
+    if ($year_token === 2016){ $legacy_field = 'board_points_legacy'; }
+    elseif ($year_token === 2019){ $legacy_field = 'board_points_legacy2'; }
+    else { return 0; }
 
     // Generate the query for selecting this user's rank
     $rank_query = "SELECT
         uo.user_id,
-        uo.board_points_legacy,
+        uo.{$legacy_field},
         (SELECT
-            COUNT(DISTINCT ui.board_points_legacy)
+            COUNT(DISTINCT ui.{$legacy_field})
            FROM mmrpg_leaderboard AS ui
-           WHERE ui.board_points_legacy >= uo.board_points_legacy
+           WHERE ui.{$legacy_field} >= uo.{$legacy_field}
            ) AS user_rank
-        FROM mmrpg_leaderboard uo
+        FROM mmrpg_leaderboard AS uo
         WHERE
         user_id = {$user_id} AND
-        uo.board_points_legacy > 0
+        uo.{$legacy_field} > 0
         ;";
 
     // Query the database for this user's specific ranking

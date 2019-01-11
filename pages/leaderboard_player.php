@@ -296,10 +296,39 @@ ob_start();
                 <strong><?= $temp_display_name ?></strong> is <?= $temp_is_contributor ? 'a contributor and ' : '' ?><?= $temp_display_active  ?> of the <strong>Mega Man RPG Prototype</strong> with a current battle point total of <strong><?= number_format($temp_display_points) ?></strong><?= $temp_display_zenny > 0 ? ' and a zenny total of <strong>'.number_format($temp_display_zenny).'</strong>' : '' ?>.
                 <strong><?= $temp_display_name ?></strong> created <?= $temp_gender_pronoun ?> account on <?= ($temp_display_created <= 1357016400 ? 'or before ' : '').date('F jS, Y', $temp_display_created) ?> and has since completed <?= $temp_counter_missions['total_complete'] ?> different missions, unlocked <?= $temp_counter_players['total'] ?> playable characters, <?= $temp_counter_robots['total'] ?> robot fighters, <?= $temp_counter_abilities['total'] ?> special abilities, and <?= count($this_playerinfo['save_values_battle_stars']) == 1 ? '1 field star' : count($this_playerinfo['save_values_battle_stars']).' field stars' ?>.
                 <strong><?= $temp_display_name ?></strong>'s most-used playable character is <?= $temp_top_player ?>, and <?= $temp_gender_pronoun ?> <?= count($temp_top_robots) > 1 ? 'top '.count($temp_top_robots).' '.$temp_top_robots_method.' robots appear' : $temp_top_robots_method.' robot appears' ?> to be <?= implode(', ', array_slice($temp_top_robots, 0, -1)).(count($temp_top_robots) > 1 ? ' and ' : '').$temp_top_robots[count($temp_top_robots) - 1] ?>.
-                <? if (!empty($this_playerinfo['board_points_legacy'])){ ?>
-                    Prior to the game-changing battle point reboot of 2016, <strong><?= $temp_display_name ?></strong> had amassed a grand total of <strong><?= number_format($this_playerinfo['board_points_legacy'], 0, '.', ',') ?></strong> battle points and reached <?= mmrpg_number_suffix(mmrpg_prototype_leaderboard_rank_legacy($this_playerinfo['user_id'])) ?> place.
-                <? } ?>
             </p>
+            <?
+            // Define a quick function for formatting a legacy ranking span
+            function format_legacy_rank($legacy_rank){
+                if ($legacy_rank === '1st'){ $legacy_rank = '<span class="type_span field_type type_electric" style="padding: 0 6px; color: #ffffff;">'.$legacy_rank.'</span>'; }
+                elseif ($legacy_rank === '2nd'){ $legacy_rank = '<span class="type_span field_type type_cutter" style="padding: 0 6px; color: #ffffff;">'.$legacy_rank.'</span>'; }
+                elseif ($legacy_rank === '3rd'){ $legacy_rank = '<span class="type_span field_type type_earth" style="padding: 0 6px; color: #ffffff;">'.$legacy_rank.'</span>'; }
+                else { $legacy_rank = '<span class="type_span field_type type_none" style="padding: 0 6px; color: #ffffff;">'.$legacy_rank.'</span>'; }
+                return $legacy_rank;
+            }
+            // Print out legacy rankings from 2016 if they exist
+            if (!empty($this_playerinfo['board_points_legacy'])){
+                ?>
+                <p class="text" style="color: rgb(157, 220, 255); border-top: 1px solid rgba(0, 0, 0, 0.3); padding-top: 5px; margin-top: 10px;">
+                    Prior to the battle point reboot of 2016,
+                    <strong><?= $temp_display_name ?></strong> had amassed a grand total of
+                    <strong><?= number_format($this_playerinfo['board_points_legacy'], 0, '.', ',') ?></strong> battle points and reached
+                    <?= format_legacy_rank(mmrpg_number_suffix(mmrpg_prototype_leaderboard_rank_legacy($this_playerinfo['user_id'], 2016))) ?> place.
+                </p>
+                <?
+            }
+            // Print out legacy rankings from 2019 if they exist
+            if (!empty($this_playerinfo['board_points_legacy2'])){
+                ?>
+                <p class="text" style="color: rgb(157, 220, 255); border-top: 1px solid rgba(0, 0, 0, 0.3); padding-top: 5px; margin-top: 10px; padding-bottom: 5px;">
+                    Prior to the battle point reboot of 2019,
+                    <strong><?= $temp_display_name ?></strong> had amassed a grand total of
+                    <strong><?= number_format($this_playerinfo['board_points_legacy2'], 0, '.', ',') ?></strong> battle points and reached
+                    <?= format_legacy_rank(mmrpg_number_suffix(mmrpg_prototype_leaderboard_rank_legacy($this_playerinfo['user_id'], 2019))) ?> place.
+                </p>
+                <?
+            }
+            ?>
         </div>
     </div>
 
