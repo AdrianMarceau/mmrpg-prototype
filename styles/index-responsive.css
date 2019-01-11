@@ -285,7 +285,7 @@ body:before {
         opacity: 0.6;
     }
 
-    #mmrpg #game_container:after {
+    #mmrpg #game_container.has_iframe:after {
         content: " ";
         display: block;
         position: absolute;
@@ -1546,6 +1546,51 @@ body:before {
     }
     #window .page .body .community .formatting.formatting_expanded {
         margin-bottom: 13px;
+    }
+
+    #window .page .leaderboard .subbody .view_points .points_table,
+    #window .page .leaderboard .subbody .view_points .points_table thead,
+    #window .page .leaderboard .subbody .view_points .points_table thead tr,
+    #window .page .leaderboard .subbody .view_points .points_table thead tr th,
+    #window .page .leaderboard .subbody .view_points .points_table tfoot,
+    #window .page .leaderboard .subbody .view_points .points_table tfoot tr,
+    #window .page .leaderboard .subbody .view_points .points_table tfoot tr td,
+    #window .page .leaderboard .subbody .view_points .points_table tbody,
+    #window .page .leaderboard .subbody .view_points .points_table tbody tr,
+    #window .page .leaderboard .subbody .view_points .points_table tbody tr td {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+    }
+    #window .page .leaderboard .subbody .view_points .points_table {
+        position: relative;
+        padding-bottom: 35px;
+    }
+    #window .page .leaderboard .subbody .view_points .points_table thead {
+        margin-bottom: 2px;
+    }
+    #window .page .leaderboard .subbody .view_points .points_table tbody {
+
+    }
+    #window .page .leaderboard .subbody .view_points .points_table tbody tr {
+
+    }
+    #window .page .leaderboard .subbody .view_points .points_table tbody tr.main td.category,
+    #window .page .leaderboard .subbody .view_points .points_table tbody tr.main td.counter,
+    #window .page .leaderboard .subbody .view_points .points_table tbody tr.main td.points {
+        clear: both;
+    }
+    #window .page .leaderboard .subbody .view_points .points_table tbody:after,
+    #window .page .leaderboard .subbody .view_points .points_table tbody tr:after {
+        content: "";
+        display: block;
+        clear: both;
+    }
+    #window .page .leaderboard .subbody .view_points .points_table tfoot {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
 
 

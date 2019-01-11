@@ -73,7 +73,6 @@ $(document).ready(function(){
         });
 
 
-
     /*
      * MAIN MENU EVENTS
      */
@@ -101,6 +100,7 @@ $(document).ready(function(){
 
         });
 
+
     /*
      * GALLERY LINK EVENTS
      */
@@ -118,6 +118,7 @@ $(document).ready(function(){
                 });
             }
         }
+
 
     /*
      * GENREAL PAGE EVENTS
@@ -148,10 +149,8 @@ $(document).ready(function(){
             }
         */
 
+        }
 
-
-
-    }
 
     /*
      * DATABASE EVENTS
@@ -308,8 +307,6 @@ $(document).ready(function(){
 
                 }
 
-
-
         }
 
 
@@ -377,14 +374,11 @@ $(document).ready(function(){
         $('.formatting .toggle', thisCommunity).click(formattingToggleFunction);
         $('.formatting .toggle', thisCommunity).trigger('click');
 
-
         }
-
 
     // Create a reference to this form
     var thisCommunity = $('.page_community');
     var thisForm = $('.form', thisCommunity);
-
     // Ensure there is actually a community page wrapper to work with
     if (thisCommunity.length){
 
@@ -545,9 +539,7 @@ $(document).ready(function(){
                 }
             }
 
-
-
-    }
+        }
 
 
     /*
@@ -602,6 +594,57 @@ $(document).ready(function(){
 
         }
 
+
+    /*
+     * LEADERBOARD EVENTS
+     */
+
+    // Capture any gallery links and ensure they function with the colorbox
+    var $thisLeaderboard = $('.page_leaderboard', thisIndex);
+    if ($thisLeaderboard.length){
+
+        // Define events for the leaderboard "Points" sub-page
+        var $pointsTable = $('.view_points', $thisLeaderboard);
+        if ($pointsTable.length){
+            // Define click events for the individual toggle buttons on the row details
+            $('tbody a.toggle', $pointsTable).bind('click', function(e){
+                e.preventDefault();
+                var $link = $(this);
+                var $topRow = $link.closest('tr');
+                var $nextRow = $topRow.next();
+                var $details = $nextRow.find('.details ul');
+                if ($nextRow.hasClass('hidden')){
+                    // Expand the next row, change the icon to a "-"
+                    $nextRow.removeClass('hidden');
+                    $link.addClass('expanded').html('<span>-</span>');
+                    $details.perfectScrollbar('update');
+                    //$('html, body').animate({scrollTop: ($link.offset().top - 20)}, 'fast');
+                    $('html, body').animate({scrollTop: '+='+$details.outerHeight()+'px'}, 'slow');
+                    } else {
+                    // Collapse the next row, change the icon to a "+"
+                    $nextRow.addClass('hidden');
+                    $link.removeClass('expanded').html('<span>+</span>');
+                    }
+                });
+            $pointsTable.find('.details ul').css({overflow:'hidden'}).perfectScrollbar(thisScrollbarSettings);
+            $(window).resize(function(){ $pointsTable.find('.details ul').perfectScrollbar('update'); });
+            // Define a click event for the global expand/collapse all button of all rows
+            $('thead a.toggle', $pointsTable).bind('click', function(e){
+                e.preventDefault();
+                var $link = $(this);
+                var $tbody = $pointsTable.find('tbody');
+                var $allHidden = $tbody.find('tr.details.hidden');
+                if ($allHidden.length){
+                    // Some are hidden so we should expand all
+                    $allHidden.removeClass('hidden').find('.details ul').perfectScrollbar('update');
+                    } else {
+                    // None are hidden so we should collapse all
+                    $tbody.find('tr.details').addClass('hidden');
+                    }
+                });
+            }
+
+        }
 
 });
 

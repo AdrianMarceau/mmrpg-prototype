@@ -2509,86 +2509,199 @@ button {
     content: ")";
 }
 
-#window .page .leaderboard .subbody .bodytext .player_stats.mission {
-    width: 49.5%;
-    margin: 0 0.5% 5px 0;
-    box-sizing: border-box;
+#window .page .leaderboard .subbody .view_points {
+    margin-top: 5px;
+    /* padding-right: 20px; */
 }
-#window .page .leaderboard .subbody .player_stats.mission .records {
+#window .page .leaderboard .subbody .view_points .points_table {
     display: table;
-    width: 100%;
-    margin: 0 auto;
     table-layout: fixed;
-}
-#window .page .leaderboard .subbody .player_stats.mission strong.label {
-    display: block;
-    -webkit-border-radius: 3px 3px 0 0;
-    -moz-border-radius: 3px 3px 0 0;
-    border-radius: 3px 3px 0 0;
-    padding: 2px 6px;
-}
-#window .page .leaderboard .subbody .player_stats.mission .label {
-
-}
-#window .page .leaderboard .subbody .player_stats.mission .stat {
-    display: table-cell;
-    text-align: left;
-    margin: 0;
-    padding: 2px 6px;
-}
-#window .page .leaderboard .subbody .player_stats.mission .stat:after {
-    content: "";
-    display: none;
-}
-#window .page .leaderboard .subbody .player_stats.mission .stat span.label,
-#window .page .leaderboard .subbody .player_stats.mission .stat span.counter {
-    display: block;
-    width: 100%;
     box-sizing: border-box;
-    padding-right: 6px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    border-spacing: 2px;
+    border-collapse: separate;
+    width: 100%;
 }
-#window .page .leaderboard .subbody .player_stats.mission .stat span.label {
-
+#window .page .leaderboard .subbody .view_points .points_table thead th {
+    position: relative;
+    font-weight: normal;
+    font-size: 120%;
+    line-height: 1.2;
+    text-align: left;
+    padding: 0;
 }
-#window .page .leaderboard .subbody .player_stats.mission .stat span.counter {
-    text-align: right;
+#window .page .leaderboard .subbody .view_points .points_table tfoot td {
+    font-weight: normal;
+    font-size: 120%;
+    line-height: 1.2;
+    text-align: left;
+    padding: 0;
 }
-#window .page .leaderboard .subbody .player_stats.mission .stat .counter.max_points {
-    font-weight: bold;
-}
-#window .page .leaderboard .subbody .player_stats.mission .stat .counter.max_points:before {
-    content: "+";
-}
-#window .page .leaderboard .subbody .player_stats.mission .stat .counter.defeat_count {
-    color: rgb(171, 50, 50);
-}
-#window .page .leaderboard .subbody .player_stats.mission .stat .counter.victory_count {
-    color: rgb(92, 193, 69);
-}
-
-#window .page .leaderboard .subbody .mission_points {
+#window .page .leaderboard .subbody .view_points .points_table thead th .table_head,
+#window .page .leaderboard .subbody .view_points .points_table tfoot td .table_foot {
     display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
     float: none;
     clear: both;
-    font-size: 13px;
-    line-height: 19px;
-    padding: 6px 12px;
-    background-color: #191919;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: : inherit;
+    text-align: inherit;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    padding: 10px;
+    position: relative;
+}
+#window .page .leaderboard .subbody .view_points .points_table thead th .table_head:before,
+#window .page .leaderboard .subbody .view_points .points_table tfoot td .table_foot:before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+#window .page .leaderboard .subbody .view_points .points_table thead th .table_head > span:not([class]),
+#window .page .leaderboard .subbody .view_points .points_table tfoot td .table_foot > span:not([class]) {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: auto;
+}
+#window .page .leaderboard .subbody .view_points .points_table thead th a.toggle {
+    display: inline-block;
+    position: absolute;
+    z-index: 3;
+    top: 9px;
+    right: 12px;
+    text-align: center;
+    font-size: 80%;
+    color: #969696;
+    cursor: pointer;
+}
+#window .page .leaderboard .subbody .view_points .points_table thead th a.toggle:hover {
+    color: #efefef;
+}
+#window .page .leaderboard .subbody .view_points .points_table thead th a.toggle > span {
+    display: inline-block;
+    padding: 0 3px;
+}
+#window .page .leaderboard .subbody .view_points .points_table thead th a.toggle:before {
+    content: "[";
+}
+#window .page .leaderboard .subbody .view_points .points_table thead th a.toggle:after {
+    content: "]";
+}
+#window .page .leaderboard .subbody .view_points .points_table tfoot td .table_foot:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#window .page .leaderboard .subbody .view_points .points_table tfoot td .table_foot .label {
+    display: block;
+    float: left;
+    text-align: left;
+}
+#window .page .leaderboard .subbody .view_points .points_table tfoot td .table_foot .total {
+    display: block;
+    float: right;
     text-align: right;
-    letter-spacing: 0.5px;
-    color: #A0A0A0;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
 }
-#window .page .leaderboard .subbody .mission_points .player {
-    color: #E0E0E0;
+#window .page .leaderboard .subbody table.points_table tr:nth-child(odd),
+#window .page .leaderboard .subbody table.points_table tr:nth-child(even) {
+    background-color: transparent;
 }
-#window .page .leaderboard .subbody .mission_points .overall {
-    color: #C0C0C0;
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.odd td {
+    background-color: #242424;
 }
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.even td {
+    background-color: #2e2e2e;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr {
+
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td {
+    padding: 5px 10px;
+    text-align: right;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td.category {
+    text-align: left;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td.category h5 {
+    font-weight: bold;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td.category h5,
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td.category a {
+    display: inline;
+    margin-right: 6px;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.details {
+
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.details td {
+    padding-bottom: 10px;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.details ul {
+    display: block;
+    margin: 0 auto;
+    padding: 5px 5px 0;
+    list-style: none;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.1);
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    font-size: 90%;
+    line-height: 1.6;
+    max-height: 400px;
+    max-height: calc(100vh - 150px);
+    overflow: auto;
+    position: relative;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.details ul:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.details ul li {
+    display: block;
+    float: left;
+    margin: 0 5px 5px 0;
+    padding: 0;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.details.hidden {
+    display: none;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td a.toggle {
+    color: inherit;
+    text-decoration: none;
+    font-size: 90%;
+    color: #969696;
+    cursor: pointer;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td a.toggle:hover,
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td a.toggle.expanded {
+    color: #efefef;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td a.toggle:before {
+    content: "[";
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td a.toggle:after {
+    content: "]";
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr td a.toggle > span {
+    display: inline-block;
+    text-align: center;
+    width: 1em;
+}
+
 
 #window .page .leaderboard .subbody .text .thread_header_links,
 #window .page .leaderboard .subbody .text .post_header_links {
@@ -5256,7 +5369,7 @@ body.windowFlag_landscapeMode #window .page_file .form .field_post_body .textare
     display: block;
     float: left;
     width: 65px;
-    width: calc((100% / 8) - 10px);
+    width: calc((100% / 9) - 10px);
     max-width: 110px;
     font-size: 13px;
     line-height: 19px;
