@@ -4941,6 +4941,7 @@ class rpg_robot extends rpg_object {
                         $new_multiplier_value = MMRPG_SETTINGS_MULTIPLIER_MAX;
                     }
                     $this_field->set_multiplier($temp_boost_type, $new_multiplier_value);
+                    $this_field->update_session();
 
                     // Create the event to show this element boost
                     if ($temp_change_percent > 0){
