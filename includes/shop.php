@@ -660,7 +660,7 @@ if (!empty($this_shop_index['reggae'])){
                 if ($cores_sold < $cores_required){ continue; }
 
                 // Apply a discount to the price if the shop is a high enough level
-                if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
+                if (!empty($level_discount)){ $ability_price -= floor(($ability_price / 2) * $level_discount); }
 
                 // Append this ability to the parent weapon selling array
                 $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
