@@ -60,14 +60,14 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
 
 
             $this_robots_count = $this_robots === 1 ? '1 Robot' : $this_robots.' Robots';
+            $this_abilities_count = $this_abilities === 1 ? '1 Ability' : $this_abilities.' Abilities';
             $this_items_count = $this_items === 1 ? '1 Item' : $this_items.' Items';
             $this_stars_count = $this_stars === 1 ? '1 Star' : $this_stars.' Stars';
-            $this_abilities_count = $this_abilities === 1 ? '1 Ability' : $this_abilities.' Abilities';
 
             $this_records_html = array();
-            if (!empty($this_items_count)){ $this_records_html[] = '<span class="count items">'.$this_items_count.'</span>'; }
             if (!empty($this_robots_count)){ $this_records_html[] = '<span class="count robots">'.$this_robots_count.'</span>'; }
             if (!empty($this_abilities_count)){ $this_records_html[] = '<span class="count abilities">'.$this_abilities_count.'</span>'; }
+            if (!empty($this_items_count)){ $this_records_html[] = '<span class="count items">'.$this_items_count.'</span>'; }
             if (!empty($this_stars_count)){ $this_records_html[] = '<span class="count stars">'.$this_stars_count.'</span>'; }
             $this_records_html = implode(' <span class="pipe">|</span> ', $this_records_html);
 
