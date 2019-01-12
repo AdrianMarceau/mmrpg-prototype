@@ -1598,7 +1598,6 @@ function mmrpg_prototype_leaderboard_rank_legacy($user_id, $year_token = 2016){
             FROM mmrpg_leaderboard AS ui
             WHERE
             ui.{$legacy_field} >= uo.{$legacy_field}
-            AND ui.user_id <> uo.user_id
             ) AS user_rank
         FROM mmrpg_leaderboard AS uo
         WHERE
