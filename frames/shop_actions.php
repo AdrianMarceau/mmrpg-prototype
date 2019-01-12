@@ -54,9 +54,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
                 $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_spent'] += $temp_price;
                 $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price + (($temp_quantity - 1) * ($temp_quantity - 1));
 
+                // Refresh battle points and ranking so we can return updated score
+                mmrpg_prototype_refresh_battle_points();
+                $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
+                $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
+
                 // Save, produce the success message with the new field order
-                mmrpg_save_game_session();
-                exit('success|item-sold|'.$temp_current_quantity.'|'.$global_zenny_counter);
+                exit('success|item-sold|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
 
             }
             // Otherwise if the user requested more than they have
@@ -107,9 +111,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
             $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_spent'] += $temp_price;
             $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price - (($temp_new_quantity - 1) * ($temp_new_quantity - 1));
 
+            // Refresh battle points and ranking so we can return updated score
+            mmrpg_prototype_refresh_battle_points();
+            $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
+            $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
+
             // Save, produce the success message with the new field order
-            mmrpg_save_game_session();
-            exit('success|star-shown|'.$temp_current_quantity.'|'.$global_zenny_counter);
+            exit('success|star-shown|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
 
         }
         // Otherwise if this star does not exist
@@ -184,9 +192,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
                 $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
                 $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price + (($temp_quantity - 1) * ($temp_quantity - 1));
 
+                // Refresh battle points and ranking so we can return updated score
+                mmrpg_prototype_refresh_battle_points();
+                $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
+                $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
+
                 // Save, produce the success message with the new field order
-                mmrpg_save_game_session();
-                exit('success|item-bought|'.$temp_current_quantity.'|'.$global_zenny_counter);
+                exit('success|item-bought|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
 
             }
             // Otherwise if the user requested more than they have
@@ -235,9 +247,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
                     $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
                     $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
 
+                    // Refresh battle points and ranking so we can return updated score
+                    mmrpg_prototype_refresh_battle_points();
+                    $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
+                    $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
+
                     // Save, produce the success message with the new ability order
-                    mmrpg_save_game_session();
-                    exit('success|ability-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
+                    exit('success|ability-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
 
                 }
                 // Otherwise, if the ability was not unlocked for some reason
@@ -293,9 +309,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
             $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
 
+            // Refresh battle points and ranking so we can return updated score
+            mmrpg_prototype_refresh_battle_points();
+            $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
+            $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
+
             // Save, produce the success message with the new field order
-            mmrpg_save_game_session();
-            exit('success|field-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
+            exit('success|field-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
 
         }
         // Otherwise if this star does not exist
@@ -355,9 +375,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
             $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
 
+            // Refresh battle points and ranking so we can return updated score
+            mmrpg_prototype_refresh_battle_points();
+            $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
+            $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
+
             // Save, produce the success message with the new robot order
-            mmrpg_save_game_session();
-            exit('success|robot-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
+            exit('success|robot-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
 
         }
         // Otherwise if this robot does not exist
@@ -395,9 +419,13 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
             $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
 
+            // Refresh battle points and ranking so we can return updated score
+            mmrpg_prototype_refresh_battle_points();
+            $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
+            $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
+
             // Save, produce the success message with the new alt order
-            mmrpg_save_game_session();
-            exit('success|alt-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter);
+            exit('success|alt-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
 
         }
         // Otherwise if this star does not exist
