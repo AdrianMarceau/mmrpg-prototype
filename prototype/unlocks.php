@@ -899,6 +899,7 @@ if (!mmrpg_prototype_item_unlocked('omega-seed')
  * COMMON OPTIONS
  */
 
+/*
 // UNLOCK EVENT : PLAYER BATTLE REWARDS
 
 // Collect any outstanding battle rewards from the database
@@ -997,5 +998,6 @@ if (!empty($temp_battles_list)){
     }
 
 }
+*/
 
 ?>
