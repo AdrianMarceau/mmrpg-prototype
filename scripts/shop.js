@@ -359,7 +359,9 @@ $(document).ready(function(){
                     // Update this item's global quantity
                     var newItemCount = data[2] != undefined ? parseInt(data[2]) : false;
                     var newZennyTotal = data[3] != undefined ? parseInt(data[3]) : false;
-                    //console.log({newItemCount:newItemCount,newZennyTotal:newZennyTotal});
+                    var newPointsTotal = data[4] != undefined && data[4].indexOf('points:') !== -1 ? parseInt(data[4].replace('points:', '')) : false;
+                    var newLeaderboardRank = data[5] != undefined && data[5].indexOf('rank:') !== -1 ? data[5].replace('rank:', '') : false;
+                    //console.log({newItemCount:newItemCount,newZennyTotal:newZennyTotal,newPointsTotal:newPointsTotal,newLeaderboardRank:newLeaderboardRank});
 
                     // Define the change text
                     if (thisAction == 'buy'){ var thisChangeText = '<span class="zenny" style="color: #C35E5E;">-'+printNumberWithCommas(thisPrice)+'z</span>'; }
@@ -386,7 +388,16 @@ $(document).ready(function(){
 
                     var thisZennyFormatted = printNumberWithCommas(newZennyTotal);
                     $('#zenny_counter', thisBody).css({color:'#8CEB80'}).html(thisZennyFormatted);
-                    if (window.self !== window.parent){ parent.prototype_update_zenny(thisZennyFormatted+' z'); }
+                    if (window.self !== window.parent){
+                        parent.prototype_update_zenny(thisZennyFormatted+' z');
+                        if (newPointsTotal !== false){
+                            var newPointsTotalFormatted = printNumberWithCommas(newPointsTotal);
+                            parent.prototype_update_battle_points(newPointsTotalFormatted);
+                            }
+                        if (newLeaderboardRank !== false){
+                            parent.prototype_update_leaderboard_rank(newLeaderboardRank);
+                            }
+                        }
 
                     updateItemCells();
 

@@ -1469,8 +1469,20 @@ function prototype_menu_switch(switchOptions){
         }
 }
 
-// Define a function for updating the zenny amount in the menu
+// Define a function for updating the zenny amount in the prototype banner
 function prototype_update_zenny(newZenny){
     var thisZennyContainer = $('.banner .subpoints .amount.zenny', thisPrototype);
     thisZennyContainer.html(newZenny);
+}
+
+// Define a function for updating the battle point amount in the prototype banner
+function prototype_update_battle_points(newPoints){
+    var thisPointsContainer = $('.banner .points .amount .value', thisPrototype);
+    thisPointsContainer.html(newPoints);
+}
+
+// Define a function for updating the ranking position in the prototype banner
+function prototype_update_leaderboard_rank(newRank){
+    var thisRankContainer = $('.banner .points .amount .place', thisPrototype);
+    thisRankContainer.html(newRank);
 }
