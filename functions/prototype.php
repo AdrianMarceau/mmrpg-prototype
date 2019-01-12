@@ -1559,9 +1559,11 @@ function mmrpg_prototype_leaderboard_rank($user_id){
         uo.board_points,
         (SELECT
             COUNT(DISTINCT ui.board_points)
-           FROM mmrpg_leaderboard AS ui
-           WHERE ui.board_points >= uo.board_points
-           ) AS user_rank
+            FROM mmrpg_leaderboard AS ui
+            WHERE
+            ui.board_points >= uo.board_points
+            AND ui.user_id <> uo.user_id
+            ) AS user_rank
         FROM mmrpg_leaderboard uo
         WHERE
         user_id = {$user_id} AND
@@ -1593,9 +1595,11 @@ function mmrpg_prototype_leaderboard_rank_legacy($user_id, $year_token = 2016){
         uo.{$legacy_field},
         (SELECT
             COUNT(DISTINCT ui.{$legacy_field})
-           FROM mmrpg_leaderboard AS ui
-           WHERE ui.{$legacy_field} >= uo.{$legacy_field}
-           ) AS user_rank
+            FROM mmrpg_leaderboard AS ui
+            WHERE
+            ui.{$legacy_field} >= uo.{$legacy_field}
+            AND ui.user_id <> uo.user_id
+            ) AS user_rank
         FROM mmrpg_leaderboard AS uo
         WHERE
         user_id = {$user_id} AND

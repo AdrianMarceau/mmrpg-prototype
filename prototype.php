@@ -189,6 +189,12 @@ if (rpg_game::is_user()){
     // Save the game session
     mmrpg_save_game_session();
 
+    // Collect and update the new rank based on point score
+    $old_board_rank = $this_boardinfo['board_rank'];
+    $new_board_rank = mmrpg_prototype_leaderboard_rank($_SESSION[$session_token]['USER']['userid']);
+    $_SESSION['GAME']['BOARD']['boardrank'] = $new_board_rank;
+    $this_boardinfo['board_rank'] = $new_board_rank;
+
 }
 
 ?>
