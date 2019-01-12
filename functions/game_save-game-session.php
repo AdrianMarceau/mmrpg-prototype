@@ -116,8 +116,8 @@ function mmrpg_save_game_session(){
                 $this_board_array['user_id'] = $temp_user_id;
                 $this_board_array['save_id'] = $temp_save_id;
                 $this_board_array['board_points'] = !empty($this_counters['battle_points']) ? $this_counters['battle_points'] : 0;
+                $this_board_array['board_robots_count'] = 0;
                 $this_board_array['board_robots'] = array();
-                $this_board_array['board_battles'] = array();
                 $this_board_array['board_stars'] = 0;
                 $this_board_array['board_stars_dr_light'] = 0;
                 $this_board_array['board_stars_dr_wily'] = 0;
@@ -126,10 +126,6 @@ function mmrpg_save_game_session(){
                 $this_board_array['board_abilities_dr_light'] = 0;
                 $this_board_array['board_abilities_dr_wily'] = 0;
                 $this_board_array['board_abilities_dr_cossack'] = 0;
-                $this_board_array['board_missions'] = 0;
-                $this_board_array['board_missions_dr_light'] = 0;
-                $this_board_array['board_missions_dr_wily'] = 0;
-                $this_board_array['board_missions_dr_cossack'] = 0;
                 $temp_board_ability_tokens = array();
                 if (!empty($this_values['battle_rewards'])){
                     foreach ($mmrpg_index_players AS $player_token => $player_array){
@@ -138,9 +134,7 @@ function mmrpg_save_game_session(){
                         $player_battles_array = !empty($this_values['battle_complete'][$player_token]) ? $this_values['battle_complete'][$player_token] : array();
                         $player_database_token = str_replace('-', '_', $player_token);
                         if (!empty($player_reward_array)){
-                            $this_board_array['board_points_'.$player_database_token] = $player_reward_array['player_points'];
                             $this_board_array['board_robots_'.$player_database_token] = array();
-                            $this_board_array['board_battles_'.$player_database_token] = array();
                             if (!empty($player_reward_array['player_robots'])){
                                 foreach ($player_reward_array['player_robots'] AS $robot_token => $robot_array){
                                     $temp_token = $robot_array['robot_token'];
@@ -161,22 +155,10 @@ function mmrpg_save_game_session(){
                                     }
                                 }
                             }
-                            if (!empty($player_battles_array)){
-                                foreach ($player_battles_array AS $battle_token => $battle_info){
-                                    $temp_token = $battle_info['battle_token'];
-                                    $this_board_array['board_battles'][] = '['.$temp_token.']';
-                                    $this_board_array['board_battles_'.$player_database_token][] = '['.$temp_token.']';
-                                    $this_board_array['board_missions'] += 1;
-                                    $this_board_array['board_missions_'.$player_database_token] += 1;
-                                }
-                            }
                         } else {
-                            $this_board_array['board_points_'.$player_database_token] = 0;
                             $this_board_array['board_robots_'.$player_database_token] = array();
-                            $this_board_array['board_battles_'.$player_database_token] = array();
                         }
                         $this_board_array['board_robots_'.$player_database_token] = !empty($this_board_array['board_robots_'.$player_database_token]) ? implode(',', $this_board_array['board_robots_'.$player_database_token]) : '';
-                        $this_board_array['board_battles_'.$player_database_token] = !empty($this_board_array['board_battles_'.$player_database_token]) ? implode(',', $this_board_array['board_battles_'.$player_database_token]) : '';
                     }
                 }
 
@@ -187,8 +169,8 @@ function mmrpg_save_game_session(){
                         $this_board_array['board_stars_'.$temp_star_player] += 1;
                     }
                 }
+                $this_board_array['board_robots_count'] = !empty($this_board_array['board_robots']) ? count($this_board_array['board_robots']) : 0;
                 $this_board_array['board_robots'] = !empty($this_board_array['board_robots']) ? implode(',', $this_board_array['board_robots']) : '';
-                $this_board_array['board_battles'] = !empty($this_board_array['board_battles']) ? implode(',', $this_board_array['board_battles']) : '';
                 $this_board_array['board_date_created'] = $this_user_array['user_date_created'];
                 $this_board_array['board_date_modified'] = $this_user_array['user_date_modified'];
 
@@ -317,8 +299,8 @@ function mmrpg_save_game_session(){
         // Define the board database update array and populate
         $this_board_array = array();
         $this_board_array['board_points'] = !empty($this_counters['battle_points']) ? $this_counters['battle_points'] : 0;
+        $this_board_array['board_robots_count'] = array();
         $this_board_array['board_robots'] = array();
-        $this_board_array['board_battles'] = array();
         $this_board_array['board_stars'] = 0;
         $this_board_array['board_stars_dr_light'] = 0;
         $this_board_array['board_stars_dr_wily'] = 0;
@@ -327,10 +309,6 @@ function mmrpg_save_game_session(){
         $this_board_array['board_abilities_dr_light'] = 0;
         $this_board_array['board_abilities_dr_wily'] = 0;
         $this_board_array['board_abilities_dr_cossack'] = 0;
-        $this_board_array['board_missions'] = 0;
-        $this_board_array['board_missions_dr_light'] = 0;
-        $this_board_array['board_missions_dr_wily'] = 0;
-        $this_board_array['board_missions_dr_cossack'] = 0;
         $this_board_array['board_awards'] = !empty($this_values['prototype_awards']) ? array_keys($this_values['prototype_awards']) : '';
 
         $temp_board_ability_tokens = array();
@@ -343,9 +321,7 @@ function mmrpg_save_game_session(){
                 $player_battles_array = !empty($this_values['battle_complete'][$player_token]) ? $this_values['battle_complete'][$player_token] : array();
                 $player_database_token = str_replace('-', '_', $player_token);
                 if (!empty($player_reward_array)){
-                    $this_board_array['board_points_'.$player_database_token] = !empty($player_reward_array['player_points']) ? $player_reward_array['player_points'] : 0;
                     $this_board_array['board_robots_'.$player_database_token] = array();
-                    $this_board_array['board_battles_'.$player_database_token] = array();
                     if (!empty($player_reward_array['player_robots'])){
                         foreach ($player_reward_array['player_robots'] AS $robot_token => $robot_array){
                             //if (!isset($robot_array['robot_token'])){ die('player_robots->'.print_r($robot_array, true)); }
@@ -367,22 +343,10 @@ function mmrpg_save_game_session(){
                             }
                         }
                     }
-                    if (!empty($player_battles_array)){
-                        foreach ($player_battles_array AS $battle_token => $battle_info){
-                            $temp_token = $battle_info['battle_token'];
-                            $this_board_array['board_battles'][] = '['.$temp_token.']';
-                            $this_board_array['board_battles_'.$player_database_token][] = '['.$temp_token.']';
-                            $this_board_array['board_missions'] += 1;
-                            $this_board_array['board_missions_'.$player_database_token] += 1;
-                        }
-                    }
                 } else {
-                    $this_board_array['board_points_'.$player_database_token] = 0;
                     $this_board_array['board_robots_'.$player_database_token] = array();
-                    $this_board_array['board_battles_'.$player_database_token] = array();
                 }
                 $this_board_array['board_robots_'.$player_database_token] = !empty($this_board_array['board_robots_'.$player_database_token]) ? implode(',', $this_board_array['board_robots_'.$player_database_token]) : '';
-                $this_board_array['board_battles_'.$player_database_token] = !empty($this_board_array['board_battles_'.$player_database_token]) ? implode(',', $this_board_array['board_battles_'.$player_database_token]) : '';
             }
         }
 
@@ -394,9 +358,8 @@ function mmrpg_save_game_session(){
             }
         }
 
-        //$this_board_array['board_robots'] = json_encode($this_board_array['board_robots']);
+        $this_board_array['board_robots_count'] = !empty($this_board_array['board_robots']) ? count($this_board_array['board_robots']) : 0;
         $this_board_array['board_robots'] = !empty($this_board_array['board_robots']) ? implode(',', $this_board_array['board_robots']) : '';
-        $this_board_array['board_battles'] = !empty($this_board_array['board_battles']) ? implode(',', $this_board_array['board_battles']) : '';
         $this_board_array['board_awards'] = !empty($this_board_array['board_awards']) ? implode(',', $this_board_array['board_awards']) : '';
         $this_board_array['board_date_modified'] = time();
 
