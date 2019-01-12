@@ -46,7 +46,7 @@ class rpg_mission_starter extends rpg_mission {
         //$temp_battle_omega['battle_name'] = $this_robot_name.($temp_target_count > 1 ? 's' : '');
         //$temp_battle_omega['battle_name'] = $this_robot_name.($temp_target_count > 1 ? 's' : '').' Battle';
         $temp_battle_omega['battle_turns'] = (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * $temp_target_count);
-        $temp_battle_omega['battle_zenny'] = ceil(($this_prototype_data['battles_complete'] > 1 ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL) * $temp_target_count);
+        $temp_battle_omega['battle_zenny'] = ceil(($this_prototype_data['battles_complete'] > 1 ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL) * $temp_target_count * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
         if ($temp_battle_omega_complete['battle_count'] > 0){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * (2 / (2 + $temp_battle_omega_complete['battle_count']))); }
         $temp_battle_omega['battle_field_base']['field_music'] = mmrpg_prototype_get_player_boss_music($this_prototype_data['this_player_token']);
         $temp_battle_omega['battle_target_player']['player_id'] = MMRPG_SETTINGS_TARGET_PLAYERID;
