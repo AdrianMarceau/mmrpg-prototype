@@ -117,8 +117,9 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             $doctors_unlocked = array_keys($user_battle_rewards);
             foreach ($doctors_unlocked AS $doctor_token){
                 if ($doctor_token === 'player'){ continue; }
+                $pt_complete = !empty($user_save_array['save_values']['prototype_awards']['prototype_complete_'.str_replace('dr-', '', $doctor_token)]) ? true : false;
                 for ($ch = 1; $ch <= 5; $ch++){
-                    if (empty($event_flags[$doctor_token.'_chapter-'.$ch.'-unlocked'])){ continue; }
+                    if (!$pt_complete && empty($event_flags[$doctor_token.'_chapter-'.$ch.'-unlocked'])){ continue; }
                     $chapter_events_unlocked[] = $doctor_token.'_chapter-'.$ch;
                 }
             }
