@@ -61,6 +61,66 @@ $update_patch_details[$token] .= "must be recalculated. ";
 function mmrpg_patch_star_force_reboot_2k16($_GAME){ /* ... */ }
 
 
+// -- BATTLE POINT REBOOT 2k19 -- //
+
+// Define a patch function for applying the next update
+$token = 'battle_point_reboot_2k19';
+$update_patch_tokens[] = $token;
+$update_patch_names[$token] = 'Battle Point Reboot of 2019';
+$update_patch_details[$token] = "As part of a major update to the game's mechanics, all battle points and leaderboard \n";
+$update_patch_details[$token] .= "standings have been reset and recalculated. Your score is no longer based on your \n";
+$update_patch_details[$token] .= "turn count in missions, but rather the progress you've made in the game and the \n";
+$update_patch_details[$token] .= "items, robots, abilities, etc. that you've collected. Please check the \"Points\" \n";
+$update_patch_details[$token] .= "tab on your leaderboard profile for more details and thank you for playing!  ";
+function mmrpg_patch_battle_point_reboot_2k19($_GAME){
+
+    // Pull in global variables
+    global $db;
+
+    // Return now if the user ID is somehow empty
+    if (empty($_GAME['user_id'])){ return false; }
+
+    // Update the user's "legacy2" score if it's not been set already
+    $db->query("UPDATE
+        mmrpg_leaderboard AS board
+        SET board.board_points_legacy2 = board.board_points
+        WHERE board.board_points_legacy2 = 0 AND board.user_id = {$_GAME['user_id']}
+        ;");
+
+    // Collect the current leaderboard data for this player
+    $legacy2_board_points = $db->get_value("SELECT
+        board.board_points_legacy2
+        FROM mmrpg_leaderboard AS board
+        WHERE board.user_id = {$_GAME['user_id']}
+        ;", 'board_points_legacy2');
+
+    // Recalculate battle points using the new system
+    $new_points_index = array();
+    $new_board_points = mmrpg_prototype_calculate_battle_points_2k19($_GAME['user_id'], $new_points_index);
+
+    // Print out the variables for the user to see
+    echo('Old Battle Point Total = '.number_format($legacy2_board_points, 0, '.', ',').PHP_EOL);
+    echo('New Battle Point Total = '.number_format($new_board_points, 0, '.', ',').PHP_EOL);
+
+    // Update the battle points of the actual game file
+    $_GAME['counters']['battle_points'] = $new_board_points;
+
+    // Update battle points and other details of the leaderboard row
+    $update_array = array();
+    $update_array['board_points'] = $new_board_points;
+    $update_array['board_robots'] = !empty($new_points_index['robots_unlocked']) ? '['.implode('],[', $new_points_index['robots_unlocked']).']' : '';
+    $update_array['board_robots_count'] = count($new_points_index['robots_unlocked']);
+    $update_array['board_abilities'] = count($new_points_index['abilities_unlocked']);
+    $update_array['board_items'] = count($new_points_index['items_unlocked']);
+    $update_array['board_stars'] = count($new_points_index['field_stars_collected']) + count($new_points_index['fusion_stars_collected']);
+    $db->update('mmrpg_leaderboard', $update_array, array('user_id' => $_GAME['user_id']));
+
+    // Return the updated game array
+    return $_GAME;
+
+}
+
+
 /*
 
 // -- PATCH FUNCTION TEMPLATE -- //
