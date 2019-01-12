@@ -31,19 +31,8 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
         $board['board_battles_'.$ptoken2] = $temp_battles;
     }
 
-    // Break apart the robot and battle values into arrays
-    $temp_robots = !empty($board['board_robots']) ? $board['board_robots'] : array();
-    if (!empty($temp_robots)){
-        $temp_robots = explode(',', $temp_robots);
-        foreach ($temp_robots AS $key => $string){
-            list($token, $level) = explode(':', substr($string, 1, -1));
-            $temp_info = array('robot_token' => $token, 'robot_level' => $level);
-            $temp_robots[$key] = $temp_info;
-        }
-    }
     // Collect this player's robots
-    $this_robots = $temp_robots;
-    $this_robots_count = !empty($this_robots) ? count($this_robots) : 0;
+    $this_robots = !empty($board['board_robots_count']) ? $board['board_robots_count'] : 0;
     $this_items = !empty($board['board_items']) ? $board['board_items'] : 0;
     $this_abilities = !empty($board['board_abilities']) ? $board['board_abilities'] : 0;
     $this_stars = !empty($board['board_stars']) ? $board['board_stars'] : 0;
@@ -70,7 +59,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
 
 
 
-            $this_robots_count = $this_robots_count === 1 ? '1 Robot' : $this_robots_count.' Robots';
+            $this_robots_count = $this_robots === 1 ? '1 Robot' : $this_robots.' Robots';
             $this_items_count = $this_items === 1 ? '1 Item' : $this_items.' Items';
             $this_stars_count = $this_stars === 1 ? '1 Star' : $this_stars.' Stars';
             $this_abilities_count = $this_abilities === 1 ? '1 Ability' : $this_abilities.' Abilities';
