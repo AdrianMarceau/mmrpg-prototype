@@ -158,6 +158,7 @@ $temp_leaderboard_query = "SELECT
     board.board_robots_dr_light,
     board.board_robots_dr_wily,
     board.board_robots_dr_cossack,
+    board.board_robots_count,
     board.board_battles,
     board.board_battles_dr_light,
     board.board_battles_dr_wily,
