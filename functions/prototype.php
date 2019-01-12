@@ -392,6 +392,33 @@ function mmrpg_prototype_calculate_battle_points($update_session = false, $_GAME
     return $total_battle_points;
 }
 
+// Define a function that automatically refreshes the user's battle point total and ranking
+function mmrpg_prototype_refresh_battle_points(){
+
+    // Do not refresh anything unless this is a logged-in user
+    if (rpg_game::is_user()){
+
+        // Return the current point total for thisgame
+        $session_token = mmrpg_game_token();
+        if (empty($_GAME)){ $_GAME = &$_SESSION[$session_token]; }
+
+        // Recalculate the overall battle points total with new values
+        mmrpg_prototype_calculate_battle_points(true);
+
+        // Save the game session
+        mmrpg_save_game_session();
+
+        // Collect and update the new rank based on point score
+        global $this_boardinfo;
+        $old_board_rank = $this_boardinfo['board_rank'];
+        $new_board_rank = mmrpg_prototype_leaderboard_rank($_GAME['USER']['userid']);
+        $_GAME['BOARD']['boardrank'] = $new_board_rank;
+        $this_boardinfo['board_rank'] = $new_board_rank;
+
+    }
+
+}
+
 // Define a function for calculating a player's prototype points total
 function mmrpg_prototype_calculate_player_points($player_token, $update_session = false, $_GAME = false){
 

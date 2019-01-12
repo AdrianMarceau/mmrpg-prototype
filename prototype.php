@@ -181,21 +181,7 @@ require('prototype_awards.php');
 
 
 // If possible, attempt to save the game to the session
-if (rpg_game::is_user()){
-
-    // Recalculate the overall battle points total with new values
-    mmrpg_prototype_calculate_battle_points(true);
-
-    // Save the game session
-    mmrpg_save_game_session();
-
-    // Collect and update the new rank based on point score
-    $old_board_rank = $this_boardinfo['board_rank'];
-    $new_board_rank = mmrpg_prototype_leaderboard_rank($_SESSION[$session_token]['USER']['userid']);
-    $_SESSION['GAME']['BOARD']['boardrank'] = $new_board_rank;
-    $this_boardinfo['board_rank'] = $new_board_rank;
-
-}
+if (rpg_game::is_user()){ mmrpg_prototype_refresh_battle_points(); }
 
 ?>
 <!DOCTYPE html>
