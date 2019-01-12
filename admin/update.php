@@ -144,7 +144,7 @@ elseif (empty($this_update_list) && $this_request_type == 'ajax'){
 // If this was an ajax request, flush the previous buffer and exit with the return markup
 if ($this_request_type == 'ajax'){
     ob_end_clean();
-    header('Content-type: text/plain;');
+    if (!isset($_REQUEST['print']) || $_REQUEST['print'] === 'false'){ header('Content-type: text/plain;'); }
     echo $this_return_markup;
     exit();
 }

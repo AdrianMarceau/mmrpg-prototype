@@ -239,7 +239,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         if ($update_array['save_values_robot_database'] != $data['save_values_robot_database']){ $this_page_markup .= 'Save values robot database has been changed...<br />'; }
         if ($update_array['save_counters'] != $data['save_counters']){ $this_page_markup .= 'Save counters have been changed...<br />'; }
         if ($temp_success === false){ $this_page_markup .= '...Failure!'; }
-        else { $this_page_markup .= '...'.(!empty($temp_success) ? 'Success!' : 'Skipped!'); }
+        else { $this_page_markup .= '...'.(!empty($temp_success) ? 'Success ('.$temp_success.')!' : 'Success!'); }
         unset($update_array);
 
     $this_page_markup .= '</p><hr />';
