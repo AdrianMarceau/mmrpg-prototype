@@ -36,7 +36,8 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     if (!empty($temp_robots)){
         $temp_robots = explode(',', $temp_robots);
         foreach ($temp_robots AS $key => $string){
-            list($token, $level) = explode(':', substr($string, 1, -1));
+            if (strstr($string, ':')){ list($token, $level) = explode(':', substr($string, 1, -1));  }
+            else { $token = substr($string, 1, -1); $level = 1; }
             $temp_info = array('robot_token' => $token, 'robot_level' => $level);
             $temp_robots[$key] = $temp_info;
         }
