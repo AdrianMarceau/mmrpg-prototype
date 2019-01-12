@@ -46,6 +46,7 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     mmrpg_leaderboard.board_robots_dr_light,
     mmrpg_leaderboard.board_robots_dr_wily,
     mmrpg_leaderboard.board_robots_dr_cossack,
+    mmrpg_leaderboard.board_robots_count,
     mmrpg_leaderboard.board_battles,
     mmrpg_leaderboard.board_battles_dr_light,
     mmrpg_leaderboard.board_battles_dr_wily,
