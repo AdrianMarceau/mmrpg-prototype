@@ -577,6 +577,9 @@ ob_start();
                             $category_count = count($category_list);
                             $category_points = $battle_points_index[$category_token.'_points'];
 
+                            // If this category has nothing, we should just skip it
+                            if (empty($category_count)){ continue; }
+
                             // If the category list isn't empty and is an array, we need to loop for details
                             if (!empty($category_list) && is_array($category_list)){
 
