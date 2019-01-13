@@ -410,9 +410,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             if (!empty($temp_player_list)){
 
                 // Shuffle the player list
-                $max_battle_count = 2;
-                if ($temp_player_list >= 4){ $max_battle_count = 4; }
-                if ($temp_player_list >= 6){ $max_battle_count = 6; }
+                $max_battle_count = 6;
                 uasort($temp_player_list, 'mmrpg_prototype_leaderboard_targets_sort');
                 $temp_player_list = array_slice($temp_player_list, 0, 9);
                 shuffle($temp_player_list);
@@ -439,6 +437,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     list($temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three) = $_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_player_battle_factors'];
                 }
 
+                if ($this_prototype_data['robots_unlocked'] < $max_battle_count){
+                    $max_battle_count = $this_prototype_data['robots_unlocked'];
+                }
+
                 for ($i = 0; $i < $max_battle_count; $i++){
 
                     // DEBUG
@@ -451,13 +453,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     if (empty($temp_player_list)){ break; }
 
                     // Pull and random player from the list and collect their full data
-                    $temp_max_robots = 2;
-                    if ($i >= 2 && $this_prototype_data['robots_unlocked'] >= 4){ $temp_max_robots = 4; }
-                    if ($i >= 4 && $this_prototype_data['robots_unlocked'] >= 8){ $temp_max_robots = 8; }
-                    //$temp_max_robots = 8; // MAYBE?
                     //$temp_player_data = array_shift($temp_player_list); //$temp_player_list[array_rand($temp_player_list)];
                     $temp_player_array = array_shift($temp_player_list);
-                    $temp_battle_omega = rpg_mission_player::generate($this_prototype_data, $temp_player_array, $temp_max_robots, $temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three);
+                    $temp_battle_omega = rpg_mission_player::generate($this_prototype_data, $temp_player_array, $max_battle_count, 100, $temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three);
                     //die('<pre>$temp_battle_omega1 : '.print_r($temp_battle_omega, true).'</pre>');
 
                     // If the collected omega battle was empty, continue gracefully

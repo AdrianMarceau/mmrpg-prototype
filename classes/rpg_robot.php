@@ -690,9 +690,17 @@ class rpg_robot extends rpg_object {
             // Update this robot's original player with any session settings
             $this->robot_original_player = mmrpg_prototype_robot_original_player($this->player_token, $this->robot_token);
 
-            // Update this robot's level with any session rewards
-            $this->robot_base_experience = $this->robot_experience = mmrpg_prototype_robot_experience($this->player_token, $this->robot_token);
-            $this->robot_base_level = $this->robot_level = mmrpg_prototype_robot_level($this->player_token, $this->robot_token);
+            // If we're in a player battle, cast all robots as level 100
+            if (!empty($this->battle->flags['player_battle'])){
+                $this->robot_base_experience = $this->robot_experience = 1000;
+                $this->robot_base_level = $this->robot_level = 100;
+            }
+            // Otherwise collect this robot's level and experience from session
+            else {
+                $this->robot_base_experience = $this->robot_experience = mmrpg_prototype_robot_experience($this->player_token, $this->robot_token);
+                $this->robot_base_level = $this->robot_level = mmrpg_prototype_robot_level($this->player_token, $this->robot_token);
+            }
+
 
         }
         // Otherwise, if this player is on autopilot

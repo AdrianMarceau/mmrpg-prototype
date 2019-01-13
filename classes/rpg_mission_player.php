@@ -6,7 +6,7 @@
 class rpg_mission_player extends rpg_mission {
 
     // Define a function for generating the PLAYER missions
-    public static function generate($this_prototype_data, $this_user_info, $this_max_robots, &$field_factors_one, &$field_factors_two, &$field_factors_three){
+    public static function generate($this_prototype_data, $this_user_info, $this_max_robots, $this_flat_level, &$field_factors_one, &$field_factors_two, &$field_factors_three){
 
         // Pull in global variables for this function
         global $mmrpg_index, $db;
@@ -94,7 +94,7 @@ class rpg_mission_player extends rpg_mission {
                 // Collect the basic details of this robot like ID, token, and level
                 $temp_robot_id = MMRPG_SETTINGS_TARGET_PLAYERID + $temp_counter;
                 $temp_robot_token = $temp_robotinfo['robot_token'];
-                $temp_robot_level = !empty($temp_robotinfo['robot_level']) ? $temp_robotinfo['robot_level'] : 1;
+                $temp_robot_level = $this_flat_level; //!empty($temp_robotinfo['robot_level']) ? $temp_robotinfo['robot_level'] : 1;
                 $temp_robot_favourite = in_array($temp_robot_token, $temp_player_favourites) ? 1 : 0;
                 $temp_robot_image = !empty($temp_settings_array['robot_image']) ? $temp_settings_array['robot_image'] : $temp_robotinfo['robot_token'];
                 $temp_robot_item = !empty($temp_settings_array['robot_item']) ? $temp_settings_array['robot_item'] : '';
