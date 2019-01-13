@@ -563,6 +563,7 @@ if (!empty($this_shop_index['auto'])){
 // -- REGGAE SHOP UNLOCKS -- //
 
 // Only continue if the shop has been unlocked
+$core_level_index = array();
 if (!empty($this_shop_index['reggae'])){
 
         // If Reggae's Shop has reached sufficient levels, expand the inventory
@@ -617,7 +618,6 @@ if (!empty($this_shop_index['reggae'])){
             */
 
             // If the player has sold any cores, loop through them and add associated abilities
-            $core_level_index = array();
             $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 100 : 0;
             if (!empty($this_battle_shops['reggae']['cores_bought'])){
                 foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
@@ -629,7 +629,7 @@ if (!empty($this_shop_index['reggae'])){
                 }
             }
 
-            // Loop through and add any shot/buster/overdrive abilities that have the required cores
+            // Loop through and add any SHOT/BUSTER/OVERDRIVE abilities that have the required cores
             foreach ($mmrpg_database_abilities AS $ability_token => $ability_info){
 
                 // Skip if this ability is incomplete
@@ -644,9 +644,10 @@ if (!empty($this_shop_index['reggae'])){
                 elseif (!strstr($ability_info['ability_group'], 'MMRPG/Weapons/')){ continue; }
 
                 // Calculate this ability's tier based on weapon energy
-                $ability_tier = 1;
-                if ($ability_info['ability_energy'] > 4){ $ability_tier += 1; }
-                if ($ability_info['ability_energy'] > 8){ $ability_tier += 1; }
+                if (strstr($ability_token, '-shot')){ $ability_tier = 1; }
+                elseif (strstr($ability_token, '-buster')){ $ability_tier = 2; }
+                elseif (strstr($ability_token, '-overdrive')){ $ability_tier = 3; }
+                else { continue; }
 
                 // Define the price based on its weapon energy
                 $ability_price = $ability_info['ability_energy'] * MMRPG_SETTINGS_SHOP_ABILITY_PRICE;
@@ -689,6 +690,13 @@ if (!empty($this_shop_index['reggae'])){
                 // Define the price based on its weapon energy
                 $ability_price = $ability_info['ability_energy'] * MMRPG_SETTINGS_SHOP_ABILITY_PRICE;
                 if (empty($ability_price)){ $ability_price = MMRPG_SETTINGS_SHOP_ABILITY_PRICE; }
+
+                // Define the cores required based on its tier
+                $cores_required = $ability_tier * 3;
+
+                // If the user has not sold enough cores, skip this ability
+                $cores_sold = !empty($core_level_index[$ability_info['ability_type']]) ? $core_level_index[$ability_info['ability_type']] : 0;
+                if ($cores_sold < $cores_required){ continue; }
 
                 // Apply a discount to the price if the shop is a high enough level
                 if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
