@@ -624,8 +624,9 @@ if (!empty($this_shop_index['reggae'])){
                     if (preg_match('/^item-core-/i', $item_token)){ $type_token = preg_replace('/^item-core-/i', '', $item_token); }
                     else { $type_token = preg_replace('/-core$/i', '', $item_token); }
                     $type_info = $mmrpg_index['types'][$type_token];
-                    if ($type_token == 'none'){ continue; }
-                    $core_level_index[$type_token] = $item_quantity;
+                    if ($type_token == 'none' || $type_token == 'copy'){ continue; }
+                    if (!isset($core_level_index[$type_token])){ $core_level_index[$type_token] = 0; }
+                    $core_level_index[$type_token] += $item_quantity;
                 }
             }
 
