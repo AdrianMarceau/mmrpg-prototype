@@ -210,10 +210,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4a'])){
 
             // Unlock the first of the final destination battles
-            $temp_final_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-fortress-ii', 'battle_level' => $this_prototype_data['this_chapter_levels'][4]);
+            $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-ii';
+            $temp_final_option = rpg_battle::get_index_info($temp_final_option_token);
+            $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
+            $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][4];
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
             rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
+            rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
 
         }
 
@@ -222,10 +226,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4b'])){
 
             // Unlock the first of the final destination battles
-            $temp_final_option = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $this_prototype_data['this_player_token'].'-fortress-iii', 'battle_level' => $this_prototype_data['this_chapter_levels'][4]);
+            $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iii';
+            $temp_final_option = rpg_battle::get_index_info($temp_final_option_token);
+            $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
+            $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][4];
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
             rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
+            rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
 
         }
 
