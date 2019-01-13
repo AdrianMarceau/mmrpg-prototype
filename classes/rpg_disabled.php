@@ -930,8 +930,8 @@ class rpg_disabled {
                 }
             }
 
-            // If this robot was a MASTER class and destroyed by WEAKNESS, it may drop a CORE
-            if ($this_robot->robot_class == 'master' && !empty($this_robot->flags['triggered_weakness'])){
+            // If this robot was a MASTER/BOSS class and destroyed by WEAKNESS, it may drop a CORE
+            if ($this_robot->robot_class != 'mecha' && !empty($this_robot->flags['triggered_weakness'])){
                 $temp_core_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
                 if ($temp_core_type != 'empty'){
                     $temp_chance_value = ($temp_value_total * 4);
@@ -960,7 +960,7 @@ class rpg_disabled {
             if (empty($_SESSION['GAME']['DEMO']) && !empty($target_player_rewards['items']) && $this_robot->player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
 
                 // Calculate the drop result based on success vs failure values
-                $temp_success_value = $this_robot->robot_class == 'master' ? 50 : 25;
+                $temp_success_value = $this_robot->robot_class != 'mecha' ? 50 : 25;
                 $temp_success_value = ceil($temp_success_value * $temp_chance_multiplier);
                 if ($temp_success_value > 100){ $temp_success_value = 100; }
                 $temp_failure_value = 100 - $temp_success_value;
