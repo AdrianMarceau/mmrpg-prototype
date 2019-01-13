@@ -136,9 +136,9 @@ if (true){
                             $core_level = !empty($core_level_index[$type_token]) ? $core_level_index[$type_token] : 0;
                             $core_opacity = 0.1 + (($core_level < 3 ? $core_level / 3 : 1) * 0.9);
                             ?>
-                            <div class="element" style="opacity: <?= $core_opacity ?>;" data-type="<?= $type_token ?>" data-tooltip="<?= $type_info['type_name'].' Cores &times; '.$core_level ?>" data-tooltip-type="item_type type_<?= $type_token ?>">
+                            <div class="element" style="opacity: <?= $core_opacity ?>;" data-type="<?= $type_token ?>" data-count="<?= $core_level ?>" data-tooltip="<?= $type_info['type_name'].' Cores &times; '.$core_level ?>" data-tooltip-type="item_type type_<?= $type_token ?>">
                                 <div class="sprite sprite_left sprite_left_40x40" style="background-image: url(images/items/<?= $type_token ?>-core/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div>
-                                <div class="counter"><?= $core_level >= 9 ? '&bigstar;' : $core_level ?></div>
+                                <div class="count"><?= $core_level >= 9 ? '&bigstar;' : $core_level ?></div>
                             </div>
                             <?
                         }

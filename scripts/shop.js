@@ -406,9 +406,9 @@ $(document).ready(function(){
                         thisConfirmCell.animate({opacity:0.3},600,'swing',function(){
                             $(this).css({opacity:1.0}).empty().append('<div class="placeholder">&hellip;</div>');
                             $('#zenny_counter', thisBody).css({color:''});
+                            //console.log('we just completed an action... postData = ', postData);
 
                             // If the completed action was buying a new robot, refresh page
-                            //console.log('we just completed an action... postData = ', postData);
                             if (postData.kind === 'robot'
                                 && postData.action === 'buy'
                                 && postData.quantity >= 1){
@@ -419,9 +419,37 @@ $(document).ready(function(){
                                     thisShopData.allowEdit = true;
                                     }
                                 }
-                            // Otherwise turn editing back on for the user
+                            // Otherwise turn editing back on and process other actions
                             else {
+
+                                // Allow editing again for the user now that complete
                                 thisShopData.allowEdit = true;
+
+                                // Update other relavant UI in the background
+
+                                // If the completed action was selling an elemental core, update guage
+                                if (postData.kind === 'item'
+                                    && postData.action === 'sell'
+                                    && postData.quantity >= 1
+                                    && postData.token.match(/-core$/)){
+                                        //console.log('we just sold a core! ', postData);
+                                        var coreType = postData.token.replace(/-core$/, '');
+                                        var $eventWrap = thisConfirmCell.closest('.event[data-token]');
+                                        var $coreGauge = $eventWrap.find('.gauge.cores');
+                                        var $coreWrap = $coreGauge.find('.element[data-type="'+coreType+'"]');
+                                        //console.log('coreType =', coreType);
+                                        //console.log('$eventWrap = ', $eventWrap.length, '$coreGauge = ', $coreGauge.length, '$coreWrap =', $coreWrap.length);
+                                        var oldCount = parseInt($coreWrap.attr('data-count'));
+                                        var newCount = oldCount + parseInt(postData.quantity);
+                                        //console.log('oldCount =', oldCount, 'newCount =', newCount);
+                                        $coreWrap.attr('data-count', newCount);
+                                        $coreWrap.attr('data-tooltip', $coreWrap.attr('data-tooltip').replace(/\s[0-9]+$/, ' '+newCount));
+                                        $coreWrap.css({opacity:(0.1 + ((newCount < 3 ? newCount / 3 : 1) * 0.9))});
+                                        if (newCount < 9){ $coreWrap.find('.count').html(newCount); }
+                                        else { $coreWrap.find('.count').html('&bigstar;'); }
+                                    }
+
+
                                 }
 
 
