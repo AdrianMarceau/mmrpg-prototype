@@ -151,6 +151,9 @@
     margin: 0;
     min-height: 272px;
 }
+#shop #console .event[data-token="reggae"] {
+    min-height: 352px;
+}
 #shop #console .event_hidden {
     display: none;
 }
@@ -621,6 +624,72 @@
 }
 #shop #console .omega.player_type:before {
     content: "\03a9";
+}
+
+#shop #console .gauge {
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 2;
+    left: 6px;
+    top: 52px;
+    width: 38px;
+    min-height: 100px;
+    height: auto;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    padding: 4px;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+#shop #console .gauge.cores {
+
+}
+#shop #console .gauge.cores .element {
+    display: block;
+    margin: 0 auto 4px;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    height: 10px;
+    font-size: 9px;
+    line-height: 10px;
+    text-align: left;
+}
+#shop #console .gauge.cores .element:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#shop #console .gauge.cores .element .sprite {
+    display: block;
+    float: left;
+    background-position: center center;
+    position: relative;
+    background-color: transparent;
+    border: 0 none transparent;
+    margin: 0 4px 0 -4px;
+    width: 10px;
+    height: 10px;
+    top: -3px;
+}
+#shop #console .gauge.cores .element .counter {
+    display: block;
+    float: left;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0;
+    font-size: 8px;
+    line-height: 10px;
+    width: 10px;
 }
 
 

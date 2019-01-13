@@ -123,6 +123,31 @@ if (true){
                     <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/shops/<?= !empty($shop_info['shop_image']) ? $shop_info['shop_image'] : $shop_info['shop_token'] ?>/sprite_right_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "><?= $shop_info['shop_name']?></div>
                 </div>
 
+                <?
+                // If this is someone with a core shop, we should show the core gauges
+                if (mmrpg_prototype_item_unlocked('weapon-codes')
+                    && in_array('cores', $shop_buying_tokens)){
+                    ?>
+                    <div class="gauge cores">
+                        <?
+                        // Loop through all elements and display gauge's for relevant ones
+                        foreach ($mmrpg_database_types AS $type_token => $type_info){
+                            if ($type_token === 'none' || $type_token === 'copy'){ continue; }
+                            $core_level = !empty($core_level_index[$type_token]) ? $core_level_index[$type_token] : 0;
+                            $core_opacity = 0.1 + (($core_level < 3 ? $core_level / 3 : 1) * 0.9);
+                            ?>
+                            <div class="element" style="opacity: <?= $core_opacity ?>;" data-type="<?= $type_token ?>" data-tooltip="<?= $type_info['type_name'].' Cores &times; '.$core_level ?>" data-tooltip-type="item_type type_<?= $type_token ?>">
+                                <div class="sprite sprite_left sprite_left_40x40" style="background-image: url(images/items/<?= $type_token ?>-core/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div>
+                                <div class="counter"><?= $core_level >= 9 ? '&bigstar;' : $core_level ?></div>
+                            </div>
+                            <?
+                        }
+                        ?>
+                    </div>
+                    <?
+                }
+                ?>
+
                 <div class="header header_left player_type player_type_<?= $shop_info['shop_colour'] ?>" style="margin-right: 0;">
                     <span class="title player_type">
                         <?= $shop_info['shop_name']?>
@@ -279,6 +304,7 @@ if (true){
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="shops" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
+<link rel="shortcut icon" type="image/x-icon" href="images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
 <link type="text/css" href="styles/jquery.scrollbar.min.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
