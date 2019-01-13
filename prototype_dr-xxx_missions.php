@@ -411,6 +411,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
                 // Shuffle the player list
                 $max_battle_count = 6;
+                $max_target_count = 6;
                 uasort($temp_player_list, 'mmrpg_prototype_leaderboard_targets_sort');
                 $temp_player_list = array_slice($temp_player_list, 0, 9);
                 shuffle($temp_player_list);
@@ -437,8 +438,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     list($temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three) = $_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_player_battle_factors'];
                 }
 
-                if ($this_prototype_data['robots_unlocked'] < $max_battle_count){
-                    $max_battle_count = $this_prototype_data['robots_unlocked'];
+                if ($this_prototype_data['robots_unlocked'] < $max_target_count){
+                    $max_target_count = $this_prototype_data['robots_unlocked'];
                 }
 
                 for ($i = 0; $i < $max_battle_count; $i++){
@@ -455,7 +456,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     // Pull and random player from the list and collect their full data
                     //$temp_player_data = array_shift($temp_player_list); //$temp_player_list[array_rand($temp_player_list)];
                     $temp_player_array = array_shift($temp_player_list);
-                    $temp_battle_omega = rpg_mission_player::generate($this_prototype_data, $temp_player_array, $max_battle_count, 100, $temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three);
+                    $temp_battle_omega = rpg_mission_player::generate($this_prototype_data, $temp_player_array, $max_target_count, 100, $temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three);
                     //die('<pre>$temp_battle_omega1 : '.print_r($temp_battle_omega, true).'</pre>');
 
                     // If the collected omega battle was empty, continue gracefully
