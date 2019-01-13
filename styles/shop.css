@@ -681,7 +681,7 @@
     height: 10px;
     top: -3px;
 }
-#shop #console .gauge.cores .element .counter {
+#shop #console .gauge.cores .element .count {
     display: block;
     float: left;
     vertical-align: middle;
