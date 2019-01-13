@@ -1746,14 +1746,16 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         } else {
             $temp_exclude_usernames_string = '';
         }
+
         // Generate the points index and then break it down to unique for ranks
         $this_points_index = array();
         foreach ($this_leaderboard_index AS $info){ $this_points_index[] = $info['board_points']; }
         $this_points_index = array_unique($this_points_index);
+
         // Define the vars for finding the online players
         $this_player_points = mmrpg_prototype_battle_points();
-        $this_player_points_min = ceil($this_player_points * 0.10);
-        $this_player_points_max = ceil($this_player_points * 2.10);
+        $this_player_points_max = ceil($this_player_points * 10.0);
+
         // Define the array for pulling all the leaderboard data
         $temp_leaderboard_query = 'SELECT
                 mmrpg_leaderboard.user_id,
@@ -1771,7 +1773,8 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
                 LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id
                 WHERE
-                board_points >= '.$this_player_points_min.' AND board_points <= '.$this_player_points_max.'
+                1 = 1
+                AND board_points <= '.$this_player_points_max.'
                 AND mmrpg_leaderboard.user_id != '.$this_userid.'
                 ORDER BY
                 '.(!empty($temp_include_usernames_string) ? ' FIELD(user_name_clean, '.$temp_include_usernames_string.') DESC, ' : '').'
@@ -1779,8 +1782,10 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 board_points DESC
                 LIMIT 12
             ';
+
         // Query the database and collect the array list of all online players
         $this_leaderboard_target_players = $db->get_array_list($temp_leaderboard_query);
+
         // Loop through and decode any fields that require it
         if (!empty($this_leaderboard_target_players)){
             foreach ($this_leaderboard_target_players AS $key => $player){
