@@ -2245,6 +2245,26 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #console .field_type_event .body {
     background-color: rgba(0, 0, 0, 0.35);
 }
+#console .field_type_event .body .results {
+
+}
+#console .field_type_event .body .results .head {
+    margin: 0;
+    font-weight: bold;
+}
+#console .field_type_event .body .results .details {
+    border-color: rgba(0, 0, 0, 0.1);
+    border-style: solid;
+    border-width: 1px 0;
+    padding: 2px 0;
+    margin: 3px 0;
+    font-size: 90%;
+    line-height: 1.6;
+}
+#console .field_type_event .body .results .foot {
+    margin: 0;
+    font-weight: bold;
+}
 #console .event_double .body {
     min-height: 101px;
 }
