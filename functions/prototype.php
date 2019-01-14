@@ -337,8 +337,8 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             AND users.user_flag_approved = 1
             AND users.user_date_created <> users.user_date_accessed
             ;", 'target_user_name');
-        $points_index['players_defeated'] = $defeated_players;
-        $points_index['players_defeated_points'] = count($defeated_players) * 10000;
+        $points_index['players_defeated'] = !empty($defeated_players) ? $defeated_players : array();
+        $points_index['players_defeated_points'] = !empty($defeated_players) ? (count($defeated_players) * 10000) : 0;
         $total_battle_points += $points_index['players_defeated_points'];
     }
 
