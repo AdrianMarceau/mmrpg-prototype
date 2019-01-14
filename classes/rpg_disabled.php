@@ -870,6 +870,11 @@ class rpg_disabled {
             // Increse the multiplier if this is an empty core robot
             if ($this_robot->robot_core == 'empty' || $this_robot->robot_core2 == 'empty'){ $temp_chance_multiplier = $temp_chance_multiplier * 2; }
 
+            // Collect the current battle item counts for reference
+            $current_items_counts = !empty($_SESSION['GAME']['values']['battle_items']) ? $_SESSION['GAME']['values']['battle_items'] : array();
+            $num_existing_small_screws = !empty($current_items_counts['small-screw']) ? $current_items_counts['small-screw'] : 0;
+            $num_existing_large_screws = !empty($current_items_counts['large-screw']) ? $current_items_counts['large-screw'] : 0;
+
             // Define the available item drops for this battle
             $target_player_rewards['items'] = !empty($this_battle->battle_rewards['items']) ? $this_battle->battle_rewards['items'] : array();
 
@@ -881,7 +886,7 @@ class rpg_disabled {
                 //$target_player_rewards['items'][] =  array('chance' => 1, 'token' => 'weapon-pellet', 'min' => 1, 'max' => 3);
 
                 // Append the Tier I screw drops
-                $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 1, 'max' => 3);
+                if ($num_existing_small_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 1, 'max' => 3); }
 
             }
             // If this robot was a MASTER class, it may drop PELLETS, CAPSULES and SMALL, LARGE SCREWS
@@ -892,9 +897,9 @@ class rpg_disabled {
                 //$target_player_rewards['items'][] =  array('chance' => 2, 'token' => 'weapon-capsule', 'min' => 2, 'max' => 6);
 
                 // Append the Tier I screw drops
-                $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 3, 'max' => 6);
+                if ($num_existing_small_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $target_player_rewards['items'][] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 3, 'max' => 6); }
                 // Append the Tier II screw drops
-                $target_player_rewards['items'][] =  array('chance' => 60, 'token' => 'large-screw', 'min' => 1, 'max' => 3);
+                if ($num_existing_large_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $target_player_rewards['items'][] =  array('chance' => 60, 'token' => 'large-screw', 'min' => 1, 'max' => 3); }
 
             }
             // If this robot was a BOSS class, it may drop PELLETS, CAPSULES and SMALL, LARGE SCREWS and ....?
@@ -905,38 +910,41 @@ class rpg_disabled {
                 //$target_player_rewards['items'][] =  array('chance' => 3, 'token' => 'weapon-tank', 'min' => 3, 'max' => 9);
 
                 // Append the Tier I screw drops
-                $target_player_rewards['items'][] =  array('chance' => 60, 'token' => 'small-screw', 'min' => 6, 'max' => 9);
+                if ($num_existing_small_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $target_player_rewards['items'][] =  array('chance' => 60, 'token' => 'small-screw', 'min' => 6, 'max' => 9); }
                 // Append the Tier II screw drops
-                $target_player_rewards['items'][] =  array('chance' => 90, 'token' => 'large-screw', 'min' => 3, 'max' => 6);
+                if ($num_existing_large_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $target_player_rewards['items'][] =  array('chance' => 90, 'token' => 'large-screw', 'min' => 3, 'max' => 6); }
                 // Append the Tier III screw drops
                 //$target_player_rewards['items'][] =  array('chance' => 90, 'token' => 'hyper-screw', 'min' => 1, 'max' => 3);
 
             }
 
-            // Precount the item values for later use
-            $temp_value_total = 0;
-            $temp_count_total = 0;
-            foreach ($target_player_rewards['items'] AS $item_reward_key => $item_reward_info){
-                $temp_value_total += $item_reward_info['chance'];
-                $temp_count_total += 1;
-            }
+            // If a weakness was triggered, we need to switch to a different item set (SHARDS / CORES)
+            if (!empty($this_robot->flags['triggered_weakness'])){
 
-            // If this robot was a MECHA class and destroyed by WEAKNESS, it may drop a SHARD
-            if ($this_robot->robot_class == 'mecha' && !empty($this_robot->flags['triggered_weakness'])){
-                $temp_shard_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
-                if ($temp_shard_type != 'empty'){
-                    $temp_chance_value = ($temp_value_total * 4);
-                    $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => $temp_shard_type.'-shard', 'min' => 1, 'max' => 1);
-                }
-            }
+                // Collect the shard or core type for this robot
+                $temp_drop_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
+                $temp_drop_kind = $this_robot->robot_class == 'mecha' ? 'shard' : 'core';
+                $num_existing_shards = !empty($current_items_counts[$temp_drop_type.'-shard']) ? $current_items_counts[$temp_drop_type.'-shard'] : 0;
+                $num_existing_cores = !empty($current_items_counts[$temp_drop_type.'-core']) ? $current_items_counts[$temp_drop_type.'-core'] : 0;
 
-            // If this robot was a MASTER/BOSS class and destroyed by WEAKNESS, it may drop a CORE
-            if ($this_robot->robot_class != 'mecha' && !empty($this_robot->flags['triggered_weakness'])){
-                $temp_core_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
-                if ($temp_core_type != 'empty'){
-                    $temp_chance_value = ($temp_value_total * 4);
-                    $target_player_rewards['items'][] =  array('chance' => $temp_chance_value, 'token' => $temp_core_type.'-core', 'min' => 1, 'max' => 1);
+                // If we're allowed to drop this item at this time, continue
+                if ($temp_drop_type !== 'empty' && (
+                    ($temp_drop_kind === 'shard' && $num_existing_shards < MMRPG_SETTINGS_SHARDS_MAXQUANTITY)
+                    || ($temp_drop_kind === 'core' && $num_existing_shards < MMRPG_SETTINGS_CORES_MAXQUANTITY)
+                    )){
+
+                    // Clear the existing set of items as they're not relevant anymore
+                    $target_player_rewards['items'] = array();
+
+                    // If this robot was a MECHA class it will drop a SHARD, else if a MASTER/BOSS class it will drop a CORE
+                    if ($temp_drop_kind === 'shard'){
+                        $target_player_rewards['items'][] =  array('chance' => 100, 'token' => $temp_drop_type.'-shard', 'min' => 1, 'max' => 1);
+                    } else if ($temp_drop_kind === 'core'){
+                        $target_player_rewards['items'][] =  array('chance' => 100, 'token' => $temp_drop_type.'-core', 'min' => 1, 'max' => 1);
+                    }
+
                 }
+
             }
 
             // If the target holds a Fortune Module, increase the chance of dropps
