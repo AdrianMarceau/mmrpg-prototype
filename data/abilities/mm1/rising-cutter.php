@@ -43,8 +43,12 @@ $ability = array(
         $this_robot->robot_frame = 'base';
         $this_robot->update_session();
 
-        // Call the global stat break function with customized options
-        rpg_ability::ability_function_stat_break($target_robot, 'defense', 2);
+
+        // Only lower the target's stat of the ability was successful
+        if ($this_ability->ability_results['this_result'] != 'failure'){
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_stat_break($target_robot, 'defense', 2);
+        }
 
         // Return true on success
         return true;
