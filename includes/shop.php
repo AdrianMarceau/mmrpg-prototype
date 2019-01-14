@@ -593,26 +593,26 @@ if (!empty($this_shop_index['reggae'])){
 
             // Add the Copy Abilities to the shop if they've been unlocked
             if (rpg_game::copy_abilities_unlocked()){
-                $prices = get_items_with_prices('copy-shot', 'copy-soul');
+                $prices = get_abilities_with_prices('copy-shot', 'copy-soul');
                 foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
             }
 
             // Add the Core Abilities to the shop if they've been unlocked
             if (rpg_game::core_abilities_unlocked()){
-                $prices = get_items_with_prices('core-shield', 'core-laser');
+                $prices = get_abilities_with_prices('core-shield', 'core-laser');
                 foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
             }
 
             // Add the Omega Abilities to the shop if they've been unlocked
             if (rpg_game::omega_abilities_unlocked()){
-                $prices = get_items_with_prices('omega-pulse', 'omega-wave');
+                $prices = get_abilities_with_prices('omega-pulse', 'omega-wave');
                 foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
             }
 
             /*
-            echo('<pre>rpg_game::robots_unlocked(dr-light) = '.print_r(rpg_game::robots_unlocked('dr-light'), true).'</pre><hr />');
-            echo('<pre>rpg_game::robots_unlocked(dr-wily) = '.print_r(rpg_game::robots_unlocked('dr-wily'), true).'</pre><hr />');
-            echo('<pre>rpg_game::robots_unlocked(dr-cossack) = '.print_r(rpg_game::robots_unlocked('dr-cossack'), true).'</pre><hr />');
+            echo('<pre>rpg_game::robots_unlocked(dr-light) = '.print_r(rpg_game::robots_unlocked('dr-light', true), true).'</pre><hr />');
+            echo('<pre>rpg_game::robots_unlocked(dr-wily) = '.print_r(rpg_game::robots_unlocked('dr-wily', true), true).'</pre><hr />');
+            echo('<pre>rpg_game::robots_unlocked(dr-cossack) = '.print_r(rpg_game::robots_unlocked('dr-cossack', true), true).'</pre><hr />');
             echo('<pre>$this_shop_index[reggae][shop_weapons][weapons_selling] = '.print_r($this_shop_index['reggae']['shop_weapons']['weapons_selling'], true).'</pre><hr />');
             exit();
             */
