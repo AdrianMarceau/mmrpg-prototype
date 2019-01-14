@@ -1226,7 +1226,7 @@ class rpg_game {
         $temp_counter = 0;
         if (!empty($_SESSION[$session_token]['values']['battle_items'])){
             foreach ($_SESSION[$session_token]['values']['battle_items'] AS $token => $quantity){
-                if (preg_match('/^item-core-/i', $token)){ $temp_counter += $quantity; }
+                if (preg_match('/-core$/i', $token)){ $temp_counter += $quantity; }
             }
         }
         return $temp_counter;
@@ -1236,14 +1236,14 @@ class rpg_game {
     public static function screws_unlocked($size = ''){
         // If neither screw type has ever been created, return a hard false
         $session_token = self::session_token();
-        if (!isset($_SESSION[$session_token]['values']['battle_items']['item-screw-small'])
-            && !isset($_SESSION[$session_token]['values']['battle_items']['item-screw-large'])){
+        if (!isset($_SESSION[$session_token]['values']['battle_items']['small-screw'])
+            && !isset($_SESSION[$session_token]['values']['battle_items']['large-screw'])){
             return false;
         }
         // Define the game session helper var
         $temp_counter = 0;
-        if (isset($_SESSION[$session_token]['values']['battle_items']['item-screw-small'])){ $temp_counter += $_SESSION[$session_token]['values']['battle_items']['item-screw-small']; }
-        if (isset($_SESSION[$session_token]['values']['battle_items']['item-screw-large'])){ $temp_counter += $_SESSION[$session_token]['values']['battle_items']['item-screw-large']; }
+        if (isset($_SESSION[$session_token]['values']['battle_items']['small-screw'])){ $temp_counter += $_SESSION[$session_token]['values']['battle_items']['small-screw']; }
+        if (isset($_SESSION[$session_token]['values']['battle_items']['large-screw'])){ $temp_counter += $_SESSION[$session_token]['values']['battle_items']['large-screw']; }
         return $temp_counter;
     }
 

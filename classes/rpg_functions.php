@@ -58,7 +58,7 @@ class rpg_functions {
         $temp_flag_lucky = false;
 
         // If the robot is holding a chance module, also look at the first digit of their level
-        if ($robot_item == 'item-fortune-module' && $temp_flag_critical == false){
+        if ($robot_item == 'fortune-module' && $temp_flag_critical == false){
             $temp_level_digit2 = substr($robot_level, 0, 1);
             $temp_flag_critical = $temp_level_digit2 == $temp_turn_digit ? true : false;
             $temp_flag_lucky = true;

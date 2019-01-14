@@ -86,7 +86,7 @@ $ability = array(
 
         /*
         // If this robot is holding a Target Module, allow target selection
-        if ($this_robot->robot_item == 'item-target-module'){
+        if ($this_robot->robot_item == 'target-module'){
             $this_ability->set_target('select_target');
         } else {
             $this_ability->reset_target();
