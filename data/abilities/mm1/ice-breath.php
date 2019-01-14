@@ -19,11 +19,11 @@ $ability = array(
         $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' frozen in ice!<br /> '.
             $target_robot->print_name().' is prevented from switching!'
             );
-        $this_destroy_text = ('The ice surrounding '.$target_robot->print_name().' melted away...<br /> '.
-            $target_robot->print_name().' isn\'t prevented from switching anymore!'
+        $this_destroy_text = ('The '.$this_ability->print_name().'\'s frozen foothold melted away...<br /> '.
+            'The active robot isn\'t prevented from switching anymore!'
             );
-        $this_refresh_text = ($this_robot->print_name().' refreshed the ice surrounding '.$target_robot->print_name().'!<br /> '.
-            $target_robot->print_name().' is still prevented from switching!'
+        $this_refresh_text = ($this_robot->print_name().' refreshed the '.$this_ability->print_name().'\'s frozen foothold!<br /> '.
+            'The active robot is still prevented from switching!'
             );
 
         // Define this ability's attachment token
