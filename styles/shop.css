@@ -659,7 +659,7 @@
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
     border-radius: 2px;
-    height: 10px;
+    height: 9px;
     font-size: 9px;
     line-height: 10px;
     text-align: left;
@@ -676,10 +676,11 @@
     position: relative;
     background-color: transparent;
     border: 0 none transparent;
-    margin: 0 4px 0 -4px;
-    width: 10px;
-    height: 10px;
-    top: -3px;
+    margin: 0 4px 0 1px;
+    width: 6px;
+    height: 6px;
+    top: 1px;
+    padding: 0;
 }
 #shop #console .gauge.cores .element .count {
     display: block;
@@ -688,8 +689,8 @@
     text-align: center;
     margin: 0;
     font-size: 8px;
-    line-height: 10px;
-    width: 10px;
+    line-height: 9px;
+    width: 14px;
 }
 
 
