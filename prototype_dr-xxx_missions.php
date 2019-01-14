@@ -110,11 +110,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Unlock the first fortress battle
         $temp_battle_token = $this_prototype_data['this_player_token'].'-fortress-i';
-        $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_token);
-        $temp_battle_omega = array('battle_phase' => $this_prototype_data['battle_phase'], 'battle_token' => $temp_battle_token, 'battle_level' => $this_prototype_data['this_chapter_levels'][2]);
+        $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
+        $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
+        $temp_battle_omega['battle_level'] = $this_prototype_data['this_chapter_levels'][2];
         $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
 
         // If the battle is complete, remove the player from the description
+        $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_token);
         if ($temp_battle_complete){
             $temp_index_battle = rpg_battle::get_index_info($temp_battle_token);
             $temp_battle_omega['battle_target_player'] = $temp_index_battle['battle_target_player'];
@@ -136,6 +138,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Add the omega battle to the battle options
         $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
     }
 
