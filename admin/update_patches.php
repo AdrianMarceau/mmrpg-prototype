@@ -121,6 +121,73 @@ function mmrpg_patch_battle_point_reboot_2k19($_GAME){
 }
 
 
+// -- [[MULTI-USE]] RECALCULATE ALL BATTLE POINTS -- //
+
+// Define a patch function for applying the next update
+$token = 'recalculate_all_battle_points';
+$update_patch_tokens[] = $token;
+$update_patch_names[$token] = 'Recalculate All Battle Points';
+$update_patch_details[$token] = "The battle point values for certain items and/or events have changed and a quick \n";
+$update_patch_details[$token] .= "recalculation of your score was necessary. This update has been applied to all \n";
+$update_patch_details[$token] .= "save files and your leaderboard standing may change. Thank you for playing. ";
+function mmrpg_patch_recalculate_all_battle_points($_GAME){
+
+    // Pull in global variables
+    global $db;
+
+    // Return now if the user ID is somehow empty
+    if (empty($_GAME['user_id'])){ return false; }
+
+    // Do not recalculate if the user is still logged in
+    $now_time = time();
+    $last_access_time = $db->get_value("SELECT
+        users.user_date_accessed
+        FROM mmrpg_users AS users
+        WHERE users.user_id = {$_GAME['user_id']}
+        ;", 'user_date_accessed');
+
+    // If the user has logged in recently (last hour), we should skip their file
+    $one_hour = 60 * 60;
+    $last_login = $now_time - $last_access_time;
+    if ($last_login < $one_hour){
+        $mins = (int)(gmdate("i", $last_login));
+        echo('Save file accessed only '.($mins !== 1 ? $mins.' minutes' : '1 minute').' ago!'.PHP_EOL);
+        return false;
+    }
+
+    // Recalculate battle points using the new system
+    $old_board_points = !empty($_GAME['counters']['battle_points']) ? $_GAME['counters']['battle_points'] : 0;
+    $new_points_index = array();
+    $new_board_points = mmrpg_prototype_calculate_battle_points_2k19($_GAME['user_id'], $new_points_index);
+
+    // Print out the variables for the user to see
+    echo('Old Battle Point Total = '.number_format($old_board_points, 0, '.', ',').' BP'.PHP_EOL);
+    echo('New Battle Point Total = '.number_format($new_board_points, 0, '.', ',').' BP'.PHP_EOL);
+    if ($old_board_points != $new_board_points){
+        $diff_board_points = $new_board_points - $old_board_points;
+        echo('Difference = '.($diff_board_points >= 0 ? '+' : '').number_format($diff_board_points, 0, '.', ',').' BP'.PHP_EOL);
+    }
+
+    // Update the battle points of the actual game file
+    $_GAME['counters']['battle_points'] = $new_board_points;
+
+    // Update battle points and other details of the leaderboard row
+    $update_array = array();
+    $update_array['board_points'] = $new_board_points;
+    $update_array['board_robots'] = !empty($new_points_index['robots_unlocked']) ? '['.implode('],[', $new_points_index['robots_unlocked']).']' : '';
+    $update_array['board_robots_count'] = count($new_points_index['robots_unlocked']);
+    $update_array['board_abilities'] = count($new_points_index['abilities_unlocked']);
+    $update_array['board_items'] = count($new_points_index['items_unlocked']);
+    $update_array['board_stars'] = count($new_points_index['field_stars_collected']) + count($new_points_index['fusion_stars_collected']);
+    $update_array['board_date_modified'] = $now_time;
+    $db->update('mmrpg_leaderboard', $update_array, array('user_id' => $_GAME['user_id']));
+
+    // Return the updated game array
+    return $_GAME;
+
+}
+
+
 /*
 
 // -- PATCH FUNCTION TEMPLATE -- //

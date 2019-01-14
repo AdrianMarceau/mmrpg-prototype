@@ -15,7 +15,23 @@ $this_request_type = !empty($_REQUEST['type']) ? $_REQUEST['type'] : 'index';
 $this_request_id = !empty($_REQUEST['id']) && is_numeric($_REQUEST['id']) ? $_REQUEST['id'] : 0;
 $this_request_patch = !empty($_REQUEST['patch']) ? trim($_REQUEST['patch']) : '';
 $this_request_force = isset($_REQUEST['force']) && $_REQUEST['force'] == 'true' ? true : false;
+$this_request_incognito = isset($_REQUEST['incognito']) && $_REQUEST['incognito'] == 'true' ? true : false;
 $this_return_markup = '';
+
+// Generate the base href for the update links
+$base_update_href = 'admin.php?action=update&amp;date='.$this_cache_date.'&amp;patch='.$this_request_patch;
+if ($this_request_force){ $base_update_href .= '&amp;force=true'; }
+if ($this_request_incognito){ $base_update_href .= '&amp;incognito=true'; }
+
+// Manually create or reset the incognito patch list based on vars
+if (!isset($_SESSION['admin']['patched_user_ids'])
+    || (isset($_REQUEST['reset']) && $_REQUEST['reset'] == 'true')){
+    $_SESSION['admin']['patched_user_ids'] = array();
+    header('Location: '.MMRPG_CONFIG_ROOTURL.str_replace('&amp;', '&', $base_update_href));
+    exit();
+}
+//echo('<pre>patched_user_ids = '.print_r($_SESSION['admin']['patched_user_ids'], true).'</pre>');
+//exit();
 
 // Prevent undefined patches from being applied
 if (!in_array($this_request_patch, $update_patch_tokens)){
@@ -28,6 +44,11 @@ if (!in_array($this_request_patch, $update_patch_tokens)){
 $this_where_query = '';
 if (!empty($this_request_id)){ $this_where_query .= "AND mmrpg_saves.user_id = {$this_request_id} "; }
 if (!$this_request_force && !empty($this_request_patch)){ $this_where_query .= "AND mmrpg_saves.save_patches_applied NOT LIKE '%\"{$this_request_patch}\"%' "; }
+
+// Do not include IDs that have alread been patched unless we're forcing
+$patched_user_ids = $_SESSION['admin']['patched_user_ids'];
+if ($this_request_force && !empty($this_request_id)){ unset($patched_user_ids[array_search($this_request_id, $patched_user_ids)]); }
+if (!empty($patched_user_ids)){ $this_where_query .= "AND mmrpg_saves.user_id NOT IN (".implode(', ', $patched_user_ids).") "; }
 
 // Collect any save files that have a cache date less than the current one // AND mmrpg_saves.user_id = 110
 $this_update_query = "SELECT
@@ -42,7 +63,9 @@ $this_update_query = "SELECT
     WHERE
         board_points > 0 {$this_where_query}
     ORDER BY
-        board_points DESC
+        -- board_points DESC
+        FIELD(mmrpg_users.user_id, 412) DESC,
+        mmrpg_users.user_id ASC
     LIMIT
         {$this_update_limit}
         ;";
@@ -94,15 +117,15 @@ if ($this_request_type != 'ajax'){
         <? } else { ?>
             <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$this_request_patch?>"><?= $update_patch_names[$this_request_patch] ?></a> &raquo;
             <br />
-            <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=1&amp;patch=<?=$this_request_patch?>" data-limit="1">x1</a>
-            |  <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=10&amp;patch=<?=$this_request_patch?>" data-limit="10">x10</a>
-            | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=50&amp;patch=<?=$this_request_patch?>" data-limit="50">x50</a>
-            | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=100&amp;patch=<?=$this_request_patch?>" data-limit="100">x100</a>
-            | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=200&amp;patch=<?=$this_request_patch?>" data-limit="200">x200</a>
-            | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=500&amp;patch=<?=$this_request_patch?>" data-limit="500">x500</a>
-            | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=1000&amp;patch=<?=$this_request_patch?>" data-limit="1000">x1000</a>
-            | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=2500&amp;patch=<?=$this_request_patch?>" data-limit="2500">x2500</a>
-            | <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=5000&amp;patch=<?=$this_request_patch?>" data-limit="5000">x5000</a>
+            <a href="<?= $base_update_href ?>&amp;limit=1" data-limit="1">x1</a>
+            |  <a href="<?= $base_update_href ?>&amp;limit=10" data-limit="10">x10</a>
+            | <a href="<?= $base_update_href ?>&amp;limit=50" data-limit="50">x50</a>
+            | <a href="<?= $base_update_href ?>&amp;limit=100" data-limit="100">x100</a>
+            | <a href="<?= $base_update_href ?>&amp;limit=200" data-limit="200">x200</a>
+            | <a href="<?= $base_update_href ?>&amp;limit=500" data-limit="500">x500</a>
+            | <a href="<?= $base_update_href ?>&amp;limit=1000" data-limit="1000">x1000</a>
+            | <a href="<?= $base_update_href ?>&amp;limit=2500" data-limit="2500">x2500</a>
+            | <a href="<?= $base_update_href ?>&amp;limit=5000" data-limit="5000">x5000</a>
         <? } ?>
     </div>
     <?
@@ -116,6 +139,12 @@ if ($this_request_type == 'index' && !empty($this_request_patch)){
     $this_page_markup .= '<strong>Count: <span id="count_pending" style="color: #9C9C9C;">0</span> / <span id="count_completed">'.$this_update_count.'</span> / <span id="count_total">'.$this_total_count.'</span> / <span id="count_percent">0%</span></strong><br />';
     $this_page_markup .= '</p>';
     $this_page_markup .= '<div id="results"></div>';
+    if (!empty($patched_user_ids)){
+        $this_page_markup .= '<pre>';
+        $this_page_markup .= '<strong>User IDs <br />Already Patched</strong>: <br />'.implode(', ', $patched_user_ids).' <br />';
+        if (isset($base_update_href)){ $this_page_markup .= '<a href="'.$base_update_href.'&reset=true" style="font-size: 80%">Start Over?</a>'; }
+        $this_page_markup .= '</pre>';
+    }
 }
 elseif ($this_request_type == 'ajax'){
     $this_return_markup .= "query/".md5($this_update_query)."\n";
