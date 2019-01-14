@@ -927,10 +927,19 @@ class rpg_disabled {
                 $num_existing_shards = !empty($current_items_counts[$temp_drop_type.'-shard']) ? $current_items_counts[$temp_drop_type.'-shard'] : 0;
                 $num_existing_cores = !empty($current_items_counts[$temp_drop_type.'-core']) ? $current_items_counts[$temp_drop_type.'-core'] : 0;
 
+                /*
+                $this_battle->events_create(false, false, 'DEBUG',
+                    '$temp_drop_type = '.$temp_drop_type.
+                    '<br /> $temp_drop_kind = '.$temp_drop_kind.
+                    '<br /> $num_existing_shards = '.$num_existing_shards.
+                    '<br /> $num_existing_cores = '.$num_existing_cores
+                    );
+                */
+
                 // If we're allowed to drop this item at this time, continue
                 if ($temp_drop_type !== 'empty' && (
                     ($temp_drop_kind === 'shard' && $num_existing_shards < MMRPG_SETTINGS_SHARDS_MAXQUANTITY)
-                    || ($temp_drop_kind === 'core' && $num_existing_shards < MMRPG_SETTINGS_CORES_MAXQUANTITY)
+                    || ($temp_drop_kind === 'core' && $num_existing_cores < MMRPG_SETTINGS_CORES_MAXQUANTITY)
                     )){
 
                     // Clear the existing set of items as they're not relevant anymore
@@ -961,8 +970,14 @@ class rpg_disabled {
             // Shuffle the rewards so it doesn't look to formulaic
             shuffle($target_player_rewards['items']);
 
+            /*
             // DEBUG
-            //$this_battle->events_create(false, false, 'DEBUG', '$target_player_rewards[\'items\'] = '.count($target_player_rewards['items']));
+            $this_battle->events_create(false, false, 'DEBUG',
+                '$temp_chance_multiplier = '.$temp_chance_multiplier.
+                '<br /> $target_player_rewards[\'items\'] = '.count($target_player_rewards['items']).
+                '<br /> '.preg_replace('/\s+/', ' ', print_r($target_player_rewards['items'], true))
+                );
+            */
 
             // Loop through the ability rewards for this robot if set and NOT demo mode
             if (empty($_SESSION['GAME']['DEMO']) && !empty($target_player_rewards['items']) && $this_robot->player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
@@ -973,6 +988,14 @@ class rpg_disabled {
                 if ($temp_success_value > 100){ $temp_success_value = 100; }
                 $temp_failure_value = 100 - $temp_success_value;
                 $temp_dropping_result = $temp_success_value == 100 ? 'success' : $this_battle->weighted_chance(array('success', 'failure'), array($temp_success_value, $temp_failure_value));
+
+                /*
+                $this_battle->events_create(false, false, 'DEBUG',
+                    '$temp_success_value = '.$temp_success_value.
+                    '<br /> $temp_failure_value = '.$temp_failure_value.
+                    '<br /> $temp_dropping_result = '.$temp_dropping_result
+                    );
+                */
 
                 // If the drop was a success, calculate the details
                 if ($temp_dropping_result == 'success'){
