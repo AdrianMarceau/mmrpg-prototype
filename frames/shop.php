@@ -131,12 +131,16 @@ if (true){
                     <div class="gauge cores">
                         <?
                         // Loop through all elements and display gauge's for relevant ones
-                        foreach ($mmrpg_database_types AS $type_token => $type_info){
-                            if ($type_token === 'none' || $type_token === 'copy'){ continue; }
+                        $core_type_list = array_keys($mmrpg_database_types);
+                        unset($core_type_list[array_search('copy', $core_type_list)]);
+                        unset($core_type_list[array_search('none', $core_type_list)]);
+                        array_push($core_type_list, 'copy', 'none');
+                        foreach ($core_type_list AS $type_key => $type_token){
+                            $core_name = $type_token === 'none' ? 'Neutral' : ucfirst($type_token);
                             $core_level = !empty($core_level_index[$type_token]) ? $core_level_index[$type_token] : 0;
                             $core_opacity = 0.1 + (($core_level < 3 ? $core_level / 3 : 1) * 0.9);
                             ?>
-                            <div class="element" style="opacity: <?= $core_opacity ?>;" data-type="<?= $type_token ?>" data-count="<?= $core_level ?>" data-tooltip="<?= $type_info['type_name'].' Cores &times; '.$core_level ?>" data-tooltip-type="item_type type_<?= $type_token ?>">
+                            <div class="element" style="opacity: <?= $core_opacity ?>;" data-type="<?= $type_token ?>" data-count="<?= $core_level ?>" data-tooltip="<?= $core_name.' Cores &times; '.$core_level ?>" data-tooltip-type="item_type type_<?= $type_token ?>">
                                 <div class="sprite sprite_left sprite_left_40x40" style="background-image: url(images/items/<?= $type_token ?>-core/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div>
                                 <div class="count"><?= $core_level >= 9 ? '&bigstar;' : $core_level ?></div>
                             </div>

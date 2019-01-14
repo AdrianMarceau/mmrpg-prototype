@@ -695,6 +695,23 @@ function mmrpg_prototype_item_unlocked($item_token){
 
 }
 
+// Define a function for checking if a prototype item has been unlocked
+function mmrpg_prototype_item_unlocked_count($item_token){
+
+    // Define the game session helper var
+    $session_token = mmrpg_game_token();
+
+    // If items are not yet loaded, return false
+    if (empty($_SESSION[$session_token]['values']['battle_items'])){ return 0; }
+
+    // If this specific item has not been unlocked, return false
+    if (!isset($_SESSION[$session_token]['values']['battle_items'][$item_token])){ return 0; }
+
+    // Otherwise return true
+    return $_SESSION[$session_token]['values']['battle_items'][$item_token];
+
+}
+
 // Define a function for checking how many prototype items have been unlock
 function mmrpg_prototype_items_unlocked($unique = true){
 
