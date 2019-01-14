@@ -4,7 +4,7 @@
 function mmrpg_admin_update_save_file($key, $data, $patch_token){
     global $db;
     global $update_patch_tokens, $update_patch_names, $update_patch_details;
-    global $this_request_force;
+    global $this_request_force, $this_request_incognito;
 
     // Start the markup variable
     $this_page_markup = '';
@@ -61,21 +61,46 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         $patch_notes = '';
 
         // Use the patch token to deterine which function to run on save data
+        $_NEW_GAME = false;
         if (in_array($patch_token, $update_patch_tokens)){
             ob_start();
             $patch_name = $update_patch_names[$patch_token];
             $patch_details = $update_patch_details[$patch_token];
             $patch_function = 'mmrpg_patch_'.$patch_token;
             if (!function_exists($patch_function)){ exit('The patch function "'.$patch_function.'" doesn\'t exist...'); }
-            $_GAME = call_user_func($patch_function, $_GAME);
+            $_NEW_GAME = call_user_func($patch_function, $_GAME);
+            if ($_NEW_GAME !== false){ $_GAME = $_NEW_GAME; }
             $patch_notes = trim(ob_get_clean());
+        }
+
+        // If this is incognito, we need to keep track of which ones are complete
+        if ($this_request_incognito){
+            if (!isset($_SESSION['admin']['patched_user_ids'])){ $_SESSION['admin']['patched_user_ids'] = array(); }
+            $_SESSION['admin']['patched_user_ids'][] = $_GAME['user_id'];
+            $_SESSION['admin']['patched_user_ids'] = array_unique($_SESSION['admin']['patched_user_ids']);
+        }
+
+        // If the new game was empty, it means the function returned early and we should skip
+        if ($_NEW_GAME === false){
+            unset($update_array);
+            $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: #dedede;">';
+                $this_page_markup .= '<strong>$this_update_list['.$key.']['.$data['user_name_clean'].']</strong><br />';
+                $this_page_markup .= 'User ID:'.$data['user_id'].'<br /> ';
+                if (!empty($_NEW_GAME)){ $this_page_markup .= $_NEW_GAME.'<br /> '; }
+                if (!empty($patch_notes)){ $this_page_markup .= nl2br($patch_notes).'<br /> '; }
+                $this_page_markup .= '...Skipped!';
+            $this_page_markup .= '</p><hr />';
+            return $this_page_markup;
         }
 
         // If the any key fields were empty, abort mission!
         if (empty($_GAME['user_id'])){ die('Something happened to the user ID...'); }
 
         // If a patch was found and applied, update save file and generate notes
-        if (!empty($patch_name) && !empty($patch_details) && !empty($patch_notes)){
+        if (!$this_request_incognito
+            && !empty($patch_name)
+            && !empty($patch_details)
+            && !empty($patch_notes)){
 
             // Add this patch token to the array list
             $_GAME['patches'][] = $patch_token;
@@ -222,7 +247,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
 
         // Print the debug headers
         $this_page_markup .= '<strong>$this_update_list['.$key.']['.$data['user_name_clean'].']</strong><br />';
-        $this_page_markup .= 'Save ID:'.$data['save_id'].'<br />';
+        $this_page_markup .= 'User ID:'.$data['user_id'].'<br />';
 
         // Check to see which fields have been updated
         if ($update_array['save_cache_date'] != $data['save_cache_date']){ $this_page_markup .= 'Save cache date has been changed...<br />'; }
@@ -238,6 +263,7 @@ function mmrpg_admin_update_save_file($key, $data, $patch_token){
         if ($update_array['save_values_battle_stars'] != $data['save_values_battle_stars']){ $this_page_markup .= 'Save values battle stars have been changed...<br />'; }
         if ($update_array['save_values_robot_database'] != $data['save_values_robot_database']){ $this_page_markup .= 'Save values robot database has been changed...<br />'; }
         if ($update_array['save_counters'] != $data['save_counters']){ $this_page_markup .= 'Save counters have been changed...<br />'; }
+        if ($this_request_incognito && !empty($patch_notes) && strlen($patch_notes) < 1000){ $this_page_markup .= nl2br($patch_notes).'<br /> '; }
         if ($temp_success === false){ $this_page_markup .= '...Failure!'; }
         else { $this_page_markup .= '...'.(!empty($temp_success) ? 'Success ('.$temp_success.')!' : 'Success!'); }
         unset($update_array);

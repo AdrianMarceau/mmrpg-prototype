@@ -25,6 +25,10 @@
             <a href="admin.php?action=update">Patch Save Files</a>
             <em>apply specific patches to existing save files</em>
         </li>
+        <li class="item">
+            <a href="admin.php?action=update&amp;date=<?=MMRPG_CONFIG_CACHE_DATE?>&amp;patch=recalculate_all_battle_points&amp;incognito=true&amp;force=true">Refresh Leaderboard</a>
+            <em>recalculate battle points for all inactive users</em>
+        </li>
     </ul>
 
     <ul class="adminhome">
