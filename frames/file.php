@@ -200,6 +200,9 @@ while ($this_action == 'save'){
 
         }
 
+        // If possible, attempt to save the game to the session
+        if (rpg_game::is_user()){ mmrpg_prototype_refresh_battle_points(); }
+
         // Save the current game session into the file
         mmrpg_save_game_session();
         $db_users_fields = rpg_user::get_index_fields(true, 'users');
