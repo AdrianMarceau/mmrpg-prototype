@@ -1051,18 +1051,23 @@ class rpg_battle extends rpg_object {
 
         // Define the first event body markup, regardless of player type
         $first_event_header = $this->battle_name.($this->battle_result == 'victory' ? ' Complete' : ' Failure').' <span style="opacity:0.25;">|</span> '.$this->battle_field->field_name;
-        if ($this->battle_result == 'victory'){ $first_event_body = 'Mission complete! '.($temp_human_rewards['battle_complete'] > 1 ? rpg_battle::random_positive_word().' That&#39;s '.$temp_human_rewards['battle_complete'].' times now! ' : '').rpg_battle::random_victory_quote(); }
-        elseif ($this->battle_result == 'defeat'){ $first_event_body = 'Mission failure. '.($temp_human_rewards['battle_failure'] > 1 ? 'That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : '').rpg_battle::random_defeat_quote(); }
-        $first_event_body .= '<br />';
 
-        // Print out the current vs allowed turns for this mission
-        $first_event_body .= 'Goal Turns : '.$this->counters['battle_turn'].' / '.$this->battle_turns.' <span style="opacity:0.25;">|</span> ';
+
+        if ($this->battle_result == 'victory'){ $first_event_body_head = 'Mission complete! '.rpg_battle::random_victory_quote().($temp_human_rewards['battle_complete'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_complete'].' times now! '.rpg_battle::random_positive_word() : ''); }
+        elseif ($this->battle_result == 'defeat'){ $first_event_body_head = 'Mission failure. '.rpg_battle::random_defeat_quote().($temp_human_rewards['battle_failure'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : ''); }
+        //$first_event_body = '<div style="border-bottom: 1px solid rgba(0, 0, 0, 0.1); padding: 0 0 3px; margin: 0 0 3px;">'.$first_event_body.'</div> ';
+        //$first_event_body .= '<br />';
 
         // Print out the base reward amount
-        $first_event_body .= 'Base Zenny : '.number_format($this->battle_zenny, 0, '.', ',').' <span style="opacity:0.25;">|</span> ';
+        $first_event_body_details = 'Base Reward: '.number_format($this->battle_zenny, 0, '.', ',').'z';
 
         // Print out the bonus and rewards based on the above stats
         if ($this->battle_result == 'victory'){
+
+            // Print out the current vs allowed turns for this mission
+            $first_event_body_details .= ' <span style="opacity:0.25;">|</span> Turns vs Goal: '.$this->counters['battle_turn'].' / '.$this->battle_turns;
+
+            $reward_mod_strings = array();
 
             // If the user was over or under the exact turns, print out bonuses
             if ($this->counters['battle_turn'] != $this->battle_turns){
@@ -1070,12 +1075,12 @@ class rpg_battle extends rpg_object {
                 // If the user gets a turn BONUS
                 if ($this->counters['battle_turn'] < $this->battle_turns){
                     $temp_bonus = round((($this->battle_turns / $this->counters['battle_turn']) - 1) * 100);
-                    $first_event_body .= 'Bonus : +'.$temp_bonus.'% <span style="opacity:0.25;">|</span> ';
+                    $reward_mod_strings[] = 'Turn Bonus: +'.$temp_bonus.'%';
                 }
                 // Else if the user gets a turn PENALTY
                 else {
                     $temp_bonus = round((($this->battle_turns / $this->counters['battle_turn']) - 1) * 100) * -1;
-                    $first_event_body .= 'Penalty : -'.$temp_bonus.'% <span style="opacity:0.25;">|</span> ';
+                    $reward_mod_strings[] = 'Turn Penalty: -'.$temp_bonus.'%';
                 }
 
             }
@@ -1086,20 +1091,31 @@ class rpg_battle extends rpg_object {
             // If the winning player had any overkill bonuses, award zenny as well
             if (!empty($this_player->counters['overkill_bonus'])){
                 $total_zenny_rewards += $this_player->counters['overkill_bonus'];
+                $reward_mod_strings[] = 'Overkill Bonus: +'.$this_player->counters['overkill_bonus'];
             }
 
             // If any of this players robots are holding a FORTUNE MODULE item
             $total_zenny_rewards_base = $total_zenny_rewards;
             $active_robots = $this_player->get_robots_active();
+            $total_fortune_modules = 0;
             foreach ($active_robots AS $key => $robot){
                 if ($robot->has_item('fortune-module')){
                     $total_zenny_rewards += $total_zenny_rewards_base;
+                    $total_fortune_modules++;
                 }
+            }
+            if ($total_fortune_modules > 0){
+                $reward_mod_strings[] = ' <span style="opacity:0.25;">|</span> Module Bonus'.($total_fortune_modules > 1 ? 'es' : '').': +'.($total_fortune_modules * 100).'%';
+            }
+
+            if (!empty($reward_mod_strings)){
+                $first_event_body_details .= '<br /> ';
+                $first_event_body_details .= implode(' <span style="opacity:0.25;">|</span> ', $reward_mod_strings);
             }
 
             // Print out the final zenny reward amounts after mods (if not empty)
             if (!empty($total_zenny_rewards)){
-                $first_event_body .= 'Earned Zenny : '.number_format($total_zenny_rewards, 0, '.', ',').'z ';
+                $first_event_body_foot = 'Final Reward: '.number_format($total_zenny_rewards, 0, '.', ',').'z';
                 if (!isset($_SESSION['GAME']['counters']['battle_zenny'])){ $_SESSION['GAME']['counters']['battle_zenny'] = 0; }
                 $_SESSION['GAME']['counters']['battle_zenny'] += $total_zenny_rewards;
             }
@@ -1109,9 +1125,15 @@ class rpg_battle extends rpg_object {
         else {
 
             // Do nothing for now
-            $first_event_body .= 'Points : 0 ';
+            $first_event_body_foot = 'Final Reward : 0z';
 
         }
+
+        $first_event_body = '<div class="results">';
+            $first_event_body .= '<div class="head">'.$first_event_body_head.'</div> ';
+            $first_event_body .= '<div class="details">'.$first_event_body_details.'</div> ';
+            $first_event_body .= '<div class="foot">'.$first_event_body_foot.'</div> ';
+        $first_event_body .= '</div>';
 
         // Print the battle complete message
         $event_options = array();
