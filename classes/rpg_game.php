@@ -935,36 +935,6 @@ class rpg_game {
     }
 
 
-    // -- GAME STATUS FUNCTIONS -- //
-
-    // Define a function for checking the Copy Abilities have been unlocked
-    public static function copy_abilities_unlocked(){
-
-        // If Dr. Light has unlocked all of his own robots (1 hero, 1 support, 8 master), unlock the Copy Abilities
-        if (self::robots_unlocked('dr-light', true) >= 10){ return true; }
-        else { return false; }
-
-    }
-
-    // Define a function for checking the Core Abilities have been unlocked
-    public static function core_abilities_unlocked(){
-
-        // If Dr. Wily has unlocked all of his own robots (1 hero, 1 support, 8 master), unlock the Core Abilities
-        if (self::robots_unlocked('dr-wily', true) >= 10){ return true; }
-        else { return false; }
-
-    }
-
-    // Define a function for checking the Omega Abilities have been unlocked
-    public static function omega_abilities_unlocked(){
-
-        // If Dr. Cossack has unlocked all of his own robots (1 hero, 1 support, 8 master), unlock the Omega Abilities
-        if (self::robots_unlocked('dr-cossack', true) >= 10){ return true; }
-        else { return false; }
-
-    }
-
-
 
     // -- ABILITY FUNCTIONS -- //
 

@@ -411,7 +411,7 @@ if (!empty($this_shop_index)){
 foreach ($this_shop_index AS $shop_token => $shop_info){
 
     // Only generate a hidden power if we've unlocked them
-    if (mmrpg_prototype_item_unlocked('omega-seed') || rpg_game::omega_abilities_unlocked()){
+    if (mmrpg_prototype_item_unlocked('omega-seed')){
 
         // Collect possible hidden power types
         $hidden_power_kind = $shop_token == 'auto' ? 'stats' : 'elements';
@@ -588,35 +588,6 @@ if (!empty($this_shop_index['reggae'])){
             // Define the weapon selling array and start it empty
             $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
 
-            // Collect a list of all abilities already unlocked
-            $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
-
-            // Add the Copy Abilities to the shop if they've been unlocked
-            if (rpg_game::copy_abilities_unlocked()){
-                $prices = get_abilities_with_prices('copy-shot', 'copy-soul');
-                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
-            }
-
-            // Add the Core Abilities to the shop if they've been unlocked
-            if (rpg_game::core_abilities_unlocked()){
-                $prices = get_abilities_with_prices('core-shield', 'core-laser');
-                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
-            }
-
-            // Add the Omega Abilities to the shop if they've been unlocked
-            if (rpg_game::omega_abilities_unlocked()){
-                $prices = get_abilities_with_prices('omega-pulse', 'omega-wave');
-                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
-            }
-
-            /*
-            echo('<pre>rpg_game::robots_unlocked(dr-light) = '.print_r(rpg_game::robots_unlocked('dr-light', true), true).'</pre><hr />');
-            echo('<pre>rpg_game::robots_unlocked(dr-wily) = '.print_r(rpg_game::robots_unlocked('dr-wily', true), true).'</pre><hr />');
-            echo('<pre>rpg_game::robots_unlocked(dr-cossack) = '.print_r(rpg_game::robots_unlocked('dr-cossack', true), true).'</pre><hr />');
-            echo('<pre>$this_shop_index[reggae][shop_weapons][weapons_selling] = '.print_r($this_shop_index['reggae']['shop_weapons']['weapons_selling'], true).'</pre><hr />');
-            exit();
-            */
-
             // If the player has sold any cores, loop through them and add associated abilities
             $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 100 : 0;
             if (!empty($this_battle_shops['reggae']['cores_bought'])){
@@ -624,11 +595,40 @@ if (!empty($this_shop_index['reggae'])){
                     if (preg_match('/^item-core-/i', $item_token)){ $type_token = preg_replace('/^item-core-/i', '', $item_token); }
                     else { $type_token = preg_replace('/-core$/i', '', $item_token); }
                     $type_info = $mmrpg_index['types'][$type_token];
-                    if ($type_token == 'none' || $type_token == 'copy'){ continue; }
                     if (!isset($core_level_index[$type_token])){ $core_level_index[$type_token] = 0; }
                     $core_level_index[$type_token] += $item_quantity;
                 }
             }
+
+            // Collect a list of all abilities already unlocked
+            $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
+
+            // Unlock the Copy Abilities when the user has maxed out their Copy Gauge in Reggae's Shop
+            if ($core_level_index['copy'] >= 9){
+                $prices = get_abilities_with_prices('copy-shot', 'copy-soul');
+                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
+            }
+
+            // Unlock the Core Abilities when the user has maxed out their Neutral Gauge in Reggae's Shop
+            if ($core_level_index['none'] >= 9){
+                $prices = get_abilities_with_prices('core-shield', 'core-laser');
+                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
+            }
+
+            // Unlock the Omega Abilities as soon as the player has unlocked the Omega Seed item
+            if (mmrpg_prototype_item_unlocked('omega-seed')){
+                $prices = get_abilities_with_prices('omega-pulse', 'omega-wave');
+                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
+            }
+
+            /*
+            echo('<pre>$core_level_index = '.print_r($core_level_index, true).'</pre><hr />');
+            echo('<pre>rpg_game::robots_unlocked(dr-light) = '.print_r(rpg_game::robots_unlocked('dr-light', true), true).'</pre><hr />');
+            echo('<pre>rpg_game::robots_unlocked(dr-wily) = '.print_r(rpg_game::robots_unlocked('dr-wily', true), true).'</pre><hr />');
+            echo('<pre>rpg_game::robots_unlocked(dr-cossack) = '.print_r(rpg_game::robots_unlocked('dr-cossack', true), true).'</pre><hr />');
+            echo('<pre>$this_shop_index[reggae][shop_weapons][weapons_selling] = '.print_r($this_shop_index['reggae']['shop_weapons']['weapons_selling'], true).'</pre><hr />');
+            exit();
+            */
 
             // Define an array to keep track of all relevant ability types
             $temp_ability_types = array();
