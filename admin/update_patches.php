@@ -146,8 +146,8 @@ function mmrpg_patch_recalculate_all_battle_points($_GAME){
         WHERE users.user_id = {$_GAME['user_id']}
         ;", 'user_date_accessed');
 
-    // If the user has logged in recently (last hour), we should skip their file
-    $one_hour = 60 * 60;
+    // If the user has logged in recently (last half-hour), we should skip their file
+    $one_hour = 60 * 30;
     $last_login = $now_time - $last_access_time;
     if ($last_login < $one_hour){
         $mins = (int)(gmdate("i", $last_login));
