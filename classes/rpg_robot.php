@@ -820,6 +820,10 @@ class rpg_robot extends rpg_object {
             if ($gender === 'male'){ return 'his'; }
             elseif ($gender === 'female'){ return 'hers'; }
             else { return $is_mecha ? 'its' : 'theirs'; }
+        } elseif ($form === 'possessive2'){
+            if ($gender === 'male'){ return 'his'; }
+            elseif ($gender === 'female'){ return 'her'; }
+            else { return $is_mecha ? 'its' : 'their'; }
         } elseif ($form === 'reflexive'){
             if ($gender === 'male'){ return 'himself'; }
             elseif ($gender === 'female'){ return 'herself'; }
@@ -4954,7 +4958,7 @@ class rpg_robot extends rpg_object {
                     // Create the event to show this element boost
                     if ($temp_change_percent > 0){
                         $this_battle->events_create($this_robot, false, $this_field->field_name.' Multipliers',
-                            $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!<br />'.
+                            $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
                             'The <span class="item_name item_type item_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).'</span> field multiplier rose!',
                             array('canvas_show_this_item_overlay' => true)
                             );
@@ -4993,8 +4997,8 @@ class rpg_robot extends rpg_object {
                         'percent' => true,
                         'modifiers' => false,
                         'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!'),
-                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!')
+                        'success' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!'),
+                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!')
                         ));
 
                     // Trigger stat recovery for the holding robot
@@ -5040,8 +5044,8 @@ class rpg_robot extends rpg_object {
                         'percent' => true,
                         'modifiers' => false,
                         'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!'),
-                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!')
+                        'success' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!'),
+                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!')
                         ));
 
                     // Trigger stat recovery for the holding robot
@@ -5116,8 +5120,8 @@ class rpg_robot extends rpg_object {
                         'percent' => true,
                         'modifiers' => false,
                         'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!'),
-                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!')
+                        'success' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!'),
+                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!')
                         ));
 
                     // Trigger stat recovery for the holding robot
@@ -5133,8 +5137,8 @@ class rpg_robot extends rpg_object {
                         'percent' => true,
                         'modifiers' => false,
                         'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!'),
-                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!')
+                        'success' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!'),
+                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!')
                         ));
 
                     // Trigger stat recovery for the holding robot
@@ -5160,7 +5164,7 @@ class rpg_robot extends rpg_object {
                 if ($this_robot->counters['attack_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
                     $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts attack by one stage');
                     // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'attack', 1, false, null, null, $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!');
+                    rpg_ability::ability_function_stat_boost($this_robot, 'attack', 1, false, null, null, $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
                 }
 
             }
@@ -5171,7 +5175,7 @@ class rpg_robot extends rpg_object {
                 if ($this_robot->counters['defense_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
                     $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts defense by one stage');
                     // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'defense', 1, false, null, null, $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!');
+                    rpg_ability::ability_function_stat_boost($this_robot, 'defense', 1, false, null, null, $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
                 }
 
             }
@@ -5182,7 +5186,7 @@ class rpg_robot extends rpg_object {
                 if ($this_robot->counters['speed_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
                     $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts speed by one stage');
                     // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'speed', 1, false, null, null, $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!');
+                    rpg_ability::ability_function_stat_boost($this_robot, 'speed', 1, false, null, null, $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
                 }
 
             }
@@ -5199,7 +5203,7 @@ class rpg_robot extends rpg_object {
                     $this_robot->set_item('');
 
                     // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'attack', $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!');
+                    rpg_ability::ability_function_stat_boost($this_robot, 'attack', $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
 
                     // Also remove this robot's item from the session, we're done with it
                     if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
@@ -5226,7 +5230,7 @@ class rpg_robot extends rpg_object {
                     $this_robot->set_item('');
 
                     // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'defense', $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!');
+                    rpg_ability::ability_function_stat_boost($this_robot, 'defense', $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
 
                     // Also remove this robot's item from the session, we're done with it
                     if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
@@ -5253,7 +5257,7 @@ class rpg_robot extends rpg_object {
                     $this_robot->set_item('');
 
                     // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'speed', $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!');
+                    rpg_ability::ability_function_stat_boost($this_robot, 'speed', $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
 
                     // Also remove this robot's item from the session, we're done with it
                     if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
@@ -5292,7 +5296,7 @@ class rpg_robot extends rpg_object {
                     $this_robot->set_item('');
 
                     // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, $trigger_stat, $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive').' '.$this_item->print_name().'!');
+                    rpg_ability::ability_function_stat_boost($this_robot, $trigger_stat, $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
                     foreach ($temp_stat_tokens AS $temp_stat){
                         if ($temp_stat === $trigger_stat){ continue; }
                         rpg_ability::ability_function_stat_boost($this_robot, $temp_stat, $item_restore_value);
