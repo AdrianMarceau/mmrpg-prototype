@@ -1071,18 +1071,9 @@ class rpg_battle extends rpg_object {
 
             // If the user was over or under the exact turns, print out bonuses
             if ($this->counters['battle_turn'] != $this->battle_turns){
-
-                // If the user gets a turn BONUS
-                if ($this->counters['battle_turn'] < $this->battle_turns){
-                    $temp_bonus = round((($this->battle_turns / $this->counters['battle_turn']) - 1) * 100);
-                    $reward_mod_strings[] = 'Turn Bonus: +'.$temp_bonus.'%';
-                }
-                // Else if the user gets a turn PENALTY
-                else {
-                    $temp_bonus = round((($this->battle_turns / $this->counters['battle_turn']) - 1) * 100) * -1;
-                    $reward_mod_strings[] = 'Turn Penalty: -'.$temp_bonus.'%';
-                }
-
+                $temp_bonus_multiplier = number_format(round(($this->battle_turns / $this->counters['battle_turn']), 2), 1, '.', ',');
+                if ($this->counters['battle_turn'] < $this->battle_turns){  $reward_mod_strings[] = 'Turn Bonus: x'.$temp_bonus_multiplier.''; }
+                else { $reward_mod_strings[] = 'Turn Penalty: x'.$temp_bonus_multiplier.''; }
             }
 
             // Define the zenny reward amount if not empty
