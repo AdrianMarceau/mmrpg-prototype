@@ -188,8 +188,7 @@ else {
             // CHAPTER STARS(7)
             if ($allow_star_fields){
                 $chapters_display_count++;
-                if ($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL){ echo '<a class="chapter_link extra chapter_link_disabled">Stars &check;</a>'; }
-                else { echo '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7">Stars</a>'; }
+                echo '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
                 echo '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
@@ -220,34 +219,34 @@ else {
         ob_start();
 
             echo '<div class="option_wrapper option_wrapper_missions option_wrapper_hidden '.($prototype_data[$player_token]['prototype_complete'] ? 'option_wrapper_complete ' : 'option_wrapper_default ').'" data-condition="this_player_token='.$player_token.'" data-music="'.$prototype_data[$player_token]['missions_music'].'">'."\n";
-            echo '<div class="chapter_select chapter_select_'.$chapters_display_count.'" data-player="'.$ptoken.'">';
-                echo $chapters_display_markup;
-            echo '</div>';
-            if ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){
-                // DEBUG
-                //echo 'checkpoint_'.__LINE__.'<br />';
+                echo '<div class="chapter_select chapter_select_'.$chapters_display_count.'" data-player="'.$ptoken.'">';
+                    echo $chapters_display_markup;
+                echo '</div>';
+                if ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){
+                    // DEBUG
+                    //echo 'checkpoint_'.__LINE__.'<br />';
 
-                echo $prototype_data[$player_token]['missions_markup']."\n";
-            }
-            elseif ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && !empty($_SESSION[$session_token]['battle_settings']['this_player_token']) && $_SESSION[$session_token]['battle_settings']['this_player_token'] == $player_token){
-                // DEBUG
-                //echo 'checkpoint_'.__LINE__.'<br />';
+                    echo $prototype_data[$player_token]['missions_markup']."\n";
+                }
+                elseif ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && !empty($_SESSION[$session_token]['battle_settings']['this_player_token']) && $_SESSION[$session_token]['battle_settings']['this_player_token'] == $player_token){
+                    // DEBUG
+                    //echo 'checkpoint_'.__LINE__.'<br />';
 
-                echo $prototype_data[$player_token]['missions_markup']."\n";
-            }
-            elseif (defined('MMRPG_SCRIPT_REQUEST')){
-                // DEBUG
-                //echo 'checkpoint_'.__LINE__.'<br />';
+                    echo $prototype_data[$player_token]['missions_markup']."\n";
+                }
+                elseif (defined('MMRPG_SCRIPT_REQUEST')){
+                    // DEBUG
+                    //echo 'checkpoint_'.__LINE__.'<br />';
 
-                echo $prototype_data[$player_token]['missions_markup']."\n";
-            }
-            else {
-                // DEBUG
-                //echo 'checkpoint_'.__LINE__.'<br />';
+                    echo $prototype_data[$player_token]['missions_markup']."\n";
+                }
+                else {
+                    // DEBUG
+                    //echo 'checkpoint_'.__LINE__.'<br />';
 
-                echo '';
-            }
-            echo '<a class="option option_1x4 option_spacer" style="visibility: hidden;">&nbsp;</a>'."\n";
+                    echo '';
+                }
+                echo '<a class="option option_1x4 option_spacer" style="visibility: hidden;">&nbsp;</a>'."\n";
             echo '</div>'."\n";
 
         // Collect the final markup and return
