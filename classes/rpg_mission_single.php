@@ -50,7 +50,7 @@ class rpg_mission_single extends rpg_mission {
 
         // If this is a starfield mission, adjust for the new conditions
         if ($starfield_mission){
-            $temp_battle_omega['battle_name'] = 'Bonus Chapter Starforce Battle';
+            $temp_battle_omega['battle_name'] = 'Bonus Chapter Star Field Battle';
             $temp_battle_omega['battle_counts'] = false;
             $temp_battle_omega['flags']['hide_robots_from_mission_select'] = true;
             $temp_battle_omega['flags']['starfield_mission'] = true;
@@ -81,7 +81,8 @@ class rpg_mission_single extends rpg_mission {
         $temp_field_star_present = $starfield_mission && empty($_SESSION['GAME']['values']['battle_stars'][$temp_field_star_token]) ? true : false;
 
         // If a field star is present on the field, fill the empty spots with like-typed robots
-        if ($temp_field_star_present){
+        if ($starfield_mission
+            || $temp_field_star_present){
 
             $temp_battle_omega['battle_target_player']['player_switch'] = 1.5;
             $temp_robot_tokens = array();
@@ -312,7 +313,7 @@ class rpg_mission_single extends rpg_mission {
             // Randomly assign this robot a hold item if applicable
             $temp_item = '';
             if ($robot['robot_class'] == 'master'){
-                $rand = $temp_field_star_present ? mt_rand(1, 4) : mt_rand(1, 10);
+                $rand = $starfield_mission || $temp_field_star_present ? mt_rand(1, 4) : mt_rand(1, 10);
                 if ($rand == 1){
                     $stats = array('energy', 'weapon', 'attack', 'defense', 'speed');
                     $items = array('pellet', 'capsule');
@@ -344,6 +345,7 @@ class rpg_mission_single extends rpg_mission {
 
         // If this is a starfield mission, it will give slightly less zenny than usual
         if ($starfield_mission){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.1); }
+        if ($starfield_mission && !$temp_field_star_present){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.1); }
 
         // Reverse the order of the robots in battle
         $temp_battle_omega['battle_target_player']['player_robots'] = array_reverse($temp_battle_omega['battle_target_player']['player_robots']);
@@ -426,8 +428,13 @@ class rpg_mission_single extends rpg_mission {
 
         // Update the battle description based on what we've calculated
         if ($starfield_mission){
-            $temp_battle_omega['battle_description'] = 'Defeat the robot masters guarding this Field Star to liberate it! ';
-            $temp_battle_omega['battle_description2'] = 'Collecting stars increases our Starforce and makes us stronger in battle! ';
+            if ($temp_field_star_present){
+                $temp_battle_omega['battle_description'] = 'Defeat the robot masters guarding this Field Star to liberate it! ';
+                $temp_battle_omega['battle_description2'] = 'Collecting stars increases our Starforce and makes us stronger in battle! ';
+            } else {
+                $temp_battle_omega['battle_description'] = 'Defeat the regenerated robot masters and support mechas! ';
+                $temp_battle_omega['battle_description2'] = 'The Field Star for this area has already been liberated, but we can go back as many times as we need to. ';
+            }
         } elseif (!empty($temp_battle_omega['values']['field_star'])){
             $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].' and collect its Field Star! ';
             $temp_battle_omega['battle_description2'] = 'The star\'s energy appears to have attracted another robot master to the field...';
