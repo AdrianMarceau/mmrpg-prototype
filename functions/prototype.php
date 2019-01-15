@@ -936,13 +936,14 @@ function mmrpg_prototype_possible_stars($return_arrays = false){
 
 
 // Define a function for calculating which stars are remaining for a player
-function mmrpg_prototype_remaining_stars($return_arrays = false){
+function mmrpg_prototype_remaining_stars($return_arrays = false, $possible_star_list = array()){
 
     // Collect the current session token
     $session_token = mmrpg_game_token();
 
     // Collect the list of possible stars first for reference
-    $remaining_star_list = mmrpg_prototype_possible_stars($return_arrays);
+    if (empty($possible_star_list)){ $possible_star_list = mmrpg_prototype_possible_stars($return_arrays); }
+    $remaining_star_list = $possible_star_list;
 
     // Remove from the above list any stars that have already been collected
     if (!empty($_SESSION[$session_token]['values']['battle_stars'])){

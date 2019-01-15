@@ -1623,6 +1623,12 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_wrapper .option_1x4.starfield div label .multi {
     display: none;
 }
+#prototype .option_wrapper .option_1x1.starfield div label.no_image .arrow,
+#prototype .option_wrapper .option_1x2.starfield div label.no_image .arrow,
+#prototype .option_wrapper .option_1x3.starfield div label.no_image .arrow,
+#prototype .option_wrapper .option_1x4.starfield div label.no_image .arrow {
+    padding-right: calc(50% - 12px);
+}
 
 
 /* WINDOW SIZE STYLES */
