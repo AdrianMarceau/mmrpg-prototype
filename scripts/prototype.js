@@ -1219,6 +1219,7 @@ function prototype_menu_switch(switchOptions){
 
                             // If the markup is not empty, replace this menu's options
                             if (markup.length){
+                                currentMenu.find('.chapter_select').remove();
                                 currentMenu.find('.option').not('.option_sticky').remove();
                                 currentMenu.find('.header').after(markup);
                                 $('.option_message:gt(0)', currentMenu).trigger('click');
@@ -1277,6 +1278,7 @@ function prototype_menu_switch(switchOptions){
                                     // If the markup is not empty, replace this menu's options
                                     if (markup.length){
                                         var tempMarkup = $(markup);
+                                        tempMenuWrapper.find('.chapter_select').remove();
                                         tempMenuWrapper.find('.option').not('.option_sticky').remove();
                                         var innerMenuWrapper = tempMenuWrapper.find('.wrap');
                                         if (innerMenuWrapper.length){

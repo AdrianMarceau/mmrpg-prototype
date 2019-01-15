@@ -338,21 +338,37 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Bonus Chapter : Star Fields'
             );
 
+        // Define how many fields we should show at once
+        $star_fields_to_show = 12;
+
         // Count the number of stars collected to determine level
         $star_count = mmrpg_prototype_stars_unlocked();
         $star_level = 50 + ceil(50 * ($star_count / MMRPG_SETTINGS_STARFORCE_STARTOTAL));
 
-        // Collect a list of all stars that have not been claimed yet
-        $remaining_stars = mmrpg_prototype_remaining_stars(true);
+        // Collect a list of possible stars
+        $possible_star_list = mmrpg_prototype_possible_stars(true);
 
-        // Shuffle the list of remaining stars before displaying some
-        $remaining_stars_tokens = array_keys($remaining_stars);
-        shuffle($remaining_stars_tokens);
+        // Collect a list of all stars that have not been claimed yet
+        $remaining_stars = mmrpg_prototype_remaining_stars(true, $possible_star_list);
+
+        // Collect a list of star fields to display, prioritizing those the player doesn't have yet
+        $visible_star_fields = array();
+        if (!empty($remaining_stars)){ $visible_star_fields += array_keys($remaining_stars); }
+        $num_visible_star_fields = count($visible_star_fields);
+        if (empty($visible_star_fields)){
+            $visible_star_fields += array_keys($possible_star_list);
+        } elseif ($num_visible_star_fields < $star_fields_to_show){
+            $possible_star_tokens = array_keys($possible_star_list);
+            shuffle($possible_star_tokens);
+            $visible_star_fields += array_slice($possible_star_tokens, 0, ($star_fields_to_show - $num_visible_star_fields));
+        }
+        $num_visible_star_fields = count($visible_star_fields);
+        shuffle($visible_star_fields);
 
         // Loop through remaining stars and display the first twelve
         $added_star_fields = 0;
-        foreach ($remaining_stars_tokens AS $key => $star_token){
-            $star_info = $remaining_stars[$star_token];
+        foreach ($visible_star_fields AS $key => $star_token){
+            $star_info = $possible_star_list[$star_token];
 
             // Collect references to the two stages' info
             $info = $star_info['info1'];
@@ -374,7 +390,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             // If we're over the limit, break now
             $added_star_fields++;
-            if ($added_star_fields >= 12){ break; }
+            if ($added_star_fields >= $star_fields_to_show){ break; }
 
         }
 
