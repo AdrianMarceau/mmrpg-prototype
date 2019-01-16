@@ -1082,7 +1082,7 @@ class rpg_battle extends rpg_object {
             // If the winning player had any overkill bonuses, award zenny as well
             if (!empty($this_player->counters['overkill_bonus'])){
                 $total_zenny_rewards += $this_player->counters['overkill_bonus'];
-                $reward_mod_strings[] = 'Overkill Bonus: +'.$this_player->counters['overkill_bonus'];
+                $reward_mod_strings[] = 'Overkill Bonus: +'.number_format($this_player->counters['overkill_bonus'], 0, '.', ',');
             }
 
             // If any of this players robots are holding a FORTUNE MODULE item

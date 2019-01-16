@@ -885,6 +885,16 @@ class rpg_robot extends rpg_object {
         $quote_text = '';
         // If the robot is visible and has the requested quote text
         if ($this->robot_token != 'robot' && isset($this->robot_quotes[$quote_type])){
+            // Loop through and replace ambiguous "Player" references in quotes
+            $num_words = count($this_find);
+            for ($key = 0; $key < $num_words; $key++){
+                $find = $this_find[$key];
+                $replace = $this_replace[$key];
+                if ($this->player->player_side === 'right' && $find === '{this_player}' && $replace === 'Player'){ $replace = 'the master'; }
+                elseif ($this->player->player_side === 'left' && $find === '{target_player}' && $replace === 'Player'){ $replace = 'your master'; }
+                else { continue; }
+                $this_replace[$key] = $replace;
+            }
             // Collect the quote text with any search/replace modifications
             $this_quote_text = str_replace($this_find, $this_replace, $this->robot_quotes[$quote_type]);
             // Collect the text colour for this robot
