@@ -224,177 +224,41 @@ if (rpg_game::is_user()){ mmrpg_prototype_refresh_battle_points(); }
 
         <div class="title">Mega Man RPG Prototype</div>
 
-        <style type="text/css">
+        <?
+        // Check to see if a Rogue Star is currently in orbit
+        $this_rogue_star = false;
+        if (true){ $this_rogue_star = array('type' => 'freeze', 'from_date' => '2019-01-17', 'to_date' => '2019-01-18'); }
+        if (!empty($this_rogue_star)){
 
-            @-webkit-keyframes rotateInPlace { /* Safari and Chrome */
-                from { -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); transform: rotate(0deg); }
-                to { -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); transform: rotate(360deg); }
-            }
-            @keyframes rotateInPlace {
-                from { -ms-transform: rotate(0deg); -moz-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); transform: rotate(0deg); }
-                to { -ms-transform: rotate(360deg); -moz-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); transform: rotate(360deg); }
-            }
+            // Collect or generate the star type, name, and description
+            $star_type = $this_rogue_star['type'];
+            $star_name = ucfirst($star_type);
+            $star_from_date = $this_rogue_star['from_date'];
+            $star_to_date = $this_rogue_star['to_date'];
+            $now_time = time();
+            $star_from_time = strtotime($star_from_date.' 00:00:00');
+            $star_to_time = strtotime($star_to_date.' 23:59:59');
+            $star_hours_left = floor(((($star_to_time - $now_time) / 60) / 60));
+            $star_position_right = ($star_hours_left / 48) * 100;
+            $star_tooltip = '&raquo; Rogue Star Event! &laquo; || A '.$star_name.'-type Rogue Star has appeared! This star grants +200 '.$star_name.'-type Starforce for a limited time. Take advantage of its power before it\'s gone! You have less than '.($star_hours_left > 1 ? $star_hours_left.' hours' : '1 hour').' left!';
 
-            @-webkit-keyframes fadeInAndOut {
-                0% {opacity:0.9}
-                50% {opacity:0.7}
-                100% {opacity:1.0}
-            }
-            @-moz-keyframes fadeInAndOut {
-                0% {opacity:0.9}
-                50% {opacity:0.7}
-                100% {opacity:1.0}
-            }
-            @keyframes fadeInAndOut {
-                0% {opacity:0.9}
-                50% {opacity:0.7}
-                100% {opacity:1.0}
-            }
-
-            #prototype .banner .rogue_star {
-                width: 193px;
-                height: 15px;
-                z-index: 30;
-                bottom: 46px;
-                left: 50px;
-            }
-            #prototype .banner .rogue_star > .wrap {
-                position: relative;
-                width: 100%;
-                height: 100%;
-                box-sizing: border-box;
-            }
-            #prototype .banner .rogue_star * {
-                pointer-events: none;
-            }
-
-            #prototype .banner .rogue_star .track,
-            #prototype .banner .rogue_star .trail {
-                position: absolute;
-                bottom: 0;
-                left: -40px;
-                height: auto;
-                width: auto;
-                border-style: solid;
-                border-width: 2px;
-                -webkit-border-radius: 50% 5px 5px 50%;
-                -moz-border-radius: 50% 5px 5px 50%;
-                border-radius: 50% 5px 5px 50%;
-                box-sizing: border-box;
-            }
-            #prototype .banner .rogue_star .track {
-                z-index: 1;
-                opacity: 0.5;
-                height: 100%;
-                right: 0;
-            }
-            #prototype .banner .rogue_star .ruler {
-                z-index: 2;
-                left: 0;
-                right: 0;
-                height: 100%;
-                background-image: url(images/assets/rogue-star_ruler.png);
-                -webkit-border-radius: 5px;
-                -moz-border-radius: 5px;
-                border-radius: 5px;
-                overflow: hidden;
-            }
-            #prototype .banner .rogue_star .trail {
-                z-index: 3;
-                bottom: 3px;
-                opacity: 0.9;
-                height: 10px;
-                border-top-width: 3px;
-                border-bottom-width: 3px;
-                -webkit-animation: fadeInAndOut 5s ease infinite;
-                -moz-animation: fadeInAndOut 5s ease infinite;
-                -ms-animation: fadeInAndOut 5s ease infinite;
-                -o-animation: fadeInAndOut 5s ease infinite;
-                animation: fadeInAndOut 5s ease infinite;
-            }
-
-            #prototype .banner .rogue_star .star {
-                z-index: 4;
-                width: 40px;
-                height: 40px;
-                z-index: 40;
-                bottom: -12px;
-                transform: rotate(45deg);
-                -webkit-animation: rotateInPlace 10s linear infinite;
-                -moz-animation: rotateInPlace 10s linear infinite;
-                -ms-animation: rotateInPlace 10s linear infinite;
-                -o-animation: rotateInPlace 10s linear infinite;
-                animation: rotateInPlace 10s linear infinite;
-            }
-
-            #prototype .banner .rogue_star .label {
-                position: absolute;
-                z-index: 5;
-                text-indent: 0;
-                left: -46px;
-                right: -10px;
-                top: 19px;
-                height: 17px;
-                width: auto;
-                box-sizing: border-box;
-                font-size: 9px;
-                line-height: 9px;
-                font-weight: normal;
-                color: #ffffff;
-                pointer-events: all;
-            }
-            #prototype .banner .rogue_star .label:after {
-                content: "";
-                display: block;
-                clear: both;
-            }
-            #prototype .banner .rogue_star .label .name,
-            #prototype .banner .rogue_star .label .effect {
-                display: block;
-                float: left;
-                box-sizing: border-box;
-                border-style: solid;
-                border-width: 1px;
-                padding: 3px 6px;
-                margin: 0 auto 0 0;
-                text-align: center;
-                vertical-align: middle;
-                border-color: rgb(22, 22, 22) !important;
-            }
-            #prototype .banner .rogue_star .label .name {
-                width: 120px;
-                font-size: 8px;
-                text-transform: uppercase;
-                -webkit-border-radius: 4px 0 0 4px;
-                -moz-border-radius: 4px 0 0 4px;
-                border-radius: 4px 0 0 4px;
-            }
-            #prototype .banner .rogue_star .label .effect {
-                width: 124px;
-                font-size: 9px;
-                text-transform: none;
-                -webkit-border-radius: 0 4px 4px 0;
-                -moz-border-radius: 0 4px 4px 0;
-                border-radius: 0 4px 4px 0;
-            }
-
-
-        </style>
-
-        <? $temp_type = 'freeze'; ?>
-        <? $temp_tooltip = '&raquo; Rogue Star Event! &laquo; || A '.ucfirst($temp_type).' type Rogue Star has appeared! This star grants +200 '.ucfirst($temp_type).'-type Starforce for a limited time. Take advantage of its power before it\'s gone! You have 26 hours left!'; ?>
-        <div class="sprite rogue_star">
-            <div class="wrap">
-                <div class="label" data-tooltip="<?= $temp_tooltip ?>" data-tooltip-type="type_<?= $temp_type ?>">
-                    <div class="name type_empty">Rogue Star!</div>
-                    <div class="effect type_<?= $temp_type ?>"><?= ucfirst($temp_type) ?> +200</div>
+            ?>
+            <div class="sprite rogue_star" data-star-type="<?= $star_type ?>" data-from-date="<?= $star_from_date ?>" data-to-date="<?= $star_to_date ?>">
+                <div class="wrap">
+                    <div class="label" data-tooltip="<?= $star_tooltip ?>" data-tooltip-type="type_<?= $star_type ?>">
+                        <div class="name type_empty">Rogue Star!</div>
+                        <div class="effect type_<?= $star_type ?>"><?= ucfirst($star_type) ?> +200</div>
+                    </div>
+                    <div class="sprite track type_<?= $star_type ?>"></div>
+                    <div class="sprite trail type_<?= $star_type ?>" style="right: <?= $star_position_right ?>%;"></div>
+                    <div class="sprite ruler"></div>
+                    <div class="sprite star" style="background-image: url(images/items/fusion-star_<?= $star_type ?>/sprite_right_40x40.png); right: <?= $star_position_right ?>%; right: calc(<?= $star_position_right ?>% - 20px);"></div>
                 </div>
-                <div class="sprite track type_<?= $temp_type ?>"></div>
-                <div class="sprite trail type_<?= $temp_type ?>" style="right: 50%;"></div>
-                <div class="sprite ruler"></div>
-                <div class="sprite star" style="background-image: url(images/items/fusion-star_<?= $temp_type ?>/sprite_right_40x40.png); right: 50%; right: calc(50% - 20px);"></div>
             </div>
-        </div>
+            <?
+
+        }
+        ?>
 
         <? if (empty($_SESSION[$session_token]['DEMO'])){
             ?>
