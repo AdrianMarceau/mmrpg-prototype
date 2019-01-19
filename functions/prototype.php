@@ -964,6 +964,7 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
     // Pull in global variables
     //global $mmrpg_index;
     $mmrpg_index_players = $GLOBALS['mmrpg_index']['players'];
+    $mmrpg_index_abilities = rpg_ability::get_index();
     $session_token = mmrpg_game_token();
     // If a specific robot token was provided
     if (!empty($player_token) && !empty($robot_token)){
@@ -975,6 +976,12 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
     } else {
         // Define the ability counter and token tracker
         $ability_tokens = $_SESSION[$session_token]['values']['battle_abilities'];
+        foreach ($ability_tokens AS $key => $token){
+            if (!isset($mmrpg_index_abilities[$token])
+                || $mmrpg_index_abilities[$token]['ability_class'] != 'master'){
+                unset($ability_tokens[$key]);
+            }
+        }
         // Return the total amount of ability tokens pulled
         return !empty($ability_tokens) ? count($ability_tokens) : 0;
     }

@@ -44,7 +44,13 @@ class rpg_mission_single extends rpg_mission {
         $temp_battle_omega['battle_field_base']['field_token'] = $temp_option_field['field_token'];
         $temp_battle_omega['battle_target_player']['player_id'] = MMRPG_SETTINGS_TARGET_PLAYERID;
         $temp_battle_omega['battle_target_player']['player_token'] = 'player';
-        $temp_battle_omega['battle_target_player']['player_robots'][0] = array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => $this_robot_token);
+        $temp_battle_omega['battle_target_player']['player_robots'] = array();
+        $temp_robot_master_tokens = array();
+        if (!$starfield_mission){
+            $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + 1;
+            $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_token'] = $this_robot_token;
+            $temp_robot_master_tokens[] = $this_robot_token;
+        }
         $temp_option_completed = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_omega['battle_token']);
         if (!empty($temp_option_completed)){ $temp_battle_omega['battle_complete'] = $temp_option_completed; }
 
@@ -83,10 +89,8 @@ class rpg_mission_single extends rpg_mission {
         // If a field star is present on the field, fill the empty spots with like-typed robots
         if ($starfield_mission
             || $temp_field_star_present){
-
             $temp_battle_omega['battle_target_player']['player_switch'] = 1.5;
-            $temp_robot_tokens = array();
-            $temp_robot_tokens[] = $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_token'];
+
             // Collect factors based on player
             if ($this_prototype_data['this_player_token'] == 'dr-light'){
                 $temp_factors_list = array($this_omega_factors_one, array_merge(
@@ -144,10 +148,10 @@ class rpg_mission_single extends rpg_mission {
                     $bonus_robot_info = rpg_robot::parse_index_info($this_robot_index[$this_factor['robot']]);
                     if (!isset($bonus_robot_info['robot_core'])){ $bonus_robot_info['robot_core'] = ''; }
                     if ($bonus_robot_info['robot_core'] == $temp_option_field['field_type']){
-                        if (!in_array($bonus_robot_info['robot_token'], $temp_robot_tokens)){
+                        if (!in_array($bonus_robot_info['robot_token'], $temp_robot_master_tokens)){
                             $bonus_robot_info['flags']['hide_from_mission_select'] = true;
                             $temp_battle_omega['battle_target_player']['player_robots'][] = $bonus_robot_info;
-                            $temp_robot_tokens[] = $bonus_robot_info['robot_token'];
+                            $temp_robot_master_tokens[] = $bonus_robot_info['robot_token'];
                         }
                     }
                 }
@@ -188,11 +192,10 @@ class rpg_mission_single extends rpg_mission {
         }
 
         // Fill the empty spots with minor enemy robots
-        if (true){
+        if (!$starfield_mission){
             $temp_battle_omega['battle_target_player']['player_switch'] = 1.5;
             $bonus_robot_count = 0;
-            if ($starfield_mission){ $bonus_robot_count += 3; }
-            elseif ($this_prototype_data['this_player_token'] == 'dr-light'){ $bonus_robot_count += 1; }
+            if ($this_prototype_data['this_player_token'] == 'dr-light'){ $bonus_robot_count += 1; }
             elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){ $bonus_robot_count += 2; }
             elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $bonus_robot_count += 3; }
             $temp_mook_options = array();
@@ -221,7 +224,7 @@ class rpg_mission_single extends rpg_mission {
                 else { $temp_mook_counts[$temp_mook_name_token]++; }
                 //$bonus_robot_info['robot_name'] .= ' '.$temp_mook_letters[$temp_mook_counts[$temp_mook_name_token]];
                 $temp_battle_omega['battle_target_player']['player_robots'][] = $bonus_robot_info;
-                $temp_robot_tokens[] = $bonus_robot_info['robot_token'];
+                $temp_robot_master_tokens[] = $bonus_robot_info['robot_token'];
             }
             // Shuffle all the target player robots and then loop through them to make final changes
             //shuffle($temp_battle_omega['battle_target_player']['player_robots']);

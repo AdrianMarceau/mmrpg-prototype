@@ -580,7 +580,7 @@ while ($this_action == 'load'){
         // Clear the form fields markup
         $html_form_fields = '<script type="text/javascript"> reloadParent = true; </script>';
         // Update the form markup buttons
-        $html_form_buttons = '<input class="button button_continue" type="button" value="Continue" onclick="javascript:parent.window.location.href=\''.MMRPG_CONFIG_ROOTURL.'\';" />';
+        $html_form_buttons = '<input class="button button_continue" type="button" value="Continue" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
 
     }
 

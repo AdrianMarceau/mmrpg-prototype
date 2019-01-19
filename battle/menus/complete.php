@@ -10,8 +10,13 @@ ob_start();
     // Display the available sub options
     ?><div class="sub_actions"><?
     ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
-    ?><a class="button action_item button_disabled" type="button">&nbsp;</a><?
-    ?><a class="button action_option button_disabled" type="button">&nbsp;</a><?
+    if ($target_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
+      ?><a class="button action_item" data-action="prototype" type="button" data-order="2"><label>Exit Mission</label></a><?
+      ?><a class="button action_option" data-action="restart" type="button" data-order="3"><label>Restart Mission</label></a><?
+    } else {
+      ?><a class="button action_item button_disabled" type="button">&nbsp;</a><?
+      ?><a class="button action_option button_disabled" type="button">&nbsp;</a><?
+    }
     ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
     ?></div><?
   }
