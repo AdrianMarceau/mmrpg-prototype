@@ -1295,6 +1295,15 @@ class rpg_game {
             asort($this_star_force);
             $this_star_force = array_reverse($this_star_force);
 
+            // Check to see if a Rogue Star is currently in orbit
+            $this_rogue_star = mmrpg_prototype_get_current_rogue_star();
+            if (!empty($this_rogue_star)){
+                $star_type = $this_rogue_star['star_type'];
+                $star_power = $this_rogue_star['star_power'];
+                if (!isset($this_star_force[$star_type])){ $this_star_force[$star_type] = 0; }
+                $this_star_force[$star_type] += $star_power;
+            }
+
             // Return the entire or filtered force array based on request
             $return_array = $strict == true ? $this_star_force_strict : $this_star_force;
             if (empty($type_filter)){

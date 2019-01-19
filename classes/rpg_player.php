@@ -142,6 +142,15 @@ class rpg_player extends rpg_object {
                 $this->player_starforce = $_SESSION['GAME']['values']['star_force'];
             }
         }
+        // Pull in Rogue Star starforce if available for CPU players
+        elseif (empty($this->player_starforce) && $this->player_side == 'right'){
+            $this_rogue_star = mmrpg_prototype_get_current_rogue_star();
+            if (!empty($this_rogue_star)){
+                $player_starforce = array();
+                $player_starforce[$this_rogue_star['star_type']] = $this_rogue_star['star_power'];
+                $this->player_starforce = $player_starforce;
+            }
+        }
 
         // If the user token is empty, collect from data
         if (empty($this->user_token)){

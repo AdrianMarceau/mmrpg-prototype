@@ -287,7 +287,7 @@ $(document).ready(function(){
             rogueStar.fromDateTime = $rogueStar.attr('data-from-date-time');
             rogueStar.toDate = $rogueStar.attr('data-to-date');
             rogueStar.toDateTime = $rogueStar.attr('data-to-date-time');
-            rogueStar.power = parseInt($rogueStar.attr('data-power'));
+            rogueStar.power = parseInt($rogueStar.attr('data-star-power'));
             rogueStar.unixFromTime = Date.parse(rogueStar.fromDate+'T'+rogueStar.fromDateTime) / 1000;
             rogueStar.unixToTime = Date.parse(rogueStar.toDate+'T'+rogueStar.toDateTime) / 1000;
             rogueStar.unixDuration = rogueStar.unixToTime - rogueStar.unixFromTime;
