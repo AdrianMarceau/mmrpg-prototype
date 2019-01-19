@@ -143,12 +143,11 @@ class rpg_player extends rpg_object {
             }
         }
         // Pull in Rogue Star starforce if available for CPU players
-        elseif (empty($this->player_starforce) && $this->player_side == 'right'){
+        elseif ($this->player_side == 'right'){
             $this_rogue_star = mmrpg_prototype_get_current_rogue_star();
             if (!empty($this_rogue_star)){
-                $player_starforce = array();
-                $player_starforce[$this_rogue_star['star_type']] = $this_rogue_star['star_power'];
-                $this->player_starforce = $player_starforce;
+                if (!isset($this->player_starforce[$this_rogue_star['star_type']])){ $this->player_starforce[$this_rogue_star['star_type']] = 0; }
+                $this->player_starforce[$this_rogue_star['star_type']] += $this_rogue_star['star_power'];
             }
         }
 
