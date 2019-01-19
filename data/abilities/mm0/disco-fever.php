@@ -69,8 +69,8 @@ $ability = array(
                 'percent' => true,
                 'frame' => 'taunt',
                 'rates' => array(100, 0, 0),
-                'success' => array(0, 30, 0, 30, $this_create_text),
-                'failure' => array(0, 30, 0, 30, $this_create_text)
+                'success' => array(0, 60, 0, 30, $this_create_text),
+                'failure' => array(0, 60, 0, 30, $this_create_text)
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -80,12 +80,12 @@ $ability = array(
                 'modifiers' => false,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
-                'success' => array(2, 30, 0, 30,  $this_destroy_text),
-                'failure' => array(2, 30, 0, 30, $this_destroy_text)
+                'success' => array(2, 60, 0, 30,  $this_destroy_text),
+                'failure' => array(2, 60, 0, 30, $this_destroy_text)
                 ),
             'ability_frame' => 0,
             'ability_frame_animate' => array(0, 1, 2, 1),
-            'ability_frame_offset' => array('x' => 30, 'y' => 0, 'z' => 20)
+            'ability_frame_offset' => array('x' => 60, 'y' => 0, 'z' => 20)
             );
 
         // Create the attachment object for this ability
