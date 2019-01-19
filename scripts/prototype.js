@@ -296,7 +296,7 @@ $(document).ready(function(){
             // Define a function for refreshing the star's postition and text
             var refreshRogueStarInterval = false;
             var refreshRogueStar = function(){
-                console.log('refreshRogueStar()');
+                //console.log('refreshRogueStar()');
                 var nowTime = Date.now() / 1000;
                 var starTimeDuration = rogueStar.unixToTime - rogueStar.unixFromTime;
                 var starTimeElapsed = nowTime - rogueStar.unixFromTime;
