@@ -1942,6 +1942,7 @@ function mmrpg_prototype_get_current_rogue_star(){
         FROM mmrpg_rogue_stars AS stars
         WHERE
         stars.star_type <> ''
+        AND stars.star_active = 1
         AND stars.star_from_date <= '{$this_date_string}'
             AND stars.star_from_date_time <= '{$this_time_string}'
         AND stars.star_to_date >= '{$this_date_string}'

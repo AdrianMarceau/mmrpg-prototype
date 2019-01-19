@@ -249,8 +249,6 @@ $(document).ready(function(){
                 }
             };
 
-
-
     // Define the event for the password prompt's click unlock sequence
     $('.banner .sprite_player', thisPrototype).live('click', function(){
         gameSettings.passwordUnlocked++;
@@ -276,6 +274,61 @@ $(document).ready(function(){
                 }
             }
         });
+
+        // Define the live Rogue Star ticker functionality if present
+        var $rogueStar = $('.banner .rogue_star', thisPrototype);
+        if ($rogueStar.length){
+
+            // Collect the details of this rogue star
+            var rogueStar = {};
+            rogueStar.type = $rogueStar.attr('data-star-type');
+            rogueStar.name = rogueStar.type.charAt(0).toUpperCase() + rogueStar.type.slice(1);
+            rogueStar.fromDate = $rogueStar.attr('data-from-date');
+            rogueStar.fromDateTime = $rogueStar.attr('data-from-date-time');
+            rogueStar.toDate = $rogueStar.attr('data-to-date');
+            rogueStar.toDateTime = $rogueStar.attr('data-to-date-time');
+            rogueStar.power = parseInt($rogueStar.attr('data-power'));
+            rogueStar.unixFromTime = Date.parse(rogueStar.fromDate+'T'+rogueStar.fromDateTime) / 1000;
+            rogueStar.unixToTime = Date.parse(rogueStar.toDate+'T'+rogueStar.toDateTime) / 1000;
+            rogueStar.unixDuration = rogueStar.unixToTime - rogueStar.unixFromTime;
+            //console.log('A rogue star is in orbit! \n', rogueStar);
+
+            // Define a function for refreshing the star's postition and text
+            var refreshRogueStarInterval = false;
+            var refreshRogueStar = function(){
+                console.log('refreshRogueStar()');
+                var nowTime = Date.now() / 1000;
+                var starTimeDuration = rogueStar.unixToTime - rogueStar.unixFromTime;
+                var starTimeElapsed = nowTime - rogueStar.unixFromTime;
+                var starTimeElapsedPercent = (starTimeElapsed / starTimeDuration) * 100;
+                var starTimeRemaining = starTimeDuration - starTimeElapsed;
+                var starPositionRight = (100 - starTimeElapsedPercent) + 1;
+                var starMinutesLeft = (starTimeRemaining / 60);
+                var starHoursLeft = (starMinutesLeft / 60);
+                //console.log('Checking the star details... \n', {nowTime:nowTime, starTimeDuration:starTimeDuration, starTimeElapsed:starTimeElapsed, starTimeElapsedPercent:starTimeElapsedPercent, starTimeRemaining:starTimeRemaining, starPositionRight:starPositionRight, starMinutesLeft:starMinutesLeft, starHoursLeft:starHoursLeft});
+
+                // If the star is still available, update the sprite, else remove it entirely
+                if (starTimeRemaining > 0){
+                    //console.log('The rogue star is refreshing! It\'s moved along a little!');
+                    var starTooltip = '&raquo; Rogue Star Event! &laquo; || A ' + rogueStar.name + '-type Rogue Star has appeared! This star grants +' + rogueStar.power + ' ' + rogueStar.name + '-type Starforce for a limited time. Take advantage of its power before it\'s gone! ';
+                    if (starHoursLeft >= 1){ starTooltip += 'You have less than ' + (starHoursLeft > 1 ? Math.ceil(starHoursLeft) + ' hours' : '1 hour') + ' remaining! '; }
+                    else if (starHoursLeft < 1){ starTooltip += 'You have only ' + (starMinutesLeft > 1 ? Math.ceil(starMinutesLeft) + ' minutes' : '1 minute') + ' remaining! ';  }
+                    $rogueStar.attr('data-tooltip', starTooltip);
+                    $rogueStar.find('.trail').css({right:starPositionRight+'%'});
+                    $rogueStar.find('.star').css({right:starPositionRight+'%'}).css({right:'calc('+starPositionRight+'% - 20px)'});
+                    } else {
+                    //console.log('Time is up!  The rogue star has been removed!');
+                    if (refreshRogueStarInterval !== false){ clearInterval(refreshRogueStarInterval); }
+                    $rogueStar.css({opacity:1}).animate({opacity:0},500,'swing',function(){ $rogueStar.remove(); });
+                    return false;
+                    }
+                };
+
+            // Automatically call the refresh function on an interval timer
+            refreshRogueStarInterval = setInterval(refreshRogueStar, 9000);
+            refreshRogueStar();
+
+            }
 
         // Trigger the prototype step function if not home
         if (gameSettings.startLink != 'home'){

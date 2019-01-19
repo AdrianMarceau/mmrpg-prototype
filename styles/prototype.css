@@ -1718,7 +1718,7 @@ body[data-source="website"] #prototype .menu {
     -ms-animation: fadeInAndOut 5s ease infinite;
     -o-animation: fadeInAndOut 5s ease infinite;
     animation: fadeInAndOut 5s ease infinite;
-    transition: right 0.3s;
+    transition: right 9;
 }
 
 #prototype .banner .rogue_star .star {
@@ -1733,7 +1733,7 @@ body[data-source="website"] #prototype .menu {
     -ms-animation: rotateInPlace 10s linear infinite;
     -o-animation: rotateInPlace 10s linear infinite;
     animation: rotateInPlace 10s linear infinite;
-    transition: right 0.3s;
+    transition: right 9s;
 }
 
 #prototype .banner .rogue_star .label {
