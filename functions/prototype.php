@@ -240,8 +240,20 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
                 if ($robot_stats['attack']['bonus'] >= $robot_stats['attack']['bonus_max'] && !in_array($robot_token, $robots_unlocked_max_attack)){ $robots_unlocked_max_attack[] = $robot_token; }
                 if ($robot_stats['defense']['bonus'] >= $robot_stats['defense']['bonus_max'] && !in_array($robot_token, $robots_unlocked_max_defense)){ $robots_unlocked_max_defense[] = $robot_token; }
                 if ($robot_stats['speed']['bonus'] >= $robot_stats['speed']['bonus_max'] && !in_array($robot_token, $robots_unlocked_max_speed)){ $robots_unlocked_max_speed[] = $robot_token; }
+                $current_summons = !empty($user_robot_database[$robot_token]['robot_summoned']) ? $user_robot_database[$robot_token]['robot_summoned'] : 0;
+                $alts_unlocked = array();
                 if (!empty($user_robot_alts[$robot_token])){
-                    $num_alts = count($user_robot_alts[$robot_token]);
+                    $alts_unlocked += $user_robot_alts[$robot_token];
+                }
+                if (!empty($mmrpg_robots[$robot_token]['robot_image_alts'])){
+                    foreach ($mmrpg_robots[$robot_token]['robot_image_alts'] AS $alt_key => $alt_info){
+                        if (!isset($alt_info['summons']) || $current_summons < $alt_info['summons']){ continue; }
+                        $alts_unlocked[] = $alt_info['token'];
+                    }
+                }
+                if (!empty($alts_unlocked)){
+                    $alts_unlocked = array_unique($alts_unlocked);
+                    $num_alts = count($alts_unlocked);
                     $robots_unlocked_alt_outfits[] = $robot_token.' x'.$num_alts;
                     $robots_unlocked_alt_outfits_count += $num_alts;
                 }
