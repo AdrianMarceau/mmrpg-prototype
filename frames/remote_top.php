@@ -33,6 +33,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
         $this_playerinfo['values']['battle_abilities'] = !defined('MMRPG_REMOTE_SKIP_ABILITIES') && !empty($this_playerinfo['save_values_battle_abilities']) ? json_decode($this_playerinfo['save_values_battle_abilities'], true) : array();
         $this_playerinfo['values']['battle_stars'] = !defined('MMRPG_REMOTE_SKIP_STARS') && !empty($this_playerinfo['save_values_battle_stars']) ? json_decode($this_playerinfo['save_values_battle_stars'], true) : array();
         $this_playerinfo['values']['robot_database'] = !defined('MMRPG_REMOTE_SKIP_DATABASE') && !empty($this_playerinfo['save_values_robot_database']) ? json_decode($this_playerinfo['save_values_robot_database'], true) : array();
+        $this_playerinfo['values']['robot_alts'] = !defined('MMRPG_REMOTE_SKIP_ALTS') && !empty($this_playerinfo['save_values_robot_alts']) ? json_decode($this_playerinfo['save_values_robot_alts'], true) : array();
         $this_playerinfo['flags'] = !empty($this_playerinfo['save_flags']) ? json_decode($this_playerinfo['save_flags'], true) : array();
         $this_playerinfo['settings'] = !empty($this_playerinfo['save_settings']) ? json_decode($this_playerinfo['save_settings'], true) : array();
         unset($this_playerinfo['save_values'],
@@ -44,6 +45,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             $this_playerinfo['save_values_battle_items'],
             $this_playerinfo['save_values_battle_abilities'],
             $this_playerinfo['save_values_battle_database'],
+            $this_playerinfo['save_values_robot_alts'],
             $this_playerinfo['save_flags'],
             $this_playerinfo['save_settings']
             );
