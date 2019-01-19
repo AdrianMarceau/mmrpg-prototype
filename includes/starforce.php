@@ -52,11 +52,26 @@ foreach ($this_battle_stars AS $temp_key => $temp_data){
 }
 asort($this_star_force);
 $this_star_force = array_reverse($this_star_force);
+
+// Check to see if a Rogue Star is currently in orbit
+$this_rogue_star = mmrpg_prototype_get_current_rogue_star();
+if (!empty($this_rogue_star)){
+    $star_type = $this_rogue_star['star_type'];
+    $star_power = $this_rogue_star['star_power'];
+    if (!isset($this_star_force[$star_type])){ $this_star_force[$star_type] = 0; }
+    $this_star_force[$star_type] += $star_power;
+    $this_star_kind_counts['rogue'][$star_type] = 1;
+}
+
+// Update the session with current starforce values
 $_SESSION[$session_token]['values']['star_force'] = $this_star_force;
 $_SESSION[$session_token]['values']['star_force_strict'] = $this_star_force_strict;
+
 //echo('<pre>$this_star_force = '.print_r($this_star_force, true).'</pre>'."\n\n");
 //echo('<pre>$this_star_force_strict = '.print_r($this_star_force_strict, true).'</pre>'."\n\n");
 //echo('<pre>$this_star_kind_counts = '.print_r($this_star_kind_counts, true).'</pre>'."\n\n");
+//$player_starforce = rpg_game::starforce_unlocked();
+//echo('<pre>$player_starforce = '.print_r($player_starforce, true).'</pre>'."\n\n");
 //die();
 
 ?>

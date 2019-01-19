@@ -1928,6 +1928,7 @@ function mmrpg_prototype_get_player_boss_music($player_token, $session_token = '
 
 // Define a function for determining a player's boss music
 function mmrpg_prototype_get_current_rogue_star(){
+    if (!mmrpg_prototype_complete()){ return false; }
     global $db;
     $this_date_string = date('Y-m-d');
     $this_time_string = date('H:i:s');
