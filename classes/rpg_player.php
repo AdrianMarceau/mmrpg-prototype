@@ -2570,8 +2570,8 @@ class rpg_player extends rpg_object {
         if (empty($player_info)){ return 'error:player-empty'; }
 
         // Collect the approriate database indexes
-        if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token'); }
-        if (empty($mmrpg_database_items)){ $mmrpg_database_items = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_class = 'item' AND ability_flag_complete = 1;", 'ability_token'); }
+        if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = rpg_robot::get_index(true); }
+        if (empty($mmrpg_database_items)){ $mmrpg_database_items = rpg_item::get_index(true); }
 
         // Define the quick-access variables for later use
         $player_token = $player_info['player_token'];
@@ -2588,7 +2588,7 @@ class rpg_player extends rpg_object {
         $player_info['player_battles_failure'] = mmrpg_prototype_battles_failure($player_token);
         $player_info['player_battles_failure_total'] = mmrpg_prototype_battles_failure($player_token, false);
         $player_info['player_robots_count'] = 0;
-        $player_info['player_abilities_count'] = mmrpg_prototype_abilities_unlocked($player_token);
+        $player_info['player_abilities_count'] = mmrpg_prototype_abilities_unlocked();
         $player_info['player_field_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'field');
         $player_info['player_fusion_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'fusion');
         $player_info['player_screw_counter'] = 0;
