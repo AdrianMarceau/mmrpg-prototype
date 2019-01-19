@@ -938,7 +938,7 @@ class rpg_disabled {
 
                 // If we're allowed to drop this item at this time, continue
                 if ($temp_drop_type !== 'empty' && (
-                    ($temp_drop_kind === 'shard' && $num_existing_shards < MMRPG_SETTINGS_SHARDS_MAXQUANTITY)
+                    ($temp_drop_kind === 'shard' && ($num_existing_shards < MMRPG_SETTINGS_SHARDS_MAXQUANTITY || $num_existing_cores < MMRPG_SETTINGS_CORES_MAXQUANTITY))
                     || ($temp_drop_kind === 'core' && $num_existing_cores < MMRPG_SETTINGS_CORES_MAXQUANTITY)
                     )){
 
