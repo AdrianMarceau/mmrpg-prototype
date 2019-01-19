@@ -237,7 +237,7 @@ if (rpg_game::is_user()){ mmrpg_prototype_refresh_battle_points(); }
             $star_time_elapsed = $now_time - $star_from_time;
             $star_time_elapsed_percent = ($star_time_elapsed / $star_time_duration) * 100;
             $star_time_remaining = $star_time_duration - $star_time_elapsed;
-            $star_position_right = (100 - $star_time_elapsed_percent);
+            $star_position_right = (100 - $star_time_elapsed_percent) + 1;
             $star_minutes_left = ($star_time_remaining / 60);
             $star_hours_left = ($star_minutes_left / 60);
             $star_tooltip = '&raquo; Rogue Star Event! &laquo; || A '.$star_name.'-type Rogue Star has appeared! This star grants +'.$this_rogue_star['star_power'].' '.$star_name.'-type Starforce for a limited time. Take advantage of its power before it\'s gone! ';
