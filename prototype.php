@@ -226,28 +226,37 @@ if (rpg_game::is_user()){ mmrpg_prototype_refresh_battle_points(); }
 
         <?
         // Check to see if a Rogue Star is currently in orbit
-        $this_rogue_star = false;
-        if (true){ $this_rogue_star = array('type' => 'freeze', 'from_date' => '2019-01-17', 'to_date' => '2019-01-18'); }
+        $this_rogue_star = mmrpg_prototype_get_current_rogue_star();
         if (!empty($this_rogue_star)){
-
-            // Collect or generate the star type, name, and description
-            $star_type = $this_rogue_star['type'];
+            $star_type = $this_rogue_star['star_type'];
             $star_name = ucfirst($star_type);
-            $star_from_date = $this_rogue_star['from_date'];
-            $star_to_date = $this_rogue_star['to_date'];
             $now_time = time();
-            $star_from_time = strtotime($star_from_date.' 00:00:00');
-            $star_to_time = strtotime($star_to_date.' 23:59:59');
-            $star_hours_left = floor(((($star_to_time - $now_time) / 60) / 60));
-            $star_position_right = ($star_hours_left / 48) * 100;
-            $star_tooltip = '&raquo; Rogue Star Event! &laquo; || A '.$star_name.'-type Rogue Star has appeared! This star grants +200 '.$star_name.'-type Starforce for a limited time. Take advantage of its power before it\'s gone! You have less than '.($star_hours_left > 1 ? $star_hours_left.' hours' : '1 hour').' left!';
-
+            $star_from_time = strtotime($this_rogue_star['star_from_date'].'T'.$this_rogue_star['star_from_date_time']);
+            $star_to_time = strtotime($this_rogue_star['star_to_date'].'T'.$this_rogue_star['star_to_date_time']);
+            $star_time_duration = $star_to_time - $star_from_time;
+            $star_time_elapsed = $now_time - $star_from_time;
+            $star_time_elapsed_percent = ($star_time_elapsed / $star_time_duration) * 100;
+            $star_time_remaining = $star_time_duration - $star_time_elapsed;
+            $star_position_right = (100 - $star_time_elapsed_percent);
+            $star_minutes_left = ($star_time_remaining / 60);
+            $star_hours_left = ($star_minutes_left / 60);
+            $star_tooltip = '&raquo; Rogue Star Event! &laquo; || A '.$star_name.'-type Rogue Star has appeared! This star grants +'.$this_rogue_star['star_power'].' '.$star_name.'-type Starforce for a limited time. Take advantage of its power before it\'s gone! ';
+            if ($star_hours_left >= 1){ $star_tooltip .= 'You have less than '.($star_hours_left > 1 ? ceil($star_hours_left).' hours' : '1 hour').' remaining! '; }
+            elseif ($star_hours_left < 1){ $star_tooltip .= 'You have only '.($star_minutes_left > 1 ? ceil($star_minutes_left).' minutes' : '1 minute').' remaining! ';  }
             ?>
-            <div class="sprite rogue_star" data-star-type="<?= $star_type ?>" data-from-date="<?= $star_from_date ?>" data-to-date="<?= $star_to_date ?>">
+            <div class="sprite rogue_star"
+                data-star-type="<?= $star_type ?>"
+                data-from-date="<?= $this_rogue_star['star_from_date'] ?>"
+                data-from-date-time="<?= $this_rogue_star['star_from_date_time'] ?>"
+                data-to-date="<?= $this_rogue_star['star_to_date'] ?>"
+                data-to-date-time="<?= $this_rogue_star['star_to_date_time'] ?>"
+                data-star-power="<?= $this_rogue_star['star_power'] ?>"
+                data-tooltip="<?= $star_tooltip ?>"
+                data-tooltip-type="type_<?= $star_type ?>">
                 <div class="wrap">
-                    <div class="label" data-tooltip="<?= $star_tooltip ?>" data-tooltip-type="type_<?= $star_type ?>">
+                    <div class="label">
                         <div class="name type_empty">Rogue Star!</div>
-                        <div class="effect type_<?= $star_type ?>"><?= ucfirst($star_type) ?> +200</div>
+                        <div class="effect type_<?= $star_type ?>"><?= ucfirst($star_type) ?> +<?= $this_rogue_star['star_power'] ?></div>
                     </div>
                     <div class="sprite track type_<?= $star_type ?>"></div>
                     <div class="sprite trail type_<?= $star_type ?>" style="right: <?= $star_position_right ?>%;"></div>
@@ -256,7 +265,6 @@ if (rpg_game::is_user()){ mmrpg_prototype_refresh_battle_points(); }
                 </div>
             </div>
             <?
-
         }
         ?>
 
