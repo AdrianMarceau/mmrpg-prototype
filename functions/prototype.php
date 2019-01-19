@@ -1925,6 +1925,33 @@ function mmrpg_prototype_get_player_boss_music($player_token, $session_token = '
 
 }
 
+
+// Define a function for determining a player's boss music
+function mmrpg_prototype_get_current_rogue_star(){
+    global $db;
+    $this_date_string = date('Y-m-d');
+    $this_time_string = date('H:i:s');
+    $this_rogue_star = $db->get_array("SELECT
+        stars.star_id,
+        stars.star_type,
+        stars.star_from_date,
+        stars.star_from_date_time,
+        stars.star_to_date,
+        stars.star_to_date_time,
+        stars.star_power
+        FROM mmrpg_rogue_stars AS stars
+        WHERE
+        stars.star_type <> ''
+        AND stars.star_from_date <= '{$this_date_string}'
+            AND stars.star_from_date_time <= '{$this_time_string}'
+        AND stars.star_to_date >= '{$this_date_string}'
+            AND stars.star_to_date_time >= '{$this_time_string}'
+        ORDER BY stars.star_id ASC
+        LIMIT 1
+        ;");
+    return $this_rogue_star;
+}
+
 // Define a function for checking the battle's prototype points total
 function mmrpg_prototype_database_summoned($robot_token = ''){
     // Define static variables amd populate if necessary
