@@ -1672,7 +1672,7 @@ body[data-source="website"] #prototype .menu {
     box-sizing: border-box;
 }
 #prototype .banner .rogue_star * {
-    pointer-events: none;
+    pointer-events: all;
 }
 
 #prototype .banner .rogue_star .track,
@@ -1718,6 +1718,7 @@ body[data-source="website"] #prototype .menu {
     -ms-animation: fadeInAndOut 5s ease infinite;
     -o-animation: fadeInAndOut 5s ease infinite;
     animation: fadeInAndOut 5s ease infinite;
+    transition: right 0.3s;
 }
 
 #prototype .banner .rogue_star .star {
@@ -1732,6 +1733,7 @@ body[data-source="website"] #prototype .menu {
     -ms-animation: rotateInPlace 10s linear infinite;
     -o-animation: rotateInPlace 10s linear infinite;
     animation: rotateInPlace 10s linear infinite;
+    transition: right 0.3s;
 }
 
 #prototype .banner .rogue_star .label {
@@ -1748,7 +1750,6 @@ body[data-source="website"] #prototype .menu {
     line-height: 9px;
     font-weight: normal;
     color: #ffffff;
-    pointer-events: all;
 }
 #prototype .banner .rogue_star .label:after {
     content: "";
