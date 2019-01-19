@@ -188,11 +188,10 @@ class rpg_mission_single extends rpg_mission {
         }
 
         // Fill the empty spots with minor enemy robots
-        if (true){
+        if (!$starfield_mission){
             $temp_battle_omega['battle_target_player']['player_switch'] = 1.5;
             $bonus_robot_count = 0;
-            if ($starfield_mission){ $bonus_robot_count += 3; }
-            elseif ($this_prototype_data['this_player_token'] == 'dr-light'){ $bonus_robot_count += 1; }
+            if ($this_prototype_data['this_player_token'] == 'dr-light'){ $bonus_robot_count += 1; }
             elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){ $bonus_robot_count += 2; }
             elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $bonus_robot_count += 3; }
             $temp_mook_options = array();
