@@ -36,8 +36,8 @@
             <strong>Database Editors</strong>
         </li>
         <li class="item">
-            <a href="admin.php?action=edit_robot_masters">Edit Robot Masters</a>
-            <em>edit robot master data, stats, abilities, and more</em>
+            <a href="admin.php?action=edit_robots">Edit Database Robots</a>
+            <em>edit the stats, abilities, and details of database robots</em>
         </li>
     </ul>
 
