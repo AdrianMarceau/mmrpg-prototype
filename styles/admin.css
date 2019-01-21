@@ -238,6 +238,10 @@ a:hover {
     background-color: #262626;
     color: #FFFFFF;
 }
+.adminform .header.type_span {
+    border-style: solid;
+    border-width: 2px;
+}
 
 
 .adminform table {
@@ -288,6 +292,9 @@ tr:nth-child(odd) td {
     text-overflow: ellipsis;
 }
 
+.adminform .field .subfield {
+    position: relative;
+}
 .adminform .search .field .subfield {
     box-sizing: border-box;
     float: left;
@@ -295,7 +302,6 @@ tr:nth-child(odd) td {
     width: calc(100% / 3);
     padding: 0 10px 0 0;
     margin: 0 auto 0 0;
-    position: relative;
 }
 .adminform .search .field .subfield .sublabel {
     display: inline-block;
@@ -324,6 +330,7 @@ tr:nth-child(odd) td {
     bottom: 3px;
 }
 
+.adminform .editor .form .type_span,
 .adminform table tbody td .type_span {
     display: inline-block;
     box-sizing: border-box;
@@ -334,6 +341,22 @@ tr:nth-child(odd) td {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+}
+.adminform .editor .form .type_span.swatch,
+.adminform table tbody td .type_span.swatch {
+    padding: 0;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    width: 1.25em;
+    height: 1.25em;
+}
+.adminform .editor .form .label .floatright {
+    float: right;
+}
+.adminform .editor .form .has2cols .label .floatright,
+.adminform .editor .form .has4cols .label .floatright {
+    margin-right: 5px;
 }
 
 .adminform.edit_robots table .class,
@@ -377,6 +400,12 @@ tr:nth-child(odd) td {
     line-height: 16px;
     min-height: 50px;
     position: relative;
+}
+.adminform .field.halfsize {
+    width: 50%;
+}
+.adminform .field.foursize {
+    width: 25%;
 }
 .adminform .field.fullsize {
     width: 100%;
@@ -426,14 +455,14 @@ tr:nth-child(odd) td {
     position: relative;
     bottom: 1px;
 }
-.adminform .field .label em:before {
+.adminform .field .label em:not(.nowrap):before {
     content: "(";
 }
-.adminform .field .label em:after {
+.adminform .field .label em:not(.nowrap):after {
     content: ")";
-
 }
 .adminform .field input[type="text"],
+.adminform .field input[type="number"],
 .adminform .field input[type="password"],
 .adminform .field select,
 .adminform .field textarea {
@@ -450,14 +479,45 @@ tr:nth-child(odd) td {
    -moz-appearance: none;
    appearance: none;
 }
+
 .adminform .field.has2cols input[type="text"],
+.adminform .field.has2cols input[type="number"],
 .adminform .field.has2cols input[type="password"],
-.adminform .field.has2cols select,
-.adminform .field.has2cols textarea {
+.adminform .field.has2cols > select,
+.adminform .field.has2cols > textarea,
+.adminform .field.has2cols .subfield {
     width: 45%;
     margin-right: 5px;
     width: calc(50% - 5px);
 }
+.adminform .field.has2cols .subfield {
+    float: left;
+}
+.adminform .field.has2cols .subfield select,
+.adminform .field.has2cols .subfield textarea {
+    width: 100%;
+    margin-right: 0;
+}
+
+.adminform .field.has4cols input[type="text"],
+.adminform .field.has4cols input[type="number"],
+.adminform .field.has4cols input[type="password"],
+.adminform .field.has4cols > select,
+.adminform .field.has4cols > textarea,
+.adminform .field.has4cols .subfield {
+    width: 24%;
+    margin-right: 5px;
+    width: calc(25% - 5px);
+}
+.adminform .field.has4cols .subfield {
+    float: left;
+}
+.adminform .field.has4cols .subfield select,
+.adminform .field.has4cols .subfield textarea {
+    width: 100%;
+    margin-right: 0;
+}
+
 .adminform .field select + span {
     position: absolute;
     display: block;
@@ -484,9 +544,14 @@ tr:nth-child(odd) td {
     padding: 2px;
 }
 
-.adminform .field input[disabled] {
+.adminform .field input[disabled],
+.adminform .field button[disabled],
+.adminform .field select[disabled],
+.adminform .field textarea[disabled] {
     border: 1px solid #DEDEDE;
     background-color: #EFEFEF;
+    pointer-events: none;
+    cursor: not-allowed;
 }
 
 .adminform .buttons input[type="button"],
@@ -638,7 +703,8 @@ tr:nth-child(odd) td {
 .adminform .results .list .actions .link.edit {
     color: #11ab00;
 }
-.adminform .results .list .actions .link.delete {
+.adminform .results .list .actions .link.delete,
+.adminform .results .list .actions .link.cancel {
     color: #ab0000;
 }
 .adminform .results .list .actions .link:before {
@@ -674,11 +740,13 @@ tr:nth-child(odd) td {
 .adminform .editor .buttons .save:hover {
     background-color: #007a0a;
 }
-.adminform .editor .buttons .delete {
+.adminform .editor .buttons .delete,
+.adminform .editor .buttons .cancel {
     background-color: #8c2525;
     border-color: #751f1f;
 }
-.adminform .editor .buttons .delete:hover {
+.adminform .editor .buttons .delete:hover,
+.adminform .editor .buttons .cancel:hover {
     background-color: #a52c2c;
 }
 

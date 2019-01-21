@@ -73,4 +73,35 @@ $(document).ready(function(){
 
         });
 
+    // Define an event for fields that depend on other fields for thier value
+    var $autoElements = $('*[data-auto]', thisAdminForm);
+    if ($autoElements.length){
+        $autoElements.each(function(){
+
+            // Collect ref to auto element and its auto type
+            var $element = $(this);
+            var autoType = $element.attr('data-auto');
+
+            // Define functionality for the FIELD SUM auto elements
+            if (autoType === 'field-sum'){
+                var autoSumFields = $element.attr('data-field-sum').split(',');
+                var $autoSumFields = [];
+                var sumTheseFields = function(){
+                    console.log('sumTheseFields()');
+                    var fieldSum = 0;
+                    for (var i = 0; i < $autoSumFields.length; i++){ var val = $autoSumFields[i].val(); fieldSum += parseInt(val); }
+                    $element.val(fieldSum);
+                    };
+                for (var i = 0; i < autoSumFields.length; i++){
+                    var $field = $('input[name="'+autoSumFields[i]+'"]', thisAdminForm);
+                    if (typeof $field !== 'undefined'){
+                        $autoSumFields.push($field);
+                        $field.bind('keyup keydown change click', function(){ sumTheseFields(); });
+                        }
+                    }
+                }
+
+            });
+        }
+
 });
