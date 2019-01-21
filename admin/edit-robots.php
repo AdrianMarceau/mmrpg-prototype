@@ -570,7 +570,7 @@
                     <div class="field has2cols">
                         <strong class="label">
                             Core Type(s)
-                            <span class="type_span type_<?= !empty($robot_data['robot_core']) ? $robot_data['robot_core'] : 'none' ?> swatch floatright">&nbsp;</span>
+                            <span class="type_span type_<?= !empty($robot_data['robot_core']) ? $robot_data['robot_core'] : 'none' ?> swatch floatright" data-auto="field-type" data-field-type="robot_core,robot_core2">&nbsp;</span>
                         </strong>
                         <div class="subfield">
                             <select class="select" name="robot_core">
@@ -616,7 +616,7 @@
 
                     <hr />
 
-                    <div class="field">
+                    <div class="field foursize">
                         <strong class="label">Source Game</strong>
                         <select class="select" name="robot_game">
                             <?
@@ -631,23 +631,22 @@
                         </select><span></span>
                     </div>
 
-                    <div class="field">
+                    <div class="field foursize">
                         <strong class="label">Sort Group</strong>
                         <input class="textbox" type="text" name="robot_group" value="<?= $robot_data['robot_group'] ?>" maxlength="64" />
                     </div>
 
-                    <div class="field">
+                    <div class="field foursize">
                         <strong class="label">Serial Number</strong>
                         <input class="textbox" type="text" name="robot_number" value="<?= $robot_data['robot_number'] ?>" maxlength="64" />
                     </div>
 
-                    <div class="field">
-                        <div class="label">
-                            <strong>Robot Class</strong>
-                            <em>three word classification</em>
-                        </div>
-                        <input class="textbox" type="text" name="robot_description" value="<?= htmlentities($robot_data['robot_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
+                    <div class="field foursize">
+                        <strong class="label">Sort Order</strong>
+                        <input class="textbox" type="number" name="robot_order" value="<?= $robot_data['robot_order'] ?>" maxlength="8" />
                     </div>
+
+                    <hr />
 
                     <div class="field">
                         <strong class="label">Home Field</strong>
@@ -657,6 +656,20 @@
                             foreach ($mmrpg_fields_index AS $field_token => $field_data){
                                 $label = $field_data['field_name'];
                                 $selected = !empty($robot_data['robot_field']) && $robot_data['robot_field'] == $field_token ? 'selected="selected"' : '';
+                                echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                            }
+                            ?>
+                        </select><span></span>
+                    </div>
+
+                    <div class="field">
+                        <strong class="label">Echo Field</strong>
+                        <select class="select" name="robot_field2">
+                            <?
+                            echo('<option value=""'.(empty($robot_data['robot_field2']) ? 'selected="selected"' : '').'>- none -</option>');
+                            foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                $label = $field_data['field_name'];
+                                $selected = !empty($robot_data['robot_field2']) && $robot_data['robot_field2'] == $field_token ? 'selected="selected"' : '';
                                 echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                             }
                             ?>
@@ -723,7 +736,8 @@
                             </strong>
                             <? for ($i = 0; $i < 4; $i++){ ?>
                                 <div class="subfield">
-                                    <select class="select" name="robot_<?= $matchup_token ?>[]">
+                                    <span class="type_span type_<?= !empty($matchup_list[$i]) ? $matchup_list[$i] : '' ?> swatch floatright hidenone" data-auto="field-type" data-field-type="robot_<?= $matchup_token ?>[<?= $i ?>]">&nbsp;</span>
+                                    <select class="select" name="robot_<?= $matchup_token ?>[<?= $i ?>]">
                                         <option value=""<?= empty($matchup_list[$i]) ? ' selected="selected"' : '' ?>>-</option>
                                         <?
                                         foreach ($mmrpg_types_index AS $type_token => $type_info){
@@ -743,6 +757,14 @@
                     ?>
 
                     <hr />
+
+                    <div class="field halfsize">
+                        <div class="label">
+                            <strong>Robot Class</strong>
+                            <em>three word classification</em>
+                        </div>
+                        <input class="textbox" type="text" name="robot_description" value="<?= htmlentities($robot_data['robot_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
+                    </div>
 
                     <div class="field fullsize">
                         <div class="label">
@@ -813,11 +835,6 @@
                                 <input class="checkbox" type="checkbox" name="robot_flag_hidden" value="1" <?= !empty($robot_data['robot_flag_hidden']) ? 'checked="checked"' : '' ?> />
                             </label>
                             <p class="subtext">This robot's data should stay hidden</p>
-                        </div>
-
-                        <div class="field foursize has2cols">
-                            <strong class="label">Order</strong>
-                            <input class="textbox" type="number" name="robot_order" value="<?= $robot_data['robot_order'] ?>" maxlength="8" />
                         </div>
 
                     </div>
