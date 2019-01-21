@@ -238,9 +238,16 @@ a:hover {
     background-color: #262626;
     color: #FFFFFF;
 }
-.adminform .header.type_span {
+.adminform .editor .header.type_span {
     border-style: solid;
     border-width: 2px;
+    width: auto;
+    display: block;
+    margin: 0 auto 20px 0;
+    padding: 6px;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
 }
 
 
@@ -330,6 +337,7 @@ tr:nth-child(odd) td {
     bottom: 3px;
 }
 
+.adminform .editor .type_span,
 .adminform .editor .form .type_span,
 .adminform table tbody td .type_span {
     display: inline-block;
@@ -341,6 +349,10 @@ tr:nth-child(odd) td {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);
+    -webkit-box-decoration-break: clone;
+    background-repeat: no-repeat !important;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 .adminform .editor .form .type_span.swatch,
 .adminform table tbody td .type_span.swatch {
@@ -354,9 +366,18 @@ tr:nth-child(odd) td {
 .adminform .editor .form .label .floatright {
     float: right;
 }
+.adminform .editor .form .subfield .floatright {
+    position: absolute;
+    top: -18px;
+    right: 0;
+}
 .adminform .editor .form .has2cols .label .floatright,
 .adminform .editor .form .has4cols .label .floatright {
     margin-right: 5px;
+}
+.adminform .editor .form .has2cols .subfield .floatright,
+.adminform .editor .form .has4cols .subfield .floatright {
+    right: 5px;
 }
 
 .adminform.edit_robots table .class,
