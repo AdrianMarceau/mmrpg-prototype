@@ -10,6 +10,8 @@ $this_page_markup = '';
 
 // Collect the current action from the URL if set
 $this_page_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : 'home';
+$this_page_tabtitle = 'Admin';
+
 
 /*
  * SAVE UPDATES REQUEST
@@ -158,7 +160,7 @@ unset($db);
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Admin | Mega Man RPG Prototype | Blank | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+<title><?= $this_page_tabtitle ?> | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
@@ -176,8 +178,6 @@ unset($db);
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
-<script type="text/javascript" src="scripts/jquery.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/admin.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 </head>
 <body id="mmrpg">
     <div id="admin">
@@ -202,5 +202,7 @@ unset($db);
         <?= htmlentities(print_r($_REQUEST), ENT_QUOTES, 'UTF-8', true) ?>
         </pre>
     <? } ?>
+<script type="text/javascript" src="scripts/jquery.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/admin.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 </body>
 </html>
