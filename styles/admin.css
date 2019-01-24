@@ -540,6 +540,16 @@ tr:nth-child(odd) td {
     margin-right: 0;
 }
 
+.adminform .field.multirow {
+
+}
+.adminform .field.multirow > .label {
+    margin-bottom: 0;
+}
+.adminform .field.multirow .subfield  {
+    margin-top: 4px;
+}
+
 .adminform .field select + span {
     position: absolute;
     display: block;
