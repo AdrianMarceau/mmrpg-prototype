@@ -87,7 +87,7 @@ $(document).ready(function(){
                 var autoSumFields = $element.attr('data-field-sum').split(',');
                 var $autoSumFields = [];
                 var sumTheseFields = function(){
-                    console.log('sumTheseFields()');
+                    //console.log('sumTheseFields()');
                     var fieldSum = 0;
                     for (var i = 0; i < $autoSumFields.length; i++){ var val = $autoSumFields[i].val(); fieldSum += parseInt(val); }
                     $element.val(fieldSum);
@@ -97,6 +97,32 @@ $(document).ready(function(){
                     if (typeof $field !== 'undefined'){
                         $autoSumFields.push($field);
                         $field.bind('keyup keydown change click', function(){ sumTheseFields(); });
+                        }
+                    }
+                }
+
+            // Define functionality for the FIELD TYPE auto elements
+            else if (autoType === 'field-type'){
+                var autoTypeFields = $element.attr('data-field-type').split(',');
+                var $autoTypeFields = [];
+                var updateFieldTypes = function(){
+                    //console.log('updateFieldTypes()');
+                    var fieldTypes = [];
+                    for (var i = 0; i < $autoTypeFields.length; i++){
+                        var val = $autoTypeFields[i].val();
+                        if (!val.length){ if (i === 0 && autoTypeFields.length > 1){ fieldTypes.push('none'); } continue; }
+                        fieldTypes.push(val);
+                        }
+                    $element.removeClass(function(index, className) { return (className.match (/(^|\s)type_\S+/g) || []).join(' '); });
+                    $element.addClass('type_span');
+                    if (!fieldTypes.length){ return; }
+                    $element.addClass('type_'+fieldTypes.join('_'));
+                    };
+                for (var i = 0; i < autoTypeFields.length; i++){
+                    var $field = $('select[name="'+autoTypeFields[i]+'"]', thisAdminForm);
+                    if (typeof $field !== 'undefined'){
+                        $autoTypeFields.push($field);
+                        $field.bind('keyup keydown change click', function(){ updateFieldTypes(); });
                         }
                     }
                 }

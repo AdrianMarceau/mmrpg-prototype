@@ -72,7 +72,7 @@
 
         // Collect form data for processing
         $search_data['robot_id'] = !empty($_GET['robot_id']) && is_numeric($_GET['robot_id']) ? trim($_GET['robot_id']) : '';
-        $search_data['robot_name'] = !empty($_GET['robot_name']) && preg_match('/[-_0-9a-z\.\*]+/i', $_GET['robot_name']) ? trim(strtolower($_GET['robot_name'])) : '';
+        $search_data['robot_name'] = !empty($_GET['robot_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['robot_name']) ? trim(strtolower($_GET['robot_name'])) : '';
         $search_data['robot_core'] = !empty($_GET['robot_core']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_core']) ? trim(strtolower($_GET['robot_core'])) : '';
         $search_data['robot_class'] = !empty($_GET['robot_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_class']) ? trim(strtolower($_GET['robot_class'])) : '';
         $search_data['robot_game'] = !empty($_GET['robot_game']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_game']) ? trim(strtoupper($_GET['robot_game'])) : '';
@@ -187,95 +187,109 @@
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
         if ($form_action == 'edit_robots'){
 
-            // Collect form data from the request and parse out simple rules
+            // COLLECT form data from the request and parse out simple rules
+
+            $old_robot_token = !empty($_POST['old_robot_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['old_robot_token']) ? trim(strtolower($_POST['old_robot_token'])) : '';
 
             $form_data['robot_id'] = !empty($_POST['robot_id']) && is_numeric($_POST['robot_id']) ? trim($_POST['robot_id']) : 0;
-
             $form_data['robot_token'] = !empty($_POST['robot_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_token']) ? trim(strtolower($_POST['robot_token'])) : '';
-            $form_data['robot_number'] = !empty($_POST['robot_number']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_number']) ? trim(strtoupper($_POST['robot_number'])) : '';
-            $form_data['robot_name'] = !empty($_POST['robot_name']) && preg_match('/^[-_0-9a-z\.\*]+$/i', $_POST['robot_name']) ? trim($_POST['robot_name']) : '';
-            $form_data['robot_game'] = !empty($_POST['robot_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_game']) ? trim(strtolower($_POST['robot_game'])) : '';
-            $form_data['robot_group'] = !empty($_POST['robot_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['robot_group']) ? trim($_POST['robot_group']) : '';
-            $form_data['robot_field'] = !empty($_POST['robot_field']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_field']) ? trim(strtolower($_POST['robot_field'])) : '';
+            $form_data['robot_name'] = !empty($_POST['robot_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['robot_name']) ? trim($_POST['robot_name']) : '';
             $form_data['robot_class'] = !empty($_POST['robot_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_class']) ? trim(strtolower($_POST['robot_class'])) : '';
-            $form_data['robot_gender'] = !empty($_POST['robot_gender']) && preg_match('/^(male|female|other|none)$/', $_POST['robot_gender']) ? trim(strtolower($_POST['robot_gender'])) : '';
-            $form_data['robot_image'] = !empty($_POST['robot_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image']) ? trim(strtolower($_POST['robot_image'])) : '';
-            $form_data['robot_image_size'] = !empty($_POST['robot_image_size']) && is_numeric($_POST['robot_image_size']) ? (int)(trim($_POST['robot_image_size'])) : '';
-            $form_data['robot_image_editor'] = !empty($_POST['robot_image_editor']) && is_numeric($_POST['robot_image_editor']) ? (int)(trim($_POST['robot_image_editor'])) : '';
             $form_data['robot_core'] = !empty($_POST['robot_core']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_core']) ? trim(strtolower($_POST['robot_core'])) : '';
             $form_data['robot_core2'] = !empty($_POST['robot_core2']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_core2']) ? trim(strtolower($_POST['robot_core2'])) : '';
-            $form_data['robot_description'] = !empty($_POST['robot_description']) && preg_match('/^[-_0-9a-z\.\*]+$/i', $_POST['robot_description']) ? trim($_POST['robot_description']) : '';
+            $form_data['robot_gender'] = !empty($_POST['robot_gender']) && preg_match('/^(male|female|other|none)$/', $_POST['robot_gender']) ? trim(strtolower($_POST['robot_gender'])) : '';
+
+            $form_data['robot_game'] = !empty($_POST['robot_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_game']) ? trim($_POST['robot_game']) : '';
+            $form_data['robot_group'] = !empty($_POST['robot_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['robot_group']) ? trim($_POST['robot_group']) : '';
+            $form_data['robot_number'] = !empty($_POST['robot_number']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_number']) ? trim($_POST['robot_number']) : '';
+            $form_data['robot_order'] = !empty($_POST['robot_order']) && is_numeric($_POST['robot_order']) ? (int)(trim($_POST['robot_order'])) : 0;
+
+            $form_data['robot_field'] = !empty($_POST['robot_field']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_field']) ? trim(strtolower($_POST['robot_field'])) : '';
+            $form_data['robot_field2'] = !empty($_POST['robot_field2']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_field2']) ? trim(strtolower($_POST['robot_field2'])) : '';
+            //$form_data['robot_mecha'] = !empty($_POST['robot_mecha']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_mecha']) ? trim(strtolower($_POST['robot_mecha'])) : '';
+
+            $form_data['robot_energy'] = !empty($_POST['robot_energy']) && is_numeric($_POST['robot_energy']) ? (int)(trim($_POST['robot_energy'])) : 0;
+            $form_data['robot_weapons'] = !empty($_POST['robot_weapons']) && is_numeric($_POST['robot_weapons']) ? (int)(trim($_POST['robot_weapons'])) : 0;
+            $form_data['robot_attack'] = !empty($_POST['robot_attack']) && is_numeric($_POST['robot_attack']) ? (int)(trim($_POST['robot_attack'])) : 0;
+            $form_data['robot_defense'] = !empty($_POST['robot_defense']) && is_numeric($_POST['robot_defense']) ? (int)(trim($_POST['robot_defense'])) : 0;
+            $form_data['robot_speed'] = !empty($_POST['robot_speed']) && is_numeric($_POST['robot_speed']) ? (int)(trim($_POST['robot_speed'])) : 0;
+
+            $form_data['robot_weaknesses'] = !empty($_POST['robot_weaknesses']) && is_array($_POST['robot_weaknesses']) ? array_values(array_unique(array_filter($_POST['robot_weaknesses']))) : array();
+            $form_data['robot_resistances'] = !empty($_POST['robot_resistances']) && is_array($_POST['robot_resistances']) ? array_values(array_unique(array_filter($_POST['robot_resistances']))) : array();
+            $form_data['robot_affinities'] = !empty($_POST['robot_affinities']) && is_array($_POST['robot_affinities']) ? array_values(array_unique(array_filter($_POST['robot_affinities']))) : array();
+            $form_data['robot_immunities'] = !empty($_POST['robot_immunities']) && is_array($_POST['robot_immunities']) ? array_values(array_unique(array_filter($_POST['robot_immunities']))) : array();
+
+            $form_data['robot_description'] = !empty($_POST['robot_description']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['robot_description']) ? trim($_POST['robot_description']) : '';
             $form_data['robot_description2'] = !empty($_POST['robot_description2']) ? trim(strip_tags($_POST['robot_description2'])) : '';
-            $form_data['robot_energy'] = !empty($_POST['robot_energy']) && is_numeric($_POST['robot_energy']) ? (int)(trim($_POST['robot_energy'])) : '';
-            $form_data['robot_weapons'] = !empty($_POST['robot_weapons']) && is_numeric($_POST['robot_weapons']) ? (int)(trim($_POST['robot_weapons'])) : '';
-            $form_data['robot_attack'] = !empty($_POST['robot_attack']) && is_numeric($_POST['robot_attack']) ? (int)(trim($_POST['robot_attack'])) : '';
-            $form_data['robot_defense'] = !empty($_POST['robot_defense']) && is_numeric($_POST['robot_defense']) ? (int)(trim($_POST['robot_defense'])) : '';
-            $form_data['robot_speed'] = !empty($_POST['robot_speed']) && is_numeric($_POST['robot_speed']) ? (int)(trim($_POST['robot_speed'])) : '';
-            $form_data['robot_weaknesses'] = !empty($_POST['robot_weaknesses']) ? trim(strip_tags($_POST['robot_weaknesses'])) : '';
-            $form_data['robot_resistances'] = !empty($_POST['robot_resistances']) ? trim(strip_tags($_POST['robot_resistances'])) : '';
-            $form_data['robot_affinities'] = !empty($_POST['robot_affinities']) ? trim(strip_tags($_POST['robot_affinities'])) : '';
-            $form_data['robot_immunities'] = !empty($_POST['robot_immunities']) ? trim(strip_tags($_POST['robot_immunities'])) : '';
-            $form_data['robot_image_alts'] = !empty($_POST['robot_image_alts']) ? trim(strip_tags($_POST['robot_image_alts'])) : '';
-            $form_data['robot_abilities_rewards'] = !empty($_POST['robot_abilities_rewards']) ? trim(strip_tags($_POST['robot_abilities_rewards'])) : '';
-            $form_data['robot_abilities_compatible'] = !empty($_POST['robot_abilities_compatible']) ? trim(strip_tags($_POST['robot_abilities_compatible'])) : '';
+
             $form_data['robot_quotes_start'] = !empty($_POST['robot_quotes_start']) ? trim(strip_tags($_POST['robot_quotes_start'])) : '';
             $form_data['robot_quotes_taunt'] = !empty($_POST['robot_quotes_taunt']) ? trim(strip_tags($_POST['robot_quotes_taunt'])) : '';
             $form_data['robot_quotes_victory'] = !empty($_POST['robot_quotes_victory']) ? trim(strip_tags($_POST['robot_quotes_victory'])) : '';
             $form_data['robot_quotes_defeat'] = !empty($_POST['robot_quotes_defeat']) ? trim(strip_tags($_POST['robot_quotes_defeat'])) : '';
-            $form_data['robot_flag_hidden'] = isset($_POST['robot_flag_hidden']) && is_numeric($_POST['robot_flag_hidden']) ? (int)(trim($_POST['robot_flag_hidden'])) : 0;
+
+            $form_data['robot_functions'] = !empty($_POST['robot_functions']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['robot_functions']) ? trim($_POST['robot_functions']) : '';
+
+            $form_data['robot_flag_published'] = isset($_POST['robot_flag_published']) && is_numeric($_POST['robot_flag_published']) ? (int)(trim($_POST['robot_flag_published'])) : 0;
             $form_data['robot_flag_complete'] = isset($_POST['robot_flag_complete']) && is_numeric($_POST['robot_flag_complete']) ? (int)(trim($_POST['robot_flag_complete'])) : 0;
             $form_data['robot_flag_hidden'] = isset($_POST['robot_flag_hidden']) && is_numeric($_POST['robot_flag_hidden']) ? (int)(trim($_POST['robot_flag_hidden'])) : 0;
 
+            /*
+            $form_data['robot_image'] = !empty($_POST['robot_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image']) ? trim(strtolower($_POST['robot_image'])) : '';
+            $form_data['robot_image_size'] = !empty($_POST['robot_image_size']) && is_numeric($_POST['robot_image_size']) ? (int)(trim($_POST['robot_image_size'])) : 0;
+            $form_data['robot_image_editor'] = !empty($_POST['robot_image_editor']) && is_numeric($_POST['robot_image_editor']) ? (int)(trim($_POST['robot_image_editor'])) : 0;
+            $form_data['robot_image_alts'] = !empty($_POST['robot_image_alts']) ? trim(strip_tags($_POST['robot_image_alts'])) : '';
+            $form_data['robot_abilities_rewards'] = !empty($_POST['robot_abilities_rewards']) ? trim(strip_tags($_POST['robot_abilities_rewards'])) : '';
+            $form_data['robot_abilities_compatible'] = !empty($_POST['robot_abilities_compatible']) ? trim(strip_tags($_POST['robot_abilities_compatible'])) : '';
+            */
+
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
+            //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
-            // If the required USER ID field was empty, complete form failure
-            if (empty($form_data['robot_id'])){
-                $form_messages[] = array('error', 'Robot ID was not provided');
-                $form_success = false;
-            }
-
-            // If the required USERNAME TOKEN field was empty, complete form failure
-            if (empty($form_data['robot_token'])){
-                $form_messages[] = array('error', 'Robotname token was not provided or was invalid');
-                $form_success = false;
-            }
-
-            // If the required LOGIN USERNAME field was empty, complete form failure
-            if (empty($form_data['robot_name'])){
-                $form_messages[] = array('error', 'Login robotname was not provided or was invalid');
-                $form_success = false;
-            }
-
-            // If there were errors, we should exit now
+            // VALIDATE all of the MANDATORY FIELDS to see if any are invalid and abort the update entirely if necessary
+            if (empty($form_data['robot_id'])){ $form_messages[] = array('error', 'Robot ID was not provided'); $form_success = false; }
+            if (empty($form_data['robot_token']) || empty($old_robot_token)){ $form_messages[] = array('error', 'Robot Token was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['robot_name'])){ $form_messages[] = array('error', 'Robot Name was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['robot_class'])){ $form_messages[] = array('error', 'Robot Kind was not provided or was invalid'); $form_success = false; }
+            if (!isset($_POST['robot_core']) || !isset($_POST['robot_core2'])){ $form_messages[] = array('warning', 'Core Types were not provided or were invalid'); $form_success = false; }
+            if (empty($form_data['robot_gender'])){ $form_messages[] = array('error', 'Robot Gender was not provided or was invalid'); $form_success = false; }
             if (!$form_success){ exit_robot_edit_action($form_data['robot_id']); }
 
-            // If trying to update the GENDER but it was invalid, do not update
-            if (empty($form_data['robot_gender']) && !empty($_POST['robot_gender'])){
-                $form_messages[] = array('warning', 'Gender identity was invalid and will not be updated');
-                unset($form_data['robot_gender']);
-            }
+            // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
+            if (empty($form_data['robot_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
+            if (empty($form_data['robot_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
+            if (empty($form_data['robot_number'])){ $form_messages[] = array('warning', 'Serial Number was not provided and may cause issues on the front-end'); }
 
-            // If there were errors, we should exit now
-            if (!$form_success){ exit_robot_edit_action($form_data['robot_id']); }
+            // REFORMAT or OPTIMIZE data for provided fields where necessary
 
-            // Update the robot name token using the new robot name string
-            if (!empty($form_data['robot_name'])){
-                $form_data['robot_token'] = preg_replace('/[^-a-z0-9]+/i', '', strtolower($form_data['robot_name']));
-            }
+            if (isset($form_data['robot_core'])){
+                // Fix any core ordering problems (like selecting Neutral + anything)
+                $cores = array_values(array_filter(array($form_data['robot_core'], $form_data['robot_core2'])));
+                $form_data['robot_core'] = isset($cores[0]) ? $cores[0] : '';
+                $form_data['robot_core2'] = isset($cores[1]) ? $cores[1] : '';
+                }
+
+            if (isset($form_data['robot_weaknesses'])){ $form_data['robot_weaknesses'] = !empty($form_data['robot_weaknesses']) ? json_encode($form_data['robot_weaknesses']) : ''; }
+            if (isset($form_data['robot_resistances'])){ $form_data['robot_resistances'] = !empty($form_data['robot_resistances']) ? json_encode($form_data['robot_resistances']) : ''; }
+            if (isset($form_data['robot_affinities'])){ $form_data['robot_affinities'] = !empty($form_data['robot_affinities']) ? json_encode($form_data['robot_affinities']) : ''; }
+            if (isset($form_data['robot_immunities'])){ $form_data['robot_immunities'] = !empty($form_data['robot_immunities']) ? json_encode($form_data['robot_immunities']) : ''; }
+
+            // DEBUG
+            //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
+            //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
             // Loop through fields to create an update string
             $update_data = $form_data;
-            $update_data['robot_date_modified'] = time();
+            //$update_data['robot_date_modified'] = time();
             unset($update_data['robot_id']);
-            $update_results = $db->update('mmrpg_robots', $update_data, array('robot_id' => $form_data['robot_id']));
+            $update_results = $db->update('mmrpg_index_robots', $update_data, array('robot_id' => $form_data['robot_id']));
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
             // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_messages[] = array('success', 'Robot data was updated successfully'); }
-            else { $form_messages[] = array('error', 'Robot data could not be updated'); }
+            if ($update_results !== false){ $form_messages[] = array('success', 'Robot data was updated successfully!'); }
+            else { $form_messages[] = array('error', 'Robot data could not be updated...'); }
 
             // We're done processing the form, we can exit
             exit_robot_edit_action($form_data['robot_id']);
@@ -529,7 +543,7 @@
 
             <div class="editor">
 
-                <h3 class="header type_span type_<?= !empty($robot_data['robot_core']) ? $robot_data['robot_core'] : 'none' ?>">Edit Robot &quot;<?= $robot_name_display ?>&quot;</h3>
+                <h3 class="header type_span type_<?= !empty($robot_data['robot_core']) ? $robot_data['robot_core'].(!empty($robot_data['robot_core2']) ? '_'.$robot_data['robot_core2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="robot_core,robot_core2">Edit Robot &quot;<?= $robot_name_display ?>&quot;</h3>
 
                 <? print_form_messages() ?>
 
@@ -570,7 +584,7 @@
                     <div class="field has2cols">
                         <strong class="label">
                             Core Type(s)
-                            <span class="type_span type_<?= !empty($robot_data['robot_core']) ? $robot_data['robot_core'] : 'none' ?> swatch floatright" data-auto="field-type" data-field-type="robot_core,robot_core2">&nbsp;</span>
+                            <span class="type_span type_<?= (!empty($robot_data['robot_core']) ? $robot_data['robot_core'].(!empty($robot_data['robot_core2']) ? '_'.$robot_data['robot_core2'] : '') : 'none') ?> swatch floatright" data-auto="field-type" data-field-type="robot_core,robot_core2">&nbsp;</span>
                         </strong>
                         <div class="subfield">
                             <select class="select" name="robot_core">
@@ -620,7 +634,7 @@
                         <strong class="label">Source Game</strong>
                         <select class="select" name="robot_game">
                             <?
-                            $robot_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots ORDER BY robot_game ASC;", 'game_token');
+                            $robot_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots WHERE robot_game <> '' ORDER BY robot_game ASC;", 'game_token');
                             echo('<option value=""'.(empty($robot_data['robot_game']) ? 'selected="selected"' : '').'>- none -</option>');
                             foreach ($robot_games_tokens AS $game_token => $game_data){
                                 $label = $game_token;
@@ -803,7 +817,7 @@
                             <strong>Robot Functions</strong>
                             <em>file path for script with robot functions like onload, ondefeat, etc.</em>
                         </div>
-                        <input class="textbox" type="text" name="robot_functions" value="<?= $robot_data['robot_functions'] ?>" maxlength="64" />
+                        <input class="textbox" type="text" name="robot_functions" value="<?= $robot_data['robot_functions'] ?>" maxlength="64" placeholder="robots/robot.php" />
                     </div>
 
                     <hr />
@@ -866,12 +880,10 @@
 
             <?
 
-
-            $debug_robot_data = $robot_data;
+            //$debug_robot_data = $robot_data;
             //$debug_robot_data['robot_profile_text'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_profile_text']);
             //$debug_robot_data['robot_credit_text'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_credit_text']);
-            echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-
+            //echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
             ?>
 
