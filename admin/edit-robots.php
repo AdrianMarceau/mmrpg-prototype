@@ -10,15 +10,19 @@
 
     // Collect an index of battle fields for options
     $mmrpg_fields_fields = rpg_field::get_index_fields(true);
-    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields ORDER BY field_order ASC", 'field_token');
+    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' ORDER BY field_order ASC", 'field_token');
 
     // Collect an index of player colours for options
     $mmrpg_players_fields = rpg_player::get_index_fields(true);
-    $mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players ORDER BY player_order ASC", 'player_token');
+    $mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players WHERE player_token <> 'player' ORDER BY player_order ASC", 'player_token');
 
     // Collect an index of robot colours for options
     $mmrpg_robots_fields = rpg_robot::get_index_fields(true);
-    $mmrpg_robots_index = $db->get_array_list("SELECT {$mmrpg_robots_fields} FROM mmrpg_index_robots WHERE robot_class = 'master' ORDER BY robot_order ASC", 'robot_token');
+    $mmrpg_robots_index = $db->get_array_list("SELECT {$mmrpg_robots_fields} FROM mmrpg_index_robots WHERE robot_token <> 'robot' ORDER BY robot_order ASC", 'robot_token');
+
+    // Collect an index of robot colours for options
+    $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
+    $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
 
 
     /* -- Form Setup Actions -- */
@@ -227,19 +231,22 @@
             $form_data['robot_quotes_victory'] = !empty($_POST['robot_quotes_victory']) ? trim(strip_tags($_POST['robot_quotes_victory'])) : '';
             $form_data['robot_quotes_defeat'] = !empty($_POST['robot_quotes_defeat']) ? trim(strip_tags($_POST['robot_quotes_defeat'])) : '';
 
+            $form_data['robot_abilities_rewards'] = !empty($_POST['robot_abilities_rewards']) ? array_values(array_unique(array_filter($_POST['robot_abilities_rewards']))) : array();
+            $form_data['robot_abilities_compatible'] = !empty($_POST['robot_abilities_compatible']) ? array_values(array_unique(array_filter($_POST['robot_abilities_compatible']))) : array();
+
             $form_data['robot_functions'] = !empty($_POST['robot_functions']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['robot_functions']) ? trim($_POST['robot_functions']) : '';
 
             $form_data['robot_flag_published'] = isset($_POST['robot_flag_published']) && is_numeric($_POST['robot_flag_published']) ? (int)(trim($_POST['robot_flag_published'])) : 0;
             $form_data['robot_flag_complete'] = isset($_POST['robot_flag_complete']) && is_numeric($_POST['robot_flag_complete']) ? (int)(trim($_POST['robot_flag_complete'])) : 0;
             $form_data['robot_flag_hidden'] = isset($_POST['robot_flag_hidden']) && is_numeric($_POST['robot_flag_hidden']) ? (int)(trim($_POST['robot_flag_hidden'])) : 0;
 
+            $form_data['robot_abilities_compatible'] = !empty($_POST['robot_abilities_compatible']) && is_array($_POST['robot_abilities_compatible']) ? array_values(array_unique(array_filter($_POST['robot_abilities_compatible']))) : array();
+
             /*
             $form_data['robot_image'] = !empty($_POST['robot_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image']) ? trim(strtolower($_POST['robot_image'])) : '';
             $form_data['robot_image_size'] = !empty($_POST['robot_image_size']) && is_numeric($_POST['robot_image_size']) ? (int)(trim($_POST['robot_image_size'])) : 0;
             $form_data['robot_image_editor'] = !empty($_POST['robot_image_editor']) && is_numeric($_POST['robot_image_editor']) ? (int)(trim($_POST['robot_image_editor'])) : 0;
             $form_data['robot_image_alts'] = !empty($_POST['robot_image_alts']) ? trim(strip_tags($_POST['robot_image_alts'])) : '';
-            $form_data['robot_abilities_rewards'] = !empty($_POST['robot_abilities_rewards']) ? trim(strip_tags($_POST['robot_abilities_rewards'])) : '';
-            $form_data['robot_abilities_compatible'] = !empty($_POST['robot_abilities_compatible']) ? trim(strip_tags($_POST['robot_abilities_compatible'])) : '';
             */
 
             // DEBUG
@@ -273,6 +280,8 @@
             if (isset($form_data['robot_resistances'])){ $form_data['robot_resistances'] = !empty($form_data['robot_resistances']) ? json_encode($form_data['robot_resistances']) : ''; }
             if (isset($form_data['robot_affinities'])){ $form_data['robot_affinities'] = !empty($form_data['robot_affinities']) ? json_encode($form_data['robot_affinities']) : ''; }
             if (isset($form_data['robot_immunities'])){ $form_data['robot_immunities'] = !empty($form_data['robot_immunities']) ? json_encode($form_data['robot_immunities']) : ''; }
+
+            if (isset($form_data['robot_abilities_compatible'])){ $form_data['robot_abilities_compatible'] = !empty($form_data['robot_abilities_compatible']) ? json_encode($form_data['robot_abilities_compatible']) : ''; }
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
@@ -812,6 +821,81 @@
 
                     <hr />
 
+                    <?
+
+                    // Collect global abilities so we can skip them
+                    $global_ability_tokens = rpg_ability::get_global_abilities();
+
+                    // Pre-generate a list of all abilities so we can re-use it over and over
+                    $ability_options_markup = array();
+                    $ability_options_markup[] = '<option value="">-</option>';
+                    foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
+                        if (in_array($ability_token, $global_ability_tokens)){ continue; }
+                        if ($ability_info['ability_class'] === 'mecha' && $robot_data['robot_class'] !== 'mecha'){ continue; }
+                        elseif ($ability_info['ability_class'] === 'boss' && $robot_data['robot_class'] !== 'boss'){ continue; }
+                        $ability_name = $ability_info['ability_name'];
+                        $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
+                        if (empty($ability_types)){ $ability_types = 'Neutral'; }
+                        $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
+                    }
+                    $ability_options_count = count($ability_options_markup);
+                    $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
+
+                    ?>
+
+                    <? /*
+                    <div class="field fullsize has4cols">
+                        <strong class="label">
+                            Level-Up Abilities
+                        </strong>
+                        <?
+                        $abilities_rewards = !empty($robot_data['robot_abilities_rewards']) ? $robot_data['robot_abilities_rewards'] : array();
+                        for ($i = 0; $i < 4; $i++){ ?>
+                            <div class="subfield">
+                                <select class="select" name="robot_abilities_rewards<?= $list_token ?>[<?= $i ?>]">
+                                    <? $current_value = isset($abilities_rewards[$i]) ? $abilities_rewards[$i] :  ?>
+                                    <?= str_replace('value=""', 'value="" selected="selected"', $ability_options_markup) ?>
+                                    <option value=""<?= empty($ability_list[$i]) ? ' selected="selected"' : '' ?>>-</option>
+                                    <?
+                                    foreach ($mmrpg_types_index AS $type_token => $type_info){
+                                        if ($type_info['type_class'] === 'special'){ continue; }
+                                        $label = $type_info['type_name'];
+                                        if (!empty($ability_list[$i]) && $ability_list[$i] === $type_token){ $selected = 'selected="selected"'; }
+                                        else { $selected = ''; }
+                                        echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
+                                </select><span></span>
+                            </div>
+                        <? } ?>
+                    </div>
+                    */ ?>
+
+                    <div class="field fullsize has4cols multirow">
+                        <strong class="label">
+                            Compatible Abilities
+                            <em>Excluding level-up abilities and global ones available to all robots by default</em>
+                        </strong>
+                        <?
+                        $current_ability_list = !empty($robot_data['robot_abilities_compatible']) ? json_decode($robot_data['robot_abilities_compatible'], true) : array();
+                        $current_ability_list = array_values(array_filter($current_ability_list, function($token) use($global_ability_tokens){ return !in_array($token, $global_ability_tokens); }));
+                        $select_limit = max(32, count($current_ability_list));
+                        $select_limit += 4 - ($select_limit % 4);
+                        for ($i = 0; $i < $select_limit; $i++){
+                            $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : '';
+                            ?>
+                            <div class="subfield" data-current="<?= $current_value ?>">
+                                <select class="select" name="robot_abilities_compatible[<?= $i ?>]">
+                                    <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $ability_options_markup) ?>
+                                </select><span></span>
+                            </div>
+                            <?
+                        }
+                        ?>
+                    </div>
+
+                    <hr />
+
                     <div class="field halfsize">
                         <div class="label">
                             <strong>Robot Functions</strong>
@@ -880,10 +964,10 @@
 
             <?
 
-            //$debug_robot_data = $robot_data;
+            $debug_robot_data = $robot_data;
             //$debug_robot_data['robot_profile_text'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_profile_text']);
             //$debug_robot_data['robot_credit_text'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_credit_text']);
-            //echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+            echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
             ?>
 
