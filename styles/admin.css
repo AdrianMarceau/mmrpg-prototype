@@ -299,6 +299,17 @@ tr:nth-child(odd) td {
     text-overflow: ellipsis;
 }
 
+.adminform .field,
+.adminform .field .subfield {
+    overflow: visible;
+}
+.adminform .field:after,
+.adminform .field .subfield:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
 .adminform .field .subfield {
     position: relative;
 }
@@ -784,4 +795,17 @@ tr:nth-child(odd) td {
 
 .adminform .editor .field input[name="user_omega"] {
     font-family: "Courier New";
+}
+
+
+.adminform .editor .field .subfield.levelup {
+
+}
+.adminform .editor .field .subfield.levelup input[type="number"] {
+    width: 75px;
+    float: left;
+}
+.adminform .editor .field .subfield.levelup select {
+    width: calc(100% - 80px);
+    float: left;
 }
