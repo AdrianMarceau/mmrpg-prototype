@@ -3,7 +3,7 @@
 
 body:before {
     content: "Z";
-    display: none;
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
@@ -61,12 +61,37 @@ body:before {
         margin: 10px;
     }
 
-    .adminform .field {
+    .adminform .field,
+    .adminform .field.foursize {
         width: 50%;
+    }
+    .adminform .field.halfsize {
+        width: 100%;
     }
     .adminform .options .field {
 
     }
+    .adminform .field.has4cols input[type="text"],
+    .adminform .field.has4cols input[type="number"],
+    .adminform .field.has4cols input[type="password"],
+    .adminform .field.has4cols > select,
+    .adminform .field.has4cols > textarea,
+    .adminform .field.has4cols .subfield {
+      width: 49%;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      width: calc(50% - 5px);
+    }
+    .adminform .field.has4cols .subfield .type_span.swatch {
+        float: left;
+        clear: none;
+        position: static;
+        margin: 3px 3px 0 0;
+    }
+    .adminform .field.has4cols .subfield .type_span.swatch + select {
+        width: calc(100% - 20px);
+    }
+
 
     .adminform .formfoot .metadata {
         float: none;
@@ -170,9 +195,26 @@ body:before {
         display: none;
     }
 
-    .adminform .field {
+    .adminform .field,
+    .adminform .field.foursize,
+    .adminform .field.halfsize {
         width: 100%;
     }
+    .adminform .field.has4cols input[type="text"],
+    .adminform .field.has4cols input[type="number"],
+    .adminform .field.has4cols input[type="password"],
+    .adminform .field.has4cols > select,
+    .adminform .field.has4cols > textarea,
+    .adminform .field.has4cols .subfield {
+        width: 99%;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        width: calc(100% - 5px);
+    }
+    .adminform .field textarea {
+        min-height: 350px;
+    }
+
     .adminform .login .field,
     .adminform .options .field {
         width: 100%;
