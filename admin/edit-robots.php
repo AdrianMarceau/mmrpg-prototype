@@ -24,6 +24,33 @@
     $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
     $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
 
+    // Collect an index of robot function files for options
+    $functions_path = MMRPG_CONFIG_ROOTDIR.'data/';
+    $functions_list = getDirContents($functions_path.'robots/');
+    $mmrpg_functions_index = array();
+    if (!empty($functions_list)){
+        foreach ($functions_list as $key => $value){
+            if (strstr($value, '_index.php')){ continue; }
+            elseif (!preg_match('/\.php$/i', $value)){ continue; }
+            $value = str_replace('\\', '/', $value);
+            $value = str_replace($functions_path, '', $value);
+            $mmrpg_functions_index[] = $value;
+        }
+        usort($mmrpg_functions_index, function($a, $b){
+            $ax = explode('/', $a); $axcount = count($ax);
+            $bx = explode('/', $b); $bxcount = count($bx);
+            $az = strstr($a, '/mm') ? true : false;
+            $bz = strstr($b, '/mm') ? true : false;
+            if ($axcount < $bxcount){ return -1; }
+            elseif ($axcount > $bxcount){ return 1; }
+            elseif ($az && !$bz){ return -1; }
+            elseif (!$az && $bz){ return 1; }
+            elseif ($a < $b){ return -1; }
+            elseif ($a > $b){ return 1; }
+            else { return 0; }
+            });
+    }
+
 
     /* -- Form Setup Actions -- */
 
@@ -916,12 +943,27 @@
 
                     <hr />
 
+                    <?
+
+                    // Pre-generate a list of all functions so we can re-use it over and over
+                    $function_options_markup = array();
+                    $function_options_markup[] = '<option value="">-</option>';
+                    foreach ($mmrpg_functions_index AS $function_key => $function_path){
+                        $function_options_markup[] = '<option value="'.$function_path.'">'.$function_path.'</option>';
+                    }
+                    $function_options_count = count($function_options_markup);
+                    $function_options_markup = implode(PHP_EOL, $function_options_markup);
+
+                    ?>
+
                     <div class="field halfsize">
                         <div class="label">
                             <strong>Robot Functions</strong>
                             <em>file path for script with robot functions like onload, ondefeat, etc.</em>
                         </div>
-                        <input class="textbox" type="text" name="robot_functions" value="<?= $robot_data['robot_functions'] ?>" maxlength="64" placeholder="robots/robot.php" />
+                        <select class="select" name="robot_functions">
+                            <?= str_replace('value="'.$robot_data['robot_functions'].'"', 'value="'.$robot_data['robot_functions'].'" selected="selected"', $function_options_markup) ?>
+                        </select><span></span>
                     </div>
 
                     <hr />
