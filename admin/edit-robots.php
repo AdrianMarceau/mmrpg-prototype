@@ -599,7 +599,20 @@
 
             <div class="editor">
 
-                <h3 class="header type_span type_<?= !empty($robot_data['robot_core']) ? $robot_data['robot_core'].(!empty($robot_data['robot_core2']) ? '_'.$robot_data['robot_core2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="robot_core,robot_core2">Edit Robot &quot;<?= $robot_name_display ?>&quot;</h3>
+                <h3 class="header type_span type_<?= !empty($robot_data['robot_core']) ? $robot_data['robot_core'].(!empty($robot_data['robot_core2']) ? '_'.$robot_data['robot_core2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="robot_core,robot_core2">
+                    <span class="title">Edit Robot &quot;<?= $robot_name_display ?>&quot;</span>
+                    <?
+                    // If the robot is published, generate and display a preview link
+                    if (!empty($robot_data['robot_flag_published'])){
+                        $preview_link = 'database/';
+                        if ($robot_data['robot_class'] === 'master'){ $preview_link .= 'robots/'; }
+                        elseif ($robot_data['robot_class'] === 'mecha'){ $preview_link .= 'mechas/'; }
+                        elseif ($robot_data['robot_class'] === 'boss'){ $preview_link .= 'bosses/'; }
+                        $preview_link .= $robot_data['robot_token'].'/';
+                        echo '<a class="preview" href="'.$preview_link.'" target="_blank">View Page <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
+                    }
+                    ?>
+                </h3>
 
                 <? print_form_messages() ?>
 
