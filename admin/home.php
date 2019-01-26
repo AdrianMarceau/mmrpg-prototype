@@ -17,18 +17,6 @@
             <a href="admin.php?action=edit_users">Moderate Users</a>
             <em>update or modify user account info and permissions</em>
         </li>
-        <li class="item">
-            <a href="admin.php?action=purge&amp;date=<?=MMRPG_CONFIG_CACHE_DATE?>">Purge Inactive Users</a>
-            <em>purge user accounts with zero progress</em>
-        </li>
-        <li class="item">
-            <a href="admin.php?action=update&amp;date=<?=MMRPG_CONFIG_CACHE_DATE?>&amp;patch=recalculate_all_battle_points&amp;incognito=true&amp;force=true">Refresh Leaderboard</a>
-            <em>recalculate battle points for all inactive users</em>
-        </li>
-        <li class="item">
-            <a href="admin.php?action=update">Patch Save Files</a>
-            <em>apply specific patches to existing save files</em>
-        </li>
     </ul>
 
     <ul class="adminhome">
@@ -36,7 +24,7 @@
             <strong>Database Editors</strong>
         </li>
         <li class="item">
-            <a href="admin.php?action=edit_robots">Edit Database Robots</a>
+            <a href="admin.php?action=edit_robots">Edit Robots</a>
             <em>edit the stats, abilities, and details of database robots</em>
         </li>
     </ul>
@@ -50,10 +38,6 @@
             <em>rescan the players directory and update the database</em>
         </li>
         <li class="item">
-            <a data-old-href="admin.php?action=import_robots"><del>Refresh Robot Databases</del></a>
-            <em><del>rescan the robots directory and update the database</del></em>
-        </li>
-        <li class="item">
             <a href="admin.php?action=import_abilities">Refresh Ability Database</a>
             <em>rescan the abilities directory and update the database</em>
         </li>
@@ -65,6 +49,10 @@
             <a href="admin.php?action=import_fields">Refresh Field Database</a>
             <em>rescan the fields directory and update the database</em>
         </li>
+        <li class="item">
+            <a data-old-href="admin.php?action=import_robots"><del>Refresh Robot Databases</del></a>
+            <em><del>rescan the robots directory and update the database</del></em>
+        </li>
     </ul>
 
     <ul class="adminhome">
@@ -72,12 +60,24 @@
             <strong>Misc Tools</strong>
         </li>
         <li class="item">
+            <a href="admin.php?action=update&amp;date=<?=MMRPG_CONFIG_CACHE_DATE?>&amp;patch=recalculate_all_battle_points&amp;incognito=true&amp;force=true">Refresh Leaderboard</a>
+            <em>recalculate battle points for all idle users</em>
+        </li>
+        <li class="item">
             <a href="admin.php?action=delete_cache">Delete Cached Files</a>
             <em>delete cached markup and database objects</em>
         </li>
         <li class="item">
-            <a href="admin.php?action=clear_sessions">Clear All Sessions</a>
-            <em>clear sessions and log out all users</em>
+            <a href="admin.php?action=purge&amp;date=<?=MMRPG_CONFIG_CACHE_DATE?>">Purge Bogus Users</a>
+            <em>purge user accounts with zero progress</em>
+        </li>
+        <li class="item">
+            <a data-href="admin.php?action=clear_sessions"><del>Clear All Sessions</del></a>
+            <em><del>clear sessions and log out all users</del></em>
+        </li>
+        <li class="item">
+            <a data-href="admin.php?action=update"><del>Patch Save Files</del></a>
+            <em><del>apply specific patches to existing save files</del></em>
         </li>
     </ul>
 
