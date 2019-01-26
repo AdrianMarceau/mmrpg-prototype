@@ -1769,14 +1769,14 @@ class rpg_canvas {
                     $static_position_offset = $this_battle->canvas_markup_offset_perspective(
                         $static_robot_data['robot_key'],
                         $static_robot_data['robot_position'],
-                        $static_robot_data['robot_sprite_size'],
+                        $static_robot_data['robot_size'],
                         $static_bench_size
                         );
                     $static_robot_data['canvas_base_offset_x'] = $static_position_offset['canvas_offset_x'];
                     $static_robot_data['canvas_base_offset_y'] = $static_position_offset['canvas_offset_y'];
                     $static_robot_data['canvas_base_offset_z'] = $static_position_offset['canvas_offset_z'];
                     $static_robot_data['robot_scale'] = $static_position_offset['canvas_scale'];
-                    $static_robot_data['robot_sprite_size']  = ceil($this_data['robot_scale'] * ($static_robot_object->robot_image_size * 2));
+                    $static_robot_data['robot_sprite_size']  = ceil($static_robot_data['robot_scale'] * ($static_robot_object->robot_image_size * 2));
 
                     // If this is an ability attachment
                     if ($attachment_info['class'] == 'ability'){
