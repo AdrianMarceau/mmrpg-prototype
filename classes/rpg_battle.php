@@ -1261,7 +1261,7 @@ class rpg_battle extends rpg_object {
                         $temp_robot->robot_frame = 'base';
                         $temp_robot->update_session();
                     }
-                } $this->events_create(false, false, '', '');
+                } // $this->events_create(false, false, '', '');
 
                 // Ensure this robot has abilities to loop through
                 if (!isset($this_robot->flags['ability_startup']) && !empty($this_robot->robot_abilities)){
