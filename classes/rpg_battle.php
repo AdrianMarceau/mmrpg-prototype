@@ -1233,7 +1233,7 @@ class rpg_battle extends rpg_object {
 
                 }
 
-                // Show the player's other robots one by one
+                // Change all this player's robot sprite to their taunt, then show 'em
                 foreach ($this_player->values['robots_active'] AS $key => $info){
                     if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
                     if ($this_robot->robot_id == $info['robot_id']){
@@ -1241,20 +1241,27 @@ class rpg_battle extends rpg_object {
                         $this_robot->robot_frame_styles = '';
                         $this_robot->robot_detail_styles = '';
                         $this_robot->update_session();
-                        $this->events_create(false, false, '', '');
-                        $this_robot->robot_frame = 'base';
-                        $this_robot->update_session();
                     } else {
                         $temp_robot = rpg_game::get_robot($this, $this_player, $info);
                         $temp_robot->robot_frame = 'taunt';
                         $temp_robot->robot_frame_styles = '';
                         $temp_robot->robot_detail_styles = '';
                         $temp_robot->update_session();
-                        $this->events_create(false, false, '', '');
+                    }
+                } $this->events_create(false, false, '', '');
+
+                // Change all this player's robot sprite back to their base, then update
+                foreach ($this_player->values['robots_active'] AS $key => $info){
+                    if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
+                    if ($this_robot->robot_id == $info['robot_id']){
+                        $this_robot->robot_frame = 'base';
+                        $this_robot->update_session();
+                    } else {
+                        $temp_robot = rpg_game::get_robot($this, $this_player, $info);
                         $temp_robot->robot_frame = 'base';
                         $temp_robot->update_session();
                     }
-                }
+                } $this->events_create(false, false, '', '');
 
                 // Ensure this robot has abilities to loop through
                 if (!isset($this_robot->flags['ability_startup']) && !empty($this_robot->robot_abilities)){
