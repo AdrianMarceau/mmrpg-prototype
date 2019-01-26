@@ -938,7 +938,7 @@
                         <?
                         $current_ability_list = !empty($robot_data['robot_abilities_compatible']) ? json_decode($robot_data['robot_abilities_compatible'], true) : array();
                         $current_ability_list = array_values(array_filter($current_ability_list, function($token) use($global_ability_tokens){ return !in_array($token, $global_ability_tokens); }));
-                        $select_limit = max(32, count($current_ability_list));
+                        $select_limit = max(12, count($current_ability_list));
                         $select_limit += 4 - ($select_limit % 4);
                         $select_limit += 4;
                         for ($i = 0; $i < $select_limit; $i++){
