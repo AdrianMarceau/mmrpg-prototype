@@ -347,7 +347,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             battles.this_user_id = {$user_id}
             AND battles.this_player_result = 'victory'
             AND users.user_flag_approved = 1
-            AND users.user_date_created <> users.user_date_accessed
+            AND users.user_last_login <> 0
             ;", 'target_user_name');
         $points_index['players_defeated'] = !empty($defeated_players) ? $defeated_players : array();
         $points_index['players_defeated_points'] = !empty($defeated_players) ? (count($defeated_players) * 10000) : 0;
@@ -1741,6 +1741,8 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 WHERE
                 battles.this_user_id = {$this_userid}
                 AND battles.this_player_result = 'victory'
+                AND users.user_flag_approved = 1
+                AND users.user_last_login <> 0
                 ;", 'target_user_name');
         }
 
