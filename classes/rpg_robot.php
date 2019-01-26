@@ -4951,7 +4951,7 @@ class rpg_robot extends rpg_object {
                 $temp_core_type = $this_robot->get_core();
                 $temp_field_type = $this_field->get_type();
                 if (empty($temp_core_type)){ $temp_boost_type = 'recovery'; }
-                elseif ($temp_core_type == 'empty'){ $temp_boost_type = 'damage'; }
+                elseif ($temp_core_type == 'copy' || $temp_core_type == 'empty'){ $temp_boost_type = 'damage'; }
                 else { $temp_boost_type = $temp_core_type; }
                 if (!isset($this_field->field_multipliers[$temp_boost_type]) || $this_field->field_multipliers[$temp_boost_type] < MMRPG_SETTINGS_MULTIPLIER_MAX){
 
