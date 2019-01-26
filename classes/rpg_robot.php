@@ -3292,6 +3292,22 @@ class rpg_robot extends rpg_object {
                                         $robot_ability_list = !empty($robot_info['robot_abilities']) ? $robot_info['robot_abilities'] : array();
                                         $robot_ability_rewards = !empty($robot_info['robot_rewards']['abilities']) ? $robot_info['robot_rewards']['abilities'] : array();
 
+                                        // Manually add any global abilities to this robot's list
+                                        $global_abilities = rpg_ability::get_global_abilities();
+                                        $robot_ability_list = array_diff($robot_ability_list, $global_abilities);
+                                        $robot_ability_list = array_merge($robot_ability_list, $global_abilities);
+
+                                        // Manually add any level-up abilities to this robot's list
+                                        foreach ($robot_ability_rewards AS $info){ $robot_ability_list[] = $info['token']; }
+
+                                        // Make sure only unique abilities are included
+                                        $robot_ability_list = array_unique($robot_ability_list);
+
+                                        //echo('<pre>$global_abilities = '.print_r($global_abilities, true).'</pre>');
+                                        //echo('<pre>$robot_ability_rewards = '.print_r($robot_ability_rewards, true).'</pre>');
+                                        //echo('<pre>$robot_ability_list = '.print_r($robot_ability_list, true).'</pre>');
+                                        //exit();
+
                                         // Collect a FULL list of abilities for display
                                         $temp_required = array();
                                         foreach ($robot_ability_rewards AS $info){ $temp_required[] = $info['token']; }
@@ -3327,7 +3343,9 @@ class rpg_robot extends rpg_object {
                                         }
                                         $robot_ability_rewards = $new_ability_rewards;
 
-                                        //echo('<pre>'.print_r($robot_ability_rewards, true).'</pre>');
+                                        //echo('<pre>$global_abilities = '.print_r($global_abilities, true).'</pre>');
+                                        //echo('<pre>$robot_ability_rewards = '.print_r($robot_ability_rewards, true).'</pre>');
+                                        //exit();
 
                                         if (!empty($robot_ability_rewards)){
                                             $temp_string = array();
