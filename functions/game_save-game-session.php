@@ -108,7 +108,7 @@ function mmrpg_save_game_session(){
                 $this_user_array['user_date_accessed'] = time();
                 $this_user_array['user_date_modified'] = time();
                 $this_user_array['user_date_birth'] = !empty($this_user['dateofbirth']) ? $this_user['dateofbirth'] : 0;
-                $this_user_array['user_flag_approved'] = !empty($this_user['approved']) ? 1 : 0;
+                $this_user_array['user_flag_approved'] = 1;
 
                 // Generate the BOARD details for import
                 $this_board_array = array();
@@ -269,7 +269,6 @@ function mmrpg_save_game_session(){
         $this_user_array['user_date_modified'] = time();
         $this_user_array['user_date_accessed'] = time();
         $this_user_array['user_date_birth'] = !empty($this_user['dateofbirth']) ? $this_user['dateofbirth'] : 0;
-        $this_user_array['user_flag_approved'] = !empty($this_user['approved']) ? 1 : 0;
 
         // Update this user's info in the database
         //echo('<hr /><pre>FINAL DB USER UPDATE (user_id = '.$this_user['userid'].')</pre>');
