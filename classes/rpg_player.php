@@ -161,14 +161,14 @@ class rpg_player extends rpg_object {
             // If this is the currently logged-in user, collect their username token
             if ($this->player_id == $_SESSION['GAME']['USER']['userid']){
                 $this->user_token = $_SESSION['GAME']['USER']['username_clean'];
-                $this->user_omega = $_SESSION['GAME']['USER']['user_omega'];
+                $this->user_omega = $_SESSION['GAME']['USER']['omega'];
                 $this->player_controller = 'human';
             }
             // Otherwise if different human player, collect username token from db
             elseif ($this->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
-                $db_info = $db->get_array("SELECT user_name_clean, user_omega FROM mmrpg_users WHERE user_id = {$this->player_id};");
-                $this->user_token = $db_info['user_name_clean'];
-                $this->user_omega = $db_info['user_omega'];
+                $db_info = $db->get_array("SELECT username_clean, omega FROM mmrpg_users WHERE user_id = {$this->player_id};");
+                $this->user_token = $db_info['username_clean'];
+                $this->user_omega = $db_info['omega'];
             }
 
         }
