@@ -169,7 +169,7 @@ elseif ($target_player->player_token == 'player'){
     $event_options['canvas_show_target'] = $event_options['console_show_target'] = false;
     $event_options['canvas_show_target_robots'] = false;
     $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
-    $this_battle->events_create(false, false, '', '');
+    //$this_battle->events_create(false, false, '', '');
 
     // Queue up an the target robot's startup action
     $this_battle->actions_append($target_player, $target_robot, $this_player, $this_robot, 'start', '');
@@ -241,7 +241,7 @@ elseif ($target_player->player_token == 'player'){
 // Execute the battle actions
 $this_battle->actions_execute();
 
-// Show the player's other robots one by one
+// Change all this player's robot sprite to their taunt, then show 'em
 foreach ($this_player->values['robots_active'] AS $key => $info){
     if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
     if ($this_robot->robot_id == $info['robot_id']){
@@ -249,20 +249,27 @@ foreach ($this_player->values['robots_active'] AS $key => $info){
         $this_robot->robot_frame_styles = '';
         $this_robot->robot_detail_styles = '';
         $this_robot->update_session();
-        $this_battle->events_create(false, false, '', '');
-        $this_robot->robot_frame = 'base';
-        $this_robot->update_session();
     } else {
         $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info);
         $temp_robot->robot_frame = 'taunt';
         $temp_robot->robot_frame_styles = '';
         $temp_robot->robot_detail_styles = '';
         $temp_robot->update_session();
-        $this_battle->events_create(false, false, '', '');
+    }
+} $this_battle->events_create(false, false, '', '');
+
+// Change all this player's robot sprite back to their base, then update
+foreach ($this_player->values['robots_active'] AS $key => $info){
+    if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
+    if ($this_robot->robot_id == $info['robot_id']){
+        $this_robot->robot_frame = 'base';
+        $this_robot->update_session();
+    } else {
+        $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info);
         $temp_robot->robot_frame = 'base';
         $temp_robot->update_session();
     }
-}
+} // $this_battle->events_create(false, false, '', '');
 
 // Create a final frame before giving control to the user
 $this_battle->events_create(false, false, '', '');
