@@ -3,6 +3,12 @@
 // Include the TOP file
 require_once('top.php');
 
+// If the user is not logged in, don't allow them here
+if (!rpg_game::is_user()){
+    header('Location: '.MMRPG_CONFIG_ROOTURL.'frames/file.php?action=load');
+    exit();
+}
+
 // Collect the game's session token
 $session_token = mmrpg_game_token();
 
