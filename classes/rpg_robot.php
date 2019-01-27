@@ -4638,7 +4638,7 @@ class rpg_robot extends rpg_object {
                         else { $this_robot->unset_attachment($attachment_token); }
 
                         // ATTACHMENT DESTROY
-                        if ($attachment_info['attachment_destroy'] !== false){
+                        if (isset($attachment_info['attachment_destroy']) && $attachment_info['attachment_destroy'] !== false){
 
                             $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
                             $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' duration ended and has '.$temp_trigger_type.' trigger!');
@@ -4949,7 +4949,7 @@ class rpg_robot extends rpg_object {
 
                 // Define the item object and trigger info
                 $temp_core_type = $this_robot->get_core();
-                $temp_field_type = $this_field->get_type();
+                $temp_field_type = $this_field->field_type;
                 if (empty($temp_core_type)){ $temp_boost_type = 'recovery'; }
                 elseif ($temp_core_type == 'copy' || $temp_core_type == 'empty'){ $temp_boost_type = 'damage'; }
                 else { $temp_boost_type = $temp_core_type; }
@@ -4975,19 +4975,19 @@ class rpg_robot extends rpg_object {
 
                     // Create or increase the elemental booster for this field
                     $temp_change_percent = round($this_item->get_recovery2() / 100, 1);
-                    $new_multiplier_value = $this_field->get_multiplier($temp_boost_type) + $temp_change_percent;
+                    $new_multiplier_value = (isset($this_field->field_multipliers[$temp_boost_type]) ? $this_field->field_multipliers[$temp_boost_type] : 1) + $temp_change_percent;
                     if ($new_multiplier_value >= MMRPG_SETTINGS_MULTIPLIER_MAX){
                         $temp_change_percent = $new_multiplier_value - MMRPG_SETTINGS_MULTIPLIER_MAX;
                         $new_multiplier_value = MMRPG_SETTINGS_MULTIPLIER_MAX;
                     }
-                    $this_field->set_multiplier($temp_boost_type, $new_multiplier_value);
+                    $this_field->field_multipliers[$temp_boost_type] = $new_multiplier_value;
                     $this_field->update_session();
 
                     // Create the event to show this element boost
                     if ($temp_change_percent > 0){
                         $this_battle->events_create($this_robot, false, $this_field->field_name.' Multipliers',
                             $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
-                            'The <span class="item_name item_type item_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).'</span> field multiplier rose!',
+                            'The <span class="item_name item_type item_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).'</span> field multiplier rose to <span class="item_name item_type item_type_none">'.$new_multiplier_value.'</span>!',
                             array('canvas_show_this_item_overlay' => true)
                             );
                     }
