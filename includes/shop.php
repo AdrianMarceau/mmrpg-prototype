@@ -604,13 +604,13 @@ if (!empty($this_shop_index['reggae'])){
             $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
 
             // Unlock the Copy Abilities when the user has maxed out their Copy Gauge in Reggae's Shop
-            if ($core_level_index['copy'] >= 9){
+            if (!empty($core_level_index['copy']) && $core_level_index['copy'] >= 9){
                 $prices = get_abilities_with_prices('copy-shot', 'copy-soul');
                 foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
             }
 
             // Unlock the Core Abilities when the user has maxed out their Neutral Gauge in Reggae's Shop
-            if ($core_level_index['none'] >= 9){
+            if (!empty($core_level_index['none']) && $core_level_index['none'] >= 9){
                 $prices = get_abilities_with_prices('core-shield', 'core-laser');
                 foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
             }
