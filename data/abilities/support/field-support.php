@@ -35,8 +35,8 @@ $ability = array(
         } else {
 
             // Define the field multipliers for when an Elemental Core robot uses the ability (boost core, break weaknesses)
-            $field_boost = 1.5;
-            $field_break = !in_array($this_robot->robot_core, $this_robot->robot_weaknesses) ? 0.5 : 0.25;
+            $field_boost = 2.00;
+            $field_break = !in_array($this_robot->robot_core, $this_robot->robot_weaknesses) ? 0.50 : 0.25;
             $this_field_multipliers[$this_robot->robot_core] = $field_boost;
             if (!empty($this_robot->robot_weaknesses)){
                 foreach ($this_robot->robot_weaknesses AS $temp_type){
@@ -270,25 +270,6 @@ $ability = array(
                 ));
             $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
-        }
-
-        // Return true on success
-        return true;
-
-        },
-    'ability_function_onload' => function($objects){
-
-        // Extract all objects into the current scope
-        extract($objects);
-
-        // Check to see if this ability has been used already, and if so increase the cost
-        if (!empty($this_robot->history['triggered_abilities'])){
-            $trigger_counts = array_count_values($this_robot->history['triggered_abilities']);
-            if (!empty($trigger_counts[$this_ability->ability_token])){
-                $trigger_count = $trigger_counts[$this_ability->ability_token];
-                $new_energy_cost = $this_ability->ability_base_energy * ($trigger_count + 1);
-                $this_ability->set_energy($new_energy_cost);
-            }
         }
 
         // Return true on success
