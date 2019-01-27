@@ -166,7 +166,7 @@ class rpg_player extends rpg_object {
             }
             // Otherwise if different human player, collect username token from db
             elseif ($this->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
-                $db_info = $db->get_array("SELECT username_clean, omega FROM mmrpg_users WHERE user_id = {$this->player_id};");
+                $db_info = $db->get_array("SELECT user_name_clean AS username_clean, user_omega AS omega FROM mmrpg_users WHERE user_id = {$this->player_id};");
                 $this->user_token = $db_info['username_clean'];
                 $this->user_omega = $db_info['omega'];
             }
