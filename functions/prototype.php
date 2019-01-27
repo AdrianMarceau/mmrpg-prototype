@@ -1817,7 +1817,6 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 AND board_points <= '.$this_player_points_max.'
                 AND mmrpg_leaderboard.user_id != '.$this_userid.'
                 AND mmrpg_users.user_flag_approved = 1
-                AND mmrpg_users.user_backup_login <> 0
                 '.(!empty($temp_include_usernames_string) ? 'AND user_name_clean NOT IN ('.$temp_exclude_usernames_string.') ' : '').'
                 ORDER BY
                 '.(!empty($temp_include_usernames_string) ? ' FIELD(user_name_clean, '.$temp_include_usernames_string.') DESC, ' : '').'
