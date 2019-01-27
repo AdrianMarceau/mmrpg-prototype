@@ -1001,7 +1001,8 @@ function prototype_menu_click_option(thisContext, thisOption){
                 for (var i in thisFieldMultipliers){
                     var thisPair = thisFieldMultipliers[i].split('*');
                     var thisType = thisPair[0];
-                    var thisMultiplier = thisPair[1];
+                    var thisMultiplier = parseFloat(thisPair[1]);
+                    if (thisMultiplier === 1){ continue; }
                     var thisTypeName = thisType.charAt(0).toUpperCase() + thisType.slice(1);
                     $('.canvas_overlay_footer .overlay_multipliers', thisBanner).append('<span class="field_multiplier field_multiplier_'+thisType+' field_multiplier_count_'+thisFieldMultipliersLength+' field_type field_type_'+thisType+'"><span class="text">'+thisTypeName+' <span class="cross" style="">x</span> '+thisMultiplier+'</span></span>');
                     }
