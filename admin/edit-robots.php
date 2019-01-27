@@ -867,7 +867,7 @@
                             <div class="label">
                                 <strong><?= ucfirst($kind_token) ?> Quote</strong>
                             </div>
-                            <input class="textbox" type="text" name="robot_quotes_<?= $kind_token ?>" value="<?= htmlentities($robot_data['robot_quotes_'.$kind_token], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
+                            <input class="textbox" type="text" name="robot_quotes_<?= $kind_token ?>" value="<?= htmlentities($robot_data['robot_quotes_'.$kind_token], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
                         </div>
                         <?
                     }
