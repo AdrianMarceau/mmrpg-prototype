@@ -911,7 +911,9 @@ while ($this_action == 'load'){
     $html_header_title .= 'Load Existing Game File';
 
     // Update the header markup text
-    $html_header_text .= 'Please enter the username and password of your save file below. Passwords are case-sensitive, though usernames are not.';
+    $html_header_text .= 'Please enter the username and password of your save file below.';
+    $html_header_text .= '<br /> Passwords are case-sensitive, though usernames are not.';
+    $html_header_text .= '<br /> Don\'t have an account yet? <a href="file/new/">Sign up for one now</a>!';
     if ($html_form_show_coppa){
         $html_header_text .= '<br /> Your date of birth must now be confirmed in accordance with <a href="http://www.coppa.org/" target="_blank">COPPA</a> guidelines.';
     }

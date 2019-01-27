@@ -117,7 +117,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     $main_menu_links['about'] = array('name' => 'About');
     $main_menu_links['gallery'] = array('name' => 'Gallery');
     $main_menu_links['database'] = array('name' => 'Database');
-    $main_menu_links['prototype'] = array('name' => ('Play the '.(rpg_game::is_user() ? 'Prototype' : 'Demo')), 'target' => '_blank');
+    if (rpg_game::is_user()){ $main_menu_links['prototype'] = array('name' => 'Play the Prototype', 'target' => '_blank'); }
     $main_menu_links['community'] = array('name' => 'Community');
     $main_menu_links['leaderboard'] = array('name' => 'Leaderboard');
     $main_menu_links['credits'] = array('name' => 'Credits');

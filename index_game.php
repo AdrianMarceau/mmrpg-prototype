@@ -10,6 +10,12 @@ if (MMRPG_CONFIG_MAINTENANCE_MODE && !in_array($_SERVER['REMOTE_ADDR'], array('9
 // Include the TOP file
 require_once('top.php');
 
+// If the user is not logged in, don't allow them here
+if (!rpg_game::is_user()){
+    header('Location: '.MMRPG_CONFIG_ROOTURL.'file/load/');
+    exit();
+}
+
 // DEBUG DEBUG DEBUG
 //if ($_SERVER['REMOTE_ADDR'] != '99.255.218.123'){ die('Currently down for maintenance.  Please check back later.'); }
 
