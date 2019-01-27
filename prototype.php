@@ -355,7 +355,7 @@ if (rpg_game::is_user()){ mmrpg_prototype_refresh_battle_points(); }
             $this_menu_tooltips['reset'] = '&laquo; Reset Game &raquo; &lt;br /&gt;Reset the demo mode back to the beginning and restart your adventure over from the first level.';
             $this_menu_tooltips['load'] = '&laquo; Load Game &raquo; &lt;br /&gt;Load an existing game file into memory and pick up where you left off during your last save.';
             $this_menu_tooltips['new'] = '&laquo; New Game &raquo; &lt;br /&gt;Create a new game file with a username and password to save progress and access the full version of the game.';
-            $this_menu_tooltips['exit'] = '&laquo; Exit Game &raquo; &lt;br /&gt;Exit your save game and unload it from memory to return to the demo screen.';
+            $this_menu_tooltips['exit'] = '&laquo; Exit Game &raquo; &lt;br /&gt;Exit your save game and unload it from memory to return to the login screen.';
             $this_menu_tooltips['save'] = '&laquo; Save Game &raquo; &lt;br /&gt;Manually save your current progress or configure save file options including game and mission resets.';
             $this_menu_tooltips['robots'] = '&laquo; Robot Editor &raquo; &lt;br /&gt;Review detailed stats about your battle robots, equip them with new abilities, and transfer them to other players in your save file.';
             $this_menu_tooltips['players'] = '&laquo; Player Editor &raquo; &lt;br /&gt;Review detailed stats about your player characters and reconfigure chapter two battle fields to generate new field and fusion stars.';
@@ -425,8 +425,10 @@ if (rpg_game::is_user()){ mmrpg_prototype_refresh_battle_points(); }
                 <a class="link link_save" data-step="file_save" data-index="<?= $temp_data_index++ ?>" data-source="frames/file.php?action=save" data-music="misc/file-menu" data-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <label>save</label>
                 </a>
+                <? /*
                 <span class="pipe">|</span>
                 <a class="link link_exit" data-index="<?= $temp_data_index++ ?>" data-tooltip="<?= $this_menu_tooltips['exit'] ?>"><label>exit</label></a>
+                */ ?>
                 <?
             }
             ?>
