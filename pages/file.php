@@ -555,7 +555,7 @@ while ($this_action == 'new'){
             // Trim spaces off the end and beginning
             $_REQUEST['username'] = trim($_REQUEST['username']);
             $temp_username_clean = preg_replace('/[^-a-z0-9]+/i', '', strtolower($_REQUEST['username']));
-            $temp_username_exists = $db->get_value("SELECT user_id FROM mmrpg_users WHERE user_name_clean LIKE '{$temp_username_clean}';", 'user_id');
+            $temp_username_exists = $db->get_value("SELECT user_id FROM mmrpg_users WHERE user_name_clean = '{$temp_username_clean}';", 'user_id');
             $_REQUEST['password'] = trim($_REQUEST['password']);
 
             // Define the is verfied and default to true
@@ -784,7 +784,7 @@ while ($this_action == 'load'){
         $this_user['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$this_user['password']);
 
         // The file exists, so let's collect this user's info from teh database
-        $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$this_user['username_clean']}'");
+        $temp_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean = '{$this_user['username_clean']}'");
 
         // Check if the requested save file path exists
         if (!empty($temp_database_user)){

@@ -66,7 +66,7 @@ if (!empty($this_current_target) && $this_category_info['category_id'] != 0){
 // If the target is not empty, collect the user info
 if (!empty($this_current_target)){
     $temp_user_name = strtolower(trim($this_current_target));
-    $target_user_info = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean LIKE '{$temp_user_name}' LIMIT 1");
+    $target_user_info = $db->get_array("SELECT * FROM mmrpg_users WHERE user_name_clean = '{$temp_user_name}' LIMIT 1");
 } elseif (!empty($this_thread_info['thread_target'])){
     $temp_user_id = (int)($this_thread_info['thread_target']);
     $target_user_info = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id} LIMIT 1");

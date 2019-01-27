@@ -392,7 +392,7 @@ while ($this_action == 'load'){
             {$db_user_fields},
             user_password_encoded
             FROM mmrpg_users WHERE
-            user_name_clean LIKE '{$this_user['username_clean']}'
+            user_name_clean = '{$this_user['username_clean']}'
             ;");
 
         // Check if the requested save file path exists
