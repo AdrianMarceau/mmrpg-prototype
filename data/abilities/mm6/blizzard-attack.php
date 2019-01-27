@@ -122,7 +122,7 @@ $ability = array(
                     $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
                     $temp_this_robot = rpg_game::get_robot($this_battle, $this_player, $info2);
                     $temp_this_robot->robot_frame = 'base';
-                    unset($temp_this_robot->robot_attachments[$temp_attachment_token]);
+                    unset($temp_this_robot->robot_attachments[$this_attachment_token]);
                     $temp_this_robot->update_session();
                     $this_key++;
                 }
