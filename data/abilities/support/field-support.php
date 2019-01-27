@@ -15,6 +15,8 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
         $mmrpg_index_fields = rpg_field::get_index();
+        $this_battle = rpg_battle::get_battle();
+        $this_field = rpg_field::get_field();
 
         // Define field multipliers differently for Copy Core, Elemental Core, and Neutral Core
         $this_field_multipliers = array();
