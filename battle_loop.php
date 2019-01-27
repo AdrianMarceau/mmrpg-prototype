@@ -2,6 +2,28 @@
 // Include the TOP file
 require_once('top.php');
 
+// If the user is not logged in, don't allow them here
+if (!rpg_game::is_user()){
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="UTF-8" />
+    <title>Login Error! | Mega Man RPG Prototype</title>
+    <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
+    </head>
+    <body>
+        <script type="text/javascript">
+            alert('You have been logged out due to inactivity or an action \n in another window! Redirecting to login page...');
+            if (window != window.top){ window.top.location.href = 'prototype/'; }
+            else { window.location.href = 'prototype/'; }
+        </script>
+    </body>
+    </html>
+    <?
+    exit();
+}
+
 //die('<pre>'.print_r($_REQUEST, true).'</pre>');
 
 // Start the output buffer to capture any errors
