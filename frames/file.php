@@ -543,7 +543,7 @@ while ($this_action == 'load'){
     }
     // Update the form markup buttons
     $html_form_buttons .= '<input class="button type type_nature button_submit" type="submit" value="Load File" />';
-    $html_form_buttons .= '<input class="button type type_flame button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
+    //$html_form_buttons .= '<input class="button type type_flame button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
 
     // If the file has been updated, update the data
     if ($file_has_updated && !empty($temp_database_user['user_id'])){
@@ -578,9 +578,9 @@ while ($this_action == 'load'){
         // Update the form messages markup text
         $html_form_messages .= '<span class="success">(!) Thank you.  Your game has been loaded.</span>';
         // Clear the form fields markup
-        $html_form_fields = '<script type="text/javascript"> reloadParent = true; </script>';
+        $html_form_fields = '<script type="text/javascript"> reloadParent = false; </script>';
         // Update the form markup buttons
-        $html_form_buttons = '<input class="button button_continue" type="button" value="Continue" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
+        $html_form_buttons = '<input class="button button_continue" type="button" value="Continue" onclick="javascript:window.location.href=\'prototype.php\';" />';
 
     }
 
@@ -667,7 +667,9 @@ $(document).ready(function(){
             thisBody.css({opacity:1}).removeClass('hidden');
             <? endif; ?>
             // Let the parent window know the menu has loaded
-            parent.prototype_menu_loaded();
+            if (typeof parent.prototype_menu_loaded !== 'undefined'){
+                parent.prototype_menu_loaded();
+                }
             }, 1000);
         }, false, true);
 
@@ -705,7 +707,7 @@ function windowResizeFrame(){
 </script>
 </head>
 <body id="mmrpg" class="iframe">
-    <div id="prototype">
+    <div id="prototype" style="<?= $this_action == 'load' ? 'padding: 60px 0;' : '' ?>">
 
         <form class="menu" action="frames/file.php?action=<?= $this_action ?>" method="post" autocomplete="on">
 
