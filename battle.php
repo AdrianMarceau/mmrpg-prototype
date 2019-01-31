@@ -455,83 +455,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                 // Display the scanline layer if enabled
                 if ($debug_flag_scanlines){ echo '<div class="foreground scanlines" style="background-image: url(images/gui/canvas-scanlines.png?'.MMRPG_CONFIG_CACHE_DATE.'); opacity: 1;">&nbsp;</div>'; }
                 ?>
-                <?/*
-
-                <div class="sprite ability_damage ability_damage_energy" style="left: 0; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-9</div>
-                <div class="sprite ability_recovery ability_recovery_energy" style="right: 0; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+9</div>
-
-                <div class="sprite ability_damage ability_damage_attack" style="left: 50px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
-                <div class="sprite ability_recovery ability_recovery_attack" style="right: 50px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+99</div>
-
-                <div class="sprite ability_damage ability_damage_defense" style="left: 100px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
-                <div class="sprite ability_recovery ability_recovery_defense" style="right: 100px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-
-                <div class="sprite ability_damage ability_damage_speed" style="left: 150px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
-                <div class="sprite ability_recovery ability_recovery_speed" style="right: 150px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+99 </div>
-
-                <div class="sprite ability_damage ability_damage_experience" style="left: 200px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
-                <div class="sprite ability_recovery ability_recovery_experience" style="right: 200px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-
-                <div class="sprite ability_damage ability_damage_level" style="left: 300px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">-1</div>
-                <div class="sprite ability_recovery ability_recovery_level" style="right: 300px; top: 200px; background-color: rgba(255, 0, 0, 0.30); ">+1</div>
-
-
-
-                <div class="sprite ability_damage ability_damage_energy_super" style="left: 0; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-9</div>
-                <div class="sprite ability_recovery ability_recovery_energy_super" style="right: 0; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+9</div>
-
-                <div class="sprite ability_damage ability_damage_attack_super" style="left: 50px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
-                <div class="sprite ability_recovery ability_recovery_attack_super" style="right: 50px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+99</div>
-
-                <div class="sprite ability_damage ability_damage_defense_super" style="left: 100px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
-                <div class="sprite ability_recovery ability_recovery_defense_super" style="right: 100px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-
-                <div class="sprite ability_damage ability_damage_speed_super" style="left: 150px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
-                <div class="sprite ability_recovery ability_recovery_speed_super" style="right: 150px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+99 </div>
-
-                <div class="sprite ability_damage ability_damage_experience_super" style="left: 200px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
-                <div class="sprite ability_recovery ability_recovery_experience_super" style="right: 200px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-
-                <div class="sprite ability_damage ability_damage_level_super" style="left: 300px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">-1</div>
-                <div class="sprite ability_recovery ability_recovery_level_super" style="right: 300px; top: 100px; background-color: rgba(255, 0, 0, 0.30); ">+1</div>
-
-
-
-                <div class="sprite ability_damage ability_damage_energy_critical" style="left: 0; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-9</div>
-                <div class="sprite ability_recovery ability_recovery_energy_critical" style="right: 0; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+9</div>
-
-                <div class="sprite ability_damage ability_damage_attack_critical" style="left: 50px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
-                <div class="sprite ability_recovery ability_recovery_attack_critical" style="right: 50px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+99</div>
-
-                <div class="sprite ability_damage ability_damage_defense_critical" style="left: 100px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
-                <div class="sprite ability_recovery ability_recovery_defense_critical" style="right: 100px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-
-                <div class="sprite ability_damage ability_damage_speed_critical" style="left: 150px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-99</div>
-                <div class="sprite ability_recovery ability_recovery_speed_critical" style="right: 150px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+99 </div>
-
-                <div class="sprite ability_damage ability_damage_experience_critical" style="left: 200px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-9999</div>
-                <div class="sprite ability_recovery ability_recovery_experience_critical" style="right: 200px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+9999</div>
-
-                <div class="sprite ability_damage ability_damage_level_critical" style="left: 300px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">-1</div>
-                <div class="sprite ability_recovery ability_recovery_level_critical" style="right: 300px; top: 0px; background-color: rgba(255, 0, 0, 0.30); ">+1</div>
-             */?>
-
             </div>
-
-            <?/*?>
-            <div class="canvas_overlay_footer canvas_overlay_hidden" style="">
-
-            <?
-            // Print out damage mulitpliers that exist for this field
-            if (!empty($this_field_data['field_multipliers'])){
-                foreach ($this_field_data['field_multipliers'] AS $this_type => $this_multiplier){
-                    echo '<span class="field_multiplier field_multiplier_'.$this_type.' field_type field_type_'.$this_type.'" style="">'.ucfirst($this_type).' <span class="cross" style="">x</span> '.number_format($this_multiplier, 1).'</span>';
-                }
-            }
-            ?>
-
-            </div>
-            <?*/?>
 
         </div>
     </div>
@@ -548,13 +472,6 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                 <a class="button action_loading button_disabled" type="button"><label>Loading...</label></a>
             </div>
         </div>
-        <?/*
-        <div id="actions_start" class="wrapper">
-            <div class="main_actions">
-                <a class="button action_start" type="button" data-action="start"><label>Start!</label></a>
-            </div>
-        </div>
-        */?>
         <div id="actions_battle" class="actions_battle wrapper"></div>
         <div id="actions_ability" class="actions_ability wrapper"></div>
         <div id="actions_item" class="actions_ability actions_item wrapper"></div>
