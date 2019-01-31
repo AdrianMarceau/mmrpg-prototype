@@ -49,7 +49,9 @@ function gameEngineSubmitFunction(){
             gameEngine.submit();
             } else {
             //console.log('Resetting timeout.');
-            gameEngineSubmitTimeout = setTimeout(gameEngineSubmitFunction, 120000);
+            requestAnimationFrame(function(){
+                gameEngineSubmitTimeout = setTimeout(gameEngineSubmitFunction, 120000);
+                });
             }
         return false;
         } else {
@@ -171,10 +173,12 @@ $(document).ready(function(){
                     var thisTime = thisDate.getTime();
                     var thisObject = this;
                     //console.log('set tooltip timeout for '+tooltipDelay+' at '+thisTime);
-                    tooltipTimeout = setTimeout(function(){
-                        tooltipShowing = true;
-                        showTooltipFunction.call(thisObject, e);
-                        }, tooltipDelay);
+                    requestAnimationFrame(function(){
+                        tooltipTimeout = setTimeout(function(){
+                            tooltipShowing = true;
+                            showTooltipFunction.call(thisObject, e);
+                            }, tooltipDelay);
+                        });
                     var thisElement = $(this);
                     if (thisElement.attr('title')){
                         thisElement.attr('data-backup-title', thisElement.attr('title'));
@@ -259,15 +263,6 @@ $(document).ready(function(){
 
             }
 
-        /*
-        $('a.toggle span', gameMusic).css({opacity:0}).html('PLAY');
-        var musicTimeout = setTimeout(function(){
-            $('a.toggle span', gameMusic).animate({opacity:1}, 2000, 'swing');
-            }, 1000);
-        */
-        // Automatically start playing the music on load
-        //mmrpg_music_play();
-
     }
 
 
@@ -283,7 +278,9 @@ $(document).ready(function(){
             //console.log('gameEngine.submit() triggered, setting timeout');
             clearTimeout(gameEngineSubmitTimeout);
             gameEngineSubmitTimeout = false;
-            gameEngineSubmitTimeout = setTimeout(gameEngineSubmitFunction, 120000);
+            requestAnimationFrame(function(){
+                gameEngineSubmitTimeout = setTimeout(gameEngineSubmitFunction, 120000);
+                });
             });
 
         // Add click-events to the hidden resend command
@@ -358,6 +355,7 @@ $(document).ready(function(){
                 $(this).removeClass('sprite_'+thisSize+'x'+thisSize+'_focus');
                 $('.scan_overlay', gameCanvas).remove();
                 });
+
         // Add scan functionality to all on-screen robot sprites
         $('.sprite[data-action]', gameCanvas).live('click', function(){
             if ($('#actions_scan', gameActions).is(':visible')){
@@ -814,16 +812,14 @@ function mmrpg_canvas_animate(){
         });
 
     // Reset the timeout event for another animation round
-    //canvasAnimationTimeout = setTimeout(function(){
-    //  mmrpg_canvas_animate(); // DEBUG PAUSE
-    //  }, gameSettings.eventTimeout);
-    // Reset the timeout event for another animation round
     if (canvasAnimationTimeout != false){ window.clearTimeout(canvasAnimationTimeout); }
     if (!canvasAnimationTimeout.length){
-        canvasAnimationTimeout = window.setTimeout(function(){
-            //console.log('mmrpg_canvas_animate');
-            mmrpg_canvas_animate(); // DEBUG PAUSE
-            }, gameSettings.eventTimeout);
+        requestAnimationFrame(function(){
+            canvasAnimationTimeout = window.setTimeout(function(){
+                //console.log('mmrpg_canvas_animate');
+                mmrpg_canvas_animate(); // DEBUG PAUSE
+                }, gameSettings.eventTimeout);
+            });
         }
     // Return true for good measure
     return true;
@@ -1394,9 +1390,11 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
 }
 // Define a function for playing the events
 function mmrpg_events(){
+
     //console.log('mmrpg_events()');
     //clearTimeout(canvasAnimationTimeout);
     clearInterval(canvasAnimationTimeout);
+
     var thisEvent = false;
     if (mmrpgEvents.length){
         // Switch to the events panel
@@ -1405,6 +1403,7 @@ function mmrpg_events(){
         thisEvent = mmrpgEvents.shift();
         thisEvent.event_functions();
         }
+
     if (mmrpgEvents.length < 1){
         // Switch to the specified "next" action
         var nextAction = $('input[name=next_action]', gameEngine).val();
@@ -1416,9 +1415,11 @@ function mmrpg_events(){
         mmrpg_canvas_animate();
         } else if (mmrpgEvents.length >= 1){
             if (gameSettings.eventAutoPlay && thisEvent.event_flags.autoplay != false){
-                var autoClickTimer = setTimeout(function(){
-                    mmrpg_events();
-                    }, parseInt(gameSettings.eventTimeout));
+                requestAnimationFrame(function(){
+                    var autoClickTimer = setTimeout(function(){
+                        mmrpg_events();
+                        }, parseInt(gameSettings.eventTimeout));
+                    });
                 $('a[data-action="continue"]').addClass('button_disabled');
                 } else {
                 $('a[data-action="continue"]').removeClass('button_disabled');
@@ -1427,9 +1428,11 @@ function mmrpg_events(){
                 clearTimeout(autoClickTimer);
                 });
         }
+
     // Collect the current battle status and result
     var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
     var battleResult = $('input[name=this_battle_result]', gameEngine).val();
+
     // Check for specific value triggers and execute events
     if (battleStatus == 'complete'){
         //console.log('checkpoint | battleStatus='+battleStatus+' battleResult='+battleResult);
@@ -1445,14 +1448,14 @@ function mmrpg_events(){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
             parent.mmrpg_music_load('misc/battle-victory', false, true);
-            //var victoryTimeout = setTimeout(function(){ parent.mmrpg_music_load('last-track'); }, 5000);
             } else if (battleResult == 'defeat' && thisEvent.event_flags.defeat != undefined && thisEvent.event_flags.defeat != false){
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
             parent.mmrpg_music_load('misc/battle-defeat', false, true);
-            //var defeatTimeout = setTimeout(function(){ parent.mmrpg_music_load('last-track'); }, 5000);
             }
         }
+
+
 }
 
 // Define a function for creating a new layer on the canvas
@@ -2031,3 +2034,13 @@ if (!Array.prototype.indexOf) {
                 return -1;
         }
 }
+
+// Polyfill for requestAnimationFrame if not exists
+window.requestAnimationFrame = window.requestAnimationFrame
+|| window.mozRequestAnimationFrame
+|| window.webkitRequestAnimationFrame
+|| window.msRequestAnimationFrame
+|| function(f){return setTimeout(f, 1000/60)};
+window.cancelAnimationFrame = window.cancelAnimationFrame
+    || window.mozCancelAnimationFrame
+    || function(requestID){clearTimeout(requestID)};
