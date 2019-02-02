@@ -1061,12 +1061,16 @@
 
                             ?>
 
+                            <? $placeholder_folder = $robot_data['robot_class'] != 'master' ? $robot_data['robot_class'] : 'robot'; ?>
                             <div class="field">
                                 <div class="label">
-                                    <strong>Sprite Token</strong>
-                                    <em>base folder name for sprite images</em>
+                                    <strong>Sprite Status</strong>
+                                    <em>select if ready or pending</em>
                                 </div>
-                                <input class="textbox" type="text" name="robot_image" value="<?= $robot_data['robot_image'] ?>" maxlength="64" />
+                                <select class="select" name="robot_image">
+                                    <option value="<?= $placeholder_folder ?>" <?= $robot_data['robot_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>Pending</option>
+                                    <option value="<?= $robot_data['robot_token'] ?>" <?= $robot_data['robot_image'] == $robot_data['robot_token'] ? 'selected="selected"' : '' ?>>Ready</option>
+                                </select><span></span>
                             </div>
 
                             <div class="field">
@@ -1074,11 +1078,16 @@
                                     <strong>Sprite Size</strong>
                                     <em>base frame size for each sprite</em>
                                 </div>
-                                <select class="select" name="robot_image_size">
-                                    <option value="40" <?= $robot_data['robot_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
-                                    <option value="80" <?= $robot_data['robot_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
-                                    <option disabled="disabled" value="160" <?= $robot_data['robot_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
-                                </select><span></span>
+                                <? if ($robot_data['robot_image'] != $placeholder_folder){ ?>
+                                    <select class="select" name="robot_image_size">
+                                        <option value="40" <?= $robot_data['robot_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
+                                        <option value="80" <?= $robot_data['robot_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
+                                        <option disabled="disabled" value="160" <?= $robot_data['robot_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
+                                    </select><span></span>
+                                <? } else { ?>
+                                    <input type="hidden" name="robot_image_size" value="<?= $robot_data['robot_image_size'] ?>" />
+                                    <input class="textbox" type="text" name="robot_image_size" value="-" disabled="disabled" />
+                                <? } ?>
                             </div>
 
                             <div class="field">
@@ -1086,12 +1095,15 @@
                                     <strong>Sprite Editor</strong>
                                     <em>user who edited or created this sprite</em>
                                 </div>
-                                <select class="select" name="robot_image_editor">
-                                    <?= str_replace('value="'.$robot_data['robot_image_editor'].'"', 'value="'.$robot_data['robot_image_editor'].'" selected="selected"', $contributor_options_markup) ?>
-                                </select><span></span>
+                                <? if ($robot_data['robot_image'] != $placeholder_folder){ ?>
+                                    <select class="select" name="robot_image_editor">
+                                        <?= str_replace('value="'.$robot_data['robot_image_editor'].'"', 'value="'.$robot_data['robot_image_editor'].'" selected="selected"', $contributor_options_markup) ?>
+                                    </select><span></span>
+                                <? } else { ?>
+                                    <input type="hidden" name="robot_image_editor" value="<?= $robot_data['robot_image_editor'] ?>" />
+                                    <input class="textbox" type="text" name="robot_image_editor" value="-" disabled="disabled" />
+                                <? } ?>
                             </div>
-
-                            <hr />
 
                             <?
 
@@ -1104,7 +1116,10 @@
 
                             // Only proceed if all required sprite fields are set
                             if (!empty($robot_data['robot_image'])
+                                && !in_array($robot_data['robot_image'], array('robot', 'master', 'boss', 'mecha'))
                                 && !empty($robot_data['robot_image_size'])){
+
+                                echo('<hr />'.PHP_EOL);
 
                                 // Define the base sprite and shadow paths for this robot given its image token
                                 $base_sprite_path = 'images/robots/'.$robot_data['robot_image'].'/';
@@ -1217,7 +1232,8 @@
                                                                 $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
                                                                 if ($group == 'sprites'){ $file_exists = in_array($file_name, $alt_files_existing) ? true : false; }
                                                                 elseif ($group == 'shadows'){ $file_exists = in_array($file_name, $alt_shadows_existing) ? true : false; }
-                                                                $file_is_unused = $kind == 'mug' && ($group == 'shadows' || $size_key > 0) ? true : false;
+                                                                $file_is_unused = false;
+                                                                if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
                                                                 $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
                                                                 echo('<li>');
                                                                     echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="filebar" data-filepath="'.$this_alt_path.'" data-filename="'.$file_name.'">');
@@ -1250,40 +1266,42 @@
                                 //echo('<pre>$base_sprite_list = '.(!empty($base_sprite_list) ? htmlentities(print_r($base_sprite_list, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
                                 //echo('<pre>$temp_alts_array = '.(!empty($temp_alts_array) ? htmlentities(print_r($temp_alts_array, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
+                                echo('<hr />'.PHP_EOL);
+
+                                ?>
+                                <div class="field halfsize">
+                                    <div class="label">
+                                        <strong>Add Another Alt</strong>
+                                        <em>select the alt you want to add and then save</em>
+                                    </div>
+                                    <select class="select" name="robot_image_alts_new">
+                                        <option value="">-</option>
+                                        <?
+                                        $alt_limit = 10;
+                                        if ($alt_limit <= count($robot_image_alts)){ $alt_limit = count($robot_image_alts) + 1; }
+                                        for ($i = 1; $i <= $alt_limit; $i++){
+                                            $alt_token = 'alt'.($i > 1 ? $i : '');
+                                            if (in_array($alt_token, $robot_image_alts_tokens)){ continue; }
+                                            ?>
+                                            <option value="<?= $alt_token ?>">
+                                                <?= $robot_data['robot_name'] ?>
+                                                (<?= ucfirst($alt_token) ?> / <?
+                                                    if ($i < 9){
+                                                        echo('Standard');
+                                                    } elseif ($i == 9){
+                                                        echo('Darkness');
+                                                    } elseif ($i > 9){
+                                                        echo('Custom');
+                                                    } ?>)
+                                            </option>
+                                        <? } ?>
+                                    </select><span></span>
+                                </div>
+                                <?
+
                             }
 
                             ?>
-
-                            <hr />
-
-                            <div class="field halfsize">
-                                <div class="label">
-                                    <strong>Add Another Alt</strong>
-                                    <em>select the alt you want to add and then save</em>
-                                </div>
-                                <select class="select" name="robot_image_alts_new">
-                                    <option value="">-</option>
-                                    <?
-                                    $alt_limit = 10;
-                                    if ($alt_limit <= count($robot_image_alts)){ $alt_limit = count($robot_image_alts) + 1; }
-                                    for ($i = 1; $i <= $alt_limit; $i++){
-                                        $alt_token = 'alt'.($i > 1 ? $i : '');
-                                        if (in_array($alt_token, $robot_image_alts_tokens)){ continue; }
-                                        ?>
-                                        <option value="<?= $alt_token ?>">
-                                            <?= $robot_data['robot_name'] ?>
-                                            (<?= ucfirst($alt_token) ?> / <?
-                                                if ($i < 9){
-                                                    echo('Standard');
-                                                } elseif ($i == 9){
-                                                    echo('Darkness');
-                                                } elseif ($i > 9){
-                                                    echo('Custom');
-                                                } ?>)
-                                        </option>
-                                    <? } ?>
-                                </select><span></span>
-                            </div>
 
                         </div>
 
