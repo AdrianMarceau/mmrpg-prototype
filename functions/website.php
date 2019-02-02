@@ -928,6 +928,7 @@ function deleteDir($dirPath) {
 // Define a function for getting a list of directory contents, recursively
 // via https://stackoverflow.com/a/24784144/1876397
 function getDirContents($dir, &$results = array()){
+    if (!file_exists($dir)){ return $results; }
     $files = scandir($dir);
     foreach($files as $key => $value){
         $path = realpath($dir.DIRECTORY_SEPARATOR.$value);

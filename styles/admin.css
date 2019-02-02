@@ -501,6 +501,137 @@ tr:nth-child(odd) td {
     margin-right: 4px;
 }
 
+.adminform .editor ul.files {
+    border: 0 none transparent;
+    list-style-type: none;
+    margin: 0 auto 10px;
+    padding: 0;
+}
+.adminform .editor ul.files > li {
+    display: block;
+    margin: 0 auto 5px;
+    border: 1px solid #d6d6d6;
+    position: relative;
+}
+.adminform .editor ul.files > li .filebar {
+    display: block;
+    padding: 3px 6px;
+    margin: 0 auto;
+    position: relative;
+    background-color: #ededed;
+}
+.adminform .editor ul.files > li .filebar .link {
+    color: #008aab;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.adminform .editor ul.files > li .filebar .link:hover {
+    color: #049dc3;
+}
+.adminform .editor ul.files > li .filebar .link.disabled {
+    color: #b0b0b0;
+    text-decoration: none;
+    cursor: default;
+}
+.adminform .editor ul.files > li .filebar .info {
+    display: inline-block;
+    margin: 0 auto 0 5px;
+    font-weight: normal;
+    color: #969696;
+    font-size: 11px;
+    line-height: 11px;
+    position: relative;
+    bottom: 1px;
+}
+.adminform .editor ul.files > li .filebar .info:before {
+    content: "(";
+}
+.adminform .editor ul.files > li .filebar .info:after {
+    content: ")";
+}
+
+.adminform .editor ul.files > li .filebar .info.status {
+    font-weight: bold;
+}
+.adminform .editor ul.files > li .filebar .info.status.good {
+    color: #47a047;
+}
+.adminform .editor ul.files > li .filebar .info.status.bad {
+    color: #ef4848;
+}
+
+.adminform .editor ul.files > li .filebar .action {
+    float: right;
+    margin: 0 0 0 5px;
+    font-size: 90%;
+    cursor: pointer;
+}
+.adminform .editor ul.files > li .filebar .action:hover {
+    text-decoration: underline;
+}
+.adminform .editor ul.files > li .filebar .action:before {
+    content: "[";
+}
+.adminform .editor ul.files > li .filebar .action:after {
+    content: "]";
+}
+.adminform .editor ul.files > li .filebar .action.disabled {
+    text-decoration: line-through;
+    cursor: default;
+    opacity: 0.3;
+}
+.adminform .editor ul.files > li .filebar .action.upload {
+    color: #47a047;
+}
+.adminform .editor ul.files > li .filebar .action.delete {
+    color: #ef4848;
+}
+
+.adminform .editor ul.files > li .filebar.unused {
+    opacity: 0.3;
+    transition: opacity 0.3s;
+}
+.adminform .editor ul.files > li .filebar.unused:hover {
+    opacity: 1.0;
+}
+.adminform .editor ul.files > li .filebar.unused .link {
+    color: #969696;
+}
+.adminform .editor ul.files > li .filebar.unused .link.view {
+    text-decoration: line-through;
+}
+
+.adminform .editor ul.files > li .filebar.unused .info.status.bad,
+.adminform .editor ul.files > li .filebar.optional .info.status.bad {
+    color: #b0b0b0;
+}
+
+/*
+.adminform .editor ul.files > li .filebar {
+    border-bottom: 1px solid #d6d6d6;
+}
+.adminform .editor ul.files > li .preview {
+    display: block;
+    min-height: 40px;
+    padding: 0;
+    margin: 0 auto;
+    background-color: #4d4d4d;
+    background-image: url(../images/sprite-grid.gif);
+    background-attachment: scroll;
+    background-repeat: repeat;
+    background-position: 0 0;
+    overflow: hidden;
+}
+.adminform .editor ul.files > li .preview img {
+    display: block;
+    margin: 0 auto 0 0;
+    width: auto;
+    height: auto;
+    background-color: transparent;
+    box-shadow: 1px 0 6px rgba(0, 0, 0, 0.6);
+}
+*/
+
 
 .adminform .field,
 .adminform .options,
