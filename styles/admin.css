@@ -263,6 +263,81 @@ a:hover {
     margin-left: 4px;
 }
 
+.adminform .editor .editor-tabs,
+.adminform .editor .editor-panels,
+.adminform .editor .editor-tabs .tab,
+.adminform .editor .editor-panels .panel {
+    display: block;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.adminform .editor .editor-tabs {
+    padding-bottom: 0;
+    margin-bottom: 20px;
+}
+.adminform .editor .editor-tabs .tab {
+    float: left;
+    vertical-align: bottom;
+    text-align: center;
+    padding: 6px 18px;
+    margin: 4px 0 0;
+    border: 1px solid #CACACA;
+    position: relative;
+    bottom: 1px;
+    -moz-border-radius: 3px 3px 0 0;
+    -webkit-border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;
+    text-decoration: none;
+    background-color: #ededed;
+    transition: background-color 0.3s, border-bottom 0.3s;
+    cursor: pointer;
+}
+.adminform .editor .editor-tabs .tab.active,
+.adminform .editor .editor-tabs .tab:hover {
+    text-decoration: underline;
+    background-color: transparent;
+    border-bottom: 0 none transparent;
+    bottom: 0;
+}
+
+.adminform .editor .editor-tabs .tab + span {
+    display: block;
+    float: left;
+    vertical-align: bottom;
+    border-bottom: 1px solid #CACACA;
+    margin: 4px 0 0;
+    padding: 6px 0;
+    width: 6px;
+}
+.adminform .editor .editor-tabs .tab + span:before {
+    content: " ";
+    display: inline-block;
+}
+.adminform .editor .editor-tabs .tab + span:last-child {
+    width: 24px;
+    border-right: 24px solid transparent;
+}
+
+.adminform .editor .editor-panels {
+
+}
+.adminform .editor .editor-panels .panel {
+    display: block;
+}
+.adminform .editor .editor-panels .panel:not(.active) {
+    display: none;
+}
+
+
+.adminform .editor .editor-tabs:after,
+.adminform .editor .editor-panels:after,
+.adminform .editor .editor-panels .panel:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
 
 .adminform table {
     margin: 0 auto 10px;

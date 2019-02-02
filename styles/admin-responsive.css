@@ -177,6 +177,23 @@ body:before {
         width: auto;
     }
 
+    .adminform .editor .editor-tabs .tab {
+        margin: 0 6px 6px 0;
+        position: static;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        min-width: calc((100% / 3) - 6px);
+    }
+    .adminform .editor .editor-tabs .tab + span {
+        display: none;
+    }
+    .adminform .editor .editor-tabs .tab,
+    .adminform .editor .editor-tabs .tab.active,
+    .adminform .editor .editor-tabs .tab:hover {
+        border: 1px solid #CACACA;
+    }
+
     .adminform .search .form {
         padding-left: 3px;
         padding-right: 3px;

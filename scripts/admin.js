@@ -73,6 +73,30 @@ $(document).ready(function(){
 
         });
 
+    // Define click events for any editor tabs and panels
+    var $editorTabs = thisAdminEditor.find('.editor-tabs[data-tabgroup]');
+    if ($editorTabs.length){
+        $editorTabs.each(function(){
+            var $tabList = $(this);
+            var tabGroup = $tabList.attr('data-tabgroup');
+            var $tabLinks = $tabList.find('.tab[data-tab]');
+            var $tabPanels = thisAdminEditor.find('.editor-panels[data-tabgroup="'+tabGroup+'"] .panel[data-tab]');
+            var showTabFunction = function(tabToken){
+                //console.log('show tab '+tabToken);
+                $tabLinks.removeClass('active');
+                $tabLinks.filter('[data-tab="'+tabToken+'"]').addClass('active');
+                $tabPanels.removeClass('active');
+                $tabPanels.filter('[data-tab="'+tabToken+'"]').addClass('active');
+                window.location.hash = tabToken;
+                };
+            $('a[data-tab]', $tabList).bind('click', function(e){ e.preventDefault(); showTabFunction($(this).attr('data-tab')); });
+            //console.log(window.location.hash);
+            if (typeof window.location.hash !== 'undefined' && window.location.hash.length > 0){ var firstTab = window.location.hash.slice(1); }
+            else { var firstTab = $tabList.find('a[data-tab]').first().attr('data-tab'); }
+            showTabFunction(firstTab);
+            });
+        }
+
     // Define an event for fields that depend on other fields for thier value
     var $autoElements = $('*[data-auto]', thisAdminForm);
     if ($autoElements.length){
