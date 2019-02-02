@@ -643,414 +643,438 @@
 
                 <? print_form_messages() ?>
 
+                <div class="editor-tabs" data-tabgroup="robot">
+                    <a class="tab active" data-tab="basic">Basic</a><span></span>
+                    <a class="tab" data-tab="stats">Stats</a><span></span>
+                    <a class="tab" data-tab="flavour">Flavour</a><span></span>
+                    <a class="tab" data-tab="abilities">Abilities</a><span></span>
+                    <a class="tab" data-tab="sprites">Sprites</a><span></span>
+                </div>
+
                 <form class="form" method="post">
 
                     <input type="hidden" name="action" value="edit_robots" />
                     <input type="hidden" name="subaction" value="editor" />
 
-                    <div class="field">
-                        <strong class="label">Robot ID</strong>
-                        <input type="hidden" name="robot_id" value="<?= $robot_data['robot_id'] ?>" />
-                        <input class="textbox" type="text" name="robot_id" value="<?= $robot_data['robot_id'] ?>" disabled="disabled" />
-                    </div>
+                    <div class="editor-panels" data-tabgroup="robot">
 
-                    <div class="field">
-                        <div class="label">
-                            <strong>Robot Token</strong>
-                            <em>avoid changing</em>
-                        </div>
-                        <input type="hidden" name="old_robot_token" value="<?= $robot_data['robot_token'] ?>" />
-                        <input class="textbox" type="text" name="robot_token" value="<?= $robot_data['robot_token'] ?>" maxlength="64" />
-                    </div>
+                        <div class="panel active" data-tab="basic">
 
-                    <div class="field">
-                        <strong class="label">Robot Name</strong>
-                        <input class="textbox" type="text" name="robot_name" value="<?= $robot_data['robot_name'] ?>" maxlength="128" />
-                    </div>
+                            <div class="field">
+                                <strong class="label">Robot ID</strong>
+                                <input type="hidden" name="robot_id" value="<?= $robot_data['robot_id'] ?>" />
+                                <input class="textbox" type="text" name="robot_id" value="<?= $robot_data['robot_id'] ?>" disabled="disabled" />
+                            </div>
 
-                    <div class="field">
-                        <strong class="label">Robot Kind</strong>
-                        <select class="select" name="robot_class">
-                            <option value="mecha" <?= $robot_data['robot_class'] == 'mecha' ? 'selected="selected"' : '' ?>>Support Mecha</option>
-                            <option value="master" <?= empty($robot_data['robot_class']) || $robot_data['robot_class'] == 'master' ? 'selected="selected"' : '' ?>>Robot Master</option>
-                            <option value="boss" <?= $robot_data['robot_class'] == 'boss' ? 'selected="selected"' : '' ?>>Fortress Boss</option>
-                        </select><span></span>
-                    </div>
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Robot Token</strong>
+                                    <em>avoid changing</em>
+                                </div>
+                                <input type="hidden" name="old_robot_token" value="<?= $robot_data['robot_token'] ?>" />
+                                <input class="textbox" type="text" name="robot_token" value="<?= $robot_data['robot_token'] ?>" maxlength="64" />
+                            </div>
 
-                    <div class="field has2cols">
-                        <strong class="label">
-                            Core Type(s)
-                            <span class="type_span type_<?= (!empty($robot_data['robot_core']) ? $robot_data['robot_core'].(!empty($robot_data['robot_core2']) ? '_'.$robot_data['robot_core2'] : '') : 'none') ?> swatch floatright" data-auto="field-type" data-field-type="robot_core,robot_core2">&nbsp;</span>
-                        </strong>
-                        <div class="subfield">
-                            <select class="select" name="robot_core">
-                                <option value=""<?= empty($robot_data['robot_core']) ? ' selected="selected"' : '' ?>>Neutral</option>
-                                <?
-                                foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                    if ($type_info['type_class'] === 'special'){ continue; }
-                                    $label = $type_info['type_name'];
-                                    if (!empty($robot_data['robot_core']) && $robot_data['robot_core'] === $type_token){ $selected = 'selected="selected"'; }
-                                    else { $selected = ''; }
-                                    echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                }
-                                ?>
-                            </select><span></span>
-                        </div>
-                        <div class="subfield">
-                            <select class="select" name="robot_core2">
-                                <option value=""<?= empty($robot_data['robot_core2']) ? ' selected="selected"' : '' ?>>-</option>
-                                <?
-                                foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                    if ($type_info['type_class'] === 'special'){ continue; }
-                                    $label = $type_info['type_name'];
-                                    if (!empty($robot_data['robot_core2']) && $robot_data['robot_core2'] === $type_token){ $selected = 'selected="selected"'; }
-                                    else { $selected = ''; }
-                                    echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                }
-                                ?>
-                            </select><span></span>
-                        </div>
-                    </div>
+                            <div class="field">
+                                <strong class="label">Robot Name</strong>
+                                <input class="textbox" type="text" name="robot_name" value="<?= $robot_data['robot_name'] ?>" maxlength="128" />
+                            </div>
 
-                    <div class="field">
-                        <strong class="label">Gender</strong>
-                        <div class="subfield">
-                            <select class="select" name="robot_gender">
-                                <option value="none" <?= empty($robot_data['robot_gender']) || $robot_data['robot_gender'] == 'none' ? 'selected="selected"' : '' ?>>None</option>
-                                <option value="other" <?= $robot_data['robot_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
-                                <option value="male" <?= $robot_data['robot_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
-                                <option value="female" <?= $robot_data['robot_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
-                            </select><span></span>
-                        </div>
-                    </div>
+                            <div class="field">
+                                <strong class="label">Robot Kind</strong>
+                                <select class="select" name="robot_class">
+                                    <option value="mecha" <?= $robot_data['robot_class'] == 'mecha' ? 'selected="selected"' : '' ?>>Support Mecha</option>
+                                    <option value="master" <?= empty($robot_data['robot_class']) || $robot_data['robot_class'] == 'master' ? 'selected="selected"' : '' ?>>Robot Master</option>
+                                    <option value="boss" <?= $robot_data['robot_class'] == 'boss' ? 'selected="selected"' : '' ?>>Fortress Boss</option>
+                                </select><span></span>
+                            </div>
 
-                    <hr />
-
-                    <div class="field foursize">
-                        <strong class="label">Source Game</strong>
-                        <select class="select" name="robot_game">
-                            <?
-                            $robot_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots WHERE robot_game <> '' ORDER BY robot_game ASC;", 'game_token');
-                            echo('<option value=""'.(empty($robot_data['robot_game']) ? 'selected="selected"' : '').'>- none -</option>');
-                            foreach ($robot_games_tokens AS $game_token => $game_data){
-                                $label = $game_token;
-                                $selected = !empty($robot_data['robot_game']) && $robot_data['robot_game'] == $game_token ? 'selected="selected"' : '';
-                                echo('<option value="'.$game_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                            }
-                            ?>
-                        </select><span></span>
-                    </div>
-
-                    <div class="field foursize">
-                        <strong class="label">Sort Group</strong>
-                        <input class="textbox" type="text" name="robot_group" value="<?= $robot_data['robot_group'] ?>" maxlength="64" />
-                    </div>
-
-                    <div class="field foursize">
-                        <strong class="label">Serial Number</strong>
-                        <input class="textbox" type="text" name="robot_number" value="<?= $robot_data['robot_number'] ?>" maxlength="64" />
-                    </div>
-
-                    <div class="field foursize">
-                        <strong class="label">Sort Order</strong>
-                        <input class="textbox" type="number" name="robot_order" value="<?= $robot_data['robot_order'] ?>" maxlength="8" />
-                    </div>
-
-                    <hr />
-
-                    <div class="field">
-                        <strong class="label">Home Field</strong>
-                        <select class="select" name="robot_field">
-                            <?
-                            echo('<option value=""'.(empty($robot_data['robot_field']) ? 'selected="selected"' : '').'>- none -</option>');
-                            foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                $label = $field_data['field_name'];
-                                $selected = !empty($robot_data['robot_field']) && $robot_data['robot_field'] == $field_token ? 'selected="selected"' : '';
-                                echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                            }
-                            ?>
-                        </select><span></span>
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">Echo Field</strong>
-                        <select class="select" name="robot_field2">
-                            <?
-                            echo('<option value=""'.(empty($robot_data['robot_field2']) ? 'selected="selected"' : '').'>- none -</option>');
-                            foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                $label = $field_data['field_name'];
-                                $selected = !empty($robot_data['robot_field2']) && $robot_data['robot_field2'] == $field_token ? 'selected="selected"' : '';
-                                echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                            }
-                            ?>
-                        </select><span></span>
-                    </div>
-
-                    <? if ($robot_data['robot_field'] !== 'mecha'){
-                        ?>
-                        <div class="field disabled">
-                            <strong class="label">Support Mecha</strong>
-                            <select class="select disabled" name="robot_mecha" disabled="disabled">
-                                <option value="">-</option>
-                            </select><span></span>
-                        </div>
-                        <?
-                    } ?>
-
-                    <hr />
-
-                    <div class="field foursize">
-                        <strong class="label"><span class="type_span type_energy">Energy</span> <em>LE</em></strong>
-                        <input class="textbox" type="number" name="robot_energy" value="<?= $robot_data['robot_energy'] ?>" maxlength="8" />
-                    </div>
-
-                    <div class="field foursize">
-                        <strong class="label"><span class="type_span type_attack">Attack</span> <em>AT</em></strong>
-                        <input class="textbox" type="number" name="robot_attack" value="<?= $robot_data['robot_attack'] ?>" maxlength="8" />
-                    </div>
-
-                    <div class="field foursize">
-                        <strong class="label"><span class="type_span type_defense">Defense</span> <em>DF</em></strong>
-                        <input class="textbox" type="number" name="robot_defense" value="<?= $robot_data['robot_defense'] ?>" maxlength="8" />
-                    </div>
-
-                    <div class="field foursize">
-                        <strong class="label"><span class="type_span type_speed">Speed</span> <em>SP</em></strong>
-                        <input class="textbox" type="number" name="robot_speed" value="<?= $robot_data['robot_speed'] ?>" maxlength="8" />
-                    </div>
-
-                    <div class="field halfsize">
-                        <strong class="label"><span class="type_span type_weapons">Weapons</span> <em>WE</em></strong>
-                        <input class="textbox" type="number" name="robot_weapons" value="<?= $robot_data['robot_weapons'] ?>" maxlength="8" />
-                    </div>
-
-                    <div class="field halfsize">
-                        <div class="label">
-                            <strong><span class="type_span type_cutter">Base Stat Total</span> <em>LE + AT + DF + SP</em></strong>
-                        </div>
-                        <? $bst_value = $robot_data['robot_energy'] + $robot_data['robot_attack'] + $robot_data['robot_defense'] + $robot_data['robot_speed']; ?>
-                        <input class="textbox disabled" type="text" name="robot_bst" value="<?= $bst_value ?>" maxlength="8" disabled="disabled" data-auto="field-sum" data-field-sum="robot_energy,robot_attack,robot_defense,robot_speed" />
-                    </div>
-
-                    <hr />
-
-                    <?
-                    $robot_type_matchups = array('weaknesses', 'resistances', 'affinities', 'immunities');
-                    foreach ($robot_type_matchups AS $matchup_key => $matchup_token){
-                        $matchup_list = $robot_data['robot_'.$matchup_token];
-                        $matchup_list = !empty($matchup_list) ? json_decode($matchup_list, true) : array();
-                        ?>
-                        <div class="field fullsize has4cols">
-                            <strong class="label">
-                                Robot <?= ucfirst($matchup_token) ?>
-                            </strong>
-                            <? for ($i = 0; $i < 4; $i++){ ?>
+                            <div class="field has2cols">
+                                <strong class="label">
+                                    Core Type(s)
+                                    <span class="type_span type_<?= (!empty($robot_data['robot_core']) ? $robot_data['robot_core'].(!empty($robot_data['robot_core2']) ? '_'.$robot_data['robot_core2'] : '') : 'none') ?> swatch floatright" data-auto="field-type" data-field-type="robot_core,robot_core2">&nbsp;</span>
+                                </strong>
                                 <div class="subfield">
-                                    <span class="type_span type_<?= !empty($matchup_list[$i]) ? $matchup_list[$i] : '' ?> swatch floatright hidenone" data-auto="field-type" data-field-type="robot_<?= $matchup_token ?>[<?= $i ?>]">&nbsp;</span>
-                                    <select class="select" name="robot_<?= $matchup_token ?>[<?= $i ?>]">
-                                        <option value=""<?= empty($matchup_list[$i]) ? ' selected="selected"' : '' ?>>-</option>
+                                    <select class="select" name="robot_core">
+                                        <option value=""<?= empty($robot_data['robot_core']) ? ' selected="selected"' : '' ?>>Neutral</option>
                                         <?
                                         foreach ($mmrpg_types_index AS $type_token => $type_info){
                                             if ($type_info['type_class'] === 'special'){ continue; }
                                             $label = $type_info['type_name'];
-                                            if (!empty($matchup_list[$i]) && $matchup_list[$i] === $type_token){ $selected = 'selected="selected"'; }
+                                            if (!empty($robot_data['robot_core']) && $robot_data['robot_core'] === $type_token){ $selected = 'selected="selected"'; }
                                             else { $selected = ''; }
                                             echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                                         }
                                         ?>
                                     </select><span></span>
                                 </div>
-                            <? } ?>
-                        </div>
-                        <?
-                    }
-                    ?>
-
-                    <hr />
-
-                    <div class="field halfsize">
-                        <div class="label">
-                            <strong>Robot Class</strong>
-                            <em>three word classification</em>
-                        </div>
-                        <input class="textbox" type="text" name="robot_description" value="<?= htmlentities($robot_data['robot_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
-                    </div>
-
-                    <div class="field fullsize">
-                        <div class="label">
-                            <strong>Robot Description</strong>
-                            <em>short paragraph about robot's design, personality, background, etc.</em>
-                        </div>
-                        <textarea class="textarea" name="robot_description2" rows="10"><?= htmlentities($robot_data['robot_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                    </div>
-
-                    <hr />
-
-                    <?
-                    $robot_quote_kinds = array('start', 'taunt', 'victory', 'defeat');
-                    foreach ($robot_quote_kinds AS $kind_key => $kind_token){
-                        ?>
-                        <div class="field halfsize">
-                            <div class="label">
-                                <strong><?= ucfirst($kind_token) ?> Quote</strong>
+                                <div class="subfield">
+                                    <select class="select" name="robot_core2">
+                                        <option value=""<?= empty($robot_data['robot_core2']) ? ' selected="selected"' : '' ?>>-</option>
+                                        <?
+                                        foreach ($mmrpg_types_index AS $type_token => $type_info){
+                                            if ($type_info['type_class'] === 'special'){ continue; }
+                                            $label = $type_info['type_name'];
+                                            if (!empty($robot_data['robot_core2']) && $robot_data['robot_core2'] === $type_token){ $selected = 'selected="selected"'; }
+                                            else { $selected = ''; }
+                                            echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                        }
+                                        ?>
+                                    </select><span></span>
+                                </div>
                             </div>
-                            <input class="textbox" type="text" name="robot_quotes_<?= $kind_token ?>" value="<?= htmlentities($robot_data['robot_quotes_'.$kind_token], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
-                        </div>
-                        <?
-                    }
-                    ?>
 
-                    <div class="field fullsize" style="min-height: 0; margin-bottom: 0; padding-bottom: 0;">
-                        <div class="label">
-                            <em class="nowrap" style="margin-left: 0;">(!) You can use <strong>{this_player}</strong>, <strong>{this_robot}</strong>, <strong>{target_player}</strong>, and <strong>{target_robot}</strong> variables for dynamic text</em>
-                        </div>
-                    </div>
+                            <div class="field">
+                                <strong class="label">Gender</strong>
+                                <div class="subfield">
+                                    <select class="select" name="robot_gender">
+                                        <option value="none" <?= empty($robot_data['robot_gender']) || $robot_data['robot_gender'] == 'none' ? 'selected="selected"' : '' ?>>None</option>
+                                        <option value="other" <?= $robot_data['robot_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
+                                        <option value="male" <?= $robot_data['robot_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
+                                        <option value="female" <?= $robot_data['robot_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
+                                    </select><span></span>
+                                </div>
+                            </div>
 
-                    <?
+                            <hr />
 
-                    // Collect global abilities so we can skip them
-                    $global_ability_tokens = rpg_ability::get_global_abilities();
-
-                    // Pre-generate a list of all abilities so we can re-use it over and over
-                    $ability_options_markup = array();
-                    $ability_options_markup[] = '<option value="">-</option>';
-                    foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
-                        //if (in_array($ability_token, $global_ability_tokens)){ continue; }
-                        if ($ability_info['ability_class'] === 'mecha' && $robot_data['robot_class'] !== 'mecha'){ continue; }
-                        elseif ($ability_info['ability_class'] === 'boss' && $robot_data['robot_class'] !== 'boss'){ continue; }
-                        $ability_name = $ability_info['ability_name'];
-                        $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
-                        if (empty($ability_types)){ $ability_types = 'Neutral'; }
-                        $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
-                    }
-                    $ability_options_count = count($ability_options_markup);
-                    $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
-
-                    ?>
-
-                    <hr />
-
-                    <div class="field fullsize multirow">
-                        <strong class="label">
-                            Level-Up Abilities
-                            <em>Only hero and support robots require level-up, others should unlock all at start</em>
-                        </strong>
-                        <?
-                        $current_ability_list = !empty($robot_data['robot_abilities_rewards']) ? json_decode($robot_data['robot_abilities_rewards'], true) : array();
-                        $select_limit = max(8, count($current_ability_list));
-                        $select_limit += 2;
-                        for ($i = 0; $i < $select_limit; $i++){
-                            $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : array();
-                            $current_value_level = !empty($current_value) ? $current_value['level'] : '';
-                            $current_value_token = !empty($current_value) ? $current_value['token'] : '';
-                            ?>
-                            <div class="subfield levelup">
-                                <input class="textarea" type="number" name="robot_abilities_rewards[<?= $i ?>][level]" value="<?= $current_value_level ?>" maxlength="3" placeholder="0" />
-                                <select class="select" name="robot_abilities_rewards[<?= $i ?>][token]">
-                                    <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $ability_options_markup) ?>
+                            <div class="field foursize">
+                                <strong class="label">Source Game</strong>
+                                <select class="select" name="robot_game">
+                                    <?
+                                    $robot_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots WHERE robot_game <> '' ORDER BY robot_game ASC;", 'game_token');
+                                    echo('<option value=""'.(empty($robot_data['robot_game']) ? 'selected="selected"' : '').'>- none -</option>');
+                                    foreach ($robot_games_tokens AS $game_token => $game_data){
+                                        $label = $game_token;
+                                        $selected = !empty($robot_data['robot_game']) && $robot_data['robot_game'] == $game_token ? 'selected="selected"' : '';
+                                        echo('<option value="'.$game_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
                                 </select><span></span>
                             </div>
-                            <?
-                        }
-                        ?>
-                    </div>
 
-                    <hr />
+                            <div class="field foursize">
+                                <strong class="label">Sort Group</strong>
+                                <input class="textbox" type="text" name="robot_group" value="<?= $robot_data['robot_group'] ?>" maxlength="64" />
+                            </div>
 
-                    <div class="field fullsize has4cols multirow">
-                        <strong class="label">
-                            Compatible Abilities
-                            <em>Excluding level-up abilities and <u title="<?= implode(', ', $global_ability_tokens) ?>">global ones</u> available to all robots by default</em>
-                        </strong>
-                        <?
-                        $current_ability_list = !empty($robot_data['robot_abilities_compatible']) ? json_decode($robot_data['robot_abilities_compatible'], true) : array();
-                        $current_ability_list = array_values(array_filter($current_ability_list, function($token) use($global_ability_tokens){ return !in_array($token, $global_ability_tokens); }));
-                        $select_limit = max(12, count($current_ability_list));
-                        $select_limit += 4 - ($select_limit % 4);
-                        $select_limit += 4;
-                        for ($i = 0; $i < $select_limit; $i++){
-                            $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : '';
-                            ?>
-                            <div class="subfield">
-                                <select class="select" name="robot_abilities_compatible[<?= $i ?>]">
-                                    <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $ability_options_markup) ?>
+                            <div class="field foursize">
+                                <strong class="label">Serial Number</strong>
+                                <input class="textbox" type="text" name="robot_number" value="<?= $robot_data['robot_number'] ?>" maxlength="64" />
+                            </div>
+
+                            <div class="field foursize">
+                                <strong class="label">Sort Order</strong>
+                                <input class="textbox" type="number" name="robot_order" value="<?= $robot_data['robot_order'] ?>" maxlength="8" />
+                            </div>
+
+                            <hr />
+
+                            <div class="field">
+                                <strong class="label">Home Field</strong>
+                                <select class="select" name="robot_field">
+                                    <?
+                                    echo('<option value=""'.(empty($robot_data['robot_field']) ? 'selected="selected"' : '').'>- none -</option>');
+                                    foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                        $label = $field_data['field_name'];
+                                        $selected = !empty($robot_data['robot_field']) && $robot_data['robot_field'] == $field_token ? 'selected="selected"' : '';
+                                        echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
                                 </select><span></span>
                             </div>
+
+                            <div class="field">
+                                <strong class="label">Echo Field</strong>
+                                <select class="select" name="robot_field2">
+                                    <?
+                                    echo('<option value=""'.(empty($robot_data['robot_field2']) ? 'selected="selected"' : '').'>- none -</option>');
+                                    foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                        $label = $field_data['field_name'];
+                                        $selected = !empty($robot_data['robot_field2']) && $robot_data['robot_field2'] == $field_token ? 'selected="selected"' : '';
+                                        echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
+                                </select><span></span>
+                            </div>
+
+                            <? if ($robot_data['robot_field'] !== 'mecha'){
+                                ?>
+                                <div class="field disabled">
+                                    <strong class="label">Support Mecha</strong>
+                                    <select class="select disabled" name="robot_mecha" disabled="disabled">
+                                        <option value="">-</option>
+                                    </select><span></span>
+                                </div>
+                                <?
+                            } ?>
+
+                            <hr />
+
                             <?
-                        }
-                        ?>
-                    </div>
 
-                    <hr />
+                            // Pre-generate a list of all functions so we can re-use it over and over
+                            $function_options_markup = array();
+                            $function_options_markup[] = '<option value="">-</option>';
+                            foreach ($mmrpg_functions_index AS $function_key => $function_path){
+                                $function_options_markup[] = '<option value="'.$function_path.'">'.$function_path.'</option>';
+                            }
+                            $function_options_count = count($function_options_markup);
+                            $function_options_markup = implode(PHP_EOL, $function_options_markup);
 
-                    <?
+                            ?>
 
-                    // Pre-generate a list of all functions so we can re-use it over and over
-                    $function_options_markup = array();
-                    $function_options_markup[] = '<option value="">-</option>';
-                    foreach ($mmrpg_functions_index AS $function_key => $function_path){
-                        $function_options_markup[] = '<option value="'.$function_path.'">'.$function_path.'</option>';
-                    }
-                    $function_options_count = count($function_options_markup);
-                    $function_options_markup = implode(PHP_EOL, $function_options_markup);
+                            <div class="field halfsize">
+                                <div class="label">
+                                    <strong>Robot Functions</strong>
+                                    <em>file path for script with robot functions like onload, ondefeat, etc.</em>
+                                </div>
+                                <select class="select" name="robot_functions">
+                                    <?= str_replace('value="'.$robot_data['robot_functions'].'"', 'value="'.$robot_data['robot_functions'].'" selected="selected"', $function_options_markup) ?>
+                                </select><span></span>
+                            </div>
 
-                    ?>
-
-                    <div class="field halfsize">
-                        <div class="label">
-                            <strong>Robot Functions</strong>
-                            <em>file path for script with robot functions like onload, ondefeat, etc.</em>
                         </div>
-                        <select class="select" name="robot_functions">
-                            <?= str_replace('value="'.$robot_data['robot_functions'].'"', 'value="'.$robot_data['robot_functions'].'" selected="selected"', $function_options_markup) ?>
-                        </select><span></span>
-                    </div>
 
-                    <hr />
+                        <div class="panel" data-tab="stats">
 
-                    <?
+                            <div class="field foursize">
+                                <strong class="label"><span class="type_span type_energy">Energy</span> <em>LE</em></strong>
+                                <input class="textbox" type="number" name="robot_energy" value="<?= $robot_data['robot_energy'] ?>" maxlength="8" />
+                            </div>
 
-                    // Pre-generate a list of all contributors so we can re-use it over and over
-                    $contributor_options_markup = array();
-                    $contributor_options_markup[] = '<option value="0">-</option>';
-                    foreach ($mmrpg_contributors_index AS $user_id => $user_info){
-                        $option_label = $user_info['user_name'];
-                        if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
-                        $contributor_options_markup[] = '<option value="'.$user_id.'">'.$option_label.'</option>';
-                    }
-                    $contributor_options_count = count($contributor_options_markup);
-                    $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
+                            <div class="field foursize">
+                                <strong class="label"><span class="type_span type_attack">Attack</span> <em>AT</em></strong>
+                                <input class="textbox" type="number" name="robot_attack" value="<?= $robot_data['robot_attack'] ?>" maxlength="8" />
+                            </div>
 
-                    ?>
+                            <div class="field foursize">
+                                <strong class="label"><span class="type_span type_defense">Defense</span> <em>DF</em></strong>
+                                <input class="textbox" type="number" name="robot_defense" value="<?= $robot_data['robot_defense'] ?>" maxlength="8" />
+                            </div>
 
-                    <div class="field">
-                        <div class="label">
-                            <strong>Sprite Token</strong>
-                            <em>base folder name for sprite images</em>
+                            <div class="field foursize">
+                                <strong class="label"><span class="type_span type_speed">Speed</span> <em>SP</em></strong>
+                                <input class="textbox" type="number" name="robot_speed" value="<?= $robot_data['robot_speed'] ?>" maxlength="8" />
+                            </div>
+
+                            <div class="field halfsize">
+                                <strong class="label"><span class="type_span type_weapons">Weapons</span> <em>WE</em></strong>
+                                <input class="textbox" type="number" name="robot_weapons" value="<?= $robot_data['robot_weapons'] ?>" maxlength="8" />
+                            </div>
+
+                            <div class="field halfsize">
+                                <div class="label">
+                                    <strong><span class="type_span type_cutter">Base Stat Total</span> <em>LE + AT + DF + SP</em></strong>
+                                </div>
+                                <? $bst_value = $robot_data['robot_energy'] + $robot_data['robot_attack'] + $robot_data['robot_defense'] + $robot_data['robot_speed']; ?>
+                                <input class="textbox disabled" type="text" name="robot_bst" value="<?= $bst_value ?>" maxlength="8" disabled="disabled" data-auto="field-sum" data-field-sum="robot_energy,robot_attack,robot_defense,robot_speed" />
+                            </div>
+
+                            <hr />
+
+                            <?
+                            $robot_type_matchups = array('weaknesses', 'resistances', 'affinities', 'immunities');
+                            foreach ($robot_type_matchups AS $matchup_key => $matchup_token){
+                                $matchup_list = $robot_data['robot_'.$matchup_token];
+                                $matchup_list = !empty($matchup_list) ? json_decode($matchup_list, true) : array();
+                                ?>
+                                <div class="field fullsize has4cols">
+                                    <strong class="label">
+                                        Robot <?= ucfirst($matchup_token) ?>
+                                    </strong>
+                                    <? for ($i = 0; $i < 4; $i++){ ?>
+                                        <div class="subfield">
+                                            <span class="type_span type_<?= !empty($matchup_list[$i]) ? $matchup_list[$i] : '' ?> swatch floatright hidenone" data-auto="field-type" data-field-type="robot_<?= $matchup_token ?>[<?= $i ?>]">&nbsp;</span>
+                                            <select class="select" name="robot_<?= $matchup_token ?>[<?= $i ?>]">
+                                                <option value=""<?= empty($matchup_list[$i]) ? ' selected="selected"' : '' ?>>-</option>
+                                                <?
+                                                foreach ($mmrpg_types_index AS $type_token => $type_info){
+                                                    if ($type_info['type_class'] === 'special'){ continue; }
+                                                    $label = $type_info['type_name'];
+                                                    if (!empty($matchup_list[$i]) && $matchup_list[$i] === $type_token){ $selected = 'selected="selected"'; }
+                                                    else { $selected = ''; }
+                                                    echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                                }
+                                                ?>
+                                            </select><span></span>
+                                        </div>
+                                    <? } ?>
+                                </div>
+                                <?
+                            }
+                            ?>
+
                         </div>
-                        <input class="textbox" type="text" name="robot_image" value="<?= $robot_data['robot_image'] ?>" maxlength="64" />
-                    </div>
 
-                    <div class="field">
-                        <div class="label">
-                            <strong>Sprite Size</strong>
-                            <em>base frame size for each sprite</em>
-                        </div>
-                        <select class="select" name="robot_image_size">
-                            <option value="40" <?= $robot_data['robot_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
-                            <option value="80" <?= $robot_data['robot_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
-                            <option disabled="disabled" value="160" <?= $robot_data['robot_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
-                        </select><span></span>
-                    </div>
+                        <div class="panel" data-tab="flavour">
 
-                    <div class="field">
-                        <div class="label">
-                            <strong>Sprite Editor</strong>
-                            <em>user who edited or created this sprite</em>
+                            <div class="field halfsize">
+                                <div class="label">
+                                    <strong>Robot Class</strong>
+                                    <em>three word classification</em>
+                                </div>
+                                <input class="textbox" type="text" name="robot_description" value="<?= htmlentities($robot_data['robot_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
+                            </div>
+
+                            <div class="field fullsize">
+                                <div class="label">
+                                    <strong>Robot Description</strong>
+                                    <em>short paragraph about robot's design, personality, background, etc.</em>
+                                </div>
+                                <textarea class="textarea" name="robot_description2" rows="10"><?= htmlentities($robot_data['robot_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                            </div>
+
+                            <hr />
+
+                            <?
+                            $robot_quote_kinds = array('start', 'taunt', 'victory', 'defeat');
+                            foreach ($robot_quote_kinds AS $kind_key => $kind_token){
+                                ?>
+                                <div class="field halfsize">
+                                    <div class="label">
+                                        <strong><?= ucfirst($kind_token) ?> Quote</strong>
+                                    </div>
+                                    <input class="textbox" type="text" name="robot_quotes_<?= $kind_token ?>" value="<?= htmlentities($robot_data['robot_quotes_'.$kind_token], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
+                                </div>
+                                <?
+                            }
+                            ?>
+
+                            <div class="field fullsize" style="min-height: 0; margin-bottom: 0; padding-bottom: 0;">
+                                <div class="label">
+                                    <em class="nowrap" style="margin-left: 0;">(!) You can use <strong>{this_player}</strong>, <strong>{this_robot}</strong>, <strong>{target_player}</strong>, and <strong>{target_robot}</strong> variables for dynamic text</em>
+                                </div>
+                            </div>
+
                         </div>
-                        <select class="select" name="robot_image_editor">
-                            <?= str_replace('value="'.$robot_data['robot_image_editor'].'"', 'value="'.$robot_data['robot_image_editor'].'" selected="selected"', $contributor_options_markup) ?>
-                        </select><span></span>
+
+                        <div class="panel" data-tab="abilities">
+
+                            <?
+
+                            // Collect global abilities so we can skip them
+                            $global_ability_tokens = rpg_ability::get_global_abilities();
+
+                            // Pre-generate a list of all abilities so we can re-use it over and over
+                            $ability_options_markup = array();
+                            $ability_options_markup[] = '<option value="">-</option>';
+                            foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
+                                //if (in_array($ability_token, $global_ability_tokens)){ continue; }
+                                if ($ability_info['ability_class'] === 'mecha' && $robot_data['robot_class'] !== 'mecha'){ continue; }
+                                elseif ($ability_info['ability_class'] === 'boss' && $robot_data['robot_class'] !== 'boss'){ continue; }
+                                $ability_name = $ability_info['ability_name'];
+                                $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
+                                if (empty($ability_types)){ $ability_types = 'Neutral'; }
+                                $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
+                            }
+                            $ability_options_count = count($ability_options_markup);
+                            $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
+
+                            ?>
+
+                            <div class="field fullsize multirow">
+                                <strong class="label">
+                                    Level-Up Abilities
+                                    <em>Only hero and support robots require level-up, others should unlock all at start</em>
+                                </strong>
+                                <?
+                                $current_ability_list = !empty($robot_data['robot_abilities_rewards']) ? json_decode($robot_data['robot_abilities_rewards'], true) : array();
+                                $select_limit = max(8, count($current_ability_list));
+                                $select_limit += 2;
+                                for ($i = 0; $i < $select_limit; $i++){
+                                    $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : array();
+                                    $current_value_level = !empty($current_value) ? $current_value['level'] : '';
+                                    $current_value_token = !empty($current_value) ? $current_value['token'] : '';
+                                    ?>
+                                    <div class="subfield levelup">
+                                        <input class="textarea" type="number" name="robot_abilities_rewards[<?= $i ?>][level]" value="<?= $current_value_level ?>" maxlength="3" placeholder="0" />
+                                        <select class="select" name="robot_abilities_rewards[<?= $i ?>][token]">
+                                            <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $ability_options_markup) ?>
+                                        </select><span></span>
+                                    </div>
+                                    <?
+                                }
+                                ?>
+                            </div>
+
+                            <hr />
+
+                            <div class="field fullsize has4cols multirow">
+                                <strong class="label">
+                                    Compatible Abilities
+                                    <em>Excluding level-up abilities and <u title="<?= implode(', ', $global_ability_tokens) ?>">global ones</u> available to all robots by default</em>
+                                </strong>
+                                <?
+                                $current_ability_list = !empty($robot_data['robot_abilities_compatible']) ? json_decode($robot_data['robot_abilities_compatible'], true) : array();
+                                $current_ability_list = array_values(array_filter($current_ability_list, function($token) use($global_ability_tokens){ return !in_array($token, $global_ability_tokens); }));
+                                $select_limit = max(12, count($current_ability_list));
+                                $select_limit += 4 - ($select_limit % 4);
+                                $select_limit += 4;
+                                for ($i = 0; $i < $select_limit; $i++){
+                                    $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : '';
+                                    ?>
+                                    <div class="subfield">
+                                        <select class="select" name="robot_abilities_compatible[<?= $i ?>]">
+                                            <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $ability_options_markup) ?>
+                                        </select><span></span>
+                                    </div>
+                                    <?
+                                }
+                                ?>
+                            </div>
+
+                        </div>
+
+                        <div class="panel" data-tab="sprites">
+
+                            <?
+
+                            // Pre-generate a list of all contributors so we can re-use it over and over
+                            $contributor_options_markup = array();
+                            $contributor_options_markup[] = '<option value="0">-</option>';
+                            foreach ($mmrpg_contributors_index AS $user_id => $user_info){
+                                $option_label = $user_info['user_name'];
+                                if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
+                                $contributor_options_markup[] = '<option value="'.$user_id.'">'.$option_label.'</option>';
+                            }
+                            $contributor_options_count = count($contributor_options_markup);
+                            $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
+
+                            ?>
+
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Sprite Token</strong>
+                                    <em>base folder name for sprite images</em>
+                                </div>
+                                <input class="textbox" type="text" name="robot_image" value="<?= $robot_data['robot_image'] ?>" maxlength="64" />
+                            </div>
+
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Sprite Size</strong>
+                                    <em>base frame size for each sprite</em>
+                                </div>
+                                <select class="select" name="robot_image_size">
+                                    <option value="40" <?= $robot_data['robot_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
+                                    <option value="80" <?= $robot_data['robot_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
+                                    <option disabled="disabled" value="160" <?= $robot_data['robot_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
+                                </select><span></span>
+                            </div>
+
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Sprite Editor</strong>
+                                    <em>user who edited or created this sprite</em>
+                                </div>
+                                <select class="select" name="robot_image_editor">
+                                    <?= str_replace('value="'.$robot_data['robot_image_editor'].'"', 'value="'.$robot_data['robot_image_editor'].'" selected="selected"', $contributor_options_markup) ?>
+                                </select><span></span>
+                            </div>
+
+                        </div>
+
                     </div>
 
                     <hr />
@@ -1113,10 +1137,10 @@
 
             <?
 
-            $debug_robot_data = $robot_data;
+            //$debug_robot_data = $robot_data;
             //$debug_robot_data['robot_profile_text'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_profile_text']);
             //$debug_robot_data['robot_credit_text'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_credit_text']);
-            echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+            //echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
             ?>
 
