@@ -51,6 +51,33 @@
             });
     }
 
+    // Collect an index of contributors and admins that have made sprites
+    $mmrpg_contributors_index = $db->get_array_list("SELECT
+        users.user_id AS user_id,
+        users.user_name AS user_name,
+        users.user_name_public AS user_name_public,
+        users.user_name_clean AS user_name_clean,
+        uroles.role_level AS user_role_level,
+        (CASE WHEN editors.robot_image_count IS NOT NULL THEN editors.robot_image_count ELSE 0 END) AS user_image_count
+        FROM
+        mmrpg_users AS users
+        LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
+        LEFT JOIN (SELECT
+                robot_image_editor AS robot_user_id,
+                COUNT(robot_image_editor) AS robot_image_count
+                FROM mmrpg_index_robots
+                GROUP BY robot_image_editor) AS editors ON editors.robot_user_id = users.user_id
+        WHERE
+        users.user_id <> 0
+        AND (uroles.role_level > 3
+            OR users.user_credit_line <> ''
+            OR users.user_credit_text <> ''
+            OR editors.robot_image_count IS NOT NULL)
+        ORDER BY
+        uroles.role_level DESC,
+        users.user_name_clean ASC
+        ;", 'user_id');
+
 
     /* -- Form Setup Actions -- */
 
@@ -259,20 +286,20 @@
             $form_data['robot_quotes_defeat'] = !empty($_POST['robot_quotes_defeat']) ? trim(strip_tags($_POST['robot_quotes_defeat'])) : '';
 
             $form_data['robot_abilities_rewards'] = !empty($_POST['robot_abilities_rewards']) ? array_values(array_filter($_POST['robot_abilities_rewards'])) : array();
-            $form_data['robot_abilities_compatible'] = !empty($_POST['robot_abilities_compatible']) ? array_values(array_unique(array_filter($_POST['robot_abilities_compatible']))) : array();
+            $form_data['robot_abilities_compatible'] = !empty($_POST['robot_abilities_compatible']) && is_array($_POST['robot_abilities_compatible']) ? array_values(array_unique(array_filter($_POST['robot_abilities_compatible']))) : array();
 
             $form_data['robot_functions'] = !empty($_POST['robot_functions']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['robot_functions']) ? trim($_POST['robot_functions']) : '';
+
+            $form_data['robot_image'] = !empty($_POST['robot_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image']) ? trim(strtolower($_POST['robot_image'])) : '';
+            $form_data['robot_image_size'] = !empty($_POST['robot_image_size']) && is_numeric($_POST['robot_image_size']) ? (int)(trim($_POST['robot_image_size'])) : 0;
+            $form_data['robot_image_editor'] = !empty($_POST['robot_image_editor']) && is_numeric($_POST['robot_image_editor']) ? (int)(trim($_POST['robot_image_editor'])) : 0;
 
             $form_data['robot_flag_published'] = isset($_POST['robot_flag_published']) && is_numeric($_POST['robot_flag_published']) ? (int)(trim($_POST['robot_flag_published'])) : 0;
             $form_data['robot_flag_complete'] = isset($_POST['robot_flag_complete']) && is_numeric($_POST['robot_flag_complete']) ? (int)(trim($_POST['robot_flag_complete'])) : 0;
             $form_data['robot_flag_hidden'] = isset($_POST['robot_flag_hidden']) && is_numeric($_POST['robot_flag_hidden']) ? (int)(trim($_POST['robot_flag_hidden'])) : 0;
 
-            $form_data['robot_abilities_compatible'] = !empty($_POST['robot_abilities_compatible']) && is_array($_POST['robot_abilities_compatible']) ? array_values(array_unique(array_filter($_POST['robot_abilities_compatible']))) : array();
 
             /*
-            $form_data['robot_image'] = !empty($_POST['robot_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image']) ? trim(strtolower($_POST['robot_image'])) : '';
-            $form_data['robot_image_size'] = !empty($_POST['robot_image_size']) && is_numeric($_POST['robot_image_size']) ? (int)(trim($_POST['robot_image_size'])) : 0;
-            $form_data['robot_image_editor'] = !empty($_POST['robot_image_editor']) && is_numeric($_POST['robot_image_editor']) ? (int)(trim($_POST['robot_image_editor'])) : 0;
             $form_data['robot_image_alts'] = !empty($_POST['robot_image_alts']) ? trim(strip_tags($_POST['robot_image_alts'])) : '';
             */
 
@@ -638,7 +665,7 @@
 
                     <div class="field">
                         <strong class="label">Robot Name</strong>
-                        <input class="textbox" type="text" name="robot_name" value="<?= $robot_data['robot_name'] ?>" maxlength="16" />
+                        <input class="textbox" type="text" name="robot_name" value="<?= $robot_data['robot_name'] ?>" maxlength="128" />
                     </div>
 
                     <div class="field">
@@ -981,6 +1008,53 @@
 
                     <hr />
 
+                    <?
+
+                    // Pre-generate a list of all contributors so we can re-use it over and over
+                    $contributor_options_markup = array();
+                    $contributor_options_markup[] = '<option value="0">-</option>';
+                    foreach ($mmrpg_contributors_index AS $user_id => $user_info){
+                        $option_label = $user_info['user_name'];
+                        if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
+                        $contributor_options_markup[] = '<option value="'.$user_id.'">'.$option_label.'</option>';
+                    }
+                    $contributor_options_count = count($contributor_options_markup);
+                    $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
+
+                    ?>
+
+                    <div class="field">
+                        <div class="label">
+                            <strong>Sprite Token</strong>
+                            <em>base folder name for sprite images</em>
+                        </div>
+                        <input class="textbox" type="text" name="robot_image" value="<?= $robot_data['robot_image'] ?>" maxlength="64" />
+                    </div>
+
+                    <div class="field">
+                        <div class="label">
+                            <strong>Sprite Size</strong>
+                            <em>base frame size for each sprite</em>
+                        </div>
+                        <select class="select" name="robot_image_size">
+                            <option value="40" <?= $robot_data['robot_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
+                            <option value="80" <?= $robot_data['robot_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
+                            <option disabled="disabled" value="160" <?= $robot_data['robot_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
+                        </select><span></span>
+                    </div>
+
+                    <div class="field">
+                        <div class="label">
+                            <strong>Sprite Editor</strong>
+                            <em>user who edited or created this sprite</em>
+                        </div>
+                        <select class="select" name="robot_image_editor">
+                            <?= str_replace('value="'.$robot_data['robot_image_editor'].'"', 'value="'.$robot_data['robot_image_editor'].'" selected="selected"', $contributor_options_markup) ?>
+                        </select><span></span>
+                    </div>
+
+                    <hr />
+
                     <div class="options">
 
                         <div class="field checkwrap">
@@ -1039,10 +1113,10 @@
 
             <?
 
-            //$debug_robot_data = $robot_data;
+            $debug_robot_data = $robot_data;
             //$debug_robot_data['robot_profile_text'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_profile_text']);
             //$debug_robot_data['robot_credit_text'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_credit_text']);
-            //echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+            echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
             ?>
 
