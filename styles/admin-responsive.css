@@ -131,6 +131,18 @@ body:before {
         display: none;
     }
 
+    .adminform .field.has2cols.widecols input[type="text"],
+    .adminform .field.has2cols.widecols input[type="number"],
+    .adminform .field.has2cols.widecols input[type="password"],
+    .adminform .field.has2cols.widecols > select,
+    .adminform .field.has2cols.widecols > textarea,
+    .adminform .field.has2cols.widecols .subfield {
+        width: 99%;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        width: calc(100% - 5px);
+    }
+
 }
 
 /* -- Almost iPhone Portrait Mode -- */
