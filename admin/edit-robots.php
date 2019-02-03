@@ -58,7 +58,8 @@
         users.user_name_public AS user_name_public,
         users.user_name_clean AS user_name_clean,
         uroles.role_level AS user_role_level,
-        (CASE WHEN editors.robot_image_count IS NOT NULL THEN editors.robot_image_count ELSE 0 END) AS user_image_count
+        (CASE WHEN editors.robot_image_count IS NOT NULL THEN editors.robot_image_count ELSE 0 END) AS user_image_count,
+        (CASE WHEN editors2.robot_image_count2 IS NOT NULL THEN editors2.robot_image_count2 ELSE 0 END) AS user_image_count2
         FROM
         mmrpg_users AS users
         LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
@@ -67,12 +68,18 @@
                 COUNT(robot_image_editor) AS robot_image_count
                 FROM mmrpg_index_robots
                 GROUP BY robot_image_editor) AS editors ON editors.robot_user_id = users.user_id
+        LEFT JOIN (SELECT
+                robot_image_editor2 AS robot_user_id,
+                COUNT(robot_image_editor2) AS robot_image_count2
+                FROM mmrpg_index_robots
+                GROUP BY robot_image_editor2) AS editors2 ON editors2.robot_user_id = users.user_id
         WHERE
         users.user_id <> 0
         AND (uroles.role_level > 3
             OR users.user_credit_line <> ''
             OR users.user_credit_text <> ''
-            OR editors.robot_image_count IS NOT NULL)
+            OR editors.robot_image_count IS NOT NULL
+            OR editors2.robot_image_count2 IS NOT NULL)
         ORDER BY
         uroles.role_level DESC,
         users.user_name_clean ASC
@@ -293,6 +300,7 @@
             $form_data['robot_image'] = !empty($_POST['robot_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image']) ? trim(strtolower($_POST['robot_image'])) : '';
             $form_data['robot_image_size'] = !empty($_POST['robot_image_size']) && is_numeric($_POST['robot_image_size']) ? (int)(trim($_POST['robot_image_size'])) : 0;
             $form_data['robot_image_editor'] = !empty($_POST['robot_image_editor']) && is_numeric($_POST['robot_image_editor']) ? (int)(trim($_POST['robot_image_editor'])) : 0;
+            $form_data['robot_image_editor2'] = !empty($_POST['robot_image_editor2']) && is_numeric($_POST['robot_image_editor2']) ? (int)(trim($_POST['robot_image_editor2'])) : 0;
 
             $form_data['robot_flag_published'] = isset($_POST['robot_flag_published']) && is_numeric($_POST['robot_flag_published']) ? (int)(trim($_POST['robot_flag_published'])) : 0;
             $form_data['robot_flag_complete'] = isset($_POST['robot_flag_complete']) && is_numeric($_POST['robot_flag_complete']) ? (int)(trim($_POST['robot_flag_complete'])) : 0;
@@ -1070,7 +1078,7 @@
                             ?>
 
                             <? $placeholder_folder = $robot_data['robot_class'] != 'master' ? $robot_data['robot_class'] : 'robot'; ?>
-                            <div class="field">
+                            <div class="field halfsize">
                                 <div class="label">
                                     <strong>Sprite Status</strong>
                                     <em>select if ready or pending</em>
@@ -1081,7 +1089,7 @@
                                 </select><span></span>
                             </div>
 
-                            <div class="field">
+                            <div class="field halfsize">
                                 <div class="label">
                                     <strong>Sprite Size</strong>
                                     <em>base frame size for each sprite</em>
@@ -1098,9 +1106,9 @@
                                 <? } ?>
                             </div>
 
-                            <div class="field">
+                            <div class="field halfsize">
                                 <div class="label">
-                                    <strong>Sprite Editor</strong>
+                                    <strong>Sprite Editor #1</strong>
                                     <em>user who edited or created this sprite</em>
                                 </div>
                                 <? if ($robot_data['robot_image'] != $placeholder_folder){ ?>
@@ -1110,6 +1118,21 @@
                                 <? } else { ?>
                                     <input type="hidden" name="robot_image_editor" value="<?= $robot_data['robot_image_editor'] ?>" />
                                     <input class="textbox" type="text" name="robot_image_editor" value="-" disabled="disabled" />
+                                <? } ?>
+                            </div>
+
+                            <div class="field halfsize">
+                                <div class="label">
+                                    <strong>Sprite Editor #2</strong>
+                                    <em>another user who collaborated on this sprite</em>
+                                </div>
+                                <? if ($robot_data['robot_image'] != $placeholder_folder){ ?>
+                                    <select class="select" name="robot_image_editor2">
+                                        <?= str_replace('value="'.$robot_data['robot_image_editor2'].'"', 'value="'.$robot_data['robot_image_editor2'].'" selected="selected"', $contributor_options_markup) ?>
+                                    </select><span></span>
+                                <? } else { ?>
+                                    <input type="hidden" name="robot_image_editor2" value="<?= $robot_data['robot_image_editor2'] ?>" />
+                                    <input class="textbox" type="text" name="robot_image_editor2" value="-" disabled="disabled" />
                                 <? } ?>
                             </div>
 
