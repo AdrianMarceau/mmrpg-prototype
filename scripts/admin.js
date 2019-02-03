@@ -7,6 +7,15 @@ var thisAdminForm = false;
 var thisAdminSearch = false;
 var thisAdminResults = false;
 var thisAdminEditor = false;
+var $adminForm = false;
+var $adminAjaxForm = false;
+var $adminAjaxFrame = false;
+
+// Pre-define the upload complete functions
+window.onUpdateImageComplete = function(){ };
+
+// Shill for the Date.now() function in UNIX timestamp format
+if (!Date.now) { Date.now = function() { return Math.floor((new Date().getTime()) / 1000); } }
 
 // Wait for document ready before delegating events
 $(document).ready(function(){
@@ -17,6 +26,9 @@ $(document).ready(function(){
     thisAdminSearch = $('.adminform > .search', thisAdmin);
     thisAdminResults = $('.adminform > .results', thisAdmin);
     thisAdminEditor = $('.adminform > .editor', thisAdmin);
+    $adminForm = $('.adminform form.form', thisAdmin);
+    $adminAjaxForm = $('.adminform form[name="ajax-form"]', thisAdmin);
+    $adminAjaxFrame = $('.adminform iframe[name="ajax-frame"]', thisAdmin);
 
     // Define an event for delete links and buttons
     var confirmTemplate1 = 'Are you sure you want to delete {object}? \nThis action cannot be undone.';
@@ -56,7 +68,7 @@ $(document).ready(function(){
                 }
 
             // Send the request to the server for delete
-            console.log('we can delete '+objName+'!');
+            //console.log('we can delete '+objName+'!');
             $.post(postURL, function(data){
                 // Delete successful, let's reload the page
                 window.location.href = window.location.href;
@@ -66,7 +78,7 @@ $(document).ready(function(){
 
             } else {
 
-            console.log('delete request denied!');
+            //console.log('delete request denied!');
 
             }
 
@@ -149,6 +161,98 @@ $(document).ready(function(){
                         $field.bind('keyup keydown change click', function(){ updateFieldTypes(); });
                         }
                     }
+                }
+
+            // Define functionality for the FILE BAR auto elements
+            else if (autoType === 'file-bar'){
+                var $listItem = $element.closest('li');
+                var autoFilePath = $element.attr('data-file-path');
+                var autoFileName = $element.attr('data-file-name');
+                var autoFileKind = $element.is('[data-file-kind]') ? $element.attr('data-file-kind') : '';
+                var autoFileWidth = $element.is('[data-file-width]') ? parseInt($element.attr('data-file-width')) : '';
+                var autoFileHeight = $element.is('[data-file-height]') ? parseInt($element.attr('data-file-height')) : '';
+                //console.log('auto file bar! autoFilePath =', autoFilePath, 'autoFileName = ', autoFileName);
+                var $uploadLink = $element.find('[data-action="upload"]');
+                var $uploadInput = $uploadLink.find('input[type="file"]');
+                var $deleteLink = $element.find('[data-action="delete"]');
+                var $viewLink = $element.find('.link.view');
+                var $statusSpan = $element.find('.info.status');
+                $uploadInput.bind('click', function(e){ e.stopPropagation(); });
+                var setupAjax = function(fileAction, fileHash){
+                    $adminAjaxForm.empty();
+                    $adminAjaxForm.append('<input type="text" name="file_path" value="'+autoFilePath+'" />');
+                    $adminAjaxForm.append('<input type="text" name="file_name" value="'+autoFileName+'" />');
+                    $adminAjaxForm.append('<input type="text" name="file_action" value="'+fileAction+'" />');
+                    $adminAjaxForm.append('<input type="text" name="file_hash" value="'+fileHash+'" />');
+                    return;
+                    };
+                var uploadAction = function(){
+                    if ($uploadLink.hasClass('disabled')){ return false; }
+                    //console.log('upload action! autoFilePath =', autoFilePath, 'autoFileName = ', autoFileName);
+                    var uploadInputValue = $uploadInput.val();
+                    //console.log('$uploadInput = ', typeof uploadInputValue, uploadInputValue);
+                    if (typeof uploadInputValue !== 'undefined'
+                        && uploadInputValue.length > 0){
+                        window.onUpdateImageComplete = function(status, message, details){
+                            //console.log('onUpdateImageComplete(UPLOAD)! ', status, message, details);
+                            if (status == 'success'){ // image was uploaded, disable upload and allow delete + view
+                                $uploadLink.addClass('disabled');
+                                $uploadInput.prop('disabled', true);
+                                $deleteLink.removeClass('disabled');
+                                $statusSpan.removeClass('bad').addClass('good').html('&check;');
+                                var newViewHref = $viewLink.attr('data-href') + '?' + Date.now();
+                                $viewLink.removeClass('disabled').attr('href', newViewHref);
+                                $listItem.addClass('success');
+                                } else if (status == 'error'){
+                                alert('There was an problem uploading the image! \n' + message + ' \n' + details);
+                                $listItem.addClass('error');
+                                }
+                            setTimeout(function(){ $listItem.removeClass('pending success error'); }, 500);
+                            };
+                        $listItem.addClass('pending');
+                        setupAjax('upload', $uploadLink.is('[data-file-hash]') ? $uploadLink.attr('data-file-hash') : '');
+                        $uploadInput.clone().appendTo($adminAjaxForm);
+                        $adminAjaxForm.append('<input type="text" name="file_kind" value="'+autoFileKind+'" />');
+                        $adminAjaxForm.append('<input type="text" name="file_width" value="'+autoFileWidth+'" />');
+                        $adminAjaxForm.append('<input type="text" name="file_height" value="'+autoFileHeight+'" />');
+                        $adminAjaxForm.submit();
+                        return true;
+                        } else {
+                        return false;
+                        }
+                    };
+                var deleteAction = function(){
+                    if ($deleteLink.hasClass('disabled')){ return false; }
+                    if (confirm('Are you sure you want to delete \n' + autoFilePath+autoFileName + ' ? ' +
+                        '\n' + 'This action cannot be undone! '+
+                        '\n' + 'Continue?')){
+                        //console.log('delete action! autoFilePath =', autoFilePath, 'autoFileName = ', autoFileName);
+                        window.onUpdateImageComplete = function(status, message, details){
+                            //console.log('onUpdateImageComplete(DELETE)! ', status, message, details);
+                            if (status == 'success'){ // image was removed, disable delete and allow upload
+                                $deleteLink.addClass('disabled');
+                                $uploadLink.removeClass('disabled');
+                                $uploadInput.prop('disabled', false);
+                                $statusSpan.removeClass('good').addClass('bad').html('&cross;');
+                                $viewLink.addClass('disabled').removeAttr('href');
+                                //$listItem.addClass('success');
+                                } else if (status == 'error'){
+                                alert('There was an problem deleting the image! \n' + message + ' \n' + details);
+                                $listItem.addClass('error');
+                                }
+                            setTimeout(function(){ $listItem.removeClass('pending success error'); }, 500);
+                            };
+                        $listItem.addClass('pending');
+                        setupAjax('delete', $deleteLink.is('[data-file-hash]') ? $deleteLink.attr('data-file-hash') : '');
+                        $adminAjaxForm.submit();
+                        return true;
+                        } else {
+                        return false;
+                        }
+                    };
+                $uploadLink.bind('click', function(e){ e.preventDefault(); return uploadAction(); });
+                $uploadInput.bind('change', function(e){ e.preventDefault(); return uploadAction(); });
+                $deleteLink.bind('click', function(e){ e.preventDefault(); return deleteAction(); });
                 }
 
             });
