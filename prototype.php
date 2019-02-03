@@ -297,10 +297,11 @@ if (rpg_game::is_user()){
                     </span>
                 </div>
             </div>
-            <div class="subpoints field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+            <? $battle_zenny_count = isset($_SESSION[$session_token]['counters']['battle_zenny']) ? $_SESSION[$session_token]['counters']['battle_zenny'] : 0; ?>
+            <div class="subpoints field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?> <?= $battle_zenny_count >= 999999999 ? 'overflow' : '' ?>">
                 <div class="wrapper">
                     <span class="amount zenny">
-                        <?= (isset($_SESSION[$session_token]['counters']['battle_zenny']) ? number_format($_SESSION[$session_token]['counters']['battle_zenny'], 0, '.', ',') : 0).'z' ?>
+                        <?= (!empty($battle_zenny_count) ? number_format($_SESSION[$session_token]['counters']['battle_zenny'], 0, '.', ',') : 0).'z' ?>
                     </span>
                     <? if (!empty($_SESSION[$session_token]['values']['battle_stars'])){ ?>
                         <span class="pipe">|</span>

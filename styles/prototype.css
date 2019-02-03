@@ -245,6 +245,14 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     height: 19px;
     font-size: 9px;
 }
+#prototype .banner .subpoints.overflow {
+  width: 280px;
+  top: 42px;
+  border-width: 1px 0 1px 1px;
+  -moz-border-radius: 1em 0 0 1em;
+  -webkit-border-radius: 1em 0 0 1em;
+  border-radius: 1em 0 0 1em;
+}
 #prototype .banner .points .label {
     display: block;
     font-weight: bold;
@@ -430,6 +438,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     margin: 0;
     padding: 3px 5px;
     width: 180px;
+    width: calc(100% - 10px);
     height: 16px;
     font-size: 10px;
     line-height: 10px;
