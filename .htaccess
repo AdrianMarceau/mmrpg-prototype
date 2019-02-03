@@ -89,8 +89,8 @@ RewriteRule ^leaderboard/([-_a-z0-9]+)/([-_a-z0-9]+)/(dr-light|dr-wily|dr-cossac
 RewriteRule ^leaderboard/([-_a-z0-9]+)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=leaderboard&sub=$1&token=$2 [L]
 RewriteRule ^leaderboard/([-_a-z0-9]+)/\??(.*)$ index.php?page=leaderboard&sub=$1&$2 [L]
 
-RewriteRule ^database/(players|abilities|robots|mechas|bosses|types|fields|items)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=database&sub=$1&token=$2 [L]
-RewriteRule ^database/(players|abilities|robots|mechas|bosses|types|fields|items)/\??(.*)$ index.php?page=database&sub=$1&$2 [L]
+RewriteRule ^database/(players|abilities|robots|mechas|bosses|types|fields|items)/([-_a-z0-9]+)/?\??(.*)$ index.php?page=database&sub=$1&token=$2&$3 [L]
+RewriteRule ^database/(players|abilities|robots|mechas|bosses|types|fields|items)/\??(.*)$ index.php?page=database&sub=$1&$2&$3 [L]
 
 RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|dev|test)/([0-9]+)/?\??(.*)$ index.php?page=$1&num=$2&$3 [L]
 RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|dev|test)/([-_a-z0-9]+)/([0-9]+)/?\??(.*)$ index.php?page=$1&sub=$2&num=$3&$4 [L]

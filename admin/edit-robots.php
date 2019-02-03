@@ -654,7 +654,8 @@
                         elseif ($robot_data['robot_class'] === 'mecha'){ $preview_link .= 'mechas/'; }
                         elseif ($robot_data['robot_class'] === 'boss'){ $preview_link .= 'bosses/'; }
                         $preview_link .= $robot_data['robot_token'].'/';
-                        echo '<a class="preview" href="'.$preview_link.'" target="_blank">View Page <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
+                        echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
+                        echo '<a class="preview" href="'.$preview_link.'preview=true" target="_blank">Preview <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
                     }
                     ?>
                 </h3>
