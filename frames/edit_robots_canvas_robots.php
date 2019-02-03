@@ -7,7 +7,8 @@ ob_start();
 
 // Include the necessary database files
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
+$mmrpg_database_robots = rpg_robot::get_index(true, false);
 
 // Loop through the allowed edit data for all players
 $key_counter = 0;

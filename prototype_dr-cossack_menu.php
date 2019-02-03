@@ -23,8 +23,6 @@ $this_prototype_data['prototype_complete'] = $prototype_complete_flag_cossack;
 $this_music_token = $this_prototype_data['battles_complete'] >= 10 ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];
 $this_prototype_data['missions_music'] = 'misc/stage-select-'.$this_music_token;
 
-// DEBUG DEBUG DEBUG
-
 // Define the robot omega array for dynamic battle options
 $temp_session_key = $this_prototype_data['this_player_token'].'_target-robot-omega_prototype';
 $this_prototype_data['target_robot_omega'] = !empty($_SESSION['GAME']['values'][$temp_session_key]) ? $_SESSION['GAME']['values'][$temp_session_key] : array();
@@ -32,22 +30,22 @@ $this_prototype_data['this_player_fields'] = !empty($_SESSION['GAME']['values'][
 // If the options have not already been defined, generate them
 $temp_save = false;
 if (empty($this_prototype_data['target_robot_omega'])){
-  // Define the phase one omega factors, then shuffle
-  $this_prototype_data['target_robot_omega'] = $this_omega_factors_three;
-  shuffle($this_prototype_data['target_robot_omega']);
-  $temp_save = true;
+    // Define the phase one omega factors, then shuffle
+    $this_prototype_data['target_robot_omega'] = $this_omega_factors_three;
+    shuffle($this_prototype_data['target_robot_omega']);
+    $temp_save = true;
 } elseif (count($this_prototype_data['target_robot_omega']) == 2){
-  // Pull the omega tokens from the old array format
-  $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1];
-  $temp_save = true;
+    // Pull the omega tokens from the old array format
+    $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1];
+    $temp_save = true;
 }
 // If the player fields have not been defined
 if (empty($this_prototype_data['this_player_fields'])){
-  // Update the player fields array in the settings
-  $temp_player_fields = array();
-  foreach ($this_prototype_data['target_robot_omega'] AS $omega){ if (!empty($omega['field'])){ $temp_player_fields[$omega['field']] = array('field_token' => $omega['field']); } }
-  $this_prototype_data['this_player_fields'] = $temp_player_fields;
-  $_SESSION['GAME']['values']['battle_settings'][$this_prototype_data['this_player_token']]['player_fields'] = $temp_player_fields;
+    // Update the player fields array in the settings
+    $temp_player_fields = array();
+    foreach ($this_prototype_data['target_robot_omega'] AS $omega){ if (!empty($omega['field'])){ $temp_player_fields[$omega['field']] = array('field_token' => $omega['field']); } }
+    $this_prototype_data['this_player_fields'] = $temp_player_fields;
+    $_SESSION['GAME']['values']['battle_settings'][$this_prototype_data['this_player_token']]['player_fields'] = $temp_player_fields;
 }
 // Update the session with the omega options
 $_SESSION['GAME']['values'][$temp_session_key] = $this_prototype_data['target_robot_omega'];
@@ -56,72 +54,54 @@ $_SESSION['GAME']['values'][$temp_session_key] = $this_prototype_data['target_ro
 // If possible, attempt to save the game to the session
 if ($temp_save && rpg_game::is_user()){
 
-  // Save the game session
-  mmrpg_save_game_session();
+    // Save the game session
+    mmrpg_save_game_session();
 
 }
-
-// DEBUG DEBUG DEBUG
-
-//die('<pre>'.print_r($this_prototype_data['target_robot_omega'], true).'</pre>');
 
 // If there were save file corruptions, reset
 if (!defined('MMRPG_SCRIPT_REQUEST') && empty($this_prototype_data['robots_unlocked'])){
-  mmrpg_reset_game_session();
-  header('Location: prototype.php');
-  exit();
+    mmrpg_reset_game_session();
+    header('Location: prototype.php');
+    exit();
 }
-
-// DEBUG DEBUG DEBUG
 
 // Require the PASSWORDS file for this player
 if (!defined('MMRPG_SCRIPT_REQUEST')){ require_once('prototype_'.$this_prototype_data['this_player_token'].'_passwords.php'); }
 
-// DEBUG DEBUG DEBUG
-
-// DEBUG DEBUG DEBUG
-
 // Require the MISSIONS file for this player
 require('prototype_dr-xxx_missions.php');
 
-// DEBUG DEBUG DEBUG
-
 // Define the robot options and counter for this mode
 if (empty($_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_robot_options'])){
-  $this_prototype_data['robot_options'] = !empty($mmrpg_index['players'][$this_prototype_data['this_player_token']]['player_robots']) ? $mmrpg_index['players'][$this_prototype_data['this_player_token']]['player_robots'] : array();
-  foreach ($this_prototype_data['robot_options'] AS $key => $info){
-    if (!mmrpg_prototype_robot_unlocked($this_prototype_data['this_player_token'], $info['robot_token'])){
-      unset($this_prototype_data['robot_options'][$key]);
-    } else {
-      $temp_settings = mmrpg_prototype_robot_settings($this_prototype_data['this_player_token'], $info['robot_token']);
-      //if ($info['robot_token'] == 'mega-man'){ die(print_r($temp_settings, true)); }
-      $this_prototype_data['robot_options'][$key]['original_player'] = !empty($temp_settings['original_player']) ? $temp_settings['original_player'] : $this_prototype_data['this_player_token'];
-      $this_prototype_data['robot_options'][$key]['robot_abilities'] = !empty($temp_settings['robot_abilities']) ? $temp_settings['robot_abilities'] : array();
+    $this_prototype_data['robot_options'] = $db->get_array_list("SELECT (300 + robot_id) AS robot_id, robot_token FROM mmrpg_index_robots
+        WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_class = 'master'
+        ORDER BY robot_order ASC
+        ;");
+    foreach ($this_prototype_data['robot_options'] AS $key => $info){
+        if (!mmrpg_prototype_robot_unlocked($this_prototype_data['this_player_token'], $info['robot_token'])){
+            unset($this_prototype_data['robot_options'][$key]);
+        } else {
+            $temp_settings = mmrpg_prototype_robot_settings($this_prototype_data['this_player_token'], $info['robot_token']);
+            $this_prototype_data['robot_options'][$key]['original_player'] = !empty($temp_settings['original_player']) ? $temp_settings['original_player'] : $this_prototype_data['this_player_token'];
+            $this_prototype_data['robot_options'][$key]['robot_abilities'] = !empty($temp_settings['robot_abilities']) ? $temp_settings['robot_abilities'] : array();
+        }
     }
-  }
-  $this_prototype_data['robot_options'] = array_values($this_prototype_data['robot_options']);
-  usort($this_prototype_data['robot_options'], 'mmrpg_prototype_sort_robots_position');
-  $_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_robot_options'] = $this_prototype_data['robot_options'];
+    $this_prototype_data['robot_options'] = array_values($this_prototype_data['robot_options']);
+    usort($this_prototype_data['robot_options'], 'mmrpg_prototype_sort_robots_position');
+    $_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_robot_options'] = $this_prototype_data['robot_options'];
 } else {
-  $this_prototype_data['robot_options'] = $_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_robot_options'];
+    $this_prototype_data['robot_options'] = $_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_robot_options'];
 }
-
-// DEBUG DEBUG DEBUG
 
 // Generate the markup for this player's robot select screen
 $this_prototype_data['robots_markup'] = mmrpg_prototype_robot_select_markup($this_prototype_data);
 
-// DEBUG DEBUG DEBUG
-
 // Generate the markup for any leftover player missions
 $this_prototype_data['missions_markup'] .= mmrpg_prototype_options_markup($this_prototype_data['battle_options'], $this_prototype_data['this_player_token']);
-
-// DEBUG DEBUG DEBUG
 
 // Add all these options to the global prototype data variable
 $prototype_data[$this_prototype_data['this_player_token']] = $this_prototype_data;
 unset($this_prototype_data);
 
-// DEBUG DEBUG DEBUG
-//die('OMG THIS IS GAY COSSACK '.time());
 ?>
