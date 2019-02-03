@@ -6,6 +6,7 @@ function mmrpg_save_game_session(){
     global $db;
     $session_token = mmrpg_game_token();
     $mmrpg_index_players = &$GLOBALS['mmrpg_index']['players'];
+    $mmrpg_index_robots = rpg_robot::get_index(true);
 
     // Do NOT load, save, or otherwise alter the game file while viewing remote
     if (defined('MMRPG_REMOTE_GAME')){ return true; }
@@ -133,6 +134,12 @@ function mmrpg_save_game_session(){
                             $this_board_array['board_robots_'.$player_database_token] = array();
                             if (!empty($player_reward_array['player_robots'])){
                                 foreach ($player_reward_array['player_robots'] AS $robot_token => $robot_array){
+                                    if (!isset($mmrpg_index_robots[$robot_token])){ continue; }
+                                    elseif (!mmrpg_prototype_robot_unlocked($player_token, $robot_token)){ continue; }
+                                    else { $robot_index = $mmrpg_index_robots[$robot_token]; }
+                                    if (empty($robot_index['robot_flag_published'])){ continue; }
+                                    elseif (empty($robot_index['robot_flag_complete'])){ continue; }
+                                    elseif (empty($robot_index['robot_flag_unlockable'])){ continue; }
                                     $temp_token = $robot_array['robot_token'];
                                     $temp_level = !empty($robot_array['robot_level']) ? $robot_array['robot_level'] : 1;
                                     $temp_robot_info = array('robot_token' => $temp_token, $temp_level);
@@ -306,7 +313,12 @@ function mmrpg_save_game_session(){
                     $this_board_array['board_robots_'.$player_database_token] = array();
                     if (!empty($player_reward_array['player_robots'])){
                         foreach ($player_reward_array['player_robots'] AS $robot_token => $robot_array){
-                            //if (!isset($robot_array['robot_token'])){ die('player_robots->'.print_r($robot_array, true)); }
+                            if (!isset($mmrpg_index_robots[$robot_token])){ continue; }
+                            elseif (!mmrpg_prototype_robot_unlocked($player_token, $robot_token)){ continue; }
+                            else { $robot_index = $mmrpg_index_robots[$robot_token]; }
+                            if (empty($robot_index['robot_flag_published'])){ continue; }
+                            elseif (empty($robot_index['robot_flag_complete'])){ continue; }
+                            elseif (empty($robot_index['robot_flag_unlockable'])){ continue; }
                             $temp_token = !empty($robot_array['robot_token']) ? $robot_array['robot_token']: $robot_token;
                             $temp_level = !empty($robot_array['robot_level']) ? $robot_array['robot_level'] : 1;
                             $temp_robot_info = array('robot_token' => $temp_token, $temp_level);
