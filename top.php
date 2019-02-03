@@ -4,7 +4,6 @@
 define('MMRPG_BUILD', 'mmrpg2k11');
 define('MMRPG_VERSION', '2.3.4');
 require('includes/config.php');
-require('includes/settings.php');
 
 // Update the timezone before starting the session
 @date_default_timezone_set('Canada/Eastern');
@@ -46,7 +45,7 @@ if (!defined('MMRPG_CONFIG_PERSPECTIVE_MODE')){
 }
 
 // Create the global database object
-if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
+if (!defined('MMRPG_INDEX_SESSION')){
     if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG'] = array(); }
     $db = new cms_database();
     // If the database could not be created, critical error mode!
@@ -56,6 +55,9 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
         $_GET['page'] = 'error';
     }
 }
+
+// Now we can require the general settings file
+require('includes/settings.php');
 
 // Collect or generate the developer whitelist for the admin panel
 $dev_whitelist = !empty($_SESSION['dev_whitelist']) ? $_SESSION['dev_whitelist'] : array();

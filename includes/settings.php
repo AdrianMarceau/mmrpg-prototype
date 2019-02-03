@@ -1,5 +1,16 @@
 <?php
 
+// Define the cache timestamp now if not already done so
+if (!defined('MMRPG_CONFIG_CACHE_DATE')){
+    $cache_info = $db->get_array_list("SELECT config_name, config_value FROM mmrpg_config WHERE config_group = 'global' && config_name IN ('cache_date', 'cache_time');", 'config_name');
+    //echo('<pre>$cache_info = '.print_r($cache_info, true).'</pre>');
+    if (!empty($cache_info)){ define('MMRPG_CONFIG_CACHE_DATE', $cache_info['cache_date']['config_value'].'-'.$cache_info['cache_time']['config_value']); }
+    elseif (defined('MMRPG_CONFIG_CACHE_DATE_FALLBACK')){ define('MMRPG_CONFIG_CACHE_DATE', MMRPG_CONFIG_CACHE_DATE_FALLBACK); }
+    else { define('MMRPG_CONFIG_CACHE_DATE', date('Ymd').'-0000'); }
+    //echo('MMRPG_CONFIG_CACHE_DATE = '. MMRPG_CONFIG_CACHE_DATE);
+    //exit();
+}
+
 // Define the core domain, locale, timezone, error reporting and cache settings
 @preg_match('#^([-~a-z0-9\.]+)#i', (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']), $THIS_DOMAIN);
 define('MMRPG_CONFIG_DOMAIN', (isset($THIS_DOMAIN[0]) ? $THIS_DOMAIN[0] : false));
