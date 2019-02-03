@@ -808,31 +808,34 @@ if (!empty($this_shop_index['kalinka'])){
         || mmrpg_prototype_item_unlocked('robot-codes')
         || mmrpg_prototype_item_unlocked('field-codes')){
 
-        // Add robot data to Kalinka's Shop
-        $this_shop_index['kalinka']['shop_kind_selling'][] = 'robots';
-        $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Would you like me to build you a new robot or two? I created a few blueprints using your scan data.';
-        $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array(
-            // MM3 Robot Masters
-            'needle-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'magnet-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            'gemini-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'hard-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            'top-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'snake-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            'spark-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'shadow-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            // MM5 Robot Masters
-            'gravity-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'wave-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            'gyro-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'star-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            // MM6 Robot Masters
-            'blizzard-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            // MM7 Robot Masters
-            'freeze-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'slash-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            // MM8 Robot Masters
-            'frost-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            // MM8.5 Robot Masters
-            'magic-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            // MM9 Robot Masters
-            'splash-woman' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE, 'jewel-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE,
-            // MM11 Robot Masters
-            'block-man' => MMRPG_SETTINGS_SHOP_ROBOT_PRICE
-            );
+        // Collect a list of robot masters that we're allowed to sell
+        $buyable_robots = $db->get_array_list("SELECT
+            robot_token
+            FROM mmrpg_index_robots
+            WHERE
+            robot_flag_published = 1
+            AND robot_flag_complete = 1
+            AND robot_flag_unlockable = 1
+            AND robot_number NOT LIKE 'RPG-%'
+            AND robot_number NOT LIKE 'PCR-%'
+            AND robot_game NOT IN ('MM00', 'MM01', 'MM02', 'MM04')
+            ORDER BY
+            robot_order ASC
+            ;", 'robot_token');
+
+        // Ensure there are robots to see before showing them
+        if (!empty($buyable_robots)){
+
+            // Add robot data to Kalinka's Shop
+            $this_shop_index['kalinka']['shop_kind_selling'][] = 'robots';
+            $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Would you like me to build you a new robot or two? I created a few blueprints using your scan data.';
+            $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array();
+            $buyable_robots = array_keys($buyable_robots);
+            foreach ($buyable_robots AS $token){
+                $this_shop_index['kalinka']['shop_robots']['robots_selling'][$token] = MMRPG_SETTINGS_SHOP_ROBOT_PRICE;
+            }
+
+        }
 
         // Add field data to Kalinka's Shop
         $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';

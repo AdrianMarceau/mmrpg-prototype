@@ -401,6 +401,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         elseif ($robot_info['robot_token'] == 'solo'){ $this_first_appearance = 'that first appeared in <em>Mega Man Star Force 3</em> for the Nintendo DS'; }
         elseif (preg_match('/^duo/i', $robot_info['robot_token'])){ $this_first_appearance = 'that first appeared in <em>Mega Man 7</em> for the Super Nintendo Entertainment System'; }
         elseif (preg_match('/^trio/i', $robot_info['robot_token'])){ $this_first_appearance = 'making their debut in the <em>Mega Man RPG Prototype</em>'; }
+        else { $this_first_appearance = 'making their debut in the <em>Mega Man RPG Prototype</em>'; }
         if ($this_first_ability['level'] == 0){ $this_level = 1; }
         else { $this_level = $this_first_ability['level']; }
         $this_weaknesses = !empty($robot_info['robot_weaknesses']) ? $robot_info['robot_weaknesses'] : array();

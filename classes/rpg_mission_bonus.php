@@ -32,7 +32,7 @@ class rpg_mission_bonus extends rpg_mission {
         if ($this_robot_class == 'master'){
             $robot_index_query .= "AND robot_class = 'master' ";
             $robot_index_query .= "AND base_total = 400 ";
-            $robot_index_query .= "AND robot_flag_hidden = 0 ";
+            $robot_index_query .= "AND (robot_flag_hidden = 0 OR (robot_flag_unlockable = 1 AND robot_number NOT LIKE 'RPG-%' AND robot_number NOT LIKE 'PCR-%')) ";
             $robot_index_query .= "AND robot_token NOT LIKE '%-copy' ";
             $robot_index_query .= "AND robot_flag_published = 1 ";
             if (true){ $robot_index_query .= "OR robot_token = 'quint' "; }
