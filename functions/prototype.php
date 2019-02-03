@@ -232,6 +232,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
                 if (!isset($mmrpg_robots[$robot_token])){ continue; }
                 elseif (in_array($robot_token, $robots_unlocked)){ continue; }
                 elseif (!$mmrpg_robots[$robot_token]['robot_flag_complete']){ continue; }
+                elseif (!$mmrpg_robots[$robot_token]['robot_flag_unlockable']){ continue; }
                 elseif ($mmrpg_robots[$robot_token]['robot_flag_hidden']){ continue; }
                 $robots_unlocked[] = $robot_token;
                 $robot_level = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : 1;
