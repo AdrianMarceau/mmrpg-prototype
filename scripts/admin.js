@@ -110,6 +110,7 @@ $(document).ready(function(){
         }
 
     // Define an event for fields that depend on other fields for thier value
+    var actionInProgress = false;
     var $autoElements = $('*[data-auto]', thisAdminForm);
     if ($autoElements.length){
         $autoElements.each(function(){
@@ -187,7 +188,7 @@ $(document).ready(function(){
                     return;
                     };
                 var uploadAction = function(){
-                    if ($uploadLink.hasClass('disabled')){ return false; }
+                    if (actionInProgress || $uploadLink.hasClass('disabled')){ return false; }
                     //console.log('upload action! autoFilePath =', autoFilePath, 'autoFileName = ', autoFileName);
                     var uploadInputValue = $uploadInput.val();
                     //console.log('$uploadInput = ', typeof uploadInputValue, uploadInputValue);
@@ -208,6 +209,7 @@ $(document).ready(function(){
                                 $listItem.addClass('error');
                                 }
                             setTimeout(function(){ $listItem.removeClass('pending success error'); }, 500);
+                            actionInProgress = false;
                             };
                         $listItem.addClass('pending');
                         setupAjax('upload', $uploadLink.is('[data-file-hash]') ? $uploadLink.attr('data-file-hash') : '');
@@ -216,13 +218,14 @@ $(document).ready(function(){
                         $adminAjaxForm.append('<input type="text" name="file_width" value="'+autoFileWidth+'" />');
                         $adminAjaxForm.append('<input type="text" name="file_height" value="'+autoFileHeight+'" />');
                         $adminAjaxForm.submit();
+                        actionInProgress = true;
                         return true;
                         } else {
                         return false;
                         }
                     };
                 var deleteAction = function(){
-                    if ($deleteLink.hasClass('disabled')){ return false; }
+                    if (actionInProgress || $deleteLink.hasClass('disabled')){ return false; }
                     if (confirm('Are you sure you want to delete \n' + autoFilePath+autoFileName + ' ? ' +
                         '\n' + 'This action cannot be undone! '+
                         '\n' + 'Continue?')){
@@ -241,10 +244,12 @@ $(document).ready(function(){
                                 $listItem.addClass('error');
                                 }
                             setTimeout(function(){ $listItem.removeClass('pending success error'); }, 500);
+                            actionInProgress = false;
                             };
                         $listItem.addClass('pending');
                         setupAjax('delete', $deleteLink.is('[data-file-hash]') ? $deleteLink.attr('data-file-hash') : '');
                         $adminAjaxForm.submit();
+                        actionInProgress = true;
                         return true;
                         } else {
                         return false;
