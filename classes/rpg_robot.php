@@ -106,6 +106,7 @@ class rpg_robot extends rpg_object {
         $this->robot_name = isset($this_robotinfo['robot_name']) ? $this_robotinfo['robot_name'] : 'Robot';
         $this->robot_token = isset($this_robotinfo['robot_token']) ? $this_robotinfo['robot_token'] : 'robot';
         $this->robot_field = isset($this_robotinfo['robot_field']) ? $this_robotinfo['robot_field'] : 'field';
+        $this->robot_field2 = isset($this_robotinfo['robot_field2']) ? $this_robotinfo['robot_field2'] : 'field';
         $this->robot_class = isset($this_robotinfo['robot_class']) ? $this_robotinfo['robot_class'] : 'master';
         $this->robot_gender = isset($this_robotinfo['robot_gender']) ? $this_robotinfo['robot_gender'] : 'none';
         $this->robot_image = isset($this_robotinfo['robot_image']) ? $this_robotinfo['robot_image'] : $this->robot_token;
@@ -2129,6 +2130,7 @@ class rpg_robot extends rpg_object {
             'robot_functions',
             'robot_flag_hidden',
             'robot_flag_complete',
+            'robot_flag_unlockable',
             'robot_flag_published',
             'robot_order'
             );
@@ -2418,6 +2420,7 @@ class rpg_robot extends rpg_object {
             'robot_name' => $this->robot_name,
             'robot_token' => $this->robot_token,
             'robot_field' => $this->robot_field,
+            'robot_field2' => $this->robot_field2,
             'robot_class' => $this->robot_class,
             'robot_gender' => $this->robot_gender,
             'robot_item' => $this->robot_item,

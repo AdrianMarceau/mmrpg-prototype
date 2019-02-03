@@ -128,10 +128,12 @@
         || !empty($_GET['robot_name'])
         || !empty($_GET['robot_core'])
         || !empty($_GET['robot_class'])
+        || !empty($_GET['robot_flavour'])
         || !empty($_GET['robot_game'])
         || !empty($_GET['robot_group'])
         || (isset($_GET['robot_flag_hidden']) && $_GET['robot_flag_hidden'] !== '')
         || (isset($_GET['robot_flag_complete']) && $_GET['robot_flag_complete'] !== '')
+        || (isset($_GET['robot_flag_unlockable']) && $_GET['robot_flag_unlockable'] !== '')
         || (isset($_GET['robot_flag_published']) && $_GET['robot_flag_published'] !== '')
         )){
 
@@ -140,10 +142,12 @@
         $search_data['robot_name'] = !empty($_GET['robot_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['robot_name']) ? trim(strtolower($_GET['robot_name'])) : '';
         $search_data['robot_core'] = !empty($_GET['robot_core']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_core']) ? trim(strtolower($_GET['robot_core'])) : '';
         $search_data['robot_class'] = !empty($_GET['robot_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_class']) ? trim(strtolower($_GET['robot_class'])) : '';
+        $search_data['robot_flavour'] = !empty($_GET['robot_flavour']) && preg_match('/[-_0-9a-z\.\*\s\{\}]+/i', $_GET['robot_flavour']) ? trim($_GET['robot_flavour']) : '';
         $search_data['robot_game'] = !empty($_GET['robot_game']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_game']) ? trim(strtoupper($_GET['robot_game'])) : '';
         $search_data['robot_group'] = !empty($_GET['robot_group']) && preg_match('/[-_0-9a-z\/]+/i', $_GET['robot_group']) ? trim($_GET['robot_group']) : '';
         $search_data['robot_flag_hidden'] = isset($_GET['robot_flag_hidden']) && $_GET['robot_flag_hidden'] !== '' ? (!empty($_GET['robot_flag_hidden']) ? 1 : 0) : '';
         $search_data['robot_flag_complete'] = isset($_GET['robot_flag_complete']) && $_GET['robot_flag_complete'] !== '' ? (!empty($_GET['robot_flag_complete']) ? 1 : 0) : '';
+        $search_data['robot_flag_unlockable'] = isset($_GET['robot_flag_unlockable']) && $_GET['robot_flag_unlockable'] !== '' ? (!empty($_GET['robot_flag_unlockable']) ? 1 : 0) : '';
         $search_data['robot_flag_published'] = isset($_GET['robot_flag_published']) && $_GET['robot_flag_published'] !== '' ? (!empty($_GET['robot_flag_published']) ? 1 : 0) : '';
 
         /* -- Collect Search Results -- */
@@ -184,6 +188,22 @@
             $search_query .= "AND robot_class = '{$search_data['robot_class']}' ";
         }
 
+        // Else if the robot flavour was provided, we can use wildcards
+        if (!empty($search_data['robot_flavour'])){
+            $robot_flavour = $search_data['robot_flavour'];
+            $robot_flavour = str_replace(array(' ', '*', '%'), '%', $robot_flavour);
+            $robot_flavour = preg_replace('/%+/', '%', $robot_flavour);
+            $robot_flavour = '%'.$robot_flavour.'%';
+            $search_query .= "AND (
+                robot_description LIKE '{$robot_flavour}'
+                OR robot_description2 LIKE '{$robot_flavour}'
+                OR robot_quotes_start LIKE '{$robot_flavour}'
+                OR robot_quotes_taunt LIKE '{$robot_flavour}'
+                OR robot_quotes_victory LIKE '{$robot_flavour}'
+                OR robot_quotes_defeat LIKE '{$robot_flavour}'
+                ) ";
+        }
+
         // If the robot game was provided
         if (!empty($search_data['robot_game'])){
             $search_query .= "AND robot_game = '{$search_data['robot_game']}' ";
@@ -194,19 +214,24 @@
             $search_query .= "AND robot_group = '{$search_data['robot_group']}' ";
         }
 
-        // If the robot flag published was provided
-        if ($search_data['robot_flag_published'] !== ''){
-            $search_query .= "AND robot_flag_published = {$search_data['robot_flag_published']} ";
+        // If the robot hidden flag was provided
+        if ($search_data['robot_flag_hidden'] !== ''){
+            $search_query .= "AND robot_flag_hidden = {$search_data['robot_flag_hidden']} ";
         }
 
-        // If the robot flag complete was provided
+        // If the robot complete flag was provided
         if ($search_data['robot_flag_complete'] !== ''){
             $search_query .= "AND robot_flag_complete = {$search_data['robot_flag_complete']} ";
         }
 
-        // If the robot flag hidden was provided
-        if ($search_data['robot_flag_hidden'] !== ''){
-            $search_query .= "AND robot_flag_hidden = {$search_data['robot_flag_hidden']} ";
+        // If the robot unlockable flag was provided
+        if ($search_data['robot_flag_unlockable'] !== ''){
+            $search_query .= "AND robot_flag_unlockable = {$search_data['robot_flag_unlockable']} ";
+        }
+
+        // If the robot published flag was provided
+        if ($search_data['robot_flag_published'] !== ''){
+            $search_query .= "AND robot_flag_published = {$search_data['robot_flag_published']} ";
         }
 
         // Append sorting parameters to the end of the query
@@ -306,6 +331,8 @@
             $form_data['robot_flag_complete'] = isset($_POST['robot_flag_complete']) && is_numeric($_POST['robot_flag_complete']) ? (int)(trim($_POST['robot_flag_complete'])) : 0;
             $form_data['robot_flag_hidden'] = isset($_POST['robot_flag_hidden']) && is_numeric($_POST['robot_flag_hidden']) ? (int)(trim($_POST['robot_flag_hidden'])) : 0;
 
+            $form_data['robot_flag_unlockable'] = isset($_POST['robot_flag_unlockable']) && is_numeric($_POST['robot_flag_unlockable']) ? (int)(trim($_POST['robot_flag_unlockable'])) : 0;
+
             $form_data['robot_image_alts'] = !empty($_POST['robot_image_alts']) && is_array($_POST['robot_image_alts']) ? array_filter($_POST['robot_image_alts']) : array();
             $robot_image_alts_new = !empty($_POST['robot_image_alts_new']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image_alts_new']) ? trim(strtolower($_POST['robot_image_alts_new'])) : '';
 
@@ -360,6 +387,21 @@
                     });
                 $form_data['robot_abilities_rewards'] = $new_rewards;
             }
+
+            if ($form_data['robot_flag_unlockable']){
+                if (!$form_data['robot_flag_published']){ $form_messages[] = array('warning', 'Robot must be published to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (!$form_data['robot_flag_complete']){ $form_messages[] = array('warning', 'Robot must be complete to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif ($form_data['robot_class'] !== 'master'){ $form_messages[] = array('warning', 'Only robot masters can be marked as unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_field']) && empty($form_data['robot_field2'])){ $form_messages[] = array('warning', 'Robot must have battle field to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_functions'])){ $form_messages[] = array('warning', 'Robot must have a function file to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_description'])){ $form_messages[] = array('warning', 'Robot must have a flavour class to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_quotes_start'])){ $form_messages[] = array('warning', 'Robot must have a start quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_quotes_taunt'])){ $form_messages[] = array('warning', 'Robot must have a taunt quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_quotes_victory'])){ $form_messages[] = array('warning', 'Robot must have a victory quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_quotes_defeat'])){ $form_messages[] = array('warning', 'Robot must have a defeat quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_abilities_rewards'])){ $form_messages[] = array('warning', 'Robot must have at least one ability to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+            }
+
 
             if (isset($form_data['robot_abilities_rewards'])){ $form_data['robot_abilities_rewards'] = !empty($form_data['robot_abilities_rewards']) ? json_encode($form_data['robot_abilities_rewards']) : ''; }
             if (isset($form_data['robot_abilities_compatible'])){ $form_data['robot_abilities_compatible'] = !empty($form_data['robot_abilities_compatible']) ? json_encode($form_data['robot_abilities_compatible']) : ''; }
@@ -492,6 +534,11 @@
                     </div>
 
                     <div class="field">
+                        <strong class="label">By Flavour</strong>
+                        <input class="textbox" type="text" name="robot_flavour" placeholder="-" value="<?= !empty($search_data['robot_flavour']) ? htmlentities($search_data['robot_flavour'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
+                    </div>
+
+                    <div class="field">
                         <strong class="label">By Game</strong>
                         <select class="select" name="robot_game"><option value="">-</option><?
                             $robot_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots ORDER BY robot_game ASC;");
@@ -513,11 +560,12 @@
                         </select><span></span>
                     </div>
 
-                    <div class="field flags">
+                    <div class="field fullsize has4cols flags">
                     <?
                     $flag_names = array(
                         'published' => array('icon' => 'fas fa-check-square', 'yes' => 'Published', 'no' => 'Unpublished'),
                         'complete' => array('icon' => 'fas fa-check-circle', 'yes' => 'Complete', 'no' => 'Incomplete'),
+                        'unlockable' => array('icon' => 'fas fa-unlock', 'yes' => 'Unlockable', 'no' => 'Locked'),
                         'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible')
                         );
                     foreach ($flag_names AS $flag_token => $flag_info){
@@ -1389,7 +1437,7 @@
                                 <input type="hidden" name="robot_flag_complete" value="0" checked="checked" />
                                 <input class="checkbox" type="checkbox" name="robot_flag_complete" value="1" <?= !empty($robot_data['robot_flag_complete']) ? 'checked="checked"' : '' ?> />
                             </label>
-                            <p class="subtext">This robot is ready to be used in the game</p>
+                            <p class="subtext">This robot's sprites have been completed</p>
                         </div>
 
                         <div class="field checkwrap">
@@ -1400,6 +1448,19 @@
                             </label>
                             <p class="subtext">This robot's data should stay hidden</p>
                         </div>
+
+                        <? if (!empty($robot_data['robot_flag_published'])
+                            && !empty($robot_data['robot_flag_complete'])
+                            && $robot_data['robot_class'] == 'master'){ ?>
+                            <div class="field checkwrap">
+                                <label class="label">
+                                    <strong>Unlockable</strong>
+                                    <input type="hidden" name="robot_flag_unlockable" value="0" checked="checked" />
+                                    <input class="checkbox" type="checkbox" name="robot_flag_unlockable" value="1" <?= !empty($robot_data['robot_flag_unlockable']) ? 'checked="checked"' : '' ?> />
+                                </label>
+                                <p class="subtext">This robot is ready to be used in the game</p>
+                            </div>
+                        <? } ?>
 
                     </div>
 
@@ -1433,9 +1494,9 @@
 
             <?
 
-            //$debug_robot_data = $robot_data;
-            //$debug_robot_data['robot_description2'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_description2']);
-            //echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+            $debug_robot_data = $robot_data;
+            $debug_robot_data['robot_description2'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_description2']);
+            echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
             ?>
 

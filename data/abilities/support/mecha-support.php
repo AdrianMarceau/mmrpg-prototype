@@ -44,9 +44,14 @@ $ability = array(
                 if ($this_robot->robot_core == 'copy'){
                     // Collect the current robots available for this current field
                     $this_field_mechas = !empty($this_battle->battle_field->field_mechas) ? $this_battle->battle_field->field_mechas : array();
-                } elseif (!empty($this_robot->robot_field)){
-                    $this_field_info = rpg_field::get_index_info($this_robot->robot_field);
-                    $this_field_mechas = !empty($this_field_info['field_mechas']) ? $this_field_info['field_mechas'] : array();
+                } else {
+                    $this_field_token = false;
+                    if (!empty($this_robot->robot_field) && $this_robot->robot_field !== 'field'){ $this_field_token = $this_robot->robot_field; }
+                    elseif (!empty($this_robot->robot_field2) && $this_robot->robot_field2 !== 'field'){ $this_field_token = $this_robot->robot_field2; }
+                    if ($this_field_token){
+                        $this_field_info = rpg_field::get_index_info($this_field_token);
+                        if (!empty($this_field_info['field_mechas'])){ $this_field_mechas = $this_field_info['field_mechas']; }
+                    }
                 }
             }
 
